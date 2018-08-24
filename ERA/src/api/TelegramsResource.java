@@ -3,10 +3,12 @@ package api;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.crypto.AEScrypto;
 import core.crypto.Base32;
 import core.crypto.Base58;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
+import gui.transaction.OnDealClick;
 import network.message.TelegramMessage;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
@@ -179,7 +181,7 @@ public class TelegramsResource {
                        @PathParam("encrypt") boolean encrypt,
                        @PathParam("password") String password) {
 
-        //APIUtils.askAPICallAllowed(password, "GET telegrams/send", request);
+        APIUtils.askAPICallAllowed(password, "GET telegrams/send", request);
 
         JSONObject out = new JSONObject();
         Controller cntr = Controller.getInstance();
@@ -198,10 +200,10 @@ public class TelegramsResource {
         }
 
         // READ RECIPIENT
-        Account recip;
+        Account recipient;
         try {
-            recip = new Account(recipient_in);
-            if (recip.getAddress() == null)
+            recipient = new Account(recipient_in);
+            if (recipient.getAddress() == null)
                 throw new Exception("");
         } catch (Exception e1) {
             // TODO Auto-generated catch block
@@ -237,8 +239,16 @@ public class TelegramsResource {
         if (messageBytes != null && messageBytes.length == 0)
             messageBytes = null;
 
-        byte[] encrypted = encrypt ? new byte[]{1} : new byte[]{0};
-        byte[] isTextByte = (encoding == 0) ? new byte[] { 1 } : new byte[] { 0 };
+        byte[] encrypted;
+        byte[] isTextByte;
+
+        if (messageBytes == null) {
+            encrypted = new byte[]{0};
+            isTextByte = new byte[]{0};
+        } else {
+            encrypted = encrypt ? new byte[]{1} : new byte[]{0};
+            isTextByte = (encoding == 0) ? new byte[] { 1 } : new byte[] { 0 };
+        }
 
         // title
         if (title != null && title.getBytes(StandardCharsets.UTF_8).length > 256) {
@@ -254,15 +264,29 @@ public class TelegramsResource {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
         }
 
+        if (encrypt && messageBytes != null) {
+            //recipient
+            byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
+            if (publicKey == null) {
+                out.put("status_code", Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT);
+                out.put("status", OnDealClick.resultMess(Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT));
+                return out.toJSONString();
+            }
+
+            //sender
+            byte[] privateKey = account.getPrivateKey();
+            messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey, publicKey);
+        }
+
         try {
             transaction = cntr.r_Send(
-                    account, feePow, recip, assetKey, amount,
+                    account, feePow, recipient, assetKey, amount,
                     title, messageBytes, isTextByte, encrypted);
             if (transaction == null)
                 throw new Exception("transaction == null");
         } catch (Exception e) {
             out.put("status_code", Transaction.INVALID_TRANSACTION_TYPE);
-            out.put("status", "Invalid Transaction");
+            out.put("status", "Invalid Transaction: " + e.getMessage());
             return out.toJSONString();
         }
 
@@ -298,6 +322,8 @@ public class TelegramsResource {
      * <h2>Example request</h2>
      * POST telegrams/send {"sender":"79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy","recipient":"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob",
      * "feePow":0,"assetKey":643,"amount":0.01,"title":"NPL","encoding":0,"encrypt":true,"password":"123456789"}
+     *
+     * {"sender":"7CzxxwH7u9aQtx5iNHskLQjyJvybyKg8rF","recipient":"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob", "feePow":0,"assetKey":643,"amount":0.01,"title":"NPL","message":"probe skd fkjsdf hskjdf hskdj ","encoding":0,"encrypt":true,"password":"123456789"}
      * <h2>Example response</h2>
      * {
      * "signature":"FC3vHuUoPhYArc8L4DbgshH4mu54EaFZdGJ8Mh48FozDb5oSZazNVucyiyTYpFAHZNALUVYn5DCATMMNvtJTPhf"
@@ -312,11 +338,13 @@ public class TelegramsResource {
         try {
             // READ JSON
             jsonObject = (JSONObject) JSONValue.parse(x);
-        } catch (NullPointerException | ClassCastException e) {
-            // JSON EXCEPTION
-            LOGGER.info(e);
+//        } catch (NullPointerException | ClassCastException e) {
+        } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
+
+        if (jsonObject == null)
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
 
         return send((String) jsonObject.getOrDefault("sender", null),
                 (String) jsonObject.getOrDefault("recipient", null),
@@ -326,11 +354,11 @@ public class TelegramsResource {
                 (String) jsonObject.getOrDefault("title", null),
                 (String) jsonObject.getOrDefault("message", null),
                 Integer.valueOf(jsonObject.getOrDefault("encoding", 0).toString()),
-                Boolean.valueOf(Boolean.parseBoolean(jsonObject.getOrDefault("encrypt", false).toString())),
+                Boolean.valueOf(jsonObject.getOrDefault("encrypt", false).toString()),
                 (String) jsonObject.getOrDefault("password", null));
     }
 
-    // GET telegrams/datadecrypt/GerrwwEJ9Ja8gZnzLrx8zdU53b7jhQjeUfVKoUAp1StCDSFP9wuyyqYSkoUhXNa8ysoTdUuFHvwiCbwarKhhBg5?password=1
+    // GET telegrams/datadecrypt/GerrwwEJ9Ja8gZnzLrx8zdU53b7jhQjeUfVKoUAp1StCDSFP9wuyyqYSkoUhXNa8ysoTdUuFHvwiCbwarKhhBg5?password=123456789
     @GET
     //@Produces("text/plain")
     @Path("datadecrypt/{signature}")
