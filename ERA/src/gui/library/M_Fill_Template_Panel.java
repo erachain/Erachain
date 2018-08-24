@@ -153,7 +153,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 
         setLayout(new java.awt.GridBagLayout());
 
-        add_Tamplate.setText(Lang.getInstance().translate("Insert Template") + "?");
+        add_Tamplate.setText(Lang.getInstance().translate("Insert template") + "?");
         add_Tamplate.addActionListener(new ActionListener() {
 
                                            @Override
@@ -180,7 +180,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
         add(add_Tamplate, gridBagConstraints);
 
-        jLabel_Template1.setText(Lang.getInstance().translate("Select Template") + ":");
+        jLabel_Template1.setText(Lang.getInstance().translate("Select template") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
