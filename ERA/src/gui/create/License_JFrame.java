@@ -27,6 +27,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import core.BlockChain;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple4;
@@ -111,8 +112,8 @@ public class License_JFrame extends JDialog {
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
         this.setIconImages(icons);
         //
-        okButton.setEnabled(false);
-        okCheckBox.setEnabled(false);
+        okButton.setEnabled(BlockChain.DEVELOP_USE);
+        okCheckBox.setEnabled(BlockChain.DEVELOP_USE);
         
         okCheckBox.addActionListener(new ActionListener() {
             

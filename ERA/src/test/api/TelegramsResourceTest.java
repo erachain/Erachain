@@ -10,7 +10,9 @@ import org.junit.Test;
 import test.CallRemoteApi;
 import test.SettingTests;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class TelegramsResourceTest extends SettingTests {
     /**
@@ -26,16 +28,18 @@ public class TelegramsResourceTest extends SettingTests {
         new ApiClient().executeCommand("POST wallet/unlock " + WALLET_PASSWORD);
 
         String resultAddresses = new ApiClient().executeCommand("GET addresses");
-        String[] parse = (resultAddresses.replace("\r\n", "").split(","));
-        String address = parse[0].replace("[", "").replace("]", "");
+        JSONParser jsonParserRequest = new JSONParser();
+        JSONArray jsonObjectRequest = (JSONArray) jsonParserRequest.parse(resultAddresses);
 
 
 /**
  *Send telegram to address
  * check send
  */
-        String sendTelegram = new ApiClient().executeCommand("GET telegrams/send/" + address.trim()
-                .replace("\"", "") + "/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/message/true/false/1");
+
+
+        String sendTelegram = new ApiClient().executeCommand("GET telegrams/send/" + jsonObjectRequest.get(0)
+                + "/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/message/true/false/1");
         String sendRequest = "[ " + sendTelegram + "]";
         JSONParser jsonParser = new JSONParser();
         JSONArray jsonArray = (JSONArray) jsonParser.parse(sendRequest);
@@ -66,7 +70,7 @@ public class TelegramsResourceTest extends SettingTests {
         JSONArray jsonArrayAddress = (JSONArray) jsonParser.parse(resultAddresses);
         String address = jsonArrayAddress.get(0).toString();
 
-        String sendTelegram = new ApiClient().executeCommand("POST telegrams/send {\"sender\":\"" + address + "\",\"recipient\":\"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob\",\"asset\":\"643\",\"amount\":\"0.01\",\"title\":\"NPL\",\"istext\":\"true\",\"encrypt\":\"true\",\"password\":\"123456789\"}");
+        String sendTelegram = new ApiClient().executeCommand("POST telegrams/send {\"sender\":\"" + address + "\",\"recipient\":\"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob\",\"asset\":\"643\",\"amount\":\"0.01\",\"title\":\"NPL\",\"istext\":\"true\",\"encrypt\":\"true\",\"password\":\"" + SettingTests.WALLET_PASSWORD + "\"}");
 
         String sendRequest = "[ " + sendTelegram + "]";
         JSONArray jsonArray = (JSONArray) jsonParser.parse(sendRequest);
