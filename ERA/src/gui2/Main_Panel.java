@@ -306,8 +306,8 @@ public class Main_Panel extends javax.swing.JPanel {
             insertTab(Lang.getInstance().translate("Search Persons"), new Persons_Search_SplitPanel());
             return;
         }
-        if (str.equals(Lang.getInstance().translate("Issue person")) || str.equals("IssuePersonPanel")) {
-            insertTab(Lang.getInstance().translate("Issue person"), new IssuePersonPanel());
+        if (str.equals(Lang.getInstance().translate("Issue Person")) || str.equals("IssuePersonPanel")) {
+            insertTab(Lang.getInstance().translate("Issue Person"), new IssuePersonPanel());
             return;
 
         }

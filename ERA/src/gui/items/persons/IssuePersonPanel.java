@@ -174,13 +174,13 @@ public class IssuePersonPanel extends JPanel {
 
         jLabel_Title.setText("");
         jLabel_Account.setText(Lang.getInstance().translate("Account") + ":");
-        jLabel_Name.setText(Lang.getInstance().translate("Full Name") + ":");
+        jLabel_Name.setText(Lang.getInstance().translate("Full name") + ":");
         jLabel_Description.setText(Lang.getInstance().translate("Description") + ":");
         jLabel_Gender.setText(Lang.getInstance().translate("Gender") + ":");
         jLabel_Born.setText(Lang.getInstance().translate("Birthday") + ":");
         jLabel_SkinColor.setText(Lang.getInstance().translate("Skin Color") + ":");
-        jLabel_EyeColor.setText(Lang.getInstance().translate("Eye Color") + ":");
-        jLabel_HairСolor.setText(Lang.getInstance().translate("Hair Сolor") + ":");
+        jLabel_EyeColor.setText(Lang.getInstance().translate("Eye color") + ":");
+        jLabel_HairСolor.setText(Lang.getInstance().translate("Hair color") + ":");
         jLabel_Height.setText(Lang.getInstance().translate("Growth") + ":");
         jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
         jLabel_BirthLongitude.setText(Lang.getInstance().translate("Coordinates of Birth") + ":");

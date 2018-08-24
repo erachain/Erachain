@@ -315,7 +315,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         gridBagConstraints1.insets = new java.awt.Insets(20, 0, 0, 0);
         mainPanel.add(pasteButton, gridBagConstraints1);
 
-        trans_Button = new MButton(Lang.getInstance().translate("Check Person and insert"), 2);
+        trans_Button = new MButton(Lang.getInstance().translate("Check person and insert"), 2);
 
         trans_Button.addActionListener(new ActionListener() {
 
