@@ -1067,7 +1067,7 @@ public class Wallet extends Observable implements Observer {
 				continue;
 			}
 
-				transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+            transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
 			this.processTransaction(transaction);
 
 			// SKIP PAYMENT TRANSACTIONS

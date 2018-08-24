@@ -1567,6 +1567,7 @@ public class BlockExplorer {
 
             BigDecimal totalAmount = BigDecimal.ZERO;
             for (Transaction transaction : block.getTransactions()) {
+                transaction.setDC(dcSet);
                 for (Account account : transaction.getInvolvedAccounts()) {
                     BigDecimal amount = transaction.getAmount(account);
                     if (amount.compareTo(BigDecimal.ZERO) > 0) {
@@ -4094,6 +4095,7 @@ public class BlockExplorer {
         block.loadHeadMind(dcSet);
 
         for (Transaction transaction : block.getTransactions()) {
+            transaction.setDC(dcSet);
             all.add(transaction);
             txsTypeCount[transaction.getType() - 1]++;
         }
@@ -4157,6 +4159,7 @@ public class BlockExplorer {
 
         BigDecimal totalAmount = BigDecimal.ZERO;
         for (Transaction transaction : block.getTransactions()) {
+            transaction.setDC(dcSet);
             for (Account account : transaction.getInvolvedAccounts()) {
                 BigDecimal amount = transaction.getAmount(account);
                 if (amount.compareTo(BigDecimal.ZERO) > 0) {

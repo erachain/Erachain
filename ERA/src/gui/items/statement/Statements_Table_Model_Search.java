@@ -168,12 +168,16 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
                     statement = (R_SignNote) transaction;
                     if (str != null && !str.equals("")) {
 
-                        if (filter_str(str, statement, b))
+                        if (filter_str(str, statement, b)) {
+                            statement.setDC(dcSet);
                             tran.add(statement);
+                        }
                     }
                     if (key > 0) {
-                        if (statement.getKey() == key)
+                        if (statement.getKey() == key) {
+                            statement.setDC(dcSet);
                             tran.add(statement);
+                        }
                     }
                 }
             }

@@ -222,6 +222,7 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
             for (Transaction transaction : db_transactions) {
                 // если ноте то пишем в transactions
                 if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION)
+                    transaction.setDC(dcSet);
                     tran.add(transaction);
 
             }

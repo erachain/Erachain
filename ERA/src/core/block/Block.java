@@ -624,6 +624,7 @@ public class Block {
     public JSONObject toJson() {
         JSONObject block = new JSONObject();
 
+        DCSet dcSet = DCSet.getInstance();
         block.put("version", this.version);
         block.put("reference", Base58.encode(this.reference));
         block.put("timestamp", this.getTimestamp(DCSet.getInstance()));
@@ -636,12 +637,13 @@ public class Block {
         block.put("transactionsHash", Base58.encode(this.transactionsHash));
         block.put("signature", Base58.encode(this.signature));
         block.put("signature", Base58.encode(this.getSignature()));
-        block.put("height", this.getHeight(DCSet.getInstance()));
+        block.put("height", this.getHeight(dcSet));
 
         //CREATE TRANSACTIONS
         JSONArray transactionsArray = new JSONArray();
 
         for (Transaction transaction : this.getTransactions()) {
+            transaction.setDC(dcSet);
             transactionsArray.add(transaction.toJson());
         }
 

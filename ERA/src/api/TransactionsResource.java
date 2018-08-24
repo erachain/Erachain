@@ -533,11 +533,12 @@ public class TransactionsResource {
         JSONArray array = new JSONArray();
         DCSet dcSet = DCSet.getInstance();
 
+        int seqNo = 0;
         for (Transaction transaction : block.getTransactions()) {
             // FOR ALL ACCOUNTS
             synchronized (accounts) {
                 for (Account account : accounts) {
-                    transaction.setDC(dcSet);
+                    transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, block.getHeight(dcSet), ++seqNo);
                     // CHECK IF INVOLVED
                     if (!account.equals(transaction.getCreator()) && transaction.isInvolved(account)) {
                         array.add(transaction.toJson());
@@ -574,12 +575,14 @@ public class TransactionsResource {
         JSONArray array = new JSONArray();
         DCSet dcSet = DCSet.getInstance();
 
+        int seqNo = 0;
         for (Transaction transaction : block.getTransactions()) {
             transaction.setDC(dcSet);
             // TODO: тут наверное поиск быстрее по HsahSet будет
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             for (Account recipient : recipients) {
                 if (recipient.equals(address)) {
+                    transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, block.getHeight(dcSet), ++seqNo);
                     array.add(transaction.toJson());
                     break;
                 }
@@ -622,12 +625,14 @@ public class TransactionsResource {
         Controller cntr = Controller.getInstance();
         DCSet dcSet = DCSet.getInstance();
 
+        int seqNo = 0;
         for (Transaction transaction : block.getTransactions()) {
             transaction.setDC(dcSet);
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             for (Account recipient : recipients) {
                 if (recipient.equals(address)) {
 
+                    transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, block.getHeight(dcSet), ++seqNo);
                     JSONObject json = transaction.toJson();
 
                     if (transaction instanceof R_Send) {

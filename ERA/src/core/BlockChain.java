@@ -899,8 +899,12 @@ public class BlockChain {
         //START FROM BLOCK
         int scannedBlocks = 0;
         do {
+            int seqNo = 0;
             //FOR ALL TRANSACTIONS IN BLOCK
             for (Transaction transaction : block.getTransactions()) {
+
+                transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, block.getHeight(dcSet), ++seqNo);
+
                 //CHECK IF ACCOUNT INVOLVED
                 if (account != null && !transaction.isInvolved(account)) {
                     continue;

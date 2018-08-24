@@ -329,6 +329,7 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
             db_transactions = (ArrayList<Transaction>) list.getB().getTransactions();
             // проходим по транзакциям
             for (Transaction transaction : db_transactions) {
+                transaction.setDC(dcSet);
                 // если ноте то пишем в transactions
                 if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION)
                     tran.add(transaction);
