@@ -98,7 +98,7 @@ public class Statuses_Library_Panel extends JPanel {
         });
 
 
-        JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Creator Name"));
+        JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy creator name"));
         menu_copyName.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -111,7 +111,7 @@ public class Statuses_Library_Panel extends JPanel {
         menu.add(menu_copyName);
 
 
-        JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Creator Account"));
+        JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy creator account"));
         copy_Creator_Address.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -121,7 +121,7 @@ public class Statuses_Library_Panel extends JPanel {
         });
         menu.add(copy_Creator_Address);
 
-        JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy Creator Public Key"));
+        JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy creator public key"));
         menu_copy_Creator_PublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -135,7 +135,7 @@ public class Statuses_Library_Panel extends JPanel {
         menu.add(menu_copy_Creator_PublicKey);
 
 
-        JMenuItem menu_copy_Block_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy No.Transaction"));
+        JMenuItem menu_copy_Block_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy no. transaction"));
         menu_copy_Block_PublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -156,7 +156,7 @@ public class Statuses_Library_Panel extends JPanel {
         });
         menu.add(Send_Coins_item_Menu);
 
-        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail to Creator"));
+        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail to creator"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account account = statusModel.get_Creator_Account(row);

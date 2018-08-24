@@ -1,13 +1,10 @@
 package core.exdata;
 
-import core.crypto.Base58;
-import core.crypto.Crypto;
 import core.item.templates.TemplateCls;
 import gui.items.link_hashes.Table_Model_Issue_Hashes;
 import gui.library.*;
 import lang.Lang;
 import org.mapdb.Fun.Tuple3;
-
 import utils.FileHash;
 import utils.Zip_Bytes;
 
@@ -744,8 +741,8 @@ public class ExData_Panel extends javax.swing.JPanel {
 class Attache_Files_Model extends DefaultTableModel {
 
     public Attache_Files_Model() {
-        super(new Object[]{Lang.getInstance().translate("Name"), Lang.getInstance().translate("Path"), "ZIP?",
-                Lang.getInstance().translate("Size/Zip Size")}, 0);
+        super(new Object[]{Lang.getInstance().translate("Name"), Lang.getInstance().translate("Path"), "Zip?",
+                Lang.getInstance().translate("Size/Zip size")}, 0);
 
     }
 
