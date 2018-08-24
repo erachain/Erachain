@@ -1,29 +1,9 @@
 package gui.items.assets;
 
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-
-import core.item.assets.Trade;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
-
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
+import core.item.assets.Trade;
 import core.transaction.CreateOrderTransaction;
 import core.transaction.Transaction;
 import datachain.DCSet;
@@ -35,6 +15,14 @@ import gui.transaction.CreateOrderDetailsFrame;
 import lang.Lang;
 import utils.Pair;
 import utils.TableMenuPopupUtil;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 
 public class Echange_Sell_Buy_Panel extends JTabbedPane {
 
@@ -199,7 +187,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
         final MTable sellOrdersTable = new MTable(this.sellOrdersTableModel);
 
         // ORDER INFO
-        JMenuItem orderInfo = new JMenuItem(Lang.getInstance().translate("Order Info"));
+        JMenuItem orderInfo = new JMenuItem(Lang.getInstance().translate("Order info"));
         orderInfo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -349,7 +337,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
         });
         
         // ORDER INFO
-        JMenuItem buyOrderInfo = new JMenuItem(Lang.getInstance().translate("Order Info"));
+        JMenuItem buyOrderInfo = new JMenuItem(Lang.getInstance().translate("Order info"));
         buyOrderInfo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
