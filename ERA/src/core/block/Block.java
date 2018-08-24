@@ -425,11 +425,16 @@ public class Block {
 
     public BigDecimal getBonusFee() {
 
+        if ( this.heightBlock > 162045 &&  this.heightBlock < 162050 ) {
+            LOGGER.error(" [" + this.heightBlock + "] BONUS = 0???");
+        }
+
         // NOT GIFT for MISSed forger
         long cut1 = this.target << 1;
         // TODO - off START POINT
         if (//this.heightBlock > 140000 &&
                 this.winValue >= cut1) {
+            LOGGER.error(" [" + this.heightBlock + "] BONUS = 0");
             return BigDecimal.ZERO;
         }
 
@@ -1274,7 +1279,7 @@ public class Block {
                 && this.heightBlock > 150000
         ) {
             // TEST COMPU ORPHANs
-            compareCOMPUbals(dcSet, this.heightBlock - 1);
+            compareCOMPUbals(dcSet, this.heightBlock - 1, "before PROCESS");
         }
 
         // for DEBUG
@@ -1371,7 +1376,7 @@ public class Block {
 
     }
 
-    public void compareCOMPUbals(DCSet dcSet, int heightParent) {
+    public void compareCOMPUbals(DCSet dcSet, int heightParent, String mess) {
         HashMap parentBalanses = (HashMap) totalCOMPUtest.get(heightParent);
         if (parentBalanses != null) {
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball;
@@ -1385,23 +1390,27 @@ public class Block {
                     ballParent = (BigDecimal) parentBalanses.get(key.a);
                     if (ballParent != null && ballParent.compareTo(ball.a.b) != 0
                             ||  ballParent == null && ball.a.b.signum() != 0) {
-                        LOGGER.error(" WRONG COMPU orphan [" + heightParent + "] for ADDR :" + key.a
+                        LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] for ADDR :" + key.a
                                 + " balParent : " + (ballParent==null?"NULL":ballParent.toPlainString())
-                                + " ---> " + (ball==null?"NULL":ball.a.b.toPlainString()));
+                                + " ---> " + (ball==null?"NULL":ball.a.b.toPlainString())
+                                + " == " + ball.a.b.subtract(ballParent==null?BigDecimal.ZERO:ballParent));
 
                         error = true;
                     }
                 }
             }
             if (error) {
+                LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] "
+                        + " totalFee: " + this.getTotalFee()
+                        + " bonusFee: " + this.getBonusFee());
+
                 error = false;
             }
-            //WRONG COMPU orphan [1637251] for ADDR :73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS balParent : -89.88749283 ---> -89.88800483
-            //  -  WRONG COMPU orphan [1637251] for ADDR :7QmyokwesG4mri3qR5VcrXQvnPAAsEksVN balParent : 0.28052000 ---> 0.28103200
-            // WRONG COMPU orphan [1637251] for ADDR :7QmyokwesG4mri3qR5VcrXQvnPAAsEksVN balParent : 0.28052000 ---> 0.28103200
-
-            //WRONG COMPU orphan [1637241] for ADDR :7QmyokwesG4mri3qR5VcrXQvnPAAsEksVN balParent : 0.28052000 ---> 0.28103200
-            //WRONG COMPU orphan [1637241] for ADDR :73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS balParent : -89.88698083 ---> -89.88749283
+/*
+            2018-08-24 17:12:51 DEBUG Block:1446 - [157047] orphaning time: 0.0 for records:0 millsec/record:0
+            2018-08-24 17:12:51 ERROR Block:1388 -  WRONG COMPU orphan after ORPHAN [157047] for ADDR :73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS balParent : -86.49401383 ---> -86.49452583 == -0.00051200
+            2018-08-24 17:12:51 ERROR Block:1388 -  WRONG COMPU orphan after ORPHAN [157047] for ADDR :75PusANxJ4mptCVk8xtrxiXMQCbHSpziai balParent : 0.25414100 ---> 0.25465300 == 0.00051200
+            */
         }
     }
 
@@ -1418,11 +1427,15 @@ public class Block {
             return;
         }
 
+        if ( this.heightBlock > 162045 &&  this.heightBlock < 162050 ) {
+            LOGGER.error(" [" + this.heightBlock + "] BONUS = 0???");
+        }
+
         if (!BlockChain.DEVELOP_USE
                 && this.heightBlock > 150000
         ) {
             // TEST COMPU ORPHANs
-            compareCOMPUbals(dcSet, height);
+            compareCOMPUbals(dcSet, height, "before ORPHAN");
         }
 
         long start = System.currentTimeMillis();
@@ -1457,7 +1470,7 @@ public class Block {
                 && this.heightBlock > 150000
         ) {
             // TEST COMPU ORPHANs
-            compareCOMPUbals(dcSet, height - 1);
+            compareCOMPUbals(dcSet, height - 1, "after ORPHAN");
         }
 
         this.heightBlock = -1;
