@@ -2927,31 +2927,6 @@ public class Controller extends Observable {
             return new Pair<Integer, Transaction>(Transaction.INVALID_RECEIVER, null);
         }
 
-        // READ FEE
-        /*
-        int feePow = 0;
-        if (feePowStr != null) {
-            try {
-                feePow = Integer.parseInt(feePowStr);
-            } catch (Exception e) {
-                return new Pair<Integer, Transaction>(Transaction.INVALID_FEE_POWER, null);
-            }
-        }
-        */
-
-        // READ AMOUNT
-        /*
-        BigDecimal amount = null;
-        if (amountStr != null) {
-            try {
-                amount = new BigDecimal(amountStr);
-            } catch (Exception e) {
-                return new Pair<Integer, Transaction>(Transaction.INVALID_AMOUNT, null);
-            }
-
-        }
-        */
-
         if (needAmount && (amount == null || amount.signum() == 0)) {
             return new Pair<Integer, Transaction>(Transaction.INVALID_AMOUNT_IS_NULL, null);
         }
@@ -3026,14 +3001,14 @@ public class Controller extends Observable {
             }
 
             if (encrypt) {
-                // sender
-                byte[] privateKey = privateKeyAccount.getPrivateKey();
-
                 // recipient
                 byte[] publicKey = cnt.getPublicKeyByAddress(recipient.getAddress());
                 if (publicKey == null) {
                     return new Pair<Integer, Transaction>(Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT, null);
                 }
+
+                // sender
+                byte[] privateKey = privateKeyAccount.getPrivateKey();
 
                 messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey, publicKey);
             }
