@@ -300,7 +300,19 @@ public class Menu_Deals extends JMenu {
 		        	}
 		        });
 		        assetsMenu.add(issueAssetMenu);
+		        
 		        */
+        
+        JMenuItem FindHashFromDir = new JMenuItem(Lang.getInstance().translate("Find Hash from DIR"));
+        FindHashFromDir.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Find Hash from DIR"));
+        FindHashFromDir.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //
+                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
+                new FindHashFrmDirDialog();
+            }
+        });
+        add(FindHashFromDir);
 
     }
 

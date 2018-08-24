@@ -7,6 +7,8 @@ import gui.items.link_hashes.Table_Model_Issue_Hashes;
 import gui.library.*;
 import lang.Lang;
 import org.mapdb.Fun.Tuple3;
+
+import utils.FileHash;
 import utils.Zip_Bytes;
 
 import javax.swing.*;
@@ -634,49 +636,12 @@ public class ExData_Panel extends javax.swing.JPanel {
 
                 for (File patch : patchs) {
 
-                    String file_name = patch.getPath();
-                    File file = new File(patch.getPath());
-
-                    // преобразуем в байты
-                    long file_len = file.length();
-                    if (file_len > Integer.MAX_VALUE) {
-                        hashes_Table_Model.addRow(new Object[]{"",
-                                Lang.getInstance().translate("length very long") + " - " + file_name});
-                        continue;
-                    }
-                    byte[] fileInArray = new byte[(int) file.length()];
-                    FileInputStream f = null;
-                    try {
-                        f = new FileInputStream(patch.getPath());
-                    } catch (FileNotFoundException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                        hashes_Table_Model.addRow(new Object[]{"",
-                                Lang.getInstance().translate("error streaming") + " - " + file_name});
-                        continue;
-                    }
-                    try {
-                        f.read(fileInArray);
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                        hashes_Table_Model.addRow(
-                                new Object[]{"", Lang.getInstance().translate("error reading") + " - " + file_name});
-                        continue;
-                    }
-                    try {
-                        f.close();
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                        continue;
-                    }
-
-                    /// HASHING
-                    String hashes = Base58.encode(Crypto.getInstance().digest(fileInArray));
+                  /// HASHING
+                    FileHash gf = new FileHash(patch);
+                    String hashes = gf.getHash();
                     hashes_Table_Model
-                            .addRow(new Object[]{hashes, Lang.getInstance().translate("from file ") + file_name});
-
+                            .addRow(new Object[]{hashes, Lang.getInstance().translate("from file ") + patch.getPath()});
+                    gf = null;
                 }
 
             }
