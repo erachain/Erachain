@@ -134,7 +134,7 @@ public class NoWalletFrame extends JFrame {
 
                 //OPEN CREATE WALLET FRAME
                 th.setVisible(false);
-                new License_JFrame(!BlockChain.DEVELOP_USE, th, 1);
+                new License_JFrame(true, th, 1);
 
             }
 
@@ -186,7 +186,7 @@ public class NoWalletFrame extends JFrame {
 
                 //OPEN CREATE WALLET FRAME
                 th.setVisible(false);
-                new License_JFrame(!BlockChain.DEVELOP_USE, th, 2);
+                new License_JFrame(true, th, 2);
 
 
             }
@@ -239,7 +239,7 @@ public class NoWalletFrame extends JFrame {
 
                 //OPEN CREATE WALLET FRAME
                 th.setVisible(false);
-                new License_JFrame(!BlockChain.DEVELOP_USE, th, 3);
+                new License_JFrame(true, th, 3);
 
             }
 
