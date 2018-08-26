@@ -109,14 +109,14 @@ public class CreateOrderPanel extends JPanel {
         label_sell_buy.gridy = ++labelGBC.gridy;
         detailGBC.gridy = ++detailGBC.gridy;
         JLabel lblWish = new JLabel(
-                "<html>" + (buying ? Lang.getInstance().translate("To Buy") + ": " + "<b>" + this.want.toString()
-                        : Lang.getInstance().translate("To Sell") + ": " + "<b>" + this.have.toString()) + "</b></html>");
+                "<html>" + (buying ? Lang.getInstance().translate("To buy") + ": " + "<b>" + this.want.toString()
+                        : Lang.getInstance().translate("To sell") + ": " + "<b>" + this.have.toString()) + "</b></html>");
 
         this.add(lblWish, label_sell_buy);
 
         JLabel lblResult = new JLabel(
-                "<html>" + (buying ? Lang.getInstance().translate("for") + ": <b>" + this.have.toString()
-                        : Lang.getInstance().translate("for") + ": <b>" + this.want.toString()) + "</b></html>");
+                "<html>" + (buying ? Lang.getInstance().translate("For") + ": <b>" + this.have.toString()
+                        : Lang.getInstance().translate("For") + ": <b>" + this.want.toString()) + "</b></html>");
 
         // Label sell
         label_sell_buy.gridy = ++labelGBC.gridy;
@@ -162,8 +162,8 @@ public class CreateOrderPanel extends JPanel {
         // LABEL AMOUNT
         labelGBC.gridy++;
 
-        String mes = buying ? Lang.getInstance().translate("Quantity to Buy")
-                : Lang.getInstance().translate("Quantity to Sell");
+        String mes = buying ? Lang.getInstance().translate("Quantity to buy")
+                : Lang.getInstance().translate("Quantity to sell");
 
         JLabel amountLabel = new JLabel(mes + ":");
         this.add(amountLabel, labelGBC);

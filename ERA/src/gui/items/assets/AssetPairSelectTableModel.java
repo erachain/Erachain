@@ -34,8 +34,8 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
     public List<ItemCls> assets;
     Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> all;
     private String[] columnNames = {Lang.getInstance().translate("Key"), Lang.getInstance().translate("Name"),
-            Lang.getInstance().translate("<html>Orders<br>Count</html>"), Lang.getInstance().translate("Orders Volume"),
-            Lang.getInstance().translate("<html>Trades<br>Count</html>"),
+            Lang.getInstance().translate("<html>Orders<br>count</html>"), Lang.getInstance().translate("Orders Volume"),
+            Lang.getInstance().translate("<html>Trades<br>count</html>"),
             Lang.getInstance().translate("Trades Volume")};
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, false, false, false, false};
     private String filter_Name;

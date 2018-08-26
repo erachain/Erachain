@@ -15,7 +15,7 @@ public class VouchingDetailsFrame extends Rec_DetailsFrame {
 
         //LABEL NAME
         ++labelGBC.gridy;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("height-seq.") + ":");
+        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Height-seq.") + ":");
         this.add(nameLabel, labelGBC);
 
         //NAME

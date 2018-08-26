@@ -211,7 +211,7 @@ public class M_Attached_Files_Panel extends JPanel {
 class Attache_Files_Model extends DefaultTableModel {
 
     public Attache_Files_Model() {
-        super(new Object[]{Lang.getInstance().translate("Name"), "ZIP?", Lang.getInstance().translate("data")}, 0);
+        super(new Object[]{Lang.getInstance().translate("Name"), "Zip?", Lang.getInstance().translate("Data")}, 0);
 
     }
 

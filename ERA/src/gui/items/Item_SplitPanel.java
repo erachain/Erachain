@@ -196,7 +196,7 @@ public class Item_SplitPanel extends Split_Panel {
 
         // CHECK IF FAVORITES
         if (Controller.getInstance().isItemFavorite(itemCls)) {
-           int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from Favorite") +"?", Lang.getInstance().translate("Delete from Favorite") , JOptionPane.OK_CANCEL_OPTION);
+           int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") +"?", Lang.getInstance().translate("Delete from favorite") , JOptionPane.OK_CANCEL_OPTION);
            
            if (dd ==0) Controller.getInstance().removeItemFavorite(itemCls);
         } else {
