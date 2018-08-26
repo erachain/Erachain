@@ -2391,13 +2391,43 @@ public class BlockExplorer {
                     transactionDataJSON.put("compressed", false);
                 }
             } else if (transaction.getType() == Transaction.CANCEL_ORDER_TRANSACTION) {
-                Long key = ((CancelOrderTransaction) unit).getOrderID();
-                if (key != null) {
-                    Order order;
-                    if (dcSet.getCompletedOrderMap().contains(key)) {
-                        order = dcSet.getCompletedOrderMap().get(key);
+                Order order;
+                CancelOrderTransaction cancelOrder = (CancelOrderTransaction) unit;
+                Long orderID = cancelOrder.getOrderID();
+                if (orderID == null) {
+                    byte[] orderSignature = cancelOrder.getorderSignature();
+                    CreateOrderTransaction createOrder;
+                    if (dcSet.getTransactionFinalMapSigns().contains(orderSignature)) {
+                        createOrder = (CreateOrderTransaction) dcSet.getTransactionFinalMap().getTransaction(orderSignature);
                     } else {
-                        order = dcSet.getOrderMap().get(key);
+                        createOrder = (CreateOrderTransaction) dcSet.getTransactionMap().get(orderSignature);
+                    }
+                    if (createOrder != null) {
+                        Map orderJSON = new LinkedHashMap();
+
+                    /*
+                    if (assetNames != null) {
+                        assetNames.setKey(order.getHave());
+                        assetNames.setKey(order.getWant());
+                    }
+                    */
+
+                        orderJSON.put("have", createOrder.getHaveKey());
+                        orderJSON.put("want", createOrder.getWantKey());
+
+                        orderJSON.put("amount", createOrder.getAmountHave().toPlainString());
+                        orderJSON.put("amountLeft", "??");
+                        orderJSON.put("amountWant", createOrder.getAmountWant().toPlainString());
+                        orderJSON.put("price", Order.calcPrice(createOrder.getAmountHave(),
+                                createOrder.getAmountWant()).toPlainString());
+
+                        transactionDataJSON.put("orderSource", orderJSON);
+                    }
+                } else {
+                    if (dcSet.getCompletedOrderMap().contains(orderID)) {
+                        order = dcSet.getCompletedOrderMap().get(orderID);
+                    } else {
+                        order = dcSet.getOrderMap().get(orderID);
                     }
 
                     Map orderJSON = new LinkedHashMap();
@@ -2418,6 +2448,7 @@ public class BlockExplorer {
                     orderJSON.put("price", order.getPrice().toPlainString());
 
                     transactionDataJSON.put("orderSource", orderJSON);
+
                 }
 
             } else if (transaction.getType() == Transaction.ISSUE_ASSET_TRANSACTION) {
@@ -2499,9 +2530,12 @@ public class BlockExplorer {
                 transactionDataJSON.put("amounts", amountOfAssetsJSON);
 
             } else if (transaction.getType() == Transaction.VOTE_ON_POLL_TRANSACTION) {
-                transactionDataJSON.put("optionString",
-                        Controller.getInstance().getPoll(((VoteOnPollTransaction) transaction).getPoll()).getOptions()
-                                .get(((VoteOnPollTransaction) transaction).getOption()).getName());
+                Poll poll = Controller.getInstance().getPoll(((VoteOnPollTransaction) transaction).getPoll());
+                if (poll != null) {
+                    transactionDataJSON.put("optionString",
+                            Controller.getInstance().getPoll(((VoteOnPollTransaction) transaction).getPoll()).getOptions()
+                                    .get(((VoteOnPollTransaction) transaction).getOption()).getName());
+                }
 
             } else if (transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
                 /*
