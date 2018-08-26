@@ -117,7 +117,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
         return this.observableData;
     }
     
-    public List<Transaction> getSubSet(long timestamp) {
+    public List<Transaction> getSubSet(long timestamp, boolean notSetDCSet) {
         
         List<Transaction> values = new ArrayList<Transaction>();
         Iterator<byte[]> iterator = this.getIterator(0, false);
@@ -137,7 +137,10 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
             
             if (count++ > 25222)
                 break;
-            
+
+            if (!notSetDCSet)
+                transaction.setDC(this.getDCSet());
+
             values.add(transaction);
             
         }
@@ -255,12 +258,15 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
         
         ArrayList<Transaction> values = new ArrayList<Transaction>();
         Iterator<byte[]> iterator = this.getIterator(from, descending);
-        
+
+        Transaction transaction;
         for (int i = 0; i < count; i++) {
             if (!iterator.hasNext())
                 break;
-            
-            values.add(map.get(iterator.next()));
+
+            transaction = this.get(iterator.next());
+            transaction.setDC(this.getDCSet());
+            values.add(transaction);
         }
         iterator = null;
         return values;
@@ -273,8 +279,10 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
         Account account = new Account(address);
         
         int i = 0;
+        Transaction transaction;
         while (iterator.hasNext()) {
-            Transaction transaction = map.get(iterator.next());
+            transaction = map.get(iterator.next());
+            transaction.setDC(this.getDCSet());
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             if (recipients == null || recipients.isEmpty())
                 continue;
@@ -307,6 +315,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
                 ok = false;
             
             if (!ok) {
+                transaction.setDC(this.getDCSet());
                 HashSet<Account> recipients = transaction.getRecipientAccounts();
                 
                 if (recipients == null || recipients.isEmpty() || !recipients.contains(account)) {

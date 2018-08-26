@@ -148,7 +148,7 @@ public class BlockGenerator extends Thread implements Observer {
         Block waitWin;
 
         long start = System.currentTimeMillis();
-        List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getSubSet(timestamp));
+        List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getSubSet(timestamp, true));
         //List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getValuesAll());
         long tickets = System.currentTimeMillis() - start;
         int txCount = orderedTransactions.size();
@@ -377,8 +377,13 @@ public class BlockGenerator extends Thread implements Observer {
                     status = 9;
                     ctrl.setForgingStatus(ForgingStatus.FORGING_ENABLED);
                     try {
-                        while (bchain.getHeight(dcSet) > this.orphanto) {
-                            Block block = bchain.getLastBlock(dcSet);
+                        while (bchain.getHeight(dcSet) >= this.orphanto
+                            //    && bchain.getHeight(dcSet) > 157044
+                            ) {
+                            //if (bchain.getHeight(dcSet) > 157045 && bchain.getHeight(dcSet) < 157049) {
+                            //    long iii = 11;
+                            //}
+                            //Block block = bchain.getLastBlock(dcSet);
                             ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
                         }
                     } catch (Exception e) {

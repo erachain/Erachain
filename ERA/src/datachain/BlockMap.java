@@ -230,12 +230,10 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     public Block getWithMind(int height) {
 
-        Block block = super.get(height);
+        Block block = this.get(height);
         if (block == null)
             return null;
 
-        block.setHeight(height);
-        block.loadHeadMind(this.getDCSet());
         return block;
 
     }
@@ -243,8 +241,10 @@ public class BlockMap extends DCMap<Integer, Block> {
     public Block get(Integer height) {
 
         Block block = super.get(height);
-        if (block != null)
+        if (block != null) {
             block.setHeight(height);
+            block.loadHeadMind(this.getDCSet());
+        }
         return block;
 
     }

@@ -700,7 +700,7 @@ public abstract class Transaction {
 
     // GET only INVITED FEE
     public long getInvitedFee() {
-        if (true)
+        if (this.height > BlockChain.VERS_4_11)
             return 0l;
 
         long fee = this.fee.unscaledValue().longValue();
@@ -740,6 +740,10 @@ public abstract class Transaction {
 
         return new Tuple2<Integer, Integer>(blockIndex, transactionIndex);
 
+    }
+
+    public int getSeqNo() {
+    return this.seqNo;
     }
 
     public int getBlockHeight(DCSet db) {
@@ -1182,6 +1186,9 @@ public abstract class Transaction {
 
     public void process_gifts(int level, long fee_gift, Account creator, boolean asOrphan) {
 
+        if (fee_gift <= 0l)
+            return;
+
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
         // byte[] recordSignature = record.getSignature();
         // TODO if PERSON die - skip it step
@@ -1249,7 +1256,7 @@ public abstract class Transaction {
             }
 
             // Multi Level Referal
-            if (false)
+            if (this.height < BlockChain.VERS_4_11)
                 process_gifts(0, getInvitedFee(), this.creator, false);
 
             String creatorAddress = this.creator.getAddress();
@@ -1289,7 +1296,7 @@ public abstract class Transaction {
             }
 
             // calc INVITED FEE
-            if (false)
+            if (this.height < BlockChain.VERS_4_11)
                 process_gifts(0, getInvitedFee(), this.creator, true);
 
             // UPDATE REFERENCE OF SENDER

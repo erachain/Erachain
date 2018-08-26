@@ -425,16 +425,11 @@ public class Block {
 
     public BigDecimal getBonusFee() {
 
-        if ( this.heightBlock > 162045 &&  this.heightBlock < 162050 ) {
-            LOGGER.error(" [" + this.heightBlock + "] BONUS = 0???");
-        }
-
         // NOT GIFT for MISSed forger
         long cut1 = this.target << 1;
         // TODO - off START POINT
         if (//this.heightBlock > 140000 &&
                 this.winValue >= cut1) {
-            LOGGER.error(" [" + this.heightBlock + "] BONUS = 0");
             return BigDecimal.ZERO;
         }
 
@@ -1214,6 +1209,7 @@ public class Block {
     }
 
     public void setCOMPUbals(DCSet dcSet, int height) {
+
         // TEST COMPU ORPHANs
         HashMap bals = new HashMap();
         Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
@@ -1228,6 +1224,41 @@ public class Block {
             }
         }
         totalCOMPUtest.put(height, bals);
+    }
+
+
+    public void compareCOMPUbals(DCSet dcSet, int heightParent, String mess) {
+
+        HashMap parentBalanses = (HashMap) totalCOMPUtest.get(heightParent);
+        if (parentBalanses != null) {
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball;
+            BigDecimal ballParent;
+            Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
+            boolean error = false;
+            for (Tuple2<String, Long> key : keys) {
+                if (key.b == 2l) {
+                    ball = dcSet.getAssetBalanceMap().get(key);
+
+                    ballParent = (BigDecimal) parentBalanses.get(key.a);
+                    if (ballParent != null && ballParent.compareTo(ball.a.b) != 0
+                            ||  ballParent == null && ball.a.b.signum() != 0) {
+                        LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] for ADDR :" + key.a
+                                + " balParent : " + (ballParent==null?"NULL":ballParent.toPlainString())
+                                + " ---> " + (ball==null?"NULL":ball.a.b.toPlainString())
+                                + " == " + ball.a.b.subtract(ballParent==null?BigDecimal.ZERO:ballParent));
+
+                        error = true;
+                    }
+                }
+            }
+            if (error) {
+                LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] "
+                        + " totalFee: " + this.getTotalFee()
+                        + " bonusFee: " + this.getBonusFee());
+
+                error = false;
+            }
+        }
     }
 
     // TODO - make it trownable
@@ -1249,9 +1280,7 @@ public class Block {
             cnt.blockchainSyncStatusUpdate(heightBlock);
         }
 
-        if (!BlockChain.DEVELOP_USE
-                && this.heightBlock > 150000
-        ) {
+        if (BlockChain.TEST_FEE_ORPHAN > 0 && BlockChain.TEST_FEE_ORPHAN > this.heightBlock) {
             setCOMPUbals(dcSet, this.heightBlock);
         }
     }
@@ -1275,9 +1304,7 @@ public class Block {
 
         this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
 
-        if (!BlockChain.DEVELOP_USE
-                && this.heightBlock > 150000
-        ) {
+        if (BlockChain.TEST_FEE_ORPHAN > 0 && BlockChain.TEST_FEE_ORPHAN > this.heightBlock) {
             // TEST COMPU ORPHANs
             compareCOMPUbals(dcSet, this.heightBlock - 1, "before PROCESS");
         }
@@ -1376,44 +1403,6 @@ public class Block {
 
     }
 
-    public void compareCOMPUbals(DCSet dcSet, int heightParent, String mess) {
-        HashMap parentBalanses = (HashMap) totalCOMPUtest.get(heightParent);
-        if (parentBalanses != null) {
-            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball;
-            BigDecimal ballParent;
-            Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
-            boolean error = false;
-            for (Tuple2<String, Long> key : keys) {
-                if (key.b == 2l) {
-                    ball = dcSet.getAssetBalanceMap().get(key);
-
-                    ballParent = (BigDecimal) parentBalanses.get(key.a);
-                    if (ballParent != null && ballParent.compareTo(ball.a.b) != 0
-                            ||  ballParent == null && ball.a.b.signum() != 0) {
-                        LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] for ADDR :" + key.a
-                                + " balParent : " + (ballParent==null?"NULL":ballParent.toPlainString())
-                                + " ---> " + (ball==null?"NULL":ball.a.b.toPlainString())
-                                + " == " + ball.a.b.subtract(ballParent==null?BigDecimal.ZERO:ballParent));
-
-                        error = true;
-                    }
-                }
-            }
-            if (error) {
-                LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] "
-                        + " totalFee: " + this.getTotalFee()
-                        + " bonusFee: " + this.getBonusFee());
-
-                error = false;
-            }
-/*
-            2018-08-24 17:12:51 DEBUG Block:1446 - [157047] orphaning time: 0.0 for records:0 millsec/record:0
-            2018-08-24 17:12:51 ERROR Block:1388 -  WRONG COMPU orphan after ORPHAN [157047] for ADDR :73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS balParent : -86.49401383 ---> -86.49452583 == -0.00051200
-            2018-08-24 17:12:51 ERROR Block:1388 -  WRONG COMPU orphan after ORPHAN [157047] for ADDR :75PusANxJ4mptCVk8xtrxiXMQCbHSpziai balParent : 0.25414100 ---> 0.25465300 == 0.00051200
-            */
-        }
-    }
-
     public void orphan(DCSet dcSet) throws Exception {
 
         Controller cnt = Controller.getInstance();
@@ -1431,9 +1420,7 @@ public class Block {
             LOGGER.error(" [" + this.heightBlock + "] BONUS = 0???");
         }
 
-        if (!BlockChain.DEVELOP_USE
-                && this.heightBlock > 150000
-        ) {
+        if (BlockChain.TEST_FEE_ORPHAN > 0 && BlockChain.TEST_FEE_ORPHAN > this.heightBlock) {
             // TEST COMPU ORPHANs
             compareCOMPUbals(dcSet, height, "before ORPHAN");
         }
@@ -1466,9 +1453,7 @@ public class Block {
 
         }
 
-        if (!BlockChain.DEVELOP_USE
-                && this.heightBlock > 150000
-        ) {
+        if (BlockChain.TEST_FEE_ORPHAN > 0 && BlockChain.TEST_FEE_ORPHAN > this.heightBlock) {
             // TEST COMPU ORPHANs
             compareCOMPUbals(dcSet, height - 1, "after ORPHAN");
         }

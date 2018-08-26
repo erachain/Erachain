@@ -630,7 +630,7 @@ public class BlockExplorer {
         Map output = new LinkedHashMap();
         try {
 
-            AssetNames assetNames = new AssetNames();
+            //AssetNames assetNames = new AssetNames();
 
             List<Transaction> transactions = new ArrayList<Transaction>();
 
@@ -673,12 +673,12 @@ public class BlockExplorer {
 
                 int i = 0;
                 for (Transaction transaction : transactions) {
-                    output.put(count - i, jsonUnitPrint(transaction, assetNames));
+                    output.put(count - i, jsonUnitPrint(transaction)); //, assetNames));
                     i++;
                 }
             }
 
-            output.put("assetNames", assetNames.getMap());
+            //output.put("assetNames", assetNames.getMap());
 
         } catch (Exception e1) {
             output = new LinkedHashMap();
@@ -2303,7 +2303,7 @@ public class BlockExplorer {
     }
 
     // dcSet
-    public Map jsonUnitPrint(Object unit, AssetNames assetNames) {
+    public Map jsonUnitPrint(Object unit) { //, AssetNames assetNames) {
 
         Map transactionDataJSON = new LinkedHashMap();
         Map transactionJSON = new LinkedHashMap();
@@ -2343,10 +2343,12 @@ public class BlockExplorer {
             transactionDataJSON.put("initiatorHave", orderInitiator.getHave());
             transactionDataJSON.put("initiatorWant", orderInitiator.getWant());
 
+            /*
             if (assetNames != null) {
                 assetNames.setKey(orderInitiator.getHave());
                 assetNames.setKey(orderInitiator.getWant());
             }
+            */
 
             Transaction createOrderTarget = this.dcSet.getTransactionFinalMap().get(orderTarget.getId());
             transactionDataJSON.put("targetTxSignature", Base58.encode(createOrderTarget.getSignature()));
@@ -2390,51 +2392,55 @@ public class BlockExplorer {
                 }
             } else if (transaction.getType() == Transaction.CANCEL_ORDER_TRANSACTION) {
                 Long key = ((CancelOrderTransaction) unit).getOrderID();
-                Order order;
-                if (dcSet.getCompletedOrderMap().contains(key)) {
-                    order = dcSet.getCompletedOrderMap().get(key);
-                } else {
-                    order = dcSet.getOrderMap().get(key);
+                if (key != null) {
+                    Order order;
+                    if (dcSet.getCompletedOrderMap().contains(key)) {
+                        order = dcSet.getCompletedOrderMap().get(key);
+                    } else {
+                        order = dcSet.getOrderMap().get(key);
+                    }
+
+                    Map orderJSON = new LinkedHashMap();
+
+                    /*
+                    if (assetNames != null) {
+                        assetNames.setKey(order.getHave());
+                        assetNames.setKey(order.getWant());
+                    }
+                    */
+
+                    orderJSON.put("have", order.getHave());
+                    orderJSON.put("want", order.getWant());
+
+                    orderJSON.put("amount", order.getAmountHave().toPlainString());
+                    orderJSON.put("amountLeft", order.getAmountHaveLeft().toPlainString());
+                    orderJSON.put("amountWant", order.getAmountWant().toPlainString());
+                    orderJSON.put("price", order.getPrice().toPlainString());
+
+                    transactionDataJSON.put("orderSource", orderJSON);
                 }
-
-                Map orderJSON = new LinkedHashMap();
-
-                if (assetNames != null) {
-                    assetNames.setKey(order.getHave());
-                    assetNames.setKey(order.getWant());
-                }
-
-                orderJSON.put("have", order.getHave());
-                orderJSON.put("want", order.getWant());
-
-                orderJSON.put("amount", order.getAmountHave().toPlainString());
-                orderJSON.put("amountLeft", order.getAmountHaveLeft().toPlainString());
-                orderJSON.put("amountWant", order.getAmountWant().toPlainString());
-                orderJSON.put("price", order.getPrice().toPlainString());
-
-                transactionDataJSON.put("orderSource", orderJSON);
 
             } else if (transaction.getType() == Transaction.ISSUE_ASSET_TRANSACTION) {
-                long assetkey = ((IssueAssetTransaction) transaction).getItem().getKey();
-
-                transactionDataJSON.put("asset", assetkey);
-
-                transactionDataJSON.put("assetName", ((IssueAssetTransaction) transaction).getItem().getName());
-
-            } else if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                if (assetNames != null) {
-                    assetNames.setKey(((R_Send) unit).getKey());
+                /*
+                if (transaction.getSeqNo() > 0 && assetNames != null) {
+                    // IS CONFIRMED
+                    long assetkey = ((IssueAssetTransaction) transaction).getItem().getKey();
+                    transactionDataJSON.put("asset", assetkey);
+                    transactionDataJSON.put("assetName", ((IssueAssetTransaction) transaction).getItem().getName());
                 }
-
-                // R_Send r_Send = (R_Send) transaction;
-                // transactionDataJSON.put("assetName",
-                // Controller.getInstance().getAsset(
-                // r_Send.getKey()).toString());
-                transactionDataJSON.put("assetName", assetNames.getMap().get(((R_Send) unit).getAbsKey()));
+                */
+            } else if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                /*
+                if (transaction.getSeqNo() > 0 && assetNames != null) {
+                    long assetkey = ((R_Send) unit).getAbsKey();
+                    transactionDataJSON.put("asset", assetkey);
+                    transactionDataJSON.put("assetName", assetNames.getMap().get(assetkey));
+                }
 
                 if (((R_Send) unit).isEncrypted()) {
                     transactionDataJSON.put("data", "encrypted");
                 }
+                */
 
             } else if (transaction.getType() == Transaction.HASHES_RECORD) {
 
@@ -2448,9 +2454,11 @@ public class BlockExplorer {
                     }
                     amount = amount.add(payment.getAmount());
 
+                    /*
                     if (assetNames != null) {
                         assetNames.setKey(payment.getAsset());
                     }
+                    */
 
                     totalAmountOfAssets.put(payment.getAsset(), amount);
                 }
@@ -2473,9 +2481,11 @@ public class BlockExplorer {
                     }
                     amount = amount.add(payment.getAmount());
 
+                    /*
                     if (assetNames != null) {
                         assetNames.setKey(payment.getAsset());
                     }
+                    */
 
                     totalAmountOfAssets.put(payment.getAsset(), amount);
                 }
@@ -2494,10 +2504,12 @@ public class BlockExplorer {
                                 .get(((VoteOnPollTransaction) transaction).getOption()).getName());
 
             } else if (transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
+                /*
                 if (assetNames != null) {
                     assetNames.setKey(((CreateOrderTransaction) transaction).getHaveKey());
                     assetNames.setKey(((CreateOrderTransaction) transaction).getWantKey());
                 }
+                */
 
             } else if (transaction.getType() == Transaction.DEPLOY_AT_TRANSACTION) {
                 transactionDataJSON.put("atAddress",
@@ -2664,11 +2676,11 @@ public class BlockExplorer {
 
         int counter = 0;
 
-        AssetNames assetNames = new AssetNames();
+        //AssetNames assetNames = new AssetNames();
 
         for (BlExpUnit unit : all) {
             if (counter >= size - start) {
-                output.put(size - counter, jsonUnitPrint(unit.getUnit(), assetNames));
+                output.put(size - counter, jsonUnitPrint(unit.getUnit())); //, assetNames));
             }
 
             if (counter > size - end) {
@@ -3291,7 +3303,7 @@ public class BlockExplorer {
 
                 Map transactionJSON = new LinkedHashMap();
 
-                transactionJSON.putAll(jsonUnitPrint(unit.getUnit(), null));
+                transactionJSON.putAll(jsonUnitPrint(unit.getUnit())); //, null));
 
                 Map tXbalanceChange = new LinkedHashMap();
                 Map<Long, Boolean> assetIsChange = new LinkedHashMap() {
@@ -3349,7 +3361,8 @@ public class BlockExplorer {
 
     public Map jsonQueryTrade(String query) {
         Map output = new LinkedHashMap();
-        AssetNames assetNames = new AssetNames();
+
+        //AssetNames assetNames = new AssetNames();
 
         List<Object> all = new ArrayList<Object>();
 
@@ -3375,11 +3388,11 @@ public class BlockExplorer {
 
         int counter = 0;
         for (Object unit : all) {
-            output.put(size - counter, jsonUnitPrint(unit, assetNames));
+            output.put(size - counter, jsonUnitPrint(unit)); //, assetNames));
             counter++;
         }
 
-        output.put("assetNames", assetNames.getMap());
+        //output.put("assetNames", assetNames.getMap());//
 
         return output;
     }
@@ -4000,7 +4013,8 @@ public class BlockExplorer {
     public Map jsonQueryTX(String query) {
 
         Map output = new LinkedHashMap();
-        AssetNames assetNames = new AssetNames();
+
+        //AssetNames assetNames = new AssetNames();
 
         TreeSet<BlExpUnit> all = new TreeSet<>();
         Map<Tuple2<byte[], byte[]>, Trade> trades = new TreeMap<Tuple2<byte[], byte[]>, Trade>();
@@ -4082,7 +4096,8 @@ public class BlockExplorer {
         int[] txsTypeCount = new int[256];
         int aTTxsCount = 0;
         Block block;
-        AssetNames assetNames = new AssetNames();
+
+        //AssetNames assetNames = new AssetNames();
 
         if (query.matches("\\d+")) {
             block = Controller.getInstance().getBlockByHeight(dcSet, Integer.parseInt(query));
@@ -4091,8 +4106,6 @@ public class BlockExplorer {
         } else {
             block = Controller.getInstance().getBlock(Base58.decode(query));
         }
-
-        block.loadHeadMind(dcSet);
 
         for (Transaction transaction : block.getTransactions()) {
             transaction.setDC(dcSet);
@@ -4262,7 +4275,7 @@ public class BlockExplorer {
         Map output = new LinkedHashMap();
         List<Transaction> all = new ArrayList<Transaction>();
 
-        AssetNames assetNames = new AssetNames();
+        //AssetNames assetNames = new AssetNames();
 
         all.addAll(Controller.getInstance().getUnconfirmedTransactions(0, 100, true));
 
@@ -4282,7 +4295,7 @@ public class BlockExplorer {
         for (Object unit : all) {
             counter++;
 
-            output.put(counter, jsonUnitPrint(unit, assetNames));
+            output.put(counter, jsonUnitPrint(unit)); //, assetNames));
         }
 
         return output;
@@ -4336,14 +4349,18 @@ public class BlockExplorer {
 
     }
 
-    class AssetNames {
+    // LOCAL MAP of ASSETS
+    class AssetNames_old {
         private Map<Long, String> assetNames;
 
-        public AssetNames() {
+        public AssetNames_old() {
             assetNames = new TreeMap<Long, String>();
         }
 
         public void setKey(long key) {
+            if (key <= 0l)
+                return;
+
             if (!assetNames.containsKey(key)) {
                 assetNames.put(key, Controller.getInstance().getAsset(key).getName());
             }

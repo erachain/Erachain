@@ -316,7 +316,7 @@ public class IssuePersonRecord extends Issue_ItemRecord {
     // GET only INVITED FEE
     @Override
     public long getInvitedFee() {
-        if (this.height > BlockChain.ALL_BALANCES_OK_TO)
+        if (this.height > BlockChain.VERS_4_11)
             return this.fee.unscaledValue().longValue() >> BlockChain.FEE_INVITED_SHIFT_FOR_INVITE;
         else
             return super.getInvitedFee();

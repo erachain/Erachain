@@ -146,7 +146,7 @@ public class BlockChain {
     //	 1487844444444   1509434273     1509434273
     public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1511164500000l : 1487844793333l;
     //public static final int FEE_MIN_BYTES = 200;
-    public static final int FEE_PER_BYTE = 100;
+    public static final int FEE_PER_BYTE = 64;
     public static final int FEE_SCALE = 8;
     public static final BigDecimal FEE_RATE = BigDecimal.valueOf(1, FEE_SCALE);
     public static final BigDecimal MIN_FEE_IN_BLOCK = BigDecimal.valueOf(FEE_PER_BYTE * 8 * 128, FEE_SCALE);
@@ -154,6 +154,7 @@ public class BlockChain {
     public static final int FEE_POW_MAX = 6;
     public static final int ISSUE_MULT_FEE = 1 << 10;
     public static final int ISSUE_ASSET_MULT_FEE = 1 << 8;
+    public static final int TEST_FEE_ORPHAN = 0; //157000;
     //
     public static final int FEE_INVITED_DEEP = 4;
 
@@ -1105,7 +1106,6 @@ public class BlockChain {
     // get Target by last blocks in chain
     public long getTarget(DCSet dcSet) {
         Block block = this.getLastBlock(dcSet);
-        block.loadHeadMind(dcSet);
         return block.getTarget();
     }
 
