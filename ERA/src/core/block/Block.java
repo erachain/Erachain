@@ -997,7 +997,9 @@ public class Block {
             long timerFinalMap_set = 0;
             long timerTransFinalMapSinds_set = 0;
 
-            long timestampEnd = this.getTimestamp(dcSet) + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1) + 1;
+            long timestampEnd = this.getTimestamp(dcSet)
+                    + (BlockChain.DEVELOP_USE ? BlockChain.GENERATING_MIN_BLOCK_TIME_MS
+                        : (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1)) + 1;
             // because time filter used by parent block timestamp on core.BlockGenerator.run()
             //long timestampBeg = this.getParent(dcSet).getTimestamp(dcSet);
 

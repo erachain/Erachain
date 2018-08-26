@@ -119,7 +119,7 @@ public class Controller extends Observable {
     public static final int STATUS_SYNCHRONIZING = 1;
     public static final int STATUS_OK = 2;
     private static final Logger LOGGER = Logger.getLogger(Controller.class);
-    private static final String version = "4.11.03 alpha";
+    private static final String version = "4.11.04 alpha";
     private static final String buildTime = "2017-11-19 15:33:33 UTC";
     public static boolean useGui = true;
     private static List<Thread> threads = new ArrayList<Thread>();
