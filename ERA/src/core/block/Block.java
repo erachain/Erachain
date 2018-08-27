@@ -427,8 +427,7 @@ public class Block {
 
         // NOT GIFT for MISSed forger
         long cut1 = this.target << 1;
-        // TODO - off START POINT
-        if (//this.heightBlock > 140000 &&
+        if (this.heightBlock > BlockChain.VERS_4_11 &&
                 this.winValue >= cut1) {
             return BigDecimal.ZERO;
         }
@@ -444,7 +443,7 @@ public class Block {
                 bonusFee = bonusFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
             else if (this.heightBlock < inDay30 << 3) // 16 mounth
                 bonusFee = bonusFee.divide(new BigDecimal(3), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-            else if (this.heightBlock < inDay30 << 4) //  64 mounth
+            else if (false && this.heightBlock < inDay30 << 4) //  64 mounth
                 bonusFee = bonusFee.divide(new BigDecimal(4), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
             else
                 bonusFee = bonusFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);

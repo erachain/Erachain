@@ -176,9 +176,9 @@ public class BlockChain {
     // need RIGHTS for PERSON account
     public static final BigDecimal MINOR_ERA_BALANCE_BD = BigDecimal.valueOf(MINOR_ERA_BALANCE);
     // GIFTS for R_SertifyPubKeys
-    public static final int GIFTED_COMPU_AMOUNT = 10000; //FEE_PER_BYTE << 8;
+    public static final int GIFTED_COMPU_AMOUNT = 20000; // FEE_PER_BYTE << 8;
     public static final BigDecimal GIFTED_COMPU_AMOUNT_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT, FEE_SCALE);
-    public static final int GIFTED_COMPU_AMOUNT_FOR_PERSON = 200 * GIFTED_COMPU_AMOUNT; // GIFTED_COMPU_AMOUNT << 7;
+    public static final int GIFTED_COMPU_AMOUNT_FOR_PERSON = 150000; //GIFTED_COMPU_AMOUNT << 7;
     public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON, FEE_SCALE);
     //private int checkPoint = DEVELOP_USE?1:32400;
     public static final Tuple2<Integer, byte[]> CHECKPOINT = new Tuple2<Integer, byte[]>(36654,
