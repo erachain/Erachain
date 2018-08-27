@@ -425,11 +425,11 @@ public class Block {
 
     public BigDecimal getBonusFee() {
 
-        // NOT GIFT for MISSed forger
-        long cut1 = this.target << 1;
-        if (this.heightBlock > BlockChain.VERS_4_11 &&
-                this.winValue >= cut1) {
-            return BigDecimal.ZERO;
+        if (this.heightBlock > BlockChain.VERS_4_11) {
+            // NOT GIFT for MISSed forger
+            if(this.winValue >= this.target + (this.target >>2)) {
+                return BigDecimal.ZERO;
+            }
         }
 
         int inDay30 = BlockChain.BLOCKS_PER_DAY * 30;

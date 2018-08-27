@@ -20,8 +20,12 @@ public class VoteOnItemPollTransaction extends Transaction {
     private static final byte TYPE_ID = (byte) VOTE_ON_ITEM_POLL_TRANSACTION;
     private static final String NAME_ID = "Vote on Item Poll";
     private static final int OPTION_SIZE_LENGTH = 4;
-    private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + KEY_LENGTH + OPTION_SIZE_LENGTH;
-    private static final int BASE_LENGTH = Transaction.BASE_LENGTH + KEY_LENGTH + OPTION_SIZE_LENGTH;
+
+    private static final int LOAD_LENGTH = KEY_LENGTH + OPTION_SIZE_LENGTH;
+    private static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + LOAD_LENGTH;
+    private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + LOAD_LENGTH;
+    private static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
+    private static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
     public int option;
     private long key;
     private PollCls poll;
@@ -68,14 +72,17 @@ public class VoteOnItemPollTransaction extends Transaction {
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
-        int test_len = BASE_LENGTH;
+        int test_len;
         if (asDeal == Transaction.FOR_MYPACK) {
-            test_len -= Transaction.TIMESTAMP_LENGTH + Transaction.FEE_POWER_LENGTH;
+            test_len = BASE_LENGTH_AS_MYPACK;
         } else if (asDeal == Transaction.FOR_PACK) {
-            test_len -= Transaction.TIMESTAMP_LENGTH;
+            test_len = BASE_LENGTH_AS_PACK;
         } else if (asDeal == Transaction.FOR_DB_RECORD) {
-            test_len += Transaction.FEE_POWER_LENGTH;
+            test_len = BASE_LENGTH_AS_DBRECORD;
+        } else {
+            test_len = BASE_LENGTH;
         }
+
         if (data.length < test_len) {
             throw new Exception("Data does not match block length " + data.length);
         }
@@ -206,11 +213,20 @@ public class VoteOnItemPollTransaction extends Transaction {
 
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
-        if (withSignature) {
-            return BASE_LENGTH_AS_PACK;
-        } else {
-            return BASE_LENGTH;
-        }
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
+        return base_len;
     }
 
     //VALIDATE
