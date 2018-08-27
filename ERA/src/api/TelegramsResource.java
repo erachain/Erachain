@@ -75,16 +75,16 @@ public class TelegramsResource {
                         try {
                             message = (new String(ddd, "UTF-8"));
                         } catch (UnsupportedEncodingException e) {
-                            message =  "error UTF-8";
+                            message = "error UTF-8";
                         }
                     } else {
                         message = Base58.encode(ddd);
                     }
                 } else {
-                    message =  "decode error";
+                    message = "decode error";
                 }
 
-                JSONObject transactionJson = (JSONObject)item.get("transaction");
+                JSONObject transactionJson = (JSONObject) item.get("transaction");
                 transactionJson.put("message", message);
 
                 item.put("transaction", transactionJson);
@@ -100,9 +100,9 @@ public class TelegramsResource {
     @GET
     @Path("timestamp/{timestamp}")
     public String getTelegramsLimited(@PathParam("timestamp") long timestamp,
-                                        @QueryParam("filter") String filter,
-                                        @QueryParam("decrypt") boolean decrypt,
-                                        @QueryParam("password") String password) {
+                                      @QueryParam("filter") String filter,
+                                      @QueryParam("decrypt") boolean decrypt,
+                                      @QueryParam("password") String password) {
 
         // CREATE JSON OBJECT
         JSONArray array = new JSONArray();
@@ -197,8 +197,8 @@ public class TelegramsResource {
     @Path("get/{signature}")
     // GET telegrams/get/6kdJgbiTxtqFt2zQDz9Lb29Z11Fa1TSwfZvjU21j6Cn9umSUEK4jXmNU19Ww4RcXpFyQiJTCaSz6Lc5YKn26hsR
     public String getTelegramBySignature(@PathParam("signature") String signature,
-                                            @QueryParam("decrypt") boolean decrypt,
-                                            @QueryParam("password") String password) {
+                                         @QueryParam("decrypt") boolean decrypt,
+                                         @QueryParam("password") String password) {
 
         if (decrypt)
             APIUtils.askAPICallAllowed(password, "GET telegrams decrypt", request);
@@ -231,16 +231,16 @@ public class TelegramsResource {
     /**
      * Send telegram. not in block chain
      *
-     * @param sender_in     address in wallet
-     * @param recipient_in  recipient
-     * @param feePow        feePow
-     * @param assetKey      assetKey
-     * @param amount        amount
-     * @param title         title
-     * @param message       message
-     * @param encoding  code if exist is text (not required field)
-     * @param encrypt       bool value isEncrypt
-     * @param password      password
+     * @param sender_in    address in wallet
+     * @param recipient_in recipient
+     * @param feePow       feePow
+     * @param assetKey     assetKey
+     * @param amount       amount
+     * @param title        title
+     * @param message      message
+     * @param encoding     code if exist is text (not required field)
+     * @param encrypt      bool value isEncrypt
+     * @param password     password
      * @return return signature telegram
      *
      * <h2>Example request</h2>
@@ -326,7 +326,7 @@ public class TelegramsResource {
             isTextByte = new byte[]{0};
         } else {
             encrypted = encrypt ? new byte[]{1} : new byte[]{0};
-            isTextByte = (encoding == 0) ? new byte[] { 1 } : new byte[] { 0 };
+            isTextByte = (encoding == 0) ? new byte[]{1} : new byte[]{0};
         }
 
         // title
@@ -399,10 +399,14 @@ public class TelegramsResource {
      * @param x JSON data row
      * @return signature telegram
      * <h2>Example request</h2>
+     * if using Node console
+     * use this:
      * POST telegrams/send {"sender":"79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy","recipient":"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob",
      * "feePow":0,"assetKey":643,"amount":0.01,"title":"NPL","encoding":0,"encrypt":true,"password":"123456789"}
+     * if using command line
+     * use this:
+     * curl -d {\"sender\":\"7CzxxwH7u9aQtx5iNHskLQjyJvybyKg8rF\",\"recipient\":\"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob\",\"title\":\"title\",\"message\":\"message\",\"encrypt\":true,\"password\":\"123456789\"} -X POST http://127.0.0.1:9068/telegrams/send
      *
-     * {"sender":"7CzxxwH7u9aQtx5iNHskLQjyJvybyKg8rF","recipient":"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob", "feePow":0,"assetKey":643,"amount":0.01,"title":"NPL","message":"probe skd fkjsdf hskjdf hskdj ","encoding":0,"encrypt":true,"password":"123456789"}
      * <h2>Example response</h2>
      * {
      * "signature":"FC3vHuUoPhYArc8L4DbgshH4mu54EaFZdGJ8Mh48FozDb5oSZazNVucyiyTYpFAHZNALUVYn5DCATMMNvtJTPhf"
@@ -520,7 +524,7 @@ public class TelegramsResource {
                 out.put("signature", obj.toString());
             else {
                 boolean found = false;
-                for (Account account: controller.getAccounts()) {
+                for (Account account : controller.getAccounts()) {
                     if (telegramMessage.getTransaction().isInvolved(account)) {
                         deleteList.add(telegramMessage);
                         found = true;
