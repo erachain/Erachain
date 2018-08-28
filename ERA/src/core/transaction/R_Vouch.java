@@ -248,7 +248,7 @@ public class R_Vouch extends Transaction {
 		if (b == null )
 			return INVALID_BLOCK_HEIGHT_ERROR;
 
-		Block block = db.getBlockMap().get(b);
+		Block block = db.getBlocksHeadMap().get(b);
 		if (block == null)
 			return INVALID_BLOCK_HEIGHT_ERROR;
 		Transaction tx = block.getTransaction(seq);

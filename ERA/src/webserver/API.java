@@ -336,14 +336,14 @@ public class API {
             ++step;
             Block block;
             LinkedList eee = null;
-            //LinkedList eee = ((LinkedList) dcSet.getBlockMap().map);//.keySet());
-            //LinkedList eee = ((LinkedList) dcSet.getBlockMap().map.keySet());
-            //LinkedList eee = ((LinkedList) dcSet.getBlockMap().map.values());
-            //LinkedList eee = ((LinkedList) dcSet.getBlockMap().map.entrySet());
+            //LinkedList eee = ((LinkedList) dcSet.getBlocksHeadMap().map);//.keySet());
+            //LinkedList eee = ((LinkedList) dcSet.getBlocksHeadMap().map.keySet());
+            //LinkedList eee = ((LinkedList) dcSet.getBlocksHeadMap().map.values());
+            //LinkedList eee = ((LinkedList) dcSet.getBlocksHeadMap().map.entrySet());
             ListIterator listIterator = eee.listIterator(height);
             block = (Block) listIterator.next();
 
-            //block = dcSet.getBlockMap().get(iterator.next());
+            //block = dcSet.getBlocksHeadMap().get(iterator.next());
             out.put("block", block.toJson());
 
             ++step;

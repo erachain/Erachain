@@ -532,12 +532,12 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 	public static int getForkHeight(DCSet db)
 	{
 		//CHECK IF FORK
-		if ( db.getBlockMap().getParentList() != null )
+		if ( db.getBlocksHeadMap().getParentList() != null )
 		{
 			//FIND FORKHEIGHT
-			if ( db.getBlockMap().getList().isEmpty()  )
+			if ( db.getBlocksHeadMap().getList().isEmpty()  )
 			{
-				return db.getBlockMap().getLastBlock().getHeight(db) + 1;
+				return db.getBlocksHeadMap().getLastBlock().getHeight(db) + 1;
 			}
 			else
 			{

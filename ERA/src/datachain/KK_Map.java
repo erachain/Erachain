@@ -22,7 +22,7 @@ public class KK_Map extends DCMap<
 
                         byte[], // any additional data
 
-                        Integer, // block.getHeight() -> db.getBlockMap(db.getHeightMap().getBlockByHeight(index))
+                        Integer, // block.getHeight() -> db.getBlocksHeadMap(db.getHeightMap().getBlockByHeight(index))
                         Integer // block.getTransaction(transaction.getSignature()) -> block.getTransaction(index)
                         >>>> {
 

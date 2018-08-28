@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+import com.google.common.primitives.Longs;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -39,17 +40,22 @@ import utils.Converter;
 public class Block {
 
     static private HashMap totalCOMPUtest = new HashMap();
+
     public static final int VERSION_LENGTH = 4;
-    //public static final int TIMESTAMP_LENGTH = 8;
+    public static final int TIMESTAMP_LENGTH = 8;
     public static final int GENERATING_BALANCE_LENGTH = 4;
     public static final int CREATOR_LENGTH = Crypto.HASH_LENGTH;
     public static final int SIGNATURE_LENGTH = Crypto.SIGNATURE_LENGTH;
     public static final int REFERENCE_LENGTH = SIGNATURE_LENGTH;
     public static final int TRANSACTIONS_HASH_LENGTH = Crypto.HASH_LENGTH;
     public static final int AT_BYTES_LENGTH = 4;
-    private static final int TRANSACTIONS_COUNT_LENGTH = 4;
-    private static final int TRANSACTION_SIZE_LENGTH = 4;
-    private static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH
+    public static final int TRANSACTIONS_COUNT_LENGTH = 4;
+    public static final int TRANSACTION_SIZE_LENGTH = 4;
+    public static final int HEIGHT_LENGTH = 4;
+    public static final int WIN_VALUE_LENGTH = 8;
+    public static final int FEE_LENGTH = 8;
+
+    public static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH
             //+ GENERATING_BALANCE_LENGTH
             + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
     public static final int MAX_TRANSACTION_BYTES = BlockChain.MAX_BLOCK_BYTES - BASE_LENGTH;
@@ -75,12 +81,229 @@ public class Block {
     protected long winValue;
     /// END of HEAD ///
     protected long target;
+    protected long totalFee;
+    protected long emittedFee;
+
     // BODY
     protected List<Transaction> transactions;
     protected byte[] rawTransactions = null;
     //protected Long atFees;
     protected byte[] atBytes;
 
+    /////////////////////////////////////// BLOCK HEAD //////////////////////////////
+    public static class BlockHead {
+
+        public static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH
+                + TRANSACTIONS_COUNT_LENGTH + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH
+                + HEIGHT_LENGTH + GENERATING_BALANCE_LENGTH + WIN_VALUE_LENGTH + WIN_VALUE_LENGTH
+                + FEE_LENGTH + FEE_LENGTH;
+
+        public final int version;
+        public final byte[] reference;
+        public final PublicKeyAccount creator;
+        public final int transactionCount;
+        public final byte[] transactionsHash;
+        public final byte[] signature;
+
+        // MIND - that calculated on DB
+        public final int heightBlock;
+        public final int forgingValue;
+        public final long winValue;
+        public final long target;
+        public final long totalFee;
+        public final long emittedFee;
+
+        public BlockHead(int version, byte[] reference, PublicKeyAccount creator, int transactionCount,
+                         byte[] transactionsHash, byte[] signature,
+                         int heightBlock, int forgingValue, long winValue, long target,
+                         long totalFee, long emittedFee) {
+            this.version = version;
+            this.creator = creator;
+            this.signature = signature;
+            this.transactionCount = transactionCount;
+            this.transactionsHash = transactionsHash;
+            this.reference = reference;
+
+            this.heightBlock = heightBlock;
+            this.forgingValue = forgingValue;
+            this.winValue = winValue;
+            this.target = target;
+            this.totalFee = totalFee;
+            this.emittedFee = emittedFee;
+        }
+
+        public BlockHead(Block block, int heightBlock, int forgingValue, long winValue, long target,
+                         long totalFee, long emittedFee) {
+            this.version = block.version;
+            this.reference = block.reference;
+            this.creator = block.creator;
+            this.transactionCount = block.transactionCount;
+            this.transactionsHash = block.transactionsHash;
+            this.signature = block.signature;
+
+            this.heightBlock = heightBlock;
+            this.forgingValue = forgingValue;
+            this.winValue = winValue;
+            this.target = target;
+            this.totalFee = totalFee;
+            this.emittedFee = emittedFee;
+        }
+
+        public BlockHead(Block block) {
+            this.version = block.version;
+            this.reference = block.reference;
+            this.creator = block.creator;
+            this.transactionCount = block.transactionCount;
+            this.transactionsHash = block.transactionsHash;
+            this.signature = block.signature;
+
+            this.heightBlock = block.heightBlock;
+            this.forgingValue = block.forgingValue;
+            this.winValue = block.winValue;
+            this.target = block.target;
+            this.totalFee = block.totalFee;
+            this.emittedFee = block.emittedFee;
+        }
+
+        public byte[] toBytes() {
+            byte[] data = new byte[0];
+
+            //WRITE VERSION
+            byte[] versionBytes = Ints.toByteArray(this.version);
+            versionBytes = Bytes.ensureCapacity(versionBytes, VERSION_LENGTH, 0);
+            data = Bytes.concat(data, versionBytes);
+
+            //WRITE REFERENCE
+            byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
+            data = Bytes.concat(data, referenceBytes);
+
+            //WRITE GENERATOR
+            byte[] generatorBytes = Bytes.ensureCapacity(this.creator.getPublicKey(), CREATOR_LENGTH, 0);
+            data = Bytes.concat(data, generatorBytes);
+
+            //WRITE TRANSACTION COUNT
+            byte[] transactionCountBytes = Ints.toByteArray(this.transactionCount);
+            transactionCountBytes = Bytes.ensureCapacity(transactionCountBytes, TRANSACTIONS_COUNT_LENGTH, 0);
+            data = Bytes.concat(data, transactionCountBytes);
+
+            //WRITE TRANSACTIONS HASH
+            data = Bytes.concat(data, this.transactionsHash);
+
+            //WRITE GENERATOR SIGNATURE
+            data = Bytes.concat(data, this.signature);
+
+            //WRITE HEIGHT
+            byte[] heightBytes = Ints.toByteArray(this.heightBlock);
+            heightBytes = Bytes.ensureCapacity(heightBytes, HEIGHT_LENGTH, 0);
+            data = Bytes.concat(data, heightBytes);
+
+            //WRITE GENERATING BALANCE
+            byte[] generatingBalanceBytes = Ints.toByteArray(this.forgingValue);
+            generatingBalanceBytes = Bytes.ensureCapacity(generatingBalanceBytes, GENERATING_BALANCE_LENGTH, 0);
+            data = Bytes.concat(data, generatingBalanceBytes);
+
+            //WRITE WIN VALUE
+            byte[] winValueBytes = Longs.toByteArray(this.winValue);
+            winValueBytes = Bytes.ensureCapacity(winValueBytes, WIN_VALUE_LENGTH, 0);
+            data = Bytes.concat(data, winValueBytes);
+
+            //WRITE TARGET
+            byte[] targetBytes = Longs.toByteArray(this.target);
+            targetBytes = Bytes.ensureCapacity(targetBytes, WIN_VALUE_LENGTH, 0);
+            data = Bytes.concat(data, targetBytes);
+
+            //WRITE TOTAL FEE
+            byte[] totalFeeBytes = Longs.toByteArray(this.totalFee);
+            totalFeeBytes = Bytes.ensureCapacity(totalFeeBytes, FEE_LENGTH, 0);
+            data = Bytes.concat(data, totalFeeBytes);
+
+            //WRITE EMITTED FEE
+            byte[] emittedFeeBytes = Longs.toByteArray(this.emittedFee);
+            emittedFeeBytes = Bytes.ensureCapacity(emittedFeeBytes, FEE_LENGTH, 0);
+            data = Bytes.concat(data, emittedFeeBytes);
+
+            return data;
+        }
+
+        public static BlockHead parse(byte[] data) throws Exception {
+
+            if (data.length == 0) {
+                return null;
+            }
+
+            //CHECK IF WE HAVE MINIMUM BLOCK LENGTH
+            if (data.length < BlockHead.BASE_LENGTH) {
+                throw new Exception("Data is less then minimum blockHead length");
+            }
+
+            int position = 0;
+
+            //READ VERSION
+            byte[] versionBytes = Arrays.copyOfRange(data, position, position + VERSION_LENGTH);
+            int version = Ints.fromByteArray(versionBytes);
+            position += VERSION_LENGTH;
+
+            //READ REFERENCE
+            byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+            position += REFERENCE_LENGTH;
+
+            //READ GENERATOR
+            byte[] generatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+            PublicKeyAccount creator = new PublicKeyAccount(generatorBytes);
+            position += CREATOR_LENGTH;
+
+            //READ TRANSACTIONS COUNT
+            byte[] transactionCountBytes = Arrays.copyOfRange(data, position, position + TRANSACTIONS_COUNT_LENGTH);
+            int transactionCount = Ints.fromByteArray(transactionCountBytes);
+            position += TRANSACTIONS_COUNT_LENGTH;
+
+            //READ TRANSACTION HASH
+            byte[] transactionsHash = Arrays.copyOfRange(data, position, position + TRANSACTIONS_HASH_LENGTH);
+            position += TRANSACTIONS_HASH_LENGTH;
+
+            //READ SIGNATURE
+            byte[] signature = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
+            position += SIGNATURE_LENGTH;
+
+            //////////////////////
+            //READ HEIGHT
+            byte[] heightBytes = Arrays.copyOfRange(data, position, position + HEIGHT_LENGTH);
+            int height = Ints.fromByteArray(heightBytes);
+            position += HEIGHT_LENGTH;
+
+            //READ GENERATING BALANCE
+            byte[] generatingBalanceBytes = Arrays.copyOfRange(data, position, position + GENERATING_BALANCE_LENGTH);
+            int forgingValue = Ints.fromByteArray(generatingBalanceBytes);
+            position += GENERATING_BALANCE_LENGTH;
+
+            //READ WIN VALUE
+            byte[] winValueBytes = Arrays.copyOfRange(data, position, position + WIN_VALUE_LENGTH);
+            long winValue = Longs.fromByteArray(winValueBytes);
+            position += WIN_VALUE_LENGTH;
+
+            //READ TARGET
+            byte[] targetBytes = Arrays.copyOfRange(data, position, position + WIN_VALUE_LENGTH);
+            long target = Longs.fromByteArray(targetBytes);
+            position += WIN_VALUE_LENGTH;
+
+            //READ TOTAL FEE
+            byte[] totalFeeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            long totalFee = Longs.fromByteArray(totalFeeBytes);
+            position += FEE_LENGTH;
+
+            //READ EMITTED FEE
+            byte[] emittedFeeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            long emittedFee = Longs.fromByteArray(emittedFeeBytes);
+            position += FEE_LENGTH;
+
+            return new BlockHead(version, reference, creator, transactionCount, transactionsHash, signature,
+                    height, forgingValue, winValue, target, totalFee, emittedFee);
+
+        }
+
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////
     public Block(int version, byte[] reference, PublicKeyAccount creator, byte[] transactionsHash, byte[] atBytes) {
         this.version = version;
         this.reference = reference;
@@ -969,10 +1192,10 @@ public class Block {
 
         if (andProcess) {
             //ADD TO DB
-            //LOGGER.debug("getBlockMap() [" + dcSet.getBlockMap().size() + "]");
+            //LOGGER.debug("getBlocksHeadMap() [" + dcSet.getBlocksHeadMap().size() + "]");
             dcSet.getBlockMap().add(this);
             this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
-            LOGGER.debug("getBlockMap().set timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
+            LOGGER.debug("getBlocksHeadMap().set timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
 
 
         }
@@ -1270,7 +1493,7 @@ public class Block {
         
 		/*
 		if (!dcSet.isFork()) {
-			int lastHeight = dcSet.getBlockMap().getLastBlock().getHeight(dcSet);
+			int lastHeight = dcSet.getBlocksHeadMap().getLastBlock().getHeight(dcSet);
 			LOGGER.error("*** core.block.Block.process(DBSet)[" + (this.getParentHeight(dcSet) + 1)
 					+ "] SET new last Height: " + lastHeight
 					+ " getHeightMap().getHeight: " + this.height_process);
@@ -1301,7 +1524,7 @@ public class Block {
         if (dcSet.getBlockMap().add(this))
             throw new Exception("block already exist!!");
 
-        LOGGER.debug("getBlockMap().set timer: " + (System.currentTimeMillis() - timerStart));
+        LOGGER.debug("getBlocksHeadMap().set timer: " + (System.currentTimeMillis() - timerStart));
 
         this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
 

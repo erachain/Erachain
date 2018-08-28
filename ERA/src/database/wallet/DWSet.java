@@ -32,7 +32,7 @@ public class DWSet implements IDB {
     private AccountMap accountMap;
     private AccountsPropertisMap accountsPropertisMap;
     private TransactionMap transactionMap;
-    private BlockMap blockMap;
+    private BlocksHeadMap blocksHeadMap;
     private NameMap nameMap;
     private NameSaleMap nameSaleMap;
     private PollMap pollMap;
@@ -79,7 +79,7 @@ public class DWSet implements IDB {
         this.accountMap = new AccountMap(this, this.database);
         this.accountsPropertisMap = new AccountsPropertisMap(this, this.database);
         this.transactionMap = new TransactionMap(this, this.database);
-        this.blockMap = new BlockMap(this, this.database);
+        this.blocksHeadMap = new BlocksHeadMap(this, this.database);
         this.nameMap = new NameMap(this, this.database);
         this.nameSaleMap = new NameSaleMap(this, this.database);
         this.pollMap = new PollMap(this, this.database);
@@ -164,8 +164,8 @@ public class DWSet implements IDB {
         return this.transactionMap;
     }
 
-    public BlockMap getBlockMap() {
-        return this.blockMap;
+    public BlocksHeadMap getBlocksHeadMap() {
+        return this.blocksHeadMap;
     }
 
     public NameMap getNameMap() {
@@ -322,7 +322,7 @@ public class DWSet implements IDB {
         this.uses++;
 
         this.accountMap.delete(account);
-        this.blockMap.delete(account);
+        this.blocksHeadMap.delete(account);
         this.transactionMap.delete(account);
         this.nameMap.delete(account);
         this.nameSaleMap.delete(account);

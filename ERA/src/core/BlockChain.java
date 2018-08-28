@@ -390,7 +390,7 @@ public class BlockChain {
 
         }
 
-        //lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
+        //lastBlockSignature = dcSet.getBlocksHeadMap().getLastBlockSignature();
         //HWeight = dcSet.getBlockSignsMap().get(lastBlockSignature);
 
     }
@@ -399,7 +399,7 @@ public class BlockChain {
     public static int getHeight(DCSet dcSet) {
 
         //GET LAST BLOCK
-        ///byte[] lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
+        ///byte[] lastBlockSignature = dcSet.getBlocksHeadMap().getLastBlockSignature();
         ///return dcSet.getBlockSignsMap().getHeight(lastBlockSignature);
         return dcSet.getBlockMap().size();
     }
@@ -620,7 +620,7 @@ public class BlockChain {
 			return null;
 
 		//GET LAST BLOCK
-		byte[] lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
+		byte[] lastBlockSignature = dcSet.getBlocksHeadMap().getLastBlockSignature();
 		// test String b58 = Base58.encode(lastBlockSignature);
 
 		int height;
@@ -728,8 +728,8 @@ public class BlockChain {
             } else {
                 packet = SYNCHRONIZE_PACKET;
             }
-            //BlocksHeadsMap childsMap = dcSet.getBlockHeightsMap();
-            //BlocksHeadsMap map = dcSet.getBlockHeightsMap();
+            //BlocksHeads_2Map childsMap = dcSet.getBlockHeightsMap();
+            //BlocksHeads_2Map map = dcSet.getBlockHeightsMap();
             BlocksHeadsMap map = dcSet.getBlocksHeadsMap();
             int counter = 0;
             while (parentSignature != null && counter++ < packet) {
@@ -797,7 +797,7 @@ public class BlockChain {
 			lastSignature = dcSet.getBlocksHeadsMap().get(height01).b;
 			if(Arrays.equals(lastSignature, block.getReference())) {
 				// CONCURENT for LAST BLOCK
-				Block lastBlock = dcSet.getBlockMap().last();
+				Block lastBlock = dcSet.getBlocksHeadMap().last();
 				if (block.calcWinValue(dcSet) > lastBlock.calcWinValue(dcSet)) {
 					LOGGER.debug("isNewBlockValid -> reference to PARENT last block >>> TRY WIN");
 					return 4;

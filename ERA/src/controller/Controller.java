@@ -496,7 +496,7 @@ public class Controller extends Observable {
 
         // CHECK IF DB NEEDS UPDATE
         /*
-         * try { if(this.dcSet.getBlockMap().getLastBlockSignature() != null) {
+         * try { if(this.dcSet.getBlocksHeadMap().getLastBlockSignature() != null) {
          * //CHECK IF NAME STORAGE NEEDS UPDATE if
          * (this.dcSet.getLocalDataMap().get("nsupdate") == null ) { //FIRST
          * NAME STORAGE UPDATE UpdateUtil.repopulateNameStorage( 70000 );
@@ -1694,7 +1694,7 @@ public class Controller extends Observable {
          * (maxPeerWeight > chainWeight) { // SAME last block? int pickTarget =
          * BlockChain.BASE_TARGET >>2; if (true || (maxPeerWeight - chainWeight
          * < pickTarget)) { byte[] lastBlockSignature =
-         * dcSet.getBlockMap().getLastBlockSignature();
+         * dcSet.getBlocksHeadMap().getLastBlockSignature();
          *
          * Block maxBlock = null; try { maxBlock =
          * core.Synchronizer.getBlock(lastBlockSignature, maxHW.c, true); }

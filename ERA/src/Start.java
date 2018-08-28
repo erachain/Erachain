@@ -108,8 +108,7 @@ public class Start {
                         .replace("%app%", Lang.getInstance().translate(controller.Controller.APP_NAME))
                         .replace("%version%", Controller.getVersion())
                         .replace("%builddate%", Controller.getBuildDateString());
-                LOGGER.info(info
-                );
+                LOGGER.info(info);
                 if (Controller.useGui) about_frame.set_console_Text(info);
 
 

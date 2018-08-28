@@ -4339,7 +4339,7 @@ public class BlockExplorer {
 
         // GET LAST BLOCK
         // byte[] lastBlockSignature =
-        // dcSet.getBlockMap().getLastBlockSignature();
+        // dcSet.getBlocksHeadMap().getLastBlockSignature();
         // RETURN HEIGHT
         // return dcSet.getBlockSignsMap().getHeight(lastBlockSignature);
         return dcSet.getBlockMap().size();

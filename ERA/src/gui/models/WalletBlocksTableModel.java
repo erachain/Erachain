@@ -35,8 +35,8 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 
     public WalletBlocksTableModel() {
         //Controller.getInstance().addWalletListener(this);
-        Controller.getInstance().wallet.database.getBlockMap().addObserver(this);
-        this.blocks = Controller.getInstance().wallet.database.getBlockMap().getList();
+        Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this);
+        this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
     }
 
     @Override
@@ -162,7 +162,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
         if (message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE) {
             this.blocks = (SortableList<Tuple2<String, String>, Block>) message.getValue();
             //this.blocks.registerObserver();
-            Controller.getInstance().wallet.database.getBlockMap().addObserver(this.blocks);
+            Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.blocks);
             this.blocks.sort(BlockMap.TIMESTAMP_INDEX, true);
             this.fireTableDataChanged();
 
@@ -182,8 +182,8 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
     }
 
     public void deleteObserver() {
-        Controller.getInstance().wallet.database.getBlockMap().deleteObserver(this);
-        Controller.getInstance().wallet.database.getBlockMap().deleteObserver(this.blocks);
+        Controller.getInstance().wallet.database.getBlocksHeadMap().deleteObserver(this);
+        Controller.getInstance().wallet.database.getBlocksHeadMap().deleteObserver(this.blocks);
 
     }
 

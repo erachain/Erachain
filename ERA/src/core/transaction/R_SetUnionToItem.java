@@ -330,7 +330,7 @@ public class R_SetUnionToItem extends Transaction {
         // pack additional data
         byte[] a_data = new byte[0];//this.value1;
 
-        //Block block = db.getBlockMap().getLastBlock();
+        //Block block = db.getBlocksHeadMap().getLastBlock();
         //int blockIndex = block.getHeight(db);
         //int transactionIndex = block.getTransactionIndex(signature);
 
