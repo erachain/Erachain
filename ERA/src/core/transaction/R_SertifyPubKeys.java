@@ -506,8 +506,10 @@ public class R_SertifyPubKeys extends Transaction {
             return BlockChain.BONUS_FEE_LVL2;
         else if (personsTotal < 100000)
             return BlockChain.BONUS_FEE_LVL3;
-        else
+        else if (personsTotal < 1000000)
             return BlockChain.BONUS_FEE_LVL4;
+        else
+            return BlockChain.BONUS_FEE_LVL5;
 
     }
 

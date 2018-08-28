@@ -165,10 +165,11 @@ public class BlockChain {
 
     // 0.0075 COMPU - is FEE for Issue Person - then >> 2 - всумме столько получают Форжер и кто привел
     // Бонус получает Персона, Вносит, Удостоверяет - 3 человека = Эмиссия
-    public static final BigDecimal BONUS_FEE_LVL1 = new BigDecimal("0.01"); // < 3000
-    public static final BigDecimal BONUS_FEE_LVL2 = new BigDecimal("0.005"); // < 10000
-    public static final BigDecimal BONUS_FEE_LVL3 = new BigDecimal("0.002"); // < 100000
-    public static final BigDecimal BONUS_FEE_LVL4 = new BigDecimal("0.001"); // else
+    public static final BigDecimal BONUS_FEE_LVL1 = new BigDecimal("0.01"); // < 3 000
+    public static final BigDecimal BONUS_FEE_LVL2 = new BigDecimal("0.008"); // < 10 000
+    public static final BigDecimal BONUS_FEE_LVL3 = new BigDecimal("0.005"); // < 100 000
+    public static final BigDecimal BONUS_FEE_LVL4 = new BigDecimal("0.0025"); // < 1 000 000
+    public static final BigDecimal BONUS_FEE_LVL5 = new BigDecimal("0.0015"); // else
     public static final int FEE_FOR_ANONIMOUSE = 33;
     // SERTIFY
     // need RIGHTS for non PERSON account
