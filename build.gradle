@@ -1,11 +1,25 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.ajoberstar:grgit:1.7.2'
+    }
+}
+
 plugins {
     id 'java'
 }
 
+ext {
+    git = org.ajoberstar.grgit.Grgit.open()
+    rev = git.head().id
+    rev = git.head().getAbbreviatedId(8)
+}
+
 archivesBaseName = 'erachain-dev'
 group 'org.erachain'
-version '4.11.2'
-
+version "4.11.04-${git.head().abbreviatedId}"
 sourceCompatibility = 1.8
 
 repositories {
@@ -22,7 +36,13 @@ compileJava {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'Start'
+        attributes('Main-Class': 'Start',
+                'Implementation-Title': 'Gradle Build: ' + project.name,
+                'Implementation-Version': project.version,
+                'Build-Time': new Date().format("yyyy-MM-dd HH:mm:ssZ"),
+                'Git-Commit': rev,
+                'Git-Branch': git.branch.current.getName()
+        )
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     exclude('META-INF/*.SF')
@@ -44,18 +64,15 @@ sourceSets {
     }
 }
 
-test{
+test {
     systemProperty('version', '411')
     systemProperty('developer', 'true')
 }
 
-
-
-build{
-    System.setProperty("version","0")
-    System.setProperty("developer","false")
+build {
+    System.setProperty("version", "0")
+    System.setProperty("developer", "false")
 }
-
 
 dependencies {
     compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.54'
