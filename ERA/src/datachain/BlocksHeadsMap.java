@@ -2,6 +2,7 @@ package datachain;
 
 
 import core.block.Block;
+import database.serializer.BlockHeadSerializer;
 import org.apache.log4j.Logger;
 import org.mapdb.Atomic;
 import org.mapdb.BTreeKeySerializer;
@@ -54,6 +55,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
         //OPEN MAP
         return database.createTreeMap(NAME)
                 .keySerializer(BTreeKeySerializer.BASIC)
+                .valueSerializer(new BlockHeadSerializer())
                 .counterEnable()
                 .makeOrGet();
     }
