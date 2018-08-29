@@ -23,6 +23,8 @@ import utils.ObserverMessage;
 @SuppressWarnings("serial")
 public class BlocksTableModel extends AbstractTableModel implements Observer {
 
+    public static final int maxSize = 50;
+
     public static final int COLUMN_HEIGHT = 0;
     public static final int COLUMN_TIMESTAMP = 1;
     public static final int COLUMN_GENERATOR = 2;
@@ -188,14 +190,22 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
             Block.BlockHead block = (Block.BlockHead) message.getValue();
             this.blocks.add(0, block);
             this.fireTableRowsInserted(0, 0);
-            if (this.blocks.size() > 100) {
-                this.blocks.remove(100);
-                this.fireTableRowsDeleted(100, 100);
+            boolean needFire = false;
+            while(this.blocks.size() > maxSize) {
+                this.blocks.remove(maxSize);
+                needFire = true;
             }
+
+            if (needFire) this.fireTableRowsDeleted(maxSize, maxSize);
 
         } else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
             //CHECK IF LIST UPDATED
-            this.blocks.remove(0);
+            try {
+                this.blocks.remove(0);
+            } catch (Exception e) {
+                resetRows();
+                return;
+            }
             if (this.blocks.size() > 10) {
                 this.fireTableRowsDeleted(0, 0);
             } else {
@@ -216,7 +226,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
         DCSet dcSet = DCSet.getInstance();
         Block.BlockHead head = cntr.getLastBlock().blockHead;
         int i = 0;
-        while (i <= 50) {
+        while (i <= maxSize) {
             if (head == null)
                 return;
             this.blocks.add(head);

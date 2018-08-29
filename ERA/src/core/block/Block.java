@@ -577,10 +577,14 @@ public class Block {
     }
 
     public void loadHeadMind(DCSet dcSet) {
-        Block.BlockHead blockHead = dcSet.getBlocksHeadsMap().get(this.heightBlock);
+        this.blockHead = dcSet.getBlocksHeadsMap().get(this.heightBlock);
         this.forgingValue = blockHead.forgingValue;
         this.winValue = blockHead.winValue;
         this.target = blockHead.target;
+        this.totalFee = blockHead.totalFee;
+        this.emittedFee = blockHead.emittedFee;
+        //this.transactionCount = blockHead.transactionsCount;
+        //this.version = blockHead.version;
     }
 
 	/*
@@ -691,6 +695,10 @@ public class Block {
     }
 
     public BigDecimal getBonusFee() {
+
+        if (this.heightBlock == 1) {
+            return BigDecimal.ZERO;
+        }
 
         if (this.heightBlock > BlockChain.VERS_4_11) {
             // NOT GIFT for MISSed forger
@@ -1450,7 +1458,7 @@ public class Block {
         long emittedFee;
         if (blockHead == null) {
             this.blockHead = new BlockHead(this, this.getTotalFee(dcSet).unscaledValue().longValue(),
-                    this.getTotalFee(dcSet).unscaledValue().longValue());
+                    this.getBonusFee().unscaledValue().longValue());
         } else {
 
         }
@@ -1463,9 +1471,8 @@ public class Block {
                 emittedFee = this.blockHead.totalFee>>1;
                 
                 Account richAccount = new Account(rich);
-                //richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).add(bonus_fee), dcSet);
                 richAccount.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY,
-                        new BigDecimal(emittedFee).scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE), true);
+                        new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true);
             } else {
                 emittedFee = this.blockHead.emittedFee;
             }
@@ -1474,17 +1481,17 @@ public class Block {
             emittedFee = this.blockHead.emittedFee;
         }
 
+        //UPDATE GENERATOR BALANCE WITH FEE
+        this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY,
+                new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true);
+
         if (emittedFee != 0) {
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY,
-                    new BigDecimal(emittedFee).scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE), true);
+                    new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true);
         }
 
         //LOGGER.debug("<<< core.block.Block.orphan(DBSet) #3");
-
-        //UPDATE GENERATOR BALANCE WITH FEE
-        this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY,
-                new BigDecimal(this.blockHead.totalFee).scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE), true);
 
     }
 

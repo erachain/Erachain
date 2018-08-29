@@ -703,14 +703,6 @@ public class GenesisBlock extends Block {
         return digest;
     }
 
-	/*
-	@Override
-	public BigDecimal getTotalFee()
-	{
-		return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-	}
-	 */
-
     @Override
     public boolean isSignatureValid() {
 

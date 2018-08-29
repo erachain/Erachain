@@ -1028,11 +1028,11 @@ public class Wallet extends Observable implements Observer {
 
         */
 		this.database.getAccountMap().changeBalance(blockGenerator.getAddress(), asOrphan, FEE_KEY,
-				new BigDecimal(blockFee).scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE));
+				new BigDecimal(blockFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE));
 
 	}
 
-	private void processBlock(Block.BlockHead block) {
+	private void processBlock(Block.BlockHead blockHead) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1041,27 +1041,27 @@ public class Wallet extends Observable implements Observer {
 		long start = System.currentTimeMillis();
 
 		// SET AS LAST BLOCK
-		this.database.setLastBlockSignature(block.signature);
+		this.database.setLastBlockSignature(blockHead.signature);
 
-		Account blockGenerator = block.creator;
+		Account blockGenerator = blockHead.creator;
 		String blockGeneratorStr = blockGenerator.getAddress();
 
 		DCSet dcSet = DCSet.getInstance();
-		int height = block.heightBlock;
+		int height = blockHead.heightBlock;
 
 		// CHECK IF WE ARE GENERATOR
 		if (this.accountExists(blockGeneratorStr)) {
 			// ADD BLOCK
-			this.database.getBlocksHeadMap().add(block);
+			this.database.getBlocksHeadMap().add(blockHead);
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
 			// PROCESS FEE
-			feeProcess(dcSet, block.totalFee, blockGenerator, false);
+			feeProcess(dcSet, blockHead.totalFee, blockGenerator, false);
 			
 		}
 
-		/*
 		// CHECK TRANSACTIONS
+		Block block = dcSet.getBlockMap().get(blockHead.heightBlock);
 		int seqNo = 0;
 		for (Transaction transaction : block.getTransactions()) {
 
@@ -1137,14 +1137,13 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		long tickets = System.currentTimeMillis() - start;
-		LOGGER.info("WALLET [" + block.getHeightByParent(DCSet.getInstance()) + "] processing time: " + tickets * 0.001
-				+ " for records:" + block.getTransactionCount() + " millsec/record:"
-				+ tickets / (block.getTransactionCount() + 1));
-		*/
+		LOGGER.info("WALLET [" + blockHead.heightBlock + "] processing time: " + tickets * 0.001
+				+ " for records:" + blockHead.transactionsCount + " millsec/record:"
+				+ tickets / (blockHead.transactionsCount + 1));
 
 	}
 
-	private void orphanBlock(Block.BlockHead block) {
+	private void orphanBlock(Block.BlockHead blockHead) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1155,11 +1154,12 @@ public class Wallet extends Observable implements Observer {
 		//List<Transaction> transactions = block.a.a;
 
 		DCSet dcSet = DCSet.getInstance();
-		int height = block.heightBlock;
-		/*
+
 		// ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
+		Block block = dcSet.getBlockMap().get(blockHead.heightBlock);
+		List<Transaction> transactions = block.getTransactions();
 		int seqNo;
-		for (int i = transactions.size() - 1; i >= 0; i--) {
+		for (int i = blockHead.transactionsCount - 1; i >= 0; i--) {
 
 			seqNo = i + 1;
 
@@ -1168,7 +1168,7 @@ public class Wallet extends Observable implements Observer {
 				continue;
 			}
 
-			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, height, seqNo);
+			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, blockHead.heightBlock, seqNo);
 			this.orphanTransaction(transaction);
 
 			// CHECK IF PAYMENT
@@ -1232,26 +1232,24 @@ public class Wallet extends Observable implements Observer {
 			}
 		}
 
-		*/
-
-		Account blockGenerator = block.creator;
+		Account blockGenerator = blockHead.creator;
 		String blockGeneratorStr = blockGenerator.getAddress();
 
 		// CHECK IF WE ARE GENERATOR
 		if (this.accountExists(blockGeneratorStr)) {
 			// DELETE BLOCK
-			this.database.getBlocksHeadMap().delete(block);
+			this.database.getBlocksHeadMap().delete(blockHead);
 
 			// SET AS LAST BLOCK
 			// this.database.setLastBlockSignature(block.getReference());
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
-            feeProcess(dcSet, block.totalFee, blockGenerator, true);
+            feeProcess(dcSet, blockHead.totalFee, blockGenerator, true);
             
 		}
 
 		// SET AS LAST BLOCK
-		this.database.setLastBlockSignature(block.reference); // .reference
+		this.database.setLastBlockSignature(blockHead.reference); // .reference
 
 		// long tickets = System.currentTimeMillis() - start;
 		// LOGGER.info("WALLET [" + block.getHeightByParent(DCSet.getInstance())
