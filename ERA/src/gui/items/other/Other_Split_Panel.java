@@ -1,20 +1,5 @@
 package gui.items.other;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JSplitPane;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-
 import controller.Controller;
 import gui.Split_Panel;
 import gui.library.MTable;
@@ -26,6 +11,13 @@ import gui.models.WalletBlocksTableModel;
 import lang.Lang;
 import network.Peer;
 import utils.TableMenuPopupUtil;
+
+import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class Other_Split_Panel extends Split_Panel {
     
@@ -145,7 +137,7 @@ public class Other_Split_Panel extends Split_Panel {
         });
         peers_Menu.add(Baned_24_Hours_Item);
         
-        JMenuItem Baned_Allways_Item = new JMenuItem(Lang.getInstance().translate("Ban Always"));
+        JMenuItem Baned_Allways_Item = new JMenuItem(Lang.getInstance().translate("Ban always"));
         Baned_Allways_Item.addActionListener(new ActionListener() {
             
             @Override
