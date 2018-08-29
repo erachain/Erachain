@@ -1,6 +1,6 @@
 package gui.items.other;
 
-import database.wallet.BlockMap;
+import database.wallet.BlocksHeadMap;
 import gui.CoreRowSorter;
 import gui.library.MTable;
 import gui.models.BlocksTableModel;
@@ -86,12 +86,12 @@ public class other_Panel extends javax.swing.JPanel {
 
         //TRANSACTIONS SORTER
         indexes = new TreeMap<Integer, Integer>();
-        indexes.put(WalletBlocksTableModel.COLUMN_HEIGHT, BlockMap.TIMESTAMP_INDEX);
-        indexes.put(WalletBlocksTableModel.COLUMN_TIMESTAMP, BlockMap.TIMESTAMP_INDEX);
-        indexes.put(WalletBlocksTableModel.COLUMN_GENERATOR, BlockMap.GENERATOR_INDEX);
-        indexes.put(WalletBlocksTableModel.COLUMN_BASETARGET, BlockMap.BALANCE_INDEX);
-        indexes.put(WalletBlocksTableModel.COLUMN_TRANSACTIONS, BlockMap.TRANSACTIONS_INDEX);
-        indexes.put(WalletBlocksTableModel.COLUMN_FEE, BlockMap.FEE_INDEX);
+        indexes.put(WalletBlocksTableModel.COLUMN_HEIGHT, BlocksHeadMap.TIMESTAMP_INDEX);
+        indexes.put(WalletBlocksTableModel.COLUMN_TIMESTAMP, BlocksHeadMap.TIMESTAMP_INDEX);
+        indexes.put(WalletBlocksTableModel.COLUMN_GENERATOR, BlocksHeadMap.GENERATOR_INDEX);
+        indexes.put(WalletBlocksTableModel.COLUMN_BASETARGET, BlocksHeadMap.BALANCE_INDEX);
+        indexes.put(WalletBlocksTableModel.COLUMN_TRANSACTIONS, BlocksHeadMap.TRANSACTIONS_INDEX);
+        indexes.put(WalletBlocksTableModel.COLUMN_FEE, BlocksHeadMap.FEE_INDEX);
         sorter = new CoreRowSorter(blocksModel, indexes);
         jTable_My_Block.setRowSorter(sorter);
         this.jTable_My_Block.setEnabled(false);

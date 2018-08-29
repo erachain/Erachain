@@ -159,7 +159,6 @@ public class DWSet implements IDB {
         return this.accountsPropertisMap;
     }
 
-
     public TransactionMap getTransactionMap() {
         return this.transactionMap;
     }

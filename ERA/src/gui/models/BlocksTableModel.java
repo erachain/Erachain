@@ -30,7 +30,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
     public static final int COLUMN_TRANSACTIONS = 4;
     public static final int COLUMN_FEE = 5;
     static Logger LOGGER = Logger.getLogger(BlocksTableModel.class.getName());
-    private List<Block> blocks;
+    private List<Block.BlockHead> blocks;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator",
             "GB pH WV dtWV", //"Generating Balance",
             "Transactions", "Fee"});
@@ -100,8 +100,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
                 return null;
             }
 
-            DCSet dcSet = DCSet.getInstance();
-            Block block = this.blocks.get(row);
+            Block.BlockHead block = this.blocks.get(row);
             //Block block = data.getB();
             if (block == null) {
                 //this.blocks.rescan();
@@ -114,73 +113,42 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
             switch (column) {
                 case COLUMN_HEIGHT:
 
-                    if (block == null) {
-                        //this.blocks.rescan();
-                        //data = this.blocks.get(row);
-                        return "-1";
-                    }
                     if (row == 0) {
-                        return block.getHeight(dcSet)
-                                + " " + Controller.getInstance().getBlockChain().getFullWeight(dcSet);
+                        return block.heightBlock
+                                + " " + Controller.getInstance().getBlockChain().getFullWeight(DCSet.getInstance());
 
                     }
 
 
-                    return block.getHeight(dcSet)
-                            + " " + block.getTarget();
+                    return block.heightBlock
+                            + " " + block.target;
 
                 case COLUMN_TIMESTAMP:
-                    if (block == null) {
-                        //this.blocks.rescan();
-                        //data = this.blocks.get(row);
-                        return "-1";
-                    }
 
-                    return DateTimeFormat.timestamptoString(block.getTimestamp(dcSet));// + " " + block.getTimestamp(DBSet.getInstance())/ 1000;
+                    return DateTimeFormat.timestamptoString(block.getTimestamp());// + " " + block.getTimestamp(DBSet.getInstance())/ 1000;
 
                 case COLUMN_GENERATOR:
 
-                    if (block == null) {
-                        //this.blocks.rescan();
-                        //data = this.blocks.get(row);
-                        return "-1";
-                    }
-                    return block.getCreator().getPersonAsString();
+                    return block.creator.getPersonAsString();
 
 
                 case COLUMN_BASETARGET:
 
-                    if (block == null) {
-                        //this.blocks.rescan();
-                        //data = this.blocks.get(row);
-                        return "-1";
-                    }
-
-                    int height = block.getHeight(dcSet);
-                    Tuple2<Integer, Integer> forgingPoint = block.getCreator().getForgingData(dcSet, height);
+                    //int height = block.heightBlock;
+                    Tuple2<Integer, Integer> forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
 
                     return forgingPoint.b + " "
-                            + (height - forgingPoint.a) + " "
-                            + block.getWinValue() + " "
-                            + new BigDecimal(block.calcWinValueTargeted() - 100000);//.movePointLeft(3);
+                            + (block.heightBlock - forgingPoint.a) + " "
+                            + block.winValue + " "
+                            + (block.winValue - block.target)/100 + "%"; //.movePointLeft(3);
 
                 case COLUMN_TRANSACTIONS:
-                    if (block == null) {
-                        //this.blocks.rescan();
-                        //data = this.blocks.get(row);
-                        return -1;
-                    }
 
-                    return block.getTransactionCount();
+                    return block.transactionsCount;
 
                 case COLUMN_FEE:
-                    if (block == null) {
-                        //this.blocks.rescan();
-                        //data = this.blocks.get(row);
-                        return "-1";
-                    }
 
-                    return NumberAsString.formatAsString(block.getTotalFee());
+                    return block.totalFee;
 
             }
 
@@ -217,10 +185,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
 
         } else if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
             //CHECK IF LIST UPDATED
-            Block block = (Block) message.getValue();
-            if (block.getHeight(DCSet.getInstance()) == 0)
-                block.setHeight(block.getHeight(DCSet.getInstance()));
-            block.loadHeadMind(DCSet.getInstance());
+            Block.BlockHead block = (Block.BlockHead) message.getValue();
             this.blocks.add(0, block);
             this.fireTableRowsInserted(0, 0);
             if (this.blocks.size() > 100) {
@@ -246,15 +211,16 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
     }
 
     public void resetRows() {
-        this.blocks = new ArrayList<Block>();
+        this.blocks = new ArrayList<Block.BlockHead>();
         Controller cntr = Controller.getInstance();
         DCSet dcSet = DCSet.getInstance();
-        Block block = cntr.getLastBlock();
-        for (int i = 0; i < 100; i++) {
-            this.blocks.add(block);
-            block = cntr.getBlock(block.getReference());
-            if (block == null)
+        Block.BlockHead head = cntr.getLastBlock().blockHead;
+        int i = 0;
+        while (i <= 50) {
+            if (head == null)
                 return;
+            this.blocks.add(head);
+            head = cntr.getBlockHead(head.heightBlock - ++i);
         }
     }
 

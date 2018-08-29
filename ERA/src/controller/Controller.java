@@ -2397,6 +2397,9 @@ public class Controller extends Observable {
     public Block getBlock(byte[] header) {
         return this.blockChain.getBlock(dcSet, header);
     }
+    public Block.BlockHead getBlockHead(int height) {
+        return this.dcSet.getBlocksHeadsMap().get(height);
+    }
 
     public Pair<Block, List<Transaction>> scanTransactions(Block block, int blockLimit, int transactionLimit, int type,
                                                            int service, Account account) {

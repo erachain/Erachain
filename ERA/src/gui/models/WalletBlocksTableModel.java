@@ -3,7 +3,7 @@ package gui.models;
 import controller.Controller;
 import core.BlockChain;
 import core.block.Block;
-import database.wallet.BlockMap;
+import database.wallet.BlocksHeadMap;
 import datachain.SortableList;
 import lang.Lang;
 import org.apache.log4j.Logger;
@@ -156,7 +156,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
             this.blocks = (SortableList<Tuple2<String, String>, Block.BlockHead>) message.getValue();
             //this.blocks.registerObserver();
             Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.blocks);
-            this.blocks.sort(BlockMap.TIMESTAMP_INDEX, true);
+            this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
             this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
@@ -169,7 +169,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
             //CHECK IF LIST UPDATED
             //this.blocks = new SortableList();
             this.blocks.registerObserver();
-            this.blocks.sort(BlockMap.TIMESTAMP_INDEX, true);
+            this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
             this.fireTableDataChanged();
         }
     }

@@ -1231,6 +1231,11 @@ public class Block {
             }
         }
 
+        if (dcSet.getBlockSignsMap().contains(signature)) {
+            LOGGER.debug("*** Block[" + Base58.encode(signature) + "] already exist");
+            return false;
+        }
+
         long timerStart = System.currentTimeMillis();
 
         if (andProcess) {
@@ -1572,13 +1577,9 @@ public class Block {
         //ADD TO DB
         long timerStart = System.currentTimeMillis();
 
-
-        if (dcSet.getBlockMap().add(this))
-            throw new Exception("block already exist!!");
-
         LOGGER.debug("getBlocksHeadMap().set timer: " + (System.currentTimeMillis() - timerStart));
 
-        this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
+        //this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
 
         if (BlockChain.TEST_FEE_ORPHAN > 0 && BlockChain.TEST_FEE_ORPHAN > this.heightBlock) {
             // TEST COMPU ORPHANs
@@ -1672,6 +1673,8 @@ public class Block {
                 + "  timerTransFinalMapSinds_set: " + timerTransFinalMapSinds_set);
 
         this.process_after(cnt, dcSet);
+
+        dcSet.getBlockMap().add(this);
 
         long tickets = System.currentTimeMillis() - start;
         LOGGER.debug("[" + this.heightBlock + "] processing time: " + tickets * 0.001
