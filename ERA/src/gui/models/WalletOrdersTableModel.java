@@ -108,12 +108,12 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
             case COLUMN_HAVE:
 
                 AssetCls asset = DCSet.getInstance().getItemAssetMap().get(order.getHave());
-                return asset == null? -1 : asset.getShort();
+                return asset == null? "[" + order.getHave() + "]" : asset.getShort();
 
             case COLUMN_WANT:
 
                 asset = DCSet.getInstance().getItemAssetMap().get(order.getWant());
-                return asset == null? -1 : asset.getShort();
+                return asset == null? "[" + order.getWant() + "]" : asset.getShort();
 
             case COLUMN_AMOUNT:
 
