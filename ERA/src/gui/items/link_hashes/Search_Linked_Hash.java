@@ -37,7 +37,7 @@ public class Search_Linked_Hash extends Split_Panel {
         this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Hash"));
         this.searchTextField_SearchToolBar_LeftPanel.setMinimumSize(new Dimension(500, 20));
         this.button2_ToolBar_LeftPanel.setVisible(false);
-        this.button1_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Search Hash"));
+        this.button1_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Search hash"));
 
         this.button1_ToolBar_LeftPanel.addActionListener(new ActionListener() {
 
