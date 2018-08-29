@@ -2,12 +2,10 @@ package core.account;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import core.item.assets.Order;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
@@ -372,7 +370,7 @@ public class Account {
                     return BigDecimal.ZERO;
                 }
 
-                // int height = dcSet.getBlockMap().size();
+                // int height = dcSet.getBlocksHeadMap().size();
                 BigDecimal freeze = BigDecimal.ZERO;
                 for (int[] point : item) {
                     if (height < point[0]) {
@@ -394,11 +392,11 @@ public class Account {
     /*
      * private void updateGeneratingBalance(DBSet db) { //CHECK IF WE NEED TO
      * RECALCULATE if(this.lastBlockSignature == null) { this.lastBlockSignature
-     * = db.getBlockMap().getLastBlockSignature();
+     * = db.getBlocksHeadMap().getLastBlockSignature();
      * calculateGeneratingBalance(db); } else { //CHECK IF WE NEED TO
      * RECALCULATE if(!Arrays.equals(this.lastBlockSignature,
-     * db.getBlockMap().getLastBlockSignature())) { this.lastBlockSignature =
-     * db.getBlockMap().getLastBlockSignature(); calculateGeneratingBalance(db);
+     * db.getBlocksHeadMap().getLastBlockSignature())) { this.lastBlockSignature =
+     * db.getBlocksHeadMap().getLastBlockSignature(); calculateGeneratingBalance(db);
      * } } }
      *
      * // take current balance public void calculateGeneratingBalance(DBSet db)
@@ -410,7 +408,7 @@ public class Account {
      * NEGATIVE AMOUNTS IN LAST 9 BLOCKS - for ERA_KEY only BigDecimal balance =
      * this.getConfirmedBalance(ERA_KEY, db);
      *
-     * Block block = db.getBlockMap().getLastBlock();
+     * Block block = db.getBlocksHeadMap().getLastBlock();
      *
      * int penalty_koeff = 1000000; int balance_penalty = penalty_koeff;
      *
@@ -514,7 +512,7 @@ public class Account {
         } else {
             absKey = -key;
         }
-        
+
         //if (amount.signum() < 0)
         //    amount = amount.negate();
 
@@ -570,6 +568,26 @@ public class Account {
         }
 
         db.getAssetBalanceMap().set(getAddress(), absKey, balance);
+
+        ////////////// DEBUG TOTAL COMPU
+        // несотыковка из-за ордеров на бирже
+        if (false && absKey == 2l && this.equals("73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS")) {
+            Collection<Tuple2<String, Long>> addrs = db.getAssetBalanceMap().getKeys();
+            BigDecimal total = BigDecimal.ZERO;
+            for (Tuple2<String, Long> addr : addrs) {
+                if (addr.b == 2l) {
+                    Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
+                            db.getAssetBalanceMap().get(addr);
+
+                    total = total.add(ball.a.b);
+                }
+            }
+            if (total.signum() != 0) {
+                Long error = null;
+                error++;
+            }
+        }
+
         return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(balance.a.b, balance.b.b, balance.c.b);
     }
 

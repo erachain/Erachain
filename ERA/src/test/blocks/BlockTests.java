@@ -46,11 +46,15 @@ public class BlockTests {
     Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
     Transaction payment;
     //CREATE EMPTY MEMORY DATABASE
-    private DCSet db = DCSet.createEmptyDatabaseSet();
-    private GenesisBlock gb = new GenesisBlock();
-    List<Transaction> gbTransactions = gb.getTransactions();
+    private DCSet db;
+    private GenesisBlock gb;
+    List<Transaction> gbTransactions;
 
     private void init() {
+
+        db = DCSet.createEmptyDatabaseSet();
+        gb = new GenesisBlock();
+        gbTransactions = gb.getTransactions();
 
         Controller.getInstance().initBlockChain(db);
         gb = Controller.getInstance().getBlockChain().getGenesisBlock();
@@ -66,6 +70,42 @@ public class BlockTests {
         payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100), timestamp, generator.getLastTimestamp(db));
         payment.sign(generator, Transaction.FOR_NETWORK);
         transactions.add(payment);
+
+    }
+
+    @Test
+    public void parseHeadBlock() {
+
+        //GENERATE NEW HEAD
+        Block.BlockHead head = new Block.BlockHead(1, new byte[Block.REFERENCE_LENGTH], generator, 100,
+                new byte[Block.TRANSACTIONS_HASH_LENGTH], new byte[Block.SIGNATURE_LENGTH], 23, 10000,
+                45000, 33000, 3456,12);
+        byte[] raw = head.toBytes();
+
+
+        Block.BlockHead parsedHead = null;
+        try {
+            //PARSE FROM BYTES
+            parsedHead = Block.BlockHead.parse(raw);
+        } catch (Exception e) {
+            fail("Exception while parsing transaction.");
+        }
+
+        //CHECK SIGNATURE
+        assertEquals(true, Arrays.equals(head.signature, parsedHead.signature));
+
+        //CHECK GENERATOR
+        assertEquals(head.creator.getAddress(), parsedHead.creator.getAddress());
+
+        //CHECK HEIGHT
+        assertEquals(head.heightBlock, parsedHead.heightBlock);
+
+        //CHECK BASE TARGET
+        assertEquals(head.forgingValue, parsedHead.forgingValue);
+
+        //CHECK FEE
+        assertEquals(head.totalFee, parsedHead.totalFee);
+        assertEquals(head.emittedFee, parsedHead.emittedFee);
 
     }
 

@@ -1,9 +1,9 @@
 package gui.models;
 
 import controller.Controller;
+import core.BlockChain;
 import core.block.Block;
-import database.wallet.BlockMap;
-import datachain.DCSet;
+import database.wallet.BlocksHeadMap;
 import datachain.SortableList;
 import lang.Lang;
 import org.apache.log4j.Logger;
@@ -18,7 +18,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>, Block> implements Observer {
+public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>, Block.BlockHead> implements Observer {
 
     public static final int COLUMN_HEIGHT = 0;
     public static final int COLUMN_TIMESTAMP = 1;
@@ -27,7 +27,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
     public static final int COLUMN_TRANSACTIONS = 4;
     public static final int COLUMN_FEE = 5;
     static Logger LOGGER = Logger.getLogger(WalletBlocksTableModel.class.getName());
-    private SortableList<Tuple2<String, String>, Block> blocks;
+    private SortableList<Tuple2<String, String>, Block.BlockHead> blocks;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator",
             "GB dtWV", //"Generating Balance",
             "Transactions", "Fee"});
@@ -35,12 +35,12 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 
     public WalletBlocksTableModel() {
         //Controller.getInstance().addWalletListener(this);
-        Controller.getInstance().wallet.database.getBlockMap().addObserver(this);
-        this.blocks = Controller.getInstance().wallet.database.getBlockMap().getList();
+        Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this);
+        this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
     }
 
     @Override
-    public SortableList<Tuple2<String, String>, Block> getSortableList() {
+    public SortableList<Tuple2<String, String>, Block.BlockHead> getSortableList() {
         return this.blocks;
     }
 
@@ -88,51 +88,44 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
             }
 
             //
-            Pair<Tuple2<String, String>, Block> data = this.blocks.get(row);
+            Pair<Tuple2<String, String>, Block.BlockHead> data = this.blocks.get(row);
 
             if (data == null || data.getB() == null) {
                 return null;
             }
 
-            Block block = data.getB();
+            Block.BlockHead block = data.getB();
             if (block == null) {
                 //this.fireTableDataChanged();
                 return null;
             }
 
-            if (block.getWinValue() == 0l) {
-                block.getHeight(DCSet.getInstance());
-                if (block.getHeight(DCSet.getInstance()) > 0)
-                    block.loadHeadMind(DCSet.getInstance());
-                else
-                    return null;
-            }
-
             switch (column) {
                 case COLUMN_HEIGHT:
 
-                    return block.getHeight(DCSet.getInstance());
+                    return block.heightBlock;
 
                 case COLUMN_TIMESTAMP:
 
-                    return DateTimeFormat.timestamptoString(block.getTimestamp(DCSet.getInstance())); // + " " + block.getTimestamp(DBSet.getInstance()) / 1000;
+                    BlockChain blockChain = Controller.getInstance().getBlockChain();
+                    return DateTimeFormat.timestamptoString(blockChain.getTimestamp(block.heightBlock));
 
                 case COLUMN_GENERATOR:
 
-                    return block.getCreator().getPersonAsString();
+                    return block.creator.getPersonAsString();
 
                 case COLUMN_BASETARGET:
 
-                    return block.getForgingValue() + " "
-                            + new BigDecimal(block.calcWinValueTargeted() - 100000); //.movePointLeft(3);
+                    return block.forgingValue + " "
+                            + new BigDecimal(block.forgingValue - block.target); //.movePointLeft(3);
 
                 case COLUMN_TRANSACTIONS:
 
-                    return block.getTransactionCount();
+                    return block.transactionsCount;
 
                 case COLUMN_FEE:
 
-                    return block.getTotalFee().toPlainString();
+                    return block.totalFee;
 
             }
         } catch (Exception e) {
@@ -160,10 +153,10 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE) {
-            this.blocks = (SortableList<Tuple2<String, String>, Block>) message.getValue();
+            this.blocks = (SortableList<Tuple2<String, String>, Block.BlockHead>) message.getValue();
             //this.blocks.registerObserver();
-            Controller.getInstance().wallet.database.getBlockMap().addObserver(this.blocks);
-            this.blocks.sort(BlockMap.TIMESTAMP_INDEX, true);
+            Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.blocks);
+            this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
             this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
@@ -176,14 +169,14 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
             //CHECK IF LIST UPDATED
             //this.blocks = new SortableList();
             this.blocks.registerObserver();
-            this.blocks.sort(BlockMap.TIMESTAMP_INDEX, true);
+            this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
             this.fireTableDataChanged();
         }
     }
 
     public void deleteObserver() {
-        Controller.getInstance().wallet.database.getBlockMap().deleteObserver(this);
-        Controller.getInstance().wallet.database.getBlockMap().deleteObserver(this.blocks);
+        Controller.getInstance().wallet.database.getBlocksHeadMap().deleteObserver(this);
+        Controller.getInstance().wallet.database.getBlocksHeadMap().deleteObserver(this.blocks);
 
     }
 

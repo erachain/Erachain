@@ -189,7 +189,7 @@ public class API {
             ++step;
             Integer heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
             if (heightWT != null && heightWT > 0) {
-                byte[] childSign = dcSet.getBlocksHeadsMap().get(heightWT + 1).a.c;
+                byte[] childSign = dcSet.getBlocksHeadsMap().get(heightWT + 1).signature;
                 out.put("child", Base58.encode(childSign));
             } else {
                 out.put("message", "signature not found");
@@ -262,7 +262,7 @@ public class API {
             out.put("block", block.toJson());
 
             ++step;
-            byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1).a.c;
+            byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1).signature;
             if (childSign != null)
                 out.put("next", Base58.encode(childSign));
 
@@ -299,7 +299,7 @@ public class API {
             out.put("block", block.toJson());
 
             ++step;
-            byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1).a.c;
+            byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1).signature;
             if (childSign != null)
                 out.put("next", Base58.encode(childSign));
 
@@ -336,18 +336,18 @@ public class API {
             ++step;
             Block block;
             LinkedList eee = null;
-            //LinkedList eee = ((LinkedList) dcSet.getBlockMap().map);//.keySet());
-            //LinkedList eee = ((LinkedList) dcSet.getBlockMap().map.keySet());
-            //LinkedList eee = ((LinkedList) dcSet.getBlockMap().map.values());
-            //LinkedList eee = ((LinkedList) dcSet.getBlockMap().map.entrySet());
+            //LinkedList eee = ((LinkedList) dcSet.getBlocksHeadMap().map);//.keySet());
+            //LinkedList eee = ((LinkedList) dcSet.getBlocksHeadMap().map.keySet());
+            //LinkedList eee = ((LinkedList) dcSet.getBlocksHeadMap().map.values());
+            //LinkedList eee = ((LinkedList) dcSet.getBlocksHeadMap().map.entrySet());
             ListIterator listIterator = eee.listIterator(height);
             block = (Block) listIterator.next();
 
-            //block = dcSet.getBlockMap().get(iterator.next());
+            //block = dcSet.getBlocksHeadMap().get(iterator.next());
             out.put("block", block.toJson());
 
             ++step;
-            byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1).a.c;
+            byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1).signature;
             if (childSign != null)
                 out.put("next", Base58.encode(childSign));
 
@@ -434,7 +434,7 @@ public class API {
                     out.put("end", 1);
                     break;
                 }
-                array.add(Base58.encode(blocksHeadsMap.get(i).a.c));
+                array.add(Base58.encode(blocksHeadsMap.get(i).signature));
             }
             out.put("signatures", array);
 

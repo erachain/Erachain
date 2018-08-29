@@ -1,6 +1,8 @@
 package datachain;
 
 
+import core.block.Block;
+import database.serializer.BlockHeadSerializer;
 import org.apache.log4j.Logger;
 import org.mapdb.Atomic;
 import org.mapdb.BTreeKeySerializer;
@@ -15,12 +17,12 @@ import java.util.Map;
 /*
  *  Block Height ->
  *  BLOCK HEAD:
- *  + FACE - version, creator, signature, transactionCount, transactionsHash
+ *  + FACE - version, creator, signature, transactionsCount, transactionsHash
  *  + parentSignature
  *  + Forging Data - Forging Value, Win Value, Target Value
  *
  */
-public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>> {
+public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
 
     static final String NAME = "blocks_heads";
     static Logger LOGGER = Logger.getLogger(BlocksHeadsMap.class.getName());
@@ -49,10 +51,11 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
     }
 
     @Override
-    protected Map<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>> getMap(DB database) {
+    protected Map<Integer, Block.BlockHead> getMap(DB database) {
         //OPEN MAP
         return database.createTreeMap(NAME)
                 .keySerializer(BTreeKeySerializer.BASIC)
+                .valueSerializer(new BlockHeadSerializer())
                 .counterEnable()
                 .makeOrGet();
     }
@@ -71,12 +74,12 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
     }
 
     @Override
-    protected Map<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>> getMemoryMap() {
-        return new HashMap<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>>();
+    protected Map<Integer, Block.BlockHead> getMemoryMap() {
+        return new HashMap<Integer, Block.BlockHead>();
     }
 
     @Override
-    protected Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> getDefaultValue() {
+    protected Block.BlockHead getDefaultValue() {
         return null;
     }
 
@@ -99,8 +102,8 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
         Iterator<Integer> iterator = this.getIterator(0, true);
         while (iterator.hasNext()) {
             Integer key = iterator.next();
-            Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> item = this.get(key);
-            weightFull += item.c.c;
+            Block.BlockHead item = this.get(key);
+            weightFull += item.winValue;
         }
 
         fullWeight = weightFull;
@@ -108,12 +111,12 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
 
     }
 
-    public boolean set(int height, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> item) {
+    public boolean set(int height, Block.BlockHead item) {
 
         //int key = this.size() + 1;
 
         // get Win Value of block
-        long weight = item.c.b;
+        long weight = item.winValue;
 
         if (startedInForkHeight == 0 && this.parent != null) {
             startedInForkHeight = height;
@@ -130,7 +133,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
 
     }
 
-    public int add(Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> item) {
+    public int add(Block.BlockHead item) {
 
         int key = this.size() + 1;
 
@@ -141,17 +144,17 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
         return key;
     }
 
-    public Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> last() {
+    public Block.BlockHead last() {
         return this.get(this.size());
     }
 
-    public Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> remove() {
+    public Block.BlockHead remove() {
 
         int key = this.size();
         if (this.contains(key)) {
             // sub old value from FULL
-            Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> value_old = this.get(key);
-            fullWeight -= value_old.c.b;
+            Block.BlockHead value_old = this.get(key);
+            fullWeight -= value_old.winValue;
 
             if (this.fullWeightVar != null) {
                 this.fullWeightVar.set(fullWeight);

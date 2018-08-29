@@ -496,7 +496,7 @@ public class Controller extends Observable {
 
         // CHECK IF DB NEEDS UPDATE
         /*
-         * try { if(this.dcSet.getBlockMap().getLastBlockSignature() != null) {
+         * try { if(this.dcSet.getBlocksHeadMap().getLastBlockSignature() != null) {
          * //CHECK IF NAME STORAGE NEEDS UPDATE if
          * (this.dcSet.getLocalDataMap().get("nsupdate") == null ) { //FIRST
          * NAME STORAGE UPDATE UpdateUtil.repopulateNameStorage( 70000 );
@@ -1694,7 +1694,7 @@ public class Controller extends Observable {
          * (maxPeerWeight > chainWeight) { // SAME last block? int pickTarget =
          * BlockChain.BASE_TARGET >>2; if (true || (maxPeerWeight - chainWeight
          * < pickTarget)) { byte[] lastBlockSignature =
-         * dcSet.getBlockMap().getLastBlockSignature();
+         * dcSet.getBlocksHeadMap().getLastBlockSignature();
          *
          * Block maxBlock = null; try { maxBlock =
          * core.Synchronizer.getBlock(lastBlockSignature, maxHW.c, true); }
@@ -2225,11 +2225,11 @@ public class Controller extends Observable {
         return this.wallet.getLastTransactions(account, limit);
     }
 
-    public List<Pair<Account, Block>> getLastBlocks(int limit) {
+    public List<Pair<Account, Block.BlockHead>> getLastBlocks(int limit) {
         return this.wallet.getLastBlocks(limit);
     }
 
-    public List<Block> getLastBlocks(Account account, int limit) {
+    public List<Block.BlockHead> getLastBlocks(Account account, int limit) {
         return this.wallet.getLastBlocks(account, limit);
     }
 
@@ -2396,6 +2396,9 @@ public class Controller extends Observable {
 
     public Block getBlock(byte[] header) {
         return this.blockChain.getBlock(dcSet, header);
+    }
+    public Block.BlockHead getBlockHead(int height) {
+        return this.dcSet.getBlocksHeadsMap().get(height);
     }
 
     public Pair<Block, List<Transaction>> scanTransactions(Block block, int blockLimit, int transactionLimit, int type,

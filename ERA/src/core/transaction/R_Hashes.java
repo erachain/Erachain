@@ -418,12 +418,12 @@ public class R_Hashes extends Transaction {
 		/*
 		int blockIndex = -1;
 		if (block == null) {
-			blockIndex = dcSet.getBlockMap().last().getHeight(dcSet);
+			blockIndex = dcSet.getBlocksHeadMap().last().getHeight(dcSet);
 		} else {
 			blockIndex = block.getHeight(dcSet);
 			if (blockIndex < 1 ) {
 				// if block not is confirmed - get last block + 1
-				blockIndex = dcSet.getBlockMap().last().getHeight(dcSet) + 1;
+				blockIndex = dcSet.getBlocksHeadMap().last().getHeight(dcSet) + 1;
 			}			
 			transactionIndex = block.getTransactionSeq(signature);
 		}

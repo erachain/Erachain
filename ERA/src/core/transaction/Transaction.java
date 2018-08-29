@@ -731,7 +731,7 @@ public abstract class Transaction {
         int transactionIndex = -1;
         int blockIndex;
         if (block == null) {
-            // blockIndex = db.getBlockMap().getLastBlock().getHeight(db);
+            // blockIndex = db.getBlocksHeadMap().getLastBlock().getHeight(db);
             blockIndex = -1;
         } else {
             blockIndex = block.getHeightByParent(this.dcSet);
@@ -1355,7 +1355,7 @@ public abstract class Transaction {
 
             // CALCULATE CONFIRMATIONS
             // int lastBlockHeight =
-            // db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature());
+            // db.getBlockSignsMap().getHeight(db.getBlocksHeadMap().getLastBlockSignature());
             // Block block =
             // DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.signature);
             Block block = this.getBlock(db);

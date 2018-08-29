@@ -85,7 +85,7 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
         ///transactions = read_Statement();
         /*
          * // база данных DBSet dcSet = DBSet.getInstance(); // читаем все блоки
-         * SortableList<byte[], Block> lists = dcSet.getBlockMap().getList(); //
+         * SortableList<byte[], Block> lists = dcSet.getBlocksHeadMap().getList(); //
          * проходим по блокам for(Pair<byte[], Block> list: lists) {
          *
          * // читаем транзакции из блока db_transactions =

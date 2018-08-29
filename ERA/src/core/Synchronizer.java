@@ -561,7 +561,7 @@ public class Synchronizer {
 
         int headersSize = headers.size();
         if (headersSize == 0) {
-            byte[] signCheck = dcSet.getBlocksHeadsMap().get(checkPointHeight).a.c;
+            byte[] signCheck = dcSet.getBlocksHeadsMap().get(checkPointHeight).signature;
 
             List<byte[]> headersCheck = this.getBlockSignatures(signCheck, peer);
             if (headersCheck.isEmpty()) {
@@ -598,7 +598,7 @@ public class Synchronizer {
         // TODO fix it error
         byte[] checkPointHeightSignature;
         Block checkPointHeightCommonBlock = null;
-        checkPointHeightSignature = dcSet.getBlocksHeadsMap().get(checkPointHeight).a.c;
+        checkPointHeightSignature = dcSet.getBlocksHeadsMap().get(checkPointHeight).signature;
 
         try {
             // try get common block from PEER
@@ -632,7 +632,7 @@ public class Synchronizer {
                 maxChainHeight = checkPointHeight;
                 lastCommonBlockSignature = checkPointHeightCommonBlock.getSignature();
             } else {
-                lastCommonBlockSignature = dcSet.getBlocksHeadsMap().get(maxChainHeight).a.c;
+                lastCommonBlockSignature = dcSet.getBlocksHeadsMap().get(maxChainHeight).signature;
             }
 
             LOGGER.debug(
@@ -751,17 +751,25 @@ public class Synchronizer {
 
                 if (observOn) {
 
-                    if (countObserv_ADD != null) {
-                        dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_ADD, countObserv_ADD);
-                    }
-                    if (countObserv_REMOVE != null) {
-                        dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_REMOVE, countObserv_REMOVE);
-                    }
-                    if (countObserv_COUNT != null) {
-                        dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_COUNT, countObserv_COUNT);
-                    }
+                        if (countObserv_ADD != null) {
+                            try {
+                                dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_ADD, countObserv_ADD);
+                            } catch (Exception e) {
+                                LOGGER.error(e.getMessage(), e);
+                            }
+                        } else if (countObserv_COUNT != null) {
+                            try {
+                                dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_COUNT, countObserv_COUNT);
+                            } catch (Exception e) {
+                                LOGGER.error(e.getMessage(), e);
+                            }
+                        }
 
-                    dcSet.getBlockMap().notifyOrphanChain(block);
+                    try {
+                        dcSet.getBlockMap().notifyOrphanChain(block);
+                    } catch (Exception e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
                 }
 
             }
@@ -799,17 +807,26 @@ public class Synchronizer {
 
                 if (observOn) {
 
-                    if (countObserv_ADD != null) {
-                        dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_ADD, countObserv_ADD);
-                    }
                     if (countObserv_REMOVE != null) {
-                        dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_REMOVE, countObserv_REMOVE);
-                    }
-                    if (countObserv_COUNT != null) {
-                        dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_COUNT, countObserv_COUNT);
+                        try {
+                            dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_REMOVE, countObserv_REMOVE);
+                        } catch (Exception e) {
+                            LOGGER.error(e.getMessage(), e);
+                        }
+                    } else if (countObserv_COUNT != null) {
+                        try {
+                            dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_COUNT, countObserv_COUNT);
+                        } catch (Exception e) {
+                            LOGGER.error(e.getMessage(), e);
+                        }
                     }
 
-                    dcSet.getBlockMap().notifyProcessChain(block);
+                    try {
+                        dcSet.getBlockMap().notifyProcessChain(block);
+                    } catch (Exception e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
+
                 }
             }
         }
