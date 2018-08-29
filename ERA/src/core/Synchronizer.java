@@ -561,7 +561,7 @@ public class Synchronizer {
 
         int headersSize = headers.size();
         if (headersSize == 0) {
-            byte[] signCheck = dcSet.getBlocksHeadsMap().get(checkPointHeight).a.c;
+            byte[] signCheck = dcSet.getBlocksHeadsMap().get(checkPointHeight).signature;
 
             List<byte[]> headersCheck = this.getBlockSignatures(signCheck, peer);
             if (headersCheck.isEmpty()) {
@@ -598,7 +598,7 @@ public class Synchronizer {
         // TODO fix it error
         byte[] checkPointHeightSignature;
         Block checkPointHeightCommonBlock = null;
-        checkPointHeightSignature = dcSet.getBlocksHeadsMap().get(checkPointHeight).a.c;
+        checkPointHeightSignature = dcSet.getBlocksHeadsMap().get(checkPointHeight).signature;
 
         try {
             // try get common block from PEER
@@ -632,7 +632,7 @@ public class Synchronizer {
                 maxChainHeight = checkPointHeight;
                 lastCommonBlockSignature = checkPointHeightCommonBlock.getSignature();
             } else {
-                lastCommonBlockSignature = dcSet.getBlocksHeadsMap().get(maxChainHeight).a.c;
+                lastCommonBlockSignature = dcSet.getBlocksHeadsMap().get(maxChainHeight).signature;
             }
 
             LOGGER.debug(

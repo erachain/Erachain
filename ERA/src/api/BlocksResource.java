@@ -160,10 +160,10 @@ public class BlocksResource {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 
-        List<Pair<Account, Block>> blocks = Controller.getInstance().getLastBlocks(limit);
+        List<Pair<Account, Block.BlockHead>> blocks = Controller.getInstance().getLastBlocks(limit);
         JSONArray array = new JSONArray();
 
-        for (Pair<Account, Block> block : blocks) {
+        for (Pair<Account, Block.BlockHead> block : blocks) {
             array.add(block.getB().toJson());
         }
 
@@ -211,7 +211,7 @@ public class BlocksResource {
         }
 
         JSONArray array = new JSONArray();
-        for (Block block : Controller.getInstance().getLastBlocks(account, limit)) {
+        for (Block.BlockHead block : Controller.getInstance().getLastBlocks(account, limit)) {
             array.add(block.toJson());
         }
 

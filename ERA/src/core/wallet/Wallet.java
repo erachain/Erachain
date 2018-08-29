@@ -221,18 +221,18 @@ public class Wallet extends Observable implements Observer {
 		return this.database.getTransactionMap().get(account, limit);
 	}
 
-	public List<Pair<Account, Tuple3<Fun.Tuple5<Integer, byte[], byte[], Integer, byte[]>, Tuple3<Integer, byte[], Long>, Tuple3<Integer, Long, Long>>>> getLastBlocks(int limit) {
+	public List<Pair<Account, Block.BlockHead>> getLastBlocks(int limit) {
 		if (!this.exists()) {
-			return new ArrayList<Pair<Account, Tuple3<Fun.Tuple5<Integer, byte[], byte[], Integer, byte[]>, Tuple3<Integer, byte[], Long>, Tuple3<Integer, Long, Long>>>>();
+			return new ArrayList<Pair<Account, Block.BlockHead>>();
 		}
 
 		List<Account> accounts = this.getAccounts();
 		return this.database.getBlocksHeadMap().get(accounts, limit);
 	}
 
-	public List<Tuple3<Fun.Tuple5<Integer, byte[], byte[], Integer, byte[]>, Tuple3<Integer, byte[], Long>, Tuple3<Integer, Long, Long>>> getLastBlocks(Account account, int limit) {
+	public List<Block.BlockHead> getLastBlocks(Account account, int limit) {
 		if (!this.exists()) {
-			return new ArrayList<Tuple3<Fun.Tuple5<Integer, byte[], byte[], Integer, byte[]>, Tuple3<Integer, byte[], Long>, Tuple3<Integer, Long, Long>>>();
+			return new ArrayList<Block.BlockHead>();
 		}
 
 		return this.database.getBlocksHeadMap().get(account, limit);
@@ -583,12 +583,9 @@ public class Wallet extends Observable implements Observer {
 				// this.update(this, new
 				// ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE,
 				// block));
-				Tuple3<Fun.Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> blockHead = dcSet.getBlocksHeadsMap().get(height);
-				Tuple3<Fun.Tuple5<Integer, byte[], byte[], Integer, byte[]>, Tuple3<Integer, byte[], Long>, Tuple3<Integer, Long, Long>> blockHeadWallet =
-						new Tuple3<>(new Tuple5<Integer, byte[], byte[], Integer, byte[]>(),
-								new Tuple)
+				Block.BlockHead blockHead = dcSet.getBlocksHeadsMap().get(height);
 
-				this.processBlock(block);
+				this.processBlock(blockHead);
 
 				if (height % (stepHeight) == 0) {
 					this.syncHeight = height;
@@ -1035,7 +1032,7 @@ public class Wallet extends Observable implements Observer {
 
 	}
 
-	private void processBlock(Tuple3<Fun.Tuple5<Integer, byte[], byte[], Integer, byte[]>, Tuple3<Integer, byte[], Long>, Tuple3<Integer, Long, Long>> block) {
+	private void processBlock(Block.BlockHead block) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1044,13 +1041,13 @@ public class Wallet extends Observable implements Observer {
 		long start = System.currentTimeMillis();
 
 		// SET AS LAST BLOCK
-		this.database.setLastBlockSignature(block.a.c);
+		this.database.setLastBlockSignature(block.signature);
 
-		Account blockGenerator = Account.makeAccountFromShort(block.a.b);
+		Account blockGenerator = block.creator;
 		String blockGeneratorStr = blockGenerator.getAddress();
 
 		DCSet dcSet = DCSet.getInstance();
-		int height = block.a.a;
+		int height = block.heightBlock;
 
 		// CHECK IF WE ARE GENERATOR
 		if (this.accountExists(blockGeneratorStr)) {
@@ -1059,7 +1056,7 @@ public class Wallet extends Observable implements Observer {
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
 			// PROCESS FEE
-			feeProcess(dcSet, block.b.c, blockGenerator, false);
+			feeProcess(dcSet, block.totalFee, blockGenerator, false);
 			
 		}
 
@@ -1147,7 +1144,7 @@ public class Wallet extends Observable implements Observer {
 
 	}
 
-	private void orphanBlock(Tuple3<Fun.Tuple5<Integer, byte[], byte[], Integer, byte[]>, Tuple3<Integer, byte[], Long>, Tuple3<Integer, Long, Long>> block) {
+	private void orphanBlock(Block.BlockHead block) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1158,7 +1155,7 @@ public class Wallet extends Observable implements Observer {
 		//List<Transaction> transactions = block.a.a;
 
 		DCSet dcSet = DCSet.getInstance();
-		int height = block.a.a;
+		int height = block.heightBlock;
 		/*
 		// ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
 		int seqNo;
@@ -1237,7 +1234,7 @@ public class Wallet extends Observable implements Observer {
 
 		*/
 
-		Account blockGenerator = Account.makeAccountFromShort(block.a.b);
+		Account blockGenerator = block.creator;
 		String blockGeneratorStr = blockGenerator.getAddress();
 
 		// CHECK IF WE ARE GENERATOR
@@ -1249,12 +1246,12 @@ public class Wallet extends Observable implements Observer {
 			// this.database.setLastBlockSignature(block.getReference());
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
-            feeProcess(dcSet, block.b.c, blockGenerator, true);
+            feeProcess(dcSet, block.totalFee, blockGenerator, true);
             
 		}
 
 		// SET AS LAST BLOCK
-		this.database.setLastBlockSignature(block.b.b); // .reference
+		this.database.setLastBlockSignature(block.reference); // .reference
 
 		// long tickets = System.currentTimeMillis() - start;
 		// LOGGER.info("WALLET [" + block.getHeightByParent(DCSet.getInstance())
@@ -1690,12 +1687,11 @@ public class Wallet extends Observable implements Observer {
 
 		if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE)// .WALLET_ADD_BLOCK_TYPE)
 		{
-			Tuple3<Fun.Tuple5<Integer, byte[], byte[], Integer, byte[]>, Tuple3<Integer, byte[], Long>, Tuple3<Integer, Long, Long>> block =
-					(Tuple3<Fun.Tuple5<Integer, byte[], byte[], Integer, byte[]>, Tuple3<Integer, byte[], Long>, Tuple3<Integer, Long, Long>>) message.getValue();
+			Block.BlockHead block =	(Block.BlockHead) message.getValue();
 
 			// CHECK IF WE NEED TO RESYNC
 			// BY REFERENCE !!!!
-			if (checkNeedSyncWallet(block.b.b)) //.getReference()))
+			if (checkNeedSyncWallet(block.reference)) //.getReference()))
 			{
 				return;
 			}
@@ -1705,12 +1701,11 @@ public class Wallet extends Observable implements Observer {
 
 		} else if (message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
 		{
-			Tuple3<Fun.Tuple5<Integer, byte[], byte[], Integer, byte[]>, Tuple3<Integer, byte[], Long>, Tuple3<Integer, Long, Long>> block
-					= (Tuple3<Fun.Tuple5<Integer, byte[], byte[], Integer, byte[]>, Tuple3<Integer, byte[], Long>, Tuple3<Integer, Long, Long>>) message.getValue();
+			Block.BlockHead block = (Block.BlockHead) message.getValue();
 
 			// CHECK IF WE NEED TO RESYNC
 			// BY SIGNATURE !!!!
-			if (checkNeedSyncWallet(block.a.c)) //.getSignature()))
+			if (checkNeedSyncWallet(block.signature)) //.getSignature()))
 			{
 				return;
 			}

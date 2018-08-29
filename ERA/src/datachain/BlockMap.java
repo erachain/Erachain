@@ -171,7 +171,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     public byte[] getLastBlockSignature() {
         if (this.lastBlockSignature == null) {
-            this.lastBlockSignature = getDCSet().getBlocksHeadsMap().get(this.size()).a.c;
+            this.lastBlockSignature = getDCSet().getBlocksHeadsMap().get(this.size()).signature;
         }
         return this.lastBlockSignature;
     }
@@ -292,8 +292,7 @@ public class BlockMap extends DCMap<Integer, Block> {
         // (System.currentTimeMillis() - start)*0.001);
 
         dcSet.getBlockSignsMap().set(signature, height);
-        dcSet.getBlocksHeadsMap().set(height, new Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>(
-                block.getHeadFace(), signature, block.getHeadMind()));
+        dcSet.getBlocksHeadsMap().set(height, block.blockHead);
         this.setLastBlockSignature(signature);
 
         // LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1500: " +
@@ -326,12 +325,10 @@ public class BlockMap extends DCMap<Integer, Block> {
         // ORPHAN FORGING DATA
         if (height > 1) {
 
-            Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> head = dcSet.getBlocksHeadsMap().remove();
+            Block.BlockHead head = dcSet.getBlocksHeadsMap().remove();
 
-            byte[] creatorByte = head.a.b;
-            PublicKeyAccount creator = new PublicKeyAccount(creatorByte);
             // INITIAL forging DATA no need remove!
-            creator.delForgingData(dcSet, height);
+            head.creator.delForgingData(dcSet, height);
 
         }
 

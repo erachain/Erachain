@@ -55,8 +55,11 @@ public class GenesisBlock extends Block {
         //SET HEADER
         super(genesisVersion, genesisReference, CREATOR, new byte[0], new byte[0]);
 
+        this.heightBlock = 1;
         this.genesisTimestamp = Settings.getInstance().getGenesisStamp();
         this.forgingValue = BlockChain.GENERAL_ERA_BALANCE;
+        this.winValue = this.forgingValue;
+        this.target = this.forgingValue;
 
         Account recipient;
         BigDecimal bdAmount0;
@@ -747,6 +750,11 @@ public class GenesisBlock extends Block {
     }
 
     public void process(DCSet dcSet) throws Exception {
+
+        this.target = 0l;
+
+        this.blockHead = new BlockHead(this);
+
         super.process(dcSet);
 
         AssetVenture item = new AssetVenture(CREATOR, AssetCls.LIA_NAME, null, null, AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);

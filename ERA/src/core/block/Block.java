@@ -9,7 +9,6 @@ import com.google.common.primitives.Longs;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -73,7 +72,7 @@ public class Block {
     protected byte[] transactionsHash;
     // LINK
     protected byte[] reference;
-    protected Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> parentBlockHead;
+    protected BlockHead parentBlockHead;
     // MIND - that calculated on DB
     protected int heightBlock;
     //protected int creatorPreviousHeightBlock;
@@ -83,6 +82,7 @@ public class Block {
     protected long target;
     protected long totalFee;
     protected long emittedFee;
+    public Block.BlockHead blockHead;
 
     // BODY
     protected List<Transaction> transactions;
@@ -101,7 +101,7 @@ public class Block {
         public final int version;
         public final byte[] reference;
         public final PublicKeyAccount creator;
-        public final int transactionCount;
+        public final int transactionsCount;
         public final byte[] transactionsHash;
         public final byte[] signature;
 
@@ -120,7 +120,7 @@ public class Block {
             this.version = version;
             this.creator = creator;
             this.signature = signature;
-            this.transactionCount = transactionCount;
+            this.transactionsCount = transactionCount;
             this.transactionsHash = transactionsHash;
             this.reference = reference;
 
@@ -137,7 +137,7 @@ public class Block {
             this.version = block.version;
             this.reference = block.reference;
             this.creator = block.creator;
-            this.transactionCount = block.transactionCount;
+            this.transactionsCount = block.transactionCount;
             this.transactionsHash = block.transactionsHash;
             this.signature = block.signature;
 
@@ -149,11 +149,27 @@ public class Block {
             this.emittedFee = emittedFee;
         }
 
+        public BlockHead(Block block, long totalFee, long emittedFee) {
+            this.version = block.version;
+            this.reference = block.reference;
+            this.creator = block.creator;
+            this.transactionsCount = block.transactionCount;
+            this.transactionsHash = block.transactionsHash;
+            this.signature = block.signature;
+
+            this.heightBlock = block.heightBlock;
+            this.forgingValue = block.forgingValue;
+            this.winValue = block.winValue;
+            this.target = block.target;
+            this.totalFee = totalFee;
+            this.emittedFee = emittedFee;
+        }
+
         public BlockHead(Block block) {
             this.version = block.version;
             this.reference = block.reference;
             this.creator = block.creator;
-            this.transactionCount = block.transactionCount;
+            this.transactionsCount = block.transactionCount;
             this.transactionsHash = block.transactionsHash;
             this.signature = block.signature;
 
@@ -163,6 +179,11 @@ public class Block {
             this.target = block.target;
             this.totalFee = block.totalFee;
             this.emittedFee = block.emittedFee;
+        }
+
+        public long getTimestamp() {
+            BlockChain blockChain = Controller.getInstance().getBlockChain();
+            return blockChain.getTimestamp(this.heightBlock);
         }
 
         public byte[] toBytes() {
@@ -182,14 +203,14 @@ public class Block {
             data = Bytes.concat(data, generatorBytes);
 
             //WRITE TRANSACTION COUNT
-            byte[] transactionCountBytes = Ints.toByteArray(this.transactionCount);
+            byte[] transactionCountBytes = Ints.toByteArray(this.transactionsCount);
             transactionCountBytes = Bytes.ensureCapacity(transactionCountBytes, TRANSACTIONS_COUNT_LENGTH, 0);
             data = Bytes.concat(data, transactionCountBytes);
 
             //WRITE TRANSACTIONS HASH
             data = Bytes.concat(data, this.transactionsHash);
 
-            //WRITE GENERATOR SIGNATURE
+            //WRITE SIGNATURE
             data = Bytes.concat(data, this.signature);
 
             //WRITE HEIGHT
@@ -300,6 +321,29 @@ public class Block {
                     height, forgingValue, winValue, target, totalFee, emittedFee);
 
         }
+
+        @SuppressWarnings("unchecked")
+        public JSONObject toJson() {
+            JSONObject head = new JSONObject();
+
+            DCSet dcSet = DCSet.getInstance();
+            head.put("version", this.version);
+            head.put("reference", Base58.encode(this.reference));
+            head.put("timestamp", this.getTimestamp());
+            head.put("forgingValue", this.forgingValue);
+            head.put("winValue", this.winValue);
+            head.put("target", this.target);
+            head.put("creator", this.creator.getAddress());
+            head.put("fee", this.totalFee);
+            head.put("emittedFee", this.emittedFee);
+            head.put("transactionsCount", this.transactionsCount);
+            head.put("transactionsHash", Base58.encode(this.transactionsHash));
+            head.put("signature", Base58.encode(this.signature));
+            head.put("height", this.heightBlock);
+
+            return head;
+        }
+
 
     }
 
@@ -517,7 +561,7 @@ public class Block {
         }
     }
 
-    public Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> getParentHead() {
+    public Block.BlockHead getParentHead() {
         return this.parentBlockHead;
     }
 
@@ -533,11 +577,10 @@ public class Block {
     }
 
     public void loadHeadMind(DCSet dcSet) {
-        Tuple3<Integer, Long, Long> headMind = dcSet.getBlocksHeadsMap().get(this.heightBlock).c;
-        this.forgingValue = headMind.a;
-        this.winValue = headMind.b;
-        this.target = headMind.c;
-
+        Block.BlockHead blockHead = dcSet.getBlocksHeadsMap().get(this.heightBlock);
+        this.forgingValue = blockHead.forgingValue;
+        this.winValue = blockHead.winValue;
+        this.target = blockHead.target;
     }
 
 	/*
@@ -569,11 +612,6 @@ public class Block {
                 this.version, this.creator.getPublicKey(), this.signature, this.transactionCount, this.transactionsHash);
     }
 
-    public Tuple3<Integer, Long, Long> getHeadMind() {
-        return new Tuple3<Integer, Long, Long>(
-                this.forgingValue, this.winValue, this.target);
-    }
-
     public Block getChild(DCSet db) {
         return db.getBlockMap().get(this.getHeight(db) + 1);
     }
@@ -602,6 +640,12 @@ public class Block {
         this.loadParentHead(db);
         return this.heightBlock;
 
+    }
+
+
+    public static long getTimestamp(int height) {
+        BlockChain blockChain = Controller.getInstance().getBlockChain();
+        return blockChain.getTimestamp(height);
     }
 
     public long getTimestamp(DCSet db) {
@@ -858,7 +902,6 @@ public class Block {
         block.put("fee", this.getTotalFee().toPlainString());
         block.put("transactionsHash", Base58.encode(this.transactionsHash));
         block.put("signature", Base58.encode(this.signature));
-        block.put("signature", Base58.encode(this.getSignature()));
         block.put("height", this.getHeight(dcSet));
 
         //CREATE TRANSACTIONS
@@ -1168,7 +1211,7 @@ public class Block {
             return false;
         }
 
-        long currentTarget = this.parentBlockHead.c.c;
+        long currentTarget = this.parentBlockHead.target;
         int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, this.winValue, currentTarget);
         if (!cnt.isTestNet() && targetedWinValue < 1) {
             //targetedWinValue = this.calcWinValueTargeted(dcSet);
@@ -1398,37 +1441,45 @@ public class Block {
     //PROCESS/ORPHAN
     public void feeProcess(DCSet dcSet, boolean asOrphan) {
         //REMOVE FEE
-        BigDecimal blockTotalFee = this.getTotalFee(dcSet);
-        BigDecimal bonusFee = this.getBonusFee();
-        BigDecimal emittedFee;
-        
+
+        long emittedFee;
+        if (blockHead == null) {
+            this.blockHead = new BlockHead(this, this.getTotalFee(dcSet).unscaledValue().longValue(),
+                    this.getTotalFee(dcSet).unscaledValue().longValue());
+        } else {
+
+        }
+
         if (BlockChain.ROBINHOOD_USE) {
             // find rich account
             String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
 
             if (!rich.equals(this.creator.getAddress())) {
-                emittedFee = bonusFee.divide(new BigDecimal(2));
+                emittedFee = this.blockHead.totalFee>>1;
                 
                 Account richAccount = new Account(rich);
                 //richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).add(bonus_fee), dcSet);
-                richAccount.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY, emittedFee, true);
+                richAccount.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY,
+                        new BigDecimal(emittedFee).scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE), true);
             } else {
-                emittedFee = bonusFee;
+                emittedFee = this.blockHead.emittedFee;
             }
             
         } else {
-            emittedFee = bonusFee;
+            emittedFee = this.blockHead.emittedFee;
         }
 
-        if (emittedFee.signum() != 0) {
+        if (emittedFee != 0) {
             // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY, emittedFee, true);
+            GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY,
+                    new BigDecimal(emittedFee).scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE), true);
         }
 
         //LOGGER.debug("<<< core.block.Block.orphan(DBSet) #3");
 
         //UPDATE GENERATOR BALANCE WITH FEE
-        this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY, blockTotalFee, true);
+        this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY,
+                new BigDecimal(this.blockHead.totalFee).scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE), true);
 
     }
 
@@ -1520,6 +1571,7 @@ public class Block {
 
         //ADD TO DB
         long timerStart = System.currentTimeMillis();
+
 
         if (dcSet.getBlockMap().add(this))
             throw new Exception("block already exist!!");

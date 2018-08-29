@@ -16,7 +16,7 @@ import java.util.Map;
 /*
  *  Block Height ->
  *  BLOCK HEAD:
- *  + FACE - version, creator, signature, transactionCount, transactionsHash
+ *  + FACE - version, creator, signature, transactionsCount, transactionsHash
  *  + parentSignature
  *  + Forging Data - Forging Value, Win Value, Target Value
  *

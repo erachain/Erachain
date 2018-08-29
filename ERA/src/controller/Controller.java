@@ -2225,11 +2225,11 @@ public class Controller extends Observable {
         return this.wallet.getLastTransactions(account, limit);
     }
 
-    public List<Pair<Account, Block>> getLastBlocks(int limit) {
+    public List<Pair<Account, Block.BlockHead>> getLastBlocks(int limit) {
         return this.wallet.getLastBlocks(limit);
     }
 
-    public List<Block> getLastBlocks(Account account, int limit) {
+    public List<Block.BlockHead> getLastBlocks(Account account, int limit) {
         return this.wallet.getLastBlocks(account, limit);
     }
 

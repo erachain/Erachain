@@ -1560,7 +1560,7 @@ public class BlockExplorer {
             blockJSON.put("generatingBalance", block.getForgingValue());
             blockJSON.put("winValue", block.getWinValue());
             blockJSON.put("winValueTargetted", block.calcWinValueTargeted() - 100000);
-            blockJSON.put("transactionCount", block.getTransactionCount());
+            blockJSON.put("transactionsCount", block.getTransactionCount());
             blockJSON.put("timestamp", block.getTimestamp(dcSet));
             blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(dcSet)));
             blockJSON.put("totalFee", block.getTotalFee().toPlainString());
@@ -1833,7 +1833,7 @@ public class BlockExplorer {
                  * //blockJSON.put("winValue", block.calcWinValue(dcSet));
                  * blockJSON.put("winValueTargetted",
                  * block.calcWinValueTargeted(dcSet));
-                 * blockJSON.put("transactionCount",
+                 * blockJSON.put("transactionsCount",
                  * block.getTransactionCount()); blockJSON.put("timestamp",
                  * block.getTimestamp(dcSet)); blockJSON.put("dateTime",
                  * BlockExplorer.timestampToStr(block.getTimestamp(dcSet)));
@@ -1958,7 +1958,7 @@ public class BlockExplorer {
              * block.getGeneratingBalance(dcSet)); //blockJSON.put("winValue",
              * block.calcWinValue(dcSet)); blockJSON.put("winValueTargetted",
              * block.calcWinValueTargeted(dcSet));
-             * blockJSON.put("transactionCount", block.getTransactionCount());
+             * blockJSON.put("transactionsCount", block.getTransactionCount());
              * blockJSON.put("timestamp", block.getTimestamp(dcSet));
              * blockJSON.put("dateTime",
              * BlockExplorer.timestampToStr(block.getTimestamp(dcSet)));
