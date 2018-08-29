@@ -19,7 +19,7 @@ public class Wallet_Sync_Button extends JButton implements Observer {
 
     public Wallet_Sync_Button() {
 
-        super(Lang.getInstance().translate("Sync Wallet"));
+        super(Lang.getInstance().translate("Sync wallet"));
         th = this;
         this.addActionListener(new ActionListener() {
 
@@ -45,7 +45,7 @@ public class Wallet_Sync_Button extends JButton implements Observer {
 
 
                 int n = JOptionPane.showConfirmDialog(
-                        new JFrame(), Lang.getInstance().translate("Sync Wallet") + "?",
+                        new JFrame(), Lang.getInstance().translate("Sync wallet") + "?",
                         Lang.getInstance().translate("Confirmation"),
                         JOptionPane.OK_CANCEL_OPTION);
                 if (n != JOptionPane.OK_OPTION) return;
