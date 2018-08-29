@@ -27,7 +27,7 @@ public class Wallets_Manager_SplitPanel extends Split_Panel {
         this.toolBar_LeftPanel.setVisible(true);
         this.button1_ToolBar_LeftPanel.setVisible(true);
         this.button1_ToolBar_LeftPanel.setBorder(new LineBorder(Color.BLACK));
-        this.button1_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Add Wallet"));
+        this.button1_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Add wallet"));
         this.button2_ToolBar_LeftPanel.setVisible(false);
 
         this.setName(Lang.getInstance().translate("Wallets Manager"));
