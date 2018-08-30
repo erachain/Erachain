@@ -576,7 +576,11 @@ public class Synchronizer {
             throw new Exception(mess);
         } else {
             // end of my CHAIN is common
-            headers.remove(0);
+
+            do {
+                headers.remove(0);
+            } while (dcSet.getBlockSignsMap().contains(headers.get(0)));
+
             return new Tuple2<byte[], List<byte[]>>(null, headers);
         }
 

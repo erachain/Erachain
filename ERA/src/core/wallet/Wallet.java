@@ -570,6 +570,9 @@ public class Wallet extends Observable implements Observer {
 		try {
 			this.syncHeight = height;
 			do {
+				if (height == 86549) {
+					int ttt = 1;
+				}
 				int maxHeight = Controller.getInstance().getMyHeight();
 				if (maxHeight < stepHeight)
 					stepHeight = maxHeight;

@@ -117,7 +117,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
                 case COLUMN_BASETARGET:
 
                     return block.forgingValue + " "
-                            + new Float(100000*(block.forgingValue - block.target)/block.target)/100.0; //.movePointLeft(3);
+                            + new Float(100000*(block.forgingValue - block.target)/block.target)/1000.0; //.movePointLeft(3);
 
                 case COLUMN_TRANSACTIONS:
 

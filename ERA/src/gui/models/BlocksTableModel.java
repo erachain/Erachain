@@ -144,7 +144,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
                     return forgingPoint.b + " "
                             + (block.heightBlock - forgingPoint.a) + " "
                             + block.winValue + " "
-                            + new Float(100000 * (block.winValue - block.target)/block.target)/100.0 + "%"; //.movePointLeft(3);
+                            + new Float(100000 * (block.winValue - block.target)/block.target)/1000.0 + "%"; //.movePointLeft(3);
 
                 case COLUMN_TRANSACTIONS:
 

@@ -114,6 +114,9 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
     public boolean set(int height, Block.BlockHead item) {
 
         //int key = this.size() + 1;
+        if (height == 86549 || item.heightBlock <= 0) {
+            int ttt = 1;
+        }
 
         // get Win Value of block
         long weight = item.winValue;
