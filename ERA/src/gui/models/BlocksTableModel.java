@@ -138,11 +138,13 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
 
                     //int height = block.heightBlock;
                     Tuple2<Integer, Integer> forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
+                    if (block.target == 0)
+                        return "GENESIS";
 
                     return forgingPoint.b + " "
                             + (block.heightBlock - forgingPoint.a) + " "
                             + block.winValue + " "
-                            + (block.winValue - block.target)/100 + "%"; //.movePointLeft(3);
+                            + new Float(100000 * (block.winValue - block.target)/block.target)/100.0 + "%"; //.movePointLeft(3);
 
                 case COLUMN_TRANSACTIONS:
 

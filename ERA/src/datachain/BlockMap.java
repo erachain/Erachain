@@ -294,6 +294,11 @@ public class BlockMap extends DCMap<Integer, Block> {
         // (System.currentTimeMillis() - start)*0.001);
 
         dcSet.getBlockSignsMap().set(signature, height);
+        if (height < 1) {
+            Long error = null;
+            ++error;
+        }
+
         dcSet.getBlocksHeadsMap().set(height, block.blockHead);
         this.setLastBlockSignature(signature);
 

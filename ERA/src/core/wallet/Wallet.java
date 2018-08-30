@@ -600,8 +600,9 @@ public class Wallet extends Observable implements Observer {
 				if (Controller.getInstance().isOnStopping())
 					return;
 
-				block = block.getChild(dcSet);
 				height++;
+				block = dcSet.getBlockMap().get(height);
+
 			} while (block != null);
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
@@ -1062,6 +1063,9 @@ public class Wallet extends Observable implements Observer {
 
 		// CHECK TRANSACTIONS
 		Block block = dcSet.getBlockMap().get(blockHead.heightBlock);
+		if (block == null) {
+			return ;
+		}
 		int seqNo = 0;
 		for (Transaction transaction : block.getTransactions()) {
 
