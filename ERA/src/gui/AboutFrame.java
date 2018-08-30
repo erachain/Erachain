@@ -13,7 +13,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 @SuppressWarnings("serial")
 public class AboutFrame extends JDialog {
