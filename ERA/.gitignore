@@ -1,13 +1,11 @@
 /data*
 /Data Files
-/wallet*
 *back*
 /bin/
 /ACCOUNTS.txt
 /*.jar
 /*.iml
 *.iml
-
 log.txt
 log.txt.*
 *.zip

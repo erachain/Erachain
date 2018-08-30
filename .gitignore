@@ -1,5 +1,5 @@
 # idea
-/.idea/
+.idea/
 # eclipse
 /.classpath
 /.project
@@ -7,7 +7,6 @@
 *.class
 /data*
 *backup*
-wallet*
 ERA/settings.json
 ERA/*.jar
 /build/
@@ -22,3 +21,5 @@ gui_settings.json
 /bin*
 /bin/
 /gradle/
+/ERA/temp/
+/ERA/wallet*/
