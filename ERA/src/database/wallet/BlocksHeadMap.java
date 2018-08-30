@@ -25,7 +25,7 @@ import java.util.*;
  *  + FACE - height, creator, signature, transactionsCount, Transactions Hash
  *  + Version, parentSignature, Fee as BigDecimal.toLong
  *  + Forging Data - Forging Value, Win Value, Target Value
- *
+ * maker
  */
 
 public class BlocksHeadMap extends DCMap<Tuple2<String, String>, Block.BlockHead> {
