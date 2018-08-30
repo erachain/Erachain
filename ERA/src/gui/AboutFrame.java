@@ -9,6 +9,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -145,5 +148,34 @@ public class AboutFrame extends JDialog {
     public void set_console_Text(String str) {
         console_Text.setText(str);
 
+    }
+
+    public static String getManifestInfo() {
+
+        try {
+            Enumeration<URL> resources = Thread.currentThread()
+                    .getContextClassLoader()
+                    .getResources("META-INF/MANIFEST.MF");
+            while (resources.hasMoreElements()) {
+                try {
+                    Manifest manifest = new Manifest(resources.nextElement().openStream());
+                    Attributes attributes = manifest.getMainAttributes();
+                    String implementationTitle = attributes.getValue("Implementation-Title");
+                    if (implementationTitle != null) { // && implementationTitle.equals(applicationName))
+                        String implementationVersion = attributes.getValue("Implementation-Version");
+                        String buildTime = attributes.getValue("Build-Time");
+                        if (buildTime == null)
+                            buildTime = LocalDateTime.now().toString();
+                        return buildTime ;
+
+                    }
+                } catch (IOException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            return "Current Version";
+        }
+        return "Current Version";
     }
 }
