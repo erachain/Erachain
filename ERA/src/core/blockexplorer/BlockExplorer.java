@@ -1560,7 +1560,7 @@ public class BlockExplorer {
             blockJSON.put("generatingBalance", block.getForgingValue());
             blockJSON.put("winValue", block.getWinValue());
             blockJSON.put("winValueTargetted", block.calcWinValueTargeted() - 100000);
-            blockJSON.put("transactionCount", block.getTransactionCount());
+            blockJSON.put("transactionsCount", block.getTransactionCount());
             blockJSON.put("timestamp", block.getTimestamp(dcSet));
             blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(dcSet)));
             blockJSON.put("totalFee", block.getTotalFee().toPlainString());
@@ -1833,7 +1833,7 @@ public class BlockExplorer {
                  * //blockJSON.put("winValue", block.calcWinValue(dcSet));
                  * blockJSON.put("winValueTargetted",
                  * block.calcWinValueTargeted(dcSet));
-                 * blockJSON.put("transactionCount",
+                 * blockJSON.put("transactionsCount",
                  * block.getTransactionCount()); blockJSON.put("timestamp",
                  * block.getTimestamp(dcSet)); blockJSON.put("dateTime",
                  * BlockExplorer.timestampToStr(block.getTimestamp(dcSet)));
@@ -1958,7 +1958,7 @@ public class BlockExplorer {
              * block.getGeneratingBalance(dcSet)); //blockJSON.put("winValue",
              * block.calcWinValue(dcSet)); blockJSON.put("winValueTargetted",
              * block.calcWinValueTargeted(dcSet));
-             * blockJSON.put("transactionCount", block.getTransactionCount());
+             * blockJSON.put("transactionsCount", block.getTransactionCount());
              * blockJSON.put("timestamp", block.getTimestamp(dcSet));
              * blockJSON.put("dateTime",
              * BlockExplorer.timestampToStr(block.getTimestamp(dcSet)));
@@ -2037,8 +2037,8 @@ public class BlockExplorer {
          List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
 
         Collection<Tuple2<String, Long>> addrs = dcSet.getAssetBalanceMap().getKeys();
-        BigDecimal total = BigDecimal.ZERO;
-        BigDecimal totalNeg = BigDecimal.ZERO;
+        //BigDecimal total = BigDecimal.ZERO;
+        //BigDecimal totalNeg = BigDecimal.ZERO;
         for (Tuple2<String, Long> addr : addrs) {
             if (addr.b == key) {
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball = dcSet
@@ -2046,17 +2046,17 @@ public class BlockExplorer {
                 // all = all.add(ball.a);
                 Account account = new Account(addr.a);
                 BigDecimal ballans = account.getBalanceUSE(key);
-                if (ball.a.b.signum() > 0) {
-                    total = total.add(ball.a.b);
-                } else {
-                    totalNeg = totalNeg.add(ball.a.b);
-                }
+                //if (ball.a.b.signum() > 0) {
+                    //total = total.add(ball.a.b);
+                //} else {
+                //    totalNeg = totalNeg.add(ball.a.b);
+                //}
 
                 top100s.add(Fun.t3(addr.a, ballans, ball.a.b));
             }
         }
 
-        totalNeg = total.add(totalNeg);
+        //totalNeg = total.add(totalNeg);
 
         Collection<Order> orders = dcSet.getOrderMap().getValuesAll();
 
@@ -4339,7 +4339,7 @@ public class BlockExplorer {
 
         // GET LAST BLOCK
         // byte[] lastBlockSignature =
-        // dcSet.getBlockMap().getLastBlockSignature();
+        // dcSet.getBlocksHeadMap().getLastBlockSignature();
         // RETURN HEIGHT
         // return dcSet.getBlockSignsMap().getHeight(lastBlockSignature);
         return dcSet.getBlockMap().size();

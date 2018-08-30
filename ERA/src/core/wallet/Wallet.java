@@ -4,7 +4,6 @@ package core.wallet;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.*;
 
 import javax.swing.JFileChooser;
@@ -12,9 +11,9 @@ import javax.swing.JFileChooser;
 import core.item.assets.Order;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -222,21 +221,21 @@ public class Wallet extends Observable implements Observer {
 		return this.database.getTransactionMap().get(account, limit);
 	}
 
-	public List<Pair<Account, Block>> getLastBlocks(int limit) {
+	public List<Pair<Account, Block.BlockHead>> getLastBlocks(int limit) {
 		if (!this.exists()) {
-			return new ArrayList<Pair<Account, Block>>();
+			return new ArrayList<Pair<Account, Block.BlockHead>>();
 		}
 
 		List<Account> accounts = this.getAccounts();
-		return this.database.getBlockMap().get(accounts, limit);
+		return this.database.getBlocksHeadMap().get(accounts, limit);
 	}
 
-	public List<Block> getLastBlocks(Account account, int limit) {
+	public List<Block.BlockHead> getLastBlocks(Account account, int limit) {
 		if (!this.exists()) {
-			return new ArrayList<Block>();
+			return new ArrayList<Block.BlockHead>();
 		}
 
-		return this.database.getBlockMap().get(account, limit);
+		return this.database.getBlocksHeadMap().get(account, limit);
 	}
 
 	public List<Pair<Account, Name>> getNames() {
@@ -526,7 +525,7 @@ public class Wallet extends Observable implements Observer {
 
 			// RESET MAPS
 			this.database.getTransactionMap().reset();
-			this.database.getBlockMap().reset();
+			this.database.getBlocksHeadMap().reset();
 			this.database.getNameMap().reset();
 			this.database.getNameSaleMap().reset();
 			this.database.getPollMap().reset();
@@ -584,7 +583,9 @@ public class Wallet extends Observable implements Observer {
 				// this.update(this, new
 				// ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE,
 				// block));
-				this.processBlock(block);
+				Block.BlockHead blockHead = dcSet.getBlocksHeadsMap().get(height);
+
+				this.processBlock(blockHead);
 
 				if (height % (stepHeight) == 0) {
 					this.syncHeight = height;
@@ -777,7 +778,7 @@ public class Wallet extends Observable implements Observer {
 		this.database.getTransactionMap().addObserver(o);
 
 		// REGISTER ON BLOCKS
-		this.database.getBlockMap().addObserver(o);
+		this.database.getBlocksHeadMap().addObserver(o);
 
 		// REGISTER ON NAMES
 		this.database.getNameMap().addObserver(o);
@@ -999,10 +1000,11 @@ public class Wallet extends Observable implements Observer {
 
 	}
 	
-	public void feeProcess(DCSet dcSet, Block block, Account blockGenerator, boolean asOrphan) {
-	    
-        BigDecimal bonusFee = block.getBonusFee();
-        BigDecimal blockTotalFee = block.getTotalFee(dcSet);
+	public void feeProcess(DCSet dcSet, Long blockFee, Account blockGenerator, boolean asOrphan) {
+
+		/*
+        BigDecimal bonusFee; // = block.getBonusFee();
+        BigDecimal blockTotalFee; // = block.getTotalFee(dcSet);
         BigDecimal emittedFee;
         
         if (BlockChain.ROBINHOOD_USE) {
@@ -1024,11 +1026,13 @@ public class Wallet extends Observable implements Observer {
             emittedFee = bonusFee;
         }
 
-        this.database.getAccountMap().changeBalance(blockGenerator.getAddress(), asOrphan, FEE_KEY, blockTotalFee);
+        */
+		this.database.getAccountMap().changeBalance(blockGenerator.getAddress(), asOrphan, FEE_KEY,
+				new BigDecimal(blockFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE));
 
 	}
 
-	private void processBlock(Block block) {
+	private void processBlock(Block.BlockHead blockHead) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1037,26 +1041,27 @@ public class Wallet extends Observable implements Observer {
 		long start = System.currentTimeMillis();
 
 		// SET AS LAST BLOCK
-		this.database.setLastBlockSignature(block.getSignature());
+		this.database.setLastBlockSignature(blockHead.signature);
 
-		Account blockGenerator = block.getCreator();
+		Account blockGenerator = blockHead.creator;
 		String blockGeneratorStr = blockGenerator.getAddress();
 
 		DCSet dcSet = DCSet.getInstance();
-		int height = block.getHeight(dcSet);
+		int height = blockHead.heightBlock;
 
 		// CHECK IF WE ARE GENERATOR
 		if (this.accountExists(blockGeneratorStr)) {
 			// ADD BLOCK
-			this.database.getBlockMap().add(block);
+			this.database.getBlocksHeadMap().add(blockHead);
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
 			// PROCESS FEE
-			feeProcess(dcSet, block, blockGenerator, false);
+			feeProcess(dcSet, blockHead.totalFee, blockGenerator, false);
 			
 		}
 
 		// CHECK TRANSACTIONS
+		Block block = dcSet.getBlockMap().get(blockHead.heightBlock);
 		int seqNo = 0;
 		for (Transaction transaction : block.getTransactions()) {
 
@@ -1132,13 +1137,13 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		long tickets = System.currentTimeMillis() - start;
-		LOGGER.info("WALLET [" + block.getHeightByParent(DCSet.getInstance()) + "] processing time: " + tickets * 0.001
-				+ " for records:" + block.getTransactionCount() + " millsec/record:"
-				+ tickets / (block.getTransactionCount() + 1));
+		LOGGER.info("WALLET [" + blockHead.heightBlock + "] processing time: " + tickets * 0.001
+				+ " for records:" + blockHead.transactionsCount + " millsec/record:"
+				+ tickets / (blockHead.transactionsCount + 1));
 
 	}
 
-	private void orphanBlock(Block block) {
+	private void orphanBlock(Block.BlockHead blockHead) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1146,13 +1151,15 @@ public class Wallet extends Observable implements Observer {
 
 		// long start = System.currentTimeMillis();
 
-		List<Transaction> transactions = block.getTransactions();
+		//List<Transaction> transactions = block.a.a;
 
 		DCSet dcSet = DCSet.getInstance();
-		int height = block.getHeight(dcSet);
+
 		// ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
+		Block block = dcSet.getBlockMap().get(blockHead.heightBlock);
+		List<Transaction> transactions = block.getTransactions();
 		int seqNo;
-		for (int i = transactions.size() - 1; i >= 0; i--) {
+		for (int i = blockHead.transactionsCount - 1; i >= 0; i--) {
 
 			seqNo = i + 1;
 
@@ -1161,7 +1168,7 @@ public class Wallet extends Observable implements Observer {
 				continue;
 			}
 
-			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, height, seqNo);
+			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, blockHead.heightBlock, seqNo);
 			this.orphanTransaction(transaction);
 
 			// CHECK IF PAYMENT
@@ -1225,24 +1232,24 @@ public class Wallet extends Observable implements Observer {
 			}
 		}
 
-		Account blockGenerator = block.getCreator();
+		Account blockGenerator = blockHead.creator;
 		String blockGeneratorStr = blockGenerator.getAddress();
 
 		// CHECK IF WE ARE GENERATOR
 		if (this.accountExists(blockGeneratorStr)) {
 			// DELETE BLOCK
-			this.database.getBlockMap().delete(block);
+			this.database.getBlocksHeadMap().delete(blockHead);
 
 			// SET AS LAST BLOCK
 			// this.database.setLastBlockSignature(block.getReference());
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
-            feeProcess(dcSet, block, blockGenerator, true);
+            feeProcess(dcSet, blockHead.totalFee, blockGenerator, true);
             
 		}
 
 		// SET AS LAST BLOCK
-		this.database.setLastBlockSignature(block.getReference());
+		this.database.setLastBlockSignature(blockHead.reference); // .reference
 
 		// long tickets = System.currentTimeMillis() - start;
 		// LOGGER.info("WALLET [" + block.getHeightByParent(DCSet.getInstance())
@@ -1678,11 +1685,12 @@ public class Wallet extends Observable implements Observer {
 
 		if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE)// .WALLET_ADD_BLOCK_TYPE)
 		{
-			Block block = (Block) message.getValue();
+			Block.BlockHead block =	(Block.BlockHead) message.getValue();
 
 			// CHECK IF WE NEED TO RESYNC
 			// BY REFERENCE !!!!
-			if (checkNeedSyncWallet(block.getReference())) {
+			if (checkNeedSyncWallet(block.reference)) //.getReference()))
+			{
 				return;
 			}
 
@@ -1691,11 +1699,12 @@ public class Wallet extends Observable implements Observer {
 
 		} else if (message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
 		{
-			Block block = (Block) message.getValue();
+			Block.BlockHead block = (Block.BlockHead) message.getValue();
 
 			// CHECK IF WE NEED TO RESYNC
 			// BY SIGNATURE !!!!
-			if (checkNeedSyncWallet(block.getSignature())) {
+			if (checkNeedSyncWallet(block.signature)) //.getSignature()))
+			{
 				return;
 			}
 

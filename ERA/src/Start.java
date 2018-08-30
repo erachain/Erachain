@@ -105,9 +105,14 @@ public class Start {
                     throw new Exception(Lang.getInstance().translate("Both gui and rpc cannot be disabled!"));
                 }
 
-                LOGGER.info(Lang.getInstance().translate("Starting %app%")
-                        .replace("%app%", Lang.getInstance().translate(controller.Controller.APP_NAME)));
-                LOGGER.info(getManifestInfo());
+                info = Lang.getInstance().translate("Starting %app% / version: %version% / build date: %builddate% / ...")
+                        .replace("%app%", Lang.getInstance().translate(controller.Controller.APP_NAME))
+                        .replace("%version%", Controller.getVersion())
+                        .replace("%builddate%", Controller.getBuildDateString());
+                LOGGER.info(info
+                );
+                if (Controller.useGui) about_frame.set_console_Text(info);
+
 
                 //STARTING NETWORK/BLOCKCHAIN/RPC
                 Controller.getInstance().start();

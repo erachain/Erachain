@@ -41,7 +41,8 @@ public class Order_Info_Panel extends JPanel {
         // HAVE
         ++detailGBC.gridy;
         JTextField have = new JTextField(
-                order.getAmountHave().toPlainString() + " x " + String.valueOf(order.getHaveAsset().toString()));
+                order.getAmountHave().toPlainString() + " x " + (order.getHaveAsset() == null?
+                        "[" + order.getHave() + "]" : String.valueOf(order.getHaveAsset().toString())));
         have.setEditable(false);
         MenuPopupUtil.installContextMenu(have);
         this.add(have, detailGBC);
@@ -54,7 +55,8 @@ public class Order_Info_Panel extends JPanel {
         // HAVE
         ++detailGBC.gridy;
         JTextField want = new JTextField(
-                order.getAmountWant().toPlainString() + " x " + String.valueOf(order.getWantAsset().toString()));
+                order.getAmountWant().toPlainString() + " x " + (order.getWantAsset() == null?
+                        "[" + order.getWant() + "]" : String.valueOf(order.getWantAsset().toString())));
         want.setEditable(false);
         MenuPopupUtil.installContextMenu(want);
         this.add(want, detailGBC);

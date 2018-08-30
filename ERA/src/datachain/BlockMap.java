@@ -137,9 +137,11 @@ public class BlockMap extends DCMap<Integer, Block> {
     @Override
     protected Map<Integer, Block> getMap(DB database) {
         // OPEN MAP
-        return database.createTreeMap("blocks").keySerializer(BTreeKeySerializer.BASIC)
+        return database.createTreeMap("blocks")
+                .keySerializer(BTreeKeySerializer.BASIC)
                 // .comparator(UnsignedBytes.lexicographicalComparator())
-                .valueSerializer(new BlockSerializer()).valuesOutsideNodesEnable()
+                .valueSerializer(new BlockSerializer())
+                .valuesOutsideNodesEnable()
                 .counterEnable() // - auto increment atomicKey
                 .makeOrGet();
     }
@@ -171,7 +173,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     public byte[] getLastBlockSignature() {
         if (this.lastBlockSignature == null) {
-            this.lastBlockSignature = getDCSet().getBlocksHeadsMap().get(this.size()).a.c;
+            this.lastBlockSignature = getDCSet().getBlocksHeadsMap().get(this.size()).signature;
         }
         return this.lastBlockSignature;
     }
@@ -292,8 +294,7 @@ public class BlockMap extends DCMap<Integer, Block> {
         // (System.currentTimeMillis() - start)*0.001);
 
         dcSet.getBlockSignsMap().set(signature, height);
-        dcSet.getBlocksHeadsMap().set(height, new Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>(
-                block.getHeadFace(), signature, block.getHeadMind()));
+        dcSet.getBlocksHeadsMap().set(height, block.blockHead);
         this.setLastBlockSignature(signature);
 
         // LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1500: " +
@@ -326,12 +327,10 @@ public class BlockMap extends DCMap<Integer, Block> {
         // ORPHAN FORGING DATA
         if (height > 1) {
 
-            Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> head = dcSet.getBlocksHeadsMap().remove();
+            Block.BlockHead head = dcSet.getBlocksHeadsMap().remove();
 
-            byte[] creatorByte = head.a.b;
-            PublicKeyAccount creator = new PublicKeyAccount(creatorByte);
             // INITIAL forging DATA no need remove!
-            creator.delForgingData(dcSet, height);
+            head.creator.delForgingData(dcSet, height);
 
         }
 
@@ -357,20 +356,15 @@ public class BlockMap extends DCMap<Integer, Block> {
     public void notifyProcessChain(Block block) {
         LOGGER.debug("++++++ NOTEFY CHAIN_ADD_BLOCK_TYPE");
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block.blockHead));
         LOGGER.debug("++++++ NOTEFY CHAIN_ADD_BLOCK_TYPE END");
     }
 
     public void notifyOrphanChain(Block block) {
         LOGGER.debug("===== NOTEFY CHAIN_REMOVE_BLOCK_TYPE");
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block.blockHead));
         LOGGER.debug("===== NOTEFY CHAIN_REMOVE_BLOCK_TYPE END");
-    }
-
-    public void notifyListChain(List<Block> blocks) {
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_LIST_BLOCK_TYPE, blocks));
     }
 
 }

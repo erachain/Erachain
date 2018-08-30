@@ -65,7 +65,7 @@ public class Search_Document_Hash extends Split_Panel {
         JButton search_Button = new JButton();
         this.searchToolBar_LeftPanel.add(search_Button);
 
-        search_Button.setText(Lang.getInstance().translate("Search Hash"));
+        search_Button.setText(Lang.getInstance().translate("Search hash"));
 
         search_Button.addActionListener(new ActionListener() {
 

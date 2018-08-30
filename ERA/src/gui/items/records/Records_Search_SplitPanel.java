@@ -44,8 +44,8 @@ public class Records_Search_SplitPanel extends Split_Panel {
 
         this.setName(Lang.getInstance().translate("Search Records"));
 
-        this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Insert Height Block or Block-SeqNo") + ":");
-        this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Insert Account") + ":"));
+        this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Insert height block or block-seqNo") + ":");
+        this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Insert account") + ":"));
         sender_address = new JTextField();
         sender_address.setToolTipText("");
         sender_address.setAlignmentX(1.0F);

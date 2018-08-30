@@ -720,7 +720,7 @@ public class BlockGenerator extends Thread implements Observer {
                                     } catch (InterruptedException e) {
                                     }
 
-                                    byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1).b;
+                                    byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1).reference;
                                     response = (SignaturesMessage) peer.getResponse(
                                             MessageFactory.getInstance().createGetHeadersMessage(prevSignature),
                                             Synchronizer.GET_BLOCK_TIMEOUT);

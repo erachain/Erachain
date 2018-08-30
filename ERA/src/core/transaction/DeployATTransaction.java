@@ -316,7 +316,7 @@ public class DeployATTransaction extends Transaction {
     public int isValid(Integer forkHeight) {
 		/*
 		//CHECK IF RELEASED
-		if(db.getBlockMap().getLastBlock().getHeight(db) + 1 < Transaction.getAT_BLOCK_HEIGHT_RELEASE())
+		if(db.getBlocksHeadMap().getLastBlock().getHeight(db) + 1 < Transaction.getAT_BLOCK_HEIGHT_RELEASE())
 		{
 			return NOT_YET_RELEASED;
 		}

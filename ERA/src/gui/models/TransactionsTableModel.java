@@ -1,15 +1,5 @@
 package gui.models;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.validation.constraints.Null;
-
-import org.apache.log4j.Logger;
-import org.mapdb.Fun.Tuple2;
-
 import controller.Controller;
 import core.account.Account;
 import core.item.assets.AssetCls;
@@ -18,8 +8,16 @@ import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.SortableList;
 import lang.Lang;
+import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
 import utils.DateTimeFormat;
 import utils.ObserverMessage;
+
+import javax.validation.constraints.Null;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 @SuppressWarnings("serial")
 // IN gui.DebugTabPane used
@@ -38,7 +36,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
     List<Transaction> transactions;
     //private SortableList<byte[], Transaction> transactions;
     private Integer blockNo = null;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Block", "Seq_No", "Type", "Amount", AssetCls.FEE_NAME});
+    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Block", "Seq_no", "Type", "Amount", AssetCls.FEE_NAME});
     private String ac;
 
     public TransactionsTableModel() {
@@ -54,7 +52,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
     public void setBlockNumber(String string) {
 
         // byte[] block_key = DBSet.getInstance().getBlockHeightsMap().get(Long.parseLong(string));
-        // Block block = DBSet.getInstance().getBlockMap().get(block_key);
+        // Block block = DBSet.getInstance().getBlocksHeadMap().get(block_key);
         // transactions = block.getTransactions();
 
         try {
