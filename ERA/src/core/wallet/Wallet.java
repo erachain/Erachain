@@ -515,6 +515,44 @@ public class Wallet extends Observable implements Observer {
 
 		DCSet dcSet = DCSet.getInstance();
 
+		///////////////////////////////////// IS CHAIN VALID
+		if (false) {
+			for (int i = 2; i < dcSet.getBlockMap().size(); i++) {
+				Block block = dcSet.getBlockMap().get(i);
+				if (block.getHeight(dcSet) != i) {
+					Long error = null;
+					++error;
+				}
+				if (block.getHeightByParent(dcSet) != i) {
+					Long error = null;
+					++error;
+				}
+				if (block.blockHead.heightBlock != i) {
+					Long error = null;
+					++error;
+				}
+				Block.BlockHead head = dcSet.getBlocksHeadsMap().get(i);
+				if (head.heightBlock != i) {
+					Long error = null;
+					++error;
+				}
+				byte[] reference = block.getReference();
+				Block parent = dcSet.getBlockSignsMap().getBlock(reference);
+				if (parent == null) {
+					Long error = null;
+					++error;
+				}
+				if (parent.getHeight(dcSet) != i - 1) {
+					Long error = null;
+					++error;
+				}
+				if (parent.getHeightByParent(dcSet) != i - 1) {
+					Long error = null;
+					++error;
+				}
+			}
+		}
+
 		Block block;
 		int height;
 
@@ -1870,37 +1908,37 @@ public class Wallet extends Observable implements Observer {
 		int ret = fileopen.showDialog(null, Lang.getInstance().translate("Open Wallet Dir"));
 		if (ret == JFileChooser.APPROVE_OPTION) {
 			String dir = fileopen.getSelectedFile().toString();
-			
+
 			// set wallet dir
 			Settings.getInstance().setWalletDir(dir);
 			// open wallet
-							Controller.getInstance().wallet = new Wallet();
-				// not wallet return 0;
-				if (!Controller.getInstance().wallet.exists()) return 2;
-				// accounts 
-				List<Account> aa = Controller.getInstance().wallet.getAccounts();
-				if (Controller.getInstance().wallet.getAccounts().size()<1) return 5;
-				if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
-					Controller.getInstance().wallet.initiateItemsFavorites();
-					// save path from setting json
-					JSONObject settingsLangJSON = new JSONObject();
-					settingsLangJSON.putAll(Settings.getInstance().read_setting_JSON());
-					Settings.getInstance().setWalletDir(dir);
-					settingsLangJSON.put("walletdir", Settings.getInstance().getWalletDir());
-					try {
-						SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsLangJSON);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					// is ok
-					return 1;
-			
+			Controller.getInstance().wallet = new Wallet();
+			// not wallet return 0;
+			if (!Controller.getInstance().wallet.exists()) return 2;
+			// accounts
+			List<Account> aa = Controller.getInstance().wallet.getAccounts();
+			if (Controller.getInstance().wallet.getAccounts().size() < 1) return 5;
+			if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
+				Controller.getInstance().wallet.initiateItemsFavorites();
+				// save path from setting json
+				JSONObject settingsLangJSON = new JSONObject();
+				settingsLangJSON.putAll(Settings.getInstance().read_setting_JSON());
+				Settings.getInstance().setWalletDir(dir);
+				settingsLangJSON.put("walletdir", Settings.getInstance().getWalletDir());
+				try {
+					SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsLangJSON);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				// is ok
+				return 1;
+
+			}
+
+
 		}
-		
-		
-	}
 		//is abort
-				return 3;
-}
+		return 3;
+	}
 }
