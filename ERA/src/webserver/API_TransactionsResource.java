@@ -46,8 +46,8 @@ public class API_TransactionsResource {
                 Lang.getInstance().translate("Get Record by sigmature."));
         help.put("apirecords/getbynumber/{height-sequence}",
                 "GET Record by Height and Sequence");
-        help.put("apirecords/incomingfromblock/{address}/{blockStart}",
-                Lang.getInstance().translate("Get Incoming Records for Address from {blockStart}. Limit checked blocks = 2000 or 100 found records. If blocks not end at height - NEXT parameter was set."));
+        help.put("apirecords/incomingfromblock/{address}/{blockStart}?type={type}",
+                Lang.getInstance().translate("Get Incoming Records for Address from {blockStart}. Filter by type. Limit checked blocks = 2000 or 100 found records. If blocks not end at height - NEXT parameter was set."));
         help.put("apirecords/getbyaddress?address={address}&asset={asset}&recordType={recordType}&unconfirmed=true",
                 Lang.getInstance().translate("Get all Records (and Unconfirmed) for Address & Asset Key by record type. recordType is option parameter"));
         help.put("apirecords/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}&unconfirmed=true",
@@ -55,8 +55,8 @@ public class API_TransactionsResource {
         help.put("apirecords/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}&type={type Transaction}&sort={des/asc}",
                 Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
 
-        help.put("apirecords/unconfirmedincomes/{address}?from={from}&count={count}&descending=true",
-                Lang.getInstance().translate("Get all unconfirmed Records for Address from Start at Count"));
+        help.put("apirecords/unconfirmedincomes/{address}?type={type}&from={from}&count={count}&descending=true",
+                Lang.getInstance().translate("Get all unconfirmed Records for Address from Start at Count filtered by Type"));
 
         help.put("apirecords/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
 
@@ -148,7 +148,8 @@ public class API_TransactionsResource {
      */
     @GET
     @Path("incomingfromblock/{address}/{from}")
-    public Response incomingFromBlock(@PathParam("address") String address, @PathParam("from") Long from) {
+    public Response incomingFromBlock(@PathParam("address") String address, @PathParam("from") Long from,
+                                      @QueryParam("type") int type) {
 
         int height = from.intValue();
         Block block;
@@ -170,6 +171,9 @@ public class API_TransactionsResource {
 
         do {
             for (Transaction transaction : block.getTransactions()) {
+                if (type != 0 && type != transaction.getType())
+                    continue;
+
                 transaction.setDC(dcSet);
                 HashSet<Account> recipients = transaction.getRecipientAccounts();
                 for (Account recipient : recipients) {
@@ -364,13 +368,13 @@ public class API_TransactionsResource {
     // get transactions/unconfirmedincomes/7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7?from=123&count=13&descending=true
     public String getNetworkIncomesTransactions(@PathParam("address") String address,
             @QueryParam("from") int from, @QueryParam("count") int count,
-            @QueryParam("descending") boolean descending) {
+            @QueryParam("type") int type, @QueryParam("descending") boolean descending) {
 
         JSONArray array = new JSONArray();
 
         DCSet dcSet = DCSet.getInstance();
 
-        for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address, from, count, descending)) {
+        for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address, type, from, count, descending)) {
             record.setDC(dcSet);
             array.add(record.toJson());
         }

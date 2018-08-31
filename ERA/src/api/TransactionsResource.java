@@ -200,13 +200,13 @@ public class TransactionsResource {
     // get transactions/unconfirmedincomes/7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7?from=123&count=13&descending=true
     public String getNetworkIncomesTransactions(@PathParam("address") String address,
             @QueryParam("from") int from, @QueryParam("count") int count,
-            @QueryParam("descending") boolean descending) {
+            @QueryParam("type") int type, @QueryParam("descending") boolean descending) {
 
         JSONArray array = new JSONArray();
 
         DCSet dcSet = DCSet.getInstance();
 
-        for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address, from, count, descending)) {
+        for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address, type, from, count, descending)) {
             record.setDC(dcSet);
             array.add(record.toJson());
         }

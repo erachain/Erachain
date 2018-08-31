@@ -272,7 +272,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
         return values;
     }
     
-    public List<Transaction> getIncomedTransactions(String address, int from, int count, boolean descending) {
+    public List<Transaction> getIncomedTransactions(String address, int type, int from, int count, boolean descending) {
         
         ArrayList<Transaction> values = new ArrayList<Transaction>();
         Iterator<byte[]> iterator = this.getIterator(from, descending);
@@ -282,6 +282,9 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
         Transaction transaction;
         while (iterator.hasNext()) {
             transaction = map.get(iterator.next());
+            if (type != 0 && type != transaction.getType())
+                continue;
+
             transaction.setDC(this.getDCSet());
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             if (recipients == null || recipients.isEmpty())

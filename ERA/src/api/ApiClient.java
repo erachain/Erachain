@@ -174,8 +174,8 @@ public class ApiClient {
                             ""
                     },
                     {
-                            "GET transactions/unconfirmedincomes/<address>?from={from}&count={count}&descending=true",
-                            "Returns an array of all the unconfirmed incoming transactions of address known to the client.",
+                            "GET transactions/unconfirmedincomes/<address>?type={type}&from={from}&count={count}&descending=true",
+                            "Returns an array of all the unconfirmed incoming transactions of address known to the client filterer by Type.",
                             ""
                     },
                     {
