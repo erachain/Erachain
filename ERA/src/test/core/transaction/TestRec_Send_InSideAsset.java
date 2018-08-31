@@ -80,10 +80,10 @@ public class TestRec_Send_InSideAsset {
         //gb.process(db);
 
         // FEE FUND
-        creditor.setLastTimestamp(gb.getTimestamp(db), db);
+        creditor.setLastTimestamp(gb.getTimestamp(), db);
         creditor.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false);
 
-        emitter.setLastTimestamp(gb.getTimestamp(db), db);
+        emitter.setLastTimestamp(gb.getTimestamp(), db);
         emitter.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false);
 
         asset = new AssetVenture(creditor, "aasdasd", icon, image, "asdasda", AssetCls.AS_INSIDE_ASSETS, 8, 50000l);

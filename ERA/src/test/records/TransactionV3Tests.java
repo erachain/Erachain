@@ -67,7 +67,7 @@ public class TransactionV3Tests {
 
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(db), db);
+        maker.setLastTimestamp(gb.getTimestamp(), db);
         maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 

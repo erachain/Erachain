@@ -104,7 +104,7 @@ public class Incoming_Mails_SplitPanel extends Split_Panel {
                 int row = inciming_Mail_Table.getSelectedRow();
                 row = inciming_Mail_Table.convertRowIndexToModel(row);
                 Transaction trans = incoming_Mails_Model.getTransaction(row);
-                int blockNo = trans.getBlockHeight(DCSet.getInstance());
+                int blockNo = trans.getBlockHeight();
                 int recNo = trans.getSeqNo(DCSet.getInstance());
                 new VouchRecordDialog(blockNo, recNo, ((R_Send) trans).getRecipient());
 

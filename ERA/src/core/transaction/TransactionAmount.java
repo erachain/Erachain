@@ -132,8 +132,8 @@ public abstract class TransactionAmount extends Transaction {
     
     // GETTERS/SETTERS
 
-    public void setBlock(Block block, DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        super.setBlock(block, dcSet, asDeal, blockHeight, seqNo);
+    public void setBlock(Block block, DCSet dcSet, int asDeal, int seqNo) {
+        super.setBlock(block, dcSet, asDeal, seqNo);
 
         if (this.amount != null) {
             this.asset = this.dcSet.getItemAssetMap().get(this.getAbsKey());

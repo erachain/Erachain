@@ -125,11 +125,11 @@ public class OrderTestsMy {
         accountB = new PrivateKeyAccount(privateKey);
 
         // FEE FUND
-        accountA.setLastTimestamp(gb.getTimestamp(db), db);
+        accountA.setLastTimestamp(gb.getTimestamp(), db);
         accountA.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100), false);
         accountA.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(10), false);
 
-        accountB.setLastTimestamp(gb.getTimestamp(db), db);
+        accountB.setLastTimestamp(gb.getTimestamp(), db);
         accountB.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100), false);
         accountB.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(10), false);
 

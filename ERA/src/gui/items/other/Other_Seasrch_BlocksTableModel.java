@@ -124,11 +124,11 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
                         return "-1";
                     }
                     if (row == 0) {
-                        return block.getHeight(dcSet) + " " + Controller.getInstance().getBlockChain().getFullWeight(dcSet);
+                        return block.getHeight() + " " + Controller.getInstance().getBlockChain().getFullWeight(dcSet);
 
                     }
 
-                    return block.getHeight(dcSet) + " " + block.getTarget();
+                    return block.getHeight() + " " + block.getTarget();
 
                 case COLUMN_TIMESTAMP:
                     if (block == null) {
@@ -137,7 +137,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
                         return "-1";
                     }
 
-                    return DateTimeFormat.timestamptoString(block.getTimestamp(dcSet));// +
+                    return DateTimeFormat.timestamptoString(block.getTimestamp());// +
                 // "
                 // "
                 // +
@@ -161,7 +161,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
                         return "-1";
                     }
 
-                    int height = block.getHeight(dcSet);
+                    int height = block.getHeight();
                     Tuple2<Integer, Integer> forgingPoint = block.getCreator().getForgingData(dcSet, height);
 
                     return forgingPoint.b + " "

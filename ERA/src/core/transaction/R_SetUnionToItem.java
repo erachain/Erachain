@@ -338,7 +338,7 @@ public class R_SetUnionToItem extends Transaction {
                 (
                         beg_date, end_date,
                         a_data,
-                        this.getBlockHeightByParent(this.dcSet), this.getSeqNo(this.dcSet)
+                        this.height, this.seqNo
                 );
 
         // SET UNION to ITEM for DURATION

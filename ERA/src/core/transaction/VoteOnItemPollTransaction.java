@@ -148,8 +148,8 @@ public class VoteOnItemPollTransaction extends Transaction {
         }
     }
 
-    public void setBlock(Block block, DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        super.setBlock(block, dcSet, asDeal, blockHeight, seqNo);
+    public void setBlock(Block block, DCSet dcSet, int asDeal, int seqNo) {
+        super.setBlock(block, dcSet, asDeal, seqNo);
 
         this.poll = (PollCls) this.dcSet.getItemPollMap().get(this.key);
     }

@@ -113,7 +113,7 @@ public class Statements_Favorite_SplitPanel extends Split_Panel {
             Transaction statement = search_Table_Model.get_Statement(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
             if (statement == null) return;
             DCSet db = DCSet.getInstance();
-            new VouchRecordDialog(statement.getBlockHeight(db), statement.getSeqNo(db));
+            new VouchRecordDialog(statement.getBlockHeight(), statement.getSeqNo(db));
         });
 
         menu.add(vouch_Item);

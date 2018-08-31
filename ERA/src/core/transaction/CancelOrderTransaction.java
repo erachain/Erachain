@@ -65,8 +65,8 @@ public class CancelOrderTransaction extends Transaction {
 
     //GETTERS/SETTERS
 
-    public void setBlock(Block block, DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        super.setBlock(block, dcSet, asDeal, blockHeight, seqNo);
+    public void setBlock(Block block, DCSet dcSet, int asDeal, int seqNo) {
+        super.setBlock(block, dcSet, asDeal, seqNo);
 
         Tuple2<Integer, Integer> createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
         //Transaction createOrder = this.dcSet.getTransactionMap().get(this.orderSignature);

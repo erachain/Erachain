@@ -37,7 +37,7 @@ public class BlockMessage extends Message {
 
         //PARSE BLOCK
         //Block block = Block.parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1), false);
-        Block block = BlockFactory.getInstance().parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1), false);
+        Block block = BlockFactory.getInstance().parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1), height);
         //block.getGeneratingBalance(dbSet);
 
         //CREATE MESSAGE
@@ -65,7 +65,7 @@ public class BlockMessage extends Message {
             return data;
         }
         //WRITE BLOCK HEIGHT
-        byte[] heightBytes = Ints.toByteArray(this.block.getHeightByParent(DCSet.getInstance()));
+        byte[] heightBytes = Ints.toByteArray(this.height);
         data = Bytes.concat(data, heightBytes);
 
         //WRITE BLOCK

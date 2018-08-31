@@ -214,7 +214,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 
                 case COLUMN_BLOCK:
 
-                    return transaction.getBlockHeight(DCSet.getInstance());
+                    return transaction.getBlockHeight();
 
                 case COLUMN_SEQ_NO:
                     return transaction.getSeqNo(DCSet.getInstance());

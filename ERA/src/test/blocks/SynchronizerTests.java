@@ -66,7 +66,7 @@ public class SynchronizerTests {
         List<Block> firstBlocks = new ArrayList<Block>();
         for (int i = 0; i < 5; i++) {
             //GENERATE NEXT BLOCK
-            Block newBlock = BlockGenerator.generateNextBlock(databaseSet, generator, lastBlock, transactionsHash);
+            Block newBlock = BlockGenerator.generateNextBlock(databaseSet, generator, height, lastBlock, transactionsHash);
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -104,7 +104,7 @@ public class SynchronizerTests {
         List<Block> newBlocks = new ArrayList<Block>();
         for (int i = 0; i < 5; i++) {
             //GENERATE NEXT BLOCK
-            Block newBlock = BlockGenerator.generateNextBlock(fork, generator, lastBlock, transactionsHash);
+            Block newBlock = BlockGenerator.generateNextBlock(fork, generator, height, lastBlock, transactionsHash);
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -150,7 +150,7 @@ public class SynchronizerTests {
             assertEquals(true, Arrays.equals(lastBlock.getSignature(), genesisBlock.getSignature()));
 
             //CHECK HEIGHT
-            assertEquals(11, databaseSet.getBlockMap().last().getHeight(databaseSet));
+            assertEquals(11, databaseSet.getBlockMap().last().getHeight());
         } catch (Exception e) {
             fail("Exception during synchronize");
         }
@@ -217,7 +217,7 @@ public class SynchronizerTests {
         BlockGenerator blockGenerator = new BlockGenerator(false);
         for (int i = 0; i < 5; i++) {
             //GENERATE NEXT BLOCK
-            Block newBlock = blockGenerator.generateNextBlock(databaseSet1, generator, lastBlock, transactionsHash);
+            Block newBlock = blockGenerator.generateNextBlock(databaseSet1, generator, height, lastBlock, transactionsHash);
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -241,7 +241,7 @@ public class SynchronizerTests {
         List<Block> newBlocks = new ArrayList<Block>();
         for (int i = 0; i < 10; i++) {
             //GENERATE NEXT BLOCK
-            Block newBlock = BlockGenerator.generateNextBlock(databaseSet2, generator2, lastBlock, transactionsHash);
+            Block newBlock = BlockGenerator.generateNextBlock(databaseSet2, generator2, height, lastBlock, transactionsHash);
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator2, newBlock.getSignature());
@@ -286,6 +286,6 @@ public class SynchronizerTests {
         assertEquals(true, Arrays.equals(lastBlock.getSignature(), gb1.getSignature()));
 
         //CHECK HEIGHT
-        assertEquals(11, databaseSet1.getBlockMap().last().getHeight(databaseSet1));
+        assertEquals(11, databaseSet1.getBlockMap().last().getHeight());
     }
 }

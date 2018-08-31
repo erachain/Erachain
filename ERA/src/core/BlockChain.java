@@ -211,7 +211,7 @@ public class BlockChain {
     public BlockChain(DCSet dcSet_in) throws Exception {
         //CREATE GENESIS BLOCK
         genesisBlock = new GenesisBlock();
-        genesisTimestamp = genesisBlock.getTimestamp(null);
+        genesisTimestamp = genesisBlock.getTimestamp();
 
         // GENERAL TRUST
         TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
@@ -905,7 +905,7 @@ public class BlockChain {
             //FOR ALL TRANSACTIONS IN BLOCK
             for (Transaction transaction : block.getTransactions()) {
 
-                transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, block.getHeight(dcSet), ++seqNo);
+                transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, ++seqNo);
 
                 //CHECK IF ACCOUNT INVOLVED
                 if (account != null && !transaction.isInvolved(account)) {

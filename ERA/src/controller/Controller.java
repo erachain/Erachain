@@ -271,10 +271,10 @@ public class Controller extends Observable {
     }
 
     public void statusInfo() {
-        long timestamp = this.blockChain.getLastBlock(dcSet).getTimestamp(this.dcSet);
+        long timestamp = this.blockChain.getLastBlock(dcSet).getTimestamp();
         LOGGER.info("STATUS " + this.getStatus() + "\n" + "| Last Block Signature: "
                 + Base58.encode(this.blockChain.getLastBlock(dcSet).getSignature()) + "\n" + "| Last Block Height: "
-                + this.blockChain.getLastBlock(dcSet).getHeight(this.dcSet) + "\n" + "| Last Block Time: "
+                + this.blockChain.getLastBlock(dcSet).getHeight() + "\n" + "| Last Block Time: "
                 + DateTimeFormat.timestamptoString(timestamp));
     }
 
@@ -1297,7 +1297,7 @@ public class Controller extends Observable {
                             + (System.currentTimeMillis() - time1) + " for headers: " + headers.size()
                             + " from Height: " + (headers.isEmpty() ? "-1"
                             : this.blockChain.getBlock(dcSet, headers.get(0)) == null ? "CHECK"
-                            : this.blockChain.getBlock(dcSet, headers.get(0)).getHeight(dcSet)));
+                            : this.blockChain.getBlock(dcSet, headers.get(0)).getHeight()));
 
                     /*
                      * LOGGER.error(message.getId() +

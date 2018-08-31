@@ -556,7 +556,7 @@ public class WEB_Transactions_HTML {
         out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td>" + Lang.getInstance().translate_from_langObj("Transaction", langObj) + "<td>" + Lang.getInstance().translate_from_langObj("Date", langObj) + "<td>" + Lang.getInstance().translate_from_langObj("Creator", langObj) + "</tr>";
         for (int i = 0; i < row_count; i++) {
             out += "<tr>";
-            out += "<td><a href=?tx=" + Base58.encode(model.getTrancaction(i).getSignature()) + get_Lang(langObj) + ">" + model.getTrancaction(i).getBlockHeight(DCSet.getInstance()) + "-" + model.getTrancaction(i).getSeqNo(DCSet.getInstance()) + "</a>";
+            out += "<td><a href=?tx=" + Base58.encode(model.getTrancaction(i).getSignature()) + get_Lang(langObj) + ">" + model.getTrancaction(i).getBlockHeight() + "-" + model.getTrancaction(i).getSeqNo(DCSet.getInstance()) + "</a>";
             out += "<td>" + model.getValueAt(i, 0);
             out += "<td>";
             Transaction tr = model.getTrancaction(i);

@@ -75,7 +75,7 @@ public class TransactionTests {
             e.printStackTrace();
         }
 
-        last_ref = gb.getTimestamp(db);
+        last_ref = gb.getTimestamp();
 
         // FEE FUND
         maker.setLastTimestamp(last_ref, db);

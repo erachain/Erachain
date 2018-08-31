@@ -87,8 +87,8 @@ public class BlockExplorerTest {
                 e.printStackTrace();
             }
 
-            if (block.getHeight(DCSet.getInstance()) % 2000 == 0) {
-                LOGGER.error(block.getHeight(DCSet.getInstance()));
+            if (block.getHeight() % 2000 == 0) {
+                LOGGER.error(block.getHeight());
             }
 
             balancesBlocks.add(new Pair<>(block, block.getCreator().getBalance(databaseSet, Transaction.FEE_KEY).a.b));

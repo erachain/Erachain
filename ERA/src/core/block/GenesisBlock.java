@@ -52,21 +52,17 @@ public class GenesisBlock extends Block {
     private long genesisTimestamp;
 
     public GenesisBlock() {
-        //SET HEADER
-        super(genesisVersion, genesisReference, CREATOR, new byte[0], new byte[0]);
 
-        this.heightBlock = 1;
+        super(genesisVersion, genesisReference, CREATOR);
+
         this.genesisTimestamp = Settings.getInstance().getGenesisStamp();
-        this.forgingValue = BlockChain.GENERAL_ERA_BALANCE;
-        this.winValue = this.forgingValue;
-        this.target = this.forgingValue;
 
         Account recipient;
         BigDecimal bdAmount0;
         BigDecimal bdAmount1;
+
         //PublicKeyAccount issuer = new PublicKeyAccount(new byte[Crypto.HASH_LENGTH]);
         //PersonCls user;
-
 
         // ISSUE ITEMS
         this.initItems();
@@ -635,7 +631,7 @@ public class GenesisBlock extends Block {
     }
 
     @Override
-    public long getTimestamp(DCSet db) {
+    public long getTimestamp() {
         return this.genesisTimestamp;
     }
 

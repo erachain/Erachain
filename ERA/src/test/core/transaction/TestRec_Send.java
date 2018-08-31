@@ -71,7 +71,7 @@ public class TestRec_Send {
         }
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(db), db);
+        maker.setLastTimestamp(gb.getTimestamp(), db);
         maker.changeBalance(db, false, ERA_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
@@ -161,7 +161,7 @@ public class TestRec_Send {
             r_Send.sign(maker, Transaction.FOR_NETWORK);
             assertEquals(r_Send.isSignatureValid(db), true);
             //r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
-            r_Send.setBlock(this.gb, db, Transaction.FOR_NETWORK, 1, 2);
+            r_Send.setBlock(this.gb, db, Transaction.FOR_NETWORK, 2);
             assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
             
             raw_r_Send = r_Send.toBytes(Transaction.FOR_NETWORK, true);
@@ -188,7 +188,7 @@ public class TestRec_Send {
 
             //r_Send_2.sign(maker, false);
             assertEquals(r_Send_2.isSignatureValid(db), true);
-            r_Send_2.setBlock(gb, db, Transaction.FOR_NETWORK, 1, 1);
+            r_Send_2.setBlock(gb, db, Transaction.FOR_NETWORK, 1);
             assertEquals(r_Send_2.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
             assertEquals(Arrays.equals(r_Send.getSignature(), r_Send_2.getSignature()), true);
@@ -362,7 +362,7 @@ public class TestRec_Send {
             r_Send.sign(maker, Transaction.FOR_NETWORK);
             assertEquals(r_Send.isSignatureValid(db), true);
             //r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
-            r_Send.setBlock(gb, db, Transaction.FOR_NETWORK, 1,1);
+            r_Send.setBlock(gb, db, Transaction.FOR_NETWORK, 1);
             assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
             
             raw_r_Send = r_Send.toBytes(Transaction.FOR_NETWORK, true);
@@ -389,7 +389,7 @@ public class TestRec_Send {
 
             //r_Send_2.sign(maker, false);
             assertEquals(r_Send_2.isSignatureValid(db), true);
-            r_Send_2.setBlock(gb, db, Transaction.FOR_NETWORK, 1, 1);
+            r_Send_2.setBlock(gb, db, Transaction.FOR_NETWORK, 1);
             assertEquals(r_Send_2.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
             assertEquals(Arrays.equals(r_Send.getSignature(), r_Send_2.getSignature()), true);
@@ -509,7 +509,7 @@ public class TestRec_Send {
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags),Transaction.VALIDATE_OK ); //);
 
-        assertEquals((long) maker.getLastTimestamp(db), gb.getTimestamp(db));
+        assertEquals((long) maker.getLastTimestamp(db), gb.getTimestamp());
         r_SendV3.process(gb, Transaction.FOR_NETWORK);
         assertEquals((long) maker.getLastTimestamp(db), timestamp);
 
@@ -541,7 +541,7 @@ public class TestRec_Send {
 
         //// MESSAGE ONLY
         r_SendV3.orphan(Transaction.FOR_NETWORK);
-        assertEquals((long) maker.getLastTimestamp(db), gb.getTimestamp(db));
+        assertEquals((long) maker.getLastTimestamp(db), gb.getTimestamp());
 
         r_SendV3 = new R_Send(
                 maker, FEE_POWER,
@@ -590,7 +590,7 @@ public class TestRec_Send {
 
         //// AMOUNT ONLY
         r_SendV3.orphan(Transaction.FOR_NETWORK);
-        assertEquals((long) maker.getLastTimestamp(db), gb.getTimestamp(db));
+        assertEquals((long) maker.getLastTimestamp(db), gb.getTimestamp());
 
         r_SendV3 = new R_Send(
                 maker, FEE_POWER,

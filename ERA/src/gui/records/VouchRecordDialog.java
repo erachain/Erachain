@@ -166,7 +166,7 @@ public class VouchRecordDialog extends JDialog {
 
         Transaction transaction = Controller.getInstance().r_Vouch(0, Transaction.FOR_NETWORK,
                 authenticator, feePow,
-                record.getBlockHeight(DCSet.getInstance()), record.getSeqNo(DCSet.getInstance()));
+                record.getBlockHeight(), record.getSeqNo(DCSet.getInstance()));
         //Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 0);
 
         String Status_text = "";

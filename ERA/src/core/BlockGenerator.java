@@ -92,15 +92,16 @@ public class BlockGenerator extends Thread implements Observer {
         }
     }
 
+    /*
     public static Block generateNextBlock(DCSet dcSet, PrivateKeyAccount account,
-                                          Block parentBlock, byte[] transactionsHash) {
+                                          int height, Block parentBlock, byte[] transactionsHash) {
 
 
         int version = parentBlock.getNextBlockVersion(dcSet);
         byte[] atBytes;
         if (version > 1) {
             AT_Block atBlock = AT_Controller.getCurrentBlockATs(AT_Constants.getInstance().MAX_PAYLOAD_FOR_BLOCK(
-                    parentBlock.getHeight(dcSet)), parentBlock.getHeight(dcSet) + 1);
+                    parentBlock.getHeight()), parentBlock.getHeight() + 1);
             atBytes = atBlock.getBytesForBlock();
         } else {
             atBytes = new byte[0];
@@ -108,7 +109,7 @@ public class BlockGenerator extends Thread implements Observer {
 
         //CREATE NEW BLOCK
         Block newBlock = BlockFactory.getInstance().create(version, parentBlock.getSignature(), account,
-                transactionsHash, atBytes);
+                height, transactionsHash, atBytes);
         // SET GENERATING BALANCE here
         ///newBlock.setCalcGeneratingBalance(dcSet);
         newBlock.sign(account);
@@ -116,6 +117,7 @@ public class BlockGenerator extends Thread implements Observer {
         return newBlock;
 
     }
+    */
 
     public static Block generateNextBlock(DCSet dcSet, PrivateKeyAccount account,
                                           Block parentBlock, Tuple2<List<Transaction>, Integer> transactionsItem, int height, int forgingValue, long winValue, long previousTarget) {
@@ -129,10 +131,10 @@ public class BlockGenerator extends Thread implements Observer {
         atBytes = new byte[0];
 
         //CREATE NEW BLOCK
-        Block newBlock = new Block(version, parentBlock.getSignature(), account, transactionsItem, atBytes);
+        Block newBlock = new Block(version, parentBlock.getSignature(), account, height,
+                transactionsItem, atBytes,
+                forgingValue, winValue, previousTarget);
         newBlock.sign(account);
-        // SET HEAD MIND before saving in DB if WIN
-        newBlock.setHeadMind(height, forgingValue, winValue, previousTarget);
         return newBlock;
 
     }

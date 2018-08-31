@@ -71,7 +71,7 @@ public class DatabaseTests {
             e.printStackTrace();
         }
 
-        last_ref = gb.getTimestamp(dcSet);
+        last_ref = gb.getTimestamp();
 
         // GET RIGHTS TO CERTIFIER
         byte gender = 1;

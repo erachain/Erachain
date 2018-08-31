@@ -351,7 +351,7 @@ public class DeployATTransaction extends Transaction {
 
         //CHECK IF CREATIONBYTES VALID
         try {
-            int height = this.dcSet.getBlockMap().last().getHeight(this.dcSet) + 1;
+            int height = this.dcSet.getBlockMap().last().getHeight() + 1;
             byte[] balanceBytes = this.getFee().unscaledValue().toByteArray();
             byte[] fill = new byte[8 - balanceBytes.length];
             balanceBytes = Bytes.concat(fill, balanceBytes);
@@ -400,7 +400,7 @@ public class DeployATTransaction extends Transaction {
         }
 
         //CREATE AT - public key or address? Is that the correct height?
-        AT at = new AT(Base58.decode(atId), Base58.decode(this.creator.getAddress()), this.name, this.description, this.type, this.tags, this.creationBytes, this.dcSet.getBlockMap().last().getHeight(this.dcSet) + 1);
+        AT at = new AT(Base58.decode(atId), Base58.decode(this.creator.getAddress()), this.name, this.description, this.type, this.tags, this.creationBytes, this.dcSet.getBlockMap().last().getHeight() + 1);
 
         //INSERT INTO DATABASE
         this.dcSet.getATMap().add(at);
@@ -418,7 +418,7 @@ public class DeployATTransaction extends Transaction {
         bf.put(desc);
         bf.put(this.creator.getPublicKey());
         bf.put(this.creationBytes);
-        bf.putInt(db.getBlockMap().last().getHeight(db) + 1);
+        bf.putInt(db.getBlockMap().last().getHeight() + 1);
         return bf.array().clone();
     }
 

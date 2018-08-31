@@ -236,7 +236,7 @@ public class ATResource {
 
 
         if ((cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE(DCSet.getInstance().getBlockMap().last()
-                .getHeight(DCSet.getInstance())) > lFee) {
+                .getHeight()) > lFee) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_FEE_POWER);
         }
         BigDecimal minActivationAmountB = new BigDecimal((String) jsonObject.get("minActivationAmount"));
@@ -260,7 +260,7 @@ public class ATResource {
         creation.order(ByteOrder.LITTLE_ENDIAN);
 
         creation.putShort(AT_Constants.getInstance().AT_VERSION(DCSet.getInstance().getBlockMap().last()
-                .getHeight(DCSet.getInstance())));
+                .getHeight()));
         creation.putShort((short) 0);
         creation.putShort((short) cpages);
         creation.putShort((short) dpages);

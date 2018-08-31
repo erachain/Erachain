@@ -100,7 +100,7 @@ public class BlocksResource {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
         }
 
-        return String.valueOf(block.getHeight(DCSet.getInstance()));
+        return String.valueOf(block.getHeight());
     }
 
     /*

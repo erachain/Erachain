@@ -83,7 +83,7 @@ public class TestRec_Send_OutsideClaims {
         }
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(db), db);
+        maker.setLastTimestamp(gb.getTimestamp(), db);
         maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100), false);
         maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false);
         recipient.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false);

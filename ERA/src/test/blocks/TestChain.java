@@ -95,7 +95,7 @@ public class TestChain {
         blockChain = Controller.getInstance().getBlockChain();
 
         Block block = blockChain.getLastBlock(dcSet);
-        int height = block.getHeight(dcSet);
+        int height = block.getHeight();
         Account creator = block.getCreator();
         Tuple2<Integer, Integer> forging = creator.getForgingData(dcSet, height);
         Tuple2<Integer, Integer> lastForging = creator.getLastForgingData(dcSet);
@@ -111,7 +111,7 @@ public class TestChain {
 
         Tuple2<Integer, Integer> forging_o = creator.getForgingData(dcSet, height);
         Tuple2<Integer, Integer> lastForging_o = creator.getLastForgingData(dcSet);
-        int height_0 = block.getHeight(dcSet);
+        int height_0 = block.getHeight();
 
         assertEquals(1, forging);
 

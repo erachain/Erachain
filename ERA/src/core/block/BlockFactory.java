@@ -21,7 +21,7 @@ public class BlockFactory {
         return instance;
     }
 
-    public Block parse(byte[] data, boolean forDB) throws Exception {
+    public Block parse(byte[] data, int height) throws Exception {
         //READ VERSION
         byte[] versionBytes = Arrays.copyOfRange(data, 0, Block.VERSION_LENGTH);
 
@@ -30,23 +30,18 @@ public class BlockFactory {
 
         if (version == 0) {
             //PARSE GENESIS BLOCK
-            return GenesisBlock.parse(data, forDB);
+            return GenesisBlock.parse(data, 1);
         } else {
             //PARSE BLOCK
-            return Block.parse(data, forDB);
+            return Block.parse(data, height);
         }
     }
 
+    /*
     // not signed and not getGeneratingBalance
-    public Block create(int version, byte[] reference, PublicKeyAccount generator, byte[] unconfirmedTransactionsHash, byte[] atBytes) {
-        return new Block(version, reference, generator, unconfirmedTransactionsHash, atBytes);
+    public Block create(int version, byte[] reference, PublicKeyAccount generator, int height, byte[] unconfirmedTransactionsHash, byte[] atBytes) {
+        return new Block(version, reference, generator, height, unconfirmedTransactionsHash, atBytes);
     }
+    */
 	
-	/*
-	// not signed and not getGeneratingBalance
-	public Block create(int version, byte[] reference, PublicKeyAccount generator, List<Transaction> trans, byte[] atBytes) 
-	{		
-		return new Block(version, reference, generator, trans, atBytes);
-	}
-	*/
 }

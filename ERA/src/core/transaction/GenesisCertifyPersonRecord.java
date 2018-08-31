@@ -134,12 +134,12 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
         int blockIndex = -1;
         //Block block = this.getBlock(db);// == null (((
         if (block == null) {
-            blockIndex = this.dcSet.getBlockMap().last().getHeight(this.dcSet);
+            blockIndex = this.dcSet.getBlockMap().last().getHeight();
         } else {
-            blockIndex = block.getHeight(this.dcSet);
+            blockIndex = block.getHeight();
             if (blockIndex < 1) {
                 // if block not is confirmed - get last block + 1
-                blockIndex = this.dcSet.getBlockMap().last().getHeight(this.dcSet) + 1;
+                blockIndex = this.dcSet.getBlockMap().last().getHeight() + 1;
             }
             //transactionIndex = this.getSeqNo(db);
             transactionIndex = block.getTransactionSeq(signature);

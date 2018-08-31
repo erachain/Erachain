@@ -133,7 +133,7 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 
                 case COLUMN_HEIGHT:
 
-                    return (int) (transaction.getBlockHeight(DCSet.getInstance()));
+                    return (int) (transaction.getBlockHeight());
 
 
             }

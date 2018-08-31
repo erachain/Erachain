@@ -331,7 +331,7 @@ public class library {
 
     public static BigDecimal getBlockSegToBigInteger(Transaction transaction) {
         if (transaction.isConfirmed(DCSet.getInstance())) {
-            String m = transaction.getBlockHeight(DCSet.getInstance()) + "";
+            String m = transaction.getBlockHeight() + "";
             String d = transaction.getSeqNo(DCSet.getInstance()) + "";
             int zz = 5 - d.length();
             for (int z = 0; z < zz; z++) {

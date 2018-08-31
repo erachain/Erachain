@@ -2,7 +2,6 @@ package core.blockexplorer;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
@@ -66,7 +65,6 @@ import core.transaction.DeployATTransaction;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.Issue_ItemRecord;
 import core.transaction.MultiPaymentTransaction;
-import core.transaction.R_Send;
 import core.transaction.R_SignNote;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
@@ -1503,12 +1501,12 @@ public class BlockExplorer {
 
         if (block == null) {
             block = getLastBlock();
-            start = block.getHeight(dcSet);
+            start = block.getHeight();
         }
 
         Map output = new LinkedHashMap();
 
-        output.put("maxHeight", block.getHeight(dcSet));
+        output.put("maxHeight", block.getHeight());
 
         // long startTime = System.currentTimeMillis();
         output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
@@ -1547,9 +1545,9 @@ public class BlockExplorer {
 
         do {
 
-            if (block.getWinValue() == 0l) {
-                block.getHeight(dcSet);
-                if (block.getHeight(dcSet) > 0)
+
+            if (false && block.getWinValue() == 0l) {
+                if (block.getHeight() > 0)
                     block.loadHeadMind(dcSet);
             }
 
@@ -1561,8 +1559,8 @@ public class BlockExplorer {
             blockJSON.put("winValue", block.getWinValue());
             blockJSON.put("winValueTargetted", block.calcWinValueTargeted() - 100000);
             blockJSON.put("transactionsCount", block.getTransactionCount());
-            blockJSON.put("timestamp", block.getTimestamp(dcSet));
-            blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(dcSet)));
+            blockJSON.put("timestamp", block.getTimestamp());
+            blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
             blockJSON.put("totalFee", block.getTotalFee().toPlainString());
 
             BigDecimal totalAmount = BigDecimal.ZERO;
@@ -2007,9 +2005,9 @@ public class BlockExplorer {
 
         Block lastBlock = getLastBlock();
 
-        output.put("height", lastBlock.getHeight(dcSet));
-        output.put("timestamp", lastBlock.getTimestamp(dcSet));
-        output.put("dateTime", BlockExplorer.timestampToStr(lastBlock.getTimestamp(dcSet)));
+        output.put("height", lastBlock.getHeight());
+        output.put("timestamp", lastBlock.getTimestamp());
+        output.put("dateTime", BlockExplorer.timestampToStr(lastBlock.getTimestamp()));
 
         output.put("timezone", Settings.getInstance().getTimeZone());
         output.put("timeformat", Settings.getInstance().getTimeFormat());
@@ -2190,7 +2188,7 @@ public class BlockExplorer {
              */
 
             //
-            transactionJSON.put("block", trans.getBlockHeight(dcSet));// .getSeqNo(dcSet));
+            transactionJSON.put("block", trans.getBlockHeight());// .getSeqNo(dcSet));
 
             transactionJSON.put("seq", trans.getSeqNo(dcSet));
             // transactionJSON.put("reference",trans.getReference());
@@ -2356,8 +2354,8 @@ public class BlockExplorer {
             transactionDataJSON.put("targetAmount", orderTarget.getAmountHave().toPlainString());
 
             Block parentBlock = createOrderTarget.getBlock(dcSet);
-            transactionDataJSON.put("height", parentBlock.getHeight(dcSet));
-            transactionDataJSON.put("confirmations", getHeight() - parentBlock.getHeight(dcSet) + 1);
+            transactionDataJSON.put("height", parentBlock.getHeight());
+            transactionDataJSON.put("confirmations", getHeight() - parentBlock.getHeight() + 1);
 
             transactionDataJSON.put("timestamp", trade.getInitiator());
             transactionDataJSON.put("dateTime", "--"); //BlockExplorer.timestampToStr(trade.getTimestamp()));
@@ -2553,7 +2551,7 @@ public class BlockExplorer {
             if (transaction.isConfirmed(dcSet)) {
                 Block parent = transaction.getBlock(dcSet);
                 transactionDataJSON.put("block", Base58.encode(parent.getSignature()));
-                transactionDataJSON.put("blockHeight", parent.getHeight(dcSet));
+                transactionDataJSON.put("blockHeight", parent.getHeight());
             }
 
             transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(transaction.getTimestamp()));
@@ -2567,10 +2565,10 @@ public class BlockExplorer {
             Block block = (Block) unit;
 
             transactionDataJSON = new LinkedHashMap();
-            transactionDataJSON.put("timestamp", block.getTimestamp(dcSet));
-            transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(dcSet)));
+            transactionDataJSON.put("timestamp", block.getTimestamp());
+            transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
 
-            int height = block.getHeight(dcSet);
+            int height = block.getHeight();
             transactionDataJSON.put("confirmations", getHeight() - height + 1);
             transactionDataJSON.put("height", height);
 
@@ -2604,7 +2602,7 @@ public class BlockExplorer {
             transactionDataJSON = aTtransaction.toJSON();
 
             Block block = Controller.getInstance().getBlockByHeight(aTtransaction.getBlockHeight());
-            long timestamp = block.getTimestamp(dcSet);
+            long timestamp = block.getTimestamp();
             transactionDataJSON.put("timestamp", timestamp);
             transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(timestamp));
 
@@ -2854,7 +2852,7 @@ public class BlockExplorer {
 
             AT at = dcSet.getATMap().getAT(address);
             Block block = Controller.getInstance().getBlockByHeight(at.getCreationBlockHeight());
-            long aTtimestamp = block.getTimestamp(dcSet);
+            long aTtimestamp = block.getTimestamp();
             BigDecimal aTbalanceCreation = BigDecimal.ZERO;
             for (Transaction transaction : block.getTransactions()) {
                 if (transaction.getType() == Transaction.DEPLOY_AT_TRANSACTION) {
@@ -2890,7 +2888,7 @@ public class BlockExplorer {
 
                 for (int height : block_heights) {
                     Block block = dcSet.getBlockMap().get(height);
-                    all.add(new BlExpUnit(block.getHeight(dcSet), 0, block));
+                    all.add(new BlExpUnit(block.getHeight(), 0, block));
                 }
             }
 
@@ -3541,7 +3539,7 @@ public class BlockExplorer {
         for (int row = 0; row < rowCount; row++) {
             Map out_statement = new LinkedHashMap();
             Transaction statement = model_Statements.get_Statement(row);
-            out_statement.put("Block", statement.getBlockHeight(dcSet));
+            out_statement.put("Block", statement.getBlockHeight());
             out_statement.put("Seg_No", statement.getSeqNo(dcSet));
             out_statement.put("person_key", model_Statements.get_person_key(row));
 
@@ -4025,7 +4023,7 @@ public class BlockExplorer {
                 Transaction vouch_Tr = (Transaction) table_sing_model.getValueAt(i, 3);
                 Map vouchJSON = new LinkedHashMap();
                 vouchJSON.put("date", vouch_Tr.viewTimestamp());
-                vouchJSON.put("block", "" + vouch_Tr.getBlockHeight(dcSet));
+                vouchJSON.put("block", "" + vouch_Tr.getBlockHeight());
                 vouchJSON.put("Seg_No", "" + vouch_Tr.getSeqNo(dcSet));
                 vouchJSON.put("creator", vouch_Tr.getCreator().getAddress());
 
@@ -4155,7 +4153,7 @@ public class BlockExplorer {
         int txsCount = all.size();
 
         LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = dcSet.getATTransactionMap()
-                .getATTransactions(block.getHeight(dcSet));
+                .getATTransactions(block.getHeight());
 
         for (Entry<Tuple2<Integer, Integer>, AT_Transaction> e : atTxs.entrySet()) {
             all.add(e.getValue());
@@ -4165,9 +4163,9 @@ public class BlockExplorer {
         output.put("type", "block");
 
         output.put("blockSignature", Base58.encode(block.getSignature()));
-        output.put("blockHeight", block.getHeight(dcSet));
+        output.put("blockHeight", block.getHeight());
 
-        if (block.getHeight(dcSet) > 1) {
+        if (block.getHeight() > 1) {
             if (block.getParent(dcSet) != null) {
                 output.put("parentBlockSignature", Base58.encode(block.getParent(dcSet).getSignature()));
             }
@@ -4252,10 +4250,10 @@ public class BlockExplorer {
             Map transactionDataJSON = new LinkedHashMap();
 
             transactionDataJSON = new LinkedHashMap();
-            transactionDataJSON.put("timestamp", block.getTimestamp(dcSet));
-            transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(dcSet)));
+            transactionDataJSON.put("timestamp", block.getTimestamp());
+            transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
 
-            int height = block.getHeight(dcSet);
+            int height = block.getHeight();
             transactionDataJSON.put("confirmations", getHeight() - height + 1);
             transactionDataJSON.put("height", height);
 

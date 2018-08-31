@@ -89,7 +89,7 @@ public class Person_Work_Dialog extends JDialog {
                 PersonCls per = person;
                 byte[] ref = per.getReference();
                 Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
-                int blockNo = transaction.getBlockHeight(DCSet.getInstance());
+                int blockNo = transaction.getBlockHeight();
                 int recNo = transaction.getSeqNo(DCSet.getInstance());
                 new VouchRecordDialog(blockNo, recNo);
                 dispose();

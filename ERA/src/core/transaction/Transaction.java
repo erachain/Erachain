@@ -518,10 +518,10 @@ public abstract class Transaction {
             this.calcFee();
     }
 
-    public void setBlock(Block block, DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+    public void setBlock(Block block, DCSet dcSet, int asDeal, int seqNo) {
         this.block = block;
         this.dcSet = dcSet;
-        this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);
+        this.height = block.getHeight();
         this.seqNo = seqNo;
         if (asDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0) )
             this.calcFee();
@@ -734,7 +734,7 @@ public abstract class Transaction {
             // blockIndex = db.getBlocksHeadMap().getLastBlock().getHeight(db);
             blockIndex = -1;
         } else {
-            blockIndex = block.getHeightByParent(this.dcSet);
+            blockIndex = block.getHeight();
             transactionIndex = block.getTransactionSeq(signature);
         }
 
@@ -746,13 +746,15 @@ public abstract class Transaction {
     return this.seqNo;
     }
 
-    public int getBlockHeight(DCSet db) {
-        if (this.isConfirmed(db)) {
-            return this.getBlock(db).getHeight(db);
+    public int getBlockHeight() {
+        //if (this.isConfirmed(db)) {
+        if (this.block != null) {
+            return this.block.getHeight();
         }
         return -1;
     }
 
+    /*
     // get current or -1
     public int getBlockHeightByParent(DCSet db) {
 
@@ -761,12 +763,13 @@ public abstract class Transaction {
 
         return getBlockHeight(db);
     }
+    */
 
     // get current or last
     public int getBlockHeightByParentOrLast(DCSet dc) {
 
         if (block != null)
-            return block.getHeightByParent(dc);
+            return block.getHeight();
 
         return dc.getBlockMap().size() + 1;
     }
@@ -787,7 +790,7 @@ public abstract class Transaction {
             return this.signature;
         }
 
-        int bh = this.getBlockHeight(db);
+        int bh = this.getBlockHeight();
         if (bh < 1)
             // not in chain
             return null;
@@ -852,7 +855,7 @@ public abstract class Transaction {
         if (seq < 1)
             return "???";
 
-        return this.getBlockHeight(db) + "-" + seq;
+        return this.getBlockHeight() + "-" + seq;
     }
 
     public String viewAmount(Account account) {
@@ -935,7 +938,7 @@ public abstract class Transaction {
             transaction.put("signature", "genesis");
             height = 1;
         } else {
-            height = this.getBlockHeight(localDCSet);
+            height = this.getBlockHeight();
             transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
             transaction.put("creator", this.creator.getAddress());
             transaction.put("signature", this.signature == null ? "null" : Base58.encode(this.signature));
@@ -968,7 +971,7 @@ public abstract class Transaction {
         if (this.creator == null) {
             height = 1;
         } else {
-            height = this.getBlockHeight(localDCSet);
+            height = this.getBlockHeight();
             transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
         }
 

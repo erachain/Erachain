@@ -5,13 +5,11 @@ import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import gui.items.Item_SplitPanel;
-import gui.library.MTable;
 import gui.models.WalletItemPersonsTableModel;
 import gui.records.VouchRecordDialog;
 import lang.Lang;
 
 import javax.swing.*;
-import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -66,7 +64,7 @@ public class Persons_My_SplitPanel extends Item_SplitPanel {
                PersonCls per = (PersonCls) th.item_Menu;
                byte[] ref = per.getReference();
                Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
-               int blockNo = transaction.getBlockHeight(DCSet.getInstance());
+               int blockNo = transaction.getBlockHeight();
                int recNo = transaction.getSeqNo(DCSet.getInstance());
                new VouchRecordDialog(blockNo, recNo);
               

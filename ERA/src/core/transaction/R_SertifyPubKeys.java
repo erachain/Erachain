@@ -527,12 +527,12 @@ public class R_SertifyPubKeys extends Transaction {
         int blockIndex = -1;
         //Block block = this.getBlock(db);// == null (((
         if (block == null) {
-            blockIndex = db.getBlockMap().last().getHeight(db);
+            blockIndex = db.getBlockMap().last().getHeight();
         } else {
-            blockIndex = block.getHeight(db);
+            blockIndex = block.getHeight();
             if (blockIndex < 1) {
                 // if block not is confirmed - get last block + 1
-                blockIndex = db.getBlockMap().last().getHeight(db) + 1;
+                blockIndex = db.getBlockMap().last().getHeight() + 1;
             }
             //transactionIndex = this.getSeqNo(db);
             transactionIndex = block.getTransactionSeq(signature);

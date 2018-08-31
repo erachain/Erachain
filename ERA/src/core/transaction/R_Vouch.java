@@ -288,7 +288,7 @@ public class R_Vouch extends Transaction {
             amount = amount.add(value.a);
         }
 
-        listNew.add(new Tuple2<Integer, Integer>(this.getBlockHeightByParent(this.dcSet), this.getSeqNo(this.dcSet)));
+        listNew.add(new Tuple2<Integer, Integer>(this.height, this.seqNo));
         // for test only!!
         //listNew.add(new Tuple2<Integer, Integer>(2, 2));
 
@@ -313,7 +313,7 @@ public class R_Vouch extends Transaction {
         // update value
         List<Tuple2<Integer, Integer>> listNew = value.b;
 
-        listNew.remove(new Tuple2<Integer, Integer>(this.getBlockHeight(this.dcSet), this.getSeqNo(this.dcSet)));
+        listNew.remove(new Tuple2<Integer, Integer>(this.height, this.seqNo));
         // for test ONLY !!!
         //listNew.remove(new Tuple2<Integer, Integer>(2, 2));
 
@@ -325,7 +325,6 @@ public class R_Vouch extends Transaction {
         this.dcSet.getVouchRecordMap().set(recordKey, valueNew);
 
     }
-
 
     @Override
     public HashSet<Account> getInvolvedAccounts() {

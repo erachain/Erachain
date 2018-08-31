@@ -55,7 +55,7 @@ public class TransactionTests3AssetsAsPack {
         }
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(db), db);
+        maker.setLastTimestamp(gb.getTimestamp(), db);
         maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
         asset = new AssetVenture(maker, "a", icon, image, "a", 0, 8, 50000l);

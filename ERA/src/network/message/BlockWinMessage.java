@@ -27,7 +27,7 @@ public class BlockWinMessage extends Message {
         int height = Ints.fromByteArray(heightBytes);
 
         //PARSE BLOCK
-        Block block = Block.parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1), false);
+        Block block = Block.parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1), height);
 
         //CREATE MESSAGE
         BlockWinMessage message = new BlockWinMessage(block);
@@ -51,7 +51,7 @@ public class BlockWinMessage extends Message {
         byte[] data = new byte[0];
 
         //WRITE BLOCK HEIGHT
-        byte[] heightBytes = Ints.toByteArray(this.block.getHeightByParent(DCSet.getInstance()));
+        byte[] heightBytes = Ints.toByteArray(this.height);
         data = Bytes.concat(data, heightBytes);
 
         //WRITE BLOCK

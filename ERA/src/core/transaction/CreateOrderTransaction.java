@@ -232,8 +232,8 @@ public class CreateOrderTransaction extends Transaction {
     }
     */
 
-    public void setBlock(Block block, DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        super.setBlock(block, dcSet, asDeal, blockHeight, seqNo);
+    public void setBlock(Block block, DCSet dcSet, int asDeal, int seqNo) {
+        super.setBlock(block, dcSet, asDeal, seqNo);
 
         this.haveAsset = this.dcSet.getItemAssetMap().get(this.haveKey);
         this.wantAsset = this.dcSet.getItemAssetMap().get(this.wantKey);

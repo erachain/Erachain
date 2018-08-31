@@ -26,7 +26,7 @@ public class BlockSerializer implements Serializer<Block>, Serializable {
         byte[] bytes = new byte[length];
         in.readFully(bytes);
         try {
-            return BlockFactory.getInstance().parse(bytes, true);
+            return BlockFactory.getInstance().parse(bytes, 0);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

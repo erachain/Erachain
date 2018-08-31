@@ -37,7 +37,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 
     public Statements_Vouch_Table_Model(Transaction transaction) {
         if (transaction != null) {
-            blockNo = transaction.getBlockHeight(DCSet.getInstance());
+            blockNo = transaction.getBlockHeight();
             recNo = transaction.getSeqNo(DCSet.getInstance());
         }
         transactions = new ArrayList<R_Vouch>();
@@ -124,7 +124,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 
                 case COLUMN_HEIGHT:
 
-                    return (int) (transaction.getBlockHeight(DCSet.getInstance()));
+                    return (int) (transaction.getBlockHeight());
 
                 case COLUMN_CREATOR_NAME:
                     return ((Account) transaction.getCreator()).getPerson().b.getName();

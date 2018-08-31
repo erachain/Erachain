@@ -112,7 +112,7 @@ public class TestRecPoll {
         //GenesisCertifyPollRecord genesis_certify = new GenesisCertifyPollRecord(certifier, 0L);
         //genesis_certify.process(db, false);
 
-        certifier.setLastTimestamp(gb.getTimestamp(db), db);
+        certifier.setLastTimestamp(gb.getTimestamp(), db);
         certifier.changeBalance(db, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false);
         certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 

@@ -31,7 +31,7 @@ public class UpdateUtil {
 
         Block b = new GenesisBlock();
         do {
-            if (b.getHeight(DCSet.getInstance()) >= height) {
+            if (b.getHeight() >= height) {
                 List<Transaction> txs = b.getTransactions();
                 for (Transaction tx : txs) {
                     if (tx instanceof ArbitraryTransaction) {
@@ -93,17 +93,17 @@ public class UpdateUtil {
         DCSet.getInstance().getTransactionFinalMap().reset();
 
         Block b = new GenesisBlock();
-        DCSet.getInstance().flush(b.getDataLength(true) >> 7, false);
+        DCSet.getInstance().flush(b.getDataLength(false) >> 7, false);
         do {
             List<Transaction> txs = b.getTransactions();
             int counter = 1;
             for (Transaction tx : txs) {
-                DCSet.getInstance().getTransactionFinalMap().add(b.getHeight(DCSet.getInstance()), counter, tx);
+                DCSet.getInstance().getTransactionFinalMap().add(b.getHeight(), counter, tx);
                 counter++;
             }
-            if (b.getHeight(DCSet.getInstance()) % 2000 == 0) {
-                LOGGER.info("UpdateUtil - Repopulating TransactionMap : " + b.getHeight(DCSet.getInstance()));
-                DCSet.getInstance().flush(b.getDataLength(true) >> 7, false);
+            if (b.getHeight() % 2000 == 0) {
+                LOGGER.info("UpdateUtil - Repopulating TransactionMap : " + b.getHeight());
+                DCSet.getInstance().flush(b.getDataLength(false) >> 7, false);
             }
             b = b.getChild(DCSet.getInstance());
         } while (b != null);
@@ -114,13 +114,13 @@ public class UpdateUtil {
         DCSet.getInstance().getPostCommentMap().reset();
 
         Block b = new GenesisBlock();
-        int height = b.getHeight(DCSet.getInstance());
-        DCSet.getInstance().flush(b.getDataLength(true) >> 7, false);
+        int height = b.getHeight();
+        DCSet.getInstance().flush(b.getDataLength(false) >> 7, false);
         do {
             List<Transaction> txs = b.getTransactions();
             int seqNo = 0;
             for (Transaction tx : txs) {
-                tx.setBlock(b, DCSet.getInstance(), Transaction.FOR_NETWORK, height, ++seqNo);
+                tx.setBlock(b, DCSet.getInstance(), Transaction.FOR_NETWORK, ++seqNo);
 
                 if (tx instanceof ArbitraryTransaction) {
                     int service = ((ArbitraryTransaction) tx).getService();
@@ -129,9 +129,9 @@ public class UpdateUtil {
                     }
                 }
             }
-            if (b.getHeight(DCSet.getInstance()) % 2000 == 0) {
-                LOGGER.info("UpdateUtil - Repopulating CommentPostMap : " + b.getHeight(DCSet.getInstance()));
-                DCSet.getInstance().flush(b.getDataLength(true) >> 7, false);
+            if (b.getHeight() % 2000 == 0) {
+                LOGGER.info("UpdateUtil - Repopulating CommentPostMap : " + b.getHeight());
+                DCSet.getInstance().flush(b.getDataLength(false) >> 7, false);
             }
             b = b.getChild(DCSet.getInstance());
         } while (b != null);

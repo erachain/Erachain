@@ -94,7 +94,7 @@ public class TestRecPerson {
             e.printStackTrace();
         }
 
-        last_ref = gb.getTimestamp(db);
+        last_ref = gb.getTimestamp();
 
         // GET RIGHTS TO CERTIFIER
         byte gender = 1;

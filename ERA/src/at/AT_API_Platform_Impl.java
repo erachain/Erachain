@@ -162,7 +162,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
     public long get_Block_Timestamp(AT_Machine_State state) {
 
         Block lastBlock = dcSet.getBlockMap().last();
-        return AT_API_Helper.getLongTimestamp(lastBlock.getHeight(dcSet) + 1, 0);
+        return AT_API_Helper.getLongTimestamp(lastBlock.getHeight() + 1, 0);
     }
 
     public long get_Creation_Timestamp(AT_Machine_State state) {
@@ -172,7 +172,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
     @Override
     public long get_Last_Block_Timestamp(AT_Machine_State state) {
         Block block = dcSet.getBlockMap().last();
-        return AT_API_Helper.getLongTimestamp(block.getHeight(dcSet), 0);
+        return AT_API_Helper.getLongTimestamp(block.getHeight(), 0);
     }
 
     @Override
@@ -267,7 +267,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
         if (transaction != null) {
 
             int txBlockHeight;
-            int blockHeight = dcSet.getBlockMap().last().getHeight(dcSet) + 1;
+            int blockHeight = dcSet.getBlockMap().last().getHeight() + 1;
             byte[] senderPublicKey = new byte[32];
 
             if (!transaction.getClass().equals(AT_Transaction.class)) {
@@ -552,7 +552,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
     public long add_Minutes_to_Timestamp(long val1, long val2, AT_Machine_State state) {
         int height = AT_API_Helper.longToHeight(val1);
         int numOfTx = AT_API_Helper.longToNumOfTx(val1);
-        int addHeight = height + (int) (val2 / AT_Constants.getInstance().AVERAGE_BLOCK_MINUTES(dcSet.getBlockMap().last().getHeight(dcSet)));
+        int addHeight = height + (int) (val2 / AT_Constants.getInstance().AVERAGE_BLOCK_MINUTES(dcSet.getBlockMap().last().getHeight()));
         return AT_API_Helper.getLongTimestamp(addHeight, numOfTx);
     }
 

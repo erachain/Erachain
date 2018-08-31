@@ -167,7 +167,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         jPanel1.add(lbl_Block, gridBagConstraints);
 
 
-        JTextField txt_Block = new JTextField(issue_record.getBlockHeight(DCSet.getInstance()) + "-" + issue_record.getSeqNo(DCSet.getInstance()));
+        JTextField txt_Block = new JTextField(issue_record.getBlockHeight() + "-" + issue_record.getSeqNo(DCSet.getInstance()));
 
         txt_Block.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();

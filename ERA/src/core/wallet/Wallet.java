@@ -11,7 +11,6 @@ import javax.swing.JFileChooser;
 import core.item.assets.Order;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
@@ -519,11 +518,7 @@ public class Wallet extends Observable implements Observer {
 		if (false) {
 			for (int i = 2; i < dcSet.getBlockMap().size(); i++) {
 				Block block = dcSet.getBlockMap().get(i);
-				if (block.getHeight(dcSet) != i) {
-					Long error = null;
-					++error;
-				}
-				if (block.getHeightByParent(dcSet) != i) {
+				if (block.getHeight() != i) {
 					Long error = null;
 					++error;
 				}
@@ -542,14 +537,14 @@ public class Wallet extends Observable implements Observer {
 					Long error = null;
 					++error;
 				}
-				if (parent.getHeight(dcSet) != i - 1) {
+				if (parent.getHeight() != i - 1) {
 					Long error = null;
 					++error;
 				}
-				if (parent.getHeightByParent(dcSet) != i - 1) {
-					Long error = null;
-					++error;
-				}
+				//if (parent.getHeightByParent(dcSet) != i - 1) {
+				//	Long error = null;
+				//	++error;
+				//}
 			}
 		}
 
@@ -600,7 +595,7 @@ public class Wallet extends Observable implements Observer {
 				return;
 			}
 
-			height = block.getHeight(dcSet);
+			height = block.getHeight();
 		}
 
 		int stepHeight = BlockChain.BLOCKS_PER_DAY;
@@ -1117,7 +1112,7 @@ public class Wallet extends Observable implements Observer {
 				continue;
 			}
 
-            transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+            transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, ++seqNo);
 			this.processTransaction(transaction);
 
 			// SKIP PAYMENT TRANSACTIONS
@@ -1216,7 +1211,7 @@ public class Wallet extends Observable implements Observer {
 				continue;
 			}
 
-			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, blockHead.heightBlock, seqNo);
+			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, seqNo);
 			this.orphanTransaction(transaction);
 
 			// CHECK IF PAYMENT

@@ -72,10 +72,10 @@ public class TestRecAsset {
         //gb.process(db);
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(db), db);
+        maker.setLastTimestamp(gb.getTimestamp(), db);
         maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
-        maker_1.setLastTimestamp(gb.getTimestamp(db), db);
+        maker_1.setLastTimestamp(gb.getTimestamp(), db);
 
         asset = new AssetVenture(maker, "aasdasd", icon, image, "asdasda", 1, 8, 50000l);
         // set SCALABLE assets ++

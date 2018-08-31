@@ -3,7 +3,6 @@ package gui.items.other;
 import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import datachain.DCSet;
 import gui.Split_Panel;
 import gui.items.records.Records_Search_SplitPanel;
 import gui.library.My_JFileChooser;
@@ -74,7 +73,7 @@ public class Other_Search_Blocks extends Split_Panel {
 
                 rp.searchToolBar_LeftPanel.setVisible(false);
                 rp.toolBar_LeftPanel.setVisible(false);
-                rp.searchTextField_SearchToolBar_LeftPanel.setText(item_Table_Selected.getHeight(DCSet.getInstance()) + "");
+                rp.searchTextField_SearchToolBar_LeftPanel.setText(item_Table_Selected.getHeight() + "");
                 rp.listener();
                 jScrollPane_jPanel_RightPanel.setViewportView(rp);
                 //			item_Table_Selected = null;

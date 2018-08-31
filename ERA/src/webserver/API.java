@@ -13,7 +13,6 @@ import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.persons.PersonCls;
-import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 import datachain.*;
@@ -38,7 +37,6 @@ import javax.ws.rs.core.UriInfo;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -262,7 +260,7 @@ public class API {
             out.put("block", block.toJson());
 
             ++step;
-            byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1).signature;
+            byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight() + 1).signature;
             if (childSign != null)
                 out.put("next", Base58.encode(childSign));
 
@@ -299,7 +297,7 @@ public class API {
             out.put("block", block.toJson());
 
             ++step;
-            byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1).signature;
+            byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight() + 1).signature;
             if (childSign != null)
                 out.put("next", Base58.encode(childSign));
 
@@ -347,7 +345,7 @@ public class API {
             out.put("block", block.toJson());
 
             ++step;
-            byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1).signature;
+            byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight() + 1).signature;
             if (childSign != null)
                 out.put("next", Base58.encode(childSign));
 
