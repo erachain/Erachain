@@ -586,21 +586,6 @@ public class Block {
         return this.target;
     }
 
-    /*
-    public void loadParentHead(DCSet db) {
-        if (parentBlockHead == null) {
-            Integer heightParentBlock = db.getBlockSignsMap().get(this.reference);
-            if (heightParentBlock == null) {
-                this.heightBlock = -1;
-                this.parentBlockHead = null;
-            } else {
-                this.heightBlock = heightParentBlock + 1;
-                this.parentBlockHead = db.getBlocksHeadsMap().get(heightParentBlock);
-            }
-        }
-    }
-    */
-
     public Block.BlockHead getParentHead() {
         return this.parentBlockHead;
     }
@@ -1261,6 +1246,8 @@ public class Block {
             LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue);
             return false;
         }
+
+        this.parentBlockHead = dcSet.getBlocksHeadsMap().get(this.heightBlock - 1);
 
         long currentTarget = this.parentBlockHead.target;
         int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, this.heightBlock, this.winValue, currentTarget);
