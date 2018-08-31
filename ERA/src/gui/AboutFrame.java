@@ -26,7 +26,7 @@ public class AboutFrame extends JDialog {
     private AboutPanel aboutPanel;
     private JTextField console_Text;
 
-    private AboutFrame() { 
+    private AboutFrame() {
         //CREATE FRAME
         setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Debug"));
         //setModalityType(DEFAULT_MODALITY_TYPE);
@@ -100,7 +100,7 @@ public class AboutFrame extends JDialog {
         gbc_lbllversionLabel.gridy = 2;
         aboutPanel.add(lblversionLabel, gbc_lbllversionLabel);
 
-        JLabel label = new JLabel(Lang.getInstance().translate("Build date: ") + Controller.getBuildDateString());
+        JLabel label = new JLabel(Lang.getInstance().translate("Build date: ") + getManifestInfo());
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setForeground(Color.RED);
         label.setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -169,7 +169,7 @@ public class AboutFrame extends JDialog {
                         String buildTime = attributes.getValue("Build-Time");
                         if (buildTime == null)
                             buildTime = LocalDateTime.now().toString();
-                        return buildTime ;
+                        return buildTime + " " + implementationVersion;
 
                     }
                 } catch (IOException e) {

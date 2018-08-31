@@ -1141,7 +1141,11 @@ public class Block {
 
     public boolean isValid(DCSet dcSet, boolean andProcess) {
 
-        int height = this.getHeightByParent(dcSet);
+        int height  = dcSet.getBlockSignsMap().get(this.reference) + 1;
+        //int height = this.getHeightByParent(dcSet);
+
+        LOGGER.debug("*** Block[" + height + " try Validate");
+
         Controller cnt = Controller.getInstance();
 
         // for DEBUG
@@ -1150,20 +1154,12 @@ public class Block {
             height = this.getHeightByParent(dcSet);
         }
 
-		/*
-		// FOR PROBE START !!!
-		if(height > 1000)
-		{
-			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] is PROBE");
-			return false;
-		}
-		 */
-
         //CHECK IF PARENT EXISTS
         if (height < 2 || this.reference == null) {
             LOGGER.debug("*** Block[" + height + "].reference invalid");
             return false;
         }
+        this.heightBlock = height;
 
         byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
         if (!Arrays.equals(lastSignature, this.reference)) {
@@ -1211,7 +1207,6 @@ public class Block {
         ///int targetedWinValue = this.calcWinValueTargeted(dcSet);
 
         this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-        this.heightBlock = height;
 
         this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
         if (!cnt.isTestNet() && this.winValue < 1) {
@@ -1246,14 +1241,6 @@ public class Block {
 
         long timerStart = System.currentTimeMillis();
 
-        if (andProcess) {
-
-            //LOGGER.debug("getBlocksHeadMap() [" + dcSet.getBlocksHeadMap().size() + "]");
-            ////this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
-            ////LOGGER.debug("getBlocksHeadMap().set timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
-
-
-        }
         //CHECK TRANSACTIONS
 
         if (this.transactionCount == 0) {

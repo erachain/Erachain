@@ -194,6 +194,8 @@ public class API_TransactionsResource {
         // IF not ENDs of CHAIN
         if (block != null) {
             out.put("next", height + 1);
+        } else {
+            out.put("height", height - 1);
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
