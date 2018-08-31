@@ -1164,6 +1164,9 @@ public class Wallet extends Observable implements Observer {
 
 		// ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
 		Block block = dcSet.getBlockMap().get(blockHead.heightBlock);
+		if (block == null)
+			return;
+
 		List<Transaction> transactions = block.getTransactions();
 		int seqNo;
 		for (int i = blockHead.transactionsCount - 1; i >= 0; i--) {

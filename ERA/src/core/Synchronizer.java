@@ -31,7 +31,7 @@ public class Synchronizer {
 
     public static final int GET_BLOCK_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
     public static final int GET_HEADERS_TIMEOUT = GET_BLOCK_TIMEOUT >> 1;
-    private static final int BYTES_MAX_GET = 1024 << 12;
+    private static final int BYTES_MAX_GET = 1024 << 10;
     private static final Logger LOGGER = Logger.getLogger(Synchronizer.class);
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
     public static int BAN_BLOCK_TIMES = 8 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60;
@@ -376,7 +376,7 @@ public class Synchronizer {
         List<byte[]> signatures = headers.b;
 
         if (lastCommonBlockSignature == null) {
-            // simple ACCEPT tail CHAIN
+            // simple ACCEPT tail CHAIN - MY LAST block founded in PEER
 
             // CREATE BLOCK BUFFER
             LOGGER.debug(
@@ -560,28 +560,32 @@ public class Synchronizer {
         LOGGER.info("findHeaders(Peer) headers.size: " + headers.size());
 
         int headersSize = headers.size();
-        if (headersSize == 0) {
-            byte[] signCheck = dcSet.getBlocksHeadsMap().get(checkPointHeight).signature;
 
-            List<byte[]> headersCheck = this.getBlockSignatures(signCheck, peer);
-            if (headersCheck.isEmpty()) {
-                String mess = "Dishonest peer: my CHECKPOINT SIGNATURE -> not found";
-                peer.ban(BAN_BLOCK_TIMES, mess);
-                throw new Exception(mess);
-            }
-        } else if (headersSize == 1) {
-            String mess = "Peer is SAME as me";
-            cnt.resetWeightOfPeer(peer);
-            peer.ban(BAN_BLOCK_TIMES >> 2, mess);
-            throw new Exception(mess);
-        } else {
-            // end of my CHAIN is common
-
+        if (headersSize > 0) {
+            // MY LAST BLOCK IS FOUNDED in PEER
             do {
                 headers.remove(0);
-            } while (dcSet.getBlockSignsMap().contains(headers.get(0)));
+            } while (headers.size() > 0 && dcSet.getBlockSignsMap().contains(headers.get(0)));
 
+            if (headers.size() == 0) {
+                String mess = "Peer is SAME as me";
+                cnt.resetWeightOfPeer(peer);
+                peer.ban(BAN_BLOCK_TIMES >> 3, mess);
+                throw new Exception(mess);
+            }
+
+            // null - not ned orphan my CHAIN
             return new Tuple2<byte[], List<byte[]>>(null, headers);
+
+        }
+
+        byte[] signCheck = dcSet.getBlocksHeadsMap().get(checkPointHeight).signature;
+
+        List<byte[]> headersCheck = this.getBlockSignatures(signCheck, peer);
+        if (headersCheck.isEmpty()) {
+            String mess = "Dishonest peer: my CHECKPOINT SIGNATURE -> not found";
+            peer.ban(BAN_BLOCK_TIMES, mess);
+            throw new Exception(mess);
         }
 
         // int myChainHeight =
@@ -623,8 +627,8 @@ public class Synchronizer {
         // GET HEADERS UNTIL COMMON BLOCK IS FOUND OR ALL BLOCKS HAVE BEEN
         // CHECKED
         // int step = BlockChain.SYNCHRONIZE_PACKET>>2;
-        int step = 2;
         byte[] lastCommonBlockSignature;
+        int step = 2;
         do {
             if (cnt.isOnStopping()) {
                 throw new Exception("on stoping");
@@ -670,6 +674,7 @@ public class Synchronizer {
         LOGGER.info("findHeaders headers CLEAR" + "now headers: " + headers.size());
 
         return new Tuple2<byte[], List<byte[]>>(lastCommonBlockSignature, headers);
+
     }
 
     private List<Block> getBlocks(DCSet dcSet, List<byte[]> signatures, Peer peer) throws Exception {
@@ -695,8 +700,8 @@ public class Synchronizer {
             ////block.setCalcGeneratingBalance(dcSet);
 
             blocks.add(block);
-            bytesGet += 500 + block.getDataLength(true);
-            LOGGER.debug("block added with RECS:" + block.getTransactionCount() + " bytesGet kb: " + bytesGet / 1000);
+            bytesGet += 1500 + block.getDataLength(true);
+            ///LOGGER.debug("block added with RECS:" + block.getTransactionCount() + " bytesGet kb: " + bytesGet / 1000);
             if (bytesGet > BYTES_MAX_GET) {
                 break;
             }
