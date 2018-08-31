@@ -414,6 +414,19 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         return Iterables.size(keys);
     }
 
+    /**
+     * @param address
+     * @param sender
+     * @param recipient
+     * @param minHeight
+     * @param maxHeight
+     * @param type
+     * @param service
+     * @param desc
+     * @param offset
+     * @param limit
+     * @return
+     */
     @SuppressWarnings({"rawtypes", "unchecked"})
     public Iterable findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
                                          final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
@@ -467,7 +480,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
             });
         }
 
-        if (type == Transaction.ARBITRARY_TRANSACTION && service > -1) {
+        if (false && type == Transaction.ARBITRARY_TRANSACTION && service > -1) {
             treeKeys = Sets.filter(treeKeys, new Predicate<Tuple2<Integer, Integer>>() {
                 @Override
                 public boolean apply(Tuple2<Integer, Integer> key) {

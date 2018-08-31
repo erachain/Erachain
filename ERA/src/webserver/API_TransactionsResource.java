@@ -1,34 +1,29 @@
 package webserver;
 
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.Map.Entry;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import api.ApiErrorFactory;
 import controller.Controller;
 import core.account.Account;
 import core.block.Block;
 import core.crypto.Base58;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import core.transaction.Transaction;
 import datachain.DCSet;
 import gui.library.library;
 import gui.models.TransactionsTableModel;
 import lang.Lang;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import utils.StrJSonFine;
 import utils.TransactionTimestampComparator;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.Map.Entry;
 
 @Path("apirecords")
 @Produces(MediaType.APPLICATION_JSON)
@@ -140,11 +135,9 @@ public class API_TransactionsResource {
     }
 
     /**
-
-     по блокам проходится и берет записи в них пока не просмотрит 2000 блоков и не насобирвет 100 записей. Если при этом не достигнут конец цепочи,
-     то выдаст в ответе параметр next со значением блока с которого нужно начать новый поиск.
-     Ограничение поиска сделано чтобы не грузить сервер запросами
-
+     * по блокам проходится и берет записи в них пока не просмотрит 2000 блоков и не насобирвет 100 записей. Если при этом не достигнут конец цепочи,
+     * то выдаст в ответе параметр next со значением блока с которого нужно начать новый поиск.
+     * Ограничение поиска сделано чтобы не грузить сервер запросами
      */
     @GET
     @Path("incomingfromblock/{address}/{from}")
@@ -212,7 +205,7 @@ public class API_TransactionsResource {
     @GET
     @Path("getbyaddress")
     public Response getByAddress(@QueryParam("address") String address, @QueryParam("asset") Long asset,
-            @QueryParam("recordType") String recordType, @QueryParam("unconfirmed") boolean unconfirmed) {
+                                 @QueryParam("recordType") String recordType, @QueryParam("unconfirmed") boolean unconfirmed) {
         List<Transaction> result;
         if (address == null || address.equals("")) {
             JSONObject ff = new JSONObject();
@@ -265,11 +258,11 @@ public class API_TransactionsResource {
         if (limit == null)
             limit = 20;
         List<Transaction> transs = new ArrayList<Transaction>();
-        
+
         List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(address);
         if (unconfirmed)
             trans.addAll(DCSet.getInstance().getTransactionMap().getTransactionsByAddress(address));
-        
+
         Collections.sort(trans, new TransactionTimestampComparator().reversed());
         for (Transaction tr : trans) {
             Long t = tr.getTimestamp();
@@ -365,19 +358,24 @@ public class API_TransactionsResource {
     @SuppressWarnings("unchecked")
     @GET
     @Path("/unconfirmedincomes/{address}")
-    // get transactions/unconfirmedincomes/7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7?from=123&count=13&descending=true
+    // get transactions/unconfirmedincomes/79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy?from=123&count=13&descending=true
     public String getNetworkIncomesTransactions(@PathParam("address") String address,
-            @QueryParam("from") int from, @QueryParam("count") int count,
-            @QueryParam("type") int type, @QueryParam("descending") boolean descending) {
+                                                @QueryParam("from") int from, @QueryParam("count") int count,
+                                                @QueryParam("type") int type, @QueryParam("descending") boolean descending) {
 
         JSONArray array = new JSONArray();
 
         DCSet dcSet = DCSet.getInstance();
+//        List<Transaction> transaction = dcSet.getTransactionFinalMap().getTransactionsByAddress(address);
+        //   List<Transaction> fb = dcSet.getTransactionMap().getIncomedTransactions(address, from, count, descending);
+        Iterable keys = dcSet.getTransactionMap().
+                findTransactionsKeys(address, null, null, 23, false, 0, 100);
 
-        for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address, type, from, count, descending)) {
+
+        /*for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address, type, from, count, descending)) {
             record.setDC(dcSet);
             array.add(record.toJson());
-        }
+        }*/
 
         return array.toJSONString();
     }
