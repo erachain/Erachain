@@ -18,6 +18,7 @@ import api.ApiErrorFactory;
 import controller.Controller;
 import core.account.Account;
 import core.block.Block;
+import core.crypto.Base58;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -41,6 +42,10 @@ public class API_TransactionsResource {
 
         Map<String, String> help = new LinkedHashMap<String, String>();
 
+        help.put("apirecords/get/{signature}",
+                Lang.getInstance().translate("Get Record by sigmature."));
+        help.put("apirecords/getbynumber/{height-sequence}",
+                "GET Record by Height and Sequence");
         help.put("apirecords/incomingfromblock/{address}/{blockStart}",
                 Lang.getInstance().translate("Get Incoming Records for Address from {blockStart}. Limit checked blocks = 2000 or 100 found records. If blocks not end at height - NEXT parameter was set."));
         help.put("apirecords/getbyaddress?address={address}&asset={asset}&recordType={recordType}&unconfirmed=true",
@@ -64,6 +69,76 @@ public class API_TransactionsResource {
 
     }
 
+
+    @GET
+    @Path("get/{signature}")
+    public Response getBySign(@PathParam("signature") String signature) {
+
+        Map out = new LinkedHashMap();
+
+        int step = 1;
+
+        try {
+            byte[] key = Base58.decode(signature);
+
+            ++step;
+            Transaction record = Controller.getInstance().getTransaction(key, DCSet.getInstance());
+            out = record.toJson();
+
+        } catch (Exception e) {
+
+            out.put("error", step);
+            if (step == 1)
+                out.put("message", "signature error, use Base58 value");
+            else if (step == 2)
+                out.put("message", "record not found");
+            else
+                out.put("message", e.getMessage());
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(out))
+                .build();
+    }
+
+    @GET
+    @Path("getbynumber/{number}")
+    public Response getByNumber(@PathParam("number") String numberStr) {
+
+        Map out = new LinkedHashMap();
+        int step = 1;
+
+        try {
+
+            String[] strA = numberStr.split("\\-");
+            int height = Integer.parseInt(strA[0]);
+            int seq = Integer.parseInt(strA[1]);
+
+            ++step;
+            Transaction record = DCSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
+            out = record.toJson();
+
+        } catch (Exception e) {
+
+            out.put("error", step);
+            if (step == 1)
+                out.put("message", "height-sequence error, use integer-integer value");
+            else if (step == 2)
+                out.put("message", "record not found");
+            else
+                out.put("message", e.getMessage());
+        }
+
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(out))
+                .build();
+    }
+
     /**
 
      по блокам проходится и берет записи в них пока не просмотрит 2000 блоков и не насобирвет 100 записей. Если при этом не достигнут конец цепочи,
@@ -73,8 +148,7 @@ public class API_TransactionsResource {
      */
     @GET
     @Path("incomingfromblock/{address}/{from}")
-    public String incomingFromBlock(@PathParam("address") String address, @PathParam("from") Long from) {
-
+    public Response incomingFromBlock(@PathParam("address") String address, @PathParam("from") Long from) {
 
         int height = from.intValue();
         Block block;
@@ -122,7 +196,9 @@ public class API_TransactionsResource {
             out.put("next", height + 1);
         }
 
-        return out.toJSONString();
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toJSONString()).build();
 
     }
 

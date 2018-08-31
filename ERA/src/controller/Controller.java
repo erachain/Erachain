@@ -2209,14 +2209,14 @@ public class Controller extends Observable {
 
     public Transaction getTransaction(byte[] signature, DCSet database) {
 
+        // CHECK IF IN TRANSACTION DATABASE
+        if (database.getTransactionMap().contains(signature)) {
+            return database.getTransactionMap().get(signature);
+        }
         // CHECK IF IN BLOCK
         Tuple2<Integer, Integer> tuple_Tx = database.getTransactionFinalMapSigns().get(signature);
         if (tuple_Tx != null) {
             return database.getTransactionFinalMap().get(tuple_Tx);
-        }
-        // CHECK IF IN TRANSACTION DATABASE
-        if (database.getTransactionMap().contains(signature)) {
-            return database.getTransactionMap().get(signature);
         }
         return null;
     }
