@@ -2,6 +2,7 @@ package datachain;
 
 // 30/03
 
+import core.BlockGenerator;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Base58;
@@ -21,9 +22,10 @@ import java.util.*;
 
 public class BlockMap extends DCMap<Integer, Block> {
 
+    static Logger LOGGER = Logger.getLogger(BlockMap.class.getName());
+
     public static final int HEIGHT_INDEX = 1; // for GUI
 
-    private static final Logger LOGGER = Logger.getLogger(BlockMap.class);
     static boolean init1 = true;
 
     //	protected Atomic.Integer atomicKey;
@@ -278,7 +280,8 @@ public class BlockMap extends DCMap<Integer, Block> {
             return true;
         }
 
-        int height = this.size() + 1;
+        //int height = this.size() + 1;
+        int height = block.getHeight();
 
         if (block.getVersion() == 0) {
             // GENESIS block
@@ -299,7 +302,7 @@ public class BlockMap extends DCMap<Integer, Block> {
             ++error;
         }
 
-        dcSet.getBlocksHeadsMap().set(height, block.blockHead);
+        dcSet.getBlocksHeadsMap().set(block.blockHead);
         this.setLastBlockSignature(signature);
 
         // LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1500: " +

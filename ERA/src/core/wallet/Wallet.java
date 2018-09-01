@@ -515,8 +515,9 @@ public class Wallet extends Observable implements Observer {
 		DCSet dcSet = DCSet.getInstance();
 
 		///////////////////////////////////// IS CHAIN VALID
-		if (false) {
-			for (int i = 2; i < dcSet.getBlockMap().size(); i++) {
+		if (true) {
+			LOGGER.info("TEST CHAIN .... ");
+			for (int i = 2; i <= dcSet.getBlockMap().size(); i++) {
 				Block block = dcSet.getBlockMap().get(i);
 				if (block.getHeight() != i) {
 					Long error = null;

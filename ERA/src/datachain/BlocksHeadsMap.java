@@ -136,6 +136,11 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
 
     }
 
+    public boolean set(Block.BlockHead item) {
+        return this.set(item.heightBlock, item);
+    }
+
+    /*
     public int add(Block.BlockHead item) {
 
         int key = this.size() + 1;
@@ -146,6 +151,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
         // RETURN KEY
         return key;
     }
+    */
 
     public Block.BlockHead last() {
         return this.get(this.size());

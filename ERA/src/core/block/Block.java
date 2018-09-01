@@ -480,7 +480,7 @@ public class Block {
         if (useHeight <= 0) {
             //READ HEIGHT
             byte[] heightBytes = Arrays.copyOfRange(data, position, position + HEIGHT_LENGTH);
-            useHeight = Ints.fromByteArray(versionBytes);
+            useHeight = Ints.fromByteArray(heightBytes);
             position += HEIGHT_LENGTH;
         }
 
@@ -1177,7 +1177,7 @@ public class Block {
 
     public boolean isValid(DCSet dcSet, boolean andProcess) {
 
-        LOGGER.debug("*** Block[" + this.heightBlock + " try Validate");
+        LOGGER.debug("*** Block[" + this.heightBlock + "] try Validate");
 
         Controller cnt = Controller.getInstance();
 
