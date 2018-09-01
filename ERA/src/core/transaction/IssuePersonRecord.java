@@ -316,18 +316,28 @@ public class IssuePersonRecord extends Issue_ItemRecord {
     // GET only INVITED FEE
     @Override
     public long getInvitedFee() {
-        if (this.height > BlockChain.VERS_4_11)
-            return this.fee.unscaledValue().longValue() >> BlockChain.FEE_INVITED_SHIFT_FOR_INVITE;
-        else
+        if (this.height < BlockChain.VERS_4_11)
             return super.getInvitedFee();
+
+        //return this.fee.unscaledValue().longValue() >> BlockChain.FEE_INVITED_SHIFT_FOR_INVITE;
+        return 0l;
     }
 
     @Override
     public long calcBaseFee()
     {
-        if (this.height > BlockChain.ALL_BALANCES_OK_TO)
-            return calcCommonFee() >> 2;
-        else
+        if (this.height < BlockChain.VERS_4_11)
             return calcCommonFee() >> 1;
+
+        PersonCls person = (PersonCls) this.item;
+
+        if (person.getDeathday() == Long.MIN_VALUE
+                || person.getDeathday() < person.getBirthday()) {
+            // IF PERSON is LIVE
+            return calcCommonFee() >> 3;
+        }
+
+        // is DEAD
+        return calcCommonFee();
     }
 }

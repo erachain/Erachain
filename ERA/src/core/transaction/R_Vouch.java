@@ -362,4 +362,13 @@ public class R_Vouch extends Transaction {
         return false;
     }
 
+    @Override
+    public long calcBaseFee() {
+        if (this.height < BlockChain.VERS_4_11)
+            return calcCommonFee();
+
+        return BlockChain.FEE_PER_BYTE * 300;
+
+    }
+
 }

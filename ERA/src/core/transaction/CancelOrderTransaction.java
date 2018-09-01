@@ -386,11 +386,10 @@ public class CancelOrderTransaction extends Transaction {
 
     @Override
     public long calcBaseFee() {
-        if (false && this.height < BlockChain.ORDER_FEE_DOWN)
+        if (this.height < BlockChain.VERS_4_11)
             return 2 * calcCommonFee();
-        else if (this.height > BlockChain.VERS_4_11)
-            return calcCommonFee();
 
-        return calcCommonFee();
+        return BlockChain.FEE_PER_BYTE * 200;
+
     }
 }

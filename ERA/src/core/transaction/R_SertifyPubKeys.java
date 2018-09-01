@@ -617,6 +617,8 @@ public class R_SertifyPubKeys extends Transaction {
                     }
                 }
 
+                process_gifts(0, 7897, this.creator, true);
+
                 // TO EMITTE FEE (with minus)
                 GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY, issued_FEE_BD_total, true);
 

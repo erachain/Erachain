@@ -1131,8 +1131,8 @@ public abstract class TransactionAmount extends Transaction {
 
         // v.4.11 FEE UP
         long fee = calcCommonFee();
-        if (fee < 200 * BlockChain.FEE_PER_BYTE)
-            return BlockChain.FEE_PER_BYTE * 200;
+        if (fee < 300 * BlockChain.FEE_PER_BYTE)
+            return BlockChain.FEE_PER_BYTE * 300;
 
         return fee;
     }

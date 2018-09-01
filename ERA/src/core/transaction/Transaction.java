@@ -713,7 +713,7 @@ public abstract class Transaction {
 
     public Block getBlock(DCSet db) {
 
-        if (block != null)
+        if (this.block != null)
             return block;
 
         // block =
@@ -722,7 +722,7 @@ public abstract class Transaction {
         if (blockHeightSeqNo == null)
             return null;
 
-        block = db.getBlockMap().get(blockHeightSeqNo.a);
+        this.block = db.getBlockMap().get(blockHeightSeqNo.a);
 
         return block;
     }

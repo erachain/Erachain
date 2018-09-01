@@ -640,11 +640,10 @@ public class CreateOrderTransaction extends Transaction {
 
     @Override
     public long calcBaseFee() {
-        if (false && this.height < BlockChain.ORDER_FEE_DOWN)
+        if (this.height < BlockChain.VERS_4_11)
             return 5 * calcCommonFee();
-        else if (this.height > BlockChain.VERS_4_11)
-            return calcCommonFee()<<1;
 
-        return calcCommonFee();
+        return BlockChain.FEE_PER_BYTE * 300;
+
     }
 }

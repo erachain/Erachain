@@ -333,6 +333,9 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
 
     @Override
     public long calcBaseFee() {
-        return calcCommonFee() + BlockChain.FEE_PER_BYTE * 128 * BlockChain.ISSUE_ASSET_MULT_FEE;
+        if (this.height < BlockChain.VERS_4_11)
+            return calcCommonFee() + BlockChain.FEE_PER_BYTE * 128 * BlockChain.ISSUE_MULT_FEE;
+
+        return calcCommonFee() + BlockChain.FEE_PER_BYTE * 30000;
     }
 }
