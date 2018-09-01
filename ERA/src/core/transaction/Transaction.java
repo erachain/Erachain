@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import core.item.persons.PersonCls;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -1193,45 +1194,52 @@ public abstract class Transaction {
             return;
 
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
-        // byte[] recordSignature = record.getSignature();
-        // TODO if PERSON die - skip it step
         if (personDuration == null) {
             // USE all GIFT for current ACCOUNT
-            // creator.addBalanceOWN(FEE_KEY,BigDecimal.valueOf(asOrphan?-fee_gift:fee_gift,
-            // BlockChain.FEE_SCALE), db);
             creator.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
             return;
         }
 
         // CREATOR is PERSON
         // FIND person
-        long personKey = personDuration.a;
-        // ItemCls person = ItemCls.getItem(db, ItemCls.PERSON_TYPE, personKey);
-        ItemCls person = this.dcSet.getItemPersonMap().get(personKey);
-        Tuple2<Integer, Integer> invitedDBRef = this.dcSet.getTransactionFinalMapSigns().get(person.getReference());
+        ItemCls person = this.dcSet.getItemPersonMap().get(personDuration.a);
+        Tuple2<Integer, Integer> inviteredDBRef = this.dcSet.getTransactionFinalMapSigns().get(person.getReference());
 
-        Transaction issueRecord = this.dcSet.getTransactionFinalMap().get(invitedDBRef);
+        Transaction issueRecord = this.dcSet.getTransactionFinalMap().get(inviteredDBRef);
+        Account inviterAccount = issueRecord.getCreator();
 
-        Account invitedAccount = issueRecord.getCreator();
-
-        if (creator.equals(invitedAccount)) {
+        if (creator.equals(inviterAccount)) {
             // IT IS ME - all fee!
             creator.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
             return;
         }
 
-        long fee_gift_next;
-        if (fee_gift > 2)
-            fee_gift_next = fee_gift >> BlockChain.FEE_INVITED_SHIFT_IN_LEVEL;
-        else
-            fee_gift_next = fee_gift - 1;
+        // IS INVITER ALIVE ???
+        Tuple4<Long, Integer, Integer, Integer> inviterDuration = inviterAccount.getPersonDuration(this.dcSet);
+        if (inviterDuration != null) {
+            PersonCls inviter = (PersonCls) this.dcSet.getItemPersonMap().get(inviterDuration.a);
+            if (!inviter.isAlive()) {
+                // SKIP this LEVEL for DEAD persons
+                process_gifts(level, fee_gift, inviterAccount, asOrphan);
+                return;
+            }
+        }
 
-        long fee_gift_get = fee_gift - fee_gift_next;
-        // invitedAccount.addBalanceOWN(FEE_KEY, fee_gift_get_BD, db);
-        invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE), false);
+        if (level < BlockChain.FEE_INVITED_DEEP ) {
 
-        if (level < BlockChain.FEE_INVITED_DEEP && fee_gift_next > 0) {
-            process_gifts(++level, fee_gift_next, invitedAccount, asOrphan);
+            long fee_gift_next = fee_gift >> BlockChain.FEE_INVITED_SHIFT_IN_LEVEL;
+            long fee_gift_get = fee_gift - fee_gift_next;
+
+            inviterAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE), false);
+
+            if (fee_gift_next > 0) {
+                process_gifts(++level, fee_gift_next, inviterAccount, asOrphan);
+            }
+
+        } else {
+            // this is END LEVEL
+            // GET REST of GIFT
+            inviterAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
         }
     }
 

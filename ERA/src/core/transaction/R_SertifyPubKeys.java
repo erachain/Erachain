@@ -5,6 +5,7 @@ import java.util.*;
 
 import core.item.persons.PersonCls;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
@@ -32,6 +33,13 @@ import datachain.DCSet;
 // 		 =1 - need sign by person
 // typeBytes[2] - size of personalized accounts
 public class R_SertifyPubKeys extends Transaction {
+
+    BigDecimal BONUS_FOR_NEW_PERSON = new BigDecimal("0.003");
+    BigDecimal BONUS_FOR_NEW_PERSON_REGISTRATOR = new BigDecimal("0.003");
+    BigDecimal BONUS_FOR_NEW_PERSON_SERTIFIER = new BigDecimal("0.004");
+    long BONUS_FOR_NEW_PERSON_REGISTRATOR_INVITER = 100000;
+    BigDecimal BONUS_FOR_NEW_PERSON_REGISTRATOR_INVITER_BD
+            = BigDecimal.valueOf(BONUS_FOR_NEW_PERSON_REGISTRATOR_INVITER, BlockChain.FEE_SCALE);
 
     public static final int DEFAULT_DURATION = 2 * 356;
     private static final byte TYPE_ID = (byte) Transaction.CERTIFY_PUB_KEYS_TRANSACTION;
@@ -599,14 +607,12 @@ public class R_SertifyPubKeys extends Transaction {
 
             } else {
 
-                //1/8 1/2 1/4
-                BigDecimal issued_FEE_BD = getBonuses();
-                // GIVE GIFT for this PUB_KEY
-                pkAccount.changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
-                BigDecimal issued_FEE_BD_total = issued_FEE_BD;
+                // GIVE GIFT for this PUB_KEY - to PERSON
+                pkAccount.changeBalance(db, false, FEE_KEY, BONUS_FOR_NEW_PERSON, false);
+                BigDecimal issued_FEE_BD_total = BONUS_FOR_NEW_PERSON;
 
-                issuer.changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
-                issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD);
+                this.creator.changeBalance(db, false, FEE_KEY, BONUS_FOR_NEW_PERSON_SERTIFIER, false);
+                issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_NEW_PERSON_SERTIFIER);
 
                 if (!this.creator.equals(issuer)) {
                     // AND this different KEY not owned by ONE PERSON
@@ -616,13 +622,15 @@ public class R_SertifyPubKeys extends Transaction {
                             || !creatorPersonItem.a.equals(issuerPersonItem.a)) {
                         // IF it is NOT SAME address and PERSON
                         // GIVE GIFT for Witness this PUB_KEY
-                        this.creator.changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
-                        issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD);
-
+                        issuer.changeBalance(db, false, FEE_KEY, BONUS_FOR_NEW_PERSON_REGISTRATOR, false);
+                        issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_NEW_PERSON_REGISTRATOR);
                     }
                 }
 
-                process_gifts(0, 7897, this.creator, true);
+                ///////// INVITER
+                process_gifts(BlockChain.FEE_INVITED_DEEP, BONUS_FOR_NEW_PERSON_REGISTRATOR_INVITER, issuer, false);
+                issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_NEW_PERSON_REGISTRATOR_INVITER_BD);
+
 
                 // TO EMITTE FEE (with minus)
                 GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY, issued_FEE_BD_total, true);
@@ -746,30 +754,30 @@ public class R_SertifyPubKeys extends Transaction {
 
             } else {
 
-                // ISSUE NEW COMPU in chain
-                BigDecimal issued_FEE_BD = getBonuses();
+                // GIVE GIFT for this PUB_KEY - to PERSON
+                pkAccount.changeBalance(db, true, FEE_KEY, BONUS_FOR_NEW_PERSON, false);
+                BigDecimal issued_FEE_BD_total = BONUS_FOR_NEW_PERSON;
 
-                pkAccount.changeBalance(db, true, FEE_KEY, issued_FEE_BD, false);
-                BigDecimal issued_FEE_BD_total = issued_FEE_BD;
+                this.creator.changeBalance(db, true, FEE_KEY, BONUS_FOR_NEW_PERSON_SERTIFIER, false);
+                issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_NEW_PERSON_SERTIFIER);
 
-                // BACK FEE FOR ISSUER without gift for this.CREATOR
-                issuer.changeBalance(db, true, FEE_KEY, issued_FEE_BD, false);
-                issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD);
-
-                // GIVE GIFT for Witness this PUB_KEY
                 if (!this.creator.equals(issuer)) {
                     // AND this different KEY not owned by ONE PERSON
                     Tuple4<Long, Integer, Integer, Integer> creatorPersonItem = db.getAddressPersonMap().getItem(this.creator.getAddress());
                     Tuple4<Long, Integer, Integer, Integer> issuerPersonItem = db.getAddressPersonMap().getItem(issuer.getAddress());
                     if (creatorPersonItem == null || issuerPersonItem == null
                             || !creatorPersonItem.a.equals(issuerPersonItem.a)) {
-
                         // IF it is NOT SAME address and PERSON
-                        this.creator.changeBalance(db, true, FEE_KEY, issued_FEE_BD, false);
-                        issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD);
-
+                        // GIVE GIFT for Witness this PUB_KEY
+                        issuer.changeBalance(db, true, FEE_KEY, BONUS_FOR_NEW_PERSON_REGISTRATOR, false);
+                        issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_NEW_PERSON_REGISTRATOR);
                     }
                 }
+
+                ///////// INVITER
+                process_gifts(BlockChain.FEE_INVITED_DEEP, BONUS_FOR_NEW_PERSON_REGISTRATOR_INVITER, issuer, true);
+                issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_NEW_PERSON_REGISTRATOR_INVITER_BD);
+
 
                 // ADD to EMISSION (with minus)
                 GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY, issued_FEE_BD_total, true);
