@@ -693,7 +693,7 @@ public class Account {
             return "";
 
         PersonCls person = personRes.b;
-        if (person.getDeathday() / 10 > person.getBirthday() / 10)
+        if (!person.isAlive())
             return "☗"; // "☗"; ☻
 
         int key = personRes.a;

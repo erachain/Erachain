@@ -160,6 +160,18 @@ public abstract class PersonCls extends ItemCls {
         return Byte.toUnsignedInt(this.height);
     }
 
+    public boolean isAlive() {
+
+        if(this.deathday == Long.MIN_VALUE
+                || this.deathday < this.birthday)
+            return true;
+
+        return false;
+
+    }
+
+
+
     // DB
     public Item_Map getDBMap(DCSet db) {
         return db.getItemPersonMap();

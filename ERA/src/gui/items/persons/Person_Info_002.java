@@ -295,7 +295,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         long bi = person.getBirthday();
         long de = person.getDeathday();
         String biStr = person.getBirthdayStr();
-        if (de / 10 > bi / 10) {
+        if (!person.isAlive()) {
             //descript =descript+"\n"+ new Date(person.getBirthday()).toString() + " - "+ new Date(person.getDeathday()).toString();
             descript = descript + "\n" + biStr + " - " + person.getDeathdayStr();
 
@@ -303,7 +303,6 @@ public class Person_Info_002 extends javax.swing.JPanel {
 
             //descript = descript+"\n" + Lang.getInstance().translate("Birthday") + ":" + new Date(person.getBirthday()) + "";
             descript = descript + "\n" + Lang.getInstance().translate("Birthday") + ":" + biStr;
-
 
         }
 

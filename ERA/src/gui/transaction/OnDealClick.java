@@ -323,6 +323,9 @@ public class OnDealClick {
             case Transaction.INVALID_CREATOR:
                 mess = "Invalid creator";
                 break;
+            case Transaction.ITEM_PERSON_IS_DEAD:
+                mess = "Person is Dead";
+                break;
             case Transaction.INVALID_TRANSFER_TYPE:
                 mess = "Invalid transfer type";
                 break;

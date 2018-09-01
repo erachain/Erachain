@@ -199,7 +199,7 @@ public abstract class Transaction {
     public static final int ITEM_DOES_NOT_UNITED = 109;
     public static final int ITEM_DUPLICATE_KEY = 110;
     public static final int ITEM_DUPLICATE = 111;
-    public static final int AMOUNT_DIVISIBLE = 115;
+    public static final int ITEM_PERSON_IS_DEAD = 115;
     public static final int AMOUNT_LENGHT_SO_LONG = 116;
     public static final int AMOUNT_SCALE_SO_BIG = 117;
     public static final int AMOUNT_SCALE_WRONG = 118;

@@ -3,6 +3,7 @@ package core.transaction;
 import java.math.BigDecimal;
 import java.util.*;
 
+import core.item.persons.PersonCls;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
@@ -470,7 +471,7 @@ public class R_SertifyPubKeys extends Transaction {
                 return result;
         }
 
-        int height = this.getBlockHeightByParentOrLast(dcSet);
+        int height = this.height;
 
         for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
             //CHECK IF PERSON PUBLIC KEY IS VALID
@@ -493,6 +494,10 @@ public class R_SertifyPubKeys extends Transaction {
         ) < 0
                 )
             return Transaction.NOT_ENOUGH_RIGHTS;
+
+        PersonCls person = (PersonCls) this.dcSet.getItemPersonMap().get(this.key);
+        if (!person.isAlive())
+            return Transaction.ITEM_PERSON_IS_DEAD;
 
         return Transaction.VALIDATE_OK;
     }
@@ -537,7 +542,6 @@ public class R_SertifyPubKeys extends Transaction {
             //transactionIndex = this.getSeqNo(db);
             transactionIndex = block.getTransactionSeq(signature);
         }
-
 
         boolean personalized = false;
         TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = this.dcSet.getPersonAddressMap().getItems(this.key);
@@ -595,6 +599,7 @@ public class R_SertifyPubKeys extends Transaction {
 
             } else {
 
+                //1/8 1/2 1/4
                 BigDecimal issued_FEE_BD = getBonuses();
                 // GIVE GIFT for this PUB_KEY
                 pkAccount.changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
@@ -804,6 +809,15 @@ public class R_SertifyPubKeys extends Transaction {
         }
 
         return false;
+    }
+
+    @Override
+    public long calcBaseFee() {
+        if (this.height < BlockChain.VERS_4_11)
+            return calcCommonFee();
+
+        return BlockChain.FEE_PER_BYTE * (200 + this.sertifiedPublicKeys.size() * 300);
+
     }
 
 }
