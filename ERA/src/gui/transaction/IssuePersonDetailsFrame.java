@@ -53,7 +53,7 @@ public class IssuePersonDetailsFrame extends Rec_DetailsFrame {
         this.add(birtday, detailGBC);
 
         //LABEL Death
-        if (!person.isAlive(NTP.getTime())) {
+        if (!person.isAlive(0l)) {
             ++labelGBC.gridy;
             JLabel deadLabel = new JLabel(Lang.getInstance().translate("Deathday") + ":");
             this.add(deadLabel, labelGBC);

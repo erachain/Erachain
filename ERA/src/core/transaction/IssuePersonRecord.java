@@ -211,7 +211,7 @@ public class IssuePersonRecord extends Issue_ItemRecord {
             if (person.getImage().length < (MAX_IMAGE_LENGTH >> 1)
                     || person.getImage().length > MAX_IMAGE_LENGTH) {
                 //int height = this.getBlockHeightByParent(this.dcSet);
-                if (this.height != 2998) {
+                if (this.height != 2998 && this.height != 57640) {
                     // early blocks has wrong ISSUE_PERSON with 0 image length - in block 2998
                     return Transaction.INVALID_IMAGE_LENGTH;
                 }

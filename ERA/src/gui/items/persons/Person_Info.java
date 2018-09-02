@@ -47,7 +47,7 @@ public class Person_Info extends JTextPane {
         //date_birthday =  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
         date_birthday = person.getBirthdayStr();
         message += " (" + date_birthday;
-        if (!person.isAlive(NTP.getTime()))
+        if (!person.isAlive(0l)) //NTP.getTime()))
             message += " - " + person.getDeathdayStr();
         message += ")";
         message = "<div>" + message + "</div>";

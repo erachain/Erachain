@@ -274,7 +274,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
                 // if ( dayTimestamp/10 > person.getBirthday()/10) {
                 txtDeathdayTxt.setVisible(false);
                 jLabel_Dead.setVisible(false);
-                if (!person.isAlive(NTP.getTime())) {
+                if (!person.isAlive(0l)) {
                     // txtDeathdayTxt.setText(new
                     // Date(person.getDeathday())+"");
                     txtDeathdayTxt.setVisible(true);

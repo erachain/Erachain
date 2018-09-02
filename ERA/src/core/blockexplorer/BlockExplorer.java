@@ -1631,7 +1631,7 @@ public class BlockExplorer {
         //////// output.put("birthday", df.format(new
         //////// Date(person.getBirthday())).toString());
         output.put("birthday", person.getBirthdayStr());
-        if (!person.isAlive(NTP.getTime())) {
+        if (!person.isAlive(0l)) { //NTP.getTime())) {
             output.put("deathday", person.getDeathdayStr());
             output.put("Label_dead", Lang.getInstance().translate_from_langObj("Deathday", langObj));
 
