@@ -504,7 +504,7 @@ public class R_SertifyPubKeys extends Transaction {
             return Transaction.NOT_ENOUGH_RIGHTS;
 
         PersonCls person = (PersonCls) this.dcSet.getItemPersonMap().get(this.key);
-        if (!person.isAlive())
+        if (!person.isAlive(this.timestamp))
             return Transaction.ITEM_PERSON_IS_DEAD;
 
         return Transaction.VALIDATE_OK;

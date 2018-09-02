@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import javax.ws.rs.core.UriInfo;
 
 import datachain.*;
+import ntp.NTP;
 import org.apache.commons.net.util.Base64;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -1630,6 +1631,11 @@ public class BlockExplorer {
         //////// output.put("birthday", df.format(new
         //////// Date(person.getBirthday())).toString());
         output.put("birthday", person.getBirthdayStr());
+        if (!person.isAlive(NTP.getTime())) {
+            output.put("deathday", person.getDeathdayStr());
+            output.put("Label_dead", Lang.getInstance().translate_from_langObj("Deathday", langObj));
+
+        }
         output.put("description", person.getDescription());
 
         String gender = Lang.getInstance().translate_from_langObj("Man", langObj);

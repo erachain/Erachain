@@ -1218,7 +1218,7 @@ public abstract class Transaction {
         Tuple4<Long, Integer, Integer, Integer> inviterDuration = inviterAccount.getPersonDuration(this.dcSet);
         if (inviterDuration != null) {
             PersonCls inviter = (PersonCls) this.dcSet.getItemPersonMap().get(inviterDuration.a);
-            if (!inviter.isAlive()) {
+            if (!inviter.isAlive(this.timestamp)) {
                 // SKIP this LEVEL for DEAD persons
                 process_gifts(level, fee_gift, inviterAccount, asOrphan);
                 return;

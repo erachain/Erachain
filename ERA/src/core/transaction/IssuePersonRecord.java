@@ -206,7 +206,7 @@ public class IssuePersonRecord extends Issue_ItemRecord {
         //if (Math.abs(person.getHeight()) < 1) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
         if (person.getHeight() > 255) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
 
-        if (person.isAlive()) {
+        if (person.isAlive(this.timestamp)) {
             // IF PERSON is LIVE
             if (person.getImage().length < (MAX_IMAGE_LENGTH >> 1)
                     || person.getImage().length > MAX_IMAGE_LENGTH) {
@@ -330,7 +330,7 @@ public class IssuePersonRecord extends Issue_ItemRecord {
 
         PersonCls person = (PersonCls) this.item;
 
-        if (person.isAlive()) {
+        if (person.isAlive(this.timestamp)) {
             // IF PERSON is LIVE
             return calcCommonFee() >> 3;
         }

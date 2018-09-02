@@ -16,6 +16,7 @@ import gui.library.MButton;
 import gui.transaction.IssuePersonDetailsFrame;
 import gui.transaction.OnDealClick;
 import lang.Lang;
+import ntp.NTP;
 import utils.Pair;
 
 import javax.swing.*;
@@ -273,7 +274,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
                 // if ( dayTimestamp/10 > person.getBirthday()/10) {
                 txtDeathdayTxt.setVisible(false);
                 jLabel_Dead.setVisible(false);
-                if (!person.isAlive()) {
+                if (!person.isAlive(NTP.getTime())) {
                     // txtDeathdayTxt.setText(new
                     // Date(person.getDeathday())+"");
                     txtDeathdayTxt.setVisible(true);

@@ -3416,7 +3416,12 @@ else
 {
 	output +=   data.Label_creator + ': &nbsp&nbsp<b> ' + data.creator + '</b><br>';
 }
-output +=   data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b><br>';
+output +=   data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b>';
+if ('deathday' in data) {
+output += ', &nbsp&nbsp ' + data.Label_dead + ': &nbsp&nbsp<b> ' + data.deathday + '</b><br>'
+} else {
+output += '<br>';
+}
 output +=   data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br>';
 output +=   data.Label_description + ': &nbsp&nbsp' + fformat(data.description) + '<br>';
 if (data.era_balance_a) {

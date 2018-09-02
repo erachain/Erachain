@@ -4,6 +4,7 @@ import core.item.persons.PersonCls;
 import datachain.DCSet;
 import datachain.ItemStatusMap;
 import lang.Lang;
+import ntp.NTP;
 import org.mapdb.Fun.Tuple5;
 
 import javax.swing.*;
@@ -46,7 +47,7 @@ public class Person_Info extends JTextPane {
         //date_birthday =  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
         date_birthday = person.getBirthdayStr();
         message += " (" + date_birthday;
-        if (!person.isAlive())
+        if (!person.isAlive(NTP.getTime()))
             message += " - " + person.getDeathdayStr();
         message += ")";
         message = "<div>" + message + "</div>";

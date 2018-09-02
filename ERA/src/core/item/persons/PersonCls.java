@@ -160,10 +160,14 @@ public abstract class PersonCls extends ItemCls {
         return Byte.toUnsignedInt(this.height);
     }
 
-    public boolean isAlive() {
+    public boolean isAlive(long onThisTime) {
 
         if(this.deathday == Long.MIN_VALUE
                 || this.deathday < this.birthday)
+            return true;
+
+        if (onThisTime > 0
+            && this.deathday > onThisTime)
             return true;
 
         return false;

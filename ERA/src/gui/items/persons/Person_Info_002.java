@@ -13,6 +13,7 @@ import core.transaction.Transaction;
 import datachain.DCSet;
 import gui.library.*;
 import lang.Lang;
+import ntp.NTP;
 import utils.MenuPopupUtil;
 
 import javax.swing.*;
@@ -295,7 +296,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         long bi = person.getBirthday();
         long de = person.getDeathday();
         String biStr = person.getBirthdayStr();
-        if (!person.isAlive()) {
+        if (!person.isAlive(NTP.getTime())) {
             //descript =descript+"\n"+ new Date(person.getBirthday()).toString() + " - "+ new Date(person.getDeathday()).toString();
             descript = descript + "\n" + biStr + " - " + person.getDeathdayStr();
 

@@ -3,6 +3,7 @@ package gui.transaction;
 import core.item.persons.PersonCls;
 import core.transaction.IssuePersonRecord;
 import lang.Lang;
+import ntp.NTP;
 import utils.MenuPopupUtil;
 
 import javax.swing.*;
@@ -52,7 +53,7 @@ public class IssuePersonDetailsFrame extends Rec_DetailsFrame {
         this.add(birtday, detailGBC);
 
         //LABEL Death
-        if (!person.isAlive()) {
+        if (!person.isAlive(NTP.getTime())) {
             ++labelGBC.gridy;
             JLabel deadLabel = new JLabel(Lang.getInstance().translate("Deathday") + ":");
             this.add(deadLabel, labelGBC);
