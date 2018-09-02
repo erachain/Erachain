@@ -120,7 +120,7 @@ public class BlockGenerator extends Thread implements Observer {
     */
 
     public static Block generateNextBlock(DCSet dcSet, PrivateKeyAccount account,
-                                          Block parentBlock, Tuple2<List<Transaction>, Integer> transactionsItem, int height, int forgingValue, long winValue, long previousTarget) {
+                  Block parentBlock, Tuple2<List<Transaction>, Integer> transactionsItem, int height, int forgingValue, long winValue, long previousTarget) {
 
         if (transactionsItem == null) {
             return null;

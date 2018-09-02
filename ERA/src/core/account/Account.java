@@ -460,7 +460,7 @@ public class Account {
                         balance.b, balance.c, balance.d, balance.e);
             else if (key == 2)
                 return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                        new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.ONE.add(BigDecimal.ONE))), balance.b,
+                        new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.TEN)), balance.b,
                         balance.c, balance.d, balance.e);
         }
         return balance;
@@ -479,7 +479,7 @@ public class Account {
                 if (key == 1)
                     return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.valueOf(1000)));
                 else if (key == 2)
-                    return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.ONE.add(BigDecimal.ONE)));
+                    return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.TEN));
             }
 
             return balance.a;

@@ -17,6 +17,7 @@ import ntp.NTP;
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
@@ -36,6 +37,7 @@ public class BlockTests {
     long flags = 0l;
     boolean forDB = true;
     List<Transaction> transactions = new ArrayList<Transaction>();
+    Fun.Tuple2<List<Transaction>, Integer> orderedTransactions = new Fun.Tuple2<>(new ArrayList<Transaction>(), 0);
     byte[] transactionsHash = new byte[Crypto.HASH_LENGTH];
     byte[] atBytes = new byte[0];
     //CREATE KNOWN ACCOUNT
@@ -181,7 +183,7 @@ public class BlockTests {
         Block parsedBlock = null;
         try {
             //PARSE FROM BYTES
-            parsedBlock = BlockFactory.getInstance().parse(rawBlock, forDB);
+            parsedBlock = BlockFactory.getInstance().parse(rawBlock, 1);
 
         } catch (Exception e) {
             fail("Exception while parsing transaction." + e);
@@ -216,7 +218,7 @@ public class BlockTests {
 
         try {
             //PARSE FROM BYTES
-            BlockFactory.getInstance().parse(rawBlock, forDB);
+            BlockFactory.getInstance().parse(rawBlock, 1);
 
             //FAIL
             fail("this should throw an exception");
@@ -308,7 +310,9 @@ public class BlockTests {
         //GENERATE NEXT BLOCK
         //BigDecimal genBal = generator.getGeneratingBalance(db);
         BlockGenerator blockGenerator = new BlockGenerator(false);
-        Block newBlock = BlockGenerator.generateNextBlock(db, generator, height, gb, transactionsHash);
+        Block newBlock = BlockGenerator.generateNextBlock(db, generator, gb,
+                orderedTransactions, 3,
+                1000, 1000l, 1000l);
         newBlock.sign(generator);
 
         ////ADD TRANSACTION SIGNATURE
@@ -329,7 +333,10 @@ public class BlockTests {
         assertEquals(false, newBlock.isSignatureValid());
 
         //INVALID GENERATOR SIGNATURE
-        newBlock = BlockFactory.getInstance().create(newBlock.getVersion(), newBlock.getReference(), generator, new byte[Crypto.HASH_LENGTH], new byte[0]);
+        //newBlock = BlockFactory.getInstance().create(newBlock.getVersion(), newBlock.getReference(), generator, new byte[Crypto.HASH_LENGTH], new byte[0]);
+        newBlock = BlockGenerator.generateNextBlock(db, generator, gb,
+                orderedTransactions, 3,
+                1000, 1000l, 1000l);
         newBlock.sign(generator);
         newBlock.setTransactions(transactions);
 
@@ -337,7 +344,9 @@ public class BlockTests {
         assertEquals(false, newBlock.isSignatureValid());
 
         //VALID TRANSACTION SIGNATURE
-        newBlock = BlockGenerator.generateNextBlock(db, generator, height, gb, transactionsHash);
+        newBlock = BlockGenerator.generateNextBlock(db, generator, gb,
+                orderedTransactions, 3,
+                1000, 1000l, 1000l);
 
         //ADD TRANSACTION
         Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
@@ -359,7 +368,9 @@ public class BlockTests {
         assertEquals(true, newBlock.isSignatureValid());
 
         //INVALID TRANSACTION SIGNATURE
-        newBlock = BlockGenerator.generateNextBlock(db, generator, height, gb, transactionsHash);
+        newBlock = BlockGenerator.generateNextBlock(db, generator, gb,
+                orderedTransactions, 3,
+                1000, 1000l, 1000l);
 
         //ADD TRANSACTION
         payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(200), NTP.getTime(), generator.getLastTimestamp(db), payment.getSignature());
@@ -413,7 +424,9 @@ public class BlockTests {
         //GENERATE NEXT BLOCK
         //BigDecimal genBal = generator.getGeneratingBalance(db);
         BlockGenerator blockGenerator = new BlockGenerator(false);
-        Block newBlock = BlockGenerator.generateNextBlock(db, generator, height, gb, transactionsHash);
+        Block newBlock = BlockGenerator.generateNextBlock(db, generator, gb,
+                orderedTransactions, 3,
+                1000, 1000l, 1000l);
 
         //ADD TRANSACTION SIGNATURE
         //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -423,14 +436,20 @@ public class BlockTests {
         assertEquals(true, newBlock.isValid(db, false));
 
         //CHANGE REFERENCE
-        Block invalidBlock = BlockFactory.getInstance().create(newBlock.getVersion(), new byte[128], newBlock.getCreator(), transactionsHash, atBytes);
+        ////Block invalidBlock = BlockFactory.getInstance().create(newBlock.getVersion(), new byte[128], newBlock.getCreator(), transactionsHash, atBytes);
+        Block invalidBlock = BlockGenerator.generateNextBlock(db, generator, gb,
+                orderedTransactions, 3,
+                1000, 1000l, 1000l);
+
         invalidBlock.sign(generator);
 
         //CHECK IF INVALID
         assertEquals(false, invalidBlock.isValid(db, false));
 
         //ADD INVALID TRANSACTION
-        invalidBlock = BlockGenerator.generateNextBlock(db, generator, height, gb, transactionsHash);
+        invalidBlock = BlockGenerator.generateNextBlock(db, generator, gb,
+                orderedTransactions, 3,
+                1000, 1000l, 1000l);
         Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
         long timestamp = newBlock.getTimestamp();
         Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(-100), timestamp, generator.getLastTimestamp(db));
@@ -447,7 +466,9 @@ public class BlockTests {
         assertEquals(false, invalidBlock.isValid(db, false));
 
         //ADD GENESIS TRANSACTION
-        invalidBlock = BlockGenerator.generateNextBlock(db, generator, height, gb, transactionsHash);
+        invalidBlock = BlockGenerator.generateNextBlock(db, generator, gb,
+                orderedTransactions, 3,
+                1000, 1000l, 1000l);
 
         //transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000), newBlock.getTimestamp());
         transaction = new GenesisIssueAssetTransaction(GenesisBlock.makeAsset(Transaction.RIGHTS_KEY));
@@ -485,7 +506,9 @@ public class BlockTests {
 
 
         //GENERATE NEXT BLOCK
-        Block block = BlockGenerator.generateNextBlock(db, generator, height, gb, transactionsHash);
+        Block block = BlockGenerator.generateNextBlock(db, generator, gb,
+                orderedTransactions, 3,
+                1000, 1000l, 1000l);
 
         //FORK
         DCSet fork = db.fork();
@@ -522,7 +545,7 @@ public class BlockTests {
         Block parsedBlock = null;
         try {
             //PARSE FROM BYTES
-            parsedBlock = BlockFactory.getInstance().parse(rawBlock, forDB);
+            parsedBlock = BlockFactory.getInstance().parse(rawBlock, 3);
         } catch (Exception e) {
             fail("Exception while parsing transaction.");
         }
@@ -556,7 +579,7 @@ public class BlockTests {
 
         try {
             //PARSE FROM BYTES
-            BlockFactory.getInstance().parse(rawBlock, forDB);
+            BlockFactory.getInstance().parse(rawBlock, 3);
 
             //FAIL
             fail("this should throw an exception");
@@ -586,7 +609,9 @@ public class BlockTests {
         generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000), false);
 
         //GENERATE NEXT BLOCK
-        Block block = BlockGenerator.generateNextBlock(db, generator, height, gb, transactionsHash);
+        Block block = BlockGenerator.generateNextBlock(db, generator, gb,
+                orderedTransactions, 3,
+                1000, 1000l, 1000l);
 
         //FORK
         DCSet fork = db.fork();
@@ -618,7 +643,7 @@ public class BlockTests {
         block.setTransactions(transactions);
 
         ////generator.setLastForgingData(db, block.getHeightByParent(db));
-        generator.setForgingData(db, block.getHeightByParent(db), payment2.getAmount().intValue());
+        generator.setForgingData(db, block.getHeight(), payment2.getAmount().intValue());
         //block.setCalcGeneratingBalance(db);
         block.sign(generator);
 

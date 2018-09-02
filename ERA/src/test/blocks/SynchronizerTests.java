@@ -13,6 +13,7 @@ import ntp.NTP;
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -33,6 +34,8 @@ public class SynchronizerTests {
     long timestamp = NTP.getTime();
     DCSet databaseSet = DCSet.createEmptyDatabaseSet();
     GenesisBlock genesisBlock = new GenesisBlock();
+
+    Fun.Tuple2<List<Transaction>, Integer> orderedTransactions = new Fun.Tuple2<>(new ArrayList<Transaction>(), 0);
 
     byte[] transactionsHash = new byte[Crypto.HASH_LENGTH];
 
@@ -66,7 +69,10 @@ public class SynchronizerTests {
         List<Block> firstBlocks = new ArrayList<Block>();
         for (int i = 0; i < 5; i++) {
             //GENERATE NEXT BLOCK
-            Block newBlock = BlockGenerator.generateNextBlock(databaseSet, generator, height, lastBlock, transactionsHash);
+            int height = i + 1;
+            Block newBlock = BlockGenerator.generateNextBlock(databaseSet, generator,
+                    lastBlock, orderedTransactions,
+                    height,  1000, 1000l, 1000l);
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -104,11 +110,13 @@ public class SynchronizerTests {
         List<Block> newBlocks = new ArrayList<Block>();
         for (int i = 0; i < 5; i++) {
             //GENERATE NEXT BLOCK
-            Block newBlock = BlockGenerator.generateNextBlock(fork, generator, height, lastBlock, transactionsHash);
+            Block newBlock = BlockGenerator.generateNextBlock(fork, generator,
+                    lastBlock, orderedTransactions,
+                    i + 1,  1000, 1000l, 1000l);
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
-            newBlock.makeTransactionsHash();
+            //newBlock.makeTransactionsHash();
 
             //PROCESS NEW BLOCK
             try {
@@ -217,7 +225,9 @@ public class SynchronizerTests {
         BlockGenerator blockGenerator = new BlockGenerator(false);
         for (int i = 0; i < 5; i++) {
             //GENERATE NEXT BLOCK
-            Block newBlock = blockGenerator.generateNextBlock(databaseSet1, generator, height, lastBlock, transactionsHash);
+            Block newBlock = blockGenerator.generateNextBlock(databaseSet1, generator,
+                    lastBlock, orderedTransactions,
+                    i + 1,  1000, 1000l, 1000l);
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -241,7 +251,9 @@ public class SynchronizerTests {
         List<Block> newBlocks = new ArrayList<Block>();
         for (int i = 0; i < 10; i++) {
             //GENERATE NEXT BLOCK
-            Block newBlock = BlockGenerator.generateNextBlock(databaseSet2, generator2, height, lastBlock, transactionsHash);
+            Block newBlock = BlockGenerator.generateNextBlock(databaseSet2, generator2,
+                    lastBlock, orderedTransactions,
+                    i + 1,  1000, 1000l, 1000l);
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator2, newBlock.getSignature());
