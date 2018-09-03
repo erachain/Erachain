@@ -515,7 +515,7 @@ public class Wallet extends Observable implements Observer {
 		DCSet dcSet = DCSet.getInstance();
 
 		///////////////////////////////////// IS CHAIN VALID
-		if (true) {
+		if (false) {
 			LOGGER.info("TEST CHAIN .... ");
 			for (int i = 2; i <= dcSet.getBlockMap().size(); i++) {
 				Block block = dcSet.getBlockMap().get(i);
@@ -604,9 +604,6 @@ public class Wallet extends Observable implements Observer {
 		try {
 			this.syncHeight = height;
 			do {
-				if (height == 86549) {
-					int ttt = 1;
-				}
 				int maxHeight = Controller.getInstance().getMyHeight();
 				if (maxHeight < stepHeight)
 					stepHeight = maxHeight;

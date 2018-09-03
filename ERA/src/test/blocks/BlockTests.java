@@ -545,7 +545,7 @@ public class BlockTests {
         Block parsedBlock = null;
         try {
             //PARSE FROM BYTES
-            parsedBlock = BlockFactory.getInstance().parse(rawBlock, 3);
+            parsedBlock = BlockFactory.getInstance().parse(rawBlock, 0);
         } catch (Exception e) {
             fail("Exception while parsing transaction.");
         }
@@ -559,20 +559,14 @@ public class BlockTests {
         //CHECK GENERATOR
         assertEquals(block.getCreator().getAddress(), parsedBlock.getCreator().getAddress());
 
-        //CHECK BASE TARGET
-        assertEquals(block.getForgingValue(), parsedBlock.getForgingValue());
-
-        //CHECK FEE
-        assertEquals(block.getTotalFee(db), parsedBlock.getTotalFee(db));
-
         //CHECK REFERENCE
         assertEquals(true, Arrays.equals(block.getReference(), parsedBlock.getReference()));
 
-        //CHECK TIMESTAMP
-        assertEquals(block.getTimestamp(), parsedBlock.getTimestamp());
-
         //CHECK TRANSACTIONS COUNT
         assertEquals(block.getTransactionCount(), parsedBlock.getTransactionCount());
+
+        //CHECK REFERENCE
+        assertEquals(true, Arrays.equals(block.getTransactionsHash(), parsedBlock.getTransactionsHash()));
 
         //PARSE TRANSACTION FROM WRONG BYTES
         rawBlock = new byte[50];

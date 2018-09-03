@@ -450,7 +450,8 @@ public class Block {
         }
 
         //CHECK IF WE HAVE MINIMUM BLOCK LENGTH
-        if (data.length < BASE_LENGTH) {
+        if (data.length < (useHeight <= 0? BASE_LENGTH + HEIGHT_LENGTH: BASE_LENGTH)
+        ) {
             throw new Exception("Data is less then minimum block length");
         }
 
@@ -981,13 +982,6 @@ public class Block {
             byte[] heightBytes = Ints.toByteArray(this.heightBlock);
             heightBytes = Bytes.ensureCapacity(heightBytes, HEIGHT_LENGTH, 0);
             data = Bytes.concat(data, heightBytes);
-        }
-
-        if (false && forDB) {
-            //WRITE GENERATING BALANCE
-            byte[] generatingBalanceBytes = Ints.toByteArray(this.forgingValue);
-            generatingBalanceBytes = Bytes.ensureCapacity(generatingBalanceBytes, GENERATING_BALANCE_LENGTH, 0);
-            data = Bytes.concat(data, generatingBalanceBytes);
         }
 
         //WRITE TRANSACTIONS HASH

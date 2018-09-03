@@ -3,9 +3,12 @@ package network.message;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
+import controller.Controller;
 import core.block.Block;
 import datachain.DCSet;
 
+import javax.naming.ldap.Control;
+import java.awt.*;
 import java.util.Arrays;
 
 public class BlockWinMessage extends Message {
@@ -25,6 +28,10 @@ public class BlockWinMessage extends Message {
         //PARSE HEIGHT
         byte[] heightBytes = Arrays.copyOfRange(data, 0, HEIGHT_LENGTH);
         int height = Ints.fromByteArray(heightBytes);
+        if (height == 0) {
+            // from VER 4.10
+            height = Controller.getInstance().getMyHeight() + 1;
+        }
 
         //PARSE BLOCK
         Block block = Block.parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1), height);
