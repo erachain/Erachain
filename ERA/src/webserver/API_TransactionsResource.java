@@ -12,7 +12,6 @@ import gui.models.TransactionsTableModel;
 import lang.Lang;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.mapdb.Fun;
 import utils.StrJSonFine;
 import utils.TransactionTimestampComparator;
 
@@ -355,27 +354,37 @@ public class API_TransactionsResource {
 
     }
 
+    /**
+     * Get all incoming unconfirmed transaction by timestamp and type transaction
+     *
+     * @param address    address
+     * @param count      limit
+     * @param type       type incoming transaction
+     * @param descending order
+     * @param timestamp  current timestamp
+     * @return JSON list of transaction
+     *
+     * <h2>Example request</h2>
+     * http://127.0.0.1:9067/apirecords/unconfirmedincomes/
+     * 7R5m1NKAL3c2p3B7jMQXMsdqNaqCktS4h9?from=23&count=13&descending=true&timestamp=1535966134229&type=36
+     */
     @SuppressWarnings("unchecked")
     @GET
     @Path("/unconfirmedincomes/{address}")
-    // get transactions/unconfirmedincomes/79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy?from=123&count=13&descending=true
+
     public String getNetworkIncomesTransactions(@PathParam("address") String address,
-                                                @QueryParam("from") int from, @QueryParam("count") int count,
-                                                @QueryParam("type") int type, @QueryParam("descending") boolean descending) {
-
+                                                @QueryParam("count") int count,
+                                                @QueryParam("type") int type, @QueryParam("descending") boolean descending,
+                                                @QueryParam("timestamp") long timestamp) {
         JSONArray array = new JSONArray();
-
         DCSet dcSet = DCSet.getInstance();
-//        List<Transaction> transaction = dcSet.getTransactionFinalMap().getTransactionsByAddress(address);
-        //   List<Transaction> fb = dcSet.getTransactionMap().getIncomedTransactions(address, from, count, descending);
-        Iterable keys = dcSet.getTransactionMap().
-                findTransactionsKeys(address, null, null, 23, false, 0, 100);
 
+        List<Transaction> transaction = dcSet.getTransactionMap().getIncomedTransactions(address, type,
+                timestamp, count, descending);
 
-        /*for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address, type, from, count, descending)) {
-            record.setDC(dcSet);
+        for (Transaction record : transaction) {
             array.add(record.toJson());
-        }*/
+        }
 
         return array.toJSONString();
     }

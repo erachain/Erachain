@@ -8,13 +8,15 @@ import core.account.Account;
 import core.transaction.Transaction;
 import database.DBMap;
 import database.serializer.TransactionSerializer;
-import org.mapdb.*;
+import org.mapdb.BTreeKeySerializer;
+import org.mapdb.BTreeMap;
+import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple2Comparator;
 import utils.ObserverMessage;
 import utils.ReverseComparator;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 // memory pool for unconfirmed transaction
@@ -58,7 +60,6 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 
     public TransactionMap(TransactionMap parent, DCSet dcSet) {
         super(parent, dcSet);
-
     }
 
     @Override
@@ -102,8 +103,8 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable().makeOrGet();
 
-        this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
-
+/*
+       this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
         Bind.secondaryKey(map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, byte[], Transaction>() {
             @Override
             public Tuple2<String, Long> run(byte[] key, Transaction val) {
@@ -113,7 +114,6 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
         });
 
         this.recipientKey = database.createTreeSet("recipient_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
-
         Bind.secondaryKeys(map, this.recipientKey,
                 new Fun.Function2<String[], byte[], Transaction>() {
                     @Override
@@ -131,9 +131,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
                     }
                 });
 
-
         this.typeKey = database.createTreeSet("address_type_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
-
         Bind.secondaryKeys(map, this.typeKey,
                 new Fun.Function2<Fun.Tuple3<String, Long, Integer>[], byte[], Transaction>() {
                     @Override
@@ -152,7 +150,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
                         return ret;
                     }
                 });
-
+*/
 
         return map;
     }
@@ -327,9 +325,9 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
         return values;
     }
 
-    public List<Transaction> getIncomedTransactions(String address, int type, int from, int count, boolean descending) {
+    public List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending) {
 
-        ArrayList<Transaction> values = new ArrayList<Transaction>();
+        ArrayList<Transaction> values = new ArrayList<>();
         Iterator<byte[]> iterator = this.getIterator(0, descending);
         Account account = new Account(address);
 
@@ -344,8 +342,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             if (recipients == null || recipients.isEmpty())
                 continue;
-
-            if (recipients.contains(account)) {
+            if (recipients.contains(account) && transaction.getTimestamp() >= timestamp) {
                 values.add(transaction);
                 i++;
                 if (count > 0 && i > count)
@@ -381,9 +378,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
                 }
 
             }
-
             values.add(transaction);
-
         }
         return values;
     }
@@ -464,7 +459,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
     }
     */
 
-
+    @Deprecated
     /**
      * Find all unconfirmed transaction by address, sender or recipient.
      * Need set only one parameter(address, sender,recipient)
@@ -479,8 +474,9 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
      * @return Key transactions
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
+
     public Iterable findTransactionsKeys(String address, String sender, String recipient,
-                                         int type, boolean desc, int offset, int limit) {
+                                         int type, boolean desc, int offset, int limit, long timestamp) {
         Iterable senderKeys = null;
         Iterable recipientKeys = null;
         TreeSet<Object> treeKeys = new TreeSet<>();
@@ -493,7 +489,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
         if (sender == null && recipient == null) {
             return treeKeys;
         }
-        Long timestamp = null;
+        //  timestamp = null;
         if (sender != null) {
             if (type > 0)
                 senderKeys = Fun.filter(this.typeKey, new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type));
@@ -536,6 +532,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
         return Iterables.limit(Iterables.skip(keys, offset), limit);
     }
 
+    @Deprecated()
     public List<Transaction> getUnconfirmedTransaction(Iterable keys) {
         Iterator iter = keys.iterator();
         List<Transaction> transactions = new ArrayList<>();
