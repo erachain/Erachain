@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.core.UriInfo;
 
+import core.transaction.*;
 import datachain.*;
 import ntp.NTP;
 import org.apache.commons.net.util.Base64;
@@ -56,23 +57,6 @@ import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
 import core.item.templates.TemplateCls;
 import core.payment.Payment;
-import core.transaction.ArbitraryTransaction;
-import core.transaction.BuyNameTransaction;
-import core.transaction.CancelOrderTransaction;
-import core.transaction.CancelSellNameTransaction;
-import core.transaction.CreateOrderTransaction;
-import core.transaction.CreatePollTransaction;
-import core.transaction.DeployATTransaction;
-import core.transaction.IssueAssetTransaction;
-import core.transaction.Issue_ItemRecord;
-import core.transaction.MultiPaymentTransaction;
-import core.transaction.R_SignNote;
-import core.transaction.RegisterNameTransaction;
-import core.transaction.SellNameTransaction;
-import core.transaction.Transaction;
-import core.transaction.TransactionAmount;
-import core.transaction.UpdateNameTransaction;
-import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
 import core.voting.PollOption;
 import gui.models.PeersTableModel;
@@ -2141,13 +2125,14 @@ public class BlockExplorer {
         return output;
     }
 
-    public LinkedHashMap Transactions_JSON(List<Transaction> transactions) {
-        return Transactions_JSON(transactions, 0, 0);
+    public LinkedHashMap Transactions_JSON(Account account, List<Transaction> transactions) {
+        return Transactions_JSON(account, transactions, 0, 0);
     }
 
-    public LinkedHashMap Transactions_JSON(List<Transaction> transactions, int fromIndex, int toIndex) {
+    public LinkedHashMap Transactions_JSON(Account account, List<Transaction> transactions, int fromIndex, int toIndex) {
 
         LinkedHashMap output = new LinkedHashMap();
+        // Creator or Recipient if ACCOUNT is SET
         int i1 = 0;
         LinkedHashMap transactionsJSON = new LinkedHashMap();
         List<Transaction> transactions2 = (toIndex == 0) ? transactions
@@ -2200,20 +2185,33 @@ public class BlockExplorer {
             // transactionJSON.put("reference",trans.getReference());
             transactionJSON.put("signature", Base58.encode(trans.getSignature()));
             transactionJSON.put("date", DateTimeFormat.timestamptoString(trans.getTimestamp()));
-            transactionJSON.put("creator", trans.viewCreator());
 
             if (trans.getCreator() == null) {
                 transactionJSON.put("creator_key", "-");
                 transactionJSON.put("creator_addr", "-");
             } else {
-                transactionJSON.put("pub_key", Base58.encode(trans.getCreator().getPublicKey()));
-                transactionJSON.put("creator_addr", trans.getCreator().getAddress());
-                if (trans.getCreator().getPerson() == null) {
+                Account atSideAccount;
+                atSideAccount = trans.getCreator();
+                if (account != null) {
+                    atSideAccount = trans.getCreator();
+                    if (trans.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                        R_Send rSend = (R_Send) trans;
+                        if (rSend.getCreator().equals(account)) {
+                            atSideAccount = rSend.getRecipient();
+                        }
+                    }
+                }
+
+                //transactionJSON.put("pub_key", Base58.encode(trans.getCreator().getPublicKey()));
+                transactionJSON.put("creator", atSideAccount.getPersonAsString());
+                transactionJSON.put("creator_addr", atSideAccount.getAddress());
+                if (atSideAccount.getPerson() == null) {
                     transactionJSON.put("creator_key", "+");
 
                 } else {
-                    transactionJSON.put("creator_key", trans.getCreator().getPerson().b.getKey());
+                    transactionJSON.put("creator_key", atSideAccount.getPerson().b.getKey());
                 }
+
             }
 
             transactionJSON.put("size", trans.viewSize(Transaction.FOR_NETWORK));
@@ -2252,6 +2250,7 @@ public class BlockExplorer {
         output.put("label_date", Lang.getInstance().translate_from_langObj("Date", langObj));
         output.put("label_type_transaction", Lang.getInstance().translate_from_langObj("Type", langObj));
         output.put("label_creator", Lang.getInstance().translate_from_langObj("Creator", langObj));
+        output.put("label_atside", Lang.getInstance().translate_from_langObj("Side", langObj));
         output.put("label_asset", Lang.getInstance().translate_from_langObj("Asset", langObj));
         output.put("label_amount", Lang.getInstance().translate_from_langObj("Amount", langObj));
         output.put("label_confirmations", Lang.getInstance().translate_from_langObj("Confirmations", langObj));
@@ -2810,7 +2809,7 @@ public class BlockExplorer {
 
 
         // Transactions view
-        output.put("Transactions", Transactions_JSON(tt, (transPage - 1) * 100, transPage * 100));
+        output.put("Transactions", Transactions_JSON(acc, tt, (transPage - 1) * 100, transPage * 100));
         output.put("pageCount", (int) Math.ceil((tt.size()) / 100d));
         output.put("pageNumber", transPage);
 
@@ -4152,7 +4151,7 @@ public class BlockExplorer {
         }
 
         // Transactions view
-        output.put("Transactions", Transactions_JSON(block.getTransactions(), (transPage - 1) * 100, transPage * 100));
+        output.put("Transactions", Transactions_JSON(null, block.getTransactions(), (transPage - 1) * 100, transPage * 100));
         output.put("pageCount", (int) Math.ceil((block.getTransactions().size()) / 100d));
         output.put("pageNumber", transPage);
 

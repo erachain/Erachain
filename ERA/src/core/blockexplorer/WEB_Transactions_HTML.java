@@ -1,6 +1,7 @@
 package core.blockexplorer;
 
 import controller.Controller;
+import core.account.Account;
 import core.crypto.Base58;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
@@ -43,7 +44,7 @@ public class WEB_Transactions_HTML {
         this.langObj = langObj;
         List<Transaction> tt = new ArrayList<Transaction>();
         tt.add(transaction);
-        LinkedHashMap json = BlockExplorer.getInstance().Transactions_JSON(tt);
+        LinkedHashMap json = BlockExplorer.getInstance().Transactions_JSON(null, tt);
         LinkedHashMap tras_json = (LinkedHashMap) ((LinkedHashMap) json.get("transactions")).get(0);
 
         String out = "<font size='+1'> <b>" + Lang.getInstance().translate_from_langObj("Transaction", langObj) + ": </b>" + tras_json.get("type");
