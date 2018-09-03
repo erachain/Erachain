@@ -3,6 +3,7 @@ package webserver;
 import api.ApiErrorFactory;
 import controller.Controller;
 import core.BlockChain;
+import core.BlockGenerator;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -24,6 +25,7 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
+import settings.Settings;
 import utils.APIUtils;
 import utils.Pair;
 import utils.StrJSonFine;
@@ -36,6 +38,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -129,6 +132,7 @@ public class API {
 
         help.put("*** TOOLS ***", "");
         help.put("POST Verify Signature for JSON {'message': ..., 'signature': Base58, 'publickey': Base58)", "verifysignature");
+        help.put("GET info by node", " GET api/info");
 
         help.put("POST Broadcast", "/broadcast JSON {raw=raw(BASE58)}");
         help.put("GET Broadcast", "/broadcast/{raw(BASE58)}");
@@ -1249,7 +1253,7 @@ public class API {
 
         JSONArray arraySell = new JSONArray();
         List<Order> orders = this.dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
-        for (Order order: orders) {
+        for (Order order : orders) {
             JSONArray itemJson = new JSONArray();
             itemJson.add(order.getAmountHaveLeft());
             itemJson.add(order.getPrice());
@@ -1260,7 +1264,7 @@ public class API {
 
         JSONArray arrayBuy = new JSONArray();
         orders = this.dcSet.getOrderMap().getOrdersForTradeWithFork(want, have, false);
-        for (Order order: orders) {
+        for (Order order : orders) {
             JSONArray itemJson = new JSONArray();
             itemJson.add(order.getAmountHaveLeft());
             itemJson.add(Order.calcPrice(order.getAmountWant(), order.getAmountHave())); // REVERSE
@@ -1506,7 +1510,7 @@ public class API {
             Long key = DCSet.getInstance().getIssuePersonMap().get(pkBytes);
             if (key == null || key == 0) {
                 throw ApiErrorFactory.getInstance().createError(
-                    Transaction.ITEM_PERSON_NOT_EXIST);
+                        Transaction.ITEM_PERSON_NOT_EXIST);
             }
 
             return Response.status(200)
@@ -1590,7 +1594,7 @@ public class API {
         PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
 
         Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
-      //Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
+        //Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
 
         if (personItem == null) {
             throw ApiErrorFactory.getInstance().createError(
@@ -1771,4 +1775,35 @@ public class API {
         }
     }
 
+    @GET
+    @Path("info")
+    public Response getInformation() throws NoSuchFieldException, IllegalAccessException {
+        JSONObject jsonObject = new JSONObject();
+
+        Controller controller = Controller.getInstance();
+
+
+        Object f = Controller.class.getDeclaredField("version");
+        ((Field) f).setAccessible(true);
+        String version = ((Field) f).get(Controller.getInstance()).toString();
+        ((Field) f).setAccessible(false);
+        jsonObject.put("version", version);
+
+        int lastBlock = (controller.getLastBlock()).getHeight();
+        jsonObject.put("lastBlock", lastBlock);
+        BlockGenerator.ForgingStatus forgingStatus = controller.getForgingStatus();
+        //jsonObject.put("forgingCodeStatus", forgingStatus.getStatuscode());
+
+        jsonObject.put("forgingStatus", forgingStatus.getName());
+
+        Settings setting = Settings.getInstance();
+        jsonObject.put("rpcEnable", setting.isRpcEnabled());
+        jsonObject.put("webEnable", setting.isWebEnabled());
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(jsonObject.toJSONString())
+                .build();
+    }
 }
