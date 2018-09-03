@@ -683,7 +683,12 @@ public abstract class Transaction {
     // calc FEE by recommended and feePOW
     public void calcFee() {
 
-        BigDecimal fee = new BigDecimal(calcBaseFee()).multiply(BlockChain.FEE_RATE).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, BigDecimal.ROUND_UP);
+        long fee_long = calcBaseFee();
+        if(this.height < BlockChain.VERS_4_11) {
+            // OLD version with x64
+            fee_long = (fee_long << 5) / 100;
+        }
+        BigDecimal fee = new BigDecimal(fee_long).multiply(BlockChain.FEE_RATE).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, BigDecimal.ROUND_UP);
 
         if (this.feePow > 0) {
             this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow(this.feePow)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, BigDecimal.ROUND_UP);
@@ -749,8 +754,13 @@ public abstract class Transaction {
 
     public int getBlockHeight() {
         //if (this.isConfirmed(db)) {
+
+        if (this.height > 0)
+            return this.height;
+
         if (this.block != null) {
-            return this.block.getHeight();
+            this.height = this.block.getHeight();
+            return this.height;
         }
         return -1;
     }
@@ -772,10 +782,15 @@ public abstract class Transaction {
         if (block != null)
             return block.getHeight();
 
+
         return dc.getBlockMap().size() + 1;
     }
 
     public int getSeqNo(DCSet db) {
+
+        if(this.seqNo > 0)
+            return this.seqNo;
+
         Block block = this.getBlock(db);
         if (block == null)
             return -1;
