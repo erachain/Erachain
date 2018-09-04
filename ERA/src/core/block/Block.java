@@ -73,7 +73,7 @@ public class Block {
     protected byte[] reference;
     protected BlockHead parentBlockHead;
     // MIND - that calculated on DB
-    protected final int heightBlock;
+    public final int heightBlock;
     //protected int creatorPreviousHeightBlock;
     protected int forgingValue;
     protected long winValue;
@@ -452,7 +452,7 @@ public class Block {
         //CHECK IF WE HAVE MINIMUM BLOCK LENGTH
         if (data.length < (useHeight <= 0? BASE_LENGTH + HEIGHT_LENGTH: BASE_LENGTH)
         ) {
-            throw new Exception("Data is less then minimum block length");
+            throw new Exception("Data is less then minimum block length - " + data.length + " useHeight:" + useHeight);
         }
 
         int position = 0;
@@ -478,10 +478,13 @@ public class Block {
         PublicKeyAccount generator = new PublicKeyAccount(generatorBytes);
         position += CREATOR_LENGTH;
 
-        if (useHeight <= 0) {
+        int height;
+        if (useHeight > 0) {
+            height = useHeight;
+        } else {
             //READ HEIGHT
             byte[] heightBytes = Arrays.copyOfRange(data, position, position + HEIGHT_LENGTH);
-            useHeight = Ints.fromByteArray(heightBytes);
+            height = Ints.fromByteArray(heightBytes);
             position += HEIGHT_LENGTH;
         }
 
@@ -509,10 +512,10 @@ public class Block {
 
             //long atFeesL = Longs.fromByteArray(atFees);
 
-            block = new Block(version, reference, generator, useHeight, transactionsHash, atBytes, signature); //, atFeesL);
+            block = new Block(version, reference, generator, height, transactionsHash, atBytes, signature); //, atFeesL);
         } else {
             // GENESIS BLOCK version = 0
-            block = new Block(version, reference, generator, useHeight, transactionsHash, new byte[0], signature);
+            block = new Block(version, reference, generator, height, transactionsHash, new byte[0], signature);
         }
 
         //if (forDB)
@@ -521,6 +524,9 @@ public class Block {
         //READ TRANSACTIONS COUNT
         byte[] transactionCountBytes = Arrays.copyOfRange(data, position, position + TRANSACTIONS_COUNT_LENGTH);
         int transactionCount = Ints.fromByteArray(transactionCountBytes);
+        if (transactionCount <0 || transactionCount > 20000) {
+            throw new Exception("Block parse - transactionCount error for useHeight[" + useHeight + "] with height:" + height);
+        }
         position += TRANSACTIONS_COUNT_LENGTH;
 
         //SET TRANSACTIONDATA
