@@ -481,6 +481,9 @@ public class Synchronizer {
                 throw new Exception(mess);
             }
 
+            // RECURSIVE CALL if new block is GENERATED
+            /////synchronize(dcSet, checkPointHeight, peer, peerHeight);
+
         } else {
 
             // GET THE BLOCKS FROM SIGNATURES
