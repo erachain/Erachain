@@ -1296,8 +1296,8 @@ public class Controller extends Observable {
                     LOGGER.debug(message.getSender().getAddress() + " getNextHeaders time: "
                             + (System.currentTimeMillis() - time1) + " for headers: " + headers.size()
                             + " from Height: " + (headers.isEmpty() ? "-1"
-                            : this.blockChain.getBlock(dcSet, headers.get(0)) == null ? "CHECK"
-                            : this.blockChain.getBlock(dcSet, headers.get(0)).getHeight()));
+                            : this.dcSet.getBlockSignsMap().get(headers.get(0)) == null ? "CHECK"
+                            : this.dcSet.getBlockSignsMap().get(headers.get(0))));
 
                     /*
                      * LOGGER.error(message.getId() +

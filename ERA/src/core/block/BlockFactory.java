@@ -30,7 +30,7 @@ public class BlockFactory {
 
         if (version == 0) {
             //PARSE GENESIS BLOCK
-            return GenesisBlock.parse(data, 1);
+            return GenesisBlock.parse(data, height);
         } else {
             //PARSE BLOCK
             return Block.parse(data, height);

@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 public class BlockMessage extends Message {
 
-    private static final int HEIGHT_LENGTH = 4;
+    private static final int HEIGHT_LENGTH = Block.HEIGHT_LENGTH;
 
     private Block block;
     private int height;
@@ -20,6 +20,7 @@ public class BlockMessage extends Message {
         super(BLOCK_TYPE);
 
         this.block = block;
+        this.height = block.heightBlock;
     }
 
     public static BlockMessage parse(byte[] data) throws Exception {
@@ -27,7 +28,7 @@ public class BlockMessage extends Message {
         // TEST DATA LEN
         if (data.length == 0) {
             BlockMessage message = new BlockMessage(null);
-            message.height = -1;
+            //message.height = -1;
             return message;
         }
 
@@ -37,12 +38,12 @@ public class BlockMessage extends Message {
 
         //PARSE BLOCK
         //Block block = Block.parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1), false);
-        Block block = BlockFactory.getInstance().parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1), height);
+        Block block = BlockFactory.getInstance().parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length ), height);
         //block.getGeneratingBalance(dbSet);
 
         //CREATE MESSAGE
         BlockMessage message = new BlockMessage(block);
-        message.height = height;
+        //message.height = height;
         return message;
     }
 
