@@ -61,6 +61,9 @@ import utils.StrJSonFine;
 //import .BlockMap;
 
 public class Wallet extends Observable implements Observer {
+
+	static final boolean CHECK_CHAIN_BROKENS_ON_SYNC_WALLET = false;
+
 	public static final int STATUS_UNLOCKED = 1;
 	public static final int STATUS_LOCKED = 0;
 
@@ -515,7 +518,7 @@ public class Wallet extends Observable implements Observer {
 		DCSet dcSet = DCSet.getInstance();
 
 		///////////////////////////////////// IS CHAIN VALID
-		if (true) {
+		if (CHECK_CHAIN_BROKENS_ON_SYNC_WALLET) {
 			LOGGER.info("TEST CHAIN .... ");
 			for (int i = 1; i <= dcSet.getBlockMap().size(); i++) {
 				Block block = dcSet.getBlockMap().get(i);
