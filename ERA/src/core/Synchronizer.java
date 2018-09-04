@@ -574,9 +574,8 @@ public class Synchronizer {
             if (headers.size() == 0) {
                 String mess = "Peer is SAME as me";
                 cnt.resetWeightOfPeer(peer);
-                return new Tuple2<byte[], List<byte[]>>(null, headers);
-                //peer.ban(0, mess);
-                //throw new Exception(mess);
+                peer.ban(0, mess);
+                throw new Exception(mess);
             }
 
             // null - not ned orphan my CHAIN
