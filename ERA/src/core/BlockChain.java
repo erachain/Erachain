@@ -733,13 +733,13 @@ public class BlockChain {
             //BlocksHeads_2Map map = dcSet.getBlockHeightsMap();
             BlocksHeadsMap map = dcSet.getBlocksHeadsMap();
             int counter = 0;
-            while (parentSignature != null && counter++ < packet) {
+            do {
                 headers.add(parentSignature);
                 if (map.contains(++height))
-                    parentSignature = map.get(height).reference;
+                    parentSignature = map.get(height).signature;
                 else
-                    parentSignature = null;
-            }
+                    break;
+            } while (parentSignature != null && counter++ < packet);
             //LOGGER.debug("get size " + counter);
         } else if (Arrays.equals(parentSignature, this.CHECKPOINT.b)) {
             headers.add(parentSignature);

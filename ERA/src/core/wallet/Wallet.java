@@ -515,9 +515,9 @@ public class Wallet extends Observable implements Observer {
 		DCSet dcSet = DCSet.getInstance();
 
 		///////////////////////////////////// IS CHAIN VALID
-		if (false) {
+		if (true) {
 			LOGGER.info("TEST CHAIN .... ");
-			for (int i = 2; i <= dcSet.getBlockMap().size(); i++) {
+			for (int i = 1; i <= dcSet.getBlockMap().size(); i++) {
 				Block block = dcSet.getBlockMap().get(i);
 				if (block.getHeight() != i) {
 					Long error = null;
@@ -532,20 +532,29 @@ public class Wallet extends Observable implements Observer {
 					Long error = null;
 					++error;
 				}
-				byte[] reference = block.getReference();
-				Block parent = dcSet.getBlockSignsMap().getBlock(reference);
-				if (parent == null) {
+				if (i > 1) {
+					byte[] reference = block.getReference();
+					Block parent = dcSet.getBlockSignsMap().getBlock(reference);
+					if (parent == null) {
+						Long error = null;
+						++error;
+					}
+					if (parent.getHeight() != i - 1) {
+						Long error = null;
+						++error;
+					}
+					parent = dcSet.getBlockMap().get(i - 1);
+					if (!Arrays.equals(parent.getSignature(), reference)) {
+						Long error = null;
+						++error;
+					}
+				}
+				byte[] signature = block.getSignature();
+				int signHeight = dcSet.getBlockSignsMap().get(signature);
+				if (signHeight != i) {
 					Long error = null;
 					++error;
 				}
-				if (parent.getHeight() != i - 1) {
-					Long error = null;
-					++error;
-				}
-				//if (parent.getHeightByParent(dcSet) != i - 1) {
-				//	Long error = null;
-				//	++error;
-				//}
 			}
 		}
 

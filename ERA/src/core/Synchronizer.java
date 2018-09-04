@@ -377,6 +377,8 @@ public class Synchronizer {
 
         if (lastCommonBlockSignature == null) {
             // simple ACCEPT tail CHAIN - MY LAST block founded in PEER
+            if (signatures == null || signatures.isEmpty())
+                return;
 
             // CREATE BLOCK BUFFER
             LOGGER.debug(
@@ -479,6 +481,9 @@ public class Synchronizer {
                 throw new Exception(mess);
             }
 
+            // RECURSIVE CALL if new block is GENERATED
+            /////synchronize(dcSet, checkPointHeight, peer, peerHeight);
+
         } else {
 
             // GET THE BLOCKS FROM SIGNATURES
@@ -512,7 +517,6 @@ public class Synchronizer {
             }
         }
 
-        fromPeer = null;
     }
 
     private List<byte[]> getBlockSignatures(byte[] header, Peer peer) throws Exception {
@@ -570,8 +574,9 @@ public class Synchronizer {
             if (headers.size() == 0) {
                 String mess = "Peer is SAME as me";
                 cnt.resetWeightOfPeer(peer);
-                peer.ban(BAN_BLOCK_TIMES >> 3, mess);
-                throw new Exception(mess);
+                return new Tuple2<byte[], List<byte[]>>(null, headers);
+                //peer.ban(0, mess);
+                //throw new Exception(mess);
             }
 
             // null - not ned orphan my CHAIN
