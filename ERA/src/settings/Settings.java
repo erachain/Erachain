@@ -862,6 +862,19 @@ public class Settings {
 
     }
 
+    public String cutPath(String path) {
+
+        //if (!(this.userPath.endsWith("\\")
+        if (path.endsWith("/")) {
+            path.substring(0, path.length() - 1);
+            path += File.separator;
+        }
+
+        return path;
+
+
+    }
+
     public JSONObject read_setting_JSON() {
         int alreadyPassed = 0;
         File file = new File(this.userPath + "settings.json");
@@ -902,21 +915,17 @@ public class Settings {
 
                 if (this.settingsJSON.containsKey("userpath")) {
                     this.userPath = (String) this.settingsJSON.get("userpath");
-
-                    if (!(this.userPath.endsWith("\\") || this.userPath.endsWith("/") || this.getBackUpPath.endsWith(File.separator))) {
-                        this.userPath += File.separator;
-                    }
                 } else {
                     alreadyPassed++;
                 }
 
-// read BackUb Path		
+                // read BackUb Path
                 if (this.settingsJSON.containsKey("backuppath")) {
                     this.getBackUpPath = (String) this.settingsJSON.get("backuppath");
 
 
                     try {
-                        if (!(this.getBackUpPath.endsWith("\\") || this.getBackUpPath.endsWith("/") || this.getBackUpPath.endsWith(File.separator))) {
+                        if ( false && !(this.getBackUpPath.endsWith("\\") || this.getBackUpPath.endsWith("/") || this.getBackUpPath.endsWith(File.separator))) {
                             this.getBackUpPath += File.separator;
                         }
                     } catch (Exception e) {
@@ -932,14 +941,6 @@ public class Settings {
                 if (this.settingsJSON.containsKey("walletdir")) {
                     this.getWalletPath = (String) this.settingsJSON.get("walletdir");
 
-                    try {
-                        if (!(this.getWalletPath.endsWith("\\") || this.getWalletPath.endsWith("/") || this.getWalletPath.endsWith(File.separator))) {
-                            this.getWalletPath += File.separator;
-                        }
-                    } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        this.getWalletPath = "";
-                    }
                 } else {
                     this.getWalletPath = "";
                 }
@@ -949,7 +950,7 @@ public class Settings {
                     this.dataPath = (String) this.settingsJSON.get("datadir");
 
                     try {
-                        if (!(this.dataPath.endsWith("\\") || this.dataPath.endsWith("/") || this.dataPath.endsWith(File.separator))) {
+                        if ( false && !(this.dataPath.endsWith("\\") || this.dataPath.endsWith("/") || this.dataPath.endsWith(File.separator))) {
                             this.dataPath += File.separator;
                         }
                     } catch (Exception e) {
