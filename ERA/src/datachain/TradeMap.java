@@ -242,9 +242,9 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
     @SuppressWarnings("unchecked")
     public SortableList<Tuple2<Long, Long>, Trade> getTrades(Long orderID) {
         //ADD REVERSE KEYS
-        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.reverseKeyMap).subMap(
-                Fun.t3(orderID, null, null),
-                Fun.t3(orderID, Fun.HI(), Fun.HI())).values();
+        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.reverseKeyMap).subMap(
+                Fun.t2(orderID, null),
+                Fun.t2(orderID, Fun.HI())).values();
 
         //RETURN
         return new SortableList<Tuple2<Long, Long>, Trade>(this, keys);
@@ -253,14 +253,13 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
     @SuppressWarnings("unchecked")
     public SortableList<Tuple2<Long, Long>, Trade> getTradesByOrderID(Long orderID) {
         //ADD REVERSE KEYS
-        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.reverseKeyMap).subMap(
-                Fun.t3(orderID, null, null),
-                Fun.t3(orderID, Fun.HI(), Fun.HI())).values();
+        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.reverseKeyMap).subMap(
+                Fun.t2(orderID, null),
+                Fun.t2(orderID, Fun.HI())).values();
 
         //RETURN
         return new SortableList<Tuple2<Long, Long>, Trade>(this, keys);
     }
-
 
     @SuppressWarnings("unchecked")
     public List<Trade> getTrades(long haveWant)

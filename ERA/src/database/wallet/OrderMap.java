@@ -5,6 +5,7 @@ import core.item.assets.Order;
 import database.DBMap;
 import database.serializer.OrderSerializer;
 import datachain.DCMap;
+import datachain.DCSet;
 import datachain.IDB;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
@@ -130,6 +131,28 @@ public class OrderMap extends DCMap<Tuple2<String, Long>, Order> {
             for (Order order : orders.get(account)) {
                 this.add(order);
             }
+        }
+    }
+
+    // UPDATE FULFILL if was WALLET SYNCHRONIZATION
+    public void updateLefts() {
+
+        DCSet dcSet = DCSet.getInstance();
+        Order order;
+        Order orderFromChain;
+        for (Tuple2<String, Long> key: map.keySet()) {
+            order = map.get(key);
+            if (dcSet.getOrderMap().contains(key.b))
+                // ACTIVE
+                orderFromChain = dcSet.getOrderMap().get(key.b);
+            else
+                // CANCELED TOO
+                orderFromChain = dcSet.getCompletedOrderMap().get(key.b);
+
+            if (orderFromChain.getFulfilledHave().compareTo(order.getFulfilledHave()) == 0)
+                continue;
+
+            this.set(key, orderFromChain);
         }
     }
 }

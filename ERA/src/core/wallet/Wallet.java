@@ -666,9 +666,12 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		// RESET UNCONFIRMED BALANCE for accounts + assets
-		LOGGER.debug("Resetted balances");
+		LOGGER.info("Resetted balances");
 		update_account_assets();
 		Controller.getInstance().walletSyncStatusUpdate(0);
+
+        LOGGER.info("Update Orders");
+        this.database.getOrderMap().updateLefts();
 
 		/// ic Controller.getInstance().walletSyncStatusUpdate(-1);
 		//// Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
@@ -1187,7 +1190,8 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		long tickets = System.currentTimeMillis() - start;
-		LOGGER.info("WALLET [" + blockHead.heightBlock + "] processing time: " + tickets * 0.001
+		if (blockHead.transactionsCount > 0)
+		    LOGGER.debug("WALLET [" + blockHead.heightBlock + "] processing time: " + tickets * 0.001
 				+ " for records:" + blockHead.transactionsCount + " millsec/record:"
 				+ tickets / (blockHead.transactionsCount + 1));
 
@@ -1687,8 +1691,11 @@ public class Wallet extends Observable implements Observer {
 			// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCreation.getCreator().getAddress())) {
 			// DELETE ORDER
-			this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCreation.getCreator().getAddress(),
-					Transaction.makeDBRef(orderCreation.getHeightSeqNo())));
+			if (false) {
+				// order STATUS is ORPHANED
+				this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCreation.getCreator().getAddress(),
+						Transaction.makeDBRef(orderCreation.getHeightSeqNo())));
+			}
 		}
 	}
 
@@ -1703,9 +1710,11 @@ public class Wallet extends Observable implements Observer {
 
 		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
-			// DELETE ORDER
-			this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCancel.getCreator().getAddress(),
-					Transaction.makeDBRef(orderCancel.getHeightSeqNo())));
+			if (false) {
+				// DELETE ORDER
+				this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCancel.getCreator().getAddress(),
+						Transaction.makeDBRef(orderCancel.getHeightSeqNo())));
+			}
 		}
 	}
 
@@ -1720,9 +1729,11 @@ public class Wallet extends Observable implements Observer {
 
 		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
-			// DELETE ORDER
-			Order order = DCSet.getInstance().getOrderMap().get(orderCancel.getOrderID());
-			this.database.getOrderMap().add(order);
+			if (false) {
+				// DELETE ORDER
+				Order order = DCSet.getInstance().getOrderMap().get(orderCancel.getOrderID());
+				this.database.getOrderMap().add(order);
+			}
 		}
 	}
 
