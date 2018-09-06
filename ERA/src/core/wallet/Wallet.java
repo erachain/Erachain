@@ -11,6 +11,7 @@ import javax.swing.JFileChooser;
 import core.item.assets.Order;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
@@ -78,6 +79,7 @@ public class Wallet extends Observable implements Observer {
 	private int secondsToUnlock = -1;
 	private Timer lockTimer = new Timer();
 	private int syncHeight;
+	private boolean onSync = false;
 
 	// CONSTRUCTORS
 
@@ -492,6 +494,11 @@ public class Wallet extends Observable implements Observer {
 
 	// SYNCRHONIZE
 
+	private void updateOrderLefts() {
+		this.database.getOrderMap().updateLefts();
+	}
+
+
 	// UPDATE all accounts for all assets unconfirmed balance
 	public void update_account_assets() {
 		List<Tuple2<Account, Long>> accounts_assets = this.getAccountsAssets();
@@ -511,174 +518,181 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
-		// here ICREATOR
-		Controller.getInstance().setNeedSyncWallet(false);
-		Controller.getInstance().setProcessingWalletSynchronize(true);
-
-		DCSet dcSet = DCSet.getInstance();
-
-		///////////////////////////////////// IS CHAIN VALID
-		if (CHECK_CHAIN_BROKENS_ON_SYNC_WALLET) {
-			LOGGER.info("TEST CHAIN .... ");
-			for (int i = 1; i <= dcSet.getBlockMap().size(); i++) {
-				Block block = dcSet.getBlockMap().get(i);
-				if (block.getHeight() != i) {
-					Long error = null;
-					++error;
-				}
-				if (block.blockHead.heightBlock != i) {
-					Long error = null;
-					++error;
-				}
-				Block.BlockHead head = dcSet.getBlocksHeadsMap().get(i);
-				if (head.heightBlock != i) {
-					Long error = null;
-					++error;
-				}
-				if (i > 1) {
-					byte[] reference = block.getReference();
-					Block parent = dcSet.getBlockSignsMap().getBlock(reference);
-					if (parent == null) {
-						Long error = null;
-						++error;
-					}
-					if (parent.getHeight() != i - 1) {
-						Long error = null;
-						++error;
-					}
-					parent = dcSet.getBlockMap().get(i - 1);
-					if (!Arrays.equals(parent.getSignature(), reference)) {
-						Long error = null;
-						++error;
-					}
-				}
-				byte[] signature = block.getSignature();
-				int signHeight = dcSet.getBlockSignsMap().get(signature);
-				if (signHeight != i) {
-					Long error = null;
-					++error;
-				}
-			}
-		}
-
-		Block block;
-		int height;
-
-		LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet...");
-
-		if (reset) {
-			LOGGER.info("   >>>>   Resetted maps");
-
-			// RESET MAPS
-			this.database.getTransactionMap().reset();
-			this.database.getBlocksHeadMap().reset();
-			this.database.getNameMap().reset();
-			this.database.getNameSaleMap().reset();
-			this.database.getPollMap().reset();
-			this.database.getAssetMap().reset();
-			this.database.getImprintMap().reset();
-			this.database.getTemplateMap().reset();
-			this.database.getPersonMap().reset();
-			this.database.getStatusMap().reset();
-			this.database.getUnionMap().reset();
-			this.database.getOrderMap().reset();
-
-			// REPROCESS BLOCKS
-			block = new GenesisBlock();
-			this.database.setLastBlockSignature(block.getReference());
-			height = 1;
-		} else {
-			byte[] lastSignature = this.database.getLastBlockSignature();
-			if (lastSignature == null) {
-				synchronize(true);
-				return;
-			}
-			block = dcSet.getBlockSignsMap().getBlock(this.database.getLastBlockSignature());
-			if (block == null) {
-				synchronize(true);
-				return;
-			}
-			block = block.getChild(dcSet);
-			if (block == null) {
-				Controller.getInstance().setProcessingWalletSynchronize(false);
-				this.database.commit();
-				// icreator this.syncHeight = -1;
-				this.syncHeight = -1;
-				Controller.getInstance().walletSyncStatusUpdate(0);
-				return;
-			}
-
-			height = block.getHeight();
-		}
-
-		int stepHeight = BlockChain.BLOCKS_PER_DAY;
-
+		this.onSync = true;
 		try {
-			this.syncHeight = height;
-			do {
-				int maxHeight = Controller.getInstance().getMyHeight();
-				if (maxHeight < stepHeight)
-					stepHeight = maxHeight;
-				stepHeight /= 100;
-				if (stepHeight < 10)
-					stepHeight = 3;
-				else if (stepHeight > BlockChain.BLOCKS_PER_DAY)
-					stepHeight = BlockChain.BLOCKS_PER_DAY;
+			// here ICREATOR
+			Controller.getInstance().setNeedSyncWallet(false);
+			Controller.getInstance().setProcessingWalletSynchronize(true);
 
-				// UPDATE
-				// this.update(this, new
-				// ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE,
-				// block));
-				Block.BlockHead blockHead = dcSet.getBlocksHeadsMap().get(height);
+			DCSet dcSet = DCSet.getInstance();
 
-				this.processBlock(blockHead);
+			///////////////////////////////////// IS CHAIN VALID
+			if (CHECK_CHAIN_BROKENS_ON_SYNC_WALLET) {
+				LOGGER.info("TEST CHAIN .... ");
+				for (int i = 1; i <= dcSet.getBlockMap().size(); i++) {
+					Block block = dcSet.getBlockMap().get(i);
+					if (block.getHeight() != i) {
+						Long error = null;
+						++error;
+					}
+					if (block.blockHead.heightBlock != i) {
+						Long error = null;
+						++error;
+					}
+					Block.BlockHead head = dcSet.getBlocksHeadsMap().get(i);
+					if (head.heightBlock != i) {
+						Long error = null;
+						++error;
+					}
+					if (i > 1) {
+						byte[] reference = block.getReference();
+						Block parent = dcSet.getBlockSignsMap().getBlock(reference);
+						if (parent == null) {
+							Long error = null;
+							++error;
+						}
+						if (parent.getHeight() != i - 1) {
+							Long error = null;
+							++error;
+						}
+						parent = dcSet.getBlockMap().get(i - 1);
+						if (!Arrays.equals(parent.getSignature(), reference)) {
+							Long error = null;
+							++error;
+						}
+					}
+					byte[] signature = block.getSignature();
+					int signHeight = dcSet.getBlockSignsMap().get(signature);
+					if (signHeight != i) {
+						Long error = null;
+						++error;
+					}
+				}
+			}
 
-				if (height % (stepHeight) == 0) {
-					this.syncHeight = height;
+			Block block;
+			int height;
 
-					Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
+			LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet...");
 
-					// LOGGER.info("Synchronize wallet: " + this.syncHeight);
+			if (reset) {
+				LOGGER.info("   >>>>   Resetted maps");
+
+				// RESET MAPS
+				this.database.getTransactionMap().reset();
+				this.database.getBlocksHeadMap().reset();
+				this.database.getNameMap().reset();
+				this.database.getNameSaleMap().reset();
+				this.database.getPollMap().reset();
+				this.database.getAssetMap().reset();
+				this.database.getImprintMap().reset();
+				this.database.getTemplateMap().reset();
+				this.database.getPersonMap().reset();
+				this.database.getStatusMap().reset();
+				this.database.getUnionMap().reset();
+				this.database.getOrderMap().reset();
+
+				// REPROCESS BLOCKS
+				block = new GenesisBlock();
+				this.database.setLastBlockSignature(block.getReference());
+				height = 1;
+			} else {
+				byte[] lastSignature = this.database.getLastBlockSignature();
+				if (lastSignature == null) {
+					synchronize(true);
+					return;
+				}
+				block = dcSet.getBlockSignsMap().getBlock(this.database.getLastBlockSignature());
+				if (block == null) {
+					synchronize(true);
+					return;
+				}
+				block = block.getChild(dcSet);
+				if (block == null) {
+					Controller.getInstance().setProcessingWalletSynchronize(false);
 					this.database.commit();
+					// icreator this.syncHeight = -1;
+					this.syncHeight = -1;
+					Controller.getInstance().walletSyncStatusUpdate(0);
+					return;
 				}
 
-				// LOAD NEXT
+				height = block.getHeight();
+			}
+
+			int stepHeight = BlockChain.BLOCKS_PER_DAY;
+
+			try {
+				this.syncHeight = height;
+				do {
+					int maxHeight = Controller.getInstance().getMyHeight();
+					if (maxHeight < stepHeight)
+						stepHeight = maxHeight;
+					stepHeight /= 100;
+					if (stepHeight < 10)
+						stepHeight = 3;
+					else if (stepHeight > BlockChain.BLOCKS_PER_DAY)
+						stepHeight = BlockChain.BLOCKS_PER_DAY;
+
+					// UPDATE
+					// this.update(this, new
+					// ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE,
+					// block));
+					Block.BlockHead blockHead = dcSet.getBlocksHeadsMap().get(height);
+
+					this.processBlock(blockHead);
+
+					if (height % (stepHeight) == 0) {
+						this.syncHeight = height;
+
+						Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
+
+						// LOGGER.info("Synchronize wallet: " + this.syncHeight);
+						this.database.commit();
+					}
+
+					// LOAD NEXT
+					if (Controller.getInstance().isOnStopping())
+						return;
+
+					height++;
+					block = dcSet.getBlockMap().get(height);
+
+				} while (block != null);
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage(), e);
+
+			} finally {
+
 				if (Controller.getInstance().isOnStopping())
 					return;
 
-				height++;
-				block = dcSet.getBlockMap().get(height);
+				Controller.getInstance().setProcessingWalletSynchronize(false);
+				this.database.commit();
+				// icreator this.syncHeight = -1;
+				this.syncHeight = height;
+				Controller.getInstance().walletSyncStatusUpdate(height);
+			}
 
-			} while (block != null);
-		} catch (Exception e) {
-			LOGGER.error(e.getMessage(), e);
+			// RESET UNCONFIRMED BALANCE for accounts + assets
+			LOGGER.debug("Resetted balances");
+			update_account_assets();
+			Controller.getInstance().walletSyncStatusUpdate(0);
 
+			/// ic Controller.getInstance().walletSyncStatusUpdate(-1);
+			//// Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
+
+			// NOW IF NOT SYNCHRONIZED SET STATUS
+			// CHECK IF WE ARE UPTODATE
+			if (false && !Controller.getInstance().checkStatus(0)) {
+				// NOTIFY
+				Controller.getInstance().notifyObservers(
+						new ObserverMessage(ObserverMessage.NETWORK_STATUS, Controller.STATUS_SYNCHRONIZING));
+			}
 		} finally {
 
-			if (Controller.getInstance().isOnStopping())
-				return;
-
-			Controller.getInstance().setProcessingWalletSynchronize(false);
-			this.database.commit();
-			// icreator this.syncHeight = -1;
-			this.syncHeight = height;
-			Controller.getInstance().walletSyncStatusUpdate(height);
-		}
-
-		// RESET UNCONFIRMED BALANCE for accounts + assets
-		LOGGER.debug("Resetted balances");
-		update_account_assets();
-		Controller.getInstance().walletSyncStatusUpdate(0);
-
-		/// ic Controller.getInstance().walletSyncStatusUpdate(-1);
-		//// Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
-
-		// NOW IF NOT SYNCHRONIZED SET STATUS
-		// CHECK IF WE ARE UPTODATE
-		if (false && !Controller.getInstance().checkStatus(0)) {
-			// NOTIFY
-			Controller.getInstance().notifyObservers(
-					new ObserverMessage(ObserverMessage.NETWORK_STATUS, Controller.STATUS_SYNCHRONIZING));
+			updateOrderLefts();
+			this.onSync = false;
 		}
 
 	}
@@ -1651,7 +1665,8 @@ public class Wallet extends Observable implements Observer {
 
 	private void processOrderCreation(CreateOrderTransaction orderCreation) {
 		// CHECK IF WALLET IS OPEN
-		if (!this.exists()) {
+		if (!this.onSync // in general by Order Maps in CHAIN events
+				|| !this.exists()) {
 			return;
 		}
 
@@ -1668,6 +1683,14 @@ public class Wallet extends Observable implements Observer {
 
 			// ADD ORDER
 			Order orderNew = orderCreation.makeOrder();
+
+			if (DCSet.getInstance().getOrderMap().contains(orderNew.getId()))
+				orderNew.setStatus(Order.ACTIVE);
+			else if (DCSet.getInstance().getCompletedOrderMap().contains(orderNew.getId()))
+				orderNew.setStatus(Order.COMPLETED);
+			else
+				orderNew.setStatus(Order.CANCELED);
+
 			this.database.getOrderMap().add(orderNew);
 
 			// TRADES for TARGETs
@@ -1677,52 +1700,70 @@ public class Wallet extends Observable implements Observer {
 
 	private void orphanOrderCreation(CreateOrderTransaction orderCreation) {
 		// CHECK IF WALLET IS OPEN
-		if (!this.exists()) {
+		if (!this.onSync // in general by Order Maps in CHAIN events
+				|| !this.exists()) {
 			return;
 		}
 
-		if(orderCreation.getOrderId() == null)
+		Long orderID = orderCreation.getOrderId();
+		if(orderID == null)
 			return;
 
-			// CHECK IF WE ARE CREATOR
+		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCreation.getCreator().getAddress())) {
+
+			Tuple2<String, Long> key = new Tuple2<String, Long>(
+					orderCreation.getCreator().getAddress(), orderID);
 			// DELETE ORDER
-			this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCreation.getCreator().getAddress(),
-					Transaction.makeDBRef(orderCreation.getHeightSeqNo())));
+			Order order = this.database.getOrderMap().get(key);
+			order.setStatus(Order.ORPHANED);
+			this.database.getOrderMap().set(key, order);
 		}
 	}
 
 	private void processOrderCancel(CancelOrderTransaction orderCancel) {
 		// CHECK IF WALLET IS OPEN
-		if (!this.exists()) {
+		if (!this.onSync // in general by Order Maps in CHAIN events
+				|| !this.exists()) {
 			return;
 		}
 
-		if (orderCancel.getOrderID() == null)
+		Long orderID = orderCancel.getOrderID();
+		if (orderID == null)
 			return;
 
 		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
+			Tuple2<String, Long> key = new Tuple2<>(orderCancel.getCreator().getAddress(), orderID);
 			// DELETE ORDER
-			this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCancel.getCreator().getAddress(),
-					Transaction.makeDBRef(orderCancel.getHeightSeqNo())));
+			Order order = this.database.getOrderMap().get(key);
+			if (order == null)
+				return;
+
+			order.setStatus(Order.CANCELED);
+			this.database.getOrderMap().set(key, order);
+
 		}
 	}
 
 	private void orphanOrderCancel(CancelOrderTransaction orderCancel) {
 		// CHECK IF WALLET IS OPEN
-		if (!this.exists()) {
+		if (!this.onSync // in general by Order Maps in CHAIN events
+				|| !this.exists()) {
 			return;
 		}
 
-		if (orderCancel.getOrderID() == null)
+		Long orderID = orderCancel.getOrderID();
+		if (orderID == null)
 			return;
 
 		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
+			Tuple2<String, Long> key = new Tuple2<>(orderCancel.getCreator().getAddress(), orderID);
 			// DELETE ORDER
-			Order order = DCSet.getInstance().getOrderMap().get(orderCancel.getOrderID());
-			this.database.getOrderMap().add(order);
+			Order order = this.database.getOrderMap().get(key);
+			order.setStatus(Order.ACTIVE);
+			this.database.getOrderMap().set(key, order);
 		}
 	}
 
@@ -1736,7 +1777,8 @@ public class Wallet extends Observable implements Observer {
 
 			return;
 
-		if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE)// .WALLET_ADD_BLOCK_TYPE)
+		int type = message.getType();
+		if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE)// .WALLET_ADD_BLOCK_TYPE)
 		{
 			Block.BlockHead block =	(Block.BlockHead) message.getValue();
 
@@ -1750,7 +1792,7 @@ public class Wallet extends Observable implements Observer {
 			// CHECK BLOCK
 			this.processBlock(block);
 
-		} else if (message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
+		} else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
 		{
 			Block.BlockHead block = (Block.BlockHead) message.getValue();
 
@@ -1764,9 +1806,9 @@ public class Wallet extends Observable implements Observer {
 			// CHECK BLOCK
 			this.orphanBlock(block);
 
-		} else if (false && message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
+		} else if (false && type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
 			;
-		} else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE)
+		} else if (type == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE)
 		{
 			Pair<byte[], Transaction> value = (Pair<byte[], Transaction>) message.getValue();
 			Transaction transaction = value.getB();
@@ -1803,10 +1845,9 @@ public class Wallet extends Observable implements Observer {
 			else if (transaction instanceof CreateOrderTransaction) {
 				this.processOrderCreation((CreateOrderTransaction) transaction);
 			}
-		} else if (false && message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
+		} else if (false && type == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
 			;
-		} else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE)
-		{
+		} else if (type == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
 			Transaction transaction = (Transaction) message.getValue();
 
 			transaction.setDC(DCSet.getInstance());
@@ -1840,21 +1881,47 @@ public class Wallet extends Observable implements Observer {
 			else if (transaction instanceof CreateOrderTransaction) {
 				this.orphanOrderCreation((CreateOrderTransaction) transaction);
 			}
+		} else if (type == ObserverMessage.ADD_ORDER_TYPE) {
+			Order order = (Order) message.getValue();
+			///if (DCSet.getInstance().getOrderMap().contains(order.getId()))
+			order.setStatus(Order.ACTIVE);
+				order.setStatus(Order.UNCONFIRMED);
+
+			this.database.getOrderMap().add(order);
+
+		} else if (type == ObserverMessage.REMOVE_ORDER_TYPE) {
+			Order order = (Order) message.getValue();
+			order.setStatus(Order.UNCONFIRMED);
+
+			this.database.getOrderMap().add(order);
+
+		} else if (type == ObserverMessage.ADD_COMPL_ORDER_TYPE) {
+			Order order = (Order) message.getValue();
+			order.setStatus(Order.COMPLETED);
+
+			this.database.getOrderMap().add(order);
+
+		} else if (type == ObserverMessage.ADD_CANC_ORDER_TYPE) {
+			Order order = (Order) message.getValue();
+			order.setStatus(Order.CANCELED);
+
+			this.database.getOrderMap().add(order);
+
 		}
 		/*
-		 * else if (message.getType() == ObserverMessage.ADD_AT_TX_TYPE)
+		 * else if (type == ObserverMessage.ADD_AT_TX_TYPE)
 		 * //.WALLET_ADD_AT_TX_TYPE) { this.processATTransaction(
 		 * (Tuple2<Tuple2<Integer, Integer>, AT_Transaction>) message.getValue()
 		 * ); }
 		 * 
-		 * else if (message.getType() ==
+		 * else if (type ==
 		 * ObserverMessage.REMOVE_AT_TX)//.WALLET_REMOVE_AT_TX) {
 		 * this.orphanATTransaction( (Tuple2<Tuple2<Integer, Integer>,
 		 * AT_Transaction>) message.getValue() ); }
 		 * 
-		 * //ADD ORDER else if(message.getType() ==
+		 * //ADD ORDER else if(type ==
 		 * ObserverMessage.ADD_ORDER_TYPE //.WALLET_ADD_ORDER_TYPE ||
-		 * message.getType() == ObserverMessage.REMOVE_ORDER_TYPE)
+		 * type == ObserverMessage.REMOVE_ORDER_TYPE)
 		 * //.WALLET_REMOVE_ORDER_TYPE) { this.addOrder((Order)
 		 * message.getValue()); }
 		 */

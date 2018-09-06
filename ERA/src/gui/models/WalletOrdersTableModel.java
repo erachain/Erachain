@@ -133,22 +133,21 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
 
             case COLUMN_STATUS:
 
-                if (order.getAmountHave().compareTo(order.getFulfilledHave()) == 0) {
-                    return "DONE";
-                } else {
-
-                    if (DCSet.getInstance().getCompletedOrderMap().contains(order.getId()))
-                        return "Canceled";
-
-                    if (DCSet.getInstance().getOrderMap().contains(order.getId()))
+                switch (order.getStatus()) {
+                    case Order.UNCONFIRMED:
+                        return "unconfirmed";
+                    case Order.ACTIVE:
                         return "ACTIVE";
-
-                    return "unconfirmed";
-
+                    case Order.COMPLETED:
+                        return "DONE";
+                    case Order.CANCELED:
+                        return "Canceled";
+                    case Order.ORPHANED:
+                        return "orphaned !";
                 }
             case COLUMN_BLOCK:
 
-                return blockDBref.a + "-" + blockDBref.b ;
+                return blockDBref == null? "?-?" : blockDBref.a + "-" + blockDBref.b ;
 
         }
 

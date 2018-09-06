@@ -5,6 +5,7 @@ import core.item.assets.Order;
 import database.DBMap;
 import database.serializer.OrderSerializer;
 import datachain.DCMap;
+import datachain.DCSet;
 import datachain.IDB;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
@@ -20,6 +21,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /*
  * Tuple4
@@ -132,4 +134,35 @@ public class OrderMap extends DCMap<Tuple2<String, Long>, Order> {
             }
         }
     }
+
+    // UPDATE FULFILL if was WALLET SYNCHRONIZATION
+    public void updateLefts() {
+
+        DCSet dcSet = DCSet.getInstance();
+        Order order;
+        Order orderFromChain;
+        for (Tuple2<String, Long> key: map.keySet()) {
+            order = map.get(key);
+            if (order.getStatus() == Order.ORPHANED)
+                continue;
+
+            if (order.getStatus() == Order.COMPLETED) {
+                order.setFulfilledHave(order.getAmountHave());
+            } else {
+                if (dcSet.getOrderMap().contains(key.b))
+                    // ACTIVE
+                    orderFromChain = dcSet.getOrderMap().get(key.b);
+                else
+                    // CANCELED TOO
+                    orderFromChain = dcSet.getCompletedOrderMap().get(key.b);
+
+                if (orderFromChain.getFulfilledHave().signum() == 0)
+                    continue;
+
+                order.setFulfilledHave(orderFromChain.getFulfilledHave());
+            }
+            this.set(key, order);
+        }
+    }
+
 }
