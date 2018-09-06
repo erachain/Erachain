@@ -98,7 +98,9 @@ public class ConnectionCreator extends Thread {
 
                         //CONNECT
                         //CHECK IF ALREADY CONNECTED TO PEER
-                        peer.connect(callback);
+                        if (peer.connect(callback) == 0) {
+                        }
+
                     }
                 }
 

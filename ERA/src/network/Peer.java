@@ -213,9 +213,9 @@ public class Peer extends Thread {
     }
 
     // connect and run
-    public void connect(ConnectionCallback callback) {
+    public int connect(ConnectionCallback callback) {
         if (Controller.getInstance().isOnStopping()) {
-            return;
+            return 0;
         }
 
         // GOOD WORK
@@ -263,7 +263,7 @@ public class Peer extends Thread {
                 LOGGER.debug("Failed to connect to : " + address + " on step: " + step);
             }
 
-            return;
+            return step;
 
         }
 
@@ -291,6 +291,7 @@ public class Peer extends Thread {
             this.callback.onConnect(this, false);
         }
 
+        return 0;
     }
 
     // connect to old reused peer

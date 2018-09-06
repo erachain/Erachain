@@ -125,8 +125,8 @@ public class PeerMap extends DBMap<byte[], byte[]> {
                         if (Settings.getInstance().isLocalAddress(address))
                             continue;
 
-                        if (Arrays.equals(peerInfo.getStatus(), BYTE_WHITELISTED)
-                                && peerInfo.banTime < NTP.getTime()) {
+                        if ( //use all peers an new and not known Arrays.equals(peerInfo.getStatus(), BYTE_WHITELISTED) &&
+                                peerInfo.banTime < NTP.getTime()) {
                             listPeerInfo.add(peerInfo);
                         }
                     } catch (Exception e) {
@@ -324,6 +324,10 @@ public class PeerMap extends DBMap<byte[], byte[]> {
             }
         }
 
+        if (peer.isWhite()) {
+            peerInfo.setStatus(BYTE_WHITELISTED);
+        }
+
         //ADD PEER INTO DB
         this.map.put(address, peerInfo.toBytes());
     }
@@ -476,6 +480,10 @@ public class PeerMap extends DBMap<byte[], byte[]> {
 
         public byte[] getAddress() {
             return address;
+        }
+
+        public void setStatus(byte[] status) {
+            this.status = status;
         }
 
         public byte[] getStatus() {

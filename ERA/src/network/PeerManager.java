@@ -34,7 +34,8 @@ public class PeerManager {
         List<Peer> knownPeers = new ArrayList<Peer>();
         //ASK DATABASE FOR A LIST OF PEERS
         if (!Controller.getInstance().isOnStopping()) {
-            knownPeers = Controller.getInstance().getDBSet().getPeerMap().getBestPeers(Settings.getInstance().getMaxReceivePeers() << 2, true);
+            knownPeers = Controller.getInstance().getDBSet().getPeerMap().getBestPeers(
+                    Settings.getInstance().getMaxReceivePeers() << 2, true);
         }
 
         //RETURN
