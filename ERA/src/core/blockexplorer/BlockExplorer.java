@@ -1648,7 +1648,7 @@ public class BlockExplorer {
                     statusJSON.put("status_creator", creator.getPersonAsString());
 
                 } else {
-                    statusJSON.put("status_creator_address", "GENESIS");
+                    statusJSON.put("status_creator_address", GenesisBlock.CREATOR.getAddress());
                     statusJSON.put("status_creator", "GENESIS");
                 }
 
@@ -2187,8 +2187,9 @@ public class BlockExplorer {
             transactionJSON.put("date", DateTimeFormat.timestamptoString(trans.getTimestamp()));
 
             if (trans.getCreator() == null) {
-                transactionJSON.put("creator_key", "-");
-                transactionJSON.put("creator_addr", "-");
+                transactionJSON.put("creator", GenesisBlock.CREATOR.getAddress());
+                transactionJSON.put("creator_addr", "GENESIS");
+
             } else {
                 Account atSideAccount;
                 atSideAccount = trans.getCreator();
@@ -2202,15 +2203,8 @@ public class BlockExplorer {
                     }
                 }
 
-                //transactionJSON.put("pub_key", Base58.encode(trans.getCreator().getPublicKey()));
                 transactionJSON.put("creator", atSideAccount.getPersonAsString());
                 transactionJSON.put("creator_addr", atSideAccount.getAddress());
-                if (atSideAccount.getPerson() == null) {
-                    transactionJSON.put("creator_key", "+");
-
-                } else {
-                    transactionJSON.put("creator_key", atSideAccount.getPerson().b.getKey());
-                }
 
             }
 

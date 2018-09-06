@@ -2,6 +2,7 @@ package gui.models;
 
 import controller.Controller;
 import core.account.Account;
+import core.block.GenesisBlock;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import lang.Lang;
