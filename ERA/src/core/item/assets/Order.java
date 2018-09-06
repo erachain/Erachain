@@ -37,8 +37,9 @@ public class Order implements Comparable<Order> {
 
     public static final int UNCONFIRMED = 0;
     public static final int ACTIVE = 1;
-    public static final int COMPLETED = 2;
-    public static final int CANCELED = 3;
+    public static final int FULFILLED = 2;
+    public static final int COMPLETED = 3;
+    public static final int CANCELED = 4;
     public static final int ORPHANED = -1;
 
     protected DCSet dcSet;

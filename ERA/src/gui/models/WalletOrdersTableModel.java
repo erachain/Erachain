@@ -29,19 +29,20 @@ import java.util.Observer;
 @SuppressWarnings("serial")
 public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, Order> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
+    public static final int COLUMN_BLOCK = 1;
     public static final int COLUMN_AMOUNT = 2;
     public static final int COLUMN_HAVE = 3;
-    public static final int COLUMN_WANT = 4;
-    public static final int COLUMN_PRICE = 5;
-    public static final int COLUMN_FULFILLED = 6;
-    public static final int COLUMN_CREATOR = 7;
-    public static final int COLUMN_STATUS = 8;
-    public static final int COLUMN_BLOCK = 1;
+    public static final int COLUMN_PRICE = 4;
+    public static final int COLUMN_WANT = 5;
+    public static final int COLUMN_AMOUNT_WANT = 6;
+    public static final int COLUMN_LEFT = 7;
+    public static final int COLUMN_CREATOR = 8;
+    public static final int COLUMN_STATUS = 9;
     int start =0,step=100;
 
     private SortableList<Tuple2<String, Long>, Order> orders;
     List<Pair<Tuple2<String, Long>, Order>> pp = new ArrayList<Pair<Tuple2<String, Long>, Order>>();
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", " ", "Amount", "Have", "Want", "Price", "Fulfilled", "Creator", "Status"});
+    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", " ", "Amount", "Have", "Price", "Want", "Total", "Left", "Creator", "Status"});
 
     public WalletOrdersTableModel() {
         columnNames[COLUMN_BLOCK]= Lang.getInstance().translate("Block") + "-" + Lang.getInstance().translate("Transaction");
@@ -105,27 +106,32 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
 
                 return DateTimeFormat.timestamptoString(Controller.getInstance().getBlockChain().getTimestamp(blockDBref.a));
 
+            case COLUMN_AMOUNT:
+
+                return order.getAmountHave().toPlainString();
+
             case COLUMN_HAVE:
 
                 AssetCls asset = DCSet.getInstance().getItemAssetMap().get(order.getHave());
                 return asset == null? "[" + order.getHave() + "]" : asset.getShort();
+
+            case COLUMN_PRICE:
+
+                return order.getPrice();
 
             case COLUMN_WANT:
 
                 asset = DCSet.getInstance().getItemAssetMap().get(order.getWant());
                 return asset == null? "[" + order.getWant() + "]" : asset.getShort();
 
-            case COLUMN_AMOUNT:
+            case COLUMN_AMOUNT_WANT:
 
-                return order.getAmountHave().toPlainString();
+                return order.getAmountWant().toPlainString();
 
-            case COLUMN_PRICE:
 
-                return order.getPrice();
+            case COLUMN_LEFT:
 
-            case COLUMN_FULFILLED:
-
-                return order.getFulfilledHave().toPlainString();
+                return order.getFulfilledWant().toPlainString();
 
             case COLUMN_CREATOR:
 
@@ -138,6 +144,8 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
                         return "unconfirmed";
                     case Order.ACTIVE:
                         return "ACTIVE";
+                    case Order.FULFILLED:
+                        return "Fulfilled";
                     case Order.COMPLETED:
                         return "DONE";
                     case Order.CANCELED:

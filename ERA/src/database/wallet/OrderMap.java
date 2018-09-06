@@ -153,14 +153,19 @@ public class OrderMap extends DCMap<Tuple2<String, Long>, Order> {
                     // ACTIVE
                     orderFromChain = dcSet.getOrderMap().get(key.b);
                 else
-                    // CANCELED TOO
+                    // CANCELED (COMPLETED was continued here)
                     orderFromChain = dcSet.getCompletedOrderMap().get(key.b);
 
                 if (orderFromChain.getFulfilledHave().signum() == 0)
                     continue;
 
                 order.setFulfilledHave(orderFromChain.getFulfilledHave());
+                if (order.getStatus() != Order.CANCELED) {
+                    // ACTIVE
+                    order.setStatus(Order.FULFILLED);
+                }
             }
+
             this.set(key, order);
         }
     }
