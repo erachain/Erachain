@@ -11,6 +11,7 @@ import javax.swing.JFileChooser;
 import core.item.assets.Order;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
@@ -1747,7 +1748,8 @@ public class Wallet extends Observable implements Observer {
 
 			return;
 
-		if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE)// .WALLET_ADD_BLOCK_TYPE)
+		int type = message.getType();
+        if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE)// .WALLET_ADD_BLOCK_TYPE)
 		{
 			Block.BlockHead block =	(Block.BlockHead) message.getValue();
 
@@ -1761,7 +1763,7 @@ public class Wallet extends Observable implements Observer {
 			// CHECK BLOCK
 			this.processBlock(block);
 
-		} else if (message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
+		} else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
 		{
 			Block.BlockHead block = (Block.BlockHead) message.getValue();
 
@@ -1775,9 +1777,9 @@ public class Wallet extends Observable implements Observer {
 			// CHECK BLOCK
 			this.orphanBlock(block);
 
-		} else if (false && message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
+		} else if (false && type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
 			;
-		} else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE)
+		} else if (type == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE)
 		{
 			Pair<byte[], Transaction> value = (Pair<byte[], Transaction>) message.getValue();
 			Transaction transaction = value.getB();
@@ -1814,9 +1816,9 @@ public class Wallet extends Observable implements Observer {
 			else if (transaction instanceof CreateOrderTransaction) {
 				this.processOrderCreation((CreateOrderTransaction) transaction);
 			}
-		} else if (false && message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
+		} else if (false && type == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
 			;
-		} else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE)
+		} else if (type == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE)
 		{
 			Transaction transaction = (Transaction) message.getValue();
 
@@ -1850,22 +1852,34 @@ public class Wallet extends Observable implements Observer {
 			// CHECK IF ORDER CREATION
 			else if (transaction instanceof CreateOrderTransaction) {
 				this.orphanOrderCreation((CreateOrderTransaction) transaction);
-			}
-		}
+            }
+        } else if (type == ObserverMessage.ADD_ORDER_TYPE
+                || type == ObserverMessage.ADD_COMPL_ORDER_TYPE) {
+            // UPDATE FULFILLED
+            Order order = (Order) message.getValue();
+            if (!this.accountExists(order.getCreator().getAddress()))
+                return;
+
+            Tuple2<String, Long> key = new Tuple2<String, Long>(order.getCreator().getAddress(), order.getId());
+            if (this.database.getOrderMap().contains(key)) {
+                this.database.getOrderMap().set(key, order);
+            }
+
+        }
 		/*
-		 * else if (message.getType() == ObserverMessage.ADD_AT_TX_TYPE)
+		 * else if (type == ObserverMessage.ADD_AT_TX_TYPE)
 		 * //.WALLET_ADD_AT_TX_TYPE) { this.processATTransaction(
 		 * (Tuple2<Tuple2<Integer, Integer>, AT_Transaction>) message.getValue()
 		 * ); }
 		 * 
-		 * else if (message.getType() ==
+		 * else if (type ==
 		 * ObserverMessage.REMOVE_AT_TX)//.WALLET_REMOVE_AT_TX) {
 		 * this.orphanATTransaction( (Tuple2<Tuple2<Integer, Integer>,
 		 * AT_Transaction>) message.getValue() ); }
 		 * 
-		 * //ADD ORDER else if(message.getType() ==
+		 * //ADD ORDER else if(type ==
 		 * ObserverMessage.ADD_ORDER_TYPE //.WALLET_ADD_ORDER_TYPE ||
-		 * message.getType() == ObserverMessage.REMOVE_ORDER_TYPE)
+		 * type == ObserverMessage.REMOVE_ORDER_TYPE)
 		 * //.WALLET_REMOVE_ORDER_TYPE) { this.addOrder((Order)
 		 * message.getValue()); }
 		 */
