@@ -1883,6 +1883,9 @@ public class Wallet extends Observable implements Observer {
 			}
 		} else if (type == ObserverMessage.ADD_ORDER_TYPE) {
 			Order order = (Order) message.getValue();
+			if (!this.accountExists(order.getCreator().getAddress()))
+				return;
+
 			///if (DCSet.getInstance().getOrderMap().contains(order.getId()))
 			order.setStatus(Order.ACTIVE);
 				order.setStatus(Order.UNCONFIRMED);
@@ -1891,18 +1894,24 @@ public class Wallet extends Observable implements Observer {
 
 		} else if (type == ObserverMessage.REMOVE_ORDER_TYPE) {
 			Order order = (Order) message.getValue();
+			if (!this.accountExists(order.getCreator().getAddress()))
+				return;
 			order.setStatus(Order.UNCONFIRMED);
 
 			this.database.getOrderMap().add(order);
 
 		} else if (type == ObserverMessage.ADD_COMPL_ORDER_TYPE) {
 			Order order = (Order) message.getValue();
+			if (!this.accountExists(order.getCreator().getAddress()))
+				return;
 			order.setStatus(Order.COMPLETED);
 
 			this.database.getOrderMap().add(order);
 
 		} else if (type == ObserverMessage.ADD_CANC_ORDER_TYPE) {
 			Order order = (Order) message.getValue();
+			if (!this.accountExists(order.getCreator().getAddress()))
+				return;
 			order.setStatus(Order.CANCELED);
 
 			this.database.getOrderMap().add(order);
