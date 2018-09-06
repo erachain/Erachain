@@ -511,6 +511,18 @@ public abstract class Transaction {
     public void setDC(DCSet dcSet) {
         this.dcSet = dcSet;
     }
+    public void setDC_HeightSeq(DCSet dcSet) {
+        this.dcSet = dcSet;
+
+        Tuple2<Integer, Integer> dbRef2 = dcSet.getTransactionFinalMapSigns().get(this.signature);
+        if (dbRef2 == null)
+            return;
+
+        this.dbRef = Transaction.makeDBRef(dbRef2);
+        this.height = dbRef2.a;
+        this.seqNo = dbRef2.b;
+    }
+
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
         this.dcSet = dcSet;
         this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);

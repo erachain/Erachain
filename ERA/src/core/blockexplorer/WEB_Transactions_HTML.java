@@ -58,14 +58,7 @@ public class WEB_Transactions_HTML {
         out += "<br><b>" + Lang.getInstance().translate_from_langObj("Reference", langObj) + ": </b>" + tras_json.get("reference");
         out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + tras_json.get("fee");
         out += "<br> ";
-        if (tras_json.get("creator_key") != "-") {
-            if (tras_json.get("creator_key") == "+") {
-                out += "<b>" + Lang.getInstance().translate_from_langObj("Creator", langObj) + ": </b><a href=?addr=" + tras_json.get("creator_addr") + get_Lang(langObj) + ">" + tras_json.get("creator") + "</a>";
-            } else {
-                out += "<b>" + Lang.getInstance().translate_from_langObj("Creator", langObj) + ": </b><a href=?person=" + tras_json.get("creator_key") + get_Lang(langObj) + ">" + tras_json.get("creator") + "</a>";
-            }
-        }
-        //output += '<br>'  +  data.transaction_Header.label_recipient       + ': ' + data.transaction_Header.transactions[0].recipient;
+        out += "<b>" + Lang.getInstance().translate_from_langObj("Creator", langObj) + ": </b><a href=?addr=" + tras_json.get("creator_addr") + get_Lang(langObj) + ">" + tras_json.get("creator") + "</a>";
         out += "<br>";
         int type = transaction.getType();
         switch (type) {
@@ -509,17 +502,10 @@ public class WEB_Transactions_HTML {
         R_Send tr = (R_Send) transaction;
         String out = "";
 
-        if (tr.getRecipient().getPerson() != null) {
-            out += "<b>" + Lang.getInstance().translate_from_langObj("Recipient", langObj) + ":</b> <a href=?person="
-                    + tr.getRecipient().getPerson().b.getKey() + get_Lang(langObj) + ">"
-                    + tr.getRecipient().viewPerson() + "</a><br>";
+        out += "<b>" + Lang.getInstance().translate_from_langObj("Recipient", langObj) + ":</b> <a href=?addr="
+                + tr.getRecipient().getAddress() + get_Lang(langObj) + ">" + tr.getRecipient().getPersonAsString()
+                + "</a><br>";
 
-        } else {
-
-            out += "<b>" + Lang.getInstance().translate_from_langObj("Recipient", langObj) + ":</b> <a href=?addr="
-                    + tr.getRecipient().getAddress() + get_Lang(langObj) + ">" + tr.getRecipient().getAddress()
-                    + "</a><br>";
-        }
         if (tr.getAmount() != null) {
             out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Amount", langObj) + ":</b> "
                     + tr.getAmount().toPlainString() + " ("
