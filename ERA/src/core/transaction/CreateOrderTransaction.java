@@ -407,6 +407,9 @@ public class CreateOrderTransaction extends Transaction {
     @Override
     public int isValid(int asDeal, long flags) {
 
+        if (this.haveAsset == null || this.wantAsset == null)
+            return ITEM_ASSET_NOT_EXIST;
+
         if (this.wantAsset.isAccounting() ^ this.haveAsset.isAccounting() && !BlockChain.DEVELOP_USE) {
 
             return INVALID_ACCOUNTING_PAIR;

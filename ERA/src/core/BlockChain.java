@@ -35,7 +35,7 @@ public class BlockChain {
 
     //public static final int START_LEVEL = 1;
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = true;
+    public static final boolean DEVELOP_USE = false;
     public static final boolean HARD_WORK = false;
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
@@ -83,7 +83,14 @@ public class BlockChain {
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
     public static final int ALL_BALANCES_OK_TO = VERS_4_11;
 
-    public static final byte[][] WIPED_RECORDS = DEVELOP_USE ? new byte[][]{} :
+    public static final byte[][] WIPED_RECORDS = DEVELOP_USE ?
+            new byte[][]{
+                    // ORDER on ERG
+                    Base58.decode("4ycpev6jq5dagkCz49LHoMmo6MM7cQEyC36A7tHKLz6ex25NjjKMkd7hdfPnd8yEmuy3biYVSezQXUuEH8f3HZFv"),
+                    Base58.decode("3JR3Wivtjm1uTmrnzkTHtXRdUvMdxrApcmu2Q5uha82HMucWqFWLgN82SwKqYB7EXQ7ThVtJD5s7iJqR8BwqGxF9"),
+                    Base58.decode("5rh9StwPMPsxu7dRvsT5N3KmYkKwUTnRdfQ4Crhqmzbey6uDMh1i6SudphFSUZkexmDAJYJzrarUGsbdEycYytu4"),
+
+            } :
             new byte[][]{
 
         // WRONG Issue Person #125
@@ -101,6 +108,17 @@ public class BlockChain {
         Base58.decode("3kaJVDpKhiv4jgTt6D1z8J5rfbx9b7tFcCh928cpji3pQnLqEmUK8TKUgXEdw5zjVLQ2eUFgT3YKBBcJaKXz6DAp"), // Cancel Order 29311-1
         Base58.decode("2BiRnFY2hmJLCENMevcXsnC1cwmaJJgfaJtRby5xADmx7EGyFswiffTf23pGyohDmeeeFqB5LYAeatDrvvopHGqN"), // Cancel Order 86549-2
         Base58.decode("5iU3zefyZnWKpv2wd7E8m2hUCmLWASLM96SEfujAfvTKKDm4TA8n1HYFF5YWZkuk1k6vHVNLLv3XCG2MWrT7oHd9"), // Cancel Order 136754-1
+
+        // DELETED base TOKEN (LIA, ERG, etc...
+        Base58.decode("Fb2TRdSLPUY7GvYnLXxhhM27qhJUQTGCRB3sRnZV5uKK3fDa4cuyGLK21xcgJ34GAaWqyh7tx6DMorqgR9s2t5g"), // 924 - 1
+        Base58.decode("sagBYvqLUVTbm6tjJ4rmkCxF1AY9SvC4jJEnfSnrc4F3T9JmqhNgGMZLzotXHxTwwQgGFprhWV4WQWYjv41Niq4"), // 926 - 1
+        Base58.decode("3LppekMMVMMuRcNrJdo14FxWRiwUnVs3KNULpjPAL7wThgqSAcDYy6369pZzSENZEenamWmUVaRUDASr3D9XrfrK"), // 972 - 1
+        Base58.decode("53gxbfbnp61Yjppf2aN33mbzEs5xWYGULsJTDBiUZ8zhdmsibZr7JFP3ZkEfiEXvsUApKmTiWvX1JVamD8YYgowo"), // 1823 - 1
+        Base58.decode("3q8y3fFAqpv8rc6vzQPtXpxHt1RCbSewJ8To4JVmB1D9JzoV37XMgmk3uk9vHzdVfTzTagjNRK1Hm6edXsawsGab"), // 1823 - 2
+        Base58.decode("4rEHZd1n5efcdKbbnodYrcURdyWhSLSQLUjPCwmDwjQ8m9BCzn8whZXrirxN8f94otiit2RSxJcUNggPHwhgK2r8"), // 2541 - 1
+        Base58.decode("2i1jHNAEFDvdaC93d2RjYy22ymiJLRnDMV2NedXdRGZfxpavZL3QnwgWNNATcwUMSAbwG2RtZxQ6TqVx2PkoyDuD"), // 3422 - 1
+        Base58.decode("1ArCghAasj2Jae6ynNEphHjQa1DsTskXqkHXCPLeTzChwzLw631d23FZjFHvnphnUJ6fw4mL2iu6AXBZQTFQkaA"), // 3735 - 1
+
 
     };
 
