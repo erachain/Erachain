@@ -745,15 +745,18 @@ public class GenesisBlock extends Block {
 
         super.process(dcSet);
 
-        AssetVenture item = new AssetVenture(CREATOR, AssetCls.LIA_NAME, null, null, AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);
-        item.setReference(this.signature);
-        dcSet.getItemAssetMap().set(AssetCls.LIA_KEY, item);
+        if (false) {
+            AssetVenture item = new AssetVenture(CREATOR, AssetCls.LIA_NAME, null, null, AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);
+            item.setReference(this.signature);
+            dcSet.getItemAssetMap().set(AssetCls.LIA_KEY, item);
+        }
 
     }
 
     public void orphan(DCSet dcSet) throws Exception {
 
-        dcSet.getItemAssetMap().delete(AssetCls.LIA_KEY);
+        if (false)
+            dcSet.getItemAssetMap().delete(AssetCls.LIA_KEY);
 
         super.orphan(dcSet);
 

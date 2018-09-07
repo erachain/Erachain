@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 
 public class GenesisIssue_ItemRecord extends Genesis_Record {
 
-    private ItemCls item;
+    protected ItemCls item;
 
     public GenesisIssue_ItemRecord(byte type, String NAME_ID, ItemCls item) {
         super(type, NAME_ID);

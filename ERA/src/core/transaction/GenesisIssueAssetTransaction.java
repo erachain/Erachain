@@ -1,6 +1,7 @@
 package core.transaction;
 
 import core.account.Account;
+import core.block.Block;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetFactory;
 import utils.NumberAsString;
@@ -65,5 +66,16 @@ public class GenesisIssueAssetTransaction extends GenesisIssue_ItemRecord {
         return false;
 
     }
+
+    public void process(Block block, int asDeal) {
+
+        if (this.dcSet.getItemAssetMap().size() > 1)
+            // SKIP all base TOKENS
+            return;
+
+        super.process(block, asDeal);
+
+    }
+
 
 }
