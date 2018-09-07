@@ -676,8 +676,6 @@ public class BlockExplorer {
         Collection<ItemCls> items = Controller.getInstance().getAllItems(ItemCls.ASSET_TYPE);
 
         for (ItemCls item : items) {
-            if (item.getKey() == AssetCls.LIA_KEY)
-                continue;
             output.put(item.getKey(), item.viewName());
         }
 
@@ -2276,9 +2274,6 @@ public class BlockExplorer {
         Map bal_Assets = new LinkedHashMap();
         if (ad > 0)
             for (idr = 0; idr < ad; idr++) {
-                if ((long) balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_ASSET_KEY) == AssetCls.LIA_KEY) {
-                    continue;
-                }
                 Map bal = new LinkedHashMap();
                 bal.put("asset_key", balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_ASSET_KEY));
                 bal.put("asset_name", balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_ASSET_NAME));
@@ -3137,9 +3132,6 @@ public class BlockExplorer {
             for (Map.Entry<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetAmounts : assetAmountOfAddr
                     .entrySet()) {
                 long assetKey = assetAmounts.getKey();
-                if (assetKey == AssetCls.LIA_KEY) {
-                    continue;
-                }
 
                 if (assetAmountTotal.containsKey(assetKey)) {
                     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = assetAmountTotal

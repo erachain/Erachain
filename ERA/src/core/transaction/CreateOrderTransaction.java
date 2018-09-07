@@ -419,7 +419,7 @@ public class CreateOrderTransaction extends Transaction {
         long haveKey = this.haveKey;
         long wantKey = this.wantKey;
 
-        if (haveKey == AssetCls.LIA_KEY || wantKey == AssetCls.LIA_KEY) {
+        if (false && (haveKey == AssetCls.LIA_KEY || wantKey == AssetCls.LIA_KEY)) {
             return INVALID_ECXHANGE_PAIR;
         }
 
