@@ -29,9 +29,18 @@ public class Order implements Comparable<Order> {
     private static final int WANT_LENGTH = 8;
     private static final int SCALE_LENGTH = 1;
     private static final int AMOUNT_LENGTH = 8;
+    private static final int STATUS_LENGTH = 1;
     public static final int FULFILLED_LENGTH = AMOUNT_LENGTH + 4;
     private static final int BASE_LENGTH = ID_LENGTH + CREATOR_LENGTH + HAVE_LENGTH + WANT_LENGTH
-            + 2 * SCALE_LENGTH + 2 * AMOUNT_LENGTH + SCALE_LENGTH + FULFILLED_LENGTH;
+            + 2 * SCALE_LENGTH + 2 * AMOUNT_LENGTH + SCALE_LENGTH + FULFILLED_LENGTH
+            + STATUS_LENGTH;
+
+    public static final int UNCONFIRMED = 0;
+    public static final int ACTIVE = 1;
+    public static final int FULFILLED = 2;
+    public static final int COMPLETED = 3;
+    public static final int CANCELED = 4;
+    public static final int ORPHANED = -1;
 
     protected DCSet dcSet;
     //protected long timestamp;
@@ -43,6 +52,7 @@ public class Order implements Comparable<Order> {
     private BigDecimal fulfilledHave;
     private BigDecimal amountWant;
     private BigDecimal price;
+    int status;
 
     public Order(Long id, Account creator, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant) {
         this.id = id;
@@ -61,7 +71,7 @@ public class Order implements Comparable<Order> {
     }
 
     public Order(Long id, Account creator, long haveKey, long wantKey, BigDecimal amountHave,
-                 BigDecimal amountWant, BigDecimal fulfilledHave) {
+                 BigDecimal amountWant, BigDecimal fulfilledHave, int status) {
         this.id = id;
         this.creator = creator;
         this.haveKey = haveKey;
@@ -71,6 +81,8 @@ public class Order implements Comparable<Order> {
         this.amountWant = amountWant;
 
         this.fulfilledHave = fulfilledHave;
+
+        this.status = status;
 
         this.price = calcPrice(amountHave, amountWant);
 
@@ -89,6 +101,14 @@ public class Order implements Comparable<Order> {
 
         return null;
 
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getStatus() {
+        return this.status;
     }
 
     public static int powerTen(BigDecimal value) {
@@ -281,7 +301,12 @@ public class Order implements Comparable<Order> {
 		BigDecimal fulfilledHave = new BigDecimal(new BigInteger(fulfilledHaveBytes), scalefulfilledHave);
 		position += FULFILLED_LENGTH;
 
-		return new Order(id, creator, have, want, amountHave, amountWant, fulfilledHave);
+        //READ FULFILLED HAVE
+        byte[] statusBytes = Arrays.copyOfRange(data, position, position + STATUS_LENGTH);
+        int status = (int)statusBytes[0];
+        position += STATUS_LENGTH;
+
+        return new Order(id, creator, have, want, amountHave, amountWant, fulfilledHave, status);
 
 	}
 
@@ -351,7 +376,10 @@ public class Order implements Comparable<Order> {
 		fulfilledHaveBytes = Bytes.concat(fill, fulfilledHaveBytes);
 		data = Bytes.concat(data, fulfilledHaveBytes);
 
-		return data;
+        //WRITE STATUS
+        data = Bytes.concat(data, new byte[]{(byte)this.status});
+
+        return data;
 	}
 
 	public int getDataLength()
@@ -380,6 +408,7 @@ public class Order implements Comparable<Order> {
         order.put("amountWant", this.amountWant.toPlainString());
         order.put("fulfilledHave", this.fulfilledHave.toPlainString());
         order.put("price", this.price.toPlainString());
+        order.put("status", this.status);
 
         return order;
 
