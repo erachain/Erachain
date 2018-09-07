@@ -133,11 +133,6 @@ public class ObserverMessage {
     public static final int REMOVE_COMPL_ORDER_TYPE = 203;
     public static final int LIST_COMPL_ORDER_TYPE = 204;
 
-    public static final int RESET_CANC_ORDER_TYPE = 201;
-    public static final int ADD_CANC_ORDER_TYPE = 202;
-    public static final int REMOVE_CANC_ORDER_TYPE = 203;
-    public static final int LIST_CANC_ORDER_TYPE = 204;
-
     public static final int RESET_ASSET_STATUS_TYPE = 1151;
     public static final int ADD_ASSET_STATUS_TYPE = 1152;
     public static final int REMOVE_ASSET_STATUS_TYPE = 1153;
