@@ -435,7 +435,7 @@ public class TelegramsResource {
                 Long.valueOf(jsonObject.getOrDefault("assetKey", 0).toString()),
                 new BigDecimal(jsonObject.getOrDefault("amount", 0).toString()),
                 (String) jsonObject.getOrDefault("title", null),
-                (String) jsonObject.getOrDefault("message", null),
+                String.valueOf(jsonObject.getOrDefault("message", null)),
                 Integer.valueOf(jsonObject.getOrDefault("encoding", 0).toString()),
                 Boolean.valueOf(jsonObject.getOrDefault("encrypt", false).toString()),
                 (String) jsonObject.getOrDefault("password", null));
