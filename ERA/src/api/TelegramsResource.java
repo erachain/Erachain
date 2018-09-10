@@ -20,10 +20,12 @@ import org.mapdb.Fun.Tuple2;
 import utils.APIUtils;
 import utils.Converter;
 
+import javax.naming.ldap.Control;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
@@ -541,5 +543,20 @@ public class TelegramsResource {
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(e.getMessage());
         }
+    }
+
+    @GET
+    @Path("info")
+    public Response infoTelegrams() {
+        JSONObject jsonObject = new JSONObject();
+        Controller controller = Controller.getInstance();
+
+        Integer count = controller.TelegramInfo();
+        jsonObject.put("count telegram", count);
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(jsonObject.toJSONString())
+                .build();
     }
 }

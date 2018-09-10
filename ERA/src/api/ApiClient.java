@@ -767,6 +767,10 @@ public class ApiClient {
                             "Delete telegram by list of signature"
                     },
                     {
+                            "GET telegrams/info",
+                            "Info about telegrams"
+                    },
+                    {
                             "GET trade/create/{creator}/{haveKey}/{wantKey}/{haveAmount}/{wantAmount}?feePow={feePow}&password={password}",
                             "make and broadcast CreateOrder "
                     },

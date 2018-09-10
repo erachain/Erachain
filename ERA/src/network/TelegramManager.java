@@ -59,6 +59,10 @@ public class TelegramManager extends Thread {
         return handledTelegrams.get(signatureKey);
     }
 
+    public Integer TelegramCount(){
+        return handledTelegrams.size();
+    }
+
     // GET telegrams for RECIPIENT from TIME
     public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp, String filter) {
         // TelegramMessage telegram;

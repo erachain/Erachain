@@ -2253,6 +2253,11 @@ public class Controller extends Observable {
         return this.network.getTelegram(signature);
     }
 
+
+    public Integer TelegramInfo() {
+        return this.network.TelegramInfo();
+    }
+
     /**
      * Get telegram by signature
      *
