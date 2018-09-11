@@ -104,7 +104,12 @@ public class TelegramManagerTest {
         String signanureStr = Base58.encode(transaction.getSignature());
         telegramer.delete(signanureStr);
 
+        telegrams = telegramer.getTelegramsFromTimestamp(0l, null);
         assertEquals(telegrams.size(), 100 - 1);
+
+        telegrams = telegramer.getTelegramsForAddress(recipient1.getAddress(), 0, null);
+        assertEquals(telegrams.size(), 100 - 1);
+
 
     }
 
