@@ -48,16 +48,17 @@ public class TelegramsResource {
             @QueryParam("filter") String filter,
             @QueryParam("decrypt") boolean decrypt,
             @QueryParam("password") String password) {
-        return this.getTelegramsLimited(NTP.getTime() - 6000000, filter, decrypt, password);
+        return this.getTelegramsLimited(NTP.getTime() - 6000000, null, filter, decrypt, password);
     }
 
     @GET
     @Path("address/{address}")
     public String getTelegramsTwo(@PathParam("address") String address,
+                                  @QueryParam("timestamp") long timestamp,
                                   @QueryParam("filter") String filter,
                                   @QueryParam("decrypt") boolean decrypt,
                                   @QueryParam("password") String password) {
-        return this.getTelegramsTimestamp(address, 0, filter, decrypt, password);
+        return this.getTelegramsTimestamp(address, timestamp, filter, decrypt, password);
     }
 
     private JSONObject decrypt(TelegramMessage telegram, JSONObject item) {
@@ -102,6 +103,7 @@ public class TelegramsResource {
     @GET
     @Path("timestamp/{timestamp}")
     public String getTelegramsLimited(@PathParam("timestamp") long timestamp,
+                                      @QueryParam("recipient") String recipient,
                                       @QueryParam("filter") String filter,
                                       @QueryParam("decrypt") boolean decrypt,
                                       @QueryParam("password") String password) {
@@ -114,7 +116,7 @@ public class TelegramsResource {
         if (decrypt)
             APIUtils.askAPICallAllowed(password, "GET telegrams decrypt", request);
 
-        for (TelegramMessage telegram : controller.getLastTelegrams(timestamp, filter)) {
+        for (TelegramMessage telegram : controller.getLastTelegrams(timestamp, recipient, filter)) {
 
             item = telegram.toJson();
             if (decrypt) {
@@ -549,6 +551,67 @@ public class TelegramsResource {
             throw ApiErrorFactory.getInstance().createError(e.getMessage());
         }
     }
+
+    /**
+     * Remove telegram by timestamp then address and title
+     * Remove telegram if this node creator
+     * <h2>Example request</h2>
+     * GET telegrams/delete/12345678900?address=79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy&title=head
+     *
+     *
+     * <h2>Example response</h2>
+     * return counter of deletions
+     *
+     * @param timestamp  timestamp
+     * @param address    recipient address
+     * @param title      title
+     *
+     *
+     * @return count int
+     */
+    @GET
+    @Path("deletemytimestamp/{timestamp}")
+    public String deleteTelegramByTimestamp(@PathParam("timestamp") long timestamp,
+                               @QueryParam("address") String address,
+                               @QueryParam("title") String title) {
+
+        Controller controller = Controller.getInstance();
+
+
+
+        return "" + controller.deleteTelegrams(timestamp, address, title);
+
+    }
+
+    /**
+     * Remove telegram by address then timestamp and title
+     * Remove telegram if this node creator
+     * <h2>Example request</h2>
+     * GET telegrams/delete/79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy?title=123&timestamp=123456789
+     *
+     *
+     * <h2>Example response</h2>
+     * return counter of deletions
+     *
+     * @param address    recipient address
+     * @param timestamp  timestamp
+     * @param title      title
+     *
+     *
+     * @return count int
+     */
+    @GET
+    @Path("deletebyrecipient/{address}")
+    public String deleteTelegramByAddress(@PathParam("address") String address,
+                                           @QueryParam("timestamp") long timestamp,
+                                           @QueryParam("title") String title) {
+
+        Controller controller = Controller.getInstance();
+
+        return "" + controller.deleteTelegrams(address, timestamp, title);
+
+    }
+
 
     @GET
     @Path("info")

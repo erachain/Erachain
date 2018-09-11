@@ -123,7 +123,7 @@ public class API_TelegramsResource {
         // CREATE JSON OBJECT
         JSONArray array = new JSONArray();
 
-        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, filter)) {
+        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, null, filter)) {
             array.add(telegram.toJson());
         }
 

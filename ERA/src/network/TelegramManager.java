@@ -59,7 +59,7 @@ public class TelegramManager extends Thread {
 
 
     // GET telegrams for RECIPIENT from TIME
-    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String filter) {
+    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter) {
         List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
         if (!Controller.getInstance().isOnStopping()) {
 
@@ -78,6 +78,12 @@ public class TelegramManager extends Thread {
                                 continue;
                         }
 
+                        if (recipient != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                            Account account = ((R_Send) transaction).getRecipient();
+                            if (!account.equals(recipient))
+                                continue;
+                        }
+
                         telegrams.add(telegram);
                     }
                 }
@@ -89,12 +95,12 @@ public class TelegramManager extends Thread {
     }
 
     // GET telegrams for RECIPIENT from TIME
-    public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp, String filter) {
+    public List<TelegramMessage> getTelegramsForAddress(String recipient, long timestamp, String filter) {
         // TelegramMessage telegram;
         List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
         // ASK DATABASE FOR A LIST OF PEERS
         if (!Controller.getInstance().isOnStopping()) {
-            List<TelegramMessage> telegramsAddress = telegramsForAddress.get(address);
+            List<TelegramMessage> telegramsAddress = telegramsForAddress.get(recipient);
             if (telegramsAddress == null)
                 return telegrams;
             for (TelegramMessage telegram : telegramsAddress) {
@@ -116,7 +122,7 @@ public class TelegramManager extends Thread {
         return telegrams;
     }
 
-    public void delete (String signatureStr) {
+    public void delete (String signatureStr, boolean withTimestamp, boolean withAddress) {
 
         HashSet<Account> recipients;
         String address;
@@ -130,27 +136,30 @@ public class TelegramManager extends Thread {
 
         transaction = telegram.getTransaction();
         byte[] signature = transaction.getSignature();
-        recipients = transaction.getRecipientAccounts();
-        if (recipients != null && !recipients.isEmpty()) {
-            int i;
-            for (Account recipient : recipients) {
-                address = recipient.getAddress();
-                List<TelegramMessage> addressTelegrams = this.telegramsForAddress.get(address);
-                if (addressTelegrams != null) {
-                    i = 0;
-                    for (TelegramMessage addressTelegram : addressTelegrams) {
-                        if (Arrays.equals(addressTelegram.getTransaction().getSignature(), signature)) {
-                            addressTelegrams.remove(i);
-                            break;
+
+        if (withAddress) {
+            recipients = transaction.getRecipientAccounts();
+            if (recipients != null && !recipients.isEmpty()) {
+                int i;
+                for (Account recipient : recipients) {
+                    address = recipient.getAddress();
+                    List<TelegramMessage> addressTelegrams = this.telegramsForAddress.get(address);
+                    if (addressTelegrams != null) {
+                        i = 0;
+                        for (TelegramMessage addressTelegram : addressTelegrams) {
+                            if (Arrays.equals(addressTelegram.getTransaction().getSignature(), signature)) {
+                                addressTelegrams.remove(i);
+                                break;
+                            }
+                            i++;
                         }
-                        i++;
                     }
-                }
-                // IF list is empty
-                if (addressTelegrams.isEmpty()) {
-                    this.telegramsForAddress.remove(address);
-                } else {
-                    this.telegramsForAddress.put(address, addressTelegrams);
+                    // IF list is empty
+                    if (addressTelegrams.isEmpty()) {
+                        this.telegramsForAddress.remove(address);
+                    } else {
+                        this.telegramsForAddress.put(address, addressTelegrams);
+                    }
                 }
             }
         }
@@ -166,27 +175,88 @@ public class TelegramManager extends Thread {
             }
         }
 
-        timestamp = transaction.getTimestamp();
-        List<TelegramMessage> telegrams = this.telegramsForTime.get(timestamp);
-        int i = 0;
-        for (TelegramMessage telegram_item : telegrams) {
-            if (Arrays.equals(telegram_item.getTransaction().getSignature(), signature)) {
-                telegrams.remove(i);
-                break;
+        if (withTimestamp) {
+            timestamp = transaction.getTimestamp();
+            List<TelegramMessage> telegrams = this.telegramsForTime.get(timestamp);
+            int i = 0;
+            for (TelegramMessage telegram_item : telegrams) {
+                if (Arrays.equals(telegram_item.getTransaction().getSignature(), signature)) {
+                    telegrams.remove(i);
+                    break;
+                }
+                i++;
             }
-            i++;
+
+            if (telegrams.isEmpty())
+                this.telegramsForTime.remove(timestamp);
+            else
+                this.telegramsForTime.put(timestamp, telegrams);
+        }
+    }
+
+    public long delete (long timestamp, String recipient, String filter) {
+        long counter = 0;
+
+        SortedMap<Long, List<TelegramMessage>> subMap = telegramsForTime.tailMap(timestamp);
+        for (Long time_item : subMap.keySet()) {
+            List<TelegramMessage> telegramsTimestamp = telegramsForTime.remove(time_item);
+            if (telegramsTimestamp == null || telegramsTimestamp.isEmpty())
+                continue;
+
+            for (TelegramMessage telegram : telegramsTimestamp) {
+                Transaction transaction = telegram.getTransaction();
+                if (timestamp > 0 && telegram.getTransaction().getTimestamp() < timestamp)
+                    continue;
+
+                if (filter != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                    String head = ((R_Send) transaction).getHead();
+                    if (!filter.equals(head))
+                        continue;
+                }
+
+                if (recipient != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                    Account account = ((R_Send) transaction).getRecipient();
+                    if (!account.equals(recipient))
+                        continue;
+                }
+
+                counter++;
+                delete(Base58.encode(transaction.getSignature()), false, true);
+            }
         }
 
-        if (telegrams.isEmpty())
-            this.telegramsForTime.remove(timestamp);
-        else
-            this.telegramsForTime.put(timestamp, telegrams);
+        return counter;
+    }
+
+    public long delete (String recipient, long timestamp, String filter) {
+        long counter = 0;
+
+        List<TelegramMessage> telegrams = telegramsForAddress.remove(recipient);
+        if (telegrams == null || telegrams.isEmpty())
+            return 0;
+
+        for (TelegramMessage telegram : telegrams) {
+            Transaction transaction = telegram.getTransaction();
+            if (timestamp > 0 && telegram.getTransaction().getTimestamp() < timestamp)
+                continue;
+
+            if (filter != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                String head = ((R_Send) transaction).getHead();
+                if (!filter.equals(head))
+                    continue;
+            }
+
+            counter++;
+            delete(Base58.encode(transaction.getSignature()), true, false);
+        }
+
+        return counter;
     }
 
     /**
-     * DELETE telegrams from ALL maps
-     *
-     */
+         * DELETE telegrams from ALL maps
+         *
+         */
     public List<String> deleteList(List<String> signatures) {
 
         List<String> left = new ArrayList<>();

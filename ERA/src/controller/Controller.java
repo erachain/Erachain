@@ -2240,13 +2240,19 @@ public class Controller extends Observable {
     public List<String> deleteTelegram(List<String> telegramSignatures) {
         return this.network.deleteTelegram(telegramSignatures);
     }
+    public long deleteTelegrams(long timestamp, String recipient, String title) {
+        return this.network.deleteTelegrams(timestamp, recipient, title);
+    }
+    public long deleteTelegrams(String recipient, long timestamp, String title) {
+        return this.network.deleteTelegrams(recipient, timestamp, title);
+    }
 
     public List<TelegramMessage> getLastTelegrams(String address, long timestamp, String filter) {
         return this.network.getTelegramsForAddress(address, timestamp, filter);
     }
 
-    public List<TelegramMessage> getLastTelegrams(long timestamp, String filter) {
-        return this.network.getTelegramsFromTimestamp(timestamp, filter);
+    public List<TelegramMessage> getLastTelegrams(long timestamp, String recipient, String filter) {
+        return this.network.getTelegramsFromTimestamp(timestamp, recipient, filter);
     }
 
     public TelegramMessage getTelegram(byte[] signature) {
