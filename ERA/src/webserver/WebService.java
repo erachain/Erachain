@@ -25,6 +25,7 @@ public class WebService {
         s.add(API_Trade.class);
         s.add(API_TelegramsResource.class);
         s.add(API_Poll.class);
+        s.add(API_Documents.class);
 
         ResourceConfig config = new ResourceConfig(s);
         config.register(MultiPartFeature.class);
