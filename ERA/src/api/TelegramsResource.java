@@ -516,27 +516,31 @@ public class TelegramsResource {
 
         JSONArray arraySign = (JSONArray) (jsonObject.get("list"));
         JSONObject out = new JSONObject();
-        List<TelegramMessage> deleteList = new ArrayList<>();
+        List<String> deleteList = new ArrayList<>();
         Controller controller = Controller.getInstance();
 
+
+        String signature;
         for (Object obj : arraySign) {
 
-            TelegramMessage telegramMessage = controller.getTelegram(obj.toString());
+            signature = obj.toString();
+            TelegramMessage telegramMessage = controller.getTelegram(signature);
             if (telegramMessage == null)
-                out.put("signature", obj.toString());
+                out.put("signature", signature);
             else {
                 boolean found = false;
                 for (Account account : controller.getAccounts()) {
                     if (telegramMessage.getTransaction().isInvolved(account)) {
-                        deleteList.add(telegramMessage);
+                        deleteList.add(signature);
                         found = true;
                         break;
                     }
                 }
                 if (!found)
-                    out.put("signature", obj.toString());
+                    out.put("signature", signature);
             }
         }
+
         try {
             controller.deleteTelegram(deleteList);
             return out.toJSONString();

@@ -83,6 +83,8 @@ public class BlockChain {
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
     public static final int ALL_BALANCES_OK_TO = VERS_4_11;
 
+    public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11  : 195000;
+
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ?
             new byte[][]{
                     // ORDER on ERG
