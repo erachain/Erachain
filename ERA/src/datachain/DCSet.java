@@ -387,7 +387,8 @@ public class DCSet implements Observer, IDB {
                 //.newMemoryDirectDB()
                 .make();
 
-        return new DCSet(database, false, false, true);
+        instance = new DCSet(database, false, false, true);
+        return instance;
     }
 
     public static DB createForkbase() {
