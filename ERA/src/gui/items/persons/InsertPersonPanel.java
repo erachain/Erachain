@@ -394,8 +394,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
                     Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, result.getA(),
                             " ",
                             (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
-                            Lang.getInstance().translate("Confirmation Transaction") + " "
-                                    + Lang.getInstance().translate("Issue person"));
+                            Lang.getInstance().translate("Confirmation transaction issue person"));
 
                     IssuePersonDetailsFrame ww = new IssuePersonDetailsFrame((IssuePersonRecord) result.getA());
                     // ww.jPanel2.setVisible(false);
