@@ -585,7 +585,7 @@ public class R_SertifyPubKeys extends Transaction {
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
 
-            if(this.height < BlockChain.VERS_4_11) {
+            if(this.height < BlockChain.VERS_4_12) {
 
                 // GET FEE from that record
                 ///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // NEED to RECAL?? if from DB
@@ -728,7 +728,7 @@ public class R_SertifyPubKeys extends Transaction {
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
 
-            if(this.height < BlockChain.VERS_4_11) {
+            if(this.height < BlockChain.VERS_4_12) {
                 // IT IS NOT VOUCHED PERSON
 
                 // GET FEE from that record

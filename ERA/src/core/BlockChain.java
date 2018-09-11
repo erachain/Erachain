@@ -35,7 +35,7 @@ public class BlockChain {
 
     //public static final int START_LEVEL = 1;
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = false;
+    public static final boolean DEVELOP_USE = true;
     public static final boolean HARD_WORK = false;
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
@@ -82,6 +82,8 @@ public class BlockChain {
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
     public static final int ALL_BALANCES_OK_TO = VERS_4_11;
+
+    public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11  : 195000;
 
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ?
             new byte[][]{

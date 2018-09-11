@@ -1,13 +1,7 @@
 package network;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
@@ -31,7 +25,7 @@ public class TelegramManager extends Thread {
     /**
      * time to live telegram
      */
-    private static final int KEEP_TIME = 60000 * 60 * 24;
+    private static final int KEEP_TIME = 60000 * 60 * (BlockChain.HARD_WORK ? 2 : 8);
     static Logger LOGGER = Logger.getLogger(TelegramManager.class.getName());
     private Network network;
     private boolean isRun;
@@ -39,9 +33,9 @@ public class TelegramManager extends Thread {
     private Map<String, TelegramMessage> handledTelegrams;
     // timestamp lists for clear
     private TreeMap<Long, List<TelegramMessage>> telegramsForTime;
-    // lists for address
+    // lists for RECIPIENTS only address
     private Map<String, List<TelegramMessage>> telegramsForAddress;
-    // counts for creators
+    // counts for CREATORs COUNT
     private Map<String, Integer> telegramsCounts;
 
     public TelegramManager(Network network) {
@@ -59,58 +53,10 @@ public class TelegramManager extends Thread {
         return handledTelegrams.get(signatureKey);
     }
 
-    public Integer TelegramCount(){
+    public Integer telegramCount(){
         return handledTelegrams.size();
     }
 
-    // GET telegrams for RECIPIENT from TIME
-    public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp, String filter) {
-        // TelegramMessage telegram;
-        List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
-        // ASK DATABASE FOR A LIST OF PEERS
-        if (!Controller.getInstance().isOnStopping()) {
-            List<TelegramMessage> telegramsAddress = telegramsForAddress.get(address);
-            if (telegramsAddress == null)
-                return telegrams;
-            for (TelegramMessage telegram : telegramsAddress) {
-                Transaction transaction = telegram.getTransaction();
-                if (timestamp >= 0 && telegram.getTransaction().getTimestamp() < timestamp)
-                    continue;
-
-                if (filter != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                    String head = ((R_Send) transaction).getHead();
-                    if (!filter.equals(head))
-                        continue;
-                }
-
-                telegrams.add(telegram);
-            }
-        }
-
-        // RETURN
-        return telegrams;
-    }
-
-    /**
-     * Remove telegram
-     *
-     * @param SignTelegram list of telegramMessage
-     * @return list not remove signature(not found in list)
-     */
-    public List<TelegramMessage> deleteTelegram(List<TelegramMessage> SignTelegram) {
-
-        // not use list
-        List<TelegramMessage> notRemoveTelegram = new ArrayList<>();
-
-        for (TelegramMessage signature : SignTelegram) {
-            String signatureKye = Base58.encode((signature).getTransaction().getSignature());
-            this.handledTelegrams.remove(signatureKye);
-            this.telegramsForTime.remove((signature).getTransaction().getTimestamp());
-            this.telegramsForAddress.remove((signature).getTransaction().getRecipientAccounts());
-            this.telegramsCounts.remove((signature).getTransaction().getCreator());
-        }
-        return notRemoveTelegram;
-    }
 
     // GET telegrams for RECIPIENT from TIME
     public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String filter) {
@@ -123,7 +69,7 @@ public class TelegramManager extends Thread {
                 if (telegramsTimestamp != null) {
                     for (TelegramMessage telegram : telegramsTimestamp) {
                         Transaction transaction = telegram.getTransaction();
-                        if (timestamp >= 0 && telegram.getTransaction().getTimestamp() < timestamp)
+                        if (timestamp > 0 && telegram.getTransaction().getTimestamp() < timestamp)
                             continue;
 
                         if (filter != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
@@ -142,7 +88,200 @@ public class TelegramManager extends Thread {
         return telegrams;
     }
 
-    public synchronized boolean pipeAddRemove(TelegramMessage telegram, Entry<Long, List<TelegramMessage>> firstItem,
+    // GET telegrams for RECIPIENT from TIME
+    public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp, String filter) {
+        // TelegramMessage telegram;
+        List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
+        // ASK DATABASE FOR A LIST OF PEERS
+        if (!Controller.getInstance().isOnStopping()) {
+            List<TelegramMessage> telegramsAddress = telegramsForAddress.get(address);
+            if (telegramsAddress == null)
+                return telegrams;
+            for (TelegramMessage telegram : telegramsAddress) {
+                Transaction transaction = telegram.getTransaction();
+                if (timestamp > 0 && telegram.getTransaction().getTimestamp() < timestamp)
+                    continue;
+
+                if (filter != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                    String head = ((R_Send) transaction).getHead();
+                    if (!filter.equals(head))
+                        continue;
+                }
+
+                telegrams.add(telegram);
+            }
+        }
+
+        // RETURN
+        return telegrams;
+    }
+
+    public void delete (String signatureStr) {
+
+        HashSet<Account> recipients;
+        String address;
+        TelegramMessage telegram;
+        Transaction transaction;
+        long timestamp;
+
+        telegram = this.handledTelegrams.remove(signatureStr);
+        if (telegram == null)
+            return;
+
+        transaction = telegram.getTransaction();
+        byte[] signature = transaction.getSignature();
+        recipients = transaction.getRecipientAccounts();
+        if (recipients != null && !recipients.isEmpty()) {
+            int i;
+            for (Account recipient : recipients) {
+                address = recipient.getAddress();
+                List<TelegramMessage> addressTelegrams = this.telegramsForAddress.get(address);
+                if (addressTelegrams != null) {
+                    i = 0;
+                    for (TelegramMessage addressTelegram : addressTelegrams) {
+                        if (Arrays.equals(addressTelegram.getTransaction().getSignature(), signature)) {
+                            addressTelegrams.remove(i);
+                            break;
+                        }
+                        i++;
+                    }
+                }
+                // IF list is empty
+                if (addressTelegrams.isEmpty()) {
+                    this.telegramsForAddress.remove(address);
+                } else {
+                    this.telegramsForAddress.put(address, addressTelegrams);
+                }
+            }
+        }
+
+        // CREATOR counts
+        address = transaction.getCreator().getAddress();
+        Integer count = this.telegramsCounts.get(address);
+        if (count != null) {
+            if (count < 2) {
+                this.telegramsCounts.remove(address);
+            } else {
+                this.telegramsCounts.put(address, count - 1);
+            }
+        }
+
+        timestamp = transaction.getTimestamp();
+        List<TelegramMessage> telegrams = this.telegramsForTime.get(timestamp);
+        int i = 0;
+        for (TelegramMessage telegram_item : telegrams) {
+            if (Arrays.equals(telegram_item.getTransaction().getSignature(), signature)) {
+                telegrams.remove(i);
+                break;
+            }
+            i++;
+        }
+
+        if (telegrams.isEmpty())
+            this.telegramsForTime.remove(timestamp);
+        else
+            this.telegramsForTime.put(timestamp, telegrams);
+    }
+
+    /**
+     * DELETE telegrams from ALL maps
+     *
+     */
+    public List<String> deleteList(List<String> signatures) {
+
+        List<String> left = new ArrayList<>();
+        HashSet<Account> recipients;
+        String address;
+        int i;
+        TelegramMessage telegram;
+        Transaction transaction;
+        byte[] signature;
+        long timestamp;
+        for (String signatureStr : signatures) {
+            telegram = this.handledTelegrams.remove(signatureStr);
+            if (telegram == null) {
+                left.add(signatureStr);
+                continue;
+            }
+
+            transaction = telegram.getTransaction();
+            signature = transaction.getSignature();
+            recipients = transaction.getRecipientAccounts();
+            if (recipients != null && !recipients.isEmpty()) {
+                for (Account recipient : recipients) {
+                    address = recipient.getAddress();
+                    List<TelegramMessage> addressTelegrams = this.telegramsForAddress.get(address);
+                    if (addressTelegrams != null) {
+                        i = 0;
+                        for (TelegramMessage addressTelegram : addressTelegrams) {
+                            if (Arrays.equals(addressTelegram.getTransaction().getSignature(), signature)) {
+                                addressTelegrams.remove(i);
+                                break;
+                            }
+                            i++;
+                        }
+                    }
+                    // IF list is empty
+                    if (addressTelegrams.isEmpty()) {
+                        this.telegramsForAddress.remove(address);
+                    } else {
+                        this.telegramsForAddress.put(address, addressTelegrams);
+                    }
+                }
+            }
+
+            // CREATOR counts
+            address = transaction.getCreator().getAddress();
+            Integer count = this.telegramsCounts.get(address);
+            if (count != null) {
+                if (count < 2) {
+                    this.telegramsCounts.remove(address);
+                } else {
+                    this.telegramsCounts.put(address, count - 1);
+                }
+            }
+
+            timestamp = transaction.getTimestamp();
+            List<TelegramMessage> telegrams = this.telegramsForTime.get(timestamp);
+            i = 0;
+            for (TelegramMessage telegram_item : telegrams) {
+                if (Arrays.equals(telegram_item.getTransaction().getSignature(), signature)) {
+                    telegrams.remove(i);
+                    break;
+                }
+                i++;
+            }
+            if (telegrams.isEmpty())
+                this.telegramsForTime.remove(timestamp);
+            else
+                this.telegramsForTime.put(timestamp, telegrams);
+        }
+
+        return left;
+    }
+
+    /**
+     * Remove telegram
+     *
+     * @param SignTelegram list of telegramMessage
+     * @return list not remove signature(not found in list)
+     */
+    public List<TelegramMessage> deleteTelegram_old(List<TelegramMessage> SignTelegram) {
+
+        // not use list
+        List<TelegramMessage> notRemoveTelegram = new ArrayList<>();
+
+        for (TelegramMessage signature : SignTelegram) {
+            String signatureKye = Base58.encode((signature).getTransaction().getSignature());
+            this.handledTelegrams.remove(signatureKye);
+            this.telegramsForTime.remove((signature).getTransaction().getTimestamp());
+            this.telegramsForAddress.remove((signature).getTransaction().getRecipientAccounts());
+            this.telegramsCounts.remove((signature).getTransaction().getCreator());
+        }
+        return notRemoveTelegram;
+    }
+
+    public synchronized boolean pipeAddRemove(TelegramMessage telegram, List<TelegramMessage> firstItem,
                                               long timeKey) {
 
         Transaction transaction;
@@ -178,13 +317,7 @@ public class TelegramManager extends Thread {
             // CHECK IF LIST IS FULL
             if (this.handledTelegrams.size() > MAX_HANDLED_TELEGRAMS_SIZE) {
                 List<TelegramMessage> telegrams = this.telegramsForTime.remove(this.telegramsForTime.firstKey());
-                for (TelegramMessage telegram_item : telegrams) {
-                    // signatureKey =
-                    // java.util.Base64.getEncoder().encodeToString(telegram_item.getTransaction().getSignature());
-                    signatureKey = Base58.encode(telegram_item.getTransaction().getSignature());
-                    this.handledTelegrams.remove(signatureKey);
-                    /// LOGGER.error("handledMessages size OVERHEAT! ");
-                }
+                pipeAddRemove(null, telegrams, 0);
             }
 
             // signatureKey =
@@ -234,7 +367,7 @@ public class TelegramManager extends Thread {
             String address;
             int i;
 
-            List<TelegramMessage> telegrams = firstItem.getValue();
+            List<TelegramMessage> telegrams = firstItem;
             // for all signatures on this TIME
             for (TelegramMessage telegram_item : telegrams) {
                 telegram = this.handledTelegrams.remove(Base58.encode(telegram_item.getTransaction().getSignature()));
@@ -277,7 +410,10 @@ public class TelegramManager extends Thread {
                     }
                 }
             }
-            this.telegramsForTime.remove(timeKey);
+
+            // by TIME
+            if (timeKey > 0)
+                this.telegramsForTime.remove(timeKey);
         }
 
         return false;
@@ -314,7 +450,7 @@ public class TelegramManager extends Thread {
                     long timeKey = firstItem.getKey();
 
                     if (timeKey + KEEP_TIME < timestamp) {
-                        pipeAddRemove(null, firstItem, timeKey);
+                        pipeAddRemove(null, firstItem.getValue(), timeKey);
                     } else {
                         break;
                     }

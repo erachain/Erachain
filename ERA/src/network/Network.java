@@ -246,8 +246,8 @@ public class Network extends Observable implements ConnectionCallback {
         return this.telegramer.getTelegramsForAddress(address, timestamp, filter);
     }
 
-    public List<TelegramMessage> deleteTelegram(List<TelegramMessage> TelegramSignature) {
-        return this.telegramer.deleteTelegram(TelegramSignature);
+    public List<String> deleteTelegram(List<String> telegramSignatures) {
+        return this.telegramer.deleteList(telegramSignatures);
     }
 
     public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String filter) {
@@ -262,7 +262,7 @@ public class Network extends Observable implements ConnectionCallback {
     }
 
     public Integer TelegramInfo() {
-        return this.telegramer.TelegramCount();
+        return this.telegramer.telegramCount();
     }
     public TelegramMessage getTelegram(String signature) {
         return this.telegramer.getTelegram(signature);
