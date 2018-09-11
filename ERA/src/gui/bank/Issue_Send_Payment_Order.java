@@ -245,8 +245,7 @@ public class Issue_Send_Payment_Order extends javax.swing.JPanel {
         String Status_text = "";
         Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Send Payment Order"), (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2),
-                Status_text, Lang.getInstance().translate("Confirmation Transaction") + " "
-                + Lang.getInstance().translate("Send Payment Order"));
+                Status_text, Lang.getInstance().translate("Confirmation transaction send payment order"));
 
         Mail_Info ww = new Mail_Info((R_Send) transaction);
         ww.jTabbedPane1.setVisible(false);
