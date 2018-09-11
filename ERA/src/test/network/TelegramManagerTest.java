@@ -21,6 +21,7 @@ import ntp.NTP;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -102,7 +103,11 @@ public class TelegramManagerTest {
 
         transaction = telegrams.get(10).getTransaction();
         String signanureStr = Base58.encode(transaction.getSignature());
+
+        ///////////// DELETE ONE
         telegramer.delete(signanureStr);
+
+        assertEquals((int)telegramer.telegramCount(), 100 - 1);
 
         telegrams = telegramer.getTelegramsFromTimestamp(0l, null);
         assertEquals(telegrams.size(), 100 - 1);
@@ -110,6 +115,24 @@ public class TelegramManagerTest {
         telegrams = telegramer.getTelegramsForAddress(recipient1.getAddress(), 0, null);
         assertEquals(telegrams.size(), 100 - 1);
 
+        List<String> signsList = new ArrayList<String>();
+        transaction = telegrams.get(13).getTransaction();
+        signsList.add(Base58.encode(transaction.getSignature()));
+        transaction = telegrams.get(25).getTransaction();
+        signsList.add(Base58.encode(transaction.getSignature()));
+        transaction = telegrams.get(77).getTransaction();
+        signsList.add(Base58.encode(transaction.getSignature()));
+
+        ///////////// DELETE LIST
+        telegramer.deleteList(signsList);
+
+        assertEquals((int)telegramer.telegramCount(), 100 - 1 - signsList.size());
+
+        telegrams = telegramer.getTelegramsFromTimestamp(0l, null);
+        assertEquals(telegrams.size(), 100 - 1 - signsList.size());
+
+        telegrams = telegramer.getTelegramsForAddress(recipient1.getAddress(), 0, null);
+        assertEquals(telegrams.size(), 100 - 1 - signsList.size());
 
     }
 

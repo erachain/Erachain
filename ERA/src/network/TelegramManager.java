@@ -53,7 +53,7 @@ public class TelegramManager extends Thread {
         return handledTelegrams.get(signatureKey);
     }
 
-    public Integer TelegramCount(){
+    public Integer telegramCount(){
         return handledTelegrams.size();
     }
 
@@ -243,12 +243,13 @@ public class TelegramManager extends Thread {
 
             timestamp = transaction.getTimestamp();
             List<TelegramMessage> telegrams = this.telegramsForTime.get(timestamp);
+            i = 0;
             for (TelegramMessage telegram_item : telegrams) {
                 if (Arrays.equals(telegram_item.getTransaction().getSignature(), signature)) {
-                    telegrams.remove(signatureStr);
+                    telegrams.remove(i);
                     break;
                 }
-
+                i++;
             }
             if (telegrams.isEmpty())
                 this.telegramsForTime.remove(timestamp);

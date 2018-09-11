@@ -262,7 +262,7 @@ public class Network extends Observable implements ConnectionCallback {
     }
 
     public Integer TelegramInfo() {
-        return this.telegramer.TelegramCount();
+        return this.telegramer.telegramCount();
     }
     public TelegramMessage getTelegram(String signature) {
         return this.telegramer.getTelegram(signature);
