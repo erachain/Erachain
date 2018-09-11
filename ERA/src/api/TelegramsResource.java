@@ -490,7 +490,8 @@ public class TelegramsResource {
     }
 
     /**
-     * Remove telegram by signature. signature not delete if signature not contains in node.
+     * Remove telegram by signature. signature not deleted if signature not contains in node.
+     * Remove telegram if this node creator
      * <h2>Example request</h2>
      * POST telegrams/delete {"list": ["5HUqfaaY2uFgdmDM7XNky31rkdcUCPTzhHXeanBviSvyDfhgYnH4a64Aje3L53Jxmyb3CcouRiBeUF4HZNc7yySy"]}
      *
