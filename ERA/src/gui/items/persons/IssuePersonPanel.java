@@ -359,7 +359,7 @@ public class IssuePersonPanel extends JPanel {
                 StringSelection sss = new StringSelection(base58str);
                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(sss, null);
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Person issue has been copy to buffer!"),
+                        Lang.getInstance().translate("Person issue has been copy to buffer") + "!",
                         Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 
                 // ENABLE
@@ -381,8 +381,7 @@ public class IssuePersonPanel extends JPanel {
             Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, issuePersonRecord,
                     " ",
                     (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
-                    Lang.getInstance().translate("Confirmation Transaction") + " "
-                            + Lang.getInstance().translate("Issue person"));
+                    Lang.getInstance().translate("Confirmation transaction issue person"));
 
             IssuePersonDetailsFrame ww = new IssuePersonDetailsFrame(issuePersonRecord);
             // ww.jPanel2.setVisible(false);
