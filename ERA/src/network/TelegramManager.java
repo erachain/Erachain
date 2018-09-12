@@ -331,27 +331,6 @@ public class TelegramManager extends Thread {
         return left;
     }
 
-    /**
-     * Remove telegram
-     *
-     * @param SignTelegram list of telegramMessage
-     * @return list not remove signature(not found in list)
-     */
-    public List<TelegramMessage> deleteTelegram_old(List<TelegramMessage> SignTelegram) {
-
-        // not use list
-        List<TelegramMessage> notRemoveTelegram = new ArrayList<>();
-
-        for (TelegramMessage signature : SignTelegram) {
-            String signatureKye = Base58.encode((signature).getTransaction().getSignature());
-            this.handledTelegrams.remove(signatureKye);
-            this.telegramsForTime.remove((signature).getTransaction().getTimestamp());
-            this.telegramsForAddress.remove((signature).getTransaction().getRecipientAccounts());
-            this.telegramsCounts.remove((signature).getTransaction().getCreator());
-        }
-        return notRemoveTelegram;
-    }
-
     public synchronized boolean pipeAddRemove(TelegramMessage telegram, List<TelegramMessage> firstItem,
                                               long timeKey) {
 
