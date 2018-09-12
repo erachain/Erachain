@@ -1,24 +1,5 @@
 package gui.items.statuses;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
-
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -33,6 +14,11 @@ import gui.library.library;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.OnDealClick;
 import lang.Lang;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 @SuppressWarnings("serial")
 public class IssueStatusPanel extends JPanel {
@@ -94,7 +80,7 @@ public class IssueStatusPanel extends JPanel {
         gridy++;
 
         add_Image_Panel = new My_Add_Image_Panel(
-                Lang.getInstance().translate("Add Image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
+                Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
         GridBagConstraints gbc_add_Image_Panel = new GridBagConstraints();
         gbc_add_Image_Panel.anchor = GridBagConstraints.NORTH;
         gbc_add_Image_Panel.fill = GridBagConstraints.HORIZONTAL;
@@ -305,7 +291,7 @@ public class IssueStatusPanel extends JPanel {
 
         // CHECK VALIDATE MESSAGE
         if (result == Transaction.VALIDATE_OK) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Status issue has been sent!"),
+            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Status issue has been sent") + "!",
                     Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
             // this.dispose();
             clearPanel();

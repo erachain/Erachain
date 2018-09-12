@@ -1,32 +1,6 @@
 package gui.items.persons;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Calendar;
-import java.util.TimeZone;
-
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
-import javax.swing.text.MaskFormatter;
-
 import com.toedter.calendar.JDateChooser;
-
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -45,6 +19,21 @@ import gui.transaction.IssuePersonDetailsFrame;
 import gui.transaction.OnDealClick;
 import lang.Lang;
 import utils.Pair;
+
+import javax.swing.*;
+import javax.swing.text.MaskFormatter;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 @SuppressWarnings("serial")
 public class IssuePersonPanel extends JPanel {
@@ -485,7 +474,7 @@ public class IssuePersonPanel extends JPanel {
         txtGender = new javax.swing.JComboBox<>();
         mainPanel = new javax.swing.JPanel();
         mainScrollPane1 = new javax.swing.JScrollPane();
-        add_Image_Panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
+        add_Image_Panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add image (%1% - %2% bytes)")
                 .replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH >> 2)))
                 .replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH), 350, 350);
         alive_CheckBox = new JCheckBox();

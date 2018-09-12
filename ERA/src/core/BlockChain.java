@@ -1,17 +1,5 @@
 package core;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-
 import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
@@ -25,8 +13,14 @@ import datachain.BlocksHeadsMap;
 import datachain.DCSet;
 import datachain.TransactionMap;
 import network.Peer;
+import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import settings.Settings;
 import utils.Pair;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 public class BlockChain {
 
@@ -35,7 +29,7 @@ public class BlockChain {
 
     //public static final int START_LEVEL = 1;
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = false;
+    public static final boolean DEVELOP_USE = true;
     public static final boolean HARD_WORK = false;
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
