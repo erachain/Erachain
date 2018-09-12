@@ -1,26 +1,18 @@
 package gui.models;
 
 import controller.Controller;
-import core.BlockChain;
-import core.account.Account;
-import core.block.Block;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
-import core.transaction.CreateOrderTransaction;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.SortableList;
 import lang.Lang;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 import utils.DateTimeFormat;
 import utils.ObserverMessage;
 import utils.Pair;
 
 import javax.validation.constraints.Null;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -45,7 +37,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", " ", "Amount", "Have", "Price", "Want", "Total", "Left", "Creator", "Status"});
 
     public WalletOrdersTableModel() {
-        columnNames[COLUMN_BLOCK]= Lang.getInstance().translate("Block") + "-" + Lang.getInstance().translate("Transaction");
+        columnNames[COLUMN_BLOCK] = Lang.getInstance().translate("Block - transaction");
         Controller.getInstance().addWalletListener(this);
     }
 
@@ -140,17 +132,17 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
             case COLUMN_STATUS:
 
                 if (order.getAmountHave().compareTo(order.getFulfilledHave()) == 0) {
-                    return "DONE";
+                    return Lang.getInstance().translate("Done");
                 } else {
 
                     if (DCSet.getInstance().getCompletedOrderMap().contains(order.getId()))
-                        return "Canceled";
+                        return Lang.getInstance().translate("Canceled");
 
                     if (DCSet.getInstance().getOrderMap().contains(order.getId())) {
                         if (order.getFulfilledHave().signum() == 0)
-                            return "ACTIVE";
+                            return Lang.getInstance().translate("Active");
                         else
-                            return "Fulfilled";
+                            return Lang.getInstance().translate("Fulfilled");
                     }
 
                     return "orphaned"; //"unconfirmed";
