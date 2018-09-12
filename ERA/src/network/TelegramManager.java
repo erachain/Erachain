@@ -194,10 +194,11 @@ public class TelegramManager extends Thread {
         }
     }
 
-    public long delete (long timestamp, String recipient, String filter) {
+    // delete all TO this timestamp
+    public long deleteToTimestamp (long timestamp, String recipient, String filter) {
         long counter = 0;
 
-        SortedMap<Long, List<TelegramMessage>> subMap = telegramsForTime.tailMap(timestamp);
+        SortedMap<Long, List<TelegramMessage>> subMap = telegramsForTime.headMap(timestamp);
         for (Long time_item : subMap.keySet()) {
             List<TelegramMessage> telegramsTimestamp = telegramsForTime.remove(time_item);
             if (telegramsTimestamp == null || telegramsTimestamp.isEmpty())
@@ -228,7 +229,7 @@ public class TelegramManager extends Thread {
         return counter;
     }
 
-    public long delete (String recipient, long timestamp, String filter) {
+    public long deleteForRecipient (String recipient, long timestamp, String filter) {
         long counter = 0;
 
         List<TelegramMessage> telegrams = telegramsForAddress.remove(recipient);

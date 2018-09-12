@@ -250,11 +250,11 @@ public class Network extends Observable implements ConnectionCallback {
         return this.telegramer.deleteList(telegramSignatures);
     }
 
-    public long deleteTelegrams(long timestamp, String recipient, String title) {
-        return this.telegramer.delete(timestamp, recipient, title);
+    public long deleteTelegramsToTimestamp(long timestamp, String recipient, String title) {
+        return this.telegramer.deleteToTimestamp(timestamp, recipient, title);
     }
-    public long deleteTelegrams(String recipient, long timestamp, String title) {
-        return this.telegramer.delete(recipient, timestamp, title);
+    public long deleteTelegramsForRecipient(String recipient, long timestamp, String title) {
+        return this.telegramer.deleteForRecipient(recipient, timestamp, title);
     }
 
     public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter) {

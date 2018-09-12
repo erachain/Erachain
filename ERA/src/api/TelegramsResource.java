@@ -553,7 +553,7 @@ public class TelegramsResource {
     }
 
     /**
-     * Remove telegram by timestamp then address and title
+     * Remove telegram to this timestamp then address and title
      * Remove telegram if this node creator
      * <h2>Example request</h2>
      * GET telegrams/delete/12345678900?address=79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy&title=head
@@ -570,8 +570,8 @@ public class TelegramsResource {
      * @return count int
      */
     @GET
-    @Path("deletemytimestamp/{timestamp}")
-    public String deleteTelegramByTimestamp(@PathParam("timestamp") long timestamp,
+    @Path("deletetotimestamp/{timestamp}")
+    public String deleteTelegramToTimestamp(@PathParam("timestamp") long timestamp,
                                @QueryParam("address") String address,
                                @QueryParam("title") String title) {
 
@@ -579,7 +579,7 @@ public class TelegramsResource {
 
 
 
-        return "" + controller.deleteTelegrams(timestamp, address, title);
+        return "" + controller.deleteTelegramsToTimestamp(timestamp, address, title);
 
     }
 
@@ -601,14 +601,14 @@ public class TelegramsResource {
      * @return count int
      */
     @GET
-    @Path("deletebyrecipient/{address}")
-    public String deleteTelegramByAddress(@PathParam("address") String address,
+    @Path("deleteforrecipient/{address}")
+    public String deleteTelegramForRecipient(@PathParam("address") String address,
                                            @QueryParam("timestamp") long timestamp,
                                            @QueryParam("title") String title) {
 
         Controller controller = Controller.getInstance();
 
-        return "" + controller.deleteTelegrams(address, timestamp, title);
+        return "" + controller.deleteTelegramsForRecipient(address, timestamp, title);
 
     }
 
