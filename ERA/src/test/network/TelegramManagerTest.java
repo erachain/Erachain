@@ -98,18 +98,18 @@ public class TelegramManagerTest {
 
         }
 
-        telegrams = telegramer.getTelegramsFromTimestamp(0l, null);
+        telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null);
         assertEquals(telegrams.size(), 100);
 
         transaction = telegrams.get(10).getTransaction();
         String signanureStr = Base58.encode(transaction.getSignature());
 
         ///////////// DELETE ONE
-        telegramer.delete(signanureStr);
+        telegramer.delete(signanureStr, true, true);
 
         assertEquals((int)telegramer.telegramCount(), 100 - 1);
 
-        telegrams = telegramer.getTelegramsFromTimestamp(0l, null);
+        telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null);
         assertEquals(telegrams.size(), 100 - 1);
 
         telegrams = telegramer.getTelegramsForAddress(recipient1.getAddress(), 0, null);
@@ -128,7 +128,7 @@ public class TelegramManagerTest {
 
         assertEquals((int)telegramer.telegramCount(), 100 - 1 - signsList.size());
 
-        telegrams = telegramer.getTelegramsFromTimestamp(0l, null);
+        telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null);
         assertEquals(telegrams.size(), 100 - 1 - signsList.size());
 
         telegrams = telegramer.getTelegramsForAddress(recipient1.getAddress(), 0, null);
