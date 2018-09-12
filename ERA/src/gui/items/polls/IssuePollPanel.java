@@ -97,7 +97,7 @@ public class IssuePollPanel extends JPanel {
 
         // ICON
         add_Image_Panel = new My_Add_Image_Panel(
-                Lang.getInstance().translate("Add Image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
+                Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
 
         GridBagConstraints gbc_add_Image_Panel = new GridBagConstraints();
         gbc_add_Image_Panel.anchor = GridBagConstraints.NORTH;
@@ -366,7 +366,7 @@ public class IssuePollPanel extends JPanel {
         int result = Controller.getInstance().getTransactionCreator().afterCreate(issuePoll, Transaction.FOR_NETWORK);
 
         if (result == Transaction.VALIDATE_OK) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Poll issue has been sent!"),
+            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Poll issue has been sent") + "!",
                     Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 
         } else {

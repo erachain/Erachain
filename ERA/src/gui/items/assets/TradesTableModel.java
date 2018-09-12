@@ -10,15 +10,12 @@ import gui.models.TableModelCls;
 import lang.Lang;
 import ntp.NTP;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 import utils.DateTimeFormat;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -149,7 +146,8 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
 
             case COLUMN_TYPE:
 
-                return type == 0 ? "" : type > 0 ? "Sell" : "Buy";
+                return type == 0 ? "" : type > 0 ? Lang.getInstance().translate("Sell") :
+                        Lang.getInstance().translate("Buy");
 
             case COLUMN_ASSET_1:
 

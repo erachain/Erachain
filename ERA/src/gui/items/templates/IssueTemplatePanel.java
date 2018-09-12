@@ -151,7 +151,7 @@ public class IssueTemplatePanel extends JPanel {
         switch (result) {
             case Transaction.VALIDATE_OK:
 
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Template issue has been sent!"),
+                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Template issue has been sent") + "!",
                         Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
                 // this.dispose();
 
@@ -228,7 +228,7 @@ public class IssueTemplatePanel extends JPanel {
         gridBagConstraints.insets = new Insets(0, 15, 5, 5);
         add(jLabel_Account_Creator, gridBagConstraints);
         add_Image_Panel = new My_Add_Image_Panel(
-                Lang.getInstance().translate("Add Image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
+                Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
 
         gridBagConstraints_3 = new java.awt.GridBagConstraints();
         gridBagConstraints_3.gridheight = 4;
