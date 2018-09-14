@@ -4,7 +4,6 @@ import core.account.Account;
 import core.block.Block;
 import database.DBMap;
 import database.serializer.BlockHeadSerializer;
-import database.serializer.BlockSerializer;
 import datachain.DCMap;
 import org.apache.log4j.Logger;
 import org.mapdb.BTreeKeySerializer;

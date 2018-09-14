@@ -14,6 +14,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import core.BlockChain;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 
@@ -106,8 +107,12 @@ public class API_TelegramsResource {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
         }
 
+        int limit = BlockChain.HARD_WORK? 10000 : 1000;
         JSONArray array = new JSONArray();
         for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(address, timestamp, filter)) {
+            if (--limit < 0)
+                break;
+
             array.add(telegram.toJson());
         }
 
@@ -120,10 +125,12 @@ public class API_TelegramsResource {
     public Response getTelegramsLimited(@PathParam("timestamp") long timestamp,
                                       @QueryParam("filter") String filter) {
 
-        // CREATE JSON OBJECT
+        int limit = BlockChain.HARD_WORK? 10000 : 1000;
         JSONArray array = new JSONArray();
-
         for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, null, filter)) {
+            if (--limit < 0)
+                break;
+
             array.add(telegram.toJson());
         }
 
