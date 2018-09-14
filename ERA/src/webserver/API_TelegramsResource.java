@@ -31,13 +31,7 @@ import utils.StrJSonFine;
 public class API_TelegramsResource {
 
     static Logger LOGGER = Logger.getLogger(API_TelegramsResource.class.getName());
-    private static int count_step;
-    private static boolean run_test = false;
-    private static Thread thread;
-    private static int sleep;
-    private static BigDecimal amm;
-    private static byte[] mes;
-    protected String tt;
+
     @Context
     HttpServletRequest request;
 
