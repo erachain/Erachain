@@ -21,11 +21,11 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
     public static final int COLUMN_FAVORITE = 5;
     public static final int COLUMN_I_OWNER = 6;
 
-    private SortableList<Long, AssetCls> assets;
+    private SortableList<Long, AssetCls> assetsSorted;
 
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false, false, false, false};
-    private List<AssetCls> persons;
+    private List<AssetCls> assets;
 
     public TableModelItemAssetsFavorute() {
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
@@ -45,7 +45,7 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
 
     @Override
     public SortableList<Long, AssetCls> getSortableList() {
-        return this.assets;
+        return this.assetsSorted;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
     }
 
     public AssetCls getAsset(int row) {
-        return this.persons.get(row);
+        return this.assets.get(row);
     }
 
     @Override
@@ -70,17 +70,17 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
 
     @Override
     public int getRowCount() {
-        return this.persons.size();
+        return this.assets.size();
 
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.persons == null || row > this.persons.size() - 1) {
+        if (this.assets == null || row > this.assets.size() - 1) {
             return null;
         }
 
-        AssetCls asset = this.persons.get(row);
+        AssetCls asset = this.assets.get(row);
         if (asset == null) return null;
 
         switch (column) {
@@ -132,25 +132,31 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
         ObserverMessage message = (ObserverMessage) arg;
 
         //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.LIST_ASSET_FAVORITES_TYPE && persons == null) {
-            persons = new ArrayList<AssetCls>();
+        int type = message.getType();
+        if (type == ObserverMessage.LIST_ASSET_FAVORITES_TYPE && assets == null) {
+            assets = new ArrayList<AssetCls>();
             fill((Set<Long>) message.getValue());
             this.fireTableDataChanged();
-        }
-        if (message.getType() == ObserverMessage.ADD_ASSET_FAVORITES_TYPE) {
-            persons.add(Controller.getInstance().getAsset((long) message.getValue()));
+        } else if (type == ObserverMessage.ADD_ASSET_FAVORITES_TYPE) {
+            assets.add(Controller.getInstance().getAsset((long) message.getValue()));
             this.fireTableDataChanged();
-        }
-        if (message.getType() == ObserverMessage.DELETE_ASSET_FAVORITES_TYPE) {
-            persons.remove(Controller.getInstance().getAsset((long) message.getValue()));
+        } else if (type == ObserverMessage.DELETE_ASSET_FAVORITES_TYPE) {
+            assets.remove(Controller.getInstance().getAsset((long) message.getValue()));
             this.fireTableDataChanged();
         }
     }
 
     public void fill(Set<Long> set) {
+        AssetCls asset;
         for (Long s : set) {
-            if (s == 0) continue;
-            persons.add(Controller.getInstance().getAsset(s));
+            if (s < 1)
+                continue;
+
+            asset = Controller.getInstance().getAsset(s);
+            if (asset == null)
+                continue;
+
+            assets.add(asset);
         }
     }
 
@@ -166,6 +172,6 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
     @Override
     public Object getItem(int k) {
         // TODO Auto-generated method stub
-        return this.persons.get(k);
+        return this.assets.get(k);
     }
 }

@@ -12,7 +12,8 @@ public class FavoriteItemAsset extends FavoriteItem {
 
     // favorites init SET
     public FavoriteItemAsset(DWSet dWSet, DB database) {
-        super(dWSet, database, ObserverMessage.LIST_ASSET_FAVORITES_TYPE, "asset", AssetCls.INITIAL_FAVORITES);
+        super(dWSet, database, ObserverMessage.LIST_ASSET_FAVORITES_TYPE, "asset", AssetCls.INITIAL_FAVORITES //, dWSet.getAssetMap()
+        );
 
     }
 

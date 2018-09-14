@@ -132,33 +132,37 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
+        int type = message.getType();
         //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.LIST_PERSON_FAVORITES_TYPE && persons == null) {
+        if (type == ObserverMessage.LIST_PERSON_FAVORITES_TYPE && persons == null) {
             persons = new ArrayList<PersonCls>();
             fill((Set<Long>) message.getValue());
             fireTableDataChanged();
-        }
-        if (message.getType() == ObserverMessage.ADD_PERSON_FAVORITES_TYPE) {
+        } else if (type == ObserverMessage.ADD_PERSON_FAVORITES_TYPE) {
             persons.add(Controller.getInstance().getPerson((long) message.getValue()));
             fireTableDataChanged();
-        }
-        if (message.getType() == ObserverMessage.DELETE_PERSON_FAVORITES_TYPE) {
+        } else if (type == ObserverMessage.DELETE_PERSON_FAVORITES_TYPE) {
             persons.remove(Controller.getInstance().getPerson((long) message.getValue()));
             fireTableDataChanged();
         }
 
-
     }
-
 
     public void fill(Set<Long> set) {
 
         //	persons.clear();
 
+        PersonCls person;
         for (Long s : set) {
 
-            persons.add(Controller.getInstance().getPerson(s));
+            if ( s < 1)
+                continue;
 
+            person = Controller.getInstance().getPerson(s);
+            if (person == null)
+                continue;
+
+            persons.add(person);
 
         }
 

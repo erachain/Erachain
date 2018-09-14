@@ -60,11 +60,11 @@ public abstract class AssetCls extends ItemCls {
     public static final int UNIQUE = 1;
     public static final int VENTURE = 2;
     public static final int NAME = 3;
-    public static final int INITIAL_FAVORITES = 4;
+    public static final int INITIAL_FAVORITES = 100;
     protected static final int SCALE_LENGTH = 1;
     protected static final int ASSET_TYPE_LENGTH = 1;
 
-    public static final long START_KEY = 1000l;
+    public static final long START_KEY = 100;
 
     ///////////////////////////////////////////////////
     /**

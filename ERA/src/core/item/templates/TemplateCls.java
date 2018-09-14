@@ -21,7 +21,7 @@ public abstract class TemplateCls extends ItemCls {
     public static final long UNMARRIAGE_KEY = 4l;
     public static final long HIRING_KEY = 5l;
     public static final long UNHIRING_KEY = 6l;
-    public static final int INITIAL_FAVORITES = 0;
+    public static final int INITIAL_FAVORITES = 10;
     protected static final int PLATE = 1;
     protected static final int SAMPLE = 2;
     protected static final int PAPER = 3;

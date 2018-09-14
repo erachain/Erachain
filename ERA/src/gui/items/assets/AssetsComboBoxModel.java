@@ -43,10 +43,9 @@ public class AssetsComboBoxModel extends DefaultComboBoxModel<AssetCls> implemen
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
+        int type = message.getType();
         //CHECK IF LIST UPDATED
-        if (message.getType() == ObserverMessage.LIST_ASSET_FAVORITES_TYPE
-              
-                
+        if (type == ObserverMessage.LIST_ASSET_FAVORITES_TYPE
                 ) {
             //GET SELECTED ITEM
             AssetCls selected = (AssetCls) this.getSelectedItem();
@@ -64,6 +63,9 @@ public class AssetsComboBoxModel extends DefaultComboBoxModel<AssetCls> implemen
 
                 //GET ASSET
                 AssetCls asset = Controller.getInstance().getAsset(key);
+                if (asset == null)
+                    continue;
+
                 assets.add(asset);
 
                 //ADD
@@ -87,12 +89,10 @@ public class AssetsComboBoxModel extends DefaultComboBoxModel<AssetCls> implemen
                     }
                 }
             }
-        } 
-        if (message.getType() == ObserverMessage.ADD_ASSET_FAVORITES_TYPE) {
+        } else if (type == ObserverMessage.ADD_ASSET_FAVORITES_TYPE) {
             this.addElement(Controller.getInstance().getAsset((long) message.getValue()));
            
-        }
-        if (message.getType() == ObserverMessage.DELETE_ASSET_FAVORITES_TYPE) {
+        } else if (type == ObserverMessage.DELETE_ASSET_FAVORITES_TYPE) {
             this.removeElement(Controller.getInstance().getAsset((long) message.getValue()));
             
         }

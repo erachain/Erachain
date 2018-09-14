@@ -17,19 +17,20 @@ public class FavoriteItem extends Observable {
 
     // favorites init SET
     public FavoriteItem(DWSet dWSet, DB database, int observer_favorites,
-                        String treeSet, int initialAdd) {
+                        String treeSet, int initialAdd //, WItem_Map map
+    ) {
         this.dWSet = dWSet;
         this.observer_favorites = observer_favorites;
 
         //OPEN MAP
         this.itemsSet = database.getTreeSet(treeSet + "Favorites");
 
-        for (long i = 0; i < initialAdd; i++) {
+        for (long i = 1; i <= initialAdd; i++) {
             //CHECK IF CONTAINS ITEM
-            if (!this.itemsSet.contains(i)) {
+            if (!this.itemsSet.contains(i)
+                //&& map.contains(i)
+            ) {
                 this.add(i);
-            } else {
-                break;
             }
         }
     }
