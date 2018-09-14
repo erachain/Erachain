@@ -556,21 +556,21 @@ public class TelegramsResource {
      * Remove telegram to this timestamp then address and title
      * Remove telegram if this node creator
      * <h2>Example request</h2>
-     * GET telegrams/delete/12345678900?address=79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy&title=head
+     * GET telegrams/deleteToTimestamp/12345678900?address=79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy&title=head
      *
      *
      * <h2>Example response</h2>
      * return counter of deletions
      *
-     * @param timestamp  timestamp
-     * @param address    recipient address
-     * @param title      title
+     * @param timestamp  timestamp (long)
+     * @param address    recipient address (String)
+     * @param title      title (String)
      *
      *
      * @return count int
      */
     @GET
-    @Path("deletetotimestamp/{timestamp}")
+    @Path("deleteToTimestamp/{timestamp}")
     public String deleteTelegramToTimestamp(@PathParam("timestamp") long timestamp,
                                @QueryParam("address") String address,
                                @QueryParam("title") String title) {
@@ -593,15 +593,15 @@ public class TelegramsResource {
      * <h2>Example response</h2>
      * return counter of deletions
      *
-     * @param address    recipient address
-     * @param timestamp  timestamp
-     * @param title      title
+     * @param address    recipient address (String)
+     * @param timestamp  timestamp (long)
+     * @param title      title (String)
      *
      *
      * @return count int
      */
     @GET
-    @Path("deleteforrecipient/{address}")
+    @Path("deleteForRecipient/{address}")
     public String deleteTelegramForRecipient(@PathParam("address") String address,
                                            @QueryParam("timestamp") long timestamp,
                                            @QueryParam("title") String title) {
