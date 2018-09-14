@@ -400,9 +400,17 @@ public class TelegramManager extends Thread {
             // java.util.Base64.getEncoder().encodeToString(transaction.getSignature());
             signatureKey = Base58.encode(transaction.getSignature());
 
-            Message old_value = this.handledTelegrams.put(signatureKey, telegram.copy());
-            if (old_value != null)
-                return true;
+            if (false) {
+                Message old_value = this.handledTelegrams.put(signatureKey, telegram.copy());
+                if (old_value != null)
+                    return true;
+            } else {
+                if (this.handledTelegrams.containsKey(signatureKey))
+                    return true;
+
+                this.handledTelegrams.put(signatureKey, telegram);
+
+            }
 
             // MAP timestamps
             List<TelegramMessage> timestampTelegrams = this.telegramsForTime.get(timestamp);

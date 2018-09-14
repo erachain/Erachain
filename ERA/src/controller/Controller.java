@@ -1638,13 +1638,12 @@ public class Controller extends Observable {
         // CREATE MESSAGE
         Message telegram = MessageFactory.getInstance().createTelegramMessage(transaction);
 
-        if (store) {
-            this.network.addTelegram((TelegramMessage) telegram);
+        if (!store || !this.network.addTelegram((TelegramMessage) telegram)) {
+            // BROADCAST MESSAGE
+            List<Peer> excludes = new ArrayList<Peer>();
+            this.network.asyncBroadcast(telegram, excludes, false);
         }
 
-        // BROADCAST MESSAGE
-        List<Peer> excludes = new ArrayList<Peer>();
-        this.network.asyncBroadcast(telegram, excludes, false);
     }
 
     // SYNCHRONIZE
