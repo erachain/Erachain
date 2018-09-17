@@ -21,7 +21,7 @@ public class TelegramManager extends Thread {
     /**
      * count telegrams
      */
-    private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK ? 1 << 20 : 1 << 16;
+    private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK ? 1 << 20 : 1 << 20;
     /**
      * time to live telegram
      */
@@ -55,6 +55,12 @@ public class TelegramManager extends Thread {
 
     public Integer telegramCount(){
         return handledTelegrams.size();
+    }
+
+    public List<TelegramMessage> toList(){
+        List<TelegramMessage> result = new ArrayList();
+        result.addAll(handledTelegrams.values());
+        return result;
     }
 
 

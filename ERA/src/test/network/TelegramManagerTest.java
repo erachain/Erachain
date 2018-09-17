@@ -1,10 +1,13 @@
 package network;
 
 import api.ApiErrorFactory;
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.AEScrypto;
 import core.crypto.Base58;
@@ -18,11 +21,14 @@ import network.message.Message;
 import network.message.MessageFactory;
 import network.message.TelegramMessage;
 import ntp.NTP;
+import org.json.simple.JSONObject;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 
@@ -133,6 +139,109 @@ public class TelegramManagerTest {
 
         telegrams = telegramer.getTelegramsForAddress(recipient1.getAddress(), 0, null);
         assertEquals(telegrams.size(), 100 - 1 - signsList.size());
+
+    }
+
+    @Test
+    public void generateRandomTelegram() {
+
+        init();
+
+        ArrayList<PrivateKeyAccount> arrayListCreator = new ArrayList();
+        ArrayList<Account> arrayListRecipient = new ArrayList();
+
+        Random random = new Random();
+        byte[] nonceBytes;
+        byte[] addressSeed;
+
+        // MAKE CREATORS
+        int creatorCount = 1000;
+        for (int i = 0; i < creatorCount; i++) {
+
+            nonceBytes = Ints.toByteArray(Integer.valueOf(i));
+            addressSeed = Crypto.getInstance().doubleDigest(Bytes.concat(nonceBytes, seed, nonceBytes));
+            byte[] privateKey = Crypto.getInstance().createKeyPair(addressSeed).getA();
+            PrivateKeyAccount sender = new PrivateKeyAccount(privateKey);
+            arrayListCreator.add(sender);
+
+        }
+
+        // MAKE RECIPIENTS
+        int recipientCount = 10000;
+        for (int i = 0; i < recipientCount; i++) {
+
+            nonceBytes = Ints.toByteArray(Integer.valueOf(-i));
+            addressSeed = Crypto.getInstance().doubleDigest(Bytes.concat(nonceBytes, seed, nonceBytes));
+            byte[] publicKey = Crypto.getInstance().createKeyPair(addressSeed).getB();
+            Account recipient = new Account(new PublicKeyAccount(publicKey).getAddress());
+            arrayListRecipient.add(recipient);
+
+        }
+
+        long date = System.currentTimeMillis();
+
+        // MAKE TELEGRAMS
+        for (int i = 0; i < 100000; i++) {
+
+            PrivateKeyAccount creator = arrayListCreator.get(random.nextInt(creatorCount));
+            Account recipient = arrayListRecipient.get(random.nextInt(recipientCount));
+            int user = random.nextInt(33465666);
+            //int expire = random.nextInt(1243555959);
+            int randomPrice = random.nextInt(10000);
+
+            String phone = String.valueOf(random.nextInt(999 - 100) + 100) +
+                    String.valueOf(random.nextInt(999 - 100) + 100) +
+                    String.valueOf(random.nextInt(9999 - 1000) + 1000);
+
+            String message = user + ":" + randomPrice;
+
+            Transaction transaction = new R_Send(creator, (byte) 0, recipient, 0, amount, phone,
+                    message.getBytes(), new byte[1], new byte[1],
+                    System.currentTimeMillis(), 0l);
+            transaction.sign(creator, Transaction.FOR_NETWORK);
+
+            Message telegram = MessageFactory.getInstance().createTelegramMessage(transaction);
+
+            telegramer.pipeAddRemove((TelegramMessage) telegram, null, 0);
+        }
+
+        long date2 = System.currentTimeMillis();
+        long diff = date2 - date;
+
+        // CHECK network.TelegramManager.MAX_HANDLED_TELEGRAMS_SIZE
+        int listCounter = telegramer.telegramCount();
+        System.out.println("Making " + listCounter + " telegrams: " + diff);
+
+        long i = 0;
+        List<TelegramMessage> list = telegramer.toList();
+
+        int testInx = 1000;
+        // TEST SPEED
+        date = System.currentTimeMillis();
+        for (long k = 0; k < testInx; k++) {
+            for (TelegramMessage item : list) {
+                if (Arrays.equals(item.getTransaction().getSignature(),
+                        list.get(random.nextInt(listCounter)).getTransaction().getSignature()))
+                    i++;
+            }
+        }
+
+        date2 = System.currentTimeMillis();
+        diff = date2 - date;
+        System.out.println("time for seek of " + testInx + "times telegrams in List: " + (diff / 2) + " ms");
+
+        ///
+        // TEST SPEED
+        date = System.currentTimeMillis();
+        for (long k = 0; k < testInx; k++) {
+            if (telegramer.getTelegram(Base58.encode(
+                    list.get(random.nextInt(listCounter)).getTransaction().getSignature())) != null)
+                i++;
+        }
+
+        date2 = System.currentTimeMillis();
+        diff = date2 - date;
+        System.out.println("time for seek of " + testInx + "times telegrams in HashMap: " + diff + " ms");
 
     }
 
