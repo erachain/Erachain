@@ -64,7 +64,7 @@ public abstract class AssetCls extends ItemCls {
     protected static final int SCALE_LENGTH = 1;
     protected static final int ASSET_TYPE_LENGTH = 1;
 
-    public static final long START_KEY = 100;
+    public static final long START_KEY = 1000;
 
     ///////////////////////////////////////////////////
     /**

@@ -876,10 +876,6 @@ public abstract class TransactionAmount extends Transaction {
         if (this.amount == null)
             return;
 
-        if (BlockChain.DEVELOP_USE && this.asset == null) {
-            return;
-        }
-        
         DCSet db = this.dcSet;
 
         int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
@@ -1007,10 +1003,6 @@ public abstract class TransactionAmount extends Transaction {
         
         if (this.amount == null)
             return;
-
-        if (BlockChain.DEVELOP_USE && this.asset == null) {
-            return;
-        }
 
         DCSet db = this.dcSet;
         
