@@ -872,12 +872,16 @@ public abstract class TransactionAmount extends Transaction {
     public void process(Block block, int asDeal) {
         
         super.process(block, asDeal);
-        
-        DCSet db = this.dcSet;
-        
+
         if (this.amount == null)
             return;
+
+        if (BlockChain.DEVELOP_USE && this.asset == null) {
+            return;
+        }
         
+        DCSet db = this.dcSet;
+
         int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
         if (amount_sign == 0)
             return;
@@ -1003,7 +1007,11 @@ public abstract class TransactionAmount extends Transaction {
         
         if (this.amount == null)
             return;
-        
+
+        if (BlockChain.DEVELOP_USE && this.asset == null) {
+            return;
+        }
+
         DCSet db = this.dcSet;
         
         int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
