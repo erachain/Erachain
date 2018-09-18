@@ -36,7 +36,9 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
     public WalletBlocksTableModel() {
         //Controller.getInstance().addWalletListener(this);
         Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this);
+        Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.blocks);
         this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
+        this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
     }
 
     @Override
@@ -153,24 +155,27 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE) {
-            this.blocks = (SortableList<Tuple2<String, String>, Block.BlockHead>) message.getValue();
             //this.blocks.registerObserver();
-            Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.blocks);
-            this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            //Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.blocks);
+            //this.blocks = (SortableList<Tuple2<String, String>, Block.BlockHead>) message.getValue();
+            this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
+            //this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
             this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
                 || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
                 ) {
+            // тут вставить обработку на запрос обновления - не обновлять сразу - а раз в 30 секунд только
+            // как это сделано в Мои Ордера
             //CHECK IF LIST UPDATED
-            this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            //this.blocks = (SortableList<Tuple2<String, String>, Block.BlockHead>) message.getValue();
             this.fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE
                 ) {
             //CHECK IF LIST UPDATED
-            //this.blocks = new SortableList();
-            this.blocks.registerObserver();
-            this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
+            //this.blocks.registerObserver();
+            //this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
             this.fireTableDataChanged();
         }
     }
@@ -178,7 +183,6 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
     public void deleteObserver() {
         Controller.getInstance().wallet.database.getBlocksHeadMap().deleteObserver(this);
         Controller.getInstance().wallet.database.getBlocksHeadMap().deleteObserver(this.blocks);
-
     }
 
     @Override

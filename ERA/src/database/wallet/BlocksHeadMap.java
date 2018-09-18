@@ -28,6 +28,7 @@ import java.util.*;
  */
 
 public class BlocksHeadMap extends DCMap<Tuple2<String, String>, Block.BlockHead> {
+// нужно сделать так: public class BlocksHeadMap extends DCMap<Integer, Block.BlockHead> {
     public static final int TIMESTAMP_INDEX = 1;
     public static final int GENERATOR_INDEX = 2;
     public static final int BALANCE_INDEX = 3;
@@ -134,7 +135,7 @@ public class BlocksHeadMap extends DCMap<Tuple2<String, String>, Block.BlockHead
     protected Map<Tuple2<String, String>, Block.BlockHead> getMap(DB database) {
         //OPEN MAP
         return database.createTreeMap("blocks")
-                .keySerializer(BTreeKeySerializer.TUPLE2)
+                .keySerializer(BTreeKeySerializer.TUPLE2) /// ТУТ тоже переделать на стандартный серилиазотор
                 .valueSerializer(new BlockHeadSerializer())
                 .valuesOutsideNodesEnable()
                 .counterEnable()
