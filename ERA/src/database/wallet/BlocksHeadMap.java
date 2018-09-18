@@ -61,7 +61,7 @@ public class BlocksHeadMap extends DCMap<Tuple2<String, String>, Block.BlockHead
                 Block.BlockHead>() {
             @Override
             public Integer run(Tuple2<String, String> key, Block.BlockHead value) {
-                return value.forgingValue;
+                return value.heightBlock;
             }
         });
 

@@ -163,6 +163,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
                 || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
                 ) {
             //CHECK IF LIST UPDATED
+            this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
             this.fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE
                 ) {

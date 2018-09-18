@@ -206,12 +206,14 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
                 this.blocks.remove(0);
             } catch (Exception e) {
                 resetRows();
+                this.fireTableDataChanged();
                 return;
             }
             if (this.blocks.size() > 10) {
                 this.fireTableRowsDeleted(0, 0);
             } else {
                 resetRows();
+                this.fireTableDataChanged();
             }
 
         } else if (type == ObserverMessage.CHAIN_RESET_BLOCK_TYPE) {
