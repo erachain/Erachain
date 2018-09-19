@@ -81,6 +81,7 @@ public class APIUtils {
             } else {
                 min_length = 8;
             }
+            if (BlockChain.DEVELOP_USE) min_length =0;
 
             if (password != null) {
                 if (password.length() <= min_length)

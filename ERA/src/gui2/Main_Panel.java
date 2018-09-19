@@ -42,6 +42,8 @@ import gui.items.unions.IssueUnionPanel;
 import gui.items.unions.My_Unions_Tab;
 import gui.items.unions.Search_Union_Tab;
 import gui.library.MSplitPane;
+import gui.telegrams.Telegram_Send_Panel;
+import gui.telegrams.Telegrams_My_SplitPanel;
 import lang.Lang;
 
 import javax.swing.*;
@@ -535,8 +537,24 @@ public class Main_Panel extends javax.swing.JPanel {
                 insertTab(Lang.getInstance().translate("Wallets Manager"), new Wallets_Manager_SplitPanel());
                 return;
             }
+            
         }
 
+        if (str.equals(Lang.getInstance().translate("My Telegrams"))
+                || str.equals("Telegrams_My_SplitPanel")) {
+            insertTab(Lang.getInstance().translate("My Telegrams"), new Telegrams_My_SplitPanel());
+
+            return;
+        }
+        
+        if (str.equals(Lang.getInstance().translate("Send Telegram"))
+                || str.equals("Telegram_Send_Panel")) {
+            insertTab(Lang.getInstance().translate("Send Telegram"), new Telegram_Send_Panel(null,null,null,null));
+
+            return;
+        }
+        
+        
     }
 
     // insert tab in tabbedpane

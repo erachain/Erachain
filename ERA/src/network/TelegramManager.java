@@ -11,6 +11,7 @@ import core.account.Account;
 import core.crypto.Base58;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
+import database.wallet.DWSet;
 import datachain.DCSet;
 import network.message.Message;
 import network.message.TelegramMessage;
@@ -413,10 +414,19 @@ public class TelegramManager extends Thread {
             } else {
                 if (this.handledTelegrams.containsKey(signatureKey))
                     return true;
-
+                
+                
                 this.handledTelegrams.put(signatureKey, telegram);
-
-            }
+              
+                // save telegram to wallet DB
+                Transaction trans = telegram.getTransaction();
+                HashSet<Account> recipients = trans.getRecipientAccounts();
+                for(Account recipient:recipients){
+                
+                  if( Controller.getInstance().wallet.accountExists(recipient.getAddress()))
+                      Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
+                }
+             }
 
             // MAP timestamps
             List<TelegramMessage> timestampTelegrams = this.telegramsForTime.get(timestamp);

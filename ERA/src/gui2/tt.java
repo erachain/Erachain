@@ -43,6 +43,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         DefaultMutableTreeNode records_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Records"));
         DefaultMutableTreeNode other_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Network DashBoard"));
         DefaultMutableTreeNode bank_Tree = new DefaultMutableTreeNode(Lang.getInstance().translate("Bank"));
+        DefaultMutableTreeNode telegrams_Tree = new DefaultMutableTreeNode(Lang.getInstance().translate("Telegrams"));
 
         if (BlockChain.DEVELOP_USE)
             root.add(bank_Tree);
@@ -61,6 +62,9 @@ public class tt extends JPanel { // implements TreeSelectionListener {
             root.add(hashes_Node);
         if (BlockChain.DEVELOP_USE)
             root.add(linked_hashes_Node);
+        if (BlockChain.DEVELOP_USE)
+            root.add(telegrams_Tree);
+        
         root.add(records_Node);
         root.add(other_Node);
 
@@ -123,6 +127,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Other")));
         if (BlockChain.DEVELOP_USE)
             other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Wallets Manager")));
+        
         other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Console")));
         other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Blocks")));
 
@@ -133,6 +138,10 @@ public class tt extends JPanel { // implements TreeSelectionListener {
 
         linked_hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Linked Hash")));
         linked_hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Linked Hash")));
+        
+       
+        telegrams_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Telegrams")));
+        telegrams_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Send Telegram")));
 
         tree = new JTree(root);
         // tree.addTreeSelectionListener(this);

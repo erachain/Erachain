@@ -48,6 +48,7 @@ public class DWSet implements IDB {
     private FavoriteItemTemplate templateFavoritesSet;
     private FavoriteItemImprint imprintFavoritesSet;
     private FavoriteItemPoll pollFavoriteSet;
+    private TelegramsMap telegramsMap;
 
     private FavoriteItemPerson personFavoritesSet;
     private FavoriteItemStatus statusFavoritesSet;
@@ -99,6 +100,7 @@ public class DWSet implements IDB {
         this.statusFavoritesSet = new FavoriteItemStatus(this, this.database);
         this.unionFavoritesSet = new FavoriteItemUnion(this, this.database);
         this.statementFavoritesSet = new FavoriteDocument(this, this.database);
+        this.telegramsMap = new TelegramsMap(this,this.database);
 
     }
 
@@ -315,8 +317,14 @@ public class DWSet implements IDB {
         } else {
             return null;
         }
+        
+          
     }
 
+    public TelegramsMap getTelegramsMap() {
+        return this.telegramsMap;
+    }
+    
     public void delete(PublicKeyAccount account) {
         this.uses++;
 
@@ -335,7 +343,7 @@ public class DWSet implements IDB {
         this.statusMap.delete(account);
         this.orderMap.delete(account);
         this.accountsPropertisMap.delete(account.getAddress());
-
+        this.telegramsMap.deleteFromAccount(account);
         this.uses--;
 
     }
