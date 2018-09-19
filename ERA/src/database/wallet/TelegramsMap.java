@@ -23,7 +23,7 @@ public class TelegramsMap extends  DCMap<String , Transaction> {
 
         this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_TELEGRAM_TYPE);
         this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_TELEGRAM_TYPE);
-        this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_TELEGRAM_TYPE);
+        this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_TELEGRAM_TYPE);
         this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_TELEGRAM_TYPE);
     }
 

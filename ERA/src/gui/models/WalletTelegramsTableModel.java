@@ -212,8 +212,10 @@ public class WalletTelegramsTableModel extends TableModelCls<String, Transaction
             this.fireTableDataChanged();
 
         
-        } else if (message.getType() ==ObserverMessage.WALLET_ADD_TELEGRAM_TYPE || 
-                message.getType() ==ObserverMessage.WALLET_RESET_TELEGRAM_TYPE)
+        } 
+        if (message.getType() ==ObserverMessage.WALLET_ADD_TELEGRAM_TYPE || 
+                message.getType() ==ObserverMessage.WALLET_RESET_TELEGRAM_TYPE 
+                || message.getType() ==ObserverMessage.WALLET_REMOVE_TELEGRAM_TYPE)
                                         this.fireTableDataChanged();
 
         

@@ -301,7 +301,7 @@ public class ObserverMessage {
     public static final int WALLET_ACCOUNT_PROPERTIES_LIST = 12019;
    
     public static final int WALLET_ADD_TELEGRAM_TYPE = 1000003;
-    public static final int WALLET_TELEGRAM_TYPE = 1000001;
+    public static final int WALLET_REMOVE_TELEGRAM_TYPE = 1000001;
     public static final int WALLET_LIST_TELEGRAM_TYPE = 1000002;
     public static final int WALLET_RESET_TELEGRAM_TYPE = 1000004;
 

@@ -1,6 +1,7 @@
 package gui.telegrams;
 
 import controller.Controller;
+import core.crypto.Base58;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import gui.Split_Panel;
@@ -36,7 +37,6 @@ public class Telegrams_My_SplitPanel extends Split_Panel {
     private JPanel records_Info_Panel;
     private JPopupMenu menu;
     private JMenuItem item_Delete;
-    private JMenuItem item_Rebroadcast;
     public WalletTelegramsTableModel records_model;
     public SetIntervalPanel setIntervalPanel;
 
@@ -123,21 +123,8 @@ public class Telegrams_My_SplitPanel extends Split_Panel {
 
         });
 
-        item_Rebroadcast = new JMenuItem(Lang.getInstance().translate("Rebroadcast"));
-
-        item_Rebroadcast.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // code Rebroadcast
-
-                if (trans == null) return;
-                // DBSet db = DBSet.getInstance();
-                Controller.getInstance().broadcastTransaction(trans);
-
-            }
-        });
-
-        menu.add(item_Rebroadcast);
+               
+        
         item_Delete = new JMenuItem(Lang.getInstance().translate("Delete"));
         item_Delete.addActionListener(new ActionListener() {
             @Override
@@ -148,7 +135,7 @@ public class Telegrams_My_SplitPanel extends Split_Panel {
                 //row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
                 //Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
                 if (trans == null) return;
-                DCSet.getInstance().getTransactionMap().delete(trans);
+                Controller.getInstance().wallet.database.getTelegramsMap().delete(Base58.encode(trans.getSignature()));
 
             }
         });
@@ -185,12 +172,7 @@ public class Telegrams_My_SplitPanel extends Split_Panel {
                 //	Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
                 if (trans == null) return;
                 item_Delete.setEnabled(true);
-                item_Rebroadcast.setEnabled(true);
-                if (trans.isConfirmed(DCSet.getInstance())) {
-                    item_Delete.setEnabled(false);
-                    item_Rebroadcast.setEnabled(false);
-
-                }
+                
             }
 
             @Override
