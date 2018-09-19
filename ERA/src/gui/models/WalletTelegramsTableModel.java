@@ -1,32 +1,23 @@
 package gui.models;
 
+import java.math.BigDecimal;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.validation.constraints.Null;
+
+import org.apache.log4j.Logger;
+
 import controller.Controller;
-import core.account.Account;
-import core.item.ItemCls;
 import core.item.assets.AssetCls;
-import core.transaction.*;
-import database.wallet.TransactionMap;
+import core.transaction.R_Send;
+import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.SortableList;
-import gui.Gui;
 import lang.Lang;
-import network.message.TelegramMessage;
-import ntp.NTP;
-import org.apache.log4j.Logger;
-import org.mapdb.Fun;
-import org.mapdb.Fun.Tuple2;
-import settings.Settings;
 import utils.DateTimeFormat;
 import utils.ObserverMessage;
 import utils.Pair;
-import utils.PlaySound;
-
-import javax.validation.constraints.Null;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 @SuppressWarnings("serial")
 // in list of records in wallet
@@ -181,8 +172,8 @@ public class WalletTelegramsTableModel extends TableModelCls<String, Transaction
 
         //} catch (Exception e) {
         //GUI ERROR
-        //	LOGGER.error(e.getMessage(),e);
-        //	return null;
+        //  LOGGER.error(e.getMessage(),e);
+        //  return null;
         //}
 
     }
