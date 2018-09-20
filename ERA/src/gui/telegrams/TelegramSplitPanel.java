@@ -165,6 +165,13 @@ public class TelegramSplitPanel extends Split_Panel {
        } catch (Exception e) {
            // TODO: handle exception
        }
+   } 
+   else{
+       leftTelegram.jComboAccount
+       .setSelectedIndex(0);
+       rightTelegramPanel.walletTelegramsFilterTableModel.setSender(leftTelegram.jComboAccount.getItemAt(0).getAddress());
+       rightTelegramPanel.jLabelLeft.setText(leftTelegram.jComboAccount.getItemAt(0).getAddress());
+       leftTelegram.jComboAccount.repaint();
    }
    
     leftTelegram.jComboAccount.addActionListener(new ActionListener() {

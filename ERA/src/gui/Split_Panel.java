@@ -289,6 +289,7 @@ public class Split_Panel extends javax.swing.JPanel {
     private void set_Divider_Parameters(String str) {
         settingsJSONbuf = Settings.getInstance().getJSONObject();
         JSONObject params;
+        params = new JSONObject();
         if (!settingsJSONbuf.containsKey("Main_Frame_Setting")) return;
         params = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
         if (!params.containsKey(str)) return;

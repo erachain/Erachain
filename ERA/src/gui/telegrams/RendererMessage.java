@@ -32,7 +32,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
             R_Send tr = (R_Send) model.getTelegramMessage(row);
             String a1 = model.getSender();
             String a2 = tr.getCreator().getAddress();
-           
+            if ( model.getSender() == null || tr == null ) return this;
             if(model.getSender().equals(tr.getCreator().getAddress())){
                 setHorizontalAlignment(JLabel.LEFT);
                 value = "<HTML><span style='font-size:10px;color:green'> Sender: " + value + "</span><br>" + tr.viewData();
