@@ -5,14 +5,18 @@
  */
 package gui;
 
+import java.awt.Dimension;
+
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import org.json.simple.JSONObject;
+
 import gui.library.MSplitPane;
 import gui.library.MTable;
 import lang.Lang;
-import org.json.simple.JSONObject;
 import settings.Settings;
-
-import javax.swing.*;
-import java.awt.*;
 
 
 /**
@@ -283,7 +287,7 @@ public class Split_Panel extends javax.swing.JPanel {
     }
 
     private void set_Divider_Parameters(String str) {
-        settingsJSONbuf = Settings.getInstance().read_setting_JSON();
+        settingsJSONbuf = Settings.getInstance().getJSONObject();
         JSONObject params;
         if (!settingsJSONbuf.containsKey("Main_Frame_Setting")) return;
         params = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");

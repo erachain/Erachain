@@ -157,7 +157,7 @@ public class MainFrame extends JFrame implements Observer {
                 Split_Panel sP;
                 HashMap outOpenTabbeds = new HashMap();
                 JSONObject settingsJSON = new JSONObject();
-                settingsJSONbuf = Settings.getInstance().read_setting_JSON();
+                settingsJSONbuf = Settings.getInstance().getJSONObject();
                 if (settingsJSONbuf.containsKey("Main_Frame_Setting"))
                     settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
                 if (th.getExtendedState() != MAXIMIZED_BOTH) {
@@ -211,6 +211,9 @@ public class MainFrame extends JFrame implements Observer {
                 settingsJSONbuf.put("FileChooser_Path", new String(My_JFileChooser.get_Default_Path()));
                 settingsJSONbuf.put("FileChooser_Wight", My_JFileChooser.get_Default_Width());
                 settingsJSONbuf.put("FileChooser_Height", My_JFileChooser.get_Default_Height());
+                
+                settingsJSONbuf.put("Telegram_Sender", Settings.getInstance().getTelegramDefaultSender());
+                settingsJSONbuf.put("Telegram_Reciever", Settings.getInstance().getTelegramDefaultReciever());
 
                 // saving menu
                 int tree_Row = 0;

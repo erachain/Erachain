@@ -1,15 +1,22 @@
 package gui2;
 
-import core.BlockChain;
-import lang.Lang;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
+import core.BlockChain;
+import lang.Lang;
 
 /**
  * @author DarkRaha
@@ -142,7 +149,8 @@ public class tt extends JPanel { // implements TreeSelectionListener {
        
         telegrams_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Telegrams")));
         telegrams_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Send Telegram")));
-
+        telegrams_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Telegrams Panel")));
+        
         tree = new JTree(root);
         // tree.addTreeSelectionListener(this);
         double dd = (double) UIManager.getFont("TextField.font").getSize() * 1.2;

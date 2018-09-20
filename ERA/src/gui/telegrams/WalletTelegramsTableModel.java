@@ -1,4 +1,4 @@
-package gui.models;
+package gui.telegrams;
 
 import java.math.BigDecimal;
 import java.util.Observable;
@@ -14,6 +14,7 @@ import core.transaction.R_Send;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.SortableList;
+import gui.models.TableModelCls;
 import lang.Lang;
 import utils.DateTimeFormat;
 import utils.ObserverMessage;

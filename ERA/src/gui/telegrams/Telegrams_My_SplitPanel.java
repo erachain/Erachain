@@ -9,7 +9,6 @@ import gui.library.MTable;
 import gui.library.SetIntervalPanel;
 import gui.library.Voush_Library_Panel;
 import gui.library.library;
-import gui.models.WalletTelegramsTableModel;
 import gui.models.WalletTransactionsTableModel;
 import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;

@@ -1,23 +1,25 @@
 package gui.items.accounts;
 
-import controller.Controller;
-import core.account.Account;
-import database.wallet.AccountsPropertisMap;
-import datachain.SortableList;
-import lang.Lang;
+import java.math.BigDecimal;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
+
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
+
+import controller.Controller;
+import core.account.Account;
+import database.wallet.AccountsPropertisMap;
+import datachain.SortableList;
+import lang.Lang;
 import utils.ObserverMessage;
 import utils.Pair;
-
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-import java.math.BigDecimal;
-import java.util.Observable;
-import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class Accounts_Name_TableModel extends AbstractTableModel implements Observer {
@@ -38,12 +40,21 @@ public class Accounts_Name_TableModel extends AbstractTableModel implements Obse
 
 
     public Accounts_Name_TableModel() {
-        db = Controller.getInstance().wallet.database.getAccountsPropertisMap();
-        db.addObserver(this);
+     init();   
 
 
     }
+    
+    public Accounts_Name_TableModel(String[] columnNames) {
+        this.columnNames = columnNames;
+      init(); 
+      this.fireTableStructureChanged();
+    }
 
+    private void init(){
+        db = Controller.getInstance().wallet.database.getAccountsPropertisMap();
+        db.addObserver(this);
+    }
 
     @Override
     public Class<? extends Object> getColumnClass(int c) {     // set column type

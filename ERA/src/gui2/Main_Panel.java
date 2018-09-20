@@ -1,5 +1,21 @@
 package gui2;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.Enumeration;
+
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+
 import core.BlockChain;
 import gui.Wallets.Wallets_Manager_SplitPanel;
 import gui.bank.Issue_Send_Payment_Order;
@@ -7,7 +23,13 @@ import gui.bank.My_Order_Pauments_SplitPanel;
 import gui.items.accounts.Accounts_Name_Search_SplitPanel;
 import gui.items.accounts.My_Accounts_SplitPanel;
 import gui.items.accounts.My_Loans_SplitPanel;
-import gui.items.assets.*;
+import gui.items.assets.Assets_Favorite_SplitPanel;
+import gui.items.assets.Exchange_Panel;
+import gui.items.assets.IssueAssetPanel;
+import gui.items.assets.My_Assets_Tab;
+import gui.items.assets.My_Balance_Tab;
+import gui.items.assets.My_Order_Tab;
+import gui.items.assets.Search_Assets_Tab;
 import gui.items.imprints.Imprints_Favorite_SplitPanel;
 import gui.items.imprints.Imprints_Search_SplitPanel;
 import gui.items.imprints.IssueImprintPanel;
@@ -20,7 +42,11 @@ import gui.items.mails.Outcoming_Mails_SplitPanel;
 import gui.items.other.Other_Console_Panel;
 import gui.items.other.Other_Search_Blocks;
 import gui.items.other.Other_Split_Panel;
-import gui.items.persons.*;
+import gui.items.persons.InsertPersonPanel;
+import gui.items.persons.IssuePersonPanel;
+import gui.items.persons.Persons_Favorite_SplitPanel;
+import gui.items.persons.Persons_My_SplitPanel;
+import gui.items.persons.Persons_Search_SplitPanel;
 import gui.items.polls.IssuePollPanel;
 import gui.items.polls.Polls_Favorite_SplitPanel;
 import gui.items.polls.Polls_My_SplitPanel;
@@ -42,21 +68,10 @@ import gui.items.unions.IssueUnionPanel;
 import gui.items.unions.My_Unions_Tab;
 import gui.items.unions.Search_Union_Tab;
 import gui.library.MSplitPane;
+import gui.telegrams.TelegramSplitPanel;
 import gui.telegrams.Telegram_Send_Panel;
 import gui.telegrams.Telegrams_My_SplitPanel;
 import lang.Lang;
-
-import javax.swing.*;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.Enumeration;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -554,6 +569,12 @@ public class Main_Panel extends javax.swing.JPanel {
             return;
         }
         
+        if (str.equals(Lang.getInstance().translate("Telegrams Panel"))
+                || str.equals("TelegramSplitPanel")) {
+            insertTab(Lang.getInstance().translate("Telegrams Panel"), new TelegramSplitPanel());
+
+            return;
+        }
         
     }
 

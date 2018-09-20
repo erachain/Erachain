@@ -8,19 +8,9 @@ import core.transaction.R_Send;
 import core.transaction.Transaction;
 import gui.items.accounts.AssetSendPanel;
 import gui.library.Issue_Confirm_Dialog;
-import gui.library.My_JFileChooser;
 import gui.library.library;
 import gui.transaction.Send_RecordDetailsFrame;
 import lang.Lang;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.filechooser.FileView;
-
-import java.awt.Container;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 
 @SuppressWarnings("serial")
@@ -37,13 +27,13 @@ public class Telegram_Send_Panel extends AssetSendPanel {
         if (asset == null) a = "";
         else a = asset.viewName();
 
-        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to send asset %asset%, fill in this form").replace("%asset%", a));
+        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to send Telegtam, fill in this form"));
 
         //  icon.setIcon(null);
         this.jButton_ok.setText(Lang.getInstance().translate("Send"));
         this.jLabel_To.setText(Lang.getInstance().translate("To: (address or name)") + ":");
         this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Receiver details") + ":");
-        this.jComboBox_Asset.setEnabled(false);
+        this.jComboBox_Asset.setEnabled(false);   
     }
 
    

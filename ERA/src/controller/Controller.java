@@ -1,9 +1,58 @@
 package controller;
 
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.TrayIcon.MessageType;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.security.SecureRandom;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.TreeMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
+
+import com.google.common.primitives.Longs;
+
 import api.ApiClient;
 import api.ApiService;
 import at.AT;
-import com.google.common.primitives.Longs;
 import core.BlockChain;
 import core.BlockGenerator;
 import core.BlockGenerator.ForgingStatus;
@@ -37,20 +86,27 @@ import core.voting.Poll;
 import core.voting.PollOption;
 import core.wallet.Wallet;
 import database.DBSet;
-import datachain.*;
+import datachain.DCSet;
+import datachain.Item_Map;
+import datachain.LocalDataMap;
+import datachain.SortableList;
+import datachain.TransactionMap;
 import gui.AboutFrame;
 import gui.Gui;
 import lang.Lang;
 import network.Network;
 import network.Peer;
-import network.message.*;
+import network.message.BlockWinMessage;
+import network.message.GetBlockMessage;
+import network.message.GetSignaturesMessage;
+import network.message.HWeightMessage;
+import network.message.Message;
+import network.message.MessageFactory;
+import network.message.SignaturesMessage;
+import network.message.TelegramMessage;
+import network.message.TransactionMessage;
+import network.message.VersionMessage;
 import ntp.NTP;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
-import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 import settings.Settings;
 import traders.TradersManager;
 import utils.Converter;
@@ -61,28 +117,6 @@ import utils.Pair;
 import utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import utils.SysTray;
 import webserver.WebService;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.TrayIcon.MessageType;
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.security.SecureRandom;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.List;
-import java.util.Timer;
 
 // 04/01 +-
 
@@ -1642,6 +1676,8 @@ public class Controller extends Observable {
             // BROADCAST MESSAGE
             List<Peer> excludes = new ArrayList<Peer>();
             this.network.asyncBroadcast(telegram, excludes, false);
+            // save DB
+            Controller.getInstance().wallet.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
         }
 
     }

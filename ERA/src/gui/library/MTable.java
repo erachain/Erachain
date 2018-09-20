@@ -17,8 +17,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
-import javax.swing.SwingUtilities;
 import javax.swing.RowFilter.ComparisonType;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -67,7 +67,7 @@ public class MTable<U, T> extends JTable {
         filters = new HashMap();
         // set model
         this.model = model;
-        setModel(this.model);
+       if (this.model!=null) setModel(this.model);
         // view filter dialog
         // show_search(true);
 

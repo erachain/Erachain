@@ -104,6 +104,8 @@ public class Settings {
     private String getBackUpPath;
     private String getWalletPath;
     private String dataPath;
+    private String telegramDefaultSender;
+    private String telegramDefaultReciever;
 
     private Settings() {
         this.localAddress = this.getCurrentIp();
@@ -189,6 +191,21 @@ public class Settings {
        
 			this.getWalletPath = dir;
 		
+    }
+    
+    public String getTelegramDefaultSender(){
+        return telegramDefaultSender;
+    }
+    
+    public void setTelegramDefaultSender(String str){
+        telegramDefaultSender = str;
+    }
+    
+   public String getTelegramDefaultReciever(){
+       return telegramDefaultReciever;
+   }
+   public void setTelegramDefaultReciever(String str){
+        this.telegramDefaultReciever=str;
     }
     
  public String getTemDir(){
@@ -861,6 +878,8 @@ public class Settings {
 
 
     }
+    
+   
 
     public String cutPath(String path) {
 
@@ -918,7 +937,15 @@ public class Settings {
                 } else {
                     alreadyPassed++;
                 }
-
+                // read Telegrams parameters
+                if (this.settingsJSON.containsKey("Telegram_Sender")){ 
+                    telegramDefaultSender =(String)this.settingsJSON.get("Telegram_Sender");
+                }   
+                
+                if (this.settingsJSON.containsKey("Telegram_Reciever")){
+                    telegramDefaultReciever = (String)this.settingsJSON.get("Telegram_Reciever");
+                }
+                
                 // read BackUb Path
                 if (this.settingsJSON.containsKey("backuppath")) {
                     this.getBackUpPath = (String) this.settingsJSON.get("backuppath");
@@ -975,6 +1002,10 @@ public class Settings {
 
         return settingsJSON;
 
+    }
+    
+    public JSONObject getJSONObject(){
+        return this.settingsJSON;
     }
     
    
