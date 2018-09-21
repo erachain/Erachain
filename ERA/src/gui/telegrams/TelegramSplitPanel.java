@@ -204,7 +204,7 @@ public class TelegramSplitPanel extends Split_Panel {
           tableFavoriteAccounts.setVisible(false);  
           rightTelegramPanel.jLabelRaght.setText(Lang.getInstance().translate("All"));
           rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(null);
-           
+          rightTelegramPanel.jPanelBottom.setVisible(false);
        }
        else{
            this.leftTelegram.jCxbRecipientmessages.setSelected(true);
@@ -213,6 +213,7 @@ public class TelegramSplitPanel extends Split_Panel {
            String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow())),accountModel.COLUMN_ADDRESS);
            rightTelegramPanel.jLabelRaght.setText(account);
            rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(account);
+           rightTelegramPanel.jPanelBottom.setVisible(true);
        }
        
        this.leftTelegram.jCxbAllmessages.addActionListener(new ActionListener(){
@@ -224,6 +225,7 @@ public class TelegramSplitPanel extends Split_Panel {
                Settings.getInstance().setTelegramRatioReciever("all");
                rightTelegramPanel.jLabelRaght.setText(Lang.getInstance().translate("All"));
                rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(null);
+               rightTelegramPanel.jPanelBottom.setVisible(false);
            }
            
        });
@@ -239,6 +241,7 @@ public class TelegramSplitPanel extends Split_Panel {
                String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow())),accountModel.COLUMN_ADDRESS);
                rightTelegramPanel.jLabelRaght.setText(account);
                rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(account);
+               rightTelegramPanel.jPanelBottom.setVisible(true);
            }
            
        });

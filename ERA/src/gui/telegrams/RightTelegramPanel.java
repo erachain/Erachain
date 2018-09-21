@@ -182,7 +182,7 @@ public RightTelegramPanel() {
    public javax.swing.JLabel jLabelCenter;
    public javax.swing.JLabel jLabelLeft;
    public javax.swing.JLabel jLabelRaght;
-   private javax.swing.JPanel jPanelBottom;
+   public javax.swing.JPanel jPanelBottom;
    private javax.swing.JPanel jPanelTop;
    private javax.swing.JScrollPane jScrollPaneCenter;
    private javax.swing.JScrollPane jScrollPaneText;
