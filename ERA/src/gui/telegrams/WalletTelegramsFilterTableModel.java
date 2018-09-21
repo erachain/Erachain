@@ -5,9 +5,11 @@ import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.table.DefaultTableModel;
 import javax.validation.constraints.Null;
 
 import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple3;
 
 import controller.Controller;
 import core.account.Account;
@@ -16,55 +18,49 @@ import core.transaction.R_Send;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.SortableList;
-import gui.models.TableModelCls;
 import lang.Lang;
 import utils.ObserverMessage;
 import utils.Pair;
 
 @SuppressWarnings("serial")
 // in list of records in wallet
-public class WalletTelegramsFilterTableModel extends TableModelCls<String, Transaction> implements Observer {
+public class WalletTelegramsFilterTableModel extends DefaultTableModel implements Observer {
 
     private boolean needUpdate = false;
     private long timeUpdate = 0;
     private String sender;
     private String reciever;
 
-   
     public static final int COLUMN_MESSAGE = 1;
     public static final int COLUMN_DATE = 0;
     static Logger LOGGER = Logger.getLogger(WalletTelegramsFilterTableModel.class.getName());
-    //ItemAssetMap dbItemAssetMap;
-    private SortableList< String, Transaction> transactions;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Date", "Message"});
-    private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
-    ArrayList<Transaction> ttt;
-       
+    // ItemAssetMap dbItemAssetMap;
+    private SortableList<String, Transaction> transactions;
+    private String[] columnNames = Lang.getInstance().translate(new String[] { "Date", "Message" });
+    private Boolean[] column_AutuHeight = new Boolean[] { true, true, true, true, true, true, true, false, false };
+    ArrayList<Tuple3<String,String,Transaction>> ttt;
 
     public WalletTelegramsFilterTableModel() {
-        ttt = new ArrayList<Transaction>();
+        ttt = new ArrayList<Tuple3<String,String,Transaction>>();
         addObservers();
 
-        //dbItemAssetMap = DBSet.getInstance().getItemAssetMap();
+        // dbItemAssetMap = DBSet.getInstance().getItemAssetMap();
 
     }
 
-    @Override
-    public SortableList< String, Transaction> getSortableList() {
+    public SortableList<String, Transaction> getSortableList() {
         return this.transactions;
     }
 
     public void setAsset(AssetCls asset) {
 
-
     }
-
 
     public Object getItem(int row) {
         return this.ttt.get(row);
     }
 
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
+    public Class<? extends Object> getColumnClass(int c) { // set column type
         Object o = getValueAt(0, c);
         return o == null ? Null.class : o.getClass();
     }
@@ -81,8 +77,8 @@ public class WalletTelegramsFilterTableModel extends TableModelCls<String, Trans
     }
 
     public Transaction getTelegramMessage(int row) {
-         return this.ttt.get(row);
-        
+        return this.ttt.get(row).c;
+
     }
 
     @Override
@@ -104,34 +100,35 @@ public class WalletTelegramsFilterTableModel extends TableModelCls<String, Trans
         return this.ttt.size();
     }
 
+    
     @Override
     public Object getValueAt(int row, int column) {
-        //try
-        //{
-        if (this.ttt == null || this.ttt.size()==0) {
+        // try
+        // {
+        if (this.ttt == null || this.ttt.size() == 0) {
             return null;
         }
 
-       R_Send transaction = (R_Send) ttt.get(row);
+        R_Send transaction = (R_Send) ttt.get(row).c;
         if (transaction == null)
             return null;
 
         switch (column) {
-            case COLUMN_MESSAGE:
+        case COLUMN_MESSAGE:
 
-                return transaction.viewCreator() ;
-                        
-            case COLUMN_DATE:
-                return transaction.viewTimestamp();
- }
+            return ttt.get(row);
+
+        case COLUMN_DATE:
+            return transaction.getTimestamp();
+        }
 
         return null;
 
-        //} catch (Exception e) {
-        //GUI ERROR
-        //  LOGGER.error(e.getMessage(),e);
-        //  return null;
-        //}
+        // } catch (Exception e) {
+        // GUI ERROR
+        // LOGGER.error(e.getMessage(),e);
+        // return null;
+        // }
 
     }
 
@@ -140,7 +137,7 @@ public class WalletTelegramsFilterTableModel extends TableModelCls<String, Trans
         try {
             this.syncUpdate(o, arg);
         } catch (Exception e) {
-            //GUI ERROR
+            // GUI ERROR
             String mess = e.getMessage();
         }
     }
@@ -149,69 +146,103 @@ public class WalletTelegramsFilterTableModel extends TableModelCls<String, Trans
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
-        //CHECK IF NEW LIST
+        // CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_TELEGRAM_TYPE) {
             if (this.transactions == null) {
-                this.transactions = (SortableList<String, Transaction>)message.getValue();
+                this.transactions = (SortableList<String, Transaction>) message.getValue();
                 this.transactions.registerObserver();
-   
+
             }
             filter();
             this.fireTableDataChanged();
 
-        
-        } 
-        if (message.getType() ==ObserverMessage.WALLET_ADD_TELEGRAM_TYPE || 
-                message.getType() ==ObserverMessage.WALLET_RESET_TELEGRAM_TYPE 
-                || message.getType() ==ObserverMessage.WALLET_REMOVE_TELEGRAM_TYPE){
+        }
+        if (message.getType() == ObserverMessage.WALLET_ADD_TELEGRAM_TYPE
+                || message.getType() == ObserverMessage.WALLET_RESET_TELEGRAM_TYPE
+                || message.getType() == ObserverMessage.WALLET_REMOVE_TELEGRAM_TYPE) {
             filter();
             this.fireTableDataChanged();
         }
-                                       
 
-        
     }
 
-    private void filter(){
+    private void filter() {
         ttt.clear();
-        for (Pair<String, Transaction> tr:transactions){
-           
-            if(tr.getB().getCreator().getAddress().equals(sender) || tr.getB().getCreator().getAddress().equals(reciever)){
-             HashSet<Account> rep = tr.getB().getRecipientAccounts();
-             for(Account r:rep){
-                 if( r.getAddress().equals(reciever) ||  r.getAddress().equals(sender)){
-                    ttt.add(tr.getB());
-                    continue;
+        for (Pair<String, Transaction> transaction : transactions) {
+            HashSet<Account> recipients = transaction.getB().getRecipientAccounts();
+            if (reciever != null) {
+                
+                if (transaction.getB().getCreator().getAddress().equals(sender)) {
+                     for (Account pecipient : recipients) {
+                        if (pecipient.getAddress().equals(reciever)) {
+                            ttt.add(new Tuple3(sender,reciever,transaction.getB()));
+                            continue;
+                        }
+
+                    }
+
                 }
+                if (transaction.getB().getCreator().getAddress().equals(reciever)) {
+                    for (Account pecipient : recipients) {
+                       if (pecipient.getAddress().equals(sender)) {
+                           Tuple3 tt = new Tuple3(reciever,sender,transaction.getB());
+                           if (!ttt.contains(tt)) 
+                               ttt.add(tt);
+                           continue;
+                       }
+
+                   }
+
+               }
                 
-            }
+               
                 
+            } else {
+                // add all recipients
+              
+                if (transaction.getB().getCreator().getAddress().equals(sender)) {
+                   
+                    for (Account recipient : recipients) {
+                        ttt.add(new Tuple3(sender,recipient.getAddress(),transaction.getB()));
+                    }
+                }else
+                {
+                    // add recipient = sender
+                    for (Account pecipient : recipients) {
+                        if (pecipient.getAddress().equals(sender)) {
+                            ttt.add(new Tuple3(transaction.getB().getCreator().getAddress(), sender, transaction.getB()));
+                            continue;
+                        }
+
+                    }
+                }
             }
         }
-        
+
     }
-    
+
     public void addObservers() {
 
-        //REGISTER ON WALLET TRANSACTIONS
+        // REGISTER ON WALLET TRANSACTIONS
         Controller.getInstance().getWallet().database.getTelegramsMap().addObserver(this);
         // for UNCONFIRMEDs
         DCSet.getInstance().getTransactionMap().addObserver(this);
         // for ??
-        ///Controller.getInstance().wallet.database.getPersonMap().addObserver(transactions);
+        /// Controller.getInstance().wallet.database.getPersonMap().addObserver(transactions);
 
     }
-
 
     public void removeObservers() {
 
         Controller.getInstance().getWallet().database.getTelegramsMap().deleteObserver(this);
         DCSet.getInstance().getTransactionMap().addObserver(this);
-        /// ??? Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);
+        /// ???
+        /// Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);
     }
 
     /**
-     * @param sender the sender to set
+     * @param sender
+     *            the sender to set
      */
     public void setSender(String sender) {
         this.sender = sender;
@@ -220,7 +251,8 @@ public class WalletTelegramsFilterTableModel extends TableModelCls<String, Trans
     }
 
     /**
-     * @param reciever the reciever to set
+     * @param reciever
+     *            the reciever to set
      */
     public void setReciever(String reciever) {
         this.reciever = reciever;
@@ -241,6 +273,5 @@ public class WalletTelegramsFilterTableModel extends TableModelCls<String, Trans
     public String getReciever() {
         return reciever;
     }
-    
-  
+
 }

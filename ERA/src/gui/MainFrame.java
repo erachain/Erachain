@@ -214,6 +214,7 @@ public class MainFrame extends JFrame implements Observer {
                 
                 settingsJSONbuf.put("Telegram_Sender", Settings.getInstance().getTelegramDefaultSender());
                 settingsJSONbuf.put("Telegram_Reciever", Settings.getInstance().getTelegramDefaultReciever());
+                settingsJSONbuf.put("Telegram_Ratio_Reciever", Settings.getInstance().getTelegramRatioReciever());
 
                 // saving menu
                 int tree_Row = 0;

@@ -1,5 +1,8 @@
 package gui.telegrams;
 
+import javax.swing.ButtonGroup;
+import javax.swing.JRadioButton;
+
 import core.account.Account;
 import gui.library.MTable;
 import gui.models.AccountsComboBoxModel;
@@ -12,6 +15,7 @@ import lang.Lang;
 public class LeftTelegram extends javax.swing.JPanel {
 
    private AccountsComboBoxModel accountsModel;
+private ButtonGroup group;
   
 /**
     * Creates new form leftTekegram
@@ -24,6 +28,9 @@ public class LeftTelegram extends javax.swing.JPanel {
        this.jLabel_AddAccount.setText(Lang.getInstance().translate("Add Recipient"));
        this.jButtonAddAccount.setText(Lang.getInstance().translate("Add"));
        this.jTextField_AddAccount.setText("");
+       this.jCxbAllmessages.setText(Lang.getInstance().translate("All"));
+       this.jCxbRecipientmessages.setText(Lang.getInstance().translate("From List Recipients"));
+      
        
        //  this.jComboBox_Account.setRenderer(new AccountRenderer(0));
      //  ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(((AssetCls) jComboBox_Account.getSelectedItem()).getKey());
@@ -49,6 +56,8 @@ public class LeftTelegram extends javax.swing.JPanel {
        jLabel_AddAccount = new javax.swing.JLabel();
        jTextField_AddAccount = new javax.swing.JTextField();
        jButtonAddAccount = new javax.swing.JButton();
+       jCxbAllmessages = new JRadioButton();
+       jCxbRecipientmessages = new JRadioButton();    
 
        java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
        layout.columnWidths = new int[] {0};
@@ -73,6 +82,26 @@ public class LeftTelegram extends javax.swing.JPanel {
        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
        gridBagConstraints.insets = new java.awt.Insets(4, 11, 0, 0);
        jPanelTop.add(jLabelAccount, gridBagConstraints);
+       
+       group = new ButtonGroup();
+       group.add(jCxbAllmessages);
+       group.add(jCxbRecipientmessages);
+       gridBagConstraints = new java.awt.GridBagConstraints();
+       gridBagConstraints.gridx = 1;
+       gridBagConstraints.gridy = 1;
+       gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+       gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+       gridBagConstraints.weightx = 0.3;
+       jPanelTop.add(jCxbAllmessages, gridBagConstraints);
+
+       gridBagConstraints = new java.awt.GridBagConstraints();
+       gridBagConstraints.gridx = 0;
+       gridBagConstraints.gridy = 1;
+       gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+      // gridBagConstraints.insets = new java.awt.Insets(4, 11, 0, 0);
+       jPanelTop.add(jCxbRecipientmessages, gridBagConstraints);
+       
+      
 
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 0;
@@ -145,7 +174,9 @@ public class LeftTelegram extends javax.swing.JPanel {
    }// </editor-fold>                        
 
 
-   // Variables declaration - do not modify                     
+   // Variables declaration - do not modify     
+   public JRadioButton jCxbAllmessages;
+   public JRadioButton jCxbRecipientmessages;    
    public javax.swing.JButton jButtonAddAccount;
    public javax.swing.JComboBox<Account> jComboAccount;
    private javax.swing.JLabel jLabelAccount;

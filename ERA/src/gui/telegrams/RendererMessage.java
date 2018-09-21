@@ -9,47 +9,57 @@ import javax.swing.JTable;
 import javax.swing.border.LineBorder;
 import javax.swing.table.TableCellRenderer;
 
-import core.transaction.R_Send;
+import org.mapdb.Fun.Tuple3;
 
+import core.transaction.R_Send;
+import core.transaction.Transaction;
+import utils.DateTimeFormat;
 
 public class RendererMessage extends JLabel implements TableCellRenderer {
     private static final long serialVersionUID = 1L;
-   
-    //   FontMetrics fontMetrics = table.getFontMetrics(table.getFont());
+
+    // FontMetrics fontMetrics = table.getFontMetrics(table.getFont());
     public RendererMessage() {
-      
+
     }
 
     @Override
-    public Component getTableCellRendererComponent(JTable table,
-                                                   Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+            int row, int column) {
 
-            setHorizontalAlignment(JLabel.RIGHT);
-            
-            WalletTelegramsFilterTableModel model = (WalletTelegramsFilterTableModel)table.getModel(); 
-            if (column == WalletTelegramsFilterTableModel.COLUMN_MESSAGE){
-            R_Send tr = (R_Send) model.getTelegramMessage(row);
-            String a1 = model.getSender();
-            String a2 = tr.getCreator().getAddress();
-            if ( model.getSender() == null || tr == null ) return this;
-            if(model.getSender().equals(tr.getCreator().getAddress())){
+        setHorizontalAlignment(JLabel.RIGHT);
+
+        WalletTelegramsFilterTableModel model = (WalletTelegramsFilterTableModel) table.getModel();
+        if (column == WalletTelegramsFilterTableModel.COLUMN_MESSAGE) {
+           
+            Tuple3<String, String, Transaction> val = (Tuple3<String,String,Transaction>)value;
+            if (model.getSender() == null ) return this;
+            if (model.getSender().equals(val.a)) {
                 setHorizontalAlignment(JLabel.LEFT);
-                value = "<HTML><span style='font-size:10px;color:green'> Sender: " + value + "</span><br>" + tr.viewData();
-            }else{
+                value = "<HTML><span style='font-size:10px;color:green'> Sender: " + val.a 
+                        + "  Recipient: " + val.b + "</span>"
+                      + "<br>" +(( R_Send)val.c).viewData();
+            } else {
                 setHorizontalAlignment(JLabel.RIGHT);
-                value = "<HTML><span style='font-size:10px;color:blue'> Sender: " + value + "</span><br>" + tr.viewData();
+                value = "<HTML><span style='font-size:10px;color:blue'> Sender: " + val.a  
+                        + " Recipient: " + val.b + "</span>"
+                      + "<br>" +(( R_Send)val.c).viewData();
+                this.setBackground(SystemColor.LIGHT_GRAY);
             }
-       
-            }
-
-
+            
+            
+        }
+        if (column == WalletTelegramsFilterTableModel.COLUMN_DATE) {
+            value = "<HTML>" + DateTimeFormat.timestamptoString((long) value);
+        }
         if (isSelected) {
             setBackground(SystemColor.blue);
-        //    value = "<HTML><p style='color:#ffffff'><b>" + "&nbsp;&nbsp;&nbsp;" + value;
+            // value = "<HTML><p style='color:#ffffff'><b>" +
+            // "&nbsp;&nbsp;&nbsp;" + value;
         } else {
-            setBackground(new Color(255, 255, 220));
-        //    value = "<HTML><p style='color:#000000'>" + "&nbsp;&nbsp;&nbsp;" + value;
+     //       setBackground(new Color(255, 255, 220));
+            // value = "<HTML><p style='color:#000000'>" + "&nbsp;&nbsp;&nbsp;"
+            // + value;
         }
 
         if (hasFocus) {
@@ -58,10 +68,8 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
             setBorder(new LineBorder(null, 0));
         }
 
-
-        //      setAlignmentX(10);
-        setText((value == null) ? "" : value+"");
-
+        // setAlignmentX(10);
+        setText((value == null) ? "" : value + "");
 
         return this;
     }

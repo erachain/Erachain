@@ -1,5 +1,15 @@
 package gui.telegrams;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
+import javax.swing.table.TableRowSorter;
+
+import org.mapdb.Fun.Tuple3;
+
 import gui.library.MTable;
 
 /**
@@ -14,12 +24,44 @@ public class RightTelegramPanel extends javax.swing.JPanel {
     
     public WalletTelegramsFilterTableModel walletTelegramsFilterTableModel;
     
-   public RightTelegramPanel() {
+  
+public RightTelegramPanel() {
        
        walletTelegramsFilterTableModel = new WalletTelegramsFilterTableModel();
        jTableMessages = new MTable(walletTelegramsFilterTableModel);
+       
+       
+       
+       jTableMessages.setAutoCreateRowSorter(false);
+       
        jTableMessages.setRowHeight(50);
-       jTableMessages.setDefaultRenderer(String.class, new RendererMessage());
+       jTableMessages.setDefaultRenderer(Long.class, new RendererMessage());
+       jTableMessages.setDefaultRenderer(Tuple3.class, new RendererMessage());
+       
+// sorter
+       TableRowSorter<WalletTelegramsFilterTableModel> t = new TableRowSorter<WalletTelegramsFilterTableModel>(walletTelegramsFilterTableModel);
+       t.setSortable(0, false); //Указываем, что сортировать будем в первой колонке
+       t.setSortable(1, false); // а в других нет
+       
+       // comparator
+           t.setComparator(WalletTelegramsFilterTableModel.COLUMN_DATE, new Comparator<Long>() {
+               
+
+            @Override
+            public int compare(Long o1, Long o2) {
+                // TODO Auto-generated method stub
+                return o2.compareTo(o1);
+            }
+             });
+           
+          // sort list  - AUTO sort
+           List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+           sortKeys.add(new RowSorter.SortKey(WalletTelegramsFilterTableModel.COLUMN_DATE, SortOrder.ASCENDING));
+           t.setSortKeys(sortKeys);
+          // sort table
+           jTableMessages.setRowSorter(t);
+     // end sortet  
+       
        initComponents();
    }
 
@@ -144,7 +186,7 @@ public class RightTelegramPanel extends javax.swing.JPanel {
    private javax.swing.JPanel jPanelTop;
    private javax.swing.JScrollPane jScrollPaneCenter;
    private javax.swing.JScrollPane jScrollPaneText;
-   private MTable jTableMessages;
+   public MTable jTableMessages;
    public javax.swing.JTextPane jTextPaneText;
    // End of variables declaration                   
 }
