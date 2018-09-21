@@ -106,6 +106,7 @@ public class Settings {
     private String dataPath;
     private String telegramDefaultSender;
     private String telegramDefaultReciever;
+    private String telegramRatioReciever = null;
 
     private Settings() {
         this.localAddress = this.getCurrentIp();
@@ -946,6 +947,9 @@ public class Settings {
                     telegramDefaultReciever = (String)this.settingsJSON.get("Telegram_Reciever");
                 }
                 
+                if (this.settingsJSON.containsKey("Telegram_Ratio_Reciever")){
+                    telegramRatioReciever = (String)this.settingsJSON.get("Telegram_Ratio_Reciever");
+                }
                 // read BackUb Path
                 if (this.settingsJSON.containsKey("backuppath")) {
                     this.getBackUpPath = (String) this.settingsJSON.get("backuppath");
@@ -1007,8 +1011,16 @@ public class Settings {
     public JSONObject getJSONObject(){
         return this.settingsJSON;
     }
+
+    public String getTelegramRatioReciever() {
+        // TODO Auto-generated method stub
+        return this.telegramRatioReciever;
+    }
     
-   
+    public void setTelegramRatioReciever(String str) {
+        // TODO Auto-generated method stub
+        this.telegramRatioReciever = str;
+    }
 
 
 }
