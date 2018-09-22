@@ -10,6 +10,7 @@ import javax.swing.table.TableRowSorter;
 
 import org.mapdb.Fun.Tuple3;
 
+import core.transaction.Transaction;
 import gui.library.MTable;
 
 /**
@@ -34,29 +35,29 @@ public RightTelegramPanel() {
        
        jTableMessages.setAutoCreateRowSorter(false);
        
-       jTableMessages.setRowHeight(50);
+      // jTableMessages.setRowHeight(50);
        jTableMessages.setDefaultRenderer(Long.class, new RendererMessage());
        jTableMessages.setDefaultRenderer(Tuple3.class, new RendererMessage());
        
 // sorter
        TableRowSorter<WalletTelegramsFilterTableModel> t = new TableRowSorter<WalletTelegramsFilterTableModel>(walletTelegramsFilterTableModel);
        t.setSortable(0, false); //Указываем, что сортировать будем в первой колонке
-       t.setSortable(1, false); // а в других нет
+    //   t.setSortable(1, false); // а в других нет
        
        // comparator
-           t.setComparator(WalletTelegramsFilterTableModel.COLUMN_DATE, new Comparator<Long>() {
+           t.setComparator(0, new Comparator<Tuple3<String,String,Transaction>>() {
                
 
             @Override
-            public int compare(Long o1, Long o2) {
+            public int compare( Tuple3<String,String,Transaction> o1, Tuple3<String,String,Transaction> o2) {
                 // TODO Auto-generated method stub
-                return o2.compareTo(o1);
+                return o2.c.getTimestamp().compareTo(o1.c.getTimestamp());
             }
              });
            
           // sort list  - AUTO sort
            List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-           sortKeys.add(new RowSorter.SortKey(WalletTelegramsFilterTableModel.COLUMN_DATE, SortOrder.ASCENDING));
+           sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
            t.setSortKeys(sortKeys);
           // sort table
            jTableMessages.setRowSorter(t);

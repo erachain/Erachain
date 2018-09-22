@@ -1,6 +1,7 @@
 package gui.telegrams;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 
 import core.account.Account;
@@ -83,12 +84,22 @@ private ButtonGroup group;
        gridBagConstraints.insets = new java.awt.Insets(4, 11, 0, 0);
        jPanelTop.add(jLabelAccount, gridBagConstraints);
        
+       gridBagConstraints = new java.awt.GridBagConstraints();
+       gridBagConstraints.gridx = 0;
+       gridBagConstraints.gridy = 1;
+       gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+       gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+       gridBagConstraints.weightx = 0.3;
+       gridBagConstraints.insets = new java.awt.Insets(4, 11, 0, 0);
+       jPanelTop.add(new JLabel("Recipients"), gridBagConstraints);
+       
+       
        group = new ButtonGroup();
        group.add(jCxbAllmessages);
        group.add(jCxbRecipientmessages);
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 1;
-       gridBagConstraints.gridy = 1;
+       gridBagConstraints.gridy = 2;
        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
        gridBagConstraints.weightx = 0.3;
@@ -96,7 +107,7 @@ private ButtonGroup group;
 
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 0;
-       gridBagConstraints.gridy = 1;
+       gridBagConstraints.gridy = 2;
        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
       // gridBagConstraints.insets = new java.awt.Insets(4, 11, 0, 0);
        jPanelTop.add(jCxbRecipientmessages, gridBagConstraints);

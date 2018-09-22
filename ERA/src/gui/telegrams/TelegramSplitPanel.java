@@ -205,6 +205,7 @@ public class TelegramSplitPanel extends Split_Panel {
           rightTelegramPanel.jLabelRaght.setText(Lang.getInstance().translate("All"));
           rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(null);
           rightTelegramPanel.jPanelBottom.setVisible(false);
+          leftTelegram.jButtonAddAccount.setVisible(false);
        }
        else{
            this.leftTelegram.jCxbRecipientmessages.setSelected(true);
@@ -214,6 +215,7 @@ public class TelegramSplitPanel extends Split_Panel {
            rightTelegramPanel.jLabelRaght.setText(account);
            rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(account);
            rightTelegramPanel.jPanelBottom.setVisible(true);
+           leftTelegram.jButtonAddAccount.setVisible(true);
        }
        
        this.leftTelegram.jCxbAllmessages.addActionListener(new ActionListener(){
@@ -226,6 +228,7 @@ public class TelegramSplitPanel extends Split_Panel {
                rightTelegramPanel.jLabelRaght.setText(Lang.getInstance().translate("All"));
                rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(null);
                rightTelegramPanel.jPanelBottom.setVisible(false);
+               leftTelegram.jButtonAddAccount.setVisible(false);
            }
            
        });
@@ -242,6 +245,7 @@ public class TelegramSplitPanel extends Split_Panel {
                rightTelegramPanel.jLabelRaght.setText(account);
                rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(account);
                rightTelegramPanel.jPanelBottom.setVisible(true);
+               leftTelegram.jButtonAddAccount.setVisible(true);
            }
            
        });

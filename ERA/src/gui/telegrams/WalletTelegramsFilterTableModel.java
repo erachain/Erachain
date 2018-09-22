@@ -31,12 +31,12 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
     private String sender;
     private String reciever;
 
-    public static final int COLUMN_MESSAGE = 1;
-    public static final int COLUMN_DATE = 0;
+    public static final int COLUMN_MESSAGE = 0;
+  //  public static final int COLUMN_DATE = 0;
     static Logger LOGGER = Logger.getLogger(WalletTelegramsFilterTableModel.class.getName());
     // ItemAssetMap dbItemAssetMap;
     private SortableList<String, Transaction> transactions;
-    private String[] columnNames = Lang.getInstance().translate(new String[] { "Date", "Message" });
+    private String[] columnNames = Lang.getInstance().translate(new String[] { "Message" });
     private Boolean[] column_AutuHeight = new Boolean[] { true, true, true, true, true, true, true, false, false };
     ArrayList<Tuple3<String,String,Transaction>> ttt;
 
@@ -114,12 +114,11 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
             return null;
 
         switch (column) {
-        case COLUMN_MESSAGE:
+        case 0:
 
             return ttt.get(row);
 
-        case COLUMN_DATE:
-            return transaction.getTimestamp();
+       
         }
 
         return null;
