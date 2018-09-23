@@ -6,6 +6,7 @@
 package gui;
 
 import java.awt.Dimension;
+import java.util.HashMap;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -22,7 +23,7 @@ import settings.Settings;
 /**
  * @author Саша
  */
-public class Split_Panel extends javax.swing.JPanel {
+public class  Split_Panel extends javax.swing.JPanel {
 
     /**
      *
@@ -288,16 +289,18 @@ public class Split_Panel extends javax.swing.JPanel {
 
     private void set_Divider_Parameters(String str) {
         settingsJSONbuf = Settings.getInstance().getJSONObject();
+    //    settingsJSONbuf = Settings.getInstance().read_setting_JSON();
         JSONObject params;
         params = new JSONObject();
         if (!settingsJSONbuf.containsKey("Main_Frame_Setting")) return;
         params = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
         if (!params.containsKey(str)) return;
-        JSONObject param = (JSONObject) params.get(str);
+       // преобразуем все в ыекштп т.к. JSONObject в методе GET  преобразует <String>"2" -> <int>2
+        HashMap param = (HashMap) params.get(str);
         if (param.containsKey("Div_Last_Loc"))
-            jSplitPanel.setLastDividerLocation(new Integer((String) param.get("Div_Last_Loc")));
-        if (param.containsKey("Div_Loc")) jSplitPanel.setDividerLocation(new Integer((String) param.get("Div_Loc")));
-        int ii = new Integer((String) param.get("Div_Orientation"));
+            jSplitPanel.setLastDividerLocation(new Integer(param.get("Div_Last_Loc")+""));
+        if (param.containsKey("Div_Loc")) jSplitPanel.setDividerLocation(new Integer(param.get("Div_Loc")+""));
+        int ii = new Integer(param.get("Div_Orientation")+"");
         if (param.containsKey("Div_Orientation")) jSplitPanel.setOrientation(ii);
         jSplitPanel.set_button_title();
 
