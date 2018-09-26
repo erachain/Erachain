@@ -22,6 +22,7 @@ import core.account.PrivateKeyAccount;
 import core.crypto.AEScrypto;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
+import gui.library.library;
 import lang.Lang;
 import settings.Settings;
 import utils.DateTimeFormat;
@@ -80,7 +81,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
             }
            
           String text = enscript(( R_Send)val.c);
-          
+          text = library.to_HTML(text);
           
           if (isSelected) {
           //    Color col = UIManager.getColor("Table.selectionBackground");
