@@ -44,16 +44,21 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
      //   setViewportView(jtp);
      //   setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED); 
         resizer = new JLabel();
-       
+   
     }
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
-
+        String background = null;
         String color;
         WalletTelegramsFilterTableModel model = (WalletTelegramsFilterTableModel) table.getModel();
        
+        Color col = UIManager.getColor("Table.background");
+            int red = col.getRed();
+            int green = col.getGreen();
+            int blue = col.getBlue();
+            background = "rgb(" + red +"," + green + "," + blue + ")";
            
             Tuple3<String, String, Transaction> val = (Tuple3<String,String,Transaction>)value;
             if (model.getSender() == null ) return this;
@@ -66,12 +71,34 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
                 color = "Blue";
                 resizer.setHorizontalAlignment(RIGHT);
                 image = Settings.getInstance().getUserPath() + "images/messages/receive.png";
+                col = Color.gray;
+                red = col.getRed();
+                green = col.getGreen();
+                blue = col.getBlue();
+              //  resizer.setBackground(Color.MAGENTA);//.UIManager.getColor("Table.selectionBackground"));
+                 background = "#DCDCDC";
             }
            
           String text = enscript(( R_Send)val.c);
-                    
+          
+          
+          if (isSelected) {
+          //    Color col = UIManager.getColor("Table.selectionBackground");
+         //     int red = col.getRed();
+          //    int green = col.getGreen();
+         //     int blue = col.getBlue();
+            //  resizer.setBackground(Color.MAGENTA);//.UIManager.getColor("Table.selectionBackground"));
+         //      background = "rgb(" + red +"," + green + "," + blue + ")";
+           } else {
+             // resizer.setBackground(UIManager.getColor("Table.background"));
+           //    Color col = UIManager.getColor("Table.background");
+           //    int red = col.getRed();
+           //    int green = col.getGreen();
+           //    int blue = col.getBlue();
+           //    background = "rgb(" + red +"," + green + "," + blue + ")";
+          }
             
-          value = "<HTML><p>&nbsp;&nbsp;<img src='file:"+ image +"'>";
+          value = "<HTML><body style='background:"+background+";'><p>&nbsp;&nbsp;<img src='file:"+ image +"'>";
           if ((( R_Send)val.c).isEncrypted()){
               
               value = value  +"&nbsp;&nbsp;<img src='file:"+ isScriptImage +"'>";
@@ -86,11 +113,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
          
        
 
-           if (isSelected) {
-            resizer.setBackground(Color.MAGENTA);//.UIManager.getColor("Table.selectionBackground"));
-         } else {
-            resizer.setBackground(UIManager.getColor("Table.background"));
-        }
+       
 
            if (hasFocus) {
                resizer.setBorder(new LineBorder(new Color(99, 130, 191)));
@@ -103,7 +126,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
            Dimension prefSize = getPreferredSize1((String) value, true, table.getWidth()-10);
          // set hight cell table
         table.setRowHeight((row), (int) (prefSize.getHeight()+30));
-        
+       
         return resizer;
     }
     
@@ -121,6 +144,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
         return new java.awt.Dimension((int) Math.ceil(w), (int) Math.ceil(h));
     }
    
+    
     
     private  String enscript(R_Send trans) {
 
