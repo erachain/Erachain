@@ -17,9 +17,11 @@ import javax.swing.table.TableRowSorter;
 
 import org.mapdb.Fun.Tuple3;
 
+import controller.Controller;
 import core.transaction.Transaction;
 import gui.library.MTable;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
 
 /**
 *
@@ -77,7 +79,7 @@ public RightTelegramPanel() {
        
        initMenu();
        
-       jTableMessages.setMenu(menu);
+       TableMenuPopupUtil.installContextMenu(jTableMessages,menu);
        
    }
 
@@ -242,14 +244,14 @@ public RightTelegramPanel() {
                
                
              Tuple3<String, String, Transaction> tt = (Tuple3<String,String,Transaction>) walletTelegramsFilterTableModel.getValueAt(row, 0);
-       //      Controller.getInstance().getWallet().database.getTelegramsMap().delete(tt.c.viewSignature()) ;
-             System.out.println(row);
+             Controller.getInstance().getWallet().database.getTelegramsMap().delete(tt.c.viewSignature()) ;
+        //     System.out.println(row);
            }
        });
        menu.add(deleteTelegram);
        
 
-    //  jTableMessages.setComponentPopupMenu(menu); 
+    
    }
    // Variables declaration - do not modify                     
    public javax.swing.JButton jButtonSendTelegram;

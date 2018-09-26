@@ -2,7 +2,6 @@ package gui.library;
 
 import java.awt.Component;
 import java.awt.Point;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.math.BigDecimal;
@@ -47,7 +46,6 @@ public class MTable<U, T> extends JTable {
 
     public TableModel model;
     public TableRowSorter search_Sorter;
-    private JPopupMenu menu;
 
     HashMap<Integer, Tuple2<Tuple3<U, RowFilter<TableModel, T>, ComparisonType>, Tuple3<U, RowFilter<TableModel, T>, ComparisonType>>> filters;
     MouseListener mouseListener;
@@ -65,7 +63,7 @@ public class MTable<U, T> extends JTable {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public MTable(TableModel model) {
         super();
-         menu = new JPopupMenu();
+
         filters = new HashMap();
         // set model
         this.model = model;
@@ -110,33 +108,7 @@ public class MTable<U, T> extends JTable {
             }
 
         };
-        
-        // select row when popum menu press right key 
-        this.addMouseListener( new MouseAdapter()
-        {
-            public void mousePressed(MouseEvent e)
-            {
-            //    System.out.println("pressed");
-            }
 
-            public void mouseReleased(MouseEvent e)
-            {
-                if (e.isPopupTrigger())
-                {
-                    MTable source = (MTable)e.getSource();
-                    int row = source.rowAtPoint( e.getPoint() );
-                    int column = source.columnAtPoint( e.getPoint() );
-
-                    if (! source.isRowSelected(row))
-                        source.changeSelection(row, column, false, false);
-
-                    menu.show(e.getComponent(), e.getX(), e.getY());
-                    
-                }
-            }
-        });
-        this.setPreferredScrollableViewportSize(this.getPreferredSize());
-        
         // Date d1 = (Date) model.getValueAt(0, 3);
         // Date d2 = (Date) model.getValueAt(model.getRowCount() - 2, 3);
         // RowFilter<TableModel, Integer> low =
@@ -537,20 +509,6 @@ public class MTable<U, T> extends JTable {
         super.setModel(model);
         addselectSelectedRow(); 
         getSelectionModel().addSelectionInterval(0, 0);
-    }
-
-    /**
-     * @return the menu
-     */
-    public JPopupMenu getMenu() {
-        return menu;
-    }
-
-    /**
-     * @param menu the menu to set
-     */
-    public void setMenu(JPopupMenu menu) {
-        this.menu = menu;
     };
     
 

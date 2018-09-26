@@ -48,6 +48,7 @@ import utils.Converter;
 import utils.NameUtils;
 import utils.NameUtils.NameResult;
 import utils.Pair;
+import utils.TableMenuPopupUtil;
 
 /**
 *
@@ -389,8 +390,8 @@ public class TelegramSplitPanel extends Split_Panel {
         }
     });
     menu.add(menuItemDelete);
-    
-    tableFavoriteAccounts.setComponentPopupMenu(menu); 
+ 
+    TableMenuPopupUtil.installContextMenu(tableFavoriteAccounts,menu);
     
    
 }
