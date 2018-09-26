@@ -32,6 +32,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
   
    
     private static final Logger LOGGER = Logger.getLogger(RendererMessage.class);
+    private String isScriptImage;
     
  //   JTextPane jtp;
  //   JTextArea ta;
@@ -70,7 +71,13 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
           String text = enscript(( R_Send)val.c);
                     
             
-          value = "<HTML><p>&nbsp;&nbsp;<img src='file:"+ image +"'>&nbsp;<span style='font-size:10px;font-family:" + UIManager.getFont("Label.font").getFamily() + ";color:"+ color   + "'>"
+          value = "<HTML><p>&nbsp;&nbsp;<img src='file:"+ image +"'>";
+          if ((( R_Send)val.c).isEncrypted()){
+              
+              value = value  +"&nbsp;&nbsp;<img src='file:"+ isScriptImage +"'>";
+          }
+                 
+              value = value    + "&nbsp;<span style='font-size:10px;font-family:" + UIManager.getFont("Label.font").getFamily() + ";color:"+ color   + "'>"
                    + " DateTime: " + DateTimeFormat.timestamptoString(val.c.getTimestamp()) + "</span></p>"
                    + "<p style='font-size:10px;font-family:" + UIManager.getFont("Label.font").getFamily() + ";color:"+ color   + "'>&nbsp;&nbsp;Sender: " + val.a   + " &nbsp;&nbsp; Recipient: " + val.b + "</p>"
                   + "&nbsp;&nbsp;<p>" + "<span style='font-size:" + UIManager.getFont("Label.font").getSize() + "px;font-family:"
@@ -123,6 +130,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
             return trans.viewData();
 
         if (!Controller.getInstance().isWalletUnlocked()) {
+            isScriptImage = Settings.getInstance().getUserPath() + "images/messages/locked.png";
             return "<span style='color:Navy'>" + Lang.getInstance().translate("Encrypted") + "</span>";
         }
 
@@ -147,12 +155,14 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
 
         try {
             
+            isScriptImage = Settings.getInstance().getUserPath() + "images/messages/unlockedred.png";
             return   new String(AEScrypto.dataDecrypt(trans.getData(), privateKey, publicKey), "UTF-8");
             
             
 
         } catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
             LOGGER.error(e1.getMessage(), e1);
+            isScriptImage = Settings.getInstance().getUserPath() + "images/messages/locked.png";
             return "<span style='color:Red'>" + Lang.getInstance().translate("Error") + "</span>";
         }
 
