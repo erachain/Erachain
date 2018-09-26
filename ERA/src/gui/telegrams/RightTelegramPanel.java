@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.swing.JCheckBox;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.RowSorter;
@@ -92,7 +93,7 @@ public RightTelegramPanel() {
        jLabelCenter = new javax.swing.JLabel();
        jLabelRaght = new javax.swing.JLabel();
        jScrollPaneCenter = new javax.swing.JScrollPane();
-       
+       jcheckIsEnscript = new JCheckBox(); 
        jPanelBottom = new javax.swing.JPanel();
        jScrollPaneText = new javax.swing.JScrollPane();
        jTextPaneText = new javax.swing.JTextPane();
@@ -177,6 +178,19 @@ public RightTelegramPanel() {
        gridBagConstraints.weightx = 0.1;
        gridBagConstraints.weighty = 0.2;
        jPanelBottom.add(jButtonSendTelegram, gridBagConstraints);
+       
+      
+       jcheckIsEnscript.setSelected(true);
+       jcheckIsEnscript.setText(Lang.getInstance().translate("Encrypt message"));
+       gridBagConstraints = new java.awt.GridBagConstraints();
+       gridBagConstraints.gridx = 0;
+       gridBagConstraints.gridy = 1;
+       gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+       gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+       gridBagConstraints.weightx = 1.0;
+       gridBagConstraints.gridwidth =2;
+       
+       jPanelBottom.add(jcheckIsEnscript, gridBagConstraints);
 
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 0;
@@ -245,5 +259,6 @@ public RightTelegramPanel() {
    private javax.swing.JScrollPane jScrollPaneText;
    public MTable jTableMessages;
    public javax.swing.JTextPane jTextPaneText;
+   public JCheckBox jcheckIsEnscript;
    // End of variables declaration                   
 }

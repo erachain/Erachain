@@ -503,7 +503,7 @@ public void onSendClick() {
     // if amount = 0 - set null
    
 
-    boolean encryptMessage = false;
+    boolean encryptMessage = rightTelegramPanel.jcheckIsEnscript.isSelected();
 
     byte[] encrypted = (encryptMessage)?  new byte[]{1} : new byte[]{0};
     byte[] isTextByte =  new byte[]{1} ;

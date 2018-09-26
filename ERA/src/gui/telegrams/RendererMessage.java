@@ -3,7 +3,7 @@ package gui.telegrams;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
+import java.io.UnsupportedEncodingException;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -12,19 +12,26 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.text.View;
 
+import org.apache.log4j.Logger;
+import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.mapdb.Fun.Tuple3;
 
+import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.AEScrypto;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
+import lang.Lang;
 import settings.Settings;
 import utils.DateTimeFormat;
 
 public class RendererMessage extends JLabel implements TableCellRenderer {
     private static final long serialVersionUID = 1L;
     private static JLabel resizer;
-    FontMetrics fontMetrics;
-    int row1 =0;
-    int rowww =1;
+  
+   
+    private static final Logger LOGGER = Logger.getLogger(RendererMessage.class);
     
  //   JTextPane jtp;
  //   JTextArea ta;
@@ -43,8 +50,6 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
 
-        
-        fontMetrics = table.getFontMetrics(UIManager.getFont("Label.font"));
         String color;
         WalletTelegramsFilterTableModel model = (WalletTelegramsFilterTableModel) table.getModel();
        
@@ -61,12 +66,15 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
                 resizer.setHorizontalAlignment(RIGHT);
                 image = Settings.getInstance().getUserPath() + "images/messages/receive.png";
             }
+           
+          String text = enscript(( R_Send)val.c);
+                    
             
-           value = "<HTML><p>&nbsp;&nbsp;<img src='file:"+ image +"'>&nbsp;<span style='font-size:10px;font-family:" + UIManager.getFont("Label.font").getFamily() + ";color:"+ color   + "'>"
+          value = "<HTML><p>&nbsp;&nbsp;<img src='file:"+ image +"'>&nbsp;<span style='font-size:10px;font-family:" + UIManager.getFont("Label.font").getFamily() + ";color:"+ color   + "'>"
                    + " DateTime: " + DateTimeFormat.timestamptoString(val.c.getTimestamp()) + "</span></p>"
                    + "<p style='font-size:10px;font-family:" + UIManager.getFont("Label.font").getFamily() + ";color:"+ color   + "'>&nbsp;&nbsp;Sender: " + val.a   + " &nbsp;&nbsp; Recipient: " + val.b + "</p>"
                   + "&nbsp;&nbsp;<p>" + "<span style='font-size:" + UIManager.getFont("Label.font").getSize() + "px;font-family:"
-                    + UIManager.getFont("Label.font").getFamily() + "'>" + (( R_Send)val.c).viewData() + "</p></HTML>";
+                    + UIManager.getFont("Label.font").getFamily() + "'>" +text + "</p></HTML>";
             
          
        
@@ -104,6 +112,50 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
         float h = view.getPreferredSpan(View.Y_AXIS);
 
         return new java.awt.Dimension((int) Math.ceil(w), (int) Math.ceil(h));
+    }
+   
+    
+    private  String enscript(R_Send trans) {
+
+        //  jTextArea_Messge.setContentType("text/html");
+        //  if (trans.isText())  jTextArea_Messge.setContentType("text");
+        if (!trans.isEncrypted())
+            return trans.viewData();
+
+        if (!Controller.getInstance().isWalletUnlocked()) {
+            return "<span style='color:Navy'>" + Lang.getInstance().translate("Encrypted") + "</span>";
+        }
+
+        Account account = Controller.getInstance().getAccountByAddress(trans.getCreator().getAddress());
+
+        byte[] privateKey = null;
+        byte[] publicKey = null;
+        //IF SENDER ANOTHER
+        if (account == null) {
+            PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(trans.getRecipient().getAddress());
+            privateKey = accountRecipient.getPrivateKey();
+
+            publicKey = trans.getCreator().getPublicKey();
+        }
+        //IF SENDER ME
+        else {
+            PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(account.getAddress());
+            privateKey = accountRecipient.getPrivateKey();
+
+            publicKey = Controller.getInstance().getPublicKeyByAddress(trans.getRecipient().getAddress());
+        }
+
+        try {
+            
+            return   new String(AEScrypto.dataDecrypt(trans.getData(), privateKey, publicKey), "UTF-8");
+            
+            
+
+        } catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
+            LOGGER.error(e1.getMessage(), e1);
+            return "<span style='color:Red'>" + Lang.getInstance().translate("Error") + "</span>";
+        }
+
     }
     
 }
