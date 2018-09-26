@@ -78,8 +78,8 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
           }
                  
               value = value    + "&nbsp;<span style='font-size:10px;font-family:" + UIManager.getFont("Label.font").getFamily() + ";color:"+ color   + "'>"
-                   + " DateTime: " + DateTimeFormat.timestamptoString(val.c.getTimestamp()) + "</span></p>"
-                   + "<p style='font-size:10px;font-family:" + UIManager.getFont("Label.font").getFamily() + ";color:"+ color   + "'>&nbsp;&nbsp;Sender: " + val.a   + " &nbsp;&nbsp; Recipient: " + val.b + "</p>"
+                   + "&nbsp;&nbsp;" + Lang.getInstance().translate("Date") +": " + DateTimeFormat.timestamptoString(val.c.getTimestamp()) + "</span></p>"
+                   + "<p style='font-size:10px;font-family:" + UIManager.getFont("Label.font").getFamily() + ";color:"+ color   + "'>&nbsp;&nbsp;"+Lang.getInstance().translate("Sender") +": " + val.a   + " &nbsp;&nbsp; "+Lang.getInstance().translate("Recipient") +": " + val.b + "</p>"
                   + "&nbsp;&nbsp;<p>" + "<span style='font-size:" + UIManager.getFont("Label.font").getSize() + "px;font-family:"
                     + UIManager.getFont("Label.font").getFamily() + "'>" +text + "</p></HTML>";
             
