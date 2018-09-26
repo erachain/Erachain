@@ -1,6 +1,24 @@
 package gui.library;
 
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.TrayIcon.MessageType;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.math.BigDecimal;
+
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import com.github.rjeschke.txtmark.Processor;
+
 import controller.Controller;
 import core.account.Account;
 import core.transaction.ArbitraryTransaction;
@@ -39,16 +57,6 @@ import lang.Lang;
 import settings.Settings;
 import utils.PlaySound;
 import utils.SysTray;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import java.awt.*;
-import java.awt.TrayIcon.MessageType;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.math.BigDecimal;
 
 /*
 import org.jvnet.substance.SubstanceLookAndFeel;
@@ -246,6 +254,7 @@ public class library {
         UIManager.put("SplitPane.dividerSize", size_font);
         UIManager.put("SplitPaneDivider.oneTouchButtonSize", size_font * 2);
         UIManager.put("SplitPane.centerOneTouchButtons", true);
+        UIManager.put("ArrowButton.size", size_font*2);
 
         if (size_font > 16)
             UIManager.put("ScrollBar.width", size_font);

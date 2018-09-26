@@ -146,9 +146,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         linked_hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Linked Hash")));
         linked_hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Linked Hash")));
         
-       
-        telegrams_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Telegrams")));
-        telegrams_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Send Telegram")));
+       //telegram
         telegrams_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Telegrams Panel")));
         
         tree = new JTree(root);

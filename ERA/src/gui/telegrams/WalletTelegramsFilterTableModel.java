@@ -157,8 +157,14 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
 
         }
         if (message.getType() == ObserverMessage.WALLET_ADD_TELEGRAM_TYPE
-                || message.getType() == ObserverMessage.WALLET_RESET_TELEGRAM_TYPE
-                || message.getType() == ObserverMessage.WALLET_REMOVE_TELEGRAM_TYPE) {
+                || message.getType() == ObserverMessage.WALLET_RESET_TELEGRAM_TYPE){
+            Object mm = message.getValue();
+            filter();
+            this.fireTableDataChanged();
+        }
+        
+        if ( message.getType() == ObserverMessage.WALLET_REMOVE_TELEGRAM_TYPE) {
+           Object mm = message.getValue();
             filter();
             this.fireTableDataChanged();
         }

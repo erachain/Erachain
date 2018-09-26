@@ -4,98 +4,106 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
-import java.awt.SystemColor;
 
+import javax.swing.JLabel;
 import javax.swing.JTable;
-import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.text.View;
 
 import org.mapdb.Fun.Tuple3;
 
 import core.transaction.R_Send;
 import core.transaction.Transaction;
+import settings.Settings;
 import utils.DateTimeFormat;
 
-public class RendererMessage extends JTextPane implements TableCellRenderer {
+public class RendererMessage extends JLabel implements TableCellRenderer {
     private static final long serialVersionUID = 1L;
+    private static JLabel resizer;
     FontMetrics fontMetrics;
     int row1 =0;
     int rowww =1;
     
+ //   JTextPane jtp;
+ //   JTextArea ta;
+    
     public RendererMessage() {
-       setContentType("text/html");
+       //setContentType("text/html");
+       // ta = new JTextArea();
+     //   jtp = new JTextPane();
+     //   setViewportView(jtp);
+     //   setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED); 
+        resizer = new JLabel();
+       
     }
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
 
+        
         fontMetrics = table.getFontMetrics(UIManager.getFont("Label.font"));
-     //   setHorizontalAlignment(JLabel.RIGHT);
-        String color = "green";
+        String color;
         WalletTelegramsFilterTableModel model = (WalletTelegramsFilterTableModel) table.getModel();
-        if (column == WalletTelegramsFilterTableModel.COLUMN_MESSAGE) {
+       
            
             Tuple3<String, String, Transaction> val = (Tuple3<String,String,Transaction>)value;
             if (model.getSender() == null ) return this;
+            String image;
             if (model.getSender().equals(val.a)) {
-        //        setHorizontalAlignment(JLabel.LEFT);
-               color = "green";
+                resizer.setHorizontalAlignment(LEFT);
+                color = "Green";
+                image = Settings.getInstance().getUserPath() + "images/messages/send.png";
             } else {
-       //         setHorizontalAlignment(JLabel.RIGHT);
-               color = "blue";
-                this.setBackground(SystemColor.LIGHT_GRAY);
+                color = "Blue";
+                resizer.setHorizontalAlignment(RIGHT);
+                image = Settings.getInstance().getUserPath() + "images/messages/receive.png";
             }
             
-           
+           value = "<HTML><p>&nbsp;&nbsp;<img src='file:"+ image +"'>&nbsp;<span style='font-size:10px;font-family:" + UIManager.getFont("Label.font").getFamily() + ";color:"+ color   + "'>"
+                   + " DateTime: " + DateTimeFormat.timestamptoString(val.c.getTimestamp()) + "</span></p>"
+                   + "<p style='font-size:10px;font-family:" + UIManager.getFont("Label.font").getFamily() + ";color:"+ color   + "'>&nbsp;&nbsp;Sender: " + val.a   + " &nbsp;&nbsp; Recipient: " + val.b + "</p>"
+                  + "&nbsp;&nbsp;<p>" + "<span style='font-size:" + UIManager.getFont("Label.font").getSize() + "px;font-family:"
+                    + UIManager.getFont("Label.font").getFamily() + "'>" + (( R_Send)val.c).viewData() + "</p></HTML>";
             
-            value = "<HTML><span style='font-size:10px;font-family:"
-                    + UIManager.getFont("Label.font").getFamily() + "color:"+ color   + "'> DateTime: " + DateTimeFormat.timestamptoString(val.c.getTimestamp()) + "Sender: " + val.a 
-                    + "  Recipient: " + val.b + "</span>"
-                  + "<br>" + "<span style='font-size:" + UIManager.getFont("Label.font").getSize() + "px;font-family:"
-                    + UIManager.getFont("Label.font").getFamily() + "'>" + (( R_Send)val.c).viewData() + "</HTML>";
+         
+       
+
+           if (isSelected) {
+            resizer.setBackground(Color.MAGENTA);//.UIManager.getColor("Table.selectionBackground"));
+         } else {
+            resizer.setBackground(UIManager.getColor("Table.background"));
         }
-         String k = value.toString();
-        int a = fontMetrics.stringWidth( value.toString());
-        int b = table.getColumnModel().getColumn(column).getWidth();
-         rowww = Math.max(rowww, (int) (fontMetrics.stringWidth( value.toString()+"           ") / table.getColumnModel().getColumn(column).getWidth())+1);
-       // if(row1!=row){
-            
-      //    System.out.println("row0"+row+" row1:"+row1+" hight:"+(int) (fontMetrics.getHeight() * rowww));
-            
-         //   table.setRowHeight((row), (int) (fontMetrics.getHeight() * rowww));
-           
-            
-            
-            rowww = 1;
-         //   row1=row;
-           
-            
-            
-      //  }
+
+           if (hasFocus) {
+               resizer.setBorder(new LineBorder(new Color(99, 130, 191)));
+               //  setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
+           } else {
+               resizer.setBorder(new LineBorder(null, 0));
+               // setBorder(noFocusBorder);
+           }
+          // calc height
+           Dimension prefSize = getPreferredSize1((String) value, true, table.getWidth()-10);
+         // set hight cell table
+        table.setRowHeight((row), (int) (prefSize.getHeight()+30));
         
-        if (isSelected) {
-            setBackground(SystemColor.blue);
-            // value = "<HTML><p style='color:#ffffff'><b>" +
-            // "&nbsp;&nbsp;&nbsp;" + value;
-        } else {
-            setBackground(new Color(255, 255, 220));
-            // value = "<HTML><p style='color:#000000'>" + "&nbsp;&nbsp;&nbsp;"
-            // + value;
-        }
-
-        if (hasFocus) {
-            setBorder(new LineBorder(new Color(99, 130, 191)));
-        } else {
-            setBorder(new LineBorder(null, 0));
-        }
-
-        // setAlignmentX(10);
-        setText((value == null) ? "" : value + "");
-         Dimension d = getPreferredSize();
-         table.setRowHeight((row), d.height);
-        return this;
+        return resizer;
     }
+    
+    
+    public static java.awt.Dimension getPreferredSize1(String html, boolean width, int prefSize) {
+
+        resizer.setText(html);
+        View view = (View) resizer.getClientProperty(javax.swing.plaf.basic.BasicHTML.propertyKey);
+
+        view.setSize(width ? prefSize : 0, width ? 0 : prefSize);
+
+        float w = view.getPreferredSpan(View.X_AXIS);
+        float h = view.getPreferredSpan(View.Y_AXIS);
+
+        return new java.awt.Dimension((int) Math.ceil(w), (int) Math.ceil(h));
+    }
+    
 }

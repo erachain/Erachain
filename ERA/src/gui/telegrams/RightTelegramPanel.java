@@ -1,17 +1,25 @@
 package gui.telegrams;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableRowSorter;
 
 import org.mapdb.Fun.Tuple3;
 
+import controller.Controller;
 import core.transaction.Transaction;
 import gui.library.MTable;
+import lang.Lang;
 
 /**
 *
@@ -24,6 +32,7 @@ public class RightTelegramPanel extends javax.swing.JPanel {
     */
     
     public WalletTelegramsFilterTableModel walletTelegramsFilterTableModel;
+protected int row;
     
   
 public RightTelegramPanel() {
@@ -64,6 +73,8 @@ public RightTelegramPanel() {
      // end sortet  
        
        initComponents();
+       
+       initMenu();
    }
 
    /**
@@ -178,6 +189,51 @@ public RightTelegramPanel() {
    }// </editor-fold>                        
 
 
+   private void initMenu(){
+    // menu
+
+       JPopupMenu menu = new JPopupMenu();
+
+       menu.addPopupMenuListener(new PopupMenuListener() {
+
+           @Override
+           public void popupMenuCanceled(PopupMenuEvent arg0) {
+               // TODO Auto-generated method stub
+
+           }
+
+           @Override
+           public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+               // TODO Auto-generated method stub
+
+           }
+
+           @Override
+           public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+               // TODO Auto-generated method stub
+               int row1 = jTableMessages.getSelectedRow();
+               if (row1 < 0)
+                   return;
+
+               row = jTableMessages.convertRowIndexToModel(row1);
+
+           }
+       });
+
+    JMenuItem deleteTelegram = new JMenuItem(Lang.getInstance().translate("Delete Telegram"));
+       deleteTelegram.addActionListener(new ActionListener() {
+           public void actionPerformed(ActionEvent e) {
+               
+               
+             Tuple3<String, String, Transaction> tt = (Tuple3<String,String,Transaction>) walletTelegramsFilterTableModel.getValueAt(row, 0);
+             Controller.getInstance().getWallet().database.getTelegramsMap().delete(tt.c.viewSignature()) ;
+
+           }
+       });
+       menu.add(deleteTelegram);
+
+       jTableMessages.setComponentPopupMenu(menu); 
+   }
    // Variables declaration - do not modify                     
    public javax.swing.JButton jButtonSendTelegram;
    public javax.swing.JLabel jLabelCenter;
