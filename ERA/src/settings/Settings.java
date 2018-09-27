@@ -44,6 +44,7 @@ public class Settings {
     public static final String DEFAULT_WALLET_DIR = "wallet";
     public static final String DEFAULT_BACKUP_DIR = "backup";
     public static final String DEFAULT_TEMP_DIR = "temp";
+    public static final String DEFAULT_TELEGRAM_DIR = "telegram";
     private static final Logger LOGGER = Logger.getLogger(Settings.class);
     //NETWORK
     private static final int DEFAULT_MIN_CONNECTIONS = 20; // for OWN maked connections
@@ -107,6 +108,9 @@ public class Settings {
     private String telegramDefaultSender;
     private String telegramDefaultReciever;
     private String telegramRatioReciever = null;
+    private String getTelegramPath;
+    
+    private String telegramtPath;
 
     private Settings() {
         this.localAddress = this.getCurrentIp();
@@ -193,6 +197,23 @@ public class Settings {
 			this.getWalletPath = dir;
 		
     }
+    
+    public String getTelegramDir() {
+        try {
+            if (this.telegramtPath.equals("")) this.telegramtPath =  this.userPath + DEFAULT_TELEGRAM_DIR;
+            return this.telegramtPath;
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            return this.userPath + DEFAULT_TELEGRAM_DIR;
+        }
+    }
+    
+    public void setTelegramDir(String dir) {
+       
+            this.telegramtPath = dir;
+        
+    }
+    
     
     public String getTelegramDefaultSender(){
         return telegramDefaultSender;

@@ -1,7 +1,14 @@
 package network;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
@@ -11,12 +18,10 @@ import core.account.Account;
 import core.crypto.Base58;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
-import database.wallet.DWSet;
 import datachain.DCSet;
 import network.message.Message;
 import network.message.TelegramMessage;
 import ntp.NTP;
-import org.jsoup.Connection;
 
 public class TelegramManager extends Thread {
     /**
@@ -417,7 +422,8 @@ public class TelegramManager extends Thread {
                 
                 
                 this.handledTelegrams.put(signatureKey, telegram);
-              
+              // save telegram to db
+                Controller.getInstance().telegtamm.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
                 // save telegram to wallet DB
                 Transaction trans = telegram.getTransaction();
                 HashSet<Account> recipients = trans.getRecipientAccounts();

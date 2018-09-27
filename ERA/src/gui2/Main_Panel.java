@@ -68,6 +68,7 @@ import gui.items.unions.IssueUnionPanel;
 import gui.items.unions.My_Unions_Tab;
 import gui.items.unions.Search_Union_Tab;
 import gui.library.MSplitPane;
+import gui.telegrams.ALLTelegramPanel;
 import gui.telegrams.TelegramSplitPanel;
 import lang.Lang;
 
@@ -559,7 +560,12 @@ public class Main_Panel extends javax.swing.JPanel {
 
             return;
         }
-        
+        if (str.equals(Lang.getInstance().translate("All Telegrams Panel"))
+                || str.equals("ALLTelegramPanel")) {
+            insertTab(Lang.getInstance().translate("All Telegrams Panel"), new ALLTelegramPanel());
+
+            return;
+        }
     }
 
     // insert tab in tabbedpane

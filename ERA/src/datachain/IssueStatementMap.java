@@ -1,10 +1,11 @@
 package datachain;
 
-import com.google.common.primitives.UnsignedBytes;
+import java.util.Map;
+
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import java.util.Map;
+import com.google.common.primitives.UnsignedBytes;
 
 public class IssueStatementMap extends Issue_ItemMap {
 

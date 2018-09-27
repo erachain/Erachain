@@ -51,6 +51,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         DefaultMutableTreeNode other_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Network DashBoard"));
         DefaultMutableTreeNode bank_Tree = new DefaultMutableTreeNode(Lang.getInstance().translate("Bank"));
         DefaultMutableTreeNode telegrams_Tree = new DefaultMutableTreeNode(Lang.getInstance().translate("Telegrams"));
+        
 
         if (BlockChain.DEVELOP_USE)
             root.add(bank_Tree);
@@ -148,6 +149,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         
        //telegram
         telegrams_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Telegrams Panel")));
+        telegrams_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("All Telegrams Panel")));
         
         tree = new JTree(root);
         // tree.addTreeSelectionListener(this);
