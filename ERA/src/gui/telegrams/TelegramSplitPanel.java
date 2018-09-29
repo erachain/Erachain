@@ -185,10 +185,7 @@ public class TelegramSplitPanel extends Split_Panel {
         @Override
         public void valueChanged(ListSelectionEvent e) {
             // TODO Auto-generated method stub
-           if( tableFavoriteAccounts.getSelectedRow() < 0) return;;
-           int a1 = tableFavoriteAccounts.getSelectedRow();
-           if(a1 >= accountModel.getRowCount()) return;
-           int b1 = tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow());
+           if( tableFavoriteAccounts.getSelectedRow() <= 0) return;;
             String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow())),accountModel.COLUMN_ADDRESS);
             rightTelegramPanel.jLabelRaght.setText(account);
             rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(account);
@@ -214,7 +211,7 @@ public class TelegramSplitPanel extends Split_Panel {
        else{
            this.leftTelegram.jCxbRecipientmessages.setSelected(true);
            tableFavoriteAccounts.setVisible(true);  
-           if( tableFavoriteAccounts.getSelectedRow() < 0) return;;
+           if( tableFavoriteAccounts.getSelectedRow() <= 0) return;;
            String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow())),accountModel.COLUMN_ADDRESS);
            rightTelegramPanel.jLabelRaght.setText(account);
            rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(account);
