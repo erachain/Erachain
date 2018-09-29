@@ -1,6 +1,21 @@
 package network;
 // 30/03 ++
 
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
+
 import controller.Controller;
 import core.BlockChain;
 import core.crypto.Base58;
@@ -8,16 +23,10 @@ import datachain.DCSet;
 import network.message.FindMyselfMessage;
 import network.message.Message;
 import network.message.MessageFactory;
+import network.message.TelegramGetMessage;
 import network.message.TelegramMessage;
-import org.apache.log4j.Logger;
-import org.mapdb.Fun.Tuple2;
 import settings.Settings;
 import utils.ObserverMessage;
-
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.*;
 
 // import org.apache.log4j.Logger;
 //import core.BlockChain;
@@ -348,7 +357,17 @@ public class Network extends Observable implements ConnectionCallback {
 
             return;
         }
-
+        
+        // GET telegrams
+        if(message.getType()== Message.TELEGRAM_GET_TYPE){
+          //CREATE NEW PEERS MESSAGE WITH PEERS
+            String address = ((TelegramGetMessage) message).getAddress();
+           return;
+           }
+        // Ansver to get transaction   
+        if ( message.getType() == Message.TELEGRAM_GET_ANSVER_TYPE){
+           return; 
+        }
         //ONLY HANDLE BLOCK AND TRANSACTION MESSAGES ONCE
         if (message.getType() == Message.TRANSACTION_TYPE
                 || message.getType() == Message.BLOCK_TYPE
