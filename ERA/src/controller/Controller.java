@@ -1703,10 +1703,10 @@ public class Controller extends Observable {
     public void broadcastGetTelegram(String address) {
 
         // CREATE MESSAGE
-      // Message telegramGet = MessageFactory.getInstance().createTelegramGetMessage(address);
+       Message telegramGet = MessageFactory.getInstance().createTelegramGetMessage(address);
         // BROADCAST MESSAGE
-      //   List<Peer> excludes = new ArrayList<Peer>();
-       // this.network.asyncBroadcast(telegramGet, excludes, false);
+         List<Peer> excludes = new ArrayList<Peer>();
+        this.network.asyncBroadcast(telegramGet, excludes, false);
       }
 
     // SYNCHRONIZE
