@@ -30,6 +30,7 @@ import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
+import core.telegram.Telegram;
 import core.transaction.Transaction;
 import gui.MainFrame;
 import gui.PasswordPane;
@@ -185,11 +186,9 @@ public class TelegramSplitPanel extends Split_Panel {
         @Override
         public void valueChanged(ListSelectionEvent e) {
             // TODO Auto-generated method stub
-           if( tableFavoriteAccounts.getSelectedRow() < 0) return;;
-           int a1 = tableFavoriteAccounts.getSelectedRow();
-           if(a1 >= accountModel.getRowCount()) return;
-           int b1 = tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow());
-            String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow())),accountModel.COLUMN_ADDRESS);
+           if( tableFavoriteAccounts.getSelectedRow() < 0 || 
+                   tableFavoriteAccounts.getSelectedRow()>= accountModel.getRowCount() ) return;
+              String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow())),accountModel.COLUMN_ADDRESS);
             rightTelegramPanel.jLabelRaght.setText(account);
             rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(account);
             // set settings
@@ -244,7 +243,8 @@ public class TelegramSplitPanel extends Split_Panel {
                // TODO Auto-generated method stub
                tableFavoriteAccounts.setVisible(true); 
                Settings.getInstance().setTelegramRatioReciever("recipient");
-               if( tableFavoriteAccounts.getSelectedRow() == 0) return;;
+               if( tableFavoriteAccounts.getSelectedRow() < 0 || 
+                       tableFavoriteAccounts.getSelectedRow()>= accountModel.getRowCount() ) return;
                String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow())),accountModel.COLUMN_ADDRESS);
                rightTelegramPanel.jLabelRaght.setText(account);
                rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(account);
@@ -269,6 +269,16 @@ public class TelegramSplitPanel extends Split_Panel {
         
     });
     
+    // refresh button
+    leftTelegram.refreshButton.addActionListener(new ActionListener(){
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+            Telegram.getInstanse().getTelegrams(rightTelegramPanel.jLabelLeft.getText()); 
+        }
+    } );
+        
     // menu
 
     JPopupMenu menu = new JPopupMenu();

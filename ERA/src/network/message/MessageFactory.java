@@ -1,17 +1,19 @@
 package network.message;
 
+import java.io.DataInputStream;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
+
 import com.google.common.primitives.Ints;
+
 import core.block.Block;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
 import lang.Lang;
 import network.Peer;
-import org.apache.log4j.Logger;
-import org.mapdb.Fun.Tuple2;
-
-import java.io.DataInputStream;
-import java.util.Arrays;
-import java.util.List;
 
 public class MessageFactory {
 
@@ -80,6 +82,14 @@ public class MessageFactory {
         return new TelegramMessage(transaction);
     }
 
+    public Message createTelegramGetMessage(String address) {
+        return new TelegramGetMessage(address);
+    }
+    public Message createTelegramsAnswerGetMessage(String address, String typeTelegramanswer) {
+        // TODO Auto-generated method stub
+        return new TelegramAnswerGetMessage(address, typeTelegramanswer );
+    }
+    
     public Message parse(Peer sender, DataInputStream inputStream) throws Exception {
         //READ MESSAGE TYPE
         byte[] typeBytes = new byte[Message.TYPE_LENGTH];
@@ -146,6 +156,12 @@ public class MessageFactory {
 
         switch (type) {
 
+        // TELEGRAM GET
+        case Message.TELEGRAM_GET_TYPE:
+
+            //CREATE MESSAGE FROM DATA
+            message = TelegramGetMessage.parse(data);
+            break;
             // TELEGRAM
             case Message.TELEGRAM_TYPE:
 
@@ -260,4 +276,6 @@ public class MessageFactory {
         //RETURN
         return message;
     }
+
+    
 }
