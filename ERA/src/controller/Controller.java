@@ -80,7 +80,6 @@ import core.item.unions.UnionCls;
 import core.naming.Name;
 import core.naming.NameSale;
 import core.payment.Payment;
-import core.telegram.Telegram;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 import core.voting.Poll;
@@ -192,7 +191,6 @@ public class Controller extends Observable {
     private AboutFrame about_frame;
     private boolean isStopping = false;
     private String info;
-    public Telegram telegtamm;
 
     public static String getVersion() {
         return version;
@@ -591,16 +589,6 @@ public class Controller extends Observable {
                 && !this.wallet.getAccounts().isEmpty()) {
             this.wallet.synchronize(true);
         }
-        
-     // CREATE TELEGRAM
-        if (Controller.useGui)
-            about_frame.set_console_Text(Lang.getInstance().translate("Open Telegram"));
-        this.telegtamm = Telegram.getInstanse();
-        
-        if (Controller.useGui)
-            about_frame.set_console_Text(Lang.getInstance().translate("Telegram OK"));
-
-           
 
         // CREATE BLOCKGENERATOR
         this.blockGenerator = new BlockGenerator(true);
@@ -895,10 +883,6 @@ public class Controller extends Observable {
         // CLOSE WALLET
         LOGGER.info("Closing wallet");
         this.wallet.close();
-        
-     // CLOSE TELEGRAM
-        LOGGER.info("Closing telegram");
-        this.telegtamm.database.close();
         
         LOGGER.info("Closed.");
         // FORCE CLOSE
@@ -1692,22 +1676,11 @@ public class Controller extends Observable {
             // BROADCAST MESSAGE
             List<Peer> excludes = new ArrayList<Peer>();
             this.network.asyncBroadcast(telegram, excludes, false);
-            // save wallet DB
+            // save DB
             Controller.getInstance().wallet.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
-            // save Telegramm DB
-            Controller.getInstance().telegtamm.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
         }
 
     }
-    
-    public void broadcastGetTelegram(String address) {
-
-        // CREATE MESSAGE
-        Message telegramGet = MessageFactory.getInstance().createTelegramGetMessage(address);
-        // BROADCAST MESSAGE
-         List<Peer> excludes = new ArrayList<Peer>();
-        this.network.asyncBroadcast(telegramGet, excludes, false);
-      }
 
     // SYNCHRONIZE
 
