@@ -166,7 +166,7 @@ public class Controller extends Observable {
     private int status;
     private boolean dcSetWithObserver = false;
     private boolean dynamicGUI = false;
-    private Network network;
+    public Network network;
     private TradersManager tradersManager;
     private ApiService rpcService;
     private WebService webService;

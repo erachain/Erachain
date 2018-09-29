@@ -107,7 +107,16 @@ public class TelegramSplitPanel extends Split_Panel {
    tableFavoriteAccounts = new MTable(this.accountModel);
    
    
+   //get telegram
+   leftTelegram.jButtonGetTelegrams.addActionListener(new ActionListener(){
 
+    @Override
+    public void actionPerformed(ActionEvent arg0) {
+        // TODO Auto-generated method stub
+        Controller.getInstance().telegram.broadcastGetTelegram(sender.getAddress());
+    }
+       
+   });
    
    leftTelegram.jScrollPaneCenter.setViewportView(tableFavoriteAccounts);
    
@@ -135,6 +144,7 @@ public class TelegramSplitPanel extends Split_Panel {
            leftTelegram.jComboAccount.repaint();
            rightTelegramPanel.jLabelLeft.setText(Settings.getInstance().getTelegramDefaultSender());
            rightTelegramPanel.walletTelegramsFilterTableModel.setSender(Settings.getInstance().getTelegramDefaultSender());
+           sender = (Account) this.leftTelegram.jComboAccount.getSelectedItem();
        } catch (Exception e) {
            // TODO: handle exception
        }
@@ -145,6 +155,7 @@ public class TelegramSplitPanel extends Split_Panel {
        rightTelegramPanel.walletTelegramsFilterTableModel.setSender(leftTelegram.jComboAccount.getItemAt(0).getAddress());
        rightTelegramPanel.jLabelLeft.setText(leftTelegram.jComboAccount.getItemAt(0).getAddress());
        leftTelegram.jComboAccount.repaint();
+       sender = (Account) this.leftTelegram.jComboAccount.getSelectedItem();
    }
    
     leftTelegram.jComboAccount.addActionListener(new ActionListener() {
@@ -157,6 +168,7 @@ public class TelegramSplitPanel extends Split_Panel {
                 rightTelegramPanel.jLabelLeft.setText(asset.getAddress()); 
                 rightTelegramPanel.walletTelegramsFilterTableModel.setSender(asset.getAddress());
                 Settings.getInstance().setTelegramDefaultSender(asset.getAddress());
+                sender = (Account) leftTelegram.jComboAccount.getSelectedItem();
                 
             }
 

@@ -1,12 +1,13 @@
 package network.message;
 
+import java.util.Arrays;
+
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
+
 import controller.Controller;
 import core.crypto.Crypto;
 import network.Peer;
-
-import java.util.Arrays;
 
 public abstract class Message {
 
@@ -33,6 +34,8 @@ public abstract class Message {
     public static final int VERSION_TYPE = 12;
     public static final int FIND_MYSELF_TYPE = 13;
     public static final int TELEGRAM_TYPE = 14;
+    public static final int TELEGRAM_GET_TYPE = 15;
+    public static final int TELEGRAM_GET_ANSVER_TYPE = 16;
 
     private int type;
     private Peer sender;

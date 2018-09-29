@@ -1,17 +1,19 @@
 package network.message;
 
+import java.io.DataInputStream;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
+
 import com.google.common.primitives.Ints;
+
 import core.block.Block;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
 import lang.Lang;
 import network.Peer;
-import org.apache.log4j.Logger;
-import org.mapdb.Fun.Tuple2;
-
-import java.io.DataInputStream;
-import java.util.Arrays;
-import java.util.List;
 
 public class MessageFactory {
 
@@ -78,6 +80,10 @@ public class MessageFactory {
 
     public Message createTelegramMessage(Transaction transaction) {
         return new TelegramMessage(transaction);
+    }
+    
+    public Message createTelegramGetMessage(String account) {
+        return new TelegramGetMessage(account);
     }
 
     public Message parse(Peer sender, DataInputStream inputStream) throws Exception {

@@ -2,13 +2,18 @@ package core.telegram;
 // 09/03
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 import org.apache.log4j.Logger;
 
+import controller.Controller;
 import core.transaction.Transaction;
 import database.telegram.TelegramSet;
+import network.Peer;
+import network.message.Message;
+import network.message.MessageFactory;
 
 
 
@@ -125,4 +130,11 @@ public class Telegram extends Observable implements Observer {
             this.database.commit();
         }
 }
+    public void broadcastGetTelegram(String address) {
+        // CREATE MESSAGE
+        Message telegram = MessageFactory.getInstance().createTelegramGetMessage(address);
+          // BROADCAST MESSAGE
+            List<Peer> excludes = new ArrayList<Peer>();
+            Controller.getInstance().network.asyncBroadcast(telegram, excludes, false);
+      }
 }
