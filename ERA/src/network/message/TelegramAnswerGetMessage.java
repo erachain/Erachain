@@ -24,6 +24,8 @@ public class TelegramAnswerGetMessage extends Message {
     public TelegramAnswerGetMessage(String address, String typeTelegramanswer) {
         super(TELEGRAM_ANSWER_GET_TYPE);
        JSONObject list = new JSONObject();
+       result = new JSONObject();
+       
         this.address = address;
        ArrayList<Transaction> array = Controller.getInstance().telegtamm.getFromCreator(address);
        int i = 0;
