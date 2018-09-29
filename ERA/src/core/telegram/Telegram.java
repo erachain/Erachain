@@ -14,6 +14,7 @@ import database.telegram.TelegramSet;
 import network.Peer;
 import network.message.Message;
 import network.message.MessageFactory;
+import network.message.TelegramMessage;
 
 
 
@@ -123,12 +124,11 @@ public class Telegram extends Observable implements Observer {
     // CREATE MESSAGE
     Message telegram = MessageFactory.getInstance().createTelegramGetMessage(adderess);
 
-  
+    if ( !Controller.getInstance().network.addTelegram((TelegramMessage) telegram)) {
         // BROADCAST MESSAGE
         List<Peer> excludes = new ArrayList<Peer>();
-        excludes = Controller.getInstance().getActivePeers();
         Controller.getInstance().network.asyncBroadcast(telegram, excludes, false);
-   
+    }
     }
 
 }
