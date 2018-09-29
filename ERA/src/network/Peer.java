@@ -52,108 +52,108 @@ public class Peer extends Thread {
         //LOGGER.debug("@@@ new Peer(InetAddress address) : " + address.getHostAddress());
         this.setName("Thread Peer - " + this.getId());
     }
-    
-    /*
+	
+	/*
 
-    private void init(ConnectionCallback callback, Socket socket) {
-        
-        if (callback != null) {
-            this.callback = callback;
-        }
-        
-        this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
-        this.pingCounter = 0;
-        this.connectionTime = NTP.getTime();
-        this.errors = 0;
-        
-        try
-        {   
-            if (socket == null) {
-                this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
-            } else {
-                this.socket = socket;
-                this.address = socket.getInetAddress();
-            }
+	private void init(ConnectionCallback callback, Socket socket) {
+		
+		if (callback != null) {
+			this.callback = callback;
+		}
+		
+		this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
+		this.pingCounter = 0;
+		this.connectionTime = NTP.getTime();
+		this.errors = 0;
+		
+		try
+		{	
+			if (socket == null) {
+				this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
+			} else {
+				this.socket = socket;
+				this.address = socket.getInetAddress();
+			}
 
-            //ENABLE KEEPALIVE
-            this.socket.setKeepAlive(KEEP_ALIVE);
-            
-            //TIMEOUT
-            this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
-            
-            this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
-            this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
+			//ENABLE KEEPALIVE
+			this.socket.setKeepAlive(KEEP_ALIVE);
+			
+			//TIMEOUT
+			this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
+			
+			this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
+			this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
-            //CREATE STRINGWRITER
-            this.out = socket.getOutputStream();
-        }
-        catch(Exception e)
-        {
-            //FAILED TO CONNECT NO NEED TO BLACKLIST
-            //LOGGER.info("Failed to connect to : " + address);
-            //LOGGER.error(e.getMessage(), e);
+			//CREATE STRINGWRITER
+			this.out = socket.getOutputStream();
+		}
+		catch(Exception e)
+		{
+			//FAILED TO CONNECT NO NEED TO BLACKLIST
+			//LOGGER.info("Failed to connect to : " + address);
+			//LOGGER.error(e.getMessage(), e);
 
-        }
-                        
-        if (this.pinger == null) {
+		}
+						
+		if (this.pinger == null) {
 
-            //START COMMUNICATON THREAD
-            this.start();
+			//START COMMUNICATON THREAD
+			this.start();
 
-            //START PINGER
-            this.pinger = new Pinger(this);
+			//START PINGER
+			this.pinger = new Pinger(this);
 
-            // IT is STARTED
-            this.runed = true;
+			// IT is STARTED
+			this.runed = true;
 
-            //ON SOCKET CONNECT
-            this.callback.onConnect(this, true);            
-        } else {
+			//ON SOCKET CONNECT
+			this.callback.onConnect(this, true);			
+		} else {
 
-            // IT is STARTED
-            this.runed = true;
+			// IT is STARTED
+			this.runed = true;
 
-            // already started
-            this.callback.onConnect(this, false);
-        }
+			// already started
+			this.callback.onConnect(this, false);
+		}
 
-    }
-    
-    
-    public Peer(ConnectionCallback callback, Socket socket)
-    {
+	}
+	
+	
+	public Peer(ConnectionCallback callback, Socket socket)
+	{
 
-        this.white = false;
-        init(callback, socket);
+		this.white = false;
+		init(callback, socket);
 
-    }
-    
+	}
+	
 
-    // connect and run
-    public void connect(ConnectionCallback callback)
-    {
-        if(Controller.getInstance().isOnStopping()){
-            return;
-        }
-        
-        this.white = true;
-        init(callback, null);
+	// connect and run
+	public void connect(ConnectionCallback callback)
+	{
+		if(Controller.getInstance().isOnStopping()){
+			return;
+		}
+		
+		this.white = true;
+		init(callback, null);
 
-    }
+	}
 
 
-    // connect to old reused peer
-    public void reconnect(Socket socket)
-    {
-            
-        if (this.socket!=null) {
-            this.close();
-        }
+	// connect to old reused peer
+	public void reconnect(Socket socket)
+	{
+			
+		if (this.socket!=null) {
+			this.close();
+		}
 
-        this.white = false;
-        init(null, socket);
+		this.white = false;
+		init(null, socket);
 
-    }
+	}
 */
 
     public Peer(ConnectionCallback callback, Socket socket) {
@@ -708,7 +708,7 @@ public class Peer extends Thread {
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
             //LOGGER.debug(" messages.remove( " + thisRequestKey + " ) by good RESPONSE " + this.getAddress().getHostAddress()
-            //       + " " + (response==null?"NULL":response.toString()));
+            //		 + " " + (response==null?"NULL":response.toString()));
             this.messages.remove(thisRequestKey);
         } catch (InterruptedException e) {
             //NO MESSAGE RECEIVED WITHIN TIME;
@@ -760,21 +760,21 @@ public class Peer extends Thread {
         //LOGGER.info("Try close peer : " + address.getHostAddress());
 
         try {
-            /*
-            //STOP PINGER
-            if(this.pinger != null)
-            {
-                //this.pinger.stopPing();
-                
-                synchronized (this.pinger) {
-                    try {
-                        this.pinger.wait();
-                    } catch(Exception e) {
-                        
-                    }
-                }
-            }
-                */
+			/*
+			//STOP PINGER
+			if(this.pinger != null)
+			{
+				//this.pinger.stopPing();
+				
+				synchronized (this.pinger) {
+					try {
+						this.pinger.wait();
+					} catch(Exception e) {
+						
+					}
+				}
+			}
+				*/
 
             //CHECK IS SOCKET EXISTS
             if (socket != null) {

@@ -126,7 +126,7 @@ public class Telegram extends Observable implements Observer {
   
         // BROADCAST MESSAGE
         List<Peer> excludes = new ArrayList<Peer>();
-       // excludes = Controller.getInstance().getActivePeers();
+        excludes = Controller.getInstance().getActivePeers();
         Controller.getInstance().network.asyncBroadcast(telegram, excludes, false);
    
     }

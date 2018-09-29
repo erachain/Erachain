@@ -186,12 +186,12 @@ public class Network extends Observable implements ConnectionCallback {
         return false;
     }
 
-    /*@Override
-    public List<Peer> getKnownPeers() {
-        
-        return this.knownPeers;
-    }
-    */
+	/*@Override
+	public List<Peer> getKnownPeers() {
+		
+		return this.knownPeers;
+	}
+	*/
 
     @Override
     // IF PEER in exist in NETWORK - get it
@@ -271,7 +271,7 @@ public class Network extends Observable implements ConnectionCallback {
         return this.telegramer.getTelegramsFromTimestamp(timestamp, recipient, filter);
     }
     //public TelegramMessage getTelegram64(String signature) {
-    //  return this.telegramer.getTelegram64(signature);
+    //	return this.telegramer.getTelegram64(signature);
     //}
 
     public TelegramMessage getTelegram(byte[] signature) {
