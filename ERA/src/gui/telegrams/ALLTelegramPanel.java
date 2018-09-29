@@ -210,7 +210,7 @@ public ALLTelegramPanel() {
                
                
              Transaction tt =  walletTelegramsFilterTableModel.getTelegramMessage(row);
-             Controller.getInstance().telegtamm.database.getTelegramsMap().delete(tt.viewSignature()) ;
+             Controller.getInstance().telegram.database.getTelegramsMap().delete(tt.viewSignature()) ;
         //     System.out.println(row);
            }
        });

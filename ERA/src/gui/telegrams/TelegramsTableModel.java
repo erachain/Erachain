@@ -166,7 +166,7 @@ public class TelegramsTableModel extends DefaultTableModel implements Observer {
     public void addObservers() {
 
         // REGISTER ON WALLET TRANSACTIONS
-        Controller.getInstance().telegtamm.database.getTelegramsMap().addObserver(this);
+        Controller.getInstance().telegram.database.getTelegramsMap().addObserver(this);
         // for UNCONFIRMEDs
        // DCSet.getInstance().getTransactionMap().addObserver(this);
         // for ??
@@ -176,7 +176,7 @@ public class TelegramsTableModel extends DefaultTableModel implements Observer {
 
     public void removeObservers() {
 
-        Controller.getInstance().telegtamm.database.getTelegramsMap().deleteObserver(this);
+        Controller.getInstance().telegram.database.getTelegramsMap().deleteObserver(this);
       // DCSet.getInstance().getTransactionMap().addObserver(this);
         /// ???
         /// Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);

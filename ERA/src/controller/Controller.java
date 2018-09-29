@@ -80,6 +80,7 @@ import core.item.unions.UnionCls;
 import core.naming.Name;
 import core.naming.NameSale;
 import core.payment.Payment;
+import core.telegram.Telegram;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 import core.voting.Poll;
@@ -160,6 +161,7 @@ public class Controller extends Observable {
     private static long buildTimestamp;
     private static Controller instance;
     public Wallet wallet;
+    public Telegram telegram;
     private boolean processingWalletSynchronize = false;
     private int status;
     private boolean dcSetWithObserver = false;
@@ -589,6 +591,15 @@ public class Controller extends Observable {
                 && !this.wallet.getAccounts().isEmpty()) {
             this.wallet.synchronize(true);
         }
+        // create telegtam
+        
+        if (Controller.useGui)
+            about_frame.set_console_Text(Lang.getInstance().translate("Open Telegram"));
+        this.telegram = Telegram.getInstanse();
+
+        
+        if (Controller.useGui)
+            about_frame.set_console_Text(Lang.getInstance().translate("Telegram OK"));
 
         // CREATE BLOCKGENERATOR
         this.blockGenerator = new BlockGenerator(true);
@@ -883,6 +894,10 @@ public class Controller extends Observable {
         // CLOSE WALLET
         LOGGER.info("Closing wallet");
         this.wallet.close();
+        
+        // CLOSE telegram
+        LOGGER.info("Closing telegram");
+        this.telegram.close();
         
         LOGGER.info("Closed.");
         // FORCE CLOSE

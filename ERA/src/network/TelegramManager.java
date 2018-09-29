@@ -423,7 +423,7 @@ public class TelegramManager extends Thread {
                 
                 this.handledTelegrams.put(signatureKey, telegram);
               // save telegram to db
-                Controller.getInstance().telegtamm.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
+                Controller.getInstance().telegram.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
                 // save telegram to wallet DB
                 Transaction trans = telegram.getTransaction();
                 HashSet<Account> recipients = trans.getRecipientAccounts();

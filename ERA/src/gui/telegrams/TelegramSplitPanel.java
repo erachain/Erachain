@@ -185,7 +185,11 @@ public class TelegramSplitPanel extends Split_Panel {
         @Override
         public void valueChanged(ListSelectionEvent e) {
             // TODO Auto-generated method stub
-           if( tableFavoriteAccounts.getSelectedRow() == 0) return;;
+           if( tableFavoriteAccounts.getSelectedRow() < 0
+                   || tableFavoriteAccounts.getSelectedRow()>= accountModel.getRowCount()) {
+               rightTelegramPanel.jLabelRaght.setText("");
+               return;
+           }
             String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow())),accountModel.COLUMN_ADDRESS);
             rightTelegramPanel.jLabelRaght.setText(account);
             rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(account);
@@ -211,12 +215,16 @@ public class TelegramSplitPanel extends Split_Panel {
        else{
            this.leftTelegram.jCxbRecipientmessages.setSelected(true);
            tableFavoriteAccounts.setVisible(true);  
-           if( tableFavoriteAccounts.getSelectedRow() == 0) return;;
+           rightTelegramPanel.jPanelBottom.setVisible(true);
+           leftTelegram.jButtonAddAccount.setVisible(true);
+           if( tableFavoriteAccounts.getSelectedRow() >= 0) {
            String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow())),accountModel.COLUMN_ADDRESS);
            rightTelegramPanel.jLabelRaght.setText(account);
            rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(account);
-           rightTelegramPanel.jPanelBottom.setVisible(true);
-           leftTelegram.jButtonAddAccount.setVisible(true);
+           }
+           else{
+               rightTelegramPanel.jLabelRaght.setText("");
+           }
        }
        
        this.leftTelegram.jCxbAllmessages.addActionListener(new ActionListener(){
@@ -241,12 +249,17 @@ public class TelegramSplitPanel extends Split_Panel {
                // TODO Auto-generated method stub
                tableFavoriteAccounts.setVisible(true); 
                Settings.getInstance().setTelegramRatioReciever("recipient");
-               if( tableFavoriteAccounts.getSelectedRow() == 0) return;;
+               rightTelegramPanel.jPanelBottom.setVisible(true);
+               leftTelegram.jButtonAddAccount.setVisible(true);
+               if( tableFavoriteAccounts.getSelectedRow() < 0
+                       || tableFavoriteAccounts.getSelectedRow()>= accountModel.getRowCount()) {
+                   rightTelegramPanel.jLabelRaght.setText("");
+                   return;
+               }
                String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow())),accountModel.COLUMN_ADDRESS);
                rightTelegramPanel.jLabelRaght.setText(account);
                rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(account);
-               rightTelegramPanel.jPanelBottom.setVisible(true);
-               leftTelegram.jButtonAddAccount.setVisible(true);
+              
            }
            
        });

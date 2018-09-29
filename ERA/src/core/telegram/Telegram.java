@@ -114,5 +114,15 @@ public class Telegram extends Observable implements Observer {
           return list;
         }
      
+    public void close() {
+        if (this.database != null) {
+            this.database.close();
+        }
+    }
 
+    public void commit() {
+        if (this.database != null) {
+            this.database.commit();
+        }
+}
 }
