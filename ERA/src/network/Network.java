@@ -18,8 +18,8 @@ import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.BlockChain;
+import core.account.Account;
 import core.crypto.Base58;
-import core.transaction.Transaction;
 import datachain.DCSet;
 import network.message.FindMyselfMessage;
 import network.message.Message;
@@ -365,7 +365,7 @@ public class Network extends Observable implements ConnectionCallback {
           //address
             String address = ((TelegramGetMessage) message).getAddress();
              // create ansver
-            Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage(address);
+            Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage((ArrayList<Account>) Controller.getInstance().wallet.getAccounts());
             answer.setId(message.getId());
             // send answer
             message.getSender().sendMessage(answer);
@@ -373,7 +373,7 @@ public class Network extends Observable implements ConnectionCallback {
            }
         // Ansver to get transaction   
         if ( message.getType() == Message.TELEGRAM_GET_ANSVER_TYPE){
-           ArrayList<Transaction> aa = ((TelegramGetAnswerMessage) message).getTelegransList();
+           ((TelegramGetAnswerMessage) message).saveToWallet();
             
             return; 
         }

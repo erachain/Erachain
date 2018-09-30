@@ -1,6 +1,7 @@
 package network.message;
 
 import java.io.DataInputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import org.mapdb.Fun.Tuple2;
 
 import com.google.common.primitives.Ints;
 
+import core.account.Account;
 import core.block.Block;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
@@ -86,7 +88,7 @@ public class MessageFactory {
         return new TelegramGetMessage(account);
     }
     
-    public Message createTelegramGetAnswerMessage(String account) {
+    public Message createTelegramGetAnswerMessage(ArrayList<Account> account) {
         return new TelegramGetAnswerMessage(account);
     }
     
