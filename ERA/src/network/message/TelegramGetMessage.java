@@ -1,29 +1,59 @@
 package network.message;
 
-import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Set;
+
+import org.bouncycastle.util.Strings;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import com.google.common.primitives.Bytes;
 
+import controller.Controller;
+import core.account.Account;
+
 public class TelegramGetMessage extends Message {
 
-    String address;
+    JSONObject address;
    
 
-    public TelegramGetMessage(String address) {
+    @SuppressWarnings("unchecked")
+    public TelegramGetMessage() {
         super(TELEGRAM_GET_TYPE);
-       this.address = address;
+        address = new JSONObject();
+        List<Account> acounts = Controller.getInstance().wallet.getAccounts();
+        for (int i = 0;i<acounts.size();i++){
+            this.address.put(i,acounts.get(i).getAddress()); 
+       }
     }
+      
+       
+
+    public TelegramGetMessage(JSONObject account) {
+        super(TELEGRAM_GET_TYPE);
+            // TODO Auto-generated constructor stub
+        address = new JSONObject();
+        Set<Integer> telegKeySet = account.keySet();
+        for (int i = 0; i<telegKeySet.size(); i++){
+            
+            address.put(i, account.get(i+""));
+        };
+        }
 
     public static TelegramGetMessage parse(byte[] data){
-      
-       return new TelegramGetMessage(new String(data, Charset.forName("UTF-8")));
+        
+        // convert byte to  String
+        String jsonString = Strings.fromByteArray(data);
+         // convert String to JSONOblect       
+       
+       return new TelegramGetMessage((JSONObject) JSONValue.parse(jsonString));
     }
     
     public byte[] toBytes() {
         byte[] data = new byte[0];
 
         //WRITE BLOCK
-        byte[] bytes = this.address.getBytes();
+        byte[] bytes = this.address.toJSONString().getBytes();
         data = Bytes.concat(data, bytes);
 
         //ADD CHECKSUM
@@ -39,9 +69,9 @@ public class TelegramGetMessage extends Message {
 
    @Override
     public int getDataLength() {
-        return address.getBytes().length;
+        return address.toJSONString().getBytes().length;
     }
-   public String getAddress(){
+   public  JSONObject getAddress(){
        return this.address;
    }
 

@@ -96,8 +96,7 @@ public class TelegramGetAnswerMessage extends Message {
    
 
     public static TelegramGetAnswerMessage parse(byte[] data) throws Exception {
-        //PARSE TRANSACTION
-        int length = data.length;
+         
         // convert byte to  String
         String jsonString = Strings.fromByteArray(data);
          // convert String to JSONOblect       

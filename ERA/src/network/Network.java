@@ -14,11 +14,11 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.BlockChain;
-import core.account.Account;
 import core.crypto.Base58;
 import datachain.DCSet;
 import network.message.FindMyselfMessage;
@@ -363,9 +363,9 @@ public class Network extends Observable implements ConnectionCallback {
         // GET telegrams
         if(message.getType()== Message.TELEGRAM_GET_TYPE){
           //address
-            String address = ((TelegramGetMessage) message).getAddress();
+             JSONObject address = ((TelegramGetMessage) message).getAddress();
              // create ansver
-            Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage((ArrayList<Account>) Controller.getInstance().wallet.getAccounts());
+            Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage(address);
             answer.setId(message.getId());
             // send answer
             message.getSender().sendMessage(answer);

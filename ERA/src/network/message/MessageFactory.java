@@ -1,16 +1,15 @@
 package network.message;
 
 import java.io.DataInputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 
 import com.google.common.primitives.Ints;
 
-import core.account.Account;
 import core.block.Block;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
@@ -84,12 +83,12 @@ public class MessageFactory {
         return new TelegramMessage(transaction);
     }
     
-    public Message createTelegramGetMessage(String account) {
+    public Message createTelegramGetMessage(JSONObject account) {
         return new TelegramGetMessage(account);
     }
     
-    public Message createTelegramGetAnswerMessage(ArrayList<Account> account) {
-        return new TelegramGetAnswerMessage(account);
+    public Message createTelegramGetAnswerMessage(JSONObject address) {
+        return new TelegramGetAnswerMessage(address);
     }
     
 
