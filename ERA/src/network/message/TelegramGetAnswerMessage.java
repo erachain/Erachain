@@ -49,17 +49,14 @@ public class TelegramGetAnswerMessage extends Message {
          
     }
     @SuppressWarnings("unchecked")
-    public TelegramGetAnswerMessage(ArrayList<Account> account) {
+    public TelegramGetAnswerMessage(ArrayList<String> account) {
         // TODO Auto-generated constructor stub
         super(TELEGRAM_GET_ANSVER_TYPE);
      // TODO Auto-generated method stub
         telegransList = new ArrayList<Transaction>();
         
-        this.senderAccount= new ArrayList<String>();
-         for ( Account acc:account){
-             this.senderAccount.add(acc.getAddress()); 
-         }
-        
+        this.senderAccount=account;
+                
         // read telegram
         json = new JSONObject();
         
@@ -95,8 +92,9 @@ public class TelegramGetAnswerMessage extends Message {
 
    
 
-    public static TelegramGetAnswerMessage parse(byte[] data) throws Exception {
-         
+       public static TelegramGetAnswerMessage parse(byte[] data) throws Exception {
+        //PARSE TRANSACTION
+        
         // convert byte to  String
         String jsonString = Strings.fromByteArray(data);
          // convert String to JSONOblect       

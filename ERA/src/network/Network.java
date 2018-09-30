@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -365,7 +366,13 @@ public class Network extends Observable implements ConnectionCallback {
           //address
              JSONObject address = ((TelegramGetMessage) message).getAddress();
              // create ansver
-            Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage(address);
+             ArrayList<String> ca = new ArrayList<String>();
+             Set keys = address.keySet();
+             for(int i = 0; i<keys.size(); i++){
+                  
+                 ca.add((String) address.get(i));
+             }
+            Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage(ca);
             answer.setId(message.getId());
             // send answer
             message.getSender().sendMessage(answer);

@@ -1,11 +1,11 @@
 package network.message;
 
 import java.io.DataInputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 
 import com.google.common.primitives.Ints;
@@ -87,7 +87,7 @@ public class MessageFactory {
         return new TelegramGetMessage();
     }
     
-    public Message createTelegramGetAnswerMessage(JSONObject address) {
+    public Message createTelegramGetAnswerMessage(ArrayList<String> address) {
         return new TelegramGetAnswerMessage(address);
     }
     
