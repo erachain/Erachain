@@ -132,7 +132,7 @@ public class Telegram extends Observable implements Observer {
 }
     public void broadcastGetTelegram(String address) {
         // CREATE MESSAGE
-        Message telegram = MessageFactory.getInstance().createTelegramGetMessage(address);
+        Message telegram = MessageFactory.getInstance().createTelegramGetMessage();
           // BROADCAST MESSAGE
             List<Peer> excludes = new ArrayList<Peer>();
             Controller.getInstance().network.asyncBroadcast(telegram, excludes, false);

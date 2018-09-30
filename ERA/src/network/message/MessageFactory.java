@@ -83,8 +83,8 @@ public class MessageFactory {
         return new TelegramMessage(transaction);
     }
     
-    public Message createTelegramGetMessage(JSONObject account) {
-        return new TelegramGetMessage(account);
+    public Message createTelegramGetMessage() {
+        return new TelegramGetMessage();
     }
     
     public Message createTelegramGetAnswerMessage(JSONObject address) {
