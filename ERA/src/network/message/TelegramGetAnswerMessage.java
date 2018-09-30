@@ -54,7 +54,8 @@ public class TelegramGetAnswerMessage extends Message {
         super(TELEGRAM_GET_ANSVER_TYPE);
      // TODO Auto-generated method stub
         telegransList = new ArrayList<Transaction>();
-        this.senderAccount.clear();
+        
+        this.senderAccount= new ArrayList<String>();
          for ( Account acc:account){
              this.senderAccount.add(acc.getAddress()); 
          }
