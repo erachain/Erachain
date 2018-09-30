@@ -1,6 +1,7 @@
 package network.message;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.bouncycastle.util.Strings;
@@ -10,6 +11,7 @@ import org.json.simple.JSONValue;
 import com.google.common.primitives.Bytes;
 
 import controller.Controller;
+import core.account.Account;
 import core.crypto.Base64;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
@@ -17,7 +19,7 @@ import utils.StrJSonFine;
 
 public class TelegramGetAnswerMessage extends Message {
 
-    private String senderAccount;
+    private ArrayList<String> senderAccount;
     private ArrayList<Transaction> telegransList;
     private JSONObject json;
     private byte[] dataBytes;
@@ -27,12 +29,13 @@ public class TelegramGetAnswerMessage extends Message {
     public TelegramGetAnswerMessage(JSONObject json) {
         super(TELEGRAM_GET_ANSVER_TYPE);
         // get list Telegrams
+        telegransList = new ArrayList<Transaction>();
         if(json.containsKey("list")){
             JSONObject jsonTelegrams = (JSONObject) json.get("list");
             @SuppressWarnings("unchecked")
             Set<Integer> telegKeySet = jsonTelegrams.keySet();
-            for (Integer tel:telegKeySet){
-                byte[] transactionByte = Base64.decode((String) jsonTelegrams.get(tel));
+            for (int i = 0; i<telegKeySet.size(); i++){
+                byte[] transactionByte = Base64.decode((String) jsonTelegrams.get(i+""));
                 Transaction trans = null;
                 try {
                     trans = R_Send.Parse(transactionByte, Transaction.FOR_NETWORK);
@@ -40,13 +43,13 @@ public class TelegramGetAnswerMessage extends Message {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                telegransList.add(trans);
+                telegransList.add((Transaction)trans);
             };
         } 
          
     }
     @SuppressWarnings("unchecked")
-    public TelegramGetAnswerMessage(String account) {
+    public TelegramGetAnswerMessage(ArrayList<String> account) {
         // TODO Auto-generated constructor stub
         super(TELEGRAM_GET_ANSVER_TYPE);
      // TODO Auto-generated method stub
@@ -59,9 +62,20 @@ public class TelegramGetAnswerMessage extends Message {
         Set<String> telegramKeys = Controller.getInstance().telegram.database.getTelegramsMap().getKeys();
         // add List
         for(String key:telegramKeys){
-            telegransList.add(Controller.getInstance().telegram.database.getTelegramsMap().get(key));
+            // senders
+            Transaction tran = Controller.getInstance().telegram.database.getTelegramsMap().get(key);
+            if(senderAccount.contains(tran.viewCreator()) &&  !telegransList.contains(tran)){
+                telegransList.add(tran);
+                continue;
+            }
+            // recievers
+            HashSet<Account> recipients = tran.getRecipientAccounts();
+            for(Account recipient:recipients){
             
-        }
+              if( Controller.getInstance().wallet.accountExists(recipient.getAddress()) &&  !telegransList.contains(tran))
+                              telegransList.add(tran);
+            }
+      }
         // add JSON
         JSONObject jsonList = new JSONObject();
         for(int i = 0;i<telegransList.size(); i++){
@@ -119,6 +133,12 @@ public class TelegramGetAnswerMessage extends Message {
      */
     public ArrayList<Transaction> getTelegransList() {
         return telegransList;
+    }
+    public void saveToWallet(){
+        for (Transaction trans:telegransList){
+            Controller.getInstance().telegram.database.getTelegramsMap().add(trans.viewSignature(), trans);
+            
+        }
     }
 
 }
