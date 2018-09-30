@@ -20,6 +20,7 @@ public class TelegramGetAnswerMessage extends Message {
     private String senderAccount;
     private ArrayList<Transaction> telegransList;
     private JSONObject json;
+    private byte[] dataBytes;
 
    
 
@@ -91,7 +92,7 @@ public class TelegramGetAnswerMessage extends Message {
     }
 
     public byte[] toBytes() {
-        byte[] data = new byte[0];
+        dataBytes = new byte[0];
 
         //WRITE BLOCK
         
@@ -99,12 +100,11 @@ public class TelegramGetAnswerMessage extends Message {
         // convert to bytes
         byte[] telegramBytes = StrJSonFine.convert(json).getBytes();
         
-        data = Bytes.concat(data, telegramBytes);
+        dataBytes = Bytes.concat(dataBytes, telegramBytes);
 
         //ADD CHECKSUM
-        data = Bytes.concat(super.toBytes(), this.generateChecksum(data), data);
-
-        return data;
+        dataBytes = Bytes.concat(super.toBytes(), this.generateChecksum(dataBytes), dataBytes);
+        return dataBytes;
     }
 
 
@@ -112,7 +112,7 @@ public class TelegramGetAnswerMessage extends Message {
 
     @Override
     public int getDataLength() {
-        return toBytes().length;
+        return dataBytes.length;
     }
     /**
      * @return the telegransList
