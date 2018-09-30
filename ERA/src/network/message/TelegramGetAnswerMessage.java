@@ -137,7 +137,7 @@ public class TelegramGetAnswerMessage extends Message {
     }
     public void saveToWallet(){
         for (Transaction trans:telegransList){
-            Controller.getInstance().telegram.database.getTelegramsMap().add(trans.viewSignature(), trans);
+            Controller.getInstance().wallet.database.getTelegramsMap().add(trans.viewSignature(), trans);
             
         }
     }
