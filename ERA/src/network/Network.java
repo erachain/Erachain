@@ -19,10 +19,12 @@ import org.mapdb.Fun.Tuple2;
 import controller.Controller;
 import core.BlockChain;
 import core.crypto.Base58;
+import core.transaction.Transaction;
 import datachain.DCSet;
 import network.message.FindMyselfMessage;
 import network.message.Message;
 import network.message.MessageFactory;
+import network.message.TelegramGetAnswerMessage;
 import network.message.TelegramGetMessage;
 import network.message.TelegramMessage;
 import settings.Settings;
@@ -360,13 +362,20 @@ public class Network extends Observable implements ConnectionCallback {
         
         // GET telegrams
         if(message.getType()== Message.TELEGRAM_GET_TYPE){
-          //CREATE NEW PEERS MESSAGE WITH PEERS
+          //address
             String address = ((TelegramGetMessage) message).getAddress();
+             // create ansver
+            Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage(address);
+            answer.setId(message.getId());
+            // send answer
+            message.getSender().sendMessage(answer);
            return;
            }
         // Ansver to get transaction   
         if ( message.getType() == Message.TELEGRAM_GET_ANSVER_TYPE){
-           return; 
+           ArrayList<Transaction> aa = ((TelegramGetAnswerMessage) message).getTelegransList();
+            
+            return; 
         }
         //ONLY HANDLE BLOCK AND TRANSACTION MESSAGES ONCE
         if (message.getType() == Message.TRANSACTION_TYPE

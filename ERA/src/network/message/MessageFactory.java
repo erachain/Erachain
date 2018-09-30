@@ -85,6 +85,11 @@ public class MessageFactory {
     public Message createTelegramGetMessage(String account) {
         return new TelegramGetMessage(account);
     }
+    
+    public Message createTelegramGetAnswerMessage(String account) {
+        return new TelegramGetAnswerMessage(account);
+    }
+    
 
     public Message parse(Peer sender, DataInputStream inputStream) throws Exception {
         //READ MESSAGE TYPE
@@ -246,7 +251,13 @@ public class MessageFactory {
                 //CREATE MESSAGE FROM DATA
                 message = FindMyselfMessage.parse(data);
                 break;
+            case Message.TELEGRAM_GET_TYPE:
+                message = TelegramGetMessage.parse(data);
+                break;
 
+            case Message.TELEGRAM_GET_ANSVER_TYPE:
+                message = TelegramGetAnswerMessage.parse(data);
+                break;
             default:
 
                 //UNKNOWN MESSAGE
