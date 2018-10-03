@@ -72,7 +72,7 @@ public class BlockChain {
     public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
-    public static final int VERS_4_11 = DEVELOP_USE ? 185376  : 200000;
+    public static final int VERS_4_11 = DEVELOP_USE ? 230000  : 200000;
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
     public static final int ALL_BALANCES_OK_TO = VERS_4_11;
@@ -488,6 +488,9 @@ public class BlockChain {
         }
 
         int result = (int) (BlockChain.BASE_TARGET * win_value / target);
+        if (result < 1 || result > BlockChain.BASE_TARGET * 10)
+            // fix overload
+            return BlockChain.BASE_TARGET * 10;
         return result;
 
     }

@@ -843,7 +843,8 @@ public abstract class TransactionAmount extends Transaction {
             
         }
 
-        if (this.amount != null && height < BlockChain.ALL_BALANCES_OK_TO) {
+        // TODO: develop use - убрать потом это при старте нового 4.11 - так как это дублирует выше проверку
+        if (this.amount != null && height < BlockChain.ALL_BALANCES_OK_TO && !BlockChain.DEVELOP_USE) {
             // дублированиме кода для отлова ошибочных трнзакций версией новой в протоколе 4.10
             int actionType = Account.actionType(this.key, this.amount);
             int assetType = this.asset.getAssetType();
@@ -867,15 +868,17 @@ public abstract class TransactionAmount extends Transaction {
         if ((flags & Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
                 && this.hasPublicText() && !isPerson) {
             if (BlockChain.DEVELOP_USE) {
-                boolean good = false;
-                for (String admin : BlockChain.GENESIS_ADMINS) {
-                    if (this.creator.equals(admin)) {
-                        good = true;
-                        break;
+                if (height > BlockChain.ALL_BALANCES_OK_TO) { // TODO: delete for new CHAIN
+                    boolean good = false;
+                    for (String admin : BlockChain.GENESIS_ADMINS) {
+                        if (this.creator.equals(admin)) {
+                            good = true;
+                            break;
+                        }
                     }
-                }
-                if (!good) {
-                    return CREATOR_NOT_PERSONALIZED;
+                    if (!good) {
+                        return CREATOR_NOT_PERSONALIZED;
+                    }
                 }
             } else if (Base58.encode(this.getSignature()).equals(
                     "1ENwbUNQ7Ene43xWgN7BmNzuoNmFvBxBGjVot3nCRH4fiiL9FaJ6Fxqqt9E4zhDgJADTuqtgrSThp3pqWravkfg")) {
