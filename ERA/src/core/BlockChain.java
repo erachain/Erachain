@@ -598,9 +598,9 @@ public class BlockChain {
                 win_value = (win_value >> 7) - (win_value >> 9);
         } else {
             if (height < BlockChain.REPEAT_WIN)
-                win_value >>= 6;
-                //else if (height < 110000)
-                //	win_value = (win_value >>6) + (win_value >>9);
+                win_value >>= 2;
+            else if (height < (BlockChain.REPEAT_WIN<<2))
+                win_value >>= 5;
             else
                 win_value >>= 7;
         }

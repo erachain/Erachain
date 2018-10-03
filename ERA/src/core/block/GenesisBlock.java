@@ -739,7 +739,7 @@ public class GenesisBlock extends Block {
 
     public void process(DCSet dcSet) throws Exception {
 
-        this.target = 0l;
+        this.target = BlockChain.BASE_TARGET;
 
         this.blockHead = new BlockHead(this);
 

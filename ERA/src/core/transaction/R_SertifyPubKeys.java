@@ -477,7 +477,8 @@ public class R_SertifyPubKeys extends Transaction {
             }
             if (!creator_admin)
                 return result;
-        }
+        } else if (result != VALIDATE_OK && this.height != 176085) // TODO: wrong transaction
+            return result;
 
         int height = this.height;
 

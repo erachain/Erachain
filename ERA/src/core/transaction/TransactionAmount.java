@@ -445,7 +445,7 @@ public abstract class TransactionAmount extends Transaction {
         boolean isPerson = this.creator.isPerson(dcSet, height);
         
         // CHECK IF AMOUNT AND ASSET
-        if (this.amount != null) {            
+        if (this.amount != null) {
             
             int amount_sign = this.amount.signum();
             if (amount_sign != 0
@@ -814,25 +814,25 @@ public abstract class TransactionAmount extends Transaction {
                         default:
                             return INVALID_TRANSFER_TYPE;
                     }
-                    
-                    // IF send from PERSON to ANONIMOUSE
-                    // TODO: PERSON RULE 1
-                    if (BlockChain.PERSON_SEND_PROTECT && isPerson && absKey != FEE_KEY
-                            && actionType != ACTION_DEBT && actionType != ACTION_HOLD
-                            && assetType != AssetCls.AS_INSIDE_BONUS) {
-                        HashSet<Account> recipients = this.getRecipientAccounts();
-                        for (Account recipient : recipients) {
-                            if (!recipient.isPerson(dcSet, height)
-                                    && !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {
-                                return RECEIVER_NOT_PERSONALIZED;
-                            }
+
+                }
+
+                // IF send from PERSON to ANONYMOUS
+                // TODO: PERSON RULE 1
+                if (BlockChain.PERSON_SEND_PROTECT && isPerson && absKey != FEE_KEY
+                        && actionType != ACTION_DEBT && actionType != ACTION_HOLD
+                        && assetType != AssetCls.AS_INSIDE_BONUS) {
+                    HashSet<Account> recipients = this.getRecipientAccounts();
+                    for (Account recipient : recipients) {
+                        if (!recipient.isPerson(dcSet, height)
+                                && !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {
+                            return RECEIVER_NOT_PERSONALIZED;
                         }
                     }
-                    
                 }
-                
+
             }
-            
+
         } else {
             // TODO first records is BAD already ((
             // CHECK IF CREATOR HAS ENOUGH FEE MONEY
@@ -842,8 +842,28 @@ public abstract class TransactionAmount extends Transaction {
             }
             
         }
-        
-        // PUBLICK TEXT only from PERSONS
+
+        if (this.amount != null && height < BlockChain.ALL_BALANCES_OK_TO) {
+            // дублированиме кода для отлова ошибочных трнзакций версией новой в протоколе 4.10
+            int actionType = Account.actionType(this.key, this.amount);
+            int assetType = this.asset.getAssetType();
+
+            // IF send from PERSON to ANONYMOUS
+            // TODO: PERSON RULE 1
+            if (BlockChain.PERSON_SEND_PROTECT && isPerson && this.key != FEE_KEY
+                    && actionType != ACTION_DEBT && actionType != ACTION_HOLD
+                    && assetType != AssetCls.AS_INSIDE_BONUS) {
+                HashSet<Account> recipients = this.getRecipientAccounts();
+                for (Account recipient : recipients) {
+                    if (!recipient.isPerson(dcSet, height)
+                            && !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {
+                        return RECEIVER_NOT_PERSONALIZED;
+                    }
+                }
+            }
+        }
+
+        // PUBLIC TEXT only from PERSONS
         if ((flags & Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
                 && this.hasPublicText() && !isPerson) {
             if (BlockChain.DEVELOP_USE) {
