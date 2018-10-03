@@ -72,7 +72,7 @@ public class BlockChain {
     public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
-    public static final int VERS_4_11 = DEVELOP_USE ? 185376  : 180000;
+    public static final int VERS_4_11 = DEVELOP_USE ? 185376  : 200000;
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
     public static final int ALL_BALANCES_OK_TO = VERS_4_11;
@@ -558,6 +558,9 @@ public class BlockChain {
                 } else if (height < 120000) {
                     if (repeatsMin > 40)
                         repeatsMin = 40;
+                } else if (height < VERS_4_11) {
+                    if (repeatsMin > 200)
+                        repeatsMin = 200;
                 } else if (repeatsMin < 10) {
                     repeatsMin = 10;
                 }
@@ -614,7 +617,9 @@ public class BlockChain {
 
         int base = BlockChain.getTargetedMin(height);
         int targetedWinValue = calcWinValueTargeted(win_value, target);
-        if (!Controller.getInstance().isTestNet() && base > targetedWinValue) {
+        if (!Controller.getInstance().isTestNet()
+                && height > VERS_4_11
+                && base > targetedWinValue) {
             return -targetedWinValue;
         }
 

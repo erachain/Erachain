@@ -741,7 +741,7 @@ public abstract class TransactionAmount extends Transaction {
                                     
                                 }
                                 
-                                if ((flags | Transaction.NOT_VALIDATE_FLAG_FEE) == 0
+                                if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
                                         && this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo(this.fee) < 0) {
                                     if (height > 41100 || BlockChain.DEVELOP_USE)
                                         return NOT_ENOUGH_FEE;
@@ -844,7 +844,7 @@ public abstract class TransactionAmount extends Transaction {
         }
         
         // PUBLICK TEXT only from PERSONS
-        if ((flags | Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
+        if ((flags & Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
                 && this.hasPublicText() && !isPerson) {
             if (BlockChain.DEVELOP_USE) {
                 boolean good = false;

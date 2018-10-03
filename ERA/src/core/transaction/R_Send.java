@@ -383,15 +383,28 @@ public class R_Send extends TransactionAmount {
 
     @Override
     public boolean hasPublicText() {
-        if (head.length() > 2)
-            return true;
+        if (head.length() > 2
+        ) {
+            String[] words = head.split("[:., _-]");
+            for (String word: words) {
+                if (Base58.isExtraSymbols(word))
+                    return true;
+            }
+        }
+
 
         if (data == null || data.length == 0)
             return false;
         if (!Arrays.equals(this.encrypted, new byte[1]))
             return false;
 
-        return true;
+        //return this.isText() && Base58.isExtraSymbols(new String(this.data, Charset.forName("UTF-8")));
+        if (this.isText()) {
+            String text = new String(this.data, Charset.forName("UTF-8"));
+            if (text.contains(" ") || text.contains("_"))
+                return true;
+        }
+        return false;
     }
 
     // PARSE/CONVERT
