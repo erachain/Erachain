@@ -462,8 +462,8 @@ public class R_SertifyPubKeys extends Transaction {
 
         boolean creator_admin = false;
 
-        int result = super.isValid(asDeal, flags);
-        if (result == Transaction.CREATOR_NOT_PERSONALIZED) {
+        int result = super.isValid(asDeal, flags | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
+        if (!this.creator.isPerson(dcSet, height)) {
             long personsCount = dcSet.getItemPersonMap().getLastKey();
             if (personsCount < 20) {
                 // FIRST Persons only by ME
@@ -475,12 +475,12 @@ public class R_SertifyPubKeys extends Transaction {
                     }
                 }
             }
-            if (!creator_admin)
-                return result;
-        } else if (result != VALIDATE_OK && this.height != 176085) // TODO: wrong transaction
-            return result;
+            if (!creator_admin
+                    && this.height != 176085) // TODO: wrong transaction
+                return CREATOR_NOT_PERSONALIZED;
 
-        int height = this.height;
+        } else if (result != VALIDATE_OK)
+            return result;
 
         for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
             //CHECK IF PERSON PUBLIC KEY IS VALID
@@ -500,8 +500,8 @@ public class R_SertifyPubKeys extends Transaction {
         if (balERA.compareTo(
                 //BlockChain.MINOR_ERA_BALANCE_BD
                 BlockChain.MIN_GENERATING_BALANCE_BD
-        ) < 0
-                )
+                ) < 0
+            )
             return Transaction.NOT_ENOUGH_RIGHTS;
 
         PersonCls person = (PersonCls) this.dcSet.getItemPersonMap().get(this.key);

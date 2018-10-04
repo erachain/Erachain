@@ -880,7 +880,7 @@ public abstract class TransactionAmount extends Transaction {
                         return CREATOR_NOT_PERSONALIZED;
                     }
                 }
-            } else if (Base58.encode(this.getSignature()).equals(
+            } else if (Base58.encode(this.getSignature()).equals( // TODO: remove on new CHAIN
                     "1ENwbUNQ7Ene43xWgN7BmNzuoNmFvBxBGjVot3nCRH4fiiL9FaJ6Fxqqt9E4zhDgJADTuqtgrSThp3pqWravkfg")) {
                 ;
             } else {

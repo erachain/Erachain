@@ -239,11 +239,11 @@ public class IssuePersonRecord extends Issue_ItemRecord {
 
         // IF BALANCE 0 or more - not check FEE
         boolean check_fee_balance = this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) < 0;        
-        int res = super.isValid(asDeal, flags | (check_fee_balance? 0l : NOT_VALIDATE_FLAG_FEE));
+        int res = super.isValid(asDeal, flags | (check_fee_balance? 0l : NOT_VALIDATE_FLAG_FEE) | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
 
-        // FIRST PERSSONS INSERT as ADMIN
+        // FIRST PERSONS INSERT as ADMIN
         boolean creator_admin = false;
-        if (res == Transaction.CREATOR_NOT_PERSONALIZED) {
+        if (!this.creator.isPerson(dcSet, height)) {
             long count = this.dcSet.getItemPersonMap().getLastKey();
             if (count < 20) {
                 // FIRST Persons only by ME
@@ -256,17 +256,9 @@ public class IssuePersonRecord extends Issue_ItemRecord {
                 }
             }
             if (!creator_admin)
-                return res;
-        } else if (res == Transaction.NOT_ENOUGH_FEE) {
-            // IF balance of FEE < 0 - ERROR
-            if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) < 0)
-                return res;
-        } else if (res != Transaction.VALIDATE_OK) {
-            return res;
+                return CREATOR_NOT_PERSONALIZED;
         }
-
-
-        return VALIDATE_OK;
+        return res;
 
     }
 
