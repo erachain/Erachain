@@ -369,6 +369,7 @@ public class TelegramManager extends Thread {
         return left;
     }
 
+    // TRUE if not added
     public synchronized boolean pipeAddRemove(TelegramMessage telegram, List<TelegramMessage> firstItem,
                                               long timeKey) {
 
