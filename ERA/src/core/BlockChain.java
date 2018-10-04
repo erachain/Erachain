@@ -77,7 +77,7 @@ public class BlockChain {
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
     public static final int ALL_BALANCES_OK_TO = VERS_4_11;
 
-    public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11  : 195000;
+    public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11  : VERS_4_11 + 50000;
 
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ?
             new byte[][]{
@@ -505,9 +505,9 @@ public class BlockChain {
     /**
      * calc WIN_VALUE for ACCOUNT in HEIGHT
      * @param dcSet
-     * @param creator - account of block creator
-     * @param height - current blockchain height
-     * @param forgingBalance - current forging Balance on account
+     * @param creator account of block creator
+     * @param height current blockchain height
+     * @param forgingBalance current forging Balance on account
      * @return (long) Win Value
      */
     public static long calcWinValue(DCSet dcSet, Account creator, int height, int forgingBalance) {
@@ -629,11 +629,11 @@ public class BlockChain {
 
     /**
      * Calculate targeted Win Value and cut by BASE
-     * @param dcSet - dataChainSet
-     * @param height - blockchain height
-     * @param win_value - win value
-     * @param target - average win value for blockchain by 1024 last blocks
-     * @return
+     * @param dcSet dataChainSet
+     * @param height blockchain height
+     * @param win_value win value
+     * @param target average win value for blockchain by 1024 last blocks
+     * @return targeted Win Value and cut by BASE
      */
     public static int calcWinValueTargetedBase(DCSet dcSet, int height, long win_value, long target) {
 

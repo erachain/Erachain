@@ -477,7 +477,7 @@ function blocks(data)
 	{
 		output += '<tr>';
 		output += '<td><a href=?block='+i+get_lang()+'>'+i+'</a><td>'+data[i].dateTime+'<td>'+'<a href=?addr='+data[i].generator+get_lang()+'>'+data[i].generator;
-		output += '<td>'+data[i].transactionCount+'<td>'+addCommas(data[i].totalFee)+'<td>'+addCommas(data[i].totalAmount); 
+		output += '<td>'+data[i].transactionsCount+'<td>'+addCommas(data[i].totalFee)+'<td>'+addCommas(data[i].totalAmount);
 		output += '<td>'+addCommas(data[i].generatingBalance)
 			//+addCommas(data[i].totalATAmount)+'<td>'+addCommas(data[i].totalAmount);
 			+'<td>'+addCommas(data[i].winValue)+' '+addCommas(data[i].winValueTargetted);

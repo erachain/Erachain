@@ -320,8 +320,8 @@ public class Account {
 
     /**
      *
-     * @param key - asset key (long)
-     * @param db - database Set
+     * @param key asset key (long)
+     * @param db database Set
      * @return (BigDecimal) balance.a + balance.b
      */
     public BigDecimal getBalanceUSE(long key, DCSet db) {
