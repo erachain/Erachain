@@ -17,7 +17,7 @@ ext {
     rev = git.head().getAbbreviatedId(8)
 }
 
-String versionEra = "4.11.04-${git.head().abbreviatedId}"
+String versionEra = "4.11.05-${git.head().abbreviatedId}"
 archivesBaseName = 'erachain-dev'
 group 'org.erachain'
 version versionEra

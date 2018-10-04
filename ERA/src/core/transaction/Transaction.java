@@ -1183,6 +1183,14 @@ public abstract class Transaction {
         //if (height <= 0 || height > 1000)
         //    return INVALID_TIMESTAMP;
 
+        // CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
+        // CHECK IF CREATOR HAS ENOUGH FEE MONEY
+        if ((flags & NOT_VALIDATE_FLAG_FEE) == 0l
+                && height > BlockChain.ALL_BALANCES_OK_TO
+                && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
+            return NOT_ENOUGH_FEE;
+        }
+
         if ( (flags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0l
                 && this.hasPublicText()
                 && (!BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
@@ -1201,14 +1209,6 @@ public abstract class Transaction {
             } else {
                 return CREATOR_NOT_PERSONALIZED;
             }
-        }
-
-        // CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
-        // CHECK IF CREATOR HAS ENOUGH FEE MONEY
-        if ((flags & NOT_VALIDATE_FLAG_FEE) == 0l
-                && height > BlockChain.ALL_BALANCES_OK_TO 
-                && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
-            return NOT_ENOUGH_FEE;
         }
 
         return VALIDATE_OK;
