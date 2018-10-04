@@ -475,10 +475,11 @@ public class R_SertifyPubKeys extends Transaction {
                     }
                 }
             }
-            if (!creator_admin)
+            if (!creator_admin
+                    && this.height != 176085) // TODO: wrong transaction
                 return CREATOR_NOT_PERSONALIZED;
 
-        } else if (result != VALIDATE_OK && this.height != 176085) // TODO: wrong transaction
+        } else if (result != VALIDATE_OK)
             return result;
 
         for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
