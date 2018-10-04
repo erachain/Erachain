@@ -441,21 +441,28 @@ public class BlockChain {
         }
     }
 
-    public static long calcTarget(int height, long targetPrevios, long winValue) {
+    /**
+     * Calculate Target (Average Win Value for 1024 last blocks) for this block
+     * @param height - height of blockchain
+     * @param targetPrevious - previous Target
+     * @param winValue - current Win Value
+     * @return
+     */
+    public static long calcTarget(int height, long targetPrevious, long winValue) {
 
         if (height < TARGET_COUNT) {
-            return targetPrevios - (targetPrevios / height) + (winValue / height);
+            return targetPrevious - (targetPrevious / height) + (winValue / height);
         }
 
         // CUT GROWTH
-        long cut1 = targetPrevios + (targetPrevios >> 1);
+        long cut1 = targetPrevious + (targetPrevious >> 1);
         if (height > TARGET_COUNT && winValue > cut1) {
             winValue = cut1;
         }
 
         //return targetPrevios - (targetPrevios>>TARGET_COUNT_SHIFT) + (winValue>>TARGET_COUNT_SHIFT);
         // better accuracy
-        return (((targetPrevios << TARGET_COUNT_SHIFT) - targetPrevios) + winValue) >> TARGET_COUNT_SHIFT;
+        return (((targetPrevious << TARGET_COUNT_SHIFT) - targetPrevious) + winValue) >> TARGET_COUNT_SHIFT;
     }
 
     // GET MIN TARGET
@@ -495,7 +502,14 @@ public class BlockChain {
 
     }
 
-    // calc WIN_VALUE for ACCOUNT in HEIGHT
+    /**
+     * calc WIN_VALUE for ACCOUNT in HEIGHT
+     * @param dcSet
+     * @param creator - account of block creator
+     * @param height - current blockchain height
+     * @param forgingBalance - current forging Balance on account
+     * @return (long) Win Value
+     */
     public static long calcWinValue(DCSet dcSet, Account creator, int height, int forgingBalance) {
 
         if (forgingBalance < MIN_GENERATING_BALANCE)
@@ -613,6 +627,14 @@ public class BlockChain {
 
     }
 
+    /**
+     * Calculate targeted Win Value and cut by BASE
+     * @param dcSet - dataChainSet
+     * @param height - blockchain height
+     * @param win_value - win value
+     * @param target - average win value for blockchain by 1024 last blocks
+     * @return
+     */
     public static int calcWinValueTargetedBase(DCSet dcSet, int height, long win_value, long target) {
 
         if (win_value < 1)
