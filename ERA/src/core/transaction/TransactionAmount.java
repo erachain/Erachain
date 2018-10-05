@@ -405,8 +405,8 @@ public abstract class TransactionAmount extends Transaction {
         return base_len - (this.typeBytes[2] < 0 ? (KEY_LENGTH + AMOUNT_LENGTH) : 0);
     }
     
-    @Override // - fee + balance - calculate here
-    public int isValid(int asDeal, long flags) {
+    //@Override // - fee + balance - calculate here
+    public int isValid(int asDeal, boolean isPerson, long flags) {
         
         for (byte[] valid_item : VALID_REC) {
             if (Arrays.equals(this.signature, valid_item)) {
@@ -441,9 +441,7 @@ public abstract class TransactionAmount extends Transaction {
                 return INVALID_TIMESTAMP;
             }
         }
-        
-        boolean isPerson = this.creator.isPerson(dcSet, height);
-        
+
         // CHECK IF AMOUNT AND ASSET
         if (this.amount != null) {
             
@@ -864,30 +862,6 @@ public abstract class TransactionAmount extends Transaction {
             }
         }
 
-        // PUBLIC TEXT only from PERSONS
-        if ((flags & Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
-                && this.hasPublicText() && !isPerson) {
-            if (BlockChain.DEVELOP_USE) {
-                if (height > BlockChain.ALL_BALANCES_OK_TO) { // TODO: delete for new CHAIN
-                    boolean good = false;
-                    for (String admin : BlockChain.GENESIS_ADMINS) {
-                        if (this.creator.equals(admin)) {
-                            good = true;
-                            break;
-                        }
-                    }
-                    if (!good) {
-                        return CREATOR_NOT_PERSONALIZED;
-                    }
-                }
-            } else if (Base58.encode(this.getSignature()).equals( // TODO: remove on new CHAIN
-                    "1ENwbUNQ7Ene43xWgN7BmNzuoNmFvBxBGjVot3nCRH4fiiL9FaJ6Fxqqt9E4zhDgJADTuqtgrSThp3pqWravkfg")) {
-                ;
-            } else {
-                return CREATOR_NOT_PERSONALIZED;
-            }
-        }
-        
         return VALIDATE_OK;
     }
     

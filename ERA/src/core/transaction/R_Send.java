@@ -492,7 +492,32 @@ public class R_Send extends TransactionAmount {
             }
         }
 
-        return super.isValid(asDeal, flags);
+        boolean isPerson = this.creator.isPerson(dcSet, height);
+        // PUBLIC TEXT only from PERSONS
+        if ((flags & Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
+                && this.hasPublicText() && !isPerson) {
+            if (BlockChain.DEVELOP_USE) {
+                if (height > BlockChain.ALL_BALANCES_OK_TO) { // TODO: delete for new CHAIN
+                    boolean good = false;
+                    for (String admin : BlockChain.GENESIS_ADMINS) {
+                        if (this.creator.equals(admin)) {
+                            good = true;
+                            break;
+                        }
+                    }
+                    if (!good) {
+                        return CREATOR_NOT_PERSONALIZED;
+                    }
+                }
+            } else if (Base58.encode(this.getSignature()).equals( // TODO: remove on new CHAIN
+                    "1ENwbUNQ7Ene43xWgN7BmNzuoNmFvBxBGjVot3nCRH4fiiL9FaJ6Fxqqt9E4zhDgJADTuqtgrSThp3pqWravkfg")) {
+                ;
+            } else {
+                return CREATOR_NOT_PERSONALIZED;
+            }
+        }
+
+        return super.isValid(asDeal, isPerson, flags);
     }
 
 }
