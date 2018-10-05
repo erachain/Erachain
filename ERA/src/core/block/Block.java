@@ -734,13 +734,6 @@ public class Block {
             return BigDecimal.ZERO;
         }
 
-        if (this.heightBlock > BlockChain.VERS_4_11) {
-            // NOT GIFT for MISSed forger
-            if(this.winValue >= this.target + (this.target >>2)) {
-                return BigDecimal.ZERO;
-            }
-        }
-
         int inDay30 = BlockChain.BLOCKS_PER_DAY * 30;
 
         BigDecimal bonusFee = BlockChain.MIN_FEE_IN_BLOCK;

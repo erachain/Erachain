@@ -295,12 +295,4 @@ public class VoteOnItemPollTransaction extends Transaction {
         return false;
     }
 
-    public long calcBaseFee() {
-        // TODO: умножать комиссию на размер списка переголосваний (СТЕК)
-
-        if (this.height < BlockChain.VERS_4_11)
-            return calcCommonFee();
-
-        return BlockChain.FEE_PER_BYTE * 100;
-    }
 }

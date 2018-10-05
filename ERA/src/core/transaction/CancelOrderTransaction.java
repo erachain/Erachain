@@ -389,7 +389,7 @@ public class CancelOrderTransaction extends Transaction {
         if (this.height < BlockChain.VERS_4_11)
             return 2 * calcCommonFee();
 
-        return BlockChain.FEE_PER_BYTE * 200;
+        return BlockChain.FEE_PER_BYTE * 300;
 
     }
 }
