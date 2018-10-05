@@ -206,7 +206,7 @@ public class IssueImprintRecord extends Issue_ItemRecord {
         if (this.height < BlockChain.VERS_4_11)
             return calcCommonFee() + BlockChain.FEE_PER_BYTE * 64 * 4;
 
-        return calcCommonFee() + BlockChain.FEE_PER_BYTE * 200;
+        return calcCommonFee();
     }
 
 }

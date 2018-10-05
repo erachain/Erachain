@@ -825,7 +825,7 @@ public class R_SertifyPubKeys extends Transaction {
         if (this.height < BlockChain.VERS_4_11)
             return calcCommonFee();
 
-        return BlockChain.FEE_PER_BYTE * (200 + this.sertifiedPublicKeys.size() * 300);
+        return BlockChain.FEE_PER_BYTE * (300 + this.sertifiedPublicKeys.size() * 64);
 
     }
 

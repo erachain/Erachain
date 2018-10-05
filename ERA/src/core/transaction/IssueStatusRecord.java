@@ -149,11 +149,4 @@ public class IssueStatusRecord extends Issue_ItemRecord {
 
     //PROCESS/ORPHAN
 
-	/*
-	@Override
-	public int calcBaseFee() {		
-		return calcCommonFee() + BlockChain.FEE_PER_BYTE * 128 * BlockChain.ISSUE_MULT_FEE;
-	}
-	*/
-
 }

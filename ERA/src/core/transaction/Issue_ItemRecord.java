@@ -228,7 +228,7 @@ public abstract class Issue_ItemRecord extends Transaction {
         if (this.height < BlockChain.VERS_4_11)
             return calcCommonFee() + BlockChain.FEE_PER_BYTE * 64 * BlockChain.ISSUE_MULT_FEE;
 
-        return calcCommonFee() + BlockChain.FEE_PER_BYTE * 100000;
+        return calcCommonFee() + BlockChain.FEE_PER_BYTE * 500 * 159;
 
     }
 }
