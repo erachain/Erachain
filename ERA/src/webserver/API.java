@@ -726,8 +726,12 @@ public class API {
             return out;
         }
 
-        Controller.getInstance().broadcastTelegram(transaction, true);
-        out.put("status", "ok");
+        if (Controller.getInstance().broadcastTelegram(transaction, true)) {
+            out.put("status", "ok");
+        } else {
+            out.put("error", "already exist");
+        }
+        out.put("signature", Base58.encode(transaction.getSignature()));
         return out;
     }
 
