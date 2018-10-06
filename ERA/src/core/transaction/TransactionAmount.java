@@ -1118,20 +1118,10 @@ public abstract class TransactionAmount extends Transaction {
     }
     
     // public abstract Map<String, Map<Long, BigDecimal>> getAssetAmount();
-    
+
     @Override
-    public long calcBaseFee() {
-        
-        if (this.height < BlockChain.VERS_4_11 ||
-                this.amount == null)
-            return calcCommonFee();
-
-        // v.4.11 FEE UP
-        long fee = calcCommonFee();
-        if (fee < 300 * BlockChain.FEE_PER_BYTE)
-            return BlockChain.FEE_PER_BYTE * 300;
-
-        return fee;
+    public int getJobLevel() {
+        return 300;
     }
-    
+
 }

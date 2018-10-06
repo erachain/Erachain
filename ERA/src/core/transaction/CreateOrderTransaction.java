@@ -642,11 +642,16 @@ public class CreateOrderTransaction extends Transaction {
     }
 
     @Override
+    public int getJobLevel() {
+        return 300;
+    }
+
+    @Override
     public long calcBaseFee() {
         if (this.height < BlockChain.VERS_4_11)
             return 5 * calcCommonFee();
 
-        return BlockChain.FEE_PER_BYTE * 300;
+        return calcCommonFee();
 
     }
 }

@@ -822,11 +822,16 @@ public class R_SertifyPubKeys extends Transaction {
     }
 
     @Override
+    public int getJobLevel() {
+        return 300;
+    }
+
+    @Override
     public long calcBaseFee() {
         if (this.height < BlockChain.VERS_4_11)
             return calcCommonFee();
 
-        return BlockChain.FEE_PER_BYTE * (300 + this.sertifiedPublicKeys.size() * 64);
+        return calcCommonFee(); // BlockChain.FEE_PER_BYTE * (300 + this.sertifiedPublicKeys.size() * 64);
 
     }
 

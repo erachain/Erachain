@@ -660,6 +660,8 @@ public abstract class Transaction {
 
     public abstract boolean hasPublicText();
 
+    public  int getJobLevel() {return 200;}
+
     public int calcCommonFee() {
         int len = this.getDataLength(Transaction.FOR_NETWORK, true);
 
@@ -684,7 +686,14 @@ public abstract class Transaction {
             len *= anonimous;
         }
 
+        int minLen = getJobLevel();
+        if (this.height > BlockChain.VERS_4_11
+            && len < minLen)
+            len = minLen;
+
+
         return len * BlockChain.FEE_PER_BYTE;
+
     }
 
     // get fee
