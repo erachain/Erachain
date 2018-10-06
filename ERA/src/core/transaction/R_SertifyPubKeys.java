@@ -33,9 +33,9 @@ import datachain.DCSet;
 // typeBytes[2] - size of personalized accounts
 public class R_SertifyPubKeys extends Transaction {
 
-    BigDecimal BONUS_FOR_PERSON_4_11 = new BigDecimal("0.005"); // 0,00477
-    BigDecimal BONUS_FOR_PERSON_REGISTRATOR_4_11 = new BigDecimal("0.008"); // 0,00795
-    BigDecimal BONUS_FOR_PERSON_SERTIFIER_4_11 = new BigDecimal("0.003"); // 0,00318
+    BigDecimal BONUS_FOR_PERSON_4_11 = new BigDecimal("0.009"); // 30 КФТ
+    BigDecimal BONUS_FOR_PERSON_REGISTRATOR_4_11 = new BigDecimal("0.015"); // 50 КФТ
+    BigDecimal BONUS_FOR_PERSON_SERTIFIER_4_11 = new BigDecimal("0.006"); // 20КФТ
     long BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 = 0;
     BigDecimal BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11
             = BigDecimal.valueOf(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BlockChain.FEE_SCALE);
