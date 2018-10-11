@@ -734,13 +734,6 @@ public class Block {
             return BigDecimal.ZERO;
         }
 
-        if (this.heightBlock > BlockChain.VERS_4_11) {
-            // NOT GIFT for MISSed forger
-            if(this.winValue >= this.target + (this.target >>2)) {
-                return BigDecimal.ZERO;
-            }
-        }
-
         int inDay30 = BlockChain.BLOCKS_PER_DAY * 30;
 
         BigDecimal bonusFee = BlockChain.MIN_FEE_IN_BLOCK;
@@ -1297,8 +1290,7 @@ public class Block {
             long timerTransFinalMapSinds_set = 0;
 
             long timestampEnd = this.getTimestamp()
-                    + (BlockChain.DEVELOP_USE ? BlockChain.GENERATING_MIN_BLOCK_TIME_MS
-                        : (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1)) + 1;
+                    + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + 1;
             // because time filter used by parent block timestamp on core.BlockGenerator.run()
             //long timestampBeg = this.getParent(dcSet).getTimestamp(dcSet);
 

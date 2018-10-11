@@ -51,7 +51,7 @@ public class AssetTypesComboBoxModel extends DefaultComboBoxModel<AssetType> {
             //list.add(new AssetType(AssetCls.AS_INSIDE_CURRENCY));
             //list.add(new AssetType(AssetCls.AS_INSIDE_UTILITY));
             //list.add(new AssetType(AssetCls.AS_INSIDE_SHARE));
-            //list.add(new AssetType(AssetCls.AS_INSIDE_BONUS));
+            list.add(new AssetType(AssetCls.AS_INSIDE_BONUS));
             //list.add(new AssetType(AssetCls.AS_INSIDE_RIGHTS));
             //list.add(new AssetType(AssetCls.AS_INSIDE_VOTE));
             list.add(new AssetType(AssetCls.AS_INDEX));

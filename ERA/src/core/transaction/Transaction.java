@@ -660,6 +660,8 @@ public abstract class Transaction {
 
     public abstract boolean hasPublicText();
 
+    public  int getJobLevel() {return 200;}
+
     public int calcCommonFee() {
         int len = this.getDataLength(Transaction.FOR_NETWORK, true);
 
@@ -684,7 +686,14 @@ public abstract class Transaction {
             len *= anonimous;
         }
 
+        int minLen = getJobLevel();
+        if (this.height > BlockChain.VERS_4_11
+            && len < minLen)
+            len = minLen;
+
+
         return len * BlockChain.FEE_PER_BYTE;
+
     }
 
     // get fee
@@ -1183,6 +1192,14 @@ public abstract class Transaction {
         //if (height <= 0 || height > 1000)
         //    return INVALID_TIMESTAMP;
 
+        // CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
+        // CHECK IF CREATOR HAS ENOUGH FEE MONEY
+        if ((flags & NOT_VALIDATE_FLAG_FEE) == 0l
+                && height > BlockChain.ALL_BALANCES_OK_TO
+                && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
+            return NOT_ENOUGH_FEE;
+        }
+
         if ( (flags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0l
                 && this.hasPublicText()
                 && (!BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
@@ -1201,14 +1218,6 @@ public abstract class Transaction {
             } else {
                 return CREATOR_NOT_PERSONALIZED;
             }
-        }
-
-        // CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
-        // CHECK IF CREATOR HAS ENOUGH FEE MONEY
-        if ((flags & NOT_VALIDATE_FLAG_FEE) == 0l
-                && height > BlockChain.ALL_BALANCES_OK_TO 
-                && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
-            return NOT_ENOUGH_FEE;
         }
 
         return VALIDATE_OK;

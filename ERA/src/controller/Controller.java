@@ -154,7 +154,7 @@ public class Controller extends Observable {
     public static final int STATUS_SYNCHRONIZING = 1;
     public static final int STATUS_OK = 2;
     private static final Logger LOGGER = Logger.getLogger(Controller.class);
-    private static final String version = "4.11.04 alpha";
+    private static final String version = "4.11.05 alpha";
     private static final String buildTime = "2017-11-19 15:33:33 UTC";
     public static boolean useGui = true;
     private static List<Thread> threads = new ArrayList<Thread>();
@@ -1682,18 +1682,21 @@ public class Controller extends Observable {
         this.network.broadcast(message, excludes, false);
     }
 
-    public void broadcastTelegram(Transaction transaction, boolean store) {
+    public boolean broadcastTelegram(Transaction transaction, boolean store) {
 
         // CREATE MESSAGE
         Message telegram = MessageFactory.getInstance().createTelegramMessage(transaction);
+        boolean notAdded = this.network.addTelegram((TelegramMessage) telegram);
 
-        if (!store || !this.network.addTelegram((TelegramMessage) telegram)) {
+        if (!store || !notAdded) {
             // BROADCAST MESSAGE
             List<Peer> excludes = new ArrayList<Peer>();
             this.network.asyncBroadcast(telegram, excludes, false);
             // save DB
             Controller.getInstance().wallet.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
         }
+
+        return !notAdded;
 
     }
 

@@ -519,6 +519,10 @@ public class Peer extends Thread {
                     continue;
                 }
 
+                if (message == null) {
+                    // unknowm message
+                    continue;
+                }
                 //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
                 if (!message.isRequest()
                         && message.hasId()

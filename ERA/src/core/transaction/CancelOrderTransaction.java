@@ -385,11 +385,16 @@ public class CancelOrderTransaction extends Transaction {
     }
 
     @Override
+    public int getJobLevel() {
+        return 300;
+    }
+
+    @Override
     public long calcBaseFee() {
         if (this.height < BlockChain.VERS_4_11)
             return 2 * calcCommonFee();
 
-        return BlockChain.FEE_PER_BYTE * 200;
+        return calcCommonFee();
 
     }
 }

@@ -405,8 +405,8 @@ public abstract class TransactionAmount extends Transaction {
         return base_len - (this.typeBytes[2] < 0 ? (KEY_LENGTH + AMOUNT_LENGTH) : 0);
     }
     
-    @Override // - fee + balance - calculate here
-    public int isValid(int asDeal, long flags) {
+    //@Override // - fee + balance - calculate here
+    public int isValid(int asDeal, boolean isPerson, long flags) {
         
         for (byte[] valid_item : VALID_REC) {
             if (Arrays.equals(this.signature, valid_item)) {
@@ -441,11 +441,9 @@ public abstract class TransactionAmount extends Transaction {
                 return INVALID_TIMESTAMP;
             }
         }
-        
-        boolean isPerson = this.creator.isPerson(dcSet, height);
-        
+
         // CHECK IF AMOUNT AND ASSET
-        if (this.amount != null) {            
+        if (this.amount != null) {
             
             int amount_sign = this.amount.signum();
             if (amount_sign != 0
@@ -741,7 +739,7 @@ public abstract class TransactionAmount extends Transaction {
                                     
                                 }
                                 
-                                if ((flags | Transaction.NOT_VALIDATE_FLAG_FEE) == 0
+                                if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
                                         && this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo(this.fee) < 0) {
                                     if (height > 41100 || BlockChain.DEVELOP_USE)
                                         return NOT_ENOUGH_FEE;
@@ -814,25 +812,25 @@ public abstract class TransactionAmount extends Transaction {
                         default:
                             return INVALID_TRANSFER_TYPE;
                     }
-                    
-                    // IF send from PERSON to ANONIMOUSE
-                    // TODO: PERSON RULE 1
-                    if (BlockChain.PERSON_SEND_PROTECT && isPerson && absKey != FEE_KEY
-                            && actionType != ACTION_DEBT && actionType != ACTION_HOLD
-                            && assetType != AssetCls.AS_INSIDE_BONUS) {
-                        HashSet<Account> recipients = this.getRecipientAccounts();
-                        for (Account recipient : recipients) {
-                            if (!recipient.isPerson(dcSet, height)
-                                    && !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {
-                                return RECEIVER_NOT_PERSONALIZED;
-                            }
+
+                }
+
+                // IF send from PERSON to ANONYMOUS
+                // TODO: PERSON RULE 1
+                if (BlockChain.PERSON_SEND_PROTECT && isPerson && absKey != FEE_KEY
+                        && actionType != ACTION_DEBT && actionType != ACTION_HOLD
+                        && assetType != AssetCls.AS_INSIDE_BONUS) {
+                    HashSet<Account> recipients = this.getRecipientAccounts();
+                    for (Account recipient : recipients) {
+                        if (!recipient.isPerson(dcSet, height)
+                                && !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {
+                            return RECEIVER_NOT_PERSONALIZED;
                         }
                     }
-                    
                 }
-                
+
             }
-            
+
         } else {
             // TODO first records is BAD already ((
             // CHECK IF CREATOR HAS ENOUGH FEE MONEY
@@ -842,29 +840,28 @@ public abstract class TransactionAmount extends Transaction {
             }
             
         }
-        
-        // PUBLICK TEXT only from PERSONS
-        if ((flags | Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
-                && this.hasPublicText() && !isPerson) {
-            if (BlockChain.DEVELOP_USE) {
-                boolean good = false;
-                for (String admin : BlockChain.GENESIS_ADMINS) {
-                    if (this.creator.equals(admin)) {
-                        good = true;
-                        break;
+
+        // TODO: develop use - убрать потом это при старте нового 4.11 - так как это дублирует выше проверку
+        if (this.amount != null && height < BlockChain.ALL_BALANCES_OK_TO && !BlockChain.DEVELOP_USE) {
+            // дублированиме кода для отлова ошибочных трнзакций версией новой в протоколе 4.10
+            int actionType = Account.actionType(this.key, this.amount);
+            int assetType = this.asset.getAssetType();
+
+            // IF send from PERSON to ANONYMOUS
+            // TODO: PERSON RULE 1
+            if (BlockChain.PERSON_SEND_PROTECT && isPerson && this.key != FEE_KEY
+                    && actionType != ACTION_DEBT && actionType != ACTION_HOLD
+                    && assetType != AssetCls.AS_INSIDE_BONUS) {
+                HashSet<Account> recipients = this.getRecipientAccounts();
+                for (Account recipient : recipients) {
+                    if (!recipient.isPerson(dcSet, height)
+                            && !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {
+                        return RECEIVER_NOT_PERSONALIZED;
                     }
                 }
-                if (!good) {
-                    return CREATOR_NOT_PERSONALIZED;
-                }
-            } else if (Base58.encode(this.getSignature()).equals(
-                    "1ENwbUNQ7Ene43xWgN7BmNzuoNmFvBxBGjVot3nCRH4fiiL9FaJ6Fxqqt9E4zhDgJADTuqtgrSThp3pqWravkfg")) {
-                ;
-            } else {
-                return CREATOR_NOT_PERSONALIZED;
             }
         }
-        
+
         return VALIDATE_OK;
     }
     
@@ -1121,20 +1118,10 @@ public abstract class TransactionAmount extends Transaction {
     }
     
     // public abstract Map<String, Map<Long, BigDecimal>> getAssetAmount();
-    
+
     @Override
-    public long calcBaseFee() {
-        
-        if (this.height < BlockChain.VERS_4_11 ||
-                this.amount == null)
-            return calcCommonFee();
-
-        // v.4.11 FEE UP
-        long fee = calcCommonFee();
-        if (fee < 300 * BlockChain.FEE_PER_BYTE)
-            return BlockChain.FEE_PER_BYTE * 300;
-
-        return fee;
+    public int getJobLevel() {
+        return 300;
     }
-    
+
 }

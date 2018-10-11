@@ -111,9 +111,22 @@ public class Start {
 
                 if (Controller.useGui) about_frame.set_console_Text(info);
 
+                String licenseFile = "Erachain Licence Agreement (genesis).txt";
+                File f = new File(licenseFile);
+                if(!f.exists()) {
+
+                    LOGGER.error("License file not found: " + licenseFile);
+
+                    //FORCE SHUTDOWN
+                    System.exit(3);
+
+                }
+
 
                 //STARTING NETWORK/BLOCKCHAIN/RPC
+
                 Controller.getInstance().start();
+
                 //unlock wallet
 
                 if (pass != null && Controller.getInstance().doesWalletDatabaseExists()) {

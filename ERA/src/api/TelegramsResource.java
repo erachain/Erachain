@@ -373,8 +373,11 @@ public class TelegramsResource {
             return out.toJSONString();
         }
 
-        cntr.broadcastTelegram(transaction, true);
-
+        if (cntr.broadcastTelegram(transaction, true)) {
+            out.put("status", "ok");
+        } else {
+            out.put("error", "already exist");
+        }
         out.put("signature", Base58.encode(transaction.getSignature()));
         return out.toJSONString();
     }

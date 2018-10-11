@@ -318,6 +318,12 @@ public class Account {
         return this.getBalanceUSE(key, DCSet.getInstance());
     }
 
+    /**
+     *
+     * @param key asset key (long)
+     * @param db database Set
+     * @return (BigDecimal) balance.a + balance.b
+     */
     public BigDecimal getBalanceUSE(long key, DCSet db) {
         if (key < 0)
             key = -key;

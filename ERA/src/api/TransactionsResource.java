@@ -800,7 +800,7 @@ public class TransactionsResource {
 
         if (check1 != null || check1 == "1") {
             out.put("fee", transaction.viewFee());
-            out.put("status_code", "1");
+            out.put("status_code", Transaction.VALIDATE_OK);
             out.put("status", "ok");
             return out.toJSONString();
 
@@ -816,7 +816,7 @@ public class TransactionsResource {
 
         }
         out.put("status", "ok");
-        out.put("status_code", "1");
+        out.put("status_code", Transaction.VALIDATE_OK);
         out.put("signature", Base58.encode(transaction.getSignature()));
         return out.toJSONString();
     }

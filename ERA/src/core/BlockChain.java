@@ -72,12 +72,12 @@ public class BlockChain {
     public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
-    public static final int VERS_4_11 = DEVELOP_USE ? 185376  : 170000;
+    public static final int VERS_4_11 = DEVELOP_USE ? 230000  : 200000;
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
     public static final int ALL_BALANCES_OK_TO = VERS_4_11;
 
-    public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11  : 195000;
+    public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11  : VERS_4_11 + 50000;
 
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ?
             new byte[][]{
@@ -441,21 +441,28 @@ public class BlockChain {
         }
     }
 
-    public static long calcTarget(int height, long targetPrevios, long winValue) {
+    /**
+     * Calculate Target (Average Win Value for 1024 last blocks) for this block
+     * @param height - height of blockchain
+     * @param targetPrevious - previous Target
+     * @param winValue - current Win Value
+     * @return
+     */
+    public static long calcTarget(int height, long targetPrevious, long winValue) {
 
         if (height < TARGET_COUNT) {
-            return targetPrevios - (targetPrevios / height) + (winValue / height);
+            return targetPrevious - (targetPrevious / height) + (winValue / height);
         }
 
         // CUT GROWTH
-        long cut1 = targetPrevios + (targetPrevios >> 1);
+        long cut1 = targetPrevious + (targetPrevious >> 1);
         if (height > TARGET_COUNT && winValue > cut1) {
             winValue = cut1;
         }
 
         //return targetPrevios - (targetPrevios>>TARGET_COUNT_SHIFT) + (winValue>>TARGET_COUNT_SHIFT);
         // better accuracy
-        return (((targetPrevios << TARGET_COUNT_SHIFT) - targetPrevios) + winValue) >> TARGET_COUNT_SHIFT;
+        return (((targetPrevious << TARGET_COUNT_SHIFT) - targetPrevious) + winValue) >> TARGET_COUNT_SHIFT;
     }
 
     // GET MIN TARGET
@@ -488,11 +495,21 @@ public class BlockChain {
         }
 
         int result = (int) (BlockChain.BASE_TARGET * win_value / target);
+        if (result < 1 || result > BlockChain.BASE_TARGET * 10)
+            // fix overload
+            return BlockChain.BASE_TARGET * 10;
         return result;
 
     }
 
-    // calc WIN_VALUE for ACCOUNT in HEIGHT
+    /**
+     * calc WIN_VALUE for ACCOUNT in HEIGHT
+     * @param dcSet
+     * @param creator account of block creator
+     * @param height current blockchain height
+     * @param forgingBalance current forging Balance on account
+     * @return (long) Win Value
+     */
     public static long calcWinValue(DCSet dcSet, Account creator, int height, int forgingBalance) {
 
         if (forgingBalance < MIN_GENERATING_BALANCE)
@@ -505,7 +522,7 @@ public class BlockChain {
             previousForgingPoint = creator.getLastForgingData(dcSet);
             if (previousForgingPoint == null)
                 if (DEVELOP_USE)
-                    previousForgingPoint = new Tuple2<Integer, Integer>(height - 10, 1000);
+                    previousForgingPoint = new Tuple2<Integer, Integer>(height - (height > VERS_4_12? 1000 : 10), 1000);
                 else
                     return 0l;
         }
@@ -558,6 +575,9 @@ public class BlockChain {
                 } else if (height < 120000) {
                     if (repeatsMin > 40)
                         repeatsMin = 40;
+                } else if (height < VERS_4_11) {
+                    if (repeatsMin > 200)
+                        repeatsMin = 200;
                 } else if (repeatsMin < 10) {
                     repeatsMin = 10;
                 }
@@ -595,9 +615,9 @@ public class BlockChain {
                 win_value = (win_value >> 7) - (win_value >> 9);
         } else {
             if (height < BlockChain.REPEAT_WIN)
-                win_value >>= 6;
-                //else if (height < 110000)
-                //	win_value = (win_value >>6) + (win_value >>9);
+                win_value >>= 2;
+            else if (height < (BlockChain.REPEAT_WIN<<2))
+                win_value >>= 5;
             else
                 win_value >>= 7;
         }
@@ -607,6 +627,14 @@ public class BlockChain {
 
     }
 
+    /**
+     * Calculate targeted Win Value and cut by BASE
+     * @param dcSet dataChainSet
+     * @param height blockchain height
+     * @param win_value win value
+     * @param target average win value for blockchain by 1024 last blocks
+     * @return targeted Win Value and cut by BASE
+     */
     public static int calcWinValueTargetedBase(DCSet dcSet, int height, long win_value, long target) {
 
         if (win_value < 1)
@@ -614,7 +642,9 @@ public class BlockChain {
 
         int base = BlockChain.getTargetedMin(height);
         int targetedWinValue = calcWinValueTargeted(win_value, target);
-        if (!Controller.getInstance().isTestNet() && base > targetedWinValue) {
+        if (!Controller.getInstance().isTestNet()
+                && height > VERS_4_11
+                && base > targetedWinValue) {
             return -targetedWinValue;
         }
 
