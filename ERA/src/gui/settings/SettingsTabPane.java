@@ -1,9 +1,10 @@
 package gui.settings;
 // 16 03
 
-import lang.Lang;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 
-import javax.swing.*;
+import lang.Lang;
 
 
 public class SettingsTabPane extends JTabbedPane {
@@ -16,6 +17,8 @@ public class SettingsTabPane extends JTabbedPane {
     public UI_Setting_Panel uI_Settings_Panel;
 
     public BackUP_Setting_Panel backUp_Setting_Panel;
+
+    public RatesSettingPanel rates_Setting_Panel;
 
     public SettingsTabPane() {
         super();
@@ -42,6 +45,9 @@ public class SettingsTabPane extends JTabbedPane {
         JScrollPane scrollPane5 = new JScrollPane(backUp_Setting_Panel);
         this.addTab(Lang.getInstance().translate("BackUp Settings"), scrollPane5);
 
+        rates_Setting_Panel = new RatesSettingPanel();
+        JScrollPane scrollPane6 = new JScrollPane(rates_Setting_Panel);
+        this.addTab(Lang.getInstance().translate("Rates Settings"), scrollPane6);
     }
 
     public void close() {

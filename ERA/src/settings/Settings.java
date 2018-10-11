@@ -576,6 +576,14 @@ public class Settings {
         return DEFAULT_BACUP_ENABLED;
     }
 
+    public String getCompuRate() {
+        if (this.settingsJSON.containsKey("compuRate")) {
+            return ((String) this.settingsJSON.get("compuRate")).toString();
+        }
+
+        return "0";
+    }
+    
     public boolean getbacUpAskToStart() {
         if (this.settingsJSON.containsKey("backupasktostart")) {
             return ((Boolean) this.settingsJSON.get("backupasktostart")).booleanValue();

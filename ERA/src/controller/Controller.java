@@ -659,9 +659,9 @@ public class Controller extends Observable {
         this.tradersManager = new TradersManager();
 
         this.COMPU_RATES.put("ru", new Tuple2<BigDecimal, String>
-                (new BigDecimal(245 * 62).setScale(2), "\u20BD"));
+                (new BigDecimal(Settings.getInstance().getCompuRate()).setScale(2), "$")); //"\u20BD"));
         this.COMPU_RATES.put("en", new Tuple2<BigDecimal, String>
-                (new BigDecimal(245).setScale(2), "$"));
+                (new BigDecimal(Settings.getInstance().getCompuRate()).setScale(2), "$"));
     }
 
     // need for TESTS

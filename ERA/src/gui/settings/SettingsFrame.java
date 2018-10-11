@@ -154,6 +154,9 @@ public class SettingsFrame extends JDialog {
         boolean limitConnections = false;
         boolean changeLang = false;
 
+        // save Rate
+        
+        settingsJSONbuf.put("compuRate", settingsTabPane.rates_Setting_Panel.getRate().toString());
         // save backup settings
         settingsJSONbuf.put("backupenabled", settingsTabPane.backUp_Setting_Panel.jCheckBox_Enable_BackUp.isSelected());
         settingsJSONbuf.put("backupasktostart", settingsTabPane.backUp_Setting_Panel.jCheckBox_Ask_To_Start.isSelected());
