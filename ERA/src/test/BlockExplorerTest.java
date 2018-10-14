@@ -203,7 +203,7 @@ public class BlockExplorerTest {
 
     public void getTransactionsByAddress() {
 
-        DCSet.getInstance().getTransactionFinalMap().contains(new Tuple2<Integer, Integer>(1, 1));
+        DCSet.getInstance().getTransactionFinalMap().contains(Transaction.makeDBRef(1, 1));
 
         Stopwatch stopwatchAll = new Stopwatch();
 
@@ -226,7 +226,7 @@ public class BlockExplorerTest {
 
     public void getTransactionsByTypeAndAddress() {
 
-        DCSet.getInstance().getTransactionFinalMap().contains(new Tuple2<Integer, Integer>(1, 1));
+        DCSet.getInstance().getTransactionFinalMap().contains(Transaction.makeDBRef(1, 1));
 
         Stopwatch stopwatchAll = new Stopwatch();
 
@@ -334,7 +334,7 @@ public class BlockExplorerTest {
     public Transaction getTransaction(byte[] signature, DCSet database) {
 
         // CHECK IF IN BLOCK
-        Tuple2<Integer, Integer> tuple_Tx = database.getTransactionFinalMapSigns().get(signature);
+        Long tuple_Tx = database.getTransactionFinalMapSigns().get(signature);
         if (tuple_Tx != null) {
             return database.getTransactionFinalMap().get(tuple_Tx);
 
