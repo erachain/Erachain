@@ -66,7 +66,7 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
         this.set(new Tuple2<Integer, String>(height, Base58.encode(atId)), stateBytes);
     }
 
-    //get the list of states stored at block height. use for roll back
+    //getBySignature the list of states stored at block height. use for roll back
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Map<String, byte[]> getStates(Integer blockHeight) {
         BTreeMap map = (BTreeMap) this.map;
@@ -83,7 +83,7 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
         Map<String, byte[]> states = new TreeMap<String, byte[]>();
 
         for (Tuple2 key : keys) {
-            //states.put( (String)key.b , (byte[]) map.get(key));
+            //states.put( (String)key.b , (byte[]) map.getBySignature(key));
             Iterator<Tuple2<Integer, String>> iter = Fun.filter(allATStates, new Tuple2<String, Integer>((String) key.b, 0), true, new Tuple2<String, Integer>((String) key.b, height - 1), true).iterator();
             if (iter.hasNext()) {
                 states.put((String) key.b, this.get(iter.next()));

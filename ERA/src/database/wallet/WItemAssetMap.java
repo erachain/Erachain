@@ -77,7 +77,7 @@ public class WItemAssetMap extends WItem_Map {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<AssetCls> get(Account account)
+	public List<AssetCls> getBySignature(Account account)
 	{
 		List<AssetCls> assets = new ArrayList<AssetCls>();
 		
@@ -104,7 +104,7 @@ public class WItemAssetMap extends WItem_Map {
 		return assets;
 	}
 	
-	public List<Pair<Account, AssetCls>> get(List<Account> accounts)
+	public List<Pair<Account, AssetCls>> getBySignature(List<Account> accounts)
 	{
 		List<Pair<Account, AssetCls>> assets = new ArrayList<Pair<Account, AssetCls>>();		
 
@@ -115,7 +115,7 @@ public class WItemAssetMap extends WItem_Map {
 			{
 				for(Account account: accounts)
 				{
-					List<AssetCls> accountAssets = get(account);
+					List<AssetCls> accountAssets = getBySignature(account);
 					for(AssetCls asset: accountAssets)
 					{
 						assets.add(new Pair<Account, AssetCls>(account, asset));
@@ -177,7 +177,7 @@ public class WItemAssetMap extends WItem_Map {
 	    for(Account account: assets.keySet())
 	    {
 	    	//FOR EACH TRANSACTION
-	    	for(AssetCls asset: assets.get(account))
+	    	for(AssetCls asset: assets.getBySignature(account))
 	    	{
 	    		this.add(asset);
 	    	}

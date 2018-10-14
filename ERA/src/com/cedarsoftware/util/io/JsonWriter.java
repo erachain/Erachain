@@ -673,7 +673,7 @@ public class JsonWriter implements Closeable, Flushable {
 
     /**
      * Fetch the customer writer for the passed in Class.  If it is cached (already associated to the
-     * passed in Class), return the same instance, otherwise, make a call to get the custom writer
+     * passed in Class), return the same instance, otherwise, make a call to getBySignature the custom writer
      * and store that result.
      *
      * @param c Class of object for which fetch a custom writer
@@ -1102,7 +1102,7 @@ public class JsonWriter implements Closeable, Flushable {
 
         // Intentionally processing each primitive array type in separate
         // custom loop for speed. All of them could be handled using
-        // reflective Array.get() but it is slower.  I chose speed over code length.
+        // reflective Array.getBySignature() but it is slower.  I chose speed over code length.
         if (byte[].class == arrayType) {
             writeByteArray((byte[]) array, lenMinus1);
         } else if (char[].class == arrayType) {

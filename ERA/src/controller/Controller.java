@@ -127,17 +127,17 @@ public class Controller extends Observable {
     public static final char GROUPING_SEPARATOR = '`';
     // IF new abilities is made - new license insert in CHAIN and set this KEY
     public static final long LICENSE_VERS = 107; // versopn of LICENSE
-    public static HashMap<String, Tuple2<Integer, Integer>> LICENSE_LANG_REFS = BlockChain.DEVELOP_USE?
-            new HashMap<String, Tuple2<Integer, Integer>>() {
+    public static HashMap<String, Long> LICENSE_LANG_REFS = BlockChain.DEVELOP_USE?
+            new HashMap<String, Long>() {
         {
-            put("en", new Tuple2<Integer, Integer>(148450, 1));
-            put("ru", new Tuple2<Integer, Integer>(191502, 1));
+            put("en", Transaction.makeDBRef(148450, 1));
+            put("ru", Transaction.makeDBRef(191502, 1));
         }
     } :
-            new HashMap<String, Tuple2<Integer, Integer>>() {
+            new HashMap<String, Long>() {
                 {
-                    put("en", new Tuple2<Integer, Integer>(159719, 1));
-                    put("ru", new Tuple2<Integer, Integer>(159727, 1));
+                    put("en", Transaction.makeDBRef(159719, 1));
+                    put("ru", Transaction.makeDBRef(159727, 1));
                 }
     };
 
@@ -534,17 +534,17 @@ public class Controller extends Observable {
         /*
          * try { if(this.dcSet.getBlocksHeadMap().getLastBlockSignature() != null) {
          * //CHECK IF NAME STORAGE NEEDS UPDATE if
-         * (this.dcSet.getLocalDataMap().get("nsupdate") == null ) { //FIRST
+         * (this.dcSet.getLocalDataMap().getBySignature("nsupdate") == null ) { //FIRST
          * NAME STORAGE UPDATE UpdateUtil.repopulateNameStorage( 70000 );
          * this.dcSet.getLocalDataMap().set("nsupdate", "1"); } //CREATE
          * TRANSACTIONS FINAL MAP if
-         * (this.dcSet.getLocalDataMap().get("txfinalmap") == null ||
-         * !this.dcSet.getLocalDataMap().get("txfinalmap").equals("2")) {
+         * (this.dcSet.getLocalDataMap().getBySignature("txfinalmap") == null ||
+         * !this.dcSet.getLocalDataMap().getBySignature("txfinalmap").equals("2")) {
          * //FIRST NAME STORAGE UPDATE UpdateUtil.repopulateTransactionFinalMap(
          * ); this.dcSet.getLocalDataMap().set("txfinalmap", "2"); }
          *
-         * if (this.dcSet.getLocalDataMap().get("blogpostmap") == null ||
-         * !this.dcSet.getLocalDataMap().get("blogpostmap").equals("2")) {
+         * if (this.dcSet.getLocalDataMap().getBySignature("blogpostmap") == null ||
+         * !this.dcSet.getLocalDataMap().getBySignature("blogpostmap").equals("2")) {
          * //recreate comment postmap UpdateUtil.repopulateCommentPostMap();
          * this.dcSet.getLocalDataMap().set("blogpostmap", "2"); } } else {
          * this.dcSet.getLocalDataMap().set("nsupdate", "1");
@@ -1354,10 +1354,10 @@ public class Controller extends Observable {
                      * + Base58.encode(getHeadersMessage.getParent()));
                      *
                      * if (!headers.isEmpty()) {
-                     * LOGGER.error("this.blockChain.getSignatures.get(0) -> " +
-                     * Base58.encode( headers.get(0) )); LOGGER.
-                     * error("this.blockChain.getSignatures.get(headers.size()-1) -> "
-                     * + Base58.encode( headers.get(headers.size()-1) )); } else
+                     * LOGGER.error("this.blockChain.getSignatures.getBySignature(0) -> " +
+                     * Base58.encode( headers.getBySignature(0) )); LOGGER.
+                     * error("this.blockChain.getSignatures.getBySignature(headers.size()-1) -> "
+                     * + Base58.encode( headers.getBySignature(headers.size()-1) )); } else
                      * { LOGGER.
                      * error("controller.Controller.onMessage(Message).GET_SIGNATURES_TYPE -> NOT FOUND!"
                      * ); }
@@ -1943,9 +1943,9 @@ public class Controller extends Observable {
      * try { synchronized (this.peerHWeight) { for (Peer peer :
      * this.peerHWeight.keySet()) { if (highestPeer == null && peer != null) {
      * highestPeer = peer; } else { // IF HEIGHT IS BIGGER if (weight <
-     * this.peerHWeight.get(peer).b) { highestPeer = peer; weight =
-     * this.peerHWeight.get(peer).b; } else if (weight ==
-     * this.peerHWeight.get(peer).b) { // IF HEIGHT IS SAME // CHECK IF PING OF
+     * this.peerHWeight.getBySignature(peer).b) { highestPeer = peer; weight =
+     * this.peerHWeight.getBySignature(peer).b; } else if (weight ==
+     * this.peerHWeight.getBySignature(peer).b) { // IF HEIGHT IS SAME // CHECK IF PING OF
      * PEER IS BETTER if (peer.getPing() < highestPeer.getPing()) { highestPeer
      * = peer; } } } } } } catch (Exception e) { // PEER REMOVED WHILE ITERATING
      * }
@@ -2254,7 +2254,7 @@ public class Controller extends Observable {
         return getTransaction(signature, this.dcSet);
     }
 
-    // by account addres + timestamp get signature
+    // by account addres + timestamp getBySignature signature
     public byte[] getSignatureByAddrTime(DCSet dcSet, String address, Long timestamp) {
 
         return dcSet.getAddressTime_SignatureMap().get(address, timestamp);
@@ -2267,7 +2267,7 @@ public class Controller extends Observable {
             return database.getTransactionMap().get(signature);
         }
         // CHECK IF IN BLOCK
-        Tuple2<Integer, Integer> tuple_Tx = database.getTransactionFinalMapSigns().get(signature);
+        Long tuple_Tx = database.getTransactionFinalMapSigns().get(signature);
         if (tuple_Tx != null) {
             return database.getTransactionFinalMap().get(tuple_Tx);
         }
@@ -2927,7 +2927,7 @@ public class Controller extends Observable {
     }
     
     public Pair<Transaction, Integer> cancelOrder(PrivateKeyAccount creator, Order order, int feePow) {
-        Transaction orderCreate = this.dcSet.getTransactionFinalMap().get(Transaction.parseDBRef(order.getId()));
+        Transaction orderCreate = this.dcSet.getTransactionFinalMap().get(order.getId());
         return cancelOrder(creator, orderCreate.getSignature(), feePow);
     }
     
@@ -3206,14 +3206,14 @@ public class Controller extends Observable {
         }
 
         // DCSet db = this.dcSet;
-        // get last transaction from this address
+        // getBySignature last transaction from this address
         byte[] sign = dcSet.getAddressTime_SignatureMap().get(address);
         if (sign == null) {
             return null;
         }
 
         /*
-         * long lastReference = db.getReferenceMap().get(address); byte[] sign =
+         * long lastReference = db.getReferenceMap().getBySignature(address); byte[] sign =
          * getSignatureByAddrTime(db, address, lastReference); if (sign == null)
          * return null;
          */

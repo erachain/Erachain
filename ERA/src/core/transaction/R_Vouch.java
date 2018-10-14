@@ -248,14 +248,14 @@ public class R_Vouch extends Transaction {
 		if (b == null )
 			return INVALID_BLOCK_HEIGHT_ERROR;
 
-		Block block = db.getBlocksHeadMap().get(b);
+		Block block = db.getBlocksHeadMap().getBySignature(b);
 		if (block == null)
 			return INVALID_BLOCK_HEIGHT_ERROR;
-		Transaction tx = block.getTransaction(seq);
+		Transaction tx = block.getBySignature(seq);
 		if (tx == null )
 			return INVALID_BLOCK_TRANS_SEQ_ERROR;
 		 */
-        if (!this.dcSet.getTransactionFinalMap().contains(new Tuple2<Integer, Integer>(this.vouchHeight, this.vouchSeqNo))) {
+        if (!this.dcSet.getTransactionFinalMap().contains(Transaction.makeDBRef(this.vouchHeight, this.vouchSeqNo))) {
             return INVALID_BLOCK_TRANS_SEQ_ERROR;
         }
 
@@ -339,7 +339,7 @@ public class R_Vouch extends Transaction {
 
         HashSet<Account> accounts = new HashSet<Account>();
 
-        Transaction record = dcSet.getTransactionFinalMap().getTransaction(vouchHeight, vouchSeqNo);
+        Transaction record = dcSet.getTransactionFinalMap().getBySignature(vouchHeight, vouchSeqNo);
         if (record == null) {
             LOGGER.debug("core.transaction.R_Vouch.getRecipientAccounts() not found record: " + vouchHeight + "-" + vouchSeqNo);
             return accounts;

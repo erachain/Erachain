@@ -145,7 +145,7 @@ public class ConnectionCreator extends Thread {
                                     break;
 
                                 if (foreignPeersCounter >= maxReceivePeers) {
-                                    // FROM EACH peer get only maxReceivePeers
+                                    // FROM EACH peer getBySignature only maxReceivePeers
                                     break;
                                 }
 

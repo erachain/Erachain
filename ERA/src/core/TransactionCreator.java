@@ -601,7 +601,7 @@ public class TransactionCreator {
         //TIME
         long time = NTP.getTime();
 
-        Transaction createOrder = this.fork.getTransactionFinalMap().get(Transaction.parseDBRef(orderID));
+        Transaction createOrder = this.fork.getTransactionFinalMap().get(orderID);
         if (createOrder == null)
             return null;
 

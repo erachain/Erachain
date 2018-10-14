@@ -25,7 +25,7 @@ import java.util.*;
 // ++ sender_txs
 // ++ recipient_txs
 // ++ address_type_txs
-public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transaction> {
+public class TransactionFinalMap extends DCMap<Long, Transaction> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     @SuppressWarnings("rawtypes")
@@ -63,18 +63,19 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
     }
 
     @SuppressWarnings("unchecked")
-    private Map<Tuple2<Integer, Integer>, Transaction> openMap(DB database) {
+    private Map<Long, Transaction> openMap(DB database) {
 
-        BTreeMap<Tuple2<Integer, Integer>, Transaction> map = database.createTreeMap("height_seq_transactions")
-                .keySerializer(BTreeKeySerializer.TUPLE2).valueSerializer(new TransactionSerializer())
+        BTreeMap<Long, Transaction> map = database.createTreeMap("height_seq_transactions")
+                //.keySerializer(BTreeKeySerializer.TUPLE2)
+                .valueSerializer(new TransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
 
         this.senderKey = database.createTreeSet("sender_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
-        Bind.secondaryKey(map, this.senderKey, new Fun.Function2<String, Tuple2<Integer, Integer>, Transaction>() {
+        Bind.secondaryKey(map, this.senderKey, new Fun.Function2<String, Long, Transaction>() {
             @Override
-            public String run(Tuple2<Integer, Integer> key, Transaction val) {
+            public String run(Long key, Transaction val) {
                 Account account = val.getCreator();
                 return account == null ? "genesis" : account.getAddress();
             }
@@ -82,9 +83,9 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 
         //	this.block_Key = database.createTreeSet("Block_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
-        //	Bind.secondaryKey(map, this.block_Key, new Fun.Function2<Integer, Tuple2<Integer, Integer>, Transaction>() {
+        //	Bind.secondaryKey(map, this.block_Key, new Fun.Function2<Integer, Long, Transaction>() {
         //		@Override
-        //		public Integer run(Tuple2<Integer, Integer> key, Transaction val) {
+        //		public Integer run(Long key, Transaction val) {
         //			return val.getBlockHeightByParentOrLast(getDCSet());
         //		}
         //	});
@@ -92,9 +93,9 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         this.recipientKey = database.createTreeSet("recipient_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
         Bind.secondaryKeys(map, this.recipientKey,
-                new Fun.Function2<String[], Tuple2<Integer, Integer>, Transaction>() {
+                new Fun.Function2<String[], Long, Transaction>() {
                     @Override
-                    public String[] run(Tuple2<Integer, Integer> key, Transaction val) {
+                    public String[] run(Long key, Transaction val) {
                         List<String> recps = new ArrayList<String>();
 
                         val.setDC(getDCSet());
@@ -111,9 +112,9 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         this.typeKey = database.createTreeSet("address_type_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
         Bind.secondaryKeys(map, this.typeKey,
-                new Fun.Function2<Tuple2<String, Integer>[], Tuple2<Integer, Integer>, Transaction>() {
+                new Fun.Function2<Tuple2<String, Integer>[], Long, Transaction>() {
                     @Override
-                    public Tuple2<String, Integer>[] run(Tuple2<Integer, Integer> key, Transaction val) {
+                    public Tuple2<String, Integer>[] run(Long key, Transaction val) {
                         List<Tuple2<String, Integer>> recps = new ArrayList<Tuple2<String, Integer>>();
                         Integer type = val.getType();
                         for (Account acc : val.getInvolvedAccounts()) {
@@ -134,13 +135,13 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
     }
 
     @Override
-    protected Map<Tuple2<Integer, Integer>, Transaction> getMap(DB database) {
+    protected Map<Long, Transaction> getMap(DB database) {
         // OPEN MAP
         return openMap(database);
     }
 
     @Override
-    protected Map<Tuple2<Integer, Integer>, Transaction> getMemoryMap() {
+    protected Map<Long, Transaction> getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
         // OPEN MAP
@@ -161,11 +162,12 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
     public void delete(Integer height) {
         BTreeMap map = (BTreeMap) this.map;
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-        Collection<Tuple2> keys = ((BTreeMap<Tuple2, Transaction>) map)
-                .subMap(Fun.t2(height, null), Fun.t2(height, Fun.HI())).keySet();
+        Collection<Long> keys = ((BTreeMap<Long, Transaction>) map)
+                .subMap(Transaction.makeDBRef(height, 0),
+                        Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet();
 
         // DELETE TRANSACTIONS
-        for (Tuple2<Integer, Integer> key : keys) {
+        for (Long key : keys) {
             if (this.contains(key))
                 this.delete(key);
         }
@@ -173,15 +175,15 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
     }
 
     public void delete(Integer height, Integer seq) {
-        this.delete(new Tuple2<Integer, Integer>(height, seq));
+        this.delete(Transaction.makeDBRef(height, seq));
     }
 
     public boolean add(Integer height, Integer seq, Transaction transaction) {
-        return this.set(new Tuple2<Integer, Integer>(height, seq), transaction);
+        return this.set(Transaction.makeDBRef(height, seq), transaction);
     }
 
-    public Transaction getTransaction(Integer height, Integer seq) {
-        return this.get(new Tuple2<Integer, Integer>(height, seq));
+    public Transaction getBySignature(Integer height, Integer seq) {
+        return this.get(Transaction.makeDBRef(height, seq));
     }
 
     public List<Transaction> getTransactionsByRecipient(String address) {
@@ -196,12 +198,13 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         List<Transaction> txs = new ArrayList<>();
         int counter = 0;
         Transaction item;
-        Tuple2<Integer, Integer> key;
+        Long key;
         while (iter.hasNext() && (limit == 0 || counter < limit)) {
 
-            key = (Tuple2<Integer, Integer>)iter.next();
+            key = (Long)iter.next();
+            Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
-            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, key.a, key.b);
+            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
 
             txs.add(item);
             counter++;
@@ -223,7 +226,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 		List<Transaction> txs = new ArrayList<>();
 		int counter = 0;
 		while (iter.hasNext() && (limit == 0 || counter < limit)) {
-			txs.add(this.map.get(iter.next()));
+			txs.add(this.map.getBySignature(iter.next()));
 			counter++;
 		}
 		iter = null;
@@ -256,11 +259,12 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         List<Transaction> txs = new ArrayList<>();
         int counter = 0;
         Transaction item;
-        Tuple2<Integer, Integer> key;
+        Long key;
         while (iter.hasNext() && (limit == 0 || counter < limit)) {
-            key = (Tuple2<Integer, Integer>)iter.next();
+            key = (Long)iter.next();
+            Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
-            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, key.a, key.b);
+            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
 
             txs.add(item);
             counter++;
@@ -278,11 +282,12 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         List<Transaction> txs = new ArrayList<>();
         int counter = 0;
         Transaction item;
-        Tuple2<Integer, Integer> key;
+        Long key;
         while (iter.hasNext() && (limit == 0 || counter < limit)) {
-            key = (Tuple2<Integer, Integer>)iter.next();
+            key = (Long)iter.next();
+            Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
-            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, key.a, key.b);
+            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
 
             txs.add(item);
             counter++;
@@ -297,7 +302,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         Iterable senderKeys = Fun.filter(this.senderKey, address);
         Iterable recipientKeys = Fun.filter(this.recipientKey, address);
 
-        Set<Tuple2<Integer, Integer>> treeKeys = new TreeSet<>();
+        Set<Long> treeKeys = new TreeSet<>();
 
         treeKeys.addAll(Sets.newTreeSet(senderKeys));
         treeKeys.addAll(Sets.newTreeSet(recipientKeys));
@@ -308,7 +313,8 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         senderKeys = null;
         Set<BlExpUnit> txs = new TreeSet<>();
         while (iter.hasNext()) {
-            Tuple2<Integer, Integer> request = (Tuple2<Integer, Integer>) iter.next();
+            Long key = (Long) iter.next();
+            Tuple2<Integer, Integer> request = Transaction.parseDBRef(key);
             txs.add(new BlExpUnit(request.a, request.b, this.map.get(request)));
         }
         iter = null;
@@ -321,7 +327,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         Iterable senderKeys = Fun.filter(this.senderKey, address);
         Iterable recipientKeys = Fun.filter(this.recipientKey, address);
 
-        Set<Tuple2<Integer, Integer>> treeKeys = new TreeSet<>();
+        Set<Long> treeKeys = new TreeSet<>();
 
         treeKeys.addAll(Sets.newTreeSet(senderKeys));
         treeKeys.addAll(Sets.newTreeSet(recipientKeys));
@@ -332,11 +338,12 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         senderKeys = null;
         List<Transaction> txs = new ArrayList<>();
         Transaction item;
-        Tuple2<Integer, Integer> key;
+        Long key;
         while (iter.hasNext()) {
-            key = (Tuple2<Integer, Integer>)iter.next();
+            key = (Long)iter.next();
             item = this.map.get(key);
-            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, key.a, key.b);
+            Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
 
             txs.add(item);
         }
@@ -350,7 +357,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         Iterable senderKeys = Fun.filter(this.senderKey, address);
         Iterable recipientKeys = Fun.filter(this.recipientKey, address);
 
-        Set<Tuple2<Integer, Integer>> treeKeys = new TreeSet<>();
+        Set<Long> treeKeys = new TreeSet<>();
 
         treeKeys.addAll(Sets.newTreeSet(senderKeys));
         treeKeys.addAll(Sets.newTreeSet(recipientKeys));
@@ -360,18 +367,19 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public Tuple2<Integer, Integer> getTransactionsAfterTimestamp(int startHeight, int numOfTx, String address) {
+    public Long getTransactionsAfterTimestamp(int startHeight, int numOfTx, String address) {
         Iterable keys = Fun.filter(this.recipientKey, address);
         Iterator iter = keys.iterator();
         int prevKey = startHeight;
         while (iter.hasNext()) {
-            Tuple2<Integer, Integer> key = (Tuple2<Integer, Integer>) iter.next();
-            if (key.a >= startHeight) {
-                if (key.a != prevKey) {
+            Long key = (Long) iter.next();
+            Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+            if (pair.a >= startHeight) {
+                if (pair.a != prevKey) {
                     numOfTx = 0;
                 }
-                prevKey = key.a;
-                if (key.b > numOfTx)
+                prevKey = pair.a;
+                if (pair.b > numOfTx)
                     iter = null;
                 return key;
             }
@@ -379,7 +387,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         return null;
     }
 
-    public DCMap<Tuple2<Integer, Integer>, Transaction> getParentMap() {
+    public DCMap<Long, Transaction> getParentMap() {
         return this.parent;
     }
 
@@ -393,12 +401,13 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         keys = null;
         List<Transaction> txs = new ArrayList<>();
         Transaction item;
-        Tuple2<Integer, Integer> key;
+        Long key;
 
         while (iter.hasNext()) {
-            key = (Tuple2<Integer, Integer>)iter.next();
+            key = (Long)iter.next();
+            Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
-            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, key.a, key.b);
+            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
 
             txs.add(item);
         }
@@ -432,7 +441,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
                                          final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
         Iterable senderKeys = null;
         Iterable recipientKeys = null;
-        Set<Tuple2<Integer, Integer>> treeKeys = new TreeSet<>();
+        Set<Long> treeKeys = new TreeSet<>();
 
         if (address != null) {
             sender = address;
@@ -472,18 +481,19 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         }
 
         if (minHeight != 0 || maxHeight != 0) {
-            treeKeys = Sets.filter(treeKeys, new Predicate<Tuple2<Integer, Integer>>() {
+            treeKeys = Sets.filter(treeKeys, new Predicate<Long>() {
                 @Override
-                public boolean apply(Tuple2<Integer, Integer> key) {
-                    return (minHeight == 0 || key.a >= minHeight) && (maxHeight == 0 || key.a <= maxHeight);
+                public boolean apply(Long key) {
+                    Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                    return (minHeight == 0 || pair.a >= minHeight) && (maxHeight == 0 || pair.a <= maxHeight);
                 }
             });
         }
 
         if (false && type == Transaction.ARBITRARY_TRANSACTION && service > -1) {
-            treeKeys = Sets.filter(treeKeys, new Predicate<Tuple2<Integer, Integer>>() {
+            treeKeys = Sets.filter(treeKeys, new Predicate<Long>() {
                 @Override
-                public boolean apply(Tuple2<Integer, Integer> key) {
+                public boolean apply(Long key) {
                     ArbitraryTransaction tx = (ArbitraryTransaction) map.get(key);
                     return tx.getService() == service;
                 }
@@ -505,12 +515,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
     @SuppressWarnings({"rawtypes", "unchecked"})
     public byte[] getSignature(int hight, int seg) {
 
-        return this.get(new Tuple2(hight, seg)).getSignature();
-
-    }
-
-    public Transaction getTransaction(byte[] signature) {
-        return this.get(getDCSet().getTransactionFinalMapSigns().get(signature));
+        return this.get(Transaction.makeDBRef(hight, seg)).getSignature();
 
     }
 
@@ -520,27 +525,28 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
             int height = Integer.parseInt(strA[0]);
             int seq = Integer.parseInt(strA[1]);
 
-            return this.getTransaction(height, seq);
+            return this.getBySignature(height, seq);
         } catch (Exception e1) {
             try {
-                return this.getTransaction(Base58.decode(refStr));
+                return this.getBySignature(Base58.decode(refStr));
             } catch (Exception e2) {
                 return null;
             }
         }
     }
 
-    public Transaction get(Long dbRefLong) {
-        return this.get(Transaction.parseDBRef(dbRefLong));
+    public Transaction getBySignature(byte[] signature) {
+        return this.get(getDCSet().getTransactionFinalMapSigns().get(signature));
     }
 
-    public Transaction get(Tuple2<Integer, Integer> key) {
+    public Transaction get(Long key) {
         // [167726]
         Transaction item = super.get(key);
         if (item == null)
             return null;
 
-        item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, key.a, key.b);
+        Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+        item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
         return item;
     }
 

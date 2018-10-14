@@ -583,7 +583,7 @@ public class GeneratorTests {
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
 
-        // get timestamp for block
+        // getBySignature timestamp for block
         long timestamp = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS / 2;
 
         //ADD 10 UNCONFIRMED VALID TRANSACTIONS
@@ -653,7 +653,7 @@ public class GeneratorTests {
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
 
-        // get timestamp for block
+        // getBySignature timestamp for block
         long timestampStart = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS / 2;
         long timestamp = timestampStart;
 
@@ -738,7 +738,7 @@ public class GeneratorTests {
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
 
-        // get timestamp for block
+        // getBySignature timestamp for block
         long timestampStart = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS / 2;
         long timestamp = timestampStart;
 

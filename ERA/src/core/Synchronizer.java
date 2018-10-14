@@ -187,7 +187,7 @@ public class Synchronizer {
                     throw new Exception(mess);
                 }
             } else {
-                //Tuple2<Integer, Long> item = fork.getBlockSignsMap().get(block);
+                //Tuple2<Integer, Long> item = fork.getBlockSignsMap().getBySignature(block);
                 if (fork.getBlockSignsMap().contains(block.getSignature())) {
                     LOGGER.error("*** checkNewBlocks - DUPLICATE SIGN! [" + height + "] "
                             + Base58.encode(block.getSignature())
@@ -341,7 +341,7 @@ public class Synchronizer {
      * startSignature = start.getSignature(); List<byte[]> headers =
      * this.getBlockSignatures(startSignature, peer); List<byte[]> nextHeaders;
      * if(!headers.isEmpty() && headers.size() < amount) { do { nextHeaders =
-     * this.getBlockSignatures(headers.get(headers.size()-1), peer);
+     * this.getBlockSignatures(headers.getBySignature(headers.size()-1), peer);
      * headers.addAll(nextHeaders); } while(headers.size() < amount &&
      * !nextHeaders.isEmpty()); }
      *
@@ -398,7 +398,7 @@ public class Synchronizer {
                 }
 
                 // GET BLOCK
-                LOGGER.debug("try get BLOCK from BUFFER");
+                LOGGER.debug("try getBySignature BLOCK from BUFFER");
 
                 long time1 = System.currentTimeMillis();
                 blockFromPeer = blockBuffer.getBlock(signature);
@@ -604,7 +604,7 @@ public class Synchronizer {
 
         LOGGER.info("findHeaders " + " maxChainHeight: " + maxChainHeight + " to minHeight: " + checkPointHeight);
 
-        // try get check point block from peer
+        // try getBySignature check point block from peer
         // GENESIS block nake ERROR in network.Peer.sendMessage(Message) ->
         // this.out.write(message.toBytes());
         // TODO fix it error
@@ -613,7 +613,7 @@ public class Synchronizer {
         checkPointHeightSignature = dcSet.getBlocksHeadsMap().get(checkPointHeight).signature;
 
         try {
-            // try get common block from PEER
+            // try getBySignature common block from PEER
             // not need CHECK peer on ping = false
             checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer, false);
         } catch (Exception e) {
@@ -683,7 +683,7 @@ public class Synchronizer {
 
     private List<Block> getBlocks(DCSet dcSet, List<byte[]> signatures, Peer peer) throws Exception {
 
-        LOGGER.debug("try get BLOCKS from common block SIZE:" + signatures.size() + " - " + peer.getAddress());
+        LOGGER.debug("try getBySignature BLOCKS from common block SIZE:" + signatures.size() + " - " + peer.getAddress());
 
         List<Block> blocks = new ArrayList<Block>();
         Controller cnt = Controller.getInstance();

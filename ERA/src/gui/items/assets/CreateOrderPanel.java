@@ -377,7 +377,7 @@ public class CreateOrderPanel extends JPanel {
         else
             superHintText.setText("<html><body style='font-size: 100%'>" + Lang.getInstance()
                     .translate("Give <b>%amount% %have%</b>"
-                            + " at the price of <b>%price%&nbsp;%want%</b> per <b>1% %have%</b> that would get "
+                            + " at the price of <b>%price%&nbsp;%want%</b> per <b>1% %have%</b> that would getBySignature "
                             + "<b>%buyingamount%&nbsp;%want%</b>.")
                     .replace("%amount%", this.txtAmountHave.getText()).replace("%have%", have.getShort())
                     .replace("%price%", this.txtPrice.getText()).replace("%want%", want.getShort())

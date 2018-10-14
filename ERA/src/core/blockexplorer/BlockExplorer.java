@@ -28,7 +28,6 @@ import javax.ws.rs.core.UriInfo;
 
 import core.transaction.*;
 import datachain.*;
-import ntp.NTP;
 import org.apache.commons.net.util.Base64;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -353,7 +352,7 @@ public class BlockExplorer {
                         info.getQueryParameters().getFirst("Seg_No")));
             } else {
 
-                Transaction transaction = dcSet.getTransactionFinalMap().getTransaction(
+                Transaction transaction = dcSet.getTransactionFinalMap().getBySignature(
                         new Integer(info.getQueryParameters().getFirst("block")),
                         new Integer(info.getQueryParameters().getFirst("Seg_No")));
                 output.put("body", WEB_Transactions_HTML.getInstance().get_HTML(transaction, langObj));
@@ -580,10 +579,10 @@ public class BlockExplorer {
             Integer blockNo = Integer.valueOf(matcher.group(1));
             Integer seqNo = Integer.valueOf(matcher.group(2));
 
-            if (dcSet.getTransactionFinalMap().contains(new Tuple2(blockNo, seqNo))) {
+            if (dcSet.getTransactionFinalMap().contains(Transaction.makeDBRef(blockNo, seqNo))) {
                 i++;
                 outputItem = new LinkedHashMap();
-                Transaction transaction = dcSet.getTransactionFinalMap().get(new Tuple2(blockNo, seqNo));
+                Transaction transaction = dcSet.getTransactionFinalMap().get(Transaction.makeDBRef(blockNo, seqNo));
                 if (transaction instanceof R_SignNote) {
                     outputItem.put(1, "statement");
                     outputItem.put(2, Lang.getInstance().translate_from_langObj("Statement", langObj));
@@ -621,15 +620,15 @@ public class BlockExplorer {
                 Account account = new Account(addr);
 
                 String address = account.getAddress();
-                // get reference to parent record for this account
+                // getBySignature reference to parent record for this account
                 Long timestampRef = account.getLastTimestamp();
-                // get signature for account + time
+                // getBySignature signature for account + time
                 byte[] signatureBytes = dcSet.getAddressTime_SignatureMap().get(address, timestampRef);
 
                 Controller cntr = Controller.getInstance();
                 do {
                     // Transaction transaction =
-                    // Controller.getInstance().getTransaction(signatureBytes);
+                    // Controller.getInstance().getBySignature(signatureBytes);
                     Transaction transaction = cntr.getTransaction(signatureBytes);
                     if (transaction == null) {
                         break;
@@ -642,10 +641,10 @@ public class BlockExplorer {
                             && ((ArbitraryTransaction) transaction).getService() == 777) {
                         transactions.add(transaction);
                     }
-                    // get reference to parent record for this account
+                    // getBySignature reference to parent record for this account
                     // timestampRef = transaction.getReference();
                     timestampRef = account.getLastTimestamp();
-                    // get signature for account + time
+                    // getBySignature signature for account + time
                     signatureBytes = dcSet.getAddressTime_SignatureMap().get(address, timestampRef);
 
                 } while (true);
@@ -968,8 +967,8 @@ public class BlockExplorer {
         pollJSON.put("totalVotes", poll.getTotalVotes(asset_q).toPlainString());
 
         if (true) {
-            //Tuple2<Integer, Integer> blocNoSeqNo = dcSet.getTransactionFinalMapSigns().get(poll.getReference());
-            //Transaction transactions = dcSet.getTransactionFinalMap().get(blocNoSeqNo);
+            //Tuple2<Integer, Integer> blocNoSeqNo = dcSet.getTransactionFinalMapSigns().getBySignature(poll.getReference());
+            //Transaction transactions = dcSet.getTransactionFinalMap().getBySignature(blocNoSeqNo);
             pollJSON.put("timestamp", 0l);//transactions.getTimestamp());
             pollJSON.put("dateTime", BlockExplorer.timestampToStr(0l)); //transactions.getTimestamp()));
         } else {
@@ -1194,7 +1193,7 @@ public class BlockExplorer {
 
         if (true) {
             if (asset.getKey() > AssetCls.START_KEY ) {
-                Tuple2<Integer, Integer> blocNoSeqNo = dcSet.getTransactionFinalMapSigns().get(asset.getReference());
+                Long blocNoSeqNo = dcSet.getTransactionFinalMapSigns().get(asset.getReference());
                 Transaction transactions = dcSet.getTransactionFinalMap().get(blocNoSeqNo);
                 assetJSON.put("timestamp", transactions.getTimestamp());
                 assetJSON.put("dateTime", BlockExplorer.timestampToStr(transactions.getTimestamp()));
@@ -2149,7 +2148,7 @@ public class BlockExplorer {
              * TransactionAmount && trans.getAbsKey() >0) { TransactionAmount
              * transAmo = (TransactionAmount)trans; //recipient =
              * transAmo.getRecipient(); ItemCls item =
-             * dcSet.getItemAssetMap().get(transAmo.getAbsKey()); if
+             * dcSet.getItemAssetMap().getBySignature(transAmo.getAbsKey()); if
              * (item==null){ itemName = "-"; itemKey = 0L;
              *
              * } itemName = item.toString(); itemKey = item.getKey(); } else if
@@ -2157,7 +2156,7 @@ public class BlockExplorer {
              * GenesisTransferAssetTransaction transGen =
              * (GenesisTransferAssetTransaction)trans; //recipient =
              * transGen.getRecipient(); ItemCls item =
-             * dcSet.getItemAssetMap().get(transGen.getAbsKey()); itemName =
+             * dcSet.getItemAssetMap().getBySignature(transGen.getAbsKey()); itemName =
              * item.toString(); itemKey = item.getKey(); } else if ( trans
              * instanceof Issue_ItemRecord) { Issue_ItemRecord transIssue =
              * (Issue_ItemRecord)trans; ItemCls item = transIssue.getItem();
@@ -2169,7 +2168,7 @@ public class BlockExplorer {
              * item.getKey(); } else if (trans instanceof R_SertifyPubKeys ) {
              * R_SertifyPubKeys sertifyPK = (R_SertifyPubKeys)trans; //recipient
              * = transAmo.getRecipient(); ItemCls item =
-             * dcSet.getItemPersonMap().get(sertifyPK.getAbsKey()); if (item ==
+             * dcSet.getItemPersonMap().getBySignature(sertifyPK.getAbsKey()); if (item ==
              * null){ itemName = "-"; itemKey = (long) -1;
              *
              * } itemName = item.toString(); itemKey = item.getKey(); } else {
@@ -2311,18 +2310,18 @@ public class BlockExplorer {
 
             /*
              * if(dcSet.getOrderMap().contains(trade.getInitiator())) {
-             * orderInitiator = dcSet.getOrderMap().get(trade.getInitiator()); }
+             * orderInitiator = dcSet.getOrderMap().getBySignature(trade.getInitiator()); }
              * else { orderInitiator =
-             * dcSet.getCompletedOrderMap().get(trade.getInitiator()); }
+             * dcSet.getCompletedOrderMap().getBySignature(trade.getInitiator()); }
              */
 
             Order orderTarget = trade.getTargetOrder(dcSet);
 
             /*
              * if(dcSet.getOrderMap().contains(trade.getTarget())) { orderTarget
-             * = dcSet.getOrderMap().get(trade.getTarget()); } else {
+             * = dcSet.getOrderMap().getBySignature(trade.getTarget()); } else {
              * orderTarget =
-             * dcSet.getCompletedOrderMap().get(trade.getTarget()); }
+             * dcSet.getCompletedOrderMap().getBySignature(trade.getTarget()); }
              */
 
             transactionDataJSON.put("amountHave", trade.getAmountHave().toPlainString());
@@ -2368,7 +2367,7 @@ public class BlockExplorer {
 
             transactionDataJSON = transaction.toJson();
             // transactionDataJSON.put("Р ВµРЎв‚¬РЎРЉРЎС“РЎвЂ№Р ВµРЎвЂћ",
-            // GZIP.webDecompress(transactionDataJSON.get("value").toString()));
+            // GZIP.webDecompress(transactionDataJSON.getBySignature("value").toString()));
 
             if (transaction.getType() == Transaction.REGISTER_NAME_TRANSACTION) {
                 if (transactionDataJSON.get("value").toString().startsWith("?gz!")) {
@@ -2394,7 +2393,7 @@ public class BlockExplorer {
                     byte[] orderSignature = cancelOrder.getorderSignature();
                     CreateOrderTransaction createOrder;
                     if (dcSet.getTransactionFinalMapSigns().contains(orderSignature)) {
-                        createOrder = (CreateOrderTransaction) dcSet.getTransactionFinalMap().getTransaction(orderSignature);
+                        createOrder = (CreateOrderTransaction) dcSet.getTransactionFinalMap().getBySignature(orderSignature);
                     } else {
                         createOrder = (CreateOrderTransaction) dcSet.getTransactionMap().get(orderSignature);
                     }
@@ -2461,7 +2460,7 @@ public class BlockExplorer {
                 if (transaction.getSeqNo() > 0 && assetNames != null) {
                     long assetkey = ((R_Send) unit).getAbsKey();
                     transactionDataJSON.put("asset", assetkey);
-                    transactionDataJSON.put("assetName", assetNames.getMap().get(assetkey));
+                    transactionDataJSON.put("assetName", assetNames.getMap().getBySignature(assetkey));
                 }
 
                 if (((R_Send) unit).isEncrypted()) {
@@ -2586,7 +2585,7 @@ public class BlockExplorer {
              */
 
             // transactionDataJSON.put("fee", balances[size -
-            // counter].getTransactionBalance().get(0l).toPlainString());
+            // counter].getTransactionBalance().getBySignature(0l).toPlainString());
             transactionDataJSON.put("fee", block.getTotalFee().toPlainString());
 
             transactionJSON.put("type", "block");
@@ -2905,9 +2904,9 @@ public class BlockExplorer {
                     Transaction.CREATE_ORDER_TRANSACTION, 0);
             TradeMap tradeMap = dcSet.getTradeMap();
             for (Transaction transaction : orders) {
-                Tuple2<Integer, Integer> dbRefTuple = dcSet.getTransactionFinalMapSigns().get(transaction.getSignature());
+                Long dbRefTuple = dcSet.getTransactionFinalMapSigns().get(transaction.getSignature());
                 SortableList<Tuple2<Long, Long>, Trade> tradesBuf
-                        = tradeMap.getTradesByOrderID(Transaction.makeDBRef(dbRefTuple));
+                        = tradeMap.getTradesByOrderID(dbRefTuple);
                 for (Pair<Tuple2<Long, Long>, Trade> pair : tradesBuf) {
                     trades.put(pair.getA(), pair.getB());
                 }
@@ -2915,9 +2914,9 @@ public class BlockExplorer {
 
             for (Map.Entry<Tuple2<Long, Long>, Trade> trade : trades
                     .entrySet()) {
-                Transaction txInitiator = dcSet.getTransactionFinalMap().get(Transaction.parseDBRef(trade.getValue().getInitiator()));
+                Transaction txInitiator = dcSet.getTransactionFinalMap().get(trade.getValue().getInitiator());
 
-                Transaction txTarget = dcSet.getTransactionFinalMap().get(Transaction.parseDBRef(trade.getValue().getTarget()));
+                Transaction txTarget = dcSet.getTransactionFinalMap().get(trade.getValue().getTarget());
 
                 all.add(new BlExpUnit(txInitiator.getBlockHeightByParentOrLast(dcSet),
                         txTarget.getBlockHeightByParentOrLast(dcSet), txInitiator.getSeqNo(dcSet),
@@ -3398,8 +3397,8 @@ public class BlockExplorer {
 
         String[] signatures = query.split("/");
 
-        Transaction initiator = dcSet.getTransactionFinalMap().getTransaction(Base58.decode(signatures[0]));
-        Transaction target = dcSet.getTransactionFinalMap().getTransaction(Base58.decode(signatures[1]));
+        Transaction initiator = dcSet.getTransactionFinalMap().getBySignature(Base58.decode(signatures[0]));
+        Transaction target = dcSet.getTransactionFinalMap().getBySignature(Base58.decode(signatures[1]));
         Trade trade = dcSet.getTradeMap()
                 .get(Fun.t2(Transaction.makeDBRef(initiator.getHeightSeqNo()),
                         Transaction.makeDBRef(target.getHeightSeqNo())));
@@ -3725,7 +3724,7 @@ public class BlockExplorer {
         // TODO Auto-generated method stub
         Map output = new LinkedHashMap();
 
-        R_SignNote trans = (R_SignNote) dcSet.getTransactionFinalMap().getTransaction(new Integer(block),
+        R_SignNote trans = (R_SignNote) dcSet.getTransactionFinalMap().getBySignature(new Integer(block),
                 new Integer(seg_No));
         // output.put("Label_title",
         // Lang.getInstance().translate_from_langObj("Title",langObj));
@@ -4092,11 +4091,11 @@ public class BlockExplorer {
              *
              * for(Map.Entry<Tuple2<byte[], byte[]>, Trade> trade :
              * trades.entrySet()) { Transaction txInitiator =
-             * Controller.getInstance().getTransaction(trade.getValue().
+             * Controller.getInstance().getBySignature(trade.getValue().
              * getInitiator().toByteArray());
              *
              * Transaction txTarget =
-             * Controller.getInstance().getTransaction(trade.getValue().
+             * Controller.getInstance().getBySignature(trade.getValue().
              * getTarget().toByteArray());
              *
              * all.add( new

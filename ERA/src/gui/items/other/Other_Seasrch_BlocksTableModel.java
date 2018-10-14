@@ -108,7 +108,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
             // Block block = data.getB();
             if (block == null) {
                 // this.blocks.rescan();
-                // data = this.blocks.get(row);
+                // data = this.blocks.getBySignature(row);
                 // return -1;
             } else {
                 //block.calcHeadMind(dcSet);
@@ -120,7 +120,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 
                     if (block == null) {
                         // this.blocks.rescan();
-                        // data = this.blocks.get(row);
+                        // data = this.blocks.getBySignature(row);
                         return "-1";
                     }
                     if (row == 0) {
@@ -133,7 +133,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
                 case COLUMN_TIMESTAMP:
                     if (block == null) {
                         // this.blocks.rescan();
-                        // data = this.blocks.get(row);
+                        // data = this.blocks.getBySignature(row);
                         return "-1";
                     }
 
@@ -148,7 +148,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 
                     if (block == null) {
                         // this.blocks.rescan();
-                        // data = this.blocks.get(row);
+                        // data = this.blocks.getBySignature(row);
                         return "-1";
                     }
                     return block.getCreator().getPersonAsString();
@@ -157,7 +157,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 
                     if (block == null) {
                         // this.blocks.rescan();
-                        // data = this.blocks.get(row);
+                        // data = this.blocks.getBySignature(row);
                         return "-1";
                     }
 
@@ -172,7 +172,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
                 case COLUMN_TRANSACTIONS:
                     if (block == null) {
                         // this.blocks.rescan();
-                        // data = this.blocks.get(row);
+                        // data = this.blocks.getBySignature(row);
                         return -1;
                     }
 
@@ -181,7 +181,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
                 case COLUMN_FEE:
                     if (block == null) {
                         // this.blocks.rescan();
-                        // data = this.blocks.get(row);
+                        // data = this.blocks.getBySignature(row);
                         return "-1";
                     }
 

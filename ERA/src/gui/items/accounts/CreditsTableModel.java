@@ -151,7 +151,7 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
 		}
 
 
-		account = this.publicKeyAccounts.get(row);
+		account = this.publicKeyAccounts.getBySignature(row);
 
 		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance;
 		Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfBalance;

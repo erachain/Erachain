@@ -118,7 +118,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
             int ttt = 1;
         }
 
-        // get Win Value of block
+        // getBySignature Win Value of block
         long weight = item.winValue;
 
         if (startedInForkHeight == 0 && this.parent != null) {

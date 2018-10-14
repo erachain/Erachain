@@ -17,7 +17,7 @@ public class CallRemoteApi {
      * Call remote/local full node API for code request
      *
      * @param urlNode       set remote url full node
-     * @param requestMethod request method (get, post, etc...)
+     * @param requestMethod request method (getBySignature, post, etc...)
      * @return number request answer
      */
     public String ResponseCodeAPI(String urlNode, String requestMethod)  {
@@ -42,7 +42,7 @@ public class CallRemoteApi {
      * Call remote/local full node API for check data request
      *
      * @param urlNode       set remote url full node
-     * @param requestMethod request method (get, post, etc...)
+     * @param requestMethod request method (getBySignature, post, etc...)
      * @param value         is value for only "post" method
      * @return data request answer
      * @throws Exception

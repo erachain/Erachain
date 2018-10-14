@@ -46,10 +46,10 @@ public class TradeResource {
                 "Start Rater: 1 - start, 0 - stop");
         help.put("GET trade/create/{creator}/{haveKey}/{wantKey}/{haveAmount}/{wantAmount}?feePow={feePow}&password={password}",
                 "make and broadcast CreateOrder ");
-        help.put("GET trade/get/{signature}",
+        help.put("GET trade/getBySignature/{signature}",
                 "Get Order");
         help.put("GET trade/getbyaddress/{creator}/{haveKey}/{wantKey}",
-                "get list of orders in CAP by address");
+                "getBySignature list of orders in CAP by address");
         help.put("GET trade/cancel/{creator}/{signature}?password={password}",
                 "Cancel Order");
 
@@ -131,7 +131,7 @@ public class TradeResource {
     }
 
     @GET
-    @Path("get/{signature}")
+    @Path("getBySignature/{signature}")
     public String get(@PathParam("signature") String signatureStr) {
 
         byte[] signature;
@@ -147,12 +147,12 @@ public class TradeResource {
             return out.toJSONString();
         }
 
-        Fun.Tuple2<Integer, Integer> key = DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
+        Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
         if (key == null) {
             throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
         }
 
-        Long orderID = Transaction.makeDBRef(key.a, key.b);
+        Long orderID = key;
         if (DCSet.getInstance().getOrderMap().contains(orderID)) {
             JSONObject out = DCSet.getInstance().getOrderMap().get(orderID).toJson();
             out.put("active", true);
@@ -203,12 +203,12 @@ public class TradeResource {
         Controller cntr = Controller.getInstance();
 
         if (!DCSet.getInstance().getTransactionMap().contains(signature)) {
-            Fun.Tuple2<Integer, Integer> key = DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
+            Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
             if (key == null) {
                 throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
             }
 
-            Long orderID = Transaction.makeDBRef(key.a, key.b);
+            Long orderID = key;
             if (!DCSet.getInstance().getOrderMap().contains(orderID)) {
                 throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
             }
@@ -248,7 +248,7 @@ public class TradeResource {
         JSONArray out = new JSONArray();
         for( Order order: ordersMap.getOrdersForAddress(address, haveKey, wantKey)) {
             JSONObject orderJson = order.toJson();
-            Fun.Tuple2<Integer, Integer> key = Transaction.parseDBRef(order.getId());
+            Long key = order.getId();
             createOrder = finalMap.get(key);
             if (createOrder == null)
                 continue;

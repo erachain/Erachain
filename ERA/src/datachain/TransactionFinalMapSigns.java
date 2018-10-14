@@ -14,7 +14,7 @@ import java.util.Map;
 //import java.math.BigDecimal;
 
 //signature -> <BlockHeoght, Record No>
-public class TransactionFinalMapSigns extends DCMap<byte[], Tuple2<Integer, Integer>> {
+public class TransactionFinalMapSigns extends DCMap<byte[], Long> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public TransactionFinalMapSigns(DCSet databaseSet, DB database) {
@@ -33,9 +33,9 @@ public class TransactionFinalMapSigns extends DCMap<byte[], Tuple2<Integer, Inte
     }
 
     @SuppressWarnings("unchecked")
-    private Map<byte[], Tuple2<Integer, Integer>> openMap(DB database) {
+    private Map<byte[], Long> openMap(DB database) {
 
-        BTreeMap<byte[], Tuple2<Integer, Integer>> map = database.createTreeMap("signature_final_tx")
+        BTreeMap<byte[], Long> map = database.createTreeMap("signature_final_tx")
                 .comparator(Fun.BYTE_ARRAY_COMPARATOR)
                 .makeOrGet();
 
@@ -44,13 +44,13 @@ public class TransactionFinalMapSigns extends DCMap<byte[], Tuple2<Integer, Inte
     }
 
     @Override
-    protected Map<byte[], Tuple2<Integer, Integer>> getMap(DB database) {
+    protected Map<byte[], Long> getMap(DB database) {
         //OPEN MAP
         return openMap(database);
     }
 
     @Override
-    protected Map<byte[], Tuple2<Integer, Integer>> getMemoryMap() {
+    protected Map<byte[], Long> getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
@@ -58,7 +58,7 @@ public class TransactionFinalMapSigns extends DCMap<byte[], Tuple2<Integer, Inte
     }
 
     @Override
-    protected Tuple2<Integer, Integer> getDefaultValue() {
+    protected Long getDefaultValue() {
         return null;
     }
 
@@ -70,7 +70,7 @@ public class TransactionFinalMapSigns extends DCMap<byte[], Tuple2<Integer, Inte
 	/*
 	public Tuple2<Integer,Integer> getHeightSegBySignature(byte[] sign){
 		
-		return this.get(sign);
+		return this.getBySignature(sign);
 		
 	}
 	*/

@@ -228,7 +228,7 @@ public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer
 		List<Calculated> txs = new ArrayList<>();
 		int counter = 0;
 		while (iter.hasNext() && (limit == 0 || counter < limit)) {
-			txs.add(this.map.get(iter.next()));
+			txs.add(this.map.getBySignature(iter.next()));
 			counter++;
 		}
 		iter = null;

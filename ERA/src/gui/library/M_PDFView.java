@@ -219,7 +219,7 @@ public class M_PDFView extends javax.swing.JPanel {
 
     private ByteBuffer readPDFFile() {
       
-        Tuple2<Integer, Integer> langRef = Controller.LICENSE_LANG_REFS.get(Settings.getInstance().getLang());
+        Long langRef = Controller.LICENSE_LANG_REFS.get(Settings.getInstance().getLang());
         if (langRef == null)
             langRef = Controller.LICENSE_LANG_REFS.get("en");
         Transaction record = DCSet.getInstance().getTransactionFinalMap().get(langRef);

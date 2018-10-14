@@ -106,7 +106,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
             //Block block = data.getB();
             if (block == null) {
                 //this.blocks.rescan();
-                //data = this.blocks.get(row);
+                //data = this.blocks.getBySignature(row);
                 //	return -1;
             } else {
                 //block.calcHeadMind(dcSet);

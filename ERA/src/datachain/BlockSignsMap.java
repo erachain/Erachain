@@ -22,7 +22,7 @@ public class BlockSignsMap extends DCMap<byte[], Integer> {
         super(databaseSet, database);
 
         //this.fullWeightVar = database.getAtomicLong("fullWeight");
-        //this.fullWeight = this.fullWeightVar.get();
+        //this.fullWeight = this.fullWeightVar.getBySignature();
         //if (this.fullWeight == null)
         //	this.fullWeight = 0L;
 
@@ -120,7 +120,7 @@ public class BlockSignsMap extends DCMap<byte[], Integer> {
 	private int getWeight(Block block)
 	{
 		if (this.contains(block.getSignature()))
-			return this.get(block.getSignature()).b;
+			return this.getBySignature(block.getSignature()).b;
 		return 0;
 	}
 	 */
@@ -132,7 +132,7 @@ public class BlockSignsMap extends DCMap<byte[], Integer> {
 		Iterator<byte[]> iterator = this.getIterator(0, true);
 		while (iterator.hasNext()) {
 			byte[] key = iterator.next();
-			Tuple2<Integer, Integer> hw = this.get(key);
+			Tuple2<Integer, Integer> hw = this.getBySignature(key);
 			weightFull += hw.b;
 		}
 
@@ -147,7 +147,7 @@ public class BlockSignsMap extends DCMap<byte[], Integer> {
 	{
 		if (this.contains(key)) {
 			// sub old value from FULL
-			Tuple2<Integer, Integer> value_old = this.get(key);
+			Tuple2<Integer, Integer> value_old = this.getBySignature(key);
 			fullWeight -= value_old.b;
 		}
 
@@ -172,7 +172,7 @@ public class BlockSignsMap extends DCMap<byte[], Integer> {
 	{
 		if (this.contains(key)) {
 			// sub old value from FULL
-			Tuple2<Integer, Integer> value_old = this.get(key);
+			Tuple2<Integer, Integer> value_old = this.getBySignature(key);
 			fullWeight -= value_old.b;
 
 			if(this.fullWeightVar != null)

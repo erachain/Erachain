@@ -422,7 +422,7 @@ public class R_Hashes extends Transaction {
 		} else {
 			blockIndex = block.getHeight(dcSet);
 			if (blockIndex < 1 ) {
-				// if block not is confirmed - get last block + 1
+				// if block not is confirmed - getBySignature last block + 1
 				blockIndex = dcSet.getBlocksHeadMap().last().getHeight(dcSet) + 1;
 			}			
 			transactionIndex = block.getTransactionSeq(signature);

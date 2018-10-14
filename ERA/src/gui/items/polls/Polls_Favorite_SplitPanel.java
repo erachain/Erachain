@@ -28,7 +28,7 @@ public class Polls_Favorite_SplitPanel extends Item_SplitPanel {
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 DCSet db = DCSet.getInstance();
-                Transaction trans = db.getTransactionFinalMap().getTransaction(((TemplateCls) th.item_Menu).getReference());
+                Transaction trans = db.getTransactionFinalMap().getBySignature(((TemplateCls) th.item_Menu).getReference());
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo(db));
 
             }

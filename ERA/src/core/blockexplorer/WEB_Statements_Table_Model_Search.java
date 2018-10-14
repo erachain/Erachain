@@ -192,7 +192,7 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
                 return null;
             }
 
-            // Transaction transaction = (R_SignNote)this.transactions.get(row);
+            // Transaction transaction = (R_SignNote)this.transactions.getBySignature(row);
 
             R_SignNote record = (R_SignNote) this.transactions.get(row);
 

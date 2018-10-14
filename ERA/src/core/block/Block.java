@@ -576,7 +576,7 @@ public class Block {
             return 1;
 
         if (heightBlock < 1) {
-            Integer item = db.getBlockSignsMap().get(this.signature);
+            Integer item = db.getBlockSignsMap().getBySignature(this.signature);
             if (item == null) {
                 heightBlock = -1;
             } else {
@@ -1395,7 +1395,7 @@ public class Block {
                         timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
                     }
 
-                    Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(this.heightBlock, seq);
+                    Long key = Transaction.makeDBRef(this.heightBlock, seq);
 
                     if (cnt.isOnStopping())
                         return false;
@@ -1419,7 +1419,7 @@ public class Block {
                     // for some TRANSACTIONs need add to FINAM MAP etc.
                     // R_SertifyPubKeys - in same BLOCK with IssuePersonRecord
 
-                    Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(this.heightBlock, seq);
+                    Long key = Transaction.makeDBRef(this.heightBlock, seq);
 
                     finalMap.set(key, transaction);
                     transFinalMapSinds.set(transactionSignature, key);
@@ -1669,7 +1669,7 @@ public class Block {
                 unconfirmedMap.delete(transactionSignature);
                 timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
 
-                Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(this.heightBlock, seq);
+                Long key = Transaction.makeDBRef(this.heightBlock, seq);
 
                 if (cnt.isOnStopping())
                     throw new Exception("on stoping");
@@ -1806,7 +1806,8 @@ public class Block {
             //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
             unconfirmedMap.add(transaction);
 
-            Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(height, seqNo);
+            Long key = Transaction.makeDBRef(height, seqNo);
+
             finalMap.delete(key);
             transFinalMapSinds.delete(transaction.getSignature());
             List<byte[]> signatures = transaction.getSignatures();

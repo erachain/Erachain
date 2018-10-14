@@ -41,7 +41,7 @@ public class API_Trade {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
-        help.put("apitrade/get?have={have}&want={want}&timestamp={timestamp}&limit={limit}",
+        help.put("apitrade/getBySignature?have={have}&want={want}&timestamp={timestamp}&limit={limit}",
                 "Get data by trade. Have= Want=, "
                         + "limit is count record. The number of transactions is limited by input param.");
         help.put("apitrade/orders?have={have}&want={want}&limit={limit}",
@@ -66,8 +66,8 @@ public class API_Trade {
      */
 
     @GET
-    @Path("get")
-    // apitrade/get?have=1&want=2&timestamp=3&limit=4
+    @Path("getBySignature")
+    // apitrade/getBySignature?have=1&want=2&timestamp=3&limit=4
     public Response getTradeByAccount(@QueryParam("have") Long have, @QueryParam("want") Long want,
                                       @QueryParam("timestamp") Long timestamp, @DefaultValue("20") @QueryParam("limit") Long limit) {
 

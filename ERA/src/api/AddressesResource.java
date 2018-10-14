@@ -415,7 +415,7 @@ public class AddressesResource {
 
     }
 
-    ///  get addresses/assetbalance/1/7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC
+    ///  getBySignature addresses/assetbalance/1/7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC
     @GET
     @Path("assetbalance/{assetid}/{address}")
     public String getAssetBalance(@PathParam("assetid") String assetid,

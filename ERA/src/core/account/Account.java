@@ -259,7 +259,7 @@ public class Account {
      * this.getBalance(key, DBSet.getInstance()); } public BigDecimal
      * getBalance(long key, DBSet db) { int type = 1; // OWN if (key < 0) { type
      * = 2; // RENT key = -key; } Tuple3<BigDecimal, BigDecimal, BigDecimal>
-     * balance = db.getAssetBalanceMap().get(getAddress(), key);
+     * balance = db.getAssetBalanceMap().getBySignature(getAddress(), key);
      *
      * if (type == 1) return balance.a; else if (type == 2) return balance.b;
      * else return balance.c; }
@@ -284,7 +284,7 @@ public class Account {
      * int type = 1; if (key < 0) { key = -key; type = 2; }
      *
      * Tuple3<BigDecimal, BigDecimal, BigDecimal> value =
-     * db.getAssetBalanceMap().get(getAddress(), key); //UPDATE BALANCE IN DB if
+     * db.getAssetBalanceMap().getBySignature(getAddress(), key); //UPDATE BALANCE IN DB if
      * (type == 1) { value = new Tuple3<BigDecimal, BigDecimal,
      * BigDecimal>(balance, value.b, value.c); } else { // SET RENT balance
      * value = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(value.a, balance,
@@ -312,7 +312,7 @@ public class Account {
      * public BigDecimal getConfirmedBalance() { return
      * this.getConfirmedBalance(DBSet.getInstance()); } public BigDecimal
      * getConfirmedBalance(DBSet db) { return
-     * db.getAssetBalanceMap().get(getAddress(), Transaction.FEE_KEY); }
+     * db.getAssetBalanceMap().getBySignature(getAddress(), Transaction.FEE_KEY); }
      */
     public BigDecimal getBalanceUSE(long key) {
         return this.getBalanceUSE(key, DCSet.getInstance());
@@ -886,7 +886,7 @@ public class Account {
         // TEST TIME and EXPIRE TIME
         long current_time = Controller.getInstance().getBlockChain().getTimestamp(forHeight);
 
-        // get person
+        // getBySignature person
         Long personKey = addressDuration.a;
         PersonCls person = (PersonCls) Controller.getInstance().getItem(dcSet, ItemCls.PERSON_TYPE, personKey);
 

@@ -215,8 +215,8 @@ public class Autolink {
             //
             // Method: Whenever possible, we actually emit HTML that contains expanded_url, and use
             // font-size:0 to hide those parts that should not be displayed (because they are not part of display_url).
-            // Elements with font-size:0 get copied even though they are not visible.
-            // Template that display:none doesn't work here. Elements with display:none don't get copied.
+            // Elements with font-size:0 getBySignature copied even though they are not visible.
+            // Template that display:none doesn't work here. Elements with display:none don't getBySignature copied.
             //
             // Additionally, we want to *display* ellipses, but we don't want them copied.  To make this happen we
             // wrap the ellipses in a tco-ellipsis class and provide an onCopy handler that sets display:none on
@@ -224,23 +224,23 @@ public class Autolink {
             //
             // As an example: The user tweets "hi http://longdomainname.com/foo"
             // This gets shortened to "hi http://t.co/xyzabc", with display_url = "…nname.com/foo"
-            // This will get rendered as:
-            // <span class='tco-ellipsis'> <!-- This stuff should get displayed but not copied -->
+            // This will getBySignature rendered as:
+            // <span class='tco-ellipsis'> <!-- This stuff should getBySignature displayed but not copied -->
             //   …
             //   <!-- There's a chance the onCopy event handler might not fire. In case that happens,
             //        we include an &nbsp; here so that the … doesn't bump up against the URL and ruin it.
             //        The &nbsp; is inside the tco-ellipsis span so that when the onCopy handler *does*
-            //        fire, it doesn't get copied.  Otherwise the copied text would have two spaces in a row,
+            //        fire, it doesn't getBySignature copied.  Otherwise the copied text would have two spaces in a row,
             //        e.g. "hi  http://longdomainname.com/foo".
             //   <span style='font-size:0'>&nbsp;</span>
             // </span>
-            // <span style='font-size:0'>  <!-- This stuff should get copied but not displayed -->
+            // <span style='font-size:0'>  <!-- This stuff should getBySignature copied but not displayed -->
             //   http://longdomai
             // </span>
-            // <span class='js-display-url'> <!-- This stuff should get displayed *and* copied -->
+            // <span class='js-display-url'> <!-- This stuff should getBySignature displayed *and* copied -->
             //   nname.com/foo
             // </span>
-            // <span class='tco-ellipsis'> <!-- This stuff should get displayed but not copied -->
+            // <span class='tco-ellipsis'> <!-- This stuff should getBySignature displayed but not copied -->
             //   <span style='font-size:0'>&nbsp;</span>
             //   …
             // </span>

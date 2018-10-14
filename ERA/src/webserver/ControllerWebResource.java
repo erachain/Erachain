@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Used to get wallet specific information using pebble (read only)
+ * Used to getBySignature wallet specific information using pebble (read only)
  *
  * @author Skerberus
  */

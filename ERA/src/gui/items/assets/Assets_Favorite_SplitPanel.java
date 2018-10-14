@@ -48,7 +48,7 @@ public class Assets_Favorite_SplitPanel extends Item_SplitPanel {
             public void actionPerformed(ActionEvent e) {
                 DCSet db = DCSet.getInstance();
                 Transaction trans = db.getTransactionFinalMap()
-                        .getTransaction(((AssetCls) th.item_Menu).getReference());
+                        .getBySignature(((AssetCls) th.item_Menu).getReference());
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo(db));
 
             }

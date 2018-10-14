@@ -108,11 +108,11 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
 			return null;
 		}
 		
-		Peer peer = peers.get(row);
+		Peer peer = peers.getBySignature(row);
 		if  (peer == null)
 			return null;
 
-		Boolean peerStatus = peersStatus.get(row);
+		Boolean peerStatus = peersStatus.getBySignature(row);
 		if  (peerStatus == null)
 			return null;
 
@@ -208,7 +208,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
         ObserverMessage message = (ObserverMessage) arg;
 
         if (message.getType() == ObserverMessage.LIST_PEER_TYPE) {
-            //(JTable)this.get
+            //(JTable)this.getBySignature
             //component.setRowSelectionInterval(row, row);
 
             List<Peer> peersBuff = (List<Peer>) message.getValue();

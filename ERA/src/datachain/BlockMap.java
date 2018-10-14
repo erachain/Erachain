@@ -46,7 +46,7 @@ public class BlockMap extends DCMap<Integer, Block> {
         super(databaseSet, database);
 
         //this.atomicKey = database.getAtomicInteger("block_map" + "_key");
-        //this.key = this.atomicKey.get();
+        //this.key = this.atomicKey.getBySignature();
 
         if (databaseSet.isWithObserver()) {
             // this.observableData.put(DBMap.NOTIFY_RESET,
@@ -62,15 +62,15 @@ public class BlockMap extends DCMap<Integer, Block> {
         }
 
         // LAST BLOCK
-        //if (database.getCatalog().get(("lastBlock" + ".type")) == null) {
+        //if (database.getCatalog().getBySignature(("lastBlock" + ".type")) == null) {
         //	database.createAtomicVar("lastBlock", new byte[0], null);
         //}
         // this.lastBlockVar = database.getAtomicVar("lastBlock");
-        // this.lastBlockSignature = this.lastBlockVar.get();
+        // this.lastBlockSignature = this.lastBlockVar.getBySignature();
 
         // POOL FEE
         // this.feePoolVar = database.getAtomicVar("feePool");
-        // this.feePool = this.feePoolVar.get();
+        // this.feePool = this.feePoolVar.getBySignature();
 
         // PROCESSING
         this.processingVar = database.getAtomicBoolean("processingBlock");
@@ -169,7 +169,7 @@ public class BlockMap extends DCMap<Integer, Block> {
     }
 
     public Block last() {
-        // return this.get(this.getLastBlockSignature());
+        // return this.getBySignature(this.getLastBlockSignature());
         return this.get(this.size());
     }
 
@@ -262,7 +262,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 			Iterator<Integer> iterator = this.getIterator(0, true);
 			while (iterator.hasNext()) {
 				Integer key = iterator.next();
-				Block itemBlock = this.get(key);
+				Block itemBlock = this.getBySignature(key);
 				byte[] pkb = itemBlock.getCreator().getPublicKey();
 				PublicKeyAccount pk = new PublicKeyAccount(pkb);
 				if (((Account)pk).equals("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")) {

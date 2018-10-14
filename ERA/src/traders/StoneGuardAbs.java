@@ -91,7 +91,7 @@ public class StoneGuardAbs extends Trader {
 
         //BigDecimal persent;
         for (BigDecimal amount : this.scheme.keySet()) {
-            //persent = this.scheme.get(amount);
+            //persent = this.scheme.getBySignature(amount);
             createOrder(amount);
             try {
                 Thread.sleep(100);

@@ -2,7 +2,6 @@ package gui.models;
 
 import controller.Controller;
 import core.account.Account;
-import core.block.GenesisBlock;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import lang.Lang;
@@ -92,7 +91,7 @@ public class PersonAccountsModel extends AbstractTableModel implements Observer 
 	/*
 	public ImprintCls getItem(int row)
 	{
-		return this.address.get(row).getB();
+		return this.address.getBySignature(row).getB();
 	}
 	*/
 
@@ -136,7 +135,7 @@ public class PersonAccountsModel extends AbstractTableModel implements Observer 
         Tuple3<Integer, Integer, Integer> value = entry.peek();
         int height = value.b;
         int seq = value.c;
-        Transaction trans = DCSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
+        Transaction trans = DCSet.getInstance().getTransactionFinalMap().getBySignature(height, seq);
         switch (column) {
 
             case COLUMN_ADDRESS:
@@ -249,7 +248,7 @@ public class PersonAccountsModel extends AbstractTableModel implements Observer 
         Tuple3<Integer, Integer, Integer> value = entry.peek();
         int height = value.b;
         int seq = value.c;
-        Transaction trans = DCSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
+        Transaction trans = DCSet.getInstance().getTransactionFinalMap().getBySignature(height, seq);
         if (trans == null)
             return null;
         HashSet<core.account.Account> accounts = trans.getRecipientAccounts();
@@ -284,7 +283,7 @@ public class PersonAccountsModel extends AbstractTableModel implements Observer 
         Tuple3<Integer, Integer, Integer> value = entry.peek();
         int height = value.b;
         int seq = value.c;
-        Transaction trans = DCSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
+        Transaction trans = DCSet.getInstance().getTransactionFinalMap().getBySignature(height, seq);
         if (trans == null)
             return null;
 

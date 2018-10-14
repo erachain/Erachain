@@ -1,7 +1,6 @@
 package core.blockexplorer;
 
 import controller.Controller;
-import core.account.Account;
 import core.crypto.Base58;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
@@ -376,7 +375,7 @@ public class WEB_Transactions_HTML {
         // TODO Auto-generated method stub
         String out = "";
         R_Vouch vouchRecord = (R_Vouch) transaction;
-        Transaction record = DCSet.getInstance().getTransactionFinalMap().getTransaction(vouchRecord.getVouchHeight(),
+        Transaction record = DCSet.getInstance().getTransactionFinalMap().getBySignature(vouchRecord.getVouchHeight(),
                 vouchRecord.getVouchSeqNo());
 		/*out += "<b>" + Lang.getInstance().translate_from_langObj("height-seq.", langObj) + ":</b> <a href=?tx="
 				+  Base58.encode(record.getSignature()) + get_Lang(langObj) + ">" + vouchRecord.getVouchHeight() + "-"

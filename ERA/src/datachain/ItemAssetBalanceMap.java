@@ -160,9 +160,9 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple5<
     }
 
 	/*
-	public BigDecimal get(String address)
+	public BigDecimal getBySignature(String address)
 	{
-		return this.get(address, FEE_KEY);
+		return this.getBySignature(address, FEE_KEY);
 	}
 	 */
 

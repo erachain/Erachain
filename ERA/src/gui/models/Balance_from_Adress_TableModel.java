@@ -159,7 +159,7 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 
             //case COLUMN_D:
 
-            //return NumberAsString.formatAsString(table_balance.get(row).getB().getB().d.b);
+            //return NumberAsString.formatAsString(table_balance.getBySignature(row).getB().getB().d.b);
 
             case COLUMN_ASSET_NAME:
 

@@ -4,7 +4,7 @@ package datachain;
 import org.mapdb.DB;
 import utils.ObserverMessage;
 
-// Person has Status of Union - person Ermolaev get Director status in Polza union
+// Person has Status of Union - person Ermolaev getBySignature Director status in Polza union
 public class KK_KPersonStatusUnionMap extends KK_K_Map {
 
     public KK_KPersonStatusUnionMap(DCSet databaseSet, DB database) {

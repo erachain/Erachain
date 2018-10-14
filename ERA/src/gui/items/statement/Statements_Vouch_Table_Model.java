@@ -164,7 +164,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
             transactions.clear();
             for (Tuple2<Integer, Integer> ttx : ttxs) {
                 // write R-Vouch transaction
-                transactions.add((R_Vouch) DCSet.getInstance().getTransactionFinalMap().getTransaction(ttx.a, ttx.b));
+                transactions.add((R_Vouch) DCSet.getInstance().getTransactionFinalMap().getBySignature(ttx.a, ttx.b));
 
             }
             fireTableDataChanged();

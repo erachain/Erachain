@@ -119,7 +119,7 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
 
     }
 
-    // get list items in name substring str
+    // getBySignature list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<ItemCls> get_By_Name(String str, boolean caseCharacter) {
         List<ItemCls> txs = new ArrayList<>();

@@ -73,7 +73,7 @@ public class License_JFrame1 extends JDialog {
     
     public String getLicenseText() {
         
-        Tuple2<Integer, Integer> langRef = Controller.LICENSE_LANG_REFS.get(Settings.getInstance().getLang());
+        Long langRef = Controller.LICENSE_LANG_REFS.get(Settings.getInstance().getLang());
         if (langRef == null)
             langRef = Controller.LICENSE_LANG_REFS.get("en");
         
