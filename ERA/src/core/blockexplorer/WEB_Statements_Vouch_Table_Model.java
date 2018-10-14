@@ -197,13 +197,13 @@ public class WEB_Statements_Vouch_Table_Model extends AbstractTableModel impleme
 
         /*
          * Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs =
-         * DBSet.getInstance().getVouchRecordMap().get(blockNo, recNo);
+         * DBSet.getInstance().getVouchRecordMap().getBySignature(blockNo, recNo);
          *
          *
          * if (signs == null) return null; for(Tuple2<Integer, Integer> seq:
          * signs.b) {
          *
-         * Transaction kk = table.getTransaction(seq.a, seq.b); if
+         * Transaction kk = table.getBySignature(seq.a, seq.b); if
          * (!tran.contains(kk)) tran.add(kk); }
          */
 
@@ -224,7 +224,7 @@ public class WEB_Statements_Vouch_Table_Model extends AbstractTableModel impleme
                     Integer bl = ll.a;
                     Integer seg = ll.b;
 
-                    Transaction kk = table.getTransaction(bl, seg);
+                    Transaction kk = table.getBySignature(bl, seg);
                     if (!tran.contains(kk))
                         tran.add(kk);
                 }

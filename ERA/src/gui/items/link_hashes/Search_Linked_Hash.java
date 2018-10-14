@@ -80,7 +80,7 @@ public class Search_Linked_Hash extends Split_Panel {
                 if (item_Table_Selected == null)
                     return;
 
-                Transaction tr = DCSet.getInstance().getTransactionFinalMap().getTransaction(item_Table_Selected.b, item_Table_Selected.c);
+                Transaction tr = DCSet.getInstance().getTransactionFinalMap().getBySignature(item_Table_Selected.b, item_Table_Selected.c);
 
                 jScrollPane_jPanel_RightPanel.setViewportView(new Rec_DetailsFrame(tr));
                 item_Table_Selected = null;

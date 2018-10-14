@@ -378,7 +378,7 @@ public abstract class AT_Controller {
             String atId = Base58.encode(at.getId());
             Account account = new Account(atId);
             LOGGER.trace("AT : " + account.getAddress() + " total balance: " + account.getBalance(dcSet, Transaction.FEE_KEY));
-            //atLastState.put( atId ,  tempAtStates.get( atId ) );
+            //atLastState.put( atId ,  tempAtStates.getBySignature( atId ) );
             dcSet.getATMap().update(at, blockHeight);
             dcSet.getATStateMap().addOrUpdate(blockHeight, at.getId(), at.getState());
 

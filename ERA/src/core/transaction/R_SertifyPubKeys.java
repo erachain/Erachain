@@ -544,7 +544,7 @@ public class R_SertifyPubKeys extends Transaction {
         } else {
             blockIndex = block.getHeight();
             if (blockIndex < 1) {
-                // if block not is confirmed - get last block + 1
+                // if block not is confirmed - getBySignature last block + 1
                 blockIndex = db.getBlockMap().last().getHeight() + 1;
             }
             //transactionIndex = this.getSeqNo(db);
@@ -571,7 +571,7 @@ public class R_SertifyPubKeys extends Transaction {
             // FIND person
             ItemCls person = db.getItemPersonMap().get(this.key);
             // FIND issue record
-            Transaction transPersonIssue = db.getTransactionFinalMap().getTransaction(person.getReference());
+            Transaction transPersonIssue = db.getTransactionFinalMap().getBySignature(person.getReference());
             // GIVE GIFT for ISSUER
             Account issuer = transPersonIssue.getCreator();
 
@@ -655,7 +655,7 @@ public class R_SertifyPubKeys extends Transaction {
 		Tuple5<Long, Long, byte[], Integer, Integer> psItem = db.getPersonStatusMap().getItem(this.key, StatusCls.ALIVE_KEY);
 		if (psItem == null) {
 			// ADD ALIVE STATUS to PERSON for permanent TO_DATE
-			PersonCls person = (PersonCls)db.getItemPersonMap().get(this.key);
+			PersonCls person = (PersonCls)db.getItemPersonMap().getBySignature(this.key);
 			db.getPersonStatusMap().addItem(this.key, StatusCls.ALIVE_KEY,
 					new Tuple5<Long, Long, byte[], Integer, Integer>(
 							person.getBirthday(), Long.MAX_VALUE,
@@ -716,7 +716,7 @@ public class R_SertifyPubKeys extends Transaction {
             // FIND person
             ItemCls person = db.getItemPersonMap().get(this.key);
             // FIND issue record
-            Transaction transPersonIssue = db.getTransactionFinalMap().getTransaction(person.getReference());
+            Transaction transPersonIssue = db.getTransactionFinalMap().getBySignature(person.getReference());
             Account issuer = transPersonIssue.getCreator();
 
             // EMITTE LIA

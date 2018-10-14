@@ -176,7 +176,7 @@ abstract class Resolver {
         Object[] mapValues = buildCollection(stack, items, size);
 
         // Save these for later so that unresolved references inside keys or values
-        // get patched first, and then build the Maps.
+        // getBySignature patched first, and then build the Maps.
         prettyMaps.add(new Object[]{jsonObj, mapKeys, mapValues});
     }
 
@@ -193,7 +193,7 @@ abstract class Resolver {
      * @param clazz   Instance will be create of this class.
      * @param jsonObj Map-of-Map representation of object to create.
      * @return a new Java object of the appropriate type (clazz) using the jsonObj to provide
-     * enough hints to get the right class instantiated.  It is not populated when returned.
+     * enough hints to getBySignature the right class instantiated.  It is not populated when returned.
      */
     protected Object createJavaObjectInstance(Class clazz, JsonObject jsonObj) {
         final boolean useMapsLocal = useMaps;

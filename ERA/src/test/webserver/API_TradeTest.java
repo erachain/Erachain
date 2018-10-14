@@ -11,7 +11,7 @@ import api.ApiClient;
 public class API_TradeTest extends SettingTests {
 
     /**
-     * Test on get documentation by API inside project
+     * Test on getBySignature documentation by API inside project
      */
     @Test
     public void Default() {
@@ -29,10 +29,10 @@ public class API_TradeTest extends SettingTests {
     public void RemoteDefault() throws Exception {
 
         CallRemoteApi RemoteAPI = new CallRemoteApi();
-        String resultStatus = RemoteAPI.ResponseCodeAPI(SettingTests.URL_REMOTE_NODE_API + "/api", "get");
+        String resultStatus = RemoteAPI.ResponseCodeAPI(SettingTests.URL_REMOTE_NODE_API + "/api", "getBySignature");
         Assert.assertEquals(Integer.parseInt(resultStatus), 200);
 
-        String resultValue = RemoteAPI.ResponseValueAPI(SettingTests.URL_REMOTE_NODE_API + "/api", "get", "");
+        String resultValue = RemoteAPI.ResponseValueAPI(SettingTests.URL_REMOTE_NODE_API + "/api", "getBySignature", "");
         Assert.assertNotNull(resultValue);
         Assert.assertNotEquals(resultValue, "");
 

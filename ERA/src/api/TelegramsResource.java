@@ -198,8 +198,8 @@ public class TelegramsResource {
     }
 
     @GET
-    @Path("get/{signature}")
-    // GET telegrams/get/6kdJgbiTxtqFt2zQDz9Lb29Z11Fa1TSwfZvjU21j6Cn9umSUEK4jXmNU19Ww4RcXpFyQiJTCaSz6Lc5YKn26hsR
+    @Path("getBySignature/{signature}")
+    // GET telegrams/getBySignature/6kdJgbiTxtqFt2zQDz9Lb29Z11Fa1TSwfZvjU21j6Cn9umSUEK4jXmNU19Ww4RcXpFyQiJTCaSz6Lc5YKn26hsR
     public String getTelegramBySignature(@PathParam("signature") String signature,
                                          @QueryParam("decrypt") boolean decrypt,
                                          @QueryParam("password") String password) {

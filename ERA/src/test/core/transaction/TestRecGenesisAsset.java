@@ -202,7 +202,7 @@ public class TestRecGenesisAsset {
         assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true, false), asset.toBytes(true, false)));
 
         //CHECK ASSET BALANCE SENDER - null
-        //assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).compareTo(new BigDecimal(asset.getQuantity())) == 0);
+        //assertEquals(true, db.getAssetBalanceMap().getBySignature(maker.getAddress(), key).compareTo(new BigDecimal(asset.getQuantity())) == 0);
 
         //CHECK REFERENCE SENDER - null
         //assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getSignature(), maker.getLastReference(db)));

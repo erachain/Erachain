@@ -404,7 +404,7 @@ public abstract class Transaction {
     }
 
     public static Transaction findByHeightSeqNo(DCSet db, int height, int seq) {
-        return db.getTransactionFinalMap().getTransaction(height, seq);
+        return db.getTransactionFinalMap().getBySignature(height, seq);
     }
 
 
@@ -414,7 +414,7 @@ public abstract class Transaction {
         if (dbRef == null)
             return null;
 
-        Tuple2<Integer, Integer> key;
+        Long key;
         if (dbRef.length > 20) {
             // soft or hard confirmations
             key = db.getTransactionFinalMapSigns().get(dbRef);
@@ -422,9 +422,11 @@ public abstract class Transaction {
                 return db.getTransactionMap().get(dbRef);
             }
         } else {
-            int blockHeight = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 0, 4));
+            int heightBlock = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 0, 4));
             int seqNo = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 4, 8));
-            key = new Tuple2<Integer, Integer>(blockHeight, seqNo);
+            //key = new Tuple2<Integer, Integer>(blockHeight, seqNo);
+            key = Transaction.makeDBRef(heightBlock, seqNo);
+
         }
 
         return db.getTransactionFinalMap().get(key);
@@ -514,13 +516,14 @@ public abstract class Transaction {
     public void setDC_HeightSeq(DCSet dcSet) {
         this.dcSet = dcSet;
 
-        Tuple2<Integer, Integer> dbRef2 = dcSet.getTransactionFinalMapSigns().get(this.signature);
+        Long dbRef2 = dcSet.getTransactionFinalMapSigns().get(this.signature);
         if (dbRef2 == null)
             return;
 
-        this.dbRef = Transaction.makeDBRef(dbRef2);
-        this.height = dbRef2.a;
-        this.seqNo = dbRef2.b;
+        this.dbRef = dbRef2;
+        Tuple2<Integer, Integer> pair = Transaction.parseDBRef(dbRef2);
+        this.height = pair.a;
+        this.seqNo = pair.b;
     }
 
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
@@ -669,7 +672,7 @@ public abstract class Transaction {
         /// if (this.getBlockHeightByParent(db))
         // TODO FEE_FOR_ANONIMOUSE + is PERSON + DB
         int anonimous = 0;
-        // TODO DBSet get from CHAIN
+        // TODO DBSet getBySignature from CHAIN
         /*
          * Controller cnt = Controller.getInstance(); BlockChain bchain =
          * cnt.getBlockChain(); for ( Account acc : this.getRecipientAccounts())
@@ -696,7 +699,7 @@ public abstract class Transaction {
 
     }
 
-    // get fee
+    // getBySignature fee
     public long calcBaseFee() {
         return calcCommonFee();
     }
@@ -743,13 +746,16 @@ public abstract class Transaction {
         if (this.block != null)
             return block;
 
-        // block =
-        // db.getTransactionRef_BlockRef_Map().getParent(this.signature);
-        Tuple2<Integer, Integer> blockHeightSeqNo = db.getTransactionFinalMapSigns().get(this.signature);
-        if (blockHeightSeqNo == null)
-            return null;
+        if (this.height <= 0) {
+            Long key = db.getTransactionFinalMapSigns().get(this.signature);
+            if (key == null)
+                return null;
 
-        this.block = db.getBlockMap().get(blockHeightSeqNo.a);
+            Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+            this.height = pair.a;
+        }
+
+        this.block = db.getBlockMap().get(this.height);
 
         return block;
     }
@@ -787,7 +793,7 @@ public abstract class Transaction {
     }
 
     /*
-    // get current or -1
+    // getBySignature current or -1
     public int getBlockHeightByParent(DCSet db) {
 
         if (block != null)
@@ -797,7 +803,7 @@ public abstract class Transaction {
     }
     */
 
-    // get current or last
+    // getBySignature current or last
     public int getBlockHeightByParentOrLast(DCSet dc) {
 
         if (block != null)
@@ -1239,7 +1245,7 @@ public abstract class Transaction {
         // CREATOR is PERSON
         // FIND person
         ItemCls person = this.dcSet.getItemPersonMap().get(personDuration.a);
-        Tuple2<Integer, Integer> inviteredDBRef = this.dcSet.getTransactionFinalMapSigns().get(person.getReference());
+        Long inviteredDBRef = this.dcSet.getTransactionFinalMapSigns().get(person.getReference());
 
         Transaction issueRecord = this.dcSet.getTransactionFinalMap().get(inviteredDBRef);
         Account inviterAccount = issueRecord.getCreator();

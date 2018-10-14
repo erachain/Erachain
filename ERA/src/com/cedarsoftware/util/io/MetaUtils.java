@@ -585,7 +585,7 @@ public class MetaUtils {
      * Return an Object[] of instance values that can be passed into a given Constructor.  This method
      * will return an array of nulls if useNull is true, otherwise it will return sensible values for
      * primitive classes, and null for non-known primitive / primitive wrappers.  This class is used
-     * when attempting to call constructors on Java objects to get them instantiated, since there is no
+     * when attempting to call constructors on Java objects to getBySignature them instantiated, since there is no
      * 'malloc' in Java.
      */
     static Object[] fillArgs(Class[] argTypes, boolean useNull) {

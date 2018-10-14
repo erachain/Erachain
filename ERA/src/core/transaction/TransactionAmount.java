@@ -457,7 +457,7 @@ public abstract class TransactionAmount extends Transaction {
                     return INVALID_TRANSFER_TYPE;
                 }
                 
-                // AssetCls asset = (AssetCls)dcSet.getItemAssetMap().get(absKey);
+                // AssetCls asset = (AssetCls)dcSet.getItemAssetMap().getBySignature(absKey);
                 if (asset == null) {
                     return ITEM_ASSET_NOT_EXIST;
                 }
@@ -975,7 +975,7 @@ public abstract class TransactionAmount extends Transaction {
             // update last forging block if it not exist
             // if exist - it not need - incomes will be negate from forging
             // balance
-            // get height by LAST block in CHAIN + 2 - skip incoming BLOCK
+            // getBySignature height by LAST block in CHAIN + 2 - skip incoming BLOCK
             
             Tuple2<Integer, Integer> privousForgingPoint = this.recipient.getLastForgingData(db);
             int currentForgingBalance = recipient.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();

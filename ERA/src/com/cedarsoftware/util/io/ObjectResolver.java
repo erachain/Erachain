@@ -193,7 +193,7 @@ public class ObjectResolver extends Resolver {
     /**
      * Given the passed in Type t, return the raw type of it, if the passed in value is a ParameterizedType.
      *
-     * @param t Type to attempt to get raw type from.
+     * @param t Type to attempt to getBySignature raw type from.
      * @return Raw type obtained from the passed in parameterized type or null if T is not a ParameterizedType
      */
     public static Class getRawType(final Type t) {

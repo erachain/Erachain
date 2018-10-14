@@ -15,7 +15,7 @@ TreeMap<Long, // item2 Key <-- STATUS
 		byte[], // any additional data
 		
 		Integer, // block.getHeight() -> db.getBlocksHeadMap(db.getHeightMap().getBlockByHeight(index))
-		Integer // block.getTransaction(transaction.getSignature()) -> block.getTransaction(index)
+		Integer // block.getBySignature(transaction.getSignature()) -> block.getBySignature(index)
 	>>>>
 {
 */

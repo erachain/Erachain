@@ -147,7 +147,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
         // {
         // return null;
         // }
-        // Transaction r_Tran = this.r_Trans.get(row);
+        // Transaction r_Tran = this.r_Trans.getBySignature(row);
 
 
         if (this.trans_List == null || this.trans_List.length == 0 || sender == null) {

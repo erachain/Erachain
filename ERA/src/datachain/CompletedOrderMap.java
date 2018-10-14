@@ -87,9 +87,9 @@ public class CompletedOrderMap extends DCMap<Long, Order> {
     /*
     @Override
     public Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> get(Long key) {
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getBySignature(Long key) {
         Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = super.get(key);
+                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = super.getBySignature(key);
         ///return datachain.OrderMap.setExecutable(order, false);
         return order;
     }

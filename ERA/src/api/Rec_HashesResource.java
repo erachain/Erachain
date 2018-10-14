@@ -57,8 +57,8 @@ public class Rec_HashesResource {
 
 			/*
 			String isTextMessageString = (String) jsonObject
-					.get("istext");
-			String encryptString = (String) jsonObject.get("encrypt");
+					.getBySignature("istext");
+			String encryptString = (String) jsonObject.getBySignature("encrypt");
 
 			boolean isTextMessage = true;
 			if (isTextMessageString != null) {

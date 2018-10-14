@@ -140,7 +140,7 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
 		}
 
 
-		account = this.publicKeyAccounts.get(row);
+		account = this.publicKeyAccounts.getBySignature(row);
 
 		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance;
 		Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfBalance;

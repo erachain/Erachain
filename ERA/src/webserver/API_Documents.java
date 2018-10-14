@@ -1,24 +1,15 @@
 package webserver;
 
 import api.ApiErrorFactory;
-import com.google.gson.Gson;
-import controller.Controller;
-import core.account.PrivateKeyAccount;
-import core.crypto.Crypto;
 import core.exdata.ExData;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
-import core.voting.Poll;
-import core.voting.PollOption;
 import datachain.DCSet;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple4;
 
-import utils.Pair;
 import utils.StrJSonFine;
 import utils.Zip_Bytes;
 
@@ -33,13 +24,12 @@ import javax.ws.rs.core.Response;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.zip.DataFormatException;
 
 /**
- * Poll class (Create, vote by poll, get poll, )
+ * Poll class (Create, vote by poll, getBySignature poll, )
  */
 @Path("apidocuments")
 @Produces(MediaType.APPLICATION_JSON)
@@ -52,8 +42,8 @@ public class API_Documents {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
-        help.put("apidocuments/getFiles?blockl={block}&txt={transaction}", "get files from transaction");
-        help.put("apidocuments/getFile?blockl={block}&txt={transaction}&name={name]", "get file (name) from transaction");
+        help.put("apidocuments/getFiles?blockl={block}&txt={transaction}", "getBySignature files from transaction");
+        help.put("apidocuments/getFile?blockl={block}&txt={transaction}&name={name]", "getBySignature file (name) from transaction");
                
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -77,7 +67,7 @@ public class API_Documents {
        JSONObject result = new JSONObject();
         try {
             //READ TXT
-           Transaction tx = DCSet.getInstance().getTransactionFinalMap().getTransaction(blockN, txtN);
+           Transaction tx = DCSet.getInstance().getTransactionFinalMap().getBySignature(blockN, txtN);
            if (tx instanceof R_SignNote){
                R_SignNote statement = (R_SignNote)tx; 
                if (statement.getVersion() == 2) {
@@ -141,7 +131,7 @@ public class API_Documents {
        byte[] resultByte = null;
         try {
             //READ TXT
-           Transaction tx = DCSet.getInstance().getTransactionFinalMap().getTransaction(blockN, txtN);
+           Transaction tx = DCSet.getInstance().getTransactionFinalMap().getBySignature(blockN, txtN);
            if (tx instanceof R_SignNote){
                R_SignNote statement = (R_SignNote)tx; 
                if (statement.getVersion() == 2) {

@@ -363,7 +363,7 @@ public class JsonReader implements Closeable {
         return retMap;
     }
 
-    // This method is needed to get around the fact that 'this()' has to be the first method of a constructor.
+    // This method is needed to getBySignature around the fact that 'this()' has to be the first method of a constructor.
     static Map makeArgMap(Map<String, Object> args, boolean useMaps) {
         args.put(USE_MAPS, useMaps);
         return args;
@@ -651,7 +651,7 @@ public class JsonReader implements Closeable {
          */
         class Support {
             /**
-             * Call this method to get an instance of the JsonReader (if needed) inside your custom reader.
+             * Call this method to getBySignature an instance of the JsonReader (if needed) inside your custom reader.
              *
              * @param args Map that was passed to your read(jOb, stack, args) method.
              * @return JsonReader instance

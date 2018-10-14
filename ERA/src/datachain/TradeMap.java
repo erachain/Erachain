@@ -263,7 +263,7 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
 
     @SuppressWarnings("unchecked")
     public List<Trade> getTrades(long haveWant)
-    // get trades for order as HAVE and as WANT
+    // getBySignature trades for order as HAVE and as WANT
     {
 
         String haveKey = String.valueOf(haveWant);

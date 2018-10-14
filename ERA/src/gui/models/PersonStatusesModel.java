@@ -126,7 +126,7 @@ public class PersonStatusesModel extends AbstractTableModel implements Observer 
 				break;
 			}
 		}
-		 Stack<Tuple5<Long, Long, byte[], Integer, Integer>> entry = statuses.get(status_key_value);
+		 Stack<Tuple5<Long, Long, byte[], Integer, Integer>> entry = statuses.getBySignature(status_key_value);
 		if (entry == null || entry.isEmpty() ) return 0;
 		
 		 Tuple5<Long, Long, byte[], Integer, Integer> value = entry.peek();

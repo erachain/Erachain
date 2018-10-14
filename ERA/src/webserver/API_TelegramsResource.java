@@ -39,7 +39,7 @@ public class API_TelegramsResource {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<String, String>();
         help.put("apitelegrams/getbysignature/{signature}", "Get Telegramm by signature");
-        help.put("apitelegrams/get?address={address}&timestamp={timestamp}&filter={filter}",
+        help.put("apitelegrams/getBySignature?address={address}&timestamp={timestamp}&filter={filter}",
                 "Get messages by filter. Filter is title.");
         help.put("apitelegrams/timestamp/{timestamp}?filter={filter}",
                 "Get messages from timestamp with filter. Filter is title.");
@@ -93,7 +93,7 @@ public class API_TelegramsResource {
      */
     @SuppressWarnings("unchecked")
     @GET
-    @Path("get")
+    @Path("getBySignature")
     public Response getTelegramsTimestamp(@QueryParam("address") String address, @QueryParam("timestamp") int timestamp, @QueryParam("filter") String filter) {
 
         // CHECK ADDRESS

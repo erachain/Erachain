@@ -139,9 +139,9 @@ public class _BalanceMap extends DCMap<Tuple2<Long, Long>,
     }
 
 	/*
-	public BigDecimal get(String assence)
+	public BigDecimal getBySignature(String assence)
 	{
-		return this.get(assence, FEE_KEY);
+		return this.getBySignature(assence, FEE_KEY);
 	}
 	 */
 

@@ -59,43 +59,45 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 
         int atTxs = dcSet.getATTransactionMap().getATTransactions(startHeight).size();
 
-        Tuple2<Integer, Integer> tx = dcSet.getTransactionFinalMap().getTransactionsAfterTimestamp(startHeight, (numOfTx > atTxs) ? numOfTx - atTxs : 0, account.getAddress());
+        Long tx = dcSet.getTransactionFinalMap().getTransactionsAfterTimestamp(startHeight, (numOfTx > atTxs) ? numOfTx - atTxs : 0, account.getAddress());
+        Tuple2<Integer, Integer> pair = Transaction.parseDBRef(tx);
 
         if (forkHeight > 0) {
             Tuple2<Integer, Integer> atTxTp = ((ATTransactionMap) dcSet.getATTransactionMap().getParent()).getNextATTransaction(startHeight, numOfTx, account.getAddress());
             int atTxsp = ((ATTransactionMap) dcSet.getATTransactionMap().getParent()).getATTransactions(startHeight).size();
 
-            Tuple2<Integer, Integer> txp = ((TransactionFinalMap) dcSet.getTransactionFinalMap().getParentMap()).getTransactionsAfterTimestamp(startHeight, (numOfTx > atTxs) ? numOfTx - atTxsp : 0, account.getAddress());
-            if (atTxTp != null && (txp == null || atTxTp.a <= txp.a) && atTxTp.a < forkHeight) {
+            Long txp = ((TransactionFinalMap) dcSet.getTransactionFinalMap().getParentMap()).getTransactionsAfterTimestamp(startHeight, (numOfTx > atTxs) ? numOfTx - atTxsp : 0, account.getAddress());
+            Tuple2<Integer, Integer> pairP = Transaction.parseDBRef(txp);
+            if (atTxTp != null && (txp == null || atTxTp.a <= pairP.a) && atTxTp.a < forkHeight) {
                 AT_Transaction atTx = ((ATTransactionMap) dcSet.getATTransactionMap().getParent()).get(atTxTp);
                 if (!atTx.getSender().equalsIgnoreCase(account.getAddress()) && atTx.getRecipient().equalsIgnoreCase(account.getAddress()) && atTx.getAmount() > state.minActivationAmount()) {
                     return AT_API_Helper.getLongTimestamp(atTxTp.a, atTxTp.b + 1);
                 }
 
-            } else if (txp != null && txp.a < forkHeight) {
-                atTxs = ((ATTransactionMap) dcSet.getATTransactionMap().getParent()).getATTransactions(txp.a).size();
+            } else if (txp != null && pairP.a < forkHeight) {
+                atTxs = ((ATTransactionMap) dcSet.getATTransactionMap().getParent()).getATTransactions(pairP.a).size();
                 Transaction transaction = ((TransactionFinalMap) dcSet.getTransactionFinalMap().getParentMap()).get(txp);
 
                 long txAmount = getAmount((Transaction) transaction, new Account(Base58.encode(state.getId())), state.getHeight());
 
                 if (transaction.isInvolved(account) && !transaction.getCreator().getAddress().equals(account.getAddress()) && txAmount >= state.minActivationAmount()) {
-                    return AT_API_Helper.getLongTimestamp(tx.a, tx.b + atTxs);
+                    return AT_API_Helper.getLongTimestamp(pair.a, pair.b + atTxs);
                 }
             }
         }
-        if (atTxT != null && (tx == null || atTxT.a <= tx.a)) {
+        if (atTxT != null && (tx == null || atTxT.a <= pair.a)) {
             AT_Transaction atTx = dcSet.getATTransactionMap().get(atTxT);
             if (!atTx.getSender().equalsIgnoreCase(account.getAddress()) && atTx.getRecipient().equalsIgnoreCase(account.getAddress()) && atTx.getAmount() > state.minActivationAmount()) {
                 return AT_API_Helper.getLongTimestamp(atTxT.a, atTxT.b + 1);
             }
         } else if (tx != null) {
-            atTxs = dcSet.getATTransactionMap().getATTransactions(tx.a).size();
+            atTxs = dcSet.getATTransactionMap().getATTransactions(pair.a).size();
             Transaction transaction = dcSet.getTransactionFinalMap().get(tx);
 
             long txAmount = getAmount(transaction, new Account(Base58.encode(state.getId())), state.getHeight());
 
             if (transaction.isInvolved(account) && !transaction.getCreator().getAddress().equals(account.getAddress()) && txAmount >= state.minActivationAmount()) {
-                return AT_API_Helper.getLongTimestamp(tx.a, tx.b + atTxs);
+                return AT_API_Helper.getLongTimestamp(pair.a, pair.b + atTxs);
             }
         }
 
@@ -137,7 +139,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
                 AT_Transaction key = atTxs.get(new Tuple2<Integer, Integer>(height, position - 1));
                 return key;
             } else {
-                return db.getTransactionFinalMap().getTransaction(height, position - atTxs.size());
+                return db.getTransactionFinalMap().getBySignature(height, position - atTxs.size());
             }
         } else if (forkHeight > height) {
             LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = ((ATTransactionMap) db.getATTransactionMap().getParent()).getATTransactions(height);
@@ -146,7 +148,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
                 AT_Transaction key = atTxs.get(new Tuple2<Integer, Integer>(height, position - 1));
                 return key;
             } else {
-                return db.getTransactionFinalMap().getTransaction(height, position - atTxs.size());
+                return db.getTransactionFinalMap().getBySignature(height, position - atTxs.size());
             }
 
         }

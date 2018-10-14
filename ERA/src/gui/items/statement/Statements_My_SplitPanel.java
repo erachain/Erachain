@@ -121,7 +121,7 @@ public class Statements_My_SplitPanel extends Split_Panel {
     public void delay_on_close() {
         // delete observer left panel
         my_Statements_Model.removeObservers();
-        // get component from right panel
+        // getBySignature component from right panel
         Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
         // if Person_Info 002 delay on close
         if (c1 instanceof Statement_Info) ((Statement_Info) c1).delay_on_Close();
