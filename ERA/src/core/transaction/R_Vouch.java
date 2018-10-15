@@ -273,27 +273,27 @@ public class R_Vouch extends Transaction {
             return;
 
         // make key for vouching record
-        Tuple2<Integer, Integer> recordKey = new Tuple2<Integer, Integer>(this.vouchHeight, this.vouchSeqNo);
+        Long recordKey = Transaction.makeDBRef(this.vouchHeight, this.vouchSeqNo);
         // find value
-        Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> value = this.dcSet.getVouchRecordMap().get(recordKey);
+        Tuple2<BigDecimal, List<Long>> value = this.dcSet.getVouchRecordMap().get(recordKey);
 
         // update value
-        Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> valueNew;
+        Tuple2<BigDecimal, List<Long>> valueNew;
         BigDecimal amount = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, this.dcSet);
-        List<Tuple2<Integer, Integer>> listNew;
+        List<Long> listNew;
         if (value == null) {
-            listNew = new ArrayList<Tuple2<Integer, Integer>>();
+            listNew = new ArrayList<Long>();
         } else {
             listNew = value.b;
             amount = amount.add(value.a);
         }
 
-        listNew.add(new Tuple2<Integer, Integer>(this.height, this.seqNo));
+        listNew.add(Transaction.makeDBRef(this.height, this.seqNo));
         // for test only!!
-        //listNew.add(new Tuple2<Integer, Integer>(2, 2));
+        //listNew.add(new Long(2, 2));
 
         valueNew =
-                new Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>(
+                new Tuple2<BigDecimal, List<Long>>(
                         amount,
                         listNew
                 );
@@ -307,18 +307,18 @@ public class R_Vouch extends Transaction {
         super.orphan(asDeal);
 
         // make key for vouching record
-        Tuple2<Integer, Integer> recordKey = new Tuple2<Integer, Integer>(this.vouchHeight, this.vouchSeqNo);
+        Long recordKey = Transaction.makeDBRef(this.vouchHeight, this.vouchSeqNo);
         // find value
-        Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> value = this.dcSet.getVouchRecordMap().get(recordKey);
+        Tuple2<BigDecimal, List<Long>> value = this.dcSet.getVouchRecordMap().get(recordKey);
         // update value
-        List<Tuple2<Integer, Integer>> listNew = value.b;
+        List<Long> listNew = value.b;
 
-        listNew.remove(new Tuple2<Integer, Integer>(this.height, this.seqNo));
+        listNew.remove(Transaction.makeDBRef(this.height, this.seqNo));
         // for test ONLY !!!
-        //listNew.remove(new Tuple2<Integer, Integer>(2, 2));
+        //listNew.remove(new Long(2, 2));
 
-        Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> valueNew =
-                new Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>(
+        Tuple2<BigDecimal, List<Long>> valueNew =
+                new Tuple2<BigDecimal, List<Long>>(
                         value.a.subtract(this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, this.dcSet)),
                         listNew
                 );

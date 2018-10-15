@@ -279,10 +279,10 @@ public class Records_My_SplitPanel extends Split_Panel {
                 tableGBC.gridy = 0;
                 records_Info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(trans), tableGBC);
 
-                Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DCSet.getInstance().getVouchRecordMap()
-                        .get(trans.getBlockHeight(), trans.getSeqNo(DCSet.getInstance()));
+                Tuple2<BigDecimal, List<Long>> keys = DCSet.getInstance().getVouchRecordMap()
+                        .get(Transaction.makeDBRef(trans.getBlockHeight(), trans.getSeqNo(DCSet.getInstance())));
                 GridBagConstraints gridBagConstraints = null;
-                if (signs != null) {
+                if (keys != null) {
 
                     JLabel jLabelTitlt_Table_Sign = new JLabel(Lang.getInstance().translate("Signatures") + ":");
                     gridBagConstraints = new java.awt.GridBagConstraints();

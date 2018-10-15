@@ -68,10 +68,10 @@ public class Statement_Info extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     private void view_V1() {
 
-        Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DCSet.getInstance().getVouchRecordMap()
-                .get(transaction.getBlockHeight(), transaction.getSeqNo(DCSet.getInstance()));
+        Tuple2<BigDecimal, List<Long>> keys = DCSet.getInstance().getVouchRecordMap()
+                .get(Transaction.makeDBRef(transaction.getBlockHeight(), transaction.getSeqNo(DCSet.getInstance())));
 
-        if (signs != null) {
+        if (keys != null) {
 
         }
 

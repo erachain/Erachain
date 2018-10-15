@@ -28,7 +28,7 @@ import java.util.Map;
 //import database.serializer.TransactionSerializer;
 
 // vouched record (BlockNo, RecNo) -> ERM balabce + List of vouchers records
-public class VouchRecordMap extends DCMap<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> {
+public class VouchRecordMap extends DCMap<Long, Tuple2<BigDecimal, List<Long>>> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public VouchRecordMap(DCSet databaseSet, DB database) {
@@ -52,11 +52,11 @@ public class VouchRecordMap extends DCMap<Tuple2<Integer, Integer>, Tuple2<BigDe
     }
 
     //@SuppressWarnings("unchecked")
-    private Map<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> openMap(DB database) {
+    private Map<Long, Tuple2<BigDecimal, List<Long>>> openMap(DB database) {
 
-        BTreeMap<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> map =
+        BTreeMap<Long, Tuple2<BigDecimal, List<Long>>> map =
                 database.createTreeMap("vouch_records")
-                        .keySerializer(BTreeKeySerializer.TUPLE2)
+                        //.keySerializer(BTreeKeySerializer.TUPLE2)
                         //.valueSerializer(new TransactionSerializer())
                         .makeOrGet();
         return map;
@@ -65,13 +65,13 @@ public class VouchRecordMap extends DCMap<Tuple2<Integer, Integer>, Tuple2<BigDe
 
 
     @Override
-    protected Map<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> getMap(DB database) {
+    protected Map<Long, Tuple2<BigDecimal, List<Long>>> getMap(DB database) {
         //OPEN MAP
         return openMap(database);
     }
 
     @Override
-    protected Map<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> getMemoryMap() {
+    protected Map<Long, Tuple2<BigDecimal, List<Long>>> getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
@@ -79,26 +79,13 @@ public class VouchRecordMap extends DCMap<Tuple2<Integer, Integer>, Tuple2<BigDe
     }
 
     @Override
-    protected Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> getDefaultValue() {
+    protected Tuple2<BigDecimal, List<Long>> getDefaultValue() {
         return null;
     }
 
     @Override
     protected Map<Integer, Integer> getObservableData() {
         return this.observableData;
-    }
-
-    public Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> get(Integer height, Integer seq) {
-        return this.get(new Tuple2<Integer, Integer>(height, seq));
-    }
-
-    public void delete(Integer height, Integer seq) {
-        this.delete(new Tuple2<Integer, Integer>(height, seq));
-    }
-
-
-    public boolean add(Integer height, Integer seq, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> value) {
-        return this.set(new Tuple2<Integer, Integer>(height, seq), value);
     }
 
 }
