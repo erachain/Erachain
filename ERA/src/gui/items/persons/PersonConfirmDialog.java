@@ -231,7 +231,7 @@ public class PersonConfirmDialog extends JDialog {
             // CHECK VALIDATE MESSAGE
             if (result == Transaction.VALIDATE_OK) {
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Person has been authenticated!"),
+                        Lang.getInstance().translate("Person has been authenticated") + "!",
                         Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
                 this.dispose();
             } else {
