@@ -225,9 +225,9 @@ public class Records_Search_SplitPanel extends Split_Panel {
                 //	JPanel a = TransactionDetailsFactory.getInstance().createTransactionDetail(voting);
                 info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(voting), tableGBC);
 
-                Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DCSet.getInstance().getVouchRecordMap().get(voting.getBlockHeight(), voting.getSeqNo(DCSet.getInstance()));
+                Tuple2<BigDecimal, List<Long>> keys = DCSet.getInstance().getVouchRecordMap().get(Transaction.makeDBRef(voting.getBlockHeight(), voting.getSeqNo(DCSet.getInstance())));
                 GridBagConstraints gridBagConstraints = null;
-                if (signs != null) {
+                if (keys != null) {
 
                     JLabel jLabelTitlt_Table_Sign = new JLabel(Lang.getInstance().translate("Signatures") + ":");
                     gridBagConstraints = new java.awt.GridBagConstraints();
