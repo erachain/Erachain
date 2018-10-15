@@ -127,19 +127,19 @@ public class Controller extends Observable {
     public static final char GROUPING_SEPARATOR = '`';
     // IF new abilities is made - new license insert in CHAIN and set this KEY
     public static final long LICENSE_VERS = 107; // versopn of LICENSE
-    public static HashMap<String, Long> LICENSE_LANG_REFS = BlockChain.DEVELOP_USE?
+    public static HashMap<String, Long> LICENSE_LANG_REFS = BlockChain.DEVELOP_USE ?
             new HashMap<String, Long>() {
-        {
-            put("en", Transaction.makeDBRef(148450, 1));
-            put("ru", Transaction.makeDBRef(191502, 1));
-        }
-    } :
+                {
+                    put("en", Transaction.makeDBRef(148450, 1));
+                    put("ru", Transaction.makeDBRef(191502, 1));
+                }
+            } :
             new HashMap<String, Long>() {
                 {
                     put("en", Transaction.makeDBRef(159719, 1));
                     put("ru", Transaction.makeDBRef(159727, 1));
                 }
-    };
+            };
 
     public static TreeMap<String, Tuple2<BigDecimal, String>> COMPU_RATES = new TreeMap();
 
@@ -496,7 +496,7 @@ public class Controller extends Observable {
         } catch (Throwable e) {
             // Error open DB
             error = 1;
-            LOGGER.error(e.getMessage(),e);
+            LOGGER.error(e.getMessage(), e);
             LOGGER.error("Error during startup detected trying to restore backup DataChain...");
             reCreateDC();
         }
@@ -592,12 +592,12 @@ public class Controller extends Observable {
             this.wallet.synchronize(true);
         }
         // create telegtam
-        
+
         if (Controller.useGui)
             about_frame.set_console_Text(Lang.getInstance().translate("Open Telegram"));
         this.telegram = Telegram.getInstanse();
 
-        
+
         if (Controller.useGui)
             about_frame.set_console_Text(Lang.getInstance().translate("Telegram OK"));
 
@@ -658,10 +658,7 @@ public class Controller extends Observable {
         // CREATE NETWORK
         this.tradersManager = new TradersManager();
 
-        this.COMPU_RATES.put("ru", new Tuple2<BigDecimal, String>
-                (new BigDecimal(Settings.getInstance().getCompuRate()).setScale(2), "$")); //"\u20BD"));
-        this.COMPU_RATES.put("en", new Tuple2<BigDecimal, String>
-                (new BigDecimal(Settings.getInstance().getCompuRate()).setScale(2), "$"));
+        updateCompuRaes();
     }
 
     // need for TESTS
@@ -894,11 +891,11 @@ public class Controller extends Observable {
         // CLOSE WALLET
         LOGGER.info("Closing wallet");
         this.wallet.close();
-        
+
         // CLOSE telegram
         LOGGER.info("Closing telegram");
         this.telegram.close();
-        
+
         LOGGER.info("Closed.");
         // FORCE CLOSE
         LOGGER.info("EXIT parameter:" + par);
@@ -2293,9 +2290,11 @@ public class Controller extends Observable {
     public List<String> deleteTelegram(List<String> telegramSignatures) {
         return this.network.deleteTelegram(telegramSignatures);
     }
+
     public long deleteTelegramsToTimestamp(long timestamp, String recipient, String title) {
         return this.network.deleteTelegramsToTimestamp(timestamp, recipient, title);
     }
+
     public long deleteTelegramsForRecipient(String recipient, long timestamp, String title) {
         return this.network.deleteTelegramsForRecipient(recipient, timestamp, title);
     }
@@ -2461,6 +2460,7 @@ public class Controller extends Observable {
     public Block getBlock(byte[] header) {
         return this.blockChain.getBlock(dcSet, header);
     }
+
     public Block.BlockHead getBlockHead(int height) {
         return this.dcSet.getBlocksHeadsMap().get(height);
     }
@@ -2540,7 +2540,7 @@ public class Controller extends Observable {
         return this.dcSet.getTransactionMap().getTransactions(from, count, descending);
 
     }
-    
+
     // BALANCES
 
     public SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalances(
@@ -2925,12 +2925,12 @@ public class Controller extends Observable {
             return this.transactionCreator.createOrderTransaction(creator, have, want, amountHave, amountWant, feePow);
         }
     }
-    
+
     public Pair<Transaction, Integer> cancelOrder(PrivateKeyAccount creator, Order order, int feePow) {
         Transaction orderCreate = this.dcSet.getTransactionFinalMap().get(order.getId());
         return cancelOrder(creator, orderCreate.getSignature(), feePow);
     }
-    
+
     public Pair<Transaction, Integer> cancelOrder(PrivateKeyAccount creator, byte[] orderID, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
@@ -2969,9 +2969,9 @@ public class Controller extends Observable {
     }
 
     public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, String recipientStr,
-            int feePow, long assetKey, boolean checkAsset, BigDecimal amount, boolean needAmount,
-            String title, String message, int messagecode, boolean encrypt) {
-        
+                                                  int feePow, long assetKey, boolean checkAsset, BigDecimal amount, boolean needAmount,
+                                                  String title, String message, int messagecode, boolean encrypt) {
+
         Controller cnt = Controller.getInstance();
 
         // READ CREATOR
@@ -3059,10 +3059,10 @@ public class Controller extends Observable {
         if (privateKeyAccount == null) {
             return new Pair<Integer, Transaction>(Transaction.INVALID_WALLET_ADDRESS, null);
         }
-        
-        byte[] encrypted = (encrypt) ? new byte[] { 1 } : new byte[] { 0 };
-        byte[] isTextByte = (messagecode == 0) ? new byte[] { 1 } : new byte[] { 0 };
-        
+
+        byte[] encrypted = (encrypt) ? new byte[]{1} : new byte[]{0};
+        byte[] isTextByte = (messagecode == 0) ? new byte[]{1} : new byte[]{0};
+
         if (messageBytes != null) {
             if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
                 return new Pair<Integer, Transaction>(Transaction.INVALID_MESSAGE_LENGTH, null);
@@ -3181,6 +3181,12 @@ public class Controller extends Observable {
      *
      * }
      */
+
+    public void updateCompuRaes() {
+        BigDecimal rate = new BigDecimal(Settings.getInstance().getCompuRate()).setScale(2);
+        this.COMPU_RATES.put("ru",new Tuple2<BigDecimal, String>(rate , "$"));
+        this.COMPU_RATES.put("en",new Tuple2<BigDecimal, String>(rate, "$"));
+    }
 
     public Block getBlockByHeight(DCSet db, int parseInt) {
         return db.getBlockMap().getWithMind(parseInt);

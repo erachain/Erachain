@@ -581,7 +581,7 @@ public class Settings {
             return ((String) this.settingsJSON.get("compuRate")).toString();
         }
 
-        return "0";
+        return "200";
     }
     
     public boolean getbacUpAskToStart() {
