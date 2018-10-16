@@ -182,9 +182,12 @@ public abstract class Transaction {
     public static final int INVALID_URL_LENGTH = 91;
     public static final int INVALID_HEAD_LENGTH = 92;
 
+    public static final int KEY_COLLISION = 94;
+
     public static final int INVALID_MESSAGE_FORMAT = 95;
     public static final int INVALID_MESSAGE_LENGTH = 96;
     public static final int UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT = 97;
+
 
     // ITEMS
     public static final int INVALID_ITEM_KEY = 99;

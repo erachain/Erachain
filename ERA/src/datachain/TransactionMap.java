@@ -2,6 +2,7 @@ package datachain;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedBytes;
 import controller.Controller;
 import core.account.Account;
@@ -29,7 +30,7 @@ import java.util.*;
  *
  * ++ seek by TIMESTAMP
  */
-public class TransactionMap extends DCMap<byte[], Transaction> implements Observer {
+public class TransactionMap extends DCMap<Long, Transaction> implements Observer {
     public static final int TIMESTAMP_INDEX = 1;
     public static final int MAX_MAP_SIZE = core.BlockChain.HARD_WORK ? 100000 : 5000;
 
@@ -71,19 +72,20 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes(DB database) {
         // TIMESTAMP INDEX
-        Tuple2Comparator<Long, byte[]> comparator = new Fun.Tuple2Comparator<Long, byte[]>(Fun.COMPARATOR,
-                UnsignedBytes.lexicographicalComparator());
-        NavigableSet<Tuple2<Integer, byte[]>> heightIndex = database.createTreeSet("transactions_index_timestamp")
+        Tuple2Comparator<Long, Long> comparator = new Fun.Tuple2Comparator<Long, Long>(Fun.COMPARATOR,
+                //UnsignedBytes.lexicographicalComparator()
+                Fun.COMPARATOR);
+        NavigableSet<Tuple2<Integer, Long>> heightIndex = database.createTreeSet("transactions_index_timestamp")
                 .comparator(comparator).makeOrGet();
 
-        NavigableSet<Tuple2<Integer, byte[]>> descendingHeightIndex = database
+        NavigableSet<Tuple2<Integer, Long>> descendingHeightIndex = database
                 .createTreeSet("transactions_index_timestamp_descending").comparator(new ReverseComparator(comparator))
                 .makeOrGet();
 
         createIndex(TIMESTAMP_INDEX, heightIndex, descendingHeightIndex,
-                new Fun.Function2<Long, byte[], Transaction>() {
+                new Fun.Function2<Long, Long, Transaction>() {
                     @Override
-                    public Long run(byte[] key, Transaction value) {
+                    public Long run(Long key, Transaction value) {
                         return value.getTimestamp();
                     }
                 });
@@ -99,12 +101,12 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
     }
 
     @Override
-    protected Map<byte[], Transaction> getMap(DB database) {
+    protected Map<Long, Transaction> getMap(DB database) {
 
         // OPEN MAP
-        BTreeMap<byte[], Transaction> map = database.createTreeMap("transactions")
+        BTreeMap<Long, Transaction> map = database.createTreeMap("transactions")
                 .keySerializer(BTreeKeySerializer.BASIC)
-                .comparator(UnsignedBytes.lexicographicalComparator())
+                //.comparator(UnsignedBytes.lexicographicalComparator())
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable().makeOrGet();
 
@@ -161,8 +163,10 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
     }
 
     @Override
-    protected Map<byte[], Transaction> getMemoryMap() {
-        return new TreeMap<byte[], Transaction>(UnsignedBytes.lexicographicalComparator());
+    protected Map<Long, Transaction> getMemoryMap() {
+        return new TreeMap<Long, Transaction>(
+                //UnsignedBytes.lexicographicalComparator()
+                );
     }
 
     @Override
@@ -178,12 +182,12 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
     public List<Transaction> getSubSet(long timestamp, boolean notSetDCSet) {
 
         List<Transaction> values = new ArrayList<Transaction>();
-        Iterator<byte[]> iterator = this.getIterator(0, false);
+        Iterator<Long> iterator = this.getIterator(0, false);
         Transaction transaction;
         int count = 0;
         int bytesTotal = 0;
         while (iterator.hasNext()) {
-            byte[] key = iterator.next();
+            Long key = iterator.next();
             transaction = this.map.get(key);
             if (transaction.getDeadline() < timestamp || transaction.getTimestamp() > timestamp)
                 continue;
@@ -208,10 +212,10 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 
     public void clear(long timestamp) {
 
-        Iterator<byte[]> iterator = this.getIterator(0, false);
+        Iterator<Long> iterator = this.getIterator(0, false);
         Transaction transaction;
         while (iterator.hasNext()) {
-            byte[] key = iterator.next();
+            Long key = iterator.next();
             transaction = this.map.get(key);
             if (transaction.getDeadline() < timestamp) {
                 this.delete(key);
@@ -239,11 +243,11 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 
             int i = 0;
 
-            Iterator<byte[]> iterator = this.getIterator(0, false);
+            Iterator<Long> iterator = this.getIterator(0, false);
             // CLEAN UP
             while (iterator.hasNext()) {
 
-                byte[] key = iterator.next();
+                Long key = iterator.next();
                 item = this.get(key);
 
                 // CHECK IF DEADLINE PASSED
@@ -262,16 +266,15 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
         }
     }
 
-    @Override
     public boolean set(byte[] signature, Transaction transaction) {
 
         if (this.size() > MAX_MAP_SIZE) {
-            Iterator<byte[]> iterator = this.getIterator(0, false);
+            Iterator<Long> iterator = this.getIterator(0, false);
             Transaction item;
             long dTime = Controller.getInstance().getBlockChain().getTimestamp(DCSet.getInstance());
 
             do {
-                byte[] key = iterator.next();
+                Long key = iterator.next();
                 item = this.get(key);
                 this.delete(key);
 
@@ -284,7 +287,8 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 
         this.getDCSet().updateUncTxCounter(1);
 
-        return super.set(signature, transaction);
+        Long key = Longs.fromByteArray(signature);
+        return this.set(key, transaction);
 
     }
 
@@ -315,7 +319,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
     public List<Transaction> getTransactions(int from, int count, boolean descending) {
 
         ArrayList<Transaction> values = new ArrayList<Transaction>();
-        Iterator<byte[]> iterator = this.getIterator(from, descending);
+        Iterator<Long> iterator = this.getIterator(from, descending);
 
         Transaction transaction;
         for (int i = 0; i < count; i++) {
@@ -333,7 +337,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
     public List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending) {
 
         ArrayList<Transaction> values = new ArrayList<>();
-        Iterator<byte[]> iterator = this.getIterator(0, descending);
+        Iterator<Long> iterator = this.getIterator(0, descending);
         Account account = new Account(address);
 
         int i = 0;
@@ -360,7 +364,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
     public List<Transaction> getTransactionsByAddress(String address) {
 
         ArrayList<Transaction> values = new ArrayList<Transaction>();
-        Iterator<byte[]> iterator = this.getIterator(0, false);
+        Iterator<Long> iterator = this.getIterator(0, false);
         Account account = new Account(address);
 
         Transaction transaction;
@@ -436,24 +440,35 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 
     }
 
-    @Override
-    public Transaction delete(byte[] signature) {
+    public Transaction delete(Long key) {
 
         // delete BROADCASTS
-        this.peersBroadcasted.remove(signature);
+        this.peersBroadcasted.remove(key);
 
-        if (this.contains(signature))
+        if (this.contains(key))
             this.getDCSet().updateUncTxCounter(-1);
 
-        return super.delete(signature);
+        return super.delete(key);
     }
+
 
     public void delete(Transaction transaction) {
         this.delete(transaction.getSignature());
     }
 
+    public Transaction delete(byte[] signature) {
+        return this.delete(Longs.fromByteArray(signature));
+    }
+    public boolean contains(byte[] signature) {
+        return this.contains(Longs.fromByteArray(signature));
+    }
+
     public boolean contains(Transaction transaction) {
         return this.contains(transaction.getSignature());
+    }
+
+    public Transaction get(byte[] signature) {
+        return this.get(Longs.fromByteArray(signature));
     }
 
     /* локально по месту надо делать наполнение - чтобы не тормозить обработку тут

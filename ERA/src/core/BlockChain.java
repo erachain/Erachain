@@ -1169,12 +1169,12 @@ public class BlockChain {
         long timestamp = GENERATING_MIN_BLOCK_TIME_MS + this.getTimestamp(dcSetOriginal);
 
         TransactionMap unconfirmedMap = dcSetOriginal.getTransactionMap();
-        Iterator<byte[]> iterator = unconfirmedMap.getIterator(0, false);
+        Iterator<Long> iterator = unconfirmedMap.getIterator(0, false);
 
         //CREATE FORK OF GIVEN DATABASE
         ///DCSet dcFork = dcSetOriginal.fork();
         Transaction transaction;
-        byte[] key;
+        Long key;
 
         while (iterator.hasNext()) {
 
