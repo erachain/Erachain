@@ -25,7 +25,7 @@ import javax.ws.rs.core.Response;
 import java.util.*;
 
 /**
- * Poll class (Create, vote by poll, getBySignature poll, )
+ * Poll class (Create, vote by poll, get poll, )
  */
 @Path("apipoll")
 @Produces(MediaType.APPLICATION_JSON)

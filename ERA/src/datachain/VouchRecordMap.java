@@ -16,19 +16,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//import java.util.ArrayList;
-//import java.util.Collection;
-//import java.util.Iterator;
-//import java.util.NavigableSet;
-//import java.util.Set;
-//import java.util.TreeSet;
-//import org.mapdb.Bind;
-//import org.mapdb.Fun;
 
-//import database.serializer.TransactionSerializer;
+/**
+ * Заверение другой транзакции<br><br>
+ *     vouched record (BlockNo, RecNo) -> ERM balabce + List of vouchers records
+ *
+ * Ключ: ссылка на запись которую заверяем.<br>
+ * Значение: Сумма ERA на момент заверения на счету заверителя + ссылка на запись заверения:<br>
+ vouched record (BlockNo, RecNo) -> ERM balabce + List of vouchers records
+ * @return dcMap
+ */
 
-// vouched record (BlockNo, RecNo) -> ERM balabce + List of vouchers records
-public class VouchRecordMap extends DCMap<Long, Tuple2<BigDecimal, List<Long>>> {
+public class VouchRecordMap extends DCMap<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public VouchRecordMap(DCSet databaseSet, DB database) {

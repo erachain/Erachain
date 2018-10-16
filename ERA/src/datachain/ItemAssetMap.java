@@ -13,6 +13,11 @@ import utils.ObserverMessage;
 
 //import database.serializer.AssetSerializer;
 
+/**
+ * Хранение активов.<br>
+ * Ключ: номер (автоинкремент)<br>
+ * Значение: Актив<br>
+ */
 public class ItemAssetMap extends Item_Map {
     // private Map<Integer, Integer> observableData = new HashMap<Integer,
     // Integer>();

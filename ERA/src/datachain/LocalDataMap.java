@@ -6,6 +6,9 @@ import org.mapdb.DB.BTreeMapMaker;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * я так понял - это отслеживание версии базы данных - и если она новая то все удаляем и заново закачиваем
+ */
 public class LocalDataMap extends DCMap<String, String> {
 
     public static final String LOCAL_DATA_VERSION_KEY = "dataversion";

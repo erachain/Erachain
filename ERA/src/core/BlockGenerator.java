@@ -259,7 +259,7 @@ public class BlockGenerator extends Thread implements Observer {
         newBlockDb.close();
         newBlockDb = null;
 
-        LOGGER.debug("getBySignature Unconfirmed Transactions = " + (System.currentTimeMillis() - start) + "ms for trans: " + counter);
+        LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) + "ms for trans: " + counter);
         start = System.currentTimeMillis();
 
         // sort by TIMESTAMP

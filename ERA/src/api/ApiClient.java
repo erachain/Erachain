@@ -742,7 +742,7 @@ public class ApiClient {
                             "Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - address does not exist in wallet"
                     },
                     {
-                            "GET telegrams/getBySignature/<signature>",
+                            "GET telegrams/get/<signature>",
                             "Get the telegram that matches the given signature.",
                             "Errors: 101 - Invalid signature. 311 - Telegram does not exist."
                     },
@@ -849,7 +849,7 @@ public class ApiClient {
                 }
             }
 
-            help += "\nType \"help all\" for detailed help for all commands. Or type \"help command\" to getBySignature detailed help for that command. Type \"clear\" for clear GUI concole.\n";
+            help += "\nType \"help all\" for detailed help for all commands. Or type \"help command\" to get detailed help for that command. Type \"clear\" for clear GUI concole.\n";
 
             return help;
         }
@@ -874,7 +874,7 @@ public class ApiClient {
             } else {
                 path = command.substring((method + " ").length());
 
-                // getBySignature telegrams/address?erty=132 123&sdf=вва
+                // get telegrams/address?erty=132 123&sdf=вва
                 int startVars = command.indexOf("?");
                 if (startVars > 0) {
                     content = command.substring(startVars + 1);
@@ -946,7 +946,7 @@ public class ApiClient {
             LOGGER.info(ioe);
             return "Invalid command! \n" +
                     ioe.getMessage() + "\n" +
-                    "Type help to getBySignature a list of commands. ";
+                    "Type help to get a list of commands. ";
         }
     }
 

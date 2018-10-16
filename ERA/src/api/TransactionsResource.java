@@ -197,7 +197,7 @@ public class TransactionsResource {
     @SuppressWarnings("unchecked")
     @GET
     @Path("/unconfirmedincomes/{address}")
-    // getBySignature transactions/unconfirmedincomes/7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7?from=123&count=13&descending=true
+    // get transactions/unconfirmedincomes/7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7?from=123&count=13&descending=true
     public String getNetworkIncomesTransactions(@PathParam("address") String address,
             @QueryParam("from") int from, @QueryParam("count") int count,
             @QueryParam("type") int type, @QueryParam("descending") boolean descending) {

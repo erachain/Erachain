@@ -8,12 +8,21 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
-//import org.mapdb.Fun.Tuple2;
-//import org.mapdb.Fun.Tuple3;
+/**
+ * Хранит Удостоверения персон для заданного публичного ключа.
+ * address -> Stack person + end_date + block.height + transaction.reference.
+ * Тут block.getHeight + transaction index  - это ссылка на транзакцию создавшую данную заметку<br>
+ *
+ * <b>Ключ:</b> (String)publickKey<br>
 
-// address -> Stack person + end_date + block.height + transaction.reference
-// transaction.reference = -1 allways??
-// Controller.getInstance().getHeight()
+ * <b>Значение:</b><br>
+ Stack((Long)person key,
+ (Integer)end_date - дата окончания действия удостоврения,<br>
+ (Integer)block.getHeight - номер блока,<br>
+ (Integer)transaction index - номер транзакции в блоке<br>
+ ))
+ */
+// TODO укротить до 20 байт адрес и ссылку на Long
 public class AddressPersonMap extends DCMap<String, Stack<Tuple4<
         Long, // person key
         Integer, // end_date day

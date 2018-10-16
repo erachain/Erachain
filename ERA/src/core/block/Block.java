@@ -576,7 +576,7 @@ public class Block {
             return 1;
 
         if (heightBlock < 1) {
-            Integer item = db.getBlockSignsMap().getBySignature(this.signature);
+            Integer item = db.getBlockSignsMap().get(this.signature);
             if (item == null) {
                 heightBlock = -1;
             } else {

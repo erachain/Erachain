@@ -691,13 +691,13 @@ public class WebResource {
         JSONObject jsonanswer = new JSONObject();
 
         if (StringUtils.isBlank(type)
-                || (!type.equalsIgnoreCase("getBySignature")
+                || (!type.equalsIgnoreCase("get")
                 && !type.equalsIgnoreCase("post") && !type
                 .equalsIgnoreCase("delete"))) {
 
             jsonanswer.put("type", "apicallerror");
             jsonanswer.put("errordetail",
-                    "type parameter must be post, getBySignature or delete");
+                    "type parameter must be post, get or delete");
 
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")

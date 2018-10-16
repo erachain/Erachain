@@ -107,7 +107,7 @@ public class TelegramSplitPanel extends Split_Panel {
    tableFavoriteAccounts = new MTable(this.accountModel);
    
    
-   //getBySignature telegram
+   //get telegram
    leftTelegram.jButtonGetTelegrams.addActionListener(new ActionListener(){
 
     @Override

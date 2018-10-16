@@ -415,7 +415,7 @@ public class Wallet extends Observable implements Observer {
 		this.initiateItemsFavorites();
 
 		// SOME
-		// Account initAccount = this.getAccounts().getBySignature(0);
+		// Account initAccount = this.getAccounts().get(0);
 		// initAccount.setConfirmedBalance(Transaction.AssetCls.DILE_KEY,
 		// BigDecimal.valueOf(0.00001));
 
@@ -1574,7 +1574,7 @@ public class Wallet extends Observable implements Observer {
 			ItemCls person = db.getItemPersonMap().get(sertifyPubKeys.getKey());
 			if (person != null) {
 				// FIND issue record
-				Transaction transPersonIssue = db.getTransactionFinalMap().getBySignature(person.getReference());
+				Transaction transPersonIssue = db.getTransactionFinalMap().get(person.getReference());
 				///// GET FEE from that record
 				///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
 
@@ -1628,7 +1628,7 @@ public class Wallet extends Observable implements Observer {
 				return;
 
 			// FIND issue record
-			Transaction transPersonIssue = db.getTransactionFinalMap().getBySignature(person.getReference());
+			Transaction transPersonIssue = db.getTransactionFinalMap().get(person.getReference());
 			//// GET FEE from that record
 			///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
 

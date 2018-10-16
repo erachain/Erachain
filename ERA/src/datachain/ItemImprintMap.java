@@ -12,6 +12,12 @@ import java.util.Map;
 //import org.mapdb.Atomic;
 //import database.serializer.ItemSerializer;
 
+/**
+ * Хранение активов.<br>
+ * Ключ: номер (автоинкремент)<br>
+ * Значение: Уникальный Отпечаток<br>
+ */
+
 public class ItemImprintMap extends Item_Map {
     static final String NAME = "item_imprints";
     static final int TYPE = ItemCls.IMPRINT_TYPE;

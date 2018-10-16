@@ -12,13 +12,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-// balances for Essence + Asset ->
-// TODO SOFT HARD TRUE
-// -> in_OWN(a, b), in_RENT(a, b), on_HOLD(a, b), SPEND(a, b)
-//   = in_USE (TOTAL on HAND)
-// a - income
-// b - balance
-// outcome = b - a
+/**
+ * balances for Essence + Asset -> BALANCE (example datachain.PersonAssetsBalance)
+ * TODO: SOFT HARD TRUE
+ * -> in_OWN(a, b), in_RENT(a, b), on_HOLD(a, b), SPEND(a, b)
+ *   = in_USE (TOTAL on HAND)
+ *   a - income
+ *   b - balance
+ *   outcome = b - a
+ */
 public class _BalanceMap extends DCMap<Tuple2<Long, Long>,
         Tuple4<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> {
@@ -139,9 +141,9 @@ public class _BalanceMap extends DCMap<Tuple2<Long, Long>,
     }
 
 	/*
-	public BigDecimal getBySignature(String assence)
+	public BigDecimal get(String assence)
 	{
-		return this.getBySignature(assence, FEE_KEY);
+		return this.get(assence, FEE_KEY);
 	}
 	 */
 

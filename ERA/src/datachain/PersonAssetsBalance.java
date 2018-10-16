@@ -5,7 +5,11 @@ import utils.ObserverMessage;
 
 //import database.serializer.AssetSerializer;
 
-// income, balance, 
+/**
+ * для хранения балансов по Персоне - на будущее
+ * Ключ: Номер Перосны + Номер Актива
+ * Значение: Балансы
+ */
 public class PersonAssetsBalance extends _BalanceMap {
     static final String NAME = "person";
 

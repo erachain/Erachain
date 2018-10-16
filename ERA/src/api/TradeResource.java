@@ -46,10 +46,10 @@ public class TradeResource {
                 "Start Rater: 1 - start, 0 - stop");
         help.put("GET trade/create/{creator}/{haveKey}/{wantKey}/{haveAmount}/{wantAmount}?feePow={feePow}&password={password}",
                 "make and broadcast CreateOrder ");
-        help.put("GET trade/getBySignature/{signature}",
+        help.put("GET trade/get/{signature}",
                 "Get Order");
         help.put("GET trade/getbyaddress/{creator}/{haveKey}/{wantKey}",
-                "getBySignature list of orders in CAP by address");
+                "get list of orders in CAP by address");
         help.put("GET trade/cancel/{creator}/{signature}?password={password}",
                 "Cancel Order");
 
@@ -131,7 +131,7 @@ public class TradeResource {
     }
 
     @GET
-    @Path("getBySignature/{signature}")
+    @Path("get/{signature}")
     public String get(@PathParam("signature") String signatureStr) {
 
         byte[] signature;

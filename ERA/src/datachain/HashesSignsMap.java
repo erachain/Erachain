@@ -14,6 +14,16 @@ import java.util.TreeMap;
 
 // hash[byte] -> Stack person + block.height + transaction.seqNo
 // Example - database.AddressPersonMap
+/** Набор хэшей - по хэшу поиск записи в котрой он участвует и
+ * используется в транзакции core.transaction.R_Hashes
+ hash[byte] -> Stack person + block.height + transaction.seqNo
+
+ * Ключ: хэш<br>
+ * Значение: список - номер персоны (Если это персона создала запись, ссылка на запись)<br>
+ // TODO укротить до 20 байт адрес и ссылку на Long
+
+ */
+
 public class HashesSignsMap extends DCMap<byte[], Stack<Tuple3<
         Long, // person key
         Integer, // block height

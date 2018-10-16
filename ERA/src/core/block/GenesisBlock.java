@@ -381,7 +381,7 @@ public class GenesisBlock extends Block {
             // NOT PERSONALIZE INVESTORS - ICO 10%
             for (List<Object> item : genesisInvestors) {
 
-                //recipient = new Account((String)item.getBySignature(0));
+                //recipient = new Account((String)item.get(0));
                 if (((String) item.get(0)).length() > 36) {
                     recipient = new PublicKeyAccount((String) item.get(0));
                 } else {

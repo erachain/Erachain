@@ -279,7 +279,7 @@ public class ATMap extends DCMap<String, AT> {
         return Fun.filter(this.creatorATs, creator);
     }
 
-    //getBySignature ATs sorted by lastRunBlockHeight
+    //get ATs sorted by lastRunBlockHeight
     @SuppressWarnings({"unchecked"})
     public Iterator<String> getOrderedATs(Integer height) {
         return Fun.filter(this.orderedATs, null, true, height, true).iterator();

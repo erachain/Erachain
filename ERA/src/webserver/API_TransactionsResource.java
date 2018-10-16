@@ -36,7 +36,7 @@ public class API_TransactionsResource {
 
         Map<String, String> help = new LinkedHashMap<String, String>();
 
-        help.put("apirecords/getBySignature/{signature}",
+        help.put("apirecords/get/{signature}",
                 Lang.getInstance().translate("Get Record by sigmature."));
         help.put("apirecords/getbynumber/{height-sequence}",
                 "GET Record by Height and Sequence");
@@ -65,7 +65,7 @@ public class API_TransactionsResource {
 
 
     @GET
-    @Path("getBySignature/{signature}")
+    @Path("get/{signature}")
     public Response getBySign(@PathParam("signature") String signature) {
 
         Map out = new LinkedHashMap();
@@ -111,7 +111,7 @@ public class API_TransactionsResource {
             int seq = Integer.parseInt(strA[1]);
 
             ++step;
-            Transaction record = DCSet.getInstance().getTransactionFinalMap().getBySignature(height, seq);
+            Transaction record = DCSet.getInstance().getTransactionFinalMap().get(height, seq);
             out = record.toJson();
 
         } catch (Exception e) {

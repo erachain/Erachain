@@ -8,6 +8,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Super Class for Issue Items
+ *
+ * Ключ: подпись создавшей класс записи - поидее надо поменять на ссылку
+ * Значение - номер сущности
+ *
+ * Используется в core.transaction.Issue_ItemRecord#orphan(int)
+ * TODO: поменять ссылку на запись с подписи на ссылку по номерам - и в таблицах ключ тоже на Лонг поменять
+ * https://lab.erachain.org/erachain/Erachain/issues/465
+ *
+ */
 public abstract class Issue_ItemMap extends DCMap<byte[], Long> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 

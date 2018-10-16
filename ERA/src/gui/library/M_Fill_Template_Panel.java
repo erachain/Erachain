@@ -53,7 +53,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
                 if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
                 if (arg0.getDescription().toString().indexOf("!$@!") != 0) {
                     //		System.out.print(arg0.getDescription());
-                    //		M_Template_Param_TextPane_Dialog d = new M_Template_Param_TextPane_Dialog(jTextPane_Message_Public.pars.getBySignature("{{"+ arg0.getDescription()+"}}"), getMousePosition());
+                    //		M_Template_Param_TextPane_Dialog d = new M_Template_Param_TextPane_Dialog(jTextPane_Message_Public.pars.get("{{"+ arg0.getDescription()+"}}"), getMousePosition());
                     //			str =d.tp.getText();
                 } else {
                     str = JOptionPane.showInputDialog(MainFrame.getInstance(), Lang.getInstance().translate("Insert") + " " + arg0.getDescription().replace("!$@!", ""), jTextPane_Message_Public.pars.get("{{" + arg0.getDescription().replace("!$@!", "") + "}}"));

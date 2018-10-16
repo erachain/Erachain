@@ -20,6 +20,17 @@ import java.util.*;
 
 //import com.sun.media.jfxmedia.logging.Logger;
 
+/**
+ * Хранит блоки полностью - с транзакциями
+ *
+ * ключ: номер блока (высота, height)<br>
+ * занчение: Блок<br>
+ *
+ * Есть вторичный индекс, для отчетов (blockexplorer) - generatorMap
+ * TODO - убрать длинный индек и вставить INT
+ *
+ * @return
+ */
 public class BlockMap extends DCMap<Integer, Block> {
 
     static Logger LOGGER = Logger.getLogger(BlockMap.class.getName());
@@ -46,7 +57,7 @@ public class BlockMap extends DCMap<Integer, Block> {
         super(databaseSet, database);
 
         //this.atomicKey = database.getAtomicInteger("block_map" + "_key");
-        //this.key = this.atomicKey.getBySignature();
+        //this.key = this.atomicKey.get();
 
         if (databaseSet.isWithObserver()) {
             // this.observableData.put(DBMap.NOTIFY_RESET,
@@ -62,15 +73,15 @@ public class BlockMap extends DCMap<Integer, Block> {
         }
 
         // LAST BLOCK
-        //if (database.getCatalog().getBySignature(("lastBlock" + ".type")) == null) {
+        //if (database.getCatalog().get(("lastBlock" + ".type")) == null) {
         //	database.createAtomicVar("lastBlock", new byte[0], null);
         //}
         // this.lastBlockVar = database.getAtomicVar("lastBlock");
-        // this.lastBlockSignature = this.lastBlockVar.getBySignature();
+        // this.lastBlockSignature = this.lastBlockVar.get();
 
         // POOL FEE
         // this.feePoolVar = database.getAtomicVar("feePool");
-        // this.feePool = this.feePoolVar.getBySignature();
+        // this.feePool = this.feePoolVar.get();
 
         // PROCESSING
         this.processingVar = database.getAtomicBoolean("processingBlock");
@@ -93,6 +104,7 @@ public class BlockMap extends DCMap<Integer, Block> {
     protected void createIndexes(DB database) {
         generatorMap = database.createTreeMap("generators_index").makeOrGet();
 
+        // TODO - убрать длинный индек и вставить INT
         Bind.secondaryKey((BTreeMap) this.map, generatorMap, new Fun.Function2<Tuple2<String, String>, Integer, Block>() {
             @Override
             public Tuple2<String, String> run(Integer b, Block block) {
@@ -169,7 +181,7 @@ public class BlockMap extends DCMap<Integer, Block> {
     }
 
     public Block last() {
-        // return this.getBySignature(this.getLastBlockSignature());
+        // return this.get(this.getLastBlockSignature());
         return this.get(this.size());
     }
 
@@ -262,7 +274,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 			Iterator<Integer> iterator = this.getIterator(0, true);
 			while (iterator.hasNext()) {
 				Integer key = iterator.next();
-				Block itemBlock = this.getBySignature(key);
+				Block itemBlock = this.get(key);
 				byte[] pkb = itemBlock.getCreator().getPublicKey();
 				PublicKeyAccount pk = new PublicKeyAccount(pkb);
 				if (((Account)pk).equals("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")) {

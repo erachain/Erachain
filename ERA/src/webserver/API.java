@@ -345,7 +345,7 @@ public class API {
             ListIterator listIterator = eee.listIterator(height);
             block = (Block) listIterator.next();
 
-            //block = dcSet.getBlocksHeadMap().getBySignature(iterator.next());
+            //block = dcSet.getBlocksHeadMap().get(iterator.next());
             out.put("block", block.toJson());
 
             ++step;
@@ -541,7 +541,7 @@ public class API {
             int seq = Integer.parseInt(strA[1]);
 
             ++step;
-            Transaction record = dcSet.getTransactionFinalMap().getBySignature(height, seq);
+            Transaction record = dcSet.getTransactionFinalMap().get(height, seq);
             out = record.toJson();
 
         } catch (Exception e) {
@@ -621,7 +621,7 @@ public class API {
             int seq = Integer.parseInt(strA[1]);
 
             ++step;
-            Transaction record = dcSet.getTransactionFinalMap().getBySignature(height, seq);
+            Transaction record = dcSet.getTransactionFinalMap().get(height, seq);
             out = record.rawToJson();
 
         } catch (Exception e) {
@@ -677,7 +677,7 @@ public class API {
         JSONObject out = new JSONObject();
         try {
             //	JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-            //	String rawDataBase58 = (String) jsonObject.getBySignature("raw");
+            //	String rawDataBase58 = (String) jsonObject.get("raw");
             byte[] transactionBytes = Base58.decode(rawDataBase58);
 
 
@@ -826,7 +826,7 @@ public class API {
         byte[] signature;
         if (!(lastTimestamp == null)) {
             signature = cntrl.getSignatureByAddrTime(db, address, lastTimestamp);
-            transactions.add(cntrl.getBySignature(signature));
+            transactions.add(cntrl.get(signature));
         }
 
         for (Transaction item : transactions) {

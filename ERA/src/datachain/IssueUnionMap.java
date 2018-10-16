@@ -6,6 +6,12 @@ import org.mapdb.DB;
 
 import java.util.Map;
 
+/**
+ * see datachain.Issue_ItemMap
+ *
+ * @return
+ */
+
 public class IssueUnionMap extends Issue_ItemMap {
 
     public IssueUnionMap(DCSet databaseSet, DB database) {

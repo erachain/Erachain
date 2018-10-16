@@ -21,10 +21,16 @@ import java.util.*;
 
 //import java.math.BigDecimal;
 
-// block.id + tx.ID in this block -> transaction
-// ++ sender_txs
-// ++ recipient_txs
-// ++ address_type_txs
+/**
+ * Транзакции занесенные в цепочку
+ *
+ * block.id + tx.ID in this block -> transaction
+ *
+ * Вторичные ключи:
+ * ++ sender_txs
+ * ++ recipient_txs
+ * ++ address_type_txs
+ */
 public class TransactionFinalMap extends DCMap<Long, Transaction> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
@@ -182,7 +188,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         return this.set(Transaction.makeDBRef(height, seq), transaction);
     }
 
-    public Transaction getBySignature(Integer height, Integer seq) {
+    public Transaction get(Integer height, Integer seq) {
         return this.get(Transaction.makeDBRef(height, seq));
     }
 
@@ -226,7 +232,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
 		List<Transaction> txs = new ArrayList<>();
 		int counter = 0;
 		while (iter.hasNext() && (limit == 0 || counter < limit)) {
-			txs.add(this.map.getBySignature(iter.next()));
+			txs.add(this.map.get(iter.next()));
 			counter++;
 		}
 		iter = null;
@@ -525,17 +531,17 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
             int height = Integer.parseInt(strA[0]);
             int seq = Integer.parseInt(strA[1]);
 
-            return this.getBySignature(height, seq);
+            return this.get(height, seq);
         } catch (Exception e1) {
             try {
-                return this.getBySignature(Base58.decode(refStr));
+                return this.get(Base58.decode(refStr));
             } catch (Exception e2) {
                 return null;
             }
         }
     }
 
-    public Transaction getBySignature(byte[] signature) {
+    public Transaction get(byte[] signature) {
         return this.get(getDCSet().getTransactionFinalMapSigns().get(signature));
     }
 

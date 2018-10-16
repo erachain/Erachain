@@ -16,10 +16,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
-/*
-ВНИМАНИЕ !!! ВТОричные ключи не хранят дубли - тоесть запись во втричном ключе не будет учтена иперезапишется если такой же ключ прийдет
-Поэтому нужно добавлять униальность
-
+/**
+ * Хранит сделки на бирже
+ * Ключ: ссылка на иницатора + ссылка на цель
+ * Значение - Сделка
 Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @SuppressWarnings("rawtypes")
@@ -263,7 +263,7 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
 
     @SuppressWarnings("unchecked")
     public List<Trade> getTrades(long haveWant)
-    // getBySignature trades for order as HAVE and as WANT
+    // get trades for order as HAVE and as WANT
     {
 
         String haveKey = String.valueOf(haveWant);

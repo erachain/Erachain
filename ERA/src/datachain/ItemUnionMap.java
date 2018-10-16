@@ -7,10 +7,11 @@ import utils.ObserverMessage;
 
 import java.util.Map;
 
-//import java.util.HashMap;
-//import java.util.Map;
-//import org.mapdb.Atomic;
-
+/**
+ * Хранение активов.<br>
+ * Ключ: номер (автоинкремент)<br>
+ * Значение: Объединение<br>
+ */
 public class ItemUnionMap extends Item_Map {
 
     static final String NAME = "item_unions";

@@ -11,12 +11,15 @@ import org.mapdb.Fun.Tuple3;
 import java.math.BigDecimal;
 import java.util.*;
 
-//import java.util.List;
-//import java.util.TreeMap;
-//import java.util.TreeSet;
+/** Общая сумма переданных средств в кредит на другой счет
+ * Используется для проверки сумм которые отдаются или забираются у заемщика<br><br>
+ *
+ * <b>Ключ:</b> account.address Creditor + asset key + account.address Debtor<br>
+ *
+ * <b>Значение:</b> сумма средств
+ *
+ */
 
-// 
-// account.address Creditor + asset key + account.address Debtor -> sum + Int Int (Block + seeqNo trunsaction
 public class Credit_AddressesMap extends DCMap<Tuple3<String, Long, String>, BigDecimal> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 

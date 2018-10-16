@@ -13,6 +13,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Класс для сортировок для GUI
+ * @param <T>
+ * @param <U>
+ */
 public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Observer {
 
     static Logger LOGGER = Logger.getLogger(SortableList.class.getName());

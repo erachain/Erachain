@@ -10,6 +10,12 @@ import java.util.Map;
 import java.util.TreeMap;
 
 // block.signature -> Height, Weight(Win Value)
+/**
+ * ключ: подпись блока
+ * занчение: номер блока (высота + height)<br>
+
+ * TODO - убрать длинный индекс
+ */
 public class BlockSignsMap extends DCMap<byte[], Integer> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
@@ -22,7 +28,7 @@ public class BlockSignsMap extends DCMap<byte[], Integer> {
         super(databaseSet, database);
 
         //this.fullWeightVar = database.getAtomicLong("fullWeight");
-        //this.fullWeight = this.fullWeightVar.getBySignature();
+        //this.fullWeight = this.fullWeightVar.get();
         //if (this.fullWeight == null)
         //	this.fullWeight = 0L;
 
@@ -120,7 +126,7 @@ public class BlockSignsMap extends DCMap<byte[], Integer> {
 	private int getWeight(Block block)
 	{
 		if (this.contains(block.getSignature()))
-			return this.getBySignature(block.getSignature()).b;
+			return this.get(block.getSignature()).b;
 		return 0;
 	}
 	 */
@@ -132,7 +138,7 @@ public class BlockSignsMap extends DCMap<byte[], Integer> {
 		Iterator<byte[]> iterator = this.getIterator(0, true);
 		while (iterator.hasNext()) {
 			byte[] key = iterator.next();
-			Tuple2<Integer, Integer> hw = this.getBySignature(key);
+			Tuple2<Integer, Integer> hw = this.get(key);
 			weightFull += hw.b;
 		}
 
@@ -147,7 +153,7 @@ public class BlockSignsMap extends DCMap<byte[], Integer> {
 	{
 		if (this.contains(key)) {
 			// sub old value from FULL
-			Tuple2<Integer, Integer> value_old = this.getBySignature(key);
+			Tuple2<Integer, Integer> value_old = this.get(key);
 			fullWeight -= value_old.b;
 		}
 
@@ -172,7 +178,7 @@ public class BlockSignsMap extends DCMap<byte[], Integer> {
 	{
 		if (this.contains(key)) {
 			// sub old value from FULL
-			Tuple2<Integer, Integer> value_old = this.getBySignature(key);
+			Tuple2<Integer, Integer> value_old = this.get(key);
 			fullWeight -= value_old.b;
 
 			if(this.fullWeightVar != null)

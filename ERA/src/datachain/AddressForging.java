@@ -12,12 +12,23 @@ import java.util.Map;
 //import org.mapdb.Fun.Tuple3;
 
 /*
- - not SAME with BLOCK HEADS - use point for not only forged blocks - with incoming ERA Volumes
  */
 
-// account.address + current block.Height ->
-//   -> previous making blockHeight + this ForgingH balance
+//
 // last forged block for ADDRESS -> by height = 0
+/**
+ * Хранит данные о сборке блока для данного счета - по номеру блока
+ * если номер блока не задан - то это последнее значение.
+ * При этом если номер блока не задана то хранится поледнее значение
+ *  account.address + current block.Height ->
+ *     previous making blockHeight + this ForgingH balance
+<hr>
+ - not SAME with BLOCK HEADS - use point for not only forged blocks - with incoming ERA Volumes
+
+ * @return
+ */
+
+// TODO укротить до 20 байт адрес
 public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Integer, Integer>> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 

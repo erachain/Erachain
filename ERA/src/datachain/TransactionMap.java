@@ -19,11 +19,16 @@ import utils.ReverseComparator;
 
 import java.util.*;
 
-// memory pool for unconfirmed transaction
-// tx.signature -> <<broadcasted peers>, transaction>
-// ++ seek by TIMESTAMP
-// тут надо запминать каким пирам мы уже разослали транзакцию неподтвержденную
-// так что бы при подключении делать автоматически broadcast
+/**
+ * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction
+ *
+ * Также хранит инфо каким пирам мы уже разослали транзакцию неподтвержденную так что бы при подключении делать автоматически broadcast
+ *
+ * signature -> Transaction
+ * TODO: укоротить ключ до 8 байт
+ *
+ * ++ seek by TIMESTAMP
+ */
 public class TransactionMap extends DCMap<byte[], Transaction> implements Observer {
     public static final int TIMESTAMP_INDEX = 1;
     public static final int MAX_MAP_SIZE = core.BlockChain.HARD_WORK ? 100000 : 5000;
@@ -452,8 +457,8 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
     }
 
     /* локально по месту надо делать наполнение - чтобы не тормозить обработку тут
-    public Transaction getBySignature(byte[] signature) {
-        Transaction item = super.getBySignature(signature);
+    public Transaction get(byte[] signature) {
+        Transaction item = super.get(signature);
         //item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, this.getDCSet().getBlocksHeadMap().size() + 1, 1);
         return item;
     }

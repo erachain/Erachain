@@ -188,7 +188,7 @@ public class WItem_Map extends DCMap<Tuple2<String, String>, ItemCls> {
 	    for(Account account: items.keySet())
 	    {
 	    	//FOR EACH TRANSACTION
-	    	for(ItemCls item: items.getBySignature(account))
+	    	for(ItemCls item: items.get(account))
 	    	{
 	    		this.add(item);
 	    	}

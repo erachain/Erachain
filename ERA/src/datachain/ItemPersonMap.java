@@ -14,6 +14,12 @@ import utils.ReverseComparator;
 import java.util.Map;
 import java.util.NavigableSet;
 
+/**
+ * Хранение активов.<br>
+ * Ключ: номер (автоинкремент)<br>
+ * Значение: Персона<br>
+ */
+
 public class ItemPersonMap extends Item_Map {
 
     public static final int PERSON_NAME_INDEX = 1;

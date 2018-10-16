@@ -66,7 +66,7 @@ public class Model_Hashes_info extends AbstractTableModel {
     public PersonCls getCreatorAdress(int row) {
 
         Tuple3<Long, Integer, Integer> ss = hashs.get(row);
-        Transaction tt = db.getTransactionFinalMap().getBySignature(ss.b, 1);
+        Transaction tt = db.getTransactionFinalMap().get(ss.b, 1);
 
 
         try {
@@ -87,7 +87,7 @@ public class Model_Hashes_info extends AbstractTableModel {
         }
 
         Tuple3<Long, Integer, Integer> ss = hashs.get(row);
-        Transaction tt = db.getTransactionFinalMap().getBySignature(ss.b, 1);
+        Transaction tt = db.getTransactionFinalMap().get(ss.b, 1);
 
         switch (column) {
             case COLUMN_KEY:

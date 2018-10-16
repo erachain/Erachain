@@ -137,7 +137,7 @@ public class Records_UnConfirmed_Panel extends JPanel // JPanel
 
                     // GET TRANSACTION
                     // Transaction transaction =
-                    // transactionsModel.getBySignature(row);
+                    // transactionsModel.get(row);
 
                     // SHOW DETAIL SCREEN OF TRANSACTION
                     // TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);

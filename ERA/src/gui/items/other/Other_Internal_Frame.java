@@ -127,7 +127,7 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
 					        row = split_Transaction.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
 					        
 					        //GET TRANSACTION
-					        Transaction transaction = transactionsTableModel.getBySignature(row);
+					        Transaction transaction = transactionsTableModel.get(row);
 					         
 					        //SHOW DETAIL SCREEN OF TRANSACTION
 					        TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);

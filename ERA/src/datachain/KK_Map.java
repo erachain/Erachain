@@ -11,8 +11,20 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
-// key to key_Stack for End_Date Map
-// in days
+/**
+ * Супер Класс для хранения по НомерСущности
+ * key to key_Stack for End_Date Map
+ *  in days
+ *
+ *  Ключ: НомерСущности
+ *  Значение: карта к ключем по Номер Сущности и Значение:
+ *          СТЭК(Дата Начала, Дата Конца,
+ *          Данные запакованные
+ *          ссвлка на запись)
+ *
+ * TODO: переделать ссылку на запись на Лонг
+ *
+ */
 public class KK_Map extends DCMap<
         Long, // item1 Key
         TreeMap<Long, // item2 Key
@@ -23,7 +35,7 @@ public class KK_Map extends DCMap<
                         byte[], // any additional data
 
                         Integer, // block.getHeight() -> db.getBlocksHeadMap(db.getHeightMap().getBlockByHeight(index))
-                        Integer // block.getBySignature(transaction.getSignature()) -> block.getBySignature(index)
+                        Integer // block.get(transaction.getSignature()) -> block.get(index)
                         >>>> {
 
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();

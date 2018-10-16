@@ -7,8 +7,11 @@ import utils.ObserverMessage;
 
 import java.util.Map;
 
-//import database.serializer.StatusSerializer;
-
+/**
+ * Хранение активов.<br>
+ * Ключ: номер (автоинкремент)<br>
+ * Значение: Представление<br>
+ */
 public class ItemStatementMap extends Item_Map {
 
     static final String NAME = "item_statements";

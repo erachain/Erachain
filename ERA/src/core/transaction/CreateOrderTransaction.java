@@ -226,8 +226,8 @@ public class CreateOrderTransaction extends Transaction {
 
         super.setDC(dcSet, asDeal);
 
-        this.haveAsset = (AssetCls) this.dcSet.getItemAssetMap().getBySignature(this.haveKey);
-        this.wantAsset = (AssetCls) this.dcSet.getItemAssetMap().getBySignature(this.wantKey);
+        this.haveAsset = (AssetCls) this.dcSet.getItemAssetMap().get(this.haveKey);
+        this.wantAsset = (AssetCls) this.dcSet.getItemAssetMap().get(this.wantKey);
 
     }
     */

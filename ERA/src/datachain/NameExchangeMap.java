@@ -12,6 +12,9 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.Map.Entry;
 
+/**
+ * для Имен - не используется в трнзакциях сейчас
+ */
 public class NameExchangeMap extends DCMap<String, BigDecimal> {
     public static final int AMOUNT_INDEX = 1;
 

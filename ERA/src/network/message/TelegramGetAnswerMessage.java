@@ -28,7 +28,7 @@ public class TelegramGetAnswerMessage extends Message {
 
     public TelegramGetAnswerMessage(JSONObject json) {
         super(TELEGRAM_GET_ANSVER_TYPE);
-        // getBySignature list Telegrams
+        // get list Telegrams
         telegransList = new ArrayList<Transaction>();
         if(json.containsKey("list")){
             JSONObject jsonTelegrams = (JSONObject) json.get("list");

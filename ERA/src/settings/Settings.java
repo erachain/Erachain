@@ -713,7 +713,7 @@ public class Settings {
 	{
 		if(this.settingsJSON.containsKey("maxbyteperfee"))
 		{
-			return ((Long) this.settingsJSON.getBySignature("maxbyteperfee")).intValue();
+			return ((Long) this.settingsJSON.get("maxbyteperfee")).intValue();
 		}
 		
 		return DEFAULT_MAX_BYTE_PER_FEE;
@@ -822,7 +822,7 @@ public class Settings {
                 }
             }
         } catch (SocketException e) {
-            LOGGER.info("unable to getBySignature current IP " + e.getMessage());
+            LOGGER.info("unable to get current IP " + e.getMessage());
         }
         return null;
     }

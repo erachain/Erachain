@@ -223,6 +223,12 @@ public class DCSet implements Observer, IDB {
 
     }
 
+    /**
+     * Make data set as Fork
+     *
+     * @param parent parent DCSet
+     * @param idDatabase
+     */
     protected DCSet(DCSet parent, DB idDatabase) {
 
         this.addUses();
@@ -320,6 +326,16 @@ public class DCSet implements Observer, IDB {
         this.outUses();
     }
 
+    /**
+     * Get instance of DCSet or create new
+     *
+     * @param withObserver [true] - for switch on GUI observers
+     * @param dynamicGUI [true] - for switch on GUI observers fir dynamic interface
+
+     * @return
+
+     * @throws Exception
+     */
     public static DCSet getInstance(boolean withObserver, boolean dynamicGUI) throws Exception {
         if (instance == null) {
             reCreateDatabase(withObserver, dynamicGUI);
@@ -328,10 +344,21 @@ public class DCSet implements Observer, IDB {
         return instance;
     }
 
+    /**
+     *
+     * @return
+     */
     public static DCSet getInstance() {
         return instance;
     }
 
+    /**
+     * remake data set
+     *
+     * @param withObserver [true] - for switch on GUI observers
+     * @param dynamicGUI [true] - for switch on GUI observers fir dynamic interface
+     * @throws Exception
+     */
     public static void reCreateDatabase(boolean withObserver, boolean dynamicGUI) throws Exception {
 
         //OPEN DB
@@ -381,6 +408,11 @@ public class DCSet implements Observer, IDB {
 
     }
 
+    /**
+     * make data set in memory. For tests
+     *
+     * @return
+     */
     public static DCSet createEmptyDatabaseSet() {
         DB database = DBMaker
                 .newMemoryDB()
@@ -391,6 +423,11 @@ public class DCSet implements Observer, IDB {
         return instance;
     }
 
+    /**
+     * create FORK of DB
+     *
+     * @return
+     */
     public static DB createForkbase() {
 
         //OPEN DB
@@ -455,6 +492,12 @@ public class DCSet implements Observer, IDB {
         }
     }
 
+    /**
+     * сколько всего транзакций в цепочке
+     * TODO: это лишнее сейчас так как счетчик встроен ФиналМап
+     *
+     * @param offset
+     */
     public void updateTxCounter(long offset) {
         if (parent == null && offset != 0l) {
             this.uses++;
@@ -468,6 +511,13 @@ public class DCSet implements Observer, IDB {
         return u;
     }
 
+
+    /**
+     * сколько всего транзакций в ожидании
+     * TODO: это лишнее сейчас так как счетчик встроен ФиналМап
+     *
+     * @param offset
+     */
     public void updateUncTxCounter(int offset) {
         if (parent == null && offset != 0) {
             this.uses++;
@@ -489,6 +539,9 @@ public class DCSet implements Observer, IDB {
         }
     }
 
+    /**
+     * reset all data set
+     */
     public void reset() {
 
         this.addUses();
@@ -569,10 +622,18 @@ public class DCSet implements Observer, IDB {
         this.outUses();
     }
 
+    /**
+     * Взять родительскую базу, с которой сделан форк. Используется в процессах транзакций
+     * @return
+     */
     public DCSet getParent() {
         return this.parent;
     }
 
+    /**
+     * всять объект цепочки для которой эта база сделана
+     * @return BlockChain
+     */
     public BlockChain getBlockChain() {
         return this.bchain;
     }
@@ -581,132 +642,375 @@ public class DCSet implements Observer, IDB {
         this.bchain = bchain;
     }
 
+    /**
+     * это форкнутая база?
+     * @return
+     */
     public boolean isFork() {
         return this.parent != null;
     }
 
+    /**************************************************************************************************/
+
+    /**
+     * Хранит данные о сборке блока для данного счета - по номеру блока
+     * если номер блока не задан - то это последнее значение.
+     * При этом если номер блока не задана то хранится поледнее значение
+     *  account.address + current block.Height ->
+     *     previous making blockHeight + this ForgingH balance
+     <hr>
+     - not SAME with BLOCK HEADS - use point for not only forged blocks - with incoming ERA Volumes
+
+     * @return
+     */
+    // TODO укротить до 20 байт адрес
     public AddressForging getAddressForging() {
         return this.addressForging;
     }
 
+    /** Общая сумма переданных средств в кредит на другой счет
+     * Используется для проверки сумм которые отдаются или забираются у заемщика<br><br>
+     *
+     * <b>Ключ:</b> account.address Creditor + asset key + account.address Debtor<br>
+     *
+     * <b>Значение:</b> сумма средств
+     *
+     */
     public Credit_AddressesMap getCredit_AddressesMap() {
         return this.credit_AddressesMap;
     }
 
+    /** Балансы для заданного адреса на данный актив. balances for all account in blockchain<br>
+     * <b>Список балансов:</b> имущество, займы, хранение, производство, резерв<br>
+     * Каждый баланс: Всего Пришло и Остаток<br><br>
+     *
+     * <b>Ключ:</b> account.address + asset key<br>
+     *
+     * <b>Значение:</b> Балансы. in_OWN, in_RENT, on_HOLD = in_USE (TOTAL on HAND)
+     *
+     */
+// TODO SOFT HARD TRUE
     public ItemAssetBalanceMap getAssetBalanceMap() {
         return this.assetBalanceMap;
     }
 
+    /**
+     * Хранит для этого адреса и времени создания ссылки на транзакции типа Statement, см. супер класс
+     * @return
+     */
     public AddressStatement_Refs getAddressStatement_Refs() {
         return this.addressStatement_Refs;
     }
 
+    /** (пока не используется - по идее для бухгалтерских единиц отдельная таблица)
+     * Балансы для заданного адреса на данный актив. balances for all account in blockchain<br>
+     * <b>Список балансов:</b> имущество, займы, хранение, производство, резерв<br>
+     * Каждый баланс: Всего Пришло и Остаток<br><br>
+     *
+     * <b>Ключ:</b> account.address + asset key<br>
+     *
+     * <b>Значение:</b> Балансы. in_OWN, in_RENT, on_HOLD = in_USE (TOTAL on HAND)
+     *
+     */
+    // TODO SOFT HARD TRUE
     public ItemAssetBalanceMap getAssetBalanceAccountingMap() {
         return this.assetBalanceAccountingMap;
     }
 
+    /**
+     * Хранит Удостоверенные публичные ключи для персон.
+     * Тут block.getHeight + transaction index  - это ссылка на транзакцию создавшую данную заметку<br>
+     *
+     * <b>Ключ:</b> person key<br>
+
+     * <b>Значение:</b><br>
+     TreeMap(<br>
+     (String)address - публичный счет,<br>
+     Stack((Integer)end_date - дата окончания действия удостоврения,<br>
+     (Integer)block.getHeight - номер блока,<br>
+     (Integer)transaction index - номер транзакции в блоке<br>
+     ))
+     */
+// TODO: ссылку на ЛОНГ
     public PersonAddressMap getPersonAddressMap() {
         return this.personAddressMap;
     }
 
+    /**
+     * Хранит Удостоверения персон для заданного публичного ключа.
+     * address -> Stack person + end_date + block.height + transaction.reference.
+     * Тут block.getHeight + transaction index  - это ссылка на транзакцию создавшую данную заметку<br>
+     *
+     * <b>Ключ:</b> (String)publickKey<br>
+
+     * <b>Значение:</b><br>
+     Stack((Long)person key,
+     (Integer)end_date - дата окончания действия удостоврения,<br>
+     (Integer)block.getHeight - номер блока,<br>
+     (Integer)transaction index - номер транзакции в блоке<br>
+     ))
+     */
+// TODO укротить до 20 байт адрес и ссылку на Long
     public AddressPersonMap getAddressPersonMap() {
         return this.addressPersonMap;
     }
 
+    /**
+     * Назначает статус для актива. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * в котрой по ключу ищем значение там карта по ключу еще и
+     * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
+
+     * @return dcMap
+     */
     public KKAssetStatusMap getAssetStatusMap() {
         return this.kKAssetStatusMap;
     }
 
+    /**
+     * Назначает статус для персоны. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * в котрой по ключу ищем значение там карта по ключу еще и
+     * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись.<br>
+     *     <br>
+
+     key: (Long)PERSON <br>
+     Value:<br>
+     TreeMap<(Long) STATUS
+     Stack(Tuple5(
+     (Long) beg_date,
+     (Long)end_date,
+
+     (byte[]) any additional data,
+
+     Integer,
+     Integer
+     ))
+
+     * @return dcMap
+     */
     public KKPersonStatusMap getPersonStatusMap() {
         return this.kKPersonStatusMap;
     }
 
+    /**
+     * Назначает статус для актива. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * в котрой по ключу ищем значение там карта по ключу еще и
+     * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
+
+     * @return dcMap
+     */
     public KKUnionStatusMap getUnionStatusMap() {
         return this.kKUnionStatusMap;
     }
 
+    /**
+     * Назначает актив для объединения. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * в котрой по ключу ищем значение там карта по ключу еще и
+     * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
+
+     * @return dcMap
+     */
     public KKAssetUnionMap getAssetUnionMap() {
         return this.kKAssetUnionMap;
     }
 
+    /**
+     * Назначает персон для объединения. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * в котрой по ключу ищем значение там карта по ключу еще и
+     * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
+
+     * @return dcMap
+     */
     public KKPersonUnionMap getPersonUnionMap() {
         return this.kKPersonUnionMap;
     }
 
+    /**
+     * Назначает голосования для объединения. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * в котрой по ключу ищем значение там карта по ключу еще и
+     * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
+
+     * @return dcMap
+     */
     public KKPollUnionMap getPollUnionMap() {
         return this.kKPollUnionMap;
     }
-	/*
-	public ItemsStatusesMap getItemsStatusesMap(ItemCls item)
-	{
-		if (item.getItemTypeInt() == ItemCls.PERSON_TYPE)
-			return this.personStatusMap;
-		else if (item.getItemTypeInt() == ItemCls.ASSET_TYPE)
-			return this.assetStatusMap;
-		else if (item.getItemTypeInt() == ItemCls.UNION_TYPE)
-			return this.unionStatusMap;
-	}
-	 */
 
+    /**
+     * Назначает статус для объединения. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * в котрой по ключу ищем значение там карта по ключу еще и
+     * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
+
+     * @return dcMap
+     */
     public KKStatusUnionMap getStatusUnionMap() {
         return this.kKStatusUnionMap;
     }
 
+    /**
+     * Назначает статус для объединения. Использует схему карты Ключ + Ключ - Значение: KK_К_Map,
+     * в котрой по ключу ищем значение там еще карта по ключу.
+     * Результат это Стэк из значений Конец, Номер Блока, подпись транзакции
+
+     * @return dcMap
+     */
     public KK_KPersonStatusUnionMap getPersonStatusUnionMap() {
         return this.kK_KPersonStatusUnionMap;
     }
 
+    /**
+     * Заверение другой транзакции<br><br>
+     * Ключ: ссылка на запись которую заверяем.<br>
+     * Значение: Сумма ERA на момент заверения на счету заверителя + ссылка на запись заверения:<br>
+     vouched record (BlockNo, RecNo) -> ERM balabce + List of vouchers records
+     * @return dcMap
+     */
     public VouchRecordMap getVouchRecordMap() {
         return this.vouchRecordMap;
     }
 
+    /**
+     * Для поиска по хешу в транзакции множества хешей - саму запись
+     * // found by hash -> record signature
+     *
+     * Ключ: хэш пользователя
+     * Значение: ссылка на запись
+     *
+     * @return
+     */
     public HashesMap getHashesMap() {
         return this.hashesMap;
     }
 
+    /** Набор хэшей - по хэшу поиск записи в котрой он участвует и
+     * используется в транзакции core.transaction.R_Hashes
+     hash[byte] -> Stack person + block.height + transaction.seqNo
+
+     * Ключ: хэш<br>
+     * Значение: список - номер персоны (Если это персона создала запись, ссылка на запись)<br>
+     // TODO укротить до 20 байт адрес и ссылку на Long
+     * @return
+     */
     public HashesSignsMap getHashesSignsMap() {
         return this.hashesSignsMap;
     }
 
-	/*
-	public BlockCreatorMap getBlockCreatorMap()
-	{
-		return this.blockCreatorMap;
-	}
-	 */
-
+    /**
+     * Хранит блоки полностью - с транзакциями
+     *
+     * ключ: номер блока (высота, height)<br>
+     * занчение: Блок<br>
+     *
+     * Есть вторичный индекс, для отчетов (blockexplorer) - generatorMap
+     * TODO - убрать длинный индек и вставить INT
+     *
+     * @return
+     */
     public BlockMap getBlockMap() {
         return this.blockMap;
     }
 
+    /**
+     * ключ: подпись блока
+     * занчение: номер блока (высота, height)<br>
+
+     * TODO - убрать длинный индекс
+     *
+     * @return
+     */
     public BlockSignsMap getBlockSignsMap() {
         return this.blockSignsMap;
     }
 
+    /**
+     *  Block Height -> Block.BlockHead - заголовок блока влючая все что вычислено <br>
+     *
+     *  + FACE - version, creator, signature, transactionsCount, transactionsHash<br>
+     *  + parentSignature<br>
+     *  + Forging Data - Forging Value, Win Value, Target Value<br>
+     *
+     *
+     */
     public BlocksHeadsMap getBlocksHeadsMap() {
         return this.blocksHeadsMap;
     }
 
+    /**
+     * TODO: Надо подумать может она лишняя??
+     * seek reference to tx_Parent by address+timestamp
+     * account.address -> <tx2.parentTimestamp>
+     *
+     */
     public ReferenceMap getReferenceMap() {
         return this.referenceMap;
     }
 
+    /**
+     * По адресу и времени найти подпись транзакции
+     * seek reference to tx_Parent by address
+     * // account.addres + tx1.timestamp -> <tx2.signature>
+     *     Ключ: адрес создателя + время создания или только адрес
+     *
+     *     Значение: подпись транзакции или подпись последней транзакции
+     *
+     *     Используется для поиска публичного ключа для данного создателя и для поиска записей в отчетах
+     *
+     *     TODO: заменить подпись на ссылку
+     *
+     * @return
+     */
     public AddressTime_SignatureMap getAddressTime_SignatureMap() {
         return this.addressTime_SignatureMap;
     }
 
+
+    /**
+     * Транзакции занесенные в цепочку
+     *
+     * block.id + tx.ID in this block -> transaction
+     *
+     * Вторичные ключи:
+     * ++ sender_txs
+     * ++ recipient_txs
+     * ++ address_type_txs
+     */
     public TransactionFinalMap getTransactionFinalMap() {
         return this.transactionFinalMap;
     }
 
+    /**
+     * Храним вычисленные транзакции - для отображения в отчетах - пока нигде не используется - на будущее
+     *
+     * Ключ: ссылка на запись Родитель + Номер Актива - хотя наверное по Активу это во вторичные ключи
+     * Значение: Сама Вычисленная транзакция
+     * block.id + tx.ID in this block -> transaction
+     *
+     * Вторичные ключи по:
+     * ++ sender_txs
+     * ++ recipient_txs
+     * ++ address_type_txs
+     */
     public TransactionFinalCalculatedMap getTransactionFinalCalculatedMap() {
         return this.transactionFinalCalculatedMap;
     }
 
+    /**
+     * Поиск по подписи ссылки на трнзакыию
+     * signature -> <BlockHeoght, Record No>
+     */
     public TransactionFinalMapSigns getTransactionFinalMapSigns() {
         return this.transactionFinalMapSigns;
     }
 
+    /**
+     * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction
+     *
+     * Также хранит инфо каким пирам мы уже разослали транзакцию неподтвержденную так что бы при подключении делать автоматически broadcast
+     *
+     * signature -> Transaction
+     * TODO: укоротить ключ до 8 байт
+     *
+     * ++ seek by TIMESTAMP
+     */
     public TransactionMap getTransactionMap() {
         return this.transactionMap;
     }
@@ -739,18 +1043,33 @@ public class DCSet implements Observer, IDB {
         return this.orphanNameStorageHelperMap;
     }
 
+    /**
+     * я так понял - это отслеживание версии базы данных - и если она новая то все удаляем и заново закачиваем/
+     * Сейчас не используется вроде ни как
+     */
     public LocalDataMap getLocalDataMap() {
         return this.localDataMap;
     }
 
+    /**
+     * для создания постов - не используется
+     * @return
+     */
     public BlogPostMap getBlogPostMap() {
         return this.blogPostMap;
     }
 
+    /**
+     * для создания постов - не используется
+     * @return
+     */
     public HashtagPostMap getHashtagPostMap() {
         return this.hashtagPostMap;
     }
 
+    /**
+     * для Имен - не используется в транзакциях сейчас
+     */
     public NameExchangeMap getNameExchangeMap() {
         return this.nameExchangeMap;
     }
@@ -767,30 +1086,73 @@ public class DCSet implements Observer, IDB {
         return this.pollMap;
     }
 
+
     public VoteOnPollMap getVoteOnPollMap() {
         return this.voteOnPollMap;
     }
 
+    /**
+     * Храним выбор голосующего по Сущности Голования
+     * POLL KEY + OPTION KEY + ACCOUNT SHORT = result Transaction reference (BlockNo + SeqNo)
+     * byte[] - un CORAMPABLE
+     *
+     * Ключ: Номер Голосвания + Номер выбора + Счет Короткий
+     * Значение: СТЭК ссылок на трнзакцию голосвания
+     *
+     * TODO: передлать ссылку на запись на Лонг
+     * TODO: передлать короткий Счет на байты
+     */
     public VoteOnItemPollMap getVoteOnItemPollMap() {
         return this.voteOnItemPollMap;
     }
 
+    /************************************** ITEMS *************************************/
+
+    /**
+     * Хранение активов.<br>
+     * Ключ: номер (автоинкремент)<br>
+     * Значение: Актив<br>
+     */
     public ItemAssetMap getItemAssetMap() {
         return this.itemAssetMap;
     }
 
+    /**
+     * see datachain.Issue_ItemMap
+     *
+     * @return
+     */
     public IssueAssetMap getIssueAssetMap() {
         return this.issueAssetMap;
     }
 
+    /**
+     * Хранение ордеров на бирже
+     * Ключ: ссылка на запись создавшую заказ
+     * Значение: Ордер
+     *
+     * @return
+     */
     public OrderMap getOrderMap() {
         return this.orderMap;
     }
 
+    /**
+     * Хранит исполненные ордера, или отмененные - все что уже не активно<br>
+     * <br>
+     * Ключ: ссылка на запись создания заказа<br>
+     * Значение: заказ<br>
+     */
     public CompletedOrderMap getCompletedOrderMap() {
         return this.completedOrderMap;
     }
 
+    /**
+     * Хранит сделки на бирже
+     * Ключ: ссылка на иницатора + ссылка на цель
+     * Значение - Сделка
+     Initiator DBRef (Long) + Target DBRef (Long) -> Trade
+     */
     public TradeMap getTradeMap() {
         return this.tradeMap;
     }
@@ -799,14 +1161,29 @@ public class DCSet implements Observer, IDB {
         return this.itemImprintMap;
     }
 
+/**
+ * see datachain.Issue_ItemMap
+ *
+ * @return
+ */
     public IssueImprintMap getIssueImprintMap() {
         return this.issueImprintMap;
     }
 
+    /**
+     * Хранение активов.<br>
+     * Ключ: номер (автоинкремент)<br>
+     * Значение: Шаблон<br>
+     */
     public ItemTemplateMap getItemTemplateMap() {
         return this.itemTemplateMap;
     }
 
+    /**
+     * see datachain.Issue_ItemMap
+     *
+     * @return
+     */
     public IssueTemplateMap getIssueTemplateMap() {
         return this.issueTemplateMap;
     }
@@ -815,42 +1192,92 @@ public class DCSet implements Observer, IDB {
         return this.itemStatementMap;
     }
 
+    /**
+     * see datachain.Issue_ItemMap
+     *
+     * @return
+     */
     public IssueStatementMap getIssueStatementMap() {
         return this.issueStatementMap;
     }
 
+    /**
+     * see datachain.Item_Map
+     *
+     * @return
+     */
     public ItemPersonMap getItemPersonMap() {
         return this.itemPersonMap;
     }
 
+    /**
+     * see datachain.Issue_ItemMap
+     *
+     * @return
+     */
     public IssuePersonMap getIssuePersonMap() {
         return this.issuePersonMap;
     }
 
+    /**
+     * see datachain.Item_Map
+     *
+     * @return
+     */
     public ItemPollMap getItemPollMap() {
         return this.itemPollMap;
     }
 
+    /**
+     * see datachain.Issue_ItemMap
+     *
+     * @return
+     */
     public IssuePollMap getIssuePollMap() {
         return this.issuePollMap;
     }
 
+    /**
+     * see datachain.Item_Map
+     *
+     * @return
+     */
     public ItemStatusMap getItemStatusMap() {
         return this.itemStatusMap;
     }
 
+    /**
+     * see datachain.Issue_ItemMap
+     *
+     * @return
+     */
     public IssueStatusMap getIssueStatusMap() {
         return this.issueStatusMap;
     }
 
+    /**
+     * see datachain.Item_Map
+     *
+     * @return
+     */
     public ItemUnionMap getItemUnionMap() {
         return this.itemUnionMap;
     }
 
+    /**
+     * see datachain.Issue_ItemMap
+     *
+     * @return
+     */
     public IssueUnionMap getIssueUnionMap() {
         return this.issueUnionMap;
     }
 
+    /**
+     * Селектор таблицы по типу Сущности
+     * @param type тип Сущности
+     * @return
+     */
     public Item_Map getItem_Map(int type) {
 
         switch (type) {
@@ -891,6 +1318,10 @@ public class DCSet implements Observer, IDB {
         return this.atTransactionMap;
     }
 
+    /**
+     * создать форк
+     * @return
+     */
     public DCSet fork() {
         this.addUses();
         DCSet fork = new DCSet(this, null);
@@ -899,6 +1330,10 @@ public class DCSet implements Observer, IDB {
         return fork;
     }
 
+    /**
+     * форк на диске
+     * @return
+     */
     public DCSet forkinFile() {
         this.addUses();
         DCSet fork = new DCSet(this, createForkbase());

@@ -26,7 +26,7 @@ public class VouchingDetailsFrame extends Rec_DetailsFrame {
         this.add(name, detailGBC);
 
         Transaction record = DCSet.getInstance().getTransactionFinalMap().
-                getBySignature(vouchRecord.getVouchHeight(), vouchRecord.getVouchSeqNo());
+                get(vouchRecord.getVouchHeight(), vouchRecord.getVouchSeqNo());
 
         String message = "<div>";
         if (record == null) {
