@@ -153,18 +153,19 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 
         if (message.getType() == ObserverMessage.LIST_VOUCH_TYPE || message.getType() == ObserverMessage.ADD_VOUCH_TYPE || message.getType() == ObserverMessage.REMOVE_VOUCH_TYPE) {
             // read indexes to DB
-            Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> vouches = DCSet.getInstance().getVouchRecordMap().get(new Tuple2<Integer, Integer>(this.blockNo, this.recNo));
+            Tuple2<BigDecimal, List<Long>> vouches = DCSet.getInstance().getVouchRecordMap().get(Transaction.makeDBRef(this.blockNo, this.recNo));
             if (vouches == null) {
                 fireTableDataChanged();
                 return;
 
             }
 
-            List<Tuple2<Integer, Integer>> ttxs = DCSet.getInstance().getVouchRecordMap().get(new Tuple2<Integer, Integer>(this.blockNo, this.recNo)).b;
+            List<Long> keys = DCSet.getInstance().getVouchRecordMap().get(Transaction.makeDBRef(this.blockNo, this.recNo)).b;
             transactions.clear();
-            for (Tuple2<Integer, Integer> ttx : ttxs) {
+            for (Long key : keys) {
                 // write R-Vouch transaction
-                transactions.add((R_Vouch) DCSet.getInstance().getTransactionFinalMap().getBySignature(ttx.a, ttx.b));
+                //transactions.add((R_Vouch) DCSet.getInstance().getTransactionFinalMap().getBySignature(ttx.a, ttx.b));
+                transactions.add((R_Vouch) DCSet.getInstance().getTransactionFinalMap().get(key));
 
             }
             fireTableDataChanged();
