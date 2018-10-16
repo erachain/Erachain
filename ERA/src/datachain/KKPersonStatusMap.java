@@ -4,21 +4,27 @@ package datachain;
 import org.mapdb.DB;
 import utils.ObserverMessage;
 
-/*
-public class KK_Map extends DCMap<
-Long, // item1 Key <-- PERSON
-TreeMap<Long, // item2 Key <-- STATUS
-	Stack<Tuple5<
-		Long, // beg_date
-		Long, // end_date
+/**
+ * Назначает статус для персоны. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+ * в котрой по ключу ищем значение там карта по ключу еще и
+ * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись.<br>
+ *     <br>
 
-		byte[], // any additional data
-		
-		Integer, // block.getHeight() -> db.getBlocksHeadMap(db.getHeightMap().getBlockByHeight(index))
-		Integer // block.getBySignature(transaction.getSignature()) -> block.getBySignature(index)
-	>>>>
-{
-*/
+    key: (Long)PERSON <br>
+    Value:<br>
+        TreeMap<(Long) STATUS
+        Stack(Tuple5(
+            (Long) beg_date,
+            (Long)end_date,
+
+            (byte[]) any additional data,
+
+            Integer,
+            Integer
+        ))
+
+     * @return dcMap
+     */
 
 public class KKPersonStatusMap extends KK_Map {
 

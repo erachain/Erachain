@@ -580,7 +580,7 @@ public class Main_Panel extends javax.swing.JPanel {
 
     }
 
-    // getBySignature node by name
+    // get node by name
     private DefaultMutableTreeNode getNodeByName(String sNodeName, DefaultMutableTreeNode parent) {
         if (parent != null)
             for (Enumeration e = parent.breadthFirstEnumeration(); e.hasMoreElements(); ) {

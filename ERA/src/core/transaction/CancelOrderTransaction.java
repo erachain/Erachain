@@ -69,7 +69,7 @@ public class CancelOrderTransaction extends Transaction {
         super.setBlock(block, dcSet, asDeal, seqNo);
 
         Long createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
-        //Transaction createOrder = this.dcSet.getTransactionMap().getBySignature(this.orderSignature);
+        //Transaction createOrder = this.dcSet.getTransactionMap().get(this.orderSignature);
         this.orderID = createDBRef;
     }
 
@@ -77,7 +77,7 @@ public class CancelOrderTransaction extends Transaction {
         super.setDC(dcSet, asDeal, blockHeight, seqNo);
 
         Long createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
-        //Transaction createOrder = this.dcSet.getTransactionMap().getBySignature(this.orderSignature);
+        //Transaction createOrder = this.dcSet.getTransactionMap().get(this.orderSignature);
         this.orderID = createDBRef;
 
     }
@@ -208,7 +208,7 @@ public class CancelOrderTransaction extends Transaction {
         //        return ORDER_DOES_NOT_EXIST;
         //}
 
-        ///Tuple2<Integer, Integer> transactionRef = this.dcSet.getTransactionFinalMapSigns().getBySignature(this.orderSignature);
+        ///Tuple2<Integer, Integer> transactionRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
         ///this.orderID = Transaction.makeDBRef(transactionIndex);
         Order order = null;
         if (this.orderID != null && this.dcSet.getOrderMap().contains(this.orderID))
@@ -281,7 +281,7 @@ public class CancelOrderTransaction extends Transaction {
         super.process(block, asDeal);
 
         // TODO - CANCEL для транзакции в том же блоке???
-        //Transaction createOrder = this.dcSet.getTransactionFinalMap().getBySignature(this.orderSignature);
+        //Transaction createOrder = this.dcSet.getTransactionFinalMap().get(this.orderSignature);
         //Tuple2<Integer, Integer> dbRefTuple2 = createOrder.getHeightSeqNo();
         //this.orderID = Transaction.makeDBRef(dbRefTuple2);
 

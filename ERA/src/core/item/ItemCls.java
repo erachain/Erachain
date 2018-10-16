@@ -55,6 +55,7 @@ public abstract class ItemCls {
     protected String name;
     protected String description;
     protected long key = 0;
+    // TODO: поменять ссылку на Long
     protected byte[] reference = null; // this is signature of issued record
     protected byte[] icon;
     protected byte[] image;

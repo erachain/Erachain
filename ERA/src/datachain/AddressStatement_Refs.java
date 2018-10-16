@@ -4,6 +4,11 @@ package datachain;
 import org.mapdb.DB;
 import utils.ObserverMessage;
 
+/**
+ * Хранит для этого адреса и времени создания ссылки на транзакции типа Statement, см. супер класс
+ * @return
+ */
+
 public class AddressStatement_Refs extends AddressItem_Refs {
     static final String NAME = "statement";
 

@@ -162,7 +162,7 @@ public class MTable<U, T> extends JTable {
 
     }
 
-    // getBySignature nom Column fro mouse cursor coordinates
+    // get nom Column fro mouse cursor coordinates
     private int getColumn(JTableHeader th, Point p) {
         TableColumnModel model = th.getColumnModel();
         for (int col = 0; col < model.getColumnCount(); col++)
@@ -408,7 +408,7 @@ public class MTable<U, T> extends JTable {
                 if (filters.get(col) != null) {
                     if (filters.get(col).a != null) {
                         if (filters.get(col).a.a != null) {
-                            //			 cx = filters.getBySignature(col).a.a;
+                            //			 cx = filters.get(col).a.a;
                             rememberChk.setSelected(Boolean.parseBoolean(filters.get(col).a.a.toString()));
                         }
                     }

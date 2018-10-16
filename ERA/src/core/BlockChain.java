@@ -46,7 +46,7 @@ public class BlockChain {
     public static final int NEED_PEERS_FOR_UPDATE = HARD_WORK ? 2 : 1;
 
     public static final int MAX_ORPHAN = 1000; // max orphan blocks in chain
-    public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - getBySignature blocks packet by transactions
+    public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get blocks packet by transactions
     public static final int TARGET_COUNT_SHIFT = 10;
     public static final int TARGET_COUNT = 1 << TARGET_COUNT_SHIFT;
     public static final int BASE_TARGET = 100000;///1 << 15;
@@ -406,7 +406,7 @@ public class BlockChain {
         }
 
         //lastBlockSignature = dcSet.getBlocksHeadMap().getLastBlockSignature();
-        //HWeight = dcSet.getBlockSignsMap().getBySignature(lastBlockSignature);
+        //HWeight = dcSet.getBlockSignsMap().get(lastBlockSignature);
 
     }
 
@@ -787,7 +787,7 @@ public class BlockChain {
                 else
                     break;
             } while (parentSignature != null && counter++ < packet);
-            //LOGGER.debug("getBySignature size " + counter);
+            //LOGGER.debug("get size " + counter);
         } else if (Arrays.equals(parentSignature, this.CHECKPOINT.b)) {
             headers.add(parentSignature);
         } else {
@@ -842,7 +842,7 @@ public class BlockChain {
 			}
 
 			int height01 = dcSet.getBlocksHeadsMap().size() - 1;
-			lastSignature = dcSet.getBlocksHeadsMap().getBySignature(height01).b;
+			lastSignature = dcSet.getBlocksHeadsMap().get(height01).b;
 			if(Arrays.equals(lastSignature, block.getReference())) {
 				// CONCURENT for LAST BLOCK
 				Block lastBlock = dcSet.getBlocksHeadMap().last();
@@ -1126,14 +1126,14 @@ public class BlockChain {
         return dcSet.getBlockMap().getLastBlockSignature();
     }
 
-    // getBySignature last blocks for target
+    // get last blocks for target
     public List<Block> getLastBlocksForTarget_old(DCSet dcSet) {
 
         Block last = dcSet.getBlockMap().last();
 
 		/*
 		if (this.lastBlocksForTarget != null
-				&& Arrays.equals(this.lastBlocksForTarget.getBySignature(0).getSignature(), last.getSignature())) {
+				&& Arrays.equals(this.lastBlocksForTarget.get(0).getSignature(), last.getSignature())) {
 			return this.lastBlocksForTarget;
 		}
 		 */
@@ -1152,7 +1152,7 @@ public class BlockChain {
         return list;
     }
 
-    // getBySignature Target by last blocks in chain
+    // get Target by last blocks in chain
     public long getTarget(DCSet dcSet) {
         Block block = this.getLastBlock(dcSet);
         return block.getTarget();

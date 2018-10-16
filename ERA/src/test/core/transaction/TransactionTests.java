@@ -1887,7 +1887,7 @@ String  s= "";
         /////assertEquals(true, Arrays.equals(pollVote.getTimestamp(), maker.getLastReference(databaseSet)));
 
         //CHECK POLL VOTER
-        //assertEquals(false, databaseSet.getPollMap().getBySignature(poll.getName()).getOptions().getBySignature(0).hasVoter(maker));
+        //assertEquals(false, databaseSet.getPollMap().get(poll.getName()).getOptions().get(0).hasVoter(maker));
 
         //CHECK POLL VOTER
         assertEquals(true, databaseSet.getPollMap().get(poll.getName()).getOptions().get(1).hasVoter(maker));

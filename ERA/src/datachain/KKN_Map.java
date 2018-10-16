@@ -11,9 +11,13 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
-// key + key to Name_Stack End_Date Map
-// union in union has name
-// TODO
+/**
+ * Супер Класс для поиска по НомерСущности
+ * key + key to Name_Stack End_Date Map
+ * union in union has name
+ * TODO: ссылку на блок и трнзакцию сменить на Лонг
+ * Значение: крта по строке - нигде не используется - лучше по байтам
+ */
 public class KKN_Map extends DCMap<
         Long, // item1 Key
         TreeMap<String, // item2 Key

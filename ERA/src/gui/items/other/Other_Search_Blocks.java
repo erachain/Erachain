@@ -68,7 +68,7 @@ public class Other_Search_Blocks extends Split_Panel {
                 if (item_Table_Selected == null)
                     return;
 
-                //	  tr = DCSet.getInstance().getTransactionFinalMap().getBySignature(item_Table_Selected.b, item_Table_Selected.c);
+                //	  tr = DCSet.getInstance().getTransactionFinalMap().get(item_Table_Selected.b, item_Table_Selected.c);
 
 
                 rp.searchToolBar_LeftPanel.setVisible(false);

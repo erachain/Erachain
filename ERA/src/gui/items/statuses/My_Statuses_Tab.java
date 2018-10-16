@@ -245,7 +245,7 @@ public class My_Statuses_Tab extends Split_Panel {
         ((DefaultRowSorter) sorter).setRowFilter(fooBarFilter);
 
         statusesModel.fireTableDataChanged();
-        //	String a = search_Status_SplitPanel.searth_Favorite_JCheckBox_LeftPanel.isSelected().getBySignature.getText();
+        //	String a = search_Status_SplitPanel.searth_Favorite_JCheckBox_LeftPanel.isSelected().get.getText();
         //	a = a+ " ";
     }
 
@@ -253,7 +253,7 @@ public class My_Statuses_Tab extends Split_Panel {
     public void delay_on_close() {
         // delete observer left panel
         statusesModel.removeObservers();
-        // getBySignature component from right panel
+        // get component from right panel
         Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
         // if Person_Info 002 delay on close
         if (c1 instanceof Status_Info) ((Status_Info) c1).delay_on_Close();

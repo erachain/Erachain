@@ -32,7 +32,7 @@ public class Search_Templates_Tab extends Item_Search_SplitPanel {
 
                 TemplateCls template = (TemplateCls) th.item_Menu;
                 if (template == null) return;
-                Transaction trans = DCSet.getInstance().getTransactionFinalMap().getBySignature(template.getReference());
+                Transaction trans = DCSet.getInstance().getTransactionFinalMap().get(template.getReference());
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo(DCSet.getInstance()));
             }
         });

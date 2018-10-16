@@ -100,7 +100,7 @@ public class RecordsPanel extends JPanel // JPanel
                     //		        row = transactionsTable.convertRowIndexToModel(row);
 
                     //GET TRANSACTION
-                    //		        Transaction transaction = transactionsModel.getBySignature(row);
+                    //		        Transaction transaction = transactionsModel.get(row);
 
                     //SHOW DETAIL SCREEN OF TRANSACTION
                     //		        TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);

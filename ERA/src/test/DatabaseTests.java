@@ -205,7 +205,7 @@ public class DatabaseTests {
         ItemAssetMap dbMap = dcSet.getItemAssetMap();
         Collection<ItemCls> assets = dbMap.getValuesAll();
         for (ItemCls asset : assets) {
-            //Asset asset = DBSet.getInstance().getAssetMap().getBySignature(key);
+            //Asset asset = DBSet.getInstance().getAssetMap().get(key);
             AssetCls aa = (AssetCls) asset;
             LOGGER.info("ASSET - " + asset.getKey(dcSet) + " : " + asset.getName()
                     + " : " + aa.getQuantity()

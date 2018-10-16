@@ -61,7 +61,7 @@ public class AccountsPropertisMap extends DCMap<String, Tuple2<String, String>> 
         return this.observableData;
     }
 
-    // getBySignature list items in name substring str
+    // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Map<String, Tuple2<String, String>> get_By_Name(String str, boolean caseCharacter) {
         Map<String, Tuple2<String, String>> txs = new TreeMap<String, Tuple2<String, String>>();

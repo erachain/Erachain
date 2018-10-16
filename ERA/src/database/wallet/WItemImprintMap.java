@@ -79,7 +79,7 @@ public class WItemImprintMap extends WItem_Map {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<ImprintCls> getBySignature(Account account)
+	public List<ImprintCls> get(Account account)
 	{
 		List<ImprintCls> imprints = new ArrayList<ImprintCls>();
 		
@@ -106,7 +106,7 @@ public class WItemImprintMap extends WItem_Map {
 		return imprints;
 	}
 	
-	public List<Pair<Account, ImprintCls>> getBySignature(List<Account> accounts)
+	public List<Pair<Account, ImprintCls>> get(List<Account> accounts)
 	{
 		List<Pair<Account, ImprintCls>> imprints = new ArrayList<Pair<Account, ImprintCls>>();		
 
@@ -117,7 +117,7 @@ public class WItemImprintMap extends WItem_Map {
 			{
 				for(Account account: accounts)
 				{
-					List<ImprintCls> accountImprints = getBySignature(account);
+					List<ImprintCls> accountImprints = get(account);
 					for(ImprintCls imprint: accountImprints)
 					{
 						imprints.add(new Pair<Account, ImprintCls>(account, imprint));
@@ -179,7 +179,7 @@ public class WItemImprintMap extends WItem_Map {
 	    for(Account account: imprints.keySet())
 	    {
 	    	//FOR EACH TRANSACTION
-	    	for(ImprintCls imprint: imprints.getBySignature(account))
+	    	for(ImprintCls imprint: imprints.get(account))
 	    	{
 	    		this.add(imprint);
 	    	}

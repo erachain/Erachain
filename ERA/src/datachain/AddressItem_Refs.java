@@ -10,6 +10,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * учет времени последней транзакции данного вида, посланной со счета.
+ * Используется для проверки валидности транзакций.
+ * Если ключ создан без времени, то хранит ссылку на последнюютранзакцию с этого счета
+ * Ключ - счет (20 байт) + время (Long)
+ * Значение  - массив байтов
+ * Используется как супер класс для AddressStatement_Refs (которая сейчас не используется?) - видимо для быстрого поиска записей данного вида для данного счета
+ */
 public class AddressItem_Refs extends DCMap<Tuple2<byte[], Long>, byte[]> {
     protected String name;
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();

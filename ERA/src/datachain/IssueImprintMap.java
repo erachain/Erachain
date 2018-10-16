@@ -6,6 +6,12 @@ import org.mapdb.DB;
 
 import java.util.Map;
 
+/**
+ * see datachain.Issue_ItemMap
+ *
+ * @return
+ */
+
 public class IssueImprintMap extends Issue_ItemMap {
 
     public IssueImprintMap(DCSet databaseSet, DB database) {

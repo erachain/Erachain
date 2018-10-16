@@ -16,11 +16,14 @@ import org.mapdb.Fun.Tuple4;
 import database.DBMap;
 import utils.ObserverMessage;
 
-/*
-ВНИМАНИЕ !!! ВТОричные ключи не хранят дубли - тоесть запись во втричном ключе не будет учтена иперезапишется если такой же ключ прийдет
-Поэтому нужно добавлять униальность
-
- for key = Long as Block Height + Transaction Sequence
+/**
+ * Хранение ордеров на бирже
+ * Ключ: ссылка на запись создавшую заказ
+ * Значение: Ордер
+ *
+ ВНИМАНИЕ !!! ВТОричные ключи не хранят дубли - тоесть запись во втричном ключе не будет учтена иперезапишется если такой же ключ прийдет
+ Поэтому нужно добавлять униальность
+ * @return
  */
 public class OrderMap extends DCMap<Long, Order> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();

@@ -15,8 +15,12 @@ import java.util.TreeMap;
 //import core.account.Account;
 //import core.block.Block;
 
-// seek reference to tx_Parent by address+timestamp
-// account.address -> <tx2.parentTimestamp>
+/**
+ * TODO: Надо подумать может она лишняя??
+ * seek reference to tx_Parent by address+timestamp
+ * account.address -> <tx2.parentTimestamp>
+ *
+ */
 public class ReferenceMap extends DCMap<byte[], Long> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 

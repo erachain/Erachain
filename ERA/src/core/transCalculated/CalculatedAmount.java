@@ -362,7 +362,7 @@ public abstract class CalculatedAmount extends Calculated {
             // update last forging block if it not exist
             // if exist - it not need - incomes will be negate from forging
             // balance
-            // getBySignature height by LAST block in CHAIN + 2 - skip incoming BLOCK
+            // get height by LAST block in CHAIN + 2 - skip incoming BLOCK
             
             Tuple2<Integer, Integer> privousForgingPoint = this.recipient.getLastForgingData(dcSet);
             int currentForgingBalance = recipient.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();

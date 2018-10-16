@@ -14,9 +14,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-// balances for all account in blockchain
+/**
+ * (пока не используется - по идее для бухгалтерских единиц отдельная таблица)
+ * Балансы для заданного адреса на данный актив. balances for all account in blockchain<br>
+ * <b>Список балансов:</b> имущество, займы, хранение, производство, резерв<br>
+ * Каждый баланс: Всего Пришло и Остаток<br><br>
+ *
+ * <b>Ключ:</b> account.address + asset key<br>
+ *
+ * <b>Значение:</b> Балансы. in_OWN, in_RENT, on_HOLD = in_USE (TOTAL on HAND)
+ *
+ */
 // TODO SOFT HARD TRUE
-// -> in_OWN, in_RENT, on_HOLD = in_USE (TOTAL on HAND)
+
 public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
         Tuple2<BigDecimal, BigDecimal>, // in DEBT
@@ -24,7 +34,6 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // it DO
         Tuple2<BigDecimal, BigDecimal>  // on HOLD
         >> {
-    //public static final long FEE_KEY = AssetCls.DILE_KEY;
 
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
@@ -160,9 +169,9 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple5<
     }
 
 	/*
-	public BigDecimal getBySignature(String address)
+	public BigDecimal get(String address)
 	{
-		return this.getBySignature(address, FEE_KEY);
+		return this.get(address, FEE_KEY);
 	}
 	 */
 

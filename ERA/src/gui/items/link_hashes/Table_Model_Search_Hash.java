@@ -73,7 +73,7 @@ public class Table_Model_Search_Hash extends DefaultTableModel {
 
         if (this.lhh.size() == 0 || this.getRowCount() == 0) return null;
 
-        Tuple3<Long, Integer, Integer> hh = lhh.get(row); //= hashes.getBySignature(row);
+        Tuple3<Long, Integer, Integer> hh = lhh.get(row); //= hashes.get(row);
         switch (col) {
             case 0:
                 return hh.a;
@@ -96,7 +96,7 @@ public class Table_Model_Search_Hash extends DefaultTableModel {
         Stack<Tuple3<Long, Integer, Integer>> hh1 = map.get(Base58.decode(hash));
         Iterator<Tuple3<Long, Integer, Integer>> hh1i = hh1.iterator();
         while (hh1i.hasNext()) {
-            // hashes = map.getBySignature(Base58.decode(hash));
+            // hashes = map.get(Base58.decode(hash));
             Tuple3<Long, Integer, Integer> h = hh1i.next();
             lhh.add(h);
         }

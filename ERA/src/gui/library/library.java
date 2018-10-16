@@ -269,7 +269,7 @@ public class library {
         // UIManager.put("Button.focus", new Color(0, 0, 0, 0));
         // UIManager.put("TabbedPane.focus", new Color(0, 0, 0, 0));
         // UIManager.put("ComboBox.focus", new Color(0, 0, 0, 0));
-        // UIManager.put("TextArea.font", UIManager.getBySignature("TextField.font"));
+        // UIManager.put("TextArea.font", UIManager.get("TextField.font"));
 
         int scrolH = (int) (size_font * 1.2);
         if (scrolH < 17)

@@ -12,8 +12,16 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
+/**
+ *  Супер Класс для хранения по ключу НомерСущности + НомерСущности
 // key+key to key_Stack for End_Date Map
 // in days
+ *
+ * ключ: НомерСузности + НомерСущности
+ * Значение: карта с ключем НомерСущности - обычно Актив, Значение: СТЭК (Дата Окончания, Блок, подпись транзакции ее создавшей
+ *
+ * TODO: передлать подпись на Long
+ */
 public class KK_K_Map extends DCMap<
         Tuple2<Long, Long>, // item1 Key + item2 Key
         TreeMap<Long, // item3 Key

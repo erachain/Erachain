@@ -9,6 +9,22 @@ import java.util.Map;
 
 // seek reference to tx_Parent by address
 // account.addres + tx1.timestamp -> <tx2.signature>
+/**
+ * По адресу и времени найти подпись транзакции
+ * seek reference to tx_Parent by address
+ * // account.addres + tx1.timestamp -> <tx2.signature>
+ *     Ключ: адрес создателя + время создания или только адрес
+ *
+ *     Значение: подпись транзакции или подпись последней транзакции
+ *
+ *     Используется для поиска публичного ключа для данного создателя и для поиска записей в отчетах
+ *
+       TODO укротить до 20 байт адрес
+ *     TODO: заменить подпись на ссылку
+ *
+ * @return
+ */
+
 public class AddressTime_SignatureMap extends DCMap<Tuple2<String, Long>, byte[]> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 

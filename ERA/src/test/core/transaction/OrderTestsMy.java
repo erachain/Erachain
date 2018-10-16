@@ -1606,11 +1606,11 @@ public class OrderTestsMy {
         assertEquals(0, db.getOrderMap().getOrdersForTradeWithFork(keyB, keyA, false).size());
         /*
          * assertEquals(BigDecimal.valueOf(23000),
-         * db.getOrderMap().getOrders(keyB, keyA).getBySignature(0).getPriceCalcReverse());
+         * db.getOrderMap().getOrders(keyB, keyA).get(0).getPriceCalcReverse());
          * assertEquals(BigDecimal.valueOf(26000),
-         * db.getOrderMap().getOrders(keyB, keyA).getBySignature(0).getAmountHaveLeft());
+         * db.getOrderMap().getOrders(keyB, keyA).get(0).getAmountHaveLeft());
          * assertEquals(BigDecimal.valueOf(1), db.getOrderMap().getOrders(keyB,
-         * keyA).getBySignature(0).getAmountWantLeft());
+         * keyA).get(0).getAmountWantLeft());
          */
 
     }

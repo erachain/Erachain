@@ -155,7 +155,7 @@ public class WalletResource {
         APIUtils.askAPICallAllowed(x, "POST wallet/unlock " + x, request);
 
         //JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-        //String password = (String) jsonObject.getBySignature("password");
+        //String password = (String) jsonObject.get("password");
 
 
         //CHECK IF WALLET EXISTS

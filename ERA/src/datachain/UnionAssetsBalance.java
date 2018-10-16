@@ -3,9 +3,12 @@ package datachain;
 import org.mapdb.DB;
 import utils.ObserverMessage;
 
-//import database.serializer.AssetSerializer;
-
-// income, balance, 
+/**
+ * Балансы для объединений - пока не используется - на будущее
+ *
+ * Ключ: Номер Объединания + Номер Актива
+ * Значение: балансы
+ */
 public class UnionAssetsBalance extends _BalanceMap {
     static final String NAME = "union";
 

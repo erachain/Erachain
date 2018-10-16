@@ -6,6 +6,12 @@ import org.mapdb.DB;
 
 import java.util.Map;
 
+/**
+ * see datachain.Issue_ItemMap
+ *
+ * @return
+ */
+
 public class IssuePollMap extends Issue_ItemMap {
 
     public IssuePollMap(DCSet databaseSet, DB database) {

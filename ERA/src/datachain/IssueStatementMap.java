@@ -7,6 +7,12 @@ import org.mapdb.DB;
 
 import com.google.common.primitives.UnsignedBytes;
 
+/**
+ * see datachain.Issue_ItemMap
+ *
+ * @return
+ */
+
 public class IssueStatementMap extends Issue_ItemMap {
 
     public IssueStatementMap(DCSet databaseSet, DB database) {

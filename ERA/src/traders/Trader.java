@@ -132,7 +132,7 @@ public abstract class Trader extends Thread {
 
     /*
     protected synchronized void unconfirmedsCancelPut(BigDecimal amount, String signatire) {
-        TreeSet<String> treeSet = unconfirmedsCancel.getBySignature(amount);
+        TreeSet<String> treeSet = unconfirmedsCancel.get(amount);
         if (treeSet == null)
             treeSet = new TreeSet();
 
@@ -141,7 +141,7 @@ public abstract class Trader extends Thread {
     }
 
     protected synchronized boolean unconfirmedsCancelRemove(BigDecimal amount, String signature) {
-        TreeSet<String> treeSet = unconfirmedsCancel.getBySignature(amount);
+        TreeSet<String> treeSet = unconfirmedsCancel.get(amount);
         boolean removed = treeSet.remove(signature);
         unconfirmedsCancel.put(amount, treeSet);
         return removed;
@@ -204,7 +204,7 @@ public abstract class Trader extends Thread {
 
         String result;
 
-        result = this.apiClient.executeCommand("GET trade/getBySignature/" + orderID);
+        result = this.apiClient.executeCommand("GET trade/get/" + orderID);
         //LOGGER.info("GET: " + Base58.encode(orderID) + "\n" + result);
 
         JSONObject jsonObject = null;
@@ -516,7 +516,7 @@ public abstract class Trader extends Thread {
 
             // make copy of LIST - for concerent DELETE
             for (String orderID: new ArrayList<>(schemeItems)) {
-                result = this.apiClient.executeCommand("GET trade/getBySignature/" + orderID);
+                result = this.apiClient.executeCommand("GET trade/get/" + orderID);
                 //LOGGER.info("GET: " + Base58.encode(orderID) + "\n" + result);
 
                 JSONObject jsonObject = null;
@@ -529,7 +529,7 @@ public abstract class Trader extends Thread {
                     //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
                 }
                 if (jsonObject != null && jsonObject.containsKey("completed")) {
-                    // in crete it removing this.schemeOrdersRemove(schemeAmount,  (String)jsonObject.getBySignature("signature"));
+                    // in crete it removing this.schemeOrdersRemove(schemeAmount,  (String)jsonObject.get("signature"));
 
                     this.createOrder(schemeAmount, this.haveKey, this.wantKey,
                             new BigDecimal(jsonObject.get("amountHave").toString()),

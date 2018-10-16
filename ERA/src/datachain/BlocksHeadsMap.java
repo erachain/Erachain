@@ -14,9 +14,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-/*
- *  Block Height ->
- *  BLOCK HEAD:
+/**
+ *  Block Height -> Block.BlockHead:
  *  + FACE - version, creator, signature, transactionsCount, transactionsHash
  *  + parentSignature
  *  + Forging Data - Forging Value, Win Value, Target Value
@@ -118,7 +117,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
             int ttt = 1;
         }
 
-        // getBySignature Win Value of block
+        // get Win Value of block
         long weight = item.winValue;
 
         if (startedInForkHeight == 0 && this.parent != null) {

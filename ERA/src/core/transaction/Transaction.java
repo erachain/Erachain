@@ -404,7 +404,7 @@ public abstract class Transaction {
     }
 
     public static Transaction findByHeightSeqNo(DCSet db, int height, int seq) {
-        return db.getTransactionFinalMap().getBySignature(height, seq);
+        return db.getTransactionFinalMap().get(height, seq);
     }
 
 
@@ -672,7 +672,7 @@ public abstract class Transaction {
         /// if (this.getBlockHeightByParent(db))
         // TODO FEE_FOR_ANONIMOUSE + is PERSON + DB
         int anonimous = 0;
-        // TODO DBSet getBySignature from CHAIN
+        // TODO DBSet get from CHAIN
         /*
          * Controller cnt = Controller.getInstance(); BlockChain bchain =
          * cnt.getBlockChain(); for ( Account acc : this.getRecipientAccounts())
@@ -699,7 +699,7 @@ public abstract class Transaction {
 
     }
 
-    // getBySignature fee
+    // get fee
     public long calcBaseFee() {
         return calcCommonFee();
     }
@@ -793,7 +793,7 @@ public abstract class Transaction {
     }
 
     /*
-    // getBySignature current or -1
+    // get current or -1
     public int getBlockHeightByParent(DCSet db) {
 
         if (block != null)
@@ -803,7 +803,7 @@ public abstract class Transaction {
     }
     */
 
-    // getBySignature current or last
+    // get current or last
     public int getBlockHeightByParentOrLast(DCSet dc) {
 
         if (block != null)

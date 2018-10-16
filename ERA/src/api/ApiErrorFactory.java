@@ -249,7 +249,7 @@ public class ApiErrorFactory {
             jsonObject.put("message", AT_Error.getATError(error - Transaction.AT_ERROR));
         } else {
             // errors for Transaction
-            //jsonObject.put("message", this.errorMessages.getBySignature(error));
+            //jsonObject.put("message", this.errorMessages.get(error));
             jsonObject.put("message", OnDealClick.resultMess(error));
         }
 

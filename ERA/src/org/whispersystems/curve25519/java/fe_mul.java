@@ -32,7 +32,7 @@ but the resulting data flow is considerably less clean.
 
 There are 12 carries below.
 10 of them are 2-way parallelizable and vectorizable.
-Can getBySignature away with 11 carries, but then data flow is much deeper.
+Can get away with 11 carries, but then data flow is much deeper.
 
 With tighter constraints on inputs can squeeze carries into int32.
 */

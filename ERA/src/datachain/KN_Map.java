@@ -11,8 +11,15 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
-// key to Name_Stack End_Date Map
-// in days
+/**
+ * Супер Класс
+ *
+ * Ключ: НомерСущности
+ * Значение: крта по строке - не используется - лучше байты
+ *
+ // key to Name_Stack End_Date Map
+ // in days
+ */
 public class KN_Map extends DCMap<
         Long, // item1 Key
         TreeMap<String, // item2 Key

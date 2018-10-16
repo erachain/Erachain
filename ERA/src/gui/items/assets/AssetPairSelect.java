@@ -296,12 +296,12 @@ public class AssetPairSelect extends JDialog {
                         //if (getParent().getClass().viewName() == "11")
 					/*	new ExchangeFrame(
 								(AssetCls)Controller.getInstance().getItem(ItemCls.ASSET_TYPE, assetPairSelectTableModel.key), 
-								(AssetCls) assetPairSelectTableModel.assets.getBySignature(row), action, account);
+								(AssetCls) assetPairSelectTableModel.assets.get(row), action, account);
 						( ((Window) pair_Panel.getTopLevelAncestor())).dispose();
 					*/
 
                         selectAsset();
-                        //	pairAsset = (AssetCls) assetPairSelectTableModel.assets.getBySignature(row);
+                        //	pairAsset = (AssetCls) assetPairSelectTableModel.assets.get(row);
 
                     }
                 }

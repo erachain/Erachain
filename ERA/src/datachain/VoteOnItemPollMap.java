@@ -11,8 +11,17 @@ import org.mapdb.Fun.Tuple3;
 import java.math.BigInteger;
 import java.util.*;
 
-// POLL KEY + OPTION KEY + ACCOUNT SHORT = result Transaction reference (BlockNo + SeqNo)
-// byte[] - un CORAMPABLE
+/**
+ * Храним выбор голосующего по Сущности Голования
+ * POLL KEY + OPTION KEY + ACCOUNT SHORT = result Transaction reference (BlockNo + SeqNo)
+ * byte[] - un CORAMPABLE
+ *
+ * Ключ: Номер Голосвания + Номер выбора + Счет Короткий
+ * Значение: СТЭК ссылок на трнзакцию голосвания
+ *
+ * TODO: передлать ссылку на запись на Лонг
+ * TODO: передлать короткий Счет на байты
+ */
 public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 

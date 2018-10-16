@@ -255,7 +255,7 @@ public class AccountMap extends Observable {
 		if(!this.assetsBalanceMap.containsKey(k))
 			return BigDecimal.ZERO;
 
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> value = this.assetsBalanceMap.getBySignature(k);
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> value = this.assetsBalanceMap.get(k);
 		if (type == 1)
 			return value.a;
 		else if (type == 2)
@@ -343,7 +343,7 @@ public class AccountMap extends Observable {
 		if(!this.assetsBalanceMap.containsKey(k)) {
 			value =	new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO), BigDecimal.ZERO);
 		} else {
-			value = this.assetsBalanceMap.getBySignature(k);
+			value = this.assetsBalanceMap.get(k);
 		}
 
 		if (type == 1)

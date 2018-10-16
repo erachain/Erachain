@@ -431,7 +431,7 @@ public class Rec_Resource {
     //@Consumes(MediaType.APPLICATION_JSON)
     //@Produces("application/json")
     //
-    // getBySignature record/getraw/31/5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF?feePow=2&timestamp=123123243&version=3&recipient=7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL&amount=123.0000123&key=12
+    // get record/getraw/31/5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF?feePow=2&timestamp=123123243&version=3&recipient=7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL&amount=123.0000123&key=12
     // http://127.0.0.1:9068/record/getraw/31/5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF?feePow=2&recipient=77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy&amount=123.0000123&key=1
     //
     public String getRaw(@PathParam("type") int record_type,

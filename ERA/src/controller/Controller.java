@@ -534,17 +534,17 @@ public class Controller extends Observable {
         /*
          * try { if(this.dcSet.getBlocksHeadMap().getLastBlockSignature() != null) {
          * //CHECK IF NAME STORAGE NEEDS UPDATE if
-         * (this.dcSet.getLocalDataMap().getBySignature("nsupdate") == null ) { //FIRST
+         * (this.dcSet.getLocalDataMap().get("nsupdate") == null ) { //FIRST
          * NAME STORAGE UPDATE UpdateUtil.repopulateNameStorage( 70000 );
          * this.dcSet.getLocalDataMap().set("nsupdate", "1"); } //CREATE
          * TRANSACTIONS FINAL MAP if
-         * (this.dcSet.getLocalDataMap().getBySignature("txfinalmap") == null ||
-         * !this.dcSet.getLocalDataMap().getBySignature("txfinalmap").equals("2")) {
+         * (this.dcSet.getLocalDataMap().get("txfinalmap") == null ||
+         * !this.dcSet.getLocalDataMap().get("txfinalmap").equals("2")) {
          * //FIRST NAME STORAGE UPDATE UpdateUtil.repopulateTransactionFinalMap(
          * ); this.dcSet.getLocalDataMap().set("txfinalmap", "2"); }
          *
-         * if (this.dcSet.getLocalDataMap().getBySignature("blogpostmap") == null ||
-         * !this.dcSet.getLocalDataMap().getBySignature("blogpostmap").equals("2")) {
+         * if (this.dcSet.getLocalDataMap().get("blogpostmap") == null ||
+         * !this.dcSet.getLocalDataMap().get("blogpostmap").equals("2")) {
          * //recreate comment postmap UpdateUtil.repopulateCommentPostMap();
          * this.dcSet.getLocalDataMap().set("blogpostmap", "2"); } } else {
          * this.dcSet.getLocalDataMap().set("nsupdate", "1");
@@ -735,6 +735,12 @@ public class Controller extends Observable {
         return this.dbSet;
     }
 
+    /**
+     * я так понял - это отслеживание версии базы данных - и если она новая то все удаляем и заново закачиваем
+     *
+     * @throws IOException
+     * @throws Exception
+     */
     public void startFromScratchOnDemand() throws IOException, Exception {
         String dataVersion = this.dcSet.getLocalDataMap().get(LocalDataMap.LOCAL_DATA_VERSION_KEY);
 
@@ -1351,10 +1357,10 @@ public class Controller extends Observable {
                      * + Base58.encode(getHeadersMessage.getParent()));
                      *
                      * if (!headers.isEmpty()) {
-                     * LOGGER.error("this.blockChain.getSignatures.getBySignature(0) -> " +
-                     * Base58.encode( headers.getBySignature(0) )); LOGGER.
-                     * error("this.blockChain.getSignatures.getBySignature(headers.size()-1) -> "
-                     * + Base58.encode( headers.getBySignature(headers.size()-1) )); } else
+                     * LOGGER.error("this.blockChain.getSignatures.get(0) -> " +
+                     * Base58.encode( headers.get(0) )); LOGGER.
+                     * error("this.blockChain.getSignatures.get(headers.size()-1) -> "
+                     * + Base58.encode( headers.get(headers.size()-1) )); } else
                      * { LOGGER.
                      * error("controller.Controller.onMessage(Message).GET_SIGNATURES_TYPE -> NOT FOUND!"
                      * ); }
@@ -1940,9 +1946,9 @@ public class Controller extends Observable {
      * try { synchronized (this.peerHWeight) { for (Peer peer :
      * this.peerHWeight.keySet()) { if (highestPeer == null && peer != null) {
      * highestPeer = peer; } else { // IF HEIGHT IS BIGGER if (weight <
-     * this.peerHWeight.getBySignature(peer).b) { highestPeer = peer; weight =
-     * this.peerHWeight.getBySignature(peer).b; } else if (weight ==
-     * this.peerHWeight.getBySignature(peer).b) { // IF HEIGHT IS SAME // CHECK IF PING OF
+     * this.peerHWeight.get(peer).b) { highestPeer = peer; weight =
+     * this.peerHWeight.get(peer).b; } else if (weight ==
+     * this.peerHWeight.get(peer).b) { // IF HEIGHT IS SAME // CHECK IF PING OF
      * PEER IS BETTER if (peer.getPing() < highestPeer.getPing()) { highestPeer
      * = peer; } } } } } } catch (Exception e) { // PEER REMOVED WHILE ITERATING
      * }
@@ -2251,7 +2257,7 @@ public class Controller extends Observable {
         return getTransaction(signature, this.dcSet);
     }
 
-    // by account addres + timestamp getBySignature signature
+    // by account addres + timestamp get signature
     public byte[] getSignatureByAddrTime(DCSet dcSet, String address, Long timestamp) {
 
         return dcSet.getAddressTime_SignatureMap().get(address, timestamp);
@@ -3212,14 +3218,14 @@ public class Controller extends Observable {
         }
 
         // DCSet db = this.dcSet;
-        // getBySignature last transaction from this address
+        // get last transaction from this address
         byte[] sign = dcSet.getAddressTime_SignatureMap().get(address);
         if (sign == null) {
             return null;
         }
 
         /*
-         * long lastReference = db.getReferenceMap().getBySignature(address); byte[] sign =
+         * long lastReference = db.getReferenceMap().get(address); byte[] sign =
          * getSignatureByAddrTime(db, address, lastReference); if (sign == null)
          * return null;
          */

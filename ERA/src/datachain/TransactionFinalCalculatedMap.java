@@ -36,10 +36,18 @@ import utils.ObserverMessage;
 
 //import java.math.BigDecimal;
 
-// block.id + tx.ID in this block -> transaction
-// ++ sender_txs
-// ++ recipient_txs
-// ++ address_type_txs
+/**
+ * Храним вычисленные транзакции - для отображения в отчетах - пока нигде не используется - на будущее
+ *
+ * Ключ: ссылка на запись Родитель + Номер Актива - хотя наверное по Активу это во вторичные ключи
+ * Значение: Сама Вычисленная транзакция
+ * block.id + tx.ID in this block -> transaction
+ *
+ * Вторичные ключи по:
+ * ++ sender_txs
+ * ++ recipient_txs
+ * ++ address_type_txs
+ */
 public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer, Long>, Calculated> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
@@ -228,7 +236,7 @@ public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer
 		List<Calculated> txs = new ArrayList<>();
 		int counter = 0;
 		while (iter.hasNext() && (limit == 0 || counter < limit)) {
-			txs.add(this.map.getBySignature(iter.next()));
+			txs.add(this.map.get(iter.next()));
 			counter++;
 		}
 		iter = null;

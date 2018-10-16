@@ -7,11 +7,11 @@ import utils.ObserverMessage;
 
 import java.util.Map;
 
-//import java.util.HashMap;
-//import java.util.Map;
-//import org.mapdb.Atomic;
-//import database.serializer.ItemSerializer;
-
+/**
+ * Хранение активов.<br>
+ * Ключ: номер (автоинкремент)<br>
+ * Значение: Шаблон<br>
+ */
 public class ItemTemplateMap extends Item_Map {
     static final String NAME = "item_templates";
     static final int TYPE = ItemCls.TEMPLATE_TYPE;

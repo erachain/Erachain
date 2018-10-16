@@ -10,6 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 // Block Height -> creator
+
+/**
+ * Главный класс для инкриментов - не используется
+ */
 public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
     static Logger LOGGER = Logger.getLogger(AutoIntegerByte.class.getName());
 

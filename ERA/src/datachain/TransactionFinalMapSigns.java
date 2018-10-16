@@ -13,7 +13,10 @@ import java.util.Map;
 
 //import java.math.BigDecimal;
 
-//signature -> <BlockHeoght, Record No>
+/**
+ * Поиск по подписи ссылки на транзакцию
+ * signature -> <BlockHeoght, Record No>
+ */
 public class TransactionFinalMapSigns extends DCMap<byte[], Long> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
@@ -70,7 +73,7 @@ public class TransactionFinalMapSigns extends DCMap<byte[], Long> {
 	/*
 	public Tuple2<Integer,Integer> getHeightSegBySignature(byte[] sign){
 		
-		return this.getBySignature(sign);
+		return this.get(sign);
 		
 	}
 	*/

@@ -13,7 +13,21 @@ import java.util.TreeMap;
 //import java.util.HashMap;
 //import database.DBSet;
 
-// Person contains an addresses
+/**
+ * Хранит Удостоверенные публичные ключи для персон.
+ * Тут block.getHeight + transaction index  - это ссылка на транзакцию создавшую данную заметку<br>
+ *
+ * <b>Ключ:</b> person key<br>
+
+ * <b>Значение:</b><br>
+ TreeMap(<br>
+ (String)address - публичный счет,<br>
+ Stack((Integer)end_date - дата окончания действия удостоврения,<br>
+ (Integer)block.getHeight - номер блока,<br>
+ (Integer)transaction index - номер транзакции в блоке<br>
+ ))
+ */
+// TODO: ссылку на ЛОНГ
 public class PersonAddressMap extends DCMap<
         Long, // personKey
         TreeMap<

@@ -671,7 +671,7 @@ public class R_SetStatusToItem extends Transaction {
             byte[] bytes = Longs.toByteArray(this.ref_to_parent);
             int height = Ints.fromByteArray(Arrays.copyOfRange(bytes, 0, 4));
             int seqNo = Ints.fromByteArray(Arrays.copyOfRange(bytes, 4, 8));
-            Transaction tx = this.dcSet.getTransactionFinalMap().getBySignature(height, seqNo);
+            Transaction tx = this.dcSet.getTransactionFinalMap().get(height, seqNo);
             if (tx == null)
                 return INVALID_BLOCK_TRANS_SEQ_ERROR;
         }

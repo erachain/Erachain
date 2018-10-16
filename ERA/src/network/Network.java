@@ -196,7 +196,7 @@ public class Network extends Observable implements ConnectionCallback {
 	*/
 
     @Override
-    // IF PEER in exist in NETWORK - getBySignature it
+    // IF PEER in exist in NETWORK - get it
     public Peer getKnownPeer(Peer peer) {
 
         try {
@@ -378,7 +378,7 @@ public class Network extends Observable implements ConnectionCallback {
             message.getSender().sendMessage(answer);
            return;
            }
-        // Ansver to getBySignature transaction
+        // Ansver to get transaction
         if ( message.getType() == Message.TELEGRAM_GET_ANSVER_TYPE){
            ((TelegramGetAnswerMessage) message).saveToWallet();
             

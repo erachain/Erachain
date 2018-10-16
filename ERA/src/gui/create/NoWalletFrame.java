@@ -314,10 +314,10 @@ public class NoWalletFrame extends JFrame {
     public void onNextClick() {
 
 	/*
-        TemplateCls template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().getBySignature(Controller.LICENSE_VERS);
+        TemplateCls template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(Controller.LICENSE_VERS);
         if (template == null) {
             // USE default LICENSE
-            template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().getBySignature(2l);
+            template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(2l);
         }
         */
 

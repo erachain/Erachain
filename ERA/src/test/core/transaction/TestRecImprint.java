@@ -177,8 +177,8 @@ public class TestRecImprint {
         LOGGER.info("imprint KEY: " + imprint.getKey(db));
 
         //CHECK IMPRINT EXISTS SENDER
-        ///////// NOT FONT THROUGHT db.getBySignature(issueImprintRecord)
-        //long key = db.getIssueImprintMap().getBySignature(issueImprintRecord);
+        ///////// NOT FONT THROUGHT db.get(issueImprintRecord)
+        //long key = db.getIssueImprintMap().get(issueImprintRecord);
         long key = issueImprintRecord.getItem().getKey(db);
         assertEquals(true, db.getItemImprintMap().contains(key));
 

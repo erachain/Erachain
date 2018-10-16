@@ -17,7 +17,7 @@ public class SetStatusToItemDetailsFrame extends Rec_DetailsFrame {
         super(setStatusToItem);
 
         //ItemCls item = ItemCls.setStatusToItem.getItemType();
-        //ItemCls item = db.getItem_Map(this.itemType).getBySignature(this.itemKey);
+        //ItemCls item = db.getItem_Map(this.itemType).get(this.itemKey);
         ItemCls item = Controller.getInstance().getItem(setStatusToItem.getItemType(), setStatusToItem.getItemKey());
 
         //NAME

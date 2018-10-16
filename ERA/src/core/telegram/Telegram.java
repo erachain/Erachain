@@ -76,7 +76,7 @@ public class Telegram extends Observable implements Observer {
 	}
 	
 	 /**
-	 * getBySignature telegrams from address
+	 * get telegrams from address
 	 * @param address
 	 * @return List (Transaction)
 	 */
@@ -103,7 +103,7 @@ public class Telegram extends Observable implements Observer {
         
      }
     /**
-     * getBySignature and delete!!!<br> telegrams from address
+     * get and delete!!!<br> telegrams from address
      * @param address
      * @return List (Transaction)
      */

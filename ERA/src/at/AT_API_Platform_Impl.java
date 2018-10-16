@@ -139,7 +139,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
                 AT_Transaction key = atTxs.get(new Tuple2<Integer, Integer>(height, position - 1));
                 return key;
             } else {
-                return db.getTransactionFinalMap().getBySignature(height, position - atTxs.size());
+                return db.getTransactionFinalMap().get(height, position - atTxs.size());
             }
         } else if (forkHeight > height) {
             LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = ((ATTransactionMap) db.getATTransactionMap().getParent()).getATTransactions(height);
@@ -148,7 +148,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
                 AT_Transaction key = atTxs.get(new Tuple2<Integer, Integer>(height, position - 1));
                 return key;
             } else {
-                return db.getTransactionFinalMap().getBySignature(height, position - atTxs.size());
+                return db.getTransactionFinalMap().get(height, position - atTxs.size());
             }
 
         }

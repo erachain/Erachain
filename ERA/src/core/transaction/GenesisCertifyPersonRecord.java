@@ -138,7 +138,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
         } else {
             blockIndex = block.getHeight();
             if (blockIndex < 1) {
-                // if block not is confirmed - getBySignature last block + 1
+                // if block not is confirmed - get last block + 1
                 blockIndex = this.dcSet.getBlockMap().last().getHeight() + 1;
             }
             //transactionIndex = this.getSeqNo(db);
