@@ -13,9 +13,7 @@ import java.nio.charset.StandardCharsets;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -41,8 +39,8 @@ import lang.Lang;
 import utils.Converter;
 import utils.MenuPopupUtil;
 import utils.NameUtils;
-import utils.Pair;
 import utils.NameUtils.NameResult;
+import utils.Pair;
 
 public class AssetSendPanel extends javax.swing.JPanel {
 
@@ -353,9 +351,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
         this.message = jTextArea_Description.getText();
 
        isTextB = true;
-
-       
-
+       messageBytes =null;
         if (message != null && message.length() > 0) {
             if (isTextB) {
                 messageBytes = message.getBytes(Charset.forName("UTF-8"));
