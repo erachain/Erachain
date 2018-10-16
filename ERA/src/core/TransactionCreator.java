@@ -110,7 +110,7 @@ public class TransactionCreator {
         //SCAN UNCONFIRMED TRANSACTIONS FOR TRANSACTIONS WHERE ACCOUNT IS CREATOR OF
         ///List<Transaction> transactions = (List<Transaction>)this.fork.getTransactionMap().getValuesAll();
         TransactionMap transactionMap = this.fork.getTransactionMap();
-        Iterator<byte[]> iterator = transactionMap.getIterator(0, false);
+        Iterator<Long> iterator = transactionMap.getIterator(0, false);
         Transaction transaction;
         List<Account> accountMap = Controller.getInstance().getAccounts();
 
@@ -947,6 +947,13 @@ public class TransactionCreator {
 
     public Integer afterCreate(Transaction transaction, int asDeal) {
         //CHECK IF PAYMENT VALID
+
+        if (this.fork.getTransactionMap().contains(transaction.getSignature())) {
+            // если случилась коллизия по подписи усеченной
+            // в базе неподтвержденных транзакций -то выдадим ошибку
+            return Transaction.KEY_COLLISION;
+        }
+
         transaction.setDC(this.fork, asDeal, this.blockHeight, ++this.seqNo);
         int valid = transaction.isValid(asDeal, 0l);
 

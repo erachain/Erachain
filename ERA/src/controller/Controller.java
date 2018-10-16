@@ -1009,7 +1009,7 @@ public class Controller extends Observable {
             return;
 
         TransactionMap map = this.dcSet.getTransactionMap();
-        Iterator<byte[]> iterator = map.getIterator(0, false);
+        Iterator<Long> iterator = map.getIterator(0, false);
         Transaction transaction;
         Message message;
         long ping = 0;

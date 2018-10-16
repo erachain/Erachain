@@ -283,8 +283,13 @@ public class M_PDFView extends javax.swing.JPanel {
             try {
                 raf = new RandomAccessFile(file, "r");
             } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                file = new File("Erachain Licence Agreement.pdf");
+                try {
+                    raf = new RandomAccessFile(file, "r");
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                    return null;
+                }
             }
             FileChannel channel = raf.getChannel();
             try {
