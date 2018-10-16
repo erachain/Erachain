@@ -197,7 +197,7 @@ public class TestRec_Vouch {
 
         Tuple2<Integer, Integer> ggg = new Tuple2<Integer, Integer>(height, seq);
 
-        Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> value = db.getVouchRecordMap().get(height, seq);
+        Tuple2<BigDecimal, List<Long>> value = db.getVouchRecordMap().get(Transaction.makeDBRef(height, seq));
 		/*
 		assertEquals(new Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>(
 				new BigDecimal(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
@@ -210,7 +210,7 @@ public class TestRec_Vouch {
 
         vouchRecord.orphan(Transaction.FOR_NETWORK);
 
-        value = db.getVouchRecordMap().get(height, seq);
+        value = db.getVouchRecordMap().get(Transaction.makeDBRef(height, seq));
         assertEquals(value, new Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>(
                 BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
                 new ArrayList<Tuple2<Integer, Integer>>(
