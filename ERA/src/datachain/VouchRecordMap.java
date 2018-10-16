@@ -27,7 +27,7 @@ import java.util.Map;
  * @return dcMap
  */
 
-public class VouchRecordMap extends DCMap<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> {
+public class VouchRecordMap extends DCMap<Long, Tuple2<BigDecimal, List<Long>>> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public VouchRecordMap(DCSet databaseSet, DB database) {

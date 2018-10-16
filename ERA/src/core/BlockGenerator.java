@@ -785,6 +785,8 @@ public class BlockGenerator extends Thread implements Observer {
                         return;
                     }
 
+                    // CHECK WALLET SYNCHRONIZE
+                    ctrl.checkNeedSyncWallet();
                     setForgingStatus(ForgingStatus.FORGING_WAIT);
 
                 }

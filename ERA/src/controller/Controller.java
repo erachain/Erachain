@@ -403,20 +403,17 @@ public class Controller extends Observable {
         return this.status == STATUS_OK;
     }
 
-    public boolean checkNeedSyncWallet() {
+    public void checkNeedSyncWallet() {
         if (this.wallet == null || this.wallet.database == null)
-            return false;
+            return;
 
         // CHECK IF WE NEED TO RESYNC
         byte[] lastBlockSignature = this.wallet.database.getLastBlockSignature();
         if (lastBlockSignature == null
                 ///// || !findLastBlockOff(lastBlockSignature, block)
                 || !Arrays.equals(lastBlockSignature, this.getBlockChain().getLastBlockSignature(dcSet))) {
-            return true;
+            this.needSyncWallet = true;
         }
-
-        return false;
-
     }
 
     public boolean isNeedSyncWallet() {
@@ -1232,7 +1229,8 @@ public class Controller extends Observable {
 
                     Controller.getInstance().setToOfflineTime(0L);
 
-                    if ((Controller.getInstance().isNeedSyncWallet() || checkNeedSyncWallet())
+                    if (false && (Controller.getInstance().isNeedSyncWallet() // || checkNeedSyncWallet()
+                            )
                             && !Controller.getInstance().isProcessingWalletSynchronize()) {
                         // LOGGER.error("actionAfterConnect --->>>>>>
                         // synchronizeWallet");
