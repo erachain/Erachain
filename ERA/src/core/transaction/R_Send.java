@@ -399,7 +399,7 @@ public class R_Send extends TransactionAmount {
             return false;
 
         //return this.isText() && Base58.isExtraSymbols(new String(this.data, Charset.forName("UTF-8")));
-        if (this.isText()) {
+        if (this.isText() && !this.isEncrypted()) {
             String text = new String(this.data, Charset.forName("UTF-8"));
             if (text.contains(" ") || text.contains("_"))
                 return true;
