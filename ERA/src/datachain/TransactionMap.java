@@ -186,8 +186,9 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         Transaction transaction;
         int count = 0;
         int bytesTotal = 0;
+        Long key;
         while (iterator.hasNext()) {
-            Long key = iterator.next();
+            key = iterator.next();
             transaction = this.map.get(key);
             if (transaction.getDeadline() < timestamp || transaction.getTimestamp() > timestamp)
                 continue;
@@ -214,8 +215,9 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         Iterator<Long> iterator = this.getIterator(0, false);
         Transaction transaction;
+        Long key;
         while (iterator.hasNext()) {
-            Long key = iterator.next();
+            key = iterator.next();
             transaction = this.map.get(key);
             if (transaction.getDeadline() < timestamp) {
                 this.delete(key);
@@ -281,13 +283,14 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             } while (item.getDeadline() < dTime && iterator.hasNext());
         }
 
-        if (this.map.containsKey(signature)) {
+        Long key = Longs.fromByteArray(signature);
+
+        if (this.map.containsKey(key)) {
             return true;
         }
 
         this.getDCSet().updateUncTxCounter(1);
 
-        Long key = Longs.fromByteArray(signature);
         return this.set(key, transaction);
 
     }
@@ -557,10 +560,10 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         Iterator iter = keys.iterator();
         List<Transaction> transactions = new ArrayList<>();
         Transaction item;
-        byte[] key;
+        Long key;
 
         while (iter.hasNext()) {
-            key = (byte[]) iter.next();
+            key = (Long) iter.next();
             item = this.map.get(key);
             transactions.add(item);
         }
