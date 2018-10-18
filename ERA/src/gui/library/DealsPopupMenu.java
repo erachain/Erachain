@@ -227,9 +227,9 @@ public class DealsPopupMenu extends JPopupMenu {
 
                 this.debtAsset.setText(Lang.getInstance().translate("Transfer to rent"));
                 this.debtAsset.setVisible(true);
-                this.debtAssetReturn.setText(Lang.getInstance().translate("Withdraw from lease"));
+                this.debtAssetReturn.setText(Lang.getInstance().translate("Return from rent"));
                 this.debtAssetReturn.setVisible(true);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Return from rent"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("Withdraw from lease")); // it is confiscate
                 this.debtAssetBackward.setVisible(true);
 
                 break;

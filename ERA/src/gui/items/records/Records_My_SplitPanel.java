@@ -262,7 +262,7 @@ public class Records_My_SplitPanel extends Split_Panel {
         @Override
         public void valueChanged(ListSelectionEvent arg0) {
             Transaction trans = null;
-            if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0) {
+            if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 && jTable_jScrollPanel_LeftPanel.getSelectedRow() < records_model.getRowCount()) {
                 trans = (Transaction) records_model.getItem(jTable_jScrollPanel_LeftPanel
                         .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 
