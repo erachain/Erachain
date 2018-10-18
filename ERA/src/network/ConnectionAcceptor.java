@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * приемник содинения - отвечает на входящие запросы и создает канал связи
+ */
 public class ConnectionAcceptor extends Thread {
 
     static Logger LOGGER = Logger.getLogger(ConnectionAcceptor.class.getName());

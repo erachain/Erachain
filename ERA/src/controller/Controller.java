@@ -121,6 +121,9 @@ import webserver.WebService;
 
 // 04/01 +-
 
+/**
+ * main class for connection all modules
+ */
 public class Controller extends Observable {
 
     public static final char DECIMAL_SEPARATOR = '.';

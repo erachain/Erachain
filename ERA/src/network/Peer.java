@@ -21,6 +21,10 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+/** верт (процесс)
+ * вертает общение с внешним пиром - чтение и запись
+ *
+ */
 public class Peer extends Thread {
 
     private final static boolean need_wait = false;

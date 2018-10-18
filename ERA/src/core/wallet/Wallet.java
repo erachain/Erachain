@@ -53,13 +53,9 @@ import utils.Pair;
 import utils.SaveStrToFile;
 import utils.StrJSonFine;
 
-//import core.transaction.IssueAssetTransaction;
-//import core.transaction.IssueImprintRecord;
-//import core.transaction.IssueTemplateRecord;
-//import core.transaction.IssuePersonRecord;
-//import core.transaction.IssueUnionRecord;
-//import .BlockMap;
-
+/**
+ * обработка секртеных ключей и моих записей, которые относятся к набору моих счетов
+ */
 public class Wallet extends Observable implements Observer {
 
 	static final boolean CHECK_CHAIN_BROKENS_ON_SYNC_WALLET = false;

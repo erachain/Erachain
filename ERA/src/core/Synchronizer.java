@@ -25,8 +25,9 @@ import network.message.SignaturesMessage;
 import ntp.NTP;
 import settings.Settings;
 
-// import org.apache.log4j.Logger;
-
+/**
+ * функционал скачки цепочки с других узлов - догоняние сети
+ */
 public class Synchronizer {
 
     public static final int GET_BLOCK_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;

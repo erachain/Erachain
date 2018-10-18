@@ -14,6 +14,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * класс для сохранения блоков при асинхронной скачки цепочки с другого пира
+ */
 public class BlockBuffer extends Thread {
     private static final int BUFFER_SIZE = 20;
     private static final Logger LOGGER = Logger.getLogger(BlockBuffer.class);

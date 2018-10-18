@@ -9,6 +9,10 @@ import settings.Settings;
 
 import java.util.List;
 
+/**
+ * класс поиска каналов связи - подключается к внешним узлам создавая пиры
+ * смотрит сколько соединений уже есть и если еще недостаточно то цепляется ко всему что сможет
+ */
 public class ConnectionCreator extends Thread {
 
     private static final Logger LOGGER = Logger

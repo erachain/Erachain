@@ -19,8 +19,11 @@ import core.web.SharedPostsMap;
 import settings.Settings;
 import utils.ObserverMessage;
 
-//import core.item.ItemCls;
-
+/**
+ * набор таблиц. Поидее тут нужно хранить список таблиц и ссылку на родителя при Форке базы.
+ * Но почемуто парент хранится в каждой таблице - хотя там сразу ссылка на форкнутую таблицу есть
+ * а в ней уже хранится объект набора DCSet
+ */
 public class DCSet implements Observer, IDB {
 
     private static final Logger LOGGER = Logger.getLogger(DCSet.class);

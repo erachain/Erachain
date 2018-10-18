@@ -6,6 +6,9 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.List;
 
+/**
+ * интерфейс для класса Network - не знаю зачем так сделано - неудобно искать методы
+ */
 public interface ConnectionCallback {
 
     void onConnect(Peer peer, boolean asNew);

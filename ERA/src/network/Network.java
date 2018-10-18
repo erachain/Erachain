@@ -1,5 +1,4 @@
 package network;
-// 30/03 ++
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -31,12 +30,9 @@ import network.message.TelegramMessage;
 import settings.Settings;
 import utils.ObserverMessage;
 
-// import org.apache.log4j.Logger;
-//import core.BlockChain;
-//import database.DBSet;
-//import database.TransactionMap;
-//import lang.Lang;
-
+/**
+ * основной класс модуля Сети
+ */
 public class Network extends Observable implements ConnectionCallback {
 
 

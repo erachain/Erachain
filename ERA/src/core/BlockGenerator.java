@@ -31,6 +31,10 @@ import settings.Settings;
 import utils.ObserverMessage;
 import utils.TransactionTimestampComparator;
 
+/**
+ * основной верт, решающий последовательно три задачи - либо собираем блок, проверяем отставание от сети
+ * и синхронизируемся с сетью если не догнали ее, либо ловим новый блок из сети и заносим его в цепочку блоков
+ */
 public class BlockGenerator extends Thread implements Observer {
 
     public static final boolean TEST_001 = true;

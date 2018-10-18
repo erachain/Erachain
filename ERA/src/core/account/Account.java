@@ -37,8 +37,9 @@ import utils.NameUtils.NameResult;
 import utils.NumberAsString;
 import utils.Pair;
 
-//import core.item.assets.AssetCls;
-
+/**
+ * обработка ключей и криптографии
+ */
 public class Account {
 
     public static final int ADDRESS_LENGTH = 25;

@@ -70,10 +70,12 @@ import ntp.NTP;
 import utils.Pair;
 import utils.TransactionTimestampComparator;
 
-//import java.math.BigInteger;
-//import settings.Settings;
-
-/// icreator -
+/**
+ * класс для создания транзакций в текущем кошельке
+ * Использует форкнутую базу цепочки
+ *
+ * TODO: - поидее его надо перенести в модуль Кошелек - ибо без кошелька он не будет пахать.
+ */
 public class TransactionCreator {
     private DCSet fork;
     private Block lastBlock;

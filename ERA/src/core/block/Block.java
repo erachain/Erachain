@@ -34,7 +34,9 @@ import datachain.TransactionMap;
 import ntp.NTP;
 import utils.Converter;
 
-
+/**
+ * обработка блоков - все что с ними связано. Без базы данных - сухие данные в вакууме
+ */
 public class Block {
 
     static private HashMap totalCOMPUtest = new HashMap();
