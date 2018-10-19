@@ -3900,7 +3900,10 @@ public class BlockExplorer {
 
                         ss = (JSONObject) params.get(s);
 
-                        hasHes += i + " " + ss.get("File_Name") + "<br>";
+                      //  hasHes += i + " " + ss.get("File_Name") + "<br>";
+                        
+                        hasHes += "<a href = 'apidocuments/getFile?block=" + block + "&txt=" + seg_No + "&name=" + ss.get("File_Name") + "'>"
+                                + i + " " + ss.get("File_Name") + "</a><br>";
                     }
 
                     str_HTML += hasHes + "<br>";
@@ -3927,7 +3930,9 @@ public class BlockExplorer {
 
                         ss = (JSONObject) params.get(s);
 
-                        hasHes += i + " " + ss.get("FN") + "<br>";
+                    //    hasHes += i + " " + ss.get("FN") + "<br>";
+                        hasHes += "<a href ='apidocuments/getFile?block=" + block + "&txt=" + seg_No + "&name=" + ss.get("FN") + "'>"
+                                + i + " " + ss.get("FN") + "</a><br>";
                     }
 
                     str_HTML += hasHes + "<br>";

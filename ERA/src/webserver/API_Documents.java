@@ -42,8 +42,8 @@ public class API_Documents {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
-        help.put("apidocuments/getFiles?blockl={block}&txt={transaction}", "get files from transaction");
-        help.put("apidocuments/getFile?blockl={block}&txt={transaction}&name={name]", "get file (name) from transaction");
+        help.put("apidocuments/getFiles?block={block}&txt={transaction}", "get files from transaction");
+        help.put("apidocuments/getFile?block={block}&txt={transaction}&name={name]", "get file (name) from transaction");
                
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
