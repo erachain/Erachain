@@ -1252,6 +1252,11 @@ public class Block {
             return false;
         }
         this.target = BlockChain.calcTarget(this.heightBlock, currentTarget, this.winValue);
+        if (this.target == 0) {
+            BlockChain.calcTarget(this.heightBlock, currentTarget, this.winValue);
+            LOGGER.debug("*** Block[" + this.heightBlock + "] TARGET = 0");
+            return false;
+        }
 
         if (this.atBytes != null && this.atBytes.length > 0) {
             try {

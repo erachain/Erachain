@@ -635,7 +635,7 @@ public abstract class TransactionAmount extends Transaction {
                                             && this.creator.getBalanceUSE(absKey, this.dcSet)
                                             .compareTo(this.amount) < 0) {
 
-                                        if (height > 120000 || BlockChain.DEVELOP_USE)
+                                        if ((!BlockChain.DEVELOP_USE && height > 120000) || height > 239800)
                                             return NO_BALANCE;
                                     }
 

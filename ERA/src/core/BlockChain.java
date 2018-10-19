@@ -527,7 +527,7 @@ public class BlockChain {
             previousForgingPoint = creator.getLastForgingData(dcSet);
             if (previousForgingPoint == null)
                 if (DEVELOP_USE)
-                    previousForgingPoint = new Tuple2<Integer, Integer>(height - (height > VERS_4_12? 1000 : 10), 1000);
+                    previousForgingPoint = new Tuple2<Integer, Integer>(height - (height > VERS_4_11? 100 : 10), 1000);
                 else
                     return 0l;
         }
