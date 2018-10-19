@@ -404,7 +404,16 @@ public abstract class TransactionAmount extends Transaction {
 
         return base_len - (this.typeBytes[2] < 0 ? (KEY_LENGTH + AMOUNT_LENGTH) : 0);
     }
-    
+
+    public boolean isUnlimited(long absKey, String owner) {
+        return absKey > AssetCls.REAL_KEY // not
+                // genesis
+                // assets!
+                && asset.getQuantity().equals(0l)
+                && asset.getOwner().getAddress().equals(owner);
+
+    }
+
     //@Override // - fee + balance - calculate here
     public int isValid(int asDeal, boolean isPerson, long flags) {
         
@@ -486,7 +495,7 @@ public abstract class TransactionAmount extends Transaction {
                 
                 // BACKWARD - CONFISCATE
                 boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
-                
+
                 if (asset.isAccounting()) {
                     
                     switch ((int) absKey) {
@@ -561,12 +570,8 @@ public abstract class TransactionAmount extends Transaction {
                                     /// ащк фдд&& asset.isMovable()
                                     ) {
                                 // if GOODS - HOLD it in STOCK and check BALANCE
-                                boolean unLimited = absKey > AssetCls.REAL_KEY // not
-                                        // genesis
-                                        // assets!
-                                        && asset.getQuantity().equals(0l)
-                                        && asset.getOwner().getAddress().equals(this.recipient.getAddress());
-                                
+                                boolean unLimited = isUnlimited(absKey, this.recipient.getAddress());
+
                                 balance = this.recipient.getBalance(dcSet, absKey, actionType).b;
                                 if (unLimited) {
                                     BigDecimal amontOWN = this.recipient.getBalance(dcSet, absKey, ACTION_SEND).b;
@@ -623,22 +628,25 @@ public abstract class TransactionAmount extends Transaction {
                                  */
                             } else {
                                 // CREDIT - GIVE CREDIT OR RETURN CREDIT
-                                
-                                Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
-                                        this.recipient.getAddress(), absKey, this.creator.getAddress());
-                                // TRY RETURN
-                                BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
-                                if (creditAmount.compareTo(amount) < 0) {
-                                    BigDecimal leftAmount = amount.subtract(creditAmount);
-                                    BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey, 1).b; // OWN
-                                    // balance
-                                    // NOT ENOUGHT DEBT from recipient to
-                                    // creator
-                                    // TRY CREDITN OWN
-                                    if (balanceOwn.compareTo(leftAmount) < 0) {
+
+                                if (!isUnlimited(absKey, this.creator.getAddress())) {
+
+                                    Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
+                                            this.recipient.getAddress(), absKey, this.creator.getAddress());
+                                    // TRY RETURN
+                                    BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
+                                    if (creditAmount.compareTo(amount) < 0) {
+                                        BigDecimal leftAmount = amount.subtract(creditAmount);
+                                        BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey, 1).b; // OWN
+                                        // balance
                                         // NOT ENOUGHT DEBT from recipient to
                                         // creator
-                                        return NO_BALANCE;
+                                        // TRY CREDITN OWN
+                                        if (balanceOwn.compareTo(leftAmount) < 0) {
+                                            // NOT ENOUGHT DEBT from recipient to
+                                            // creator
+                                            return NO_BALANCE;
+                                        }
                                     }
                                 }
                             }
@@ -676,15 +684,10 @@ public abstract class TransactionAmount extends Transaction {
                                 }
                                 
                             }
-                            
+
                             // if asset is unlimited and me is creator of this
                             // asset
-                            boolean unLimited = absKey > AssetCls.REAL_KEY // not
-                                    // genesis
-                                    // assets!
-                                    && asset.getQuantity().equals(0l)
-                                    && asset.getOwner().getAddress().equals(this.creator.getAddress());
-                            
+                            boolean unLimited = isUnlimited(absKey, this.creator.getAddress());
                             // CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
                             if (unLimited) {
                                 // not make RETURN - check validate next
