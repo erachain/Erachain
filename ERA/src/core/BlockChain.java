@@ -80,7 +80,7 @@ public class BlockChain {
     public static final int VERS_4_11 = DEVELOP_USE ? 230000  : 200000;
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
-    public static final int ALL_BALANCES_OK_TO = VERS_4_11;
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : VERS_4_11;
 
     public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11  : VERS_4_11 + 50000;
 

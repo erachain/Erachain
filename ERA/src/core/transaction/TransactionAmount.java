@@ -631,13 +631,27 @@ public abstract class TransactionAmount extends Transaction {
 
                                 if (!isUnlimited(absKey, this.creator.getAddress())) {
 
+                                    if ((flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0
+                                            && this.creator.getBalanceUSE(absKey, this.dcSet)
+                                            .compareTo(this.amount) < 0) {
+
+                                        if (height > 120000 || BlockChain.DEVELOP_USE)
+                                            return NO_BALANCE;
+                                    }
+
                                     Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
                                             this.recipient.getAddress(), absKey, this.creator.getAddress());
                                     // TRY RETURN
                                     BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
                                     if (creditAmount.compareTo(amount) < 0) {
+
+                                        // TODO: найти ошибку когда возвращаем больше чем на счету
+                                        // и идет переворот выдачи займа в dcSet.getCredit_AddressesMap().get(creditKey);
+                                        if (false)
+                                            return NO_BALANCE;
+
                                         BigDecimal leftAmount = amount.subtract(creditAmount);
-                                        BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey, 1).b; // OWN
+                                        BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey,  ACTION_SEND).b; // OWN
                                         // balance
                                         // NOT ENOUGHT DEBT from recipient to
                                         // creator
@@ -701,7 +715,7 @@ public abstract class TransactionAmount extends Transaction {
                                     return NO_INCLAIM_BALANCE;
                                 
                                 if ((flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0
-                                        && this.creator.getBalance(dcSet, FEE_KEY, 1).b
+                                        && this.creator.getBalance(dcSet, FEE_KEY,  ACTION_SEND).b
                                         .compareTo(this.amount.add(this.fee)) < 0) {
                                     
                                     if (height > 120000 || BlockChain.DEVELOP_USE)
@@ -743,7 +757,7 @@ public abstract class TransactionAmount extends Transaction {
                                 }
                                 
                                 if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
-                                        && this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo(this.fee) < 0) {
+                                        && this.creator.getBalance(dcSet, FEE_KEY,  ACTION_SEND).b.compareTo(this.fee) < 0) {
                                     if (height > 41100 || BlockChain.DEVELOP_USE)
                                         return NOT_ENOUGH_FEE;
                                         
@@ -801,7 +815,7 @@ public abstract class TransactionAmount extends Transaction {
                         case ACTION_SPEND: // PRODUCE - SPEND
                             
                             // TRY FEE
-                            if (this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo(this.fee) < 0) {
+                            if (this.creator.getBalance(dcSet, FEE_KEY,  ACTION_SEND).b.compareTo(this.fee) < 0) {
                                 return NOT_ENOUGH_FEE;
                             }
                             

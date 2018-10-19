@@ -27,7 +27,7 @@ public class TelegramManager extends Thread {
     /**
      * count telegrams
      */
-    private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK ? 1 << 20 : 1 << 20;
+    private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK ? 1 << 20 : 32000;
     /**
      * time to live telegram
      */

@@ -38,7 +38,7 @@ public class TestRec_Send_InSideAsset {
     Tuple3<String, Long, String> creditKey;
     Tuple3<String, Long, String> creditKeyReverse;
 
-    long flags = 0l;
+    long flags = Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT;
     Controller cntrl;
     //CREATE KNOWN ACCOUNT
     byte[] privateKey_1 = Crypto.getInstance().createKeyPair(Crypto.getInstance().digest("tes213sdffsdft".getBytes())).getA();
@@ -387,8 +387,42 @@ public class TestRec_Send_InSideAsset {
         assertEquals(BigDecimal.valueOf(3), debtorBalance.b.a);
         assertEquals(BigDecimal.valueOf(-27), debtorBalance.b.b);
 
-        
-        
+        ///////// теперь проверим возврат долга выше своего возможного значения
+
+        // CREDIT INVALID
+        r_Send = new R_Send(debtor, FEE_POWER, creditor, -assetKey, BigDecimal.valueOf(60),
+                "", null, new byte[]{1}, new byte[]{1},
+                ++timestamp, 0l);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_BALANCE);
+
+        r_Send.sign(emitter, Transaction.FOR_NETWORK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_Send.process(gb, Transaction.FOR_NETWORK);
+
+        assertEquals(BigDecimal.valueOf(0), db.getCredit_AddressesMap().get(creditKey));
+        assertEquals(BigDecimal.valueOf(27), db.getCredit_AddressesMap().get(creditKeyReverse));
+
+
+        //CHECK BALANCE CREDITOR
+        creditorBalance = creditor.getBalance(db, assetKey);
+        assertEquals(BigDecimal.valueOf(50), creditorBalance.a.a);
+        assertEquals(BigDecimal.valueOf(50), creditorBalance.a.b);
+
+        assertEquals(BigDecimal.valueOf(30), creditorBalance.b.a);
+        assertEquals(BigDecimal.valueOf(27), creditorBalance.b.b);
+        assertEquals(BigDecimal.valueOf(50+27), creditor.getBalanceUSE(assetKey, db));
+
+        //CHECK BALANCE DEBTOR
+        debtorBalance = debtor.getBalance(db, assetKey);
+        assertEquals(BigDecimal.valueOf(30), debtorBalance.a.a);
+        assertEquals(BigDecimal.valueOf(30), debtorBalance.a.b);
+
+        assertEquals(BigDecimal.valueOf(3), debtorBalance.b.a);
+        assertEquals(BigDecimal.valueOf(-27), debtorBalance.b.b);
+
+
+
     }
 
 }
