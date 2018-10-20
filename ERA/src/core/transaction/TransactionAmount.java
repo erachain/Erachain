@@ -60,6 +60,9 @@ typeBytes[3].3-7 = point accuracy: -16..16 = BYTE - 16
 
  */
 
+/**
+ *
+ */
 public abstract class TransactionAmount extends Transaction {
     public static final byte[][] VALID_REC = new byte[][]{
         //Base58.decode("2PLy4qTVeYnwAiESvaeaSUTWuGcERQr14bpGj3qo83c4vTP8RRMjnmRXnd6USsbvbLwWUNtjErcdvs5KtZMpyREC"),
