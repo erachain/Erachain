@@ -37,51 +37,21 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     public static final int HEIGHT_INDEX = 1; // for GUI
 
-    static boolean init1 = true;
-
-    //	protected Atomic.Integer atomicKey;
-    //	protected int key;
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-    // private Var<byte[]> lastBlockVar;
     private byte[] lastBlockSignature;
-    private Var<Long> feePoolVar;
-    private long feePool; // POOL for OVER_FREE FEE
     private Atomic.Boolean processingVar;
-    // NavigableSet<Tuple2<Integer, byte[]>> heightIndex;
-    // BTreeMap<byte[], byte[]> childIndex;
-    // private List<Block> lastBlocksForTarget;
     private Boolean processing;
     private BTreeMap<Tuple2<String, String>, Integer> generatorMap;
 
     public BlockMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
-        //this.atomicKey = database.getAtomicInteger("block_map" + "_key");
-        //this.key = this.atomicKey.get();
 
         if (databaseSet.isWithObserver()) {
-            // this.observableData.put(DBMap.NOTIFY_RESET,
-            // ObserverMessage.RESET_BLOCK_TYPE);
             if (databaseSet.isDynamicGUI()) {
-                // this.observableData.put(DBMap.NOTIFY_ADD,
-                // ObserverMessage.ADD_BLOCK_TYPE);
-                // this.observableData.put(DBMap.NOTIFY_REMOVE,
-                // ObserverMessage.REMOVE_BLOCK_TYPE);
             }
-            // this.observableData.put(DBMap.NOTIFY_LIST,
-            // ObserverMessage.LIST_BLOCK_TYPE);
         }
 
-        // LAST BLOCK
-        //if (database.getCatalog().get(("lastBlock" + ".type")) == null) {
-        //	database.createAtomicVar("lastBlock", new byte[0], null);
-        //}
-        // this.lastBlockVar = database.getAtomicVar("lastBlock");
-        // this.lastBlockSignature = this.lastBlockVar.get();
-
-        // POOL FEE
-        // this.feePoolVar = database.getAtomicVar("feePool");
-        // this.feePool = this.feePoolVar.get();
 
         // PROCESSING
         this.processingVar = database.getAtomicBoolean("processingBlock");
@@ -91,10 +61,7 @@ public class BlockMap extends DCMap<Integer, Block> {
     public BlockMap(BlockMap parent, DCSet dcSet) {
         super(parent, dcSet);
 
-        //this.key = parent.size();
-
         this.lastBlockSignature = parent.getLastBlockSignature();
-        this.feePool = parent.getFeePool();
         this.processing = false; /// parent.isProcessing();
 
     }
@@ -104,13 +71,14 @@ public class BlockMap extends DCMap<Integer, Block> {
     protected void createIndexes(DB database) {
         generatorMap = database.createTreeMap("generators_index").makeOrGet();
 
-        // TODO - убрать длинный индек и вставить INT
+        /*
         Bind.secondaryKey((BTreeMap) this.map, generatorMap, new Fun.Function2<Tuple2<String, String>, Integer, Block>() {
             @Override
             public Tuple2<String, String> run(Integer b, Block block) {
                 return new Tuple2<String, String>(block.getCreator().getAddress(), Converter.toHex(block.getSignature()));
             }
         });
+        */
 
         /*
          * secondary value map. Key - byte[], value Tuple2<Integer, Integer>
@@ -120,7 +88,6 @@ public class BlockMap extends DCMap<Integer, Block> {
          * Fun.Function2<Tuple2<Integer,Integer>, byte[], Block>() {
          *
          * @Override public Tuple2<Integer, Integer> run(byte[] a, Block b) { //
-         * TODO Auto-generated method stub return new Tuple2(b.getHeight(db),
          * b.getSignature(); } });
          */
         /*
@@ -201,29 +168,6 @@ public class BlockMap extends DCMap<Integer, Block> {
         // }
 
     }
-
-    public Long getFeePool() {
-        return this.feePool;
-    }
-
-    private void setFeePool(Long feePool) {
-
-        this.feePool = feePool;
-        if (this.feePoolVar != null) {
-            this.feePoolVar.set(this.feePool);
-        }
-
-    }
-
-	/*
-	@Override
-	public int size() {
-		// size from Map as .size() - .deleted() + parent.size() for numbered key is WRONG
-		// if same key in .deleted() and in parent.map - поправил с помощью shiftSize
-		// so use this KEY
-		return this.key;
-	}
-	 */
 
     public boolean isProcessing() {
         if (this.processing != null) {
@@ -358,15 +302,6 @@ public class BlockMap extends DCMap<Integer, Block> {
         return super.delete(height);
 
     }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public Collection<Integer> getGeneratorBlocks(String address) {
-        Collection<Integer> headers = ((BTreeMap) (this.generatorMap))
-                .subMap(Fun.t2(address, null), Fun.t2(address, Fun.HI())).values();
-
-        return headers;
-    }
-
 
     public void notifyResetChain() {
         this.setChanged();
