@@ -423,64 +423,31 @@ public class API_TransactionsResource {
     @GET
     @Path("find")
     public Response getTransactionsFind(@QueryParam("address") String address, @QueryParam("sender") String sender,
-                                        @QueryParam("recipient") String recipient, @QueryParam("startblock") String s_minHeight,
-                                        @QueryParam("endblock") String s_maxHeight, @QueryParam("type") String s_type,
-                                        @QueryParam("service") String s_service, @QueryParam("desc") String s_desc,
-                                        @QueryParam("offset") String s_offset, @QueryParam("limit") String s_limit
+                                        @QueryParam("recipient") String recipient,
+                                        @QueryParam("startblock") int minHeight,
+                                        @QueryParam("endblock") int maxHeight, @QueryParam("type") int type,
+                                        //@QueryParam("timestamp") long timestamp,
+                                        @QueryParam("desc") boolean desc,
+                                        @QueryParam("offset") int offset, @QueryParam("limit") int limit,
+                                        @QueryParam("unconfirmed") boolean unconfirmed
     ) {
 
-        int maxHeight;
-        try {
-            maxHeight = new Integer(s_maxHeight);
-        } catch (NumberFormatException e) {
-            // TODO Auto-generated catch block
-            maxHeight = 0;
-        }
-        int minHeight;
-        try {
-            minHeight = new Integer(s_minHeight);
-        } catch (NumberFormatException e) {
-            // TODO Auto-generated catch block
-            minHeight = 0;
-        }
-        int type;
-        try {
-            type = new Integer(s_type);
-        } catch (NumberFormatException e) {
-            // TODO Auto-generated catch block
-            type = 0;
-        }
-        int service;
-        try {
-            service = new Integer(s_service);
-        } catch (NumberFormatException e) {
-            // TODO Auto-generated catch block
-            service = 0;
-        }
-        int offset;
-        try {
-            offset = new Integer(s_offset);
-        } catch (NumberFormatException e) {
-            // TODO Auto-generated catch block
-            offset = 0;
-        }
-        int limit;
-        try {
-            limit = new Integer(s_limit);
-        } catch (NumberFormatException e) {
-            // TODO Auto-generated catch block
-            limit = 0;
-        }
-
         List<Transaction> result = DCSet.getInstance().getTransactionFinalMap().findTransactions(address, sender,
-                recipient, minHeight, maxHeight, type, service, false, offset, limit);
+                recipient, minHeight, maxHeight, type, 0, false, offset, limit);
 
         JSONArray array = new JSONArray();
         for (Transaction trans : result) {
-
             array.add(trans.toJson());
         }
-        // json.put("transactions", array);
+
+        if (unconfirmed) {
+            List<Transaction> resultUnconfirmed = DCSet.getInstance().getTransactionMap().findTransactions(address, sender,
+                    recipient, type, false, 0, limit, 0);
+            for (Transaction trans : resultUnconfirmed) {
+                array.add(trans.toJson());
+            }
+        }
+
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(array.toJSONString()).build();

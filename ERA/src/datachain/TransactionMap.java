@@ -30,7 +30,10 @@ import java.util.*;
  * - он оргнизыется внутри DCMap в списке индексов для сортировок в ГУИ
  *
  * Также хранит инфо каким пирам мы уже разослали транзакцию неподтвержденную так что бы при подключении делать автоматически broadcast
- **
+ *
+ *  <hr>
+ *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
+ *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
 public class TransactionMap extends DCMap<Long, Transaction> implements Observer {
     public static final int TIMESTAMP_INDEX = 0;
@@ -113,7 +116,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable().makeOrGet();
 
-       this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
+        this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
         Bind.secondaryKey(map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {
             @Override
             public Tuple2<String, Long> run(Long key, Transaction val) {
@@ -132,7 +135,8 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                         val.setDC(getDCSet());
 
                         for (Account acc : val.getRecipientAccounts()) {
-                            recps.add(acc.getAddress() + val.viewTimestamp());
+                            // recps.add(acc.getAddress() + val.viewTimestamp()); уникальнось внутри Бинда делается
+                            recps.add(acc.getAddress());
                         }
                         String[] ret = new String[recps.size()];
                         ret = recps.toArray(ret);
@@ -491,7 +495,17 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     }
 
-    public List<Transaction> getUnconfirmedTransaction(Iterable keys) {
+    public List<Transaction> findTransactions(String address, String sender, String recipient,
+                                         int type, boolean desc, int offset, int limit, long timestamp) {
+
+        Iterable keys = findTransactionsKeys(address, sender, recipient,
+                type, desc, offset, limit, timestamp);
+        return getUnconfirmedTransaction(keys);
+
+    }
+
+
+        public List<Transaction> getUnconfirmedTransaction(Iterable keys) {
         Iterator iter = keys.iterator();
         List<Transaction> transactions = new ArrayList<>();
         Transaction item;
@@ -521,6 +535,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     }
 
+    // slow?? without index
     public List<Transaction> getTransactionsByAddress(String address) {
 
         ArrayList<Transaction> values = new ArrayList<Transaction>();
