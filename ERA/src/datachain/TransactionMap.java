@@ -9,37 +9,37 @@ import core.account.Account;
 import core.transaction.Transaction;
 import database.DBMap;
 import database.serializer.TransactionSerializer;
-import org.mapdb.BTreeKeySerializer;
-import org.mapdb.BTreeMap;
-import org.mapdb.DB;
-import org.mapdb.Fun;
+import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple2Comparator;
 import utils.ObserverMessage;
 import utils.ReverseComparator;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
- * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction
+ * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction.
+ * Signature (as Long) -> Transaction
+ * <hr>
+ * Здесь вторичные индексы создаются по несколько для одной записи путем создания массива ключей,
+ * см. typeKey и recipientKey. Они используются для API RPC block explorer.
+ * Нужно огрничивать размер выдаваемого списка чтобы не перегружать ноду.
+ * <br>
+ * Так же вторичный индекс по времени, который используется в ГУИ TIMESTAMP_INDEX = 0 (default)
+ * - он оргнизыется внутри DCMap в списке индексов для сортировок в ГУИ
  *
  * Также хранит инфо каким пирам мы уже разослали транзакцию неподтвержденную так что бы при подключении делать автоматически broadcast
- *
- * signature -> Transaction
- * TODO: укоротить ключ до 8 байт
- *
- * ++ seek by TIMESTAMP
+ **
  */
 public class TransactionMap extends DCMap<Long, Transaction> implements Observer {
-    public static final int TIMESTAMP_INDEX = 1;
+    public static final int TIMESTAMP_INDEX = 0;
     public static final int MAX_MAP_SIZE = core.BlockChain.HARD_WORK ? 100000 : 5000;
 
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-    private NavigableSet<Tuple2<Integer, byte[]>> heightIndex;
-
     // PEERS for transaction signature
-    private Map<byte[], List<byte[]>> peersBroadcasted = new HashMap<byte[], List<byte[]>>();
+    private Map<Long, List<byte[]>> peersBroadcasted = new HashMap<Long, List<byte[]>>();
 
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
@@ -75,11 +75,14 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         Tuple2Comparator<Long, Long> comparator = new Fun.Tuple2Comparator<Long, Long>(Fun.COMPARATOR,
                 //UnsignedBytes.lexicographicalComparator()
                 Fun.COMPARATOR);
-        NavigableSet<Tuple2<Integer, Long>> heightIndex = database.createTreeSet("transactions_index_timestamp")
-                .comparator(comparator).makeOrGet();
+        NavigableSet<Tuple2<Long, Long>> heightIndex = database
+                .createTreeSet("transactions_index_timestamp")
+                .comparator(comparator)
+                .makeOrGet();
 
-        NavigableSet<Tuple2<Integer, Long>> descendingHeightIndex = database
-                .createTreeSet("transactions_index_timestamp_descending").comparator(new ReverseComparator(comparator))
+        NavigableSet<Tuple2<Long, Long>> descendingHeightIndex = database
+                .createTreeSet("transactions_index_timestamp_descending")
+                .comparator(new ReverseComparator(comparator))
                 .makeOrGet();
 
         createIndex(TIMESTAMP_INDEX, heightIndex, descendingHeightIndex,
@@ -110,11 +113,10 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable().makeOrGet();
 
-/*
        this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
-        Bind.secondaryKey(map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, byte[], Transaction>() {
+        Bind.secondaryKey(map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {
             @Override
-            public Tuple2<String, Long> run(byte[] key, Transaction val) {
+            public Tuple2<String, Long> run(Long key, Transaction val) {
                 Account account = val.getCreator();
                 return new Tuple2<String, Long>(account == null ? "genesis" : account.getAddress(), val.getTimestamp());
             }
@@ -122,9 +124,9 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         this.recipientKey = database.createTreeSet("recipient_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
         Bind.secondaryKeys(map, this.recipientKey,
-                new Fun.Function2<String[], byte[], Transaction>() {
+                new Fun.Function2<String[], Long, Transaction>() {
                     @Override
-                    public String[] run(byte[] key, Transaction val) {
+                    public String[] run(Long key, Transaction val) {
                         List<String> recps = new ArrayList<String>();
 
                         val.setDC(getDCSet());
@@ -140,24 +142,28 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         this.typeKey = database.createTreeSet("address_type_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
         Bind.secondaryKeys(map, this.typeKey,
-                new Fun.Function2<Fun.Tuple3<String, Long, Integer>[], byte[], Transaction>() {
+                new Fun.Function2<Fun.Tuple3<String, Long, Integer>[], Long, Transaction>() {
                     @Override
-                    public Fun.Tuple3<String, Long, Integer>[] run(byte[] key, Transaction val) {
+                    public Fun.Tuple3<String, Long, Integer>[] run(Long key, Transaction val) {
                         List<Fun.Tuple3<String, Long, Integer>> recps = new ArrayList<Fun.Tuple3<String, Long, Integer>>();
                         Integer type = val.getType();
+
+                        val.setDC(getDCSet());
+
                         for (Account acc : val.getInvolvedAccounts()) {
                             recps.add(new Fun.Tuple3<String, Long, Integer>(acc.getAddress(), val.getTimestamp(), type));
 
                         }
                         // Tuple2<Integer, String>[] ret = (Tuple2<Integer,
                         // String>[]) new Object[ recps.size() ];
-                        Fun.Tuple3<String, Long, Integer>[] ret = (Fun.Tuple3<String, Long, Integer>[]) Array.newInstance(Fun.Tuple3.class,
-                                recps.size());
+                        Fun.Tuple3<String, Long, Integer>[] ret = (Fun.Tuple3<String, Long, Integer>[])
+                                Array.newInstance(Fun.Tuple3.class, recps.size());
+
                         ret = recps.toArray(ret);
+
                         return ret;
                     }
                 });
-*/
 
         return map;
     }
@@ -182,7 +188,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     public List<Transaction> getSubSet(long timestamp, boolean notSetDCSet) {
 
         List<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = this.getIterator(0, false);
+        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
         Transaction transaction;
         int count = 0;
         int bytesTotal = 0;
@@ -190,8 +196,12 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         while (iterator.hasNext()) {
             key = iterator.next();
             transaction = this.map.get(key);
-            if (transaction.getDeadline() < timestamp || transaction.getTimestamp() > timestamp)
+            if (transaction.getTimestamp() > timestamp)
                 continue;
+            if (transaction.getDeadline() < timestamp) {
+                // мы используем отсортированный индекс
+                break;
+            }
 
             bytesTotal += transaction.getDataLength(Transaction.FOR_NETWORK, true);
             if (bytesTotal > core.BlockGenerator.MAX_BLOCK_SIZE_BYTE + (core.BlockGenerator.MAX_BLOCK_SIZE_BYTE >> 3)) {
@@ -305,100 +315,27 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     public void addBroadcastedPeer(Transaction transaction, byte[] peer) {
 
         byte[] signature = transaction.getSignature();
+        Long key = Longs.fromByteArray(signature);
 
         List<byte[]> peers;
-        if (!this.peersBroadcasted.containsKey(signature)) {
+        if (!this.peersBroadcasted.containsKey(key)) {
             peers = new ArrayList<byte[]>();
         } else {
-            peers = this.peersBroadcasted.get(signature);
+            peers = this.peersBroadcasted.get(key);
             if (peers == null)
                 peers = new ArrayList<byte[]>();
         }
 
         if (peers.add(peer))
-            this.peersBroadcasted.put(signature, peers);
-    }
-
-    public List<Transaction> getTransactions(int from, int count, boolean descending) {
-
-        ArrayList<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = this.getIterator(from, descending);
-
-        Transaction transaction;
-        for (int i = 0; i < count; i++) {
-            if (!iterator.hasNext())
-                break;
-
-            transaction = this.get(iterator.next());
-            transaction.setDC(this.getDCSet());
-            values.add(transaction);
-        }
-        iterator = null;
-        return values;
-    }
-
-    public List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending) {
-
-        ArrayList<Transaction> values = new ArrayList<>();
-        Iterator<Long> iterator = this.getIterator(0, descending);
-        Account account = new Account(address);
-
-        int i = 0;
-        Transaction transaction;
-        while (iterator.hasNext()) {
-            transaction = map.get(iterator.next());
-            if (type != 0 && type != transaction.getType())
-                continue;
-
-            transaction.setDC(this.getDCSet());
-            HashSet<Account> recipients = transaction.getRecipientAccounts();
-            if (recipients == null || recipients.isEmpty())
-                continue;
-            if (recipients.contains(account) && transaction.getTimestamp() >= timestamp) {
-                values.add(transaction);
-                i++;
-                if (count > 0 && i > count)
-                    break;
-            }
-        }
-        return values;
-    }
-
-    public List<Transaction> getTransactionsByAddress(String address) {
-
-        ArrayList<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = this.getIterator(0, false);
-        Account account = new Account(address);
-
-        Transaction transaction;
-        boolean ok = false;
-
-        while (iterator.hasNext()) {
-
-            transaction = map.get(iterator.next());
-            if (transaction.getCreator().equals(address))
-                ok = true;
-            else
-                ok = false;
-
-            if (!ok) {
-                transaction.setDC(this.getDCSet());
-                HashSet<Account> recipients = transaction.getRecipientAccounts();
-
-                if (recipients == null || recipients.isEmpty() || !recipients.contains(account)) {
-                    continue;
-                }
-
-            }
-            values.add(transaction);
-        }
-        return values;
+            this.peersBroadcasted.put(key, peers);
     }
 
     public boolean needBroadcasting(Transaction transaction, byte[] peerBYtes) {
 
         byte[] signature = transaction.getSignature();
-        List<byte[]> peers = this.peersBroadcasted.get(signature);
+        Long key = Longs.fromByteArray(signature);
+
+        List<byte[]> peers = this.peersBroadcasted.get(key);
         if (peers == null || peers.isEmpty() || (!peers.contains(peerBYtes) && peers.size() < 4)) {
             return true;
         }
@@ -411,7 +348,9 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     public int getBroadcasts(Transaction transaction) {
 
         byte[] signature = transaction.getSignature();
-        List<byte[]> peers = this.peersBroadcasted.get(signature);
+        Long key = Longs.fromByteArray(signature);
+
+        List<byte[]> peers = this.peersBroadcasted.get(key);
         if (peers == null || peers.isEmpty())
             return 0;
 
@@ -423,10 +362,12 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     public List<byte[]> getBroadcastedPeers(Transaction transaction) {
 
         byte[] signature = transaction.getSignature();
-        if (!this.peersBroadcasted.containsKey(signature)) {
+        Long key = Longs.fromByteArray(signature);
+
+        if (!this.peersBroadcasted.containsKey(key)) {
             return new ArrayList<byte[]>();
         } else {
-            return this.peersBroadcasted.get(signature);
+            return this.peersBroadcasted.get(key);
         }
 
     }
@@ -435,10 +376,12 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     public boolean isBroadcastedToPeer(Transaction transaction, byte[] peer) {
 
         byte[] signature = transaction.getSignature();
-        if (!this.peersBroadcasted.containsKey(signature)) {
+        Long key = Longs.fromByteArray(signature);
+
+        if (!this.peersBroadcasted.containsKey(key)) {
             return false;
         } else {
-            return this.peersBroadcasted.get(signature).contains(peer);
+            return this.peersBroadcasted.get(key).contains(peer);
         }
 
     }
@@ -474,15 +417,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         return this.get(Longs.fromByteArray(signature));
     }
 
-    /* локально по месту надо делать наполнение - чтобы не тормозить обработку тут
-    public Transaction get(byte[] signature) {
-        Transaction item = super.get(signature);
-        //item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, this.getDCSet().getBlocksHeadMap().size() + 1, 1);
-        return item;
-    }
-    */
-
-    @Deprecated
     /**
      * Find all unconfirmed transaction by address, sender or recipient.
      * Need set only one parameter(address, sender,recipient)
@@ -548,14 +482,15 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         limit = (limit == 0) ? Iterables.size(keys) : limit;
 
+        // зачем это тут ?
+        //// Iterable k = Iterables.limit(Iterables.skip(keys, offset), limit);
+        //// getUnconfirmedTransaction(k);
+        //// return Iterables.limit(Iterables.skip(keys, offset), limit);
 
-        Iterable k = Iterables.limit(Iterables.skip(keys, offset), limit);
-
-        getUnconfirmedTransaction(k);
         return Iterables.limit(Iterables.skip(keys, offset), limit);
+
     }
 
-    @Deprecated()
     public List<Transaction> getUnconfirmedTransaction(Iterable keys) {
         Iterator iter = keys.iterator();
         List<Transaction> transactions = new ArrayList<>();
@@ -568,6 +503,105 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             transactions.add(item);
         }
         return transactions;
+    }
+
+    public List<Transaction> getTransactionsByAddressFast100(String address) {
+
+        Iterable senderKeys = null;
+        Iterable recipientKeys = null;
+        TreeSet<Object> treeKeys = new TreeSet<>();
+
+        senderKeys = Iterables.limit(Fun.filter(this.senderKey, address), 100);
+        recipientKeys = Iterables.limit(Fun.filter(this.recipientKey, address), 100);
+
+        treeKeys.addAll(Sets.newTreeSet(senderKeys));
+        treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+
+        return getUnconfirmedTransaction(Iterables.limit(treeKeys, 100));
+
+    }
+
+    public List<Transaction> getTransactionsByAddress(String address) {
+
+        ArrayList<Transaction> values = new ArrayList<Transaction>();
+        Iterator<Long> iterator = this.getIterator(0, false);
+        Account account = new Account(address);
+
+        Transaction transaction;
+        boolean ok = false;
+
+        int i = 0;
+        while (iterator.hasNext()) {
+
+            transaction = map.get(iterator.next());
+            if (transaction.getCreator().equals(address))
+                ok = true;
+            else
+                ok = false;
+
+            if (!ok) {
+                transaction.setDC(this.getDCSet());
+                HashSet<Account> recipients = transaction.getRecipientAccounts();
+
+                if (recipients == null || recipients.isEmpty() || !recipients.contains(account)) {
+                    continue;
+                }
+
+            }
+
+            // SET LIMIT
+            if (++i > 100)
+                break;
+
+            values.add(transaction);
+
+        }
+        return values;
+    }
+
+    public List<Transaction> getTransactions(int from, int count, boolean descending) {
+
+        ArrayList<Transaction> values = new ArrayList<Transaction>();
+        Iterator<Long> iterator = this.getIterator(from, descending);
+
+        Transaction transaction;
+        for (int i = 0; i < count; i++) {
+            if (!iterator.hasNext())
+                break;
+
+            transaction = this.get(iterator.next());
+            transaction.setDC(this.getDCSet());
+            values.add(transaction);
+        }
+        iterator = null;
+        return values;
+    }
+
+    public List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending) {
+
+        ArrayList<Transaction> values = new ArrayList<>();
+        Iterator<Long> iterator = this.getIterator(0, descending);
+        Account account = new Account(address);
+
+        int i = 0;
+        Transaction transaction;
+        while (iterator.hasNext()) {
+            transaction = map.get(iterator.next());
+            if (type != 0 && type != transaction.getType())
+                continue;
+
+            transaction.setDC(this.getDCSet());
+            HashSet<Account> recipients = transaction.getRecipientAccounts();
+            if (recipients == null || recipients.isEmpty())
+                continue;
+            if (recipients.contains(account) && transaction.getTimestamp() >= timestamp) {
+                values.add(transaction);
+                i++;
+                if (count > 0 && i > count)
+                    break;
+            }
+        }
+        return values;
     }
 
 }

@@ -216,7 +216,7 @@ public class API_TransactionsResource {
 
         result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(address);
         if (unconfirmed)
-            result.addAll(DCSet.getInstance().getTransactionMap().getTransactionsByAddress(address));
+            result.addAll(DCSet.getInstance().getTransactionMap().getTransactionsByAddressFast100(address));
 
         JSONArray array = new JSONArray();
         for (Transaction transaction : result) {
@@ -260,7 +260,7 @@ public class API_TransactionsResource {
 
         List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(address);
         if (unconfirmed)
-            trans.addAll(DCSet.getInstance().getTransactionMap().getTransactionsByAddress(address));
+            trans.addAll(DCSet.getInstance().getTransactionMap().getTransactionsByAddressFast100(address));
 
         Collections.sort(trans, new TransactionTimestampComparator().reversed());
         for (Transaction tr : trans) {
