@@ -4,10 +4,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedBytes;
 import core.block.Block;
-import org.mapdb.SerializerBase;
-import org.mapdb.SerializerPojo;
-import org.mapdb.BTreeKeySerializer;
-import org.mapdb.DB;
+import org.mapdb.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -44,7 +41,10 @@ public class BlockSignsMap extends DCMap<Long, Integer> {
         return database.createHashMap("height")
                 .keySerializer(SerializerBase.LONG)
                 .valueSerializer(SerializerBase.INTEGER)
-                //.comparator(UnsignedBytes.lexicographicalComparator()) // for byte[] KEYS
+
+                // .comparator(UnsignedBytes.lexicographicalComparator()) // for byte[] KEYS
+                // or from MapDB .comparator(Fun.BYTE_ARRAY_COMPARATOR)
+
                 //.counterEnable() not need
                 .makeOrGet();
     }
