@@ -390,6 +390,10 @@ public class OnDealClick {
             case Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR:
                 mess = "Invalid block record sequence";
                 break;
+            case Transaction.KEY_COLLISION:
+                mess = "Key collision, try again";
+                break;
+
 
         }
         return mess;

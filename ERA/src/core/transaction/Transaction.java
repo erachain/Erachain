@@ -87,6 +87,7 @@ public abstract class Transaction {
     public static final long NOT_VALIDATE_FLAG_PERSONAL = 2l;
     public static final long NOT_VALIDATE_FLAG_PUBLIC_TEXT = 4l;
     public static final long NOT_VALIDATE_FLAG_BALANCE = 8l;
+    public static final long NOT_VALIDATE_KEY_COLLISION = 16l;
 
     // VALIDATION CODE
     public static final int VALIDATE_OK = 1;
@@ -1227,6 +1228,12 @@ public abstract class Transaction {
             } else {
                 return CREATOR_NOT_PERSONALIZED;
             }
+        }
+
+        if ((flags & NOT_VALIDATE_KEY_COLLISION) == 0l
+                && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
+            // потому что мы ключ урезали до 12 байт - могут быть коллизии
+            return KEY_COLLISION;
         }
 
         return VALIDATE_OK;
