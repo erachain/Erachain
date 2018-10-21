@@ -1419,7 +1419,7 @@ public abstract class Transaction {
             if (block == null)
                 return 0;
 
-            int transactionBlockHeight = db.getBlockSignsMap().getHeight(block);
+            int transactionBlockHeight = db.getBlockSignsMap().get(block);
 
             // RETURN
             return 1 + db.getBlockMap().size() - transactionBlockHeight;

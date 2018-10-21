@@ -1,44 +1,36 @@
 package datachain;
 
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedBytes;
 import core.block.Block;
+import org.mapdb.SerializerBase;
+import org.mapdb.SerializerPojo;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-// block.signature -> Height, Weight(Win Value)
 /**
- * ключ: подпись блока
- * занчение: номер блока (высота + height)<br>
-
- * TODO - убрать длинный индекс
+ * block.signature[0..7] (as Long) -> Height (as Integer)<br>
+ * Here used createHashMap - its is more quick
+ * <hr>
+ * ключ: подпись блока<br>
+ * занчение: номер блока (высота, height)<br>
  */
-public class BlockSignsMap extends DCMap<byte[], Integer> {
+public class BlockSignsMap extends DCMap<Long, Integer> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
-    // for saving in DB
-    //private Atomic.Long fullWeightVar;
-    //private Long fullWeight = 0L;
-    //private int startedInForkHeight = 0;
 
     public BlockSignsMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
-        //this.fullWeightVar = database.getAtomicLong("fullWeight");
-        //this.fullWeight = this.fullWeightVar.get();
-        //if (this.fullWeight == null)
-        //	this.fullWeight = 0L;
-
-        //startedInForkHeight = 0;
     }
 
     public BlockSignsMap(BlockSignsMap parent, DCSet dcSet) {
         super(parent, dcSet);
-        //this.fullWeight = parent.getFullWeight();
-        //startedInForkHeight
     }
 
     @Override
@@ -46,150 +38,74 @@ public class BlockSignsMap extends DCMap<byte[], Integer> {
     }
 
     @Override
-    protected Map<byte[], Integer> getMap(DB database) {
-        //OPEN MAP
-        return database.createTreeMap("height")
-                .keySerializer(BTreeKeySerializer.BASIC)
-                .comparator(UnsignedBytes.lexicographicalComparator())
-                .counterEnable()
+    protected Map<Long, Integer> getMap(DB database) {
+        //OPEN HASH MAP
+        //
+        return database.createHashMap("height")
+                .keySerializer(SerializerBase.LONG)
+                .valueSerializer(SerializerBase.INTEGER)
+                //.comparator(UnsignedBytes.lexicographicalComparator()) // for byte[] KEYS
+                //.counterEnable() not need
                 .makeOrGet();
     }
 
     @Override
-    protected Map<byte[], Integer> getMemoryMap() {
-        return new TreeMap<byte[], Integer>(UnsignedBytes.lexicographicalComparator());
+    protected Map<Long, Integer> getMemoryMap() {
+        //return new TreeMap<long[], Integer>(UnsignedBytes.lexicographicalComparator()); // for byte[] KEYS
+        return new TreeMap<Long, Integer>();
     }
 
     @Override
     protected Integer getDefaultValue() {
-        //return new Tuple2<Integer, Long>(-1,-1L);
         return null;
     }
-
-	/*
-	private Long getFullWeight() {
-		return this.fullWeight;
-	}
-	 */
-
-	/*
-	public void setFullWeight(long value) {
-
-		fullWeight = value;
-		if(this.fullWeightVar != null)
-		{
-			this.fullWeightVar.set(fullWeight);
-		}
-	}
-	 */
-
-	/*
-	private int getStartedInForkHeight() {
-		return this.startedInForkHeight;
-	}
-	 */
-
 
     @Override
     protected Map<Integer, Integer> getObservableData() {
         return this.observableData;
     }
 
+    public boolean contains(byte[] signature) {
+        Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
+                signature[4], signature[5], signature[6], signature[7]);
+        return this.contains(key);
+    }
+
     public Integer get(Block block) {
-        return this.get(block.getSignature());
+        byte[] signature = block.getSignature();
+        Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
+                signature[4], signature[5], signature[6], signature[7]);
+        return this.get(key);
+    }
+
+    public Integer get(byte[] signature) {
+        Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
+                signature[4], signature[5], signature[6], signature[7]);
+        return this.get(key);
+    }
+
+    public void delete(byte[] signature) {
+        Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
+                signature[4], signature[5], signature[6], signature[7]);
+        this.delete(key);
     }
 
     public Block getBlock(byte[] signature) {
-        Integer key = this.get(signature);
-        if (key != null && key > 0)
-            return this.getDCSet().getBlockMap().get(key);
+        Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
+                signature[4], signature[5], signature[6], signature[7]);
+        Integer value = this.get(key);
+        if (value == null)
+            return null;
 
-        return null;
+        return this.getDCSet().getBlockMap().get(value);
+
     }
 
-    public Integer getHeight(Block block) {
-        if (this.contains(block.getSignature()))
-            return this.get(block.getSignature());
-        return -1;
+    public boolean set(byte[] signature, Integer height) {
+        Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
+                signature[4], signature[5], signature[6], signature[7]);
+        return this.set(key, height);
+
     }
-
-    public Integer getHeight(byte[] signature) {
-        if (this.contains(signature)) {
-            Integer o = this.get(signature);
-            if (o != null)
-                return this.get(signature);
-        }
-        return -1;
-    }
-
-	/*
-	private int getWeight(Block block)
-	{
-		if (this.contains(block.getSignature()))
-			return this.get(block.getSignature()).b;
-		return 0;
-	}
-	 */
-
-	/*
-	private void recalcWeightFull(DCSet dcSet) {
-
-		long weightFull = 0l;
-		Iterator<byte[]> iterator = this.getIterator(0, true);
-		while (iterator.hasNext()) {
-			byte[] key = iterator.next();
-			Tuple2<Integer, Integer> hw = this.get(key);
-			weightFull += hw.b;
-		}
-
-		fullWeight = weightFull;
-		this.fullWeightVar.set(fullWeight);
-
-	}
-	 */
-
-	/*
-	public boolean set(byte[] key, int height)//, int weight)
-	{
-		if (this.contains(key)) {
-			// sub old value from FULL
-			Tuple2<Integer, Integer> value_old = this.get(key);
-			fullWeight -= value_old.b;
-		}
-
-		if (startedInForkHeight == 0 && this.parent != null) {
-			startedInForkHeight = height;
-		}
-
-		fullWeight += 1; //weight;
-
-		if(this.fullWeightVar != null)
-		{
-			this.fullWeightVar.set(fullWeight);
-		}
-
-		return super.set(key, new Tuple2<Integer, Integer>(height, 1)); //weight));
-	}
-	 */
-
-	/*
-	@Override
-	public void delete(byte[] key)
-	{
-		if (this.contains(key)) {
-			// sub old value from FULL
-			Tuple2<Integer, Integer> value_old = this.get(key);
-			fullWeight -= value_old.b;
-
-			if(this.fullWeightVar != null)
-			{
-				this.fullWeightVar.set(fullWeight);
-			}
-
-			super.delete(key);
-		}
-
-	}
-	 */
 
 }

@@ -1,8 +1,11 @@
 package datachain;
 
+import org.mapdb.BTreeMap;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +27,8 @@ import java.util.Map;
  *     previous making blockHeight + this ForgingH balance
 <hr>
  - not SAME with BLOCK HEADS - use point for not only forged blocks - with incoming ERA Volumes
+ <br>
+ Так же тут можно искать блоки собранны с данного счета - а вторичный индекс у блоков не нужен
 
  * @return
  */
@@ -76,6 +81,13 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
 
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public Collection<Tuple2<Integer, Integer>> getGeneratorBlocks(String address) {
+        Collection<Tuple2<Integer, Integer>> headers = ((BTreeMap) (this.map))
+                .subMap(Fun.t2(address, null), Fun.t2(address, Fun.HI())).values();
+
+        return headers;
+    }
 
     // height
     public void set(String address, Integer currentHeight, Integer currentForgingVolume) {

@@ -2884,10 +2884,11 @@ public class BlockExplorer {
 
         for (String address : addresses) {
             if (!address.startsWith("A")) {
-                Collection<Integer> block_heights = dcSet.getBlockMap().getGeneratorBlocks(address);
+                // height + win value
+                Collection<Tuple2<Integer, Integer>> block_heights = dcSet.getAddressForging().getGeneratorBlocks(address);
 
-                for (int height : block_heights) {
-                    Block block = dcSet.getBlockMap().get(height);
+                for (Tuple2<Integer, Integer> item : block_heights) {
+                    Block block = dcSet.getBlockMap().get(item.a);
                     all.add(new BlExpUnit(block.getHeight(), 0, block));
                 }
             }
