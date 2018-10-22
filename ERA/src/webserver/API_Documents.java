@@ -22,8 +22,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLConnection;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.zip.DataFormatException;
@@ -43,7 +49,7 @@ public class API_Documents {
         Map<String, String> help = new LinkedHashMap<>();
 
         help.put("apidocuments/getFiles?block={block}&txt={transaction}", "get files from transaction");
-        help.put("apidocuments/getFile?block={block}&txt={transaction}&name={name]", "get file (name) from transaction");
+        help.put("apidocuments/getFile?download={true/false}block={block}&txt={transaction}&name={name]", "get file (name) from transaction");
                
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -126,7 +132,7 @@ public class API_Documents {
     @GET
     @Path("getFile")
     @Produces("application/zip")
-    public Response getFile(@QueryParam("block") int blockN, @QueryParam("txt") int txtN, @QueryParam("name") String name ) {
+    public Response getFile(@QueryParam("block") int blockN, @QueryParam("txt") int txtN, @QueryParam("name") String name, @QueryParam("download") String downloadParam ) {
        JSONObject result = new JSONObject();
        byte[] resultByte = null;
         try {
@@ -172,14 +178,44 @@ public class API_Documents {
                               }else{
                                   resultByte = file.getValue().b;
                               }
+                  // ifdownloadParam
                               
-                             
-                                return Response.status(200).header("Content-Type", "application/x-download")
-                                          .header("Access-Control-Allow-Origin", "*")
-                                          .header("Content-disposition", "attachment; filename=" + name)
-                                          .entity(new ByteArrayInputStream(resultByte))
-                                          .build();
-                           
+                              // convert shar to ANSI 
+                              Charset utf8charset = Charset.forName("UTF-8");
+                              Charset iso88591charset = Charset.forName("ISO-8859-1");
+                              ByteBuffer inputBuffer = ByteBuffer.wrap(name.getBytes());
+                              // decode UTF-8
+                              CharBuffer data1 = utf8charset.decode(inputBuffer);
+                              // encode ISO-8559-1
+                              ByteBuffer outputBuffer = iso88591charset.encode(data1);
+                              byte[] outputData = outputBuffer.array();
+                              String ss = new String(outputData);
+                             //  mime TYPE
+                              InputStream is = new BufferedInputStream(new ByteArrayInputStream(resultByte));
+                               String mm = null;
+                            try {
+                                mm = URLConnection.guessContentTypeFromStream(is);
+                            } catch (IOException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                            
+                            //if downloadParam
+                            if(downloadParam!=null){
+                                
+                               if (downloadParam.equals("true")){
+                                    return Response.status(200).header("Content-Type", mm)
+                                            .header("Access-Control-Allow-Origin", "*")
+                                            .header("Content-disposition", "attachment; filename=" + new String(outputData).replace(" ", "_"))
+                                            .entity(new ByteArrayInputStream(resultByte))
+                                            .build();
+                                }
+                            }
+                            return Response.status(200).header("Content-Type", mm)
+                                    .header("Access-Control-Allow-Origin", "*")
+                                //    .header("Content-disposition", "attachment; filename=" + new String(outputData).replace(" ", "_"))
+                                    .entity(new ByteArrayInputStream(resultByte))
+                                    .build();
                            }
                        }
                           

@@ -152,10 +152,12 @@ public class BlockExplorer {
             if (info.getQueryParameters().containsKey("search")) {
 
                 String type = info.getQueryParameters().get("search").get(0);
+                String search = info.getQueryParameters().get("q").get(0);
                 if (type.equals("persons") || type.equals("person")) {
                     // search persons
                     output.put("search", type);
                     output.putAll(jsonQuerySearchPersons(info.getQueryParameters().getFirst("q")));
+                    
                } else if (type.equals("assets") || type.equals("asset")) {
                     // search assets
                     output.put("search", type);
@@ -166,7 +168,13 @@ public class BlockExplorer {
                     output.put("search", type);
                     output.putAll(jsonQuerySearchStatuses(info.getQueryParameters().getFirst("q")));
                     
-                }
+                
+                } else if (type.equals("block") || type.equals("blocks")) {
+                // search assets
+                output.put("search", "block");
+                output.putAll(jsonQueryBlock(search, 1));
+                
+            }
 
             }
         // top 100   
@@ -370,7 +378,7 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryHelp() {
+   public Map jsonQueryHelp() {
         Map help = new LinkedHashMap();
 
         help.put("Unconfirmed Transactions", "blockexplorer.json?unconfirmed");
@@ -3903,8 +3911,9 @@ public class BlockExplorer {
 
                       //  hasHes += i + " " + ss.get("File_Name") + "<br>";
                         
-                        hasHes += "<a href = 'apidocuments/getFile?block=" + block + "&txt=" + seg_No + "&name=" + ss.get("File_Name") + "'>"
-                                + i + " " + ss.get("File_Name") + "</a><br>";
+                        hasHes += i + " " + ss.get("File_Name");
+                        hasHes += "<a href = '../apidocuments/getFile?download=false&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("File_Name") + "'> View </a><br>";
+                        hasHes += "<a href = '../apidocuments/getFile?download=true&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("File_Name") + "'> Download </a><br>";
                     }
 
                     str_HTML += hasHes + "<br>";
@@ -3932,8 +3941,9 @@ public class BlockExplorer {
                         ss = (JSONObject) params.get(s);
 
                     //    hasHes += i + " " + ss.get("FN") + "<br>";
-                        hasHes += "<a href ='apidocuments/getFile?block=" + block + "&txt=" + seg_No + "&name=" + ss.get("FN") + "'>"
-                                + i + " " + ss.get("FN") + "</a><br>";
+                        hasHes +=  i + " " + ss.get("FN");
+                        hasHes += "<a href ='../apidocuments/getFile?download=false&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("FN") + "'> View </a>";
+                        hasHes += "<a href ='../apidocuments/getFile?download=true&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("FN") + "'>  Download</a><br>";
                     }
 
                     str_HTML += hasHes + "<br>";
@@ -4017,7 +4027,8 @@ public class BlockExplorer {
 
         Map vouchesJSON = new LinkedHashMap();
 
-        WEB_Statements_Vouch_Table_Model table_sing_model = new WEB_Statements_Vouch_Table_Model(trans);
+        WEB_Statements_Vouch_Table_Model table_sing_model = null;//new WEB_Statements_Vouch_Table_Model(trans);
+        if (table_sing_model== null) return output;
         int rowCount = table_sing_model.getRowCount();
 
         if (rowCount > 0) {
@@ -4058,7 +4069,7 @@ public class BlockExplorer {
 
         byte[] signatureBytes = null;
 
-        output.put("type", "transaction");
+        
 
         for (int i = 0; i < signatures.length; i++) {
             try {
@@ -4071,11 +4082,17 @@ public class BlockExplorer {
             if (transaction == null)
                 continue;
 
-            ///transaction.setDC(dcSet, Transaction.FOR_NETWORK);
-            List<Transaction> tt = new ArrayList<Transaction>();
-            tt.add(transaction);
-            // output.put("transaction_Header",Transactions_JSON(tt));
-            output.put("body", WEB_Transactions_HTML.getInstance().get_HTML(tt.get(0), langObj));
+            if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION){//.ISSUE_STATEMENT_TRANSACTION){
+                int block = transaction.getBlockHeight();
+                int seqNo = transaction.getSeqNo();
+                output.putAll(jsonQueryStatement(block+"",seqNo+""));  
+                output.put("type", "statement");
+                
+            }else {
+                output.put("type", "transaction");
+                output.put("body", WEB_Transactions_HTML.getInstance().get_HTML(transaction, langObj));
+                output.put("Label_Transaction", Lang.getInstance().translate_from_langObj("Transaction", langObj));
+            }
             // output.put("Json", transaction.toJson().toString());
 
             // output.put("",transaction);
@@ -4119,7 +4136,7 @@ public class BlockExplorer {
              */
         }
 
-        output.put("Label_Transaction", Lang.getInstance().translate_from_langObj("Transaction", langObj));
+        
 
         return output;
     }

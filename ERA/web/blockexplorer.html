@@ -1489,6 +1489,10 @@ function mainQuery(data) {
 			output += '<br><br>';
 		}
 	
+	if(data.type == 'statement')
+		{
+		output += statement(data);
+		}
 		
 		
 		if(data.type == 'name')
@@ -3569,7 +3573,12 @@ function getQueryParams(name) {
 }
 
 function buttonSearch() {
-   document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value)+ get_lang() + '&search=' + $("#searchparam").val (); 
+var par = $("#searchparam").val ();
+if (par =="blocks" || par=="blocks") {
+	 document.location.href = '?block=' + encodeURIComponent(document.getElementById('q').value)+ get_lang(); 
+	 return;
+}
+   document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value)+ get_lang() + '&search=' + par; 
 }
 
 function start() {
