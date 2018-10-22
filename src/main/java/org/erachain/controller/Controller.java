@@ -2393,11 +2393,12 @@ public class Controller extends Observable {
     }
 
     public ForgingStatus getForgingStatus() {
-        return this.getForgingStatus();
+        return this.blockGenerator.getForgingStatus();
     }
 
+
     public void setForgingStatus(ForgingStatus status) {
-        this.setForgingStatus(status);
+        this.blockGenerator.setForgingStatus(status);
     }
 
     // BLOCKCHAIN
