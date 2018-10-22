@@ -533,9 +533,9 @@ public class TestRecPerson {
 
         //assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
-        assertEquals(false, userAccount1.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
-        assertEquals(false, userAccount2.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
-        assertEquals(false, userAccount3.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(false, userAccount1.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(false, userAccount2.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(false, userAccount3.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
 
         initPersonalize();
 
@@ -639,9 +639,9 @@ public class TestRecPerson {
         assertEquals(1, (int) dbPA.getItem(personKey, userAddress3).b);
 //		assertEquals( true, Arrays.equals(dbPA.getItem(personKey, userAddress3).c, r_SertifyPubKeys.getSignature()));
 
-        assertEquals(true, userAccount1.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
-        assertEquals(true, userAccount2.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
-        assertEquals(true, userAccount3.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(true, userAccount1.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(true, userAccount2.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(true, userAccount3.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
 
         ////////// ORPHAN //////////////////
         r_SertifyPubKeys.orphan(Transaction.FOR_NETWORK);
@@ -683,9 +683,9 @@ public class TestRecPerson {
         // PERSON -> ADDRESS
         assertEquals(null, dbPA.getItem(personKey, userAddress3));
 
-        assertEquals(false, userAccount1.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
-        assertEquals(false, userAccount2.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
-        assertEquals(false, userAccount3.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(false, userAccount1.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(false, userAccount2.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(false, userAccount3.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
 
         /////////////////////////////////////////////// TEST DURATIONS
         // TRY DURATIONS
@@ -703,7 +703,7 @@ public class TestRecPerson {
         //assertEquals( (long)person.getBirthday(), (long)dbPS.getItem(personKey, ALIVE_KEY).a);
 
         assertEquals(abs_end_date, (int) userAccount1.getPersonDuration(db).b);
-        assertEquals(true, userAccount2.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(true, userAccount2.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
 
         // TEST LIST and STACK
         int end_date2 = -12;
@@ -717,12 +717,12 @@ public class TestRecPerson {
         int abs_end_date2 = end_date2 + (int) (r_SertifyPubKeys.getTimestamp() / 86400000.0);
 
         assertEquals(abs_end_date2, (int) userAccount2.getPersonDuration(db).b);
-        assertEquals(false, userAccount2.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(false, userAccount2.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
 
         r_SertifyPubKeys.orphan(Transaction.FOR_NETWORK);
 
         assertEquals(abs_end_date, (int) userAccount2.getPersonDuration(db).b);
-        assertEquals(true, userAccount2.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(true, userAccount2.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
 
     }
     @Ignore
@@ -735,9 +735,9 @@ public class TestRecPerson {
 
         //assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
-        assertEquals(false, userAccount1.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(false, userAccount1.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
         assertEquals(false, userAccount2.isPerson(db, db.getBlockMap().size()));
-        assertEquals(false, userAccount3.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(false, userAccount3.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
 
         initPersonalize();
 
@@ -867,15 +867,15 @@ public class TestRecPerson {
         //assertEquals( 1, (int)dbPA_fork.getItem(personKey, userAddress3).b);
 //		assertEquals( true, Arrays.equals(dbPA.getItem(personKey, userAddress3).c, r_SertifyPubKeys.getSignature()));
 
-        assertEquals(false, userAccount1.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
-        assertEquals(null, userAccount1.getPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
-        assertEquals(false, userAccount2.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
-        assertEquals(false, userAccount3.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(false, userAccount1.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(null, userAccount1.getPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(false, userAccount2.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(false, userAccount3.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
 
-        assertEquals(true, userAccount1.isPerson(fork, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
-        assertNotEquals(null, userAccount1.getPerson(fork, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
-        assertEquals(true, userAccount2.isPerson(fork, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
-        assertEquals(true, userAccount3.isPerson(fork, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(true, userAccount1.isPerson(fork, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
+        assertNotEquals(null, userAccount1.getPerson(fork, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(true, userAccount2.isPerson(fork, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(true, userAccount3.isPerson(fork, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
 
 
         ////////// ORPHAN //////////////////
@@ -918,9 +918,9 @@ public class TestRecPerson {
         // PERSON -> ADDRESS
         assertEquals(null, dbPA_fork.getItem(personKey, userAddress3));
 
-        assertEquals(false, userAccount1.isPerson(fork, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
-        assertEquals(false, userAccount2.isPerson(fork, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
-        assertEquals(false, userAccount3.isPerson(fork, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(false, userAccount1.isPerson(fork, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(false, userAccount2.isPerson(fork, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
+        assertEquals(false, userAccount3.isPerson(fork, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
     }
 
     @Test
