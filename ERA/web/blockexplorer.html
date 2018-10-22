@@ -200,9 +200,9 @@ function asyncAjax (url, type){
 					$("#searchparam").val (type);
 				document.getElementById('Langs').innerHTML = langs(data);
 
-				if(type == 'blocks')
+				if(type == 'org.erachain.blocks')
 				{
-					document.getElementById('main').innerHTML = blocks(data);
+					document.getElementById('main').innerHTML = org.erachain.blocks(data);
 				}
 				
 				if(type == 'peers')
@@ -406,7 +406,7 @@ function aTs (data)
 	
 	output += lastBlock(data.lastBlock);
 	
-	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="680">';
+	output += '<table id=org.erachain.blocks BORDER=0 cellpadding=15 cellspacing=0 width="680">';
 	output += '<tr><td>'; 
 	
 	output += '<center><h3>AT Accounts</h3>';
@@ -454,7 +454,7 @@ function aTs (data)
 	return output;
 }
 
-function blocks(data)
+function org.erachain.blocks(data)
 {
 	var output = '';
 	
@@ -465,11 +465,11 @@ function blocks(data)
 	
 	output += lastBlock(data.lastBlock);
 
-	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
+	output += '<table id=org.erachain.blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
 	output += '<tr><td align=left>';
 	output += '<table id=blocks_Transactions BORDER=0 cellpadding=15 cellspacing=0 width="1180" ><tr><td><a href=?unconfirmed'+get_lang()+'>' + data.Label_Unconfirmed_transactions+': '+data.unconfirmedTxs+'</a>';
 	output += '<td align="right">' + data.Label_total_transactions+': '+data.totaltransactions + "</table>";
-	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
+	output += '<table id=org.erachain.blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
 	output += '<tr><td><b>'+ data.Label_Height +' <td><b>'+data.Label_Time+'<td><b>'+ data.Label_Generator +'<td><b>'+data.Label_TXs+'<td><b>'+data.Label_Fee+'<td><b>'+data.Label_Amount+'<td><b>'+data.Label_Gen_balance+'<td><b>WV dtWV'; 
 
 	minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
@@ -516,11 +516,11 @@ function peers(data)
 	
 	output += lastBlock(data.lastBlock);
 
-	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
+	output += '<table id=org.erachain.blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
 	output += '<tr><td align=left>';
 //	output += '<a href=?unconfirmed'+get_lang()+'>' + data.Label_Unconfirmed_transactions+': '+data.unconfirmedTxs+'</a>.';
 	
-	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
+	output += '<table id=org.erachain.blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
 	output += '<tr><td><b>'+ data.Label_No+'<td><b>'+ data.Label_IP +' <td><b>'+data.Label_Height+'<td><b>'+ data.Label_Ping_mc +'<td><b>'+data.Label_Reliable+'<td><b>'+data.Label_Initiator+'<td><b>'+data.Label_Finding_ago+'<td><b>'+data.Label_Online_Time+'<td><b>'+data.Label_Version; 
 
 	minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
@@ -566,7 +566,7 @@ function topRichest(data)
 	
 	output += lastBlock(data.lastBlock);
 
-	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="900">';
+	output += '<table id=org.erachain.blocks BORDER=0 cellpadding=15 cellspacing=0 width="900">';
 	output += '<tr><td align=center>';
 	
 	output += data.Label_Total_coins_in_the_system +': ' + 
@@ -3406,7 +3406,7 @@ function parseUrlQuery() {
 
 function person(data)
 {
-output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+output = '<table id=org.erachain.blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
 output += '<tr><td align=left>';
 output += '<table><tr><td>';
 
@@ -3499,11 +3499,11 @@ var output = '';
 	
 	output += lastBlock(data.lastBlock);
 
-	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
+	output += '<table id=org.erachain.blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
 	output += '<tr><td align=left>';
 	output += '<a href=?unconfirmed'+get_lang()+'>' + data.Label_Unconfirmed_transactions+': '+data.unconfirmedTxs+'</a>.';
 	
-	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
+	output += '<table id=org.erachain.blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
 	output += '<tr><td><td><b>'+ data.Label_key +' <td><b>'+data.Label_name+'<td><b>'+ data.Label_creator; // +'<td><b>'+data.Label_Gen_balance+'<td><b>'+data.Label_TXs+'<td><b>'+data.Label_Fee+'<td><b>'+data.Label_AT_Amount+'<td><b>'+data.Label_Amount; 
 
 	
@@ -3574,7 +3574,7 @@ function getQueryParams(name) {
 
 function buttonSearch() {
 var par = $("#searchparam").val ();
-if (par =="blocks" || par=="blocks") {
+if (par =="org.erachain.blocks" || par=="org.erachain.blocks") {
 	 document.location.href = '?block=' + encodeURIComponent(document.getElementById('q').value)+ get_lang(); 
 	 return;
 }
@@ -3954,7 +3954,7 @@ function start() {
 	
 	if(params.hasOwnProperty('startBlock'))
 	{
-		asyncAjax('blockexplorer.json?blocks&start=' + params['startBlock']+'&lang='+params['lang'], 'blocks');
+		asyncAjax('blockexplorer.json?org.erachain.blocks&start=' + params['startBlock']+'&lang='+params['lang'], 'org.erachain.blocks');
 
 		document.title = title + ' - Start from ' + params['startBlock'] + ' block';
 		
@@ -4027,7 +4027,7 @@ function start() {
 		return;
 	}
 	
-	asyncAjax('blockexplorer.json?blocks'+'&lang='+params['lang'], 'blocks');
+	asyncAjax('blockexplorer.json?org.erachain.blocks'+'&lang='+params['lang'], 'org.erachain.blocks');
 	
 	document.title = title;
 	

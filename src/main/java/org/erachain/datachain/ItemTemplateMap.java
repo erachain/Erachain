@@ -1,0 +1,43 @@
+package org.erachain.datachain;
+
+import org.erachain.core.item.ItemCls;
+import org.erachain.database.serializer.ItemSerializer;
+import org.mapdb.DB;
+import org.erachain.utils.ObserverMessage;
+
+import java.util.Map;
+
+/**
+ * Хранение активов.<br>
+ * Ключ: номер (автоинкремент)<br>
+ * Значение: Шаблон<br>
+ */
+public class ItemTemplateMap extends Item_Map {
+    static final String NAME = "item_templates";
+    static final int TYPE = ItemCls.TEMPLATE_TYPE;
+
+    public ItemTemplateMap(DCSet databaseSet, DB database) {
+        super(databaseSet, database,
+                //TYPE,
+                "item_templates",
+                ObserverMessage.RESET_TEMPLATE_TYPE,
+                ObserverMessage.ADD_TEMPLATE_TYPE,
+                ObserverMessage.REMOVE_TEMPLATE_TYPE,
+                ObserverMessage.LIST_TEMPLATE_TYPE
+        );
+    }
+
+    public ItemTemplateMap(ItemTemplateMap parent) {
+        super(parent);
+    }
+
+    // type+name not initialized yet! - it call as Super in New
+    protected Map<Long, ItemCls> getMap(DB database) {
+
+        //OPEN MAP
+        return database.createTreeMap(NAME)
+                .valueSerializer(new ItemSerializer(TYPE))
+                .makeOrGet();
+    }
+
+}

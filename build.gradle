@@ -54,13 +54,13 @@ jar {
 sourceSets {
     main {
         java {
-            srcDir 'ERA/src'
+            srcDir 'src/main'
         }
     }
 
     test {
         java {
-            srcDir 'ERA/src/test'
+            srcDir 'src/test'
         }
     }
 }
@@ -126,13 +126,13 @@ dependencies {
     compile group: 'org.jvnet.mimepull', name: 'mimepull', version: '1.9.6'
     compile group: 'com.mitchellbosecke', name: 'pebble', version: '1.6.0'
     compile 'log4j:log4j:1.2.17'
-    compile 'org.slf4j:slf4j-api:1.7.5'
+    compile 'org.slf4j:slf4j-org.erachain.api:1.7.5'
     compile 'org.slf4j:slf4j-log4j12:1.7.5'
     compile group: 'com.twitter', name: 'twitter-text', version: '1.13.0'
     compile group: 'es.nitaur.markdown', name: 'txtmark', version: '0.16'
-    compile group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.0.1'
-    compile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
-    compile group: 'javax.validation', name: 'validation-api', version: '1.1.0.Final'
+    compile group: 'javax.ws.rs', name: 'javax.ws.rs-org.erachain.api', version: '2.0.1'
+    compile group: 'javax.servlet', name: 'javax.servlet-org.erachain.api', version: '3.0.1'
+    compile group: 'javax.validation', name: 'validation-org.erachain.api', version: '1.1.0.Final'
     compile group: 'net.sf.tinylaf', name: 'tinylaf', version: '1.4.0'
     compile group: 'junit', name: 'junit', version: '4.12'
     compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.22.2'
