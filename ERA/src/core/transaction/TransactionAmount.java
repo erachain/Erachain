@@ -1141,6 +1141,9 @@ public abstract class TransactionAmount extends Transaction {
 
     @Override
     public int getJobLevel() {
+        if (this.amount == null || this.amount.signum() == 0) {
+            return 150;
+        }
         return 300;
     }
 
