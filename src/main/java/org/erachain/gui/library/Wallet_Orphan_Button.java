@@ -19,7 +19,7 @@ public class Wallet_Orphan_Button extends JButton implements Observer {
 
     public Wallet_Orphan_Button() {
 
-        super(Lang.getInstance().translate("Roll back org.erachain.blocks"));
+        super(Lang.getInstance().translate("Roll back blocks"));
         th = this;
         this.addActionListener(new ActionListener() {
 

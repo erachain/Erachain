@@ -253,7 +253,7 @@ public class Other_Split_Panel extends Split_Panel {
         jPanel8.setLayout(new java.awt.GridBagLayout());
         
         JLabel jLabel_All_Block = new JLabel();
-        jLabel_All_Block.setText(Lang.getInstance().translate("Last 100 org.erachain.blocks"));
+        jLabel_All_Block.setText(Lang.getInstance().translate("Last 100 blocks"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;

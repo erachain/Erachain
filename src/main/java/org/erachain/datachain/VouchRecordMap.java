@@ -19,11 +19,11 @@ import java.util.Map;
 
 /**
  * Заверение другой транзакции<br><br>
- *     vouched record (BlockNo, RecNo) -> ERM balabce + List of vouchers org.erachain.records
+ *     vouched record (BlockNo, RecNo) -> ERM balabce + List of vouchers records
  *
  * Ключ: ссылка на запись которую заверяем.<br>
  * Значение: Сумма ERA на момент заверения на счету заверителя + ссылка на запись заверения:<br>
- vouched record (BlockNo, RecNo) -> ERM balabce + List of vouchers org.erachain.records
+ vouched record (BlockNo, RecNo) -> ERM balabce + List of vouchers records
  * @return dcMap
  */
 

@@ -383,7 +383,7 @@ public class TelegramManager extends Thread {
             Account creator = transaction.getCreator();
             if (creator == null || !transaction.isSignatureValid(DCSet.getInstance())) {
                 // DISHONEST PEER
-                ///this.org.erachain.network.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
+                ///this.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
                 ///		"ban PeerOnError - invalid telegram signature");
                 return true;
             }
@@ -391,12 +391,12 @@ public class TelegramManager extends Thread {
             long timestamp = transaction.getTimestamp();
             if (timestamp > NTP.getTime() + 10000) {
                 // DISHONEST PEER
-                ///this.org.erachain.network.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
+                ///this.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
                 ///		"ban PeerOnError - invalid telegram timestamp >>");
                 return true;
             } else if (30000 + timestamp < NTP.getTime()) {
                 // DISHONEST PEER
-                ///this.org.erachain.network.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
+                ///this.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
                 ///		"ban PeerOnError - invalid telegram timestamp <<");
                 return true;
             }

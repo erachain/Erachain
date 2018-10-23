@@ -662,7 +662,7 @@ public class DCSet implements Observer, IDB {
      *  account.address + current block.Height ->
      *     previous making blockHeight + this ForgingH balance
      <hr>
-     - not SAME with BLOCK HEADS - use point for not only forged org.erachain.blocks - with incoming ERA Volumes
+     - not SAME with BLOCK HEADS - use point for not only forged blocks - with incoming ERA Volumes
 
      * @return
      */
@@ -864,7 +864,7 @@ public class DCSet implements Observer, IDB {
      * Заверение другой транзакции<br><br>
      * Ключ: ссылка на запись которую заверяем.<br>
      * Значение: Сумма ERA на момент заверения на счету заверителя + ссылка на запись заверения:<br>
-     vouched record (BlockNo, RecNo) -> ERM balabce + List of vouchers org.erachain.records
+     vouched record (BlockNo, RecNo) -> ERM balabce + List of vouchers records
      * @return dcMap
      */
     public VouchRecordMap getVouchRecordMap() {

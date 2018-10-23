@@ -45,7 +45,7 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
     private String[] columnNames = new String[]{"Timestamp", "Creator", "Template", "Statement"};// ,
     // AssetCls.FEE_NAME});
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, false};
-    // private Map<byte[], BlockingQueue<Block>> org.erachain.blocks;
+    // private Map<byte[], BlockingQueue<Block>> blocks;
 
     public WEB_Statements_Table_Model_Search() {
         // transactions = new ArrayList<Transaction>();
@@ -97,15 +97,15 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
          * } }
          */
 
-        // this.org.erachain.blocks = new HashMap<byte[], BlockingQueue<Block>>();
+        // this.blocks = new HashMap<byte[], BlockingQueue<Block>>();
 
         //
 
-        // List<Pair<Account, Block>> org.erachain.blocks =
+        // List<Pair<Account, Block>> blocks =
         // Controller.getInstance().getLastBlocks();
         // JSONArray array = new JSONArray();
         /*
-         * for(Pair<Account, Block> block: org.erachain.blocks) { array.add(block.getB());
+         * for(Pair<Account, Block> block: blocks) { array.add(block.getB());
          * List<Transaction> transactions = block.getTransactions() }
          *
          *

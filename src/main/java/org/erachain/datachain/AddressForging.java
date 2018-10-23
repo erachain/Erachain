@@ -26,7 +26,7 @@ import java.util.Map;
  *  account.address + current block.Height ->
  *     previous making blockHeight + this ForgingH balance
 <hr>
- - not SAME with BLOCK HEADS - use point for not only forged org.erachain.blocks - with incoming ERA Volumes
+ - not SAME with BLOCK HEADS - use point for not only forged blocks - with incoming ERA Volumes
  <br>
  Так же тут можно искать блоки собранны с данного счета - а вторичный индекс у блоков не нужен
 

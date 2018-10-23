@@ -207,7 +207,7 @@ public class TelegramManagerTest {
         long date2 = System.currentTimeMillis();
         long diff = date2 - date;
 
-        // CHECK org.erachain.network.TelegramManager.MAX_HANDLED_TELEGRAMS_SIZE
+        // CHECK network.TelegramManager.MAX_HANDLED_TELEGRAMS_SIZE
         int listCounter = telegramer.telegramCount();
         System.out.println("Making " + listCounter + " telegrams: " + diff);
 

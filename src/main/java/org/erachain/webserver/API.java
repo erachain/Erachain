@@ -48,7 +48,7 @@ import java.util.*;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 
-@Path("org.erachain.api")
+@Path("api")
 public class API {
 
     private static final Logger LOGGER = Logger
@@ -134,7 +134,7 @@ public class API {
 
         help.put("*** TOOLS ***", "");
         help.put("POST Verify Signature for JSON {'message': ..., 'signature': Base58, 'publickey': Base58)", "verifysignature");
-        help.put("GET info by node", " GET org.erachain.api/info");
+        help.put("GET info by node", " GET api/info");
 
         help.put("POST Broadcast", "/broadcast JSON {raw=raw(BASE58)}");
         help.put("GET Broadcast", "/broadcast/{raw(BASE58)}");
@@ -397,7 +397,7 @@ public class API {
                 }
                 array.add(blockMap.get(i));
             }
-            out.put("org.erachain.blocks", array);
+            out.put("blocks", array);
 
         } catch (Exception e) {
 

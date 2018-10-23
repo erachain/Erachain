@@ -2,7 +2,7 @@ package org.erachain.blocks;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockGenerator;;
-import import org.erachain.core.Synchronizer;
+import org.erachain.core.Synchronizer;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;

@@ -167,7 +167,7 @@ public class TransactionsResource {
 
     @SuppressWarnings("unchecked")
     @GET
-    @Path("/org.erachain.network")
+    @Path("/network")
     public String getNetworkTransactions() {
         List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 100, true);
         JSONArray array = new JSONArray();
@@ -251,7 +251,7 @@ public class TransactionsResource {
             }
 
             if (blockLimit > 360) // 360 ensures at least six hours of
-            // org.erachain.blocks can be queried at once
+            // blocks can be queried at once
             {
                 String ipAddress = ServletUtils.getRemoteAddress(request);
                 if (!ServletUtils.isRemoteRequest(request, ipAddress))

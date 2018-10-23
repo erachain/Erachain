@@ -241,7 +241,7 @@ public class PollsResource {
 
     @SuppressWarnings("unchecked")
     @GET
-    @Path("/org.erachain.network")
+    @Path("/network")
     public String getAllPolls() {
         Collection<Poll> polls = Controller.getInstance().getAllPolls();
         JSONArray array = new JSONArray();

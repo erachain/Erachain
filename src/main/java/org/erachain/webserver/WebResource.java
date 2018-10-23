@@ -671,7 +671,7 @@ public class WebResource {
 
     @SuppressWarnings("unchecked")
     @POST
-    @Path("index/org.erachain.api.html")
+    @Path("index/api.html")
     @Consumes("application/x-www-form-urlencoded")
     public Response createApiCall(@Context HttpServletRequest request,
                                   MultivaluedMap<String, String> form) throws IOException {

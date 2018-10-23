@@ -170,7 +170,7 @@ public class BlockExplorer {
                     output.putAll(jsonQuerySearchStatuses(info.getQueryParameters().getFirst("q")));
                     
                 
-                } else if (type.equals("block") || type.equals("org.erachain.blocks")) {
+                } else if (type.equals("block") || type.equals("blocks")) {
                 // search assets
                 output.put("search", "block");
                 output.putAll(jsonQueryBlock(search, 1));
@@ -209,7 +209,7 @@ public class BlockExplorer {
 
                 output.putAll(jsonQueryTrades(have, want));
             }
-        } else if (info.getQueryParameters().containsKey("org.erachain.blocks")) {
+        } else if (info.getQueryParameters().containsKey("blocks")) {
              output.putAll(jsonQueryBlocks(info));
             //peers
         } else if (info.getQueryParameters().containsKey("peers")) {
@@ -384,7 +384,7 @@ public class BlockExplorer {
 
         help.put("Unconfirmed Transactions", "blockexplorer.json?unconfirmed");
         help.put("Block", "blockexplorer.json?block={block}[&page={page}]");
-        help.put("Blocks List", "blockexplorer.json?org.erachain.blocks[&start={height}]");
+        help.put("Blocks List", "blockexplorer.json?blocks[&start={height}]");
         help.put("Assets List", "blockexplorer.json?assets");
         help.put("Assets List Lite", "blockexplorer.json?assetsLite");
         help.put("Asset", "blockexplorer.json?asset={asset}");
@@ -398,7 +398,7 @@ public class BlockExplorer {
         help.put("Name (additional)", "blockexplorer.json?name={name}&start={offset}&allOnOnePage");
         help.put("Address", "blockexplorer.json?addr={address}");
         help.put("Address (additional)",
-                "blockexplorer.json?addr={address}&start={offset}&allOnOnePage&withoutBlocks&showWithout={1,2,org.erachain.blocks}&showOnly={type}");
+                "blockexplorer.json?addr={address}&start={offset}&allOnOnePage&withoutBlocks&showWithout={1,2,blocks}&showOnly={type}");
         help.put("Top Richest", "blockexplorer.json?top");
         help.put("Top Richest", "blockexplorer.json?top={limit}&asset={asset}");
         help.put("Address All Not Zero", "blockexplorer.json?top=allnotzero");
@@ -2941,7 +2941,7 @@ public class BlockExplorer {
 
         if (size == 0) {
             output.put("error",
-                    "No transactions found for this address.<br>It has probably not been used on the org.erachain.network yet.");
+                    "No transactions found for this address.<br>It has probably not been used on the network yet.");
             return output;
         }
 
@@ -3199,8 +3199,8 @@ public class BlockExplorer {
             }
 
             if (totalBlocksGeneratedCount > 0) {
-                if (!showOnlyMap.containsKey("org.erachain.blocks")) {
-                    showWithoutMap.put("org.erachain.blocks", true);
+                if (!showOnlyMap.containsKey("blocks")) {
+                    showWithoutMap.put("blocks", true);
                 }
             }
 
@@ -3275,7 +3275,7 @@ public class BlockExplorer {
 
             onThisPage++;
 
-            if (((unit.getUnit() instanceof Block) && (showWithoutMap.containsKey("org.erachain.blocks")))) {
+            if (((unit.getUnit() instanceof Block) && (showWithoutMap.containsKey("blocks")))) {
                 onThisPage--;
             }
 
@@ -3317,7 +3317,7 @@ public class BlockExplorer {
             }
 
             if (start != -1 && counter <= start && ((onThisPageCurent < txOnPage) || allOnOnePage)) {
-                if ((unit.getUnit() instanceof Block) && (showWithoutMap.containsKey("org.erachain.blocks"))) {
+                if ((unit.getUnit() instanceof Block) && (showWithoutMap.containsKey("blocks"))) {
                     counter--;
                     continue;
                 }

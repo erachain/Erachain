@@ -25,7 +25,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 
-@Path("org.erachain.blocks")
+@Path("blocks")
 @Produces(MediaType.APPLICATION_JSON)
 public class BlocksResource {
     @Context
@@ -286,7 +286,7 @@ public class BlocksResource {
     public String orphanTo(@PathParam("height") int heightTo) {
 
         String password = "";
-        APIUtils.askAPICallAllowed(password, "GET org.erachain.blocks/orphanto/", request);
+        APIUtils.askAPICallAllowed(password, "GET blocks/orphanto/", request);
 
         Controller.getInstance().setOrphanTo(heightTo);
 

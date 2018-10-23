@@ -155,11 +155,11 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE) {
-            //this.org.erachain.blocks.registerObserver();
-            //Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.org.erachain.blocks);
-            //this.org.erachain.blocks = (SortableList<Tuple2<String, String>, Block.BlockHead>) message.getValue();
+            //this.blocks.registerObserver();
+            //Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.blocks);
+            //this.blocks = (SortableList<Tuple2<String, String>, Block.BlockHead>) message.getValue();
             this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
-            //this.org.erachain.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            //this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
             this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
@@ -168,14 +168,14 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
             // тут вставить обработку на запрос обновления - не обновлять сразу - а раз в 30 секунд только
             // как это сделано в Мои Ордера
             //CHECK IF LIST UPDATED
-            //this.org.erachain.blocks = (SortableList<Tuple2<String, String>, Block.BlockHead>) message.getValue();
+            //this.blocks = (SortableList<Tuple2<String, String>, Block.BlockHead>) message.getValue();
             this.fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE
                 ) {
             //CHECK IF LIST UPDATED
             this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
-            //this.org.erachain.blocks.registerObserver();
-            //this.org.erachain.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            //this.blocks.registerObserver();
+            //this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
             this.fireTableDataChanged();
         }
     }

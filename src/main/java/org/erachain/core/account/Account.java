@@ -419,7 +419,7 @@ public class Account {
      *
      * int penalty_koeff = 1000000; int balance_penalty = penalty_koeff;
      *
-     * // icreator X 10 // not resolve first 100 org.erachain.blocks for(int i=1;
+     * // icreator X 10 // not resolve first 100 blocks for(int i=1;
      * i<GenesisBlock.GENERATING_RETARGET * 10 && block != null &&
      * block.getHeight(db) > 100; i++) { for(Transaction transaction:
      * block.getTransactions()) { if(transaction.isInvolved(this) & transaction

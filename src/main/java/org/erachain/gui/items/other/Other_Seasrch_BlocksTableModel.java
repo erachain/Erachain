@@ -63,8 +63,8 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 
     /*
      * @Override public SortableList<byte[], Block> getSortableList() { return
-     * this.org.erachain.blocks; } public SortableList<byte[], Block> getSortableList() {
-     * return this.org.erachain.blocks; }
+     * this.blocks; } public SortableList<byte[], Block> getSortableList() {
+     * return this.blocks; }
      */
 
     public void clear() {
@@ -107,8 +107,8 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
             Block block = this.blocks.get(row);
             // Block block = data.getB();
             if (block == null) {
-                // this.org.erachain.blocks.rescan();
-                // data = this.org.erachain.blocks.get(row);
+                // this.blocks.rescan();
+                // data = this.blocks.get(row);
                 // return -1;
             } else {
                 //block.calcHeadMind(dcSet);
@@ -119,8 +119,8 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
                 case COLUMN_HEIGHT:
 
                     if (block == null) {
-                        // this.org.erachain.blocks.rescan();
-                        // data = this.org.erachain.blocks.get(row);
+                        // this.blocks.rescan();
+                        // data = this.blocks.get(row);
                         return "-1";
                     }
                     if (row == 0) {
@@ -132,8 +132,8 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 
                 case COLUMN_TIMESTAMP:
                     if (block == null) {
-                        // this.org.erachain.blocks.rescan();
-                        // data = this.org.erachain.blocks.get(row);
+                        // this.blocks.rescan();
+                        // data = this.blocks.get(row);
                         return "-1";
                     }
 
@@ -147,8 +147,8 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
                 case COLUMN_GENERATOR:
 
                     if (block == null) {
-                        // this.org.erachain.blocks.rescan();
-                        // data = this.org.erachain.blocks.get(row);
+                        // this.blocks.rescan();
+                        // data = this.blocks.get(row);
                         return "-1";
                     }
                     return block.getCreator().getPersonAsString();
@@ -156,8 +156,8 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
                 case COLUMN_BASETARGET:
 
                     if (block == null) {
-                        // this.org.erachain.blocks.rescan();
-                        // data = this.org.erachain.blocks.get(row);
+                        // this.blocks.rescan();
+                        // data = this.blocks.get(row);
                         return "-1";
                     }
 
@@ -171,8 +171,8 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 
                 case COLUMN_TRANSACTIONS:
                     if (block == null) {
-                        // this.org.erachain.blocks.rescan();
-                        // data = this.org.erachain.blocks.get(row);
+                        // this.blocks.rescan();
+                        // data = this.blocks.get(row);
                         return -1;
                     }
 
@@ -180,8 +180,8 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 
                 case COLUMN_FEE:
                     if (block == null) {
-                        // this.org.erachain.blocks.rescan();
-                        // data = this.org.erachain.blocks.get(row);
+                        // this.blocks.rescan();
+                        // data = this.blocks.get(row);
                         return "-1";
                     }
 

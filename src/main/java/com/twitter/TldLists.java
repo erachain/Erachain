@@ -447,7 +447,7 @@ public class TldLists {
             "nec",
             "net",
             "netbank",
-            "org.erachain.network",
+            "network",
             "neustar",
             "new",
             "news",

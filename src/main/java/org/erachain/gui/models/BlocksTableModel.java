@@ -66,10 +66,10 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
 	/*
 	@Override
 	public SortableList<byte[], Block> getSortableList() {
-		return this.org.erachain.blocks;
+		return this.blocks;
 	}
 	public SortableList<byte[], Block> getSortableList() {
-		return this.org.erachain.blocks;
+		return this.blocks;
 	}
 	 */
 
@@ -105,8 +105,8 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
             Block.BlockHead block = this.blocks.get(row);
             //Block block = data.getB();
             if (block == null) {
-                //this.org.erachain.blocks.rescan();
-                //data = this.org.erachain.blocks.get(row);
+                //this.blocks.rescan();
+                //data = this.blocks.get(row);
                 //	return -1;
             } else {
                 //block.calcHeadMind(dcSet);
@@ -239,7 +239,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
     }
 
     public void removeObservers() {
-        //this.org.erachain.blocks.removeObserver();
+        //this.blocks.removeObserver();
         DCSet.getInstance().getBlockMap().deleteObserver(this);
     }
 }

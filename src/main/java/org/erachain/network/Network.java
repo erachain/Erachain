@@ -433,7 +433,7 @@ public class Network extends Observable implements ConnectionCallback {
                 FindMyselfMessage findMyselfMessage = (FindMyselfMessage) message;
 
                 if (Arrays.equals(findMyselfMessage.getFoundMyselfID(), Controller.getInstance().getFoundMyselfID())) {
-                    //LOGGER.info("org.erachain.network.onMessage - Connected to self. Disconnection.");
+                    //LOGGER.info("network.onMessage - Connected to self. Disconnection.");
 
                     Network.myselfAddress = message.getSender().getAddress();
                     tryDisconnect(message.getSender(), 99999, null);

@@ -1,11 +1,12 @@
-package org.erachain;// 30/03
+package org.erachain;
+// 30/03
 
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.blockexplorer.BlockExplorer;
-import core.blockexplorer.BlockExplorer.Stopwatch;
+import org.erachain.core.blockexplorer.BlockExplorer.Stopwatch;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.Transaction;
@@ -15,6 +16,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mapdb.Fun.Tuple2;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
 
@@ -147,7 +149,7 @@ public class BlockExplorerTest {
 		Deploy AT:
 		Genesis:
 		//+Trades:
-		//Generated org.erachain.blocks:
+		//Generated blocks:
 		//AT Transactions:
 
 		17 tx type
@@ -337,6 +339,7 @@ public class BlockExplorerTest {
             return database.getTransactionFinalMap().get(tuple_Tx);
 
         }
+
 
         // CHECK IF IN TRANSACTION DATABASE
         return DCSet.getInstance().getTransactionMap().get(signature);

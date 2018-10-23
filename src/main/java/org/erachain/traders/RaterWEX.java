@@ -27,7 +27,7 @@ public class RaterWEX extends Rater {
     public RaterWEX(TradersManager tradersManager, int sleepSec) {
         super(tradersManager, "wex", sleepSec);
 
-        this.apiURL = "https://wex.nz/org.erachain.api/3/ticker/btc_rur-btc_usd-usd_rur";
+        this.apiURL = "https://wex.nz/api/3/ticker/btc_rur-btc_usd-usd_rur";
 
     }
 

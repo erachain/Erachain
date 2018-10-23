@@ -977,8 +977,8 @@ public class Controller extends Observable {
         Message message;
         long ping = 0;
         int counter = 0;
-        ///////// big maxCounter freeze org.erachain.network and make bans on response
-        ///////// headers and org.erachain.blocks
+        ///////// big maxCounter freeze network and make bans on response
+        ///////// headers andblocks
         int stepCount = 128; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
         long dTime = this.blockChain.getTimestamp(this.dcSet);
 
@@ -1151,7 +1151,7 @@ public class Controller extends Observable {
          * HWeight))) return;
          *
          * //peer.setNeedPing(); peer.tryPing(30000);
-         * this.org.erachain.network.notifyObserveUpdatePeer(peer);
+         * this.network.notifyObserveUpdatePeer(peer);
          */
 
     }
@@ -1716,7 +1716,7 @@ public class Controller extends Observable {
          * Block maxBlock = null; try { maxBlock =
          * core.Synchronizer.getBlock(lastBlockSignature, maxHW.c, true); }
          * catch (Exception e) { // error on peer - disconnect! this.status =
-         * STATUS_SYNCHRONIZING; this.org.erachain.network.tryDisconnect(maxHW.c, 0,
+         * STATUS_SYNCHRONIZING; this.network.tryDisconnect(maxHW.c, 0,
          * "checkStatus - core.Synchronizer.getBlock - " + e.getMessage());
          * return false; } if (maxBlock != null) { // SAME LAST BLOCK
          * //this.blockChain.getHWeight(dcSet, false);
@@ -2293,7 +2293,7 @@ public class Controller extends Observable {
         return this.network.getTelegram(signature);
     }
     // public TelegramMessage getTelegram(String signature) {
-    // return this.org.erachain.network.getTelegram(signature);
+    // return this.network.getTelegram(signature);
     // }
 
     public List<Pair<Account, Name>> getNames() {
@@ -2477,7 +2477,7 @@ public class Controller extends Observable {
             isValid = true; // GENERATE by ME
         } else {
             isValid = newBlock.isSignatureValid() && newBlock.isValid(this.dcSet, false);
-            LOGGER.debug("+++ flushNewBlockGenerated Validated org.erachain.records: " + newBlock.getTransactionCount());
+            LOGGER.debug("+++ flushNewBlockGenerated Validatedrecords: " + newBlock.getTransactionCount());
         }
 
         if (!isValid)

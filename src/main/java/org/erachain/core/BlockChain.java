@@ -50,8 +50,8 @@ public class BlockChain {
     public static final boolean ROBINHOOD_USE = false;
     public static final int NEED_PEERS_FOR_UPDATE = HARD_WORK ? 2 : 1;
 
-    public static final int MAX_ORPHAN = 1000; // max orphan org.erachain.blocks in chain
-    public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get org.erachain.blocks packet by transactions
+    public static final int MAX_ORPHAN = 1000; // max orphan blocks in chain
+    public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get blocks packet by transactions
     public static final int TARGET_COUNT_SHIFT = 10;
     public static final int TARGET_COUNT = 1 << TARGET_COUNT_SHIFT;
     public static final int BASE_TARGET = 100000;///1 << 15;
@@ -447,7 +447,7 @@ public class BlockChain {
     }
 
     /**
-     * Calculate Target (Average Win Value for 1024 last org.erachain.blocks) for this block
+     * Calculate Target (Average Win Value for 1024 last blocks) for this block
      * @param height - height of blockchain
      * @param targetPrevious - previous Target
      * @param winValue - current Win Value
@@ -637,7 +637,7 @@ public class BlockChain {
      * @param dcSet dataChainSet
      * @param height blockchain height
      * @param win_value win value
-     * @param target average win value for blockchain by 1024 last org.erachain.blocks
+     * @param target average win value for blockchain by 1024 last blocks
      * @return targeted Win Value and cut by BASE
      */
     public static int calcWinValueTargetedBase(DCSet dcSet, int height, long win_value, long target) {
@@ -1131,7 +1131,7 @@ public class BlockChain {
         return dcSet.getBlockMap().getLastBlockSignature();
     }
 
-    // get last org.erachain.blocks for target
+    // get last blocks for target
     public List<Block> getLastBlocksForTarget_old(DCSet dcSet) {
 
         Block last = dcSet.getBlockMap().last();
@@ -1157,7 +1157,7 @@ public class BlockChain {
         return list;
     }
 
-    // get Target by last org.erachain.blocks in chain
+    // get Target by last blocks in chain
     public long getTarget(DCSet dcSet) {
         Block block = this.getLastBlock(dcSet);
         return block.getTarget();

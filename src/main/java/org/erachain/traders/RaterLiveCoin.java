@@ -22,7 +22,7 @@ public class RaterLiveCoin extends Rater {
     public RaterLiveCoin(TradersManager tradersManager, int sleepSec) {
         super(tradersManager, "livecoin", sleepSec);
 
-        this.apiURL = "https://org.erachain.api.livecoin.net/exchange/ticker?currencyPair=ETH/BTC";
+        this.apiURL = "https://api.livecoin.net/exchange/ticker?currencyPair=ETH/BTC";
 
     }
 

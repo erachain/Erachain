@@ -292,7 +292,7 @@ public class Synchronizer {
 
 
         // PROCESS THE NEW BLOCKS
-        LOGGER.debug("*** synchronize PROCESS NEW org.erachain.blocks.size:" + newBlocks.size());
+        LOGGER.debug("*** synchronize PROCESS NEW blocks.size:" + newBlocks.size());
         for (Block block : newBlocks) {
 
             if (cnt.isOnStopping())
@@ -383,7 +383,7 @@ public class Synchronizer {
 
             // CREATE BLOCK BUFFER
             LOGGER.debug(
-                    "START BUFFER" + " peer: " + peer.getAddress().getHostName() + " for org.erachain.blocks: " + signatures.size());
+                    "START BUFFER" + " peer: " + peer.getAddress().getHostName() + " for blocks: " + signatures.size());
             BlockBuffer blockBuffer = new BlockBuffer(signatures, peer);
             Block blockFromPeer;
 
@@ -498,7 +498,7 @@ public class Synchronizer {
 
             // SYNCHRONIZE BLOCKS
             LOGGER.error("synchronize with OPRHAN from common block [" + lastCommonBlock.getHeight()
-                    + "] for org.erachain.blocks: " + blocks.size());
+                    + "] for blocks: " + blocks.size());
             List<Transaction> orphanedTransactions = this.synchronize_blocks(dcSet, lastCommonBlock, checkPointHeight,
                     blocks, peer);
             if (cnt.isOnStopping()) {

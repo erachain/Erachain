@@ -545,7 +545,7 @@ public class Peer extends Thread {
                     }
                 } else {
                     //CALLBACK
-                    // see in org.erachain.network.Network.onMessage(Message)
+                    // see in network.Network.onMessage(Message)
                     // and then see controller.Controller.onMessage(Message)
                     if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
                         LOGGER.debug(" onMess solve ");

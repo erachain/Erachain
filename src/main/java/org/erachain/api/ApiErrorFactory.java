@@ -150,14 +150,14 @@ public class ApiErrorFactory {
         //this.errorMessages.put(ERROR_LAST_KEY_IS_DEFAULT_KEY_ERROR, Lang.getInstance().translate(("you can't delete the key \"%key%\" if it is the only key")).replace("%key%", Corekeys.DEFAULT.toString()));
         //this.errorMessages.put(ERROR_FEE_LESS_REQUIRED, Lang.getInstance().translate("fee less required"));
         this.errorMessages.put(ERROR_WALLET_NOT_IN_SYNC, Lang.getInstance().translate("wallet needs to be synchronized"));
-        this.errorMessages.put(ERROR_INVALID_NETWORK_ADDRESS, Lang.getInstance().translate("invalid org.erachain.network address"));
+        this.errorMessages.put(ERROR_INVALID_NETWORK_ADDRESS, Lang.getInstance().translate("invalid network address"));
 
         //WALLET
         this.errorMessages.put(ERROR_WALLET_NO_EXISTS, Lang.getInstance().translate("wallet does not exist"));
         this.errorMessages.put(ERROR_WALLET_ADDRESS_NO_EXISTS, Lang.getInstance().translate("address does not exist in wallet"));
         this.errorMessages.put(ERROR_WALLET_LOCKED, Lang.getInstance().translate("wallet is locked"));
         this.errorMessages.put(ERROR_WALLET_ALREADY_EXISTS, Lang.getInstance().translate("wallet already exists"));
-        this.errorMessages.put(ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER, Lang.getInstance().translate("user denied org.erachain.api call"));
+        this.errorMessages.put(ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER, Lang.getInstance().translate("user denied api call"));
         this.errorMessages.put(ERROR_WALLET_PASSWORD_SO_SHORT, Lang.getInstance().translate("password is too short"));
 
         //BLOCK

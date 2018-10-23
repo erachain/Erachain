@@ -215,7 +215,7 @@ public class IssuePersonRecord extends Issue_ItemRecord {
                         && this.height > 157640 // for all DEVELOPS
 
                 ) {
-                    // early org.erachain.blocks has wrong ISSUE_PERSON with 0 image length - in block 2998
+                    // early blocks has wrong ISSUE_PERSON with 0 image length - in block 2998
                     return Transaction.INVALID_IMAGE_LENGTH;
                 }
             }

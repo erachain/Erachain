@@ -238,7 +238,7 @@ public class InitiateAcctFrame extends JFrame {
         //LABEL BLOCKS
         labelGBC.gridx = 2;
         labelGBC.gridwidth = 3;
-        JLabel blocksLabel = new JLabel(Lang.getInstance().translate("org.erachain.blocks ( 1 block approx. %min% min )").replace("%min%", String.valueOf(AT_Constants.getInstance().AVERAGE_BLOCK_MINUTES(DCSet.getInstance().getBlockMap().last().getHeight()))));
+        JLabel blocksLabel = new JLabel(Lang.getInstance().translate("blocks ( 1 block approx. %min% min )").replace("%min%", String.valueOf(AT_Constants.getInstance().AVERAGE_BLOCK_MINUTES(DCSet.getInstance().getBlockMap().last().getHeight()))));
         this.add(blocksLabel, labelGBC);
         labelGBC.gridwidth = 1;
 

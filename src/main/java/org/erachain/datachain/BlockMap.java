@@ -118,7 +118,7 @@ public class BlockMap extends DCMap<Integer, Block> {
     @Override
     protected Map<Integer, Block> getMap(DB database) {
         // OPEN MAP
-        return database.createTreeMap("org.erachain.blocks")
+        return database.createTreeMap("blocks")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 // .comparator(UnsignedBytes.lexicographicalComparator())
                 .valueSerializer(new BlockSerializer())

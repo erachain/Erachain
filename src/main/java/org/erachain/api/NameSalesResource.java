@@ -92,7 +92,7 @@ public class NameSalesResource {
     }
 
     @SuppressWarnings("unchecked")
-    @Path("/org.erachain.network")
+    @Path("/network")
     @GET
     public String getAllNameSales() {
         List<NameSale> nameSales = Controller.getInstance().getAllNameSales();

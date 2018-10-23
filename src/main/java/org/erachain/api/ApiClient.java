@@ -46,7 +46,7 @@ public class ApiClient {
                     },
                     {
                             "GET core/isuptodate",
-                            "Shows if the application is synchronized with the org.erachain.network.",
+                            "Shows if the application is synchronized with the network.",
                             ""
                     },
                     {
@@ -72,7 +72,7 @@ public class ApiClient {
                     {
                             "POST peers <address>",
                             "Adds address of peer.",
-                            "Errors: 123 - invalid org.erachain.network address."
+                            "Errors: 123 - invalid network address."
                     },
                     {
                             "GET peers/detail",
@@ -82,7 +82,7 @@ public class ApiClient {
                     {
                             "GET peers/detail/<ip>",
                             "Returns all available information for peer with given ip.",
-                            "Errors: 123 - invalid org.erachain.network address."
+                            "Errors: 123 - invalid network address."
                     },
                     {
                             "GET peers/best",
@@ -164,7 +164,7 @@ public class ApiClient {
                             "Errors: 101 - Invalid signature. 311 - Transaction does not exist."
                     },
                     {
-                            "GET transactions/org.erachain.network",
+                            "GET transactions network",
                             "Returns an array of all the unconfirmed transactions known to the client.",
                             ""
                     },
@@ -180,8 +180,8 @@ public class ApiClient {
                     },
                     {
                             "POST transactions/scan {\"start\": \"<startBlockSign>, \"blocklimit\":<amountBlocks>, \"transactionlimit\":<amountTransactions>, \"type\":<type>, \"service\":<service>, \"address\":\"<address>\"}",
-                            "Returns all the transactions that match the filters. All filters are optional but please limit that amount of transactions or org.erachain.blocks to scan to avoid running into issues. Requests that don't specify a blocklimit <= 360 will be denied to remote users. Return the last block it scanned, the amount of org.erachain.blocks it scanned and the scanned transactions.",
-                            "Filters:\nstart - The signature of the starting block. \nblocklimit - The maximum amount of org.erachain.blocks to scan. \ntransactionlimit - The maximum amount of transactions to return.\ntype - Only return transactions with the given type.\nservice - Only return Arbitrary Transactions with the given service.\naddress - Only return transactions where the given address is involved.\nErrors: 1 -Json error. 102 - Invalid address. 101 - Invalid signature. 301 - Block does not exist.",
+                            "Returns all the transactions that match the filters. All filters are optional but please limit that amount of transactions or blocks to scan to avoid running into issues. Requests that don't specify a blocklimit <= 360 will be denied to remote users. Return the last block it scanned, the amount of blocks it scanned and the scanned transactions.",
+                            "Filters:\nstart - The signature of the starting block. \nblocklimit - The maximum amount of blocks to scan. \ntransactionlimit - The maximum amount of transactions to return.\ntype - Only return transactions with the given type.\nservice - Only return Arbitrary Transactions with the given service.\naddress - Only return transactions where the given address is involved.\nErrors: 1 -Json error. 102 - Invalid address. 101 - Invalid signature. 301 - Block does not exist.",
                     },
                     {
                             "GET transactions/recipient/<address>/limit/<limit>",
@@ -216,7 +216,7 @@ public class ApiClient {
 
                     {
                             "POST transactions/find {\"address\":\"<address>\", \"sender\":\"<sender>\", \"recipient\":\"<recipient>\", \"type\":<type>, \"service\":<service>, \"offset\":<offset>, \"limit\":<limit>, \"minHeight\":<minHeight>, \"maxHeight\":<maxHeight>, \"desc\":<true/false>, \"count\":<true/false>}",
-                            "Returns an array of the <limit> transactions from given <offset> with a specific params. Set parameter \"count\" to true to find out the number of transactions. Set parameter \"desc\" to true for reverse order. Parameter \"service\" means service of ArbitraryTransaction. \"minHeight\" and \"maxHeight\" means height of org.erachain.blocks. All params are optional, but must be specified at least one address field.",
+                            "Returns an array of the <limit> transactions from given <offset> with a specific params. Set parameter \"count\" to true to find out the number of transactions. Set parameter \"desc\" to true for reverse order. Parameter \"service\" means service of ArbitraryTransaction. \"minHeight\" and \"maxHeight\" means height of blocks. All params are optional, but must be specified at least one address field.",
                             "Errors: 102 - Invalid address."
                     },
                     {
@@ -225,82 +225,82 @@ public class ApiClient {
                             ""
                     },
                     {
-                            "GET org.erachain.blocks/addresses/<limit>",
-                            "Returns an array of the LIMIT last org.erachain.blocks generated by your accounts.",
+                            "GET blocks/addresses/<limit>",
+                            "Returns an array of the LIMIT last blocks generated by your accounts.",
                             "Errors: 201 - Wallet does not exist."
                     },
                     {
-                            "GET org.erachain.blocks/address/<address>/<limit>",
-                            "Returns an array of the LIMIT last org.erachain.blocks generated by a specific address in your wallet.",
+                            "GET blocks/address/<address>/<limit>",
+                            "Returns an array of the LIMIT last blocks generated by a specific address in your wallet.",
                             "Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - Address does not exist in wallet."
                     },
                     {
-                            "GET org.erachain.blocks/<signature>",
+                            "GET blocks/<signature>",
                             "Returns the block that matches the given signature.",
                             "Errors: 101 - Invalid signature. 301 - Block does not exist."
                     },
                     {
-                            "GET org.erachain.blocks/first",
+                            "GET blocks/first",
                             "Returns the genesis block.",
                             ""
                     },
                     {
-                            "GET org.erachain.blocks/last",
+                            "GET blocks/last",
                             "Returns the last valid block.",
                             ""
                     },
                     {
-                            "GET org.erachain.blocks/child/<signature>",
+                            "GET blocks/child/<signature>",
                             "Returns the child block of the block that matches the given signature.",
                             "Errors: 101 - Invalid signature. 301 - Block does not exist."
                     },
                     {
-                            "GET org.erachain.blocks/generatingbalance",
+                            "GET blocks/generatingbalance",
                             "Calculates the generating balance of the block that will follow the last block.",
                             ""
                     },
                     {
-                            "GET org.erachain.blocks/generatingbalance/<signature>",
+                            "GET blocks/generatingbalance/<signature>",
                             "Calculates the generating balance of the block that will follow the block that matches the signature.",
                             "Errors: 101 - Invalid signature. 301 - Block does not exist."
                     },
                     {
-                            "GET org.erachain.blocks/time",
-                            "Calculates the time it should take for the org.erachain.network to generate the next block.",
+                            "GET blocks/time",
+                            "Calculates the time it should take for the network to generate the next block.",
                             ""
                     },
                     {
-                            "GET org.erachain.blocks/time/<generatingbalance>",
-                            "Calculates the time it should take for the org.erachain.network to generate org.erachain.blocks when the current generating balance in the org.erachain.network is the specified generating balance.",
+                            "GET blocks/time/<generatingbalance>",
+                            "Calculates the time it should take for the network to generate blocks when the current generating balance in the network is the specified generating balance.",
                             ""
                     },
                     {
-                            "GET org.erachain.blocks/height",
+                            "GET blocks/height",
                             "Returns the block height of the last block.",
                             ""
                     },
                     {
-                            "GET org.erachain.blocks/height/<signature>",
+                            "GET blocks/height/<signature>",
                             "Returns the block height of the block that matches the given signature.",
                             "Errors: 101 - Invalid signature. 301 - Block does not exist."
                     },
                     {
-                            "GET org.erachain.blocks/headers/<signature>",
+                            "GET blocks/headers/<signature>",
                             "Returns the list oof block headers - for test networ response in controller.Controller.onMessage(GET_SIGNATURES_TYPE).",
                             "Errors: 101 - Invalid signature. 301 - Block does not exist."
                     },
                     {
-                            "GET org.erachain.blocks/byheight/<height>",
+                            "GET blocks/byheight/<height>",
                             "Returns the block whith given height.",
                             "Errors: 301 - Block does not exist."
                     },
                     {
-                            "GET org.erachain.blocks/fromheight/<height>",
+                            "GET blocks/fromheight/<height>",
                             "Returns the block from given height.",
                             "Errors: 301 - Block does not exist."
                     },
                     {
-                            "GET org.erachain.blocks/orphanto/<height>",
+                            "GET blocks/orphanto/<height>",
                             "Orphan to given height.",
                             "Errors: 301 - Block does not exist."
                     },
@@ -516,7 +516,7 @@ public class ApiClient {
                             "Errors: 410 - Name is not for sale."
                     },
                     {
-                            "GET namesales/org.erachain.network",
+                            "GET namesales network",
                             "Returns an array of all the names that are for sale. For performance this array only contains the keys of the names that are for sale and not the details.",
                             ""
                     },
@@ -551,7 +551,7 @@ public class ApiClient {
                             "Errors: 501 - Poll does not exist."
                     },
                     {
-                            "GET polls/org.erachain.network",
+                            "GET polls network",
                             "Returns an array of all the polls. For performance this array only contains the names of the polls and not the details.",
                             ""
                     },

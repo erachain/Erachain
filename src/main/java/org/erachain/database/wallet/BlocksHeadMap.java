@@ -134,7 +134,7 @@ public class BlocksHeadMap extends DCMap<Tuple2<String, String>, Block.BlockHead
     @Override
     protected Map<Tuple2<String, String>, Block.BlockHead> getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("org.erachain.blocks")
+        return database.createTreeMap("blocks")
                 .keySerializer(BTreeKeySerializer.TUPLE2) /// ТУТ тоже переделать на стандартный серилиазотор
                 .valueSerializer(new BlockHeadSerializer())
                 .valuesOutsideNodesEnable()

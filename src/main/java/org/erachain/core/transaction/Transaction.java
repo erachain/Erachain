@@ -1047,7 +1047,7 @@ public abstract class Transaction {
             return;
 
         // all test a not valid for main test
-        // all other org.erachain.network must be invalid here!
+        // all other network must be invalid here!
         int port = Controller.getInstance().getNetworkPort();
         data = Bytes.concat(data, Ints.toByteArray(port));
 
@@ -1150,7 +1150,7 @@ public abstract class Transaction {
         }
 
         // all test a not valid for main test
-        // all other org.erachain.network must be invalid here!
+        // all other network must be invalid here!
         int port = Controller.getInstance().getNetworkPort();
         data = Bytes.concat(data, Ints.toByteArray(port));
 

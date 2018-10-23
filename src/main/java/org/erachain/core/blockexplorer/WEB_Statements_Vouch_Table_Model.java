@@ -35,7 +35,7 @@ public class WEB_Statements_Vouch_Table_Model extends AbstractTableModel impleme
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator", "Address_Creator", "Transaction"});// ,
     // AssetCls.FEE_NAME});
     private Boolean[] column_AutuHeight = new Boolean[]{true, true};
-    // private Map<byte[], BlockingQueue<Block>> org.erachain.blocks;
+    // private Map<byte[], BlockingQueue<Block>> blocks;
     // private Transaction transaction;
     private int blockNo;
     private int recNo;
