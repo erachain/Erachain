@@ -40,24 +40,16 @@ public class Account_Repay_Debt_Panel extends AssetSendPanel {
     // private final MessagesTableModel messagesTableModel;
 
     public Account_Repay_Debt_Panel(AssetCls asset, Account account,   Account account_To, PersonCls person) {
-        super(asset,account,account_To, person);
-        String a;
-        if (asset == null){
-            a = "";
-            asset = Controller.getInstance().getAsset(1);
-        }
-        else
-            a = asset.viewName();
+        super(asset, account, account_To, person);
 
         this.jLabel_Title.setText(Lang.getInstance()
-                .translate("If You want to give the borrowed asset %asset%, fill in this form").replace("%asset%", a));
+                .translate("If You want to give the borrowed asset %asset%, fill in this form").replace("%asset%", asset.viewName()));
 
         // icon.setIcon(null);
         this.jButton_ok.setText(Lang.getInstance().translate("Repay Debt"));
         this.jLabel_To.setText(Lang.getInstance().translate("Lender Account") + ":");
         this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Lender Details") + ":");
 
-    
     }
 
     @Override
@@ -71,10 +63,11 @@ public class Account_Repay_Debt_Panel extends AssetSendPanel {
                 amount, head, messageBytes, isTextByte, encrypted);
 
         String Status_text = "";
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
+        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, transaction,
                 Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2),
                 (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
+
         dd.jScrollPane1.setViewportView(ww);
         dd.setLocationRelativeTo(this);
         dd.setVisible(true);
@@ -86,6 +79,7 @@ public class Account_Repay_Debt_Panel extends AssetSendPanel {
 
             confirmaftecreatetransaction();
         }
+
         // ENABLE
         this.jButton_ok.setEnabled(true);
     }

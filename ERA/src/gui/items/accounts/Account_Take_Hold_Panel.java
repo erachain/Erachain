@@ -40,23 +40,12 @@ import utils.Pair;
 @SuppressWarnings("serial")
 
 public class Account_Take_Hold_Panel extends AssetSendPanel {
-    //private final MessagesTableModel messagesTableModel;
-
-
-    //private Account_Take_Hold_Panel th;
-
 
     public Account_Take_Hold_Panel(AssetCls asset, Account account,   Account account_To, PersonCls person) {
-        super(asset,account,account_To, person);
-        String a;
-        //th = this;
-        if (asset == null) {
-            a = "";
-            asset = Controller.getInstance().getAsset(1);
-        }
-        else a = asset.viewName();
+        super(asset, account, account_To, person);
 
-        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to take on hold issued asset %asset%, fill in this form").replace("%asset%", a));
+        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to take on hold issued asset %asset%, fill in this form")
+                .replace("%asset%", asset.viewName()));
 
         //	icon.setIcon(null);
         this.jButton_ok.setText(Lang.getInstance().translate("Hold Asset"));
@@ -67,7 +56,6 @@ public class Account_Take_Hold_Panel extends AssetSendPanel {
 
     @Override
     public void onSendClick() {
-       
        
         // confirm params
        if (!cheskError()) return;
@@ -87,7 +75,7 @@ public class Account_Take_Hold_Panel extends AssetSendPanel {
                 Lang.getInstance().translate("Confirmation Transaction"));
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
         dd.jScrollPane1.setViewportView(ww);
-        dd.pack();
+        //dd.pack();
         dd.setLocationRelativeTo(this);
         dd.setVisible(true);
 
@@ -98,6 +86,7 @@ public class Account_Take_Hold_Panel extends AssetSendPanel {
             confirmaftecreatetransaction();
 
         }
+
         //ENABLE
         this.jButton_ok.setEnabled(true);
     }

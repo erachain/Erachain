@@ -26,17 +26,16 @@ import java.io.IOException;
 
 public class Account_Send_Panel extends AssetSendPanel {
     
-    private Account_Send_Panel th;
+    //private Account_Send_Panel th;
     public boolean noRecive;
 
     public Account_Send_Panel(AssetCls asset, Account account, Account account_To, PersonCls person) {
-        super(asset,account,account_To, person);
+        super(asset, account, account_To, person);
         String a;
-        th = this;
-        if (asset == null) a = "";
-        else a = asset.viewName();
+        //th = this;
 
-        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to send asset %asset%, fill in this form").replace("%asset%", a));
+        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to send asset %asset%, fill in this form").
+                replace("%asset%", asset.viewName()));
 
         //  icon.setIcon(null);
         this.jButton_ok.setText(Lang.getInstance().translate("Send"));
@@ -66,7 +65,6 @@ public class Account_Send_Panel extends AssetSendPanel {
                 Lang.getInstance().translate("Confirmation Transaction"), !noRecive);
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
         dd.jScrollPane1.setViewportView(ww);
-        dd.pack();
         dd.setLocationRelativeTo(this);
         dd.setVisible(true);
 
@@ -85,6 +83,7 @@ public class Account_Send_Panel extends AssetSendPanel {
                 confirmaftecreatetransaction();
             }
         }
+
         // ENABLE
         this.jButton_ok.setEnabled(true);
     }
