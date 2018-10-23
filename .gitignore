@@ -6,7 +6,6 @@
 # project
 *.class
 /data*
-*backup*
 ERA/settings.json
 ERA/*.jar
 /build/
