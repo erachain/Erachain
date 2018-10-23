@@ -1,3 +1,7 @@
+package org.erachain;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.erachain.api.ApiClient;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -5,11 +9,12 @@ import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
 import org.erachain.gui.library.Issue_Confirm_Dialog;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SysTray;
 import org.erachain.webserver.Status;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 
 import javax.swing.*;
 import java.io.File;
@@ -21,10 +26,9 @@ import java.util.Scanner;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-// 30/03
-
+@SpringBootApplication
+@EnableAutoConfiguration(exclude = {org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration.class})
 public class Start {
-
 
     public static boolean backUP = false;
     static Logger LOGGER = Logger.getLogger(Start.class.getName());
@@ -32,13 +36,14 @@ public class Start {
     private static String info;
 
     public static void main(String args[]) throws IOException {
+        SpringApplicationBuilder builder = new SpringApplicationBuilder(Start.class);
+        builder.headless(false).run(args);
 
-
-        ////
         File log4j = new File("log4j.properties");
         if (log4j.exists()) {
             PropertyConfigurator.configure(log4j.getAbsolutePath());
-        } else {
+        }
+        else {
             try (InputStream resourceAsStream = ClassLoader.class.getResourceAsStream("/log4j/log4j.default");) {
                 PropertyConfigurator.configure(resourceAsStream);
                 LOGGER.error("log4j.properties not found, search path is " + log4j.getAbsolutePath() + " using default!");
@@ -98,8 +103,6 @@ public class Start {
         if (!cli) {
             try {
 
-                ///fff = Controller.getInstance(Settings.getInstance().isGuiEnabled(), Settings.getInstance().isGuiDynamic());
-
                 //ONE MUST BE ENABLED
                 if (!Settings.getInstance().isGuiEnabled() && !Settings.getInstance().isRpcEnabled()) {
                     throw new Exception(Lang.getInstance().translate("Both gui and rpc cannot be disabled!"));
@@ -157,8 +160,6 @@ public class Start {
                         LOGGER.error(Lang.getInstance().translate("GUI ERROR - at Start"), e1);
                     }
                 }
-
-                //Controller.getInstance().isTestnet();
 
 
             } catch (Exception e) {

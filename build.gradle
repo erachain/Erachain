@@ -9,12 +9,20 @@ buildscript {
 
 plugins {
     id 'java'
+    id 'idea'
+    id 'org.springframework.boot' version '2.0.5.RELEASE'
+
 }
 
 ext {
     git = org.ajoberstar.grgit.Grgit.open()
     rev = git.head().id
     rev = git.head().getAbbreviatedId(8)
+    logbackVersion = '1.2.3'
+    springbootVersion = '2.0.5.RELEASE'
+    jerseyVersion = '2.27'
+
+
 }
 
 String versionEra = "4.11.05-${git.head().abbreviatedId}"
@@ -37,7 +45,7 @@ compileJava {
 jar {
     destinationDir project.file('build/libs/' + versionEra + '/bin')
     manifest {
-        attributes('Main-Class': 'Start',
+        attributes('Main-Class': 'org.Start',
                 'Implementation-Title': 'Gradle Build: ' + project.name,
                 'Implementation-Version': project.version,
                 'Build-Time': new Date().format("yyyy-MM-dd HH:mm:ssZ"),
@@ -108,6 +116,9 @@ task CreateZip(type: Zip) {
     archiveName versionEra + '.zip'
     destinationDir(file('build/libs/' + versionEra))
 }
+configurations.all {
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+}
 
 dependencies {
     compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.54'
@@ -125,14 +136,11 @@ dependencies {
     compile group: 'org.mapdb', name: 'mapdb', version: '1.0.7'
     compile group: 'org.jvnet.mimepull', name: 'mimepull', version: '1.9.6'
     compile group: 'com.mitchellbosecke', name: 'pebble', version: '1.6.0'
-    compile 'log4j:log4j:1.2.17'
-    compile 'org.slf4j:slf4j-org.erachain.api:1.7.5'
-    compile 'org.slf4j:slf4j-log4j12:1.7.5'
     compile group: 'com.twitter', name: 'twitter-text', version: '1.13.0'
     compile group: 'es.nitaur.markdown', name: 'txtmark', version: '0.16'
-    compile group: 'javax.ws.rs', name: 'javax.ws.rs-org.erachain.api', version: '2.0.1'
-    compile group: 'javax.servlet', name: 'javax.servlet-org.erachain.api', version: '3.0.1'
-    compile group: 'javax.validation', name: 'validation-org.erachain.api', version: '1.1.0.Final'
+    compile group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.0.1'
+    compile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
+    compile group: 'javax.validation', name: 'validation-api', version: '1.1.0.Final'
     compile group: 'net.sf.tinylaf', name: 'tinylaf', version: '1.4.0'
     compile group: 'junit', name: 'junit', version: '4.12'
     compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.22.2'
@@ -143,4 +151,9 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'jetty-util', version: '9.3.7.v20160115'
     compile group: 'net.sf.squirrel-sql.thirdparty-non-maven', name: 'tinylaf', version: '1.4.0'
     compile group: 'org.swinglabs', name: 'pdf-renderer', version: '1.0.5'
+    compile group: 'log4j', name: 'log4j', version: '1.2.17'
+
+    compile "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
+    compile "org.springframework.boot:spring-boot-starter-log4j2:${springbootVersion}"
+    compile "org.springframework.boot:spring-boot:${springbootVersion}"
 }
