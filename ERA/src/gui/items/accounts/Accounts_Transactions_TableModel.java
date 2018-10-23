@@ -11,7 +11,6 @@ import core.transaction.Transaction;
 import database.wallet.TransactionMap;
 import datachain.DCSet;
 import datachain.SortableList;
-import gui.library.library;
 import lang.Lang;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.mapdb.Fun.Tuple2;
@@ -48,7 +47,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
             "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "Type Asset"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
 
-    private SortableList<Tuple2<String, String>, Transaction> ss;
+    private SortableList<Tuple2<String, String>, Transaction> sortableItems;
     private Account sender;
 
     private AssetCls asset;
@@ -76,8 +75,9 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
     public void set_Account(Account sender) {
 
         this.sender = sender;
-        if (this.sender != null)
-            ss.setFilter(this.sender.getAddress());
+        if (sortableItems != null)
+            sortableItems.setFilter(this.sender.getAddress());
+
     }
 
     public void set_Asset(AssetCls asset) {
@@ -304,10 +304,10 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.trans_List == null) {
                 
-                ss = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
-                //ss.registerObserver();
-                Controller.getInstance().wallet.database.getTransactionMap().addObserver(ss);
-                ss.sort(TransactionMap.ADDRESS_INDEX, true);
+                sortableItems = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
+                //sortableItems.registerObserver();
+                Controller.getInstance().wallet.database.getTransactionMap().addObserver(sortableItems);
+                sortableItems.sort(TransactionMap.ADDRESS_INDEX, true);
                 // this.r_Trans.sort(NameMap.NAME_INDEX);
                 get_R_Send();
                
@@ -340,12 +340,12 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 
     public void get_R_Send() {
 
-        if (this.sender == null || this.asset == null)
+        if (this.sender == null || this.asset == null || sortableItems == null)
             return;
-     //   this.r_Trans.clear();
+
         trans_Hash_Map = new HashMap<String, Trans>();
         trans_List = null;
-        Iterator<Pair<Tuple2<String, String>, Transaction>> s_it = ss.iterator();
+        Iterator<Pair<Tuple2<String, String>, Transaction>> s_it = sortableItems.iterator();
         while (s_it.hasNext()) {
             Pair<Tuple2<String, String>, Transaction> tt = s_it.next();
             Transaction ttt = tt.getB();
