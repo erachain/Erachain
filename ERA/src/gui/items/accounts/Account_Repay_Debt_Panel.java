@@ -69,6 +69,7 @@ public class Account_Repay_Debt_Panel extends AssetSendPanel {
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
 
         dd.jScrollPane1.setViewportView(ww);
+        dd.pack();
         dd.setLocationRelativeTo(this);
         dd.setVisible(true);
 

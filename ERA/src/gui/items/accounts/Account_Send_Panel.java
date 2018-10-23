@@ -65,6 +65,7 @@ public class Account_Send_Panel extends AssetSendPanel {
                 Lang.getInstance().translate("Confirmation Transaction"), !noRecive);
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
         dd.jScrollPane1.setViewportView(ww);
+        dd.pack();
         dd.setLocationRelativeTo(this);
         dd.setVisible(true);
 
