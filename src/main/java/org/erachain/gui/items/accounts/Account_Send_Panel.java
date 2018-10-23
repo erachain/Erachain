@@ -26,17 +26,16 @@ import java.io.IOException;
 
 public class Account_Send_Panel extends AssetSendPanel {
     
-    private Account_Send_Panel th;
+    //private Account_Send_Panel th;
     public boolean noRecive;
 
     public Account_Send_Panel(AssetCls asset, Account account, Account account_To, PersonCls person) {
-        super(asset,account,account_To, person);
+        super(asset, account, account_To, person);
         String a;
-        th = this;
-        if (asset == null) a = "";
-        else a = asset.viewName();
+        //th = this;
 
-        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to send asset %asset%, fill in this form").replace("%asset%", a));
+        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to send asset %asset%, fill in this form").
+                replace("%asset%", asset.viewName()));
 
         //  icon.setIcon(null);
         this.jButton_ok.setText(Lang.getInstance().translate("Send"));
@@ -61,7 +60,7 @@ public class Account_Send_Panel extends AssetSendPanel {
 
         String Status_text = "";
         Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, transaction,
-                Lang.getInstance().translate("Send Mail"),
+                Lang.getInstance().translate("Send"),
                 (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction"), !noRecive);
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
@@ -85,6 +84,7 @@ public class Account_Send_Panel extends AssetSendPanel {
                 confirmaftecreatetransaction();
             }
         }
+
         // ENABLE
         this.jButton_ok.setEnabled(true);
     }

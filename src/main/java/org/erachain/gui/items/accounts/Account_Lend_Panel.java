@@ -37,37 +37,24 @@ import java.nio.charset.StandardCharsets;
 @SuppressWarnings("serial")
 
 public class Account_Lend_Panel extends AssetSendPanel {
-    //private final MessagesTableModel messagesTableModel;
 
+    public Account_Lend_Panel(AssetCls asset, Account account, Account account_To, PersonCls person) {
+        super(asset, account, account_To, person);
 
-    public Account_Lend_Panel(AssetCls asset, Account account,   Account account_To, PersonCls person) {
-        super(asset,account,account_To, person);
-      
-        String a;
-        if (asset == null) {
-            a = "";
-            asset = Controller.getInstance().getAsset(1);
-        }
-        else a = asset.viewName();
-
-        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to give a loan asset %asset%, fill in this form").replace("%asset%", a));
+        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to give a loan asset %asset%, fill in this form")
+                .replace("%asset%", asset.viewName()));
 
         //	icon.setIcon(null);
         this.jButton_ok.setText(Lang.getInstance().translate("Lend"));
         this.jLabel_To.setText(Lang.getInstance().translate("Debtor account") + ":");
         this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Debtor details") + ":");
 
-
-       
-
-       
     }
 
     @Override
     public void onSendClick() {
         // confirm params
         if (!cheskError()) return;
-
 
         //CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance()
@@ -76,13 +63,13 @@ public class Account_Lend_Panel extends AssetSendPanel {
                         head, messageBytes, isTextByte, encrypted);
 
         String Status_text = "";
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
-                Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, transaction,
+                Lang.getInstance().translate("Lend"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2),
+                Status_text, Lang.getInstance().translate("Confirmation Transaction"));
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
 
-
-        //	ww.jTabbedPane1.setVisible(false);
         dd.jScrollPane1.setViewportView(ww);
+        dd.pack();
         dd.setLocationRelativeTo(this);
         dd.setVisible(true);
 
@@ -94,6 +81,7 @@ public class Account_Lend_Panel extends AssetSendPanel {
 
             confirmaftecreatetransaction();
         }
+
         //ENABLE
         this.jButton_ok.setEnabled(true);
     }

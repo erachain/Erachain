@@ -200,7 +200,9 @@ public class DealsPopupMenu extends JPopupMenu {
         switch (this.asset.getAssetType()) {
             case AssetCls.AS_OUTSIDE_GOODS:
                 this.sendAsset.setText(Lang.getInstance().translate("Transfer to the ownership"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("Confirm acceptance \"in hand\""));
+                this.holdAsset.setVisible(true);
 
                 // поидее тут как ЛИЗИНГ
                 this.debtAsset.setVisible(false);
@@ -211,7 +213,9 @@ public class DealsPopupMenu extends JPopupMenu {
                 
             case AssetCls.AS_INSIDE_ASSETS:
                 this.sendAsset.setText(Lang.getInstance().translate("Transfer to the ownership"));
-                this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
+
+                //this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
+                this.holdAsset.setVisible(false);
 
                 this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
                 this.debtAsset.setVisible(true);
@@ -224,7 +228,9 @@ public class DealsPopupMenu extends JPopupMenu {
                 
             case AssetCls.AS_OUTSIDE_IMMOVABLE:
                 this.sendAsset.setText(Lang.getInstance().translate("Transfer to the ownership"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("The employment security/received from security"));
+                this.holdAsset.setVisible(true);
 
                 this.debtAsset.setText(Lang.getInstance().translate("Transfer to rent"));
                 this.debtAsset.setVisible(true);
@@ -237,7 +243,9 @@ public class DealsPopupMenu extends JPopupMenu {
                 
             case AssetCls.AS_OUTSIDE_CURRENCY:
                 this.sendAsset.setText(Lang.getInstance().translate("Send payment request"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
+                this.holdAsset.setVisible(true);
 
                 this.debtAsset.setText(Lang.getInstance().translate("Require repayment"));
                 this.debtAsset.setVisible(true);
@@ -249,7 +257,9 @@ public class DealsPopupMenu extends JPopupMenu {
                 
             case AssetCls.AS_OUTSIDE_SERVICE:
                 this.sendAsset.setText(Lang.getInstance().translate("Transfer Service Requirement"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
+                this.holdAsset.setVisible(true);
 
                 this.debtAsset.setText(Lang.getInstance().translate("To require the provision of services"));
                 this.debtAsset.setVisible(true);
@@ -261,7 +271,9 @@ public class DealsPopupMenu extends JPopupMenu {
                 
             case AssetCls.AS_OUTSIDE_SHARE:
                 this.sendAsset.setText(Lang.getInstance().translate("To transfer shares in the property"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
+                this.holdAsset.setVisible(true);
 
                 this.debtAsset.setText(Lang.getInstance().translate("To require the transfer of shares"));
                 this.debtAsset.setVisible(true);
@@ -273,7 +285,9 @@ public class DealsPopupMenu extends JPopupMenu {
                 
             case AssetCls.AS_OUTSIDE_BILL:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать вексель в собственность"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("Подтвердить получение выплаты?"));
+                this.holdAsset.setVisible(true);
 
                 this.debtAsset.setText(Lang.getInstance().translate("Потребовать погашение векселя!"));
                 this.debtAsset.setVisible(true);
@@ -287,7 +301,9 @@ public class DealsPopupMenu extends JPopupMenu {
                 
             case AssetCls.AS_OUTSIDE_BILL_EX:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать вексель в собственность"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("Подтвердить получение выплаты?"));
+                this.holdAsset.setVisible(true);
 
                 this.debtAsset.setText(Lang.getInstance().translate("Потребовать погашение векселя!"));
                 this.debtAsset.setVisible(true);
@@ -301,7 +317,9 @@ public class DealsPopupMenu extends JPopupMenu {
                 
             case AssetCls.AS_OUTSIDE_OTHER_CLAIM:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать в собственность требование"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("Учесть прием требования на баланс"));
+                this.holdAsset.setVisible(true);
 
                 this.debtAsset.setText(Lang.getInstance().translate("Потребовать исполнения своего права"));
                 this.debtAsset.setVisible(true);
@@ -313,7 +331,9 @@ public class DealsPopupMenu extends JPopupMenu {
 
             case AssetCls.AS_INSIDE_CURRENCY:
                 this.sendAsset.setText(Lang.getInstance().translate("Певести в собственность деньги"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("Учесть прием денег на баланс"));
+                this.holdAsset.setVisible(true);
 
                 this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
                 this.debtAsset.setVisible(true);
@@ -326,7 +346,9 @@ public class DealsPopupMenu extends JPopupMenu {
 
             case AssetCls.AS_INSIDE_UTILITY:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать в собственность действе"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
+                this.holdAsset.setVisible(true);
 
                 this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
                 this.debtAsset.setVisible(true);
@@ -339,7 +361,9 @@ public class DealsPopupMenu extends JPopupMenu {
 
             case AssetCls.AS_INSIDE_SHARE:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать в собственность акции"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
+                this.holdAsset.setVisible(true);
 
                 this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
                 this.debtAsset.setVisible(true);
@@ -352,7 +376,9 @@ public class DealsPopupMenu extends JPopupMenu {
 
             case AssetCls.AS_INSIDE_BONUS:
                 this.sendAsset.setText(Lang.getInstance().translate("Начислить бонусы"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
+                this.holdAsset.setVisible(true);
 
                 this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
                 this.debtAsset.setVisible(true);
@@ -365,7 +391,9 @@ public class DealsPopupMenu extends JPopupMenu {
 
             case AssetCls.AS_INSIDE_ACCESS:
                 this.sendAsset.setText(Lang.getInstance().translate("Наделить правами"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
+                this.holdAsset.setVisible(true);
 
                 this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
                 this.debtAsset.setVisible(true);
@@ -378,7 +406,9 @@ public class DealsPopupMenu extends JPopupMenu {
 
             case AssetCls.AS_INSIDE_VOTE:
                 this.sendAsset.setText(Lang.getInstance().translate("Наделить голосом"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
+                this.holdAsset.setVisible(true);
 
                 this.debtAsset.setText(Lang.getInstance().translate("Передать делегату"));
                 this.debtAsset.setVisible(true);
@@ -391,8 +421,9 @@ public class DealsPopupMenu extends JPopupMenu {
 
             case AssetCls.AS_INDEX:
                 this.sendAsset.setText(Lang.getInstance().translate("Перевести в собственность индекс"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("Учесть прием индекса на баланс"));
-                //this.holdAsset.setVisible(false);
+                this.holdAsset.setVisible(true);
 
                 //this.debtAsset.setText(Lang.getInstance().translate("Передать в долг"));
                 this.debtAsset.setVisible(false);
@@ -405,7 +436,9 @@ public class DealsPopupMenu extends JPopupMenu {
 
             case AssetCls.AS_INSIDE_OTHER_CLAIM:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать в собственность требование"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("Учесть прием требования на баланс"));
+                this.holdAsset.setVisible(true);
 
                 this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
                 this.debtAsset.setVisible(true);
@@ -417,9 +450,7 @@ public class DealsPopupMenu extends JPopupMenu {
                 break;
 
         }
-        
-        //Component comp1 = this.getComponent(3);
-        //comp1.setEnabled(false);
+
     }
 
 

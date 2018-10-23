@@ -45,7 +45,7 @@ public class BlockSignsMap extends DCMap<Long, Integer> {
                 // .comparator(UnsignedBytes.lexicographicalComparator()) // for byte[] KEYS
                 // or from MapDB .comparator(Fun.BYTE_ARRAY_COMPARATOR)
 
-                //.counterEnable() not need
+                .counterEnable() // used in datachain.DCSet.DCSet(org.mapdb.DB, boolean, boolean, boolean)
                 .makeOrGet();
     }
 

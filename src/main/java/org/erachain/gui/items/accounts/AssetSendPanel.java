@@ -45,7 +45,7 @@ import org.erachain.utils.Pair;
 public class AssetSendPanel extends javax.swing.JPanel {
 
  // TODO - "A" - &
-    static String wrongFirstCharOfAddress = "A";
+    //static String wrongFirstCharOfAddress = "A";
     public Account recipient;
 
     public String message;
@@ -85,10 +85,15 @@ public class AssetSendPanel extends javax.swing.JPanel {
     */
 
     private AccountsComboBoxModel accountsModel;
-   public AssetSendPanel(AssetCls asset2, Account account2,  Account account_To, PersonCls person) {
+   public AssetSendPanel(AssetCls asset_in, Account account2,  Account account_To, PersonCls person) {
 
-       account = account2;
-       asset =asset2;
+       this.account = account2;
+       if (asset == null)
+           this.asset = Controller.getInstance().getAsset(2);
+       else
+           this.asset = asset_in;
+
+
        recipient = account_To;
        person_To = person;
 
@@ -98,14 +103,16 @@ public class AssetSendPanel extends javax.swing.JPanel {
        this.jTextField_Mess_Title.setText("");
        this.jTextField_Ammount.setText("0");
        this.jLabel_Icon.setText("");
+
        // icon
        jLabel_Icon.setIcon(new ImageIcon(defaultImagePath));
+
        // account model
        this.accountsModel = new AccountsComboBoxModel();
        jComboBox_Account.setModel(accountsModel);
-   
-    // favorite combo box
-      jComboBox_Asset.setModel(new AssetsComboBoxModel());
+
+       // favorite combo box
+       jComboBox_Asset.setModel(new AssetsComboBoxModel());
        if (asset != null) {
            this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
 
@@ -123,7 +130,8 @@ public class AssetSendPanel extends javax.swing.JPanel {
        }
 
        this.jComboBox_Fee.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
-       // accoutn ComboBox
+
+       // account ComboBox
        this.accountsModel = new AccountsComboBoxModel();
        this.jComboBox_Account.setModel(accountsModel);
      //  this.jComboBox_Account.setRenderer(new AccountRenderer(0));
@@ -219,26 +227,27 @@ public class AssetSendPanel extends javax.swing.JPanel {
 
        }
 
-      this.jLabel_Title.setText(Lang.getInstance().translate("Title"));
-      this.jLabel_Account.setText(Lang.getInstance().translate("Select account") + ":");
-      this.jLabel_To.setText(Lang.getInstance().translate("To: (address or name)"));
-      this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Receiver details") + ":");
-      this.jLabel_Mess_Title.setText(Lang.getInstance().translate("Title") + ":");
-     this.jLabel_Mess.setText(Lang.getInstance().translate("Message") + ":");
-      this.jCheckBox_Enscript.setText(Lang.getInstance().translate("Encrypt message") + ":");
-      this.jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
-      this.jLabel_Ammount.setText(Lang.getInstance().translate("Amount") + ":");
-      this.jLabel_Fee.setText(Lang.getInstance().translate("Fee level") + ":");
+    this.jLabel_Title.setText(Lang.getInstance().translate("Title"));
+    this.jLabel_Account.setText(Lang.getInstance().translate("Select account") + ":");
+    this.jLabel_To.setText(Lang.getInstance().translate("To: (address or name)"));
+    this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Receiver details") + ":");
+    this.jLabel_Mess_Title.setText(Lang.getInstance().translate("Title") + ":");
+    this.jLabel_Mess.setText(Lang.getInstance().translate("Message") + ":");
+    this.jCheckBox_Enscript.setText(Lang.getInstance().translate("Encrypt message") + ":");
+    this.jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
+    this.jLabel_Ammount.setText(Lang.getInstance().translate("Amount") + ":");
+    this.jLabel_Fee.setText(Lang.getInstance().translate("Fee level") + ":");
 
-      this.jButton_ok.setText(Lang.getInstance().translate("Send"));
-   // CONTEXT MENU
-      MenuPopupUtil.installContextMenu(this.jTextField_To);
-      MenuPopupUtil.installContextMenu(this.jTextField_Ammount);
-      MenuPopupUtil.installContextMenu(this.jTextArea_Description);
-      MenuPopupUtil.installContextMenu(this.jTextField_Recive_Detail);
-      jTextArea_Account_Description.setWrapStyleWord(true);
-      jTextArea_Account_Description.setLineWrap(true);
-      jScrollPane2.setViewportView(new Asset_Info(asset)); //jTextArea_Account_Description);
+    this.jButton_ok.setText(Lang.getInstance().translate("Send"));
+
+    // CONTEXT MENU
+    MenuPopupUtil.installContextMenu(this.jTextField_To);
+    MenuPopupUtil.installContextMenu(this.jTextField_Ammount);
+    MenuPopupUtil.installContextMenu(this.jTextArea_Description);
+    MenuPopupUtil.installContextMenu(this.jTextField_Recive_Detail);
+    jTextArea_Account_Description.setWrapStyleWord(true);
+    jTextArea_Account_Description.setLineWrap(true);
+    jScrollPane2.setViewportView(new Asset_Info(asset)); //jTextArea_Account_Description);
    }
    
    private void refreshReceiverDetails() {
@@ -247,28 +256,10 @@ public class AssetSendPanel extends javax.swing.JPanel {
 
        this.jTextField_Recive_Detail.setText(Account.getDetails(toValue, asset));
 
-       if (false && toValue != null && toValue.startsWith(wrongFirstCharOfAddress)) {
-           this.jCheckBox_Enscript.setEnabled(false);
-           this.jCheckBox_Enscript.setSelected(false);
-          // isText.setSelected(false);
-       } else {
-           this.jCheckBox_Enscript.setEnabled(true);
-       }
+       this.jCheckBox_Enscript.setEnabled(true);
    }
     public boolean cheskError(){
         this.jButton_ok.setEnabled(false);
-        //TODO TEST
-        //CHECK IF NETWORK OK
-        /*if(Controller.getInstance().getStatus() != Controller.STATUS_OKE)
-        {
-            //NETWORK NOT OK
-            JOptionPane.showMessageDialog(null, "You are unable to send a transaction while synchronizing or while having no connections!", "Error", JOptionPane.ERROR_MESSAGE);
-
-            //ENABLE
-            this.jButton_ok.setEnabled(true);
-
-            return;
-        }*/
 
         //READ SENDER
         sender = (Account) jComboBox_Account.getSelectedItem();
@@ -431,6 +422,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
     }
 
     public void confirmaftecreatetransaction(){
+
         //CHECK VALIDATE MESSAGE
         if (result == Transaction.VALIDATE_OK) {
             //RESET FIELDS
@@ -440,19 +432,13 @@ public class AssetSendPanel extends javax.swing.JPanel {
                 this.jTextField_Ammount.setText("0");
             }
 
-            // TODO "A" ??
-            if (false && this.jTextField_To.getText().startsWith(wrongFirstCharOfAddress)) {
-                this.jTextField_To.setText("");
-            }
-
             this.jTextArea_Description.setText("");
 
-            // TODO "A" ??
-            if (true || this.jTextField_To.getText().startsWith(wrongFirstCharOfAddress)) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message and/or payment has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-            }
+            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message and/or payment has been sent!"),
+                    Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
         }
     
    

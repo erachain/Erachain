@@ -40,23 +40,12 @@ import org.erachain.utils.Pair;
 @SuppressWarnings("serial")
 
 public class Account_Take_Hold_Panel extends AssetSendPanel {
-    //private final MessagesTableModel messagesTableModel;
-
-
-    private Account_Take_Hold_Panel th;
-
 
     public Account_Take_Hold_Panel(AssetCls asset, Account account,   Account account_To, PersonCls person) {
-        super(asset,account,account_To, person);
-        String a;
-        th = this;
-        if (asset == null) {
-            a = "";
-            asset = Controller.getInstance().getAsset(1);
-        }
-        else a = asset.viewName();
+        super(asset, account, account_To, person);
 
-        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to take on hold issued asset %asset%, fill in this form").replace("%asset%", a));
+        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to take on hold issued asset %asset%, fill in this form")
+                .replace("%asset%", asset.viewName()));
 
         //	icon.setIcon(null);
         this.jButton_ok.setText(Lang.getInstance().translate("Hold Asset"));
@@ -67,7 +56,6 @@ public class Account_Take_Hold_Panel extends AssetSendPanel {
 
     @Override
     public void onSendClick() {
-       
        
         // confirm params
        if (!cheskError()) return;
@@ -82,20 +70,23 @@ public class Account_Take_Hold_Panel extends AssetSendPanel {
         // test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);
 
         String Status_text = "";
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
-                Lang.getInstance().translate("Send Mail"), (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, transaction,
+                Lang.getInstance().translate("Holden"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
+                Lang.getInstance().translate("Confirmation Transaction"));
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
         dd.jScrollPane1.setViewportView(ww);
-        dd.setLocationRelativeTo(th);
+        dd.pack();
+        dd.setLocationRelativeTo(this);
         dd.setVisible(true);
 
         //	JOptionPane.OK_OPTION
         if (dd.isConfirm) {
 
-           
             result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+            confirmaftecreatetransaction();
 
         }
+
         //ENABLE
         this.jButton_ok.setEnabled(true);
     }
