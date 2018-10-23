@@ -2,33 +2,27 @@ package org.erachain.settings;
 // 17/03 Qj1vEeuz7iJADzV2qrxguSFGzamZiYZVUP
 // 30/03 ++
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
 import org.erachain.ntp.NTP;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 //import java.util.Arrays;
 // import org.apache.log4j.Logger;
@@ -44,7 +38,7 @@ public class Settings {
     public static final String DEFAULT_WALLET_DIR = "wallet";
     public static final String DEFAULT_BACKUP_DIR = "backup";
     public static final String DEFAULT_TEMP_DIR = "temp";
-    public static final String DEFAULT_TELEGRAM_DIR = "telegram";
+    public static final String DEFAULT_TELEGRAM_DIR = "datagram";
     private static final Logger LOGGER = Logger.getLogger(Settings.class);
     //NETWORK
     private static final int DEFAULT_MIN_CONNECTIONS = 20; // for OWN maked connections

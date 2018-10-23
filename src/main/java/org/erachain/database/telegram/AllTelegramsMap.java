@@ -1,17 +1,16 @@
 package org.erachain.database.telegram;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.mapdb.BTreeKeySerializer;
-import org.mapdb.DB;
-
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCMap;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.BTreeKeySerializer;
+import org.mapdb.DB;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class AllTelegramsMap extends  DCMap<String , Transaction> {
     
@@ -34,7 +33,7 @@ public class AllTelegramsMap extends  DCMap<String , Transaction> {
       //OPEN MAP
        return database.createTreeMap("telegrams")
               .keySerializer(BTreeKeySerializer.BASIC)
-              .valueSerializer(new  TransactionSerializer())
+               .valueSerializer(new TransactionSerializer())
               .counterEnable()
               .makeOrGet();
     }
