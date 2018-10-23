@@ -1,20 +1,18 @@
 package org.erachain.core.transaction;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.json.simple.JSONObject;
-
 import com.google.common.primitives.Longs;
-
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.datachain.DCSet;
+import org.json.simple.JSONObject;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class IssueAssetTransaction extends Issue_ItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
@@ -257,13 +255,11 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
         if (quantity > 0) {
             this.creator.changeBalance(this.dcSet, false, asset.getKey(this.dcSet),
                     new BigDecimal(quantity).setScale(0), false);
-            
-            if (asset.isMovable()) {
-                // make HOLD balance
-                this.creator.changeBalance(this.dcSet, false, asset.getKey(this.dcSet),
-                        new BigDecimal(-quantity).setScale(0), false);
+
+            // make HOLD balance
+            this.creator.changeBalance(this.dcSet, false, asset.getKey(this.dcSet),
+                    new BigDecimal(-quantity).setScale(0), false);
                 
-            }
         }
 
     }
@@ -282,10 +278,8 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
             this.creator.changeBalance(this.dcSet, true, asset.getKey(this.dcSet),
                     new BigDecimal(quantity).setScale(0), false);
 
-            if (asset.isMovable()) {
-                this.creator.changeBalance(this.dcSet, true, asset.getKey(this.dcSet),
-                        new BigDecimal(-quantity).setScale(0), false);            
-            }
+            this.creator.changeBalance(this.dcSet, true, asset.getKey(this.dcSet),
+                    new BigDecimal(-quantity).setScale(0), false);
         }
     }
 
