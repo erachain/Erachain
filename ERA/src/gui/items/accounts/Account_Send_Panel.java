@@ -61,7 +61,7 @@ public class Account_Send_Panel extends AssetSendPanel {
 
         String Status_text = "";
         Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, transaction,
-                Lang.getInstance().translate("Send Mail"),
+                Lang.getInstance().translate("Send"),
                 (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction"), !noRecive);
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
