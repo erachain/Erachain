@@ -12,6 +12,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.mapdb.*;
+import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
@@ -25,11 +26,19 @@ import java.util.*;
  * Транзакции занесенные в цепочку
  *
  * block.id + tx.ID in this block -> transaction
- *
+ * * <hr>
+ *  Здесь вторичные индексы создаются по несколько для одной записи путем создания массива ключей,
+ *  см. typeKey и recipientKey. Они используются для API RPC block explorer.
+ *  Нужно огрничивать размер выдаваемого списка чтобы не перегружать ноду.
+ *  <br>
  * Вторичные ключи:
- * ++ sender_txs
- * ++ recipient_txs
- * ++ address_type_txs
+ * ++ senderKey
+ * ++ recipientKey
+ * ++ typeKey
+ * <hr>
+ * (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
+ * <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
+ *
  */
 public class TransactionFinalMap extends DCMap<Long, Transaction> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
@@ -71,30 +80,24 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
     @SuppressWarnings("unchecked")
     private Map<Long, Transaction> openMap(DB database) {
 
+        // TREE MAP for sortable search
         BTreeMap<Long, Transaction> map = database.createTreeMap("height_seq_transactions")
-                //.keySerializer(BTreeKeySerializer.TUPLE2)
+                .keySerializer(BasicKeySerializer.BASIC)
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
 
         this.senderKey = database.createTreeSet("sender_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
+        // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
         Bind.secondaryKey(map, this.senderKey, new Fun.Function2<String, Long, Transaction>() {
             @Override
             public String run(Long key, Transaction val) {
                 Account account = val.getCreator();
-                return account == null ? "genesis" : account.getAddress();
+                // make UNIQUE key??  + val.viewTimestamp()
+                return (account == null ? "genesis" : account.getAddress());
             }
         });
-
-        //	this.block_Key = database.createTreeSet("Block_txs").comparator(Fun.COMPARATOR).makeOrGet();
-
-        //	Bind.secondaryKey(map, this.block_Key, new Fun.Function2<Integer, Long, Transaction>() {
-        //		@Override
-        //		public Integer run(Long key, Transaction val) {
-        //			return val.getBlockHeightByParentOrLast(getDCSet());
-        //		}
-        //	});
 
         this.recipientKey = database.createTreeSet("recipient_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
@@ -107,6 +110,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
                         val.setDC(getDCSet());
 
                         for (Account acc : val.getRecipientAccounts()) {
+                            // make UNIQUE key??  + val.viewTimestamp()
                             recps.add(acc.getAddress());
                         }
                         String[] ret = new String[recps.size()];
@@ -124,13 +128,14 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
                         List<Tuple2<String, Integer>> recps = new ArrayList<Tuple2<String, Integer>>();
                         Integer type = val.getType();
                         for (Account acc : val.getInvolvedAccounts()) {
+                            // TODO: make unique key??  + val.viewTimestamp()
                             recps.add(new Tuple2<String, Integer>(acc.getAddress(), type));
-
                         }
+
                         // Tuple2<Integer, String>[] ret = (Tuple2<Integer,
                         // String>[]) new Object[ recps.size() ];
-                        Tuple2<String, Integer>[] ret = (Tuple2<String, Integer>[]) Array.newInstance(Fun.Tuple2.class,
-                                recps.size());
+                        Tuple2<String, Integer>[] ret = (Tuple2<String, Integer>[])
+                                Array.newInstance(Fun.Tuple2.class, recps.size());
                         ret = recps.toArray(ret);
                         return ret;
                     }
@@ -220,35 +225,43 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
     }
 
     public Collection<Transaction> getTransactionsByBlock(Integer block) {
-        return getTransactionsByBlock(block, 0);
+        return getTransactionsByBlock(block, 0, 0);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getTransactionsByBlock(Integer block, int limit) {
-		/*
-		Iterable keys = Fun.filter(this.block_Key, block);
-		Iterator iter = keys.iterator();
-		keys = null;
-		List<Transaction> txs = new ArrayList<>();
-		int counter = 0;
-		while (iter.hasNext() && (limit == 0 || counter < limit)) {
-			txs.add(this.map.get(iter.next()));
-			counter++;
-		}
-		iter = null;
-		*/
-        //BTreeMap map = (BTreeMap) this.map;
-        // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-        Collection<Transaction> keys1 = ((BTreeMap) map)
+    public Collection<Long> getTransactionsByBlockKeys(Integer forBlock, int offset, int limit) {
+
+        Collection<Long> keys = ((BTreeMap) map)
+                .subMap(Fun.t2(forBlock, null), Fun.t2(forBlock, Fun.HI())).keySet();
+
+        if (offset > 0)
+            keys = (Collection)Iterables.skip(keys, offset);
+
+        if(limit > 0)
+            keys = (Collection)Iterables.limit(keys, limit);
+
+        return keys;
+
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<Transaction> getTransactionsByBlock(Integer block, int offset, int limit) {
+
+        Collection<Transaction> keys = ((BTreeMap) map)
                 .subMap(Fun.t2(block, null), Fun.t2(block, Fun.HI())).values();
 
+        if (offset > 0)
+            keys = (Collection)Iterables.skip(keys, offset);
+
+        if(limit > 0)
+            keys = (Collection)Iterables.limit(keys, limit);
 
         List<Transaction> txs = new ArrayList<>();
-        for (Transaction bb : keys1) {
-            txs.add(bb);
-            bb = null;
+        for (Long key: getTransactionsByBlockKeys(block, offset, limit)) {
+            txs.add(this.map.get(key));
+            key = null;
         }
-        keys1 = null;
+
         return txs;
 
     }
@@ -404,7 +417,6 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
                 offset, limit);
 
         Iterator iter = keys.iterator();
-        keys = null;
         List<Transaction> txs = new ArrayList<>();
         Transaction item;
         Long key;
@@ -414,10 +426,8 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
             item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
-
             txs.add(item);
         }
-        iter = null;
         return txs;
     }
 
@@ -459,7 +469,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         }
 
         if (sender != null) {
-            if (type > 0) {
+            if (type != 0) {
                 senderKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(sender, type));
             } else {
                 senderKeys = Fun.filter(this.senderKey, sender);
@@ -467,7 +477,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         }
 
         if (recipient != null) {
-            if (type > 0) {
+            if (type != 0) {
                 recipientKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(recipient, type));
             } else {
                 recipientKeys = Fun.filter(this.recipientKey, recipient);
@@ -496,7 +506,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
             });
         }
 
-        if (false && type == Transaction.ARBITRARY_TRANSACTION && service > -1) {
+        if (false && type == Transaction.ARBITRARY_TRANSACTION && service != 0) {
             treeKeys = Sets.filter(treeKeys, new Predicate<Long>() {
                 @Override
                 public boolean apply(Long key) {
