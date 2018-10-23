@@ -1,14 +1,12 @@
 package org.erachain.datachain;
 
 
+import org.apache.log4j.Logger;
 import org.erachain.core.block.Block;
 import org.erachain.database.serializer.BlockHeadSerializer;
-import org.apache.log4j.Logger;
 import org.mapdb.Atomic;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -55,7 +53,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
         return database.createTreeMap(NAME)
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .valueSerializer(new BlockHeadSerializer())
-                .counterEnable()
+                .counterEnable() // used in datachain.DCSet.DCSet(org.mapdb.DB, boolean, boolean, boolean)
                 .makeOrGet();
     }
 

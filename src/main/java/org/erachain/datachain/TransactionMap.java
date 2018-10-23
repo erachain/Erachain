@@ -3,7 +3,6 @@ package org.erachain.datachain;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
-import com.google.common.primitives.UnsignedBytes;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.BlockGenerator;
@@ -11,11 +10,11 @@ import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.TransactionSerializer;
+import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.ReverseComparator;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple2Comparator;
-import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.ReverseComparator;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -114,9 +113,9 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         // OPEN MAP
         BTreeMap<Long, Transaction> map = database.createTreeMap("transactions")
                 .keySerializer(BTreeKeySerializer.BASIC)
-                //.comparator(UnsignedBytes.lexicographicalComparator())
                 .valueSerializer(new TransactionSerializer())
-                .counterEnable().makeOrGet();
+                .counterEnable()
+                .makeOrGet();
 
         this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
         Bind.secondaryKey(map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {
