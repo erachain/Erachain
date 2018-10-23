@@ -76,7 +76,8 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
     public void set_Account(Account sender) {
 
         this.sender = sender;
-        ss.setFilter(this.sender.getAddress());
+        if (this.sender != null)
+            ss.setFilter(this.sender.getAddress());
     }
 
     public void set_Asset(AssetCls asset) {
