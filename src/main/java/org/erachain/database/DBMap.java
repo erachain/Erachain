@@ -2,7 +2,8 @@ package org.erachain.database;
 // upd 09/03
 
 import org.erachain.datachain.DCSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -23,7 +24,7 @@ public abstract class DBMap<T, U> extends Observable {
     public static final int NOTIFY_COUNT = 5;
 
     public static final int DEFAULT_INDEX = 0;
-    static Logger LOGGER = Logger.getLogger(DBMap.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(DBMap.class.getName());
     protected IDB databaseSet;
     protected Map<T, U> map;
     private Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;

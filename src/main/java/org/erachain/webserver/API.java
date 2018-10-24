@@ -18,7 +18,8 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.*;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.gui.transaction.OnDealClick;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -51,8 +52,7 @@ import java.util.*;
 @Path("api")
 public class API {
 
-    private static final Logger LOGGER = Logger
-            .getLogger(API.class);
+    private static final Logger LOGGER = LoggerFactory            .getLogger(API.class);
     @Context
     private UriInfo uriInfo;
     private HttpServletRequest request;
@@ -695,7 +695,7 @@ public class API {
             }
 
         } catch (Exception e) {
-            //LOGGER.info(e);
+            //LOGGER.error(e.getMessage());
             out.put("error", APIUtils.errorMess(-1, e.toString() + " on step: " + step));
             return out;
         }
@@ -710,7 +710,7 @@ public class API {
         try {
             transactionBytes = Base58.decode(rawDataBase58);
         } catch (Exception e) {
-            //LOGGER.info(e);
+            //LOGGER.error(e.getMessage());
             out.put("error", APIUtils.errorMess(-1, e.toString() + " INVALID_RAW_DATA"));
             return out;
         }

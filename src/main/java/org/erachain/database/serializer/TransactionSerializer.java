@@ -3,7 +3,8 @@ package org.erachain.database.serializer;
 
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Serializer;
 
 import java.io.DataInput;
@@ -13,7 +14,7 @@ import java.io.Serializable;
 
 public class TransactionSerializer implements Serializer<Transaction>, Serializable {
     private static final long serialVersionUID = -6538913048331349777L;
-    static Logger LOGGER = Logger.getLogger(TransactionSerializer.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TransactionSerializer.class.getName());
 
     @Override
     public void serialize(DataOutput out, Transaction value) throws IOException {

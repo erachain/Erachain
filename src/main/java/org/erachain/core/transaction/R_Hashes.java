@@ -33,7 +33,8 @@ import org.erachain.datachain.HashesSignsMap;
 //import java.util.LinkedHashMap;
 //import java.util.List;
 //import java.util.Map;
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 public class R_Hashes extends Transaction {

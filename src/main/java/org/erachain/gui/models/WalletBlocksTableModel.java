@@ -6,7 +6,8 @@ import org.erachain.core.block.Block;
 import org.erachain.database.wallet.BlocksHeadMap;
 import org.erachain.datachain.SortableList;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
@@ -26,7 +27,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
     public static final int COLUMN_BASETARGET = 3;
     public static final int COLUMN_TRANSACTIONS = 4;
     public static final int COLUMN_FEE = 5;
-    static Logger LOGGER = Logger.getLogger(WalletBlocksTableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(WalletBlocksTableModel.class.getName());
     private SortableList<Tuple2<String, String>, Block.BlockHead> blocks;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator",
             "GB dtWV", //"Generating Balance",

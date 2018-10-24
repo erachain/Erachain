@@ -1,7 +1,8 @@
 package org.erachain.datachain;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.core.block.Block;
 import org.erachain.database.serializer.BlockHeadSerializer;
 import org.mapdb.Atomic;
@@ -22,7 +23,7 @@ import java.util.Map;
 public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
 
     static final String NAME = "blocks_heads";
-    static Logger LOGGER = Logger.getLogger(BlocksHeadsMap.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(BlocksHeadsMap.class.getName());
     protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
     // for saving in DB
     private Atomic.Long fullWeightVar;

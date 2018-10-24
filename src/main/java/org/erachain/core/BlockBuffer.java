@@ -5,7 +5,8 @@ import org.erachain.network.Peer;
 import org.erachain.network.message.BlockMessage;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class BlockBuffer extends Thread {
     private static final int BUFFER_SIZE = 20;
-    private static final Logger LOGGER = Logger.getLogger(BlockBuffer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlockBuffer.class);
     private List<byte[]> signatures;
     private Peer peer;
     private int counter;

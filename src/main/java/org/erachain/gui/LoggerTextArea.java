@@ -10,7 +10,6 @@ import java.util.logging.SimpleFormatter;
 @SuppressWarnings("serial")
 public class LoggerTextArea extends JTextArea {
 
-
     private Handler handler;
     private Logger logger;
 
@@ -49,7 +48,7 @@ public class LoggerTextArea extends JTextArea {
 
 
 class TextComponentHandler extends Handler {
-    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(LoggerTextArea.class);
+    private static final Logger LOGGER = Logger.getLogger(LoggerTextArea.class.getName());
     private final JTextArea text;
 
     TextComponentHandler(JTextArea text) {
@@ -70,7 +69,7 @@ class TextComponentHandler extends Handler {
                         int end = this.text.getLineEndOffset(rows - 10000 - 1);
                         this.text.replaceRange("", 0, end);
                     } catch (BadLocationException e) {
-                        LOGGER.error(e.getMessage(), e);
+                        LOGGER.info(e.getMessage());
                     }
 
                 }

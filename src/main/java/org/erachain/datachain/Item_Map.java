@@ -2,7 +2,8 @@ package org.erachain.datachain;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.DBMap;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.erachain.utils.Pair;
@@ -17,7 +18,7 @@ import java.util.*;
  */
 public abstract class Item_Map extends DCMap<Long, ItemCls> {
 
-    static Logger LOGGER = Logger.getLogger(Item_Map.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Item_Map.class.getName());
 
     // protected int type;
     protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();

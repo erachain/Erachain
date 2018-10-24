@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class WItemStatusMap extends WItem_Map {
 
-    //static Logger LOGGER = Logger.getLogger(WItemStatusMap.class.getName());
+    //static Logger LOGGER = LoggerFactory.getLogger(WItemStatusMap.class.getName());
     static final String NAME = "status";
     static final int TYPE = ItemCls.STATUS_TYPE;
 

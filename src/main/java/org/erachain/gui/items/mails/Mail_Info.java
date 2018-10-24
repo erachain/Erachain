@@ -12,7 +12,8 @@ import org.erachain.gui.library.M_Accoutn_Text_Field;
 import org.erachain.gui.library.Voush_Library_Panel;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.MenuPopupUtil;
@@ -36,7 +37,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class Mail_Info extends javax.swing.JPanel {
 
-    private static final Logger LOGGER = Logger.getLogger(Send_RecordDetailsFrame.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Send_RecordDetailsFrame.class);
     public Voush_Library_Panel voush_Library_Panel;
     public JTabbedPane jTabbedPane1;
     R_Send trans;

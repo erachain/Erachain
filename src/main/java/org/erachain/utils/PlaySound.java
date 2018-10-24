@@ -1,7 +1,8 @@
 package org.erachain.utils;
 // 03/03
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.sound.sampled.*;
 import java.io.File;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class PlaySound {
-    private static final Logger LOGGER = Logger.getLogger(PlaySound.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlaySound.class);
     private static PlaySound instance;
     private ArrayList<byte[]> transactionsAlreadyPlayed;
 
@@ -57,9 +58,9 @@ public class PlaySound {
                         clip.stop();
                         clip.close();
                     } catch (IOException | UnsupportedAudioFileException | LineUnavailableException exc) {
-                        LOGGER.error(exc.getMessage(), exc);
+                        LOGGER.error(exc.getMessage());
                     } catch (InterruptedException exc) {
-                        LOGGER.debug(exc);
+                        LOGGER.debug(exc.getMessage());
                     } catch (Exception e) {
                     }
 

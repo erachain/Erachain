@@ -1,7 +1,8 @@
 package org.erachain.utils;
 // 30/03
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.wallet.TransactionMap;
@@ -34,7 +35,7 @@ import java.util.TreeMap;
 public class SysTray implements Observer {
 
 
-    private static final Logger LOGGER = Logger.getLogger(SysTray.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SysTray.class);
     private static SysTray systray = null;
     private TrayIcon icon = null;
     private PopupMenu createPopupMenu;

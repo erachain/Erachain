@@ -6,7 +6,8 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.R_Hashes;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
@@ -27,8 +28,7 @@ import java.util.List;
 public class Rec_HashesResource {
 
 
-    private static final Logger LOGGER = Logger
-            .getLogger(Rec_HashesResource.class);
+    private static final Logger LOGGER = LoggerFactory            .getLogger(Rec_HashesResource.class);
 
     @Context
     HttpServletRequest request;
@@ -132,7 +132,7 @@ public class Rec_HashesResource {
 
         } catch (NullPointerException | ClassCastException e) {
             // JSON EXCEPTION
-            LOGGER.info(e);
+            LOGGER.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_JSON);
         }

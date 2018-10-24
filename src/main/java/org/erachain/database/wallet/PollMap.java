@@ -5,7 +5,8 @@ import org.erachain.core.voting.Poll;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.PollSerializer;
 import org.erachain.datachain.DCMap;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
@@ -20,7 +21,7 @@ import java.util.*;
 public class PollMap extends DCMap<Tuple2<String, String>, Poll> {
     public static final int NAME_INDEX = 1;
     public static final int CREATOR_INDEX = 2;
-    static Logger LOGGER = Logger.getLogger(PollMap.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(PollMap.class.getName());
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public PollMap(DWSet dWSet, DB database) {

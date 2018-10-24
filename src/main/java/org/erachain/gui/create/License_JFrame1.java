@@ -19,7 +19,8 @@ import java.util.Map.Entry;
 import javax.swing.JDialog;
 import javax.swing.JTextPane;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
@@ -40,7 +41,7 @@ import org.erachain.settings.Settings;
 
 public class License_JFrame1 extends JDialog {
     
-    static Logger LOGGER = Logger.getLogger(License_JFrame1.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(License_JFrame1.class.getName());
     boolean needAccept;
     NoWalletFrame parent;
     int goCreateWallet;

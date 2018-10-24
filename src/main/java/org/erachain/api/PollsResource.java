@@ -8,7 +8,8 @@ import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.voting.Poll;
 import org.erachain.core.voting.PollOption;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -27,7 +28,7 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class PollsResource {
 
-    private static final Logger LOGGER = Logger.getLogger(PollsResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PollsResource.class);
 
     @Context
     HttpServletRequest request;
@@ -97,7 +98,7 @@ public class PollsResource {
                 return "ok";
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
-            LOGGER.info(e);
+            LOGGER.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
         return "ok";
@@ -169,7 +170,7 @@ public class PollsResource {
 
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
-            LOGGER.info(e);
+            LOGGER.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
     }

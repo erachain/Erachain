@@ -6,7 +6,8 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.lang.Lang;
@@ -25,7 +26,8 @@ import java.util.Enumeration;
 import java.util.List;
 
 //import java.util.Arrays;
-// import org.apache.log4j.Logger;
+// import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class Settings {
 
@@ -39,7 +41,7 @@ public class Settings {
     public static final String DEFAULT_BACKUP_DIR = "backup";
     public static final String DEFAULT_TEMP_DIR = "temp";
     public static final String DEFAULT_TELEGRAM_DIR = "datagram";
-    private static final Logger LOGGER = Logger.getLogger(Settings.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Settings.class);
     //NETWORK
     private static final int DEFAULT_MIN_CONNECTIONS = 20; // for OWN maked connections
     private static final int DEFAULT_MAX_CONNECTIONS = 32;
@@ -82,8 +84,8 @@ public class Settings {
     private static final String DEFAULT_BIRTH_TIME_FORMAT = "yyyy-MM-dd HH:mm z";
     private static final boolean DEFAULT_NS_UPDATE = false;
     private static final boolean DEFAULT_FORGING_ENABLED = true;
-    private static final String NOTEFY_INCOMING_URL = "http://127.0.0.1:8000/exhange/era/income";
-    private static final int NOTEFY_INCOMING_CONFIRMATIONS = 0;
+    private static final String NOTIFY_INCOMING_URL = "http://127.0.0.1:8000/exhange/era/income";
+    private static final int NOTIFY_INCOMING_CONFIRMATIONS = 0;
     public static String DEFAULT_LANGUAGE = "en";
     private static Settings instance;
     List<Peer> cacheInternetPeers;
@@ -284,7 +286,7 @@ public class Settings {
         if (this.settingsJSON.containsKey("notify_incoming_url")) {
             return (String) this.settingsJSON.get("notify_incoming_url");
         }
-        return NOTEFY_INCOMING_URL;
+        return NOTIFY_INCOMING_URL;
     }
 
     public int getNotifyIncomingConfirmations() {
@@ -292,7 +294,7 @@ public class Settings {
             return (int) (long) this.settingsJSON.get("notify_incoming_confirmations");
         }
 
-        return NOTEFY_INCOMING_CONFIRMATIONS;
+        return NOTIFY_INCOMING_CONFIRMATIONS;
     }
 
     public JSONArray getPeersJson() {

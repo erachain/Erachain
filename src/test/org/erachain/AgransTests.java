@@ -6,7 +6,8 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.network.Peer;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -24,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 
 public class AgransTests {
 
-    static Logger LOGGER = Logger.getLogger(AgransTests.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(AgransTests.class.getName());
 
     @Test
     public void testLinkedHashMap() throws UnknownHostException {

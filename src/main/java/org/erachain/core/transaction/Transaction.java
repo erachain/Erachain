@@ -8,13 +8,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.erachain.core.item.persons.PersonCls;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple4;
 
-// import org.apache.log4j.Logger;
+// import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -355,7 +357,7 @@ public abstract class Transaction {
     protected static final int BASE_LENGTH_AS_DBRECORD = BASE_LENGTH + FEE_LENGTH;
 
     // in pack toByte and Parse - reference not included
-    static Logger LOGGER = Logger.getLogger(Transaction.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Transaction.class.getName());
 
     protected DCSet dcSet;
     protected String TYPE_NAME = "unknown";

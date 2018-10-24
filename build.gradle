@@ -116,9 +116,6 @@ task CreateZip(type: Zip) {
     archiveName versionEra + '.zip'
     destinationDir(file('build/libs/' + versionEra))
 }
-configurations.all {
-    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-}
 
 dependencies {
     compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.54'
@@ -151,9 +148,7 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'jetty-util', version: '9.3.7.v20160115'
     compile group: 'net.sf.squirrel-sql.thirdparty-non-maven', name: 'tinylaf', version: '1.4.0'
     compile group: 'org.swinglabs', name: 'pdf-renderer', version: '1.0.5'
-    compile group: 'log4j', name: 'log4j', version: '1.2.17'
 
     compile "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
-    compile "org.springframework.boot:spring-boot-starter-log4j2:${springbootVersion}"
     compile "org.springframework.boot:spring-boot:${springbootVersion}"
 }

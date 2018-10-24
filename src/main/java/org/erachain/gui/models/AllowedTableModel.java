@@ -2,7 +2,8 @@ package org.erachain.gui.models;
 
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -16,7 +17,7 @@ import java.util.Observer;
 @SuppressWarnings("serial")
 public class AllowedTableModel extends AbstractTableModel implements Observer {
 
-    static Logger LOGGER = Logger.getLogger(AllowedTableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(AllowedTableModel.class.getName());
     private List<Peer> peers;
     private String[] columnNames = {"IP"};
 

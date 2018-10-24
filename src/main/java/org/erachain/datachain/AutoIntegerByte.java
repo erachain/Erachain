@@ -2,7 +2,8 @@ package org.erachain.datachain;
 
 
 import org.erachain.database.DBMap;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
 
@@ -15,7 +16,7 @@ import java.util.Map;
  * Главный класс для инкриментов - не используется
  */
 public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
-    static Logger LOGGER = Logger.getLogger(AutoIntegerByte.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(AutoIntegerByte.class.getName());
 
     // protected int type;
     protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();

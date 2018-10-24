@@ -11,7 +11,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -32,8 +33,7 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class Rec_Resource {
 
-    private static final Logger LOGGER = Logger
-            .getLogger(Rec_Resource.class);
+    private static final Logger LOGGER = LoggerFactory            .getLogger(Rec_Resource.class);
     @Context
     HttpServletRequest request;
     @Context
@@ -51,7 +51,7 @@ public class Rec_Resource {
             jsonObject = new JSONObject(queryParameters);
         } catch (NullPointerException | ClassCastException e) {
             // JSON EXCEPTION
-            //LOGGER.info(e);
+            //LOGGER.error(e.getMessage());
             //return Response.status(500).entity(ApiErrorFactory.getInstance().createError(
             //		ApiErrorFactory.ERROR_JSON)).build();
             return APIUtils.errorMess(ApiErrorFactory.ERROR_JSON, ApiErrorFactory.getInstance().createError(
@@ -329,7 +329,7 @@ public class Rec_Resource {
                     Ints.toByteArray(port)));
 
         } catch (Exception e) {
-            //LOGGER.info(e);
+            //LOGGER.error(e.getMessage());
             return APIUtils.errorMess(-step, e.toString() + " on step: " + step);
         }
 
@@ -452,7 +452,7 @@ public class Rec_Resource {
             jsonObject = new JSONObject(queryParameters);
         } catch (NullPointerException | ClassCastException e) {
             // JSON EXCEPTION
-            //LOGGER.info(e);
+            //LOGGER.error(e.getMessage());
             return APIUtils.errorMess(ApiErrorFactory.ERROR_JSON, ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_JSON).toString());
         }
@@ -549,7 +549,7 @@ public class Rec_Resource {
             }
 
         } catch (Exception e) {
-            //LOGGER.info(e);
+            //LOGGER.error(e.getMessage());
             return APIUtils.errorMess(-1, e.toString() + " on step: " + step);
         }
     }

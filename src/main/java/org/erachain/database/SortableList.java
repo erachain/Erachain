@@ -1,6 +1,7 @@
 package org.erachain.database;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 
@@ -11,7 +12,7 @@ import java.util.regex.Pattern;
 
 public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Observer {
 
-    static Logger LOGGER = Logger.getLogger(SortableList.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(SortableList.class.getName());
     private DBMap<T, U> db;
     private int index;
     private boolean descending;

@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
 import com.google.common.primitives.Ints;
@@ -18,7 +19,7 @@ import org.erachain.network.Peer;
 
 public class MessageFactory {
 
-    static Logger LOGGER = Logger.getLogger(MessageFactory.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(MessageFactory.class.getName());
     private static MessageFactory instance;
 
     public static MessageFactory getInstance() {

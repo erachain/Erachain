@@ -29,7 +29,8 @@ import javax.ws.rs.core.UriInfo;
 import org.erachain.core.transaction.*;
 import org.erachain.datachain.*;
 import org.apache.commons.net.util.Base64;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.gui.models.PeersTableModel;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -76,7 +77,7 @@ import org.erachain.utils.ReverseComparator;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class BlockExplorer {
     public static final String LANG_DEFAULT = "en";
-    private static final Logger LOGGER = Logger.getLogger(BlockExplorer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlockExplorer.class);
     private static final long FEE_KEY = Transaction.FEE_KEY;
     private static BlockExplorer blockExplorer;
     private JSONObject langObj;
@@ -3086,7 +3087,7 @@ public class BlockExplorer {
 
                 if ((newTotalBalance.containsKey(FEE_KEY))
                         && newTotalBalance.get(FEE_KEY).compareTo(BigDecimal.ZERO) < 0) {
-                    LOGGER.info(i);
+                    LOGGER.info(String.valueOf(i));
                 }
             }
 

@@ -6,7 +6,8 @@ import java.util.Observer;
 import javax.swing.table.DefaultTableModel;
 import javax.validation.constraints.Null;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
@@ -28,7 +29,7 @@ public class TelegramsTableModel extends DefaultTableModel implements Observer {
     public static final int COLUMN_MESSAGE = 3;
     public static final int COLUMN_SIGNATURE = 4;
   //  public static final int COLUMN_DATE = 0;
-    static Logger LOGGER = Logger.getLogger(TelegramsTableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TelegramsTableModel.class.getName());
     // ItemAssetMap dbItemAssetMap;
     private SortableList<String, Transaction> transactions;
     private String[] columnNames = Lang.getInstance().translate(new String[] {"Date", "Sender", "Recipient", "Message", "Signature" });

@@ -9,7 +9,8 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.SortableList;
 import org.erachain.gui.models.TableModelCls;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 import org.erachain.settings.Settings;
 import org.erachain.utils.*;
@@ -35,7 +36,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
     public static final int COLUMN_RECIPIENT = 6;
     public static final int COLUMN_FEE = 7;
     public static final int COLUMN_SIZE = 8;
-    static Logger LOGGER = Logger.getLogger(Payment_Orders_TableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Payment_Orders_TableModel.class.getName());
     private SortableList<Tuple2<String, String>, Transaction> transactions;
     //ItemAssetMap dbItemAssetMap;
     private ArrayList<R_Send> trans;

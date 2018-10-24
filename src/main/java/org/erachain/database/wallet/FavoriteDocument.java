@@ -6,7 +6,8 @@ import org.erachain.database.DBMap;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCMap;
 import org.erachain.datachain.DCSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
@@ -25,7 +26,7 @@ import java.util.*;
 
 public class FavoriteDocument extends DCMap<Tuple2<String, String>, Transaction> implements Observer {
 
-    static Logger LOGGER = Logger.getLogger(TransactionMap.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class.getName());
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public FavoriteDocument(DWSet dWSet, DB database) {

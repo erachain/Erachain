@@ -7,7 +7,8 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SaveStrToFile;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 
 import javax.swing.*;
@@ -29,8 +30,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class ConfirmSeedFrame extends JFrame {
 
-    private static final Logger LOGGER = Logger
-            .getLogger(ConfirmSeedFrame.class);
+    private static final Logger LOGGER = LoggerFactory            .getLogger(ConfirmSeedFrame.class);
     private CreateWalletFrame parent;
     private JTextField seedTxt;
     private JTextField passwordTxt;

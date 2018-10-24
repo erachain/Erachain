@@ -2,14 +2,16 @@ package org.erachain.traders;
 // 30/03 ++
 
 import org.erachain.core.BlockChain;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.TreeMap;
 
-// import org.apache.log4j.Logger;
+// import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 //import org.erachain.core.BlockChain;
 //import org.erachain.database.DBSet;
 //import database.TransactionMap;
@@ -18,7 +20,7 @@ import java.util.TreeMap;
 // shift as ABSOLUTE in scheme
 public class StoneGuardAbs extends Trader {
 
-    private static final Logger LOGGER = Logger.getLogger(StoneGuardAbs.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StoneGuardAbs.class);
 
     // in ABSOLUT
     protected BigDecimal limitUP;

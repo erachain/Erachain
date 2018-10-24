@@ -6,7 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
 import org.erachain.controller.Controller;
@@ -33,7 +34,7 @@ public class Synchronizer {
     public static final int GET_BLOCK_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
     public static final int GET_HEADERS_TIMEOUT = GET_BLOCK_TIMEOUT >> 1;
     private static final int BYTES_MAX_GET = 1024 << 10;
-    private static final Logger LOGGER = Logger.getLogger(Synchronizer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class);
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
     public static int BAN_BLOCK_TIMES = 8 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60;
     private static int MAX_ORPHAN_TRANSACTIONS = 100000;

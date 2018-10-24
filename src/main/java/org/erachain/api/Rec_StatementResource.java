@@ -3,7 +3,8 @@ package org.erachain.api;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.transaction.Transaction;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
 import org.erachain.utils.APIUtils;
@@ -23,8 +24,7 @@ import java.nio.charset.StandardCharsets;
 public class Rec_StatementResource {
 
 
-    private static final Logger LOGGER = Logger
-            .getLogger(Rec_StatementResource.class);
+    private static final Logger LOGGER = LoggerFactory            .getLogger(Rec_StatementResource.class);
 
     @Context
     HttpServletRequest request;
@@ -114,7 +114,7 @@ public class Rec_StatementResource {
             return "";
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
-            LOGGER.info(e);
+            LOGGER.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
     }

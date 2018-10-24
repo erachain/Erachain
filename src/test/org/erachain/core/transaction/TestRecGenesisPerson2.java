@@ -9,7 +9,8 @@ import datachain.AddressPersonMap;
 import org.erachain.datachain.DCSet;
 import datachain.KKPersonStatusMap;
 import datachain.PersonAddressMap;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -19,7 +20,7 @@ import static org.junit.Assert.fail;
 
 public class TestRecGenesisPerson2 {
 
-    static Logger LOGGER = Logger.getLogger(TestRecGenesisPerson2.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRecGenesisPerson2.class.getName());
 
     //Long Transaction.FOR_NETWORK = null;
 

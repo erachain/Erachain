@@ -12,7 +12,8 @@ import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
@@ -26,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 @Ignore
 public class DatabaseTests {
 
-    static Logger LOGGER = Logger.getLogger(DatabaseTests.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(DatabaseTests.class.getName());
     byte[] assetReference = new byte[Crypto.SIGNATURE_LENGTH];
     Long releaserReference = null;
 

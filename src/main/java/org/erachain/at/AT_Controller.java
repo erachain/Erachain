@@ -8,7 +8,8 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
@@ -22,7 +23,7 @@ import java.util.*;
 public abstract class AT_Controller {
 
 
-    private static final Logger LOGGER = Logger.getLogger(AT_Controller.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AT_Controller.class);
 
     public static int runSteps(AT_Machine_State state, int blockHeight) {
         state.getMachineState().stopped = false;

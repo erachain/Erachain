@@ -11,7 +11,8 @@ import org.erachain.core.web.OrphanNameStorageHelperMap;
 import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.datachain.DCSet;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -31,7 +32,7 @@ public class StorageUtils {
     public static final String ADD_KEY = "add";
     // ADD PATCH TO CURRENT VALUE
     public static final String PATCH_KEY = "patch";
-    static Logger LOGGER = Logger.getLogger(StorageUtils.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(StorageUtils.class.getName());
 
     @SuppressWarnings("unchecked")
     public static JSONObject getStorageJsonObject(

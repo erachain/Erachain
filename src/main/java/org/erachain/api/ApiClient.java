@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.settings.Settings;
@@ -25,7 +26,7 @@ public class ApiClient {
     public static final String APICALLKEY = "apicallkey";
     public static final int SELF_CALL = 10;
     private static final String ERA_ABBREV = AssetCls.ERA_ABBREV;
-    private static final Logger LOGGER = Logger.getLogger(ApiClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApiClient.class);
     private static List<String> allowedcalls = new CopyOnWriteArrayList<>();
     String[][] helpStrings =
             {
@@ -943,7 +944,7 @@ public class ApiClient {
             }
 
         } catch (Exception ioe) {
-            LOGGER.info(ioe);
+            LOGGER.info(ioe.getMessage());
             return "Invalid command! \n" +
                     ioe.getMessage() + "\n" +
                     "Type help to get a list of commands. ";

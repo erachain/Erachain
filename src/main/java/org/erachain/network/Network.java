@@ -1,6 +1,24 @@
 package org.erachain.network;
 
-import org.apache.log4j.Logger;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+
+
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
@@ -25,7 +43,7 @@ public class Network extends Observable implements ConnectionCallback {
     public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK ? 0 : 1;
     private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 4096 << 4 : 4096;
     private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 5 : 1024 << 4;
-    private static final Logger LOGGER = Logger.getLogger(Network.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Network.class);
     private static InetAddress myselfAddress;
     private ConnectionCreator creator;
     private ConnectionAcceptor acceptor;

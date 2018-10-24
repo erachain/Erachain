@@ -13,7 +13,8 @@ import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import datachain.KKUnionStatusMap;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -27,7 +28,7 @@ import static org.junit.Assert.fail;
 
 public class TestRecUnion {
 
-    static Logger LOGGER = Logger.getLogger(TestRecUnion.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRecUnion.class.getName());
 
     //int releaserReference = null;
 

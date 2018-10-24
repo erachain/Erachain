@@ -4,7 +4,8 @@ package org.erachain.network;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.PeersMessage;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.settings.Settings;
 
 import java.util.List;
@@ -15,8 +16,7 @@ import java.util.List;
  */
 public class ConnectionCreator extends Thread {
 
-    private static final Logger LOGGER = Logger
-            .getLogger(ConnectionCreator.class);
+    private static final Logger LOGGER = LoggerFactory            .getLogger(ConnectionCreator.class);
     private ConnectionCallback callback;
     private boolean isRun;
 

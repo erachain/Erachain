@@ -9,7 +9,8 @@ import org.erachain.core.item.assets.AssetCls;
 import core.item.assets.AssetUnique;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.datachain.DCSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ import static org.junit.Assert.*;
 
 public class TransactionTests3AssetsAsPack {
 
-    static Logger LOGGER = Logger.getLogger(TransactionTests3AssetsAsPack.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TransactionTests3AssetsAsPack.class.getName());
     static int asPack = Transaction.FOR_NETWORK;
     //Long Transaction.FOR_NETWORK;
     long FEE_KEY = 1l;

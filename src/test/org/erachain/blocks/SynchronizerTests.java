@@ -10,7 +10,8 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun;
@@ -25,7 +26,7 @@ import static org.junit.Assert.fail;
 
 public class SynchronizerTests {
 
-    static Logger LOGGER = Logger.getLogger(SynchronizerTests.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(SynchronizerTests.class.getName());
 
     long ERM_KEY = Transaction.RIGHTS_KEY;
     long FEE_KEY = Transaction.FEE_KEY;

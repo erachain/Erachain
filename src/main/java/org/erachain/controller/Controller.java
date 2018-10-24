@@ -2,7 +2,8 @@ package org.erachain.controller;
 
 import com.google.common.primitives.Longs;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.erachain.api.ApiClient;
 import org.erachain.api.ApiService;
@@ -116,7 +117,7 @@ public class Controller extends Observable {
     public static final int STATUS_NO_CONNECTIONS = 0;
     public static final int STATUS_SYNCHRONIZING = 1;
     public static final int STATUS_OK = 2;
-    private static final Logger LOGGER = Logger.getLogger(Controller.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
     private static final String version = "4.11.05 alpha";
     private static final String buildTime = "2017-11-19 15:33:33 UTC";
     public static boolean useGui = true;

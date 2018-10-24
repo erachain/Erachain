@@ -12,7 +12,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.text.View;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.erachain.gui.library.library;
 import org.mapdb.Fun.Tuple3;
@@ -33,7 +34,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
     private static JLabel resizer;
   
    
-    private static final Logger LOGGER = Logger.getLogger(RendererMessage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RendererMessage.class);
     private String isScriptImage;
     
  //   JTextPane jtp;

@@ -8,7 +8,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.SortableList;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
@@ -30,7 +31,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
     public static final int COLUMN_TYPE = 3;
     public static final int COLUMN_AMOUNT = 4;
     public static final int COLUMN_FEE = 5;
-    static Logger LOGGER = Logger.getLogger(TransactionsTableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TransactionsTableModel.class.getName());
     Long block_Height;
     Integer block_No;
     List<Transaction> transactions;

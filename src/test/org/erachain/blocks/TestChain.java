@@ -14,7 +14,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlocksHeadsMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
@@ -27,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 @Ignore
 public class TestChain {
 
-    static Logger LOGGER = Logger.getLogger(TestChain.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestChain.class.getName());
     byte[] assetReference = new byte[64];
     Long releaserReference = null;
     BigDecimal BG_ZERO = BigDecimal.ZERO;

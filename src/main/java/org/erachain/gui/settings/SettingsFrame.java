@@ -20,7 +20,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -34,7 +35,7 @@ import org.erachain.utils.SaveStrToFile;
 
 @SuppressWarnings("serial")
 public class SettingsFrame extends JDialog {
-    static Logger LOGGER = Logger.getLogger(SettingsFrame.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(SettingsFrame.class.getName());
 
     public JSONObject settingsJSONbuf;
     private SettingsTabPane settingsTabPane;

@@ -14,7 +14,8 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.utils.Converter;
 import org.erachain.utils.Pair;
 
@@ -33,7 +34,7 @@ import java.util.List;
 
 @SuppressWarnings("serial")
 public class DeployATFrame extends JFrame {
-    static Logger LOGGER = Logger.getLogger(DeployATFrame.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(DeployATFrame.class.getName());
 
     private JComboBox<Account> cbxFrom;
     private JTextField txtFeePow;

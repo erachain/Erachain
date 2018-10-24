@@ -7,7 +7,8 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
 import org.erachain.controller.Controller;
@@ -26,7 +27,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
     public static final int COLUMN_BASETARGET = 3;
     public static final int COLUMN_TRANSACTIONS = 4;
     public static final int COLUMN_FEE = 5;
-    static Logger LOGGER = Logger.getLogger(Other_Seasrch_BlocksTableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Other_Seasrch_BlocksTableModel.class.getName());
     private List<Block> blocks;
     private String[] columnNames = Lang.getInstance()
             .translate(new String[]{"Height", "Timestamp", "Generator", "GB pH WV dtWV", // "Generating

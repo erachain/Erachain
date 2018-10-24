@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
@@ -42,7 +43,7 @@ public class BlockGenerator extends Thread implements Observer {
     static final int FLUSH_TIMEPOINT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2);
     static final int WIN_TIMEPOINT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2;
     private static final int MAX_BLOCK_SIZE = BlockChain.HARD_WORK ? 22221 : 1000;
-    static Logger LOGGER = Logger.getLogger(BlockGenerator.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(BlockGenerator.class.getName());
     private static Controller ctrl = Controller.getInstance();
     private static int status = 0;
     private PrivateKeyAccount acc_winner;

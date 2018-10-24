@@ -7,7 +7,8 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 
@@ -31,7 +32,7 @@ public class R_Vouch extends Transaction {
 
     private static final byte TYPE_ID = (byte) Transaction.VOUCH_TRANSACTION;
     private static final String NAME_ID = "Vouch";
-    static Logger LOGGER = Logger.getLogger(R_Vouch.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(R_Vouch.class.getName());
     protected int vouchHeight;
     protected int vouchSeqNo;
 

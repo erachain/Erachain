@@ -8,7 +8,8 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.SortableList;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
@@ -27,7 +28,7 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
      *
      */
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = Logger.getLogger(Person_Vouch_From_Table_Model.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Person_Vouch_From_Table_Model.class);
     List<R_SertifyPubKeys> transactions;
     PersonCls person;
     TransactionFinalMap table;

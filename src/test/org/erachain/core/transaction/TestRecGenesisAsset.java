@@ -7,7 +7,8 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ import static org.junit.Assert.*;
 @Ignore
 public class TestRecGenesisAsset {
 
-    static Logger LOGGER = Logger.getLogger(TestRecGenesisAsset.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRecGenesisAsset.class.getName());
 
     //int asPack = Transaction.FOR_NETWORK;
 

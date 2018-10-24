@@ -10,7 +10,8 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 
 //import java.util.Map;
-// import org.apache.log4j.Logger;
+// import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class IssueTemplateRecord extends Issue_ItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_TEMPLATE_TRANSACTION;

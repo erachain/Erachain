@@ -10,7 +10,8 @@ import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemStatusMap;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.erachain.utils.Corekeys;
@@ -27,7 +28,7 @@ import static org.junit.Assert.fail;
 
 public class TestRecStatus {
 
-    static Logger LOGGER = Logger.getLogger(TestRecStatus.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRecStatus.class.getName());
 
     //Long releaserReference = null;
 

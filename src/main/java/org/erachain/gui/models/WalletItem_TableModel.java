@@ -5,7 +5,8 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.SortableList;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.Observable;
@@ -17,7 +18,7 @@ public abstract class WalletItem_TableModel extends TableModelCls<Tuple2<String,
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_CONFIRMED = 3;
-    static Logger LOGGER = Logger.getLogger(WalletItem_TableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(WalletItem_TableModel.class.getName());
     protected SortableList<Tuple2<String, String>, ItemCls> items;
 
     protected String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed"});

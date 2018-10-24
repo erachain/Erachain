@@ -9,7 +9,8 @@ import java.util.*;
 import javax.swing.JFileChooser;
 
 import org.erachain.core.item.assets.Order;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -65,7 +66,7 @@ public class Wallet extends Observable implements Observer {
 
 	private static final long RIGHTS_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
-	static Logger LOGGER = Logger.getLogger(Wallet.class.getName());
+	static Logger LOGGER = LoggerFactory.getLogger(Wallet.class.getName());
 	public DWSet database;
 	AssetsFavorites assetsFavorites;
 	TemplatesFavorites templatesFavorites;

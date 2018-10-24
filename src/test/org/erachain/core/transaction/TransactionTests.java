@@ -13,7 +13,8 @@ import org.erachain.core.voting.Poll;
 import org.erachain.core.voting.PollOption;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -30,7 +31,7 @@ import static org.junit.Assert.fail;
 @Ignore
 public class TransactionTests {
 
-    static Logger LOGGER = Logger.getLogger(TransactionTests.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TransactionTests.class.getName());
     //Long Transaction.FOR_NETWORK = null;
     long ERM_KEY = Transaction.RIGHTS_KEY;
     long FEE_KEY = Transaction.FEE_KEY;

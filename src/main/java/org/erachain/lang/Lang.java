@@ -7,7 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
@@ -21,7 +22,7 @@ public class Lang {
 
     public static final String translationsUrl = "https://raw.githubusercontent.com/erachain/erachain-public/master/languages/";
 
-    private static final Logger LOGGER = Logger.getLogger(Lang.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Lang.class);
     private static Lang instance;
     private Map<String, String> noTranslateMap;
 

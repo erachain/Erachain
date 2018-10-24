@@ -6,7 +6,8 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemImprintMap;
 import org.erachain.gui.items.TableModelItems;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.validation.constraints.Null;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class TableModelImprintsSearch extends TableModelItems {
     public static final int COLUMN_BORN = 2;
     public static final int COLUMN_PUBLISHER = 3;
     public static final int COLUMN_FAVORITE = 4;
-    static Logger LOGGER = Logger.getLogger(TableModelImprintsSearch.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TableModelImprintsSearch.class.getName());
     private String[] columnNames = Lang.getInstance()
             .translate(new String[]{"Key", "Name", "Birthday", "Publisher", "Favorite"});// ,
     // "Favorite"});

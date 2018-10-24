@@ -11,7 +11,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TransactionFinalMap;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.gui.transaction.OnDealClick;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -36,7 +37,7 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 public class TradeResource {
 
-    private static final Logger LOGGER = Logger.getLogger(TradeResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TradeResource.class);
     @Context
     HttpServletRequest request;
 

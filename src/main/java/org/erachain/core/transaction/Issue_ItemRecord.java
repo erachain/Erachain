@@ -7,7 +7,8 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.erachain.utils.Pair;
 
@@ -16,7 +17,7 @@ import java.util.HashSet;
 
 public abstract class Issue_ItemRecord extends Transaction {
 
-    static Logger LOGGER = Logger.getLogger(Issue_ItemRecord.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Issue_ItemRecord.class.getName());
 
     //private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK;
     //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;

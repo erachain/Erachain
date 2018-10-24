@@ -16,7 +16,8 @@ import org.erachain.core.web.blog.BlogEntry;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.PostCommentMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.eclipse.jetty.util.StringUtil;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -27,7 +28,7 @@ import java.util.*;
 public class BlogUtils {
 
 
-    private static final Logger LOGGER = Logger.getLogger(BlogUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlogUtils.class);
     public static int COMMENT_SERVICE_ID = 778;
 
     /**

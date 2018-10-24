@@ -9,7 +9,8 @@ import org.erachain.network.Peer;
 import org.erachain.network.message.HWeightMessage;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.erachain.settings.Settings;
@@ -22,7 +23,7 @@ import java.util.TreeMap;
 
 public abstract class Rater extends Thread {
 
-    private static final Logger LOGGER = Logger.getLogger(Rater.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Rater.class);
 
     // HAVE KEY + WANT KEY + COURSE NAME
     private static TreeMap<Fun.Tuple3<Long, Long, String>, BigDecimal> rates = new TreeMap<Fun.Tuple3<Long, Long, String>, BigDecimal>();

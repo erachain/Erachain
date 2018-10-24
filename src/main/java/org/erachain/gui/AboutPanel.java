@@ -1,6 +1,7 @@
 package org.erachain.gui;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -11,14 +12,14 @@ import java.io.IOException;
 
 @SuppressWarnings("serial")
 public class AboutPanel extends JPanel {
-    private static final Logger LOGGER = Logger.getLogger(AboutPanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AboutPanel.class);
     private BufferedImage image;
 
     public AboutPanel() {
         try {
             image = ImageIO.read(new File("images/about.png"));
         } catch (IOException ex) {
-            LOGGER.error(ex);
+            LOGGER.error(ex.getMessage());
         }
     }
 

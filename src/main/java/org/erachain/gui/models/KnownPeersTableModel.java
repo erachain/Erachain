@@ -5,7 +5,8 @@ import org.erachain.database.PeerMap.PeerInfo;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
@@ -30,7 +31,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
     private static final int COLUMN_FINDING_AGO = 5;
     private static final int COLUMN_ONLINE_TIME = 6;
     private static final int COLUMN_VERSION = 7;
-    static Logger LOGGER = Logger.getLogger(KnownPeersTableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(KnownPeersTableModel.class.getName());
     //	private String[] columnNames = {"IP", Lang.getInstance().translate("Connected now")};
 //	String[] columnNames = new String[]{"IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago", "Online Time", "Version"};
     String[] columnNames = Lang.getInstance().translate(new String[]{"IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago", "Online Time", "Version"});

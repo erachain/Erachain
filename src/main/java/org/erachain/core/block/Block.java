@@ -6,7 +6,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 import com.google.common.primitives.Longs;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -62,7 +63,7 @@ public class Block {
     //private static final int AT_FEES_LENGTH = 8;
     //private static final int AT_LENGTH = AT_FEES_LENGTH + AT_BYTES_LENGTH;
     private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
-    static Logger LOGGER = Logger.getLogger(Block.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Block.class.getName());
     /// HEAD of BLOCK ///
     // FACE
     protected int version;

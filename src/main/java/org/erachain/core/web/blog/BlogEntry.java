@@ -5,7 +5,8 @@ import org.erachain.core.web.Profile;
 import org.erachain.datachain.DCSet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
@@ -30,7 +31,7 @@ import java.util.regex.Pattern;
  */
 public class BlogEntry {
 
-    static Logger LOGGER = Logger.getLogger(BlogEntry.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(BlogEntry.class.getName());
     private final String creator;
     private final Profile profileOpt;
     private String titleOpt;

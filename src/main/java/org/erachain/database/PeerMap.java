@@ -5,7 +5,8 @@ import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedBytes;
 import org.erachain.network.Peer;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.erachain.settings.Settings;
@@ -19,7 +20,7 @@ public class PeerMap extends DBMap<byte[], byte[]> {
     private static final byte[] BYTE_WHITELISTED = new byte[]{0, 0};
     //private static final byte[] BYTE_BLACKLISTED = new byte[]{1, 1};
     private static final byte[] BYTE_NOTFOUND = new byte[]{2, 2};
-    static Logger LOGGER = Logger.getLogger(PeerMap.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(PeerMap.class.getName());
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public PeerMap(DBSet databaseSet, DB database) {

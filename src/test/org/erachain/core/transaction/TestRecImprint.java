@@ -11,7 +11,8 @@ import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemImprintMap;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -26,7 +27,7 @@ import static org.junit.Assert.fail;
 
 public class TestRecImprint {
 
-    static Logger LOGGER = Logger.getLogger(TestRecImprint.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRecImprint.class.getName());
 
     int asPack = Transaction.FOR_NETWORK;
     long FEE_KEY = AssetCls.FEE_KEY;

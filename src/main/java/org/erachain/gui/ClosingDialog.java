@@ -2,7 +2,8 @@ package org.erachain.gui;
 
 import org.erachain.controller.Controller;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,7 +13,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class ClosingDialog extends JFrame {
 
-    private static final Logger LOGGER = Logger.getLogger(ClosingDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClosingDialog.class);
     private JDialog waitDialog;
     private AboutFrame about_Frame;
 

@@ -5,7 +5,8 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.datachain.DCMap;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
@@ -20,7 +21,7 @@ public class WItem_Map extends DCMap<Tuple2<String, String>, ItemCls> {
 
     public static final int NAME_INDEX = 1;
     public static final int CREATOR_INDEX = 2;
-    static Logger LOGGER = Logger.getLogger(WItem_Map.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(WItem_Map.class.getName());
     protected int type;
     protected String name;
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();

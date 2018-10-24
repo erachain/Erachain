@@ -5,14 +5,15 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.R_SertifyPubKeys;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
 
 @SuppressWarnings("serial")
 public class SertifyPubKeysDetailsFrame extends Rec_DetailsFrame {
-    private static final Logger LOGGER = Logger.getLogger(SertifyPubKeysDetailsFrame.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SertifyPubKeysDetailsFrame.class);
     private JTextField messageText;
 
     public SertifyPubKeysDetailsFrame(final R_SertifyPubKeys sertifyPubKeysRecord) {

@@ -10,7 +10,8 @@ import javax.ws.rs.WebApplicationException;
 
 import org.erachain.core.web.ProfileHelper;
 import org.erachain.gui.Gui;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -38,7 +39,7 @@ import org.erachain.settings.Settings;
 
 public class APIUtils {
     
-    static Logger LOGGER = Logger.getLogger(APIUtils.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(APIUtils.class.getName());
     
     public static String errorMess(int error, String message) {
         return "{ \"error\":" + error + ", \"message\": \"" + message + "\" }";
@@ -340,7 +341,7 @@ public class APIUtils {
             
         } catch (NullPointerException | ClassCastException e) {
             // JSON EXCEPTION
-            // LOGGER.info(e);
+            // LOGGER.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
         

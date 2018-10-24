@@ -11,7 +11,8 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.DB;
@@ -31,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 public class BlockExplorerTest {
 
 
-    static Logger LOGGER = Logger.getLogger(BlockExplorerTest.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(BlockExplorerTest.class.getName());
 
     private byte[] icon = new byte[]{1, 3, 4, 5, 6, 9}; // default value
     private byte[] image = new byte[]{4, 11, 32, 23, 45, 122, 11, -45}; // default value
