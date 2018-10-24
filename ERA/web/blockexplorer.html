@@ -193,12 +193,21 @@ function asyncAjax (url, type){
 	$(menu_percons).text(data.id_menu_percons);
 	$(menu_pals_asset).text(data.id_menu_pals_asset);
 	$(menu_assets).text(data.id_menu_assets);
-	$(menu_aTs).text(data.id_menu_aTs);			
+	$(menu_aTs).text(data.id_menu_aTs);
+	$(menu_documents).text(data.id_menu_documents);
+
+	$(menu_percons_op).text(data.id_menu_percons);
+	$(menu_pals_asset_op).text(data.id_menu_pals_asset);
+	$(menu_assets_op).text(data.id_menu_assets);
+
+	$(menu_documents_op).text(data.id_menu_documents);
 				
 	*/			
 				
 					$("#searchparam").val (type);
 				document.getElementById('Langs').innerHTML = langs(data);
+				
+				$('#selectID').val(data.search);
 
 				if(type == 'blocks')
 				{
@@ -300,6 +309,10 @@ function asyncAjax (url, type){
 				if (type == 'status')
 				{
 					document.getElementById('main').innerHTML = status(data);
+				}
+				if(type == 'block')
+				{
+					document.getElementById('main').innerHTML = block(data);
 				}
 				
 				document.getElementById('loading').style.display = 'none';
@@ -1388,84 +1401,7 @@ function mainQuery(data) {
 
 		if(data.type == 'block')
 		{
-			url = '?block=' + data.blockHeight;
-			urlstart = url;
-			
-			output +=  '<table width="1280" border=0><tr><td align=left>';	
-			output += '<font size="+1">' + data.label_block + ': ';
-			if(data.hasOwnProperty('parentBlockSignature'))
-			{
-				output += '<a style="text-decoration: none" href="?block='+(data.blockHeight-1)+get_lang()+'"><b>&lt;</b></a> ';
-			}
-			output += '<a href="?block='+data.blockHeight+get_lang()+'">'+data.blockHeight+'</a> ';
-			if(data.hasOwnProperty('childBlockSignature'))
-			{
-				output += '<a style="text-decoration: none" href="?block='+(data.blockHeight+1)+get_lang()+'"><b>&gt;</b></a>';
-			}
-			output += '</font>';
-			output += '<br><br>';
-
-			output += data.label_Block_version + ': <span title="v1 - from 1 block (2014-05-16 13:34:34 UTC)\nv2 - from 99000 block (2015-05-17 11:13:40 UTC)\nv3 - from 2016-02-15 19:00:00 UTC">' + data.version + '</span><br><br>';
-			
-			if(data.countTx.hasOwnProperty('txsCount'))
-			{
-				output += data.label_Transactions_count +': ' + data.countTx.txsCount + '<br>' + data.label_Including + ':<br>';
-
-				for(key in data.countTx.txsTypesCount) {
-					output += '&nbsp;&nbsp;&nbsp;'
-					+transactionTypes[key]+': '
-					+data.countTx.txsTypesCount[key]+ '<br>\n';
-				}
-			}
-			else
-			{
-				output += data.label_Transactions_count +': 0<br>';
-			}
-			
-			if(data.countTx.tradesCount > 0)
-			{
-				output += '<br>+ Trades: ' + data.countTx.tradesCount + '<br>\n';
-			}
-			
-			if(data.countTx.aTTxsCount > 0)
-			{
-				output += '<br>+ AT Transactions: ' + data.countTx.aTTxsCount + '<br>\n';
-			}
-
-			output += '<br>' + data.label_Total_Amount+': '+ data.totalAmount ;
-			output += '<br>' + data.label_Total_AT_Amount+':'+ data.totalATAmount ;
-			output += '<br>' + data.label_Total_Fee+': '+ data.totalFee ;
-
-			output += '<br>';
-			
-			output += '<br>' + data.label_Generating_Balance+': '+ addCommas(data.generatingBalance);
-			output += '<br>' + data.label_Win_Value+':'+ addCommas(data.winValue);
-			output += '<br>' + data.label_Target+': '+ addCommas(data.target);
-			output += '<br>' + data.label_Targeted_Win_Value+': '+ addCommas(data.winValueTargeted);
-
-			output += '<br><br>';
-			
-			if(data.hasOwnProperty('parentBlockSignature'))
-			{
-				
-				output += data.label_Parent_block +': '+ (data.blockHeight-1) + ',   ' + data.label_Signature + ': ';
-				output += '<a  href=?block='+ data.parentBlockSignature + get_lang()+'>' + data.parentBlockSignature + '</a>';
-				output += '<br><br>';
-			}
-			
-			output += '<b>' + data.label_Current_block + ': ' + (data.blockHeight) + ',    ' + data.label_Signature + ':</b> ';
-			output += '<a  href=?block='+ data.blockSignature + get_lang()+'>' + data.blockSignature + '</a>';
-			output += '<br><br>';
-			
-			if(data.hasOwnProperty('childBlockSignature'))
-			{
-				output += data.label_Child_block +': '+(data.blockHeight+1)+ ',   ' + data.label_Signature + ': ';
-				output += '<a  href=?block='+ data.childBlockSignature + get_lang()+'>' + data.childBlockSignature + '</a>';
-				output += '<br><br>';
-			}
-			output += transactions_Table(data);
-			
-		return output;
+			return output + block(data);
 		}
 		
 		
@@ -3124,6 +3060,83 @@ function mainQuery(data) {
 	return output;
 }
 
+function block(data){
+			var output = '';
+			url = '?block=' + data.blockHeight;
+			urlstart = url;
+			
+			output +=  '<table width="1280" border=0><tr><td align=left>';	
+			output += '<font size="+1">' + data.label_block + ': ';
+			if(data.hasOwnProperty('parentBlockSignature'))
+			{
+				output += '<a style="text-decoration: none" href="?block='+(data.blockHeight-1)+get_lang()+'"><b>&lt;</b></a> ';
+			}
+			output += '<a href="?block='+data.blockHeight+get_lang()+'">'+data.blockHeight+'</a> ';
+			if(data.hasOwnProperty('childBlockSignature'))
+			{
+				output += '<a style="text-decoration: none" href="?block='+(data.blockHeight+1)+get_lang()+'"><b>&gt;</b></a>';
+			}
+			output += '</font>';
+			output += '<br><br>';
+
+			output += data.label_Block_version + ': <span title="v1 - from 1 block (2014-05-16 13:34:34 UTC)\nv2 - from 99000 block (2015-05-17 11:13:40 UTC)\nv3 - from 2016-02-15 19:00:00 UTC">' + data.version + '</span><br><br>';
+			
+			if(data.countTx.hasOwnProperty('txsCount'))
+			{
+				output += data.label_Transactions_count +': ' + data.countTx.txsCount + '<br>' + data.label_Including + ':<br>';
+	
+			}
+			else
+			{
+				output += data.label_Transactions_count +': 0<br>';
+			}
+			
+			if(data.countTx.tradesCount > 0)
+			{
+				output += '<br>+ Trades: ' + data.countTx.tradesCount + '<br>\n';
+			}
+			
+			if(data.countTx.aTTxsCount > 0)
+			{
+				output += '<br>+ AT Transactions: ' + data.countTx.aTTxsCount + '<br>\n';
+			}
+
+			output += '<br>' + data.label_Total_Amount+': '+ data.totalAmount ;
+			output += '<br>' + data.label_Total_AT_Amount+':'+ data.totalATAmount ;
+			output += '<br>' + data.label_Total_Fee+': '+ data.totalFee ;
+
+			output += '<br>';
+			
+			output += '<br>' + data.label_Generating_Balance+': '+ addCommas(data.generatingBalance);
+			output += '<br>' + data.label_Win_Value+':'+ addCommas(data.winValue);
+			output += '<br>' + data.label_Target+': '+ addCommas(data.target);
+			output += '<br>' + data.label_Targeted_Win_Value+': '+ addCommas(data.winValueTargeted);
+
+			output += '<br><br>';
+			
+			if(data.hasOwnProperty('parentBlockSignature'))
+			{
+				
+				output += data.label_Parent_block +': '+ (data.blockHeight-1) + ',   ' + data.label_Signature + ': ';
+				output += '<a  href=?block='+ data.parentBlockSignature + get_lang()+'>' + data.parentBlockSignature + '</a>';
+				output += '<br><br>';
+			}
+			
+			output += '<b>' + data.label_Current_block + ': ' + (data.blockHeight) + ',    ' + data.label_Signature + ':</b> ';
+			output += '<a  href=?block='+ data.blockSignature + get_lang()+'>' + data.blockSignature + '</a>';
+			output += '<br><br>';
+			
+			if(data.hasOwnProperty('childBlockSignature'))
+			{
+				output += data.label_Child_block +': '+(data.blockHeight+1)+ ',   ' + data.label_Signature + ': ';
+				output += '<a  href=?block='+ data.childBlockSignature + get_lang()+'>' + data.childBlockSignature + '</a>';
+				output += '<br><br>';
+			}
+			output += transactions_Table(data);
+			
+		return output;
+		}
+
 function uintToString(uintArray) {
     var encodedString = String.fromCharCode.apply(null, uintArray);
 	try {
@@ -3406,6 +3419,7 @@ function parseUrlQuery() {
 
 function person(data)
 {
+var output = '';
 output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
 output += '<tr><td align=left>';
 output += '<table><tr><td>';
@@ -3573,13 +3587,11 @@ function getQueryParams(name) {
 }
 
 function buttonSearch() {
-var par = $("#searchparam").val ();
-if (par =="blocks" || par=="blocks") {
-	 document.location.href = '?block=' + encodeURIComponent(document.getElementById('q').value)+ get_lang(); 
-	 return;
-}
-   document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value)+ get_lang() + '&search=' + par; 
-}
+  var n = document.getElementById("selectID").options.selectedIndex;
+  var par = document.getElementById("selectID").options[n].value;
+  document.getElementById("searchparam").value = par;
+  document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value)+ get_lang() + '&search='+ par; 
+ }
 
 function start() {
     
@@ -3588,6 +3600,8 @@ function start() {
 	
 	document.getElementById('main').innerHTML = '';
 	if (params['lang'] == null) params['lang']="en";
+	$('#selectID').val('block');
+	if (params[search]!= null)  $('#selectID').val(params[search]);	
 //document.getElementById('menuBlocks').innerHTML = '<a href="#?lang=111'+params['lang'] +'" id=home2>Blocks</a>'
 	
 //	document.getElementById('home').href = document.location.pathname;
@@ -3600,6 +3614,7 @@ function start() {
 	document.getElementById('menu_statuses').href ='?statuses&lang='+ params['lang'] ;
 	document.getElementById('menu_peers').href ='?peers&lang='+ params['lang'] ;
 	document.getElementById('menu_templates').href ='?templates&lang='+ params['lang'] ;
+	document.getElementById('menu_documents').href ='?documents&startdocument&lang='+ params['lang'] ;
 	
 	
 				
@@ -3773,8 +3788,6 @@ function start() {
 			document.title = title + ' - Address - ' + params['addr'];
 		}
 		
-		document.getElementById('q').value = decodeURIComponent(params['addr']);
-		
 		return;
 	}
 	
@@ -3820,8 +3833,6 @@ function start() {
 		
 		document.title = title + ' - Name - ' + decodeURIComponent (params['name']);
 		
-		document.getElementById('q').value = decodeURIComponent(params['name']);
-		
 		return;
 	}
 	
@@ -3831,8 +3842,6 @@ function start() {
 		
 		document.title = title + ' - Transaction - ' + params['tx'];
 		
-		document.getElementById('q').value = decodeURIComponent(params['tx']);
-		
 		return;
 	}
 	
@@ -3841,8 +3850,6 @@ function start() {
 		asyncAjax('blockexplorer.json?trade=' + params['trade']+'&lang='+params['lang'], 'mainQuery');
 		
 		document.title = title + ' - Trade - ' + params['trade'];
-		
-		document.getElementById('q').value = decodeURIComponent(params['trade']);
 		
 		return;
 	}
@@ -3854,8 +3861,6 @@ function start() {
 		
 		document.title = title + ' - AT TX - ' + params['atTx'];
 		
-		document.getElementById('q').value = decodeURIComponent(params['atTx']);
-		
 		return;
 	}
 	
@@ -3864,8 +3869,6 @@ function start() {
 		asyncAjax('blockexplorer.json?poll=' + params['poll']+'& asset=' +params['asset']+'&lang='+params['lang'], 'poll');
 		
 		document.title = title + ' - Poll - ' + decodeURIComponent(params['poll']);
-		
-		document.getElementById('q').value = decodeURIComponent(params['poll']);
 		
 		document.getElementById('menuPolls').setAttribute('class', 'active');
 		
@@ -3887,7 +3890,6 @@ function start() {
 			
 			document.title = title + ' - Asset - ' + params['asset'];
 			
-			document.getElementById('q').value = decodeURIComponent(params['asset']);
 		}
 		
 		document.getElementById('menuAssets').setAttribute('class', 'active');
@@ -3910,7 +3912,6 @@ function start() {
 			
 			document.title = title + ' - Asset - ' + params['status'];
 			
-			document.getElementById('q').value = decodeURIComponent(params['status']);
 		}
 		
 		document.getElementById('menuStatuses').setAttribute('class', 'active');
@@ -3934,8 +3935,6 @@ function start() {
 		asyncAjax('blockexplorer.json?block=' + params['block'] + '&lang=' + params['lang'] + '&page=' + page, 'mainQuery');
 		
 		document.title = title + ' - Block - ' + params['block'];
-		
-		document.getElementById('q').value = decodeURIComponent(params['block']);
 		
 		return;
 	}
@@ -3964,9 +3963,10 @@ function start() {
 	if(params.hasOwnProperty('q'))
 	{
 	var ss = 'search';
-	if (params['search'] == 'person' || params['search'] == 'persons') ss = params['search']; 
-	if (params['search'] == 'asset' || params['search'] == 'assets') ss = params['search']; 
-	if (params['search'] == 'status' || params['search'] == 'statuses') ss = params['search']; 
+	if (params['search'] == 'person' || params['search'] == 'persons') ss = 'persons'; 
+	if (params['search'] == 'asset' || params['search'] == 'assets') ss = 'assets'; 
+	if (params['search'] == 'status' || params['search'] == 'statuses') ss = 'statuses'; 
+	if (params['search'] == 'block' || params['search'] == 'blocks') ss = 'block'; 
 	
 		asyncAjax('blockexplorer.json?q=' + params['q']+'&lang='+params['lang']+'&search='+params['search'], ss);
 
@@ -4111,12 +4111,23 @@ function Lang_setting(){
           </ul>-->
           <div class="navbar-form navbar-left">
             <div class="input-group">
-              <label for="name" class="sr-only">Search</label>
+               <select id="selectID" class="form-control" role="tablist">
+                   <option value=block id=home2_op translate="true">Blocks</option>
+					<option value=asset id =menu_assets_op  translate="true">Asset</option>
+					<option value=person id =menu_percons_op  translate="true">Person</option>
+					<option value=transaction  translate="true">Transaction</option>
+					<option value=status  id =menu_statuses_op   translate="true">Status</option>
+					<option value=template id= menu_templates_op  translate="true">Templates</option>
+				   <option value=template  id=menu_documents_op  translate="true">Documents</option>
+					
+			</select>
+			</div>
+		 <div class="input-group">	
               <input id="q" size="55" type="text" value="" class="form-control" onkeydown="if (event.keyCode == 13) buttonSearch()"><span class="input-group-btn">
                 <button id="button" type="button" value="!searchval!" class="btn btn-link" onClick="buttonSearch()"><span class="glyphicon glyphicon-search"></span><span class="sr-only">Search</span></button></span>
 				<input  hidden id="searchparam">
 		  </div>
-			 <select id ="Langs" OnChange="Lang_setting()">
+			 <select id ="Langs" OnChange="Lang_setting()" class="form-control">
 			 </select>
 		   </div>
 		   <div class="navbar-form navbar-right">
@@ -4132,14 +4143,18 @@ function Lang_setting(){
           <div class="container">
             <div class="row" id="main-menu" >
               <ul role="tablist" class="nav nav-tabs">
-                <li id=menuBlocks><a href="#" id=home2><translate>Blocks</translate></a></li>
-				<li id=menuTop100Richest><a href="?top=100" id=menu_top_100><translate>Top 100 Richest</translate></a></li>
-				<li id=menuPersons><a href="?persons&startPerson" id =menu_percons><translate>Persons</translate></a></li>
-				<li id=menuPolls><a href="?polls&asset=1" id =menu_pals_asset><translate>Polls</translate></a></li>
-				<li id=menuAssets><a href="?assets" id =menu_assets><translate>Assets</translate></a></li>
-				<li id=menuStatuses><a href="?statuses" id =menu_statuses><translate>Statuses</translate></a></li>	
-				<li id=menupeers><a href="?peers" id=menu_peers><translate>Peers</translate></a></li>				
-				<li id=menutemplates><a href="?templates" id=menu_templates><translate>Templates</translate></a></li>		
+                <li id=menuBlocks><a href="#" id=home2  translate="true">Blocks</a></li>
+				<li id=menuTop100Richest><a href="?top=100" id=menu_top_100  translate="true">Top 100 Richest</a></li>
+				<li id=menuPersons><a href="?persons&startPerson" id =menu_percons  translate="true">Persons</a></li>
+				<li id=menuPolls><a href="?polls&asset=1" id =menu_pals_asset   translate="true"> Polls </a></li>
+				<li id=menuAssets><a href="?assets" id =menu_assets  translate="true"> Assets </a></li>
+				<li id=menuStatuses><a href="?statuses" id =menu_statuses  translate="true"> Statuses </a></li>
+				<li id=menupeers><a href="?peers" id=menu_peers  translate="true"> Peers </a></li>
+				<li id=menudocument><a href="?templates" id=menu_documents  translate="true"> Documents </a></li>
+				 <li id=menutemplates><a href="?templates" id=menu_templates  translate="true"> Templates </a></li>
+
+
+
               </ul>
             </div>
           </div>

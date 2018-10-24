@@ -104,7 +104,9 @@ public class BlockExplorer {
     public Map jsonQueryMain(UriInfo info) throws UnsupportedEncodingException {
         Stopwatch stopwatchAll = new Stopwatch();
 
+
         Map output = new LinkedHashMap();
+        output.put("search", "block");
         // lang
         if (!info.getQueryParameters().containsKey("lang")) {
             lang_file = LANG_DEFAULT + ".json";
@@ -137,15 +139,17 @@ public class BlockExplorer {
         output.put("id_menu_pals_asset", Lang.getInstance().translate_from_langObj("Polls", langObj));
         output.put("id_menu_assets", Lang.getInstance().translate_from_langObj("Assets", langObj));
         output.put("id_menu_aTs", Lang.getInstance().translate_from_langObj("ATs", langObj));
+        output.put("id_menu_documents", Lang.getInstance().translate_from_langObj("Documents", langObj));
+
         // servece info
         output.put("lastBlock", jsonQueryLastBlock());
 
         if (info.getQueryParameters().containsKey("balance")) {
-            
+
             for (String address : info.getQueryParameters().get("balance")) {
                 output.put(address, jsonQueryBalance(address));
             }
-           
+
         }
 
         if (info.getQueryParameters().containsKey("q")) {
@@ -158,40 +162,42 @@ public class BlockExplorer {
                     // search persons
                     output.put("search", type);
                     output.putAll(jsonQuerySearchPersons(info.getQueryParameters().getFirst("q")));
-                    
+
                } else if (type.equals("assets") || type.equals("asset")) {
                     // search assets
                     output.put("search", type);
                     output.putAll(jsonQuerySearchAssets(info.getQueryParameters().getFirst("q")));
-                    
+
                 } else if (type.equals("status") || type.equals("statuses")) {
                     // search assets
                     output.put("search", type);
                     output.putAll(jsonQuerySearchStatuses(info.getQueryParameters().getFirst("q")));
-                    
-                
+
+
                 } else if (type.equals("block") || type.equals("blocks")) {
                 // search assets
                 output.put("search", "block");
                 output.putAll(jsonQueryBlock(search, 1));
-                
+
             }
 
             }
-        // top 100   
-        } else  if (info.getQueryParameters().containsKey("top")) 
+        // top 100
+        } else  if (info.getQueryParameters().containsKey("top"))
                 output.putAll(jsonQueryTopRichest(info));
         // asset lite
         else if (info.getQueryParameters().containsKey("assetsLite")) {
             output.put("assetsLite", jsonQueryAssetsLite());
          // assets list
         }else if (info.getQueryParameters().containsKey("assets")) {
+             output.put("search", "asset");
              output.putAll(jsonQueryAssets(info));
         // polls list
         }else if (info.getQueryParameters().containsKey("polls")) {
             output.putAll(jsonQueryPools(info));
-        // asset 
+        // asset
         } else if (info.getQueryParameters().containsKey("asset")) {
+            output.put("search", "asset");
           if (info.getQueryParameters().get("asset").size() == 1) {
                 try {
                     output.put("asset", jsonQueryAsset(Long.valueOf((info.getQueryParameters().getFirst("asset")))));
@@ -210,6 +216,7 @@ public class BlockExplorer {
                 output.putAll(jsonQueryTrades(have, want));
             }
         } else if (info.getQueryParameters().containsKey("blocks")) {
+            output.put("search", "block");
              output.putAll(jsonQueryBlocks(info));
             //peers
         } else if (info.getQueryParameters().containsKey("peers")) {
@@ -254,11 +261,11 @@ public class BlockExplorer {
                 showWithout = info.getQueryParameters().getFirst("showWithout");
             }
 
-            
+
             output.putAll(jsonQueryAddress(info.getQueryParameters().get("addr"), transPage, start, txOnPage, filter,
                     allOnOnePage, showOnly, showWithout));
 
-         // name 
+         // name
         }else if (info.getQueryParameters().containsKey("name")) {
             int start = -1;
             int txOnPage = 100;
@@ -285,6 +292,7 @@ public class BlockExplorer {
        // block
         } else  if (info.getQueryParameters().containsKey("block")) {
          int transPage = 1;
+            output.put("search", "block");
             if (info.getQueryParameters().containsKey("page")) {
                 transPage = Integer.parseInt(info.getQueryParameters().getFirst("page"));
             }
@@ -315,6 +323,7 @@ public class BlockExplorer {
         // persons list
         else if (info.getQueryParameters().containsKey("persons")) {
             String start = null;
+            output.put("search", "person");
             if (info.getQueryParameters().containsKey("startPerson")) {
                 start = info.getQueryParameters().getFirst("startPerson");
             }
@@ -322,11 +331,13 @@ public class BlockExplorer {
         }
         // person
         else if (info.getQueryParameters().containsKey("person")) {
+            output.put("search", "person");
             output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
         }
         // templates list
         else if (info.getQueryParameters().containsKey("templates")) {
             int start = -1;
+            output.put("search", "template");
             if (info.getQueryParameters().containsKey("start")) {
                 start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
             }
@@ -336,7 +347,7 @@ public class BlockExplorer {
         else if (info.getQueryParameters().containsKey("statuses")) {
             int start = -1;
             if (info.getQueryParameters().containsKey("start")) {
-
+                output.put("search", "status");
                 try {
                     start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
                 } catch (NumberFormatException e) {
@@ -348,10 +359,12 @@ public class BlockExplorer {
         }
         // template
         else if (info.getQueryParameters().containsKey("template")) {
+            output.put("search", "template");
             output.putAll(jsonQueryTemplate(Long.valueOf(info.getQueryParameters().getFirst("template"))));
         }
         // status
         else if (info.getQueryParameters().containsKey("status")) {
+            output.put("search", "status");
             output.putAll(jsonQueryStatus(Long.valueOf(info.getQueryParameters().getFirst("status"))));
         }
         // tx from seq-No
@@ -366,7 +379,7 @@ public class BlockExplorer {
                         new Integer(info.getQueryParameters().getFirst("Seg_No")));
                 output.put("body", WEB_Transactions_HTML.getInstance().get_HTML(transaction, langObj));
             }
-        } 
+        }
         // not key
         else {
             output.put("error", "Not enough parameters.");
@@ -374,7 +387,7 @@ public class BlockExplorer {
         }
         // time guery
         output.put("queryTimeMs", stopwatchAll.elapsedTime());
-        
+
 
         return output;
     }
@@ -742,7 +755,7 @@ public class BlockExplorer {
         Map output = new LinkedHashMap();
 
         int start = 0;
-       
+
                 try {
                     start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
                 } catch (NumberFormatException e) {
@@ -750,7 +763,7 @@ public class BlockExplorer {
                    // e.printStackTrace();
                     start = 0;
                 }
-       
+
         SortableList<Long, ItemCls> it = dcSet.getItemAssetMap().getList();
 
         int view_Row = 21;
@@ -1324,7 +1337,7 @@ public class BlockExplorer {
         BigDecimal vol;
         // show SELLs in BACK order
         for (int i = ordersHave.size() - 1; i >= 0; i--) {
-            
+
             Order order = ordersHave.get(i);
             Map sellJSON = new LinkedHashMap();
 
@@ -1367,7 +1380,7 @@ public class BlockExplorer {
         for (int i = ordersWant.size() - 1; i >= 0; i--) {
 
             Order order = ordersWant.get(i);
-        
+
             Map buyJSON = new LinkedHashMap();
 
             buyJSON.put("price", order.getPrice().toPlainString());
@@ -2027,7 +2040,7 @@ public class BlockExplorer {
         BigDecimal alloreders = BigDecimal.ZERO;
         int limit = Integer.valueOf((info.getQueryParameters().getFirst("top")));
         long key = 1l;
-        if (info.getQueryParameters().containsKey("asset")) 
+        if (info.getQueryParameters().containsKey("asset"))
             key =  Long.valueOf(info.getQueryParameters().getFirst("asset"));
          List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
 
@@ -3911,7 +3924,7 @@ public class BlockExplorer {
                         ss = (JSONObject) params.get(s);
 
                       //  hasHes += i + " " + ss.get("File_Name") + "<br>";
-                        
+
                         hasHes += i + " " + ss.get("File_Name");
                         hasHes += "<a href = '../apidocuments/getFile?download=false&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("File_Name") + "'> View </a><br>";
                         hasHes += "<a href = '../apidocuments/getFile?download=true&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("File_Name") + "'> Download </a><br>";
@@ -4070,7 +4083,7 @@ public class BlockExplorer {
 
         byte[] signatureBytes = null;
 
-        
+
 
         for (int i = 0; i < signatures.length; i++) {
             try {
@@ -4086,9 +4099,9 @@ public class BlockExplorer {
             if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION){//.ISSUE_STATEMENT_TRANSACTION){
                 int block = transaction.getBlockHeight();
                 int seqNo = transaction.getSeqNo();
-                output.putAll(jsonQueryStatement(block+"",seqNo+""));  
+                output.putAll(jsonQueryStatement(block+"",seqNo+""));
                 output.put("type", "statement");
-                
+
             }else {
                 output.put("type", "transaction");
                 output.put("body", WEB_Transactions_HTML.getInstance().get_HTML(transaction, langObj));
@@ -4137,7 +4150,7 @@ public class BlockExplorer {
              */
         }
 
-        
+
 
         return output;
     }

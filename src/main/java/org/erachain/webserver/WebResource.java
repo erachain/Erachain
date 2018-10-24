@@ -387,12 +387,18 @@ public class WebResource {
             LOGGER.error("try lang file: " + lang + ".json");
             langObj = Lang.openLangFile(lang + ".json");
 
-
-            Elements el = doc.select("translate");
+     /*   // translate select
+            Elements el = doc.getElementsByTag("option");//.select("translate");
+            for (Element e : el) {
+                e.text(Lang.getInstance().translate_from_langObj(e.text(), langObj));
+          }
+      */        // translate links
+            Elements el = doc.getElementsByAttributeValueContaining("translate", "true");//.select("translate");
             for (Element e : el) {
                 e.text(Lang.getInstance().translate_from_langObj(e.text(), langObj));
             }
         }
+
 
         return Response.ok(doc.toString(), "text/html; charset=utf-8").build();
 
