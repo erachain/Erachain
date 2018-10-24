@@ -7,19 +7,9 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.R_Send;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.library.Issue_Confirm_Dialog;
-import org.erachain.gui.library.My_JFileChooser;
 import org.erachain.gui.library.library;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.filechooser.FileView;
-
-import java.awt.Container;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 
 @SuppressWarnings("serial")
@@ -31,8 +21,6 @@ public class Account_Send_Panel extends AssetSendPanel {
 
     public Account_Send_Panel(AssetCls asset, Account account, Account account_To, PersonCls person) {
         super(asset, account, account_To, person);
-        String a;
-        //th = this;
 
         this.jLabel_Title.setText(Lang.getInstance().translate("If You want to send asset %asset%, fill in this form").
                 replace("%asset%", asset.viewName()));

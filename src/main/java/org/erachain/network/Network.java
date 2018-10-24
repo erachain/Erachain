@@ -1,34 +1,20 @@
 package org.erachain.network;
 
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
-import org.erachain.network.message.FindMyselfMessage;
-import org.erachain.network.message.Message;
-import org.erachain.network.message.MessageFactory;
-import org.erachain.network.message.TelegramGetAnswerMessage;
-import org.erachain.network.message.TelegramGetMessage;
-import org.erachain.network.message.TelegramMessage;
+import org.erachain.network.message.*;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.*;
 
 /**
  * основной класс модуля Сети
@@ -450,7 +436,7 @@ public class Network extends Observable implements ConnectionCallback {
     }
 
     public void pingAllPeers(List<Peer> exclude, boolean onlySynchronized) {
-        LOGGER.debug("Broadcasting PING ALL");
+        //LOGGER.debug("Broadcasting PING ALL");
 
         Controller cnt = Controller.getInstance();
         BlockChain chain = cnt.getBlockChain();
@@ -483,12 +469,12 @@ public class Network extends Observable implements ConnectionCallback {
         }
 
         peer = null;
-        LOGGER.debug("Broadcasting PING ALL end");
+        //LOGGER.debug("Broadcasting PING ALL end");
     }
 
     public void asyncBroadcastPing(Message message, List<Peer> exclude) {
 
-        LOGGER.debug("ASYNC Broadcasting with Ping before " + message.viewType());
+        //LOGGER.debug("ASYNC Broadcasting with Ping before " + message.viewType());
 
         for (int i = 0; i < this.knownPeers.size(); i++) {
 
@@ -513,12 +499,12 @@ public class Network extends Observable implements ConnectionCallback {
             }
         }
 
-        LOGGER.debug("ASYNC Broadcasting with Ping before ENDED " + message.viewType());
+        //LOGGER.debug("ASYNC Broadcasting with Ping before ENDED " + message.viewType());
     }
 
     public void asyncBroadcast(Message message, List<Peer> exclude, boolean onlySynchronized) {
 
-        LOGGER.debug("ASYNC Broadcasting " + message.viewType());
+        //LOGGER.debug("ASYNC Broadcasting " + message.viewType());
         Controller cnt = Controller.getInstance();
         BlockChain chain = cnt.getBlockChain();
         Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
@@ -547,7 +533,7 @@ public class Network extends Observable implements ConnectionCallback {
             }
         }
 
-        LOGGER.debug("ASYNC Broadcasting end " + message.viewType());
+        //LOGGER.debug("ASYNC Broadcasting end " + message.viewType());
     }
 
     public void broadcast(Message message, List<Peer> exclude, boolean onlySynchronized) {
@@ -586,7 +572,7 @@ public class Network extends Observable implements ConnectionCallback {
 
     public void asyncBroadcastWinBlock(Message message, List<Peer> exclude, boolean onlySynchronized) {
 
-        LOGGER.debug("ASYNC Broadcasting " + message.viewType());
+        //LOGGER.debug("ASYNC Broadcasting " + message.viewType());
         Controller cnt = Controller.getInstance();
         BlockChain chain = cnt.getBlockChain();
         Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
@@ -615,7 +601,7 @@ public class Network extends Observable implements ConnectionCallback {
             }
         }
 
-        LOGGER.debug("ASYNC Broadcasting end " + message.viewType());
+        //LOGGER.debug("ASYNC Broadcasting end " + message.viewType());
     }
 
     @Override

@@ -1,30 +1,20 @@
 package org.erachain.gui.library;
 
-import java.awt.Toolkit;
+import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.crypto.Base32;
+import org.erachain.core.item.assets.AssetCls;
+import org.erachain.gui.items.accounts.*;
+import org.erachain.gui.models.AccountsTableModel;
+import org.erachain.lang.Lang;
+
+import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.JComboBox;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-
-import org.erachain.core.BlockChain;
-import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.crypto.Base32;
-import org.erachain.core.item.assets.AssetCls;
-import org.erachain.gui.items.accounts.Account_Confiscate_Debt_Dialog;
-import org.erachain.gui.items.accounts.Account_Lend_Dialog;
-import org.erachain.gui.items.accounts.Account_Repay_Debt_Dialog;
-import org.erachain.gui.items.accounts.Account_Send_Dialog;
-import org.erachain.gui.items.accounts.Account_Set_Name_Dialog;
-import org.erachain.gui.items.accounts.Account_Take_Hold_Dialog;
-import org.erachain.gui.*;
-import org.erachain.gui.models.AccountsTableModel;
-import org.erachain.lang.Lang;
 
 public class DealsPopupMenu extends JPopupMenu {
     
@@ -214,8 +204,8 @@ public class DealsPopupMenu extends JPopupMenu {
             case AssetCls.AS_INSIDE_ASSETS:
                 this.sendAsset.setText(Lang.getInstance().translate("Transfer to the ownership"));
 
-                //this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
-                this.holdAsset.setVisible(false);
+                this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
+                this.holdAsset.setVisible(true);
 
                 this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
                 this.debtAsset.setVisible(true);

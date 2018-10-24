@@ -1,19 +1,7 @@
 package org.erachain.core.transaction;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.erachain.lang.Lang;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
@@ -22,7 +10,17 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
+import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /*
 
@@ -577,10 +575,10 @@ public abstract class TransactionAmount extends Transaction {
 
                                 balance = this.recipient.getBalance(dcSet, absKey, actionType).b;
                                 if (unLimited) {
-                                    BigDecimal amontOWN = this.recipient.getBalance(dcSet, absKey, ACTION_SEND).b;
+                                    BigDecimal amountOWN = this.recipient.getBalance(dcSet, absKey, ACTION_SEND).b;
                                     // amontOWN, balance and amount - is
                                     // negative
-                                    if (balance.add(this.amount).compareTo(amontOWN) < 0) {
+                                    if (balance.add(this.amount).compareTo(amountOWN) < 0) {
                                         return NO_HOLD_BALANCE;
                                     }
                                 } else {

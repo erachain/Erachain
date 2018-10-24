@@ -1,23 +1,5 @@
 package org.erachain.gui.items.accounts;
 
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -41,6 +23,21 @@ import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.NameUtils;
 import org.erachain.utils.NameUtils.NameResult;
 import org.erachain.utils.Pair;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class AssetSendPanel extends javax.swing.JPanel {
 
@@ -88,7 +85,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
    public AssetSendPanel(AssetCls asset_in, Account account2,  Account account_To, PersonCls person) {
 
        this.account = account2;
-       if (asset == null)
+       if (asset_in == null)
            this.asset = Controller.getInstance().getAsset(2);
        else
            this.asset = asset_in;
