@@ -46,7 +46,7 @@ public class Account_Confiscate_Debt_Panel extends AssetSendPanel {
 
         String Status_text = "";
         Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, transaction,
-                Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2),
+                Lang.getInstance().translate("Confiscate Debt"), (int) (this.getWidth() / 1.2),
                 (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
 
