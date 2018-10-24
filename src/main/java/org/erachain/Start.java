@@ -7,7 +7,7 @@ import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
 import org.erachain.gui.library.Issue_Confirm_Dialog;
 import org.erachain.lang.Lang;
-import org.erachain.log4j.Logging;
+import org.erachain.utils.Logging;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SysTray;
 import org.erachain.webserver.Status;
@@ -40,12 +40,13 @@ public class Start {
 
     public static boolean backUP = false;
     private static final Logger LOGGER = LoggerFactory.getLogger(Start.class);
-
     private static AboutFrame about_frame;
     private static String info;
 
     public static void main(String args[]) throws IOException {
+
         SpringApplicationBuilder builder = new SpringApplicationBuilder(Start.class);
+
         builder.headless(false).run(args);
 
         boolean cli = false;

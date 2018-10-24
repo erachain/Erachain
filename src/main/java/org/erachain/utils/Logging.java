@@ -1,4 +1,4 @@
-package org.erachain.log4j;
+package org.erachain.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
