@@ -5,7 +5,8 @@ import org.erachain.core.naming.Name;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.NameSerializer;
 import org.erachain.datachain.DCMap;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
@@ -20,7 +21,7 @@ import java.util.*;
 public class NameMap extends DCMap<Tuple2<String, String>, Name> {
     public static final int NAME_INDEX = 1;
     public static final int OWNER_INDEX = 2;
-    static Logger LOGGER = Logger.getLogger(NameMap.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(NameMap.class.getName());
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public NameMap(DWSet dWSet, DB database) {

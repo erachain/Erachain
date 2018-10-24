@@ -4,7 +4,8 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.erachain.utils.APIUtils;
@@ -19,7 +20,7 @@ import javax.ws.rs.core.MediaType;
 public class WalletResource {
 
 
-    private static final Logger LOGGER = Logger.getLogger(WalletResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WalletResource.class);
 
     @Context
     HttpServletRequest request;
@@ -142,7 +143,7 @@ public class WalletResource {
                 return String.valueOf(Controller.getInstance().createWallet(Controller.getInstance().getWalletLicense(), seedBytes, password, amount, path));
             }
         } catch (NullPointerException | ClassCastException e) {
-            LOGGER.info(e);
+            LOGGER.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
     }

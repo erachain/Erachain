@@ -9,7 +9,8 @@
 package org.erachain.at;
 
 import org.erachain.core.transaction.Transaction;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -22,7 +23,7 @@ import java.util.Arrays;
 public class AT_API_Impl implements AT_API {
 
 
-    private static final Logger LOGGER = Logger.getLogger(AT_API_Impl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AT_API_Impl.class);
 
     AT_API_Platform_Impl platform = AT_API_Platform_Impl.getInstance();
 

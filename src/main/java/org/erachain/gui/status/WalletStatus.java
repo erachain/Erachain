@@ -3,7 +3,8 @@ package org.erachain.gui.status;
 import org.erachain.controller.Controller;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.utils.ObserverMessage;
 
 import javax.imageio.ImageIO;
@@ -16,7 +17,7 @@ import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class WalletStatus extends JLabel implements Observer {
-    static Logger LOGGER = Logger.getLogger(WalletStatus.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(WalletStatus.class.getName());
 
     private ImageIcon unlockedIcon;
     private ImageIcon lockedIcon;

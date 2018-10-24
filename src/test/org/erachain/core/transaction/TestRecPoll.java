@@ -13,7 +13,8 @@ import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -28,7 +29,7 @@ import static org.junit.Assert.fail;
 
 public class TestRecPoll {
 
-    static Logger LOGGER = Logger.getLogger(TestRecPoll.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRecPoll.class.getName());
 
     //Long Transaction.FOR_NETWORK = null;
 

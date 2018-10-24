@@ -11,7 +11,8 @@ import org.erachain.core.payment.Payment;
 import org.erachain.core.web.blog.BlogEntry;
 import org.erachain.datachain.DCSet;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -30,7 +31,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 
     protected static final byte TYPE_ID = (byte) ARBITRARY_TRANSACTION;
     private static final String NAME_ID = "OLD: Arbitrary";
-    static Logger LOGGER = Logger.getLogger(ArbitraryTransaction.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(ArbitraryTransaction.class.getName());
     protected int service;
     protected byte[] data;
     protected List<Payment> payments;

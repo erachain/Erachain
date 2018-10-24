@@ -5,7 +5,8 @@ import static org.junit.Assert.assertNotEquals;
 
 import java.math.BigDecimal;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
@@ -23,7 +24,7 @@ import org.erachain.ntp.NTP;
 
 public class TestRec_Send_Movable {
 
-    static Logger LOGGER = Logger.getLogger(TestRec_Send_Movable.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRec_Send_Movable.class.getName());
 
     Long releaserReference = null;
 

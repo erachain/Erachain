@@ -1,10 +1,11 @@
 package org.erachain.utils;
 
 import org.erachain.controller.Controller;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class MemoryViewer extends Thread {
-    private static final Logger LOGGER = Logger.getLogger(Controller.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
 
     Controller controller;
 

@@ -15,7 +15,8 @@ import org.erachain.datachain.DCSet;
 import datachain.KKPersonStatusMap;
 import datachain.PersonAddressMap;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple4;
@@ -29,7 +30,7 @@ import static org.junit.Assert.*;
 
 public class TestRecPerson {
 
-    static Logger LOGGER = Logger.getLogger(TestRecPerson.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRecPerson.class.getName());
     
     BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
     long ERM_KEY = Transaction.RIGHTS_KEY;

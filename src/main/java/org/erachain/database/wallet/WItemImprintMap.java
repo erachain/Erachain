@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class WItemImprintMap extends WItem_Map {
 
-    //static Logger LOGGER = Logger.getLogger(WItemImprintMap.class.getName());
+    //static Logger LOGGER = LoggerFactory.getLogger(WItemImprintMap.class.getName());
     static final String NAME = "imprint";
     static final int TYPE = ItemCls.IMPRINT_TYPE;
 

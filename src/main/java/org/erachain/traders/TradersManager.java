@@ -4,13 +4,15 @@ package org.erachain.traders;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.utils.ObserverMessage;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-// import org.apache.log4j.Logger;
+// import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 //import org.erachain.core.BlockChain;
 //import org.erachain.database.DBSet;
 //import database.TransactionMap;
@@ -20,7 +22,7 @@ public class TradersManager extends Observable {
 
     protected static final String WALLET_PASSWORD = "123456789";
 
-    private static final Logger LOGGER = Logger.getLogger(TradersManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TradersManager.class);
     private List<Rater> knownRaters;
     private List<Trader> knownTraders;
     //private boolean run;

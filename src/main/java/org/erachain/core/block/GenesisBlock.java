@@ -36,7 +36,8 @@ import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
 
-// import org.apache.log4j.Logger;
+// import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 //import org.erachain.core.item.assets.AssetCls;
 
 public class GenesisBlock extends Block {

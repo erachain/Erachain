@@ -11,7 +11,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.network.message.TelegramMessage;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -38,7 +39,7 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class TelegramsResource {
 
-    private static final Logger LOGGER = Logger.getLogger(TelegramsResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TelegramsResource.class);
 
     @Context
     HttpServletRequest request;

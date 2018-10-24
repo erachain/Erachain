@@ -5,7 +5,8 @@ import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
@@ -26,7 +27,7 @@ import org.erachain.utils.ObserverMessage;
  */
 public class DCSet implements Observer, IDB {
 
-    private static final Logger LOGGER = Logger.getLogger(DCSet.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.HARD_WORK ? 1024 << 10 : 1024 << 5;
     private static final int CASH_SIZE = BlockChain.HARD_WORK ? 1024 << 2 : 1024;
 

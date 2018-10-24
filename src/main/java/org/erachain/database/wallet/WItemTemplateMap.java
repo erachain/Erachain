@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class WItemTemplateMap extends WItem_Map {
 
-    //static Logger LOGGER = Logger.getLogger(WItemTemplateMap.class.getName());
+    //static Logger LOGGER = LoggerFactory.getLogger(WItemTemplateMap.class.getName());
     static final String NAME = "template";
     static final int TYPE = ItemCls.TEMPLATE_TYPE;
 

@@ -6,7 +6,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Serializer;
 
 import org.erachain.core.transCalculated.Calculated;
@@ -14,7 +15,7 @@ import org.erachain.core.transCalculated.CalculatedFactory;
 
 public class CalculatedSerializer implements Serializer<Calculated>, Serializable {
     private static final long serialVersionUID = -6538913048331349777L;
-    static Logger LOGGER = Logger.getLogger(CalculatedSerializer.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(CalculatedSerializer.class.getName());
 
     @Override
     public void serialize(DataOutput out, Calculated value) throws IOException {

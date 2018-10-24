@@ -9,7 +9,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.utils.Pair;
 
 import javax.swing.*;
@@ -24,7 +25,7 @@ import java.util.List;
 
 @SuppressWarnings("serial")
 public class BuyNameFrame extends JFrame {
-    static Logger LOGGER = Logger.getLogger(BuyNameFrame.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(BuyNameFrame.class.getName());
     private JTextField txtName;
     private JComboBox<Account> cbxBuyer;
     private JTextField txtPrice;

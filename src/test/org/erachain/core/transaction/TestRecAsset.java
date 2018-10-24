@@ -7,7 +7,8 @@ import static org.junit.Assert.fail;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
@@ -27,7 +28,7 @@ import org.erachain.ntp.NTP;
 
 public class TestRecAsset {
 
-    static Logger LOGGER = Logger.getLogger(TestRecAsset.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRecAsset.class.getName());
 
     //Long Transaction.FOR_NETWORK = null;
 

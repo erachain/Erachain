@@ -3,7 +3,8 @@ package org.erachain.utils;
 import org.erachain.core.crypto.Base64;
 import org.erachain.gui.*;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.gui.models.KeyValueTableModel;
 
 import java.io.BufferedReader;
@@ -17,7 +18,7 @@ import java.util.zip.GZIPOutputStream;
 
 public class GZIP {
 
-    static Logger LOGGER = Logger.getLogger(GZIP.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(GZIP.class.getName());
 
     private static byte[] GZIPcompress(String str) throws Exception {
         try (ByteArrayOutputStream obj = new ByteArrayOutputStream(); GZIPOutputStream gzip = new GZIPOutputStream(obj);) {

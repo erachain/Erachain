@@ -4,7 +4,8 @@ import org.erachain.core.account.Account;
 import org.erachain.core.naming.NameSale;
 import org.erachain.database.DBMap;
 import org.erachain.datachain.DCMap;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
@@ -22,7 +23,7 @@ public class NameSaleMap extends DCMap<Tuple2<String, String>, BigDecimal> {
     public static final int NAME_INDEX = 1;
     public static final int SELLER_INDEX = 2;
     public static final int AMOUNT_INDEX = 3;
-    static Logger LOGGER = Logger.getLogger(NameSaleMap.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(NameSaleMap.class.getName());
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public NameSaleMap(DWSet dWSet, DB database) {

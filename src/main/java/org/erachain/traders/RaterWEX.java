@@ -3,7 +3,8 @@ package org.erachain.traders;
 
 import org.erachain.api.ApiErrorFactory;
 import com.google.gson.Gson;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun;
@@ -13,7 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-// import org.apache.log4j.Logger;
+// import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 //import org.erachain.core.BlockChain;
 //import org.erachain.database.DBSet;
 //import database.TransactionMap;
@@ -22,7 +24,7 @@ import java.util.TreeMap;
 /// result   "last":9577.769,"buy":9577.769,"sell":9509.466
 public class RaterWEX extends Rater {
 
-    private static final Logger LOGGER = Logger.getLogger(RaterWEX.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RaterWEX.class);
 
     public RaterWEX(TradersManager tradersManager, int sleepSec) {
         super(tradersManager, "wex", sleepSec);
@@ -48,7 +50,7 @@ public class RaterWEX extends Rater {
             json = (JSONObject) JSONValue.parse(result);
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
-            ///LOGGER.info(e);
+            ///LOGGER.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
 

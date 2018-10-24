@@ -17,7 +17,8 @@ import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.datachain.AddressTime_SignatureMap;
 
 //import java.util.Map;
-// import org.apache.log4j.Logger;
+// import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class IssuePersonRecord extends Issue_ItemRecord {
     public static final int MAX_IMAGE_LENGTH = 20480;

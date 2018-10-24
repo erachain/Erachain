@@ -7,7 +7,8 @@ import org.erachain.lang.Lang;
 import org.erachain.lang.LangFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.erachain.settings.Settings;
@@ -26,8 +27,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class SettingLangFrame extends JDialog {
 
-    private static final Logger LOGGER = Logger
-            .getLogger(SettingLangFrame.class);
+    private static final Logger LOGGER = LoggerFactory            .getLogger(SettingLangFrame.class);
     private JList<LangFile> listLang;
     private JComboBox<String> size_Font;
     private JButton nextButton;

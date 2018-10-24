@@ -15,7 +15,8 @@ import org.erachain.gui.PasswordPane;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import jersey.repackaged.com.google.common.primitives.Ints;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.utils.Converter;
 import org.erachain.utils.Pair;
 
@@ -33,7 +34,7 @@ import java.util.List;
 
 @SuppressWarnings("serial")
 public class ResponseAcctFrame extends JFrame {
-    static Logger LOGGER = Logger.getLogger(ResponseAcctFrame.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(ResponseAcctFrame.class.getName());
 
     private JComboBox<Account> cbxFrom;
     private JTextField txtFeePow;

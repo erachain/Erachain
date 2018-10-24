@@ -5,7 +5,8 @@ import org.erachain.core.block.Block;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.BlockHeadSerializer;
 import org.erachain.datachain.DCMap;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
@@ -34,7 +35,7 @@ public class BlocksHeadMap extends DCMap<Tuple2<String, String>, Block.BlockHead
     public static final int BALANCE_INDEX = 3;
     public static final int TRANSACTIONS_INDEX = 4;
     public static final int FEE_INDEX = 5;
-    static Logger LOGGER = Logger.getLogger(BlocksHeadMap.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(BlocksHeadMap.class.getName());
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public BlocksHeadMap(DWSet dWSet, DB database) {

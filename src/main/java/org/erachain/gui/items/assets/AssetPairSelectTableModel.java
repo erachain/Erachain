@@ -9,7 +9,8 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple6;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
@@ -28,7 +29,7 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
     public static final int COLUMN_TRADES_COUNT = 4;
     public static final int COLUMN_TRADES_VOLUME = 5;
 
-    private static final Logger LOGGER = Logger.getLogger(AssetPairSelectTableModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AssetPairSelectTableModel.class);
 
     public long key;
     public List<ItemCls> assets;

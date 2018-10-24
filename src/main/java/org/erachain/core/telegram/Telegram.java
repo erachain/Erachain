@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
@@ -20,7 +21,7 @@ import org.erachain.network.message.MessageFactory;
 public class Telegram extends Observable implements Observer {
 
 	
-	static Logger LOGGER = Logger.getLogger(Telegram.class.getName());
+	static Logger LOGGER = LoggerFactory.getLogger(Telegram.class.getName());
 	public TelegramSet database;
     // time alive telegram
 	protected long aliveTime = 24*60*60*1000;

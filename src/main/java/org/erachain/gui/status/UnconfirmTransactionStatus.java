@@ -6,7 +6,8 @@ import org.erachain.gui.*;
 import org.erachain.gui.items.records.Records_UnConfirmed_Panel;
 import org.erachain.gui2.Main_Panel;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.utils.ObserverMessage;
 
 import javax.swing.*;
@@ -18,7 +19,7 @@ import java.util.Observer;
 
 public class UnconfirmTransactionStatus extends JLabel implements Observer {
 
-    private static final Logger LOGGER = Logger.getLogger(UnconfirmTransactionStatus.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnconfirmTransactionStatus.class);
 
     private TransactionMap map;
     private int counter;

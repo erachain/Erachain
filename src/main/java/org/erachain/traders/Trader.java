@@ -15,7 +15,8 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.gui.models.WalletOrdersTableModel;
 import org.apache.commons.lang3.BitField;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.bouncycastle.jcajce.provider.symmetric.ARC4;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -34,7 +35,7 @@ import java.util.*;
 
 public abstract class Trader extends Thread {
 
-    private static final Logger LOGGER = Logger.getLogger(Trader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Trader.class);
 
     private static final int INVALID_TIMESTAMP = 7;
     private static final int ORDER_DOES_NOT_EXIST = 36;
@@ -167,7 +168,7 @@ public abstract class Trader extends Thread {
                 jsonObject = (JSONObject) JSONValue.parse(result);
             } catch (NullPointerException | ClassCastException e) {
                 //JSON EXCEPTION
-                LOGGER.error(e);
+                LOGGER.error(e.getMessage());
             } finally {
                 this.apiClient.executeCommand("GET wallet/lock");
             }
@@ -213,7 +214,7 @@ public abstract class Trader extends Thread {
             jsonObject = (JSONObject) JSONValue.parse(result);
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
-            LOGGER.info(e);
+            LOGGER.error(e.getMessage());
             //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
         if (!jsonObject.containsKey("id")
@@ -232,7 +233,7 @@ public abstract class Trader extends Thread {
                 jsonObject = (JSONObject) JSONValue.parse(result);
             } catch (NullPointerException | ClassCastException e) {
                 //JSON EXCEPTION
-                LOGGER.info(e);
+                LOGGER.error(e.getMessage());
                 //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
             } finally {
                 this.apiClient.executeCommand("GET wallet/lock");
@@ -283,7 +284,7 @@ public abstract class Trader extends Thread {
             jsonArray = (JSONArray) jsonParser.parse(sendRequest);
         } catch (NullPointerException | ClassCastException | ParseException e) {
             //JSON EXCEPTION
-            LOGGER.info(e);
+            LOGGER.error(e.getMessage());
             //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
             return null;
         }
@@ -339,7 +340,7 @@ public abstract class Trader extends Thread {
             arrayUnconfirmed = (JSONArray) JSONValue.parse(result);
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
-            LOGGER.info(e);
+            LOGGER.error(e.getMessage());
         }
 
         if (arrayUnconfirmed == null)
@@ -477,7 +478,7 @@ public abstract class Trader extends Thread {
                     transaction = (JSONObject) JSONValue.parse(result);
                 } catch (NullPointerException | ClassCastException e) {
                     //JSON EXCEPTION
-                    LOGGER.error(e);
+                    LOGGER.error(e.getMessage());
                 }
 
                 if (transaction == null || !transaction.containsKey("signature"))
@@ -525,7 +526,7 @@ public abstract class Trader extends Thread {
                     jsonObject = (JSONObject) JSONValue.parse(result);
                 } catch (NullPointerException | ClassCastException e) {
                     //JSON EXCEPTION
-                    LOGGER.info(e);
+                    LOGGER.error(e.getMessage());
                     //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
                 }
                 if (jsonObject != null && jsonObject.containsKey("completed")) {

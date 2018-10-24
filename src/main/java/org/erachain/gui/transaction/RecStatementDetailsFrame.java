@@ -10,7 +10,8 @@ import org.erachain.gui.PasswordPane;
 import org.erachain.gui.*;
 import org.erachain.gui.library.library;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
@@ -24,7 +25,7 @@ import java.nio.charset.Charset;
 
 @SuppressWarnings("serial")
 public class RecStatementDetailsFrame extends Rec_DetailsFrame {
-    private static final Logger LOGGER = Logger.getLogger(Send_RecordDetailsFrame.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Send_RecordDetailsFrame.class);
     private JTextPane messageText;
     private RecStatementDetailsFrame th;
 

@@ -10,7 +10,8 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -32,7 +33,7 @@ public class TelegramManager extends Thread {
      * time to live telegram
      */
     private static final int KEEP_TIME = 60000 * 60 * (BlockChain.HARD_WORK ? 2 : 8);
-    static Logger LOGGER = Logger.getLogger(TelegramManager.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TelegramManager.class.getName());
     private Network network;
     private boolean isRun;
     // pool of messages

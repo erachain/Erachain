@@ -10,7 +10,7 @@ import org.erachain.utils.ObserverMessage;
 import java.util.Map;
 
 public class WItemAssetMap extends WItem_Map {
-    //static Logger LOGGER = Logger.getLogger(WItemAssetMap.class.getName());
+    //static Logger LOGGER = LoggerFactory.getLogger(WItemAssetMap.class.getName());
 
     static final String NAME = "asset";
     static final int TYPE = ItemCls.ASSET_TYPE;

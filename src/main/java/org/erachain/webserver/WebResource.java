@@ -49,7 +49,8 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.eclipse.jetty.util.StringUtil;
 import org.erachain.core.web.*;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
@@ -102,7 +103,7 @@ import org.erachain.utils.UpdateUtil;
 @Path("/")
 public class WebResource {
 
-    private static final Logger LOGGER = Logger.getLogger(WebResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebResource.class);
     @Context
     HttpServletRequest request;
     String[] imgsArray = {"Erachain.org.png", "logo_header.png", "Erachain.org-user.png",

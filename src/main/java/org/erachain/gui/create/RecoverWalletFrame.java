@@ -4,7 +4,8 @@ package org.erachain.gui.create;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.settings.Settings;
 
 import javax.swing.*;
@@ -24,7 +25,7 @@ import java.util.List;
 
 @SuppressWarnings("serial")
 public class RecoverWalletFrame extends JFrame {
-    private static final Logger LOGGER = Logger
+    private static final Logger LOGGER = LoggerFactory
             .getLogger(RecoverWalletFrame.class);
     private NoWalletFrame parent;
     private JTextField seedTxt;

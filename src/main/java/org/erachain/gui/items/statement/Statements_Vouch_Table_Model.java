@@ -6,7 +6,8 @@ import org.erachain.core.transaction.R_Vouch;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
@@ -29,7 +30,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
     /**
      *
      */
-    static Logger LOGGER = Logger.getLogger(Statements_Vouch_Table_Model.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Statements_Vouch_Table_Model.class.getName());
     List<R_Vouch> transactions;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator", "Height"});
     private int blockNo;

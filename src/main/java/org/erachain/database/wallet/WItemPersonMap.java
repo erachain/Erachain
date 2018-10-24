@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class WItemPersonMap extends WItem_Map {
 
-    //static Logger LOGGER = Logger.getLogger(WItemPersonMap.class.getName());
+    //static Logger LOGGER = LoggerFactory.getLogger(WItemPersonMap.class.getName());
     static final String NAME = "person";
     static final int TYPE = ItemCls.PERSON_TYPE;
 

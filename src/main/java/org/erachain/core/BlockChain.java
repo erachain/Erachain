@@ -13,7 +13,8 @@ import org.erachain.datachain.BlocksHeadsMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.network.Peer;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.erachain.settings.Settings;
@@ -215,7 +216,7 @@ public class BlockChain {
     public static HashMap<String, String> LOCKED__ADDRESSES = new HashMap<String, String>();
     public static HashMap<String, Tuple3<String, Integer, Integer>> LOCKED__ADDRESSES_PERIOD = new HashMap<String, Tuple3<String, Integer, Integer>>();
     public static HashMap<Long, PublicKeyAccount> ASSET_OWNERS = new HashMap<Long, PublicKeyAccount>();
-    static Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(BlockChain.class.getName());
     private GenesisBlock genesisBlock;
     private long genesisTimestamp;
     private Block waitWinBuffer;

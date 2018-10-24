@@ -14,7 +14,8 @@ import org.erachain.core.transaction.R_Send;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun;
@@ -28,7 +29,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 public class BlockTests {
-    static Logger LOGGER = Logger.getLogger(BlockTests.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(BlockTests.class.getName());
     long ERM_KEY = Transaction.RIGHTS_KEY;
     long FEE_KEY = Transaction.FEE_KEY;
     byte FEE_POWER = (byte) 0;

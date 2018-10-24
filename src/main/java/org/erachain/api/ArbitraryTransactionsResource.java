@@ -7,7 +7,8 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.Transaction;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -27,8 +28,7 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class ArbitraryTransactionsResource {
 
-    private static final Logger LOGGER = Logger
-            .getLogger(ArbitraryTransactionsResource.class);
+    private static final Logger LOGGER = LoggerFactory            .getLogger(ArbitraryTransactionsResource.class);
     @Context
     HttpServletRequest request;
 
@@ -130,7 +130,7 @@ public class ArbitraryTransactionsResource {
             return checkArbitraryTransaction(result);
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
-            LOGGER.info(e);
+            LOGGER.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
     }

@@ -15,7 +15,8 @@ import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.payment.Payment;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -28,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 
 public class TestRec_Send {
 
-    static Logger LOGGER = Logger.getLogger(TestRec_Send.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRec_Send.class.getName());
 
     //Long Transaction.FOR_NETWORK = null;
     long assetKeyTest = 1011;

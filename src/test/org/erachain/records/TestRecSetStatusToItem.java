@@ -14,7 +14,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple5;
 
@@ -31,7 +32,7 @@ import static org.junit.Assert.fail;
 
 public class TestRecSetStatusToItem {
 
-    static Logger LOGGER = Logger.getLogger(TestRecSetStatusToItem.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRecSetStatusToItem.class.getName());
 
     Long releaserReference = null;
 

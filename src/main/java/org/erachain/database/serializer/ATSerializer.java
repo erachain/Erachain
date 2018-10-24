@@ -1,7 +1,8 @@
 package org.erachain.database.serializer;
 
 import org.erachain.at.AT;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Serializer;
 
 import java.io.DataInput;
@@ -11,7 +12,7 @@ import java.io.Serializable;
 
 public class ATSerializer implements Serializer<AT>, Serializable {
     private static final long serialVersionUID = -6538913048331349777L;
-    static Logger LOGGER = Logger.getLogger(ATSerializer.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(ATSerializer.class.getName());
 
     @Override
     public void serialize(DataOutput out, AT value) throws IOException {

@@ -10,7 +10,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.Issue_ItemMap;
 import org.erachain.datachain.Item_Map;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple6;
 import org.erachain.utils.Pair;
@@ -48,7 +49,7 @@ public abstract class ItemCls {
 
     //protected DCMap dbMap;
     //protected DCMap dbIssueMap;
-    static Logger LOGGER = Logger.getLogger(ItemCls.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(ItemCls.class.getName());
     protected String TYPE_NAME = "unknown";
     protected byte[] typeBytes;
     protected PublicKeyAccount owner;

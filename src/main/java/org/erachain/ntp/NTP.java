@@ -3,14 +3,15 @@ package org.erachain.ntp;
 import org.erachain.lang.Lang;
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.net.InetAddress;
 
 public final class NTP {
     private static final long TIME_TILL_UPDATE = 1000 * 60 * 60 * 12;
     private static final String NTP_SERVER = "pool.ntp.org";
-    static Logger LOGGER = Logger.getLogger(NTP.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(NTP.class.getName());
     private static long lastUpdate = 0;
     private static long offset = 0;
 

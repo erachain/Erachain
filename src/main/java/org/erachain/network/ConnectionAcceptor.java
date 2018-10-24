@@ -2,7 +2,8 @@ package org.erachain.network;
 
 import org.erachain.controller.Controller;
 import org.erachain.database.PeerMap;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.settings.Settings;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ import java.net.Socket;
  */
 public class ConnectionAcceptor extends Thread {
 
-    static Logger LOGGER = Logger.getLogger(ConnectionAcceptor.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(ConnectionAcceptor.class.getName());
     private ConnectionCallback callback;
     private ServerSocket socket;
     private boolean isRun;

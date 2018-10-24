@@ -15,7 +15,8 @@ import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.My_JFileChooser;
 import org.erachain.gui.models.WalletItemImprintsTableModel;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
@@ -49,7 +50,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
      *
      */
     private static final long serialVersionUID = 1L;
-    static Logger LOGGER = Logger.getLogger(Accounts_Name_Search_SplitPanel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Accounts_Name_Search_SplitPanel.class.getName());
     protected My_JFileChooser chooser;
     protected int row;
     private Accounts_Name_TableModel tableModelImprints;

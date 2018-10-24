@@ -7,7 +7,8 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
@@ -22,7 +23,7 @@ import static org.junit.Assert.fail;
 
 public class TestRec_Vouch {
 
-    static Logger LOGGER = Logger.getLogger(TestRec_Vouch.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRec_Vouch.class.getName());
 
     //Long releaserReference = null;
 

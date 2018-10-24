@@ -20,7 +20,8 @@ import org.erachain.utils.ByteArrayUtils;
 import org.erachain.utils.DateTimeFormat;
 
 //import java.util.Arrays;
-// import org.apache.log4j.Logger;
+// import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 //import com.google.common.primitives.Ints;
 
 //birthLatitude -90..90; birthLongitude -180..180

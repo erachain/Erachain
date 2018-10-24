@@ -33,7 +33,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
 import org.erachain.controller.Controller;
@@ -56,8 +57,7 @@ import org.erachain.utils.TableMenuPopupUtil;
 @SuppressWarnings("serial")
 public class Mails_Transactions_Table extends JTable implements Observer {
 
-    private static final Logger LOGGER = Logger
-            .getLogger(Mails_Transactions_Table.class);
+    private static final Logger LOGGER = LoggerFactory            .getLogger(Mails_Transactions_Table.class);
     public Boolean incoming;
     Comparator<MessageBuf> comparator = new Comparator<MessageBuf>() {
         public int compare(MessageBuf c1, MessageBuf c2) {

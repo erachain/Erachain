@@ -9,7 +9,8 @@ import java.util.Observer;
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
 import org.erachain.controller.Controller;
@@ -31,7 +32,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
     public static final int COLUMN_BASETARGET = 3;
     public static final int COLUMN_TRANSACTIONS = 4;
     public static final int COLUMN_FEE = 5;
-    static Logger LOGGER = Logger.getLogger(BlocksTableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(BlocksTableModel.class.getName());
     private List<Block.BlockHead> blocks;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator",
             "GB pH WV dtWV", //"Generating Balance",

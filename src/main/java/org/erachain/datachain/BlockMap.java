@@ -7,7 +7,8 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.database.serializer.BlockSerializer;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.*;
 import org.mapdb.Atomic.Var;
 import org.mapdb.Fun.Tuple2;
@@ -33,7 +34,7 @@ import java.util.*;
  */
 public class BlockMap extends DCMap<Integer, Block> {
 
-    static Logger LOGGER = Logger.getLogger(BlockMap.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(BlockMap.class.getName());
 
     public static final int HEIGHT_INDEX = 1; // for GUI
 
@@ -309,17 +310,17 @@ public class BlockMap extends DCMap<Integer, Block> {
     }
 
     public void notifyProcessChain(Block block) {
-        LOGGER.debug("++++++ NOTEFY CHAIN_ADD_BLOCK_TYPE");
+        LOGGER.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE");
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block.blockHead));
-        LOGGER.debug("++++++ NOTEFY CHAIN_ADD_BLOCK_TYPE END");
+        LOGGER.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE END");
     }
 
     public void notifyOrphanChain(Block block) {
-        LOGGER.debug("===== NOTEFY CHAIN_REMOVE_BLOCK_TYPE");
+        LOGGER.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE");
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block.blockHead));
-        LOGGER.debug("===== NOTEFY CHAIN_REMOVE_BLOCK_TYPE END");
+        LOGGER.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE END");
     }
 
 }

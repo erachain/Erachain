@@ -15,7 +15,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.erachain.core.BlockChain;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONArray;
 
 import org.erachain.api.ApiErrorFactory;
@@ -30,7 +31,7 @@ import org.erachain.utils.StrJSonFine;
 @Produces(MediaType.APPLICATION_JSON)
 public class API_TelegramsResource {
 
-    static Logger LOGGER = Logger.getLogger(API_TelegramsResource.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(API_TelegramsResource.class.getName());
 
     @Context
     HttpServletRequest request;

@@ -9,7 +9,8 @@ import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.SortableList;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -17,7 +18,7 @@ import java.util.List;
 
 public class UpdateUtil {
 
-    static Logger LOGGER = Logger.getLogger(UpdateUtil.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(UpdateUtil.class.getName());
 
     public static void repopulateNameStorage(int height) {
         DCSet.getInstance().getNameStorageMap().reset();

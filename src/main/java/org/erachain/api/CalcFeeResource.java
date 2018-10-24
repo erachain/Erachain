@@ -3,7 +3,8 @@ package org.erachain.api;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.Transaction;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.eclipse.jetty.util.StringUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -21,8 +22,7 @@ import java.util.List;
 public class CalcFeeResource {
 
 
-    private static final Logger LOGGER = Logger
-            .getLogger(CalcFeeResource.class);
+    private static final Logger LOGGER = LoggerFactory            .getLogger(CalcFeeResource.class);
 
     @SuppressWarnings("unchecked")
     @POST
@@ -60,7 +60,7 @@ public class CalcFeeResource {
 
         } catch (ClassCastException | NullPointerException e) {
             //JSON EXCEPTION
-            LOGGER.info(e);
+            LOGGER.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
     }

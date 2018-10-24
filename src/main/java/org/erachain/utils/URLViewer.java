@@ -1,6 +1,7 @@
 package org.erachain.utils;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.awt.*;
 import java.net.HttpURLConnection;
@@ -10,7 +11,7 @@ import java.net.URL;
 
 public class URLViewer {
 
-    static Logger LOGGER = Logger.getLogger(URLViewer.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(URLViewer.class.getName());
 
     public static void openWebpage(URI uri) {
         Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;

@@ -16,7 +16,8 @@ import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.CreateOrderDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -30,7 +31,7 @@ import java.math.RoundingMode;
 
 @SuppressWarnings("serial")
 public class CreateOrderPanel extends JPanel {
-    static Logger LOGGER = Logger.getLogger(CreateOrderPanel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(CreateOrderPanel.class.getName());
     public JComboBox<Account> cbxAccount;
     public M_DecimalFormatedTextField txtAmountHave;
     public M_DecimalFormatedTextField txtPrice;

@@ -7,13 +7,14 @@ import org.erachain.datachain.DCSet;
 import org.erachain.network.message.HWeightMessage;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 import org.erachain.settings.Settings;
 
 public class Pinger extends Thread {
 
-    private static final Logger LOGGER = Logger.getLogger(Pinger.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Pinger.class);
     private static final int DEFAULT_QUICK_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 3;
 
     private Peer peer;

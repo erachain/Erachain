@@ -12,7 +12,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -22,8 +23,7 @@ import org.erachain.utils.APIUtils;
 @Produces(MediaType.APPLICATION_JSON)
 public class Rec_PaymentResource {
 
-    private static final Logger LOGGER = Logger
-            .getLogger(Rec_PaymentResource.class);
+    private static final Logger LOGGER = LoggerFactory            .getLogger(Rec_PaymentResource.class);
     @Context
     HttpServletRequest request;
 
@@ -45,7 +45,7 @@ public class Rec_PaymentResource {
             return APIUtils.processPayment(password, sender, feePow, recipient, assetKey, amount, "", request, null);
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
-            LOGGER.info(e);
+            LOGGER.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
 
@@ -72,7 +72,7 @@ public class Rec_PaymentResource {
             return APIUtils.processPayment(password, sender, feePow, recipient, assetKey, amount, x, request, jsonObject);
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
-            LOGGER.info(e);
+            LOGGER.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
 

@@ -8,7 +8,8 @@ import java.util.Observer;
 import javax.swing.table.DefaultTableModel;
 import javax.validation.constraints.Null;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple3;
 
 import org.erachain.controller.Controller;
@@ -33,7 +34,7 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
 
     public static final int COLUMN_MESSAGE = 0;
   //  public static final int COLUMN_DATE = 0;
-    static Logger LOGGER = Logger.getLogger(WalletTelegramsFilterTableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(WalletTelegramsFilterTableModel.class.getName());
     // ItemAssetMap dbItemAssetMap;
     private SortableList<String, Transaction> transactions;
     private String[] columnNames = Lang.getInstance().translate(new String[] { "Message" });

@@ -1,6 +1,5 @@
 package org.erachain;
 
-import org.apache.log4j.Logger;
 import org.erachain.api.ApiClient;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -12,6 +11,8 @@ import org.erachain.log4j.Logging;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SysTray;
 import org.erachain.webserver.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
@@ -28,8 +29,6 @@ import java.util.Scanner;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-import static org.apache.log4j.Level.INFO;
-
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = {org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration.class})
 public class Start {
@@ -40,7 +39,7 @@ public class Start {
     }
 
     public static boolean backUP = false;
-    static Logger LOGGER = Logger.getLogger(Start.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(Start.class);
 
     private static AboutFrame about_frame;
     private static String info;

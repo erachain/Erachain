@@ -5,7 +5,8 @@ package org.erachain.datachain;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBMap;
 import org.erachain.database.wallet.DWSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -27,7 +28,7 @@ import java.util.*;
  */
 public abstract class DCMap<T, U> extends Observable {
 
-    static Logger LOGGER = Logger.getLogger(DCMap.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(DCMap.class.getName());
     protected DCMap<T, U> parent;
     protected IDB databaseSet;
     protected Map<T, U> map;

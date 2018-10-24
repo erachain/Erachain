@@ -2,14 +2,16 @@ package org.erachain.traders;
 // 30/03 ++
 
 import org.erachain.api.ApiErrorFactory;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 
-// import org.apache.log4j.Logger;
+// import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 //import org.erachain.core.BlockChain;
 //import org.erachain.database.DBSet;
 //import database.TransactionMap;
@@ -17,7 +19,7 @@ import java.math.BigDecimal;
 
 public class RaterPolonex extends Rater {
 
-    private static final Logger LOGGER = Logger.getLogger(RaterPolonex.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RaterPolonex.class);
 
     public RaterPolonex(TradersManager tradersManager, int sleepSec) {
         super(tradersManager, "polonex", sleepSec);
@@ -36,7 +38,7 @@ public class RaterPolonex extends Rater {
             json = (JSONObject) JSONValue.parse(result);
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
-            ///LOGGER.info(e);
+            ///LOGGER.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
 

@@ -8,7 +8,8 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.Transaction;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -30,8 +31,7 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class MultiPaymentResource {
 
-    private static final Logger LOGGER = Logger
-            .getLogger(MultiPaymentResource.class);
+    private static final Logger LOGGER = LoggerFactory            .getLogger(MultiPaymentResource.class);
     @Context
     HttpServletRequest request;
 
@@ -153,7 +153,7 @@ public class MultiPaymentResource {
 
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
-            LOGGER.info(e);
+            LOGGER.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
     }

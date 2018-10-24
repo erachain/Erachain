@@ -4,7 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -22,7 +23,7 @@ import org.erachain.ntp.NTP;
 
 public class TestRec_Send_InSideAsset {
 
-    static Logger LOGGER = Logger.getLogger(TestRec_Send_InSideAsset.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRec_Send_InSideAsset.class.getName());
 
     //Long Transaction.FOR_NETWORK = null;
 

@@ -3,7 +3,8 @@ package org.erachain.core.crypto;
 import com.google.common.primitives.Bytes;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.utils.Pair;
 
 import java.security.MessageDigest;
@@ -19,7 +20,7 @@ public class Crypto {
 
     public static final byte ADDRESS_VERSION = 15;
     public static final byte AT_ADDRESS_VERSION = 23;
-    static Logger LOGGER = Logger.getLogger(Crypto.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Crypto.class.getName());
     private static Crypto instance;
 
     private Crypto() {

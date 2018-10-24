@@ -5,7 +5,8 @@ import org.erachain.core.BlockChain;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.ntp.NTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.erachain.settings.Settings;
 
 import java.io.DataInputStream;
@@ -28,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class Peer extends Thread {
 
     private final static boolean need_wait = false;
-    static Logger LOGGER = Logger.getLogger(Peer.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getName());
     // KEEP_ALIVE = false - as web browser - getConnectionTimeout will break connection
     private static boolean KEEP_ALIVE = true;
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго

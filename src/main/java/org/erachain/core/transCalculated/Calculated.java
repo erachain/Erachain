@@ -4,12 +4,14 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
-// import org.apache.log4j.Logger;
+// import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -48,7 +50,7 @@ public abstract class Calculated {
     protected static final int SEQ_NO_LENGTH = 8;
     protected static final int BASE_LENGTH = TYPE_LENGTH + BLOCK_NO_LENGTH + TRANS_NO_LENGTH + SEQ_NO_LENGTH;
 
-    static Logger LOGGER = Logger.getLogger(Calculated.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Calculated.class.getName());
     protected String TYPE_NAME = "unknown";
 
     protected DCSet dcSet;

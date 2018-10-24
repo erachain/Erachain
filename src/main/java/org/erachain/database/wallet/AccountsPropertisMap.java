@@ -2,7 +2,8 @@ package org.erachain.database.wallet;
 
 import org.erachain.database.DBMap;
 import org.erachain.datachain.DCMap;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
@@ -19,7 +20,7 @@ import java.util.TreeMap;
 public class AccountsPropertisMap extends DCMap<String, Tuple2<String, String>> {
     public static final int NAME_INDEX = 1;
     public static final int OWNER_INDEX = 2;
-    static Logger LOGGER = Logger.getLogger(AccountsPropertisMap.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(AccountsPropertisMap.class.getName());
     BTreeMap<String, String> titleIndex;
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 

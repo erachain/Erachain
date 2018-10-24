@@ -27,13 +27,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
-//import org.apache.log4j.Logger;
 
 public class DebugTabPane extends JTabbedPane {
 
     private static final long serialVersionUID = 2717571093561259483L;
     static Logger LOGGER = Logger.getLogger(DebugTabPane.class.getName());
-
 
     private PeersTableModel peersTableModel;
     private Debug_Transactions_Table_Model transactionsTableModel;
@@ -112,13 +110,11 @@ public class DebugTabPane extends JTabbedPane {
             });
             pppp.add(bb);
 
-            //		this.addTab(Lang.getInstance().translate("OffRun"), new JScrollPane(pppp));
-
-
+            //		this.addTab(Lang.getInstance().translate("OffRun"), new JScrollPane(pppp))
         }
 
-        this.loggerTextArea = new LoggerTextArea(LOGGER);
-        JScrollPane scrollPane = new JScrollPane(this.loggerTextArea);
+        loggerTextArea = new LoggerTextArea(LOGGER);
+        JScrollPane scrollPane = new JScrollPane(loggerTextArea);
         JScrollBar vertical = scrollPane.getVerticalScrollBar();
         vertical.setValue(vertical.getMaximum());
         //      this.addTab("Logger", scrollPane);
