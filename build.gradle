@@ -11,9 +11,10 @@ plugins {
     id 'java'
     id 'idea'
     id 'org.springframework.boot' version '2.0.5.RELEASE'
+ //   id 'io.spring.dependency-management'
 
 }
-
+apply plugin: 'io.spring.dependency-management'
 ext {
     git = org.ajoberstar.grgit.Grgit.open()
     rev = git.head().id
@@ -30,7 +31,7 @@ archivesBaseName = 'erachain-dev'
 group 'org.erachain'
 version versionEra
 sourceCompatibility = 1.8
-
+String fullName = 'erachain-dev-' + versionEra
 repositories {
     mavenCentral()
     maven {
@@ -43,9 +44,11 @@ compileJava {
 }
 
 jar {
+    baseName = "erachain-dev"
+    enabled = true
     destinationDir project.file('build/libs/' + versionEra + '/bin')
     manifest {
-        attributes('Main-Class': 'org.Start',
+        attributes('Main-Class': 'org.erachain.Start',
                 'Implementation-Title': 'Gradle Build: ' + project.name,
                 'Implementation-Version': project.version,
                 'Build-Time': new Date().format("yyyy-MM-dd HH:mm:ssZ"),
@@ -74,7 +77,7 @@ sourceSets {
 }
 
 build {
-        finalizedBy = ["CopyResourse", "CreateZip"]
+    //    finalizedBy = ["CopyResourse", "CreateZip"]
 }
 
 task CopyResourse {
@@ -151,4 +154,5 @@ dependencies {
 
     compile "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
     compile "org.springframework.boot:spring-boot:${springbootVersion}"
+   // classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.5.RELEASE")
 }
