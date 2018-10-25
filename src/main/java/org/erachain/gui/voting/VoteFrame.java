@@ -13,7 +13,6 @@ import org.erachain.gui.AccountRenderer;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.ComboBoxModelItemsAll;
 import org.erachain.gui.models.AccountsComboBoxModel;
-import org.erachain.gui.*;
 import org.erachain.gui.models.OptionsComboBoxModel_old;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Pair;
@@ -190,7 +189,7 @@ public class VoteFrame extends JFrame {
         //TXT FEE
         detailGBC.gridy = 6;
         this.txtFeePow = new JTextField();
-        this.txtFeePow.setText("1");
+        this.txtFeePow.setText("0");
         this.add(this.txtFeePow, detailGBC);
 
         //ADD EXCHANGE BUTTON

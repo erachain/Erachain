@@ -9,9 +9,9 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.lang.Lang;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -130,7 +130,7 @@ public class BuyNameFrame extends JFrame {
         //TXT FEE
         txtGBC.gridy = 4;
         txtFeePow = new JTextField();
-        this.txtFeePow.setText("1");
+        this.txtFeePow.setText("0");
         this.add(txtFeePow, txtGBC);
 
         //BUTTON BUY

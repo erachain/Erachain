@@ -197,7 +197,7 @@ public class Polls_Dialog extends JDialog {
         // TXT FEE
         detailGBC.gridy = 6;
         this.txtFeePow = new JTextField();
-        this.txtFeePow.setText("1");
+        this.txtFeePow.setText("0");
         this.add(this.txtFeePow, detailGBC);
 
         // ADD EXCHANGE BUTTON

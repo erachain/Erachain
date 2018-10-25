@@ -7,18 +7,16 @@ import org.erachain.core.naming.Name;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.*;
-import org.erachain.gui.*;
 import org.erachain.gui.models.KeyValueTableModel;
 import org.erachain.gui.models.NameComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.erachain.utils.Corekeys;
 import org.erachain.utils.GZIP;
 import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.Pair;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -287,7 +285,7 @@ public class UpdateNameFrame extends JFrame {
         //TXT FEE
         txtGBC.gridy = 9;
         txtFeePow = new JTextField();
-        this.txtFeePow.setText("1");
+        this.txtFeePow.setText("0");
         this.add(txtFeePow, txtGBC);
 
         //BUTTON Register

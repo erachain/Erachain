@@ -5,7 +5,6 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.naming.NameSale;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.*;
 import org.erachain.gui.models.NameSalesComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -134,7 +133,7 @@ public class CancelSellNameFrame extends JFrame {
         //TXT FEE
         txtGBC.gridy = 4;
         txtFeePow = new JTextField();
-        this.txtFeePow.setText("1");
+        this.txtFeePow.setText("0");
         this.add(txtFeePow, txtGBC);
 
         //BUTTON CANCEL SALE

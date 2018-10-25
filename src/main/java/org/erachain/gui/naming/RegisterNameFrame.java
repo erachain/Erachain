@@ -293,7 +293,7 @@ public class RegisterNameFrame extends JFrame {
         //TXT FEE
         txtGBC.gridy = 9;
         this.txtFeePow = new JTextField();
-        this.txtFeePow.setText("1");
+        this.txtFeePow.setText("0");
         this.add(this.txtFeePow, txtGBC);
 
         //BUTTON Register

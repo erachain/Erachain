@@ -163,7 +163,7 @@ public class CreatePollFrame extends JFrame {
         //TXT FEE
         txtGBC.gridy = 5;
         this.txtFee = new JTextField();
-        this.txtFee.setText("1");
+        this.txtFee.setText("0");
         this.add(this.txtFee, txtGBC);
 
         //BUTTON Register
