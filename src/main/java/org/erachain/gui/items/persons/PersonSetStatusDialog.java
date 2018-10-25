@@ -1,6 +1,7 @@
 package org.erachain.gui.items.persons;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.toedter.calendar.JDateChooser;
 import org.erachain.controller.Controller;
@@ -19,7 +20,6 @@ import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.records.Record_Info;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.gui.transaction.SetStatusToItemDetailsFrame;
-import jersey.repackaged.com.google.common.primitives.Ints;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;

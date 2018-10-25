@@ -11,18 +11,13 @@ plugins {
     id 'java'
     id 'idea'
     id 'org.springframework.boot' version '2.0.5.RELEASE'
-
 }
-apply plugin: 'io.spring.dependency-management'
+
 ext {
     git = org.ajoberstar.grgit.Grgit.open()
     rev = git.head().id
     rev = git.head().getAbbreviatedId(8)
-    logbackVersion = '1.2.3'
     springbootVersion = '2.0.5.RELEASE'
-    jerseyVersion = '2.27'
-
-
 }
 
 String versionEra = "4.11.05-${git.head().abbreviatedId}"
@@ -30,7 +25,7 @@ archivesBaseName = 'erachain-dev'
 group 'org.erachain'
 version versionEra
 sourceCompatibility = 1.8
-String fullName = 'erachain-dev-' + versionEra
+
 repositories {
     mavenCentral()
     maven {
@@ -41,16 +36,15 @@ repositories {
 compileJava {
     options.encoding = "UTF-8"
 }
-bootJar{
-    destinationDir project.file('build/libs/' + versionEra + '/bin')
-}
 
-jar {
+bootJar {
     baseName = "erachain-dev"
-    enabled = true
     destinationDir project.file('build/libs/' + versionEra + '/bin')
+
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+
     manifest {
-        attributes('Main-Class': 'org.erachain.Start',
+        attributes(
                 'Implementation-Title': 'Gradle Build: ' + project.name,
                 'Implementation-Version': project.version,
                 'Build-Time': new Date().format("yyyy-MM-dd HH:mm:ssZ"),
@@ -58,10 +52,6 @@ jar {
                 'Git-Branch': git.branch.current.getName()
         )
     }
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    exclude('META-INF/*.SF')
-    exclude('META-INF/*.DSA')
-    exclude('META-INF/*.RSA')
 }
 
 sourceSets {
@@ -79,20 +69,26 @@ sourceSets {
 }
 
 build {
-    //    finalizedBy = ["CopyResourse", "CreateZip"]
+    finalizedBy = ["CreateZip", "CopyResourse"]
 }
 
 task CopyResourse {
-    doFirst {
-        copy {
+
+    copy {
             from 'ERA'
             into 'build/libs/' + versionEra + '/bin'
-            include '*.bat'
-            include '*.properties'
+           // include '*.bat'
+        // include '*.properties'
             include 'Erachain Licence*'
             include 'peers*'
         }
-        copy {
+    copy {
+        from "ERA"
+        into 'build/libs/' + versionEra + '/bin'
+        include '*.bat'
+    }
+
+    copy {
             from 'ERA/web'
             into 'build/libs/' + versionEra + '/bin/web'
         }
@@ -112,9 +108,9 @@ task CopyResourse {
             from 'ERA/images'
             into 'build/libs/' + versionEra + '/bin/images'
         }
-    }
 }
 task CreateZip(type: Zip) {
+
     from 'build/libs/' + versionEra + '/bin'
     include '*'
     include '*/*'
@@ -156,5 +152,4 @@ dependencies {
 
     compile "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
     compile "org.springframework.boot:spring-boot:${springbootVersion}"
-   // classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.5.RELEASE")
 }
