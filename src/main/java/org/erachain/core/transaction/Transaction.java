@@ -1,27 +1,8 @@
 package org.erachain.core.transaction;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.erachain.core.item.persons.PersonCls;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple4;
-
-// import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -32,10 +13,22 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.AddressTime_SignatureMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple4;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
+import java.util.*;
+
+// import org.slf4j.LoggerFactory;
 
 //import java.math.RoundingMode;
 //import java.math.MathContext;
@@ -669,7 +662,9 @@ public abstract class Transaction {
 
     public abstract boolean hasPublicText();
 
-    public  int getJobLevel() {return 200;}
+    public int getJobLevel() {
+        return 100;
+    }
 
     public int calcCommonFee() {
         int len = this.getDataLength(Transaction.FOR_NETWORK, true);
