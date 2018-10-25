@@ -1,5 +1,6 @@
 package org.erachain.gui.at;
 
+import com.google.common.primitives.Ints;
 import org.erachain.at.AT_Constants;
 import org.erachain.at.AT_Error;
 import com.google.common.primitives.Bytes;
@@ -13,7 +14,6 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.models.AccountsComboBoxModel;
-import jersey.repackaged.com.google.common.primitives.Ints;
 import org.erachain.lang.Lang;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
