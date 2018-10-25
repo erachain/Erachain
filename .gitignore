@@ -23,3 +23,4 @@ gui_settings.json
 /ERA/temp/
 /ERA/wallet*/
 /ERA/telegram/
+*.log
