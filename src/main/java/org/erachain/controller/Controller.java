@@ -2,14 +2,13 @@ package org.erachain.controller;
 
 import com.google.common.primitives.Longs;
 import org.apache.commons.io.FileUtils;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.erachain.api.ApiClient;
 import org.erachain.api.ApiService;
 import org.erachain.at.AT;
 import org.erachain.core.BlockChain;
 import org.erachain.core.BlockGenerator;
+import org.erachain.core.BlockGenerator.ForgingStatus;
 import org.erachain.core.Synchronizer;
 import org.erachain.core.TransactionCreator;
 import org.erachain.core.account.Account;
@@ -27,8 +26,8 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
-import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.polls.Poll;
+import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
@@ -44,7 +43,6 @@ import org.erachain.database.DBSet;
 import org.erachain.datachain.*;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
-import org.erachain.core.BlockGenerator.ForgingStatus;
 import org.erachain.lang.Lang;
 import org.erachain.network.Network;
 import org.erachain.network.Peer;
@@ -57,6 +55,8 @@ import org.erachain.webserver.WebService;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.*;
@@ -849,7 +849,17 @@ public class Controller extends Observable {
         // a = this.blockGenerator.isAlive() ;
         // while(this.blockGenerator.isAlive()){
         // };
+
         this.synchronizer.stop();
+
+        // WAITING STOP MAIN PROCESS
+        LOGGER.info("Waiting stopping processors");
+        while (blockGenerator.getStatus() >= 0) {
+            try {
+                Thread.sleep(100);
+            } catch (Exception e) {
+            }
+        }
 
         // CLOSE DATABABASE
         LOGGER.info("Closing database");

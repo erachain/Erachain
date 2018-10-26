@@ -1,26 +1,9 @@
 package org.erachain.core;
 
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-
-import org.erachain.at.AT_Block;
-import org.erachain.at.AT_Constants;
-import org.erachain.at.AT_Controller;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.Block;
-import org.erachain.core.block.BlockFactory;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
@@ -31,6 +14,13 @@ import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.TransactionTimestampComparator;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * основной верт, решающий последовательно три задачи - либо собираем блок, проверяем отставание от сети
@@ -597,6 +587,7 @@ public class BlockGenerator extends Thread implements Observer {
 
                                 if (generatedBlock == null) {
                                     if (ctrl.isOnStopping()) {
+                                        this.status = -1;
                                         return;
                                     }
 
@@ -799,13 +790,16 @@ public class BlockGenerator extends Thread implements Observer {
 
             } catch (Exception e) {
                 if (ctrl.isOnStopping()) {
-                    status = -1;
+                    this.status = -1;
                     return;
                 }
                 LOGGER.error(e.getMessage(), e);
 
             }
         }
+
+        // EXITED
+        this.status = -1;
     }
 
     @Override
