@@ -1,20 +1,19 @@
 package org.erachain.core.telegram;
 // 09/03
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.telegram.TelegramSet;
 import org.erachain.network.Peer;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 
 
@@ -65,7 +64,11 @@ public class Telegram extends Observable implements Observer {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-           for ( Transaction transaction:database.getTelegramsMap().getValuesAll()){
+
+             if (Controller.getInstance().isOnStopping())
+                 return;
+
+             for (Transaction transaction : database.getTelegramsMap().getValuesAll()) {
              if ( transaction.getTimestamp()< (System.currentTimeMillis()-aliveTime)) 
                  database.getTelegramsMap().delete(transaction.viewSignature());
             }
