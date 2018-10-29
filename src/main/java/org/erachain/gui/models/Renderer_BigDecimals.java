@@ -1,65 +1,47 @@
 package org.erachain.gui.models;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.math.BigDecimal;
 
+/**
+ *
+ * @author  Ermolaev Alexander
+ * @see JTable
+ */
+public class Renderer_BigDecimals extends DefaultTableCellRenderer
 
-public class Renderer_BigDecimals extends JFormattedTextField implements TableCellRenderer {
-    private static final long serialVersionUID = 1L;
-    int roww = 0;
-    int rowww = 1;
-    int n = 0;
-    int row1 = 0;
-    FontMetrics fontMetrics;
-    int rowHeight;
-    Boolean[] column_auto_Height;
-    static DecimalFormat ff = (DecimalFormat) DecimalFormat.getInstance();
+{
 
-    //   FontMetrics fontMetrics = table.getFontMetrics(table.getFont());
+    private int scale;
+    /**
+     * Creates a BigDecimal table cell renderer.
+     ** @param scale the scale digits view
+     */
     public Renderer_BigDecimals(Integer scale) {
-        //	fontMetrics=fontMetrics1;	
-        super(ff);
-        ff.setMaximumFractionDigits(scale);
-        ff.setMinimumFractionDigits(scale);
-        setOpaque(true);
-        setBackground(new Color(255, 255, 220));
-        setHorizontalAlignment(JLabel.RIGHT);//.RIGHT);
-   
+        super();
+        this.scale = scale;
+        setHorizontalAlignment(JLabel.RIGHT);
     }
 
+
+    /**
+     * Sets the <code>String</code> object for the cell being rendered to
+     * <code>value</code>.
+     *
+     * @param value  the string value for this cell; if value is
+     *          <code>null</code> it sets the text value to an empty string
+     * @see JLabel#setText
+     *
+     */
     @Override
-    public Component getTableCellRendererComponent(JTable table,
-                                                   Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-       
-       
-         // using L&F colors
-            setForeground(isSelected ?
-                UIManager.getColor("Table.selectionForeground") :
-                UIManager.getColor("Table.foreground"));
-            setBackground(isSelected ?
-                UIManager.getColor("Table.selectionBackground") :
-                UIManager.getColor("Table.background"));
-           
-               
-     //           BorderFactory.createEmptyBorder(BT, BT, BT, BT));
-     //       setIcon(icon);
-     //       return this;
-            
-            
-     //   }
+    protected void setValue(Object value) {
 
-        if (hasFocus) {
-            BorderFactory.createLineBorder(UIManager.getColor("Table.LineBorder"), 1) ;
-        } else {
-            setBorder(new LineBorder(null, 0));
+        try {
+            setText((value == null) ? "" :  ((BigDecimal)value).setScale(scale).toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            setText("");
         }
-
-        setValue(value);
-
-        return this;
     }
 }
