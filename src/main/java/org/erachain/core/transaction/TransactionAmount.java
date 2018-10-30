@@ -424,7 +424,7 @@ public abstract class TransactionAmount extends Transaction {
             }
         }
 
-        int height = this.getBlockHeightByParentOrLast(dcSet);
+        int height = this.height > 0 ? this.height : this.getBlockHeightByParentOrLast(dcSet);
         boolean wrong = true;
         
         // CHECK IF RECIPIENT IS VALID ADDRESS
@@ -453,7 +453,8 @@ public abstract class TransactionAmount extends Transaction {
         }
 
         // CHECK IF AMOUNT AND ASSET
-        if (this.amount != null) {
+        if ((flags & NOT_VALIDATE_FLAG_BALANCE) == 0l
+                && this.amount != null) {
             
             int amount_sign = this.amount.signum();
             if (amount_sign != 0
