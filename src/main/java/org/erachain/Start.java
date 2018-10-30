@@ -29,8 +29,7 @@ import java.util.Scanner;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-@SpringBootApplication
-@EnableAutoConfiguration(exclude = {org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration.class})
+@SpringBootApplication(exclude = {org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration.class})
 public class Start {
 
     @Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)

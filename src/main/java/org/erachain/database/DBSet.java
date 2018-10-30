@@ -1,9 +1,9 @@
 package org.erachain.database;
 // 30/03 ++
 
+import org.erachain.settings.Settings;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
-import org.erachain.settings.Settings;
 
 import java.io.File;
 
@@ -43,7 +43,7 @@ public class DBSet implements IDB {
         DATA_FILE.getParentFile().mkdirs();
 
         database = DBMaker.newFileDB(DATA_FILE)
-                .closeOnJvmShutdown()
+                // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 //.cacheDisable()
                 .checksumEnable()
                 .mmapFileEnableIfSupported()

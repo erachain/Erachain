@@ -1,15 +1,6 @@
 package org.erachain.datachain;
 // upd 09/03
 
-import java.io.File;
-import java.util.Observable;
-import java.util.Observer;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.ItemCls;
@@ -19,6 +10,14 @@ import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * набор таблиц. Поидее тут нужно хранить список таблиц и ссылку на родителя при Форке базы.
@@ -372,7 +371,7 @@ public class DCSet implements Observer, IDB {
         /// https://jankotek.gitbooks.io/mapdb/performance/
         //CREATE DATABASE
         DB database = DBMaker.newFileDB(dbFile)
-                .closeOnJvmShutdown()
+                // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 //.cacheSize(CASH_SIZE)
                 //.cacheDisable()
                 .checksumEnable()
@@ -385,7 +384,6 @@ public class DCSet implements Observer, IDB {
                 //.cacheHardRefEnable()
 
                 /*
-                .closeOnJvmShutdown()
                 .cacheSize(CASH_SIZE)
                 //.checksumEnable()
                 .cacheHardRefEnable()
@@ -441,7 +439,7 @@ public class DCSet implements Observer, IDB {
         /// https://jankotek.gitbooks.io/mapdb/performance/
         //CREATE DATABASE
         return DBMaker.newFileDB(dbFile)
-                .closeOnJvmShutdown()
+                // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 .transactionDisable()
                 .cacheSize(1024)
                 //.cacheDisable()
