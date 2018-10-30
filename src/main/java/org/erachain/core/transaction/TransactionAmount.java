@@ -881,6 +881,13 @@ public abstract class TransactionAmount extends Transaction {
             }
         }
 
+        // так как мы не лезем в супер класс то тут проверим тоже ее
+        if ((flags & NOT_VALIDATE_KEY_COLLISION) == 0l
+                && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
+            // потому что мы ключ урезали до 12 байт - могут быть коллизии
+            return KEY_COLLISION;
+        }
+
         return VALIDATE_OK;
     }
     
