@@ -691,10 +691,11 @@ public abstract class Transaction {
         }
 
         int minLen = getJobLevel();
-        if (this.height > BlockChain.VERS_4_11
-            && len < minLen)
-            len = minLen;
+        if (this.height < BlockChain.VERS_4_11)
+            return len * BlockChain.FEE_PER_BYTE_4_10;
 
+        if (len < minLen)
+            len = minLen;
 
         return len * BlockChain.FEE_PER_BYTE;
 
