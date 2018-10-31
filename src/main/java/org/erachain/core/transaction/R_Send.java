@@ -1,21 +1,19 @@
 package org.erachain.core.transaction;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
+import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
+import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.crypto.Base58;
+import org.json.simple.JSONObject;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-
-import org.json.simple.JSONObject;
-
-import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
-
-import org.erachain.core.BlockChain;
-import org.erachain.core.account.Account;
-import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.crypto.Base58;
 
 /*
 
@@ -383,7 +381,7 @@ public class R_Send extends TransactionAmount {
 
     @Override
     public boolean hasPublicText() {
-        if (head.length() > 2
+        if (head.length() > 100
         ) {
             String[] words = head.split("[:., _-]");
             for (String word: words) {
