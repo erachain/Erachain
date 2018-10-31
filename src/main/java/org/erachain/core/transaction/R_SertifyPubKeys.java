@@ -560,7 +560,9 @@ public class R_SertifyPubKeys extends Transaction {
             }
         }
 
-        if (!personalized) {
+        if (!personalized
+                || this.height < BlockChain.VERS_4_11 // TODO: remove it on new CHAIN (for 4.10 error calculated)
+        ) {
             // IT IS NOT VOUCHED PERSON
 
             PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
