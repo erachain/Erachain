@@ -34,7 +34,7 @@ public class R_SertifyPubKeys extends Transaction {
     BigDecimal BONUS_FOR_PERSON_4_11 = new BigDecimal("0.009"); // 30 КФТ
     BigDecimal BONUS_FOR_PERSON_REGISTRATOR_4_11 = new BigDecimal("0.015"); // 50 КФТ
     BigDecimal BONUS_FOR_PERSON_SERTIFIER_4_11 = new BigDecimal("0.006"); // 20КФТ
-    long BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 = 0;
+    int BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 = 0;
     BigDecimal BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11
             = BigDecimal.valueOf(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BlockChain.FEE_SCALE);
 
@@ -629,7 +629,7 @@ public class R_SertifyPubKeys extends Transaction {
 
                 ///////// INVITER
                 if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0) {
-                    process_gifts(BlockChain.FEE_INVITED_DEEP, BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, false);
+                    process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, false);
                     issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11);
                 }
 
@@ -777,7 +777,7 @@ public class R_SertifyPubKeys extends Transaction {
 
                 ///////// INVITER
                 if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0) {
-                    process_gifts(BlockChain.FEE_INVITED_DEEP, BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, true);
+                    process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, true);
                     issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11);
                 }
 

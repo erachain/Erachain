@@ -1275,7 +1275,7 @@ public abstract class Transaction {
             }
         }
 
-        if (level < BlockChain.FEE_INVITED_DEEP ) {
+        if (level > 0) {
 
             long fee_gift_next = fee_gift >> BlockChain.FEE_INVITED_SHIFT_IN_LEVEL;
             long fee_gift_get = fee_gift - fee_gift_next;
@@ -1283,7 +1283,7 @@ public abstract class Transaction {
             inviterAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE), false);
 
             if (fee_gift_next > 0) {
-                process_gifts(++level, fee_gift_next, inviterAccount, asOrphan);
+                process_gifts(--level, fee_gift_next, inviterAccount, asOrphan);
             }
 
         } else {
@@ -1318,7 +1318,7 @@ public abstract class Transaction {
 
             // Multi Level Referal
             if (this.height < BlockChain.VERS_4_11)
-                process_gifts(0, getInvitedFee(), this.creator, false);
+                process_gifts(BlockChain.FEE_INVITED_DEEP, getInvitedFee(), this.creator, false);
 
             String creatorAddress = this.creator.getAddress();
             AddressTime_SignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();
@@ -1358,7 +1358,7 @@ public abstract class Transaction {
 
             // calc INVITED FEE
             if (this.height < BlockChain.VERS_4_11)
-                process_gifts(0, getInvitedFee(), this.creator, true);
+                process_gifts(BlockChain.FEE_INVITED_DEEP, getInvitedFee(), this.creator, true);
 
             // UPDATE REFERENCE OF SENDER
             if (this.isReferenced()) {
