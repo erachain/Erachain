@@ -624,7 +624,7 @@ public class TelegramsResource {
         Controller controller = Controller.getInstance();
 
         Integer count = controller.TelegramInfo();
-        jsonObject.put("count telegram", count);
+        jsonObject.put("count", count);
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
