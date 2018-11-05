@@ -1,17 +1,8 @@
 package org.erachain.core.transaction;
 
-import java.math.BigDecimal;
-import java.util.*;
-
-import org.erachain.core.item.persons.PersonCls;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -23,7 +14,14 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 
 // if person has not ALIVE status - add it
@@ -36,7 +34,7 @@ public class R_SertifyPubKeys extends Transaction {
     BigDecimal BONUS_FOR_PERSON_4_11 = new BigDecimal("0.009"); // 30 КФТ
     BigDecimal BONUS_FOR_PERSON_REGISTRATOR_4_11 = new BigDecimal("0.015"); // 50 КФТ
     BigDecimal BONUS_FOR_PERSON_SERTIFIER_4_11 = new BigDecimal("0.006"); // 20КФТ
-    long BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 = 0;
+    int BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 = 0;
     BigDecimal BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11
             = BigDecimal.valueOf(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BlockChain.FEE_SCALE);
 
@@ -562,7 +560,9 @@ public class R_SertifyPubKeys extends Transaction {
             }
         }
 
-        if (!personalized) {
+        if (!personalized
+                || this.height < BlockChain.VERS_4_11 // TODO: remove it on new CHAIN (for 4.10 error calculated)
+        ) {
             // IT IS NOT VOUCHED PERSON
 
             PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
@@ -595,15 +595,15 @@ public class R_SertifyPubKeys extends Transaction {
 
                 // BACK FEE FOR ISSUER without gift for this.CREATOR
                 issuer.changeBalance(db, false, FEE_KEY,
-                        issued_FEE_BD.subtract(BlockChain.GIFTED_COMPU_AMOUNT_BD), false);
+                        issued_FEE_BD.subtract(BlockChain.GIFTED_COMPU_AMOUNT_BD_4_10), false);
 
                 // GIVE GIFT for Witness this PUB_KEY
-                this.creator.changeBalance(db, false, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_BD, false);
-                pkAccount.changeBalance(db, false, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD, false);
+                this.creator.changeBalance(db, false, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_BD_4_10, false);
+                pkAccount.changeBalance(db, false, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD_4_10, false);
 
                 // ADD to EMISSION (with minus)
                 GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY,
-                        issued_FEE_BD.add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD), true);
+                        issued_FEE_BD.add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD_4_10), true);
 
             } else {
 
@@ -629,7 +629,7 @@ public class R_SertifyPubKeys extends Transaction {
 
                 ///////// INVITER
                 if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0) {
-                    process_gifts(BlockChain.FEE_INVITED_DEEP, BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, false);
+                    process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, false);
                     issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11);
                 }
 
@@ -743,11 +743,11 @@ public class R_SertifyPubKeys extends Transaction {
 
                 // BACK FEE FOR ISSUER without gift for this.CREATOR
                 transPersonIssue.getCreator().changeBalance(db, true, FEE_KEY,
-                        issued_FEE_BD.subtract(BlockChain.GIFTED_COMPU_AMOUNT_BD), false);
+                        issued_FEE_BD.subtract(BlockChain.GIFTED_COMPU_AMOUNT_BD_4_10), false);
 
                 // GIVE GIFT for Witness this PUB_KEY
-                this.creator.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_BD, false);
-                pkAccount.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD, false);
+                this.creator.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_BD_4_10, false);
+                pkAccount.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD_4_10, false);
 
                 // ADD to EMISSION (with minus)
                 GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY,
@@ -777,7 +777,7 @@ public class R_SertifyPubKeys extends Transaction {
 
                 ///////// INVITER
                 if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0) {
-                    process_gifts(BlockChain.FEE_INVITED_DEEP, BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, true);
+                    process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, true);
                     issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11);
                 }
 

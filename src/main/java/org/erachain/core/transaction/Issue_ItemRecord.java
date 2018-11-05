@@ -7,10 +7,10 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.json.simple.JSONObject;
 import org.erachain.utils.Pair;
+import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
@@ -227,7 +227,7 @@ public abstract class Issue_ItemRecord extends Transaction {
     @Override
     public long calcBaseFee() {
         if (this.height < BlockChain.VERS_4_11)
-            return calcCommonFee() + BlockChain.FEE_PER_BYTE * 64 * BlockChain.ISSUE_MULT_FEE;
+            return calcCommonFee() + BlockChain.FEE_PER_BYTE_4_10 * 128 * BlockChain.ISSUE_MULT_FEE;
 
         return calcCommonFee() + BlockChain.FEE_PER_BYTE * 15000; // x 50 Financial Transaction Commission
 

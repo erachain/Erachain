@@ -1,21 +1,8 @@
 package org.erachain.core.block;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
-
-import com.google.common.primitives.Longs;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple5;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
-
+import com.google.common.primitives.Longs;
 import org.erachain.at.AT_Block;
 import org.erachain.at.AT_Controller;
 import org.erachain.at.AT_Exception;
@@ -34,6 +21,17 @@ import org.erachain.datachain.TransactionFinalMapSigns;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Converter;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple5;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 /**
  * обработка блоков - все что с ними связано. Без базы данных - сухие данные в вакууме
@@ -739,20 +737,22 @@ public class Block {
 
         int inDay30 = BlockChain.BLOCKS_PER_DAY * 30;
 
-        BigDecimal bonusFee = BlockChain.MIN_FEE_IN_BLOCK;
+        BigDecimal bonusFee; // = BlockChain.MIN_FEE_IN_BLOCK;
 
         if(true || this.heightBlock < BlockChain.VERS_4_12) {
+            bonusFee = BlockChain.MIN_FEE_IN_BLOCK_4_10;
             if (this.heightBlock < inDay30 << 1)
                 ;
             else if (this.heightBlock < inDay30 << 2) // 120 days = 4 mounth
                 bonusFee = bonusFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-            else if (this.heightBlock < inDay30 << 3) // 16 mounth
-                bonusFee = bonusFee.divide(new BigDecimal(3), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-            else if (false && this.heightBlock < inDay30 << 4) //  64 mounth
+            else if (this.heightBlock < inDay30 << 3) // 16 mounth - 72000
                 bonusFee = bonusFee.divide(new BigDecimal(4), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+            else if (false && this.heightBlock < inDay30 << 4) //  64 mounth
+                bonusFee = bonusFee.divide(new BigDecimal(8), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
             else
                 bonusFee = bonusFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
         } else {
+            bonusFee = BlockChain.MIN_FEE_IN_BLOCK;
             if (this.heightBlock < inDay30 << 1)
                 ;
             else if (this.heightBlock < inDay30 << 2) // 120 days = 4 mounth
