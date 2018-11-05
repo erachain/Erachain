@@ -11,6 +11,8 @@ import org.erachain.core.transaction.ArbitraryTransactionV3;
 import org.erachain.core.transaction.R_Send;
 import org.erachain.gui.*;
 import org.erachain.gui.*;
+import org.erachain.gui.transaction.ArbitraryTransactionDetailsFrame;
+import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.ntp.NTP;
 import org.junit.Ignore;
 import org.junit.Test;

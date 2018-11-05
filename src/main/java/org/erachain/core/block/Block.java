@@ -1510,17 +1510,19 @@ public class Block {
         }
 
         //UPDATE GENERATOR BALANCE WITH FEE
-        BigDecimal totalFee = new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE);
-        this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY,
-                totalFee, true);
+        if (this.blockHead.totalFee != 0) {
+            BigDecimal totalFee = new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE);
+            this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY,
+                    totalFee, true);
 
-        // MAKE CALCULATED TRANSACTIONS
-        if (!dcSet.isFork() && !asOrphan) {
-            if (this.txCalculated == null)
-                this.txCalculated = new ArrayList<R_Calculated>();
+            // MAKE CALCULATED TRANSACTIONS
+            if (!dcSet.isFork() && !asOrphan) {
+                if (this.txCalculated == null)
+                    this.txCalculated = new ArrayList<R_Calculated>();
 
-            this.txCalculated.add(new R_Calculated(this.creator, Transaction.FEE_KEY,
-                    totalFee,"forging", Transaction.makeDBRef(this.heightBlock, 0)));
+                this.txCalculated.add(new R_Calculated(this.creator, Transaction.FEE_KEY,
+                        totalFee, "forging", Transaction.makeDBRef(this.heightBlock, 0)));
+            }
         }
 
         if (emittedFee != 0) {

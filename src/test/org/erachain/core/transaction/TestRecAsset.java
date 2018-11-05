@@ -21,7 +21,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
-import core.item.assets.AssetUnique;
+import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;

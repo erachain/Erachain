@@ -102,7 +102,7 @@ public abstract class TransactionAmount extends Transaction {
 
     protected Account recipient;
     protected BigDecimal amount;
-    protected long key = Transaction.FEE_KEY;
+    protected long key; //  = Transaction.FEE_KEY;
     protected AssetCls asset;
     
     // need for calculate fee by feePow into GUI
@@ -119,9 +119,8 @@ public abstract class TransactionAmount extends Transaction {
             typeBytes[2] = (byte) (typeBytes[2] & (byte) 127);
             
             this.amount = amount;
+            this.key = key;
         }
-        
-        this.key = key;
     }
     
     // need for calculate fee
@@ -363,7 +362,9 @@ public abstract class TransactionAmount extends Transaction {
     @Override
     public HashSet<Account> getInvolvedAccounts() {
         HashSet<Account> accounts = new HashSet<Account>();
-        accounts.add(this.creator);
+        if (this.creator != null)
+            accounts.add(this.creator);
+
         accounts.addAll(this.getRecipientAccounts());
         return accounts;
     }
@@ -379,7 +380,8 @@ public abstract class TransactionAmount extends Transaction {
     public boolean isInvolved(Account account) {
         String address = account.getAddress();
         
-        if (address.equals(creator.getAddress()) || address.equals(recipient.getAddress())) {
+        if (this.creator != null && address.equals(creator.getAddress())
+                || address.equals(recipient.getAddress())) {
             return true;
         }
         

@@ -208,8 +208,9 @@ public class R_Calculated extends TransactionAmount {
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
 
-        return TYPE_LENGTH + REFERENCE_LENGTH + RECIPIENT_LENGTH + 1
-                + message.getBytes(StandardCharsets.UTF_8).length;
+        return TYPE_LENGTH + REFERENCE_LENGTH + RECIPIENT_LENGTH
+                + (this.amount == null? 0 : AMOUNT_LENGTH + KEY_LENGTH)
+                + 1 + message.getBytes(StandardCharsets.UTF_8).length;
     }
 
 }
