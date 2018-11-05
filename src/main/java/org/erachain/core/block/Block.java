@@ -1616,16 +1616,17 @@ public class Block {
             TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
             R_Calculated txCalculated;
             int size = this.txCalculated.size();
+            int indexStart = this.transactionCount + 1;
             long key;
-            for (int index = 0; index < size; index++) {
+            int index;
+            for (int i = 0; i < size; i++) {
                 if (cnt.isOnStopping())
                     return;
 
-                key = Transaction.makeDBRef(this.heightBlock, index + this.transactionCount);
-
-                txCalculated = this.txCalculated.get(index);
-
-                finalMap.set(key, txCalculated);
+                index = i + indexStart;
+                txCalculated = this.txCalculated.get(i);
+                txCalculated.setHeightSeq(this.heightBlock, index);
+                finalMap.set(txCalculated);
 
             }
         }

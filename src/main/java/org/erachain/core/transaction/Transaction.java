@@ -510,6 +510,12 @@ public abstract class Transaction {
 
     // GETTERS/SETTERS
 
+    public void setHeightSeq(int height, int seqNo) {
+        this.dbRef = makeDBRef(height, seqNo);
+        this.height = height;
+        this.seqNo = seqNo;
+    }
+
     // NEED FOR DB SECONDATY KEYS
     // see org.mapdb.Bind.secondaryKeys
     public void setDC(DCSet dcSet) {
@@ -541,6 +547,8 @@ public abstract class Transaction {
         this.dcSet = dcSet;
         this.height = block.getHeight();
         this.seqNo = seqNo;
+        this.dbRef = Transaction.makeDBRef(height, seqNo);
+
         if (asDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0) )
             this.calcFee();
     }
@@ -831,7 +839,11 @@ public abstract class Transaction {
 
     }
 
-    // reference in Map - or as signatire or as BlockHeight + seqNo
+    public long getDBRef() {
+        return this.dbRef;
+    }
+
+        // reference in Map - or as signatire or as BlockHeight + seqNo
     public byte[] getDBRef(DCSet db) {
         if (this.getConfirmations(db) < BlockChain.MAX_ORPHAN) {
             // soft or hard confirmations

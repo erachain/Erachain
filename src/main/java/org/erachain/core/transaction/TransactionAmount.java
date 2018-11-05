@@ -143,7 +143,7 @@ public abstract class TransactionAmount extends Transaction {
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
         super.setDC(dcSet, asDeal, blockHeight, seqNo);
         
-        if (this.amount != null) {
+        if (this.amount != null && dcSet != null) {
             this.asset = this.dcSet.getItemAssetMap().get(this.getAbsKey());
         }
     }
