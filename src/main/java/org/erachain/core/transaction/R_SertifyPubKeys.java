@@ -1,8 +1,17 @@
 package org.erachain.core.transaction;
 
+import java.math.BigDecimal;
+import java.util.*;
+
+import org.erachain.core.item.persons.PersonCls;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
+
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -34,9 +43,10 @@ public class R_SertifyPubKeys extends Transaction {
     BigDecimal BONUS_FOR_PERSON_4_11 = new BigDecimal("0.009"); // 30 КФТ
     BigDecimal BONUS_FOR_PERSON_REGISTRATOR_4_11 = new BigDecimal("0.015"); // 50 КФТ
     BigDecimal BONUS_FOR_PERSON_SERTIFIER_4_11 = new BigDecimal("0.006"); // 20КФТ
-    int BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 = 0;
+    long BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 = 300 * 20 * BlockChain.FEE_PER_BYTE;
     BigDecimal BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11
             = BigDecimal.valueOf(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BlockChain.FEE_SCALE);
+    int BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11 = 2;
 
     public static final int DEFAULT_DURATION = 2 * 356;
     private static final byte TYPE_ID = (byte) Transaction.CERTIFY_PUB_KEYS_TRANSACTION;
@@ -561,7 +571,8 @@ public class R_SertifyPubKeys extends Transaction {
         }
 
         if (!personalized
-                || this.height < BlockChain.VERS_4_11 // TODO: remove it on new CHAIN (for 4.10 error calculated)
+                || this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE
+            // TODO: remove it on new CHAIN (for 4.10 error calculated)
         ) {
             // IT IS NOT VOUCHED PERSON
 
@@ -585,7 +596,7 @@ public class R_SertifyPubKeys extends Transaction {
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
 
-            if(this.height < BlockChain.VERS_4_11) {
+            if(this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE) {
 
                 // GET FEE from that record
                 ///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // NEED to RECAL?? if from DB
@@ -629,7 +640,8 @@ public class R_SertifyPubKeys extends Transaction {
 
                 ///////// INVITER
                 if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0) {
-                    process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, false);
+                    process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11,
+                            BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, false);
                     issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11);
                 }
 
@@ -729,7 +741,7 @@ public class R_SertifyPubKeys extends Transaction {
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
 
-            if(this.height < BlockChain.VERS_4_11) {
+            if(this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE) {
                 // IT IS NOT VOUCHED PERSON
 
                 // GET FEE from that record
@@ -777,7 +789,8 @@ public class R_SertifyPubKeys extends Transaction {
 
                 ///////// INVITER
                 if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0) {
-                    process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, true);
+                    process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11,
+                            BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, true);
                     issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11);
                 }
 
@@ -828,7 +841,7 @@ public class R_SertifyPubKeys extends Transaction {
 
     @Override
     public long calcBaseFee() {
-        if (this.height < BlockChain.VERS_4_11)
+        if (this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE)
             return calcCommonFee();
 
         return calcCommonFee(); // BlockChain.FEE_PER_BYTE * (300 + this.sertifiedPublicKeys.size() * 64);

@@ -226,7 +226,7 @@ public abstract class Issue_ItemRecord extends Transaction {
 
     @Override
     public long calcBaseFee() {
-        if (this.height < BlockChain.VERS_4_11)
+        if (this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE)
             return calcCommonFee() + BlockChain.FEE_PER_BYTE_4_10 * 128 * BlockChain.ISSUE_MULT_FEE;
 
         return calcCommonFee() + BlockChain.FEE_PER_BYTE * 15000; // x 50 Financial Transaction Commission

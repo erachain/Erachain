@@ -203,7 +203,7 @@ public class IssueImprintRecord extends Issue_ItemRecord {
 
     @Override
     public long calcBaseFee() {
-        if (this.height < BlockChain.VERS_4_11)
+        if (this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE)
             return calcCommonFee() + BlockChain.FEE_PER_BYTE_4_10 * 128 * 4;
 
         return calcCommonFee();

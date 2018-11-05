@@ -13,12 +13,12 @@ import org.erachain.datachain.BlocksHeadsMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.network.Peer;
-import org.erachain.settings.Settings;
-import org.erachain.utils.Pair;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.erachain.settings.Settings;
+import org.erachain.utils.Pair;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -35,7 +35,7 @@ public class BlockChain {
 
     //public static final int START_LEVEL = 1;
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = false;
+    public static final boolean DEVELOP_USE = true;
     public static final boolean HARD_WORK = false;
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
@@ -180,10 +180,12 @@ public class BlockChain {
 
     public static final int FEE_FOR_ANONIMOUSE = 33;
     //
-    public static final int FEE_INVITED_DEEP = 4;
+    public static final boolean VERS_4_11_USE_OLD_FEE = false;
+    public static final int FEE_INVITED_DEEP = VERS_4_11_USE_OLD_FEE? 4 : 2;
+
     // levels for deep
     public static final int FEE_INVITED_SHIFT = 5; // 2^5 = 64 - total FEE -> fee for Forger and fee for Inviter
-    public static final int FEE_INVITED_SHIFT_IN_LEVEL = 3;
+    public static final int FEE_INVITED_SHIFT_IN_LEVEL = VERS_4_11_USE_OLD_FEE? 3 : 1;
     public static final int FEE_INVITED_SHIFT_FOR_INVITE = 1; // - total FEE for Inviter of Person
 
     // 0.0075 COMPU - is FEE for Issue Person - then >> 2 - всумме столько получают Форжер и кто привел

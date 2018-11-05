@@ -691,7 +691,7 @@ public abstract class Transaction {
         }
 
         int minLen = getJobLevel();
-        if (this.height < BlockChain.VERS_4_11)
+        if (this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE)
             return len * BlockChain.FEE_PER_BYTE_4_10;
 
         if (len < minLen)
@@ -710,7 +710,7 @@ public abstract class Transaction {
     public void calcFee() {
 
         long fee_long = calcBaseFee();
-        if(this.height < BlockChain.VERS_4_11) {
+        if(this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE) {
             // OLD version with x64
             fee_long = (fee_long << 5) / 100;
         }
@@ -732,7 +732,7 @@ public abstract class Transaction {
 
     // GET only INVITED FEE
     public long getInvitedFee() {
-        if (this.height > BlockChain.VERS_4_11)
+        if (this.height > BlockChain.VERS_4_11 || !BlockChain.VERS_4_11_USE_OLD_FEE)
             return 0l;
 
         long fee = this.fee.unscaledValue().longValue();
@@ -1275,7 +1275,7 @@ public abstract class Transaction {
             }
         }
 
-        if (level > 0) {
+        if (level > 1 ) {
 
             long fee_gift_next = fee_gift >> BlockChain.FEE_INVITED_SHIFT_IN_LEVEL;
             long fee_gift_get = fee_gift - fee_gift_next;
@@ -1317,7 +1317,7 @@ public abstract class Transaction {
             }
 
             // Multi Level Referal
-            if (this.height < BlockChain.VERS_4_11)
+            if (this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE)
                 process_gifts(BlockChain.FEE_INVITED_DEEP, getInvitedFee(), this.creator, false);
 
             String creatorAddress = this.creator.getAddress();
@@ -1357,7 +1357,7 @@ public abstract class Transaction {
             }
 
             // calc INVITED FEE
-            if (this.height < BlockChain.VERS_4_11)
+            if (this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE)
                 process_gifts(BlockChain.FEE_INVITED_DEEP, getInvitedFee(), this.creator, true);
 
             // UPDATE REFERENCE OF SENDER
