@@ -521,8 +521,13 @@ public abstract class Transaction {
     public void setDC(DCSet dcSet) {
         this.dcSet = dcSet;
     }
+
     public void setDC_HeightSeq(DCSet dcSet) {
         this.dcSet = dcSet;
+
+        if (this.typeBytes[0] == Transaction.CALCULATED_TRANSACTION) {
+
+        }
 
         Long dbRef2 = dcSet.getTransactionFinalMapSigns().get(this.signature);
         if (dbRef2 == null)

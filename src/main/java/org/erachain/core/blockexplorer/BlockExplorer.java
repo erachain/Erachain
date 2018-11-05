@@ -2160,7 +2160,11 @@ public class BlockExplorer {
                 : transactions.subList(fromIndex, Math.min(toIndex, transactions.size()));
         for (Transaction trans : transactions2) {
             // SET + HEIGHT + SEQ
-            trans.setDC_HeightSeq(dcSet);
+            if (trans.getType() == 100) {
+                trans.setDC(dcSet);
+            }
+            trans.setDC(dcSet);
+
 
             LinkedHashMap transactionJSON = new LinkedHashMap();
 
@@ -2206,34 +2210,50 @@ public class BlockExplorer {
             transactionJSON.put("block", trans.getBlockHeight());// .getSeqNo(dcSet));
 
             transactionJSON.put("seq", trans.getSeqNo(dcSet));
-            // transactionJSON.put("reference",trans.getReference());
-            transactionJSON.put("signature", Base58.encode(trans.getSignature()));
-            transactionJSON.put("date", DateTimeFormat.timestamptoString(trans.getTimestamp()));
 
-            if (trans.getCreator() == null) {
-                transactionJSON.put("creator", GenesisBlock.CREATOR.getAddress());
-                transactionJSON.put("creator_addr", "GENESIS");
+            if (trans.getType() == Transaction.CALCULATED_TRANSACTION) {
+                R_Calculated txCalculated = (R_Calculated) trans;
+                transactionJSON.put("reference", "--");
+                transactionJSON.put("signature", trans.getBlockHeight() + "-" + trans.getSeqNo());
+                transactionJSON.put("date", txCalculated.getMessage());
+
+                transactionJSON.put("creator", txCalculated.getRecipient().getPersonAsString());
+                transactionJSON.put("creator_addr", txCalculated.getRecipient().getAddress());
+
+                transactionJSON.put("size", "--");
+                transactionJSON.put("fee", "--");
 
             } else {
-                Account atSideAccount;
-                atSideAccount = trans.getCreator();
-                if (account != null) {
+                transactionJSON.put("signature", Base58.encode(trans.getSignature()));
+                transactionJSON.put("date", DateTimeFormat.timestamptoString(trans.getTimestamp()));
+
+                if (trans.getCreator() == null) {
+                    transactionJSON.put("creator", GenesisBlock.CREATOR.getAddress());
+                    transactionJSON.put("creator_addr", "GENESIS");
+
+                } else {
+                    Account atSideAccount;
                     atSideAccount = trans.getCreator();
-                    if (trans.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                        R_Send rSend = (R_Send) trans;
-                        if (rSend.getCreator().equals(account)) {
-                            atSideAccount = rSend.getRecipient();
+                    if (account != null) {
+                        atSideAccount = trans.getCreator();
+                        if (trans.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                            R_Send rSend = (R_Send) trans;
+                            if (rSend.getCreator().equals(account)) {
+                                atSideAccount = rSend.getRecipient();
+                            }
                         }
                     }
+
+                    transactionJSON.put("creator", atSideAccount.getPersonAsString());
+                    transactionJSON.put("creator_addr", atSideAccount.getAddress());
+
                 }
 
-                transactionJSON.put("creator", atSideAccount.getPersonAsString());
-                transactionJSON.put("creator_addr", atSideAccount.getAddress());
+                transactionJSON.put("size", trans.viewSize(Transaction.FOR_NETWORK));
+                transactionJSON.put("fee", trans.getFee());
 
             }
 
-            transactionJSON.put("size", trans.viewSize(Transaction.FOR_NETWORK));
-            transactionJSON.put("fee", trans.getFee());
             transactionJSON.put("confirmations", trans.getConfirmations(dcSet));
             transactionJSON.put("type", Lang.getInstance().translate_from_langObj(trans.viewFullTypeName(), langObj));
 
