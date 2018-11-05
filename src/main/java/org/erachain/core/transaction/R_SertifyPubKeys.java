@@ -641,7 +641,9 @@ public class R_SertifyPubKeys extends Transaction {
                 ///////// INVITER
                 if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0) {
                     process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11,
-                            BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, false);
+                            BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, false,
+                            this.block != null && this.block.txCalculated != null?
+                                    this.block.txCalculated : null, "for invite");
                     issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11);
                 }
 
@@ -772,6 +774,13 @@ public class R_SertifyPubKeys extends Transaction {
                 BigDecimal issued_FEE_BD_total = BONUS_FOR_PERSON_4_11;
 
                 issuer.changeBalance(db, true, FEE_KEY, BONUS_FOR_PERSON_REGISTRATOR_4_11, false);
+                boolean makeCalculates = false;
+                if (this.block != null && this.block.txCalculated != null) {
+                    makeCalculates = true;
+                    this.block.txCalculated.add(new R_Calculated(issuer, FEE_KEY, BONUS_FOR_PERSON_REGISTRATOR_4_11,
+                            "for registration", this.dbRef));
+                }
+
                 issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_4_11);
 
                 if (!this.creator.equals(issuer)) {
@@ -783,6 +792,10 @@ public class R_SertifyPubKeys extends Transaction {
                         // IF it is NOT SAME address and PERSON
                         // GIVE GIFT for Witness this PUB_KEY
                         this.creator.changeBalance(db, true, FEE_KEY, BONUS_FOR_PERSON_SERTIFIER_4_11, false);
+                        if (makeCalculates)
+                            this.block.txCalculated.add(new R_Calculated(this.creator, FEE_KEY, BONUS_FOR_PERSON_SERTIFIER_4_11,
+                                "for sertifyPubKey", this.dbRef));
+
                         issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_SERTIFIER_4_11);
                     }
                 }
@@ -790,7 +803,8 @@ public class R_SertifyPubKeys extends Transaction {
                 ///////// INVITER
                 if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0) {
                     process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11,
-                            BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, true);
+                            BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, true,
+                            null, null);
                     issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11);
                 }
 

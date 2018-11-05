@@ -104,13 +104,13 @@ public class TransactionFactory {
                 // PARSE ACCOUNTING TRANSACTION V3
                 return R_Hashes.Parse(data, asDeal);
 				
-				/*
-		case Transaction.JSON_TRANSACTION:
+                    /*
+            case Transaction.JSON_TRANSACTION:
 
-			
-			// PARSE JSON1 TRANSACTION
-			return JsonTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
-			*/
+
+                // PARSE JSON1 TRANSACTION
+                return JsonTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
+                */
 
             case Transaction.VOUCH_TRANSACTION:
 
@@ -167,19 +167,24 @@ public class TransactionFactory {
                 //PARSE ISSUE PLATE TRANSACTION
                 return IssueUnionRecord.Parse(data, asDeal);
 
-		/*
-		case Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION:
-			
-			//PARSE TRANSFER ASSET TRANSACTION
-			return GenesisCertifyPersonRecord.Parse(data);
-			*/	
+            case Transaction.CALCULATED_TRANSACTION:
 
-		/*
-		case Transaction.GENESIS_ASSIGN_STATUS_TRANSACTION:
-			
-			//PARSE TRANSFER ASSET TRANSACTION
-			return GenesisTransferStatusTransaction.Parse(data);
-			*/
+                //PARSE ISSUE PLATE TRANSACTION
+                return R_Calculated.Parse(data);
+
+            /*
+            case Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION:
+
+                //PARSE TRANSFER ASSET TRANSACTION
+                return GenesisCertifyPersonRecord.Parse(data);
+                */
+
+            /*
+            case Transaction.GENESIS_ASSIGN_STATUS_TRANSACTION:
+
+                //PARSE TRANSFER ASSET TRANSACTION
+                return GenesisTransferStatusTransaction.Parse(data);
+                */
 
             case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
 
