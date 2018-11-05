@@ -424,15 +424,23 @@ public class TelegramManager extends Thread {
                 
                 
                 this.handledTelegrams.put(signatureKey, telegram);
-              // save telegram to db
-                Controller.getInstance().telegram.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
-                // save telegram to wallet DB
-                Transaction trans = telegram.getTransaction();
-                HashSet<Account> recipients = trans.getRecipientAccounts();
-                for(Account recipient:recipients){
-                
-                  if( Controller.getInstance().wallet.accountExists(recipient.getAddress()))
-                      Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
+
+                if(Controller.getInstance().telegram != null) {
+                    // save telegram to db
+                    Controller.getInstance().telegram.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
+                }
+
+                if( Controller.getInstance().wallet.isWalletDatabaseExisting()) {
+                    // save telegram to wallet DB
+                    Transaction trans = telegram.getTransaction();
+                    HashSet<Account> recipients = trans.getRecipientAccounts();
+                    for (Account recipient : recipients) {
+
+                        if (Controller.getInstance().wallet.accountExists(recipient.getAddress())) {
+                            Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
+                            break;
+                        }
+                    }
                 }
              }
 
