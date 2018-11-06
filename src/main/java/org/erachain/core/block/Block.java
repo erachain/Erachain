@@ -1864,6 +1864,9 @@ public class Block {
             }
 
         }
+
+        // DELETE ALL CALCULATED
+        finalMap.delete(height);
     }
 
     @Override

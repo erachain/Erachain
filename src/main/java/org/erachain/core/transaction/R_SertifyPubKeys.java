@@ -1,17 +1,8 @@
 package org.erachain.core.transaction;
 
-import java.math.BigDecimal;
-import java.util.*;
-
-import org.erachain.core.item.persons.PersonCls;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -623,6 +614,12 @@ public class R_SertifyPubKeys extends Transaction {
                 BigDecimal issued_FEE_BD_total = BONUS_FOR_PERSON_4_11;
 
                 issuer.changeBalance(db, false, FEE_KEY, BONUS_FOR_PERSON_REGISTRATOR_4_11, false);
+                boolean makeCalculates = false;
+                if (this.block != null && this.block.txCalculated != null) {
+                    makeCalculates = true;
+                    this.block.txCalculated.add(new R_Calculated(issuer, FEE_KEY, BONUS_FOR_PERSON_REGISTRATOR_4_11,
+                            "for invite", this.dbRef));
+                }
                 issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_4_11);
 
                 if (!this.creator.equals(issuer)) {
@@ -634,6 +631,10 @@ public class R_SertifyPubKeys extends Transaction {
                         // IF it is NOT SAME address and PERSON
                         // GIVE GIFT for Witness this PUB_KEY
                         this.creator.changeBalance(db, false, FEE_KEY, BONUS_FOR_PERSON_SERTIFIER_4_11, false);
+                        if (makeCalculates)
+                            this.block.txCalculated.add(new R_Calculated(this.creator, FEE_KEY, BONUS_FOR_PERSON_SERTIFIER_4_11,
+                                    "for certify", this.dbRef));
+
                         issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_SERTIFIER_4_11);
                     }
                 }
@@ -774,12 +775,6 @@ public class R_SertifyPubKeys extends Transaction {
                 BigDecimal issued_FEE_BD_total = BONUS_FOR_PERSON_4_11;
 
                 issuer.changeBalance(db, true, FEE_KEY, BONUS_FOR_PERSON_REGISTRATOR_4_11, false);
-                boolean makeCalculates = false;
-                if (this.block != null && this.block.txCalculated != null) {
-                    makeCalculates = true;
-                    this.block.txCalculated.add(new R_Calculated(issuer, FEE_KEY, BONUS_FOR_PERSON_REGISTRATOR_4_11,
-                            "for registration", this.dbRef));
-                }
 
                 issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_4_11);
 
@@ -792,9 +787,6 @@ public class R_SertifyPubKeys extends Transaction {
                         // IF it is NOT SAME address and PERSON
                         // GIVE GIFT for Witness this PUB_KEY
                         this.creator.changeBalance(db, true, FEE_KEY, BONUS_FOR_PERSON_SERTIFIER_4_11, false);
-                        if (makeCalculates)
-                            this.block.txCalculated.add(new R_Calculated(this.creator, FEE_KEY, BONUS_FOR_PERSON_SERTIFIER_4_11,
-                                "for sertifyPubKey", this.dbRef));
 
                         issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_SERTIFIER_4_11);
                     }

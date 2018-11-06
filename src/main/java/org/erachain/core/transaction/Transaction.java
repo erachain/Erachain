@@ -1264,7 +1264,7 @@ public abstract class Transaction {
         if (fee_gift <= 0l)
             return;
 
-        String messageLevel = message + " lvl.level" + level;
+        String messageLevel = message + " level." + level;
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
         if (personDuration == null) {
             // USE all GIFT for current ACCOUNT
