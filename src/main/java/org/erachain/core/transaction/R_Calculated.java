@@ -1,17 +1,14 @@
 package org.erachain.core.transaction;
 
 import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
-import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -32,7 +29,7 @@ import java.util.Arrays;
 public class R_Calculated extends TransactionAmount {
 
     private static final byte TYPE_ID = (byte) Transaction.CALCULATED_TRANSACTION;
-    private static final String NAME_ID = "Calculated";
+    private static final String NAME_ID = "*calculated*";
     protected String message;
 
     public R_Calculated(byte[] typeBytes, Account recipient, long key,
@@ -63,6 +60,16 @@ public class R_Calculated extends TransactionAmount {
     }
 
     // GETTERS/SETTERS
+
+    @Override
+    public String viewTypeName() {
+        return NAME_ID;
+    }
+
+    @Override
+    public String viewSubTypeName() {
+        return "";
+    }
 
     @Override
     public boolean hasPublicText() {
