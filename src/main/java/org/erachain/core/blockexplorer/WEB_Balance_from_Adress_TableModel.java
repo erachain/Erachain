@@ -5,11 +5,11 @@ import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.SortableList;
 import org.erachain.lang.Lang;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple5;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple5;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
@@ -53,6 +53,9 @@ public class WEB_Balance_from_Adress_TableModel extends AbstractTableModel imple
         this.balances = Controller.getInstance().getBalances(account); //.getBalances(key);
         for (int ib = 0; this.balances.size() > ib; ib++) {
             balance = this.balances.get(ib);
+            if (balance.getA().b == 5)
+                continue;
+
             table_balance1.add(new Pair(account, new Pair(balance.getA().b, balance.getB())));
             item.add(balance.getA().b);
         }
