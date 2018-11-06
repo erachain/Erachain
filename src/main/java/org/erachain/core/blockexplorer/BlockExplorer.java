@@ -4078,18 +4078,20 @@ public class BlockExplorer {
 
         String[] signatures = query.split(",");
 
-        byte[] signatureBytes = null;
-
-
+        byte[] signatureBytes = null; // new clear
 
         for (int i = 0; i < signatures.length; i++) {
+
+            Transaction transaction = null; // new
             try {
+                // as Base58
                 signatureBytes = Base58.decode(signatures[i]);
+                transaction = Controller.getInstance().getTransaction(signatureBytes);
             } catch (Exception e) {
-                continue;
+                // as 12345-12
+                transaction = dcSet.getTransactionFinalMap().getRecord(signatures[i]);
             }
 
-            Transaction transaction = Controller.getInstance().getTransaction(signatureBytes);
             if (transaction == null)
                 continue;
 
