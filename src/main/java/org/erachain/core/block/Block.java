@@ -13,6 +13,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.transaction.R_Calculated;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.DCSet;
@@ -83,6 +84,7 @@ public class Block {
     protected long totalFee;
     protected long emittedFee;
     public Block.BlockHead blockHead;
+    public List<R_Calculated> txCalculated;
 
     // BODY
     protected List<Transaction> transactions;
@@ -1306,6 +1308,7 @@ public class Block {
 
             if (andProcess) {
                 validatingDC = dcSet;
+                this.txCalculated = new ArrayList<R_Calculated>();
             } else {
                 validatingDC = dcSet.fork();
             }
@@ -1507,8 +1510,20 @@ public class Block {
         }
 
         //UPDATE GENERATOR BALANCE WITH FEE
-        this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY,
-                new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true);
+        if (this.blockHead.totalFee != 0) {
+            BigDecimal totalFee = new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE);
+            this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY,
+                    totalFee, true);
+
+            // MAKE CALCULATED TRANSACTIONS
+            if (!dcSet.isFork() && !asOrphan) {
+                if (this.txCalculated == null)
+                    this.txCalculated = new ArrayList<R_Calculated>();
+
+                this.txCalculated.add(new R_Calculated(this.creator, Transaction.FEE_KEY,
+                        totalFee, "forging", Transaction.makeDBRef(this.heightBlock, 0)));
+            }
+        }
 
         if (emittedFee != 0) {
             // SUBSTRACT from EMISSION (with minus)
@@ -1595,6 +1610,27 @@ public class Block {
         if (BlockChain.TEST_FEE_ORPHAN > 0 && BlockChain.TEST_FEE_ORPHAN > this.heightBlock) {
             setCOMPUbals(dcSet, this.heightBlock);
         }
+
+        // MAKE CALCULATER TRANSACTIONS
+        if (this.txCalculated != null && !this.txCalculated.isEmpty()) {
+            TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
+            R_Calculated txCalculated;
+            int size = this.txCalculated.size();
+            int indexStart = this.transactionCount + 1;
+            long key;
+            int index;
+            for (int i = 0; i < size; i++) {
+                if (cnt.isOnStopping())
+                    return;
+
+                index = i + indexStart;
+                txCalculated = this.txCalculated.get(i);
+                txCalculated.setHeightSeq(this.heightBlock, index);
+                finalMap.set(txCalculated);
+
+            }
+        }
+
     }
 
     // TODO - make it trownable
@@ -1632,6 +1668,8 @@ public class Block {
         this.getTransactions();
 
         if (this.transactionCount > 0) {
+            this.txCalculated = new ArrayList<R_Calculated>();
+
             //DBSet dbSet = Controller.getInstance().getDBSet();
             TransactionMap unconfirmedMap = dcSet.getTransactionMap();
             TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
@@ -1826,6 +1864,9 @@ public class Block {
             }
 
         }
+
+        // DELETE ALL CALCULATED
+        finalMap.delete(height);
     }
 
     @Override

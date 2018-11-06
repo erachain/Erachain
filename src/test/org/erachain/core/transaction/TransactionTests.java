@@ -15,7 +15,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+//import org.apache.log4j.PropertyConfigurator;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -64,7 +64,7 @@ public class TransactionTests {
         System.out.println(log4j.getAbsolutePath());
         if (log4j.exists()) {
             System.out.println("configured");
-            PropertyConfigurator.configure(log4j.getAbsolutePath());
+            //PropertyConfigurator.configure(log4j.getAbsolutePath());
         }
 
         databaseSet = db = DCSet.createEmptyDatabaseSet();
@@ -1307,7 +1307,7 @@ String  s= "";
         //nameSaleTransaction.process();
         nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        LOGGER.addAppender(null);
+        //LOGGER.addAppender(null);
         LOGGER.debug("nameSale ");
         LOGGER.info("nameSale " + nameSale.getName(databaseSet));
         LOGGER.info("nameSale " + nameSale.getName(databaseSet));

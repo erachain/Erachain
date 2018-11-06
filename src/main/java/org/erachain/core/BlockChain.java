@@ -13,12 +13,12 @@ import org.erachain.datachain.BlocksHeadsMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.network.Peer;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.*;

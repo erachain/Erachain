@@ -2,12 +2,14 @@ package org.erachain.webserver;
 
 import javax.ws.rs.core.Response;
 
+import org.erachain.CallRemoteApi;
+import org.erachain.SettingTests;
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.erachain.api.ApiClient;
-import test.CallRemoteApi;
-import test.SettingTests;
+//import test.CallRemoteApi;
+//import test.SettingTests;
 import org.erachain.webserver.API_TelegramsResource;
 
 public class API_TelegramsResourceTest extends SettingTests {

@@ -912,5 +912,51 @@ public class TestRec_Send {
 
     }
 
+    @Test
+    public void parsCalculatedTransaction() {
+
+
+        /// MESSAGE + AMOUNT
+        R_Calculated txCalculated = new R_Calculated(recipient, ERA_KEY, amount,
+                head, timestamp
+        );
+
+        byte[] rawCalculated = txCalculated.toBytes(Transaction.FOR_NETWORK, true);
+        int length = txCalculated.getDataLength(Transaction.FOR_NETWORK, true);
+        assertEquals(rawCalculated.length, length);
+
+
+        R_Calculated txCalculated_2 = null;
+        try {
+            txCalculated_2 = (R_Calculated) R_Calculated.Parse(rawCalculated);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        assertEquals(txCalculated.getRecipient(), txCalculated_2.getRecipient());
+        assertEquals(txCalculated.getKey(), txCalculated_2.getKey());
+        assertEquals(txCalculated.getAmount(), txCalculated_2.getAmount());
+        assertEquals(txCalculated.getMessage(), txCalculated_2.getMessage());
+
+        txCalculated = new R_Calculated(recipient, ERA_KEY, null,
+                head, timestamp
+        );
+
+        rawCalculated = txCalculated.toBytes(Transaction.FOR_NETWORK, true);
+        length = txCalculated.getDataLength(Transaction.FOR_NETWORK, true);
+        assertEquals(rawCalculated.length, length);
+
+
+        txCalculated_2 = null;
+        try {
+            txCalculated_2 = (R_Calculated) R_Calculated.Parse(rawCalculated);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        assertEquals(txCalculated.getRecipient(), txCalculated_2.getRecipient());
+        assertEquals(txCalculated.getKey(), txCalculated_2.getKey());
+        assertEquals(txCalculated.getMessage(), txCalculated_2.getMessage());
+
+
+    }
 
 }

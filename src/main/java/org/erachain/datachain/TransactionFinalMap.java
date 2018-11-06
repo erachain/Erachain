@@ -566,4 +566,8 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         return item;
     }
 
+    public boolean set(Transaction transaction) {
+        return super.set(transaction.getDBRef(), transaction);
+    }
+
 }

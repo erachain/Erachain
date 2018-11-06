@@ -1,16 +1,15 @@
 package org.erachain.datachain;
 
-import java.util.Map;
-
-import org.erachain.core.block.GenesisBlock;
-import org.mapdb.DB;
-
 import org.erachain.core.BlockChain;
+import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.DB;
+
+import java.util.Map;
 
 //import database.serializer.AssetSerializer;
 
@@ -59,16 +58,14 @@ public class ItemAssetMap extends Item_Map {
 
     public AssetCls get(Long key) {
 
-        if (BlockChain.DEVELOP_USE && key > 100 && key < 1000) {
+        if (BlockChain.DEVELOP_USE && key > 4 && key < 1000) {
             AssetCls item;
             switch (key.intValue()) {
                 // http://seo-mayak.com/sozdanie-bloga/wordpress-dlya-novichkov/simvoly-kotoryx-net-na-klaviature.html
-                /*
                 case (int)AssetCls.LIA_KEY:
-                    item = new AssetVenture((byte) 0, core.block.GenesisBlock.CREATOR, AssetCls.LIA_NAME, null, null,
+                    item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, AssetCls.LIA_NAME, null, null,
                             AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);
                     break;
-                    */
                 case 555:
                     item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, new String("¤¤¤"), null, null,
                             "Businessman", AssetCls.AS_ACCOUNTING, 8, 0l);
@@ -104,6 +101,11 @@ public class ItemAssetMap extends Item_Map {
             item.setKey(key);
             return item;
         } else {
+            if (key.equals(AssetCls.LIA_KEY)) {
+                return new AssetVenture((byte) 0, GenesisBlock.CREATOR, AssetCls.LIA_NAME, null, null,
+                        AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);
+            }
+
             return (AssetCls) super.get(key);
         }
     }

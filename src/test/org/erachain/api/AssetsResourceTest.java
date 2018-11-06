@@ -1,12 +1,14 @@
 package org.erachain.api;
 
 
+import org.erachain.CallRemoteApi;
+import org.erachain.SettingTests;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.Assert;
 import org.junit.Test;
-import test.CallRemoteApi;
-import test.SettingTests;
+//import org.erachain.test.CallRemoteApi;
+//import org.erachain.test.SettingTests;
 
 import java.util.HashMap;
 import java.util.Map;

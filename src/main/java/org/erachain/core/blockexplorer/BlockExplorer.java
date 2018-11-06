@@ -1,47 +1,6 @@
 package org.erachain.core.blockexplorer;
 
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.nio.charset.Charset;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.ws.rs.core.UriInfo;
-
-import org.erachain.core.transaction.*;
-import org.erachain.datachain.*;
 import org.apache.commons.net.util.Base64;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.erachain.gui.models.PeersTableModel;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.json.simple.parser.ParseException;
-import org.mapdb.Fun;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
-import org.mapdb.Fun.Tuple5;
-import org.mapdb.Fun.Tuple6;
-
 import org.erachain.at.AT;
 import org.erachain.at.AT_Transaction;
 import org.erachain.controller.Controller;
@@ -58,19 +17,36 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.payment.Payment;
+import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
 import org.erachain.core.voting.PollOption;
-import org.erachain.gui.*;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.SortableList;
+import org.erachain.datachain.TradeMap;
+import org.erachain.datachain.TransactionFinalMap;
+import org.erachain.gui.models.PeersTableModel;
 import org.erachain.gui.models.PersonAccountsModel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.utils.BlExpUnit;
-import org.erachain.utils.DateTimeFormat;
-import org.erachain.utils.GZIP;
-import org.erachain.utils.M_Integer;
-import org.erachain.utils.NumberAsString;
-import org.erachain.utils.Pair;
-import org.erachain.utils.ReverseComparator;
+import org.erachain.utils.*;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
+import org.mapdb.Fun;
+import org.mapdb.Fun.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.core.UriInfo;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // 30/03 ++ asset - Trans_Amount
 
@@ -2160,7 +2136,11 @@ public class BlockExplorer {
                 : transactions.subList(fromIndex, Math.min(toIndex, transactions.size()));
         for (Transaction trans : transactions2) {
             // SET + HEIGHT + SEQ
-            trans.setDC_HeightSeq(dcSet);
+            if (trans.getType() == 100) {
+                trans.setDC(dcSet);
+            }
+            trans.setDC(dcSet);
+
 
             LinkedHashMap transactionJSON = new LinkedHashMap();
 
@@ -2206,35 +2186,51 @@ public class BlockExplorer {
             transactionJSON.put("block", trans.getBlockHeight());// .getSeqNo(dcSet));
 
             transactionJSON.put("seq", trans.getSeqNo(dcSet));
-            // transactionJSON.put("reference",trans.getReference());
-            transactionJSON.put("signature", Base58.encode(trans.getSignature()));
-            transactionJSON.put("date", DateTimeFormat.timestamptoString(trans.getTimestamp()));
 
-            if (trans.getCreator() == null) {
-                transactionJSON.put("creator", GenesisBlock.CREATOR.getAddress());
-                transactionJSON.put("creator_addr", "GENESIS");
+            if (trans.getType() == Transaction.CALCULATED_TRANSACTION) {
+                R_Calculated txCalculated = (R_Calculated) trans;
+                transactionJSON.put("reference", "--");
+                transactionJSON.put("signature", trans.getBlockHeight() + "-" + trans.getSeqNo());
+                transactionJSON.put("date", txCalculated.getMessage());
+
+                transactionJSON.put("creator", txCalculated.getRecipient().getPersonAsString());
+                transactionJSON.put("creator_addr", txCalculated.getRecipient().getAddress());
+
+                transactionJSON.put("size", "--");
+                transactionJSON.put("fee", "--");
 
             } else {
-                Account atSideAccount;
-                atSideAccount = trans.getCreator();
-                if (account != null) {
+                transactionJSON.put("signature", Base58.encode(trans.getSignature()));
+                transactionJSON.put("date", DateTimeFormat.timestamptoString(trans.getTimestamp()));
+
+                if (trans.getCreator() == null) {
+                    transactionJSON.put("creator", GenesisBlock.CREATOR.getAddress());
+                    transactionJSON.put("creator_addr", "GENESIS");
+
+                } else {
+                    Account atSideAccount;
                     atSideAccount = trans.getCreator();
-                    if (trans.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                        R_Send rSend = (R_Send) trans;
-                        if (rSend.getCreator().equals(account)) {
-                            atSideAccount = rSend.getRecipient();
+                    if (account != null) {
+                        atSideAccount = trans.getCreator();
+                        if (trans.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                            R_Send rSend = (R_Send) trans;
+                            if (rSend.getCreator().equals(account)) {
+                                atSideAccount = rSend.getRecipient();
+                            }
                         }
                     }
+
+                    transactionJSON.put("creator", atSideAccount.getPersonAsString());
+                    transactionJSON.put("creator_addr", atSideAccount.getAddress());
+
                 }
 
-                transactionJSON.put("creator", atSideAccount.getPersonAsString());
-                transactionJSON.put("creator_addr", atSideAccount.getAddress());
+                transactionJSON.put("size", trans.viewSize(Transaction.FOR_NETWORK));
+                transactionJSON.put("fee", trans.getFee());
+                transactionJSON.put("confirmations", trans.getConfirmations(dcSet));
 
             }
 
-            transactionJSON.put("size", trans.viewSize(Transaction.FOR_NETWORK));
-            transactionJSON.put("fee", trans.getFee());
-            transactionJSON.put("confirmations", trans.getConfirmations(dcSet));
             transactionJSON.put("type", Lang.getInstance().translate_from_langObj(trans.viewFullTypeName(), langObj));
 
             // String amount = "-";

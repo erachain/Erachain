@@ -11,7 +11,6 @@ import org.erachain.core.item.unions.Union;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
-import datachain.KKUnionStatusMap;
 import org.erachain.ntp.NTP;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -64,7 +63,7 @@ public class TestRecUnion {
     UnionCls union;
     long unionKey = -1;
     IssueUnionRecord issueUnionTransaction;
-    KKUnionStatusMap dbPS;
+    //KKUnionStatusMap dbPS;
     int version = 0;
     long parent = -1;
     private byte[] icon = new byte[]{1, 3, 4, 5, 6, 9}; // default value
@@ -90,7 +89,7 @@ public class TestRecUnion {
 
         //dbPA = db.getUnionAddressMap();
         //dbAP = db.getAddressUnionMap();
-        dbPS = db.getUnionStatusMap();
+        //dbPS = db.getUnionStatusMap();
 
         // GET RIGHTS TO CERTIFIER
         unionGeneral = new Union(certifier, "СССР", timestamp - 12345678,
