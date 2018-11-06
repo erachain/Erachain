@@ -618,7 +618,7 @@ public class R_SertifyPubKeys extends Transaction {
                 if (this.block != null && this.block.txCalculated != null) {
                     makeCalculates = true;
                     this.block.txCalculated.add(new R_Calculated(issuer, FEE_KEY, BONUS_FOR_PERSON_REGISTRATOR_4_11,
-                            "for invite", this.dbRef));
+                            "register", this.dbRef));
                 }
                 issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_4_11);
 
@@ -633,7 +633,7 @@ public class R_SertifyPubKeys extends Transaction {
                         this.creator.changeBalance(db, false, FEE_KEY, BONUS_FOR_PERSON_SERTIFIER_4_11, false);
                         if (makeCalculates)
                             this.block.txCalculated.add(new R_Calculated(this.creator, FEE_KEY, BONUS_FOR_PERSON_SERTIFIER_4_11,
-                                    "for certify", this.dbRef));
+                                    "certify", this.dbRef));
 
                         issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_SERTIFIER_4_11);
                     }
