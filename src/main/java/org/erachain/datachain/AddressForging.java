@@ -108,9 +108,6 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
             return;
         }
 
-        if ("7RyoDipJAeEzfk1p6XVky9s2u5Dbbmbi4v".equals((address))) {
-            int i = 1;
-        }
         Tuple2<String, Integer> keyLast = new Tuple2<String, Integer>(address, 0);
         Tuple2<Integer, Integer> last = this.get(keyLast);
         Tuple2<String, Integer> key = new Tuple2<String, Integer>(address, height);
