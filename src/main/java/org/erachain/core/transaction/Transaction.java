@@ -1352,9 +1352,8 @@ public abstract class Transaction {
             // this.calcFee();
 
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
-                // this.creator.setBalance(FEE_KEY, this.creator.getBalance(db,
-                // FEE_KEY).subtract(this.fee), db);
-                this.creator.changeBalance(this.dcSet, true, FEE_KEY, this.fee, false);
+                // NOT update INCOME balance
+                this.creator.changeBalance(this.dcSet, true, FEE_KEY, this.fee, true);
 
             }
 
@@ -1394,9 +1393,8 @@ public abstract class Transaction {
 
         if (asDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
-                // this.creator.setBalance(FEE_KEY, this.creator.getBalance(db,
-                // FEE_KEY).add(this.fee), db);
-                this.creator.changeBalance(this.dcSet, false, FEE_KEY, this.fee, false);
+                // NOT update INCOME balance
+                this.creator.changeBalance(this.dcSet, false, FEE_KEY, this.fee, true);
 
             }
 

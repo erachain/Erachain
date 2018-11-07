@@ -744,29 +744,27 @@ public class Block {
         if(true || this.heightBlock < BlockChain.VERS_4_12) {
             bonusFee = BlockChain.MIN_FEE_IN_BLOCK_4_10;
             if (this.heightBlock < inDay30 << 1)
-                return new BigDecimal("0.00050");
+                return BigDecimal.valueOf(55000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else if (this.heightBlock < inDay30 << 2) // 120 days = 4 mounth
-                //bonusFee = bonusFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-                return new BigDecimal("0.00040");
+                return BigDecimal.valueOf(50000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else if (this.heightBlock < inDay30 << 3) // 16 mounth - 72000
-                //bonusFee = bonusFee.divide(new BigDecimal(4), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-                return new BigDecimal("0.00035");
+                return BigDecimal.valueOf(45000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else if (false && this.heightBlock < inDay30 << 4) //  64 mounth
-                //bonusFee = bonusFee.divide(new BigDecimal(8), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-                return new BigDecimal("0.00030");
+                return BigDecimal.valueOf(40000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+            else if (false && this.heightBlock < inDay30 << 6) //  256 mounth
+                return BigDecimal.valueOf(35000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else
-                //bonusFee = bonusFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-                return new BigDecimal("0.00025");
+                return BigDecimal.valueOf(30000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
         } else {
             bonusFee = BlockChain.MIN_FEE_IN_BLOCK;
             if (this.heightBlock < inDay30 << 1)
                 ;
             else if (this.heightBlock < inDay30 << 2) // 120 days = 4 mounth
-                bonusFee = bonusFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+                bonusFee = bonusFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.FEE_SCALE);
             else if (this.heightBlock < inDay30 << 3) // 16 mounth
-                bonusFee = bonusFee.divide(new BigDecimal(4), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+                bonusFee = bonusFee.divide(new BigDecimal(4), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.FEE_SCALE);
             else
-                bonusFee = bonusFee.divide(new BigDecimal(8), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+                bonusFee = bonusFee.divide(new BigDecimal(8), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.FEE_SCALE);
         }
 
         return bonusFee;

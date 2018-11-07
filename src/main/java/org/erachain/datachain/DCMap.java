@@ -5,15 +5,15 @@ package org.erachain.datachain;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBMap;
 import org.erachain.database.wallet.DWSet;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -125,7 +125,7 @@ public abstract class DCMap<T, U> extends Observable {
     //since from.deleted the key is removed and there is no parent in the parent and that
     // the deleted ones are smaller and the size is increased by 1
     public int size() {
-        this.addUses();
+        //this.addUses();
 
         int u = this.map.size();
 
@@ -137,7 +137,7 @@ public abstract class DCMap<T, U> extends Observable {
             u += this.parent.size();
         }
 
-        this.outUses();
+        //this.outUses();
         return u;
     }
 

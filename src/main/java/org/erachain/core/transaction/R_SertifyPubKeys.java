@@ -31,9 +31,9 @@ import java.util.*;
 // typeBytes[2] - size of personalized accounts
 public class R_SertifyPubKeys extends Transaction {
 
-    BigDecimal BONUS_FOR_PERSON_4_11 = new BigDecimal("0.009"); // 30 КФТ
-    BigDecimal BONUS_FOR_PERSON_REGISTRATOR_4_11 = new BigDecimal("0.015"); // 50 КФТ
-    BigDecimal BONUS_FOR_PERSON_SERTIFIER_4_11 = new BigDecimal("0.006"); // 20КФТ
+    BigDecimal BONUS_FOR_PERSON_4_11 = BigDecimal.valueOf(10000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+    BigDecimal BONUS_FOR_PERSON_REGISTRATOR_4_11 = BigDecimal.valueOf(15000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+    BigDecimal BONUS_FOR_PERSON_SERTIFIER_4_11 = BigDecimal.valueOf(3000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
     long BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 = 300 * 20 * BlockChain.FEE_PER_BYTE;
     BigDecimal BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11
             = BigDecimal.valueOf(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BlockChain.FEE_SCALE);
@@ -535,6 +535,12 @@ public class R_SertifyPubKeys extends Transaction {
 
         DCSet db = this.dcSet;
 
+
+        if ("2VTcBHzzbRGU7m11zeDVsnDNfqYhtH4UtiZga5ekqNcH57Pb9kdHisrWqyfr1YGcd14XrGv1vsvkG7PMQHk5hVvr".
+                equals(Base58.encode(this.signature))) {
+            int i = 1;
+        }
+
         int transactionIndex = -1;
         int blockIndex = -1;
         //Block block = this.getBlock(db);// == null (((
@@ -609,14 +615,21 @@ public class R_SertifyPubKeys extends Transaction {
 
             } else {
 
-                // GIVE GIFT for this PUB_KEY - to PERSON
-                pkAccount.changeBalance(db, false, FEE_KEY, BONUS_FOR_PERSON_4_11, false);
-                BigDecimal issued_FEE_BD_total = BONUS_FOR_PERSON_4_11;
-
-                issuer.changeBalance(db, false, FEE_KEY, BONUS_FOR_PERSON_REGISTRATOR_4_11, false);
                 boolean makeCalculates = false;
                 if (this.block != null && this.block.txCalculated != null) {
                     makeCalculates = true;
+                }
+
+                // GIVE GIFT for this PUB_KEY - to PERSON
+                pkAccount.changeBalance(db, false, FEE_KEY, BONUS_FOR_PERSON_4_11, false);
+                if (makeCalculates) {
+                    this.block.txCalculated.add(new R_Calculated(pkAccount, FEE_KEY, BONUS_FOR_PERSON_4_11,
+                            "enter", this.dbRef));
+                }
+                BigDecimal issued_FEE_BD_total = BONUS_FOR_PERSON_4_11;
+
+                issuer.changeBalance(db, false, FEE_KEY, BONUS_FOR_PERSON_REGISTRATOR_4_11, false);
+                if (makeCalculates) {
                     this.block.txCalculated.add(new R_Calculated(issuer, FEE_KEY, BONUS_FOR_PERSON_REGISTRATOR_4_11,
                             "register", this.dbRef));
                 }

@@ -1,21 +1,7 @@
 package org.erachain.core.account;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.*;
-
-import org.erachain.core.item.assets.Order;
-import org.mapdb.Fun;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
-import org.mapdb.Fun.Tuple5;
-
-//04/01 +-
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
@@ -24,6 +10,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
@@ -36,6 +23,16 @@ import org.erachain.utils.NameUtils;
 import org.erachain.utils.NameUtils.NameResult;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.*;
+
+//04/01 +-
 
 /**
  * обработка ключей и криптографии
@@ -511,13 +508,17 @@ public class Account {
                                                                     BigDecimal amount_in, boolean notUpdateIncomed) {
 
         int actionType = actionType(key, amount_in);
-        
+
         BigDecimal amount = amount_in.abs();
         long absKey;
         if (key > 0) {
             absKey = key;
         } else {
             absKey = -key;
+        }
+
+        if (this.equals("74iioGxnvHWGKijJTUzWrJHZ4ndHSc8PLY") && !db.isFork() && absKey == 2) {
+            int i = 1;
         }
 
         //if (amount.signum() < 0)

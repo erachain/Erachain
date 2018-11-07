@@ -509,8 +509,13 @@ public class DCSet implements Observer, IDB {
     }
 
     public long getTxCounter() {
-        long u = this.database.getAtomicLong(TX_COUNTER).longValue();
-        return u;
+        if (true) {
+            return this.transactionFinalMap.size();
+
+        } else {
+            long u = this.database.getAtomicLong(TX_COUNTER).longValue();
+            return u;
+        }
     }
 
 
