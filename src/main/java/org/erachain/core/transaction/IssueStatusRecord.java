@@ -53,6 +53,17 @@ public class IssueStatusRecord extends Issue_ItemRecord {
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Status"; }
 
+    // RETURN START KEY in tot GEMESIS
+    public long getStartKey(int height) {
+
+        if (height < BlockChain.VERS_4_11) {
+            return START_KEY;
+        }
+
+        return 0l;
+
+    }
+
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
         int test_len;
@@ -122,11 +133,6 @@ public class IssueStatusRecord extends Issue_ItemRecord {
         } else {
             return new IssueStatusRecord(typeBytes, creator, status, signatureBytes);
         }
-    }
-
-    // NOT GENESIS ISSUE STRT FRON NUM
-    protected long getStartKey() {
-        return 0l;
     }
 
     //PARSE CONVERT

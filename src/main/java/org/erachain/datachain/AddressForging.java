@@ -115,7 +115,7 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
         if (previous != null) {
             // иногда бывавет что при откате в этом же блок и был собран блок
             // и была транзакция с ЭРА то два раза пытается откатить - сначала как у транзакции
-            // а потом как у блока - то тут словим на второй раз нулл - b pfghtn lkz ajh;byuf e 'njuj cxtnf
+            // а потом как у блока - то тут словим на второй раз NULL - и форжинг с него прекращается
             this.delete(key);
             this.setLast(address, previous);
         }

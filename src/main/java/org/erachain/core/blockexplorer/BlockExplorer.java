@@ -1191,7 +1191,7 @@ public class BlockExplorer {
         assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
 
         if (true) {
-            if (asset.getKey() > AssetCls.START_KEY ) {
+            if (true) { //asset.getKey() > AssetCls.START_KEY ) {
                 Long blocNoSeqNo = dcSet.getTransactionFinalMapSigns().get(asset.getReference());
                 Transaction transactions = dcSet.getTransactionFinalMap().get(blocNoSeqNo);
                 assetJSON.put("timestamp", transactions.getTimestamp());

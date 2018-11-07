@@ -19,8 +19,9 @@ public abstract class Issue_ItemRecord extends Transaction {
 
     static Logger LOGGER = LoggerFactory.getLogger(Issue_ItemRecord.class.getName());
 
-    //private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK;
     //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
+
+    public static final long START_KEY = 1 << 20;
 
     protected ItemCls item;
 
@@ -56,6 +57,9 @@ public abstract class Issue_ItemRecord extends Transaction {
         return item.toString();
     }
 
+    // RETURN START KEY in tot GEMESIS
+    public abstract long getStartKey(int height);
+
     @Override
     public boolean hasPublicText() {
         return true;
@@ -69,7 +73,6 @@ public abstract class Issue_ItemRecord extends Transaction {
         if (this.item.getReference() == null) this.item.setReference(this.signature);
     }
 
-    protected abstract long getStartKey();
     //PARSE CONVERT
 
 
@@ -178,7 +181,7 @@ public abstract class Issue_ItemRecord extends Transaction {
             this.item.setReference(this.signature);
 
         //INSERT INTO DATABASE
-        this.item.insertToMap(this.dcSet, this.getStartKey());
+        this.item.insertToMap(this.dcSet, this.getStartKey(this.height));
 
     }
 

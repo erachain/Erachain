@@ -61,6 +61,17 @@ public class IssueImprintRecord extends Issue_ItemRecord {
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Imprint"; }
 
+    // RETURN START KEY in tot GEMESIS
+    public long getStartKey(int height) {
+
+        if (height < BlockChain.VERS_4_11) {
+            return START_KEY;
+        }
+
+        return 0l;
+
+    }
+
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
         //boolean asPack = releaserReference != null;
@@ -133,12 +144,6 @@ public class IssueImprintRecord extends Issue_ItemRecord {
         } else {
             return new IssueImprintRecord(typeBytes, creator, imprint, signatureBytes);
         }
-    }
-
-    // NOT GENESIS ISSUE STRT FRON NUM
-    @Override
-    protected long getStartKey() {
-        return 0l;
     }
 
     @Override

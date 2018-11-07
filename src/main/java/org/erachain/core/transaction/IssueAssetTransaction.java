@@ -4,6 +4,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.datachain.DCSet;
@@ -56,6 +57,18 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
 
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Asset"; }
+
+
+    // RETURN START KEY in tot GEMESIS
+    public long getStartKey(int height) {
+
+        if (height < BlockChain.VERS_4_11) {
+            return START_KEY;
+        }
+
+        return 1000l;
+
+    }
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
         //boolean asPack = releaserReference != null;
@@ -150,12 +163,6 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
 
         AssetCls asset = (AssetCls) this.item;
         return BigDecimal.ZERO.setScale(asset.getScale());
-    }
-
-    // NOT GENESIS ISSUE START FRON NUM
-    @Override
-    protected long getStartKey() {
-        return AssetCls.START_KEY;
     }
 
 	/*

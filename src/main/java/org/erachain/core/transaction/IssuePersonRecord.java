@@ -61,6 +61,17 @@ public class IssuePersonRecord extends Issue_ItemRecord {
     //GETTERS/SETTERS
     //public String getName() { return "Issue Person"; }
 
+    // RETURN START KEY in tot GEMESIS
+    public long getStartKey(int height) {
+
+        if (height < BlockChain.VERS_4_11) {
+            return START_KEY;
+        }
+
+        return 0l;
+
+    }
+
     //PARSE CONVERT
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
@@ -135,12 +146,6 @@ public class IssuePersonRecord extends Issue_ItemRecord {
         } else {
             return new IssuePersonRecord(typeBytes, creator, person, signatureBytes);
         }
-    }
-
-    // NOT GENESIS ISSUE STRT FRON NUM
-    @Override
-    protected long getStartKey() {
-        return 0l;
     }
 
     @Override
