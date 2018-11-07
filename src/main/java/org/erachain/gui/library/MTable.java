@@ -29,6 +29,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import org.erachain.gui.models.Renderer_Boolean;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
@@ -137,6 +138,7 @@ public class MTable<U, T> extends JTable {
          *
          */
 
+        setDefaultRenderer(Boolean.class, new Renderer_Boolean());
 
         show_search(true);
         addselectSelectedRow();
