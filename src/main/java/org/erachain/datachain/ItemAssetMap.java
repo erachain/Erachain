@@ -58,8 +58,8 @@ public class ItemAssetMap extends Item_Map {
 
     public AssetCls get(Long key) {
 
-        if (BlockChain.DEVELOP_USE && key > 4 && key < 1000) {
-            AssetCls item;
+        AssetCls item;
+        if (BlockChain.DEVELOP_USE && key > 2 && key < 1000) {
             switch (key.intValue()) {
                 // http://seo-mayak.com/sozdanie-bloga/wordpress-dlya-novichkov/simvoly-kotoryx-net-na-klaviature.html
                 case (int)AssetCls.LIA_KEY:
@@ -98,16 +98,19 @@ public class ItemAssetMap extends Item_Map {
                     item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, "ISO." + key, null, null,
                             "Accounting currency by ISO 4217 standard", AssetCls.AS_ACCOUNTING, 2, 0l);
             }
-            item.setKey(key);
-            return item;
         } else {
             if (key.equals(AssetCls.LIA_KEY)) {
-                return new AssetVenture((byte) 0, GenesisBlock.CREATOR, AssetCls.LIA_NAME, null, null,
+                item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, AssetCls.LIA_NAME, null, null,
                         AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);
+            } else {
+                item = (AssetCls) super.get(key);
             }
-
-            return (AssetCls) super.get(key);
         }
+
+        if (item != null)
+            item.setKey(key);
+
+        return item;
     }
 
 }
