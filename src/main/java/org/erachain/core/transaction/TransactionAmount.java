@@ -1123,10 +1123,10 @@ public abstract class TransactionAmount extends Transaction {
         }
         
         if (absKey == Transaction.RIGHTS_KEY) {
-            int blockHeight = this.getBlockHeightByParentOrLast(db);
+            //int blockHeight = this.getBlockHeightByParentOrLast(db);
             Tuple2<Integer, Integer> lastForgingPoint = this.recipient.getLastForgingData(db);
-            if (lastForgingPoint != null && lastForgingPoint.a == blockHeight) {
-                this.recipient.delForgingData(db, blockHeight);
+            if (lastForgingPoint != null && lastForgingPoint.a == height) {
+                this.recipient.delForgingData(db, height);
             }
         }
     }

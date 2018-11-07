@@ -39,9 +39,9 @@ public class R_SertifyPubKeys extends Transaction {
             = BigDecimal.valueOf(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BlockChain.FEE_SCALE);
     int BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11 = 2;
 
-    public static final int DEFAULT_DURATION = 2 * 356;
+    public static final int DEFAULT_DURATION = 700;
     private static final byte TYPE_ID = (byte) Transaction.CERTIFY_PUB_KEYS_TRANSACTION;
-    private static final String NAME_ID = "Sertify Person";
+    private static final String NAME_ID = "Certify Person";
     private static final int USER_ADDRESS_LENGTH = Transaction.CREATOR_LENGTH;
     private static final int DATE_DAY_LENGTH = 4; // one year + 256 days max
 

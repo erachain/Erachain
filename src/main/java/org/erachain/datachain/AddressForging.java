@@ -107,10 +107,21 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
             // not delete GENESIS forging data for all accounts
             return;
         }
+
+        if ("7RyoDipJAeEzfk1p6XVky9s2u5Dbbmbi4v".equals((address))) {
+            int i = 1;
+        }
+        Tuple2<String, Integer> keyLast = new Tuple2<String, Integer>(address, 0);
+        Tuple2<Integer, Integer> last = this.get(keyLast);
         Tuple2<String, Integer> key = new Tuple2<String, Integer>(address, height);
         Tuple2<Integer, Integer> previous = this.get(key);
-        this.delete(key);
-        this.setLast(address, previous);
+        if (previous != null) {
+            // иногда бывавет что при откате в этом же блок и был собран блок
+            // и была транзакция с ЭРА то два раза пытается откатить - сначала как у транзакции
+            // а потом как у блока - то тут словим на второй раз нулл - b pfghtn lkz ajh;byuf e 'njuj cxtnf
+            this.delete(key);
+            this.setLast(address, previous);
+        }
 
     }
 
