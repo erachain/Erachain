@@ -1182,10 +1182,11 @@ public class Block {
         Controller cnt = Controller.getInstance();
 
         // for DEBUG
-        if (this.heightBlock == 65431
-                || this.heightBlock == 86549) {
+        /*
+        if (this.heightBlock == 60624) {
             int rrr = 0;
         }
+        */
 
         //CHECK IF PARENT EXISTS
         if (this.heightBlock < 2 || this.reference == null) {

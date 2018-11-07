@@ -517,13 +517,7 @@ public class Account {
             absKey = -key;
         }
 
-        if (this.equals("74iioGxnvHWGKijJTUzWrJHZ4ndHSc8PLY") && !db.isFork() && absKey == 2) {
-            int i = 1;
-        }
-
-        //if (amount.signum() < 0)
-        //    amount = amount.negate();
-
+        // for DEBUG
         /*
         if (false
                 && this.equals("77HyuCsr8u7f6znj2Lq8gXjK6DCG7osehs") && absKey == 1 && !db.isFork()
