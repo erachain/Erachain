@@ -1,62 +1,24 @@
 package org.erachain.gui.library;
 
-import java.awt.Container;
-import java.awt.Font;
-import java.awt.Toolkit;
+import com.github.rjeschke.txtmark.Processor;
+import de.muntjak.tinylookandfeel.Theme;
+import org.erachain.controller.Controller;
+import org.erachain.core.account.Account;
+import org.erachain.core.transaction.*;
+import org.erachain.datachain.DCSet;
+import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
+import org.erachain.utils.PlaySound;
+import org.erachain.utils.SysTray;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
-
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import com.github.rjeschke.txtmark.Processor;
-
-import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
-import org.erachain.core.transaction.ArbitraryTransaction;
-import org.erachain.core.transaction.BuyNameTransaction;
-import org.erachain.core.transaction.CancelOrderTransaction;
-import org.erachain.core.transaction.CancelSellNameTransaction;
-import org.erachain.core.transaction.CreateOrderTransaction;
-import org.erachain.core.transaction.CreatePollTransaction;
-import org.erachain.core.transaction.GenesisCertifyPersonRecord;
-import org.erachain.core.transaction.GenesisIssueAssetTransaction;
-import org.erachain.core.transaction.GenesisIssueTemplateRecord;
-import org.erachain.core.transaction.GenesisTransferAssetTransaction;
-import org.erachain.core.transaction.IssueAssetTransaction;
-import org.erachain.core.transaction.IssueImprintRecord;
-import org.erachain.core.transaction.IssuePersonRecord;
-import org.erachain.core.transaction.IssuePollRecord;
-import org.erachain.core.transaction.IssueStatusRecord;
-import org.erachain.core.transaction.IssueTemplateRecord;
-import org.erachain.core.transaction.IssueUnionRecord;
-import org.erachain.core.transaction.MultiPaymentTransaction;
-import org.erachain.core.transaction.R_Hashes;
-import org.erachain.core.transaction.R_Send;
-import org.erachain.core.transaction.R_SertifyPubKeys;
-import org.erachain.core.transaction.R_SetStatusToItem;
-import org.erachain.core.transaction.R_SignNote;
-import org.erachain.core.transaction.R_Vouch;
-import org.erachain.core.transaction.RegisterNameTransaction;
-import org.erachain.core.transaction.SellNameTransaction;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.UpdateNameTransaction;
-import org.erachain.core.transaction.VoteOnItemPollTransaction;
-import org.erachain.core.transaction.VoteOnPollTransaction;
-import org.erachain.datachain.DCSet;
-import de.muntjak.tinylookandfeel.Theme;
-import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
-import org.erachain.utils.PlaySound;
-import org.erachain.utils.SysTray;
 
 /*
 import org.jvnet.substance.SubstanceLookAndFeel;
@@ -339,6 +301,8 @@ public class library {
     }
 
     public static BigDecimal getBlockSegToBigInteger(Transaction transaction) {
+        if (transaction == null)
+            return new BigDecimal(-2);
         if (transaction.isConfirmed(DCSet.getInstance())) {
             String m = transaction.getBlockHeight() + "";
             String d = transaction.getSeqNo(DCSet.getInstance()) + "";
