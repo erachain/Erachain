@@ -114,8 +114,14 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
         return this.key;
     }
 
-    public void remove() {
+    public void remove(long key) {
         super.delete(key);
+
+        if (this.key != key)
+            // it is not top of STACK (for UNIQUE items with short NUM)
+            return;
+
+        // delete on top STACK
 
         if (this.atomicKey != null) {
             this.atomicKey.decrementAndGet();

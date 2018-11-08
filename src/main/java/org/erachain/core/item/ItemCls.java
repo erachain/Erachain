@@ -463,13 +463,16 @@ public abstract class ItemCls {
         //DELETE FROM DATABASE
 
         long thisKey = this.getKey(db);
+        /* OLD
         //LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 1a, getKey= " + thisKey);
         Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
         if (pair == null) {
-            this.getDBMap(db).remove();
+            this.getDBMap(db).remove(thisKey);
         } else {
             this.getDBMap(db).delete(thisKey);
         }
+        */
+        this.getDBMap(db).delete(thisKey);
 
         //DELETE ORPHAN DATA
         //LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 2");
