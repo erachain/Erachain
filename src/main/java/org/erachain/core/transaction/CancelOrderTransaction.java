@@ -291,7 +291,7 @@ public class CancelOrderTransaction extends Transaction {
 
         process_it(this.dcSet, order);
         this.addCalculated(this.creator, order.getHave(), order.getAmountHave(),
-                "cancel order");
+                "cancel order" + Transaction.viewDBRef(order.getId()));
     }
 
     public static void orphan_it(DCSet db, Order order) {
