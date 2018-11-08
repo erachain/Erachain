@@ -57,10 +57,10 @@ public class IssueTemplateRecord extends Issue_ItemRecord {
     public long getStartKey(int height) {
 
         if (height < BlockChain.VERS_4_11) {
-            return START_KEY;
+            return 0l;
         }
 
-        return 0l;
+        return START_KEY;
 
     }
 

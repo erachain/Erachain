@@ -63,10 +63,10 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
     public long getStartKey(int height) {
 
         if (height < BlockChain.VERS_4_11) {
-            return START_KEY;
+            return 1000l;
         }
 
-        return 1000l;
+        return START_KEY;
 
     }
 

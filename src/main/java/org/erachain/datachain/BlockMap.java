@@ -281,7 +281,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 	 */
 
     // TODO make CHAIN deletes - only for LAST block!
-    public Block remove(byte[] signature, byte[] reference) {
+    public Block remove(byte[] signature, byte[] reference, PublicKeyAccount creator) {
         DCSet dcSet = getDCSet();
 
         int height = this.size();
@@ -292,10 +292,19 @@ public class BlockMap extends DCMap<Integer, Block> {
         // ORPHAN FORGING DATA
         if (height > 1) {
 
-            Block.BlockHead head = dcSet.getBlocksHeadsMap().remove();
+            //Block.BlockHead head = dcSet.getBlocksHeadsMap().remove();
+            dcSet.getBlocksHeadsMap().remove();
 
             // INITIAL forging DATA no need remove!
-            head.creator.delForgingData(dcSet, height);
+            Tuple2<String, Integer> key = new Tuple2<String, Integer>(creator.getAddress(), height);
+            Tuple2<Integer, Integer> previous = dcSet.getAddressForging().get(key);
+            if (previous != null) {
+                // иногда бывавет что при откате в этом же блок и был собран блок
+                // и была транзакция с ЭРА то два раза пытается откатить - сначала как у транзакции
+                // а потом как у блока - то тут словим на второй раз NULL - и форжинг с него прекращается
+                // однако удаление для прихода монет в ноль должно остаться
+                creator.delForgingData(dcSet, height);
+            }
 
         }
 

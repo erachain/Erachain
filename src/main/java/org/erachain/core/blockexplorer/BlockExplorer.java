@@ -1928,53 +1928,24 @@ public class BlockExplorer {
         do {
 
             PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(i);
-
             Map blockJSON = new LinkedHashMap();
-            blockJSON.put("key", person.getKey());
-            blockJSON.put("name", person.getName());
-            blockJSON.put("creator", person.getOwner().getAddress());
-            String img = Base64.encodeBase64String(person.getImage());
-            blockJSON.put("img", img);
-            String ico = Base64.encodeBase64String(person.getIcon());
-            blockJSON.put("ico", ico);
-
-            /*
-             * blockJSON.put("generatingBalance",
-             * block.getGeneratingBalance(dcSet)); //blockJSON.put("winValue",
-             * block.calcWinValue(dcSet)); blockJSON.put("winValueTargetted",
-             * block.calcWinValueTargeted(dcSet));
-             * blockJSON.put("transactionsCount", block.getTransactionCount());
-             * blockJSON.put("timestamp", block.getTimestamp(dcSet));
-             * blockJSON.put("dateTime",
-             * BlockExplorer.timestampToStr(block.getTimestamp(dcSet)));
-             * blockJSON.put("totalFee", block.getTotalFee().toPlainString());
-             *
-             * BigDecimal totalAmount = BigDecimal.ZERO; for (Transaction
-             * transaction : block.getTransactions()) { for (Account account :
-             * transaction.getInvolvedAccounts()) { BigDecimal amount =
-             * transaction.getAmount(account);
-             * if(amount.compareTo(BigDecimal.ZERO) > 0) { totalAmount =
-             * totalAmount.add(amount); } } }
-             *
-             * blockJSON.put("totalAmount", totalAmount.toPlainString());
-             *
-             * LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction> aTtxs =
-             * dcSet.getATTransactionMap().getATTransactions(counter);
-             *
-             * BigDecimal totalATAmount = BigDecimal.ZERO;
-             *
-             * for(Map.Entry<Tuple2<Integer, Integer> , AT_Transaction> e :
-             * aTtxs.entrySet()) { totalATAmount =
-             * totalATAmount.add(BigDecimal.valueOf( e.getValue().getAmount()));
-             * }
-             *
-             * blockJSON.put("totalATAmount", totalATAmount.toPlainString());
-             * //blockJSON.put("aTfee", block.getATfee().toPlainString());
-             *
-             * output.put(counter, blockJSON);
-             *
-             * counter --; block = block.getParent(dcSet);
-             */
+            if (person != null) {
+                blockJSON.put("key", person.getKey());
+                blockJSON.put("name", person.getName());
+                blockJSON.put("creator", person.getOwner().getAddress());
+                String img = Base64.encodeBase64String(person.getImage());
+                blockJSON.put("img", img);
+                String ico = Base64.encodeBase64String(person.getIcon());
+                blockJSON.put("ico", ico);
+            } else {
+                blockJSON.put("key", i);
+                blockJSON.put("name", "-");
+                blockJSON.put("creator", "-");
+                //String img = Base64.encodeBase64String(person.getImage());
+                blockJSON.put("img", "");
+                //String ico = Base64.encodeBase64String(person.getIcon());
+                blockJSON.put("ico", "");
+            }
             output.put(i, blockJSON);
             i--;
 

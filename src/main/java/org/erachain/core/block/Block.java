@@ -1794,7 +1794,7 @@ public class Block {
         feeProcess(dcSet, true);
 
         //DELETE BLOCK FROM DB
-        dcSet.getBlockMap().remove(this.signature, this.reference);
+        dcSet.getBlockMap().remove(this.signature, this.reference, this.creator);
 
         //LOGGER.debug("<<< core.block.Block.orphan(DBSet) #4");
 
