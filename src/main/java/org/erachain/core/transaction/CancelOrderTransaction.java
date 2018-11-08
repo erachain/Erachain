@@ -1,24 +1,21 @@
 package org.erachain.core.transaction;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.erachain.core.item.assets.Order;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.item.assets.Order;
 import org.erachain.datachain.DCSet;
+import org.json.simple.JSONObject;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class CancelOrderTransaction extends Transaction {
     private static long ALL_VALID = 187550l * 2l * (long)Integer.MAX_VALUE;
@@ -293,6 +290,8 @@ public class CancelOrderTransaction extends Transaction {
         }
 
         process_it(this.dcSet, order);
+        this.addCalculated(this.creator, order.getHave(), order.getAmountHave(),
+                "cancel order");
     }
 
     public static void orphan_it(DCSet db, Order order) {

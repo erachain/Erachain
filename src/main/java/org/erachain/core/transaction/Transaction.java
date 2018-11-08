@@ -892,6 +892,24 @@ public abstract class Transaction {
 
     }
 
+    public boolean addCalculated(R_Calculated calculated) {
+        if (this.block != null && this.block.txCalculated != null) {
+            this.block.txCalculated.add(calculated);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean addCalculated(Account creator, long assetKey, BigDecimal amount,
+                                 String message) {
+        if (this.block != null && this.block.txCalculated != null) {
+            this.block.txCalculated.add(new R_Calculated(creator, assetKey, amount,
+                    message, this.dbRef));
+            return true;
+        }
+        return false;
+    }
+
     ////
     // VIEW
     public String viewType() {
@@ -913,6 +931,17 @@ public abstract class Transaction {
     public String viewFullTypeName() {
         String sub = viewSubTypeName();
         return sub.length() > 0 ? viewTypeName() + ":" + sub : viewTypeName();
+    }
+
+    public static String viewDBRef(long dbRef) {
+
+        byte[] bytes = Longs.toByteArray(dbRef);
+
+        int blockHeight = Ints.fromByteArray(Arrays.copyOfRange(bytes, 0, 4));
+        int seqNo = Ints.fromByteArray(Arrays.copyOfRange(bytes, 4, 8));
+
+        return blockHeight + "-" + seqNo;
+
     }
 
     public String viewHeightSeq(DCSet db) {
