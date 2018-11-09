@@ -31,12 +31,13 @@ import java.util.*;
 // typeBytes[2] - size of personalized accounts
 public class R_SertifyPubKeys extends Transaction {
 
-    protected static final BigDecimal BONUS_FOR_PERSON_4_11 = BigDecimal.valueOf(10000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-    protected static final BigDecimal BONUS_FOR_PERSON_REGISTRATOR_4_11 = BigDecimal.valueOf(10000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-    protected static final BigDecimal BONUS_FOR_PERSON_SERTIFIER_4_11 = BigDecimal.valueOf(10000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-    protected static final long BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 = 20000 * BlockChain.FEE_PER_BYTE;
-    protected static final BigDecimal BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11
-            = BigDecimal.valueOf(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BlockChain.FEE_SCALE);
+    protected static final BigDecimal BONUS_FOR_PERSON_4_11 = BigDecimal.valueOf(2000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+    protected static final BigDecimal FEE_FOR_PERSON_REGISTRATOR_4_11 = BigDecimal.valueOf(100 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+    //protected static final BigDecimal BONUS_FOR_PERSON_REGISTRATOR_4_11 = BigDecimal.valueOf(5000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+    //protected static final BigDecimal BONUS_FOR_PERSON_SERTIFIER_4_11 = BigDecimal.valueOf(10000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+    protected static final long BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 = 0; //20000 * BlockChain.FEE_PER_BYTE;
+    //protected static final BigDecimal BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11
+    //        = BigDecimal.valueOf(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BlockChain.FEE_SCALE);
     protected static final int BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11 = 2;
 
     public static final int DEFAULT_DURATION = 700;
@@ -628,13 +629,17 @@ public class R_SertifyPubKeys extends Transaction {
                 }
                 BigDecimal issued_FEE_BD_total = BONUS_FOR_PERSON_4_11;
 
-                issuer.changeBalance(db, false, FEE_KEY, BONUS_FOR_PERSON_REGISTRATOR_4_11, false);
-                if (makeCalculates) {
-                    this.block.txCalculated.add(new R_Calculated(issuer, FEE_KEY, BONUS_FOR_PERSON_REGISTRATOR_4_11,
-                            "register bonus @P:" + this.key, this.dbRef));
-                }
-                issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_4_11);
+                BigDecimal issued_FEE_BD = transPersonIssue.getFee().subtract(FEE_FOR_PERSON_REGISTRATOR_4_11);
 
+                issuer.changeBalance(db, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRATOR_4_11,
+                        false);
+                if (makeCalculates) {
+                    this.block.txCalculated.add(new R_Calculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRATOR_4_11,
+                            "register reward @P:" + this.key, this.dbRef));
+                }
+                issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRATOR_4_11);
+
+                /*
                 if (!this.creator.equals(issuer)) {
                     // AND this different KEY not owned by ONE PERSON
                     Tuple4<Long, Integer, Integer, Integer> creatorPersonItem = db.getAddressPersonMap().getItem(this.creator.getAddress());
@@ -660,6 +665,7 @@ public class R_SertifyPubKeys extends Transaction {
                             this.block != null? this.block.txCalculated : null, "invite bonus @P:" + this.key);
                     issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11);
                 }
+                */
 
                 // TO EMITTE FEE (with minus)
                 GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY, issued_FEE_BD_total, true);
@@ -785,12 +791,17 @@ public class R_SertifyPubKeys extends Transaction {
 
                 // GIVE GIFT for this PUB_KEY - to PERSON
                 pkAccount.changeBalance(db, true, FEE_KEY, BONUS_FOR_PERSON_4_11, false);
+
                 BigDecimal issued_FEE_BD_total = BONUS_FOR_PERSON_4_11;
 
-                issuer.changeBalance(db, true, FEE_KEY, BONUS_FOR_PERSON_REGISTRATOR_4_11, false);
+                BigDecimal issued_FEE_BD = transPersonIssue.getFee().subtract(FEE_FOR_PERSON_REGISTRATOR_4_11);
 
-                issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_4_11);
+                issuer.changeBalance(db, true, FEE_KEY, issued_FEE_BD, //BONUS_FOR_PERSON_REGISTRATOR_4_11,
+                        false);
 
+                issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRATOR_4_11);
+
+                /*
                 if (!this.creator.equals(issuer)) {
                     // AND this different KEY not owned by ONE PERSON
                     Tuple4<Long, Integer, Integer, Integer> creatorPersonItem = db.getAddressPersonMap().getItem(this.creator.getAddress());
@@ -813,6 +824,7 @@ public class R_SertifyPubKeys extends Transaction {
                             null, null);
                     issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11);
                 }
+                */
 
                 // ADD to EMISSION (with minus)
                 GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY, issued_FEE_BD_total, true);

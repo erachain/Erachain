@@ -1,13 +1,6 @@
 package org.erachain.core.transaction;
 
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import com.google.common.primitives.Longs;
-
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -16,9 +9,14 @@ import org.erachain.core.item.persons.PersonFactory;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.datachain.AddressTime_SignatureMap;
 
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 //import java.util.Map;
 // import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 public class IssuePersonRecord extends Issue_ItemRecord {
     public static final int MAX_IMAGE_LENGTH = 20480;
@@ -333,7 +331,7 @@ public class IssuePersonRecord extends Issue_ItemRecord {
 
         if (person.isAlive(this.timestamp)) {
             // IF PERSON is LIVE
-            return calcCommonFee() >> 3;
+            return calcCommonFee() >> 1;
         }
 
         // is DEAD

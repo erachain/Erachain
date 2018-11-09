@@ -177,7 +177,7 @@ public class BlockChain {
     public static final BigDecimal MIN_FEE_IN_BLOCK = BigDecimal.valueOf(FEE_PER_BYTE * 6 * 128, FEE_SCALE);
     public static final float FEE_POW_BASE = (float) 1.5;
     public static final int FEE_POW_MAX = 6;
-    public static final int FINANCIAL_FEE_LEVEL = 500;
+    public static final int FINANCIAL_FEE_LEVEL = 100;
     public static final int ISSUE_MULT_FEE = 1 << 10;
     public static final int ISSUE_ASSET_MULT_FEE = 1 << 8;
     public static final int TEST_FEE_ORPHAN = 0; //157000;
