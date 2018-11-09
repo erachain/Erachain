@@ -59,7 +59,7 @@ public class ItemAssetMap extends Item_Map {
     public AssetCls get(Long key) {
 
         AssetCls item;
-        if (BlockChain.DEVELOP_USE && key > 2 && key < 1000) {
+        if (BlockChain.DEVELOP_USE && key > 100 && key < 1000) {
             switch (key.intValue()) {
                 // http://seo-mayak.com/sozdanie-bloga/wordpress-dlya-novichkov/simvoly-kotoryx-net-na-klaviature.html
                 case (int)AssetCls.LIA_KEY:
