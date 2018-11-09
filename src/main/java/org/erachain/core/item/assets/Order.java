@@ -562,7 +562,7 @@ public class Order implements Comparable<Order> {
                 this.creator.changeBalance(this.dcSet, false,
                         this.haveKey, this.getAmountHaveLeft(), false);
                 transaction.addCalculated(this.creator, this.haveKey, this.getAmountHaveLeft(),
-                        "ended order: " + Transaction.viewDBRef(this.id));
+                        "ended order @" + Transaction.viewDBRef(this.id));
 
                 break;
             }
@@ -688,7 +688,7 @@ public class Order implements Comparable<Order> {
                 //TRANSFER FUNDS
                 order.getCreator().changeBalance(this.dcSet, false, order.getWant(), tradeAmountForWant, false);
                 transaction.addCalculated(order.getCreator(), order.getWant(), tradeAmountForWant,
-                        "order: " + Transaction.viewDBRef(order.id));
+                        "order @" + Transaction.viewDBRef(order.id));
 
 
                 // update new values
@@ -708,7 +708,7 @@ public class Order implements Comparable<Order> {
                     this.creator.changeBalance(this.dcSet, false,
                             this.haveKey, this.getAmountHaveLeft(), false);
                     transaction.addCalculated(this.creator, this.haveKey, this.getAmountHaveLeft(),
-                            "ended order: " + transaction.viewDBRef(this.id));
+                            "ended order @" + transaction.viewDBRef(this.id));
                     break;
                 }
 
@@ -729,7 +729,7 @@ public class Order implements Comparable<Order> {
         if (processedAmountFulfilledWant.signum() > 0) {
             this.creator.changeBalance(this.dcSet, false, this.wantKey, processedAmountFulfilledWant, false);
             transaction.addCalculated(this.creator, this.wantKey, processedAmountFulfilledWant,
-                    "trans order: " + Transaction.viewDBRef(this.id));
+                    "order @" + Transaction.viewDBRef(this.id));
         }
 
 

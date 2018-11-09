@@ -1671,7 +1671,10 @@ public class Block {
         this.getTransactions();
 
         if (this.transactionCount > 0) {
-            this.txCalculated = new ArrayList<R_Calculated>();
+            if (!dcSet.isFork()) {
+                // make pool for calculated
+                this.txCalculated = new ArrayList<R_Calculated>();
+            }
 
             //DBSet dbSet = Controller.getInstance().getDBSet();
             TransactionMap unconfirmedMap = dcSet.getTransactionMap();

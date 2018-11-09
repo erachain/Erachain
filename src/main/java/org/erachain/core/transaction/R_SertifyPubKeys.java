@@ -656,8 +656,7 @@ public class R_SertifyPubKeys extends Transaction {
                 if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0) {
                     process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11,
                             BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, false,
-                            this.block != null && this.block.txCalculated != null?
-                                    this.block.txCalculated : null, "for invite");
+                            this.block != null? this.block.txCalculated : null, "for invite");
                     issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11);
                 }
 
