@@ -32,9 +32,9 @@ import java.util.*;
 public class R_SertifyPubKeys extends Transaction {
 
     BigDecimal BONUS_FOR_PERSON_4_11 = BigDecimal.valueOf(10000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-    BigDecimal BONUS_FOR_PERSON_REGISTRATOR_4_11 = BigDecimal.valueOf(15000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-    BigDecimal BONUS_FOR_PERSON_SERTIFIER_4_11 = BigDecimal.valueOf(3000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-    long BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 = 300 * 20 * BlockChain.FEE_PER_BYTE;
+    BigDecimal BONUS_FOR_PERSON_REGISTRATOR_4_11 = BigDecimal.valueOf(10000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+    BigDecimal BONUS_FOR_PERSON_SERTIFIER_4_11 = BigDecimal.valueOf(10000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+    long BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 = 10000 * BlockChain.FEE_PER_BYTE;
     BigDecimal BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11
             = BigDecimal.valueOf(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BlockChain.FEE_SCALE);
     int BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11 = 2;
@@ -624,14 +624,14 @@ public class R_SertifyPubKeys extends Transaction {
                 pkAccount.changeBalance(db, false, FEE_KEY, BONUS_FOR_PERSON_4_11, false);
                 if (makeCalculates) {
                     this.block.txCalculated.add(new R_Calculated(pkAccount, FEE_KEY, BONUS_FOR_PERSON_4_11,
-                            "enter", this.dbRef));
+                            "enter bonus", this.dbRef));
                 }
                 BigDecimal issued_FEE_BD_total = BONUS_FOR_PERSON_4_11;
 
                 issuer.changeBalance(db, false, FEE_KEY, BONUS_FOR_PERSON_REGISTRATOR_4_11, false);
                 if (makeCalculates) {
                     this.block.txCalculated.add(new R_Calculated(issuer, FEE_KEY, BONUS_FOR_PERSON_REGISTRATOR_4_11,
-                            "register", this.dbRef));
+                            "register bonus @P:" + this.key, this.dbRef));
                 }
                 issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_4_11);
 
@@ -646,7 +646,7 @@ public class R_SertifyPubKeys extends Transaction {
                         this.creator.changeBalance(db, false, FEE_KEY, BONUS_FOR_PERSON_SERTIFIER_4_11, false);
                         if (makeCalculates)
                             this.block.txCalculated.add(new R_Calculated(this.creator, FEE_KEY, BONUS_FOR_PERSON_SERTIFIER_4_11,
-                                    "certify", this.dbRef));
+                                    "certify bonus @P:" + this.key, this.dbRef));
 
                         issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_SERTIFIER_4_11);
                     }
@@ -656,7 +656,7 @@ public class R_SertifyPubKeys extends Transaction {
                 if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0) {
                     process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11,
                             BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, false,
-                            this.block != null? this.block.txCalculated : null, "for invite");
+                            this.block != null? this.block.txCalculated : null, "invite bonus @P:" + this.key);
                     issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11);
                 }
 
