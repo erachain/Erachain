@@ -653,7 +653,8 @@ public class R_SertifyPubKeys extends Transaction {
                 }
 
                 ///////// INVITER
-                if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0) {
+                if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0
+                        && !Arrays.equals(BlockChain.BONUS_STOP_ACCOUNT, issuer.getShortAddressBytes())) {
                     process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11,
                             BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, false,
                             this.block != null? this.block.txCalculated : null, "invite bonus @P:" + this.key);
@@ -805,7 +806,8 @@ public class R_SertifyPubKeys extends Transaction {
                 }
 
                 ///////// INVITER
-                if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0) {
+                if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0
+                        && !Arrays.equals(BlockChain.BONUS_STOP_ACCOUNT, issuer.getShortAddressBytes())) {
                     process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11,
                             BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, true,
                             null, null);
