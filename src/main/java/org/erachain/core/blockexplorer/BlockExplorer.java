@@ -2105,6 +2105,8 @@ public class BlockExplorer {
 
         // use negate for amount
         boolean outcome = false;
+        int type;
+
         LinkedHashMap transactionsJSON = new LinkedHashMap();
         List<Transaction> transactions2 = (toIndex == 0) ? transactions
                 : transactions.subList(fromIndex, Math.min(toIndex, transactions.size()));
@@ -2183,13 +2185,17 @@ public class BlockExplorer {
                 if (trans.getCreator() == null) {
                     transactionJSON.put("creator", GenesisBlock.CREATOR.getAddress());
                     transactionJSON.put("creator_addr", "GENESIS");
+                    if (trans.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
+                        outcome = false;
+                    }
 
                 } else {
                     Account atSideAccount;
                     atSideAccount = trans.getCreator();
                     if (account != null) {
                         atSideAccount = trans.getCreator();
-                        if (trans.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                        type = trans.getType();
+                        if (type == Transaction.SEND_ASSET_TRANSACTION) {
                             R_Send rSend = (R_Send) trans;
                             if (rSend.getCreator().equals(account)) {
                                 outcome = false;
