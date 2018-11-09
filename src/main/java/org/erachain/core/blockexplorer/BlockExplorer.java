@@ -2109,6 +2109,7 @@ public class BlockExplorer {
         List<Transaction> transactions2 = (toIndex == 0) ? transactions
                 : transactions.subList(fromIndex, Math.min(toIndex, transactions.size()));
         for (Transaction trans : transactions2) {
+
             // SET + HEIGHT + SEQ
             if (trans.getType() == 100) {
                 trans.setDC(dcSet);
@@ -2163,6 +2164,7 @@ public class BlockExplorer {
             transactionJSON.put("seq", trans.getSeqNo(dcSet));
 
             if (trans.getType() == Transaction.CALCULATED_TRANSACTION) {
+                outcome = false;
                 R_Calculated txCalculated = (R_Calculated) trans;
                 transactionJSON.put("reference", "--");
                 transactionJSON.put("signature", trans.getBlockHeight() + "-" + trans.getSeqNo());
@@ -2193,6 +2195,8 @@ public class BlockExplorer {
                                 outcome = false;
                                 atSideAccount = rSend.getRecipient();
                             }
+                            // возврат и взять на харенение обратный
+                            outcome = outcome ^ !rSend.isBackward() ^ (rSend.getActionType() == TransactionAmount.ACTION_HOLD);
                         }
                     }
 
@@ -2218,7 +2222,7 @@ public class BlockExplorer {
             if (absKey > 0) {
                 if (amount.length() > 0) {
                     transactionJSON.put("amount_key",
-                            (outcome? "-":"") +trans.viewAmount() + ":" + absKey);
+                            (outcome? "-":"+") +trans.viewAmount() + ":" + absKey);
                 } else {
                     transactionJSON.put("amount_key", "" + absKey);
                 }
