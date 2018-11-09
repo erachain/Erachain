@@ -385,7 +385,7 @@ public class CancelOrderTransaction extends Transaction {
 
     @Override
     public int getJobLevel() {
-        return 300;
+        return BlockChain.FINANCIAL_FEE_LEVEL;
     }
 
     @Override

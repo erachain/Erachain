@@ -1152,7 +1152,7 @@ public abstract class TransactionAmount extends Transaction {
         if (this.amount == null || this.amount.signum() == 0) {
             return 100;
         }
-        return 300;
+        return BlockChain.FINANCIAL_FEE_LEVEL;
     }
 
 }

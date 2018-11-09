@@ -31,13 +31,13 @@ import java.util.*;
 // typeBytes[2] - size of personalized accounts
 public class R_SertifyPubKeys extends Transaction {
 
-    BigDecimal BONUS_FOR_PERSON_4_11 = BigDecimal.valueOf(10000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-    BigDecimal BONUS_FOR_PERSON_REGISTRATOR_4_11 = BigDecimal.valueOf(10000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-    BigDecimal BONUS_FOR_PERSON_SERTIFIER_4_11 = BigDecimal.valueOf(10000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-    long BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 = 10000 * BlockChain.FEE_PER_BYTE;
-    BigDecimal BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11
+    protected static final BigDecimal BONUS_FOR_PERSON_4_11 = BigDecimal.valueOf(10000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+    protected static final BigDecimal BONUS_FOR_PERSON_REGISTRATOR_4_11 = BigDecimal.valueOf(10000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+    protected static final BigDecimal BONUS_FOR_PERSON_SERTIFIER_4_11 = BigDecimal.valueOf(10000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+    protected static final long BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 = 20000 * BlockChain.FEE_PER_BYTE;
+    protected static final BigDecimal BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11
             = BigDecimal.valueOf(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BlockChain.FEE_SCALE);
-    int BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11 = 2;
+    protected static final int BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11 = 2;
 
     public static final int DEFAULT_DURATION = 700;
     private static final byte TYPE_ID = (byte) Transaction.CERTIFY_PUB_KEYS_TRANSACTION;
@@ -854,7 +854,7 @@ public class R_SertifyPubKeys extends Transaction {
 
     @Override
     public int getJobLevel() {
-        return 300;
+        return BlockChain.FINANCIAL_FEE_LEVEL;
     }
 
     @Override

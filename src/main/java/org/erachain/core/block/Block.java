@@ -744,17 +744,17 @@ public class Block {
         if(true || this.heightBlock < BlockChain.VERS_4_12) {
             bonusFee = BlockChain.MIN_FEE_IN_BLOCK_4_10;
             if (this.heightBlock < inDay30 << 1)
-                return BigDecimal.valueOf(55000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+                return BigDecimal.valueOf(70000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else if (this.heightBlock < inDay30 << 2) // 120 days = 4 mounth
-                return BigDecimal.valueOf(50000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+                return BigDecimal.valueOf(65000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else if (this.heightBlock < inDay30 << 3) // 16 mounth - 72000
-                return BigDecimal.valueOf(45000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+                return BigDecimal.valueOf(60000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else if (false && this.heightBlock < inDay30 << 4) //  64 mounth
-                return BigDecimal.valueOf(40000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+                return BigDecimal.valueOf(55000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else if (false && this.heightBlock < inDay30 << 6) //  256 mounth
-                return BigDecimal.valueOf(35000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+                return BigDecimal.valueOf(50000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else
-                return BigDecimal.valueOf(30000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+                return BigDecimal.valueOf(50000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
         } else {
             bonusFee = BlockChain.MIN_FEE_IN_BLOCK;
             if (this.heightBlock < inDay30 << 1)

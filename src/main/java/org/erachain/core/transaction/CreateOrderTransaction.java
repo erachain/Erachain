@@ -1,18 +1,7 @@
 package org.erachain.core.transaction;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple3;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
@@ -20,6 +9,15 @@ import org.erachain.core.block.Block;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.datachain.DCSet;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple3;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /*
 
@@ -648,7 +646,7 @@ public class CreateOrderTransaction extends Transaction {
 
     @Override
     public int getJobLevel() {
-        return 300;
+        return BlockChain.FINANCIAL_FEE_LEVEL;
     }
 
     @Override

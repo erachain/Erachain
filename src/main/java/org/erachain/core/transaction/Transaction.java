@@ -1314,7 +1314,10 @@ public abstract class Transaction {
         Transaction issueRecord = this.dcSet.getTransactionFinalMap().get(inviteredDBRef);
         Account inviterAccount = issueRecord.getCreator();
 
-        if (creator.equals(inviterAccount)) {
+        if (creator.equals(inviterAccount)
+                // EXCLUDE ME
+                || Arrays.equals(BlockChain.BONUS_STOP_ACCOUNT, inviterAccount.getShortAddressBytes())
+        ) {
             // IT IS ME - all fee!
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
             creator.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
