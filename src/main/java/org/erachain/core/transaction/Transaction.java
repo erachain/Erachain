@@ -1313,6 +1313,13 @@ public abstract class Transaction {
 
         Transaction issueRecord = this.dcSet.getTransactionFinalMap().get(inviteredDBRef);
         Account inviterAccount = issueRecord.getCreator();
+        Tuple4<Long, Integer, Integer, Integer> inviterPersonDuration = inviterAccount.getPersonDuration(this.dcSet);
+
+        if (inviterPersonDuration != null && inviterPersonDuration.a.equals(personDuration.a)) {
+            // if it SAME perdsn - skip
+            process_gifts(--level, fee_gift, inviterAccount, asOrphan, txCalculated, message);
+            return;
+        }
 
         if (creator.equals(inviterAccount)
                 // EXCLUDE ME
@@ -1478,6 +1485,11 @@ public abstract class Transaction {
     }
 
     public boolean isConfirmed(DCSet db) {
+        if (this.getType() == Transaction.CALCULATED_TRANSACTION) {
+            // USE referenced transaction
+            return db.getTransactionFinalMap().contains(this.reference);
+        }
+
         return db.getTransactionFinalMapSigns().contains(this.getSignature());
     }
 
@@ -1485,8 +1497,10 @@ public abstract class Transaction {
 
         try {
             // CHECK IF IN UNCONFIRMED TRANSACTION
-            if (db.getTransactionMap().contains(this)) {
-                return -db.getTransactionMap().getBroadcasts(this);
+            if (this.getType() != Transaction.CALCULATED_TRANSACTION) {
+                if (!db.getTransactionMap().contains(this)) {
+                    return -db.getTransactionMap().getBroadcasts(this);
+                }
             }
 
             // CALCULATE CONFIRMATIONS
