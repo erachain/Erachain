@@ -100,6 +100,11 @@ public class CreateOrderTransaction extends Transaction {
     // GETTERS/SETTERS
     // public static String getName() { return "Create Order"; }
 
+    @Override
+    public String viewAmount() {
+        return this.amountHave.toPlainString();
+    }
+
     /*
      * public void makeOrder() { if (this.order == null) this.order = new
      * Order(new BigInteger(this.signature), this.creator, this.have, this.want,

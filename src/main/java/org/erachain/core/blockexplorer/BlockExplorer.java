@@ -2102,6 +2102,9 @@ public class BlockExplorer {
         LinkedHashMap output = new LinkedHashMap();
         // Creator or Recipient if ACCOUNT is SET
         int i1 = 0;
+
+        // use negate for amount
+        boolean outcome = false;
         LinkedHashMap transactionsJSON = new LinkedHashMap();
         List<Transaction> transactions2 = (toIndex == 0) ? transactions
                 : transactions.subList(fromIndex, Math.min(toIndex, transactions.size()));
@@ -2112,6 +2115,7 @@ public class BlockExplorer {
             }
             trans.setDC(dcSet);
 
+            outcome = true;
 
             LinkedHashMap transactionJSON = new LinkedHashMap();
 
@@ -2186,6 +2190,7 @@ public class BlockExplorer {
                         if (trans.getType() == Transaction.SEND_ASSET_TRANSACTION) {
                             R_Send rSend = (R_Send) trans;
                             if (rSend.getCreator().equals(account)) {
+                                outcome = false;
                                 atSideAccount = rSend.getRecipient();
                             }
                         }
@@ -2212,7 +2217,8 @@ public class BlockExplorer {
             String amount = trans.viewAmount();
             if (absKey > 0) {
                 if (amount.length() > 0) {
-                    transactionJSON.put("amount_key", trans.viewAmount() + ":" + absKey);
+                    transactionJSON.put("amount_key",
+                            (outcome? "-":"") +trans.viewAmount() + ":" + absKey);
                 } else {
                     transactionJSON.put("amount_key", "" + absKey);
                 }
