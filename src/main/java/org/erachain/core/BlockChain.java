@@ -185,12 +185,12 @@ public class BlockChain {
     public static final int FEE_FOR_ANONIMOUSE = 33;
     //
     public static final boolean VERS_4_11_USE_OLD_FEE = false;
-    public static final int FEE_INVITED_DEEP = VERS_4_11_USE_OLD_FEE? 4 : 2;
+    public static final int FEE_INVITED_DEEP = 2;
 
     // levels for deep
-    public static final int FEE_INVITED_SHIFT = 5; // 2^5 = 64 - total FEE -> fee for Forger and fee for Inviter
-    public static final int FEE_INVITED_SHIFT_IN_LEVEL = VERS_4_11_USE_OLD_FEE? 3 : 1;
-    public static final int FEE_INVITED_SHIFT_FOR_INVITE = 1; // - total FEE for Inviter of Person
+    public static final int FEE_INVITED_SHIFT = 1;
+    public static final int BONUS_REFERAL = 50 * FEE_PER_BYTE;
+    public static final int FEE_INVITED_SHIFT_IN_LEVEL = 1;
 
     // 0.0075 COMPU - is FEE for Issue Person - then >> 2 - всумме столько получают Форжер и кто привел
     // Бонус получает Персона, Вносит, Удостоверяет - 3 человека = Эмиссия

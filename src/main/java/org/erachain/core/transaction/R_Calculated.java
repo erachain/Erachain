@@ -29,7 +29,7 @@ import java.util.Arrays;
 public class R_Calculated extends TransactionAmount {
 
     private static final byte TYPE_ID = (byte) Transaction.CALCULATED_TRANSACTION;
-    private static final String NAME_ID = "*calculated*";
+    private static final String NAME_ID = "_protocol_";
     protected String message;
 
     public R_Calculated(byte[] typeBytes, Account recipient, long key,

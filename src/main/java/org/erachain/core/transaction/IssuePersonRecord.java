@@ -59,6 +59,11 @@ public class IssuePersonRecord extends Issue_ItemRecord {
     //GETTERS/SETTERS
     //public String getName() { return "Issue Person"; }
 
+    @Override
+    public long getInvitedFee() {
+        return 0l;
+    }
+
     // RETURN START KEY in tot GEMESIS
     public long getStartKey(int height) {
 
@@ -306,35 +311,9 @@ public class IssuePersonRecord extends Issue_ItemRecord {
 
     }
 
-        /*
-    всю комиссию получает форжер - может быть это не живоая персона?
-    поэтому у форжера будут забраны компу после регистрации персоны
-    */
-
-    // GET only INVITED FEE
-    @Override
-    public long getInvitedFee() {
-        if (this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE)
-            return super.getInvitedFee();
-
-        //return this.fee.unscaledValue().longValue() >> BlockChain.FEE_INVITED_SHIFT_FOR_INVITE;
-        return 0l;
-    }
-
     @Override
     public long calcBaseFee()
     {
-        if (this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE)
-            return calcCommonFee() >> 1;
-
-        PersonCls person = (PersonCls) this.item;
-
-        if (person.isAlive(this.timestamp)) {
-            // IF PERSON is LIVE
-            return calcCommonFee() >> 1;
-        }
-
-        // is DEAD
-        return calcCommonFee();
+        return calcCommonFee() >> 1;
     }
 }

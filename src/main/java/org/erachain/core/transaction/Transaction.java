@@ -679,29 +679,15 @@ public abstract class Transaction {
     public abstract boolean hasPublicText();
 
     public int getJobLevel() {
-        return 100;
+        return 0;
     }
 
     public int calcCommonFee() {
+
         int len = this.getDataLength(Transaction.FOR_NETWORK, true);
 
-        // FEE_FOR_ANONIMOUSE !
-        /// if (this.getBlockHeightByParent(db))
-        // TODO FEE_FOR_ANONIMOUSE + is PERSON + DB
-        int anonimous = 0;
-        // TODO DBSet get from CHAIN
         /*
-         * Controller cnt = Controller.getInstance(); BlockChain bchain =
-         * cnt.getBlockChain(); for ( Account acc : this.getRecipientAccounts())
-         * { //byte[] publicKey = cnt.getPublicKeyByAddress(acc.getAddress());
-         * if (!acc.isPerson(bchain.getDB())) { anonimuus +=
-         * BlockChain.FEE_FOR_ANONIMOUSE; } }
-         *
-         * if ( anonimuus == 0 && this.creator != null) { byte[] publicKey =
-         * cnt.getPublicKeyByAddress(this.creator.getAddress()); if (publicKey
-         * == null) { anonimuus += BlockChain.FEE_FOR_ANONIMOUSE; } }
-         */
-
+        int anonimous = 0;
         if (anonimous > 0) {
             len *= anonimous;
         }
@@ -712,6 +698,7 @@ public abstract class Transaction {
 
         if (len < minLen)
             len = minLen;
+        */
 
         return len * BlockChain.FEE_PER_BYTE;
 
@@ -726,11 +713,7 @@ public abstract class Transaction {
     public void calcFee() {
 
         long fee_long = calcBaseFee();
-        if(this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE) {
-            // OLD version with x64
-            fee_long = (fee_long << 5) / 100;
-        }
-        BigDecimal fee = new BigDecimal(fee_long).multiply(BlockChain.FEE_RATE).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, BigDecimal.ROUND_UP);
+        BigDecimal fee = new BigDecimal(fee_long).multiply(BlockChain.FEE_RATE).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
 
         if (this.feePow > 0) {
             this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow(this.feePow)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, BigDecimal.ROUND_UP);
@@ -748,11 +731,15 @@ public abstract class Transaction {
 
     // GET only INVITED FEE
     public long getInvitedFee() {
-        if (this.height > BlockChain.VERS_4_11 || !BlockChain.VERS_4_11_USE_OLD_FEE)
-            return 0l;
 
         long fee = this.fee.unscaledValue().longValue();
-        return fee >> BlockChain.FEE_INVITED_SHIFT;
+        //return fee >> BlockChain.FEE_INVITED_SHIFT;
+
+        // Если слишком большая комиссия, то и награду чуток увеличим
+        if (fee > BlockChain.BONUS_REFERAL<<3)
+            return BlockChain.BONUS_REFERAL<<1;
+
+        return BlockChain.BONUS_REFERAL;
     }
 
     public BigDecimal feeToBD(int fee) {
@@ -1295,7 +1282,11 @@ public abstract class Transaction {
 
         String messageLevel = message + " level:" + level;
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
-        if (personDuration == null) {
+        if (personDuration == null
+                // если уровень уже низкий - иначе зацикливание
+                || level <=1
+                // это моя персона - закончим, иначе зацикливание?
+                || personDuration.a < 100 ) {
             // USE all GIFT for current ACCOUNT
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
             creator.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
@@ -1341,7 +1332,7 @@ public abstract class Transaction {
             PersonCls inviter = (PersonCls) this.dcSet.getItemPersonMap().get(inviterDuration.a);
             if (!inviter.isAlive(this.timestamp)) {
                 // SKIP this LEVEL for DEAD persons
-                process_gifts(level, fee_gift, inviterAccount, asOrphan, txCalculated, message);
+                process_gifts(--level, fee_gift, inviterAccount, asOrphan, txCalculated, message);
                 return;
             }
         }
@@ -1397,8 +1388,9 @@ public abstract class Transaction {
             }
 
             // Multi Level Referal
-            if (this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE)
-                process_gifts(BlockChain.FEE_INVITED_DEEP, getInvitedFee(), this.creator, false,
+            long invitedFee = getInvitedFee();
+            if (invitedFee > 0)
+                process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
                         this.block != null && this.block.txCalculated != null?
                                 this.block.txCalculated : null, "referal");
 
@@ -1438,8 +1430,9 @@ public abstract class Transaction {
             }
 
             // calc INVITED FEE
-            if (this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE)
-                process_gifts(BlockChain.FEE_INVITED_DEEP, getInvitedFee(), this.creator, true,
+            long invitedFee = getInvitedFee();
+            if (invitedFee > 0)
+                process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, true,
                         null, null);
 
             // UPDATE REFERENCE OF SENDER

@@ -2166,8 +2166,9 @@ public class BlockExplorer {
             transactionJSON.put("seq", trans.getSeqNo(dcSet));
 
             if (trans.getType() == Transaction.CALCULATED_TRANSACTION) {
-                outcome = false;
                 R_Calculated txCalculated = (R_Calculated) trans;
+                outcome = txCalculated.getAmount().signum() < 0;
+
                 transactionJSON.put("reference", "--");
                 transactionJSON.put("signature", trans.getBlockHeight() + "-" + trans.getSeqNo());
                 transactionJSON.put("date", txCalculated.getMessage());

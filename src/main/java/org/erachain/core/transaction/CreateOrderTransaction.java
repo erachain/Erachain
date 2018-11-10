@@ -644,17 +644,4 @@ public class CreateOrderTransaction extends Transaction {
         return assetAmount;
     }
 
-    @Override
-    public int getJobLevel() {
-        return BlockChain.FINANCIAL_FEE_LEVEL;
-    }
-
-    @Override
-    public long calcBaseFee() {
-        if (this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE)
-            return 5 * calcCommonFee();
-
-        return calcCommonFee();
-
-    }
 }
