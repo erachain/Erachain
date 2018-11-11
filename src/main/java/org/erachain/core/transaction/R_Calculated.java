@@ -76,6 +76,9 @@ public class R_Calculated extends TransactionAmount {
         return false;
     }
 
+    public String getMessage() {
+        return this.message;
+    }
 
     // PARSE/CONVERT
 
@@ -138,10 +141,6 @@ public class R_Calculated extends TransactionAmount {
 
         return new R_Calculated(typeBytes, recipient, key, amount, message, txReference);
 
-    }
-
-    public String getMessage() {
-        return this.message;
     }
 
     @SuppressWarnings("unchecked")
