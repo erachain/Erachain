@@ -787,7 +787,6 @@ public abstract class Transaction {
     }
 
     public int getBlockHeight() {
-        //if (this.isConfirmed(db)) {
 
         if (this.height > 0)
             return this.height;
@@ -799,43 +798,20 @@ public abstract class Transaction {
         return -1;
     }
 
-    /*
-    // get current or -1
-    public int getBlockHeightByParent(DCSet db) {
-
-        if (block != null)
-            return block.getHeightByParent(db);
-
-        return getBlockHeight(db);
-    }
-    */
-
     // get current or last
     public int getBlockHeightByParentOrLast(DCSet dc) {
 
+        if (this.height > 0)
+            return this.height;
+
         if (block != null)
             return block.getHeight();
-
 
         return dc.getBlockMap().size() + 1;
     }
 
     public int getSeqNo() {
         return this.seqNo;
-    }
-
-    public int getSeqNo1(DCSet db) {
-
-        if(this.seqNo > 0)
-            return this.seqNo;
-
-        Block block = this.getBlock(db);
-        if (block == null)
-            return -1;
-
-        this.seqNo = block.getTransactionSeq(this.signature);
-        return this.seqNo;
-
     }
 
     public long getDBRef() {
