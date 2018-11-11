@@ -78,7 +78,8 @@ public class BlockChain {
     public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
-    public static final byte[] BONUS_STOP_ACCOUNT = new Account("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5").getShortAddressBytes();
+    //public static final byte[] BONUS_STOP_ACCOUNT = new Account("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5").getShortAddressBytes();
+    public static final long BONUS_STOP_PERSON_KEY = 13l;
 
     public static final int VERS_4_11 = DEVELOP_USE ? 230000  : 200000;
     //public static final int ORDER_FEE_DOWN = VERS_4_11;

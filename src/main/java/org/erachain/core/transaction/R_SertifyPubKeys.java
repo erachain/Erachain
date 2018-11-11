@@ -542,12 +542,6 @@ public class R_SertifyPubKeys extends Transaction {
 
         DCSet db = this.dcSet;
 
-
-        if ("2VTcBHzzbRGU7m11zeDVsnDNfqYhtH4UtiZga5ekqNcH57Pb9kdHisrWqyfr1YGcd14XrGv1vsvkG7PMQHk5hVvr".
-                equals(Base58.encode(this.signature))) {
-            int i = 1;
-        }
-
         int transactionIndex = -1;
         int blockIndex = -1;
         //Block block = this.getBlock(db);// == null (((
@@ -629,8 +623,7 @@ public class R_SertifyPubKeys extends Transaction {
             issued_FEE_BD_total = issued_FEE_BD_total.subtract(FEE_FOR_PERSON_CERTIFIER_4_11);
 
             ///////// INVITER MULTILEVEL REFERAL
-            if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0
-                    && !Arrays.equals(BlockChain.BONUS_STOP_ACCOUNT, issuer.getShortAddressBytes())) {
+            if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0) {
                 process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11,
                         BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, false,
                         this.block != null? this.block.txCalculated : null, "invite bonus @P:" + this.key);
@@ -748,8 +741,7 @@ public class R_SertifyPubKeys extends Transaction {
             issued_FEE_BD_total = issued_FEE_BD_total.subtract(FEE_FOR_PERSON_CERTIFIER_4_11);
 
             ///////// INVITER MULTILEVEL REFERAL
-            if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0
-                    && !Arrays.equals(BlockChain.BONUS_STOP_ACCOUNT, issuer.getShortAddressBytes())) {
+            if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0) {
                 process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11,
                         BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, true,
                         null, null);

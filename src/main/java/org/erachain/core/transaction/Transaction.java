@@ -9,6 +9,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
@@ -734,7 +735,7 @@ public abstract class Transaction {
 
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
         if (personDuration == null
-                || personDuration.a < 14 ) {
+                || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY ) {
             // ANONYMOUS or ME
             return 0l;
         }
@@ -1304,7 +1305,7 @@ public abstract class Transaction {
             return;
         }
 
-        if (issuerPersonKey < 14
+        if (issuerPersonKey <= BlockChain.BONUS_STOP_PERSON_KEY
         ) {
             // IT IS ME - all fee to INVITED
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
@@ -1364,13 +1365,16 @@ public abstract class Transaction {
             return;
 
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
-        long creatorPersonKey = personDuration.a;
         if (personDuration == null
-                || personDuration.a < 14 ) {
+                || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY ) {
+
+            // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
+            GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, FEE_KEY,
+                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), true);
             return;
         }
 
-        process_gifts_turn(level, fee_gift, creator, creatorPersonKey, asOrphan, txCalculated, message);
+        process_gifts_turn(level, fee_gift, creator, personDuration.a, asOrphan, txCalculated, message);
 
     }
 
