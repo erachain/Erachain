@@ -732,8 +732,14 @@ public abstract class Transaction {
     // GET only INVITED FEE
     public long getInvitedFee() {
 
+        Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
+        if (personDuration == null
+                || personDuration.a < 14 ) {
+            // ANONYMOUS or ME
+            return 0l;
+        }
+
         long fee = this.fee.unscaledValue().longValue();
-        //return fee >> BlockChain.FEE_INVITED_SHIFT;
 
         // Если слишком большая комиссия, то и награду чуток увеличим
         if (fee > BlockChain.BONUS_REFERAL<<3)
@@ -1274,67 +1280,49 @@ public abstract class Transaction {
 
     }
 
-    public void process_gifts(int level, long fee_gift, Account creator, boolean asOrphan,
+    public void process_gifts_turn(int level, long fee_gift, Account invitedAccount,
+                                   long invitedPersonKey, boolean asOrphan,
                               List<R_Calculated> txCalculated, String message) {
 
         if (fee_gift <= 0l)
             return;
 
-        String messageLevel = message + " level:" + level;
-        Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
-        if (personDuration == null
-                // если уровень уже низкий - иначе зацикливание
-                || level <=1
-                // это моя персона - закончим, иначе зацикливание?
-                || personDuration.a < 100 ) {
-            // USE all GIFT for current ACCOUNT
-            BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            creator.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
-            if (txCalculated != null && !asOrphan) {
-                txCalculated.add(new R_Calculated(creator, FEE_KEY, giftBG,
-                        messageLevel, this.dbRef));
-            }
-            return;
-        }
+        String messageLevel;
 
         // CREATOR is PERSON
         // FIND person
-        ItemCls person = this.dcSet.getItemPersonMap().get(personDuration.a);
+        ItemCls person = this.dcSet.getItemPersonMap().get(invitedPersonKey);
         Long inviteredDBRef = this.dcSet.getTransactionFinalMapSigns().get(person.getReference());
 
         Transaction issueRecord = this.dcSet.getTransactionFinalMap().get(inviteredDBRef);
-        Account inviterAccount = issueRecord.getCreator();
-        Tuple4<Long, Integer, Integer, Integer> inviterPersonDuration = inviterAccount.getPersonDuration(this.dcSet);
+        Account issuerAccount = issueRecord.getCreator();
+        Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = issuerAccount.getPersonDuration(this.dcSet);
+        long issuerPersonKey = issuerPersonDuration.a;
 
-        if (inviterPersonDuration != null && inviterPersonDuration.a.equals(personDuration.a)) {
-            // if it SAME perdsn - skip
-            process_gifts(--level, fee_gift, inviterAccount, asOrphan, txCalculated, message);
+        if (issuerPersonKey == invitedPersonKey) {
+            // loop ??
             return;
         }
 
-        if (creator.equals(inviterAccount)
-                // EXCLUDE ME
-                || Arrays.equals(BlockChain.BONUS_STOP_ACCOUNT, inviterAccount.getShortAddressBytes())
+        if (issuerPersonKey < 14
         ) {
-            // IT IS ME - all fee!
+            // IT IS ME - all fee to INVITED
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            creator.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
+            invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
             if (txCalculated != null && !asOrphan) {
-                txCalculated.add(new R_Calculated(creator, FEE_KEY, giftBG,
+                messageLevel = message + " top level";
+                txCalculated.add(new R_Calculated(invitedAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
             return;
         }
 
         // IS INVITER ALIVE ???
-        Tuple4<Long, Integer, Integer, Integer> inviterDuration = inviterAccount.getPersonDuration(this.dcSet);
-        if (inviterDuration != null) {
-            PersonCls inviter = (PersonCls) this.dcSet.getItemPersonMap().get(inviterDuration.a);
-            if (!inviter.isAlive(this.timestamp)) {
-                // SKIP this LEVEL for DEAD persons
-                process_gifts(--level, fee_gift, inviterAccount, asOrphan, txCalculated, message);
-                return;
-            }
+        PersonCls issuer = (PersonCls) this.dcSet.getItemPersonMap().get(issuerPersonKey);
+        if (!issuer.isAlive(this.timestamp)) {
+            // SKIP this LEVEL for DEAD persons
+            process_gifts_turn(level, fee_gift, issuerAccount, issuerPersonKey, asOrphan, txCalculated, message);
+            return;
         }
 
         if (level > 1 ) {
@@ -1343,26 +1331,47 @@ public abstract class Transaction {
             long fee_gift_get = fee_gift - fee_gift_next;
 
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE);
-            inviterAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
+            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
             if (txCalculated != null && !asOrphan) {
-                txCalculated.add(new R_Calculated(inviterAccount, FEE_KEY, giftBG,
+                messageLevel = message + " level:" + level + " for @P:" + invitedPersonKey;
+                txCalculated.add(new R_Calculated(issuerAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
 
             if (fee_gift_next > 0) {
-                process_gifts(--level, fee_gift_next, inviterAccount, asOrphan, txCalculated, message);
+                process_gifts_turn(--level, fee_gift_next, issuerAccount, issuerPersonKey, asOrphan, txCalculated, message);
             }
 
         } else {
             // this is END LEVEL
             // GET REST of GIFT
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            inviterAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
+            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
+
             if (txCalculated != null && !asOrphan) {
-                txCalculated.add(new R_Calculated(inviterAccount, FEE_KEY, giftBG,
+                messageLevel = message + " level:" + level + " for @P:" + invitedPersonKey;
+                txCalculated.add(new R_Calculated(issuerAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
         }
+    }
+
+
+    public void process_gifts(int level, long fee_gift, Account creator, boolean asOrphan,
+                              List<R_Calculated> txCalculated, String message) {
+
+        if (fee_gift <= 0l)
+            return;
+
+        Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
+        long creatorPersonKey = personDuration.a;
+        if (personDuration == null
+                || personDuration.a < 14 ) {
+            return;
+        }
+
+        process_gifts_turn(level, fee_gift, creator, creatorPersonKey, asOrphan, txCalculated, message);
+
     }
 
     // REST
