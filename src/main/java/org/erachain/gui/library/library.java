@@ -305,7 +305,7 @@ public class library {
             return new BigDecimal(-2);
         if (transaction.isConfirmed(DCSet.getInstance())) {
             String m = transaction.getBlockHeight() + "";
-            String d = transaction.getSeqNo(DCSet.getInstance()) + "";
+            String d = transaction.getSeqNo() + "";
             int zz = 5 - d.length();
             for (int z = 0; z < zz; z++) {
                 d = "0" + d;

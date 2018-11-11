@@ -2163,7 +2163,7 @@ public class BlockExplorer {
             //
             transactionJSON.put("block", trans.getBlockHeight());// .getSeqNo(dcSet));
 
-            transactionJSON.put("seq", trans.getSeqNo(dcSet));
+            transactionJSON.put("seq", trans.getSeqNo());
 
             if (trans.getType() == Transaction.CALCULATED_TRANSACTION) {
                 R_Calculated txCalculated = (R_Calculated) trans;
@@ -2927,8 +2927,8 @@ public class BlockExplorer {
                 Transaction txTarget = dcSet.getTransactionFinalMap().get(trade.getValue().getTarget());
 
                 all.add(new BlExpUnit(txInitiator.getBlockHeightByParentOrLast(dcSet),
-                        txTarget.getBlockHeightByParentOrLast(dcSet), txInitiator.getSeqNo(dcSet),
-                        txTarget.getSeqNo(dcSet), trade.getValue()));
+                        txTarget.getBlockHeightByParentOrLast(dcSet), txInitiator.getSeqNo(),
+                        txTarget.getSeqNo(), trade.getValue()));
             }
 
             Set<BlExpUnit> atTransactions = dcSet.getATTransactionMap().getBlExpATTransactionsByRecipient(address);
@@ -3545,7 +3545,7 @@ public class BlockExplorer {
             Map out_statement = new LinkedHashMap();
             Transaction statement = model_Statements.get_Statement(row);
             out_statement.put("Block", statement.getBlockHeight());
-            out_statement.put("Seg_No", statement.getSeqNo(dcSet));
+            out_statement.put("Seg_No", statement.getSeqNo());
             out_statement.put("person_key", model_Statements.get_person_key(row));
 
             for (int column = 0; column < column_Count; column++) {
@@ -4037,7 +4037,7 @@ public class BlockExplorer {
                 Map vouchJSON = new LinkedHashMap();
                 vouchJSON.put("date", vouch_Tr.viewTimestamp());
                 vouchJSON.put("block", "" + vouch_Tr.getBlockHeight());
-                vouchJSON.put("Seg_No", "" + vouch_Tr.getSeqNo(dcSet));
+                vouchJSON.put("Seg_No", "" + vouch_Tr.getSeqNo());
                 vouchJSON.put("creator", vouch_Tr.getCreator().getAddress());
 
                 Tuple2<Integer, PersonCls> personInfo = vouch_Tr.getCreator().getPerson();

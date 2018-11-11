@@ -78,7 +78,7 @@ public class AssetDetailsPanel extends JPanel {
         // SEQ-NO
         Transaction record = Transaction.findByDBRef(DCSet.getInstance(), asset.getReference());
         detailGBC.gridy = gridy;
-        JTextField txtSeqNo = new JTextField(record.viewHeightSeq(DCSet.getInstance()));
+        JTextField txtSeqNo = new JTextField(record.viewHeightSeq());
         txtSeqNo.setEditable(false);
         this.add(txtSeqNo, detailGBC);
 

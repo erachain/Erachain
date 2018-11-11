@@ -247,7 +247,7 @@ public class PersonSetStatusDialog extends JDialog {
         int version = 0;
         if (PersonSetStatusDialog.parentRecord != null) {
             int blockID = PersonSetStatusDialog.parentRecord.getBlockHeight();
-            int seqNo = PersonSetStatusDialog.parentRecord.getSeqNo(DCSet.getInstance());
+            int seqNo = PersonSetStatusDialog.parentRecord.getSeqNo();
             byte[] bytesParent = Ints.toByteArray(blockID);
             bytesParent = Bytes.concat(bytesParent, Ints.toByteArray(seqNo));
             refParent = Longs.fromByteArray(bytesParent);

@@ -94,32 +94,9 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 
 
         if (account != null) {
+
             transactions = new ArrayList();
-            // read Genessis block
-            List<Transaction> genesisTransactions = new ArrayList();
-            genesisTransactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(1));
-            int k = 0;
-            for (Transaction gT : genesisTransactions) {
-                if (gT.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
-                    GenesisTransferAssetTransaction assetTransfer = (GenesisTransferAssetTransaction) gT;
-                    if (assetTransfer.getOwner() != null) {
-                        Account ow = assetTransfer.getOwner();
-                        ac = assetTransfer.getOwner().getAddress();
-                        //				System.out.print("\n k="+ k + "ac="+ac);
-                        if (ac.equals(address)) {
-                            transactions.add(gT);
-                        }
-                    }
-
-                }
-                k++;
-            }
-
-
             transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress()));//.findTransactions(address, sender=address, recipient=address, minHeight=0, maxHeight=0, type=0, service=0, desc=false, offset=0, limit=0);//.getTransactionsByBlock(block_No);
-            //for (Transaction transaction: transactions) {
-            //    transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
-            //}
 
             this.fireTableDataChanged();
         } else {
@@ -218,7 +195,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
                     return transaction.getBlockHeight();
 
                 case COLUMN_SEQ_NO:
-                    return transaction.getSeqNo(DCSet.getInstance());
+                    return transaction.getSeqNo();
 
                 //		case COLUMN_NO:
                 //			return row;

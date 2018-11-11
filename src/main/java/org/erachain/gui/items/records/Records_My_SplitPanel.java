@@ -280,7 +280,7 @@ public class Records_My_SplitPanel extends Split_Panel {
                 records_Info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(trans), tableGBC);
 
                 Tuple2<BigDecimal, List<Long>> keys = DCSet.getInstance().getVouchRecordMap()
-                        .get(Transaction.makeDBRef(trans.getBlockHeight(), trans.getSeqNo(DCSet.getInstance())));
+                        .get(Transaction.makeDBRef(trans.getBlockHeight(), trans.getSeqNo()));
                 GridBagConstraints gridBagConstraints = null;
                 if (keys != null) {
 

@@ -208,7 +208,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
                 if (statement == null)
                     return;
                 DCSet db = DCSet.getInstance();
-                new VouchRecordDialog(statement.getBlockHeight(), statement.getSeqNo(db));
+                new VouchRecordDialog(statement.getBlockHeight(), statement.getSeqNo());
 
             }
         });
