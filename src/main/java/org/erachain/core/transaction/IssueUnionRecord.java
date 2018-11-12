@@ -11,11 +11,12 @@ import java.util.Arrays;
 
 //import java.util.Map;
 // import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 public class IssueUnionRecord extends Issue_ItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_UNION_TRANSACTION;
     private static final String NAME_ID = "Issue Union";
+
+    public static final long START_KEY = 1l << 20;
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference);
