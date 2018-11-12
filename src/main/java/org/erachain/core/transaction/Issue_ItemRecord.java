@@ -21,7 +21,7 @@ public abstract class Issue_ItemRecord extends Transaction {
 
     //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
-    public static final long START_KEY = 1 << 20;
+    public static final long START_KEY = 0; // << 20;
 
     protected ItemCls item;
 
