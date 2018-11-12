@@ -16,7 +16,7 @@ public class IssueUnionRecord extends Issue_ItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_UNION_TRANSACTION;
     private static final String NAME_ID = "Issue Union";
 
-    public static final long START_KEY = 10000;
+    public static final long START_KEY = 1l << 20;
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference);

@@ -11,11 +11,12 @@ import java.util.Arrays;
 
 //import java.util.Map;
 // import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 public class IssueTemplateRecord extends Issue_ItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_TEMPLATE_TRANSACTION;
     private static final String NAME_ID = "Issue Template";
+
+    public static final long START_KEY = 1000l; // << 20;
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, template, feePow, timestamp, reference);
