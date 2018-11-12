@@ -4,7 +4,6 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
-import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.datachain.DCSet;
@@ -18,6 +17,8 @@ import java.util.Map;
 public class IssueAssetTransaction extends Issue_ItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
     private static final String NAME_ID = "Issue Asset";
+
+    public static final long START_KEY = 1000; // << 20;
 
     //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
