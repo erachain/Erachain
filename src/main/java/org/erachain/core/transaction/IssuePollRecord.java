@@ -13,6 +13,8 @@ public class IssuePollRecord extends Issue_ItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_POLL_TRANSACTION;
     private static final String NAME_ID = "Issue Poll";
 
+    public static final long START_KEY = 1l << 20;
+
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, poll, feePow, timestamp, reference);
     }
