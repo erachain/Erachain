@@ -314,6 +314,15 @@ public class IssuePersonRecord extends Issue_ItemRecord {
     @Override
     public long calcBaseFee()
     {
-        return calcCommonFee() >> 2;
+
+        PersonCls person = (PersonCls) this.item;
+
+        if (person.isAlive(this.timestamp)) {
+            // IF PERSON is LIVE
+            return calcCommonFee() >> 1;
+        }
+
+        // is DEAD
+        return calcCommonFee();
     }
 }
