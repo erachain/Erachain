@@ -92,7 +92,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
         //Height + Seq
         detailGBC.gridy = componentLevel++;
         JTextField shorn_Info = new JTextField(DateTimeFormat.timestamptoString(record.getTimestamp())
-                + " [" + record.viewHeightSeq(dcSet) + " "
+                + " [" + record.viewHeightSeq() + " "
                 + String.valueOf(record.getDataLength(Transaction.FOR_NETWORK, true)) + "^" + String.valueOf(record.getFeePow())
                 + "=" + record.getFeeLong() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
                 + ">>" + record.getConfirmations(dcSet));
@@ -207,7 +207,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
             public void actionPerformed(ActionEvent e) {
 
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection value = new StringSelection(record.viewHeightSeq(dcSet));
+                StringSelection value = new StringSelection(record.viewHeightSeq());
                 clipboard.setContents(value, null);
             }
         });

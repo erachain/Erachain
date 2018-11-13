@@ -787,12 +787,7 @@ public abstract class Transaction {
 
     }
 
-    public int getSeqNo() {
-    return this.seqNo;
-    }
-
     public int getBlockHeight() {
-        //if (this.isConfirmed(db)) {
 
         if (this.height > 0)
             return this.height;
@@ -804,38 +799,20 @@ public abstract class Transaction {
         return -1;
     }
 
-    /*
-    // get current or -1
-    public int getBlockHeightByParent(DCSet db) {
-
-        if (block != null)
-            return block.getHeightByParent(db);
-
-        return getBlockHeight(db);
-    }
-    */
-
     // get current or last
     public int getBlockHeightByParentOrLast(DCSet dc) {
+
+        if (this.height > 0)
+            return this.height;
 
         if (block != null)
             return block.getHeight();
 
-
         return dc.getBlockMap().size() + 1;
     }
 
-    public int getSeqNo(DCSet db) {
-
-        if(this.seqNo > 0)
-            return this.seqNo;
-
-        Block block = this.getBlock(db);
-        if (block == null)
-            return -1;
-
-        return block.getTransactionSeq(this.signature);
-
+    public int getSeqNo() {
+        return this.seqNo;
     }
 
     public long getDBRef() {
@@ -855,7 +832,7 @@ public abstract class Transaction {
             return null;
 
         byte[] ref = Ints.toByteArray(bh);
-        Bytes.concat(ref, Ints.toByteArray(this.getSeqNo(db)));
+        Bytes.concat(ref, Ints.toByteArray(this.getSeqNo()));
         return ref;
 
     }
@@ -938,12 +915,8 @@ public abstract class Transaction {
 
     }
 
-    public String viewHeightSeq(DCSet db) {
-        int seq = this.getSeqNo(db);
-        if (seq < 1)
-            return "???";
-
-        return this.getBlockHeight() + "-" + seq;
+    public String viewHeightSeq() {
+        return this.height + "-" + this.seqNo;
     }
 
     public String viewAmount(Account account) {
@@ -1037,7 +1010,7 @@ public abstract class Transaction {
             transaction.put("property2", Byte.toUnsignedInt(this.typeBytes[3]));
             if (this.block != null) {
                 transaction.put("height", height); //this.block.getHeightByParent(localDCSet));
-                transaction.put("sequence", this.getSeqNo(localDCSet));
+                transaction.put("sequence", this.getSeqNo());
             }
         }
 
@@ -1064,9 +1037,9 @@ public abstract class Transaction {
         }
 
         if (height > 0) {
-            transaction.put("sequence", this.getSeqNo(localDCSet));
+            transaction.put("sequence", this.getSeqNo());
             transaction.put("block", Base58.encode(block.getSignature()));
-            transaction.put("block_seq", viewHeightSeq(localDCSet));
+            transaction.put("block_seq", viewHeightSeq());
             transaction.put("height", height);
         }
 
@@ -1405,7 +1378,7 @@ public abstract class Transaction {
             if (invitedFee > 0)
                 process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
                         this.block != null && this.block.txCalculated != null?
-                                this.block.txCalculated : null, "referal");
+                                this.block.txCalculated : null, "@" + this.viewHeightSeq() + " referal");
 
             String creatorAddress = this.creator.getAddress();
             AddressTime_SignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();

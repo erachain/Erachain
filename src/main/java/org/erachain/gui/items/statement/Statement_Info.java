@@ -69,7 +69,7 @@ public class Statement_Info extends javax.swing.JPanel {
     private void view_V1() {
 
         Tuple2<BigDecimal, List<Long>> keys = DCSet.getInstance().getVouchRecordMap()
-                .get(Transaction.makeDBRef(transaction.getBlockHeight(), transaction.getSeqNo(DCSet.getInstance())));
+                .get(Transaction.makeDBRef(transaction.getBlockHeight(), transaction.getSeqNo()));
 
         if (keys != null) {
 

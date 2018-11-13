@@ -39,7 +39,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
     public Statements_Vouch_Table_Model(Transaction transaction) {
         if (transaction != null) {
             blockNo = transaction.getBlockHeight();
-            recNo = transaction.getSeqNo(DCSet.getInstance());
+            recNo = transaction.getSeqNo();
         }
         transactions = new ArrayList<R_Vouch>();
         addObservers();
@@ -88,7 +88,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
         if (transaction == null)
             return null;
 
-        return transaction.viewHeightSeq(DCSet.getInstance());
+        return transaction.viewHeightSeq();
 
     }
 
