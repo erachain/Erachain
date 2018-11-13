@@ -733,6 +733,10 @@ public abstract class Transaction {
     // GET only INVITED FEE
     public long getInvitedFee() {
 
+        if (true)
+            // SWITCH OFF REFERRAL
+            return 0l;
+
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
         if (personDuration == null
                 || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY ) {
