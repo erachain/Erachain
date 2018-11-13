@@ -36,6 +36,24 @@ public class TransactionDetailsFactory {
 
         switch (transaction.getType()) {
 
+            case Transaction.CALCULATED_TRANSACTION:
+                R_Calculated r_Calc = (R_Calculated) transaction;
+
+                R_CalculatedDetailsFrame frame = new R_CalculatedDetailsFrame(r_Calc);
+                gridBagConstraints.gridy = frame.labelGBC.gridy + 1;
+                frame.add(jLabel9, gridBagConstraints);
+
+                return frame;
+
+            case Transaction.SEND_ASSET_TRANSACTION:
+                R_Send r_Send = (R_Send) transaction;
+
+                Send_RecordDetailsFrame send_RecordDetailsFrame = new Send_RecordDetailsFrame(r_Send);
+                gridBagConstraints.gridy = send_RecordDetailsFrame.labelGBC.gridy + 1;
+                send_RecordDetailsFrame.add(jLabel9, gridBagConstraints);
+
+                return send_RecordDetailsFrame;
+
             case Transaction.SIGN_NOTE_TRANSACTION:
 
                 R_SignNote statement = (R_SignNote) transaction;
@@ -213,15 +231,6 @@ public class TransactionDetailsFactory {
                 multiPaymentDetailsFrame.add(jLabel9, gridBagConstraints);
 
                 return multiPaymentDetailsFrame;
-
-            case Transaction.SEND_ASSET_TRANSACTION:
-                R_Send r_Send = (R_Send) transaction;
-
-                Send_RecordDetailsFrame send_RecordDetailsFrame = new Send_RecordDetailsFrame(r_Send);
-                gridBagConstraints.gridy = send_RecordDetailsFrame.labelGBC.gridy + 1;
-                send_RecordDetailsFrame.add(jLabel9, gridBagConstraints);
-
-                return send_RecordDetailsFrame;
 
             case Transaction.VOUCH_TRANSACTION:
                 R_Vouch r_Vouch = (R_Vouch) transaction;

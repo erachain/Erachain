@@ -97,7 +97,7 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
         if (transaction == null)
             return null;
 
-        return transaction.viewHeightSeq(DCSet.getInstance());
+        return transaction.viewHeightSeq();
 
     }
 

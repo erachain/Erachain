@@ -65,7 +65,7 @@ public class Persons_My_SplitPanel extends Item_SplitPanel {
                byte[] ref = per.getReference();
                Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
                int blockNo = transaction.getBlockHeight();
-               int recNo = transaction.getSeqNo(DCSet.getInstance());
+               int recNo = transaction.getSeqNo();
                new VouchRecordDialog(blockNo, recNo);
               
            }

@@ -92,7 +92,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
         //Height + Seq
         detailGBC.gridy = componentLevel++;
         JTextField shorn_Info = new JTextField(DateTimeFormat.timestamptoString(record.getTimestamp())
-                + " [" + record.viewHeightSeq(dcSet) + " "
+                + " [" + record.viewHeightSeq() + " "
                 + String.valueOf(record.getDataLength(Transaction.FOR_NETWORK, true)) + "^" + String.valueOf(record.getFeePow())
                 + "=" + record.getFeeLong() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
                 + ">>" + record.getConfirmations(dcSet));
@@ -100,58 +100,62 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 //		MenuPopupUtil.installContextMenu(shorn_Info);
         this.add(shorn_Info, detailGBC);
 
+        if (record.getCreator() != null) {
 
-        //LABEL CREATOR
-        componentLevel++;
-        labelGBC.gridy = componentLevel;
-        JLabel creatorLabel = new JLabel(Lang.getInstance().translate("Creator") + ":");
-        this.add(creatorLabel, labelGBC);
-
-        //CREATOR
-        detailGBC.gridy = componentLevel;
-        M_Accoutn_Text_Field creator = new M_Accoutn_Text_Field(record.getCreator());
-
-        creator.setEditable(false);
-
-        this.add(creator, detailGBC);
-
-        String personStr = record.getCreator().viewPerson();
-        if (personStr.length() > 0) {
-            //LABEL PERSON
+            //LABEL CREATOR
             componentLevel++;
+            labelGBC.gridy = componentLevel;
+            JLabel creatorLabel = new JLabel(Lang.getInstance().translate("Creator") + ":");
+            this.add(creatorLabel, labelGBC);
+
+            //CREATOR
             detailGBC.gridy = componentLevel;
-            //		this.add(new JLabel(personStr), detailGBC);
+            M_Accoutn_Text_Field creator = new M_Accoutn_Text_Field(record.getCreator());
+
+            creator.setEditable(false);
+
+            this.add(creator, detailGBC);
+
+            String personStr = record.getCreator().viewPerson();
+            if (personStr.length() > 0) {
+                //LABEL PERSON
+                componentLevel++;
+                detailGBC.gridy = componentLevel;
+                //		this.add(new JLabel(personStr), detailGBC);
+            }
+
+            //LABEL CREATOR PUBLIC KEY
+            componentLevel++;
+            labelGBC.gridy = componentLevel;
+            JLabel creator_Pub_keyLabel = new JLabel(Lang.getInstance().translate("Creator Publick Key") + ":");
+            //	this.add(creator_Pub_keyLabel, labelGBC);
+
+            //CREATOR
+            detailGBC.gridy = componentLevel;
+
+            JTextField creator_Pub_key = new JTextField(record.getCreator().getBase58());
+            creator_Pub_key.setEditable(false);
+            MenuPopupUtil.installContextMenu(creator_Pub_key);
+            //	this.add(creator_Pub_key, detailGBC);
+
         }
 
-        //LABEL CREATOR PUBLIC KEY
-        componentLevel++;
-        labelGBC.gridy = componentLevel;
-        JLabel creator_Pub_keyLabel = new JLabel(Lang.getInstance().translate("Creator Publick Key") + ":");
-        //	this.add(creator_Pub_keyLabel, labelGBC);
+        if (record.getSignature() != null) {
+            componentLevel++;
+            //LABEL SIGNATURE
+            labelGBC.gridy = componentLevel;
+            JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
+            //			this.add(signatureLabel, labelGBC);
 
-        //CREATOR
-        detailGBC.gridy = componentLevel;
+            //SIGNATURE
+            detailGBC.gridy = componentLevel;
+            //JTextField signature = new JTextField(Base58.encode(record.getSignature()).substring(0, 12) + "..");
+            signature = new JTextField(Base58.encode(record.getSignature()));
+            signature.setEditable(false);
+            MenuPopupUtil.installContextMenu(signature);
+            //			this.add(signature, detailGBC);
 
-        JTextField creator_Pub_key = new JTextField(record.getCreator().getBase58());
-        creator_Pub_key.setEditable(false);
-        MenuPopupUtil.installContextMenu(creator_Pub_key);
-        //	this.add(creator_Pub_key, detailGBC);
-
-        componentLevel++;
-        //LABEL SIGNATURE
-        labelGBC.gridy = componentLevel;
-        JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
-        //			this.add(signatureLabel, labelGBC);
-
-        //SIGNATURE
-        detailGBC.gridy = componentLevel;
-        //JTextField signature = new JTextField(Base58.encode(record.getSignature()).substring(0, 12) + "..");
-        signature = new JTextField(Base58.encode(record.getSignature()));
-        signature.setEditable(false);
-        MenuPopupUtil.installContextMenu(signature);
-        //			this.add(signature, detailGBC);
-		
-		
+        }
 		
 		/*
 		//LABEL FEE POWER
@@ -207,7 +211,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
             public void actionPerformed(ActionEvent e) {
 
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection value = new StringSelection(record.viewHeightSeq(dcSet));
+                StringSelection value = new StringSelection(record.viewHeightSeq());
                 clipboard.setContents(value, null);
             }
         });

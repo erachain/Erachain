@@ -29,10 +29,13 @@ public class M_Accoutn_Text_Field extends JTextField {
     }
 
     public void set_account(Account account) {
-        if (account.isPerson()) {
+        if (account == null) {
+            this.setText("--");
+        } else if (GenesisBlock.CREATOR.equals(account)) {
+            this.setText("GENESIS");
+        } else if (account.isPerson()) {
             this.setText(account.getPersonAsString());
-        } else if (GenesisBlock.CREATOR.equals(account)) this.setText("GENESIS");
-        else {
+        } else {
             this.setText(account.getAddress());
         }
 
@@ -50,7 +53,9 @@ public class M_Accoutn_Text_Field extends JTextField {
         creator_Meny.add(copy_Creator_Address1);
 
         PublicKeyAccount public_Account;
-        if (account instanceof PublicKeyAccount) {
+        if (account == null) {
+            public_Account = null;
+        } else if (account instanceof PublicKeyAccount) {
             public_Account = (PublicKeyAccount) account;
         } else {
             byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(account.getAddress());

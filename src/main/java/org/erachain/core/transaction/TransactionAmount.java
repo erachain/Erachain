@@ -1147,12 +1147,4 @@ public abstract class TransactionAmount extends Transaction {
     
     // public abstract Map<String, Map<Long, BigDecimal>> getAssetAmount();
 
-    @Override
-    public int getJobLevel() {
-        if (this.amount == null || this.amount.signum() == 0) {
-            return 100;
-        }
-        return BlockChain.FINANCIAL_FEE_LEVEL;
-    }
-
 }

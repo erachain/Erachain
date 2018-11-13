@@ -29,7 +29,7 @@ import java.util.Arrays;
 public class R_Calculated extends TransactionAmount {
 
     private static final byte TYPE_ID = (byte) Transaction.CALCULATED_TRANSACTION;
-    private static final String NAME_ID = "*calculated*";
+    private static final String NAME_ID = "_protocol_";
     protected String message;
 
     public R_Calculated(byte[] typeBytes, Account recipient, long key,
@@ -76,6 +76,9 @@ public class R_Calculated extends TransactionAmount {
         return false;
     }
 
+    public String getMessage() {
+        return this.message;
+    }
 
     // PARSE/CONVERT
 
@@ -138,10 +141,6 @@ public class R_Calculated extends TransactionAmount {
 
         return new R_Calculated(typeBytes, recipient, key, amount, message, txReference);
 
-    }
-
-    public String getMessage() {
-        return this.message;
     }
 
     @SuppressWarnings("unchecked")

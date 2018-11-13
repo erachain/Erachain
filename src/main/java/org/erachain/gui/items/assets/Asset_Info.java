@@ -120,7 +120,7 @@ public class Asset_Info extends JTextPane {
             text += "<div><a href ='!!img'  style='color: " + color + "' ><img src=\"" + img_Local_URL + "\"></a></div>";
         Transaction record = Transaction.findByDBRef(DCSet.getInstance(), asset.getReference());
         if (record != null)
-            text += "<td><div  style='float:left'><div><b>" + Lang.getInstance().translate("Block-SeqNo") + ": </b>" + record.viewHeightSeq(DCSet.getInstance()) + "</div>";
+            text += "<td><div  style='float:left'><div><b>" + Lang.getInstance().translate("Block-SeqNo") + ": </b>" + record.viewHeightSeq() + "</div>";
         text += "<div><b>" + Lang.getInstance().translate("Name") + ": </b>" + asset.viewName() + "</div>";
         text += "<div   style='word-wrap: break-word; '>"
                 + library.to_HTML(Lang.getInstance().translate(asset.viewDescription())) + "</div>";

@@ -50,6 +50,8 @@ public class Account {
     protected byte[] bytes;
     protected byte[] shortBytes;
     // private long generatingBalance; //used for forging balance
+    Tuple4<Long, Integer, Integer, Integer> personDuration;
+
 
     protected Account() {
         // this.generatingBalance = 0l;
@@ -174,11 +176,6 @@ public class Account {
             }
         }
 
-    }
-
-    // personKey, days, block, reference
-    public static Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DCSet db, String address) {
-        return db.getAddressPersonMap().getItem(address);
     }
 
     public static Map<String, BigDecimal> getKeyBalancesWithForks(DCSet dcSet, long key,
@@ -828,7 +825,11 @@ public class Account {
     }
 
     public Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DCSet db) {
-        return getPersonDuration(db, this.address);
+        if (this.personDuration == null) {
+            this.personDuration =  db.getAddressPersonMap().getItem(address);
+
+        }
+        return this.personDuration;
     }
 
     public boolean isPerson(DCSet dcSet, int forHeight) {

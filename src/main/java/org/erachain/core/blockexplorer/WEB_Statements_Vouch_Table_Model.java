@@ -46,7 +46,7 @@ public class WEB_Statements_Vouch_Table_Model extends AbstractTableModel impleme
     public WEB_Statements_Vouch_Table_Model(Transaction transaction) {
         table = DCSet.getInstance().getTransactionFinalMap();
         blockNo = transaction.getBlockHeight();
-        recNo = transaction.getSeqNo(DCSet.getInstance());
+        recNo = transaction.getSeqNo();
         transactions = new ArrayList<Transaction>();
         // transactions = read_Sign_Accoutns();
         //	DCSet.getInstance().getTransactionFinalMap().addObserver(this);

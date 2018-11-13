@@ -110,7 +110,7 @@ public class Records_Search_SplitPanel extends Split_Panel {
                 row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
                 Transaction trans = transactionsTableModel.getTransaction(row);
                 DCSet db = DCSet.getInstance();
-                new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo(db));
+                new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
 
             }
         });
@@ -225,7 +225,7 @@ public class Records_Search_SplitPanel extends Split_Panel {
                 //	JPanel a = TransactionDetailsFactory.getInstance().createTransactionDetail(voting);
                 info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(voting), tableGBC);
 
-                Tuple2<BigDecimal, List<Long>> keys = DCSet.getInstance().getVouchRecordMap().get(Transaction.makeDBRef(voting.getBlockHeight(), voting.getSeqNo(DCSet.getInstance())));
+                Tuple2<BigDecimal, List<Long>> keys = DCSet.getInstance().getVouchRecordMap().get(Transaction.makeDBRef(voting.getBlockHeight(), voting.getSeqNo()));
                 GridBagConstraints gridBagConstraints = null;
                 if (keys != null) {
 
