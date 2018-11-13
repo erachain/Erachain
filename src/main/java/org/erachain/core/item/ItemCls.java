@@ -10,11 +10,11 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.Issue_ItemMap;
 import org.erachain.datachain.Item_Map;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple6;
-import org.erachain.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -459,20 +459,16 @@ public abstract class ItemCls {
 
     }
 
-    public long removeFromMap(DCSet db) {
+    public long removeFromMap(DCSet db, long startKey) {
         //DELETE FROM DATABASE
 
         long thisKey = this.getKey(db);
-        /* OLD
-        //LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 1a, getKey= " + thisKey);
-        Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
-        if (pair == null) {
+
+        if (thisKey > startKey) {
             this.getDBMap(db).remove(thisKey);
         } else {
             this.getDBMap(db).delete(thisKey);
         }
-        */
-        this.getDBMap(db).delete(thisKey);
 
         //DELETE ORPHAN DATA
         //LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 2");

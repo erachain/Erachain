@@ -193,7 +193,7 @@ public abstract class Issue_ItemRecord extends Transaction {
 
         //LOGGER.debug("<<<<< org.erachain.core.transaction.Issue_ItemRecord.orphan 1");
         //DELETE FROM DATABASE
-        long key = this.item.removeFromMap(this.dcSet);
+        long key = this.item.removeFromMap(this.dcSet, START_KEY);
         //LOGGER.debug("<<<<< org.erachain.core.transaction.Issue_ItemRecord.orphan 2");
     }
 
