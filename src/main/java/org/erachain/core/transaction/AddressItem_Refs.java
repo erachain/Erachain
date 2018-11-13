@@ -16,6 +16,8 @@ public abstract class AddressItem_Refs extends Transaction {
 
     private ItemCls item;
 
+    public static final long START_KEY = 1000l; // << 20;
+
     public AddressItem_Refs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
         this.item = item;
@@ -136,7 +138,7 @@ public abstract class AddressItem_Refs extends Transaction {
         if (this.item.getReference() == null) this.item.setReference(this.signature);
 
         //INSERT INTO DATABASE
-        this.item.insertToMap(this.dcSet, 1000l);
+        this.item.insertToMap(this.dcSet, START_KEY);
 
     }
 
@@ -147,7 +149,7 @@ public abstract class AddressItem_Refs extends Transaction {
         super.orphan(asDeal);
 
         //DELETE FROM DATABASE
-        long key = this.item.removeFromMap(this.dcSet);
+        long key = this.item.removeFromMap(this.dcSet, START_KEY);
     }
 
     @Override
