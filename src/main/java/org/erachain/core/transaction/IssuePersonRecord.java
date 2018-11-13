@@ -314,6 +314,6 @@ public class IssuePersonRecord extends Issue_ItemRecord {
     @Override
     public long calcBaseFee()
     {
-        return calcCommonFee() >> 1;
+        return calcCommonFee() >> 2;
     }
 }
