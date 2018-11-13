@@ -85,16 +85,5 @@ public class RecGenesis_DetailsFrame extends JPanel //JFrame
         MenuPopupUtil.installContextMenu(feePow);
         this.add(feePow, detailGBC);
 
-        //LABEL CONFIRMATIONS
-        componentLevel++;
-        labelGBC.gridy = componentLevel;
-        JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations") + ":");
-        this.add(confirmationsLabel, labelGBC);
-
-        //CONFIRMATIONS
-        detailGBC.gridy = componentLevel;
-        JLabel confirmations = new JLabel(String.valueOf(record.getConfirmations(DCSet.getInstance())));
-        this.add(confirmations, detailGBC);
-
     }
 }
