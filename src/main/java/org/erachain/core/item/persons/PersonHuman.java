@@ -228,7 +228,7 @@ public class PersonHuman extends PersonCls {
     }
 
     public int getMinNameLen() {
-        return 6;
+        return 5;
     }
 
     public byte[] getOwnerSignature() {

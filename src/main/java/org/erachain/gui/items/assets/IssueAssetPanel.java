@@ -296,7 +296,9 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 7);
         add(scale_jLabel, gridBagConstraints);
         
-        txtScale.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" }));
+        txtScale.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6",
+                "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
+                "21", "22", "23", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8"}));
         txtScale.setSelectedIndex(8);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;

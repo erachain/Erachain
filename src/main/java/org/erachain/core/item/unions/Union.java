@@ -119,7 +119,7 @@ public class Union extends UnionCls {
     }
 
     public int getMinNameLen() {
-        return 12;
+        return 1;
     }
 
 }
