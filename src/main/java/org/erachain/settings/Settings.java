@@ -6,8 +6,6 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.lang.Lang;
@@ -16,6 +14,8 @@ import org.erachain.ntp.NTP;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +27,6 @@ import java.util.List;
 
 //import java.util.Arrays;
 // import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 public class Settings {
 
@@ -577,7 +576,7 @@ public class Settings {
             return ((String) this.settingsJSON.get("compuRate")).toString();
         }
 
-        return "200";
+        return "100";
     }
     
     public boolean getbacUpAskToStart() {
