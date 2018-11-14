@@ -2107,6 +2107,8 @@ public class BlockExplorer {
         boolean outcome = false;
         int type;
 
+        int height = Controller.getInstance().getMyHeight();
+
         LinkedHashMap transactionsJSON = new LinkedHashMap();
         List<Transaction> transactions2 = (toIndex == 0) ? transactions
                 : transactions.subList(fromIndex, Math.min(toIndex, transactions.size()));
@@ -2161,6 +2163,8 @@ public class BlockExplorer {
              */
 
             //
+
+
             transactionJSON.put("block", trans.getBlockHeight());// .getSeqNo(dcSet));
 
             transactionJSON.put("seq", trans.getSeqNo());
@@ -2172,6 +2176,8 @@ public class BlockExplorer {
                 transactionJSON.put("reference", "--");
                 transactionJSON.put("signature", trans.getBlockHeight() + "-" + trans.getSeqNo());
                 transactionJSON.put("date", txCalculated.getMessage());
+
+                transactionJSON.put("confirmations", trans.getConfirmations(height));
 
                 transactionJSON.put("creator", txCalculated.getRecipient().getPersonAsString());
                 transactionJSON.put("creator_addr", txCalculated.getRecipient().getAddress());
@@ -2214,7 +2220,7 @@ public class BlockExplorer {
 
                 transactionJSON.put("size", trans.viewSize(Transaction.FOR_NETWORK));
                 transactionJSON.put("fee", trans.getFee());
-                transactionJSON.put("confirmations", trans.getConfirmations(dcSet));
+                transactionJSON.put("confirmations", trans.getConfirmations(height));
 
             }
 

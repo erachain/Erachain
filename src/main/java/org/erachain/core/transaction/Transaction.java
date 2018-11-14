@@ -1476,35 +1476,37 @@ public abstract class Transaction {
         return db.getTransactionFinalMapSigns().contains(this.getSignature());
     }
 
+    public int getConfirmations(int chainHeight) {
+
+        if (this.height == 0) {
+            return 0;
+        } else {
+            return chainHeight - this.height;
+        }
+    }
+
     public int getConfirmations(DCSet db) {
 
-        try {
-            // CHECK IF IN UNCONFIRMED TRANSACTION
-            if (this.getType() != Transaction.CALCULATED_TRANSACTION) {
-                if (!db.getTransactionMap().contains(this)) {
-                    return -db.getTransactionMap().getBroadcasts(this);
-                }
+        // CHECK IF IN UNCONFIRMED TRANSACTION
+
+        if (this.height > 0)
+            return 1 + db.getBlockMap().size() - this.height;
+
+
+        if (this.getType() != Transaction.CALCULATED_TRANSACTION) {
+            if (db.getTransactionMap().contains(this)) {
+                return -db.getTransactionMap().getBroadcasts(this);
             }
-
-            // CALCULATE CONFIRMATIONS
-            // int lastBlockHeight =
-            // db.getBlockSignsMap().getHeight(db.getBlocksHeadMap().getLastBlockSignature());
-            // Block block =
-            // DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.signature);
-            Block block = this.getBlock(db);
-
-            if (block == null)
-                return 0;
-
-            int transactionBlockHeight = db.getBlockSignsMap().get(block);
-
-            // RETURN
-            return 1 + db.getBlockMap().size() - transactionBlockHeight;
-
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            return 0;
         }
+
+        Block block = this.getBlock(db);
+
+        if (block == null)
+            return 0;
+
+        // RETURN
+        return 1 + db.getBlockMap().size() - block.heightBlock;
+
     }
 
     public int getBlockVersion(DCSet db) {
