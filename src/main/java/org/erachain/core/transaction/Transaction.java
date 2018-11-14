@@ -962,13 +962,13 @@ public abstract class Transaction {
         return feePow + ":" + this.fee.unscaledValue().longValue();
     }
 
-    public String viewFee() {
+    public String viewFeeAndFiat() {
         Fun.Tuple2<BigDecimal, String> compu_rate = Controller.COMPU_RATES.get(Settings.getInstance().getLang());
         if (compu_rate == null) {
             compu_rate = Controller.COMPU_RATES.get("en");
         }
         String text = fee.toString();
-        if (compu_rate != null) {
+        if (compu_rate != null && compu_rate.a.signum() > 0) {
             BigDecimal fee_fiat = fee.multiply(compu_rate.a).setScale(compu_rate.a.scale(), BigDecimal.ROUND_HALF_UP);
             text += "(" + compu_rate.b + fee_fiat.toString() + ")";
         }

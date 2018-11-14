@@ -1542,7 +1542,7 @@ public class BlockExplorer {
             blockJSON.put("transactionsCount", block.getTransactionCount());
             blockJSON.put("timestamp", block.getTimestamp());
             blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
-            blockJSON.put("totalFee", block.getTotalFee().toPlainString());
+            blockJSON.put("totalFee", block.viewFeeAsBigDecimal());
 
             BigDecimal totalAmount = BigDecimal.ZERO;
             int seq = 0;
@@ -2599,7 +2599,7 @@ public class BlockExplorer {
 
             // transactionDataJSON.put("fee", balances[size -
             // counter].getTransactionBalance().get(0l).toPlainString());
-            transactionDataJSON.put("fee", block.getTotalFee().toPlainString());
+            transactionDataJSON.put("fee", block.viewFeeAsBigDecimal());
 
             transactionJSON.put("type", "block");
             transactionJSON.put("block", transactionDataJSON);
@@ -2990,7 +2990,7 @@ public class BlockExplorer {
 
             } else if (unit.getUnit() instanceof Block) {
 
-                BigDecimal fee = ((Block) unit.getUnit()).getTotalFee();
+                BigDecimal fee = ((Block) unit.getUnit()).getFeeAsBigDecimal();
                 String generator = ((Block) unit.getUnit()).getCreator().getAddress();
 
                 tXincome = Transaction.addAssetAmount(tXincome, generator, FEE_KEY, fee);
@@ -4252,7 +4252,7 @@ public class BlockExplorer {
 
         output.put("totalATAmount", totalATAmount.toPlainString());
         // output.put("aTfee", block.getATfee().toPlainString());
-        output.put("totalFee", block.getTotalFee().toPlainString());
+        output.put("totalFee", block.viewFeeAsBigDecimal());
         output.put("version", block.getVersion());
 
         output.put("generatingBalance", block.getForgingValue());
@@ -4296,7 +4296,7 @@ public class BlockExplorer {
             // Base58.encode(block.getTransactionsSignature()));
             transactionDataJSON.put("version", block.getVersion());
 
-            transactionDataJSON.put("fee", block.getTotalFee().toPlainString());
+            transactionDataJSON.put("fee", block.viewFeeAsBigDecimal());
 
             transactionJSON.put("type", "block");
             transactionJSON.put("block", transactionDataJSON);

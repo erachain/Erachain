@@ -1,25 +1,23 @@
 package org.erachain.gui.models;
 
+import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
+import org.erachain.core.block.Block;
+import org.erachain.datachain.DCSet;
+import org.erachain.lang.Lang;
+import org.erachain.utils.DateTimeFormat;
+import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.mapdb.Fun.Tuple2;
-
-import org.erachain.controller.Controller;
-import org.erachain.core.block.Block;
-import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
-import org.erachain.utils.DateTimeFormat;
-import org.erachain.utils.NumberAsString;
-import org.erachain.utils.ObserverMessage;
 
 @SuppressWarnings("serial")
 public class BlocksTableModel extends AbstractTableModel implements Observer {
@@ -153,7 +151,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
 
                 case COLUMN_FEE:
 
-                    return block.totalFee;
+                    return BigDecimal.valueOf(block.totalFee, BlockChain.FEE_SCALE);
 
             }
 

@@ -94,7 +94,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
         JTextField shorn_Info = new JTextField(DateTimeFormat.timestamptoString(record.getTimestamp())
                 + " [" + record.viewHeightSeq() + " "
                 + String.valueOf(record.getDataLength(Transaction.FOR_NETWORK, true)) + "^" + String.valueOf(record.getFeePow())
-                + "=" + record.getFeeLong() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
+                + "=" + record.getFee() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
                 + ">>" + record.getConfirmations(dcSet));
         shorn_Info.setEditable(false);
 //		MenuPopupUtil.installContextMenu(shorn_Info);
@@ -189,7 +189,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
         new JTextField(DateTimeFormat.timestamptoString(record.getTimestamp())
 
                 + String.valueOf(record.getDataLength(Transaction.FOR_NETWORK, true)) + "^" + String.valueOf(record.getFeePow())
-                + "=" + record.getFeeLong() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
+                + "=" + record.getFee() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
                 + ">>" + record.getConfirmations(dcSet));
 
 

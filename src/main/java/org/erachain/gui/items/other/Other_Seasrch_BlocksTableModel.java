@@ -1,22 +1,19 @@
 package org.erachain.gui.items.other;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.mapdb.Fun.Tuple2;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
-import org.erachain.utils.NumberAsString;
+import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("serial")
 public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
@@ -186,7 +183,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
                         return "-1";
                     }
 
-                    return NumberAsString.formatAsString(block.getTotalFee());
+                    return block.viewFeeAsBigDecimal();
 
             }
 

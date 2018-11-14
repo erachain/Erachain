@@ -5,13 +5,11 @@ package org.erachain.gui.library;
  * and open the template in the editor.
  */
 
+import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
-
-import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.transaction.TransactionDetailsFactory;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -67,7 +65,7 @@ public class Issue_Confirm_Dialog extends javax.swing.JDialog {
         if (transaction != null) {
             String feeText = "" + Lang.getInstance().translate("Size") + ":&nbsp;"
                     + transaction.viewSize(Transaction.FOR_NETWORK) + " Bytes, ";
-            feeText += Lang.getInstance().translate("Fee") + ":&nbsp;<b>" + transaction.viewFee()
+            feeText += Lang.getInstance().translate("Fee") + ":&nbsp;<b>" + transaction.viewFeeAndFiat()
                     + "</b>";
             status_Text += feeText;
         }
