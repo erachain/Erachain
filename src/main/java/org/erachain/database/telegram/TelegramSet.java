@@ -3,11 +3,11 @@ package org.erachain.database.telegram;
 
 import java.io.File;
 
+import org.erachain.database.IDB;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.datachain.IDB;
 import org.erachain.settings.Settings;
 
 //import org.mapdb.Serializer;
@@ -66,16 +66,23 @@ public class TelegramSet implements IDB {
 
     }
 
+    @Override
     public void outUses() {
         this.uses--;
     }
 
+    @Override
     public boolean isBusy() {
         if (this.uses > 0) {
             return true;
         } else {
             return false;
         }
+    }
+
+    @Override
+    public void openDBSet() {
+
     }
 
     public AllTelegramsMap getTelegramsMap() {
@@ -89,6 +96,7 @@ public class TelegramSet implements IDB {
 
     }
 
+    @Override
     public void commit() {
         this.uses++;
         this.database.commit();
@@ -96,6 +104,7 @@ public class TelegramSet implements IDB {
 
     }
 
+    @Override
     public void close() {
         if (this.database != null) {
             if (!this.database.isClosed()) {

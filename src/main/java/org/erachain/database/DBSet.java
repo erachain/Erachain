@@ -94,6 +94,11 @@ public class DBSet implements IDB {
         }
     }
 
+    @Override
+    public void openDBSet() {
+
+    }
+
 
     public void commit() {
         this.uses++;
@@ -102,6 +107,7 @@ public class DBSet implements IDB {
 
     }
 
+    @Override
     public void close() {
         if (this.database != null) {
             if (!this.database.isClosed()) {

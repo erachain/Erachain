@@ -388,7 +388,7 @@ public class Controller extends Observable {
         this.needSyncWallet = needSync;
     }
 
-    private void openDataBaseFile(String name, String path, DBSet dbSet) {
+    private void openDataBaseFile(String name, String path, org.erachain.database.IDB dbSet) {
 
         boolean error = false;
         boolean backUped = false;
@@ -399,7 +399,7 @@ public class Controller extends Observable {
                 about_frame.set_console_Text(Lang.getInstance().translate("Open") + " " + name);
 
             //// должен быть метод
-            ///// dbSet.open();
+            dbSet.openDBSet();
             /// this.dbSet = DBSet.getinstanse();
 
             LOGGER.info(name + " OK");
