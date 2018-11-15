@@ -923,7 +923,7 @@ public class Block {
 
     public String viewFeeAsBigDecimal() {
 
-        return NumberAsString.formatAsString(BigDecimal.valueOf(this.totalFee, BlockChain.FEE_SCALE));
+        return NumberAsString.formatAsString(BigDecimal.valueOf(this.blockHead.totalFee, BlockChain.FEE_SCALE));
     }
 
     //PARSE/CONVERT
@@ -945,7 +945,7 @@ public class Block {
         block.put("target", this.getTarget());
         ///block.put("winValueTargeted", this.calcWinValueTargeted(DCSet.getInstance()));
         block.put("creator", this.creator.getAddress());
-        block.put("fee", this.getTotalFee().toPlainString());
+        block.put("fee", this.viewFeeAsBigDecimal());
         block.put("transactionsHash", Base58.encode(this.transactionsHash));
         block.put("signature", Base58.encode(this.signature));
         block.put("height", this.getHeight());
