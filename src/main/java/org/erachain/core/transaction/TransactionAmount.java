@@ -852,6 +852,11 @@ public abstract class TransactionAmount extends Transaction {
 
             }
 
+            if (creator.equals(recipient)) {
+                // TODO 4.11 перенести это вверх где Сумма есть а сейчас там балансы не проверяются
+                return Transaction.INVALID_ADDRESS;
+            }
+
         } else {
             // TODO first org.erachain.records is BAD already ((
             // CHECK IF CREATOR HAS ENOUGH FEE MONEY
