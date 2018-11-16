@@ -591,12 +591,14 @@ public class R_SertifyPubKeys extends Transaction {
             }
 
             // GIVE GIFT for this PUB_KEY - to PERSON
-            pkAccount.changeBalance(db, false, FEE_KEY, BONUS_FOR_PERSON_4_11, false);
+            BigDecimal personBonus = BlockChain.VERS_4_11 < height ? BONUS_FOR_PERSON_4_11.add(BONUS_FOR_PERSON_4_11)
+                    : BONUS_FOR_PERSON_4_11;
+            pkAccount.changeBalance(db, false, FEE_KEY, personBonus, false);
             if (makeCalculates) {
-                this.block.txCalculated.add(new R_Calculated(pkAccount, FEE_KEY, BONUS_FOR_PERSON_4_11,
+                this.block.txCalculated.add(new R_Calculated(pkAccount, FEE_KEY, personBonus,
                         "enter bonus", this.dbRef));
             }
-            BigDecimal issued_FEE_BD_total = BONUS_FOR_PERSON_4_11;
+            BigDecimal issued_FEE_BD_total = personBonus;
 
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
             issuer.changeBalance(db, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRATOR_4_11,
@@ -704,8 +706,11 @@ public class R_SertifyPubKeys extends Transaction {
             // BONUSES
 
             // GIVE GIFT for this PUB_KEY - to PERSON
-            pkAccount.changeBalance(db, true, FEE_KEY, BONUS_FOR_PERSON_4_11, false);
-            BigDecimal issued_FEE_BD_total = BONUS_FOR_PERSON_4_11;
+            // GIVE GIFT for this PUB_KEY - to PERSON
+            BigDecimal personBonus = BlockChain.VERS_4_11 < height ? BONUS_FOR_PERSON_4_11.add(BONUS_FOR_PERSON_4_11)
+                    : BONUS_FOR_PERSON_4_11;
+            pkAccount.changeBalance(db, true, FEE_KEY, personBonus, false);
+            BigDecimal issued_FEE_BD_total = personBonus;
 
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
             issuer.changeBalance(db, true, FEE_KEY, issued_FEE_BD, //BONUS_FOR_PERSON_REGISTRATOR_4_11,
