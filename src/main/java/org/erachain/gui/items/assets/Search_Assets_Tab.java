@@ -61,7 +61,7 @@ public class Search_Assets_Tab extends Item_Search_SplitPanel {
                 DCSet db = DCSet.getInstance();
                 Transaction trans = db.getTransactionFinalMap().get(th.item_Menu.getReference());
 
-                new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo(db));
+                new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
 
             }
         });

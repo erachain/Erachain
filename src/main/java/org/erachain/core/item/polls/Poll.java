@@ -128,6 +128,7 @@ public class Poll extends PollCls {
         return "poll";
     }
 
+    @Override
     public int getMinNameLen() {
         return 12;
     }

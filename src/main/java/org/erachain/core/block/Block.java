@@ -22,6 +22,7 @@ import org.erachain.datachain.TransactionFinalMapSigns;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Converter;
+import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -770,23 +771,16 @@ public class Block {
         return bonusFee;
     }
 
-    public BigDecimal getTotalFee(DCSet db) {
+    private BigDecimal getTotalFee(DCSet db) {
         BigDecimal fee = this.getFeeByProcess(db);
         return fee.add(this.getBonusFee());
     }
 
-	/*
-	public BigDecimal getATfee()
-	{
-		return BigDecimal.valueOf(this.atFees, BlockChain.AMOUNT_DEDAULT_SCALE);
-	}
-	 */
-
-    public BigDecimal getTotalFee() {
+    private BigDecimal getTotalFee() {
         return getTotalFee(DCSet.getInstance());
     }
 
-    public BigDecimal getFeeByProcess(DCSet db) {
+    private BigDecimal getFeeByProcess(DCSet db) {
         //BigDecimal fee = BigDecimal.ZERO;
         int fee = 0;
 
@@ -922,6 +916,16 @@ public class Block {
         return this.transactionsHash;
     }
 
+    public BigDecimal getFeeAsBigDecimal() {
+
+        return BigDecimal.valueOf(this.totalFee, BlockChain.FEE_SCALE);
+    }
+
+    public String viewFeeAsBigDecimal() {
+
+        return NumberAsString.formatAsString(BigDecimal.valueOf(this.blockHead.totalFee, BlockChain.FEE_SCALE));
+    }
+
     //PARSE/CONVERT
 
     public void makeTransactionsHash() {
@@ -941,7 +945,7 @@ public class Block {
         block.put("target", this.getTarget());
         ///block.put("winValueTargeted", this.calcWinValueTargeted(DCSet.getInstance()));
         block.put("creator", this.creator.getAddress());
-        block.put("fee", this.getTotalFee().toPlainString());
+        block.put("fee", this.viewFeeAsBigDecimal());
         block.put("transactionsHash", Base58.encode(this.transactionsHash));
         block.put("signature", Base58.encode(this.signature));
         block.put("height", this.getHeight());

@@ -6,12 +6,12 @@ import org.erachain.core.block.Block;
 import org.erachain.database.wallet.BlocksHeadMap;
 import org.erachain.datachain.SortableList;
 import org.erachain.lang.Lang;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Null;
 import java.math.BigDecimal;
@@ -128,7 +128,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 
                 case COLUMN_FEE:
 
-                    return block.totalFee;
+                    return BigDecimal.valueOf(block.totalFee, BlockChain.FEE_SCALE);
 
             }
         } catch (Exception e) {

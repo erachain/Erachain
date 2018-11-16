@@ -1,10 +1,10 @@
 package org.erachain.gui.records;
 
-import javax.swing.JTextPane;
-
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
+
+import javax.swing.*;
 
 //import org.erachain.gui.*;
 
@@ -35,11 +35,12 @@ public class Record_Info extends JTextPane {
         if (!record.isConfirmed(db)) {
             message = Lang.getInstance().translate("Not confirmed");
         } else {
-            message = "Block Height - SeqNo.: " + record.viewHeightSeq(db) + ", Confs.: " + record.getConfirmations(DCSet.getInstance()) + ", Block Ver.: " + record.getBlockVersion(db);
+            message = "Block Height - SeqNo.: " + record.viewHeightSeq() + ", Confs.: " + record.getConfirmations(DCSet.getInstance()) + ", Block Ver.: " + record.getBlockVersion(db);
         }
         message = "<div><b>" + message + "</b>"
                 + ", time: " + record.viewTimestamp() + "</div>";
-        message += "<div> type: <b>" + record.viewFullTypeName() + "</b>, size: " + record.viewSize(Transaction.FOR_NETWORK) + ", fee:" + record.viewFee() + "</div>";
+        message += "<div> type: <b>" + record.viewFullTypeName() + "</b>, size: " + record.viewSize(Transaction.FOR_NETWORK)
+                + ", fee:" + record.viewFeeAndFiat() + "</div>";
 
         //message += "<div>REF: <font size='2'>" + record.viewReference() + "</font></div>";
         message += "<div>SIGN: <font size='2'>" + record.viewSignature() + "</font></div>";

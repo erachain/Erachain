@@ -9,6 +9,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
@@ -679,29 +680,15 @@ public abstract class Transaction {
     public abstract boolean hasPublicText();
 
     public int getJobLevel() {
-        return 100;
+        return 0;
     }
 
     public int calcCommonFee() {
+
         int len = this.getDataLength(Transaction.FOR_NETWORK, true);
 
-        // FEE_FOR_ANONIMOUSE !
-        /// if (this.getBlockHeightByParent(db))
-        // TODO FEE_FOR_ANONIMOUSE + is PERSON + DB
-        int anonimous = 0;
-        // TODO DBSet get from CHAIN
         /*
-         * Controller cnt = Controller.getInstance(); BlockChain bchain =
-         * cnt.getBlockChain(); for ( Account acc : this.getRecipientAccounts())
-         * { //byte[] publicKey = cnt.getPublicKeyByAddress(acc.getAddress());
-         * if (!acc.isPerson(bchain.getDB())) { anonimuus +=
-         * BlockChain.FEE_FOR_ANONIMOUSE; } }
-         *
-         * if ( anonimuus == 0 && this.creator != null) { byte[] publicKey =
-         * cnt.getPublicKeyByAddress(this.creator.getAddress()); if (publicKey
-         * == null) { anonimuus += BlockChain.FEE_FOR_ANONIMOUSE; } }
-         */
-
+        int anonimous = 0;
         if (anonimous > 0) {
             len *= anonimous;
         }
@@ -712,6 +699,7 @@ public abstract class Transaction {
 
         if (len < minLen)
             len = minLen;
+        */
 
         return len * BlockChain.FEE_PER_BYTE;
 
@@ -726,11 +714,7 @@ public abstract class Transaction {
     public void calcFee() {
 
         long fee_long = calcBaseFee();
-        if(this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE) {
-            // OLD version with x64
-            fee_long = (fee_long << 5) / 100;
-        }
-        BigDecimal fee = new BigDecimal(fee_long).multiply(BlockChain.FEE_RATE).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, BigDecimal.ROUND_UP);
+        BigDecimal fee = new BigDecimal(fee_long).multiply(BlockChain.FEE_RATE).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
 
         if (this.feePow > 0) {
             this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow(this.feePow)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, BigDecimal.ROUND_UP);
@@ -748,11 +732,25 @@ public abstract class Transaction {
 
     // GET only INVITED FEE
     public long getInvitedFee() {
-        if (this.height > BlockChain.VERS_4_11 || !BlockChain.VERS_4_11_USE_OLD_FEE)
+
+        if (true)
+            // SWITCH OFF REFERRAL
             return 0l;
 
+        Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
+        if (personDuration == null
+                || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY ) {
+            // ANONYMOUS or ME
+            return 0l;
+        }
+
         long fee = this.fee.unscaledValue().longValue();
-        return fee >> BlockChain.FEE_INVITED_SHIFT;
+
+        // Если слишком большая комиссия, то и награду чуток увеличим
+        if (fee > BlockChain.BONUS_REFERAL<<3)
+            return BlockChain.BONUS_REFERAL<<1;
+
+        return BlockChain.BONUS_REFERAL;
     }
 
     public BigDecimal feeToBD(int fee) {
@@ -793,12 +791,7 @@ public abstract class Transaction {
 
     }
 
-    public int getSeqNo() {
-    return this.seqNo;
-    }
-
     public int getBlockHeight() {
-        //if (this.isConfirmed(db)) {
 
         if (this.height > 0)
             return this.height;
@@ -810,38 +803,20 @@ public abstract class Transaction {
         return -1;
     }
 
-    /*
-    // get current or -1
-    public int getBlockHeightByParent(DCSet db) {
-
-        if (block != null)
-            return block.getHeightByParent(db);
-
-        return getBlockHeight(db);
-    }
-    */
-
     // get current or last
     public int getBlockHeightByParentOrLast(DCSet dc) {
+
+        if (this.height > 0)
+            return this.height;
 
         if (block != null)
             return block.getHeight();
 
-
         return dc.getBlockMap().size() + 1;
     }
 
-    public int getSeqNo(DCSet db) {
-
-        if(this.seqNo > 0)
-            return this.seqNo;
-
-        Block block = this.getBlock(db);
-        if (block == null)
-            return -1;
-
-        return block.getTransactionSeq(this.signature);
-
+    public int getSeqNo() {
+        return this.seqNo;
     }
 
     public long getDBRef() {
@@ -861,7 +836,7 @@ public abstract class Transaction {
             return null;
 
         byte[] ref = Ints.toByteArray(bh);
-        Bytes.concat(ref, Ints.toByteArray(this.getSeqNo(db)));
+        Bytes.concat(ref, Ints.toByteArray(this.getSeqNo()));
         return ref;
 
     }
@@ -944,12 +919,8 @@ public abstract class Transaction {
 
     }
 
-    public String viewHeightSeq(DCSet db) {
-        int seq = this.getSeqNo(db);
-        if (seq < 1)
-            return "???";
-
-        return this.getBlockHeight() + "-" + seq;
+    public String viewHeightSeq() {
+        return this.height + "-" + this.seqNo;
     }
 
     public String viewAmount(Account account) {
@@ -991,13 +962,13 @@ public abstract class Transaction {
         return feePow + ":" + this.fee.unscaledValue().longValue();
     }
 
-    public String viewFee() {
+    public String viewFeeAndFiat() {
         Fun.Tuple2<BigDecimal, String> compu_rate = Controller.COMPU_RATES.get(Settings.getInstance().getLang());
         if (compu_rate == null) {
             compu_rate = Controller.COMPU_RATES.get("en");
         }
         String text = fee.toString();
-        if (compu_rate != null) {
+        if (compu_rate != null && compu_rate.a.signum() > 0) {
             BigDecimal fee_fiat = fee.multiply(compu_rate.a).setScale(compu_rate.a.scale(), BigDecimal.ROUND_HALF_UP);
             text += "(" + compu_rate.b + fee_fiat.toString() + ")";
         }
@@ -1043,7 +1014,7 @@ public abstract class Transaction {
             transaction.put("property2", Byte.toUnsignedInt(this.typeBytes[3]));
             if (this.block != null) {
                 transaction.put("height", height); //this.block.getHeightByParent(localDCSet));
-                transaction.put("sequence", this.getSeqNo(localDCSet));
+                transaction.put("sequence", this.getSeqNo());
             }
         }
 
@@ -1070,9 +1041,9 @@ public abstract class Transaction {
         }
 
         if (height > 0) {
-            transaction.put("sequence", this.getSeqNo(localDCSet));
+            transaction.put("sequence", this.getSeqNo());
             transaction.put("block", Base58.encode(block.getSignature()));
-            transaction.put("block_seq", viewHeightSeq(localDCSet));
+            transaction.put("block_seq", viewHeightSeq());
             transaction.put("height", height);
         }
 
@@ -1287,63 +1258,49 @@ public abstract class Transaction {
 
     }
 
-    public void process_gifts(int level, long fee_gift, Account creator, boolean asOrphan,
+    public void process_gifts_turn(int level, long fee_gift, Account invitedAccount,
+                                   long invitedPersonKey, boolean asOrphan,
                               List<R_Calculated> txCalculated, String message) {
 
         if (fee_gift <= 0l)
             return;
 
-        String messageLevel = message + " level:" + level;
-        Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
-        if (personDuration == null) {
-            // USE all GIFT for current ACCOUNT
-            BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            creator.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
-            if (txCalculated != null && !asOrphan) {
-                txCalculated.add(new R_Calculated(creator, FEE_KEY, giftBG,
-                        messageLevel, this.dbRef));
-            }
-            return;
-        }
+        String messageLevel;
 
         // CREATOR is PERSON
         // FIND person
-        ItemCls person = this.dcSet.getItemPersonMap().get(personDuration.a);
+        ItemCls person = this.dcSet.getItemPersonMap().get(invitedPersonKey);
         Long inviteredDBRef = this.dcSet.getTransactionFinalMapSigns().get(person.getReference());
 
         Transaction issueRecord = this.dcSet.getTransactionFinalMap().get(inviteredDBRef);
-        Account inviterAccount = issueRecord.getCreator();
-        Tuple4<Long, Integer, Integer, Integer> inviterPersonDuration = inviterAccount.getPersonDuration(this.dcSet);
+        Account issuerAccount = issueRecord.getCreator();
+        Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = issuerAccount.getPersonDuration(this.dcSet);
+        long issuerPersonKey = issuerPersonDuration.a;
 
-        if (inviterPersonDuration != null && inviterPersonDuration.a.equals(personDuration.a)) {
-            // if it SAME perdsn - skip
-            process_gifts(--level, fee_gift, inviterAccount, asOrphan, txCalculated, message);
+        if (issuerPersonKey == invitedPersonKey) {
+            // loop ??
             return;
         }
 
-        if (creator.equals(inviterAccount)
-                // EXCLUDE ME
-                || Arrays.equals(BlockChain.BONUS_STOP_ACCOUNT, inviterAccount.getShortAddressBytes())
+        if (issuerPersonKey <= BlockChain.BONUS_STOP_PERSON_KEY
         ) {
-            // IT IS ME - all fee!
+            // IT IS ME - all fee to INVITED
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            creator.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
+            invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
             if (txCalculated != null && !asOrphan) {
-                txCalculated.add(new R_Calculated(creator, FEE_KEY, giftBG,
+                messageLevel = message + " top level";
+                txCalculated.add(new R_Calculated(invitedAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
             return;
         }
 
         // IS INVITER ALIVE ???
-        Tuple4<Long, Integer, Integer, Integer> inviterDuration = inviterAccount.getPersonDuration(this.dcSet);
-        if (inviterDuration != null) {
-            PersonCls inviter = (PersonCls) this.dcSet.getItemPersonMap().get(inviterDuration.a);
-            if (!inviter.isAlive(this.timestamp)) {
-                // SKIP this LEVEL for DEAD persons
-                process_gifts(level, fee_gift, inviterAccount, asOrphan, txCalculated, message);
-                return;
-            }
+        PersonCls issuer = (PersonCls) this.dcSet.getItemPersonMap().get(issuerPersonKey);
+        if (!issuer.isAlive(this.timestamp)) {
+            // SKIP this LEVEL for DEAD persons
+            process_gifts_turn(level, fee_gift, issuerAccount, issuerPersonKey, asOrphan, txCalculated, message);
+            return;
         }
 
         if (level > 1 ) {
@@ -1352,26 +1309,50 @@ public abstract class Transaction {
             long fee_gift_get = fee_gift - fee_gift_next;
 
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE);
-            inviterAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
+            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
             if (txCalculated != null && !asOrphan) {
-                txCalculated.add(new R_Calculated(inviterAccount, FEE_KEY, giftBG,
+                messageLevel = message + " level:" + level + " for @P:" + invitedPersonKey;
+                txCalculated.add(new R_Calculated(issuerAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
 
             if (fee_gift_next > 0) {
-                process_gifts(--level, fee_gift_next, inviterAccount, asOrphan, txCalculated, message);
+                process_gifts_turn(--level, fee_gift_next, issuerAccount, issuerPersonKey, asOrphan, txCalculated, message);
             }
 
         } else {
             // this is END LEVEL
             // GET REST of GIFT
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            inviterAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
+            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
+
             if (txCalculated != null && !asOrphan) {
-                txCalculated.add(new R_Calculated(inviterAccount, FEE_KEY, giftBG,
+                messageLevel = message + " level:" + level + " for @P:" + invitedPersonKey;
+                txCalculated.add(new R_Calculated(issuerAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
         }
+    }
+
+
+    public void process_gifts(int level, long fee_gift, Account creator, boolean asOrphan,
+                              List<R_Calculated> txCalculated, String message) {
+
+        if (fee_gift <= 0l)
+            return;
+
+        Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
+        if (personDuration == null
+                || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY ) {
+
+            // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
+            GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, FEE_KEY,
+                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), true);
+            return;
+        }
+
+        process_gifts_turn(level, fee_gift, creator, personDuration.a, asOrphan, txCalculated, message);
+
     }
 
     // REST
@@ -1397,10 +1378,11 @@ public abstract class Transaction {
             }
 
             // Multi Level Referal
-            if (this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE)
-                process_gifts(BlockChain.FEE_INVITED_DEEP, getInvitedFee(), this.creator, false,
+            long invitedFee = getInvitedFee();
+            if (invitedFee > 0)
+                process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
                         this.block != null && this.block.txCalculated != null?
-                                this.block.txCalculated : null, "referal");
+                                this.block.txCalculated : null, "@" + this.viewHeightSeq() + " referal");
 
             String creatorAddress = this.creator.getAddress();
             AddressTime_SignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();
@@ -1438,8 +1420,9 @@ public abstract class Transaction {
             }
 
             // calc INVITED FEE
-            if (this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE)
-                process_gifts(BlockChain.FEE_INVITED_DEEP, getInvitedFee(), this.creator, true,
+            long invitedFee = getInvitedFee();
+            if (invitedFee > 0)
+                process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, true,
                         null, null);
 
             // UPDATE REFERENCE OF SENDER
@@ -1493,35 +1476,37 @@ public abstract class Transaction {
         return db.getTransactionFinalMapSigns().contains(this.getSignature());
     }
 
+    public int getConfirmations(int chainHeight) {
+
+        if (this.height == 0) {
+            return 0;
+        } else {
+            return chainHeight - this.height;
+        }
+    }
+
     public int getConfirmations(DCSet db) {
 
-        try {
-            // CHECK IF IN UNCONFIRMED TRANSACTION
-            if (this.getType() != Transaction.CALCULATED_TRANSACTION) {
-                if (!db.getTransactionMap().contains(this)) {
-                    return -db.getTransactionMap().getBroadcasts(this);
-                }
+        // CHECK IF IN UNCONFIRMED TRANSACTION
+
+        if (this.height > 0)
+            return 1 + db.getBlockMap().size() - this.height;
+
+
+        if (this.getType() != Transaction.CALCULATED_TRANSACTION) {
+            if (db.getTransactionMap().contains(this)) {
+                return -db.getTransactionMap().getBroadcasts(this);
             }
-
-            // CALCULATE CONFIRMATIONS
-            // int lastBlockHeight =
-            // db.getBlockSignsMap().getHeight(db.getBlocksHeadMap().getLastBlockSignature());
-            // Block block =
-            // DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.signature);
-            Block block = this.getBlock(db);
-
-            if (block == null)
-                return 0;
-
-            int transactionBlockHeight = db.getBlockSignsMap().get(block);
-
-            // RETURN
-            return 1 + db.getBlockMap().size() - transactionBlockHeight;
-
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            return 0;
         }
+
+        Block block = this.getBlock(db);
+
+        if (block == null)
+            return 0;
+
+        // RETURN
+        return 1 + db.getBlockMap().size() - block.heightBlock;
+
     }
 
     public int getBlockVersion(DCSet db) {

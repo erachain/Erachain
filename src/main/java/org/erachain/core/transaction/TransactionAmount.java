@@ -852,6 +852,11 @@ public abstract class TransactionAmount extends Transaction {
 
             }
 
+            if (height > (BlockChain.DEVELOP_USE ? 259300 : BlockChain.VERS_4_11) && creator.equals(recipient)) {
+                // TODO 4.11 перенести это вверх где Сумма есть а сейчас там балансы не проверяются
+                return Transaction.INVALID_ADDRESS;
+            }
+
         } else {
             // TODO first org.erachain.records is BAD already ((
             // CHECK IF CREATOR HAS ENOUGH FEE MONEY
@@ -1146,13 +1151,5 @@ public abstract class TransactionAmount extends Transaction {
     }
     
     // public abstract Map<String, Map<Long, BigDecimal>> getAssetAmount();
-
-    @Override
-    public int getJobLevel() {
-        if (this.amount == null || this.amount.signum() == 0) {
-            return 100;
-        }
-        return BlockChain.FINANCIAL_FEE_LEVEL;
-    }
 
 }

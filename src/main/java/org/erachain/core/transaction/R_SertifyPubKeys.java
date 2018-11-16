@@ -31,14 +31,7 @@ import java.util.*;
 // typeBytes[2] - size of personalized accounts
 public class R_SertifyPubKeys extends Transaction {
 
-    protected static final BigDecimal BONUS_FOR_PERSON_4_11 = BigDecimal.valueOf(2000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-    protected static final BigDecimal FEE_FOR_PERSON_REGISTRATOR_4_11 = BigDecimal.valueOf(100 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-    //protected static final BigDecimal BONUS_FOR_PERSON_REGISTRATOR_4_11 = BigDecimal.valueOf(5000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-    //protected static final BigDecimal BONUS_FOR_PERSON_SERTIFIER_4_11 = BigDecimal.valueOf(10000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-    protected static final long BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 = 0; //20000 * BlockChain.FEE_PER_BYTE;
-    //protected static final BigDecimal BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11
-    //        = BigDecimal.valueOf(BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, BlockChain.FEE_SCALE);
-    protected static final int BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11 = 2;
+    protected static final BigDecimal BONUS_FOR_PERSON_4_11 = BigDecimal.valueOf(1000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
 
     public static final int DEFAULT_DURATION = 700;
     private static final byte TYPE_ID = (byte) Transaction.CERTIFY_PUB_KEYS_TRANSACTION;
@@ -357,6 +350,11 @@ public class R_SertifyPubKeys extends Transaction {
         }
     }
 
+    @Override
+    public long getInvitedFee() {
+        return 0l;
+    }
+
     //@Override
     @Override
     public byte[] toBytes(int forDeal, boolean withSignature) {
@@ -512,6 +510,7 @@ public class R_SertifyPubKeys extends Transaction {
 
     public BigDecimal getBonuses() {
 
+        // TODO: в кошельке сделать правильный пересчет
         long personsTotal = this.dcSet.getItemPersonMap().getLastKey();
         if (personsTotal < 3000)
             return BlockChain.BONUS_FEE_LVL1;
@@ -535,12 +534,6 @@ public class R_SertifyPubKeys extends Transaction {
         super.process(block, asDeal);
 
         DCSet db = this.dcSet;
-
-
-        if ("2VTcBHzzbRGU7m11zeDVsnDNfqYhtH4UtiZga5ekqNcH57Pb9kdHisrWqyfr1YGcd14XrGv1vsvkG7PMQHk5hVvr".
-                equals(Base58.encode(this.signature))) {
-            int i = 1;
-        }
 
         int transactionIndex = -1;
         int blockIndex = -1;
@@ -568,10 +561,7 @@ public class R_SertifyPubKeys extends Transaction {
             }
         }
 
-        if (!personalized
-                || this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE
-            // TODO: remove it on new CHAIN (for 4.10 error calculated)
-        ) {
+        if (!personalized) {
             // IT IS NOT VOUCHED PERSON
 
             PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
@@ -594,83 +584,33 @@ public class R_SertifyPubKeys extends Transaction {
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
 
-            if(this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE) {
 
-                // GET FEE from that record
-                ///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // NEED to RECAL?? if from DB
-
-                // ISSUE NEW COMPU in chain
-                BigDecimal issued_FEE_BD = transPersonIssue.getFee();
-
-                // BACK FEE FOR ISSUER without gift for this.CREATOR
-                issuer.changeBalance(db, false, FEE_KEY,
-                        issued_FEE_BD.subtract(BlockChain.GIFTED_COMPU_AMOUNT_BD_4_10), false);
-
-                // GIVE GIFT for Witness this PUB_KEY
-                this.creator.changeBalance(db, false, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_BD_4_10, false);
-                pkAccount.changeBalance(db, false, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD_4_10, false);
-
-                // ADD to EMISSION (with minus)
-                GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY,
-                        issued_FEE_BD.add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD_4_10), true);
-
-            } else {
-
-                boolean makeCalculates = false;
-                if (this.block != null && this.block.txCalculated != null) {
-                    makeCalculates = true;
-                }
-
-                // GIVE GIFT for this PUB_KEY - to PERSON
-                pkAccount.changeBalance(db, false, FEE_KEY, BONUS_FOR_PERSON_4_11, false);
-                if (makeCalculates) {
-                    this.block.txCalculated.add(new R_Calculated(pkAccount, FEE_KEY, BONUS_FOR_PERSON_4_11,
-                            "enter bonus", this.dbRef));
-                }
-                BigDecimal issued_FEE_BD_total = BONUS_FOR_PERSON_4_11;
-
-                BigDecimal issued_FEE_BD = transPersonIssue.getFee().subtract(FEE_FOR_PERSON_REGISTRATOR_4_11);
-
-                issuer.changeBalance(db, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRATOR_4_11,
-                        false);
-                if (makeCalculates) {
-                    this.block.txCalculated.add(new R_Calculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRATOR_4_11,
-                            "register reward @P:" + this.key, this.dbRef));
-                }
-                issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRATOR_4_11);
-
-                /*
-                if (!this.creator.equals(issuer)) {
-                    // AND this different KEY not owned by ONE PERSON
-                    Tuple4<Long, Integer, Integer, Integer> creatorPersonItem = db.getAddressPersonMap().getItem(this.creator.getAddress());
-                    Tuple4<Long, Integer, Integer, Integer> issuerPersonItem = db.getAddressPersonMap().getItem(issuer.getAddress());
-                    if (creatorPersonItem == null || issuerPersonItem == null
-                            || !creatorPersonItem.a.equals(issuerPersonItem.a)) {
-                        // IF it is NOT SAME address and PERSON
-                        // GIVE GIFT for Witness this PUB_KEY
-                        this.creator.changeBalance(db, false, FEE_KEY, BONUS_FOR_PERSON_SERTIFIER_4_11, false);
-                        if (makeCalculates)
-                            this.block.txCalculated.add(new R_Calculated(this.creator, FEE_KEY, BONUS_FOR_PERSON_SERTIFIER_4_11,
-                                    "certify bonus @P:" + this.key, this.dbRef));
-
-                        issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_SERTIFIER_4_11);
-                    }
-                }
-
-                ///////// INVITER
-                if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0
-                        && !Arrays.equals(BlockChain.BONUS_STOP_ACCOUNT, issuer.getShortAddressBytes())) {
-                    process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11,
-                            BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, false,
-                            this.block != null? this.block.txCalculated : null, "invite bonus @P:" + this.key);
-                    issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11);
-                }
-                */
-
-                // TO EMITTE FEE (with minus)
-                GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY, issued_FEE_BD_total, true);
-
+            boolean makeCalculates = false;
+            if (this.block != null && this.block.txCalculated != null) {
+                makeCalculates = true;
             }
+
+            // GIVE GIFT for this PUB_KEY - to PERSON
+            BigDecimal personBonus = height < BlockChain.VERS_4_11 ? BONUS_FOR_PERSON_4_11.add(BONUS_FOR_PERSON_4_11)
+                    : BONUS_FOR_PERSON_4_11;
+            pkAccount.changeBalance(db, false, FEE_KEY, personBonus, false);
+            if (makeCalculates) {
+                this.block.txCalculated.add(new R_Calculated(pkAccount, FEE_KEY, personBonus,
+                        "enter bonus", this.dbRef));
+            }
+            BigDecimal issued_FEE_BD_total = personBonus;
+
+            BigDecimal issued_FEE_BD = transPersonIssue.getFee();
+            issuer.changeBalance(db, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRATOR_4_11,
+                    false);
+            if (makeCalculates) {
+                this.block.txCalculated.add(new R_Calculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRATOR_4_11,
+                        "register reward @P:" + this.key, this.dbRef));
+            }
+            issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRATOR_4_11);
+
+            // TO EMITTE FEE (with minus)
+            GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY, issued_FEE_BD_total, true);
 
         }
 
@@ -763,72 +703,22 @@ public class R_SertifyPubKeys extends Transaction {
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
 
-            if(this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE) {
-                // IT IS NOT VOUCHED PERSON
+            // BONUSES
 
-                // GET FEE from that record
-                ////transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // NEED to RECAL?? if from DB
-                //long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
-                //if (true || BlockChain.START_LEVEL == 1)
-                //	issueFEE = issueFEE>>2;
+            // GIVE GIFT for this PUB_KEY - to PERSON
+            // GIVE GIFT for this PUB_KEY - to PERSON
+            BigDecimal personBonus = height < BlockChain.VERS_4_11 ? BONUS_FOR_PERSON_4_11.add(BONUS_FOR_PERSON_4_11)
+                    : BONUS_FOR_PERSON_4_11;
+            pkAccount.changeBalance(db, true, FEE_KEY, personBonus, false);
+            BigDecimal issued_FEE_BD_total = personBonus;
 
-                // ISSUE NEW COMPU in chain
-                BigDecimal issued_FEE_BD = transPersonIssue.getFee();
+            BigDecimal issued_FEE_BD = transPersonIssue.getFee();
+            issuer.changeBalance(db, true, FEE_KEY, issued_FEE_BD, //BONUS_FOR_PERSON_REGISTRATOR_4_11,
+                    false);
+            issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRATOR_4_11);
 
-                // BACK FEE FOR ISSUER without gift for this.CREATOR
-                transPersonIssue.getCreator().changeBalance(db, true, FEE_KEY,
-                        issued_FEE_BD.subtract(BlockChain.GIFTED_COMPU_AMOUNT_BD_4_10), false);
-
-                // GIVE GIFT for Witness this PUB_KEY
-                this.creator.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_BD_4_10, false);
-                pkAccount.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD_4_10, false);
-
-                // ADD to EMISSION (with minus)
-                GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY,
-                        issued_FEE_BD.add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD), true);
-
-            } else {
-
-                // GIVE GIFT for this PUB_KEY - to PERSON
-                pkAccount.changeBalance(db, true, FEE_KEY, BONUS_FOR_PERSON_4_11, false);
-
-                BigDecimal issued_FEE_BD_total = BONUS_FOR_PERSON_4_11;
-
-                BigDecimal issued_FEE_BD = transPersonIssue.getFee().subtract(FEE_FOR_PERSON_REGISTRATOR_4_11);
-
-                issuer.changeBalance(db, true, FEE_KEY, issued_FEE_BD, //BONUS_FOR_PERSON_REGISTRATOR_4_11,
-                        false);
-
-                issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRATOR_4_11);
-
-                /*
-                if (!this.creator.equals(issuer)) {
-                    // AND this different KEY not owned by ONE PERSON
-                    Tuple4<Long, Integer, Integer, Integer> creatorPersonItem = db.getAddressPersonMap().getItem(this.creator.getAddress());
-                    Tuple4<Long, Integer, Integer, Integer> issuerPersonItem = db.getAddressPersonMap().getItem(issuer.getAddress());
-                    if (creatorPersonItem == null || issuerPersonItem == null
-                            || !creatorPersonItem.a.equals(issuerPersonItem.a)) {
-                        // IF it is NOT SAME address and PERSON
-                        // GIVE GIFT for Witness this PUB_KEY
-                        this.creator.changeBalance(db, true, FEE_KEY, BONUS_FOR_PERSON_SERTIFIER_4_11, false);
-
-                        issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_SERTIFIER_4_11);
-                    }
-                }
-
-                ///////// INVITER
-                if (BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11 > 0
-                        && !Arrays.equals(BlockChain.BONUS_STOP_ACCOUNT, issuer.getShortAddressBytes())) {
-                    process_gifts(BONUS_FOR_PERSON_REGISTRATOR_INVITER_LEVEL_4_11,
-                            BONUS_FOR_PERSON_REGISTRATOR_INVITER_4_11, issuer, true,
-                            null, null);
-                    issued_FEE_BD_total = issued_FEE_BD_total.add(BONUS_FOR_PERSON_REGISTRATOR_INVITER_BD_4_11);
-                }
-                */
-
-                // ADD to EMISSION (with minus)
-                GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY, issued_FEE_BD_total, true);
-            }
+            // ADD to EMISSION (with minus)
+            GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY, issued_FEE_BD_total, true);
 
         }
     }
@@ -866,18 +756,5 @@ public class R_SertifyPubKeys extends Transaction {
         return false;
     }
 
-    @Override
-    public int getJobLevel() {
-        return BlockChain.FINANCIAL_FEE_LEVEL;
-    }
-
-    @Override
-    public long calcBaseFee() {
-        if (this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE)
-            return calcCommonFee();
-
-        return calcCommonFee(); // BlockChain.FEE_PER_BYTE * (300 + this.sertifiedPublicKeys.size() * 64);
-
-    }
 
 }

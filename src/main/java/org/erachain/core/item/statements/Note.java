@@ -107,7 +107,7 @@ public class Note extends StatementCls {
     }
 
     public int getMinNameLen() {
-        return 4;
+        return 12;
     }
 
 }
