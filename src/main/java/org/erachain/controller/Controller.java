@@ -399,7 +399,7 @@ public class Controller extends Observable {
                 about_frame.set_console_Text(Lang.getInstance().translate("Open") + " " + name);
 
             //// должен быть метод
-            dbSet.openDBSet();
+            ///// dbSet.open();
             /// this.dbSet = DBSet.getinstanse();
 
             LOGGER.info(name + " OK");
@@ -945,6 +945,11 @@ public class Controller extends Observable {
         // CLOSE WALLET
         LOGGER.info("Closing wallet");
         this.wallet.close();
+
+        // CLOSE LOCAL
+
+        LOGGER.info("Closing Local database");
+        this.dbSet.close();
 
         // CLOSE telegram
         LOGGER.info("Closing telegram");

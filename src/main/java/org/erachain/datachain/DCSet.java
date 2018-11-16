@@ -375,6 +375,7 @@ public class DCSet implements Observer, IDB {
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 //.cacheSize(CASH_SIZE)
                 //.cacheDisable()
+                .closeOnJvmShutdown()
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // -- error on asyncWriteEnable
                 //.snapshotEnable()

@@ -45,6 +45,7 @@ public class DBSet implements IDB {
         database = DBMaker.newFileDB(DATA_FILE)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 //.cacheDisable()
+                .closeOnJvmShutdown()
                 .checksumEnable()
                 .mmapFileEnableIfSupported()
                 /// ICREATOR
@@ -107,7 +108,6 @@ public class DBSet implements IDB {
 
     }
 
-    @Override
     public void close() {
         if (this.database != null) {
             if (!this.database.isClosed()) {

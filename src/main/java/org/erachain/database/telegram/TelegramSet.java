@@ -33,7 +33,9 @@ public class TelegramSet implements IDB {
         this.database = DBMaker.newFileDB(dbFile).closeOnJvmShutdown()
                 // .cacheSize(2048)
                 // .cacheDisable()
-                .checksumEnable().mmapFileEnableIfSupported()
+                .checksumEnable()
+                .mmapFileEnableIfSupported()
+                .closeOnJvmShutdown()
                 /// ICREATOR
                // .commitFileSyncDisable()
                 .make();
