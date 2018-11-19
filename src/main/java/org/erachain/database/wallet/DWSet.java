@@ -66,7 +66,7 @@ public class DWSet implements IDB {
         //transactionFile.delete();
 
         this.database = DBMaker.newFileDB(WALLET_FILE)
-                .closeOnJvmShutdown()
+                // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 //.cacheSize(2048)
                 //.cacheDisable()
                 .checksumEnable()
