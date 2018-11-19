@@ -76,7 +76,7 @@ public class TelegramsResource {
                 if (ddd != null) {
                     if (r_Send.isText()) {
                         try {
-                            message = (new String(ddd, "UTF-8"));
+                            message = new String(ddd, "UTF-8");
                         } catch (UnsupportedEncodingException e) {
                             message = "error UTF-8";
                         }

@@ -3,6 +3,7 @@ package org.erachain.network;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.R_Send;
 import org.erachain.core.transaction.Transaction;
@@ -10,9 +11,13 @@ import org.erachain.datachain.DCSet;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.TelegramMessage;
 import org.erachain.ntp.NTP;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -362,6 +367,95 @@ public class TelegramManager extends Thread {
         return left;
     }
 
+    private void try_command(TelegramMessage telegramCommand, Transaction transactionCommand) {
+        if (transactionCommand.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+            R_Send tx = (R_Send) transactionCommand;
+            if (tx.isEncrypted() || !tx.isText() || tx.getData() == null)
+                return;
+
+            String message;
+            try {
+                message = new String(tx.getData(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                return;
+            }
+
+            JSONObject jsonObject;
+            try {
+                jsonObject = (JSONObject) JSONValue.parse(message);
+            } catch (Exception e) {
+                return;
+            }
+
+
+            if (jsonObject.containsKey("__DELETE")) {
+                boolean wasDeleted = false;
+                PublicKeyAccount commander = transactionCommand.getCreator();
+                JSONObject delete = (JSONObject) jsonObject.get("__DELETE");
+                if (delete.containsKey("list")) {
+
+                    // TRY MAKE DELETION LIST
+                    List<String> deleteList = new ArrayList<>();
+
+                    for (Object sign58 : (JSONArray) delete.get("list")) {
+                        TelegramMessage telegramToDelete = this.handledTelegrams.get((String) sign58);
+                        if (telegramToDelete != null
+                                && telegramToDelete.getTransaction().getCreator().equals(commander)) {
+                            // IT FOUND and same CREATOR
+                            deleteList.add((String) sign58);
+                        }
+                    }
+
+                    // DELETE FOUNDED LIST
+                    if (!deleteList.isEmpty()) {
+                        wasDeleted = true;
+                        deleteList(deleteList);
+                    }
+
+                }
+                if (delete.containsKey("toTime")) {
+                    long timestamp = (Long) delete.get("toTime");
+
+                    // TRY MAKE DELETION LIST
+                    List<String> deleteList = new ArrayList<>();
+
+                    SortedMap<Long, List<TelegramMessage>> subMap = telegramsForTime.headMap(timestamp);
+                    for (Entry<Long, List<TelegramMessage>> item : subMap.entrySet()) {
+                        List<TelegramMessage> telegramsTimestamp = item.getValue();
+                        if (telegramsTimestamp != null) {
+                            for (TelegramMessage telegram : telegramsTimestamp) {
+                                Transaction transaction = telegram.getTransaction();
+
+                                // ALREADY FILTERED by .headMap
+                                ////if (telegram.getTransaction().getTimestamp() > timestamp)
+                                ////    continue;
+
+                                if (!commander.equals(transaction.getCreator()))
+                                    continue;
+                            }
+
+                            deleteList.add(transactionCommand.viewSignature());
+                        }
+                    }
+
+                    // DELETE FOUNDED LIST
+                    if (!deleteList.isEmpty()) {
+                        wasDeleted = true;
+                        deleteList(deleteList);
+                    }
+                }
+
+                if (wasDeleted && (delete.containsKey("__CAST") || delete.containsKey("broadcast"))) {
+                    ///////// BROADCASTED already
+                    ;
+                }
+            }
+
+
+        }
+
+    }
+
     // TRUE if not added
     public synchronized boolean pipeAddRemove(TelegramMessage telegram, List<TelegramMessage> firstItem,
                                               long timeKey) {
@@ -468,6 +562,9 @@ public class TelegramManager extends Thread {
             } else {
                 this.telegramsCounts.put(address, 1);
             }
+
+            // TRY DO COMMANDS
+            try_command(telegram, transaction);
 
         } else {
 
