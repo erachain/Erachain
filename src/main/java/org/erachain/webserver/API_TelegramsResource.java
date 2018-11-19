@@ -1,6 +1,5 @@
 package org.erachain.webserver;
 
-import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -15,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.erachain.core.BlockChain;
+import org.json.simple.JSONObject;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.json.simple.JSONArray;
@@ -44,6 +44,8 @@ public class API_TelegramsResource {
                 "Get messages by filter. Filter is title.");
         help.put("apitelegrams/timestamp/{timestamp}?filter={filter}",
                 "Get messages from timestamp with filter. Filter is title.");
+        help.put("apitelegrams/check/{signature}",
+                "Check telegrams contain in node");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -133,4 +135,38 @@ public class API_TelegramsResource {
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(array.toJSONString())).build();
     }
 
+    /**
+     * Check telegrams
+     *
+     * @param signature is signature transaction Base58 encode
+     * @return JSON string contain telegram in node
+     *
+     * <h2>Example request</h2>
+     * http://127.0.0.1:9067/apitelegrams/check/453ryw6jZKmtxRW3TXCyU1RdCdWiiPPiAYha2ZdzbtwXcn9HrukkP2feaGkC76Ww5etbaa9uhG2FcUU42RS62gNx
+     *
+     * <h2>Example response</h2>
+     * <p>
+     * if exist
+     * <p>
+     * {"check":true}
+     * <p><p>
+     * if not exist
+     * <p>
+     * {"check":false}
+     */
+    @GET
+    @Path("check/{signature}")
+    @SuppressWarnings("unchecked")
+    public String checkSignature(@PathParam("signature") String signature) {
+
+        TelegramMessage telegram = Controller.getInstance().getTelegram(signature);
+        JSONObject jsonObject = new JSONObject();
+
+        if (telegram == null)
+            jsonObject.put("check", false);
+        else
+            jsonObject.put("check", true);
+
+        return jsonObject.toJSONString();
+    }
 }
