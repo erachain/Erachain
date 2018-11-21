@@ -10,7 +10,7 @@ ERA/settings.json
 ERA/*.jar
 /build/
 .gradle
-log*.txt
+/ERA/logs
 /ERA/build/
 settings.json
 gui_settings.json
