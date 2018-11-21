@@ -1,14 +1,13 @@
 package org.erachain.database.telegram;
 // 30/03 ++
 
-import java.io.File;
-
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.database.IDB;
+import org.erachain.settings.Settings;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
-import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.settings.Settings;
+import java.io.File;
 
 //import org.mapdb.Serializer;
 
@@ -30,12 +29,12 @@ public class TelegramSet implements IDB {
         // File(Settings.getInstance().getWalletDir(), "wallet.dat.t");
         // transactionFile.delete();
 
-        this.database = DBMaker.newFileDB(dbFile).closeOnJvmShutdown()
+        this.database = DBMaker.newFileDB(dbFile)
+                // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 // .cacheSize(2048)
                 // .cacheDisable()
                 .checksumEnable()
                 .mmapFileEnableIfSupported()
-                .closeOnJvmShutdown()
                 /// ICREATOR
                // .commitFileSyncDisable()
                 .make();

@@ -11,10 +11,10 @@ import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.database.IDB;
+import org.erachain.settings.Settings;
 import org.mapdb.Atomic.Var;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
-import org.erachain.settings.Settings;
 
 import java.io.File;
 
@@ -66,7 +66,7 @@ public class DWSet implements IDB {
         //transactionFile.delete();
 
         this.database = DBMaker.newFileDB(WALLET_FILE)
-                .closeOnJvmShutdown()
+                // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 //.cacheSize(2048)
                 //.cacheDisable()
                 .checksumEnable()
