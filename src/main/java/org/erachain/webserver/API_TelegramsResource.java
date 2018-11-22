@@ -1,31 +1,25 @@
 package org.erachain.webserver;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.erachain.core.BlockChain;
-import org.json.simple.JSONObject;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.json.simple.JSONArray;
-
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.network.message.TelegramMessage;
 import org.erachain.utils.StrJSonFine;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Path("apitelegrams")
 @Produces(MediaType.APPLICATION_JSON)
@@ -157,7 +151,7 @@ public class API_TelegramsResource {
     @GET
     @Path("check/{signature}")
     @SuppressWarnings("unchecked")
-    public String checkSignature(@PathParam("signature") String signature) {
+    public Response checkSignature(@PathParam("signature") String signature) {
 
         TelegramMessage telegram = Controller.getInstance().getTelegram(signature);
         JSONObject jsonObject = new JSONObject();
@@ -166,7 +160,8 @@ public class API_TelegramsResource {
             jsonObject.put("check", false);
         else
             jsonObject.put("check", true);
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(jsonObject.toJSONString())).build();
 
-        return jsonObject.toJSONString();
     }
 }
