@@ -369,7 +369,7 @@ public class TelegramManager extends Thread {
     }
 
     /**
-     * Do internal commands sended in transactions message as JSON.
+     * Do internal commands sent in transactions message as JSON.
      * ... "__DELETE": "list": ["BaseSignature",..], "toTime":TIMESTAMP, ...
      *
      * @param transactionCommand transaction from telegram
