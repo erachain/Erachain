@@ -8,6 +8,7 @@ import org.erachain.core.web.NameStorageMap;
 import org.erachain.core.web.OrphanNameStorageHelperMap;
 import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
+import org.erachain.database.IDB;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
@@ -492,6 +493,11 @@ public class DCSet implements Observer, IDB {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public void openDBSet() {
+
     }
 
     /**
@@ -1348,7 +1354,7 @@ public class DCSet implements Observer, IDB {
 
         return fork;
     }
-
+    @Override
     public void close() {
         if (this.database != null) {
             // THIS IS not FORK

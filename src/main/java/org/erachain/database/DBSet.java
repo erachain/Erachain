@@ -94,6 +94,11 @@ public class DBSet implements IDB {
         }
     }
 
+    @Override
+    public void openDBSet() {
+
+    }
+
 
     public void commit() {
         this.uses++;

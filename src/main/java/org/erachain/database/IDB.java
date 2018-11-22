@@ -10,4 +10,9 @@ public interface IDB {
 
     public boolean isBusy();
 
+    public void openDBSet();
+
+    public void close();
+
+
 }
