@@ -3,6 +3,7 @@ package org.erachain.network;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.R_Send;
 import org.erachain.core.transaction.Transaction;
@@ -11,9 +12,13 @@ import org.erachain.network.message.Message;
 import org.erachain.network.message.TelegramMessage;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -53,11 +58,11 @@ public class TelegramManager extends Thread {
         return handledTelegrams.get(signatureKey);
     }
 
-    public Integer telegramCount(){
+    public Integer telegramCount() {
         return handledTelegrams.size();
     }
 
-    public List<TelegramMessage> toList(){
+    public List<TelegramMessage> toList() {
         List<TelegramMessage> result = new ArrayList();
         result.addAll(handledTelegrams.values());
         return result;
@@ -133,9 +138,9 @@ public class TelegramManager extends Thread {
      *
      * @param signatureStr
      * @param withTimestamp if TRUE delete from timestamp MAP too
-     * @param withAddress if TRUE delete from senders MAP too
+     * @param withAddress   if TRUE delete from senders MAP too
      */
-    public void delete (String signatureStr, boolean withTimestamp, boolean withAddress) {
+    public void delete(String signatureStr, boolean withTimestamp, boolean withAddress) {
 
         HashSet<Account> recipients;
         String address;
@@ -213,11 +218,11 @@ public class TelegramManager extends Thread {
      * delete all to this Timestamp and filter by Recipient address and Title
      *
      * @param toTimestamp timestamp (Long)
-     * @param recipient String
-     * @param filter String
+     * @param recipient   String
+     * @param filter      String
      * @return - counter (long)
      */
-    public long deleteToTimestamp (long toTimestamp, String recipient, String filter) {
+    public long deleteToTimestamp(long toTimestamp, String recipient, String filter) {
         long counter = 0;
 
         SortedMap<Long, List<TelegramMessage>> subMap = telegramsForTime.headMap(toTimestamp);
@@ -256,10 +261,10 @@ public class TelegramManager extends Thread {
      *
      * @param recipient
      * @param toTimestamp if > 0 use filter to this value (delete all that less)
-     * @param filter if not null use it for filter
+     * @param filter      if not null use it for filter
      * @return
      */
-    public long deleteForRecipient (String recipient, long toTimestamp, String filter) {
+    public long deleteForRecipient(String recipient, long toTimestamp, String filter) {
         long counter = 0;
 
         List<TelegramMessage> telegrams = telegramsForAddress.remove(recipient);
@@ -363,6 +368,98 @@ public class TelegramManager extends Thread {
         return left;
     }
 
+    /**
+     * Do internal commands sent in transactions message as JSON.
+     * ... "__DELETE": "list": ["BaseSignature",..], "toTime":TIMESTAMP, ...
+     *
+     * @param transactionCommand transaction from telegram
+     * @return true if has LOAD and need to save local
+     */
+    protected boolean try_command(Transaction transactionCommand) {
+
+        boolean hasLoad = true;
+
+        if (transactionCommand.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+            R_Send tx = (R_Send) transactionCommand;
+            if (tx.isEncrypted() || !tx.isText() || tx.getData() == null)
+                return hasLoad;
+
+            String message;
+            try {
+                message = new String(tx.getData(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                return hasLoad;
+            }
+
+            JSONObject jsonObject;
+            try {
+                jsonObject = (JSONObject) JSONValue.parse(message);
+            } catch (Exception e) {
+                return hasLoad;
+            }
+
+            if (jsonObject.containsKey("__DELETE")) {
+
+                // if THERE only ONE command DELETE - not broadcast if not delete
+                JSONObject delete = (JSONObject) jsonObject.remove("__DELETE");
+
+                PublicKeyAccount commander = transactionCommand.getCreator();
+                if (delete.containsKey("list")) {
+
+                    // TRY MAKE DELETION LIST
+                    List<String> deleteList = new ArrayList<>();
+
+                    for (Object sign58 : (JSONArray) delete.get("list")) {
+                        TelegramMessage telegramToDelete = this.handledTelegrams.get((String) sign58);
+                        if (telegramToDelete != null
+                                && telegramToDelete.getTransaction().getCreator().equals(commander)) {
+                            // IT FOUND and same CREATOR
+                            deleteList.add((String) sign58);
+                        }
+                    }
+
+                    // DELETE FOUNDED LIST
+                    if (!deleteList.isEmpty()) {
+                        deleteList(deleteList);
+                    }
+
+                }
+                if (delete.containsKey("toTime")) {
+                    long timestamp = (Long) delete.get("toTime");
+
+                    // TRY MAKE DELETION LIST
+                    List<String> deleteList = new ArrayList<>();
+
+                    SortedMap<Long, List<TelegramMessage>> subMap = telegramsForTime.headMap(timestamp);
+                    for (Entry<Long, List<TelegramMessage>> item : subMap.entrySet()) {
+                        List<TelegramMessage> telegramsTimestamp = item.getValue();
+                        if (telegramsTimestamp != null) {
+                            for (TelegramMessage telegram : telegramsTimestamp) {
+                                Transaction transaction = telegram.getTransaction();
+
+                                if (commander.equals(transaction.getCreator())) {
+                                    deleteList.add(transactionCommand.viewSignature());
+                                }
+                            }
+
+                        }
+                    }
+
+                    // DELETE FOUNDED LIST
+                    if (!deleteList.isEmpty()) {
+                        deleteList(deleteList);
+                    }
+                }
+            }
+
+            hasLoad = !jsonObject.isEmpty();
+
+        }
+
+        return hasLoad;
+
+    }
+
     // TRUE if not added
     public synchronized boolean pipeAddRemove(TelegramMessage telegram, List<TelegramMessage> firstItem,
                                               long timeKey) {
@@ -395,6 +492,12 @@ public class TelegramManager extends Thread {
                 return true;
             }
 
+            // TRY DO COMMANDS
+            if (!try_command(transaction)) {
+                // go broadcast
+                return false;
+            }
+
             String signatureKey;
 
             // CHECK IF LIST IS FULL
@@ -414,8 +517,8 @@ public class TelegramManager extends Thread {
             } else {
                 if (this.handledTelegrams.containsKey(signatureKey))
                     return true;
-                
-                
+
+
                 this.handledTelegrams.put(signatureKey, telegram);
 
                 if (Settings.getInstance().getTelegramStoreUse() && Settings.getInstance().getTelegramStorePeriod() > 0) {
@@ -439,7 +542,7 @@ public class TelegramManager extends Thread {
                         }
                     }
                 }
-             }
+            }
 
             // MAP timestamps
             List<TelegramMessage> timestampTelegrams = this.telegramsForTime.get(timestamp);
@@ -538,11 +641,7 @@ public class TelegramManager extends Thread {
      */
 
     public void run() {
-        int i;
         this.isRun = true;
-        TelegramMessage telegram;
-        String address;
-        HashSet<Account> recipients;
 
         while (this.isRun && !this.isInterrupted()) {
             try {
