@@ -11,6 +11,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.TelegramMessage;
 import org.erachain.ntp.NTP;
+import org.erachain.settings.Settings;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -511,7 +512,28 @@ public class TelegramManager extends Thread {
                 
                 this.handledTelegrams.put(signatureKey, telegram);
 
-             }
+                if (Settings.getInstance().getTelegramStoreUse() && Settings.getInstance().getTelegramStorePeriod() > 0) {
+                    // IF MY STORE is USED
+                    if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
+
+                        // save telegram to wallet DB
+                        Transaction trans = telegram.getTransaction();
+                        if (Controller.getInstance().wallet.accountExists(trans.getCreator().getAddress())) {
+                            // add as my OUTCOME
+                            Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
+                        } else {
+                            // TRY ADD as my INCOME
+                            HashSet<Account> recipients = trans.getRecipientAccounts();
+                            for (Account recipient : recipients) {
+                                if (Controller.getInstance().wallet.accountExists(recipient.getAddress())) {
+                                    Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             // MAP timestamps
             List<TelegramMessage> timestampTelegrams = this.telegramsForTime.get(timestamp);
