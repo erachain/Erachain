@@ -86,6 +86,12 @@ public class Settings {
     private static final String NOTIFY_INCOMING_URL = "http://127.0.0.1:8000/exhange/era/income";
     private static final int NOTIFY_INCOMING_CONFIRMATIONS = 0;
     public static String DEFAULT_LANGUAGE = "en";
+
+    public static final boolean USE_TELEGRAM_STORE = false;
+    public static final int TELEGRAM_STORE_PERIOD = 5; // in days
+
+
+
     private static Settings instance;
     List<Peer> cacheInternetPeers;
     long timeLoadInternetPeers;
@@ -208,8 +214,16 @@ public class Settings {
             this.telegramtPath = dir;
         
     }
-    
-    
+
+    public boolean getTelegramStoreUse() {
+        return USE_TELEGRAM_STORE;
+    }
+
+    public int getTelegramStorePeriod() {
+        return TELEGRAM_STORE_PERIOD;
+    }
+
+
     public String getTelegramDefaultSender(){
         return telegramDefaultSender;
     }

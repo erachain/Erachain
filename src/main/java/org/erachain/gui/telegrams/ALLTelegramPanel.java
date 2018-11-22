@@ -1,19 +1,16 @@
 package org.erachain.gui.telegrams;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JCheckBox;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
+
+import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
 *
@@ -210,7 +207,7 @@ public ALLTelegramPanel() {
                
                
              Transaction tt =  walletTelegramsFilterTableModel.getTelegramMessage(row);
-             Controller.getInstance().telegram.database.getTelegramsMap().delete(tt.viewSignature()) ;
+               Controller.getInstance().telegramStore.database.getTelegramsMap().delete(tt.viewSignature());
         //     System.out.println(row);
            }
        });

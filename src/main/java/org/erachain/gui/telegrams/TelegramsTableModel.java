@@ -1,14 +1,5 @@
 package org.erachain.gui.telegrams;
 
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.swing.table.DefaultTableModel;
-import javax.validation.constraints.Null;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.R_Send;
@@ -16,6 +7,13 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.SortableList;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.table.DefaultTableModel;
+import javax.validation.constraints.Null;
+import java.util.Observable;
+import java.util.Observer;
 
 @SuppressWarnings("serial")
 // in list of org.erachain.records in wallet
@@ -167,7 +165,7 @@ public class TelegramsTableModel extends DefaultTableModel implements Observer {
     public void addObservers() {
 
         // REGISTER ON WALLET TRANSACTIONS
-        Controller.getInstance().telegram.database.getTelegramsMap().addObserver(this);
+        Controller.getInstance().telegramStore.database.getTelegramsMap().addObserver(this);
         // for UNCONFIRMEDs
        // DCSet.getInstance().getTransactionMap().addObserver(this);
         // for ??
@@ -177,7 +175,7 @@ public class TelegramsTableModel extends DefaultTableModel implements Observer {
 
     public void removeObservers() {
 
-        Controller.getInstance().telegram.database.getTelegramsMap().deleteObserver(this);
+        Controller.getInstance().telegramStore.database.getTelegramsMap().deleteObserver(this);
       // DCSet.getInstance().getTransactionMap().addObserver(this);
         /// ???
         /// Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);
