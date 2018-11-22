@@ -373,35 +373,37 @@ public class TelegramManager extends Thread {
      * ... "__DELETE": "list": ["BaseSignature",..], "toTime":TIMESTAMP, ...
      *
      * @param transactionCommand transaction from telegram
-     * @return true if need broadcast this telegram
+     * @return true if has LOAD and need to save local
      */
     protected boolean try_command(Transaction transactionCommand) {
 
-        boolean goBroadcast = true;
+        boolean hasLoad = true;
 
         if (transactionCommand.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             R_Send tx = (R_Send) transactionCommand;
             if (tx.isEncrypted() || !tx.isText() || tx.getData() == null)
-                return false;
+                return hasLoad;
 
             String message;
             try {
                 message = new String(tx.getData(), "UTF-8");
             } catch (UnsupportedEncodingException e) {
-                return false;
+                return hasLoad;
             }
 
             JSONObject jsonObject;
             try {
                 jsonObject = (JSONObject) JSONValue.parse(message);
             } catch (Exception e) {
-                return false;
+                return hasLoad;
             }
 
             if (jsonObject.containsKey("__DELETE")) {
 
                 // if THERE only ONE command DELETE - not broadcast if not delete
-                goBroadcast = jsonObject.size() != 1;
+                jsonObject.remove("__DELETE");
+                hasLoad = !jsonObject.isEmpty();
+
 
                 PublicKeyAccount commander = transactionCommand.getCreator();
                 JSONObject delete = (JSONObject) jsonObject.get("__DELETE");
@@ -421,7 +423,6 @@ public class TelegramManager extends Thread {
 
                     // DELETE FOUNDED LIST
                     if (!deleteList.isEmpty()) {
-                        goBroadcast = true;
                         deleteList(deleteList);
                     }
 
@@ -439,24 +440,23 @@ public class TelegramManager extends Thread {
                             for (TelegramMessage telegram : telegramsTimestamp) {
                                 Transaction transaction = telegram.getTransaction();
 
-                                if (!commander.equals(transaction.getCreator()))
-                                    continue;
+                                if (commander.equals(transaction.getCreator())) {
+                                    deleteList.add(transactionCommand.viewSignature());
+                                }
                             }
 
-                            deleteList.add(transactionCommand.viewSignature());
                         }
                     }
 
                     // DELETE FOUNDED LIST
                     if (!deleteList.isEmpty()) {
-                        goBroadcast = true;
                         deleteList(deleteList);
                     }
                 }
             }
         }
 
-        return goBroadcast;
+        return hasLoad;
 
     }
 
@@ -490,6 +490,12 @@ public class TelegramManager extends Thread {
                 ///this.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
                 ///		"ban PeerOnError - invalid telegram timestamp <<");
                 return true;
+            }
+
+            // TRY DO COMMANDS
+            if (!try_command(transaction)) {
+                // go broadcast
+                return false;
             }
 
             String signatureKey;
@@ -570,9 +576,6 @@ public class TelegramManager extends Thread {
             } else {
                 this.telegramsCounts.put(address, 1);
             }
-
-            // TRY DO COMMANDS
-            return !try_command(transaction);
 
         } else {
 
