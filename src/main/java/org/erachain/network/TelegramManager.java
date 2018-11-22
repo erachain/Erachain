@@ -12,7 +12,6 @@ import org.erachain.network.message.Message;
 import org.erachain.network.message.TelegramMessage;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
-import org.erachain.settings.Settings;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -447,12 +446,7 @@ public class TelegramManager extends Thread {
                     }
                 }
 
-                if (wasDeleted && (delete.containsKey("__CAST") || delete.containsKey("broadcast"))) {
-                    ///////// BROADCASTED already
-                    ;
-                }
             }
-
 
         }
 

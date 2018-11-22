@@ -843,20 +843,20 @@ public class TransactionsResource {
 
         APIUtils.askAPICallAllowed(password, "POST decrypt data\n " + signature, request);
 
-        byte[] ddd = Controller.getInstance().decrypt(r_Send.getCreator(), r_Send.getRecipient(), r_data);
-        if (ddd == null) {
+        byte[] message = Controller.getInstance().decrypt(r_Send.getCreator(), r_Send.getRecipient(), r_data);
+        if (message == null) {
             return "wrong decryption";
         }
 
         if (r_Send.isText()) {
             try {
-                String str = (new String(ddd, "UTF-8"));
+                String str = (new String(message, "UTF-8"));
                 return str;
             } catch (UnsupportedEncodingException e) {
                 return "error UTF-8";
             }
         } else {
-            String str = Base58.encode(ddd);
+            String str = Base58.encode(message);
             return str;
         }
     }
