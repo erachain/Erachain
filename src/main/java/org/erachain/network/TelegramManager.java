@@ -58,11 +58,11 @@ public class TelegramManager extends Thread {
         return handledTelegrams.get(signatureKey);
     }
 
-    public Integer telegramCount(){
+    public Integer telegramCount() {
         return handledTelegrams.size();
     }
 
-    public List<TelegramMessage> toList(){
+    public List<TelegramMessage> toList() {
         List<TelegramMessage> result = new ArrayList();
         result.addAll(handledTelegrams.values());
         return result;
@@ -138,9 +138,9 @@ public class TelegramManager extends Thread {
      *
      * @param signatureStr
      * @param withTimestamp if TRUE delete from timestamp MAP too
-     * @param withAddress if TRUE delete from senders MAP too
+     * @param withAddress   if TRUE delete from senders MAP too
      */
-    public void delete (String signatureStr, boolean withTimestamp, boolean withAddress) {
+    public void delete(String signatureStr, boolean withTimestamp, boolean withAddress) {
 
         HashSet<Account> recipients;
         String address;
@@ -218,11 +218,11 @@ public class TelegramManager extends Thread {
      * delete all to this Timestamp and filter by Recipient address and Title
      *
      * @param toTimestamp timestamp (Long)
-     * @param recipient String
-     * @param filter String
+     * @param recipient   String
+     * @param filter      String
      * @return - counter (long)
      */
-    public long deleteToTimestamp (long toTimestamp, String recipient, String filter) {
+    public long deleteToTimestamp(long toTimestamp, String recipient, String filter) {
         long counter = 0;
 
         SortedMap<Long, List<TelegramMessage>> subMap = telegramsForTime.headMap(toTimestamp);
@@ -261,10 +261,10 @@ public class TelegramManager extends Thread {
      *
      * @param recipient
      * @param toTimestamp if > 0 use filter to this value (delete all that less)
-     * @param filter if not null use it for filter
+     * @param filter      if not null use it for filter
      * @return
      */
-    public long deleteForRecipient (String recipient, long toTimestamp, String filter) {
+    public long deleteForRecipient(String recipient, long toTimestamp, String filter) {
         long counter = 0;
 
         List<TelegramMessage> telegrams = telegramsForAddress.remove(recipient);
@@ -369,6 +369,8 @@ public class TelegramManager extends Thread {
     }
 
     /**
+     * Do internal commands sended in transactions message as JSON.
+     * ... "__DELETE": "list": ["BaseSignature",..], "toTime":TIMESTAMP, ...
      *
      * @param transactionCommand transaction from telegram
      * @return true if need broadcast this telegram
@@ -509,8 +511,8 @@ public class TelegramManager extends Thread {
             } else {
                 if (this.handledTelegrams.containsKey(signatureKey))
                     return true;
-                
-                
+
+
                 this.handledTelegrams.put(signatureKey, telegram);
 
                 if (Settings.getInstance().getTelegramStoreUse() && Settings.getInstance().getTelegramStorePeriod() > 0) {
@@ -534,7 +536,7 @@ public class TelegramManager extends Thread {
                         }
                     }
                 }
-             }
+            }
 
             // MAP timestamps
             List<TelegramMessage> timestampTelegrams = this.telegramsForTime.get(timestamp);
@@ -636,11 +638,7 @@ public class TelegramManager extends Thread {
      */
 
     public void run() {
-        int i;
         this.isRun = true;
-        TelegramMessage telegram;
-        String address;
-        HashSet<Account> recipients;
 
         while (this.isRun && !this.isInterrupted()) {
             try {

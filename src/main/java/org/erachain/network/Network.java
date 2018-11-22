@@ -1,24 +1,5 @@
 package org.erachain.network;
 
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-
-
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
@@ -28,6 +9,8 @@ import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -638,6 +621,9 @@ public class Network extends Observable implements ConnectionCallback {
     }
 
     public void stop() {
+
+        this.telegramer.halt();
+
         this.run = false;
         this.onMessage(null);
         while (!this.knownPeers.isEmpty()) {
