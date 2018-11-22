@@ -1,7 +1,7 @@
 package org.erachain.blocks;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockGenerator;;
+import org.erachain.core.BlockGenerator;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.Block;
@@ -14,12 +14,12 @@ import org.erachain.core.transaction.R_Send;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -27,6 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
+
+;
 
 public class BlockTests {
     static Logger LOGGER = LoggerFactory.getLogger(BlockTests.class.getName());
@@ -195,12 +197,6 @@ public class BlockTests {
 
         //CHECK SIGNATURE
         assertEquals(true, Arrays.equals(gb.getSignature(), parsedBlock.getSignature()));
-
-        //CHECK BASE TARGET
-        assertEquals(gb.getForgingValue(), parsedBlock.getForgingValue());
-
-        //CHECK FEE
-        assertEquals(gb.getTotalFee(), parsedBlock.getTotalFee());
 
         //CHECK TRANSACTION COUNT
         assertEquals(gb.getTransactionCount(), parsedBlock.getTransactionCount());
@@ -678,7 +674,7 @@ public class BlockTests {
         assertNotEquals(recipient2.getLastTimestamp(db), payment2.getTimestamp());
 
         //CHECK TOTAL FEE
-        assertEquals(block.getTotalFee(), BigDecimal.valueOf(0.00065536));
+        assertEquals(block.blockHead.totalFee, BigDecimal.valueOf(0.00065536));
 
         //CHECK TOTAL TRANSACTIONS
         assertEquals(2, block.getTransactionCount());

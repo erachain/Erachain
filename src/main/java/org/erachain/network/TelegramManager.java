@@ -367,7 +367,7 @@ public class TelegramManager extends Thread {
         return left;
     }
 
-    private void try_command(TelegramMessage telegramCommand, Transaction transactionCommand) {
+    protected void try_command(TelegramMessage telegramCommand, Transaction transactionCommand) {
         if (transactionCommand.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             R_Send tx = (R_Send) transactionCommand;
             if (tx.isEncrypted() || !tx.isText() || tx.getData() == null)
@@ -511,23 +511,6 @@ public class TelegramManager extends Thread {
                 
                 this.handledTelegrams.put(signatureKey, telegram);
 
-                if(Controller.getInstance().telegram != null) {
-                    // save telegram to db
-                    Controller.getInstance().telegram.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
-                }
-
-                if( Controller.getInstance().wallet.isWalletDatabaseExisting()) {
-                    // save telegram to wallet DB
-                    Transaction trans = telegram.getTransaction();
-                    HashSet<Account> recipients = trans.getRecipientAccounts();
-                    for (Account recipient : recipients) {
-
-                        if (Controller.getInstance().wallet.accountExists(recipient.getAddress())) {
-                            Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
-                            break;
-                        }
-                    }
-                }
              }
 
             // MAP timestamps
