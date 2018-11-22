@@ -369,13 +369,11 @@ public class TelegramManager extends Thread {
     }
 
     /**
-     * if need broadcast - return true
      *
-     * @param telegramCommand
-     * @param transactionCommand
-     * @return
+     * @param transactionCommand transaction from telegram
+     * @return true if need broadcast this telegram
      */
-    protected boolean try_command(TelegramMessage telegramCommand, Transaction transactionCommand) {
+    protected boolean try_command(Transaction transactionCommand) {
 
         boolean goBroadcast = true;
 
@@ -439,10 +437,6 @@ public class TelegramManager extends Thread {
                             for (TelegramMessage telegram : telegramsTimestamp) {
                                 Transaction transaction = telegram.getTransaction();
 
-                                // ALREADY FILTERED by .headMap
-                                ////if (telegram.getTransaction().getTimestamp() > timestamp)
-                                ////    continue;
-
                                 if (!commander.equals(transaction.getCreator()))
                                     continue;
                             }
@@ -457,9 +451,7 @@ public class TelegramManager extends Thread {
                         deleteList(deleteList);
                     }
                 }
-
             }
-
         }
 
         return goBroadcast;
@@ -578,7 +570,7 @@ public class TelegramManager extends Thread {
             }
 
             // TRY DO COMMANDS
-            return !try_command(telegram, transaction);
+            return !try_command(transaction);
 
         } else {
 
