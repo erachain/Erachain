@@ -850,7 +850,7 @@ public class TransactionsResource {
 
         if (r_Send.isText()) {
             try {
-                String str = (new String(message, "UTF-8"));
+                String str = new String(message, "UTF-8");
                 return str;
             } catch (UnsupportedEncodingException e) {
                 return "error UTF-8";
