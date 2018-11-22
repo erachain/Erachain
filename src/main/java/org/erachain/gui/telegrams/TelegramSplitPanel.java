@@ -1,27 +1,5 @@
 package org.erachain.gui.telegrams;
 
-import java.awt.GridBagConstraints;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-
-import javax.swing.JFrame;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-
-import org.erachain.gui.items.accounts.*;
-import org.mapdb.Fun.Tuple2;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -35,9 +13,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.Split_Panel;
-import org.erachain.gui.*;
-import org.erachain.gui.*;
-import org.erachain.gui.*;
+import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.mails.Mail_Send_Dialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.AccountsComboBoxModel;
@@ -48,6 +24,21 @@ import org.erachain.utils.NameUtils;
 import org.erachain.utils.NameUtils.NameResult;
 import org.erachain.utils.Pair;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.mapdb.Fun.Tuple2;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
 *
@@ -112,7 +103,7 @@ public class TelegramSplitPanel extends Split_Panel {
     @Override
     public void actionPerformed(ActionEvent arg0) {
         // TODO Auto-generated method stub
-        Controller.getInstance().telegram.broadcastGetTelegram(sender.getAddress());
+        Controller.getInstance().telegramStore.broadcastGetTelegram(sender.getAddress());
     }
        
    });

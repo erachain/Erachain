@@ -34,7 +34,7 @@ import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.naming.Name;
 import org.erachain.core.naming.NameSale;
 import org.erachain.core.payment.Payment;
-import org.erachain.core.telegram.Telegram;
+import org.erachain.core.telegram.TelegramStore;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.core.voting.PollOption;
@@ -125,7 +125,7 @@ public class Controller extends Observable {
     private static long buildTimestamp;
     private static Controller instance;
     public Wallet wallet;
-    public Telegram telegram;
+    public TelegramStore telegramStore;
     private boolean processingWalletSynchronize = false;
     private int status;
     private boolean dcSetWithObserver = false;
@@ -633,7 +633,7 @@ public class Controller extends Observable {
 
         if (Controller.useGui)
             about_frame.set_console_Text(Lang.getInstance().translate("Open Telegram"));
-        this.telegram = Telegram.getInstanse();
+        this.telegramStore = TelegramStore.getInstanse();
 
 
         if (Controller.useGui)
@@ -953,7 +953,7 @@ public class Controller extends Observable {
 
         // CLOSE telegram
         LOGGER.info("Closing telegram");
-        this.telegram.close();
+        this.telegramStore.close();
 
         LOGGER.info("Closed.");
         // FORCE CLOSE

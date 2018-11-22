@@ -2,7 +2,7 @@ package org.erachain.database.telegram;
 // 30/03 ++
 
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.database.IDB;
+import org.erachain.datachain.IDB;
 import org.erachain.settings.Settings;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -30,13 +30,11 @@ public class TelegramSet implements IDB {
         // transactionFile.delete();
 
         this.database = DBMaker.newFileDB(dbFile)
-                // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 // .cacheSize(2048)
                 // .cacheDisable()
                 .checksumEnable()
                 .mmapFileEnableIfSupported()
-                /// ICREATOR
-               // .commitFileSyncDisable()
+                .transactionDisable() // DISABLE TRANSACTIONS
                 .make();
 
         uses = 0;

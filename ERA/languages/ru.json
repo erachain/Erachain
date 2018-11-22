@@ -298,7 +298,11 @@
   "Digital Index": "Цифровой индекс",
   "Digital Currency": "Цифровые деньги",
   "Digital Service": "Цифровые услуги",
+<<<<<<< ERA/languages/ru.json
+  "Digital Share": "Цифровые доли и акции",
+=======
   "Digital Share": "Цифровые Доли и Акции",
+>>>>>>> ERA/languages/ru.json
   "Digital Vote": "Цифровой голос",
   "Digital Utility": "Цифровая услуга",
   "Index": "Индекс",
