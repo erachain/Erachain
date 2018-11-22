@@ -368,29 +368,41 @@ public class TelegramManager extends Thread {
         return left;
     }
 
-    protected void try_command(TelegramMessage telegramCommand, Transaction transactionCommand) {
+    /**
+     * if need broadcast - return true
+     *
+     * @param telegramCommand
+     * @param transactionCommand
+     * @return
+     */
+    protected boolean try_command(TelegramMessage telegramCommand, Transaction transactionCommand) {
+
+        boolean goBroadcast = true;
+
         if (transactionCommand.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             R_Send tx = (R_Send) transactionCommand;
             if (tx.isEncrypted() || !tx.isText() || tx.getData() == null)
-                return;
+                return false;
 
             String message;
             try {
                 message = new String(tx.getData(), "UTF-8");
             } catch (UnsupportedEncodingException e) {
-                return;
+                return false;
             }
 
             JSONObject jsonObject;
             try {
                 jsonObject = (JSONObject) JSONValue.parse(message);
             } catch (Exception e) {
-                return;
+                return false;
             }
 
-
             if (jsonObject.containsKey("__DELETE")) {
-                boolean wasDeleted = false;
+
+                // if THERE only ONE command DELETE - not broadcast if not delete
+                goBroadcast = jsonObject.size() != 1;
+
                 PublicKeyAccount commander = transactionCommand.getCreator();
                 JSONObject delete = (JSONObject) jsonObject.get("__DELETE");
                 if (delete.containsKey("list")) {
@@ -409,7 +421,7 @@ public class TelegramManager extends Thread {
 
                     // DELETE FOUNDED LIST
                     if (!deleteList.isEmpty()) {
-                        wasDeleted = true;
+                        goBroadcast = true;
                         deleteList(deleteList);
                     }
 
@@ -441,7 +453,7 @@ public class TelegramManager extends Thread {
 
                     // DELETE FOUNDED LIST
                     if (!deleteList.isEmpty()) {
-                        wasDeleted = true;
+                        goBroadcast = true;
                         deleteList(deleteList);
                     }
                 }
@@ -449,6 +461,8 @@ public class TelegramManager extends Thread {
             }
 
         }
+
+        return goBroadcast;
 
     }
 
@@ -564,7 +578,7 @@ public class TelegramManager extends Thread {
             }
 
             // TRY DO COMMANDS
-            try_command(telegram, transaction);
+            return !try_command(telegram, transaction);
 
         } else {
 
