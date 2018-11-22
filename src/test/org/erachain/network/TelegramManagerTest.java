@@ -1,6 +1,5 @@
 package org.erachain.network;
 
-import org.erachain.api.ApiErrorFactory;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import org.erachain.controller.Controller;
@@ -9,14 +8,12 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.GenesisBlock;
-import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.R_Send;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.TelegramMessage;
@@ -29,7 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TelegramManagerTest {
 
@@ -246,5 +243,44 @@ public class TelegramManagerTest {
 
     @Test
     public void pipeAddRemove() {
+    }
+
+    @Test
+    public void try_command() {
+
+        init();
+
+        Transaction transaction;
+
+        Controller cntr = Controller.getInstance();
+
+        String message = "{\"info\":\"sldkf jslkfd jsldfk\"}";
+
+        transaction = new R_Send(sender, (byte) 0, recipient1, 0, amount, "---",
+                message.getBytes(), new byte[1], new byte[1],
+                System.currentTimeMillis(), 0l);
+        transaction.sign(sender, Transaction.FOR_NETWORK);
+
+        Message telegram = MessageFactory.getInstance().createTelegramMessage(transaction);
+
+        telegramer.pipeAddRemove((TelegramMessage) telegram, null, 0);
+
+        assertEquals((int) telegramer.telegramCount(), 1);
+
+        String signature = transaction.viewSignature();
+        message = "{\"info\":\"sldkf jslkfd jsldfk\",\"__DELETE\":{\"list\":[\""
+                + transaction.viewSignature() + "\"]}}";
+
+        transaction = new R_Send(sender, (byte) 0, recipient1, 0, amount, "---",
+                message.getBytes(), new byte[]{1}, new byte[1],
+                System.currentTimeMillis(), 0l);
+        transaction.sign(sender, Transaction.FOR_NETWORK);
+
+        telegram = MessageFactory.getInstance().createTelegramMessage(transaction);
+
+        telegramer.pipeAddRemove((TelegramMessage) telegram, null, 0);
+
+        assertEquals((int) telegramer.telegramCount(), 1);
+
     }
 }

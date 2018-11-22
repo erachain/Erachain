@@ -69,19 +69,19 @@ public class TelegramsResource {
             R_Send r_Send = (R_Send) transaction;
             if (r_Send.isEncrypted()) {
 
-                byte[] ddd = Controller.getInstance().decrypt(r_Send.getCreator(), r_Send.getRecipient(), r_Send.getData());
+                byte[] dataMess = Controller.getInstance().decrypt(r_Send.getCreator(), r_Send.getRecipient(), r_Send.getData());
 
                 String message;
 
-                if (ddd != null) {
+                if (dataMess != null) {
                     if (r_Send.isText()) {
                         try {
-                            message = (new String(ddd, "UTF-8"));
+                            message = new String(dataMess, "UTF-8");
                         } catch (UnsupportedEncodingException e) {
                             message = "error UTF-8";
                         }
                     } else {
-                        message = Base58.encode(ddd);
+                        message = Base58.encode(dataMess);
                     }
                 } else {
                     message = "decode error";
@@ -491,20 +491,20 @@ public class TelegramsResource {
 
         APIUtils.askAPICallAllowed(password, "POST decrypt telegram data\n " + signature, request);
 
-        byte[] ddd = Controller.getInstance().decrypt(r_Send.getCreator(), r_Send.getRecipient(), r_data);
-        if (ddd == null) {
+        byte[] message = Controller.getInstance().decrypt(r_Send.getCreator(), r_Send.getRecipient(), r_data);
+        if (message == null) {
             return "wrong decryption";
         }
 
         if (r_Send.isText()) {
             try {
-                String str = (new String(ddd, "UTF-8"));
+                String str = new String(message, "UTF-8");
                 return str;
             } catch (UnsupportedEncodingException e) {
                 return "error UTF-8";
             }
         } else {
-            String str = Base58.encode(ddd);
+            String str = Base58.encode(message);
             return str;
         }
     }
