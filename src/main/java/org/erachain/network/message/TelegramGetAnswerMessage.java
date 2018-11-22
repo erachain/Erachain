@@ -1,21 +1,19 @@
 package org.erachain.network.message;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.bouncycastle.util.Strings;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
 import com.google.common.primitives.Bytes;
-
+import org.bouncycastle.util.Strings;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base64;
 import org.erachain.core.transaction.R_Send;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.utils.StrJSonFine;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TelegramGetAnswerMessage extends Message {
 
@@ -59,12 +57,12 @@ public class TelegramGetAnswerMessage extends Message {
                 
         // read telegram
         json = new JSONObject();
-        
-        Set<String> telegramKeys = Controller.getInstance().telegram.database.getTelegramsMap().getKeys();
+
+        Set<String> telegramKeys = Controller.getInstance().telegramStore.database.getTelegramsMap().getKeys();
         // add List
         for(String key:telegramKeys){
             // senders
-            Transaction tran = Controller.getInstance().telegram.database.getTelegramsMap().get(key);
+            Transaction tran = Controller.getInstance().telegramStore.database.getTelegramsMap().get(key);
             if(senderAccount.contains(tran.viewCreator()) &&  !telegransList.contains(tran)){
                 telegransList.add(tran);
                 continue;

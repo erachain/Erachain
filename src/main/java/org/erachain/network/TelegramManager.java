@@ -10,6 +10,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.TelegramMessage;
 import org.erachain.ntp.NTP;
+import org.erachain.settings.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -417,20 +418,24 @@ public class TelegramManager extends Thread {
                 
                 this.handledTelegrams.put(signatureKey, telegram);
 
-                if(Controller.getInstance().telegram != null) {
-                    // save telegram to db
-                    Controller.getInstance().telegram.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
-                }
+                if (Settings.getInstance().getTelegramStoreUse() && Settings.getInstance().getTelegramStorePeriod() > 0) {
+                    // IF MY STORE is USED
+                    if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
 
-                if( Controller.getInstance().wallet.isWalletDatabaseExisting()) {
-                    // save telegram to wallet DB
-                    Transaction trans = telegram.getTransaction();
-                    HashSet<Account> recipients = trans.getRecipientAccounts();
-                    for (Account recipient : recipients) {
-
-                        if (Controller.getInstance().wallet.accountExists(recipient.getAddress())) {
+                        // save telegram to wallet DB
+                        Transaction trans = telegram.getTransaction();
+                        if (Controller.getInstance().wallet.accountExists(trans.getCreator().getAddress())) {
+                            // add as my OUTCOME
                             Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
-                            break;
+                        } else {
+                            // TRY ADD as my INCOME
+                            HashSet<Account> recipients = trans.getRecipientAccounts();
+                            for (Account recipient : recipients) {
+                                if (Controller.getInstance().wallet.accountExists(recipient.getAddress())) {
+                                    Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
+                                    break;
+                                }
+                            }
                         }
                     }
                 }

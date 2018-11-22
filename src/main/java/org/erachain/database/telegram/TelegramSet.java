@@ -1,14 +1,13 @@
 package org.erachain.database.telegram;
 // 30/03 ++
 
-import java.io.File;
-
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.datachain.IDB;
 import org.erachain.settings.Settings;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+
+import java.io.File;
 
 //import org.mapdb.Serializer;
 
@@ -30,12 +29,12 @@ public class TelegramSet implements IDB {
         // File(Settings.getInstance().getWalletDir(), "wallet.dat.t");
         // transactionFile.delete();
 
-        this.database = DBMaker.newFileDB(dbFile).closeOnJvmShutdown()
+        this.database = DBMaker.newFileDB(dbFile)
                 // .cacheSize(2048)
                 // .cacheDisable()
-                .checksumEnable().mmapFileEnableIfSupported()
-                /// ICREATOR
-               // .commitFileSyncDisable()
+                .checksumEnable()
+                .mmapFileEnableIfSupported()
+                .transactionDisable() // DISABLE TRANSACTIONS
                 .make();
 
         uses = 0;
