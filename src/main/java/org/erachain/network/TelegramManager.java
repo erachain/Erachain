@@ -401,12 +401,9 @@ public class TelegramManager extends Thread {
             if (jsonObject.containsKey("__DELETE")) {
 
                 // if THERE only ONE command DELETE - not broadcast if not delete
-                jsonObject.remove("__DELETE");
-                hasLoad = !jsonObject.isEmpty();
-
+                JSONObject delete = (JSONObject) jsonObject.remove("__DELETE");
 
                 PublicKeyAccount commander = transactionCommand.getCreator();
-                JSONObject delete = (JSONObject) jsonObject.get("__DELETE");
                 if (delete.containsKey("list")) {
 
                     // TRY MAKE DELETION LIST
@@ -454,6 +451,9 @@ public class TelegramManager extends Thread {
                     }
                 }
             }
+
+            hasLoad = !jsonObject.isEmpty();
+
         }
 
         return hasLoad;
