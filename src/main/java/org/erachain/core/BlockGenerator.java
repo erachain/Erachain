@@ -29,11 +29,9 @@ import java.util.*;
 public class BlockGenerator extends Thread implements Observer {
 
     public static final boolean TEST_001 = true;
-    public static final int MAX_BLOCK_SIZE_BYTE = BlockChain.HARD_WORK ? BlockChain.MAX_BLOCK_BYTES : BlockChain.MAX_BLOCK_BYTES >> 2;
-    static final int FLUSH_TIMEPOINT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2);
-    static final int WIN_TIMEPOINT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2;
-    private static final int MAX_BLOCK_SIZE = BlockChain.HARD_WORK ? 22221 : 1000;
+
     static Logger LOGGER = LoggerFactory.getLogger(BlockGenerator.class.getName());
+
     private static Controller ctrl = Controller.getInstance();
     private static int status = 0;
     private PrivateKeyAccount acc_winner;
@@ -211,8 +209,8 @@ public class BlockGenerator extends Thread implements Observer {
                 //CHECK IF ENOUGH ROOM
                 totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
 
-                if (totalBytes > MAX_BLOCK_SIZE_BYTE
-                        || ++counter > MAX_BLOCK_SIZE) {
+                if (totalBytes > BlockChain.MAX_BLOCK_SIZE_BYTE
+                        || ++counter > BlockChain.MAX_BLOCK_SIZE) {
                     counter--;
                     break;
                 }
@@ -402,7 +400,7 @@ public class BlockGenerator extends Thread implements Observer {
 
                     LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit);
 
-                    flushPoint = FLUSH_TIMEPOINT + timePoint;
+                    flushPoint = BlockChain.FLUSH_TIMEPOINT + timePoint;
                     this.solvingReference = null;
                     status = 0;
 
@@ -526,7 +524,8 @@ public class BlockGenerator extends Thread implements Observer {
                                 return;
                             }
 
-                            wait_new_block_broadcast = (WIN_TIMEPOINT >> 1) + WIN_TIMEPOINT * 4 * (int) ((previousTarget - winned_winValue) / previousTarget);
+                            wait_new_block_broadcast = (BlockChain.WIN_TIMEPOINT >> 1)
+                                    + BlockChain.WIN_TIMEPOINT * 4 * (int) ((previousTarget - winned_winValue) / previousTarget);
 
                             newWinner = false;
                             if (wait_new_block_broadcast > 0) {
@@ -574,7 +573,8 @@ public class BlockGenerator extends Thread implements Observer {
                                 try {
                                     generatedBlock = generateNextBlock(dcSet, acc_winner, solvingBlock,
                                             getUnconfirmedTransactions(dcSet,
-                                                    timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS
+                                                    timePoint
+                                                            + BlockChain.FLUSH_TIMEPOINT
                                                             - BlockChain.UNCONFIRMED_SORT_WAIT_MS - 1000,
                                                     bchain, winned_winValue),
                                             height, winned_forgingValue, winned_winValue, previousTarget);
@@ -656,7 +656,7 @@ public class BlockGenerator extends Thread implements Observer {
                         LOGGER.debug("TRY to FLUSH WINER to DB MAP");
 
                         try {
-                            if (flushPoint + FLUSH_TIMEPOINT < NTP.getTime()) {
+                            if (flushPoint + BlockChain.FLUSH_TIMEPOINT < NTP.getTime()) {
                                 try {
                                     Thread.sleep(BlockChain.DEVELOP_USE ? 1000 : 10000);
                                 } catch (InterruptedException e) {
