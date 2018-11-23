@@ -573,7 +573,9 @@ public class BlockGenerator extends Thread implements Observer {
                                 generatedBlock = null;
                                 try {
                                     generatedBlock = generateNextBlock(dcSet, acc_winner, solvingBlock,
-                                            getUnconfirmedTransactions(dcSet, timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS - 10),
+                                            getUnconfirmedTransactions(dcSet,
+                                                    timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS
+                                                            - BlockChain.UNCONFIRMED_SORT_WAIT_MS - 1000,
                                                     bchain, winned_winValue),
                                             height, winned_forgingValue, winned_winValue, previousTarget);
                                 } catch (java.lang.OutOfMemoryError e) {
