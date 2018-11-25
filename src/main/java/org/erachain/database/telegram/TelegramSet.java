@@ -2,7 +2,7 @@ package org.erachain.database.telegram;
 // 30/03 ++
 
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.datachain.IDB;
+import org.erachain.database.IDB;
 import org.erachain.settings.Settings;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
