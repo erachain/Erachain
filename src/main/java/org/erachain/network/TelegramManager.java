@@ -391,12 +391,18 @@ public class TelegramManager extends Thread {
                 return hasLoad;
             }
 
+            if (message == null)
+                return hasLoad;
+
             JSONObject jsonObject;
             try {
                 jsonObject = (JSONObject) JSONValue.parse(message);
             } catch (Exception e) {
                 return hasLoad;
             }
+
+            if (jsonObject == null)
+                return hasLoad;
 
             if (jsonObject.containsKey("__DELETE")) {
 
