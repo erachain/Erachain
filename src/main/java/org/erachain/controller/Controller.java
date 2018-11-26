@@ -931,7 +931,19 @@ public class Controller extends Observable {
 
         // WAITING STOP MAIN PROCESS
         LOGGER.info("Waiting stopping processors");
+
         while (blockGenerator.getStatus() >= 0) {
+            try {
+                Thread.sleep(100);
+            } catch (Exception e) {
+            }
+        }
+
+        if (dcSet.isBusy())
+            LOGGER.info("DCSet is busy...");
+
+        int i = 0;
+        while (i++ < 10000 && dcSet.isBusy()) {
             try {
                 Thread.sleep(100);
             } catch (Exception e) {
