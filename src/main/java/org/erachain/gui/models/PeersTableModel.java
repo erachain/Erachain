@@ -166,6 +166,11 @@ public class PeersTableModel extends AbstractTableModel implements Observer {
             return null;
         }
 
+        if (Controller.getInstance().isOnStopping()) {
+            this.timer.cancel();
+            return null;
+        }
+
         Peer peer = peersView.get(row);
 
         if (peer == null || DCSet.getInstance().isStoped())
@@ -240,6 +245,11 @@ public class PeersTableModel extends AbstractTableModel implements Observer {
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
+
+        if (Controller.getInstance().isOnStopping()) {
+            this.timer.cancel();
+            return;
+        }
 
         if (message.getType() == ObserverMessage.LIST_PEER_TYPE) {
 
