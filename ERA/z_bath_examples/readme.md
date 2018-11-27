@@ -1,0 +1,1 @@
+Examples for command files for start with forging and loop restart
