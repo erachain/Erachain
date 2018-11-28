@@ -5,7 +5,6 @@ import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
-import org.erachain.core.BlockGenerator;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
@@ -209,7 +208,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             }
 
             bytesTotal += transaction.getDataLength(Transaction.FOR_NETWORK, true);
-            if (bytesTotal > BlockGenerator.MAX_BLOCK_SIZE_BYTE + (BlockGenerator.MAX_BLOCK_SIZE_BYTE >> 3)) {
+            if (bytesTotal > BlockChain.MAX_BLOCK_SIZE_BYTE + (BlockChain.MAX_BLOCK_SIZE_BYTE >> 3)) {
                 break;
             }
 
