@@ -1307,7 +1307,9 @@ public class Block {
             long timerTransFinalMapSinds_set = 0;
 
             long timestampEnd = this.getTimestamp()
-                    + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + 1;
+                    + (BlockChain.DEVELOP_USE ? BlockChain.GENERATING_MIN_BLOCK_TIME_MS : BlockChain.FLUSH_TIMEPOINT)
+                    - BlockChain.UNCONFIRMED_SORT_WAIT_MS
+                    + 10;
             // because time filter used by parent block timestamp on core.BlockGenerator.run()
             //long timestampBeg = this.getParent(dcSet).getTimestamp(dcSet);
 
@@ -1347,10 +1349,22 @@ public class Block {
 
                     if (!transaction.isSignatureValid(validatingDC)) {
                         //
-                        LOGGER.debug("*** Block[" + this.heightBlock
-                                + "].Tx[" + seqNo + "=" + this.getTransactionSeq(transaction.getSignature()) + " : "
-                                + transaction.viewFullTypeName() + "]"
-                                + "signature not valid!"
+                        LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
+                                + ":" + transaction.viewFullTypeName()
+                                + " signature  invalid!"
+                                + " " + Base58.encode(transaction.getSignature()));
+                        return false;
+                    }
+
+                    //CHECK TIMESTAMP AND DEADLINE
+                    if (this.heightBlock > 105999
+                            && transaction.getTimestamp() > timestampEnd
+                        //|| transaction.getDeadline() <= timestampBeg // не нужно так как при слиянии цепочек
+                        // могут и должны страрые транзакции заноситься
+                    ) {
+                        LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
+                                + ":" + transaction.viewFullTypeName()
+                                + " timestampEnd invalid"
                                 + " " + Base58.encode(transaction.getSignature()));
                         return false;
                     }
@@ -1359,21 +1373,10 @@ public class Block {
 
                     //CHECK IF VALID
                     if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
-                        LOGGER.debug("*** Block[" + this.heightBlock
-                                + "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
-                                + transaction.viewFullTypeName() + "]"
-                                + "invalid code: " + transaction.isValid(Transaction.FOR_NETWORK, 0l)
+                        LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
+                                + ":" + transaction.viewFullTypeName()
+                                + " invalid code: " + transaction.isValid(Transaction.FOR_NETWORK, 0l)
                                 + " " + Base58.encode(transaction.getSignature()));
-                        return false;
-                    }
-
-                    //CHECK TIMESTAMP AND DEADLINE
-                    if (transaction.getTimestamp() > timestampEnd
-                            //|| transaction.getDeadline() <= timestampBeg
-                            && this.heightBlock > 105999
-                            ) {
-                        LOGGER.debug("*** Block[" + this.heightBlock + "].TX.timestamp invalid "
-                                + Base58.encode(transaction.getSignature()));
                         return false;
                     }
 
@@ -1384,7 +1387,8 @@ public class Block {
                         if (cnt.isOnStopping())
                             return false;
 
-                        LOGGER.error("*** Block[" + this.heightBlock + "].TX.process ERROR", e);
+                        LOGGER.error("*** " + this.heightBlock + "-" + seqNo
+                                + ":" + transaction.viewFullTypeName() + e.getMessage(), e);
                         return false;
                     }
                     timerProcess += System.currentTimeMillis() - timerStart;

@@ -67,13 +67,20 @@ public class BlockChain {
     public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
     //public static final int GENERATING_RETARGET = 10;
     public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE ? 120 : 288; // 300 PER DAY
-    public static final int GENERATING_MIN_BLOCK_TIME_MS = BlockChain.GENERATING_MIN_BLOCK_TIME * 1000;
+    public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000;
+    public static final int FLUSH_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS - (GENERATING_MIN_BLOCK_TIME_MS >> 2);
+    static final int WIN_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS >> 2;
+    public static final int MAX_BLOCK_SIZE = HARD_WORK ? 22221 : 1000;
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
+    // задержка на включение в блок для хорошей сортировки
+    public static final int UNCONFIRMED_SORT_WAIT_MS = 15000;
+
 
     public static final int BLOCKS_PER_DAY = 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME; // 300 PER DAY
     //public static final int GENERATING_MAX_BLOCK_TIME = 1000;
     public static final int MAX_BLOCK_BYTES = 2 << 21; //4 * 1048576;
     public static final int MAX_REC_DATA_BYTES = MAX_BLOCK_BYTES >> 1;
+    public static final int MAX_BLOCK_SIZE_BYTE = HARD_WORK ? MAX_BLOCK_BYTES : MAX_BLOCK_BYTES >> 2;
     public static final int GENESIS_WIN_VALUE = DEVELOP_USE ? 3000 : 22000;
     public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
