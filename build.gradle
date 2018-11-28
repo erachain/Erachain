@@ -92,22 +92,26 @@ task CopyResourse {
             from 'ERA/web'
             into 'build/libs/' + versionEra + '/bin/web'
         }
-        copy {
-            from 'ERA/languages'
-            into 'build/libs/' + versionEra + '/bin/languages'
-        }
-        copy {
-            from 'ERA/themes'
-            into 'build/libs/' + versionEra + '/bin/themes'
-        }
-        copy {
-            from 'ERA/sounds'
-            into 'build/libs/' + versionEra + '/bin/sounds'
-        }
-        copy {
-            from 'ERA/images'
-            into 'build/libs/' + versionEra + '/bin/images'
-        }
+    copy {
+        from 'ERA/languages'
+        into 'build/libs/' + versionEra + '/bin/languages'
+    }
+    copy {
+        from 'ERA/themes'
+        into 'build/libs/' + versionEra + '/bin/themes'
+    }
+    copy {
+        from 'ERA/sounds'
+        into 'build/libs/' + versionEra + '/bin/sounds'
+    }
+    copy {
+        from 'ERA/images'
+        into 'build/libs/' + versionEra + '/bin/images'
+    }
+    copy {
+        from 'ERA/z_bath_examples'
+        into 'build/libs/' + versionEra + '/bin/z_bath_examples'
+    }
 }
 task CreateZip(type: Zip) {
 
