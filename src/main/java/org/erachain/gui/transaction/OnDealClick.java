@@ -311,6 +311,13 @@ public class OnDealClick {
             case Transaction.CREATOR_NOT_PERSONALIZED:
                 mess = "Creator Account is not personalized";
                 break;
+            case Transaction.NOT_SELF_PERSONALIZY:
+                mess = "Not Self personalization";
+                break;
+            case Transaction.PUB_KEY_NOT_PERSONALIZED:
+                mess = "Public Key is not personalized";
+                break;
+
             case Transaction.RECEIVER_NOT_PERSONALIZED:
                 mess = "Receiver Account is not personalized";
                 break;
