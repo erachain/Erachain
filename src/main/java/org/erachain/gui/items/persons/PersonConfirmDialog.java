@@ -473,7 +473,7 @@ public class PersonConfirmDialog extends JDialog {
 
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
-        getContentPane().add(jLabel_addDays, gridBagConstraints);
+        //getContentPane().add(jLabel_addDays, gridBagConstraints);
 
         /*
          * try { jFormattedTextField_ToDo.setFormatterFactory(new
@@ -497,7 +497,7 @@ public class PersonConfirmDialog extends JDialog {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        getContentPane().add(jTextField_addDays, gridBagConstraints);
+        //getContentPane().add(jTextField_addDays, gridBagConstraints);
 
         jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
