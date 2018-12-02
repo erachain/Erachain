@@ -306,7 +306,7 @@ public class OnDealClick {
                 mess = "Item does not exist";
                 break;
             case Transaction.OWNER_NOT_PERSONALIZED:
-                mess = "Ownre Account is not personalized";
+                mess = "Owner Account is not personalized";
                 break;
             case Transaction.CREATOR_NOT_PERSONALIZED:
                 mess = "Creator Account is not personalized";
