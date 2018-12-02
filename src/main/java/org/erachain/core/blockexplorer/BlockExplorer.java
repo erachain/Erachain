@@ -1627,7 +1627,7 @@ public class BlockExplorer {
         // statuses
         output.put("Label_statuses", Lang.getInstance().translate_from_langObj("Statuses", langObj));
         output.put("Label_Status_table_status", Lang.getInstance().translate_from_langObj("Status", langObj));
-        output.put("Label_Status_table_data", Lang.getInstance().translate_from_langObj("Date", langObj));
+        output.put("Label_Status_table_period", Lang.getInstance().translate_from_langObj("Period", langObj));
 
         Map statusesJSON = new LinkedHashMap();
 
@@ -1637,7 +1637,8 @@ public class BlockExplorer {
             for (int i = 0; i < rowCount; i++) {
                 Map statusJSON = new LinkedHashMap();
                 statusJSON.put("status_name", statusModel.getValueAt(i, statusModel.COLUMN_STATUS_NAME));
-                statusJSON.put("status_date", statusModel.getValueAt(i, statusModel.COLUMN_MAKE_DATE));
+                //statusJSON.put("status_date", statusModel.getValueAt(i, statusModel.COLUMN_MAKE_DATE));
+                statusJSON.put("status_period", statusModel.getValueAt(i, statusModel.COLUMN_PERIOD));
                 Account creator = (Account)statusModel.getValueAt(i, statusModel.COLUMN_MAKER_ACCOUNT);
 
                 if (creator != null) {
@@ -1657,7 +1658,7 @@ public class BlockExplorer {
         // accounts
         output.put("Label_accounts", Lang.getInstance().translate_from_langObj("Accounts", langObj));
         output.put("Label_accounts_table_adress", Lang.getInstance().translate_from_langObj("Address", langObj));
-        output.put("Label_accounts_table_data", Lang.getInstance().translate_from_langObj("Date", langObj));
+        output.put("Label_accounts_table_to_date", Lang.getInstance().translate_from_langObj("To Date", langObj));
         output.put("Label_accounts_table_creator", Lang.getInstance().translate_from_langObj("Creator", langObj));
 
         Map accountsJSON = new LinkedHashMap();
@@ -1681,10 +1682,10 @@ public class BlockExplorer {
 
             for (int i = 0; i < rowCount; i++) {
                 Map accountJSON = new LinkedHashMap();
-                accountJSON.put("address", personModel.getValueAt(i, 0));
-                accountJSON.put("data", personModel.getValueAt(i, 2));
-                accountJSON.put("creator", personModel.getValueAt(i, 3));
-                accountJSON.put("creator_address", personModel.getValueAt(i, 32));
+                accountJSON.put("address", personModel.getValueAt(i, personModel.COLUMN_ADDRESS));
+                accountJSON.put("to_date", personModel.getValueAt(i, personModel.COLUMN_TO_DATE));
+                accountJSON.put("creator", personModel.getValueAt(i, personModel.COLUMN_CREATOR));
+                accountJSON.put("creator_address", personModel.getValueAt(i, personModel.COLUMN_CREATOR_ADDRESS));
 
 
                 accountsJSON.put(i, accountJSON);

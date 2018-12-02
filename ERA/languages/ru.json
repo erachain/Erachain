@@ -2,7 +2,7 @@
 {
   "_lang_ISO_": "ru",
   "_lang_name_": "Русский",
-  "_timestamp_of_translation_": 1540021081966,
+  "_timestamp_of_translation_": 1541021081966,
   " ( * optional field )": " ( * дополнительное поле )",
   " and start the application again.": " и запустите приложение снова.",
   "( DO NOT USE your wallet's password. )": "( Не используйте Ваш пароль кошелька! )",
@@ -717,6 +717,7 @@
   "Public key": "Открытый ключ",
   "public key not found": "публичный ключ не найден",
   "Public Key is not personalized": "Публичный ключ не удостоверен",
+  "Public Key was Certified": "Публичный ключ был удостоверен",
   "Public Part": "Открытая часть",
   "Publisher": "Издатель",
   "Purpose payment": "Назначение платежа",

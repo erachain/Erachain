@@ -455,11 +455,14 @@ public class R_SertifyPubKeys extends Transaction {
     @Override
     public int isValid(int asDeal, long flags) {
 
-        boolean creator_admin = false;
-
         int result = super.isValid(asDeal, flags | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
 
+        // сюда без проверки Персоны приходит
+        if (result != VALIDATE_OK)
+            return result;
+
         if (!this.creator.isPerson(dcSet, height)) {
+            boolean creator_admin = false;
             long personsCount = dcSet.getItemPersonMap().getLastKey();
             if (personsCount < 20) {
                 // FIRST Persons only by ME
@@ -474,9 +477,10 @@ public class R_SertifyPubKeys extends Transaction {
             if (!creator_admin
                     && this.height != 176085) // TODO: wrong transaction
                 return CREATOR_NOT_PERSONALIZED;
+        }
 
-        } else if (result != VALIDATE_OK)
-            return result;
+        // MY SELF PERSON INFO
+        Fun.Tuple2<Integer, PersonCls> creatorPersonInfo = this.creator.getPerson(dcSet, height);
 
         for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
             //CHECK IF PERSON PUBLIC KEY IS VALID
@@ -488,14 +492,13 @@ public class R_SertifyPubKeys extends Transaction {
                 // если этот ключ уже удостоврен то его изменять может только сам владелец
                 // снять удостоврение ключа может только сам владелец
                 // или продлить только сам владелец может
-                if (sertifyInfo.b.getKey() != this.key) {
+                if (creatorPersonInfo.b.getKey() != this.key) {
                     return NOT_SELF_PERSONALIZY;
                 }
             } else {
                 if (this.add_day < 0) {
                     // нельзя снять удостоврение со счета который еще не удостоверен
                     return PUB_KEY_NOT_PERSONALIZED;
-                } else {
                 }
             }
         }
@@ -512,8 +515,7 @@ public class R_SertifyPubKeys extends Transaction {
             )
             return Transaction.NOT_ENOUGH_RIGHTS;
 
-        PersonCls person = (PersonCls) this.dcSet.getItemPersonMap().get(this.key);
-        if (!person.isAlive(this.timestamp))
+        if (creatorPersonInfo != null && !creatorPersonInfo.b.isAlive(this.timestamp))
             return Transaction.ITEM_PERSON_IS_DEAD;
 
         return Transaction.VALIDATE_OK;
@@ -627,7 +629,7 @@ public class R_SertifyPubKeys extends Transaction {
 
         int add_day = this.add_day < 0? this.add_day : DEFAULT_DURATION;
         // set to time stamp of record
-        int end_day = (int) (this.timestamp / 86400000) + add_day;
+        int end_day = (int) (this.timestamp / 86400000l) + add_day;
 
         Tuple3<Integer, Integer, Integer> itemP = new Tuple3<Integer, Integer, Integer>(end_day,
                 //Controller.getInstance().getHeight(), this.signature);
