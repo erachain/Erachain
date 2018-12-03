@@ -7,15 +7,13 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.*;
-import org.erachain.gui.*;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.TransactionsTableModel;
 import org.erachain.lang.Lang;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.TransactionTimestampComparator;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -59,6 +57,7 @@ public class API_TransactionsResource {
         help.put("apirecords/find?address={address}&sender={sender}&recipient={recipient}&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={des/asc}&offset={offset}&limit={limit}&unconfirmed=true",
                 Lang.getInstance().translate("Find Records"));
 
+        help.put("apirecords/rawTransactionsByBlock/{height}?param", "Get raw transaction(encoding Base58). By default param is 3(for network)");
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(StrJSonFine.convert(help)).build();
@@ -455,4 +454,40 @@ public class API_TransactionsResource {
                 .entity(array.toJSONString()).build();
     }
 
+    @GET
+    @Path("/rawTransactionsByBlock/{height}")
+    @SuppressWarnings("unchecked")
+    public Response getRawTransactionByBlock(@PathParam("height") int height,
+                                             @DefaultValue("3") @QueryParam("param") int paramTransaction) {
+        Block block;
+
+        if (paramTransaction > 6 || paramTransaction < 0) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_TRANSACTION_TYPE);
+        }
+
+        JSONObject jsonObject = new JSONObject();
+        JSONObject jsonObjectTransactions = new JSONObject();
+        try {
+            block = Controller.getInstance().getBlockByHeight(height);
+            int i = 1;
+            for (Transaction transaction : block.getTransactions()) {
+                String rawTransaction = Base58.encode(transaction.toBytes(paramTransaction, true));
+                jsonObjectTransactions.put(i, rawTransaction);
+                i++;
+            }
+            jsonObject.put("transactions", jsonObjectTransactions);
+
+
+            if (block == null) {
+                throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
+            }
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(jsonObject.toJSONString())
+                .build();
+    }
 }

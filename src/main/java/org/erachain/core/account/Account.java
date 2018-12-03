@@ -857,7 +857,7 @@ public class Account {
          * db.getPersonStatusMap().getItem(personKey, ALIVE_KEY); // TEST TIME
          * and EXPIRE TIME for ALIVE person Long end_date = personDuration.b; if
          * (end_date == null ) return true; // permanent active if (end_date <
-         * current_time + 86400000 ) return false; // - 1 day
+         * current_time + 86400000l ) return false; // - 1 day
          */
 
         return true;
@@ -902,7 +902,7 @@ public class Account {
          * new Tuple2<Integer, PersonCls>(-2, person); Long end_date =
          * personDuration.b; if (end_date == null ) // permanent active return
          * new Tuple2<Integer, PersonCls>(0, person); else if (end_date <
-         * current_time + 86400000 ) // ALIVE expired return new Tuple2<Integer,
+         * current_time + 86400000l ) // ALIVE expired return new Tuple2<Integer,
          * PersonCls>(-1, person);
          */
 
