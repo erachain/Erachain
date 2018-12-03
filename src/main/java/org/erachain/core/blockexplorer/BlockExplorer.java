@@ -1637,7 +1637,6 @@ public class BlockExplorer {
             for (int i = 0; i < rowCount; i++) {
                 Map statusJSON = new LinkedHashMap();
                 statusJSON.put("status_name", statusModel.getValueAt(i, statusModel.COLUMN_STATUS_NAME));
-                //statusJSON.put("status_date", statusModel.getValueAt(i, statusModel.COLUMN_MAKE_DATE));
                 statusJSON.put("status_period", statusModel.getValueAt(i, statusModel.COLUMN_PERIOD));
                 Account creator = (Account)statusModel.getValueAt(i, statusModel.COLUMN_MAKER_ACCOUNT);
 
