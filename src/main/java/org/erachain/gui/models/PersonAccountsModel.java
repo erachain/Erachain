@@ -2,6 +2,7 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
@@ -145,8 +146,7 @@ public class PersonAccountsModel extends AbstractTableModel implements Observer 
 
             case COLUMN_TO_DATE:
 
-                //return  formatDate.format( new Date(value.a)).toString();
-                return DateTimeFormat.timestamptoString(value.a);
+                return DateTimeFormat.timestamptoString(value.a * 86400000l);
 
             case COLUMN_CREATOR:
 
