@@ -219,7 +219,7 @@ public class RIPPersonFrame extends JInternalFrame {
 					personDetails += "<br>Dead";
 				else {
 					long current_time = NTP.getTime();
-					int daysLeft = (int)((aliveStatus.a - current_time) / 86400000);
+					int daysLeft = (int)((aliveStatus.a - current_time) / 86400000l);
 					personDetails += "<br>" + Lang.getInstance().translate("Died %days% days ago").replace("%days%", ""+daysLeft);
 				}
 			} else {
@@ -228,7 +228,7 @@ public class RIPPersonFrame extends JInternalFrame {
 					personDetails += "<br>Alive";
 				else {
 					long current_time = NTP.getTime();
-					int daysLeft = (int)((aliveStatus.a - current_time) / 86400000);
+					int daysLeft = (int)((aliveStatus.a - current_time) / 86400000l);
 					if (daysLeft < 0 ) personDetails += "<br>" + Lang.getInstance().translate("Person died %days% ago days ago").replace("%days%", ""+daysLeft);
 					else personDetails += "<br>" + Lang.getInstance().translate("Person is still alive %days%").replace("%days%", ""+daysLeft);
 				}
