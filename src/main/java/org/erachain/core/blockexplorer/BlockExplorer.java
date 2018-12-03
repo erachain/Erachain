@@ -1726,6 +1726,7 @@ public class BlockExplorer {
         // my persons
 
         output.put("Label_My_Persons", Lang.getInstance().translate_from_langObj("My Persons", langObj));
+        output.put("Label_accounts_table_date", Lang.getInstance().translate_from_langObj("Creation Date", langObj));
         output.put("Label_My_Person_key", Lang.getInstance().translate_from_langObj("Key", langObj));
         output.put("Label_My_Persons_Name", Lang.getInstance().translate_from_langObj("Name", langObj));
 
