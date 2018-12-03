@@ -34,7 +34,12 @@ public class PersonStatusesModel extends AbstractTableModel implements Observer 
     //TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
     String from_date_str;
     String to_date_str;
-    Long dte;
+
+    Long dteStart;
+    Long dteEnd;
+    boolean startIs = true;
+    boolean endIs = true;
+
     ItemStatusMap statusesMap;
     long itemKey;
     private DCSet dcSet = DCSet.getInstance();
@@ -151,26 +156,23 @@ public class PersonStatusesModel extends AbstractTableModel implements Observer 
 
             case COLUMN_PERIOD:
 
-                boolean meedle = true;
-                dte = value.b.a;
-                if (dte == null || dte == Long.MIN_VALUE) {
+                dteStart = value.b.a;
+                dteEnd = value.b.b;
+                startIs = true;
+                endIs = true;
+
+                if (dteStart == null || dteStart == Long.MIN_VALUE) {
                     from_date_str = "-> ";
-                    meedle = false;
-                } else {
-                    //from_date_str = formatDate.format( new Date(dte));
-                    from_date_str = DateTimeFormat.timestamptoString(dte);
-                }
+                    startIs = false;
+                } else from_date_str = formatDate.format(new Date(dteStart));
 
-                dte = value.b.b;
-                if (dte == null || dte == Long.MAX_VALUE) {
+                if (dteEnd == null || dteEnd == Long.MAX_VALUE) {
                     to_date_str = " ->";
-                    meedle = false;
-                } else {
-                    //to_date_str = formatDate.format( new Date(dte));
-                    to_date_str = DateTimeFormat.timestamptoString(dte);
-                }
+                    endIs = false;
+                } else to_date_str = formatDate.format(new Date(dteEnd));
 
-                return from_date_str + (meedle ? " - " : "") + to_date_str;
+                return !startIs && !endIs? "" :
+                        from_date_str + (startIs && endIs? " - " : "") + to_date_str;
 
             case COLUMN_MAKER:
 

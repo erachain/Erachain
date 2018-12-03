@@ -17,6 +17,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
@@ -33,7 +34,7 @@ public class R_SertifyPubKeys extends Transaction {
 
     protected static final BigDecimal BONUS_FOR_PERSON_4_11 = BigDecimal.valueOf(1000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
 
-    public static final int DEFAULT_DURATION = 700;
+    public static final int DEFAULT_DURATION = 365 * 3; // 3 years
     private static final byte TYPE_ID = (byte) Transaction.CERTIFY_PUB_KEYS_TRANSACTION;
     private static final String NAME_ID = "Certify Person";
     private static final int USER_ADDRESS_LENGTH = Transaction.CREATOR_LENGTH;
@@ -57,9 +58,6 @@ public class R_SertifyPubKeys extends Transaction {
 
         this.key = key;
         this.sertifiedPublicKeys = sertifiedPublicKeys;
-        if (add_day == 0)
-            // set to_date to default
-            add_day = DEFAULT_DURATION;
         this.add_day = add_day;
     }
 
@@ -457,10 +455,14 @@ public class R_SertifyPubKeys extends Transaction {
     @Override
     public int isValid(int asDeal, long flags) {
 
-        boolean creator_admin = false;
-
         int result = super.isValid(asDeal, flags | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
+
+        // сюда без проверки Персоны приходит
+        if (result != VALIDATE_OK)
+            return result;
+
         if (!this.creator.isPerson(dcSet, height)) {
+            boolean creator_admin = false;
             long personsCount = dcSet.getItemPersonMap().getLastKey();
             if (personsCount < 20) {
                 // FIRST Persons only by ME
@@ -475,17 +477,29 @@ public class R_SertifyPubKeys extends Transaction {
             if (!creator_admin
                     && this.height != 176085) // TODO: wrong transaction
                 return CREATOR_NOT_PERSONALIZED;
+        }
 
-        } else if (result != VALIDATE_OK)
-            return result;
+        // MY SELF PERSON INFO
+        Fun.Tuple2<Integer, PersonCls> creatorPersonInfo = this.creator.getPerson(dcSet, height);
 
         for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
             //CHECK IF PERSON PUBLIC KEY IS VALID
             if (!publicAccount.isValid()) {
                 return INVALID_PUBLIC_KEY;
-            } else if (publicAccount.getPerson(dcSet, height) != null) {
-                LOGGER.error("ACCOUNT_ALREADY_PERSONALIZED " + publicAccount.getPerson(dcSet, height));
-                return ACCOUNT_ALREADY_PERSONALIZED;
+            }
+            Fun.Tuple2<Integer, PersonCls> sertifyInfo = publicAccount.getPerson(dcSet, height);
+            if (sertifyInfo != null) {
+                // если этот ключ уже удостоврен то его изменять может только сам владелец
+                // снять удостоврение ключа может только сам владелец
+                // или продлить только сам владелец может
+                if (creatorPersonInfo.b.getKey() != this.key) {
+                    return NOT_SELF_PERSONALIZY;
+                }
+            } else {
+                if (this.add_day < 0) {
+                    // нельзя снять удостоврение со счета который еще не удостоверен
+                    return PUB_KEY_NOT_PERSONALIZED;
+                }
             }
         }
 
@@ -501,8 +515,7 @@ public class R_SertifyPubKeys extends Transaction {
             )
             return Transaction.NOT_ENOUGH_RIGHTS;
 
-        PersonCls person = (PersonCls) this.dcSet.getItemPersonMap().get(this.key);
-        if (!person.isAlive(this.timestamp))
+        if (creatorPersonInfo != null && !creatorPersonInfo.b.isAlive(this.timestamp))
             return Transaction.ITEM_PERSON_IS_DEAD;
 
         return Transaction.VALIDATE_OK;
@@ -614,10 +627,9 @@ public class R_SertifyPubKeys extends Transaction {
 
         }
 
-        int add_day = this.add_day;
+        int add_day = this.add_day < 0? this.add_day : DEFAULT_DURATION;
         // set to time stamp of record
-        int start_day = (int) (this.timestamp / 86400000);
-        int end_day = start_day + add_day;
+        int end_day = (int) (this.timestamp / 86400000l) + add_day;
 
         Tuple3<Integer, Integer, Integer> itemP = new Tuple3<Integer, Integer, Integer>(end_day,
                 //Controller.getInstance().getHeight(), this.signature);

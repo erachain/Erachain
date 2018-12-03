@@ -149,6 +149,9 @@ public abstract class Transaction {
     public static final int INVALID_TITLE_LENGTH = 56;
 
     public static final int INVALID_BACKWARD_ACTION = 57;
+    public static final int NOT_SELF_PERSONALIZY = 58;
+    public static final int PUB_KEY_NOT_PERSONALIZED = 59;
+
 
     // NAMES
     public static final int NAME_DOES_NOT_EXIST = 60;
