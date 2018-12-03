@@ -1209,7 +1209,8 @@ public abstract class Transaction {
         //Long reference = asDeal == null ? this.creator.getLastTimestamp(dcSet) : asDeal;
         if (asDeal > Transaction.FOR_MYPACK) {
             Long reference = this.creator.getLastTimestamp(dcSet);
-            if (this.isReferenced() && reference.compareTo(this.timestamp) >= 0) {
+            if (this.isReferenced() && reference.compareTo(this.timestamp) >= 0
+                    && height > BlockChain.VERS_4_11) {
                 return INVALID_TIMESTAMP;
             }
         }
