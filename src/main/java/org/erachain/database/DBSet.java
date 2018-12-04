@@ -43,7 +43,6 @@ public class DBSet implements IDB {
         DATA_FILE.getParentFile().mkdirs();
 
         database = DBMaker.newFileDB(DATA_FILE)
-                // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 //.cacheDisable()
                 .checksumEnable()
                 .mmapFileEnableIfSupported()
