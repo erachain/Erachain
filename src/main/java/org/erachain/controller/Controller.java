@@ -746,8 +746,6 @@ public class Controller extends Observable {
     public DBSet reCreateDB() throws IOException, Exception {
 
         File dataLocal = new File(Settings.getInstance().getLocalDir());
-//        File dataLocalBackUp = new File(Settings.getInstance().getBackUpDir() + File.separator
- //               + Settings.getInstance().DEFAULT_LOCAL_DIR + File.separator);
 
         // del DataLocal
         if (dataLocal.exists()) {
@@ -757,20 +755,39 @@ public class Controller extends Observable {
                 LOGGER.error(e.getMessage(), e);
             }
         }
-        // copy Loc dir to Back
-  //      if (dataLocalBackUp.exists()) {
 
-  //          try {
-  //              FileUtils.copyDirectory(dataLocalBackUp, dataLocal);
-  //              LOGGER.info("Restore BackUp/DataLocal to DataLocal is Ok");
- //           } catch (IOException e) {
- //               LOGGER.error(e.getMessage(), e);
-//            }
-
-  //      }
         DBSet.reCreateDatabase();
         this.dbSet = DBSet.getinstanse();
         return this.dbSet;
+    }
+
+    private void createDataCheckpoint() {
+        if (!this.dcSet.getBlockMap().isProcessing()) {
+            // && Settings.getInstance().isCheckpointingEnabled()) {
+            // this.dcSet.close();
+
+            File dataDir = new File(Settings.getInstance().getDataDir());
+
+            File dataBakDC = new File(Settings.getInstance().getBackUpDir() + File.separator
+                    + Settings.getInstance().DEFAULT_DATA_DIR + File.separator);
+            // copy Data dir to Back
+            if (dataDir.exists()) {
+                if (dataBakDC.exists()) {
+                    try {
+                        Files.walkFileTree(dataBakDC.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+                    } catch (IOException e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
+                }
+                try {
+                    FileUtils.copyDirectory(dataDir, dataBakDC);
+                    LOGGER.info("Copy DataChain to BackUp");
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+        }
+
     }
 
     /**
@@ -976,56 +993,6 @@ public class Controller extends Observable {
 
     }
 
-    private void createDataCheckpoint() {
-        if (!this.dcSet.getBlockMap().isProcessing()) {
-            // && Settings.getInstance().isCheckpointingEnabled()) {
-            // this.dcSet.close();
-
-            File dataDir = new File(Settings.getInstance().getDataDir());
-       //     File dataLoc = new File(Settings.getInstance().getLocalDir());
-
-            File dataBakDC = new File(Settings.getInstance().getBackUpDir() + File.separator
-                    + Settings.getInstance().DEFAULT_DATA_DIR + File.separator);
-     //       File dataBakLoc = new File(Settings.getInstance().getBackUpDir() + File.separator
-     //               + Settings.getInstance().DEFAULT_LOCAL_DIR + File.separator);
-            // copy Data dir to Back
-            if (dataDir.exists()) {
-                if (dataBakDC.exists()) {
-                    try {
-                        Files.walkFileTree(dataBakDC.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-                    } catch (IOException e) {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                }
-                try {
-                    FileUtils.copyDirectory(dataDir, dataBakDC);
-                    LOGGER.info("Copy DataChain to BackUp");
-                } catch (IOException e) {
-                    LOGGER.error(e.getMessage(), e);
-                }
-
-            }
-            // copy Loc dir to Back
-           /* if (dataLoc.exists()) {
-                if (dataBakLoc.exists()) {
-                    try {
-                        Files.walkFileTree(dataBakLoc.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-                    } catch (IOException e) {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                }
-                try {
-                    FileUtils.copyDirectory(dataLoc, dataBakLoc);
-                    LOGGER.info("Copy DataLocal to BackUp");
-                } catch (IOException e) {
-                    LOGGER.error(e.getMessage(), e);
-                }
-
-            }*/
-
-        }
-
-    }
 
     // NETWORK
 
