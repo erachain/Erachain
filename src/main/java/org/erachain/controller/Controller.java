@@ -388,6 +388,78 @@ public class Controller extends Observable {
         this.needSyncWallet = needSync;
     }
 
+    private void openDataBaseFile(String name, String path, org.erachain.database.IDB dbSet) {
+
+        boolean error = false;
+        boolean backUped = false;
+
+        try {
+            LOGGER.info("Open " + name);
+            if (Controller.useGui)
+                about_frame.set_console_Text(Lang.getInstance().translate("Open") + " " + name);
+
+            //// должен быть метод
+            ///// dbSet.open();
+            /// this.dbSet = DBSet.getinstanse();
+
+            LOGGER.info(name + " OK");
+            if (Controller.useGui)
+                about_frame.set_console_Text(name + " " + Lang.getInstance().translate("OK"));
+
+        } catch (Throwable e) {
+
+            LOGGER.error("Error during startup detected trying to restore backup " + name);
+
+            error = true;
+
+            try {
+                // пытаемся восстановисть
+
+                /// у объекта должен быть этот метод восстанорвления
+                // dbSet.restoreBuckUp();
+
+            } catch (Throwable e1) {
+
+                LOGGER.error("Error during backup, tru recreate " + name);
+                backUped = true;
+
+                try {
+                    // пытаемся пересоздать
+                    //// у объекта должен быть такой метод пересоздания
+                    // dbSet.reCreateDB();
+
+                } catch (Throwable e2) {
+
+                    // не смогли пересоздать выход!
+                    stopAll(-3);
+                }
+
+            }
+        }
+
+        if (!error && !backUped && Settings.getInstance().getbacUpEnabled()) {
+            // если нет ошибок и не было восстановления и нужно делать копии то сделаем
+
+            if (Controller.useGui && Settings.getInstance().getbacUpAskToStart()) {
+                // ask dialog
+                int n = JOptionPane.showConfirmDialog(null, Lang.getInstance().translate("BackUp Database?"),
+                        Lang.getInstance().translate("Confirmation"), JOptionPane.OK_CANCEL_OPTION);
+                if (n == JOptionPane.OK_OPTION) {
+                    about_frame.set_console_Text(Lang.getInstance().translate("BackUp datachain"));
+                    // delete & copy files in BackUp dir
+
+                    //// у объекта должен быть этот метод сохранения dbSet.createDataCheckpoint();
+                }
+            } else {
+                if (Controller.useGui)
+                    about_frame.set_console_Text(Lang.getInstance().translate("BackUp datachain"));
+                // delete & copy files in BackUp dir
+                //// у объекта должен быть этот метод сохранения dbSet.createDataCheckpoint();
+            }
+        }
+
+    }
+
     public void start() throws Exception {
 
         this.toOfflineTime = NTP.getTime();
@@ -432,6 +504,8 @@ public class Controller extends Observable {
         int error = 0;
         // OPEN DATABASE
 
+        /////////openDataBaseFile("DataLocale", "/datalocal", DCSet);
+
         try {
             if (Controller.useGui)
                 about_frame.set_console_Text(Lang.getInstance().translate("Open DataLocale"));
@@ -443,7 +517,7 @@ public class Controller extends Observable {
             // TODO Auto-generated catch block
             // e1.printStackTrace();
             reCreateDB();
-            LOGGER.error("Error during startup detected trying to restore backup DataLocale...");
+            LOGGER.error("Error during startup detected trying to recreate DataLocale...");
         }
 
         // OPENING DATABASES
@@ -461,6 +535,8 @@ public class Controller extends Observable {
             LOGGER.error("Error during startup detected trying to restore backup DataChain...");
             reCreateDC();
         }
+
+
         if (error == 0 && Controller.useGui && Settings.getInstance().getbacUpEnabled()) {
 
             if (Settings.getInstance().getbacUpAskToStart()) {
@@ -478,6 +554,7 @@ public class Controller extends Observable {
                 createDataCheckpoint();
             }
         }
+
         if (this.dcSet.getBlockMap().isProcessing()) {
             try {
                 this.dcSet.close();
@@ -669,8 +746,6 @@ public class Controller extends Observable {
     public DBSet reCreateDB() throws IOException, Exception {
 
         File dataLocal = new File(Settings.getInstance().getLocalDir());
-        File dataLocalBackUp = new File(Settings.getInstance().getBackUpDir() + File.separator
-                + Settings.getInstance().DEFAULT_LOCAL_DIR + File.separator);
 
         // del DataLocal
         if (dataLocal.exists()) {
@@ -680,20 +755,39 @@ public class Controller extends Observable {
                 LOGGER.error(e.getMessage(), e);
             }
         }
-        // copy Loc dir to Back
-        if (dataLocalBackUp.exists()) {
 
-            try {
-                FileUtils.copyDirectory(dataLocalBackUp, dataLocal);
-                LOGGER.info("Restore BackUp/DataLocal to DataLocal is Ok");
-            } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
-            }
-
-        }
         DBSet.reCreateDatabase();
         this.dbSet = DBSet.getinstanse();
         return this.dbSet;
+    }
+
+    private void createDataCheckpoint() {
+        if (!this.dcSet.getBlockMap().isProcessing()) {
+            // && Settings.getInstance().isCheckpointingEnabled()) {
+            // this.dcSet.close();
+
+            File dataDir = new File(Settings.getInstance().getDataDir());
+
+            File dataBakDC = new File(Settings.getInstance().getBackUpDir() + File.separator
+                    + Settings.getInstance().DEFAULT_DATA_DIR + File.separator);
+            // copy Data dir to Back
+            if (dataDir.exists()) {
+                if (dataBakDC.exists()) {
+                    try {
+                        Files.walkFileTree(dataBakDC.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+                    } catch (IOException e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
+                }
+                try {
+                    FileUtils.copyDirectory(dataDir, dataBakDC);
+                    LOGGER.info("Copy DataChain to BackUp");
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+        }
+
     }
 
     /**
@@ -854,7 +948,19 @@ public class Controller extends Observable {
 
         // WAITING STOP MAIN PROCESS
         LOGGER.info("Waiting stopping processors");
+
         while (blockGenerator.getStatus() >= 0) {
+            try {
+                Thread.sleep(100);
+            } catch (Exception e) {
+            }
+        }
+
+        if (dcSet.isBusy())
+            LOGGER.info("DCSet is busy...");
+
+        int i = 0;
+        while (i++ < 10000 && dcSet.isBusy()) {
             try {
                 Thread.sleep(100);
             } catch (Exception e) {
@@ -869,6 +975,11 @@ public class Controller extends Observable {
         LOGGER.info("Closing wallet");
         this.wallet.close();
 
+        // CLOSE LOCAL
+
+        LOGGER.info("Closing Local database");
+        this.dbSet.close();
+
         // CLOSE telegram
         LOGGER.info("Closing telegram");
         this.telegramStore.close();
@@ -882,56 +993,6 @@ public class Controller extends Observable {
 
     }
 
-    private void createDataCheckpoint() {
-        if (!this.dcSet.getBlockMap().isProcessing()) {
-            // && Settings.getInstance().isCheckpointingEnabled()) {
-            // this.dcSet.close();
-
-            File dataDir = new File(Settings.getInstance().getDataDir());
-            File dataLoc = new File(Settings.getInstance().getLocalDir());
-
-            File dataBakDC = new File(Settings.getInstance().getBackUpDir() + File.separator
-                    + Settings.getInstance().DEFAULT_DATA_DIR + File.separator);
-            File dataBakLoc = new File(Settings.getInstance().getBackUpDir() + File.separator
-                    + Settings.getInstance().DEFAULT_LOCAL_DIR + File.separator);
-            // copy Data dir to Back
-            if (dataDir.exists()) {
-                if (dataBakDC.exists()) {
-                    try {
-                        Files.walkFileTree(dataBakDC.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-                    } catch (IOException e) {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                }
-                try {
-                    FileUtils.copyDirectory(dataDir, dataBakDC);
-                    LOGGER.info("Copy DataChain to BackUp");
-                } catch (IOException e) {
-                    LOGGER.error(e.getMessage(), e);
-                }
-
-            }
-            // copy Loc dir to Back
-            if (dataLoc.exists()) {
-                if (dataBakLoc.exists()) {
-                    try {
-                        Files.walkFileTree(dataBakLoc.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-                    } catch (IOException e) {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                }
-                try {
-                    FileUtils.copyDirectory(dataLoc, dataBakLoc);
-                    LOGGER.info("Copy DataLocal to BackUp");
-                } catch (IOException e) {
-                    LOGGER.error(e.getMessage(), e);
-                }
-
-            }
-
-        }
-
-    }
 
     // NETWORK
 
