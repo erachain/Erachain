@@ -960,9 +960,9 @@ public class Controller extends Observable {
             LOGGER.info("DCSet is busy...");
 
         int i = 0;
-        while (i++ < 10000 && dcSet.isBusy()) {
+        while (i++ < 20 && dcSet.isBusy()) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(1000);
             } catch (Exception e) {
             }
         }
