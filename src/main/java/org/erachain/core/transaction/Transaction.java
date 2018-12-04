@@ -1006,7 +1006,6 @@ public abstract class Transaction {
             transaction.put("signature", "genesis");
             height = 1;
         } else {
-            height = this.getBlockHeight();
             transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
             transaction.put("creator", this.creator.getAddress());
             transaction.put("signature", this.signature == null ? "null" : Base58.encode(this.signature));
@@ -1015,9 +1014,9 @@ public abstract class Transaction {
             transaction.put("version", Byte.toUnsignedInt(this.typeBytes[1]));
             transaction.put("property1", Byte.toUnsignedInt(this.typeBytes[2]));
             transaction.put("property2", Byte.toUnsignedInt(this.typeBytes[3]));
-            if (this.block != null) {
-                transaction.put("height", height); //this.block.getHeightByParent(localDCSet));
-                transaction.put("sequence", this.getSeqNo());
+            if (this.height > 0) {
+                transaction.put("height", this.height);
+                transaction.put("sequence", this.seqNo);
             }
         }
 
