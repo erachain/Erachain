@@ -10,11 +10,11 @@ import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
-import org.erachain.datachain.IDB;
+import org.erachain.database.IDB;
+import org.erachain.settings.Settings;
 import org.mapdb.Atomic.Var;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
-import org.erachain.settings.Settings;
 
 import java.io.File;
 
@@ -136,6 +136,11 @@ public class DWSet implements IDB {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public void openDBSet() {
+
     }
 
     public byte[] getLastBlockSignature() {
@@ -348,6 +353,7 @@ public class DWSet implements IDB {
 
     }
 
+    @Override
     public void commit() {
         this.uses++;
         this.database.commit();
@@ -355,6 +361,7 @@ public class DWSet implements IDB {
 
     }
 
+    @Override
     public void close() {
         if (this.database != null) {
             if (!this.database.isClosed()) {

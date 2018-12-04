@@ -4,6 +4,7 @@ package org.erachain.datachain;
 
 import org.erachain.controller.Controller;
 import org.erachain.database.DBMap;
+import org.erachain.database.IDB;
 import org.erachain.database.wallet.DWSet;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -48,7 +49,7 @@ public abstract class DCMap<T, U> extends Observable {
         this.createIndexes(database);
     }
 
-    public DCMap(DCMap<T, U> parent, DCSet dcSet) {
+    public DCMap(DCMap<T, U> parent, IDB dcSet) {
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"

@@ -1,10 +1,10 @@
 package org.erachain.database.wallet;
 
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.settings.Settings;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Serializer;
-import org.erachain.settings.Settings;
 
 import java.io.File;
 
@@ -29,7 +29,7 @@ public class SecureWalletDatabase {
 
         this.database = DBMaker.newFileDB(SECURE_WALLET_FILE)
                 .encryptionEnable(password)
-                .closeOnJvmShutdown()
+                // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 .cacheSize(2048)
                 .checksumEnable()
                 .mmapFileEnableIfSupported()
