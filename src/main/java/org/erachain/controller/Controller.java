@@ -938,20 +938,15 @@ public class Controller extends Observable {
 
         // STOP BLOCK PROCESSOR
         LOGGER.info("Stopping block processor");
-        // boolean a = this.blockGenerator.isAlive() ;
-        // this.blockGenerator.interrupt();
-        // a = this.blockGenerator.isAlive() ;
-        // while(this.blockGenerator.isAlive()){
-        // };
-
         this.synchronizer.stop();
 
         // WAITING STOP MAIN PROCESS
         LOGGER.info("Waiting stopping processors");
 
-        while (blockGenerator.getStatus() >= 0) {
+        int i = 0;
+        while (i++ < 10 && blockGenerator.getStatus() > 0) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(1000);
             } catch (Exception e) {
             }
         }
@@ -959,7 +954,7 @@ public class Controller extends Observable {
         if (dcSet.isBusy())
             LOGGER.info("DCSet is busy...");
 
-        int i = 0;
+        i = 0;
         while (i++ < 20 && dcSet.isBusy()) {
             try {
                 Thread.sleep(1000);
