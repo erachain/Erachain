@@ -62,76 +62,76 @@ public class WEB_Transactions_HTML {
         int type = transaction.getType();
         switch (type) {
             case Transaction.SEND_ASSET_TRANSACTION:
-                out = out + r_Send_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + r_Send_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.ISSUE_ASSET_TRANSACTION:
-                out = out + issue_Asset_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + issue_Asset_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.ISSUE_PERSON_TRANSACTION:
-                out = out + issue_Person_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + issue_Person_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.ISSUE_POLL_TRANSACTION:
-                //out= out+ issue_Person_HTML(transaction, langObj) + get_Vouches(transaction);
+                //out= out+ issue_Person_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.ISSUE_IMPRINT_TRANSACTION:
-                out = out + issue_Imprint_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + issue_Imprint_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.ISSUE_TEMPLATE_TRANSACTION:
-                out = out + issue_Template_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + issue_Template_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.ISSUE_STATUS_TRANSACTION:
-                out = out + issue_Status_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + issue_Status_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.ISSUE_UNION_TRANSACTION:
-                out = out + issue_Union_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + issue_Union_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.VOUCH_TRANSACTION:
-                out = out + vouch_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + vouch_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.SIGN_NOTE_TRANSACTION:
-                out = out + sign_Note_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + sign_Note_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
-                out = out + serttify_Pub_Key_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + serttify_Pub_Key_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
-                out = out + set_Status_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + set_Status_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.HASHES_RECORD:
-                out = out + hash_Record_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + hash_Record_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.CREATE_ORDER_TRANSACTION:
-                out = out + create_Order_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + create_Order_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.CANCEL_ORDER_TRANSACTION:
-                out = out + cancel_Order_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + cancel_Order_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.CREATE_POLL_TRANSACTION:
-                out = out + create_Poll_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + create_Poll_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.VOTE_ON_POLL_TRANSACTION:
-                out = out + vate_On_Poll_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + vate_On_Poll_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION:
-                out = out + genesis_Certify_Person_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + genesis_Certify_Person_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
-                out = out + genesis_Issue_Asset_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + genesis_Issue_Asset_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.GENESIS_ISSUE_TEMPLATE_TRANSACTION:
-                out = out + genesis_Issue_Template_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + genesis_Issue_Template_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.GENESIS_ISSUE_PERSON_TRANSACTION:
-                out = out + genesis_Certify_Person_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + genesis_Certify_Person_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
-                out = out + genesis_Send_Asset_HTML(transaction, langObj) + get_Vouches(transaction);
+                out = out + genesis_Send_Asset_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             default:
                 out += "<br>" + transaction.toJson();
         }
         //		out += "<br>" +transaction.toJson();
-        out += "<br><a href ='/org.erachain.api/recordrawbynumber/" + tras_json.get("block") + "-" + tras_json.get("seq") + "'> RAW </a>";
+        out += "<br><a href ='/api/recordrawbynumber/" + tras_json.get("block") + "-" + tras_json.get("seq") + "'> RAW </a>";
         return out;
     }
 
@@ -380,10 +380,10 @@ public class WEB_Transactions_HTML {
 		/*out += "<b>" + Lang.getInstance().translate_from_langObj("height-seq.", langObj) + ":</b> <a href=?tx="
 				+  Base58.encode(record.getSignature()) + get_Lang(langObj) + ">" + vouchRecord.getVouchHeight() + "-"
 				+ vouchRecord.getVouchSeqNo() + "</a><br>"; */
-        out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> ";
-
-        out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td><td>";
-        out += "<td>" + get_HTML(record, langObj) + "</table><br>";
+        //out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b>";
+      //  out += "<b>" + Lang.getInstance().translate_from_langObj("Vouch Record", langObj) + ":</b> ";
+        out += "<b>"+ Lang.getInstance().translate_from_langObj("Vouch Record", langObj) + ": </b> <a href='?tx=" + record.viewSignature() + get_Lang(langObj) + "'> " ;
+        out += record.getBlockHeight()+ "-" + record.getSeqNo() +"</a> <br>";
         // LABEL DESCRIPTION
 
         return out;
@@ -530,7 +530,7 @@ public class WEB_Transactions_HTML {
 
     }
 
-    private String get_Vouches(Transaction transaction) {
+    public String get_Vouches(Transaction transaction, JSONObject langObj) {
 
 
         Statements_Vouch_Table_Model model = new Statements_Vouch_Table_Model(transaction);
