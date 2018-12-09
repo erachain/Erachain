@@ -206,7 +206,7 @@ public class ConnectionCreator extends Thread {
                         if (peer.connect(callback) == 0) {
                             LOGGER.info("connected!!! " + peer.getAddress().getHostAddress());
                             // TRY CONNECT to WHITE peers of this PEER
-                            connectToPeersOfThisPeer(peer, 2);
+                            connectToPeersOfThisPeer(peer, 3);
                         }
 
                     }
