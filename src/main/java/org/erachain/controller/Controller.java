@@ -1,8 +1,10 @@
 package org.erachain.controller;
 
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.erachain.Start;
 import org.erachain.api.ApiClient;
 import org.erachain.api.ApiService;
 import org.erachain.at.AT;
@@ -618,6 +620,40 @@ public class Controller extends Observable {
         if (Controller.useGui)
             about_frame.set_console_Text(Lang.getInstance().translate("Open Wallet"));
         this.wallet = new Wallet();
+
+        if (Start.seedCommand != null && Start.seedCommand.length > 1) {
+            /// 0 - Accounts number, 1 - seed, 2 - password, [3 - path]
+            byte[] seed;
+            try {
+                seed = Base58.decode(Start.seedCommand[1]);
+            } catch (Exception e) {
+                seed = null;
+            }
+
+            if (seed != null) {
+
+                int accsNum;
+                try {
+                    accsNum = Ints.tryParse(Start.seedCommand[0]);
+                } catch (Exception e) {
+                    accsNum = 0;
+                }
+
+                if (accsNum > 0) {
+
+                    String path;
+                    if (Start.seedCommand.length == 4) {
+                        path = Start.seedCommand[3];
+                    } else {
+                        path = Settings.getInstance().getWalletDir();
+                    }
+
+                    boolean res = recoverWallet(seed, Start.seedCommand[2], accsNum, path);
+                    Start.seedCommand = null;
+                }
+            }
+
+        }
 
         if (this.wallet.isWalletDatabaseExisting()) {
             this.wallet.initiateItemsFavorites();
