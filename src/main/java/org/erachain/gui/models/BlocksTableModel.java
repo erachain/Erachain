@@ -229,11 +229,11 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
         DCSet dcSet = DCSet.getInstance();
         Block.BlockHead head = cntr.getLastBlock().blockHead;
         int i = 0;
-        while (i <= maxSize) {
+        while (i++ <= maxSize) {
             if (head == null)
                 return;
             this.blocks.add(head);
-            head = cntr.getBlockHead(head.heightBlock - ++i);
+            head = cntr.getBlockHead(head.heightBlock - 1);
         }
     }
 

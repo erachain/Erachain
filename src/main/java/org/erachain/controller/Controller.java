@@ -118,8 +118,8 @@ public class Controller extends Observable {
     public static final int STATUS_SYNCHRONIZING = 1;
     public static final int STATUS_OK = 2;
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
-    private static final String version = "4.11.06 alpha release";
-    private static final String buildTime = "2017-11-19 15:33:33 UTC";
+    private static final String version = "4.11.07 beta";
+    private static final String buildTime = "2018-12-04 13:33:33 UTC";
     public static boolean useGui = true;
     private static List<Thread> threads = new ArrayList<Thread>();
     private static long buildTimestamp;
@@ -960,9 +960,9 @@ public class Controller extends Observable {
             LOGGER.info("DCSet is busy...");
 
         int i = 0;
-        while (i++ < 10000 && dcSet.isBusy()) {
+        while (i++ < 20 && dcSet.isBusy()) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(1000);
             } catch (Exception e) {
             }
         }
