@@ -95,6 +95,7 @@ public class Network extends Observable implements ConnectionCallback {
             //ADD TO CONNECTED PEERS
             synchronized (this.knownPeers) {
                 this.knownPeers.add(peer);
+                peer.setName("Peer: " +peer.getAddress().getHostAddress());
             }
         }
 
@@ -626,14 +627,24 @@ public class Network extends Observable implements ConnectionCallback {
 
         this.run = false;
         this.onMessage(null);
-        while (!this.knownPeers.isEmpty()) {
-            try {
-                this.knownPeers.get(0).close();
-                this.knownPeers.remove(0); // icreator
-            } catch (Exception e) {
-
+        int size = knownPeers.size();
+        try {
+            for (int i =0; i<size; i++){
+                Peer pp = knownPeers.get(i);
+               // Close Peer
+                pp.close();
+                // Waite for Closed
+                while(pp.isAlive()){
+                    pp.close();
+                }
+                // delete from list Peer
+              //     knownPeers.remove(i);
             }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        knownPeers.clear();
         // stop thread
         this.acceptor.halt();
         // wait for thread stop;

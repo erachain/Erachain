@@ -3918,8 +3918,8 @@ public class BlockExplorer {
                       //  hasHes += i + " " + ss.get("File_Name") + "<br>";
 
                         hasHes += i + " " + ss.get("File_Name");
-                        hasHes += "<a href = '../apidocuments/getFile?download=false&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("File_Name") + "'> View </a><br>";
-                        hasHes += "<a href = '../apidocuments/getFile?download=true&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("File_Name") + "'> Download </a><br>";
+                        hasHes += "<a href = '../apidocuments/getFile?download=false&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("File_Name") + "'> " + Lang.getInstance().translate_from_langObj("View", langObj) + " </a><br>";
+                        hasHes += "<a href = '../apidocuments/getFile?download=true&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("File_Name") + "'> " + Lang.getInstance().translate_from_langObj("Download", langObj) + " </a><br>";
                     }
 
                     str_HTML += hasHes + "<br>";
@@ -3948,8 +3948,8 @@ public class BlockExplorer {
 
                     //    hasHes += i + " " + ss.get("FN") + "<br>";
                         hasHes +=  i + " " + ss.get("FN");
-                        hasHes += "<a href ='../apidocuments/getFile?download=false&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("FN") + "'> View </a>";
-                        hasHes += "<a href ='../apidocuments/getFile?download=true&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("FN") + "'>  Download</a><br>";
+                        hasHes += "<a href ='../apidocuments/getFile?download=false&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("FN")  + "'> " + Lang.getInstance().translate_from_langObj("View", langObj) + " </a>";
+                        hasHes += "<a href ='../apidocuments/getFile?download=true&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("FN") + "'> " + Lang.getInstance().translate_from_langObj("Download", langObj) + "</a><br>";
                     }
 
                     str_HTML += hasHes + "<br>";
@@ -4026,12 +4026,12 @@ public class BlockExplorer {
         // output.put("description", person.getDescription());
 
         // vouchers
-        output.put("Label_vouchs", Lang.getInstance().translate_from_langObj("Certified", langObj));
+        /* output.put("Label_vouchs", Lang.getInstance().translate_from_langObj("Certified", langObj));
         output.put("Label_accounts_table_adress", Lang.getInstance().translate_from_langObj("Address", langObj));
         output.put("Label_accounts_table_data", Lang.getInstance().translate_from_langObj("Date", langObj));
         output.put("Label_accounts_table_creator", Lang.getInstance().translate_from_langObj("Creator", langObj));
 
-        Map vouchesJSON = new LinkedHashMap();
+       Map vouchesJSON = new LinkedHashMap();
 
         WEB_Statements_Vouch_Table_Model table_sing_model = null;//new WEB_Statements_Vouch_Table_Model(trans);
         if (table_sing_model== null) return output;
@@ -4058,6 +4058,9 @@ public class BlockExplorer {
             }
         }
         output.put("vouches", vouchesJSON);
+        */
+        output.put("vouches_table", WEB_Transactions_HTML.getInstance().get_Vouches(trans, langObj));
+
 
         return output;
     }

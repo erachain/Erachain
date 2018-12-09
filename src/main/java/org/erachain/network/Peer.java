@@ -416,13 +416,11 @@ public class Peer extends Thread {
         byte[] messageMagic = null;
         DataInputStream in = null;
 
-        while (true) {
+        while (runed) {
 
 
             // CHECK connection
-            if (socket == null || !socket.isConnected() || socket.isClosed()
-                    || !runed
-                    ) {
+            if (socket == null || !socket.isConnected() || socket.isClosed()) {
 
                 try {
                     Thread.sleep(1000);
