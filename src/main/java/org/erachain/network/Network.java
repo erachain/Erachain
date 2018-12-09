@@ -628,22 +628,17 @@ public class Network extends Observable implements ConnectionCallback {
         this.run = false;
         this.onMessage(null);
         int size = knownPeers.size();
-        try {
-            for (int i =0; i<size; i++){
-                Peer pp = knownPeers.get(i);
-               // Close Peer
-                pp.close();
-                // Waite for Closed
-                while(pp.isAlive()){
-                    pp.close();
-                }
-                // delete from list Peer
-              //     knownPeers.remove(i);
-            }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        for (int i =0; i<size; i++){
+           // HALT Peer
+            knownPeers.get(i).halt();
+            try {
+                knownPeers.get(i).join();
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
         }
+
         knownPeers.clear();
         // stop thread
         this.acceptor.halt();
