@@ -7,13 +7,12 @@ import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
 import org.erachain.gui.library.Issue_Confirm_Dialog;
 import org.erachain.lang.Lang;
-import org.erachain.utils.Logging;
 import org.erachain.settings.Settings;
+import org.erachain.utils.Logging;
 import org.erachain.utils.SysTray;
 import org.erachain.webserver.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -41,6 +40,7 @@ public class Start {
     private static final Logger LOGGER = LoggerFactory.getLogger(Start.class);
     private static AboutFrame about_frame;
     private static String info;
+    public static String[] seedCommand;
 
     public static void main(String args[]) throws IOException {
 
@@ -55,41 +55,36 @@ public class Start {
         for (String arg : args) {
             if (arg.equals("-cli")) {
                 cli = true;
-            }
-            // backUP data
-            if (arg.equals("-backup")) {
+            } else if (arg.equals("-backup")) {
+                // backUP data
                 backUP = true;
 
+            } else if (arg.equals("-nogui")) {
+                Controller.useGui = false;
 
-            } else {
-                if (arg.equals("-nogui")) {
+            } else if (arg.startsWith("-seed=") && arg.length() > 6) {
+                seedCommand = arg.substring(6).split(":");
 
-                    Controller.useGui = false;
+            } else if (arg.startsWith("-pass=") && arg.length() > 6) {
+                pass = arg.substring(6);
 
-                }
+            } else if (arg.startsWith("-peers=") && arg.length() > 7) {
+                Settings.getInstance().setDefaultPeers(arg.substring(7).split(","));
 
-                if (arg.startsWith("-pass=") && arg.length() > 6) {
-                    pass = arg.substring(6);
-                }
+            } else if (arg.equals("-testnet")) {
+                Settings.getInstance().setGenesisStamp(System.currentTimeMillis());
 
-                if (arg.startsWith("-peers=") && arg.length() > 7) {
-                    Settings.getInstance().setDefaultPeers(arg.substring(7).split(","));
-                }
+            } else if (arg.startsWith("-testnet=") && arg.length() > 9) {
+                try {
+                    long testnetstamp = Long.parseLong(arg.substring(9));
 
-                if (arg.equals("-testnet")) {
-                    Settings.getInstance().setGenesisStamp(System.currentTimeMillis());
-                } else if (arg.startsWith("-testnet=") && arg.length() > 9) {
-                    try {
-                        long testnetstamp = Long.parseLong(arg.substring(9));
-
-                        if (testnetstamp == 0) {
-                            testnetstamp = System.currentTimeMillis();
-                        }
-
-                        Settings.getInstance().setGenesisStamp(testnetstamp);
-                    } catch (Exception e) {
-                        Settings.getInstance().setGenesisStamp(BlockChain.DEFAULT_MAINNET_STAMP);
+                    if (testnetstamp == 0) {
+                        testnetstamp = System.currentTimeMillis();
                     }
+
+                    Settings.getInstance().setGenesisStamp(testnetstamp);
+                } catch (Exception e) {
+                    Settings.getInstance().setGenesisStamp(BlockChain.DEFAULT_MAINNET_STAMP);
                 }
             }
         }
