@@ -58,7 +58,7 @@ public class DWSet implements IDB {
 
     public DWSet() {
         //OPEN WALLET
-    	WALLET_FILE = new File(Settings.getInstance().getWalletDir(), "wallet.dat");
+        WALLET_FILE = new File(Settings.getInstance().getDataWalletDir(), "wallet.dat");
         WALLET_FILE.getParentFile().mkdirs();
 
         //DELETE TRANSACTIONS

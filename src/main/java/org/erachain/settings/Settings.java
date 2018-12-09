@@ -24,19 +24,20 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 //import java.util.Arrays;
 // import org.slf4j.LoggerFactory;
 
 public class Settings {
-
     //private static final String[] DEFAULT_PEERS = { };
     public static final String DEFAULT_THEME = "System";
     public static final int DEFAULT_ACCOUNTS = 1;
     //DATA
     public static final String DEFAULT_DATA_DIR = "datachain";
     public static final String DEFAULT_LOCAL_DIR = "datalocal";
-    public static final String DEFAULT_WALLET_DIR = "wallet";
+    public static final String DEFAULT_WALLET_DIR = "walletKeys";
+    private static final String DEFAULT_DATAWALET_DIR = "dataWallet";
     public static final String DEFAULT_BACKUP_DIR = "backup";
     public static final String DEFAULT_TEMP_DIR = "temp";
     public static final String DEFAULT_TELEGRAM_DIR = "datagram";
@@ -105,6 +106,7 @@ public class Settings {
     private String tmpPath;
     private String getBackUpPath;
     private String getWalletPath;
+    private String getDataWalletPath;
     private String dataPath;
     private String telegramDefaultSender;
     private String telegramDefaultReciever;
@@ -148,10 +150,16 @@ public class Settings {
     }
 
     public static Settings getInstance() {
-        if (instance == null) {
-            instance = new Settings();
-        }
+        ReentrantLock lock = new ReentrantLock();
+        lock.lock();
+        try {
+            if (instance == null) {
 
+                instance = new Settings();
+            }
+        } finally {
+            lock.unlock();
+        }
         return instance;
     }
 
@@ -188,11 +196,19 @@ public class Settings {
 			if (this.getWalletPath.equals("")) return this.userPath + DEFAULT_WALLET_DIR;
 			return this.getWalletPath;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			return this.userPath + DEFAULT_WALLET_DIR;
 		}
     }
-    
+
+    public String getDataWalletDir() {
+        try {
+            if (this.getDataWalletPath.equals("")) return this.userPath + DEFAULT_DATAWALET_DIR;
+            return this.getWalletPath;
+        } catch (Exception e) {
+            return this.userPath + DEFAULT_DATAWALET_DIR;
+        }
+    }
+
     public void setWalletDir(String dir) {
        
 			this.getWalletPath = dir;
