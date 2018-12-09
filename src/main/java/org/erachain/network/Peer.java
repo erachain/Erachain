@@ -45,6 +45,7 @@ public class Peer extends Thread {
     private long pingCounter;
     private long connectionTime;
     private boolean runed;
+    private boolean stoped;
     private int errors;
     private int requestKey = 0;
     private long sendedBeforePing = 0l;
@@ -416,11 +417,13 @@ public class Peer extends Thread {
         byte[] messageMagic = null;
         DataInputStream in = null;
 
-        while (runed) {
+        while (!stoped) {
 
 
             // CHECK connection
-            if (socket == null || !socket.isConnected() || socket.isClosed()) {
+            if (socket == null || !socket.isConnected() || socket.isClosed()
+                    || !runed
+            ) {
 
                 try {
                     Thread.sleep(1000);
@@ -798,4 +801,9 @@ public class Peer extends Thread {
         }
     }
 
+    public void halt() {
+
+        this.stoped = true;
+        this.close();
+    }
 }

@@ -77,16 +77,9 @@ task CopyResourse {
     copy {
             from 'ERA'
             into 'build/libs/' + versionEra + '/bin'
-           // include '*.bat'
-        // include '*.properties'
             include 'Erachain Licence*'
             include 'peers*'
         }
-    copy {
-        from "ERA"
-        into 'build/libs/' + versionEra + '/bin'
-        include '*.bat'
-    }
 
     copy {
             from 'ERA/web'
