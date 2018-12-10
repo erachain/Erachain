@@ -4,9 +4,9 @@ package org.erachain.network;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.PeersMessage;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.settings.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -23,6 +23,92 @@ public class ConnectionCreator extends Thread {
     public ConnectionCreator(ConnectionCallback callback) {
         this.callback = callback;
         this.setName("Thread ConnectionCreator - " + this.getId());
+    }
+
+    private int connectToPeersOfThisPeer(Peer peer, int maxReceivePeers) {
+
+        LOGGER.info("GET peers from: " + peer.getName() + " get max: " + maxReceivePeers);
+
+        //CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE
+        if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true))
+            return 0;
+
+        //ASK PEER FOR PEERS
+        Message getPeersMessage = MessageFactory.getInstance().createGetPeersMessage();
+        long start = System.currentTimeMillis();
+        PeersMessage peersMessage = (PeersMessage) peer.getResponse(getPeersMessage);
+        if (peersMessage == null) {
+            return 0;
+        }
+
+        peer.setPing((int) (System.currentTimeMillis() - start));
+
+        int foreignPeersCounter = 0;
+        //FOR ALL THE RECEIVED PEERS
+
+        for (Peer newPeer : peersMessage.getPeers()) {
+
+            if (!this.isRun)
+                return 0;
+
+            if (foreignPeersCounter >= maxReceivePeers) {
+                // FROM EACH peer get only maxReceivePeers
+                break;
+            }
+
+            if (Network.isMyself(newPeer.getAddress())) {
+                continue;
+            }
+
+            //CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE
+            if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true))
+                break;
+
+            //CHECK IF THAT PEER IS NOT BLACKLISTED
+            if (PeerManager.getInstance().isBanned(newPeer))
+                continue;
+
+            //CHECK IF SOCKET IS NOT LOCALHOST
+            if (newPeer.getAddress().isSiteLocalAddress()
+                    || newPeer.getAddress().isLoopbackAddress()
+                    || newPeer.getAddress().isAnyLocalAddress())
+                continue;
+
+            if (!Settings.getInstance().isTryingConnectToBadPeers() && newPeer.isBad())
+                continue;
+
+            //CHECK IF ALREADY CONNECTED TO PEER
+            //CHECK IF PEER ALREADY used
+            newPeer = callback.getKnownPeer(newPeer);
+            if (newPeer.isUsed()) {
+                continue;
+            }
+
+            // TODO small height not use
+            //Controller.getInstance().getMyHeight();
+            // newPeer.
+            if (newPeer.isBanned())
+                continue;
+
+            if (!this.isRun)
+                return 0;
+
+
+            //CONNECT
+            newPeer.connect(callback);
+            if (newPeer.isUsed()) {
+                foreignPeersCounter++;
+
+                LOGGER.info("connected to BRANCH and recurse: " + newPeer.getAddress().getHostAddress());
+
+                // RECURSE to OTHER PEERS
+                connectToPeersOfThisPeer(newPeer, maxReceivePeers >> 1);
+
+            }
+        }
+
+        return foreignPeersCounter;
+
     }
 
     public void run() {
@@ -61,6 +147,8 @@ public class ConnectionCreator extends Thread {
 
                         if (!this.isRun)
                             return;
+
+                        LOGGER.info("try connect to: " + peer.getAddress().getHostAddress());
 
                         //CHECK IF WE ALREADY HAVE MIN CONNECTIONS
                         if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true)) {
@@ -103,6 +191,9 @@ public class ConnectionCreator extends Thread {
                         //CONNECT
                         //CHECK IF ALREADY CONNECTED TO PEER
                         if (peer.connect(callback) == 0) {
+                            LOGGER.info("connected!!! " + peer.getAddress().getHostAddress());
+                            // TRY CONNECT to WHITE peers of this PEER
+                            connectToPeersOfThisPeer(peer, 4);
                         }
 
                     }
@@ -122,87 +213,8 @@ public class ConnectionCreator extends Thread {
                         if (peer.isBanned())
                             continue;
 
-                        //CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE
-                        if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true) << 1)
-                            break;
+                        connectToPeersOfThisPeer(peer, callback.getActivePeersCounter(true) >> 2);
 
-                        //ASK PEER FOR PEERS
-                        Message getPeersMessage = MessageFactory.getInstance().createGetPeersMessage();
-                        long start = System.currentTimeMillis();
-                        PeersMessage peersMessage = (PeersMessage) peer.getResponse(getPeersMessage);
-                        if (peersMessage != null) {
-                            peer.setPing((int) (System.currentTimeMillis() - start));
-
-                            int foreignPeersCounter = 0;
-                            //FOR ALL THE RECEIVED PEERS
-
-                            for (Peer newPeer : peersMessage.getPeers()) {
-
-                                if (!this.isRun)
-                                    return;
-
-                                if (Network.isMyself(newPeer.getAddress())) {
-                                    continue;
-                                }
-                                //CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE
-                                if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true) << 1)
-                                    break;
-
-                                if (foreignPeersCounter >= maxReceivePeers) {
-                                    // FROM EACH peer get only maxReceivePeers
-                                    break;
-                                }
-
-                                //CHECK IF THAT PEER IS NOT BLACKLISTED
-                                if (PeerManager.getInstance().isBanned(newPeer))
-                                    continue;
-
-                                //CHECK IF SOCKET IS NOT LOCALHOST
-                                if (newPeer.getAddress().isSiteLocalAddress()
-                                        || newPeer.getAddress().isLoopbackAddress()
-                                        || newPeer.getAddress().isAnyLocalAddress())
-                                    continue;
-
-                                if (!Settings.getInstance().isTryingConnectToBadPeers() && newPeer.isBad())
-                                    continue;
-
-                                //CHECK IF ALREADY CONNECTED TO PEER
-                                //CHECK IF PEER ALREADY used
-                                newPeer = callback.getKnownPeer(newPeer);
-                                if (newPeer.isUsed()) {
-                                    continue;
-                                }
-
-                                // TODO small height not use
-                                //Controller.getInstance().getMyHeight();
-                                // newPeer.
-                                if (newPeer.isBanned())
-                                    continue;
-
-                                if (!this.isRun)
-                                    return;
-								
-								/*
-								int maxReceivePeersForPrint = (maxReceivePeers > peersMessage.getPeers().size()) ? peersMessage.getPeers().size() : maxReceivePeers;  
-								LOGGER.info(
-									Lang.getInstance().translate("Connecting to peer %newpeer% proposed by %peer% :: %foreignPeersCounter% / %maxReceivePeersForPrint% / %allReceivePeers% :: Connections: %activeConnections%")
-										.replace("%newpeer%", newPeer.getAddress().getHostAddress())
-										.replace("%peer%", peer.getAddress().getHostAddress())
-										.replace("%foreignPeersCounter%", String.valueOf(foreignPeersCounter))
-										.replace("%maxReceivePeersForPrint%", String.valueOf(maxReceivePeersForPrint))
-										.replace("%allReceivePeers%", String.valueOf(peersMessage.getPeers().size()))
-										.replace("%activeConnections%", String.valueOf(callback.getActivePeersCounter(false)))
-										);
-										*/
-
-
-                                //CONNECT
-                                newPeer.connect(callback);
-                                if (newPeer.isUsed()) {
-                                    foreignPeersCounter++;
-                                }
-                            }
-                        }
                     }
                 }
 
@@ -210,13 +222,21 @@ public class ConnectionCreator extends Thread {
                 int counter = callback.getActivePeersCounter(false);
                 if (counter < 6)
                     continue;
-                else if (counter < 10)
-                    Thread.sleep(10000);
-                else
-                    Thread.sleep(20000);
+
+                int needMinConnections = Settings.getInstance().getMinConnections();
+                int maxConnections = Settings.getInstance().getMaxConnections();
+
+                if (counter < needMinConnections)
+                    Thread.sleep(1000);
+                else {
+                    if (counter < needMinConnections + ((maxConnections - needMinConnections) >> 1))
+                        Thread.sleep(5000);
+                    else
+                        Thread.sleep(10000);
+                }
 
             } catch (Exception e) {
-                //LOGGER.error(e.getMessage(),e);
+                LOGGER.error(e.getMessage(),e);
             }
         }
     }
