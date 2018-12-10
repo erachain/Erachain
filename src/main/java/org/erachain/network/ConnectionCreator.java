@@ -4,9 +4,9 @@ package org.erachain.network;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.PeersMessage;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.settings.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -115,7 +115,7 @@ public class ConnectionCreator extends Thread {
                 LOGGER.info("connected to BRANCH and recurse: " + newPeer.getAddress().getHostAddress());
 
                 // RECURSE to OTGER PEERS
-                connectToPeersOfThisPeer(newPeer, maxReceivePeers);
+                connectToPeersOfThisPeer(newPeer, maxReceivePeers >> 1);
 
             }
         }
@@ -206,7 +206,7 @@ public class ConnectionCreator extends Thread {
                         if (peer.connect(callback) == 0) {
                             LOGGER.info("connected!!! " + peer.getAddress().getHostAddress());
                             // TRY CONNECT to WHITE peers of this PEER
-                            connectToPeersOfThisPeer(peer, 3);
+                            connectToPeersOfThisPeer(peer, 4);
                         }
 
                     }
