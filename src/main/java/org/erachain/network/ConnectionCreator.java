@@ -93,19 +93,6 @@ public class ConnectionCreator extends Thread {
             if (!this.isRun)
                 return 0;
 
-                            /*
-                            int maxReceivePeersForPrint = (maxReceivePeers > peersMessage.getPeers().size()) ? peersMessage.getPeers().size() : maxReceivePeers;
-                            LOGGER.info(
-                                Lang.getInstance().translate("Connecting to peer %newpeer% proposed by %peer% :: %foreignPeersCounter% / %maxReceivePeersForPrint% / %allReceivePeers% :: Connections: %activeConnections%")
-                                    .replace("%newpeer%", newPeer.getAddress().getHostAddress())
-                                    .replace("%peer%", peer.getAddress().getHostAddress())
-                                    .replace("%foreignPeersCounter%", String.valueOf(foreignPeersCounter))
-                                    .replace("%maxReceivePeersForPrint%", String.valueOf(maxReceivePeersForPrint))
-                                    .replace("%allReceivePeers%", String.valueOf(peersMessage.getPeers().size()))
-                                    .replace("%activeConnections%", String.valueOf(callback.getActivePeersCounter(false)))
-                                    );
-                                    */
-
 
             //CONNECT
             newPeer.connect(callback);
@@ -114,7 +101,7 @@ public class ConnectionCreator extends Thread {
 
                 LOGGER.info("connected to BRANCH and recurse: " + newPeer.getAddress().getHostAddress());
 
-                // RECURSE to OTGER PEERS
+                // RECURSE to OTHER PEERS
                 connectToPeersOfThisPeer(newPeer, maxReceivePeers >> 1);
 
             }
