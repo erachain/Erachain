@@ -95,7 +95,7 @@ function statement(data){
 		return '<h2>' + data.error + '</h2>';
 	}
 	
-	output += lastBlock(data.lastBlock);
+	//output += lastBlock(data.lastBlock);
 
 	output += '<table><tr><td>';
 	output +='<div style="word-wrap: break-word;  width: 800px;">';
@@ -111,7 +111,7 @@ function statement(data){
 // vouches	
 	output +='<br><br>' + data.statement;
 	output +='</div>';
-	output +=   '</td></tr></table>';
+/*	output +=   '</td></tr></table>';
 	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
 	output += '<tr><td align=left>';
 	output += '<br>' + data.Label_vouchs +':<br>';
@@ -133,7 +133,11 @@ function statement(data){
 	}
 	
 	output += '</table><br>';
-			
+	*/
+	if(data.hasOwnProperty('vouches_table')){
+ output +=data.vouches_table;
+ 
+ }	
 	return output;
 
 

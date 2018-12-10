@@ -1,8 +1,10 @@
 package org.erachain.controller;
 
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.erachain.Start;
 import org.erachain.api.ApiClient;
 import org.erachain.api.ApiService;
 import org.erachain.at.AT;
@@ -118,8 +120,8 @@ public class Controller extends Observable {
     public static final int STATUS_SYNCHRONIZING = 1;
     public static final int STATUS_OK = 2;
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
-    private static final String version = "4.11.06 alpha release";
-    private static final String buildTime = "2017-11-19 15:33:33 UTC";
+    private static final String version = "4.11.07 beta";
+    private static final String buildTime = "2018-12-04 13:33:33 UTC";
     public static boolean useGui = true;
     private static List<Thread> threads = new ArrayList<Thread>();
     private static long buildTimestamp;
@@ -517,7 +519,7 @@ public class Controller extends Observable {
             // TODO Auto-generated catch block
             // e1.printStackTrace();
             reCreateDB();
-            LOGGER.error("Error during startup detected trying to restore backup DataLocale...");
+            LOGGER.error("Error during startup detected trying to recreate DataLocale...");
         }
 
         // OPENING DATABASES
@@ -618,6 +620,40 @@ public class Controller extends Observable {
         if (Controller.useGui)
             about_frame.set_console_Text(Lang.getInstance().translate("Open Wallet"));
         this.wallet = new Wallet();
+
+        if (Start.seedCommand != null && Start.seedCommand.length > 1) {
+            /// 0 - Accounts number, 1 - seed, 2 - password, [3 - path]
+            byte[] seed;
+            try {
+                seed = Base58.decode(Start.seedCommand[1]);
+            } catch (Exception e) {
+                seed = null;
+            }
+
+            if (seed != null) {
+
+                int accsNum;
+                try {
+                    accsNum = Ints.tryParse(Start.seedCommand[0]);
+                } catch (Exception e) {
+                    accsNum = 0;
+                }
+
+                if (accsNum > 0) {
+
+                    String path;
+                    if (Start.seedCommand.length == 4) {
+                        path = Start.seedCommand[3];
+                    } else {
+                        path = Settings.getInstance().getWalletDir();
+                    }
+
+                    boolean res = recoverWallet(seed, Start.seedCommand[2], accsNum, path);
+                    Start.seedCommand = null;
+                }
+            }
+
+        }
 
         if (this.wallet.isWalletDatabaseExisting()) {
             this.wallet.initiateItemsFavorites();
@@ -746,8 +782,6 @@ public class Controller extends Observable {
     public DBSet reCreateDB() throws IOException, Exception {
 
         File dataLocal = new File(Settings.getInstance().getLocalDir());
-        File dataLocalBackUp = new File(Settings.getInstance().getBackUpDir() + File.separator
-                + Settings.getInstance().DEFAULT_LOCAL_DIR + File.separator);
 
         // del DataLocal
         if (dataLocal.exists()) {
@@ -757,20 +791,39 @@ public class Controller extends Observable {
                 LOGGER.error(e.getMessage(), e);
             }
         }
-        // copy Loc dir to Back
-        if (dataLocalBackUp.exists()) {
 
-            try {
-                FileUtils.copyDirectory(dataLocalBackUp, dataLocal);
-                LOGGER.info("Restore BackUp/DataLocal to DataLocal is Ok");
-            } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
-            }
-
-        }
         DBSet.reCreateDatabase();
         this.dbSet = DBSet.getinstanse();
         return this.dbSet;
+    }
+
+    private void createDataCheckpoint() {
+        if (!this.dcSet.getBlockMap().isProcessing()) {
+            // && Settings.getInstance().isCheckpointingEnabled()) {
+            // this.dcSet.close();
+
+            File dataDir = new File(Settings.getInstance().getDataDir());
+
+            File dataBakDC = new File(Settings.getInstance().getBackUpDir() + File.separator
+                    + Settings.getInstance().DEFAULT_DATA_DIR + File.separator);
+            // copy Data dir to Back
+            if (dataDir.exists()) {
+                if (dataBakDC.exists()) {
+                    try {
+                        Files.walkFileTree(dataBakDC.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+                    } catch (IOException e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
+                }
+                try {
+                    FileUtils.copyDirectory(dataDir, dataBakDC);
+                    LOGGER.info("Copy DataChain to BackUp");
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+        }
+
     }
 
     /**
@@ -921,20 +974,15 @@ public class Controller extends Observable {
 
         // STOP BLOCK PROCESSOR
         LOGGER.info("Stopping block processor");
-        // boolean a = this.blockGenerator.isAlive() ;
-        // this.blockGenerator.interrupt();
-        // a = this.blockGenerator.isAlive() ;
-        // while(this.blockGenerator.isAlive()){
-        // };
-
         this.synchronizer.stop();
 
         // WAITING STOP MAIN PROCESS
         LOGGER.info("Waiting stopping processors");
 
-        while (blockGenerator.getStatus() >= 0) {
+        int i = 0;
+        while (i++ < 10 && blockGenerator.getStatus() > 0) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(1000);
             } catch (Exception e) {
             }
         }
@@ -942,10 +990,10 @@ public class Controller extends Observable {
         if (dcSet.isBusy())
             LOGGER.info("DCSet is busy...");
 
-        int i = 0;
-        while (i++ < 10000 && dcSet.isBusy()) {
+        i = 0;
+        while (i++ < 20 && dcSet.isBusy()) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(1000);
             } catch (Exception e) {
             }
         }
@@ -976,56 +1024,6 @@ public class Controller extends Observable {
 
     }
 
-    private void createDataCheckpoint() {
-        if (!this.dcSet.getBlockMap().isProcessing()) {
-            // && Settings.getInstance().isCheckpointingEnabled()) {
-            // this.dcSet.close();
-
-            File dataDir = new File(Settings.getInstance().getDataDir());
-            File dataLoc = new File(Settings.getInstance().getLocalDir());
-
-            File dataBakDC = new File(Settings.getInstance().getBackUpDir() + File.separator
-                    + Settings.getInstance().DEFAULT_DATA_DIR + File.separator);
-            File dataBakLoc = new File(Settings.getInstance().getBackUpDir() + File.separator
-                    + Settings.getInstance().DEFAULT_LOCAL_DIR + File.separator);
-            // copy Data dir to Back
-            if (dataDir.exists()) {
-                if (dataBakDC.exists()) {
-                    try {
-                        Files.walkFileTree(dataBakDC.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-                    } catch (IOException e) {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                }
-                try {
-                    FileUtils.copyDirectory(dataDir, dataBakDC);
-                    LOGGER.info("Copy DataChain to BackUp");
-                } catch (IOException e) {
-                    LOGGER.error(e.getMessage(), e);
-                }
-
-            }
-            // copy Loc dir to Back
-            if (dataLoc.exists()) {
-                if (dataBakLoc.exists()) {
-                    try {
-                        Files.walkFileTree(dataBakLoc.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-                    } catch (IOException e) {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                }
-                try {
-                    FileUtils.copyDirectory(dataLoc, dataBakLoc);
-                    LOGGER.info("Copy DataLocal to BackUp");
-                } catch (IOException e) {
-                    LOGGER.error(e.getMessage(), e);
-                }
-
-            }
-
-        }
-
-    }
 
     // NETWORK
 
