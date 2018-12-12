@@ -55,26 +55,37 @@ public class Start {
         for (String arg : args) {
             if (arg.equals("-cli")) {
                 cli = true;
-            } else if (arg.equals("-backup")) {
+                continue;
+            }
+
+            if (arg.equals("-backup")) {
                 // backUP data
                 backUP = true;
+                continue;
+            }
 
-            } else if (arg.equals("-nogui")) {
+            if (arg.equals("-nogui")) {
                 Controller.useGui = false;
+                continue;
+            }
 
-            } else if (arg.startsWith("-seed=") && arg.length() > 6) {
+            if (arg.startsWith("-seed=") && arg.length() > 6) {
                 seedCommand = arg.substring(6).split(":");
-
-            } else if (arg.startsWith("-pass=") && arg.length() > 6) {
+                continue;
+            }
+            if (arg.startsWith("-pass=") && arg.length() > 6) {
                 pass = arg.substring(6);
-
-            } else if (arg.startsWith("-peers=") && arg.length() > 7) {
+                continue;
+            }
+            if (arg.startsWith("-peers=") && arg.length() > 7) {
                 Settings.getInstance().setDefaultPeers(arg.substring(7).split(","));
-
-            } else if (arg.equals("-testnet")) {
+                continue;
+            }
+            if (arg.equals("-testnet")) {
                 Settings.getInstance().setGenesisStamp(System.currentTimeMillis());
-
-            } else if (arg.startsWith("-testnet=") && arg.length() > 9) {
+                continue;
+            }
+            if (arg.startsWith("-testnet=") && arg.length() > 9) {
                 try {
                     long testnetstamp = Long.parseLong(arg.substring(9));
 
