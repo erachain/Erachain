@@ -96,21 +96,19 @@ public class ConnectionAcceptor extends Thread {
             } catch (Exception e) {
 
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 } catch (InterruptedException es) {
-                    try {
-                        socket.close();
-                    } catch (IOException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
-                    break;
-                }
-                {
                 }
 
+                try {
+                    socket.close();
+                } catch (IOException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
                 //LOGGER.info(e.getMessage(),e);
                 //LOGGER.info(Lang.getInstance().translate("Error accepting new connection") + " - " + e.getMessage());
+                break;
             }
             if (this.isInterrupted()) break;
         }
@@ -119,6 +117,8 @@ public class ConnectionAcceptor extends Thread {
 
     public void halt() {
         //this.interrupt();
+        this.isRun = false;
+
         try {
             socket.close();
         } catch (IOException e) {
@@ -126,6 +126,5 @@ public class ConnectionAcceptor extends Thread {
             e.printStackTrace();
         }
 
-        this.isRun = false;
     }
 }
