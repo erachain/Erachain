@@ -478,7 +478,7 @@ public class MTable<U, T> extends JTable {
             });
          
         // set selected row
-        this.getModel().addTableModelListener(new TableModelListener() {      
+        this.getModel().addTableModelListener(new TableModelListener() {
                
                
                 @Override
@@ -487,12 +487,12 @@ public class MTable<U, T> extends JTable {
              //       TableCellEditor editor=jTable_Peers.getCellEditor();
              //       if (editor!=null) editor.cancelCellEditing();
 
-                  
+                   if(getSelectionModel().getMaxSelectionIndex()<0)return;
                    if (selectedRow <0) selectedRow =0;
               //      final int col=0;
                 //    if (row<0||col<0) return;
 
-                    SwingUtilities.invokeLater(new Runnable() {
+                SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             // http://book.javanb.com/the-java-developers-almanac-1-4/egs/javax.swing.table/Sel.html
