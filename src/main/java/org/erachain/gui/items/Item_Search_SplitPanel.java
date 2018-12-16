@@ -61,14 +61,14 @@ public class Item_Search_SplitPanel extends Item_SplitPanel {
                     @Override
                     public void run() {
                         search_Table_Model.Find_item_from_key(key_Item.getText());
-                        if (search_Table_Model.getRowCount() < 1) {
-                            Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found"));
-                            jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
-                            jScrollPane_jPanel_RightPanel.setViewportView(null);
+                        if (search_Table_Model.getRowCount() > 0) {
+                            jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+                            jTable_jScrollPanel_LeftPanel. getSelectionModel().addSelectionInterval(0, 0);
                             return;
                         }
-                        jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
-                        jTable_jScrollPanel_LeftPanel. getSelectionModel().addSelectionInterval(0, 0);
+                        Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found"));
+                        jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+                        jScrollPane_jPanel_RightPanel.setViewportView(null);
                     }
                 }.start();
             }
