@@ -426,7 +426,10 @@ public class BlockChain {
             genesisBlock.process(dcSet);
 
         } else {
-            if (!dcSet.getBlockSignsMap().contains(genesisBlock.getSignature())) {
+
+            // TRY compare GENESIS BLOCK SIGNATURE
+            if (!Arrays.equals(dcSet.getBlockMap().get(1).getSignature(),
+                    genesisBlock.getSignature())) {
 
                 throw new Exception("wrong DB for GENESIS BLOCK");
             }
