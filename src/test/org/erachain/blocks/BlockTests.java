@@ -146,6 +146,8 @@ public class BlockTests {
     @Test
     public void validateGenesisBlock() {
 
+        gb = new GenesisBlock();
+
         //CHECK IF VALID
         assertEquals(true, gb.isValid(db, false));
 
