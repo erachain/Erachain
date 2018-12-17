@@ -1,6 +1,7 @@
 package org.erachain.network;
 // 30/03
 
+import org.erachain.controller.Controller;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.PeersMessage;
@@ -26,6 +27,9 @@ public class ConnectionCreator extends Thread {
     }
 
     private int connectToPeersOfThisPeer(Peer peer, int maxReceivePeers) {
+
+        if (!this.isRun)
+            return 0;
 
         LOGGER.info("GET peers from: " + peer.getName() + " get max: " + maxReceivePeers);
 
@@ -126,6 +130,9 @@ public class ConnectionCreator extends Thread {
 
                 Thread.sleep(100);
 
+                if (!this.isRun)
+                    return;
+
                 int maxReceivePeers = 4; // Settings.getInstance().getMaxReceivePeers();
 
                 //CHECK IF WE NEED NEW CONNECTIONS
@@ -206,6 +213,7 @@ public class ConnectionCreator extends Thread {
                     //avoids Exception when adding new elements
                     List<Peer> peers = callback.getActivePeers(false);
                     for (int i = 0; i < callback.getActivePeersCounter(false); i++) {
+
                         if (!this.isRun)
                             return;
 
@@ -225,6 +233,10 @@ public class ConnectionCreator extends Thread {
 
                 int needMinConnections = Settings.getInstance().getMinConnections();
                 int maxConnections = Settings.getInstance().getMaxConnections();
+
+                if (!this.isRun)
+                    return;
+
 
                 if (counter < needMinConnections)
                     Thread.sleep(1000);

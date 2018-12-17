@@ -623,6 +623,12 @@ public class Network extends Observable implements ConnectionCallback {
 
     public void stop() {
 
+        // stop thread
+        this.creator.halt();
+
+        // stop thread
+        this.acceptor.halt();
+
         this.telegramer.halt();
 
         this.run = false;
@@ -640,11 +646,7 @@ public class Network extends Observable implements ConnectionCallback {
         }
 
         knownPeers.clear();
-        // stop thread
-        this.acceptor.halt();
         // wait for thread stop;
         while (this.acceptor.isAlive()) ;
-        // stop thread
-        this.creator.halt();
     }
 }
