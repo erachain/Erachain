@@ -7,6 +7,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.BlockFactory;
 import org.erachain.core.block.GenesisBlock;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.GenesisIssueAssetTransaction;
 import org.erachain.core.transaction.GenesisTransferAssetTransaction;
@@ -118,14 +119,16 @@ public class BlockTests {
     @Test
     public void validateSignatureGenesisBlock() {
 
+        gb = new GenesisBlock();
+
         //CHECK IF SIGNATURE VALID
         LOGGER.info("getGeneratorSignature " + gb.getSignature().length
-                + " : " + gb.getSignature());
+                + " : " + Base58.encode(gb.getSignature()));
 
         assertEquals(true, gb.isSignatureValid());
 
         //ADD TRANSACTION SIGNATURE
-        LOGGER.info("getGeneratorSignature " + gb.getSignature());
+        LOGGER.info("getGeneratorSignature " + Base58.encode(gb.getSignature()));
 
         //ADD a GENESIS TRANSACTION for invalid SIGNATURE
         List<Transaction> transactions = gb.getTransactions();
