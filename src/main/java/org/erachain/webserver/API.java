@@ -3,7 +3,7 @@ package org.erachain.webserver;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
-import org.erachain.core.BlockGenerator;;
+import org.erachain.core.BlockGenerator;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -18,9 +18,11 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.*;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.gui.transaction.OnDealClick;
+import org.erachain.settings.Settings;
+import org.erachain.utils.APIUtils;
+import org.erachain.utils.Pair;
+import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -28,10 +30,8 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
-import org.erachain.settings.Settings;
-import org.erachain.utils.APIUtils;
-import org.erachain.utils.Pair;
-import org.erachain.utils.StrJSonFine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -45,6 +45,8 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
+;
 
 
 @SuppressWarnings({"unchecked", "rawtypes"})
@@ -731,7 +733,7 @@ public class API {
         if (Controller.getInstance().broadcastTelegram(transaction, true)) {
             out.put("status", "ok");
         } else {
-            out.put("error", "already exist");
+            out.put("status", "exist");
         }
         out.put("signature", Base58.encode(transaction.getSignature()));
         return out;
