@@ -43,8 +43,8 @@ public class Settings {
     public static final String DEFAULT_TELEGRAM_DIR = "datagram";
     private static final Logger LOGGER = LoggerFactory.getLogger(Settings.class);
     //NETWORK
-    private static final int DEFAULT_MIN_CONNECTIONS = 20; // for OWN maked connections
-    private static final int DEFAULT_MAX_CONNECTIONS = 32;
+    private static final int DEFAULT_MIN_CONNECTIONS = 10; // for OWN maked connections
+    private static final int DEFAULT_MAX_CONNECTIONS = 100;
     // EACH known PEER may send that whit peers to me - not white peer may be white peer for me
     private static final int DEFAULT_MAX_RECEIVE_PEERS = 100;
     private static final int DEFAULT_MAX_SENT_PEERS = DEFAULT_MAX_RECEIVE_PEERS;

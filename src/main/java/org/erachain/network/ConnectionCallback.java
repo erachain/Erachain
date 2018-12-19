@@ -24,6 +24,8 @@ public interface ConnectionCallback {
 
     int getActivePeersCounter(boolean onlyWhite);
 
+    List<Peer> getIncomedPeers();
+
     Peer getKnownPeer(Peer peer);
 
     void onMessage(Message message);
