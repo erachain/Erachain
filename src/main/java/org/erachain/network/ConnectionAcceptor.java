@@ -9,9 +9,12 @@ import org.erachain.settings.Settings;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
+import java.util.Random;
 
 /**
  * приемник содинения - отвечает на входящие запросы и создает канал связи
+ * запускает первый слушатель и ждет входящего соединения
  */
 public class ConnectionAcceptor extends Thread {
 
@@ -28,9 +31,11 @@ public class ConnectionAcceptor extends Thread {
     public void run() {
         this.isRun = true;
 
+        Random random = new Random();
 
         PeerMap map = Controller.getInstance().getDBSet().getPeerMap();
         while (this.isRun && !this.isInterrupted()) {
+
             try {
 
                 if (socket == null) {
@@ -38,67 +43,46 @@ public class ConnectionAcceptor extends Thread {
                     socket = new ServerSocket(Controller.getInstance().getNetworkPort());
                 }
 
+                //REOPEN SOCKET
+                if (socket.isClosed()) {
+                    socket = new ServerSocket(Controller.getInstance().getNetworkPort());
+                }
+
+                //ACCEPT CONNECTION
+                Socket connectionSocket = socket.accept();
+
+                //CHECK IF SOCKET IS NOT LOCALHOST || WE ARE ALREADY CONNECTED TO THAT SOCKET || BLACKLISTED
+                if (
+                        map.isBanned(connectionSocket.getInetAddress().getAddress())
+                        ) {
+                    //DO NOT CONNECT TO OURSELF/EXISTING CONNECTION
+                    // or BANNED
+                    connectionSocket.close();
+                    continue;
+                }
+
+                if (!this.isRun)
+                    break;
+
+                //CREATE PEER
+                ////new Peer(callback, connectionSocket);
+                //LOGGER.info("START ACCEPT CONNECT FROM " + connectionSocket.getInetAddress().getHostAddress()
+                //		+ " isMy:" + Network.isMyself(connectionSocket.getInetAddress())
+                //		+ " my:" + Network.getMyselfAddress());
+
+                callback.startPeer(connectionSocket);
 
                 //CHECK IF WE HAVE MAX CONNECTIONS CONNECTIONS
                 if (Settings.getInstance().getMaxConnections() <= callback.getActivePeersCounter(false)) {
-                    //IF SOCKET IS OPEN CLOSE IT
-                    if (!socket.isClosed()) {
-                        socket.close();
-                    }
-
-                    //Thread.sleep(50);
-                } else {
-                    //REOPEN SOCKET
-                    if (socket.isClosed()) {
-                        socket = new ServerSocket(Controller.getInstance().getNetworkPort());
-                    }
-
-                    //ACCEPT CONNECTION
-                    Socket connectionSocket = socket.accept();
-
-
-                    //CHECK IF SOCKET IS NOT LOCALHOST || WE ARE ALREADY CONNECTED TO THAT SOCKET || BLACKLISTED
-                    if (
-                        /*connectionSocket.getInetAddress().isSiteLocalAddress()
-                         * || connectionSocket.getInetAddress().isAnyLocalAddress()
-                         * || connectionSocket.getInetAddress().isLoopbackAddress()
-                         *  */
-							
-							/*
-							(
-									(NTP.getTime() < Transaction.getPOWFIX_RELEASE() ) 
-									&& 
-									callback.isConnectedTo(connectionSocket.getInetAddress())
-							)
-							||
-							*/
-                            map.isBanned(connectionSocket.getInetAddress().getAddress())
-                            )
-
-                    {
-                        //DO NOT CONNECT TO OURSELF/EXISTING CONNECTION
-                        // or BANNED
-                        connectionSocket.close();
-                    } else {
-
-                        if (!this.isRun)
-                            break;
-
-                        //CREATE PEER
-                        ////new Peer(callback, connectionSocket);
-                        //LOGGER.info("START ACCEPT CONNECT FROM " + connectionSocket.getInetAddress().getHostAddress()
-                        //		+ " isMy:" + Network.isMyself(connectionSocket.getInetAddress())
-                        //		+ " my:" + Network.getMyselfAddress());
-
-                        callback.startPeer(connectionSocket);
+                    // get only income peers;
+                    List<Peer> incomePeers = callback.getIncomedPeers();
+                    if (incomePeers != null && !incomePeers.isEmpty()) {
+                        Peer peer = incomePeers.get(random.nextInt((incomePeers.size())));
+                        peer.ban(0, "Clear place for new connection");
                     }
                 }
+
             } catch (Exception e) {
-
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException es) {
-                }
 
                 try {
                     socket.close();

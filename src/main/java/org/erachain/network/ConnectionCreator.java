@@ -11,13 +11,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+//
 /**
  * класс поиска каналов связи - подключается к внешним узлам создавая пиры
- * смотрит сколько соединений уже есть и если еще недостаточно то цепляется ко всему что сможет
+ * смотрит сколько соединений во вне (white) уже есть и если еще недостаточно то цепляется ко всему что сможет
  */
 public class ConnectionCreator extends Thread {
 
-    private static final Logger LOGGER = LoggerFactory            .getLogger(ConnectionCreator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionCreator.class);
     private ConnectionCallback callback;
     private boolean isRun;
 
@@ -67,6 +68,12 @@ public class ConnectionCreator extends Thread {
             //CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE
             if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true))
                 break;
+
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                LOGGER.error(e.getMessage(), e);
+            }
 
             //CHECK IF THAT PEER IS NOT BLACKLISTED
             if (PeerManager.getInstance().isBanned(newPeer))
@@ -118,138 +125,133 @@ public class ConnectionCreator extends Thread {
     public void run() {
         this.isRun = true;
 
-        int sleep_time = 0;
-
         List<Peer> knownPeers = null;
-        int needloadCountMax = 1000;
-        int needloadCount = needloadCountMax;
 
         while (isRun) {
 
             try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                LOGGER.error(e.getMessage(), e);
+            }
 
-                Thread.sleep(100);
+            if (!this.isRun)
+                return;
 
-                if (!this.isRun)
-                    return;
+            //CHECK IF WE NEED NEW CONNECTIONS
+            if (this.isRun && Settings.getInstance().getMinConnections() >= callback.getActivePeersCounter(true)) {
 
-                int maxReceivePeers = 4; // Settings.getInstance().getMaxReceivePeers();
+                //GET LIST OF KNOWN PEERS
+                knownPeers = PeerManager.getInstance().getKnownPeers();
 
-                //CHECK IF WE NEED NEW CONNECTIONS
-                if (this.isRun && Settings.getInstance().getMinConnections() >= callback.getActivePeersCounter(true)) {
+                //ITERATE knownPeers
+                for (Peer peer : knownPeers) {
 
-                    needloadCount++;
-                    if (needloadCount > needloadCountMax) {
-                        // try update banned peers each minute
-                        //GET LIST OF KNOWN PEERS
-                        knownPeers = PeerManager.getInstance().getKnownPeers();
-                        needloadCount = 0;
+                    //CHECK IF WE ALREADY HAVE MIN CONNECTIONS
+                    if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true)) {
+                        // stop use KNOWN peers
+                        break;
                     }
 
-                    //ITERATE knownPeers
-                    for (Peer peer : knownPeers) {
-                        if (Network.isMyself(peer.getAddress())) {
-                            continue;
-                        }
-
-                        if (!this.isRun)
-                            return;
-
-                        LOGGER.info("try connect to: " + peer.getAddress().getHostAddress());
-
-                        //CHECK IF WE ALREADY HAVE MIN CONNECTIONS
-                        if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true)) {
-                            // stop use KNOWN peers
-                            break;
-                        }
-
-                        //CHECK IF SOCKET IS NOT LOCALHOST
-                        //if(true)
-                        if (peer.getAddress().isSiteLocalAddress()
-                                || peer.getAddress().isLoopbackAddress()
-                                || peer.getAddress().isAnyLocalAddress()) {
-                            continue;
-                        }
-
-                        //CHECK IF ALREADY CONNECTED TO PEER
-                        //CHECK IF PEER ALREADY used
-                        // new PEER from NETWORK poll or original from DB
-                        peer = callback.getKnownPeer(peer);
-                        if (peer.isUsed()) {
-                            continue;
-                        }
-
-                        if (peer.isBanned())
-                            continue;
-
-                        if (!this.isRun)
-                            return;
-
-						/*
-						LOGGER.info(
-								Lang.getInstance().translate("Connecting to known peer %peer% :: %knownPeersCounter% / %allKnownPeers% :: Connections: %activeConnections%")
-									.replace("%peer%", peer.getAddress().getHostAddress())
-									.replace("%knownPeersCounter%", String.valueOf(knownPeersCounter))
-									.replace("%allKnownPeers%", String.valueOf(knownPeers.size()))
-									.replace("%activeConnections%", String.valueOf(callback.getActivePeersCounter(false)))
-									);
-									*/
-
-                        //CONNECT
-                        //CHECK IF ALREADY CONNECTED TO PEER
-                        if (peer.connect(callback) == 0) {
-                            LOGGER.info("connected!!! " + peer.getAddress().getHostAddress());
-                            // TRY CONNECT to WHITE peers of this PEER
-                            connectToPeersOfThisPeer(peer, 4);
-                        }
-
+                    if (Network.isMyself(peer.getAddress())) {
+                        continue;
                     }
-                }
 
-                //CHECK IF WE STILL NEED NEW CONNECTIONS
-                // USE unknown peers from known peers
-                if (this.isRun && Settings.getInstance().getMinConnections() >= callback.getActivePeersCounter(true)) {
-                    //OLD SCHOOL ITERATE activeConnections
-                    //avoids Exception when adding new elements
-                    List<Peer> peers = callback.getActivePeers(false);
-                    for (int i = 0; i < callback.getActivePeersCounter(false); i++) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        LOGGER.error(e.getMessage(),e);
+                    }
 
-                        if (!this.isRun)
-                            return;
+                    if (!this.isRun)
+                        return;
 
-                        Peer peer = peers.get(i);
-                        if (peer.isBanned())
-                            continue;
+                    //CHECK IF SOCKET IS NOT LOCALHOST
+                    //if(true)
+                    if (peer.getAddress().isSiteLocalAddress()
+                            || peer.getAddress().isLoopbackAddress()
+                            || peer.getAddress().isAnyLocalAddress()) {
+                        continue;
+                    }
 
-                        connectToPeersOfThisPeer(peer, callback.getActivePeersCounter(true) >> 2);
+                    //CHECK IF ALREADY CONNECTED TO PEER
+                    //CHECK IF PEER ALREADY used
+                    // new PEER from NETWORK poll or original from DB
+                    peer = callback.getKnownPeer(peer);
+                    if (peer.isUsed()) {
+                        continue;
+                    }
 
+                    if (peer.isBanned())
+                        continue;
+
+                    if (!this.isRun)
+                        return;
+
+                    LOGGER.info("try connect to: " + peer.getAddress().getHostAddress());
+
+                    /*
+                    LOGGER.info(
+                            Lang.getInstance().translate("Connecting to known peer %peer% :: %knownPeersCounter% / %allKnownPeers% :: Connections: %activeConnections%")
+                                .replace("%peer%", peer.getAddress().getHostAddress())
+                                .replace("%knownPeersCounter%", String.valueOf(knownPeersCounter))
+                                .replace("%allKnownPeers%", String.valueOf(knownPeers.size()))
+                                .replace("%activeConnections%", String.valueOf(callback.getActivePeersCounter(true)))
+                                );
+                                */
+
+                    //CONNECT
+                    //CHECK IF ALREADY CONNECTED TO PEER
+                    if (peer.connect(callback) == 0) {
+                        LOGGER.info("connected!!! " + peer.getAddress().getHostAddress());
+                        // TRY CONNECT to WHITE peers of this PEER
+                        connectToPeersOfThisPeer(peer, 4);
                     }
                 }
+            }
 
-                //SLEEP
-                int counter = callback.getActivePeersCounter(false);
-                if (counter < 6)
-                    continue;
+            //CHECK IF WE STILL NEED NEW CONNECTIONS
+            // USE unknown peers from known peers
+            if (this.isRun && Settings.getInstance().getMinConnections() >= callback.getActivePeersCounter(true)) {
+                //OLD SCHOOL ITERATE activeConnections
+                //avoids Exception when adding new elements
+                List<Peer> peers = callback.getActivePeers(false);
+                for (Peer peer: peers) {
 
-                int needMinConnections = Settings.getInstance().getMinConnections();
-                int maxConnections = Settings.getInstance().getMaxConnections();
+                    if (!this.isRun)
+                        return;
 
-                if (!this.isRun)
-                    return;
+                    if (peer.isBanned())
+                        continue;
 
+                    if (Settings.getInstance().getMinConnections() >= callback.getActivePeersCounter(true)) {
+                        break;
+                    }
 
+                    connectToPeersOfThisPeer(peer, Settings.getInstance().getMinConnections());
+
+                }
+            }
+
+            //SLEEP
+            int counter = callback.getActivePeersCounter(true);
+            if (counter < 6)
+                continue;
+
+            int needMinConnections = Settings.getInstance().getMinConnections();
+
+            if (!this.isRun)
+                return;
+
+            try {
                 if (counter < needMinConnections)
                     Thread.sleep(1000);
-                else {
-                    if (counter < needMinConnections + ((maxConnections - needMinConnections) >> 1))
-                        Thread.sleep(5000);
-                    else
-                        Thread.sleep(10000);
-                }
-
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(),e);
+                else
+                    Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                LOGGER.error(e.getMessage(), e);
             }
+
         }
     }
 

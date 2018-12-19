@@ -234,6 +234,19 @@ public class Network extends Observable implements ConnectionCallback {
         return counter;
     }
 
+    public List<Peer> getIncomedPeers() {
+
+        List<Peer> incomedPeers = new ArrayList<Peer>();
+        synchronized (this.knownPeers) {
+            for (Peer peer : this.knownPeers) {
+                if (peer.isUsed())
+                    if (!peer.isWhite())
+                        incomedPeers.add(peer);
+            }
+        }
+        return incomedPeers;
+    }
+
     public boolean addTelegram(TelegramMessage telegram) {
         return this.telegramer.pipeAddRemove(telegram, null, 0);
     }
