@@ -141,9 +141,8 @@ public class Controller extends Observable {
     private Synchronizer synchronizer;
     private TransactionCreator transactionCreator;
     private boolean needSyncWallet = false;
-    private Timer timer = new Timer();
-    private Timer timerUnconfirmed = new Timer();
-    private Timer timerPeerHeightUpdate = new Timer();
+    private Timer timer;
+    private Timer timerUnconfirmed;
     private Random random = new SecureRandom();
     private byte[] foundMyselfID = new byte[128];
     private byte[] messageMagic;
@@ -691,33 +690,6 @@ public class Controller extends Observable {
             }
         });
 
-        if (false) {
-            // TIMER TO SEND HEIGHT TO NETWORK EVERY 5 MIN
-
-            this.timerPeerHeightUpdate.cancel();
-            this.timerPeerHeightUpdate = new Timer();
-
-            TimerTask action = new TimerTask() {
-                @Override
-                public void run() {
-
-                    if (Controller.getInstance().getStatus() == STATUS_OK) {
-                        List<Peer> peers = Controller.getInstance().getActivePeers();
-                        int peersCounter = peers.size();
-                        if (peersCounter > 0) {
-                            Peer peer = peers.get(random.nextInt(peers.size()));
-                            if (peer != null) {
-                                Controller.getInstance().sendMyHWeightToPeer(peer);
-                            }
-                        }
-                    }
-                }
-            };
-
-            this.timerPeerHeightUpdate.schedule(action, BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 4,
-                    BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2);
-        }
-
         if (Settings.getInstance().isTestnet())
             this.status = STATUS_OK;
 
@@ -1263,51 +1235,53 @@ public class Controller extends Observable {
     public void actionAfterConnect() {
 
         ///////// UNCONFIRMED MAP CLEAR
-        this.timerUnconfirmed.cancel();
-        this.timerUnconfirmed = new Timer();
+        if (this.timerUnconfirmed == null) {
+            this.timerUnconfirmed = new Timer();
 
-        TimerTask actionUnconfirmed = new TimerTask() {
-            @Override
-            public void run() {
+            TimerTask actionUnconfirmed = new TimerTask() {
+                @Override
+                public void run() {
 
-                // LOGGER.debug("timerUnconfirmed ---------------- ");
-                Controller.getInstance().clearUnconfirmedRecords();
+                    // LOGGER.debug("timerUnconfirmed ---------------- ");
+                    Controller.getInstance().clearUnconfirmedRecords();
 
-            }
-        };
+                }
+            };
 
-        this.timerUnconfirmed.schedule(actionUnconfirmed, BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1);
+            this.timerUnconfirmed.schedule(actionUnconfirmed, BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1);
+        }
 
         if (// BlockChain.HARD_WORK ||
                 !this.doesWalletExists() || !this.useGui)
             return;
 
-        this.timer.cancel();
-        this.timer = new Timer();
+        if (this.timer == null) {
+            this.timer = new Timer();
 
-        TimerTask action = new TimerTask() {
-            @Override
-            public void run() {
+            TimerTask action = new TimerTask() {
+                @Override
+                public void run() {
 
-                // LOGGER.error("actionAfterConnect --->>>>>> ");
+                    // LOGGER.error("actionAfterConnect --->>>>>> ");
 
-                if (Controller.getInstance().getStatus() == STATUS_OK) {
-                    // Controller.getInstance().statusInfo();
+                    if (Controller.getInstance().getStatus() == STATUS_OK) {
+                        // Controller.getInstance().statusInfo();
 
-                    Controller.getInstance().setToOfflineTime(0L);
+                        Controller.getInstance().setToOfflineTime(0L);
 
-                    if (false && (Controller.getInstance().isNeedSyncWallet() // || checkNeedSyncWallet()
-                    )
-                            && !Controller.getInstance().isProcessingWalletSynchronize()) {
-                        // LOGGER.error("actionAfterConnect --->>>>>>
-                        // synchronizeWallet");
-                        Controller.getInstance().synchronizeWallet();
+                        if (false && (Controller.getInstance().isNeedSyncWallet() // || checkNeedSyncWallet()
+                        )
+                                && !Controller.getInstance().isProcessingWalletSynchronize()) {
+                            // LOGGER.error("actionAfterConnect --->>>>>>
+                            // synchronizeWallet");
+                            Controller.getInstance().synchronizeWallet();
+                        }
                     }
                 }
-            }
-        };
+            };
 
-        this.timer.schedule(action, BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1);
+            this.timer.schedule(action, BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1);
+        }
 
     }
 

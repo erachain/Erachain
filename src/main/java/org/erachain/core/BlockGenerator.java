@@ -524,8 +524,20 @@ public class BlockGenerator extends Thread implements Observer {
                                 return;
                             }
 
-                            wait_new_block_broadcast = (BlockChain.WIN_TIMEPOINT >> 1)
-                                    + BlockChain.WIN_TIMEPOINT * 4 * (int) ((previousTarget - winned_winValue) / previousTarget);
+                            if (true) {
+                                wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1;
+                                int koeff_123 = (int) ((((previousTarget - winned_winValue) * 10) / previousTarget));
+                                wait_new_block_broadcast = wait_new_block_broadcast + wait_new_block_broadcast * koeff_123;
+                            } else {
+                                wait_new_block_broadcast = (BlockChain.WIN_TIMEPOINT >> 1)
+                                        + BlockChain.WIN_TIMEPOINT * 4 * (int) ((previousTarget - winned_winValue) / previousTarget);
+                            }
+
+                            if (wait_new_block_broadcast < (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 3)) {
+                                wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 3;
+                            } else if (wait_new_block_broadcast > BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
+                                wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+                            }
 
                             newWinner = false;
                             if (wait_new_block_broadcast > 0) {
