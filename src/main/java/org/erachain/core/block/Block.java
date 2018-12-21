@@ -1896,9 +1896,9 @@ public class Block {
 
     public String toString(DCSet dcSet) {
         
-        return this.forgingValue != 0? " GB: " + this.forgingValue : "" //this.calcWinValueTargeted()
+        return "[" + this.getHeight() + "]"
+                + (this.winValue != 0? " GB: " + this.winValue : "")
                 + " recs: " + this.transactionCount
-                + " H: " + this.getHeight()
                 + " C: " + this.getCreator().getPersonAsString();
     }
 

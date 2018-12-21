@@ -26,7 +26,7 @@ public class PeersTableModel extends AbstractTableModel implements Observer {
     private static final int COLUMN_VERSION = 7;
     String[] columnNames = new String[] { "IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago",
             "Online Time", "Version" };
-    private Timer timer = new Timer();
+    private Timer timer;
     private List<Peer> peers;
     List<Peer> peersView = new ArrayList<Peer>();
     int view = 1;
@@ -38,24 +38,25 @@ public class PeersTableModel extends AbstractTableModel implements Observer {
     public PeersTableModel() {
         Controller.getInstance().addActivePeersObserver(this);
 
-        this.timer.cancel();
-        this.timer = new Timer();
+        if (this.timer == null) {
+            this.timer = new Timer();
 
-        TimerTask action = new TimerTask() {
-            public void run() {
-                try {
-                    fireTableDataChanged();
-                } catch (Exception e) {
-                    // LOGGER.error(e.getMessage(),e);
+            TimerTask action = new TimerTask() {
+                public void run() {
+                    try {
+                        fireTableDataChanged();
+                    } catch (Exception e) {
+                        // LOGGER.error(e.getMessage(),e);
+                    }
                 }
-            }
-        };
+            };
 
-        this.timer.schedule(action,
-                // Settings.getInstance().getPingInterval()>>1,
-                5000,
-                // Settings.getInstance().getPingInterval()
-                5000);
+            this.timer.schedule(action,
+                    // Settings.getInstance().getPingInterval()>>1,
+                    5000,
+                    // Settings.getInstance().getPingInterval()
+                    5000);
+        }
     }
 
     // sort to Reliable
