@@ -197,8 +197,11 @@ public class Peer extends Thread {
             //START PINGER
             if (this.pinger == null)
                 this.pinger = new Pinger(this);
-            else
+            else {
                 this.pinger.setPing(Integer.MAX_VALUE);
+                this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
+            }
+
 
             // IT is STARTED
             this.runed = true;
@@ -291,6 +294,7 @@ public class Peer extends Thread {
             this.callback.onConnect(this, true);
         } else {
             this.pinger.setPing(Integer.MAX_VALUE);
+            this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
 
             // IT is STARTED
             this.runed = true;
@@ -336,6 +340,7 @@ public class Peer extends Thread {
             this.out = socket.getOutputStream();
 
             this.pinger.setPing(Integer.MAX_VALUE);
+            this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
 
             // IT is STARTED
             this.runed = true;

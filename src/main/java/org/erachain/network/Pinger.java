@@ -29,7 +29,8 @@ public class Pinger extends Thread {
         this.peer = peer;
         //this.run = true;
         this.ping = Integer.MAX_VALUE;
-        this.setName("Thread Pinger - " + this.getId());
+        this.setName("Pinger - " + this.getId() + " for: " + peer.getAddress().getHostAddress());
+
         this.start();
     }
 
