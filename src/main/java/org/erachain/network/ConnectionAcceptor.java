@@ -25,7 +25,7 @@ public class ConnectionAcceptor extends Thread {
 
     public ConnectionAcceptor(ConnectionCallback callback) {
         this.callback = callback;
-        this.setName("Thread ConnectionAcceptor - " + this.getId());
+        this.setName("ConnectionAcceptor - " + this.getId());
     }
 
     public void run() {

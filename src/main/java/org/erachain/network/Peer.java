@@ -56,7 +56,8 @@ public class Peer extends Thread {
         this.address = address;
         this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
         //LOGGER.debug("@@@ new Peer(InetAddress address) : " + address.getHostAddress());
-        this.setName("Thread Peer - " + this.getId());
+        this.setName("Peer: " + this.getAddress().getHostAddress() + " as address");
+
     }
 	
 	/*
@@ -178,8 +179,6 @@ public class Peer extends Thread {
             this.sendedBeforePing = 0l;
             this.maxBeforePing = MAX_BEFORE_PING;
 
-            this.setName("Thread Peer - " + this.getId());
-
             //ENABLE KEEPALIVE
             this.socket.setKeepAlive(KEEP_ALIVE);
 
@@ -206,6 +205,9 @@ public class Peer extends Thread {
 
             //ON SOCKET CONNECT
             this.callback.onConnect(this, true);
+
+            this.setName("Peer: " + this.getAddress().getHostAddress() + " as socket"
+                    + (this.isWhite()?" is White" : ""));
 
             //LOGGER.debug("@@@ new Peer(ConnectionCallback callback, Socket socket) : " + socket.getInetAddress().getHostAddress());
 
@@ -341,6 +343,9 @@ public class Peer extends Thread {
             //ON SOCKET CONNECT
             this.callback.onConnect(this, false);
 
+            this.setName("Peer: " + this.getAddress().getHostAddress() + " reconnected"
+                + (this.isWhite()?" is White" : ""));
+
         } catch (Exception e) {
             //FAILED TO CONNECT NO NEED TO BLACKLIST
             //LOGGER.info("Failed to connect to : " + address);
@@ -424,6 +429,8 @@ public class Peer extends Thread {
             if (socket == null || !socket.isConnected() || socket.isClosed()
                     || !runed
             ) {
+
+                //this.setName("Peer: " + this.getAddress().getHostAddress() + " broken");
 
                 try {
                     Thread.sleep(1000);
@@ -753,6 +760,9 @@ public class Peer extends Thread {
 
 
     public void ban(int banForMinutes, String mess) {
+        this.setName("Peer: " + this.getAddress().getHostAddress()
+                + " banned for " + banForMinutes + " " + mess);
+
         this.callback.tryDisconnect(this, banForMinutes, mess);
     }
 
@@ -805,5 +815,7 @@ public class Peer extends Thread {
 
         this.stoped = true;
         this.close();
+        this.setName("Peer: " + this.getAddress().getHostAddress() + " halted");
+
     }
 }

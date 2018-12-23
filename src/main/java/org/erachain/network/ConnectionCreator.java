@@ -5,6 +5,7 @@ import org.erachain.controller.Controller;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.PeersMessage;
+import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,13 +19,16 @@ import java.util.List;
  */
 public class ConnectionCreator extends Thread {
 
+    // как часто запрашивать все пиры у других пиров
+    private static long GET_PEERS_PERIOD = 60 * 10 * 1000;
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionCreator.class);
     private ConnectionCallback callback;
+    private static long getPeersTimestamp;
     private boolean isRun;
 
     public ConnectionCreator(ConnectionCallback callback) {
         this.callback = callback;
-        this.setName("Thread ConnectionCreator - " + this.getId());
+        this.setName("ConnectionCreator - " + this.getId());
     }
 
     private int connectToPeersOfThisPeer(Peer peer, int maxReceivePeers) {
@@ -32,11 +36,12 @@ public class ConnectionCreator extends Thread {
         if (!this.isRun)
             return 0;
 
-        LOGGER.info("GET peers from: " + peer.getName() + " get max: " + maxReceivePeers);
-
         //CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE
-        if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true))
+        if (Settings.getInstance().getMinConnections() < callback.getActivePeersCounter(true)
+            || (Settings.getInstance().getMaxConnections() >> 1) < callback.getActivePeersCounter(false))
             return 0;
+
+        LOGGER.info("GET peers from: " + peer.getName() + " get max: " + maxReceivePeers);
 
         //ASK PEER FOR PEERS
         Message getPeersMessage = MessageFactory.getInstance().createGetPeersMessage();
@@ -66,7 +71,8 @@ public class ConnectionCreator extends Thread {
             }
 
             //CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE
-            if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true))
+            if (Settings.getInstance().getMinConnections() < callback.getActivePeersCounter(true)
+                    || (Settings.getInstance().getMaxConnections() >> 1) < callback.getActivePeersCounter(false))
                 break;
 
             try {
@@ -138,8 +144,12 @@ public class ConnectionCreator extends Thread {
             if (!this.isRun)
                 return;
 
+            this.setName("ConnectionCreator - " + this.getId()
+                    + " white:" + callback.getActivePeersCounter(true)
+                    + " total:" + callback.getActivePeersCounter(false));
+
             //CHECK IF WE NEED NEW CONNECTIONS
-            if (this.isRun && Settings.getInstance().getMinConnections() >= callback.getActivePeersCounter(true)) {
+            if (this.isRun && Settings.getInstance().getMinConnections() > callback.getActivePeersCounter(true)) {
 
                 //GET LIST OF KNOWN PEERS
                 knownPeers = PeerManager.getInstance().getKnownPeers();
@@ -212,7 +222,7 @@ public class ConnectionCreator extends Thread {
 
             //CHECK IF WE STILL NEED NEW CONNECTIONS
             // USE unknown peers from known peers
-            if (this.isRun && Settings.getInstance().getMinConnections() >= callback.getActivePeersCounter(true)) {
+            if (this.isRun && Settings.getInstance().getMinConnections() > callback.getActivePeersCounter(true)) {
                 //OLD SCHOOL ITERATE activeConnections
                 //avoids Exception when adding new elements
                 List<Peer> peers = callback.getActivePeers(false);
@@ -224,11 +234,15 @@ public class ConnectionCreator extends Thread {
                     if (peer.isBanned())
                         continue;
 
-                    if (Settings.getInstance().getMinConnections() >= callback.getActivePeersCounter(true)) {
+                    if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true)) {
                         break;
                     }
 
-                    connectToPeersOfThisPeer(peer, Settings.getInstance().getMinConnections());
+                    long timesatmp = NTP.getTime();
+                    if (timesatmp - getPeersTimestamp > GET_PEERS_PERIOD) {
+                        connectToPeersOfThisPeer(peer, Settings.getInstance().getMaxConnections());
+                        getPeersTimestamp = timesatmp;
+                    }
 
                 }
             }
@@ -240,6 +254,9 @@ public class ConnectionCreator extends Thread {
 
             int needMinConnections = Settings.getInstance().getMinConnections();
 
+            this.setName("Thread ConnectionCreator - " + this.getId() + " white:" + counter
+                    + " total:" + callback.getActivePeersCounter(false));
+
             if (!this.isRun)
                 return;
 
@@ -247,7 +264,7 @@ public class ConnectionCreator extends Thread {
                 if (counter < needMinConnections)
                     Thread.sleep(1000);
                 else
-                    Thread.sleep(10000);
+                    Thread.sleep(60000);
             } catch (InterruptedException e) {
                 LOGGER.error(e.getMessage(), e);
             }
