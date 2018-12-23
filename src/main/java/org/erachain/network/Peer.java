@@ -424,6 +424,13 @@ public class Peer extends Thread {
 
         while (!stoped) {
 
+            if (false)
+                LOGGER.info(this.getAddress().getHostAddress()
+                    + (this.isUsed()?" is Used" : "")
+                    + (this.isBanned()?" is Banned" : "")
+                    + (this.isBad()?" is Bad" : "")
+                    + (this.isWhite()?" is White" : ""));
+
 
             // CHECK connection
             if (socket == null || !socket.isConnected() || socket.isClosed()
@@ -531,6 +538,10 @@ public class Peer extends Thread {
                     callback.tryDisconnect(this, 6, "parse message wrong - " + e.getMessage());
                     continue;
                 }
+
+                if (false)
+                    LOGGER.info(this.getAddress().getHostAddress() + " ->> "
+                            + (message == null? "message: null" : "message: " + message.toString()));
 
                 if (message == null) {
                     // unknowm message
