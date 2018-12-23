@@ -51,6 +51,8 @@ public class TelegramManager extends Thread {
         this.telegramsForAddress = new HashMap<String, List<TelegramMessage>>();
         this.telegramsCounts = new HashMap<String, Integer>();
 
+        this.setName("TelegramManager - " + this.getId());
+
     }
 
     // GET telegram

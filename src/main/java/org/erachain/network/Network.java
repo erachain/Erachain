@@ -95,9 +95,12 @@ public class Network extends Observable implements ConnectionCallback {
             //ADD TO CONNECTED PEERS
             synchronized (this.knownPeers) {
                 this.knownPeers.add(peer);
-                peer.setName("Peer: " +peer.getAddress().getHostAddress());
             }
         }
+
+        peer.setName("Peer: " + peer.getAddress().getHostAddress()
+                + (asNew? " as new" : " reconnected")
+                + (peer.isWhite()?" is White" : ""));
 
         //ADD TO DATABASE
         PeerManager.getInstance().addPeer(peer, 0);
