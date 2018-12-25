@@ -1,6 +1,5 @@
 package org.erachain.utils;
 
-import java.awt.GraphicsEnvironment;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 
@@ -8,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.swing.JOptionPane;
 import javax.ws.rs.WebApplicationException;
 
-import org.erachain.core.web.ProfileHelper;
 import org.erachain.gui.Gui;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -30,11 +28,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.*;
-import org.erachain.gui.*;
 import org.erachain.gui.library.Issue_Confirm_Dialog;
-import org.erachain.gui.*;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 //import test.org.erachain.records.TestRecTemplate;
 
 public class APIUtils {
@@ -60,7 +55,7 @@ public class APIUtils {
         //}
     }
     
-    public static void askAPICallAllowed(String password, final String messageToDisplay, HttpServletRequest request)
+    public static void askAPICallAllowed(String password, final String messageToDisplay, HttpServletRequest request, boolean once)
             throws WebApplicationException {
         // CHECK API CALL ALLOWED
         
@@ -89,8 +84,14 @@ public class APIUtils {
                 if (password.length() <= min_length)
                     throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_PASSWORD_SO_SHORT);
 
-                if (Controller.getInstance().unlockOnceWallet(password))
-                    return;
+                if (once) {
+                    if (Controller.getInstance().unlockOnceWallet(password))
+                        return;
+                } else {
+                    Controller.getInstance().setSecondsToUnlock(-1);
+                    if (Controller.getInstance().unlockOnceWallet(password))
+                        return;
+                }
 
                 throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
 
@@ -119,8 +120,15 @@ public class APIUtils {
                 // password = PasswordPane.showUnlockWalletDialog(new
                 // DebugTabPane());
 
-                if (password.length() > 0 && Controller.getInstance().unlockWallet(password)) {
-                    return;
+                if (password.length() > 0) {
+                    if (once) {
+                        if (Controller.getInstance().unlockOnceWallet(password))
+                            return;
+                    } else {
+                        Controller.getInstance().setSecondsToUnlock(-1);
+                        if (Controller.getInstance().unlockOnceWallet(password))
+                            return;
+                    }
                 } else {
                     JOptionPane.showMessageDialog(null, "Invalid password", "Unlock Wallet",
                             JOptionPane.ERROR_MESSAGE);
@@ -225,7 +233,7 @@ public class APIUtils {
         byte[] isEncrypted = encrypt ? new byte[] { 1 } : new byte[] { 0 };
         
         // TRU UNLOCK
-        askAPICallAllowed(password, "POST payment\n" + x, request);
+        askAPICallAllowed(password, "POST payment\n" + x, request, true);
         
         // CHECK WALLET UNLOCKED
         if (!Controller.getInstance().isWalletUnlocked()) {
@@ -324,7 +332,7 @@ public class APIUtils {
             }
             
             // TRY UNLOCK
-            askAPICallAllowed(password, x, request);
+            askAPICallAllowed(password, x, request, true);
             
             // CHECK WALLET UNLOCKED
             if (!Controller.getInstance().isWalletUnlocked()) {

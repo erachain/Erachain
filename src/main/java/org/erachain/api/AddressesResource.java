@@ -69,7 +69,7 @@ public class AddressesResource {
     @GET
     public String getAddresses(@QueryParam("password") String password) {
 
-        APIUtils.askAPICallAllowed(password, "GET addresses", request);
+        APIUtils.askAPICallAllowed(password, "GET addresses", request, true);
 
         // CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {
@@ -196,7 +196,7 @@ public class AddressesResource {
                     ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 
-        APIUtils.askAPICallAllowed(password, "GET addresses/seed/" + address + "\nWARNING, your seed will be revealed to the caller!", request);
+        APIUtils.askAPICallAllowed(password, "GET addresses/seed/" + address + "\nWARNING, your seed will be revealed to the caller!", request, true);
 
         // CHECK WALLET UNLOCKED
         if (!Controller.getInstance().isWalletUnlocked()) {
@@ -232,7 +232,7 @@ public class AddressesResource {
                     ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 
-        APIUtils.askAPICallAllowed(password, "GET addresses/private/" + address + "\nWARNING, your private key will be revealed to the caller!", request);
+        APIUtils.askAPICallAllowed(password, "GET addresses/private/" + address + "\nWARNING, your private key will be revealed to the caller!", request, true);
 
         // CHECK WALLET UNLOCKED
         if (!Controller.getInstance().isWalletUnlocked()) {
@@ -254,7 +254,7 @@ public class AddressesResource {
     @GET
     @Path("/new")
     public String generateNewAccount(@QueryParam("password") String password) {
-        APIUtils.askAPICallAllowed(password, "GET addresses/new", request);
+        APIUtils.askAPICallAllowed(password, "GET addresses/new", request, true);
 
         // CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {
@@ -279,7 +279,7 @@ public class AddressesResource {
 	
         if (x.isEmpty()) {
             
-            APIUtils.askAPICallAllowed(password, "POST addresses new\nGenerates a new account", request);
+            APIUtils.askAPICallAllowed(password, "POST addresses new\nGenerates a new account", request, true);
 
             // CHECK IF WALLET EXISTS
             if (!Controller.getInstance().doesWalletExists()) {
@@ -295,7 +295,7 @@ public class AddressesResource {
 
             return Controller.getInstance().generateNewAccount();
         } else {
-            APIUtils.askAPICallAllowed(password, "POST addresses import seed\n " + x, request);
+            APIUtils.askAPICallAllowed(password, "POST addresses import seed\n " + x, request, true);
 
             String seed = x;
 
@@ -336,7 +336,7 @@ public class AddressesResource {
     @Path("/{address}")
     public String deleteAddress(@PathParam("address") String address, @QueryParam("password") String password) {
 
-        APIUtils.askAPICallAllowed(password, "DELETE addresses/" + address, request);
+        APIUtils.askAPICallAllowed(password, "DELETE addresses/" + address, request, true);
 
         // CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {
@@ -556,7 +556,7 @@ public class AddressesResource {
     public String sign(String x, @PathParam("address") String address, @QueryParam("password") String password) {
 
         //String password = null;
-        APIUtils.askAPICallAllowed(password, "POST addresses/sign/" + address, request);
+        APIUtils.askAPICallAllowed(password, "POST addresses/sign/" + address, request, true);
 
         // CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {

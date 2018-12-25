@@ -286,7 +286,7 @@ public class BlocksResource {
     public String orphanTo(@PathParam("height") int heightTo) {
 
         String password = "";
-        APIUtils.askAPICallAllowed(password, "GET blocks/orphanto/", request);
+        APIUtils.askAPICallAllowed(password, "GET blocks/orphanto/", request, true);
 
         Controller.getInstance().setOrphanTo(heightTo);
 

@@ -88,7 +88,7 @@ public class MultiPaymentResource {
     public String createMultiPayment(String x) {
         try {
             String password = null;
-            APIUtils.askAPICallAllowed(password, "POST multipayment\n" + x, request);
+            APIUtils.askAPICallAllowed(password, "POST multipayment\n" + x, request, true);
 
             //READ JSON
             JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
