@@ -599,7 +599,7 @@ public abstract class Transaction {
 
     public long getDeadline() {
         // 24HOUR DEADLINE TO INCLUDE TRANSACTION IN BLOCK
-        return this.timestamp + (1000 * 60 * 60 * 24);
+        return this.timestamp + (1000 * 60 * 60);
     }
 
     /// tyutuy jhg jhg jg j

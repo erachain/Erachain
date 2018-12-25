@@ -74,6 +74,8 @@ public class BlockChain {
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
     // задержка на включение в блок для хорошей сортировки
     public static final int UNCONFIRMED_SORT_WAIT_MS = 15000;
+    public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = 10000;
+    public static final int ON_CONNECT_SEND_UNCONFIRMED_NEED_COUNT = 10;
 
 
     public static final int BLOCKS_PER_DAY = 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME; // 300 PER DAY
@@ -763,21 +765,29 @@ public class BlockChain {
     // SOLVE WON BLOCK
     // 0 - unchanged;
     // 1 - changed, need broadcasting;
-    public synchronized boolean setWaitWinBuffer(DCSet dcSet, Block block) {
+    public synchronized boolean setWaitWinBuffer(DCSet dcSet, Block block, Peer peer) {
 
-        LOGGER.info("try set new winBlock: " + block.toString(dcSet));
+        LOGGER.info("try set new winBlock: " + block.toString());
 
-        if (this.waitWinBuffer == null
-                || block.compareWin(waitWinBuffer) > 0) {
+        if (this.waitWinBuffer != null && block.compareWin(waitWinBuffer) <= 0) {
 
-            this.waitWinBuffer = block;
+            LOGGER.info("new winBlock is POOR!");
+            return false;
 
-            LOGGER.info("new winBlock setted! Transactions: " + block.getTransactionCount());
-            return true;
         }
 
-        LOGGER.info("new winBlock ignored!");
-        return false;
+        // FULL VALIDATE because before was only HEAD validating
+        if (!block.isValid(dcSet, false)) {
+            LOGGER.info("new winBlock is BAD!");
+            Controller.getInstance().banPeerOnError(peer, "invalid block", 30);
+            return false;
+        }
+
+        this.waitWinBuffer = block;
+
+        LOGGER.info("new winBlock setted!!!" + block.toString());
+        return true;
+
     }
 
     public Tuple2<Integer, Long> getHWeightFull(DCSet dcSet) {
@@ -837,135 +847,6 @@ public class BlockChain {
 
         return dcSet.getBlockMap().get(height);
     }
-
-    public int isNewBlockValid(DCSet dcSet, Block block, Peer peer) {
-
-        //CHECK IF NOT GENESIS
-        if (block.getVersion() == 0 || block instanceof GenesisBlock) {
-            LOGGER.debug("isNewBlockValid ERROR -> as GenesisBlock");
-            return -100;
-        }
-
-        //CHECK IF SIGNATURE IS VALID
-        if (!block.isSignatureValid()) {
-            LOGGER.debug("isNewBlockValid ERROR -> signature");
-            return -200;
-        }
-
-        //int height = dcSet.getBlockHeightsMap().getSize();
-        BlockSignsMap dbMap = dcSet.getBlockSignsMap();
-        //byte[] lastSignature = dcSet.getBlockHeightsMap().last();
-        byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
-
-        byte[] newBlockReference = block.getReference();
-        if (!Arrays.equals(lastSignature, newBlockReference)) {
-
-            // при больших нагрузках увеличивает развал сети
-            if (true)
-                return -111;
-
-			/*
-			//CHECK IF WE KNOW THIS BLOCK
-			if(dbMap.contains(block.getSignature()))
-			{
-				LOGGER.debug("isNewBlockValid IGNORE -> already in DB #" + block.getHeight(dcSet));
-				return 3;
-			}
-
-			int height01 = dcSet.getBlocksHeadsMap().size() - 1;
-			lastSignature = dcSet.getBlocksHeadsMap().get(height01).b;
-			if(Arrays.equals(lastSignature, block.getReference())) {
-				// CONCURENT for LAST BLOCK
-				Block lastBlock = dcSet.getBlocksHeadMap().last();
-				if (block.calcWinValue(dcSet) > lastBlock.calcWinValue(dcSet)) {
-					LOGGER.debug("isNewBlockValid -> reference to PARENT last block >>> TRY WIN");
-					return 4;
-				} else {
-					LOGGER.debug("isNewBlockValid -> reference to PARENT last block >>> weak...");
-					peer.sendMessage(MessageFactory.getInstance().createWinBlockMessage(lastBlock));
-					return -4;
-				}
-			}
-
-			Block winBlock = this.getWaitWinBuffer();
-			if (winBlock == null) {
-				LOGGER.debug("isNewBlockValid ERROR -> reference NOT to last block AND win BLOCK is NULL");
-				return -6;
-			}
-
-			if (Arrays.equals(winBlock.getSignature(), newBlockReference)) {
-				// this new block for my winBlock + 1 Height
-				if (this.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS - (GENERATING_MIN_BLOCK_TIME_MS>>8) > NTP.getTime()) {
-					// BLOCK from FUTURE
-					LOGGER.debug("isNewBlockValid ERROR -> reference to WIN block in BUFFER and IT from FUTURE");
-					return -5;
-				} else {
-					// LETS FLUSH winBlock and set newBlock as waitWIN
-					LOGGER.debug("isNewBlockValid ERROR -> reference to WIN block in BUFFER try SET IT");
-					return 5;
-				}
-			}
-
-			LOGGER.debug("isNewBlockValid ERROR -> reference NOT to last block -9");
-			return -7;
-			*/
-        }
-
-        return 0;
-    }
-
-	/*
-	// ignore BIG win_values
-	public static long getTarget_old(DCSet dcSet, Block block)
-	{
-
-		if (block == null)
-			return 1000l;
-
-		long min_value = 0;
-		long win_value = 0;
-		Block parent = block.getParent(dcSet);
-		int i = 0;
-		long value = 0;
-
-		while (parent != null && parent.getVersion() > 0 && i < BlockChain.TARGET_COUNT)
-		{
-			i++;
-			value = parent.calcWinValue(dcSet);
-			if (min_value==0
-					|| min_value > value) {
-				min_value = value;
-			}
-
-			if (min_value + (min_value<<1) < value)
-				value = min_value + (min_value<<1);
-
-			parent = parent.getParent(dcSet);
-		}
-
-		if (i == 0) {
-			return block.calcWinValue(dcSet);
-		}
-
-		int height = block.getHeightByParent(dcSet);
-		min_value = min_value<<1;
-
-		parent = block.getParent(dcSet);
-		i = 0;
-		while (parent != null && parent.getVersion() > 0 && i < BlockChain.TARGET_COUNT)
-		{
-			i++;
-			value = parent.calcWinValue(dcSet);
-			if (height > TARGET_COUNT && min_value < value)
-				value = min_value;
-			win_value += value;
-
-			parent = parent.getParent(dcSet);
-		}
-
-		return win_value / i;
-	}
-	 */
 
     public Pair<Block, List<Transaction>> scanTransactions(DCSet dcSet, Block block, int blockLimit, int transactionLimit, int type, int service, Account account) {
         //CREATE LIST

@@ -1179,9 +1179,7 @@ public class Block {
         return BlockChain.calcWinValueTargeted(this.winValue, this.target);
     }
 
-    public boolean isValid(DCSet dcSet, boolean andProcess) {
-
-        LOGGER.debug("*** Block[" + this.heightBlock + "] try Validate");
+    public boolean isValidHead(DCSet dcSet) {
 
         Controller cnt = Controller.getInstance();
 
@@ -1283,6 +1281,19 @@ public class Block {
             LOGGER.debug("*** Block[" + Base58.encode(signature) + "] already exist");
             return false;
         }
+
+        return true;
+    }
+
+    public boolean isValid(DCSet dcSet, boolean andProcess) {
+
+        LOGGER.debug("*** Block[" + this.heightBlock + "] try Validate");
+
+        // TRY CHECK HEAD
+        if (!this.isValidHead(dcSet))
+            return false;
+
+        Controller cnt = Controller.getInstance();
 
         long timerStart = System.currentTimeMillis();
 
@@ -1894,12 +1905,13 @@ public class Block {
         return false;
     }
 
-    public String toString(DCSet dcSet) {
+    @Override
+    public String toString() {
         
         return "[" + this.getHeight() + "]"
-                + (this.winValue != 0? " GB: " + this.winValue : "")
-                + " recs: " + this.transactionCount
-                + " C: " + this.getCreator().getPersonAsString();
+                + (this.winValue != 0 ? " WV: " + this.winValue : "")
+                + " TX: " + this.transactionCount
+                + " CR:" + this.getCreator().getPersonAsString();
     }
 
 }
