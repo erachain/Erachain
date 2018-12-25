@@ -114,7 +114,7 @@ public class TelegramsResource {
         JSONObject item;
 
         if (decrypt)
-            APIUtils.askAPICallAllowed(password, "GET telegrams decrypt", request);
+            APIUtils.askAPICallAllowed(password, "GET telegrams decrypt", request, true);
 
         for (TelegramMessage telegram : controller.getLastTelegrams(timestamp, recipient, filter)) {
 
@@ -178,7 +178,7 @@ public class TelegramsResource {
         }
 
         if (decrypt)
-            APIUtils.askAPICallAllowed(password, "GET telegrams decrypt", request);
+            APIUtils.askAPICallAllowed(password, "GET telegrams decrypt", request, true);
 
         JSONArray array = new JSONArray();
         JSONObject item;
@@ -205,7 +205,7 @@ public class TelegramsResource {
                                          @QueryParam("password") String password) {
 
         if (decrypt)
-            APIUtils.askAPICallAllowed(password, "GET telegrams decrypt", request);
+            APIUtils.askAPICallAllowed(password, "GET telegrams decrypt", request, true);
 
         // DECODE SIGNATURE
         byte[] signatureBytes;
@@ -264,7 +264,7 @@ public class TelegramsResource {
                        @PathParam("encrypt") boolean encrypt,
                        @PathParam("password") String password) {
 
-        APIUtils.askAPICallAllowed(password, "GET telegrams/send", request);
+        APIUtils.askAPICallAllowed(password, "GET telegrams/send", request, true);
 
         JSONObject out = new JSONObject();
         Controller cntr = Controller.getInstance();
@@ -489,7 +489,7 @@ public class TelegramsResource {
         if (r_data == null || r_data.length == 0)
             return null;
 
-        APIUtils.askAPICallAllowed(password, "POST decrypt telegram data\n " + signature, request);
+        APIUtils.askAPICallAllowed(password, "POST decrypt telegram data\n " + signature, request, true);
 
         byte[] message = Controller.getInstance().decrypt(r_Send.getCreator(), r_Send.getRecipient(), r_data);
         if (message == null) {

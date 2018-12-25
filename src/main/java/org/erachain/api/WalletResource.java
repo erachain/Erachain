@@ -1,8 +1,6 @@
 package org.erachain.api;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
-import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -29,7 +27,7 @@ public class WalletResource {
     @GET
     public String getWallet() {
         String password = null;
-        APIUtils.askAPICallAllowed(password, "GET wallet", request);
+        APIUtils.askAPICallAllowed(password, "GET wallet", request, true);
 
         JSONObject jsonObject = new JSONObject();
 
@@ -44,7 +42,7 @@ public class WalletResource {
     public String getSeed() {
 
         String password = null;
-        APIUtils.askAPICallAllowed(password, "GET wallet/seed", request);
+        APIUtils.askAPICallAllowed(password, "GET wallet/seed", request, true);
 
         //CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {
@@ -64,7 +62,7 @@ public class WalletResource {
     @Path("/synchronize")
     public String synchronize() {
         String password = null;
-        APIUtils.askAPICallAllowed(password, "GET wallet/synchronize", request);
+        APIUtils.askAPICallAllowed(password, "GET wallet/synchronize", request, true);
 
         //CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {
@@ -106,7 +104,7 @@ public class WalletResource {
             String password = (String) jsonObject.get("password");
 
             password = null;
-            APIUtils.askAPICallAllowed(password, "POST wallet " + x, request);
+            APIUtils.askAPICallAllowed(password, "POST wallet " + x, request, true);
 
             boolean recover = (boolean) jsonObject.get("recover");
             String seed = (String) jsonObject.get("seed");
@@ -152,19 +150,14 @@ public class WalletResource {
     @Path("/unlock")
     @Consumes(MediaType.WILDCARD)
     public String unlock(String x) {
-        //String password = null;
-        APIUtils.askAPICallAllowed(x, "POST wallet/unlock " + x, request);
 
-        //JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-        //String password = (String) jsonObject.get("password");
-
+        APIUtils.askAPICallAllowed(x, "POST wallet/unlock " + x, request, false);
 
         //CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 
-        //return String.valueOf(Controller.getInstance().unlockWallet(password));
         return String.valueOf(Controller.getInstance().isWalletUnlocked());
     }
 

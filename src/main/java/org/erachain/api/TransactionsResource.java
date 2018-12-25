@@ -86,7 +86,7 @@ public class TransactionsResource {
     @Path("limit/{limit}")
     public String getTransactionsLimited(@PathParam("limit") int limit) {
         String password = null;
-        APIUtils.askAPICallAllowed(password, "GET transactions/limit/" + limit, request);
+        APIUtils.askAPICallAllowed(password, "GET transactions/limit/" + limit, request, true);
 
         // CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {
@@ -129,7 +129,7 @@ public class TransactionsResource {
     @Path("address/{address}/limit/{limit}")
     public String getTransactionsLimited(@PathParam("address") String address, @PathParam("limit") int limit) {
         String password = null;
-        APIUtils.askAPICallAllowed(password, "GET transactions/address/" + address + "/limit/" + limit, request);
+        APIUtils.askAPICallAllowed(password, "GET transactions/address/" + address + "/limit/" + limit, request, true);
 
         // CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {
@@ -636,7 +636,7 @@ public class TransactionsResource {
                             if (r_data != null && r_data.length > 0) {
 
                                 if (needPass) {
-                                    APIUtils.askAPICallAllowed(password, "GET incoming for [" + height + "] DECRYPT data - password: " + password + "\n", request);
+                                    APIUtils.askAPICallAllowed(password, "GET incoming for [" + height + "] DECRYPT data - password: " + password + "\n", request, true);
                                     needPass = false;
                                 }
                                 r_data = cntr.decrypt(transaction.getCreator(), recipient, r_data);
@@ -678,12 +678,7 @@ public class TransactionsResource {
 
         JSONObject out = new JSONObject();
 
-        if (pass == null || pass.length() == 0
-                || !Controller.getInstance().unlockOnceWallet(pass)) {
-            out.put("status_code", 0);
-            out.put("status", "Invalid Password");
-            return out.toJSONString();
-        }
+        APIUtils.askAPICallAllowed(pass, "GET send\n ", request, true);
 
         // READ SENDER
         Account sender;
@@ -841,7 +836,7 @@ public class TransactionsResource {
         if (r_data == null || r_data.length == 0)
             return null;
 
-        APIUtils.askAPICallAllowed(password, "POST decrypt data\n " + signature, request);
+        APIUtils.askAPICallAllowed(password, "POST decrypt data\n " + signature, request, true);
 
         byte[] message = Controller.getInstance().decrypt(r_Send.getCreator(), r_Send.getRecipient(), r_data);
         if (message == null) {

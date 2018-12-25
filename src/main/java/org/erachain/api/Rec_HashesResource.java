@@ -76,7 +76,7 @@ public class Rec_HashesResource {
             // full check is later to prompt user with calculated fee
             //APIUtils.disallowRemote(request);
             password = null;
-            APIUtils.askAPICallAllowed(password, "POST payment\n " + x, request);
+            APIUtils.askAPICallAllowed(password, "POST payment\n " + x, request, true);
 
 
             // CHECK IF WALLET EXISTS

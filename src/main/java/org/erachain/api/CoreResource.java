@@ -24,7 +24,7 @@ public class CoreResource {
     @Path("/stop")
     public String stop() {
         String password = null;
-        APIUtils.askAPICallAllowed(password, "GET core/stop", request);
+        APIUtils.askAPICallAllowed(password, "GET core/stop", request, true);
 
         if (Controller.getInstance().doesWalletExists() && !Controller.getInstance().isWalletUnlocked()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);

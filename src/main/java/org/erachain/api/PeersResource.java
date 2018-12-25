@@ -48,7 +48,7 @@ public class PeersResource {
     public String addPeer(String address) {
 
         String password = null;
-        APIUtils.askAPICallAllowed(password, "POST peers " + address, request);
+        APIUtils.askAPICallAllowed(password, "POST peers " + address, request, true);
 
         // CHECK WALLET UNLOCKED
         if (Controller.getInstance().doesWalletExists() && !Controller.getInstance().isWalletUnlocked()) {

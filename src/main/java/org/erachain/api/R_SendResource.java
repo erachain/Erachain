@@ -79,7 +79,7 @@ public class R_SendResource {
                           @QueryParam("encoding") int encoding,
                           @QueryParam("encrypt") boolean encrypt, @QueryParam("password") String password) {
 
-        APIUtils.askAPICallAllowed(password, "GET send\n ", request);
+        APIUtils.askAPICallAllowed(password, "GET send\n ", request, true);
 
         JSONObject out = new JSONObject();
         Controller cntr = Controller.getInstance();
@@ -192,7 +192,7 @@ public class R_SendResource {
                              @QueryParam("rawbase") int rawbase,
                              @QueryParam("password") String password) {
 
-        APIUtils.askAPICallAllowed(password, "GET rawSend\n ", request);
+        APIUtils.askAPICallAllowed(password, "GET rawSend\n ", request, true);
 
         JSONObject out = new JSONObject();
         Controller cntr = Controller.getInstance();

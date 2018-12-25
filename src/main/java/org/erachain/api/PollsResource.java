@@ -71,7 +71,7 @@ public class PollsResource {
             }
 
             String password = null;
-            APIUtils.askAPICallAllowed(password, "POST polls " + x, request);
+            APIUtils.askAPICallAllowed(password, "POST polls " + x, request, true);
             Controller controller = new Controller().getInstance();
             //CHECK IF WALLET EXISTS
             if (!controller.doesWalletExists()) {
@@ -130,7 +130,7 @@ public class PollsResource {
             }
 
             String password = null;
-            APIUtils.askAPICallAllowed(password, "POST polls/vote/" + name + "\n" + x, request);
+            APIUtils.askAPICallAllowed(password, "POST polls/vote/" + name + "\n" + x, request, true);
 
             //CHECK IF WALLET EXISTS
             if (!Controller.getInstance().doesWalletExists()) {
@@ -179,7 +179,7 @@ public class PollsResource {
     @GET
     public String getPolls() {
         String password = null;
-        APIUtils.askAPICallAllowed(password, "GET polls", request);
+        APIUtils.askAPICallAllowed(password, "GET polls", request, true);
 
         //CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {
@@ -201,7 +201,7 @@ public class PollsResource {
     @Path("/address/{address}")
     public String getPolls(@PathParam("address") String address) {
         String password = null;
-        APIUtils.askAPICallAllowed(password, "GET polls/address/" + address, request);
+        APIUtils.askAPICallAllowed(password, "GET polls/address/" + address, request, true);
 
         //CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {
