@@ -1544,32 +1544,6 @@ public class BlockExplorer {
             blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
             blockJSON.put("totalFee", block.viewFeeAsBigDecimal());
 
-            BigDecimal totalAmount = BigDecimal.ZERO;
-            int seq = 0;
-            for (Transaction transaction : block.getTransactions()) {
-                transaction.setBlock(block, dcSet, block.heightBlock, ++seq);
-                for (Account account : transaction.getInvolvedAccounts()) {
-                    BigDecimal amount = transaction.getAmount(account);
-                    if (amount.compareTo(BigDecimal.ZERO) > 0) {
-                        totalAmount = totalAmount.add(amount);
-                    }
-                }
-            }
-
-            blockJSON.put("totalAmount", totalAmount.toPlainString());
-
-            LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> aTtxs = dcSet.getATTransactionMap()
-                    .getATTransactions(counter);
-
-            BigDecimal totalATAmount = BigDecimal.ZERO;
-
-            for (Map.Entry<Tuple2<Integer, Integer>, AT_Transaction> e : aTtxs.entrySet()) {
-                totalATAmount = totalATAmount.add(BigDecimal.valueOf(e.getValue().getAmount()));
-            }
-
-            blockJSON.put("totalATAmount", totalATAmount.toPlainString());
-            // blockJSON.put("aTfee", block.getATfee().toPlainString());
-
             output.put(counter, blockJSON);
 
             counter--;
