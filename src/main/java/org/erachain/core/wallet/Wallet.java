@@ -1,23 +1,8 @@
 package org.erachain.core.wallet;
 // 09/03
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.*;
-
-import javax.swing.JFileChooser;
-
-import org.erachain.core.item.assets.Order;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
-
 import org.erachain.at.AT_Transaction;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -28,21 +13,10 @@ import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.assets.Order;
 import org.erachain.core.naming.Name;
 import org.erachain.core.naming.NameSale;
-import org.erachain.core.transaction.BuyNameTransaction;
-import org.erachain.core.transaction.CancelOrderTransaction;
-import org.erachain.core.transaction.CancelSellNameTransaction;
-import org.erachain.core.transaction.CreateOrderTransaction;
-import org.erachain.core.transaction.CreatePollTransaction;
-import org.erachain.core.transaction.Issue_ItemRecord;
-import org.erachain.core.transaction.R_Send;
-import org.erachain.core.transaction.R_SertifyPubKeys;
-import org.erachain.core.transaction.RegisterNameTransaction;
-import org.erachain.core.transaction.SellNameTransaction;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.UpdateNameTransaction;
-import org.erachain.core.transaction.VoteOnPollTransaction;
+import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
 import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.SecureWalletDatabase;
@@ -53,6 +27,18 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.erachain.utils.SaveStrToFile;
 import org.erachain.utils.StrJSonFine;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.Timer;
 
 /**
  * обработка секртеных ключей и моих записей, которые относятся к набору моих счетов
@@ -342,6 +328,11 @@ public class Wallet extends Observable implements Observer {
 		Settings.getInstance().setWalletDir(path);
 		// OPEN WALLET
 		DWSet database = new DWSet();
+
+        if (this.secureDatabase != null) {
+            // CLOSE secured WALLET
+            lock();
+        }
 
 		// OPEN SECURE WALLET
 		SecureWalletDatabase secureDatabase = new SecureWalletDatabase(password);
@@ -686,6 +677,11 @@ public class Wallet extends Observable implements Observer {
 	// UNLOCK
 	public boolean unlockOnce(String password) {
 
+        if (this.secureDatabase != null) {
+            // CLOSE secured WALLET
+            lock();
+        }
+
 		// TRY TO UNLOCK
 		try {
 			SecureWalletDatabase secureDatabase = new SecureWalletDatabase(password);
@@ -708,12 +704,17 @@ public class Wallet extends Observable implements Observer {
 	public boolean unlock(SecureWalletDatabase secureDatabase) {
 		this.secureDatabase = secureDatabase;
 
-		// NOTIFY
-		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_STATUS, STATUS_UNLOCKED));
+        if (Controller.useGui) {
+            // NOTIFY
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_STATUS, STATUS_UNLOCKED));
+        }
 
 		if (this.secondsToUnlock > 0) {
-			this.lockTimer.cancel();
+
+            if (this.lockTimer != null)
+                this.lockTimer.cancel();
+
 			this.lockTimer = new Timer();
 
 			TimerTask action = new TimerTask() {
@@ -734,15 +735,20 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		// CLOSE
-		this.secureDatabase.close();
-		this.secureDatabase = null;
+        if (this.secureDatabase != null) {
+            this.secureDatabase.close();
+            this.secureDatabase = null;
+        }
 
-		// NOTIFY
-		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_STATUS, STATUS_LOCKED));
+        if (Controller.useGui) {
+            // NOTIFY
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_STATUS, STATUS_LOCKED));
+        }
 
 		this.secondsToUnlock = -1;
-		this.lockTimer.cancel();
+        if (this.lockTimer != null)
+            this.lockTimer.cancel();
 
 		// LOCK SUCCESSFULL
 		return true;
