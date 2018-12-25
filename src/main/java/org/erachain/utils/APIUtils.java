@@ -1,20 +1,5 @@
 package org.erachain.utils;
 
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.swing.JOptionPane;
-import javax.ws.rs.WebApplicationException;
-
-import org.erachain.gui.Gui;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.erachain.gui.transaction.Send_RecordDetailsFrame;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple3;
-
 import org.erachain.api.ApiClient;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
@@ -27,9 +12,23 @@ import org.erachain.core.transaction.R_Send;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.*;
+import org.erachain.gui.Gui;
+import org.erachain.gui.MainFrame;
+import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.swing.*;
+import javax.ws.rs.WebApplicationException;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 //import test.org.erachain.records.TestRecTemplate;
 
 public class APIUtils {
@@ -58,6 +57,9 @@ public class APIUtils {
     public static void askAPICallAllowed(String password, final String messageToDisplay, HttpServletRequest request, boolean once)
             throws WebApplicationException {
         // CHECK API CALL ALLOWED
+
+        if (Controller.getInstance().doesWalletExists() && Controller.getInstance().isWalletUnlocked())
+            return;
         
         try {
             
