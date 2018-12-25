@@ -67,6 +67,7 @@ public class APIUtils {
             boolean noGUI = !Gui.isGuiStarted();
             if (noGUI) {
 
+                // если кошелек открыт на постоянно то не спрашиваем пароль
                 if (Controller.getInstance().doesWalletExists() && Controller.getInstance().isWalletUnlockedForRPC())
                     return;
 

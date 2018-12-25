@@ -680,9 +680,6 @@ public class Wallet extends Observable implements Observer {
 
 	// UNLOCK
 	public boolean unlock(String password) {
-		if (false && this.isUnlocked()) {
-			return true;
-		}
 
 		if (this.secureDatabase != null) {
 			// CLOSE secure WALLET
@@ -715,7 +712,10 @@ public class Wallet extends Observable implements Observer {
             // NOTIFY
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_STATUS, STATUS_UNLOCKED));
-        }
+        } else {
+			// CACHE ACCOUNTS
+			Controller.getInstance().BlockGeneratorCacheAccounts();
+		}
 
 		if (this.secondsToUnlock > 0) {
 

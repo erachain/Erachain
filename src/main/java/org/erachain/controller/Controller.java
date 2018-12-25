@@ -2001,12 +2001,10 @@ public class Controller extends Observable {
     }
 
     public List<PublicKeyAccount> getPublicKeyAccounts() {
-
         return this.wallet.getPublicKeyAccounts();
     }
 
     public List<PrivateKeyAccount> getPrivateKeyAccounts() {
-
         return this.wallet.getprivateKeyAccounts();
     }
 
@@ -2376,6 +2374,10 @@ public class Controller extends Observable {
 
     public void startBlockGenerator() {
         this.blockGenerator.start();
+    }
+
+    public void BlockGeneratorCacheAccounts() {
+        this.blockGenerator.cacheKnownAccounts();
     }
 
     public ForgingStatus getForgingStatus() {
