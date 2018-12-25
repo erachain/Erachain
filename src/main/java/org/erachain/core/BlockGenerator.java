@@ -526,8 +526,8 @@ public class BlockGenerator extends Thread implements Observer {
 
                             if (true) {
                                 wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1;
-                                int koeff_123 = (int) ((((previousTarget - winned_winValue) * 10) / previousTarget));
-                                wait_new_block_broadcast = wait_new_block_broadcast + wait_new_block_broadcast * koeff_123;
+                                int shiftTime = (int) (((wait_new_block_broadcast * (previousTarget - winned_winValue) * 10) / previousTarget));
+                                wait_new_block_broadcast = wait_new_block_broadcast + shiftTime;
                             } else {
                                 wait_new_block_broadcast = (BlockChain.WIN_TIMEPOINT >> 1)
                                         + BlockChain.WIN_TIMEPOINT * 4 * (int) ((previousTarget - winned_winValue) / previousTarget);
@@ -618,7 +618,7 @@ public class BlockGenerator extends Thread implements Observer {
                                     //PASS BLOCK TO CONTROLLER
                                     ///ctrl.newBlockGenerated(block);
                                     LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
-                                    if (bchain.setWaitWinBuffer(dcSet, generatedBlock)) {
+                                    if (bchain.setWaitWinBuffer(dcSet, generatedBlock, peer)) {
 
                                         // need to BROADCAST
                                         status = 8;

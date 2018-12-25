@@ -149,7 +149,7 @@ public class Controller extends Observable {
     private long toOfflineTime;
     private Map<Peer, Tuple2<Integer, Long>> peerHWeight;
     private Map<Peer, Pair<String, Long>> peersVersions;
-    private HashSet<byte[]> waitWinBufferProcessed = new HashSet<byte[]>();
+    private HashSet<String> waitWinBufferProcessed = new HashSet<String>();
     private DBSet dbSet; // = DBSet.getInstance();
     private DCSet dcSet; // = DBSet.getInstance();
 
@@ -1055,7 +1055,7 @@ public class Controller extends Observable {
         int counter = 0;
         ///////// big maxCounter freeze network and make bans on response
         ///////// headers andblocks
-        int stepCount = 128; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
+        int stepCount = 512; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
         long dTime = this.blockChain.getTimestamp(this.dcSet);
 
         while (iterator.hasNext() && stepCount > 4) {
@@ -1075,7 +1075,10 @@ public class Controller extends Observable {
 
             // LOGGER.error(" time " + transaction.viewTimestamp());
 
-            if (!map.needBroadcasting(transaction, peerByte))
+            if (counter > BlockChain.ON_CONNECT_SEND_UNCONFIRMED_UNTIL
+                    // дело в том что при коннекте новому узлу надо все же
+                    // передавать все так как он может собрать пустой блок
+                    && !map.needBroadcasting(transaction, peerByte))
                 continue;
 
             message = MessageFactory.getInstance().createTransactionMessage(transaction);
@@ -1328,7 +1331,7 @@ public class Controller extends Observable {
     }
 
     public void clearWaitWinBufferProcessed() {
-        waitWinBufferProcessed = new HashSet<byte[]>();
+        waitWinBufferProcessed = new HashSet<String>();
     }
 
     // SYNCHRONIZED DO NOT PROCESSS MESSAGES SIMULTANEOUSLY
@@ -1455,148 +1458,44 @@ public class Controller extends Observable {
                     newBlock = blockWinMessage.getBlock();
 
                     // if already it block in process
-                    byte[] key = newBlock.getSignature();
+                    String key = newBlock.getCreator().getBase58();
 
                     synchronized (this.waitWinBufferProcessed) {
                         if (!waitWinBufferProcessed.add(key)
-                                || Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), key))
+                                || Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getSignature()))
                             return;
                     }
 
                     info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
-                            + newBlock.toString(dcSet);
+                            + newBlock.toString();
                     LOGGER.debug(info);
 
                     if (this.status == STATUS_SYNCHRONIZING) {
                         // SET for FUTURE without CHECK
                         blockChain.clearWaitWinBuffer();
-                        blockChain.setWaitWinBuffer(dcSet, newBlock);
+                        blockChain.setWaitWinBuffer(dcSet, newBlock, blockWinMessage.getSender());
                         break;
                     }
 
-                    int isNewWinBlockValid = this.blockChain.isNewBlockValid(dcSet, newBlock, message.getSender());
-                    if (isNewWinBlockValid < 0) {
-                        if (isNewWinBlockValid < -10) {
-                            info = "newBlock (" + newBlock.toString(dcSet) + ") is Invalid";
-                            banPeerOnError(message.getSender(), info);
-                            return;
-                        } else if (isNewWinBlockValid == -4) {
-                            // reference to PARENT last block >>> weak...
-                            // already - BROADCASTED to him
-                            return;
-                        } else {
-                            /// NOT BAN - WATCH it
-                            if (this.network.getActivePeersCounter(false) > Settings.getInstance().getMaxConnections()
-                                    - 3) {
-                                this.network.tryDisconnect(message.getSender(), 0, "");
-                            }
-                            return;
-                        }
+                    if (!newBlock.isValidHead(dcSet)) {
+                        info = "Block (" + newBlock.toString() + ") is Invalid";
+                        banPeerOnError(message.getSender(), info);
+                        return;
                     }
 
-                    if (isNewWinBlockValid == 3) {
-                        return;
-                    } else if (isNewWinBlockValid == 0) {
-                        // CHECK IF VALID
-                        if (!newBlock.isValid(dcSet, false)) {
-                            info = "Block (" + newBlock.toString(dcSet) + ") is Invalid";
-                            banPeerOnError(message.getSender(), info);
-                            return;
-                        }
-
-                        ///// newBlock.calcWinValue(dcSet);
-
-                        if (blockChain.setWaitWinBuffer(dcSet, newBlock)) {
-                            // IF IT WIN
-                            /*
-                             * LOGGER.info(Lang.getInstance().
-                             * translate("received new valid WIN Block") +
-                             * " for Height: " + this.getMyHeight());
-                             */
-
-                            // BROADCAST
-                            List<Peer> excludes = new ArrayList<Peer>();
-                            excludes.add(message.getSender());
-                            this.network.asyncBroadcast(message, excludes, false);
-                        } else {
-                            // SEND IF my WIN BLOCK as RESPONCE
-                            if (blockChain.compareNewWin(dcSet, newBlock) < 0) {
-                                Message messageBestWin = MessageFactory.getInstance()
-                                        .createWinBlockMessage(blockChain.getWaitWinBuffer());
-                                message.getSender().sendMessage(messageBestWin);
-                            }
-                        }
-                        return;
-
-                    } else if (false // при больших нагрузках увеличивает развал
-                            // сети
-                            && isNewWinBlockValid == 4) {
-                        // NEW BLOCK is CONURENT for last BLOCK - try WIN it
-                        // STOP FORGING
-                        LOGGER.debug("   ++ block CONCURENT to LAST BLOCK in CHAIN ++");
-                        ForgingStatus tempStatus = this.blockGenerator.getForgingStatus();
-                        this.blockGenerator.setForgingStatus(ForgingStatus.FORGING_WAIT);
-                        try {
-                            Block lastBlock = this.getLastBlock();
-                            this.blockChain.clearWaitWinBuffer();
-                            this.synchronizer.pipeProcessOrOrphan(this.dcSet, lastBlock, true, false);
-                            if (!newBlock.isValid(dcSet, false)) {
-                                info = "Block (" + newBlock.toString(dcSet) + ") is Invalid";
-                                banPeerOnError(message.getSender(), info);
-                                this.blockGenerator.setForgingStatus(tempStatus);
-                                return;
-                            }
-                            this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, false);
-                            List<Peer> excludes = new ArrayList<Peer>();
-                            excludes.add(message.getSender());
-                            this.network.asyncBroadcast(message, excludes, false);
-                        } catch (Exception e) {
-                            if (this.isOnStopping()) {
-                                return;
-                            } else {
-                                LOGGER.error(e.getMessage(), e);
-                            }
-                        }
-                        // FORGING RESTORE
-                        this.blockGenerator.setForgingStatus(tempStatus);
-                        return;
-                    } else if (false // при больших нагрузках увеличивает развал
-                            // сети
-                            && isNewWinBlockValid == 5) {
-                        // STOP FORGING
-                        LOGGER.debug("   ++ block to FUTURE ++");
-                        ForgingStatus tempStatus = this.blockGenerator.getForgingStatus();
-                        this.blockGenerator.setForgingStatus(ForgingStatus.FORGING_WAIT);
-                        try {
-                            if (this.flushNewBlockGenerated()) {
-                                if (!newBlock.isValid(dcSet, false)) {
-                                    info = "Block (" + newBlock.toString(dcSet) + ") is Invalid";
-                                    banPeerOnError(message.getSender(), info);
-                                    this.blockGenerator.setForgingStatus(tempStatus);
-                                    return;
-                                }
-                                this.blockChain.setWaitWinBuffer(dcSet, newBlock);
-                                List<Peer> excludes = new ArrayList<Peer>();
-                                excludes.add(message.getSender());
-                                this.network.asyncBroadcast(message, excludes, false);
-                            }
-                        } catch (Exception e) {
-                            if (this.isOnStopping()) {
-                                return;
-                            } else {
-                                LOGGER.error(e.getMessage(), e);
-                            }
-                        }
-                        // FORGING RESTORE
-                        this.blockGenerator.setForgingStatus(tempStatus);
-                        return;
+                    if (blockChain.setWaitWinBuffer(dcSet, newBlock, message.getSender())) {
+                        // IF IT WIN
+                        // BROADCAST
+                        List<Peer> excludes = new ArrayList<Peer>();
+                        excludes.add(message.getSender());
+                        this.network.asyncBroadcast(message, excludes, false);
                     } else {
-                        LOGGER.debug("controller.Controller.onMessage BLOCK_TYPE -> WIN block not valid "
-                                + " for Height: " + this.getMyHeight() + ", code: " + isNewWinBlockValid + ", "
-                                + newBlock.toString(dcSet));
+                        // SEND my BLOCK
+                        Message messageBestWin = MessageFactory.getInstance()
+                                .createWinBlockMessage(blockChain.getWaitWinBuffer());
+                        message.getSender().sendMessage(messageBestWin);
                     }
-
-                    break;
+                    return;
 
                 case Message.TRANSACTION_TYPE:
 
@@ -1672,6 +1571,10 @@ public class Controller extends Observable {
         }
     }
 
+    public void banPeerOnError(Peer peer, String mess, int minutes) {
+        this.network.tryDisconnect(peer, minutes, "ban PeerOnError - " + mess);
+    }
+
     public void addActivePeersObserver(Observer o) {
         this.network.addObserver(o);
     }
@@ -1682,7 +1585,7 @@ public class Controller extends Observable {
 
     public void broadcastWinBlock(Block newBlock, List<Peer> excludes) {
 
-        LOGGER.info("broadcast winBlock " + newBlock.toString(this.dcSet) + " size:" + newBlock.getTransactionCount());
+        LOGGER.info("broadcast winBlock " + newBlock.toString() + " size:" + newBlock.getTransactionCount());
 
         // CREATE MESSAGE
         Message message = MessageFactory.getInstance().createWinBlockMessage(newBlock);
@@ -2548,18 +2451,7 @@ public class Controller extends Observable {
             return false;
         }
 
-        LOGGER.debug("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString(this.dcSet));
-
-        boolean isValid = false;
-        if (isMyAccountByAddress(newBlock.getCreator().getAddress())) {
-            isValid = true; // GENERATE by ME
-        } else {
-            isValid = newBlock.isSignatureValid() && newBlock.isValid(this.dcSet, false);
-            LOGGER.debug("+++ flushNewBlockGenerated Validatedrecords: " + newBlock.getTransactionCount());
-        }
-
-        if (!isValid)
-            return false;
+        LOGGER.debug("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
 
         try {
             this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true);

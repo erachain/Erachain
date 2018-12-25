@@ -340,7 +340,8 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         Long key = Longs.fromByteArray(signature);
 
         List<byte[]> peers = this.peersBroadcasted.get(key);
-        if (peers == null || peers.isEmpty() || (!peers.contains(peerBYtes) && peers.size() < 4)) {
+        if (peers == null || peers.isEmpty()
+                || (!peers.contains(peerBYtes) && peers.size() < BlockChain.ON_CONNECT_SEND_UNCONFIRMED_NEED_COUNT)) {
             return true;
         }
 
