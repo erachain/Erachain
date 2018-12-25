@@ -2183,7 +2183,8 @@ public class Controller extends Observable {
     }
 
     public boolean unlockOnceWallet(String password) {
-        return this.wallet.unlockOnce(password);
+        this.wallet.setSecondsToUnlock(3);
+        return this.wallet.unlock(password);
     }
 
     public void setSecondsToUnlock(int seconds) {

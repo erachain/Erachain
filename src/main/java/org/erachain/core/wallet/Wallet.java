@@ -58,7 +58,7 @@ public class Wallet extends Observable implements Observer {
 	TemplatesFavorites templatesFavorites;
 	PersonsFavorites personsFavorites;
 	private SecureWalletDatabase secureDatabase;
-	private int secondsToUnlock = -1;
+	private int secondsToUnlock = 100;
 	private Timer lockTimer = new Timer();
 	private int syncHeight;
 
@@ -675,12 +675,15 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	// UNLOCK
-	public boolean unlockOnce(String password) {
+	public boolean unlock(String password) {
+		if (false && this.isUnlocked()) {
+			return true;
+		}
 
-        if (this.secureDatabase != null) {
-            // CLOSE secured WALLET
-            lock();
-        }
+		if (this.secureDatabase != null) {
+			// CLOSE secure WALLET
+			lock();
+		}
 
 		// TRY TO UNLOCK
 		try {
@@ -689,17 +692,17 @@ public class Wallet extends Observable implements Observer {
 		} catch (Exception e) {
 			return false;
 		}
-	}
-
-	public boolean unlock(String password) {
-		if (false && this.isUnlocked()) {
-			return true;
-		}
-
-		// TRY TO UNLOCK
-		return unlockOnce(password);
 
 	}
+
+	/*
+	// UNLOCK ONCE
+	public boolean unlockOnce(String password) {
+
+		this.secondsToUnlock = -1;
+		return unlock(password);
+	}
+	*/
 
 	public boolean unlock(SecureWalletDatabase secureDatabase) {
 		this.secureDatabase = secureDatabase;
@@ -746,7 +749,7 @@ public class Wallet extends Observable implements Observer {
             this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_STATUS, STATUS_LOCKED));
         }
 
-		this.secondsToUnlock = -1;
+		this.secondsToUnlock = 100;
         if (this.lockTimer != null)
             this.lockTimer.cancel();
 

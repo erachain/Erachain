@@ -678,12 +678,7 @@ public class TransactionsResource {
 
         JSONObject out = new JSONObject();
 
-        if (pass == null || pass.length() == 0
-                || !Controller.getInstance().unlockOnceWallet(pass)) {
-            out.put("status_code", 0);
-            out.put("status", "Invalid Password");
-            return out.toJSONString();
-        }
+        APIUtils.askAPICallAllowed(pass, "GET send\n ", request);
 
         // READ SENDER
         Account sender;
