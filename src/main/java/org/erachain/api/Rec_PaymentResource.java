@@ -67,7 +67,7 @@ public class Rec_PaymentResource {
             String password = (String) jsonObject.get("password");
 
             password = null;
-            APIUtils.askAPICallAllowed(password, "POST payment\n " + x, request);
+            APIUtils.askAPICallAllowed(password, "POST payment\n " + x, request, true);
 
             return APIUtils.processPayment(password, sender, feePow, recipient, assetKey, amount, x, request, jsonObject);
         } catch (NullPointerException | ClassCastException e) {

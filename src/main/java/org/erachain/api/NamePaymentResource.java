@@ -44,7 +44,7 @@ public class NamePaymentResource {
             String password = (String) jsonObject.get("password");
 
             // TRU UNLOCK
-            APIUtils.askAPICallAllowed(password, "POST send\n" + x, request);
+            APIUtils.askAPICallAllowed(password, "POST send\n" + x, request, true);
 
             Pair<Account, NameResult> nameToAdress = NameUtils.nameToAdress(nameName);
             if (nameToAdress.getB() == NameResult.OK) {

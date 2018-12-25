@@ -43,7 +43,7 @@ public class NameSalesResource {
     @GET
     public String getNameSales() {
         String password = null;
-        APIUtils.askAPICallAllowed(password, "GET namesales", request);
+        APIUtils.askAPICallAllowed(password, "GET namesales", request, true);
 
         //CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {
@@ -65,7 +65,7 @@ public class NameSalesResource {
     @Path("/address/{address}")
     public String getNameSales(@PathParam("address") String address) {
         String password = null;
-        APIUtils.askAPICallAllowed(password, "GET namesales/address/" + address, request);
+        APIUtils.askAPICallAllowed(password, "GET namesales/address/" + address, request, true);
 
         //CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {
@@ -133,7 +133,7 @@ public class NameSalesResource {
             }
 
             String password = null;
-            APIUtils.askAPICallAllowed(password, "POST namesales/" + nameName + "\n" + x, request);
+            APIUtils.askAPICallAllowed(password, "POST namesales/" + nameName + "\n" + x, request, true);
 
             //CHECK IF WALLET EXISTS
             if (!Controller.getInstance().doesWalletExists()) {
@@ -190,7 +190,7 @@ public class NameSalesResource {
             NameSale nameSale = Controller.getInstance().getNameSale(nameName);
 
             String password = null;
-            APIUtils.askAPICallAllowed(password, "DELETE namesales/" + nameName + "/" + feePow, request);
+            APIUtils.askAPICallAllowed(password, "DELETE namesales/" + nameName + "/" + feePow, request, true);
 
             //CHECK IF WALLET EXISTS
             if (!Controller.getInstance().doesWalletExists()) {
@@ -249,7 +249,7 @@ public class NameSalesResource {
             }
 
             String password = null;
-            APIUtils.askAPICallAllowed(password, "POST namesales/buy/" + nameName + "\n" + x, request);
+            APIUtils.askAPICallAllowed(password, "POST namesales/buy/" + nameName + "\n" + x, request, true);
 
             //CHECK IF WALLET EXISTS
             if (!Controller.getInstance().doesWalletExists()) {

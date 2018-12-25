@@ -2001,12 +2001,10 @@ public class Controller extends Observable {
     }
 
     public List<PublicKeyAccount> getPublicKeyAccounts() {
-
         return this.wallet.getPublicKeyAccounts();
     }
 
     public List<PrivateKeyAccount> getPrivateKeyAccounts() {
-
         return this.wallet.getprivateKeyAccounts();
     }
 
@@ -2123,6 +2121,10 @@ public class Controller extends Observable {
         return this.wallet.isUnlocked();
     }
 
+    public boolean isWalletUnlockedForRPC() {
+        return this.wallet.isUnlockedForRPC();
+    }
+
     public int checkAPICallAllowed(String json, HttpServletRequest request) throws Exception {
         int result = 0;
 
@@ -2183,7 +2185,8 @@ public class Controller extends Observable {
     }
 
     public boolean unlockOnceWallet(String password) {
-        return this.wallet.unlockOnce(password);
+        this.wallet.setSecondsToUnlock(3);
+        return this.wallet.unlock(password);
     }
 
     public void setSecondsToUnlock(int seconds) {
@@ -2371,6 +2374,10 @@ public class Controller extends Observable {
 
     public void startBlockGenerator() {
         this.blockGenerator.start();
+    }
+
+    public void BlockGeneratorCacheAccounts() {
+        this.blockGenerator.cacheKnownAccounts();
     }
 
     public ForgingStatus getForgingStatus() {

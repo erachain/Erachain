@@ -322,6 +322,18 @@ public class BlockGenerator extends Thread implements Observer {
         }
     }
 
+    public void cacheKnownAccounts() {
+        if (Settings.getInstance().isGeneratorKeyCachingEnabled()) {
+            List<PrivateKeyAccount> privateKeyAccounts = ctrl.getPrivateKeyAccounts();
+
+            //IF ACCOUNTS EXISTS
+            if (!privateKeyAccounts.isEmpty()) {
+                //CACHE ACCOUNTS
+                this.cachedAccounts = privateKeyAccounts;
+            }
+        }
+    }
+
     @Override
     public void run() {
 

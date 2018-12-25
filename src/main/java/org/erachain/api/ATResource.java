@@ -135,7 +135,7 @@ public class ATResource {
         }
 
         String password = null;
-        APIUtils.askAPICallAllowed(password, "POST at " + x, request);
+        APIUtils.askAPICallAllowed(password, "POST at " + x, request, true);
 
         //CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {

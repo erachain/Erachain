@@ -141,7 +141,7 @@ public class NameStorageResource {
             JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
             String password = (String) jsonObject.get("password");
 
-            APIUtils.askAPICallAllowed(password, "POST updateEntry\n " + x, request);
+            APIUtils.askAPICallAllowed(password, "POST updateEntry\n " + x, request, true);
 
             // CHECK IF WALLET EXISTS
             if (!Controller.getInstance().doesWalletExists()) {
@@ -376,7 +376,7 @@ public class NameStorageResource {
                     basicInfo += apicalls;
 
                     //String password = null;
-                    APIUtils.askAPICallAllowed(password, basicInfo, request);
+                    APIUtils.askAPICallAllowed(password, basicInfo, request, true);
 
                     //CHECK WALLET UNLOCKED
                     if (!Controller.getInstance().isWalletUnlocked()) {
@@ -433,7 +433,7 @@ public class NameStorageResource {
             APIUtils.askAPICallAllowed(password, basicInfo +
                     "POST namestorage/update/" + name + "\n"
                     + GZIP.webDecompress(jsonString) + "\nfee: "
-                    + feePow, request);
+                    + feePow, request, true);
 
             //CHECK WALLET UNLOCKED
             if (!Controller.getInstance().isWalletUnlocked()) {

@@ -98,7 +98,7 @@ public class BlogPostResource {
 
             String password = null;
             APIUtils.askAPICallAllowed(password, "POST blogpost/comment/"
-                    + signatureOfComment, request);
+                    + signatureOfComment, request, true);
 
             // CHECK IF WALLET EXISTS
             if (!Controller.getInstance().doesWalletExists()) {
@@ -207,7 +207,7 @@ public class BlogPostResource {
             }
 
             APIUtils.askAPICallAllowed(password,
-                    "POST blogpost/comment" + "\n" + x, request);
+                    "POST blogpost/comment" + "\n" + x, request, true);
 
             // CHECK IF WALLET EXISTS
             if (!Controller.getInstance().doesWalletExists()) {
@@ -321,7 +321,7 @@ public class BlogPostResource {
             isPostAllowed(blogname);
 
             APIUtils.askAPICallAllowed(password,
-                    "POST blogpost/" + blogname + "\n" + x, request);
+                    "POST blogpost/" + blogname + "\n" + x, request, true);
 
             // CHECK IF WALLET EXISTS
             if (!Controller.getInstance().doesWalletExists()) {

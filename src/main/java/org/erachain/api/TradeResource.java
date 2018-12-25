@@ -1,7 +1,6 @@
 package org.erachain.api;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
@@ -16,11 +15,8 @@ import org.slf4j.Logger;
 import org.erachain.gui.transaction.OnDealClick;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.json.simple.parser.ParseException;
 import org.mapdb.Fun;
 import org.erachain.utils.APIUtils;
-import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,8 +24,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -91,7 +85,7 @@ public class TradeResource {
                           @PathParam("haveAmount") BigDecimal haveAmount, @PathParam("wantAmount") BigDecimal wantAmount,
                           @DefaultValue("0") @QueryParam("feePow") Long feePower, @QueryParam("password") String password) {
 
-        APIUtils.askAPICallAllowed(password, "GET create Order\n ", request);
+        APIUtils.askAPICallAllowed(password, "GET create Order\n ", request, true);
 
         Controller cntr = Controller.getInstance();
 
@@ -187,7 +181,7 @@ public class TradeResource {
                          @PathParam("signature") String signatureStr,
                          @DefaultValue("0") @QueryParam("feePow") Long feePower, @QueryParam("password") String password) {
 
-        APIUtils.askAPICallAllowed(password, "GET create Order\n ", request);
+        APIUtils.askAPICallAllowed(password, "GET create Order\n ", request, true);
 
         byte[] signature;
         try {
