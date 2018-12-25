@@ -120,6 +120,10 @@ public class Wallet extends Observable implements Observer {
 	public boolean isUnlocked() {
 		return this.secureDatabase != null;
 	}
+	public boolean isUnlockedForRPC() {
+		// Если раслочено на все время
+		return this.secureDatabase != null && this.secondsToUnlock < 0;
+	}
 
 	public List<Account> getAccounts() {
 		return this.database.getAccountMap().getAccounts();

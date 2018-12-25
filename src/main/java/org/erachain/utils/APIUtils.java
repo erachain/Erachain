@@ -58,9 +58,6 @@ public class APIUtils {
             throws WebApplicationException {
         // CHECK API CALL ALLOWED
 
-        if (Controller.getInstance().doesWalletExists() && Controller.getInstance().isWalletUnlocked())
-            return;
-        
         try {
             
             String ipAddress = ServletUtils.getRemoteAddress(request);
@@ -70,17 +67,20 @@ public class APIUtils {
             boolean noGUI = !Gui.isGuiStarted();
             if (noGUI) {
 
+                if (Controller.getInstance().doesWalletExists() && Controller.getInstance().isWalletUnlockedForRPC())
+                    return;
+
                 if (!ServletUtils.isRemoteRequest(request, ipAddress)) {
-                    if (Controller.getInstance().isWalletUnlocked())
-                        return;
-                    min_length = 3;
+                    min_length = 4;
                 } else {
-                    min_length = 6;
+                    min_length = 8;
                 }
             } else {
                 min_length = 8;
             }
-            if (BlockChain.DEVELOP_USE) min_length =0;
+
+            if (BlockChain.DEVELOP_USE)
+                min_length = 0;
 
             if (password != null) {
                 if (password.length() <= min_length)
@@ -91,7 +91,7 @@ public class APIUtils {
                         return;
                 } else {
                     Controller.getInstance().setSecondsToUnlock(-1);
-                    if (Controller.getInstance().unlockOnceWallet(password))
+                    if (Controller.getInstance().unlockWallet(password))
                         return;
                 }
 
@@ -111,8 +111,7 @@ public class APIUtils {
                 // STOP ACCESS from CONCOLE without PASSWORD or UNLOCKED wallet
                 if (Controller.getInstance().isWalletUnlocked())
                     return;
-            } else if (//!BlockChain.DEVELOP_USE ||
-                        !Controller.getInstance().isWalletUnlocked()) {
+            } else {
                 //password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
                 // password =
                 // PasswordPane.showUnlockWalletDialog(Main_Panel.getInstance());
@@ -128,7 +127,7 @@ public class APIUtils {
                             return;
                     } else {
                         Controller.getInstance().setSecondsToUnlock(-1);
-                        if (Controller.getInstance().unlockOnceWallet(password))
+                        if (Controller.getInstance().unlockWallet(password))
                             return;
                     }
                 } else {

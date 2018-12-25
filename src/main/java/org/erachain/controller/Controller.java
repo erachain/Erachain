@@ -2123,6 +2123,10 @@ public class Controller extends Observable {
         return this.wallet.isUnlocked();
     }
 
+    public boolean isWalletUnlockedForRPC() {
+        return this.wallet.isUnlockedForRPC();
+    }
+
     public int checkAPICallAllowed(String json, HttpServletRequest request) throws Exception {
         int result = 0;
 
