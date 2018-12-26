@@ -2,7 +2,7 @@
 {
   "_lang_ISO_": "ru",
   "_lang_name_": "Русский",
-  "_timestamp_of_translation_": 1541021081966,
+  "_timestamp_of_translation_": 1541021081967,
   " ( * optional field )": " ( * дополнительное поле )",
   " and start the application again.": " и запустите приложение снова.",
   "( DO NOT USE your wallet's password. )": "( Не используйте Ваш пароль кошелька! )",
@@ -298,11 +298,7 @@
   "Digital Index": "Цифровой индекс",
   "Digital Currency": "Цифровые деньги",
   "Digital Service": "Цифровые услуги",
-<<<<<<< ERA/languages/ru.json
   "Digital Share": "Цифровые доли и акции",
-=======
-  "Digital Share": "Цифровые Доли и Акции",
->>>>>>> ERA/languages/ru.json
   "Digital Vote": "Цифровой голос",
   "Digital Utility": "Цифровая услуга",
   "Index": "Индекс",
@@ -873,7 +869,8 @@
   "Sync wallet": "Синхронизировать кошелёк",
   "Synchronizing": "Синхронизация",
   "System Theme": "Тема Системы",
-  "target": "высота",
+  "target": "цель",
+  "Target": "Цель",
   "Take on Hold": "Удержания",
   "Take the reception into balance": "Учесть прием на балланс",
   "Tags length exceeded!": "",

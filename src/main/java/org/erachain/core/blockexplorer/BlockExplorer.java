@@ -1519,6 +1519,7 @@ public class BlockExplorer {
         output.put("Label_Fee", Lang.getInstance().translate_from_langObj("Fee", langObj));
         output.put("Label_AT_Amount", Lang.getInstance().translate_from_langObj("AT Amount", langObj));
         output.put("Label_Amount", Lang.getInstance().translate_from_langObj("Amount", langObj));
+         output.put("Label_Target", Lang.getInstance().translate_from_langObj("Target", langObj));
         output.put("Label_Later", Lang.getInstance().translate_from_langObj("Later", langObj));
         output.put("Label_Previous", Lang.getInstance().translate_from_langObj("Previous", langObj));
 
@@ -1537,6 +1538,7 @@ public class BlockExplorer {
             blockJSON.put("signature", Base58.encode(block.getSignature()));
             blockJSON.put("generator", block.getCreator().getAddress());
             blockJSON.put("generatingBalance", block.getForgingValue());
+            blockJSON.put("target", block.getTarget());
             blockJSON.put("winValue", block.getWinValue());
             blockJSON.put("winValueTargetted", block.calcWinValueTargeted() - 100000);
             blockJSON.put("transactionsCount", block.getTransactionCount());
