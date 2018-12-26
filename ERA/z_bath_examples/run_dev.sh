@@ -3,7 +3,7 @@
 LOG=`basename $0`.log
 DTFMT='+ %d-%m-%Y %T'
 
-app=erachain
+app=erachain-dev
 xms=512
 xmx=1024
 mms=256

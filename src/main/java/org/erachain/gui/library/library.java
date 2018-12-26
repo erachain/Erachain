@@ -1,9 +1,7 @@
 package org.erachain.gui.library;
 
 import com.github.rjeschke.txtmark.Processor;
-//import de.muntjak.tinylookandfeel.Theme;
-//import net.sf.tinylaf.Theme;
-import de.muntjak.tinylookandfeel.Theme;
+import net.sf.tinylaf.Theme;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.*;
@@ -21,6 +19,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+
+// почемуто иногда она не может найти эту библиотеку при запуске JAR - надо закоментить ее и опять вставить здесь
+// по Alt-Enter на Класса с вызовом Theme. ниже в коде
 
 /*
 import org.jvnet.substance.SubstanceLookAndFeel;
