@@ -641,13 +641,13 @@ public class Controller extends Observable {
                 if (accsNum > 0) {
 
                     String path;
-                    if (Start.seedCommand.length == 4) {
+                    if (Start.seedCommand.length > 3) {
                         path = Start.seedCommand[3];
                     } else {
                         path = Settings.getInstance().getWalletDir();
                     }
 
-                    boolean res = recoverWallet(seed, Start.seedCommand[2], accsNum, path);
+                    boolean res = recoverWallet(seed, path, accsNum, path);
                     Start.seedCommand = null;
                 }
             }
