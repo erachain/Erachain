@@ -8,7 +8,6 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.BlockSignsMap;
 import org.erachain.datachain.BlocksHeadsMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
@@ -35,7 +34,7 @@ public class BlockChain {
 
     //public static final int START_LEVEL = 1;
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = false;
+    public static final boolean DEVELOP_USE = true;
     public static final boolean HARD_WORK = false;
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)

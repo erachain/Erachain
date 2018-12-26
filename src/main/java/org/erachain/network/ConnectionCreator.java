@@ -1,7 +1,7 @@
 package org.erachain.network;
 // 30/03
 
-import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.PeersMessage;
@@ -249,7 +249,8 @@ public class ConnectionCreator extends Thread {
 
             //SLEEP
             int counter = callback.getActivePeersCounter(true);
-            if (counter < 6)
+            if (counter == 0 && BlockChain.DEVELOP_USE
+                    || counter < 6)
                 continue;
 
             int needMinConnections = Settings.getInstance().getMinConnections();
