@@ -647,7 +647,7 @@ public class Controller extends Observable {
                         path = Settings.getInstance().getWalletDir();
                     }
 
-                    boolean res = recoverWallet(seed, path, accsNum, path);
+                    boolean res = recoverWallet(seed, Start.seedCommand[2], accsNum, path);
                     Start.seedCommand = null;
                 }
             }
