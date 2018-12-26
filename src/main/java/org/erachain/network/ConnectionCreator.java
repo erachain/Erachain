@@ -249,8 +249,8 @@ public class ConnectionCreator extends Thread {
 
             //SLEEP
             int counter = callback.getActivePeersCounter(true);
-            if (counter == 0 && BlockChain.DEVELOP_USE
-                    || counter < 6)
+            if (counter == 0
+                    || counter < 6 && !BlockChain.DEVELOP_USE)
                 continue;
 
             int needMinConnections = Settings.getInstance().getMinConnections();
@@ -263,7 +263,7 @@ public class ConnectionCreator extends Thread {
 
             try {
                 if (counter < needMinConnections)
-                    Thread.sleep(1000);
+                    Thread.sleep(BlockChain.DEVELOP_USE ? 10000 : 1000);
                 else
                     Thread.sleep(60000);
             } catch (InterruptedException e) {
