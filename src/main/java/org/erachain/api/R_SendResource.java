@@ -1,8 +1,13 @@
 package org.erachain.api;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
+import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.erachain.gui.transaction.OnDealClick;
@@ -18,9 +23,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.math.BigDecimal;
-import java.util.Base64;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.net.InetAddress;
+import java.nio.charset.Charset;
+import java.util.*;
 
 @Path("r_send")
 @Produces(MediaType.APPLICATION_JSON)
@@ -267,6 +272,82 @@ public class R_SendResource {
                 rawbase,
                 password
         );
+
+    }
+
+    private long test1Delay = 0;
+    private static Thread threadTest1;
+
+    @GET
+    @Path("test1")
+    public String test1(@QueryParam("delay") long delay, @QueryParam("password") String password) {
+
+        if (!BlockChain.DEVELOP_USE)
+            return "-";
+
+        APIUtils.askAPICallAllowed(password, "GET test1\n ", request, true);
+
+        if (threadTest1 != null) {
+            test1Delay = delay;
+            JSONObject out = new JSONObject();
+            out.put("delay", delay);
+            return out.toJSONString();
+        }
+
+        byte[] seed = Controller.getInstance().exportSeed();
+        List<Account> accounts = Controller.getInstance().getAccounts();
+
+        byte[] accountSeed = Controller.getInstance().wallet.generateAccountSeed(seed, -111);
+        PrivateKeyAccount account = new PrivateKeyAccount(accountSeed);
+
+        test1Delay = delay;
+
+        Random random = new Random();
+
+        JSONObject out = new JSONObject();
+
+        threadTest1 = new Thread(() -> {
+
+            do {
+
+                if (test1Delay <= 0) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                    continue;
+                }
+
+                Account recipient = accounts.get(random.nextInt(accounts.size()));
+
+                Transaction transaction = Controller.getInstance().r_Send(account, 0, recipient,
+                        2l, null, "TEST 1",
+                        new byte[]{(byte)1}, "sfdsfsdfsfd lkjhdkfjhd gkljdhgflkg".getBytes(Charset.forName("UTF-8")),
+                        new byte[]{(byte)0});
+
+                Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+                // CHECK VALIDATE MESSAGE
+                if (result != Transaction.VALIDATE_OK) {
+                    LOGGER.info(OnDealClick.resultMess(result));
+                    test1Delay = 0;
+                    continue;
+                }
+
+                try {
+                    Thread.sleep(this.test1Delay);
+                } catch (InterruptedException e) {
+                }
+
+
+            } while (true);
+        });
+
+        threadTest1.start();
+
+        out.put("delay", test1Delay);
+
+        return out.toJSONString();
 
     }
 
