@@ -603,6 +603,7 @@ public class Controller extends Observable {
         if (Settings.getInstance().isRpcEnabled()) {
             if (Controller.useGui)
                 about_frame.set_console_Text(Lang.getInstance().translate("Start API Service"));
+            LOGGER.info(Lang.getInstance().translate("Start API Service"));
             this.rpcService = new ApiService();
             this.rpcService.start();
         }
@@ -611,6 +612,7 @@ public class Controller extends Observable {
         if (Settings.getInstance().isWebEnabled()) {
             if (Controller.useGui)
                 about_frame.set_console_Text(Lang.getInstance().translate("Start WEB Service"));
+            LOGGER.info(Lang.getInstance().translate("Start WEB Service"));
             this.webService = new WebService();
             this.webService.start();
         }
