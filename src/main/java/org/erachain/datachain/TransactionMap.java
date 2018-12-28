@@ -255,7 +255,8 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         ObserverMessage message = (ObserverMessage) arg;
 
         // ON NEW BLOCK
-        if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
+        if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
+                || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
 
             long dTime = Controller.getInstance().getBlockChain().getTimestamp(DCSet.getInstance());
 

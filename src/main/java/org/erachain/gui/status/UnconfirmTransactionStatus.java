@@ -6,6 +6,7 @@ import org.erachain.gui.*;
 import org.erachain.gui.items.records.Records_UnConfirmed_Panel;
 import org.erachain.gui2.Main_Panel;
 import org.erachain.lang.Lang;
+import org.erachain.ntp.NTP;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.erachain.utils.ObserverMessage;
@@ -75,6 +76,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
         });
     }
 
+    private static long lastUpdate;
     @Override
     public void update(Observable arg0, Object arg1) {
 
@@ -88,10 +90,14 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 
         if (message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
             counter++;
-            refresh();
+            if (NTP.getTime() - lastUpdate > 2000) {
+                refresh();
+            }
         } else if (message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
             counter--;
-            refresh();
+            if (NTP.getTime() - lastUpdate > 2000) {
+                refresh();
+            }
         } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
                 || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
             counter = map.size();
@@ -104,6 +110,9 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
     }
 
     private void refresh() {
+
+        lastUpdate = NTP.getTime();
+
         if (counter > 0) {
             this.setCursor(new Cursor(Cursor.HAND_CURSOR));
             setText("<HTML>| <A href = ' '>" + Lang.getInstance().translate("Unconfirmed Records") + ": " + counter

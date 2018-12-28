@@ -75,7 +75,7 @@ public class BlockChain {
     public static final int UNCONFIRMED_SORT_WAIT_MS = 15000;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = 10000;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_NEED_COUNT = 10;
-    public static final int MAX_UNCONFIGMED_MAP_SIZE = HARD_WORK ? 100000 : 10000;
+    public static final int MAX_UNCONFIGMED_MAP_SIZE = HARD_WORK ? 100000 : 1000;
 
 
 
@@ -1074,58 +1074,9 @@ public class BlockChain {
     // CLEAR UNCONFIRMED TRANSACTION from Invalid and DEAD
     public void clearUnconfirmedRecords(Controller ctrl, DCSet dcSetOriginal) {
 
-        if (true)
-            return;
+        long timestamp = this.getTimestamp(dcSetOriginal);
 
-        long startTime = System.currentTimeMillis();
-
-        long timestamp = GENERATING_MIN_BLOCK_TIME_MS + this.getTimestamp(dcSetOriginal);
-
-        TransactionMap unconfirmedMap = dcSetOriginal.getTransactionMap();
-        Iterator<Long> iterator = unconfirmedMap.getIterator(0, false);
-
-        //CREATE FORK OF GIVEN DATABASE
-        ///DCSet dcFork = dcSetOriginal.fork();
-        Transaction transaction;
-        Long key;
-
-        while (iterator.hasNext()) {
-
-            if (ctrl.isOnStopping()) {
-                return;
-            }
-
-            key = iterator.next();
-            transaction = unconfirmedMap.get(key);
-
-            //CHECK TRANSACTION DEADLINE
-            if (transaction.getDeadline() < timestamp) {
-                unconfirmedMap.delete(key);
-                continue;
-            }
-
-            //CHECK IF VALID
-            if (!transaction.isSignatureValid(DCSet.getInstance())) {
-                // INVALID TRANSACTION
-                unconfirmedMap.delete(key);
-                continue;
-            }
-
-			/*
-				transaction.setDB(dcFork, false);
-
-				if (transaction.isValid(dcFork, null) != Transaction.VALIDATE_OK) {
-					// INVALID TRANSACTION
-					unconfirmedMap.delete(transaction);
-					continue;
-				}
-			}
-			 */
-        }
-
-        LOGGER.debug("timerUnconfirmed ----------------  work: "
-                + (System.currentTimeMillis() - startTime)
-                + " new SIZE: " + dcSetOriginal.getUncTxCounter());
+        dcSetOriginal.getTransactionMap().clear(timestamp);
 
     }
 }

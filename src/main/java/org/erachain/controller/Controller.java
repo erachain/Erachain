@@ -1240,7 +1240,7 @@ public class Controller extends Observable {
     public void actionAfterConnect() {
 
         ///////// UNCONFIRMED MAP CLEAR
-        if (this.timerUnconfirmed == null) {
+        if (false && this.timerUnconfirmed == null) {
             this.timerUnconfirmed = new Timer();
 
             TimerTask actionUnconfirmed = new TimerTask() {
@@ -2117,6 +2117,7 @@ public class Controller extends Observable {
 
     public void clearUnconfirmedRecords() {
         this.blockChain.clearUnconfirmedRecords(this, this.dcSet);
+
     }
 
     /**
