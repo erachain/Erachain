@@ -654,10 +654,12 @@ public class Network extends Observable implements ConnectionCallback {
         for (int i =0; i<size; i++){
            // HALT Peer
             knownPeers.get(i).halt();
-            try {
-                knownPeers.get(i).join();
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
+            if (false) {
+                try {
+                    knownPeers.get(i).join();
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
             }
         }
 

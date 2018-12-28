@@ -86,26 +86,28 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 
         ObserverMessage message = (ObserverMessage) arg1;
 
-        /// LOGGER.error("update - type:" + message.getType());
+        switch (message.getType()) {
+            case ObserverMessage.ADD_UNC_TRANSACTION_TYPE:
+                counter++;
+                if (NTP.getTime() - lastUpdate > 2000) {
+                    refresh();
+                }
+                break;
+            case ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE:
+                counter--;
+                if (NTP.getTime() - lastUpdate > 2000) {
+                    refresh();
+                }
+                break;
+            case ObserverMessage.CHAIN_ADD_BLOCK_TYPE:
+                counter = map.size();
+                refresh();
+                break;
+            case ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE:
+                counter = map.size();
+                refresh();
+                break;
 
-        if (message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
-            counter++;
-            if (NTP.getTime() - lastUpdate > 2000) {
-                refresh();
-            }
-        } else if (message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
-            counter--;
-            if (NTP.getTime() - lastUpdate > 2000) {
-                refresh();
-            }
-        } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
-                || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
-            counter = map.size();
-            refresh();
-            // } else if (message.getType() ==
-            // ObserverMessage.COUNT_UNC_TRANSACTION_TYPE) {
-            // counter = (int) message.getValue();
-            // refresh();
         }
     }
 
