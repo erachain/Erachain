@@ -1506,8 +1506,9 @@ public class Controller extends Observable {
                     // GET TRANSACTION
                     Transaction transaction = transactionMessage.getTransaction();
 
-                    // CHECK IF SIGNATURE IS VALID OR GENESIS TRANSACTION
-                    if (transaction.getCreator() != null & !transaction.isSignatureValid(DCSet.getInstance())) {
+                    // CHECK IF SIGNATURE IS VALID ////// ------- OR GENESIS TRANSACTION
+                    if (transaction.getCreator() == null
+                            || !transaction.isSignatureValid(DCSet.getInstance())) {
                         // DISHONEST PEER
                         banPeerOnError(message.getSender(), "invalid transaction signature");
 

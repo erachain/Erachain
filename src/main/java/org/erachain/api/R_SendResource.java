@@ -3,6 +3,7 @@ package org.erachain.api;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
+import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.transaction.OnDealClick;
@@ -324,12 +325,17 @@ public class R_SendResource {
                 } while (recipient.equals(creator));
 
 
-                Transaction transaction = Controller.getInstance().r_Send(
-                        Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress()),
+                PrivateKeyAccount privKey = Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress());
+                if (privKey == null) {
+                    this.test1Delay = 0;
+                    continue;
+                }
+                Transaction transaction = Controller.getInstance().r_Send(privKey,
                         0, recipient,
                         2l, null, "TEST 1",
-                        new byte[]{(byte) 1}, "TEST TEST TEST".getBytes(Charset.forName("UTF-8")),
-                        new byte[]{(byte)0});
+                        new byte[]{(byte) 1},
+                        "TEST TEST TEST".getBytes(Charset.forName("UTF-8")),
+                        new byte[]{(byte) 0});
 
                 Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 

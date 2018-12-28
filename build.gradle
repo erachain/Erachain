@@ -15,7 +15,7 @@ plugins {
 
 ext {
     git = org.ajoberstar.grgit.Grgit.open()
-    rev = git.head().id
+    //rev = git.head().id
     rev = git.head().getAbbreviatedId(8)
     springbootVersion = '2.0.5.RELEASE'
 }
