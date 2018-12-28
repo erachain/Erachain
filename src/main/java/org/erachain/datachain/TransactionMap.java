@@ -37,7 +37,6 @@ import java.util.*;
  */
 public class TransactionMap extends DCMap<Long, Transaction> implements Observer {
     public static final int TIMESTAMP_INDEX = 0;
-    public static final int MAX_MAP_SIZE = BlockChain.HARD_WORK ? 100000 : 5000;
 
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
@@ -267,7 +266,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                 item = this.get(key);
 
                 // CHECK IF DEADLINE PASSED
-                if (i > MAX_MAP_SIZE || item.getDeadline() < dTime) {
+                if (i > BlockChain.MAX_UNCONFIGMED_MAP_SIZE || item.getDeadline() < dTime) {
                     iterator.remove();
                     continue;
                 }
@@ -284,17 +283,23 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     public boolean set(byte[] signature, Transaction transaction) {
 
-        if (this.size() > MAX_MAP_SIZE) {
-            Iterator<Long> iterator = this.getIterator(0, false);
-            Transaction item;
-            long dTime = Controller.getInstance().getBlockChain().getTimestamp(DCSet.getInstance());
+        if (false) {
+            int overLoad = this.size() - BlockChain.MAX_UNCONFIGMED_MAP_SIZE;
+            if (overLoad > 0) {
+                Iterator<Long> iterator = this.getIterator(0, false);
+                Transaction item;
+                long dTime = Controller.getInstance().getBlockChain().getTimestamp(DCSet.getInstance());
 
-            do {
-                Long key = iterator.next();
-                item = this.get(key);
-                this.delete(key);
+                ////////// ************** ERROR
+                // TODO: здесь нельзя удалять в Итераторе - ошибка - нужно сначала взять индексы в список а потом поним удалить
+                do {
+                    Long key = iterator.next();
+                    item = this.get(key);
+                    this.delete(key);
 
-            } while (item.getDeadline() < dTime && iterator.hasNext());
+                } while (overLoad > 0
+                        || item.getDeadline() < dTime && iterator.hasNext());
+            }
         }
 
         Long key = Longs.fromByteArray(signature);
@@ -310,14 +315,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     }
 
     public boolean add(Transaction transaction) {
-
-        // java.util.ConcurrentModificationException:from org.erachain.core.block.Block.orphanTransactions
-        while (this.isWorked()) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-            }
-        }
 
         return this.set(transaction.getSignature(), transaction);
 

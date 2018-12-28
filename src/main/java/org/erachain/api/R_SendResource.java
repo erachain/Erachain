@@ -290,6 +290,7 @@ public class R_SendResource {
         if (threadTest1 != null) {
             JSONObject out = new JSONObject();
             out.put("delay", delay);
+            LOGGER.info("TEST1 DELAY UPDATE:" + delay);
             return out.toJSONString();
         }
 
@@ -328,6 +329,7 @@ public class R_SendResource {
                 PrivateKeyAccount privKey = Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress());
                 if (privKey == null) {
                     this.test1Delay = 0;
+                    LOGGER.info("TEST1: WALLET is locket");
                     continue;
                 }
                 Transaction transaction = Controller.getInstance().r_Send(privKey,
@@ -358,6 +360,7 @@ public class R_SendResource {
         threadTest1.start();
 
         out.put("delay", test1Delay);
+        LOGGER.info("TEST1: STARTED");
 
         return out.toJSONString();
 

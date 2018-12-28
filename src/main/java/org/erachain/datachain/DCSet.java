@@ -376,10 +376,10 @@ public class DCSet implements Observer, IDB {
                 //.cacheSize(CASH_SIZE)
                 //.cacheDisable()
                 .checksumEnable()
-                .mmapFileEnableIfSupported() // -- error on asyncWriteEnable
+                .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
                 //.snapshotEnable()
                 /// ICREATOR
-                .commitFileSyncDisable()
+                .commitFileSyncDisable() // ++
                 //.asyncWriteEnable()
                 //.asyncWriteFlushDelay(100)
                 //.cacheHardRefEnable()

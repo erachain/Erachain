@@ -1515,9 +1515,13 @@ public class Controller extends Observable {
                         return;
                     }
 
-                    // AND UNCONFIRMED
-                    // TODO fee
-                    // transaction.calcFee();
+                    // DEADTIME
+                    if (transaction.getDeadline() < this.blockChain.getTimestamp(DCSet.getInstance())) {
+                        // so OLD transaction
+                        return;
+                    }
+
+                    // ALREADY EXIST
                     byte[] signature = transaction.getSignature();
                     if (this.dcSet.getTransactionMap().contains(signature)
                             || this.dcSet.getTransactionFinalMapSigns().contains(signature) || this.isStopping)

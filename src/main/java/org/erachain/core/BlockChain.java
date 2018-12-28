@@ -75,6 +75,8 @@ public class BlockChain {
     public static final int UNCONFIRMED_SORT_WAIT_MS = 15000;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = 10000;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_NEED_COUNT = 10;
+    public static final int MAX_UNCONFIGMED_MAP_SIZE = HARD_WORK ? 100000 : 10000;
+
 
 
     public static final int BLOCKS_PER_DAY = 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME; // 300 PER DAY
