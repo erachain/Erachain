@@ -3,27 +3,23 @@ package org.erachain.api;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
-import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
-import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.gui.transaction.OnDealClick;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.json.simple.parser.ParseException;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.math.BigDecimal;
-import java.net.InetAddress;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -275,42 +271,45 @@ public class R_SendResource {
 
     }
 
-    private long test1Delay = 0;
+    private static long test1Delay = 0;
     private static Thread threadTest1;
+    private static List<Account> test1Creators;
 
     @GET
-    @Path("test1")
-    public String test1(@QueryParam("delay") long delay, @QueryParam("password") String password) {
+    @Path("test1/{delay}")
+    public String test1(@PathParam("delay") long delay, @QueryParam("password") String password) {
 
         if (!BlockChain.DEVELOP_USE)
-            return "-";
+            return "not DEVELOP";
 
-        APIUtils.askAPICallAllowed(password, "GET test1\n ", request, true);
+        APIUtils.askAPICallAllowed(password, "GET test1\n ", request, false);
+
+        this.test1Delay = delay;
 
         if (threadTest1 != null) {
-            test1Delay = delay;
             JSONObject out = new JSONObject();
             out.put("delay", delay);
             return out.toJSONString();
         }
 
-        byte[] seed = Controller.getInstance().exportSeed();
-        List<Account> accounts = Controller.getInstance().getAccounts();
+        test1Creators = Controller.getInstance().getAccounts();
 
-        byte[] accountSeed = Controller.getInstance().wallet.generateAccountSeed(seed, -111);
-        PrivateKeyAccount account = new PrivateKeyAccount(accountSeed);
+        JSONObject out = new JSONObject();
 
-        test1Delay = delay;
+        if (test1Creators.size() <= 1) {
+            out.put("error", "too small accounts");
+
+            return out.toJSONString();
+        }
 
         Random random = new Random();
 
-        JSONObject out = new JSONObject();
 
         threadTest1 = new Thread(() -> {
 
             do {
 
-                if (test1Delay <= 0) {
+                if (this.test1Delay <= 0) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -318,11 +317,18 @@ public class R_SendResource {
                     continue;
                 }
 
-                Account recipient = accounts.get(random.nextInt(accounts.size()));
+                Account creator = test1Creators.get(random.nextInt(test1Creators.size()));
+                Account recipient;
+                do {
+                    recipient = test1Creators.get(random.nextInt(test1Creators.size()));
+                } while (recipient.equals(creator));
 
-                Transaction transaction = Controller.getInstance().r_Send(account, 0, recipient,
+
+                Transaction transaction = Controller.getInstance().r_Send(
+                        Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress()),
+                        0, recipient,
                         2l, null, "TEST 1",
-                        new byte[]{(byte)1}, "sfdsfsdfsfd lkjhdkfjhd gkljdhgflkg".getBytes(Charset.forName("UTF-8")),
+                        new byte[]{(byte) 1}, "TEST TEST TEST".getBytes(Charset.forName("UTF-8")),
                         new byte[]{(byte)0});
 
                 Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
@@ -330,7 +336,7 @@ public class R_SendResource {
                 // CHECK VALIDATE MESSAGE
                 if (result != Transaction.VALIDATE_OK) {
                     LOGGER.info(OnDealClick.resultMess(result));
-                    test1Delay = 0;
+                    this.test1Delay = 0;
                     continue;
                 }
 

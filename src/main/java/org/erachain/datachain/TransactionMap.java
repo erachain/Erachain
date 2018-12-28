@@ -311,6 +311,14 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     public boolean add(Transaction transaction) {
 
+        // java.util.ConcurrentModificationException:from org.erachain.core.block.Block.orphanTransactions
+        while (this.isWorked()) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+            }
+        }
+
         return this.set(transaction.getSignature(), transaction);
 
     }

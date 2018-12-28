@@ -441,16 +441,8 @@ public class DCSet implements Observer, IDB {
         //CREATE DATABASE
         return DBMaker.newFileDB(dbFile)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
-                .transactionDisable()
-                .cacheSize(1024)
-                //.cacheDisable()
                 .mmapFileEnableIfSupported() // -- error on asyncWriteEnable
-                //.snapshotEnable()
-                /// ICREATOR
                 .commitFileSyncDisable()
-                .asyncWriteEnable()
-                .asyncWriteFlushDelay(10)
-                //.cacheHardRefEnable()
                 .make();
     }
 
