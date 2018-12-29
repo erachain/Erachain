@@ -72,6 +72,11 @@ public class R_Send extends TransactionAmount {
                   Long reference) {
         super(typeBytes, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);
 
+        if (isText != null)
+            assert(isText.length == 1);
+        if (encrypted != null)
+            assert(encrypted.length == 1);
+
         this.head = head;
         if (head == null)
             this.head = "";

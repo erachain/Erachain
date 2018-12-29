@@ -657,8 +657,8 @@ public class TransactionCreator {
     //public Pair<Transaction, Integer> r_Send(PrivateKeyAccount creator,
 
     public Transaction r_Send(PrivateKeyAccount creator,
-                              Account recipient, long key, BigDecimal amount, int feePow, String title, byte[] isText,
-                              byte[] message, byte[] encryptMessage) {
+                              Account recipient, long key, BigDecimal amount, int feePow, String title, byte[] message, byte[] isText,
+                              byte[] encryptMessage) {
 
         this.checkUpdate();
 
@@ -677,8 +677,8 @@ public class TransactionCreator {
 
     public Transaction r_Send(byte version, byte property1, byte property2,
                               PrivateKeyAccount creator,
-                              Account recipient, long key, BigDecimal amount, int feePow, String title, byte[] isText,
-                              byte[] message, byte[] encryptMessage) {
+                              Account recipient, long key, BigDecimal amount, int feePow, String title,
+                              byte[] message, byte[] isText, byte[] encryptMessage) {
 
         this.checkUpdate();
 
@@ -687,7 +687,8 @@ public class TransactionCreator {
         long timestamp = NTP.getTime();
 
         //CREATE MESSAGE TRANSACTION
-        messageTx = new R_Send(version, property1, property2, creator, (byte) feePow, recipient, key, amount, title, message, isText, encryptMessage, timestamp, 0l);
+        messageTx = new R_Send(version, property1, property2, creator, (byte) feePow, recipient, key, amount, title,
+                message, isText, encryptMessage, timestamp, 0l);
         messageTx.sign(creator, Transaction.FOR_NETWORK);
         messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 

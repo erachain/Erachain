@@ -316,11 +316,14 @@ public class R_SendResource {
 
                     if (this.test1Delay <= 0) {
                         try {
-                            Thread.sleep(1000);
+                            Thread.sleep(10);
                         } catch (InterruptedException e) {
                         }
                         continue;
                     }
+
+                    if (Controller.getInstance().isOnStopping())
+                        return;
 
                     Account creator = test1Creators.get(random.nextInt(test1Creators.size()));
                     Account recipient;
@@ -338,15 +341,11 @@ public class R_SendResource {
                     Transaction transaction = Controller.getInstance().r_Send(privKey,
                             0, recipient,
                             2l, null, "TEST 1",
-                            new byte[]{(byte) 1},
-                            "TEST TEST TEST".getBytes(Charset.forName("UTF-8")),
-                            new byte[]{(byte) 0});
+                            "TEST TEST TEST".getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                            new byte[]{(byte) 1});
 
-                    if (false) {
-
-                        byte[] bytes = transaction.toBytes(Transaction.FOR_NETWORK, true);
-                        Transaction transaction2 = TransactionFactory.getInstance().parse(bytes, Transaction.FOR_NETWORK);
-                    }
+                    if (Controller.getInstance().isOnStopping())
+                        return;
 
                     Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
@@ -368,6 +367,9 @@ public class R_SendResource {
                         Thread.sleep(this.test1Delay);
                     } catch (InterruptedException e) {
                     }
+
+                    if (Controller.getInstance().isOnStopping())
+                        return;
 
                 } catch (Exception e10) {
                     LOGGER.error(e10.getMessage(), e10);

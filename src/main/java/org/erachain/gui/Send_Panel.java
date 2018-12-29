@@ -703,7 +703,8 @@ public class Send_Panel extends JPanel {
 
 
         //CREATE TX MESSAGE
-        Transaction transaction = Controller.getInstance().r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key, amount, head, messageBytes, isTextByte, encrypted);
+        Transaction transaction = Controller.getInstance().r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()),
+                feePow, recipient, key, amount, head, messageBytes, isTextByte, encrypted);
         // test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);
 
 

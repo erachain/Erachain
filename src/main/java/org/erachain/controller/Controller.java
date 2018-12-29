@@ -3035,7 +3035,7 @@ public class Controller extends Observable {
 
         // CREATE R_Send
         return new Pair<Integer, Transaction>(Transaction.VALIDATE_OK, this.r_Send(privateKeyAccount, feePow, recipient,
-                assetKey, amount, title, isTextByte, messageBytes, encrypted));
+                assetKey, amount, title, messageBytes, isTextByte, encrypted));
 
     }
 
@@ -3044,21 +3044,21 @@ public class Controller extends Observable {
     }
 
     public Transaction r_Send(PrivateKeyAccount sender, int feePow,
-                              Account recipient, long key, BigDecimal amount, String title, byte[] isText, byte[] message,
+                              Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_Send(sender, recipient, key, amount, feePow, title, isText, message,
+            return this.transactionCreator.r_Send(sender, recipient, key, amount, feePow, title, message, isText,
                     encryptMessage);
         }
     }
 
     public Transaction r_Send(byte version, byte property1, byte property2,
                               PrivateKeyAccount sender, int feePow,
-                              Account recipient, long key, BigDecimal amount, String title, byte[] isText, byte[] message,
+                              Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage) {
         synchronized (this.transactionCreator) {
             return this.transactionCreator.r_Send(version, property1, property2, sender, recipient, key, amount, feePow,
-                    title, isText, message, encryptMessage);
+                    title, message, isText, encryptMessage);
         }
     }
 
