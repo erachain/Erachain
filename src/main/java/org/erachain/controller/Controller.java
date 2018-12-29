@@ -1070,11 +1070,6 @@ public class Controller extends Observable {
             if (transaction == null)
                 continue;
 
-            if (transaction.getDeadline() < dTime) {
-                map.delete(transaction);
-                continue;
-            }
-
             // LOGGER.error(" time " + transaction.viewTimestamp());
 
             if (counter > BlockChain.ON_CONNECT_SEND_UNCONFIRMED_UNTIL
@@ -3052,7 +3047,7 @@ public class Controller extends Observable {
                               Account recipient, long key, BigDecimal amount, String title, byte[] isText, byte[] message,
                               byte[] encryptMessage) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_Send(sender, recipient, key, amount, feePow, title, message, isText,
+            return this.transactionCreator.r_Send(sender, recipient, key, amount, feePow, title, isText, message,
                     encryptMessage);
         }
     }
@@ -3063,7 +3058,7 @@ public class Controller extends Observable {
                               byte[] encryptMessage) {
         synchronized (this.transactionCreator) {
             return this.transactionCreator.r_Send(version, property1, property2, sender, recipient, key, amount, feePow,
-                    title, message, isText, encryptMessage);
+                    title, isText, message, encryptMessage);
         }
     }
 

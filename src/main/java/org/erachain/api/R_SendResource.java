@@ -6,6 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
@@ -311,48 +312,66 @@ public class R_SendResource {
 
             do {
 
-                if (this.test1Delay <= 0) {
+                try {
+
+                    if (this.test1Delay <= 0) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                        }
+                        continue;
+                    }
+
+                    Account creator = test1Creators.get(random.nextInt(test1Creators.size()));
+                    Account recipient;
+                    do {
+                        recipient = test1Creators.get(random.nextInt(test1Creators.size()));
+                    } while (recipient.equals(creator));
+
+
+                    PrivateKeyAccount privKey = Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress());
+                    if (privKey == null) {
+                        this.test1Delay = 0;
+                        LOGGER.info("TEST1: WALLET is locket");
+                        continue;
+                    }
+                    Transaction transaction = Controller.getInstance().r_Send(privKey,
+                            0, recipient,
+                            2l, null, "TEST 1",
+                            new byte[]{(byte) 1},
+                            "TEST TEST TEST".getBytes(Charset.forName("UTF-8")),
+                            new byte[]{(byte) 0});
+
+                    if (false) {
+
+                        byte[] bytes = transaction.toBytes(Transaction.FOR_NETWORK, true);
+                        Transaction transaction2 = TransactionFactory.getInstance().parse(bytes, Transaction.FOR_NETWORK);
+                    }
+
+                    Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+                    // CHECK VALIDATE MESSAGE
+                    if (result != Transaction.VALIDATE_OK) {
+                        if (result == Transaction.RECEIVER_NOT_PERSONALIZED
+                                || result == Transaction.CREATOR_NOT_PERSONALIZED
+                                || result == Transaction.NO_BALANCE
+                                || result == Transaction.NOT_ENOUGH_FEE
+                                || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT)
+                            continue;
+
+                        LOGGER.info(OnDealClick.resultMess(result));
+                        this.test1Delay = 0;
+                        continue;
+                    }
+
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(this.test1Delay);
                     } catch (InterruptedException e) {
                     }
-                    continue;
+
+                } catch (Exception e10) {
+                    LOGGER.error(e10.getMessage(), e10);
                 }
-
-                Account creator = test1Creators.get(random.nextInt(test1Creators.size()));
-                Account recipient;
-                do {
-                    recipient = test1Creators.get(random.nextInt(test1Creators.size()));
-                } while (recipient.equals(creator));
-
-
-                PrivateKeyAccount privKey = Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress());
-                if (privKey == null) {
-                    this.test1Delay = 0;
-                    LOGGER.info("TEST1: WALLET is locket");
-                    continue;
-                }
-                Transaction transaction = Controller.getInstance().r_Send(privKey,
-                        0, recipient,
-                        2l, null, "TEST 1",
-                        new byte[]{(byte) 1},
-                        "TEST TEST TEST".getBytes(Charset.forName("UTF-8")),
-                        new byte[]{(byte) 0});
-
-                Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-
-                // CHECK VALIDATE MESSAGE
-                if (result != Transaction.VALIDATE_OK) {
-                    LOGGER.info(OnDealClick.resultMess(result));
-                    this.test1Delay = 0;
-                    continue;
-                }
-
-                try {
-                    Thread.sleep(this.test1Delay);
-                } catch (InterruptedException e) {
-                }
-
 
             } while (true);
         });

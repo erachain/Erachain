@@ -1,15 +1,6 @@
 package org.erachain.core;
 
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 import com.google.common.primitives.Bytes;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -34,41 +25,17 @@ import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.naming.Name;
 import org.erachain.core.naming.NameSale;
 import org.erachain.core.payment.Payment;
-import org.erachain.core.transaction.ArbitraryTransactionV3;
-import org.erachain.core.transaction.BuyNameTransaction;
-import org.erachain.core.transaction.CancelOrderTransaction;
-import org.erachain.core.transaction.CancelSellNameTransaction;
-import org.erachain.core.transaction.CreateOrderTransaction;
-import org.erachain.core.transaction.CreatePollTransaction;
-import org.erachain.core.transaction.DeployATTransaction;
-import org.erachain.core.transaction.IssueAssetTransaction;
-import org.erachain.core.transaction.IssueImprintRecord;
-import org.erachain.core.transaction.IssuePersonRecord;
-import org.erachain.core.transaction.IssuePollRecord;
-import org.erachain.core.transaction.IssueStatusRecord;
-import org.erachain.core.transaction.IssueTemplateRecord;
-import org.erachain.core.transaction.IssueUnionRecord;
-import org.erachain.core.transaction.Issue_ItemRecord;
-import org.erachain.core.transaction.MultiPaymentTransaction;
-import org.erachain.core.transaction.R_Hashes;
-import org.erachain.core.transaction.R_Send;
-import org.erachain.core.transaction.R_SertifyPubKeys;
-import org.erachain.core.transaction.R_SetStatusToItem;
-import org.erachain.core.transaction.R_SignNote;
-import org.erachain.core.transaction.R_Vouch;
-import org.erachain.core.transaction.RegisterNameTransaction;
-import org.erachain.core.transaction.SellNameTransaction;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.TransactionFactory;
-import org.erachain.core.transaction.UpdateNameTransaction;
-import org.erachain.core.transaction.VoteOnItemPollTransaction;
-import org.erachain.core.transaction.VoteOnPollTransaction;
+import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Pair;
 import org.erachain.utils.TransactionTimestampComparator;
+
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 
 /**
@@ -690,7 +657,7 @@ public class TransactionCreator {
     //public Pair<Transaction, Integer> r_Send(PrivateKeyAccount creator,
 
     public Transaction r_Send(PrivateKeyAccount creator,
-                              Account recipient, long key, BigDecimal amount, int feePow, String head, byte[] isText,
+                              Account recipient, long key, BigDecimal amount, int feePow, String title, byte[] isText,
                               byte[] message, byte[] encryptMessage) {
 
         this.checkUpdate();
@@ -701,7 +668,7 @@ public class TransactionCreator {
 
         //CREATE MESSAGE TRANSACTION
         //messageTx = new R_Send(creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);
-        messageTx = new R_Send(creator, (byte) feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);
+        messageTx = new R_Send(creator, (byte) feePow, recipient, key, amount, title, message, isText, encryptMessage, timestamp, 0l);
         messageTx.sign(creator, Transaction.FOR_NETWORK);
         messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
@@ -710,7 +677,7 @@ public class TransactionCreator {
 
     public Transaction r_Send(byte version, byte property1, byte property2,
                               PrivateKeyAccount creator,
-                              Account recipient, long key, BigDecimal amount, int feePow, String head, byte[] isText,
+                              Account recipient, long key, BigDecimal amount, int feePow, String title, byte[] isText,
                               byte[] message, byte[] encryptMessage) {
 
         this.checkUpdate();
@@ -720,7 +687,7 @@ public class TransactionCreator {
         long timestamp = NTP.getTime();
 
         //CREATE MESSAGE TRANSACTION
-        messageTx = new R_Send(version, property1, property2, creator, (byte) feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);
+        messageTx = new R_Send(version, property1, property2, creator, (byte) feePow, recipient, key, amount, title, message, isText, encryptMessage, timestamp, 0l);
         messageTx.sign(creator, Transaction.FOR_NETWORK);
         messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
