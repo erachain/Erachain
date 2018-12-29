@@ -3035,7 +3035,7 @@ public class Controller extends Observable {
 
         // CREATE R_Send
         return new Pair<Integer, Transaction>(Transaction.VALIDATE_OK, this.r_Send(privateKeyAccount, feePow, recipient,
-                assetKey, amount, title, messageBytes, isTextByte, encrypted));
+                assetKey, amount, title, isTextByte, messageBytes, encrypted));
 
     }
 
