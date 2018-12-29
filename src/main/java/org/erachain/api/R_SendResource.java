@@ -381,7 +381,7 @@ public class R_SendResource {
         threadTest1.start();
 
         out.put("delay", test1Delay);
-        LOGGER.info("TEST1: STARTED");
+        LOGGER.info("TEST1: STARTED for delay: " + test1Delay);
 
         return out.toJSONString();
 
