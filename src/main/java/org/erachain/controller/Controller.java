@@ -1488,9 +1488,16 @@ public class Controller extends Observable {
                         this.network.asyncBroadcast(message, excludes, false);
                     } else {
                         // SEND my BLOCK
-                        Message messageBestWin = MessageFactory.getInstance()
-                                .createWinBlockMessage(blockChain.getWaitWinBuffer());
-                        message.getSender().sendMessage(messageBestWin);
+
+                        // GET till not NULL
+                        Block myWinBlock = blockChain.getWaitWinBuffer();
+                        if (myWinBlock != null) {
+                            // оказывается иногда там НУЛ случается
+                            // надо сначала взять, проскрить и потом слать
+                            Message messageBestWin = MessageFactory.getInstance()
+                                    .createWinBlockMessage(myWinBlock);
+                            message.getSender().sendMessage(messageBestWin);
+                        }
                     }
                     return;
 
