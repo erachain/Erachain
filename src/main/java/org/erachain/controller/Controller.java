@@ -1233,7 +1233,8 @@ public class Controller extends Observable {
         }
 
         // BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-        this.broadcastUnconfirmedToPeer(peer);
+        if (!this.broadcastUnconfirmedToPeer(peer))
+            this.network.tryDisconnect(peer, 1, "broken on SEND UNCONFIRMEDs");
 
         /*
          * // GET HEIGHT Tuple2<Integer, Long> HWeight =
