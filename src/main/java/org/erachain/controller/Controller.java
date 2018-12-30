@@ -1028,6 +1028,10 @@ public class Controller extends Observable {
         this.notifyObservers(new ObserverMessage(ObserverMessage.BLOCKCHAIN_SYNC_STATUS, height));
     }
 
+    /**
+     * Total time in disconnect
+     * @return
+     */
     public long getToOfflineTime() {
         return this.toOfflineTime;
     }
@@ -1051,13 +1055,11 @@ public class Controller extends Observable {
 
         TransactionMap map = this.dcSet.getTransactionMap();
         Iterator<Long> iterator = map.getIterator(0, false);
-        Transaction transaction;
-        Message message;
         long ping = 0;
         int counter = 0;
         ///////// big maxCounter freeze network and make bans on response
         ///////// headers andblocks
-        int stepCount = 512; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
+        int stepCount = 126; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
         long dTime = this.blockChain.getTimestamp(this.dcSet);
 
         while (iterator.hasNext() && stepCount > 4) {
@@ -1066,7 +1068,7 @@ public class Controller extends Observable {
                 return;
             }
 
-            transaction = map.get(iterator.next());
+            Transaction transaction = map.get(iterator.next());
             if (transaction == null)
                 continue;
 
@@ -1078,14 +1080,27 @@ public class Controller extends Observable {
                     && !map.needBroadcasting(transaction, peerByte))
                 continue;
 
-            message = MessageFactory.getInstance().createTransactionMessage(transaction);
+            try {
+                Thread.sleep(1);
+            } catch (Exception e) {
+            }
+
+            Message message = MessageFactory.getInstance().createTransactionMessage(transaction);
 
             try {
-                if (peer.sendMessage(message)) {
+                if (peer.tryTimesSend(message, 100)) {
                     counter++;
                     map.addBroadcastedPeer(transaction, peerByte);
                 } else {
-                    break;
+                    // понизим число передач за раз
+                    stepCount >>= 1;
+                    try {
+                        Thread.sleep(10000);
+                    } catch (Exception e) {
+                    }
+                    if (this.isStopping) {
+                        return;
+                    }
                 }
             } catch (Exception e) {
                 if (this.isStopping) {
@@ -1269,8 +1284,7 @@ public class Controller extends Observable {
 
                         Controller.getInstance().setToOfflineTime(0L);
 
-                        if (false && (Controller.getInstance().isNeedSyncWallet() // || checkNeedSyncWallet()
-                        )
+                        if (Controller.getInstance().isNeedSyncWallet() // || checkNeedSyncWallet()
                                 && !Controller.getInstance().isProcessingWalletSynchronize()) {
                             // LOGGER.error("actionAfterConnect --->>>>>>
                             // synchronizeWallet");
