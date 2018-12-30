@@ -93,8 +93,25 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
     // height
     public void set(String address, Integer currentHeight, Integer currentForgingVolume) {
 
+        if (address.equals("7CvpXXALviZPkZ9Yn27NncLVz6SkxMA8rh")
+                && currentHeight > 291000 && currentHeight < 291050) {
+            Tuple2<Integer, Integer> pointPrev = getLast(address);
+            if (pointPrev != null) {
+                Tuple2<Integer, Integer> pointPrev1 = get(new Tuple2<>(address, pointPrev.a));
+                if (pointPrev1 != null) {
+                    Tuple2<Integer, Integer> pointPrev2 = get(new Tuple2<>(address, pointPrev1.a));
+                    if (pointPrev2 != null) {
+                        Tuple2<Integer, Integer> pointPrev3 = get(new Tuple2<>(address, pointPrev2.a));
+                        int a= 0;
+                    }
+                }
+            }
+        }
+
         Tuple2<Integer, Integer> previousPoint = this.getLast(address);
         if (previousPoint != null && currentHeight > previousPoint.a) {
+            // ONLY if not SAME HEIGHT !!! потому что в одном блоке может идти несколько
+            // транзакций на один счет инициализирующих - нужно результат в конце поймать
             this.set(new Tuple2<String, Integer>(address, currentHeight), previousPoint);
         }
 
@@ -109,12 +126,23 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
             return;
         }
 
-        //Tuple2<String, Integer> keyLast = new Tuple2<String, Integer>(address, 0);
-        //Tuple2<Integer, Integer> last = this.get(keyLast);
-        Tuple2<String, Integer> key = new Tuple2<String, Integer>(address, height);
-        Tuple2<Integer, Integer> previous = this.get(key);
+        if (address.equals("7CvpXXALviZPkZ9Yn27NncLVz6SkxMA8rh")
+                && height > 291000 && height < 291056) {
+            Tuple2<Integer, Integer> pointPrev = getLast(address);
+            if (pointPrev != null) {
+                Tuple2<Integer, Integer> pointPrev1 = get(new Tuple2<>(address, pointPrev.a));
+                if (pointPrev1 != null) {
+                    Tuple2<Integer, Integer> pointPrev2 = get(new Tuple2<>(address, pointPrev1.a));
+                    if (pointPrev2 != null) {
+                        Tuple2<Integer, Integer> pointPrev3 = get(new Tuple2<>(address, pointPrev2.a));
+                        int a= 0;
+                    }
+                }
+            }
+        }
 
-        this.delete(key);
+        Tuple2<String, Integer> key = new Tuple2<String, Integer>(address, height);
+        Tuple2<Integer, Integer> previous = this.delete(key);
         this.setLast(address, previous);
 
     }

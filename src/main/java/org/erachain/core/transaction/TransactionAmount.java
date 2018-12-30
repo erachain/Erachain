@@ -1005,22 +1005,22 @@ public abstract class TransactionAmount extends Transaction {
         }
                 
         if (absKey == Transaction.RIGHTS_KEY) {
-            // update last forging block if it not exist
-            // if exist - it not need - incomes will be negate from forging
-            // balance
-            // get height by LAST block in CHAIN + 2 - skip incoming BLOCK
-            
+            // если нет передыдущей инфо - это первый приход, просто добавим
+            // будет создано предыдущее значение и последнее которое на него показывает
+            //     НО
+            // если уже есть и последнее совпадает с текухим по высоте то обновим БАЛАНС на новый
             Tuple2<Integer, Integer> privousForgingPoint = this.recipient.getLastForgingData(db);
             int currentForgingBalance = recipient.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-            int blockHeight = this.getBlockHeightByParentOrLast(db);
-            if (privousForgingPoint == null || privousForgingPoint.a == blockHeight) {
+            if (privousForgingPoint == null || privousForgingPoint.a == this.height) {
                 if (currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
-                    this.recipient.setForgingData(db, blockHeight, currentForgingBalance);
+                    this.recipient.setForgingData(db, this.height, currentForgingBalance);
                 }
             } else {
+                // если это не инициализация то может там нулевой баланс был
+                // надо обновить приход
                 if (privousForgingPoint.b < BlockChain.MIN_GENERATING_BALANCE
                         && currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
-                    this.recipient.setForgingData(db, blockHeight, this.amount.intValue());
+                    this.recipient.setForgingData(db, this.height, currentForgingBalance);
                 }
             }
         }
@@ -1046,7 +1046,8 @@ public abstract class TransactionAmount extends Transaction {
         
         // BACKWARD - CONFISCATE
         boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
-        
+
+        String creatorStr = this.creator.getAddress();
         // ASSET TYPE ORPHAN
         if (this.asset.isOutsideType()) {
             if (actionType == ACTION_SEND && backward) {
@@ -1059,7 +1060,7 @@ public abstract class TransactionAmount extends Transaction {
                 this.creator.changeBalance(db, true, -absKey, this.amount, true);
                 this.recipient.changeBalance(db, false, -absKey, this.amount, true);
                 
-                Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(this.creator.getAddress(),
+                Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(creatorStr,
                         absKey, this.recipient.getAddress());
                 db.getCredit_AddressesMap().add(creditKey, this.amount);
             } else {
@@ -1104,20 +1105,20 @@ public abstract class TransactionAmount extends Transaction {
         if (actionType == ACTION_DEBT) {
             if (backward) {
                 // BORROW
-                Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(this.creator.getAddress(),
+                Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(creatorStr,
                         absKey, this.recipient.getAddress());
                 db.getCredit_AddressesMap().add(creditKey, this.amount);
             } else {
                 // in BACK order - RETURN CREDIT << CREDIT
                 // GET CREDIT for left AMOUNT
-                Tuple3<String, Long, String> leftCreditKey = new Tuple3<String, Long, String>(this.creator.getAddress(),
+                Tuple3<String, Long, String> leftCreditKey = new Tuple3<String, Long, String>(creatorStr,
                         absKey, this.recipient.getAddress()); // REVERSE
                 BigDecimal leftAmount = db.getCredit_AddressesMap().get(leftCreditKey);
                 if (leftAmount.compareTo(amount) < 0) {
                     db.getCredit_AddressesMap().sub(leftCreditKey, leftAmount);
                     // CREDIR or RETURN CREDIT
                     Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
-                            this.recipient.getAddress(), absKey, this.creator.getAddress());
+                            this.recipient.getAddress(), absKey, creatorStr);
                     db.getCredit_AddressesMap().add(creditKey, amount.subtract(leftAmount));
                 } else {
                     // ONLY RETURN CREDIT
@@ -1128,10 +1129,13 @@ public abstract class TransactionAmount extends Transaction {
         }
         
         if (absKey == Transaction.RIGHTS_KEY) {
-            //int blockHeight = this.getBlockHeightByParentOrLast(db);
-            Tuple2<Integer, Integer> lastForgingPoint = this.recipient.getLastForgingData(db);
-            if (lastForgingPoint != null && lastForgingPoint.a == height) {
-                this.recipient.delForgingData(db, height);
+            if (!this.block.getCreator().equals(creatorStr)) {
+                // если этот блок не собирался этим человеком
+                Tuple2<Integer, Integer> lastForgingPoint = this.recipient.getLastForgingData(db);
+                if (lastForgingPoint != null && lastForgingPoint.a == height
+                        && !this.block.getCreator().equals(creatorStr)) {
+                    this.recipient.delForgingData(db, height);
+                }
             }
         }
     }

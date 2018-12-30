@@ -609,6 +609,10 @@ public class Peer extends Thread {
             try {
                 this.out.write(bytes);
                 this.out.flush();
+            } catch (java.net.SocketException eSock) {
+                callback.tryDisconnect(this, 0, eSock.getMessage());
+                return false;
+
             } catch (IOException e) {
                 if (this.socket.isOutputShutdown()) {
                     //ERROR

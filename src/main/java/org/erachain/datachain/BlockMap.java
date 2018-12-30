@@ -295,7 +295,14 @@ public class BlockMap extends DCMap<Integer, Block> {
             //Block.BlockHead head = dcSet.getBlocksHeadsMap().remove();
             dcSet.getBlocksHeadsMap().remove();
 
-            // INITIAL forging DATA no need remove!
+            if (creator.getAddress().equals("7CvpXXALviZPkZ9Yn27NncLVz6SkxMA8rh")
+                    && height > 291000 && height < 291056) {
+                Tuple2<String, Integer> key = new Tuple2<String, Integer>(creator.getAddress(), height);
+                Tuple2<Integer, Integer> previous = dcSet.getAddressForging().get(key);
+                int ii = 0;
+            }
+
+                // INITIAL forging DATA no need remove!
             Tuple2<String, Integer> key = new Tuple2<String, Integer>(creator.getAddress(), height);
             Tuple2<Integer, Integer> previous = dcSet.getAddressForging().get(key);
             if (previous != null) {
