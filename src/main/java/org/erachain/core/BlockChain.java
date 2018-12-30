@@ -97,6 +97,8 @@ public class BlockChain {
 
     public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11  : VERS_4_11 + 50000;
 
+    public static final int DEVELOP_FORGING_START = 100;
+
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ?
             new byte[][]{
                     // ORDER on ERG
@@ -556,7 +558,8 @@ public class BlockChain {
             previousForgingPoint = creator.getLastForgingData(dcSet);
             if (previousForgingPoint == null)
                 if (DEVELOP_USE)
-                    previousForgingPoint = new Tuple2<Integer, Integer>(height - (height > VERS_4_11? 100 : 10), 1000);
+                    // - (height > VERS_4_11? 100 : 10), 1000);
+                    previousForgingPoint = new Tuple2<Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance);
                 else
                     return 0l;
         }

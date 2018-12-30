@@ -112,6 +112,8 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
         if (previousPoint != null && currentHeight > previousPoint.a) {
             // ONLY if not SAME HEIGHT !!! потому что в одном блоке может идти несколько
             // транзакций на один счет инициализирующих - нужно результат в конце поймать
+            // и если одниковый блок и форжинговое значение - то обновлять только Последнее,
+            // то есть сюда приходит только если НАОБОРОТ - это не Первое значение и Не с темже блоком в Последнее
             this.set(new Tuple2<String, Integer>(address, currentHeight), previousPoint);
         }
 

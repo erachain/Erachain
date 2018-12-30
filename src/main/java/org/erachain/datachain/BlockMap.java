@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 // 30/03
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.BlockGenerator;;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -248,6 +249,10 @@ public class BlockMap extends DCMap<Integer, Block> {
         }
 
         PublicKeyAccount creator = block.getCreator();
+        if (BlockChain.DEVELOP_USE && creator.getLastForgingData(dcSet) == null) {
+            // так как унас новые счета сами стартуют без инициализации - надо тут учеть начало
+            creator.setForgingData(dcSet, height - BlockChain.DEVELOP_FORGING_START, block.getForgingValue());
+        }
         creator.setForgingData(dcSet, height, block.getForgingValue());
 
         // LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1200: " +
