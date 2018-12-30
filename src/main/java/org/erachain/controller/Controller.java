@@ -1044,14 +1044,14 @@ public class Controller extends Observable {
         this.network.notifyObserveUpdatePeer(peer);
     }
 
-    public void broadcastUnconfirmedToPeer(Peer peer) {
+    public boolean broadcastUnconfirmedToPeer(Peer peer) {
 
         // LOGGER.info(peer.getAddress() + " sended UNCONFIRMED ++++ START ");
 
         byte[] peerByte = peer.getAddress().getAddress();
 
         if (this.isStopping)
-            return;
+            return false;
 
         TransactionMap map = this.dcSet.getTransactionMap();
         Iterator<Long> iterator = map.getIterator(0, false);
@@ -1059,13 +1059,13 @@ public class Controller extends Observable {
         int counter = 0;
         ///////// big maxCounter freeze network and make bans on response
         ///////// headers andblocks
-        int stepCount = 126; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
+        int stepCount = 64; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
         long dTime = this.blockChain.getTimestamp(this.dcSet);
 
-        while (iterator.hasNext() && stepCount > 4) {
+        while (iterator.hasNext() && stepCount > 2) {
 
             if (this.isStopping) {
-                return;
+                return false;
             }
 
             Transaction transaction = map.get(iterator.next());
@@ -1093,23 +1093,16 @@ public class Controller extends Observable {
             Message message = MessageFactory.getInstance().createTransactionMessage(transaction);
 
             try {
-                if (peer.tryTimesSend(message, 100)) {
+                if (peer.sendMessage(message)) {
                     counter++;
                     map.addBroadcastedPeer(transaction, peerByte);
                 } else {
-                    // понизим число передач за раз
-                    stepCount >>= 1;
-                    try {
-                        Thread.sleep(10000);
-                    } catch (Exception e) {
-                    }
-                    if (this.isStopping) {
-                        return;
-                    }
+                    // DISCONNECT
+                    return false;
                 }
             } catch (Exception e) {
                 if (this.isStopping) {
-                    return;
+                    return false;
                 }
                 LOGGER.error(e.getMessage(), e);
             }
@@ -1120,7 +1113,7 @@ public class Controller extends Observable {
                 this.network.notifyObserveUpdatePeer(peer);
 
                 ping = peer.getPing();
-                if (ping < 0 || ping > 500) {
+                if (ping < 0 || ping > 1000) {
 
                     stepCount >>= 1;
 
@@ -1137,7 +1130,7 @@ public class Controller extends Observable {
                     // LOGGER.debug(peer.getAddress() + " stepCount down " +
                     // stepCount);
 
-                } else if (ping < 100) {
+                } else if (ping < 200) {
                     stepCount <<= 1;
                     // LOGGER.debug(peer.getAddress() + " stepCount UP " +
                     // stepCount + " for PING: " + ping);
@@ -1152,6 +1145,8 @@ public class Controller extends Observable {
 
         // LOGGER.info(peer.getAddress() + " sended UNCONFIRMED counter: " +
         // counter);
+
+        return true;
 
     }
 

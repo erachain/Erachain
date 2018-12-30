@@ -721,30 +721,6 @@ public class Peer extends Thread {
         return true;
     }
 
-    /**
-     * попытка послать сообщение Х рах
-     * @param message
-     * @param times
-     * @return
-     */
-    public boolean tryTimesSend(Message message, int times) {
-
-        do {
-            if (this.sendMessage(message)) {
-                return true;
-            } else {
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                }
-                times--;
-            }
-        } while (times > 0 && this.runed);
-
-        return false;
-
-    }
-
     public synchronized int getResponseKey()
     //public int getResponseKey()
     {
