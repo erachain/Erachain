@@ -613,20 +613,29 @@ public class Peer extends Thread {
                 if (this.socket.isOutputShutdown()) {
                     //ERROR
                     LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType())
-                            + " ERROR: " + e.getMessage());
+                            + " (**isOutputShutdown**) ERROR: " + e.getMessage());
                     //callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
                     /////callback.tryDisconnect(this, 0, "try write 1");
 
                     //RETURN
                     return false;
                 } else {
+                    // INFO
+                    LOGGER.debug("TRACK: " + e.getMessage(), e);
+
                     try {
+                        int newSendBufferSize = this.socket.getSendBufferSize() << 1;
+                        if (newSendBufferSize > BlockChain.MAX_BLOCK_SIZE_BYTE)
+                            return false;
+
                         LOGGER.debug("try setSendBufferSize to " + this.address + " "
-                                + (this.socket.getSendBufferSize()<<1));
-                        this.socket.setSendBufferSize(this.socket.getSendBufferSize()<<1);
+                                + newSendBufferSize);
+                        this.socket.setSendBufferSize(newSendBufferSize);
+                        return false;
                     } catch (IOException eSize) {
                         LOGGER.debug("try setSendBufferSize to " + this.address + " on " + Message.viewType(message.getType())
                                 + " ERROR: " + eSize.getMessage());
+                        return false;
                     }
                 }
             } catch (Exception e) {
