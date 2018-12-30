@@ -1080,6 +1080,11 @@ public class Controller extends Observable {
                     && !map.needBroadcasting(transaction, peerByte))
                 continue;
 
+            if (transaction.getDeadline() < dTime) {
+                clearUnconfirmedRecords();
+                continue;
+            }
+
             try {
                 Thread.sleep(1);
             } catch (Exception e) {
@@ -1546,10 +1551,16 @@ public class Controller extends Observable {
                     // ADD TO UNCONFIRMED TRANSACTIONS
                     this.dcSet.getTransactionMap().add(transaction);
 
-                    // BROADCAST
-                    List<Peer> excludes = new ArrayList<Peer>();
-                    excludes.add(message.getSender());
-                    this.network.broadcast(message, excludes, false);
+                    if (this.status != STATUS_OK) {
+                        // если мы не в синхронизации - так как мы тогда
+                        // не знаем время текущее цепочки и не понимаем можно ли борадкастить дальше трнзакцию
+                        // так как непонятно - протухла она или нет
+
+                        // BROADCAST
+                        List<Peer> excludes = new ArrayList<Peer>();
+                        excludes.add(message.getSender());
+                        this.network.broadcast(message, excludes, false);
+                    }
 
                     return;
 
