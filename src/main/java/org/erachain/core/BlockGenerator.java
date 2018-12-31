@@ -407,10 +407,11 @@ public class BlockGenerator extends Thread implements Observer {
 
                 if (timePoint != timeTmp) {
                     timePoint = timeTmp;
-                    Timestamp timestampPoit = new Timestamp(timePoint);
-                    dcSet.getTransactionMap().clear(timePoint - BlockChain.GENERATING_MIN_BLOCK_TIME_MS);
 
+                    Timestamp timestampPoit = new Timestamp(timePoint);
                     LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit);
+
+                    ///dcSet.getTransactionMap().clear(timePoint - BlockChain.GENERATING_MIN_BLOCK_TIME_MS);
 
                     flushPoint = BlockChain.FLUSH_TIMEPOINT + timePoint;
                     this.solvingReference = null;

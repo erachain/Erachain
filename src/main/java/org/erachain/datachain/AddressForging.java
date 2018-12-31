@@ -74,8 +74,9 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
 
     public Tuple2<Integer, Integer> get(String address, int height) {
         Tuple2<Integer, Integer> point = this.get(new Tuple2<String, Integer>(address, height));
-        if (point == null)
+        if (point == null) {
             return this.get(new Tuple2<String, Integer>(address, 0));
+        }
 
         return point;
 

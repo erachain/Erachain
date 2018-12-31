@@ -70,9 +70,9 @@ public class DWSet implements IDB {
                 //.cacheSize(2048)
                 //.cacheDisable()
                 .checksumEnable()
-                .mmapFileEnableIfSupported()
+                .mmapFileEnableIfSupported() // ++
                 /// ICREATOR
-                .commitFileSyncDisable()
+                .commitFileSyncDisable() // ++
                 .make();
 
         uses = 0;

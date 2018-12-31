@@ -45,9 +45,9 @@ public class DBSet implements IDB {
         database = DBMaker.newFileDB(DATA_FILE)
                 //.cacheDisable()
                 .checksumEnable()
-                .mmapFileEnableIfSupported()
+                .mmapFileEnableIfSupported() // ++
                 /// ICREATOR
-                .commitFileSyncDisable()
+                .commitFileSyncDisable() // ++
                 .transactionDisable()
                 .make();
 

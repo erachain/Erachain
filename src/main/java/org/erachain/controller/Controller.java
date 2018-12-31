@@ -1028,6 +1028,10 @@ public class Controller extends Observable {
         this.notifyObservers(new ObserverMessage(ObserverMessage.BLOCKCHAIN_SYNC_STATUS, height));
     }
 
+    /**
+     * Total time in disconnect
+     * @return
+     */
     public long getToOfflineTime() {
         return this.toOfflineTime;
     }
@@ -1051,13 +1055,11 @@ public class Controller extends Observable {
 
         TransactionMap map = this.dcSet.getTransactionMap();
         Iterator<Long> iterator = map.getIterator(0, false);
-        Transaction transaction;
-        Message message;
         long ping = 0;
         int counter = 0;
         ///////// big maxCounter freeze network and make bans on response
         ///////// headers andblocks
-        int stepCount = 512; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
+        int stepCount = 126; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
         long dTime = this.blockChain.getTimestamp(this.dcSet);
 
         while (iterator.hasNext() && stepCount > 4) {
@@ -1066,14 +1068,9 @@ public class Controller extends Observable {
                 return;
             }
 
-            transaction = map.get(iterator.next());
+            Transaction transaction = map.get(iterator.next());
             if (transaction == null)
                 continue;
-
-            if (transaction.getDeadline() < dTime) {
-                map.delete(transaction);
-                continue;
-            }
 
             // LOGGER.error(" time " + transaction.viewTimestamp());
 
@@ -1083,14 +1080,32 @@ public class Controller extends Observable {
                     && !map.needBroadcasting(transaction, peerByte))
                 continue;
 
-            message = MessageFactory.getInstance().createTransactionMessage(transaction);
+            if (transaction.getDeadline() < dTime) {
+                clearUnconfirmedRecords();
+                continue;
+            }
 
             try {
-                if (peer.sendMessage(message)) {
+                Thread.sleep(1);
+            } catch (Exception e) {
+            }
+
+            Message message = MessageFactory.getInstance().createTransactionMessage(transaction);
+
+            try {
+                if (peer.tryTimesSend(message, 100)) {
                     counter++;
                     map.addBroadcastedPeer(transaction, peerByte);
                 } else {
-                    break;
+                    // понизим число передач за раз
+                    stepCount >>= 1;
+                    try {
+                        Thread.sleep(10000);
+                    } catch (Exception e) {
+                    }
+                    if (this.isStopping) {
+                        return;
+                    }
                 }
             } catch (Exception e) {
                 if (this.isStopping) {
@@ -1240,7 +1255,7 @@ public class Controller extends Observable {
     public void actionAfterConnect() {
 
         ///////// UNCONFIRMED MAP CLEAR
-        if (this.timerUnconfirmed == null) {
+        if (false && this.timerUnconfirmed == null) {
             this.timerUnconfirmed = new Timer();
 
             TimerTask actionUnconfirmed = new TimerTask() {
@@ -1274,8 +1289,7 @@ public class Controller extends Observable {
 
                         Controller.getInstance().setToOfflineTime(0L);
 
-                        if (false && (Controller.getInstance().isNeedSyncWallet() // || checkNeedSyncWallet()
-                        )
+                        if (Controller.getInstance().isNeedSyncWallet() // || checkNeedSyncWallet()
                                 && !Controller.getInstance().isProcessingWalletSynchronize()) {
                             // LOGGER.error("actionAfterConnect --->>>>>>
                             // synchronizeWallet");
@@ -1493,9 +1507,16 @@ public class Controller extends Observable {
                         this.network.asyncBroadcast(message, excludes, false);
                     } else {
                         // SEND my BLOCK
-                        Message messageBestWin = MessageFactory.getInstance()
-                                .createWinBlockMessage(blockChain.getWaitWinBuffer());
-                        message.getSender().sendMessage(messageBestWin);
+
+                        // GET till not NULL
+                        Block myWinBlock = blockChain.getWaitWinBuffer();
+                        if (myWinBlock != null) {
+                            // оказывается иногда там НУЛ случается
+                            // надо сначала взять, проскрить и потом слать
+                            Message messageBestWin = MessageFactory.getInstance()
+                                    .createWinBlockMessage(myWinBlock);
+                            message.getSender().sendMessage(messageBestWin);
+                        }
                     }
                     return;
 
@@ -1506,17 +1527,22 @@ public class Controller extends Observable {
                     // GET TRANSACTION
                     Transaction transaction = transactionMessage.getTransaction();
 
-                    // CHECK IF SIGNATURE IS VALID OR GENESIS TRANSACTION
-                    if (transaction.getCreator() != null & !transaction.isSignatureValid(DCSet.getInstance())) {
+                    // CHECK IF SIGNATURE IS VALID ////// ------- OR GENESIS TRANSACTION
+                    if (transaction.getCreator() == null
+                            || !transaction.isSignatureValid(DCSet.getInstance())) {
                         // DISHONEST PEER
                         banPeerOnError(message.getSender(), "invalid transaction signature");
 
                         return;
                     }
 
-                    // AND UNCONFIRMED
-                    // TODO fee
-                    // transaction.calcFee();
+                    // DEADTIME
+                    if (transaction.getDeadline() < this.blockChain.getTimestamp(DCSet.getInstance())) {
+                        // so OLD transaction
+                        return;
+                    }
+
+                    // ALREADY EXIST
                     byte[] signature = transaction.getSignature();
                     if (this.dcSet.getTransactionMap().contains(signature)
                             || this.dcSet.getTransactionFinalMapSigns().contains(signature) || this.isStopping)
@@ -1525,10 +1551,16 @@ public class Controller extends Observable {
                     // ADD TO UNCONFIRMED TRANSACTIONS
                     this.dcSet.getTransactionMap().add(transaction);
 
-                    // BROADCAST
-                    List<Peer> excludes = new ArrayList<Peer>();
-                    excludes.add(message.getSender());
-                    this.network.broadcast(message, excludes, false);
+                    if (this.status != STATUS_OK) {
+                        // если мы не в синхронизации - так как мы тогда
+                        // не знаем время текущее цепочки и не понимаем можно ли борадкастить дальше трнзакцию
+                        // так как непонятно - протухла она или нет
+
+                        // BROADCAST
+                        List<Peer> excludes = new ArrayList<Peer>();
+                        excludes.add(message.getSender());
+                        this.network.broadcast(message, excludes, false);
+                    }
 
                     return;
 
@@ -2112,6 +2144,7 @@ public class Controller extends Observable {
 
     public void clearUnconfirmedRecords() {
         this.blockChain.clearUnconfirmedRecords(this, this.dcSet);
+
     }
 
     /**
@@ -3043,7 +3076,7 @@ public class Controller extends Observable {
     }
 
     public Transaction r_Send(PrivateKeyAccount sender, int feePow,
-                              Account recipient, long key, BigDecimal amount, String title, byte[] isText, byte[] message,
+                              Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage) {
         synchronized (this.transactionCreator) {
             return this.transactionCreator.r_Send(sender, recipient, key, amount, feePow, title, message, isText,
@@ -3053,7 +3086,7 @@ public class Controller extends Observable {
 
     public Transaction r_Send(byte version, byte property1, byte property2,
                               PrivateKeyAccount sender, int feePow,
-                              Account recipient, long key, BigDecimal amount, String title, byte[] isText, byte[] message,
+                              Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage) {
         synchronized (this.transactionCreator) {
             return this.transactionCreator.r_Send(version, property1, property2, sender, recipient, key, amount, feePow,

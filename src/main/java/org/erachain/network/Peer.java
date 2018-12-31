@@ -610,13 +610,34 @@ public class Peer extends Thread {
                 this.out.write(bytes);
                 this.out.flush();
             } catch (IOException e) {
-                //ERROR
-                //LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
-                //callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
-                callback.tryDisconnect(this, 0, "try write 1");
+                if (this.socket.isOutputShutdown()) {
+                    //ERROR
+                    LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType())
+                            + " (**isOutputShutdown**) ERROR: " + e.getMessage());
+                    //callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
+                    /////callback.tryDisconnect(this, 0, "try write 1");
 
-                //RETURN
-                return false;
+                    //RETURN
+                    return false;
+                } else {
+                    // INFO
+                    LOGGER.debug("TRACK: " + e.getMessage(), e);
+
+                    try {
+                        int newSendBufferSize = this.socket.getSendBufferSize() << 1;
+                        if (newSendBufferSize > BlockChain.MAX_BLOCK_SIZE_BYTE)
+                            return false;
+
+                        LOGGER.debug("try setSendBufferSize to " + this.address + " "
+                                + newSendBufferSize);
+                        this.socket.setSendBufferSize(newSendBufferSize);
+                        return false;
+                    } catch (IOException eSize) {
+                        LOGGER.debug("try setSendBufferSize to " + this.address + " on " + Message.viewType(message.getType())
+                                + " ERROR: " + eSize.getMessage());
+                        return false;
+                    }
+                }
             } catch (Exception e) {
                 //ERROR
                 //LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
@@ -694,6 +715,30 @@ public class Peer extends Thread {
 
         //RETURN
         return true;
+    }
+
+    /**
+     * попытка послать сообщение Х рах
+     * @param message
+     * @param times
+     * @return
+     */
+    public boolean tryTimesSend(Message message, int times) {
+
+        do {
+            if (this.sendMessage(message)) {
+                return true;
+            } else {
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                }
+                times--;
+            }
+        } while (times > 0 && this.runed);
+
+        return false;
+
     }
 
     public synchronized int getResponseKey()

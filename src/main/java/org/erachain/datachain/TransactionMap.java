@@ -37,7 +37,6 @@ import java.util.*;
  */
 public class TransactionMap extends DCMap<Long, Transaction> implements Observer {
     public static final int TIMESTAMP_INDEX = 0;
-    public static final int MAX_MAP_SIZE = BlockChain.HARD_WORK ? 100000 : 5000;
 
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
@@ -229,14 +228,23 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         Iterator<Long> iterator = this.getIterator(0, false);
         Transaction transaction;
-        Long key;
+
+        List<Long> keys = new ArrayList<Long>();
+
         while (iterator.hasNext()) {
-            key = iterator.next();
+            Long key = iterator.next();
             transaction = this.map.get(key);
-            if (transaction.getDeadline() < timestamp) {
-                this.delete(key);
+            if (transaction.getDeadline() < timestamp
+                    || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
+                keys.add(key);
+            } else {
+                break;
             }
 
+        }
+
+        for (Long key : keys) {
+            this.delete(key);
         }
 
     }
@@ -244,38 +252,20 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     @Override
     public void update(Observable o, Object arg) {
 
-        if (true)
-            return;
-
         ObserverMessage message = (ObserverMessage) arg;
 
         // ON NEW BLOCK
-        if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
+        if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
+                || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
 
             long dTime = Controller.getInstance().getBlockChain().getTimestamp(DCSet.getInstance());
 
             Transaction item;
             long start = System.currentTimeMillis();
 
-            int i = 0;
+            // CREAL from OLD
+            clear(dTime);
 
-            Iterator<Long> iterator = this.getIterator(0, false);
-            // CLEAN UP
-            while (iterator.hasNext()) {
-
-                Long key = iterator.next();
-                item = this.get(key);
-
-                // CHECK IF DEADLINE PASSED
-                if (i > MAX_MAP_SIZE || item.getDeadline() < dTime) {
-                    iterator.remove();
-                    continue;
-                }
-
-                i++;
-
-            }
-            iterator = null;
             long tickets = System.currentTimeMillis() - start;
             LOGGER.debug("update CLEAR DEADLINE time " + tickets);
 
@@ -283,19 +273,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     }
 
     public boolean set(byte[] signature, Transaction transaction) {
-
-        if (this.size() > MAX_MAP_SIZE) {
-            Iterator<Long> iterator = this.getIterator(0, false);
-            Transaction item;
-            long dTime = Controller.getInstance().getBlockChain().getTimestamp(DCSet.getInstance());
-
-            do {
-                Long key = iterator.next();
-                item = this.get(key);
-                this.delete(key);
-
-            } while (item.getDeadline() < dTime && iterator.hasNext());
-        }
 
         Long key = Longs.fromByteArray(signature);
 
