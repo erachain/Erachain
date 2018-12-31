@@ -1678,7 +1678,7 @@ public class Controller extends Observable {
     // SYNCHRONIZE
 
     public void orphanInPipe(Block block) throws Exception {
-        this.synchronizer.pipeProcessOrOrphan(this.dcSet, block, true, true);
+        this.synchronizer.pipeProcessOrOrphan(this.dcSet, block, true, false);
     }
 
     public boolean checkStatus(int shift) {

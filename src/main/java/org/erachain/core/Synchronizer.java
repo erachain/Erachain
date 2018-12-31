@@ -727,7 +727,6 @@ public class Synchronizer {
             throw new Exception("on stoping");
         }
 
-        int blockSize = 500 + (block.getDataLength(false)) >> (hardFlush ? 0 : 2);
         dcSet.getBlockMap().setProcessing(true);
         boolean observOn = cnt.doesWalletExists() && cnt.useGui;
         Integer countObserv_ADD = null;
@@ -746,6 +745,7 @@ public class Synchronizer {
                 dcSet.getBlockMap().setProcessing(false);
                 dcSet.updateTxCounter(-block.getTransactionCount());
                 // FARDFLUSH not use in each case - only after accumulate size
+                int blockSize = 100 + block.getDataLength(false);
                 dcSet.flush(blockSize, false);
 
                 if (cnt.isOnStopping())
@@ -797,6 +797,7 @@ public class Synchronizer {
                 dcSet.getBlockMap().setProcessing(false);
                 dcSet.updateTxCounter(block.getTransactionCount());
                 // FARDFLUSH not use in each case - only after accumulate size
+                int blockSize = 1000 + block.getDataLength(false);
                 dcSet.flush(blockSize, false);
                 if (Settings.getInstance().getNotifyIncomingConfirmations() > 0) {
                     cnt.NotifyIncoming(block.getTransactions());

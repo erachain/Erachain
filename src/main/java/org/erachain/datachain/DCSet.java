@@ -28,7 +28,7 @@ import java.util.Observer;
 public class DCSet implements Observer, IDB {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
-    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.HARD_WORK ? 1024 << 10 : 1024 << 5;
+    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_BYTE << 3;
     private static final int CASH_SIZE = BlockChain.HARD_WORK ? 1024 << 2 : 1024;
 
     private static final String TX_COUNTER = "tx_counter";

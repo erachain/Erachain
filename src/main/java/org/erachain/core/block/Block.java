@@ -1065,7 +1065,11 @@ public class Block {
         this.signature = Crypto.getInstance().sign(account, data);
     }
 
+    private int dataLength = -1;
     public int getDataLength(boolean withHeight) {
+
+        if (dataLength >= 0)
+            return dataLength;
 
         int length = BASE_LENGTH;
         if (withHeight)
