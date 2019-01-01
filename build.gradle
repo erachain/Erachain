@@ -144,7 +144,6 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.3.7.v20160115'
     compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.3.7.v20160115'
     compile group: 'org.eclipse.jetty', name: 'jetty-util', version: '9.3.7.v20160115'
-    compile group: 'net.sf.squirrel-sql.thirdparty-non-maven', name: 'tinylaf', version: '1.4.0'
     compile group: 'org.swinglabs', name: 'pdf-renderer', version: '1.0.5'
 
     compile "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
