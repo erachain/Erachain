@@ -309,7 +309,9 @@ public class CreateOrderTransaction extends Transaction {
         BigDecimal amountWant = this.amountWant.setScale(this.wantAsset.getScale());
 
         return new Order(Transaction.makeDBRef(this.height, this.seqNo), this.creator, this.haveKey, this.wantKey,
-                amountHave, amountWant // new SCALE
+                amountHave, amountWant, // new SCALE
+                // для отработки форжинговой информации в текущем блоке
+                this.block
         );
     }
 

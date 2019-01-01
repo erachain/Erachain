@@ -1004,25 +1004,8 @@ public abstract class TransactionAmount extends Transaction {
             }
         }
                 
-        if (absKey == Transaction.RIGHTS_KEY) {
-            // если нет передыдущей инфо - это первый приход, просто добавим
-            // будет создано предыдущее значение и последнее которое на него показывает
-            //     НО
-            // если уже есть и последнее совпадает с текухим по высоте то обновим БАЛАНС на новый
-            Tuple2<Integer, Integer> privousForgingPoint = this.recipient.getLastForgingData(db);
-            int currentForgingBalance = recipient.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-            if (privousForgingPoint == null || privousForgingPoint.a == this.height) {
-                if (currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
-                    this.recipient.setForgingData(db, this.height, currentForgingBalance);
-                }
-            } else {
-                // если это не инициализация то может там нулевой баланс был
-                // надо обновить приход
-                if (privousForgingPoint.b < BlockChain.MIN_GENERATING_BALANCE
-                        && currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
-                    this.recipient.setForgingData(db, this.height, currentForgingBalance);
-                }
-            }
+        if (absKey == Transaction.RIGHTS_KEY && block != null) {
+            block.addForgingInfoUpdate(this.recipient);
         }
     }
     
@@ -1127,17 +1110,11 @@ public abstract class TransactionAmount extends Transaction {
                 
             }
         }
-        
-        if (absKey == Transaction.RIGHTS_KEY) {
-            if (!this.block.getCreator().equals(creatorStr)) {
-                // если этот блок не собирался этим человеком
-                Tuple2<Integer, Integer> lastForgingPoint = this.recipient.getLastForgingData(db);
-                if (lastForgingPoint != null && lastForgingPoint.a == height
-                        && !this.block.getCreator().equals(creatorStr)) {
-                    this.recipient.delForgingData(db, height);
-                }
-            }
+
+        if (absKey == Transaction.RIGHTS_KEY && block != null) {
+            block.addForgingInfoUpdate(this.recipient);
         }
+
     }
     
     public Map<String, Map<Long, BigDecimal>> getAssetAmount() {

@@ -93,6 +93,10 @@ public class Block {
     //protected Long atFees;
     protected byte[] atBytes;
 
+    // FORGING INFO
+    // при обработке трнзакций используем для запоминания что данные менялись
+    protected List<Account> forgingInfoUpdate;
+
     /////////////////////////////////////// BLOCK HEAD //////////////////////////////
     public static class BlockHead {
 
@@ -720,6 +724,30 @@ public class Block {
         return this.forgingValue;
     }
 
+    /**
+     * Обновляет данные об измененных форжинговых балансах - используется при обработке транзакций
+     * Копит все для каждого счета результирующее и потом разом в блоке изменим
+     * Так обходится неопределенность при откате - если несколько транзакций для одного счета
+     * меняли инфо по форжингу
+     * @param account
+     * @param amount
+     */
+    public void addForgingInfoUpdate(Account account) {
+        if (this.forgingInfoUpdate == null) {
+            this.forgingInfoUpdate = new ArrayList<Account>();
+            this.forgingInfoUpdate.add(account);
+            return;
+        }
+
+        // проверим может уже естьт ам такой счет
+        for (Account item: this.forgingInfoUpdate) {
+            if (account.equals(item))
+                return;
+        }
+        this.forgingInfoUpdate.add(account);
+
+    }
+
     public long getWinValue() {
         return this.winValue;
     }
@@ -1330,11 +1358,15 @@ public class Block {
 
             DCSet validatingDC;
 
+            // RESET forginf Info Updates
+            this.forgingInfoUpdate = null;
+
             if (andProcess) {
                 validatingDC = dcSet;
                 this.txCalculated = new ArrayList<R_Calculated>();
             } else {
                 validatingDC = dcSet.fork();
+                this.txCalculated = null;
             }
 
             //DBSet dbSet = Controller.getInstance().getDBSet();
@@ -1619,6 +1651,35 @@ public class Block {
 
         //PROCESS FEE
         feeProcess(dcSet, false);
+
+        if (this.forgingInfoUpdate != null) {
+            // обновить форжинговые данные - один раз для всех трнзакций в блоке
+            // Обрабатывает данные об измененных форжинговых балансах
+            // Для каждого счета берем результирующее изменения по форжинговой инфо
+            // и разом в тут блоке изменим
+            // Так обходится неопределенность при откате - если несколько транзакций для одного счета
+            // меняли инфо по форжингу
+
+            for (Account account: this.forgingInfoUpdate) {
+
+                Tuple2<Integer, Integer> privousForgingPoint = account.getLastForgingData(dcSet);
+                int currentForgingBalance = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+                if (privousForgingPoint == null) {
+                    if (currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
+                        account.setForgingData(dcSet, this.heightBlock, currentForgingBalance);
+                    }
+                } else {
+                    // если это не инициализация то может на счете ранее нулевой баланс был
+                    // надо обновить приход
+                    if (privousForgingPoint.b < BlockChain.MIN_GENERATING_BALANCE
+                            && currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
+                        account.setForgingData(dcSet, this.heightBlock, currentForgingBalance);
+                    }
+                }
+
+            }
+
+        }
         
 		/*
 		if (!dcSet.isFork()) {
@@ -1691,10 +1752,15 @@ public class Block {
         byte[] blockSignature = this.getSignature();
         byte[] transactionSignature;
 
+        // RESET forginf Info Updates
+        this.forgingInfoUpdate = null;
+
         this.getTransactions();
 
         if (this.transactionCount > 0) {
-            if (!dcSet.isFork()) {
+            if (dcSet.isFork()) {
+                this.txCalculated = null;
+            } else {
                 // make pool for calculated
                 this.txCalculated = new ArrayList<R_Calculated>();
             }
@@ -1793,8 +1859,7 @@ public class Block {
             throw new Exception("on stoping");
 
         //LOGGER.debug("<<< core.block.Block.orphan(DBSet) #0");
-        int height = this.getHeight();
-        if (height == 1) {
+        if (this.heightBlock == 1) {
             // GENESIS BLOCK cannot be orphanED
             return;
         }
@@ -1805,21 +1870,43 @@ public class Block {
 
         if (BlockChain.TEST_FEE_ORPHAN > 0 && BlockChain.TEST_FEE_ORPHAN > this.heightBlock) {
             // TEST COMPU ORPHANs
-            compareCOMPUbals(dcSet, height, "before ORPHAN");
+            compareCOMPUbals(dcSet, heightBlock, "before ORPHAN");
         }
 
         long start = System.currentTimeMillis();
 
+        // RESET forginf Info Updates
+        this.forgingInfoUpdate = null;
+
         //ORPHAN TRANSACTIONS
         //LOGGER.debug("<<< core.block.Block.orphan(DBSet) #2 ORPHAN TRANSACTIONS");
-        this.orphanTransactions(dcSet, height);
+        this.orphanTransactions(dcSet, heightBlock);
 
         //LOGGER.debug("<<< core.block.Block.orphan(DBSet) #2f FEE");
 
         //REMOVE FEE
         feeProcess(dcSet, true);
 
-        //DELETE BLOCK FROM DB
+        if (this.forgingInfoUpdate != null) {
+            // обновить форжинговые данные - один раз для всех трнзакций в блоке
+            // Обрабатывает данные об измененных форжинговых балансах
+            // Для каждого счета берем результирующее изменения по форжинговой инфо
+            // и разом в тут блоке изменим
+            // Так обходится неопределенность при откате - если несколько транзакций для одного счета
+            // меняли инфо по форжингу
+            for (Account account: this.forgingInfoUpdate) {
+                if (!this.getCreator().equals(account)) {
+                    // если этот блок не собирался этим человеком
+                    Tuple2<Integer, Integer> lastForgingPoint = account.getLastForgingData(dcSet);
+                    if (lastForgingPoint != null && lastForgingPoint.a == heightBlock
+                            && !this.getCreator().equals(account)) {
+                        account.delForgingData(dcSet, heightBlock);
+                    }
+                }
+            }
+        }
+
+            //DELETE BLOCK FROM DB
         dcSet.getBlockMap().remove(this.signature, this.reference, this.creator);
 
         //LOGGER.debug("<<< core.block.Block.orphan(DBSet) #4");
@@ -1838,7 +1925,7 @@ public class Block {
 
         if (BlockChain.TEST_FEE_ORPHAN > 0 && BlockChain.TEST_FEE_ORPHAN > this.heightBlock) {
             // TEST COMPU ORPHANs
-            compareCOMPUbals(dcSet, height - 1, "after ORPHAN");
+            compareCOMPUbals(dcSet, heightBlock - 1, "after ORPHAN");
         }
 
         //this.heightBlock = -1;
