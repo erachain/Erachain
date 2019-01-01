@@ -1547,7 +1547,7 @@ public class Controller extends Observable {
                     // ADD TO UNCONFIRMED TRANSACTIONS
                     this.dcSet.getTransactionMap().add(transaction);
 
-                    if (this.status != STATUS_OK) {
+                    if (this.status == STATUS_OK) {
                         // если мы не в синхронизации - так как мы тогда
                         // не знаем время текущее цепочки и не понимаем можно ли борадкастить дальше трнзакцию
                         // так как непонятно - протухла она или нет
@@ -1894,6 +1894,14 @@ public class Controller extends Observable {
         } else {
             this.status = STATUS_OK;
             this.pingAllPeers(false);
+            if (this.isStopping) return;
+
+            // после очередного синхрона передать все свои трнзакции всем пирам вокруг
+            this.clearUnconfirmedRecords();
+            for (Peer peerOut: this.getActivePeers()) {
+                if (this.isStopping) return;
+                this.broadcastUnconfirmedToPeer(peerOut);
+            }
         }
 
         // send to ALL my HW
