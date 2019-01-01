@@ -89,7 +89,7 @@ import java.util.Timer;
  */
 public class Controller extends Observable {
 
-    private static final String version = "4.11.07a beta";
+    private static final String version = "4.11.07a1 beta";
     private static final String buildTime = "2018-12-04 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -1078,12 +1078,9 @@ public class Controller extends Observable {
             if (counter > BlockChain.ON_CONNECT_SEND_UNCONFIRMED_UNTIL
                     // дело в том что при коннекте новому узлу надо все же
                     // передавать все так как он может собрать пустой блок
-                    && !map.needBroadcasting(transaction, peerByte))
-                continue;
-
-            if (transaction.getDeadline() < dTime) {
-                continue;
-            }
+                    /////&& !map.needBroadcasting(transaction, peerByte)
+            )
+                break;
 
             try {
                 Thread.sleep(1);
@@ -1120,7 +1117,7 @@ public class Controller extends Observable {
                     if (ping < 0) {
                         stepCount >>= 1;
                         try {
-                            Thread.sleep(10000);
+                            Thread.sleep(5000);
                         } catch (Exception e) {
                         }
                     } else if (ping > 5000) {
