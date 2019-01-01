@@ -599,7 +599,7 @@ public abstract class Transaction {
 
     public long getDeadline() {
         // 0,5 HOUR DEADLINE TO INCLUDE TRANSACTION IN BLOCK
-        return this.timestamp + (1000 * 60 * 30);
+        return this.timestamp + BlockChain.UNCONFIRMED_DEADTIME_MS;
     }
 
     /// tyutuy jhg jhg jg j

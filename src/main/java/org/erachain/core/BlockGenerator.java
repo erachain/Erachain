@@ -143,7 +143,10 @@ public class BlockGenerator extends Thread implements Observer {
         Block waitWin;
 
         long start = System.currentTimeMillis();
-        List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getSubSet(timestamp, true));
+        // брем все транзакции даже просроченные в нашем хранилище
+        // потом они все равно удалятся
+        List<Transaction> orderedTransactions = new ArrayList<Transaction>(
+                dcSet.getTransactionMap().getSubSet(timestamp, true, false));
         //List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getValuesAll());
         long tickets = System.currentTimeMillis() - start;
         int txCount = orderedTransactions.size();

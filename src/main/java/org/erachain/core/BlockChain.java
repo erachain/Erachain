@@ -73,10 +73,10 @@ public class BlockChain {
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
     // задержка на включение в блок для хорошей сортировки
     public static final int UNCONFIRMED_SORT_WAIT_MS = 15000;
+    public static final int UNCONFIRMED_DEADTIME_MS = 1000 * 60 * 30;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = 10000;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_NEED_COUNT = 10;
     public static final int MAX_UNCONFIGMED_MAP_SIZE = HARD_WORK ? 100000 : 1000;
-
 
 
     public static final int BLOCKS_PER_DAY = 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME; // 300 PER DAY
@@ -1075,11 +1075,11 @@ public class BlockChain {
     }
 
     // CLEAR UNCONFIRMED TRANSACTION from Invalid and DEAD
-    public void clearUnconfirmedRecords(Controller ctrl, DCSet dcSetOriginal) {
+    public void clearUnconfirmedRecords(Controller ctrl, DCSet dcSetOriginal, boolean cutDeadTime) {
 
         long timestamp = this.getTimestamp(dcSetOriginal);
 
-        dcSetOriginal.getTransactionMap().clear(timestamp);
+        dcSetOriginal.getTransactionMap().clear(timestamp, cutDeadTime);
 
     }
 }

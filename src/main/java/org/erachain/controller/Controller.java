@@ -1082,7 +1082,6 @@ public class Controller extends Observable {
                 continue;
 
             if (transaction.getDeadline() < dTime) {
-                clearUnconfirmedRecords();
                 continue;
             }
 
@@ -1260,7 +1259,7 @@ public class Controller extends Observable {
                 public void run() {
 
                     // LOGGER.debug("timerUnconfirmed ---------------- ");
-                    Controller.getInstance().clearUnconfirmedRecords();
+                    Controller.getInstance().clearUnconfirmedRecords(false);
 
                 }
             };
@@ -1534,7 +1533,7 @@ public class Controller extends Observable {
                     }
 
                     // DEADTIME
-                    if (transaction.getDeadline() < this.blockChain.getTimestamp(DCSet.getInstance())) {
+                    if (transaction.getDeadline() < this.blockChain.getTimestamp(this.dcSet)) {
                         // so OLD transaction
                         return;
                     }
@@ -1898,7 +1897,7 @@ public class Controller extends Observable {
             if (this.isStopping) return;
 
             // после очередного синхрона передать все свои трнзакции всем пирам вокруг
-            this.clearUnconfirmedRecords();
+            this.clearUnconfirmedRecords(false);
             for (Peer peerOut: this.getActivePeers()) {
                 if (this.isStopping) return;
                 this.broadcastUnconfirmedToPeer(peerOut);
@@ -2147,8 +2146,8 @@ public class Controller extends Observable {
         this.wallet.synchronize(false);
     }
 
-    public void clearUnconfirmedRecords() {
-        this.blockChain.clearUnconfirmedRecords(this, this.dcSet);
+    public void clearUnconfirmedRecords(boolean cutDeadTime) {
+        this.blockChain.clearUnconfirmedRecords(this, this.dcSet, cutDeadTime);
 
     }
 

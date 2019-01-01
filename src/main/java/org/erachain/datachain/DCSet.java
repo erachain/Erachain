@@ -1368,13 +1368,7 @@ public class DCSet implements Observer, IDB {
 
     @Override
     public void commit() {
-        this.actions++;
-		/*
-		if(this.actions >= ACTIONS_BEFORE_COMMIT)
-		{
-			this.flush();
-		}
-		 */
+        this.actions += 100;
     }
 
     public void rollback() {
@@ -1408,29 +1402,6 @@ public class DCSet implements Observer, IDB {
 
     @Override
     public void update(Observable o, Object arg) {
-
-        if (true)
-            return;
-
-        //this.actions++;
-
-        ObserverMessage message = (ObserverMessage) arg;
-
-        //CHECK IF NEW BLOCK
-        if (false && message.getType() == ObserverMessage.LIST_BLOCK_TYPE) {
-
-            //CHECK IF WE NEED TO COMMIT
-            if (this.actions >= ACTIONS_BEFORE_COMMIT) {
-                //this.flush();
-
-                //NOTIFY CONTROLLER SO HE CAN NOTIFY WALLET
-                if (false)
-                    Controller.getInstance().onDatabaseCommit();
-            } else {
-
-            }
-        }
-
     }
 
     public long getEngineeSize() {

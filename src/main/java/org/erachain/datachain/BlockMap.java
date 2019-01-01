@@ -335,7 +335,9 @@ public class BlockMap extends DCMap<Integer, Block> {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block.blockHead));
 
-        this.getDCSet().getTransactionMap().clear(block.getTimestamp());
+        // образать список и по времени протухания
+        this.getDCSet().getTransactionMap().clear(block.getTimestamp(), true);
+        this.getDCSet().getEngineeSize();
 
         LOGGER.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE END");
     }
@@ -345,7 +347,8 @@ public class BlockMap extends DCMap<Integer, Block> {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block.blockHead));
 
-        this.getDCSet().getTransactionMap().clear(block.getTimestamp());
+        // образать список только по максимальному размеру
+        this.getDCSet().getTransactionMap().clear(block.getTimestamp(), false);
 
         LOGGER.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE END");
     }

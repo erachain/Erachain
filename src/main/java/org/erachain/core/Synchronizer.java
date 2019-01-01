@@ -745,7 +745,7 @@ public class Synchronizer {
                 dcSet.getBlockMap().setProcessing(false);
                 dcSet.updateTxCounter(-block.getTransactionCount());
                 // FARDFLUSH not use in each case - only after accumulate size
-                int blockSize = 100 + (block.getDataLength(false)>>3);
+                int blockSize = 1000 + block.getDataLength(false);
                 dcSet.flush(blockSize, false);
 
                 if (cnt.isOnStopping())
