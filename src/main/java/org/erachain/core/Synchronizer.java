@@ -745,7 +745,7 @@ public class Synchronizer {
                 dcSet.getBlockMap().setProcessing(false);
                 dcSet.updateTxCounter(-block.getTransactionCount());
                 // FARDFLUSH not use in each case - only after accumulate size
-                int blockSize = 1000 + block.getDataLength(false);
+                int blockSize = (1 + block.getTransactionCount()) * 1000 + block.getDataLength(false);
                 dcSet.flush(blockSize, false);
 
                 if (cnt.isOnStopping())
@@ -797,7 +797,7 @@ public class Synchronizer {
                 dcSet.getBlockMap().setProcessing(false);
                 dcSet.updateTxCounter(block.getTransactionCount());
                 // FARDFLUSH not use in each case - only after accumulate size
-                int blockSize = 1000 + block.getDataLength(false);
+                int blockSize = (1 + block.getTransactionCount()) * 1000 + block.getDataLength(false);
                 dcSet.flush(blockSize, false);
                 if (Settings.getInstance().getNotifyIncomingConfirmations() > 0) {
                     cnt.NotifyIncoming(block.getTransactions());
