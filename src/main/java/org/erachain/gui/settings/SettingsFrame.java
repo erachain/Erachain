@@ -240,6 +240,7 @@ public class SettingsFrame extends JDialog {
         }
         if (Settings.getInstance().isRpcEnabled() != settingsTabPane.settingsBasicPanel.chckbxRpcEnabled.isSelected()) {
             settingsJSONbuf.put("rpcenabled", settingsTabPane.settingsBasicPanel.chckbxRpcEnabled.isSelected());
+            Controller.getInstance().rpcServiceRestart();
             settingsTabPane.settingsAllowedPanel.rpcServiceRestart = true;
         }
 

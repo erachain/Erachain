@@ -603,14 +603,16 @@ public class Controller extends Observable {
         if (Settings.getInstance().isRpcEnabled()) {
             if (Controller.useGui)
                 about_frame.set_console_Text(Lang.getInstance().translate("Start API Service"));
-            this.rpcService = new ApiService();
-            this.rpcService.start();
+            LOGGER.info(Lang.getInstance().translate("Start API Service"));
+           this.rpcService = new ApiService();
+            this.rpcServiceRestart();
         }
 
         // START WEB SERVICE
         if (Settings.getInstance().isWebEnabled()) {
             if (Controller.useGui)
                 about_frame.set_console_Text(Lang.getInstance().translate("Start WEB Service"));
+            LOGGER.info(Lang.getInstance().translate("Start WEB Service"));
             this.webService = new WebService();
             this.webService.start();
         }
@@ -835,13 +837,18 @@ public class Controller extends Observable {
         return new File(dataDir.getParent(), Settings.getInstance().getDataDir() + "Bak");
     }
 
+    public ApiService getRPCService() {
+        if (this.rpcService == null){
+            this.rpcService = new ApiService();
+        }
+               return rpcService;
+    }
     public void rpcServiceRestart() {
-        if (this.rpcService != null)
-            this.rpcService.stop();
+        getRPCService();
+       this.rpcService.stop();
 
         // START API SERVICE
         if (Settings.getInstance().isRpcEnabled()) {
-            this.rpcService = new ApiService();
             this.rpcService.start();
         }
     }

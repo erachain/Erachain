@@ -32,6 +32,7 @@ public class StatusPanel extends JPanel {
         this.add(new ForgingStatus(), BorderLayout.EAST);
         this.add(new UnconfirmTransactionStatus(), BorderLayout.EAST);
         this.add(new ErachainStatus(), BorderLayout.EAST);
+        this.add(new RPCStatus(), BorderLayout.EAST);
 
 
     }

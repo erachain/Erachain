@@ -311,6 +311,8 @@ public class ObserverMessage {
     public static final int ALL_TELEGRAMT_REMOVE_TYPE = -1002;
     public static final int ALL_TELEGRAMT_LIST_TYPE = -1000;
 
+    public static final int  RPC_WORK_TYPE = 20000;
+
 
     private int type;
     private Object value;

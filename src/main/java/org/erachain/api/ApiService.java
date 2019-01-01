@@ -1,18 +1,25 @@
 package org.erachain.api;
 
 import java.util.HashSet;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 
+import javafx.beans.InvalidationListener;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.IPAccessHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.erachain.controller.Controller;
+import org.erachain.database.DBMap;
+import org.erachain.datachain.SortableList;
+import org.erachain.utils.ObserverMessage;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
 import org.erachain.settings.Settings;
 
-public class ApiService {
+public class ApiService extends Observable {
 
     public Server server;
 
@@ -71,6 +78,8 @@ public class ApiService {
         try {
             //START RPC
             server.start();
+            setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.RPC_WORK_TYPE, true));
         } catch (Exception e) {
             //FAILED TO START RPC
         }
@@ -80,8 +89,21 @@ public class ApiService {
         try {
             //STOP RPC
             server.stop();
+            setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.RPC_WORK_TYPE, false));
         } catch (Exception e) {
             //FAILED TO STOP RPC
         }
     }
+    @Override
+    public void addObserver(Observer o) {
+
+         // ADD OBSERVER
+        super.addObserver(o);
+        setChanged();
+            this.notifyObservers(
+                    new ObserverMessage(ObserverMessage.RPC_WORK_TYPE, Settings.getInstance().isRpcEnabled())); /// SLOW .size()));
+        }
+
+
 }
