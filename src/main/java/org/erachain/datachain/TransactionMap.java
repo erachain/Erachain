@@ -188,14 +188,20 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         return this.observableData;
     }
 
-    /**
-     * Используется для получения трнзакций для сборки блока
-     * Поидее нужно братьв се что есть без учета времени протухания для сборки блока своего
-     * @param timestamp
-     * @param notSetDCSet
-     * @param cutDeadTime true is need filter by Dead Time
-     * @return
-     */
+    public Iterator<Long> getTimestampIterator() {
+
+        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
+        return iterator;
+    }
+
+        /**
+         * Используется для получения трнзакций для сборки блока
+         * Поидее нужно братьв се что есть без учета времени протухания для сборки блока своего
+         * @param timestamp
+         * @param notSetDCSet
+         * @param cutDeadTime true is need filter by Dead Time
+         * @return
+         */
     public List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime) {
 
         List<Transaction> values = new ArrayList<Transaction>();
@@ -214,13 +220,13 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                 // мы используем отсортированный индекс, поэтому можно обрывать
                 break;
 
+            if (count++ > BlockChain.MAX_BLOCK_SIZE)
+                break;
+
             bytesTotal += transaction.getDataLength(Transaction.FOR_NETWORK, true);
             if (bytesTotal > BlockChain.MAX_BLOCK_SIZE_BYTE + (BlockChain.MAX_BLOCK_SIZE_BYTE >> 3)) {
                 break;
             }
-
-            if (count++ > BlockChain.MAX_BLOCK_SIZE)
-                break;
 
             if (!notSetDCSet)
                 transaction.setDC(this.getDCSet());
