@@ -14,7 +14,6 @@ import org.erachain.network.message.SignaturesMessage;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.TransactionTimestampComparator;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
@@ -42,7 +41,7 @@ public class BlockGenerator extends Thread implements Observer {
     private ForgingStatus forgingStatus = ForgingStatus.FORGING_DISABLED;
     private boolean walletOnceUnlocked = false;
     private int orphanto = 0;
-    private static List<byte[]> needRemove;
+    private static List<byte[]> needRemoveInvalids;
 
     public BlockGenerator(boolean withObserve) {
         if (Settings.getInstance().isGeneratorKeyCachingEnabled()) {
@@ -129,7 +128,7 @@ public class BlockGenerator extends Thread implements Observer {
         TransactionMap map = dcSet.getTransactionMap();
         Iterator<Long> iterator = map.getTimestampIterator();
 
-        needRemove = new ArrayList<byte[]>();
+        needRemoveInvalids = new ArrayList<byte[]>();
 
         while (iterator.hasNext()) {
 
@@ -149,7 +148,7 @@ public class BlockGenerator extends Thread implements Observer {
             if (transaction.getTimestamp() > timestamp)
                 break;
             if (!transaction.isSignatureValid(newBlockDC)) {
-                needRemove.add(transaction.getSignature());
+                needRemoveInvalids.add(transaction.getSignature());
                 continue;
             }
 
@@ -158,7 +157,7 @@ public class BlockGenerator extends Thread implements Observer {
                 transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
 
                 if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
-                    needRemove.add(transaction.getSignature());
+                    needRemoveInvalids.add(transaction.getSignature());
                     continue;
                 }
 
@@ -190,7 +189,7 @@ public class BlockGenerator extends Thread implements Observer {
 
                 LOGGER.error(e.getMessage(), e);
                 //REMOVE FROM LIST
-                needRemove.add(transaction.getSignature());
+                needRemoveInvalids.add(transaction.getSignature());
 
                 continue;
 
@@ -205,15 +204,16 @@ public class BlockGenerator extends Thread implements Observer {
         return new Tuple2<List<Transaction>, Integer>(transactionsList, counter);
     }
 
-    private static void clearInvalids() {
-        if (!needRemove.isEmpty()) {
+    private static void clearInvalids(DCSet dcSet) {
+        if (needRemoveInvalids != null && !needRemoveInvalids.isEmpty()) {
             long start = System.currentTimeMillis();
-            for (byte[] signature : needRemove) {
+            TransactionMap transactionsMap = dcSet.getTransactionMap();
+            for (byte[] signature : needRemoveInvalids) {
                 if (transactionsMap.contains(signature))
                     transactionsMap.delete(signature);
             }
-            LOGGER.debug("clear Unconfirmed Transactions = " + (System.currentTimeMillis() - start) + "ms for removed: " + needRemove.size());
-            needRemove = null;
+            LOGGER.debug("clear Unconfirmed Transactions = " + (System.currentTimeMillis() - start) + "ms for removed: " + needRemoveInvalids.size());
+            needRemoveInvalids = null;
         }
 
     }
@@ -233,7 +233,7 @@ public class BlockGenerator extends Thread implements Observer {
         TransactionMap map = dcSet.getTransactionMap();
         Iterator<Long> iterator = map.getTimestampIterator();
 
-        needRemove = new ArrayList<byte[]>();
+        needRemoveInvalids = new ArrayList<byte[]>();
 
         while (iterator.hasNext()) {
 
@@ -246,7 +246,7 @@ public class BlockGenerator extends Thread implements Observer {
             if (transaction.getTimestamp() > timestamp)
                 break;
             if (!transaction.isSignatureValid(newBlockDC)) {
-                needRemove.add(transaction.getSignature());
+                needRemoveInvalids.add(transaction.getSignature());
                 continue;
             }
 
@@ -255,7 +255,7 @@ public class BlockGenerator extends Thread implements Observer {
                 transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
 
                 if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
-                    needRemove.add(transaction.getSignature());
+                    needRemoveInvalids.add(transaction.getSignature());
                     continue;
                 }
 
@@ -284,7 +284,7 @@ public class BlockGenerator extends Thread implements Observer {
 
                 LOGGER.error(e.getMessage(), e);
                 //REMOVE FROM LIST
-                needRemove.add(transaction.getSignature());
+                needRemoveInvalids.add(transaction.getSignature());
 
                 continue;
 
@@ -447,7 +447,7 @@ public class BlockGenerator extends Thread implements Observer {
                     timePointForGenerate = timePoint
                             + (BlockChain.DEVELOP_USE ? BlockChain.GENERATING_MIN_BLOCK_TIME_MS
                             : BlockChain.FLUSH_TIMEPOINT)
-                            - BlockChain.UNCONFIRMED_SORT_WAIT_MS
+                            - BlockChain.UNCONFIRMED_SORT_WAIT_MS;
 
                     Timestamp timestampPoit = new Timestamp(timePoint);
                     LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit);
@@ -749,11 +749,11 @@ public class BlockGenerator extends Thread implements Observer {
                         }
 
 
-                        if (needRemove != null) {
-                            clearInvalids();
+                        if (needRemoveInvalids != null) {
+                            clearInvalids(dcSet);
                         } else {
                             checkForRemove(dcSet, timePointForGenerate);
-                            clearInvalids();
+                            clearInvalids(dcSet);
                         }
 
                     }
