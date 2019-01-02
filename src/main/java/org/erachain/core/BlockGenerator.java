@@ -362,10 +362,12 @@ public class BlockGenerator extends Thread implements Observer {
         LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) + "ms for trans: " + counter);
 
         if (!removeList.isEmpty()) {
+            start = System.currentTimeMillis();
             for (byte[] signature: removeList) {
                 if (map.contains(signature))
                     map.delete(signature);
             }
+            LOGGER.debug("clear Unconfirmed Transactions = " + (System.currentTimeMillis() - start) + "ms for removed: " + removeList.size());
         }
 
         return new Tuple2<List<Transaction>, Integer>(transactionsList, counter);
