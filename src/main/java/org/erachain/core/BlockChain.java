@@ -10,7 +10,6 @@ import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlocksHeadsMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TransactionMap;
 import org.erachain.network.Peer;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
@@ -1079,7 +1078,7 @@ public class BlockChain {
 
         long timestamp = this.getTimestamp(dcSetOriginal);
 
-        dcSetOriginal.getTransactionMap().clear(timestamp, cutDeadTime);
+        dcSetOriginal.getTransactionMap().clearByDeadTimeAndLimit(timestamp, cutDeadTime);
 
     }
 }
