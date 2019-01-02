@@ -327,23 +327,25 @@ public class BlockMap extends DCMap<Integer, Block> {
     }
 
     public void notifyProcessChain(Block block) {
-        LOGGER.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE");
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block.blockHead));
 
         // образать список и по времени протухания
         this.getDCSet().getTransactionMap().clearByDeadTimeAndLimit(block.getTimestamp(), true);
+
+        LOGGER.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE");
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block.blockHead));
 
         LOGGER.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE END");
     }
 
     public void notifyOrphanChain(Block block) {
-        LOGGER.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE");
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block.blockHead));
 
         // образать список только по максимальному размеру
         this.getDCSet().getTransactionMap().clearByDeadTimeAndLimit(block.getTimestamp(), false);
+
+        LOGGER.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE");
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block.blockHead));
 
         LOGGER.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE END");
     }
