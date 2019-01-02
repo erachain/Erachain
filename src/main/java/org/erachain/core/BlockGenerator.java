@@ -6,6 +6,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionMap;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
 import org.erachain.network.message.MessageFactory;
@@ -132,7 +133,7 @@ public class BlockGenerator extends Thread implements Observer {
 
     }
 
-    public static Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(DCSet dcSet, long timestamp, BlockChain bchain, long max_winned_value) {
+    public static Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions_old(DCSet dcSet, long timestamp, BlockChain bchain, long max_winned_value) {
 
         long timrans1 = System.currentTimeMillis();
 
@@ -262,6 +263,112 @@ public class BlockGenerator extends Thread implements Observer {
         Collections.sort(transactionsList, new TransactionTimestampComparator());
 
         LOGGER.debug("sort 2 Unconfirmed Transactions =" + (System.currentTimeMillis() - start) + "milsec for trans: " + counter);
+
+        return new Tuple2<List<Transaction>, Integer>(transactionsList, counter);
+    }
+
+    public static Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(DCSet dcSet, long timestamp, BlockChain bchain, long max_winned_value) {
+
+        long timrans1 = System.currentTimeMillis();
+
+        //CREATE FORK OF GIVEN DATABASE
+        DCSet newBlockDC = dcSet.fork();
+        int blockHeight =  newBlockDC.getBlockMap().size() + 1;
+
+        Block waitWin;
+
+        long start = System.currentTimeMillis();
+
+        List<Transaction> transactionsList = new ArrayList<Transaction>();
+
+        //	boolean transactionProcessed;
+        long totalBytes = 0;
+        int counter = 0;
+
+        TransactionMap map = dcSet.getTransactionMap();
+        Iterator<Long> iterator = map.getTimestampIterator();
+
+        List<byte[]> removeList = new ArrayList<byte[]>();
+
+        while (iterator.hasNext()) {
+
+            if (ctrl.isOnStopping()) {
+                return null;
+            }
+
+            if (bchain != null) {
+                waitWin = bchain.getWaitWinBuffer();
+                if (waitWin != null && waitWin.getWinValue() > max_winned_value) {
+                    break;
+                }
+            }
+
+            Transaction transaction = map.get(iterator.next());
+
+            if (transaction.getTimestamp() > timestamp)
+                break;
+            if (!transaction.isSignatureValid(newBlockDC)) {
+                removeList.add(transaction.getSignature());
+                continue;
+            }
+
+            try {
+
+                transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
+
+                if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
+                    removeList.add(transaction.getSignature());
+                    continue;
+                }
+
+                //CHECK IF ENOUGH ROOM
+                totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
+
+                if (totalBytes > BlockChain.MAX_BLOCK_SIZE_BYTE
+                        || ++counter > BlockChain.MAX_BLOCK_SIZE) {
+                    counter--;
+                    break;
+                }
+
+                ////ADD INTO LIST
+                transactionsList.add(transaction);
+
+                //PROCESS IN NEWBLOCKDB
+                transaction.process(null, Transaction.FOR_NETWORK);
+
+                // GO TO NEXT TRANSACTION
+                continue;
+
+            } catch (Exception e) {
+
+                if (ctrl.isOnStopping()) {
+                    return null;
+                }
+
+                //     transactionProcessed = true;
+
+                LOGGER.error(e.getMessage(), e);
+                //REMOVE FROM LIST
+                removeList.add(transaction.getSignature());
+
+                continue;
+
+            }
+
+        }
+
+        newBlockDC.close();
+
+        LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) + "ms for trans: " + counter);
+
+        if (!removeList.isEmpty()) {
+            start = System.currentTimeMillis();
+            for (byte[] signature: removeList) {
+                if (map.contains(signature))
+                    map.delete(signature);
+            }
+            LOGGER.debug("clear Unconfirmed Transactions = " + (System.currentTimeMillis() - start) + "ms for removed: " + removeList.size());
+        }
 
         return new Tuple2<List<Transaction>, Integer>(transactionsList, counter);
     }
