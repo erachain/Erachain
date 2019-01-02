@@ -188,7 +188,15 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         return this.observableData;
     }
 
-    public List<Transaction> getSubSet(long timestamp, boolean notSetDCSet) {
+    /**
+     * Используется для получения трнзакций для сборки блока
+     * Поидее нужно братьв се что есть без учета времени протухания для сборки блока своего
+     * @param timestamp
+     * @param notSetDCSet
+     * @param cutDeadTime true is need filter by Dead Time
+     * @return
+     */
+    public List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime) {
 
         List<Transaction> values = new ArrayList<Transaction>();
         Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
@@ -199,19 +207,19 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         while (iterator.hasNext()) {
             key = iterator.next();
             transaction = this.map.get(key);
-            if (transaction.getTimestamp() > timestamp)
+
+            if (cutDeadTime && transaction.getDeadline() < timestamp)
                 continue;
-            if (transaction.getDeadline() < timestamp) {
-                // мы используем отсортированный индекс
+            if (transaction.getTimestamp() > timestamp)
+                // мы используем отсортированный индекс, поэтому можно обрывать
                 break;
-            }
 
             bytesTotal += transaction.getDataLength(Transaction.FOR_NETWORK, true);
             if (bytesTotal > BlockChain.MAX_BLOCK_SIZE_BYTE + (BlockChain.MAX_BLOCK_SIZE_BYTE >> 3)) {
                 break;
             }
 
-            if (count++ > 25222)
+            if (count++ > BlockChain.MAX_BLOCK_SIZE)
                 break;
 
             if (!notSetDCSet)
@@ -224,23 +232,26 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         return values;
     }
 
-    public void clear(long timestamp) {
+    private static long MAX_DEADTIME = 1000 * 60 * 60 * 24;
+    public void clear(long timestamp, boolean cutDeadTime) {
 
         Iterator<Long> iterator = this.getIterator(0, false);
         Transaction transaction;
 
         List<Long> keys = new ArrayList<Long>();
 
+
         while (iterator.hasNext()) {
             Long key = iterator.next();
             transaction = this.map.get(key);
-            if (transaction.getDeadline() < timestamp
+            long deadtime = transaction.getDeadline();
+            if (((BlockChain.HARD_WORK || cutDeadTime) && deadtime < timestamp)
+                    || !BlockChain.HARD_WORK && deadtime + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
                     || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
                 keys.add(key);
             } else {
                 break;
             }
-
         }
 
         for (Long key : keys) {
@@ -252,24 +263,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     @Override
     public void update(Observable o, Object arg) {
 
-        ObserverMessage message = (ObserverMessage) arg;
-
-        // ON NEW BLOCK
-        if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
-                || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
-
-            long dTime = Controller.getInstance().getBlockChain().getTimestamp(DCSet.getInstance());
-
-            Transaction item;
-            long start = System.currentTimeMillis();
-
-            // CREAL from OLD
-            clear(dTime);
-
-            long tickets = System.currentTimeMillis() - start;
-            LOGGER.debug("update CLEAR DEADLINE time " + tickets);
-
-        }
     }
 
     public boolean set(byte[] signature, Transaction transaction) {

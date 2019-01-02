@@ -69,14 +69,14 @@ public class BlockChain {
     public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000;
     public static final int FLUSH_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS - (GENERATING_MIN_BLOCK_TIME_MS >> 2);
     static final int WIN_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS >> 2;
-    public static final int MAX_BLOCK_SIZE = HARD_WORK ? 22221 : 1000;
+    public static final int MAX_BLOCK_SIZE = HARD_WORK ? 22222 : 5000;
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
     // задержка на включение в блок для хорошей сортировки
     public static final int UNCONFIRMED_SORT_WAIT_MS = 15000;
-    public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = 10000;
+    public static final int UNCONFIRMED_DEADTIME_MS = 1000 * 60 * 30;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_NEED_COUNT = 10;
-    public static final int MAX_UNCONFIGMED_MAP_SIZE = HARD_WORK ? 100000 : 1000;
-
+    public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE<<2;
+    public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_UNCONFIGMED_MAP_SIZE;
 
 
     public static final int BLOCKS_PER_DAY = 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME; // 300 PER DAY
@@ -96,6 +96,8 @@ public class BlockChain {
     public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : VERS_4_11;
 
     public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11  : VERS_4_11 + 50000;
+
+    public static final int DEVELOP_FORGING_START = 100;
 
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ?
             new byte[][]{
@@ -556,7 +558,8 @@ public class BlockChain {
             previousForgingPoint = creator.getLastForgingData(dcSet);
             if (previousForgingPoint == null)
                 if (DEVELOP_USE)
-                    previousForgingPoint = new Tuple2<Integer, Integer>(height - (height > VERS_4_11? 100 : 10), 1000);
+                    // - (height > VERS_4_11? 100 : 10), 1000);
+                    previousForgingPoint = new Tuple2<Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance);
                 else
                     return 0l;
         }
@@ -1072,11 +1075,11 @@ public class BlockChain {
     }
 
     // CLEAR UNCONFIRMED TRANSACTION from Invalid and DEAD
-    public void clearUnconfirmedRecords(Controller ctrl, DCSet dcSetOriginal) {
+    public void clearUnconfirmedRecords(Controller ctrl, DCSet dcSetOriginal, boolean cutDeadTime) {
 
         long timestamp = this.getTimestamp(dcSetOriginal);
 
-        dcSetOriginal.getTransactionMap().clear(timestamp);
+        dcSetOriginal.getTransactionMap().clear(timestamp, cutDeadTime);
 
     }
 }

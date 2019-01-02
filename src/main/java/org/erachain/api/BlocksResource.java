@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
@@ -283,9 +280,8 @@ public class BlocksResource {
 
     @GET
     @Path("/orphanto/{height}")
-    public String orphanTo(@PathParam("height") int heightTo) {
+    public String orphanTo(@PathParam("height") int heightTo, @QueryParam("password") String password) {
 
-        String password = "";
         APIUtils.askAPICallAllowed(password, "GET blocks/orphanto/", request, true);
 
         Controller.getInstance().setOrphanTo(heightTo);

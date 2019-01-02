@@ -28,7 +28,7 @@ import java.util.Observer;
 public class DCSet implements Observer, IDB {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
-    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.HARD_WORK ? 1024 << 10 : 1024 << 5;
+    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_BYTE << 3;
     private static final int CASH_SIZE = BlockChain.HARD_WORK ? 1024 << 2 : 1024;
 
     private static final String TX_COUNTER = "tx_counter";
@@ -1368,13 +1368,7 @@ public class DCSet implements Observer, IDB {
 
     @Override
     public void commit() {
-        this.actions++;
-		/*
-		if(this.actions >= ACTIONS_BEFORE_COMMIT)
-		{
-			this.flush();
-		}
-		 */
+        this.actions += 100;
     }
 
     public void rollback() {
@@ -1408,29 +1402,6 @@ public class DCSet implements Observer, IDB {
 
     @Override
     public void update(Observable o, Object arg) {
-
-        if (true)
-            return;
-
-        //this.actions++;
-
-        ObserverMessage message = (ObserverMessage) arg;
-
-        //CHECK IF NEW BLOCK
-        if (false && message.getType() == ObserverMessage.LIST_BLOCK_TYPE) {
-
-            //CHECK IF WE NEED TO COMMIT
-            if (this.actions >= ACTIONS_BEFORE_COMMIT) {
-                //this.flush();
-
-                //NOTIFY CONTROLLER SO HE CAN NOTIFY WALLET
-                if (false)
-                    Controller.getInstance().onDatabaseCommit();
-            } else {
-
-            }
-        }
-
     }
 
     public long getEngineeSize() {

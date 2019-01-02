@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 // 30/03
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.BlockGenerator;;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -248,6 +249,10 @@ public class BlockMap extends DCMap<Integer, Block> {
         }
 
         PublicKeyAccount creator = block.getCreator();
+        if (BlockChain.DEVELOP_USE && creator.getLastForgingData(dcSet) == null) {
+            // так как унас новые счета сами стартуют без инициализации - надо тут учеть начало
+            creator.setForgingData(dcSet, height - BlockChain.DEVELOP_FORGING_START, block.getForgingValue());
+        }
         creator.setForgingData(dcSet, height, block.getForgingValue());
 
         // LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1200: " +
@@ -295,7 +300,14 @@ public class BlockMap extends DCMap<Integer, Block> {
             //Block.BlockHead head = dcSet.getBlocksHeadsMap().remove();
             dcSet.getBlocksHeadsMap().remove();
 
-            // INITIAL forging DATA no need remove!
+            if (creator.getAddress().equals("7CvpXXALviZPkZ9Yn27NncLVz6SkxMA8rh")
+                    && height > 291000 && height < 291056) {
+                Tuple2<String, Integer> key = new Tuple2<String, Integer>(creator.getAddress(), height);
+                Tuple2<Integer, Integer> previous = dcSet.getAddressForging().get(key);
+                int ii = 0;
+            }
+
+                // INITIAL forging DATA no need remove!
             Tuple2<String, Integer> key = new Tuple2<String, Integer>(creator.getAddress(), height);
             Tuple2<Integer, Integer> previous = dcSet.getAddressForging().get(key);
             if (previous != null) {
@@ -323,7 +335,9 @@ public class BlockMap extends DCMap<Integer, Block> {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block.blockHead));
 
-        this.getDCSet().getTransactionMap().clear(block.getTimestamp());
+        // образать список и по времени протухания
+        this.getDCSet().getTransactionMap().clear(block.getTimestamp(), true);
+        this.getDCSet().getEngineeSize();
 
         LOGGER.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE END");
     }
@@ -333,7 +347,8 @@ public class BlockMap extends DCMap<Integer, Block> {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block.blockHead));
 
-        this.getDCSet().getTransactionMap().clear(block.getTimestamp());
+        // образать список только по максимальному размеру
+        this.getDCSet().getTransactionMap().clear(block.getTimestamp(), false);
 
         LOGGER.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE END");
     }

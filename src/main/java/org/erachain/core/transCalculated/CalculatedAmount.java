@@ -373,7 +373,7 @@ public abstract class CalculatedAmount extends Calculated {
             } else {
                 if (privousForgingPoint.b < BlockChain.MIN_GENERATING_BALANCE
                         && currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
-                    this.recipient.setForgingData(dcSet, this.blockNo, this.amount.intValue());
+                    this.recipient.setForgingData(dcSet, this.blockNo, currentForgingBalance);
                 }
             }
         }

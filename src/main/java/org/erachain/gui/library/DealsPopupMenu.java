@@ -367,15 +367,15 @@ public class DealsPopupMenu extends JPopupMenu {
             case AssetCls.AS_INSIDE_BONUS:
                 this.sendAsset.setText(Lang.getInstance().translate("Начислить бонусы"));
 
-                this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
-                this.holdAsset.setVisible(true);
+                //this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
+                this.holdAsset.setVisible(false);
 
-                this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
-                this.debtAsset.setVisible(true);
-                this.debtAssetReturn.setText(Lang.getInstance().translate("Return debt"));
-                this.debtAssetReturn.setVisible(true);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("To confiscate a debt"));
-                this.debtAssetBackward.setVisible(true);
+                //this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
+                this.debtAsset.setVisible(false);
+                //this.debtAssetReturn.setText(Lang.getInstance().translate("Return debt"));
+                this.debtAssetReturn.setVisible(false);
+                //this.debtAssetBackward.setText(Lang.getInstance().translate("To confiscate a debt"));
+                this.debtAssetBackward.setVisible(false);
 
                 break;
 

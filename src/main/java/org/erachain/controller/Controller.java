@@ -89,6 +89,9 @@ import java.util.Timer;
  */
 public class Controller extends Observable {
 
+    private static final String version = "4.11.07a1 beta";
+    private static final String buildTime = "2018-12-04 13:33:33 UTC";
+
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
     // IF new abilities is made - new license insert in CHAIN and set this KEY
@@ -120,8 +123,6 @@ public class Controller extends Observable {
     public static final int STATUS_SYNCHRONIZING = 1;
     public static final int STATUS_OK = 2;
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
-    private static final String version = "4.11.07 beta";
-    private static final String buildTime = "2018-12-04 13:33:33 UTC";
     public static boolean useGui = true;
     private static List<Thread> threads = new ArrayList<Thread>();
     private static long buildTimestamp;
@@ -1051,14 +1052,14 @@ public class Controller extends Observable {
         this.network.notifyObserveUpdatePeer(peer);
     }
 
-    public void broadcastUnconfirmedToPeer(Peer peer) {
+    public boolean broadcastUnconfirmedToPeer(Peer peer) {
 
         // LOGGER.info(peer.getAddress() + " sended UNCONFIRMED ++++ START ");
 
         byte[] peerByte = peer.getAddress().getAddress();
 
         if (this.isStopping)
-            return;
+            return false;
 
         TransactionMap map = this.dcSet.getTransactionMap();
         Iterator<Long> iterator = map.getIterator(0, false);
@@ -1066,13 +1067,13 @@ public class Controller extends Observable {
         int counter = 0;
         ///////// big maxCounter freeze network and make bans on response
         ///////// headers andblocks
-        int stepCount = 126; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
+        int stepCount = 64; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
         long dTime = this.blockChain.getTimestamp(this.dcSet);
 
-        while (iterator.hasNext() && stepCount > 4) {
+        while (iterator.hasNext() && stepCount > 2) {
 
             if (this.isStopping) {
-                return;
+                return false;
             }
 
             Transaction transaction = map.get(iterator.next());
@@ -1084,13 +1085,9 @@ public class Controller extends Observable {
             if (counter > BlockChain.ON_CONNECT_SEND_UNCONFIRMED_UNTIL
                     // дело в том что при коннекте новому узлу надо все же
                     // передавать все так как он может собрать пустой блок
-                    && !map.needBroadcasting(transaction, peerByte))
-                continue;
-
-            if (transaction.getDeadline() < dTime) {
-                clearUnconfirmedRecords();
-                continue;
-            }
+                    /////&& !map.needBroadcasting(transaction, peerByte)
+            )
+                break;
 
             try {
                 Thread.sleep(1);
@@ -1100,23 +1097,16 @@ public class Controller extends Observable {
             Message message = MessageFactory.getInstance().createTransactionMessage(transaction);
 
             try {
-                if (peer.tryTimesSend(message, 100)) {
+                if (peer.sendMessage(message)) {
                     counter++;
                     map.addBroadcastedPeer(transaction, peerByte);
                 } else {
-                    // понизим число передач за раз
-                    stepCount >>= 1;
-                    try {
-                        Thread.sleep(10000);
-                    } catch (Exception e) {
-                    }
-                    if (this.isStopping) {
-                        return;
-                    }
+                    // DISCONNECT
+                    return false;
                 }
             } catch (Exception e) {
                 if (this.isStopping) {
-                    return;
+                    return false;
                 }
                 LOGGER.error(e.getMessage(), e);
             }
@@ -1127,14 +1117,14 @@ public class Controller extends Observable {
                 this.network.notifyObserveUpdatePeer(peer);
 
                 ping = peer.getPing();
-                if (ping < 0 || ping > 500) {
+                if (ping < 0 || ping > 1000) {
 
                     stepCount >>= 1;
 
                     if (ping < 0) {
                         stepCount >>= 1;
                         try {
-                            Thread.sleep(10000);
+                            Thread.sleep(5000);
                         } catch (Exception e) {
                         }
                     } else if (ping > 5000) {
@@ -1144,7 +1134,7 @@ public class Controller extends Observable {
                     // LOGGER.debug(peer.getAddress() + " stepCount down " +
                     // stepCount);
 
-                } else if (ping < 100) {
+                } else if (ping < 200) {
                     stepCount <<= 1;
                     // LOGGER.debug(peer.getAddress() + " stepCount UP " +
                     // stepCount + " for PING: " + ping);
@@ -1159,6 +1149,8 @@ public class Controller extends Observable {
 
         // LOGGER.info(peer.getAddress() + " sended UNCONFIRMED counter: " +
         // counter);
+
+        return true;
 
     }
 
@@ -1245,7 +1237,8 @@ public class Controller extends Observable {
         }
 
         // BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-        this.broadcastUnconfirmedToPeer(peer);
+        if (!this.broadcastUnconfirmedToPeer(peer))
+            this.network.tryDisconnect(peer, 1, "broken on SEND UNCONFIRMEDs");
 
         /*
          * // GET HEIGHT Tuple2<Integer, Long> HWeight =
@@ -1270,7 +1263,7 @@ public class Controller extends Observable {
                 public void run() {
 
                     // LOGGER.debug("timerUnconfirmed ---------------- ");
-                    Controller.getInstance().clearUnconfirmedRecords();
+                    Controller.getInstance().clearUnconfirmedRecords(false);
 
                 }
             };
@@ -1544,7 +1537,7 @@ public class Controller extends Observable {
                     }
 
                     // DEADTIME
-                    if (transaction.getDeadline() < this.blockChain.getTimestamp(DCSet.getInstance())) {
+                    if (transaction.getDeadline() < this.blockChain.getTimestamp(this.dcSet)) {
                         // so OLD transaction
                         return;
                     }
@@ -1558,7 +1551,7 @@ public class Controller extends Observable {
                     // ADD TO UNCONFIRMED TRANSACTIONS
                     this.dcSet.getTransactionMap().add(transaction);
 
-                    if (this.status != STATUS_OK) {
+                    if (this.status == STATUS_OK) {
                         // если мы не в синхронизации - так как мы тогда
                         // не знаем время текущее цепочки и не понимаем можно ли борадкастить дальше трнзакцию
                         // так как непонятно - протухла она или нет
@@ -1689,7 +1682,7 @@ public class Controller extends Observable {
     // SYNCHRONIZE
 
     public void orphanInPipe(Block block) throws Exception {
-        this.synchronizer.pipeProcessOrOrphan(this.dcSet, block, true, true);
+        this.synchronizer.pipeProcessOrOrphan(this.dcSet, block, true, false);
     }
 
     public boolean checkStatus(int shift) {
@@ -1905,6 +1898,14 @@ public class Controller extends Observable {
         } else {
             this.status = STATUS_OK;
             this.pingAllPeers(false);
+            if (this.isStopping) return;
+
+            // после очередного синхрона передать все свои трнзакции всем пирам вокруг
+            this.clearUnconfirmedRecords(false);
+            for (Peer peerOut: this.getActivePeers()) {
+                if (this.isStopping) return;
+                this.broadcastUnconfirmedToPeer(peerOut);
+            }
         }
 
         // send to ALL my HW
@@ -2149,8 +2150,8 @@ public class Controller extends Observable {
         this.wallet.synchronize(false);
     }
 
-    public void clearUnconfirmedRecords() {
-        this.blockChain.clearUnconfirmedRecords(this, this.dcSet);
+    public void clearUnconfirmedRecords(boolean cutDeadTime) {
+        this.blockChain.clearUnconfirmedRecords(this, this.dcSet, cutDeadTime);
 
     }
 

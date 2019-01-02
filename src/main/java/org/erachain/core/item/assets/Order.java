@@ -4,6 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
+import org.erachain.core.block.Block;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.CompletedOrderMap;
 import org.erachain.datachain.DCSet;
@@ -55,6 +56,7 @@ public class Order implements Comparable<Order> {
     private BigDecimal amountWant;
     private BigDecimal price;
     int status;
+    Block block;
 
     public Order(Long id, Account creator, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant) {
         this.id = id;
@@ -69,8 +71,14 @@ public class Order implements Comparable<Order> {
 
         this.price = calcPrice(amountHave, amountWant, 1);
 
-        //this.timestamp = timestamp;
     }
+
+    public Order(Long id, Account creator, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant, Block block) {
+        this(id, creator, haveKey, wantKey, amountHave, amountWant);
+
+        this.block = block;
+    }
+
 
     public Order(Long id, Account creator, long haveKey, long wantKey, BigDecimal amountHave,
                  BigDecimal amountWant, BigDecimal fulfilledHave, int status) {
@@ -686,10 +694,14 @@ public class Order implements Comparable<Order> {
                 }
 
                 //TRANSFER FUNDS
-                order.getCreator().changeBalance(this.dcSet, false, order.getWant(), tradeAmountForWant, false);
+                order.getCreator().changeBalance(this.dcSet, false, order.wantKey, tradeAmountForWant, false);
                 transaction.addCalculated(order.getCreator(), order.getWant(), tradeAmountForWant,
                         "order @" + Transaction.viewDBRef(order.id));
 
+                // Учтем что у стороны ордера обновилась форжинговая информация
+                if (order.wantKey == Transaction.RIGHTS_KEY && block != null) {
+                    block.addForgingInfoUpdate(order.getCreator());
+                }
 
                 // update new values
                 thisAmountHaveLeft = this.getAmountHaveLeft();
@@ -766,7 +778,12 @@ public class Order implements Comparable<Order> {
             target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
             thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
 
-            target.getCreator().changeBalance(this.dcSet, true, target.getWant(), tradeAmountWant, false);
+            target.getCreator().changeBalance(this.dcSet, true, target.wantKey, tradeAmountWant, false);
+
+            // Учтем что у стороны ордера обновилась форжинговая информация
+            if (target.wantKey == Transaction.RIGHTS_KEY && block != null) {
+                block.addForgingInfoUpdate(target.getCreator());
+            }
 
             //UPDATE ORDERS
             ordersMap.add(target);

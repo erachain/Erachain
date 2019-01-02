@@ -609,6 +609,10 @@ public class Peer extends Thread {
             try {
                 this.out.write(bytes);
                 this.out.flush();
+            } catch (java.net.SocketException eSock) {
+                callback.tryDisconnect(this, 0, eSock.getMessage());
+                return false;
+
             } catch (IOException e) {
                 if (this.socket.isOutputShutdown()) {
                     //ERROR
@@ -715,30 +719,6 @@ public class Peer extends Thread {
 
         //RETURN
         return true;
-    }
-
-    /**
-     * попытка послать сообщение Х рах
-     * @param message
-     * @param times
-     * @return
-     */
-    public boolean tryTimesSend(Message message, int times) {
-
-        do {
-            if (this.sendMessage(message)) {
-                return true;
-            } else {
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                }
-                times--;
-            }
-        } while (times > 0 && this.runed);
-
-        return false;
-
     }
 
     public synchronized int getResponseKey()
