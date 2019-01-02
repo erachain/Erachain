@@ -1092,6 +1092,7 @@ public class Wallet extends Observable implements Observer {
 
 	}
 
+	private long processBlockLogged = 0;
 	private void processBlock(Block.BlockHead blockHead) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
@@ -1199,11 +1200,14 @@ public class Wallet extends Observable implements Observer {
 			}
 		}
 
-		long tickets = System.currentTimeMillis() - start;
-		if (blockHead.transactionsCount > 0)
-		    LOGGER.debug("WALLET [" + blockHead.heightBlock + "] processing time: " + tickets * 0.001
-				+ " for org.erachain.records:" + blockHead.transactionsCount + " millsec/record:"
-				+ tickets / (blockHead.transactionsCount + 1));
+		if (blockHead.transactionsCount > 0
+                && start - processBlockLogged > (BlockChain.DEVELOP_USE? 1000 : 10000)) {
+            long tickets = System.currentTimeMillis() - start;
+            processBlockLogged = start;
+            LOGGER.debug("WALLET [" + blockHead.heightBlock + "] processing time: " + tickets * 0.001
+                    + " for org.erachain.records:" + blockHead.transactionsCount + " millsec/record:"
+                    + tickets / (blockHead.transactionsCount + 1));
+        }
 
 	}
 
