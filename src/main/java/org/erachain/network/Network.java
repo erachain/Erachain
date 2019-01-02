@@ -24,7 +24,7 @@ public class Network extends Observable implements ConnectionCallback {
 
 
     public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK ? 0 : 1;
-    private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 4096 << 4 : 4096;
+    private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<4;
     private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 5 : 1024 << 4;
     private static final Logger LOGGER = LoggerFactory.getLogger(Network.class);
     private static InetAddress myselfAddress;

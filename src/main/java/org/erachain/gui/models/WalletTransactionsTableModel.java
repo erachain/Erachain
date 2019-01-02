@@ -8,13 +8,11 @@ import org.erachain.core.transaction.*;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.SortableList;
-import org.erachain.gui.Gui;
 import org.erachain.gui.library.library;
 import org.erachain.lang.Lang;
 import org.erachain.ntp.NTP;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
@@ -53,7 +51,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
     private int start =0;
     private int step =100;
-    private List<Pair<Tuple2<String, String>, Transaction>> pp;
+    private List<Pair<Tuple2<String, String>, Transaction>> pairTransactions;
 
     public WalletTransactionsTableModel() {
         addObservers();
@@ -113,22 +111,22 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
     @Override
     public int getRowCount() {
-        if (this.pp == null) {
+        if (this.pairTransactions == null) {
             return 0;
         }
 
-        return this.pp.size();
+        return this.pairTransactions.size();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
         //try
         //{
-        if (this.pp == null || this.pp.size() - 1 < row) {
+        if (this.pairTransactions == null || this.pairTransactions.size() - 1 < row) {
             return null;
         }
 
-        Pair<Tuple2<String, String>, Transaction> data = this.pp.get(row);
+        Pair<Tuple2<String, String>, Transaction> data = this.pairTransactions.get(row);
 
         if (data == null || data.getB() == null) {
             return null;
@@ -432,7 +430,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
        // pp.c.clear();
         int end = start+step;
         if (end > transactions.size()) end = transactions.size();
-        pp = this.transactions.subList(start, end);
+        pairTransactions = this.transactions.subList(start, end);
         
     }
     public void setInterval(int start, int step){

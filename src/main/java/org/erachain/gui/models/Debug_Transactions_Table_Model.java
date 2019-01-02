@@ -34,7 +34,7 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
     private static final int MAX_ROWS = 1000;
     private static final Logger LOGGER = LoggerFactory            .getLogger(Debug_Transactions_Table_Model.class);
     private List<Transaction> transactions;
-    SortableList <byte[],Transaction> list;
+    SortableList <Long, Transaction> list;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Fee"});
 
     public Debug_Transactions_Table_Model() {
@@ -133,7 +133,7 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
             //CHECK IF NEW LIST
     //        LOGGER.error("gui.models.Debug_Transactions_Table_Model.syncUpdate - LIST_UNC_TRANSACTION_TYPE");
             if (this.list == null) {
-                this.list = (SortableList<byte[], Transaction>) message.getValue();
+                this.list = (SortableList<Long, Transaction>) message.getValue();
                 this.list.registerObserver();
             }
             this.fireTableDataChanged();
