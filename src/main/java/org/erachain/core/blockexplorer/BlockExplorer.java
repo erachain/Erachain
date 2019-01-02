@@ -2260,7 +2260,7 @@ public class BlockExplorer {
         WEB_Balance_from_Adress_TableModel balanceTableModel = new WEB_Balance_from_Adress_TableModel(account);
         int ad = balanceTableModel.getRowCount();
         int idr;
-        Map bal_Assets = new LinkedHashMap();
+        TreeMap bal_Assets = new TreeMap();
         if (ad > 0)
             for (idr = 0; idr < ad; idr++) {
                 Map bal = new LinkedHashMap();
@@ -2272,7 +2272,7 @@ public class BlockExplorer {
                 if (!(balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_A).equals("0.00000000")
                         && balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_B).equals("0.00000000")
                         && balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_C).equals("0.00000000")))
-                    bal_Assets.put(idr, bal);
+                    bal_Assets.put(balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_ASSET_KEY), bal);
             }
 
         output.put("balances", bal_Assets);
