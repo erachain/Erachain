@@ -25,7 +25,7 @@ public class Network extends Observable implements ConnectionCallback {
 
     public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK ? 0 : 1;
     private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<4;
-    private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 5 : 1024 << 4;
+    private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 12 : 1024 << 8;
     private static final Logger LOGGER = LoggerFactory.getLogger(Network.class);
     private static InetAddress myselfAddress;
     private ConnectionCreator creator;
@@ -125,6 +125,9 @@ public class Network extends Observable implements ConnectionCallback {
         if (!peer.isUsed())
             return;
 
+        //CLOSE CONNECTION
+        peer.close();
+
         if (banForMinutes != 0) {
             //ADD TO BLACKLIST
             PeerManager.getInstance().addPeer(peer, banForMinutes);
@@ -138,8 +141,6 @@ public class Network extends Observable implements ConnectionCallback {
             }
         }
 
-        //CLOSE CONNECTION IF STILL ACTIVE
-        peer.close();
 
         //PASS TO CONTROLLER
         Controller.getInstance().afterDisconnect(peer);

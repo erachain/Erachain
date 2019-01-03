@@ -89,7 +89,7 @@ import java.util.Timer;
  */
 public class Controller extends Observable {
 
-    private static final String version = "4.11.07a2 beta";
+    private static final String version = "4.11.07a3 beta";
     private static final String buildTime = "2018-12-04 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -1113,7 +1113,7 @@ public class Controller extends Observable {
 
             if (counter % stepCount == 0) {
 
-                peer.tryPing(10000);
+                peer.tryQuickPing();
                 this.network.notifyObserveUpdatePeer(peer);
 
                 ping = peer.getPing();
@@ -1144,7 +1144,7 @@ public class Controller extends Observable {
 
         }
 
-        peer.tryPing(10000);
+        //peer.tryQuickPing();
         this.network.notifyObserveUpdatePeer(peer);
 
         // LOGGER.info(peer.getAddress() + " sended UNCONFIRMED counter: " +

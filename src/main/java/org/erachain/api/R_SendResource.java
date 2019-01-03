@@ -316,7 +316,7 @@ public class R_SendResource {
 
                     if (this.test1Delay <= 0) {
                         try {
-                            Thread.sleep(10);
+                            Thread.sleep(1000);
                         } catch (InterruptedException e) {
                         }
                         continue;
