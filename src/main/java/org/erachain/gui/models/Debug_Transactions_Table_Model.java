@@ -32,7 +32,7 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
     public static final int COLUMN_TYPE = 1;
     public static final int COLUMN_FEE = 2;
     private static final int MAX_ROWS = 1000;
-    private static final Logger LOGGER = LoggerFactory            .getLogger(Debug_Transactions_Table_Model.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Debug_Transactions_Table_Model.class);
     private List<Transaction> transactions;
     SortableList <Long, Transaction> list;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Fee"});

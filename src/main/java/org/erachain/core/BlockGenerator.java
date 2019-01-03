@@ -209,6 +209,9 @@ public class BlockGenerator extends Thread implements Observer {
             long start = System.currentTimeMillis();
             TransactionMap transactionsMap = dcSet.getTransactionMap();
             for (byte[] signature : needRemoveInvalids) {
+                if (ctrl.isOnStopping()) {
+                    return;
+                }
                 if (transactionsMap.contains(signature))
                     transactionsMap.delete(signature);
             }

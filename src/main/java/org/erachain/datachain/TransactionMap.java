@@ -36,7 +36,7 @@ import java.util.*;
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
 public class TransactionMap extends DCMap<Long, Transaction> implements Observer {
-    public static final int TIMESTAMP_INDEX = 0;
+    public static final int TIMESTAMP_INDEX = 1;
 
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
