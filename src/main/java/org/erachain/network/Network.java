@@ -81,7 +81,7 @@ public class Network extends Observable implements ConnectionCallback {
     }
 
     @Override
-    public void onConnect(Peer peer, boolean asNew) {
+    public void onConnect(Peer peer) {
 
         //LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer.getAddress());
 
@@ -91,6 +91,13 @@ public class Network extends Observable implements ConnectionCallback {
         } catch (InterruptedException e) {
         }
 
+        boolean asNew = true;
+        for (Peer peerKnown: this.knownPeers) {
+            if (peer.equals(peerKnown)) {
+                asNew = false;
+                break;
+            }
+        }
         if (asNew) {
             //ADD TO CONNECTED PEERS
             synchronized (this.knownPeers) {
@@ -291,39 +298,41 @@ public class Network extends Observable implements ConnectionCallback {
     public Peer startPeer(Socket socket) {
 
         // REUSE known peer
-        InetAddress address = socket.getInetAddress();
+        byte[] addressIP = socket.getInetAddress().getAddress();
         synchronized (this.knownPeers) {
             //FOR ALL connectedPeers
             for (Peer knownPeer : knownPeers) {
                 //CHECK IF ADDRESS IS THE SAME
-                if (address.equals(knownPeer.getAddress())) {
-                    knownPeer.reconnect(socket);
-                    return knownPeer;
+                if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
+                    knownPeer.reconnect(socket, "reconnected!!! ");
+                    if (knownPeer.isUsed())
+                        return knownPeer;
+                    break;
                 }
             }
         }
 
-        // ADD new peer
-        int maxPeers = Settings.getInstance().getMaxConnections();
-        if (maxPeers > this.knownPeers.size()) {
-            // make NEW PEER and use empty slots
-            return new Peer(this, socket);
-        }
-        if (maxPeers > this.getActivePeersCounter(false)) {
-            // use UNUSED peers
-            synchronized (this.knownPeers) {
-                for (Peer knownPeer : this.knownPeers) {
-                    if (!knownPeer.isUsed()
-                        //|| !Network.isMyself(knownPeer.getAddress())
-                            ) {
-                        knownPeer.reconnect(socket);
+        // use UNUSED peers
+        synchronized (this.knownPeers) {
+            for (Peer knownPeer : this.knownPeers) {
+                if (!knownPeer.isUsed()
+                    //|| !Network.isMyself(knownPeer.getAddress())
+                        ) {
+                    if (knownPeer.reconnect(socket)) {
+                        LOGGER.info("recicled connected!!! " + knownPeer.getAddress().getHostAddress());
+                        knownPeer.callback.onConnect(knownPeer);
                         return knownPeer;
                     }
                 }
             }
         }
-        return null;
 
+        // ADD new peer
+        // make NEW PEER and use empty slots
+
+        Peer peer = new Peer(this, socket, "connected start!!! ");
+
+        return peer;
     }
 
     private void addHandledMessage(String hash) {

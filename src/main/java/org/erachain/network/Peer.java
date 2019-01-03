@@ -163,7 +163,7 @@ public class Peer extends Thread {
 	}
 */
 
-    public Peer(ConnectionCallback callback, Socket socket) {
+    public Peer(ConnectionCallback callback, Socket socket, String description) {
 
         //LOGGER.debug("@@@ new Peer(ConnectionCallback callback, Socket socket) : " + socket.getInetAddress().getHostAddress());
 
@@ -191,6 +191,9 @@ public class Peer extends Thread {
             //CREATE STRINGWRITER
             this.out = socket.getOutputStream();
 
+            // IT is STARTED
+            this.runed = true;
+
             //START COMMUNICATON THREAD
             this.start();
 
@@ -202,20 +205,17 @@ public class Peer extends Thread {
                 this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
             }
 
-
-            // IT is STARTED
-            this.runed = true;
-
-            //ON SOCKET CONNECT
-            this.callback.onConnect(this, true);
-
             this.setName("Peer: " + this.getAddress().getHostAddress() + " as socket"
                     + (this.isWhite()?" is White" : ""));
 
-            //LOGGER.debug("@@@ new Peer(ConnectionCallback callback, Socket socket) : " + socket.getInetAddress().getHostAddress());
+            LOGGER.info(description + address.getAddress());
+            callback.onConnect(this);
 
         } catch (Exception e) {
             //FAILED TO CONNECT NO NEED TO BLACKLIST
+
+            this.runed = false;
+
             LOGGER.info("Failed to connect to : " + address);
             LOGGER.error(e.getMessage(), e);
 
@@ -292,7 +292,6 @@ public class Peer extends Thread {
 
             //ON SOCKET CONNECT
             step++;
-            this.callback.onConnect(this, true);
         } else {
             this.pinger.setPing(Integer.MAX_VALUE);
             this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
@@ -300,15 +299,13 @@ public class Peer extends Thread {
             // IT is STARTED
             this.runed = true;
 
-            // already started
-            this.callback.onConnect(this, false);
         }
 
         return 0;
     }
 
     // connect to old reused peer
-    public void reconnect(Socket socket) {
+    public boolean reconnect(Socket socket, String description) {
 
         //LOGGER.debug("@@@ reconnect(socket) : " + socket.getInetAddress().getHostAddress());
 
@@ -347,17 +344,22 @@ public class Peer extends Thread {
             this.runed = true;
 
             //ON SOCKET CONNECT
-            this.callback.onConnect(this, false);
-
             this.setName("Peer: " + this.getAddress().getHostAddress() + " reconnected"
                 + (this.isWhite()?" is White" : ""));
+
+            LOGGER.info(description + address.getAddress());
+            callback.onConnect(this);
 
         } catch (Exception e) {
             //FAILED TO CONNECT NO NEED TO BLACKLIST
             //LOGGER.info("Failed to connect to : " + address);
             //LOGGER.error(e.getMessage(), e);
 
+            return false;
         }
+
+        return true;
+
     }
 
 
@@ -367,6 +369,15 @@ public class Peer extends Thread {
 
     public long getPingCounter() {
         return this.pingCounter;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Peer) {
+            return Arrays.equals(((Peer)obj).address.getAddress(),
+                    this.address.getAddress());
+        }
+        return false;
     }
 
     public int getErrors() {

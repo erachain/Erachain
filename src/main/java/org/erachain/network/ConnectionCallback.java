@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface ConnectionCallback {
 
-    void onConnect(Peer peer, boolean asNew);
+    void onConnect(Peer peer);
 
     void tryDisconnect(Peer peer, int banForMinutes, String error);
 

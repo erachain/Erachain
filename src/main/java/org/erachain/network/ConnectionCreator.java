@@ -112,13 +112,12 @@ public class ConnectionCreator extends Thread {
 
 
             //CONNECT
-            newPeer.connect(callback);
-            if (newPeer.isUsed()) {
-                foreignPeersCounter++;
-
+            if (newPeer.connect(callback) == 0) {
                 LOGGER.info("connected to BRANCH and recurse: " + newPeer.getAddress().getHostAddress());
+                newPeer.callback.onConnect(newPeer);
 
                 // RECURSE to OTHER PEERS
+                foreignPeersCounter++;
                 connectToPeersOfThisPeer(newPeer, maxReceivePeers >> 1);
 
             }
@@ -214,6 +213,9 @@ public class ConnectionCreator extends Thread {
                     //CHECK IF ALREADY CONNECTED TO PEER
                     if (peer.connect(callback) == 0) {
                         LOGGER.info("connected!!! " + peer.getAddress().getHostAddress());
+
+                        this.callback.onConnect(peer);
+
                         // TRY CONNECT to WHITE peers of this PEER
                         connectToPeersOfThisPeer(peer, 4);
                     }
