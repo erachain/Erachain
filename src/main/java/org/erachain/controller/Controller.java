@@ -1827,6 +1827,8 @@ public class Controller extends Observable {
         // Settings.BLOCK_MAX_SIGNATURES;
         int checkPointHeight = BlockChain.getCheckPoint(dcSet);
 
+        Tuple2<Integer, Long> myHWeight = this.getBlockChain().getHWeightFull(dcSet);
+
         boolean isUpToDate;
         // WHILE NOT UPTODATE
         do {
@@ -1837,8 +1839,10 @@ public class Controller extends Observable {
 
             // START UPDATE FROM HIGHEST HEIGHT PEER
             // withWinBuffer = true
-            Tuple3<Integer, Long, Peer> peerHW = this.getMaxPeerHWeight(shift, false);
-            if (peerHW != null) {
+            // тут поиск длаем с учетом СИЛЫ
+            // но если найдено с такой же высотой как у нас то игнорируем
+            Tuple3<Integer, Long, Peer> peerHW = this.getMaxPeerHWeight(shift, true);
+            if (peerHW != null && peerHW.a > myHWeight.a) {
                 peer = peerHW.c;
                 if (peer != null) {
                     info = "update from MaxHeightPeer:" + peer.getAddress().getHostAddress() + " WH: "

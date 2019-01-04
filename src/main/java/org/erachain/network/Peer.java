@@ -213,10 +213,10 @@ public class Peer extends Thread {
                 this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
             }
 
-            this.setName("Peer: " + this.getAddress().getHostAddress() + " as socket"
+            this.setName("Peer: " + this.address.getHostAddress() + " as socket"
                     + (this.isWhite()?" is White" : ""));
 
-            LOGGER.info(description + address.getAddress());
+            LOGGER.info(description + address.getHostAddress());
             // при коннекте во вне связь может порваться поэтому тут по runed
             callback.onConnect(this);
 
@@ -225,7 +225,7 @@ public class Peer extends Thread {
 
             this.runed = false;
 
-            LOGGER.info("Failed to connect to : " + address);
+            LOGGER.info("Failed to connect to : " + address.getHostAddress());
             LOGGER.error(e.getMessage(), e);
 
         }
@@ -282,7 +282,7 @@ public class Peer extends Thread {
             //FAILED TO CONNECT NO NEED TO BLACKLIST
             if (step != 1) {
                 LOGGER.error(e.getMessage(), e);
-                LOGGER.debug("Failed to connect to : " + address + " on step: " + step);
+                LOGGER.debug("Failed to connect to : " + address.getHostAddress() + " on step: " + step);
             }
 
             return false;
@@ -348,7 +348,7 @@ public class Peer extends Thread {
             this.out = socket.getOutputStream();
 
             this.pinger.setPing(Integer.MAX_VALUE);
-            this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
+            this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.address.getHostAddress());
 
             // IT is STARTED
             this.runed = true;
