@@ -21,15 +21,22 @@ public class Account_Send_Panel extends AssetSendPanel {
 
     public Account_Send_Panel(AssetCls asset, Account account, Account account_To, PersonCls person) {
         super(asset, account, account_To, person);
-
+        String assetName = "";
+        if (asset != null) {
+            assetName = asset.viewName();
+            this.jComboBox_Asset.setEnabled(false);
+        }else{
+             this.jComboBox_Asset.setEnabled(true);
+        }
         this.jLabel_Title.setText(Lang.getInstance().translate("If You want to send asset %asset%, fill in this form").
-                replace("%asset%", asset.viewName()));
+                replace("%asset%", assetName));
 
         //  icon.setIcon(null);
+
         this.jButton_ok.setText(Lang.getInstance().translate("Send"));
         this.jLabel_To.setText(Lang.getInstance().translate("To: (address or name)") + ":");
         this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Receiver details") + ":");
-        this.jComboBox_Asset.setEnabled(false);
+
     }
 
    
