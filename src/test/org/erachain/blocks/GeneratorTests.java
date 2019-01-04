@@ -40,6 +40,9 @@ public class GeneratorTests {
     private DCSet db;
     long flags = 0l;
 
+    BlockChain blockchain;
+    Block genesisBlock;
+
     PrivateKeyAccount generator1;
 
     List<Transaction> transactions = new ArrayList<Transaction>();
@@ -59,15 +62,13 @@ public class GeneratorTests {
     public void generateNewBlock() {
 
         //PROCESS GENESISBLOCK
-        GenesisBlock genesisBlock = new GenesisBlock();
-        Controller.getInstance().initBlockChain(dcSet);
         try {
-            genesisBlock.process(dcSet);
+            blockchain = new BlockChain(dcSet);
+            genesisBlock = blockchain.getGenesisBlock();
         } catch (Exception e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
         }
 
+        BlockGenerator blockGenerator = new BlockGenerator(dcSet, blockchain, false);
 
         //CREATE KNOWN ACCOUNT
         int nonce = 1;
@@ -127,7 +128,7 @@ public class GeneratorTests {
                 generator = generator4;
 
             //GENERATE NEXT BLOCK
-            Block newBlock = BlockGenerator.generateNextBlock(dcSet, generator,
+            Block newBlock = blockGenerator.generateNextBlock(generator,
                     lastBlock, orderedTransactions,
                     height,  1000, 1000l, 1000l);
 
@@ -280,10 +281,15 @@ public class GeneratorTests {
     public void fullWeight() {
 
         //PROCESS GENESISBLOCK
-        GenesisBlock genesisBlock = new GenesisBlock();
-        cntrlr.initBlockChain(dcSet);
+        try {
+            blockchain = new BlockChain(dcSet);
+            genesisBlock = blockchain.getGenesisBlock();
+        } catch (Exception e1) {
+        }
+
         // already processed genesisBlock.process(dcSet);
 
+        BlockGenerator blockGenerator = new BlockGenerator(dcSet, null, false);
 
         //CREATE KNOWN ACCOUNT
         int nonce = 1;
@@ -391,7 +397,7 @@ public class GeneratorTests {
                 generator = generator0;
 
             //GENERATE NEXT BLOCK
-            Block newBlock = BlockGenerator.generateNextBlock(dcSet, generator,
+            Block newBlock = blockGenerator.generateNextBlock(generator,
                     lastBlock, orderedTransactions,
                     height,  1000, 1000l, 1000l);
 
@@ -555,14 +561,11 @@ public class GeneratorTests {
     public void addTransactions() {
         // TEN
 
-
         //PROCESS GENESISBLOCK
-        GenesisBlock genesisBlock = new GenesisBlock();
         try {
-            genesisBlock.process(dcSet);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            blockchain = new BlockChain(dcSet);
+            genesisBlock = blockchain.getGenesisBlock();
+        } catch (Exception e1) {
         }
 
         //CREATE KNOWN ACCOUNT
@@ -578,8 +581,8 @@ public class GeneratorTests {
         generator.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(10000), false);
 
         //GENERATE NEXT BLOCK
-        BlockGenerator blockGenerator = new BlockGenerator(false);
-        Block newBlock = BlockGenerator.generateNextBlock(dcSet, generator,
+        BlockGenerator blockGenerator = new BlockGenerator(dcSet, null, false);
+        Block newBlock = blockGenerator.generateNextBlock(generator,
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
 
@@ -603,13 +606,13 @@ public class GeneratorTests {
 
         }
 
-        Tuple2<List<Transaction>, Integer> transactionsItem = BlockGenerator.getUnconfirmedTransactions(dcSet, newBlock.getTimestamp(), null, 0l);
+        Tuple2<List<Transaction>, Integer> transactionsItem = blockGenerator.getUnconfirmedTransactions(newBlock.getTimestamp(), null, 0l);
         transactions = transactionsItem.a;
         // CALCULATE HASH for that transactions
         byte[] transactionsHash = Block.makeTransactionsHash(generator.getPrivateKey(), transactions, null);
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
-        newBlock = BlockGenerator.generateNextBlock(dcSet, generator,
+        newBlock = blockGenerator.generateNextBlock(generator,
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
         newBlock.setTransactions(transactions);
@@ -648,8 +651,8 @@ public class GeneratorTests {
 
 
         //GENERATE NEXT BLOCK
-        BlockGenerator blockGenerator = new BlockGenerator(false);
-        Block newBlock = BlockGenerator.generateNextBlock(dcSet, generator,
+        BlockGenerator blockGenerator = new BlockGenerator(dcSet, null, false);
+        Block newBlock = blockGenerator.generateNextBlock(generator,
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
 
@@ -681,7 +684,7 @@ public class GeneratorTests {
         }
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
-        transactions = BlockGenerator.getUnconfirmedTransactions(dcSet, newBlock.getTimestamp(), null, 0l).a;
+        transactions = blockGenerator.getUnconfirmedTransactions(newBlock.getTimestamp(), null, 0l).a;
 
         //CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
         assertEquals(true, max_count > transactions.size());
@@ -690,7 +693,7 @@ public class GeneratorTests {
         byte[] transactionsHash = Block.makeTransactionsHash(generator.getPrivateKey(), transactions, null);
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
-        newBlock = BlockGenerator.generateNextBlock(dcSet, generator,
+        newBlock = blockGenerator.generateNextBlock(generator,
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
         newBlock.setTransactions(transactions);
@@ -707,12 +710,10 @@ public class GeneratorTests {
         // as win values updated on block process
 
         //PROCESS GENESISBLOCK
-        GenesisBlock genesisBlock = new GenesisBlock();
         try {
-            genesisBlock.process(dcSet);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            blockchain = new BlockChain(dcSet);
+            genesisBlock = blockchain.getGenesisBlock();
+        } catch (Exception e1) {
         }
 
         int nonce = 1;
@@ -733,8 +734,8 @@ public class GeneratorTests {
 
 
         //GENERATE NEXT BLOCK
-        BlockGenerator blockGenerator = new BlockGenerator(false);
-        Block newBlock = BlockGenerator.generateNextBlock(dcSet, userAccount1,
+        BlockGenerator blockGenerator = new BlockGenerator(dcSet, blockchain, false);
+        Block newBlock = blockGenerator.generateNextBlock(userAccount1,
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
 
@@ -752,13 +753,13 @@ public class GeneratorTests {
         dcSet.getTransactionMap().add(payment);
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
-        transactions = BlockGenerator.getUnconfirmedTransactions(dcSet, newBlock.getTimestamp(), null, 0l).a;
+        transactions = blockGenerator.getUnconfirmedTransactions(newBlock.getTimestamp(), null, 0l).a;
 
         // CALCULATE HASH for that transactions
         byte[] transactionsHash = Block.makeTransactionsHash(userAccount1.getPrivateKey(), transactions, null);
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
-        newBlock = BlockGenerator.generateNextBlock(dcSet, userAccount1,
+        newBlock = blockGenerator.generateNextBlock(userAccount1,
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
         newBlock.setTransactions(transactions);

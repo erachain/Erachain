@@ -122,7 +122,7 @@ public class BlockGenerator extends Thread implements Observer {
             }
 
 
-            maxPeer = ctrl.getMaxPeerHWeight(-1);
+            maxPeer = ctrl.getMaxPeerHWeight(0, true);
             if (maxPeer == null)
                 return;
 
@@ -130,62 +130,63 @@ public class BlockGenerator extends Thread implements Observer {
             if (peer == null)
                 return;
 
-            if (myHW.a < maxPeer.a || myHW.b < maxPeer.b) {
+            if (myHW.a >= maxPeer.a && myHW.b >= maxPeer.b)
+                return;
 
-                if (myHW.a > 1) {
+            if (myHW.a > 1) {
 
-                    LOGGER.debug("ctrl.getMaxPeerHWeight(-1) found: " + peer.getAddress().getHostAddress()
-                            + " - HW: " + maxPeer.a + ":" + maxPeer.b);
+                LOGGER.debug("ctrl.getMaxPeerHWeight(-1) found: " + peer.getAddress().getHostAddress()
+                        + " - HW: " + maxPeer.a + ":" + maxPeer.b);
 
-                    SignaturesMessage response = null;
-                    try {
+                SignaturesMessage response = null;
+                try {
 
-                        byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1).reference;
-                        response = (SignaturesMessage) peer.getResponse(
-                                MessageFactory.getInstance().createGetHeadersMessage(prevSignature),
-                                Synchronizer.GET_BLOCK_TIMEOUT);
-                    } catch (java.lang.ClassCastException e) {
-                        ////peer.ban(1, "Cannot retrieve headers - from UPDATE");
-                        // remove HW from peers
-                        ctrl.setWeightOfPeer(peer, null);
+                    byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1).reference;
+                    response = (SignaturesMessage) peer.getResponse(
+                            MessageFactory.getInstance().createGetHeadersMessage(prevSignature),
+                            Synchronizer.GET_BLOCK_TIMEOUT);
+                } catch (Exception e) {
+                    ////peer.ban(1, "Cannot retrieve headers - from UPDATE");
+                    LOGGER.debug("peers response error " + peer.getAddress().getAddress());
+                    // remove HW from peers
+                    ctrl.setWeightOfPeer(peer, null);
+                    continue;
+                }
+
+                if (response == null) {
+                    ////peer.ban(1, "Cannot retrieve headers - from UPDATE");
+                    LOGGER.debug("peers is null " + peer.getAddress().getAddress());
+                    // remove HW from peers
+                    ctrl.setWeightOfPeer(peer, null);
+                    continue;
+                }
+
+                List<byte[]> headers = response.getSignatures();
+                byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
+                int headersSize = headers.size();
+                if (headersSize == 2) {
+                    if (Arrays.equals(headers.get(1), lastSignature)) {
+                        // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
+                        LOGGER.debug("peers has same Weight " + peer.getAddress().getAddress());
+                        ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
+                        // продолжим поиск дальше
                         continue;
-                    }
-
-                    if (response == null) {
-                        ////peer.ban(1, "Cannot retrieve headers - from UPDATE");
-                        LOGGER.debug("peers is null " + peer.getAddress().getAddress());
-                        // remove HW from peers
-                        ctrl.setWeightOfPeer(peer, null);
-                        continue;
-                    }
-
-                    List<byte[]> headers = response.getSignatures();
-                    byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
-                    int headersSize = headers.size();
-                    if (headersSize == 2) {
-                        if (Arrays.equals(headers.get(1), lastSignature)) {
-                            // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
-                            LOGGER.debug("peers has same Weight " + peer.getAddress().getAddress());
-                            ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
-                            // продолжим поиск дальше
-                            continue;
-                        } else {
-                            try {
-                                LOGGER.debug("I to orphaan - peers has better Weight " + peer.getAddress().getAddress()
-                                    + " = " + maxPeer);
-                                ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                                return;
-                            } catch (Exception e) {
-                            }
-                        }
-                    } else if (headersSize < 2) {
+                    } else {
                         try {
                             LOGGER.debug("I to orphaan - peers has better Weight " + peer.getAddress().getAddress()
-                                    + " = " + maxPeer);
+                                + " = " + maxPeer);
                             ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
                             return;
                         } catch (Exception e) {
                         }
+                    }
+                } else if (headersSize < 2) {
+                    try {
+                        LOGGER.debug("I to orphaan - peers has better Weight " + peer.getAddress().getAddress()
+                                + " = " + maxPeer);
+                        ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                        return;
+                    } catch (Exception e) {
                     }
                 }
             }
@@ -869,14 +870,9 @@ public class BlockGenerator extends Thread implements Observer {
                 ////////////////////////// UPDATE ////////////////////
 
                 timeUpdate = timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS - NTP.getTime();
-                if (timeUpdate > 0)
-                    continue;
-
-                Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-                if ((timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) < 0)
-                            || myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
-                    // если случилась патовая ситуация или рах в ХХХ блоков ::
-                    // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
+                 if (timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) < 0) {
+                    // если случилась патовая ситуация то найдем более сильную цепочку (не по высоте)
+                    // если есть сильнее то сделаем откат у себя
                     checkWeightPeers();
                 }
 
@@ -909,6 +905,13 @@ public class BlockGenerator extends Thread implements Observer {
                     ctrl.checkNeedSyncWallet();
 
                     setForgingStatus(ForgingStatus.FORGING_WAIT);
+
+                } else {
+                    Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+                    if (myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
+                        // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
+                        checkWeightPeers();
+                    }
 
                 }
 

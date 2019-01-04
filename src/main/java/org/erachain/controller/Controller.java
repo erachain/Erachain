@@ -1691,7 +1691,7 @@ public class Controller extends Observable {
         }
 
         // withWinBuffer
-        Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight(shift);
+        Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight(shift, false);
         if (maxHW.c == null) {
             this.status = STATUS_OK;
             return true;
@@ -1837,7 +1837,7 @@ public class Controller extends Observable {
 
             // START UPDATE FROM HIGHEST HEIGHT PEER
             // withWinBuffer = true
-            Tuple3<Integer, Long, Peer> peerHW = this.getMaxPeerHWeight(shift);
+            Tuple3<Integer, Long, Peer> peerHW = this.getMaxPeerHWeight(shift, false);
             if (peerHW != null) {
                 peer = peerHW.c;
                 if (peer != null) {
@@ -1919,7 +1919,7 @@ public class Controller extends Observable {
      * return highestPeer; }
      */
 
-    public Tuple3<Integer, Long, Peer> getMaxPeerHWeight(int shift) {
+    public Tuple3<Integer, Long, Peer> getMaxPeerHWeight(int shift, boolean useWeight) {
 
         if (this.isStopping || this.dcSet.isStoped())
             return null;
@@ -1933,7 +1933,8 @@ public class Controller extends Observable {
             synchronized (this.peerHWeight) {
                 for (Peer peer : this.peerHWeight.keySet()) {
                     Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
-                    if (height < whPeer.a || (maxPeer != null && height == whPeer.a && weight < whPeer.b)) {
+                    if (height < whPeer.a
+                            || (useWeight && height == whPeer.a && weight < whPeer.b)) {
                         height = whPeer.a;
                         weight = whPeer.b;
                         maxPeer = peer;

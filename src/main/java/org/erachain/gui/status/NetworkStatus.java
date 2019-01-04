@@ -46,9 +46,9 @@ public class NetworkStatus extends JLabel implements Observer {
                 if (Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
                     mess += Lang.getInstance().translate("Block height") + ": " + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a;
                 } else if (Controller.getInstance().getWalletSyncHeight() > 0) {
-                    mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "/" + Controller.getInstance().getMaxPeerHWeight(0);
+                    mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false);
                 } else {
-                    mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight(0).a;
+                    mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight(0, false).a;
                 }
                 setToolTipText(mess);
             }
@@ -64,7 +64,7 @@ public class NetworkStatus extends JLabel implements Observer {
 
     private void viewProgress() {
         currentHeight = Controller.getInstance().getMyHeight();
-        Tuple3<Integer, Long, Peer> heightW = Controller.getInstance().getMaxPeerHWeight(0);
+        Tuple3<Integer, Long, Peer> heightW = Controller.getInstance().getMaxPeerHWeight(0, false);
         if (heightW == null)
             return;
 

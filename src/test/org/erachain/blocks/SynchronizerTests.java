@@ -1,6 +1,7 @@
 package org.erachain.blocks;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.BlockGenerator;;
 import org.erachain.core.Synchronizer;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -35,6 +36,7 @@ public class SynchronizerTests {
     long timestamp = NTP.getTime();
     DCSet databaseSet = DCSet.createEmptyDatabaseSet();
     GenesisBlock genesisBlock = new GenesisBlock();
+    BlockChain blockChain;
 
     Fun.Tuple2<List<Transaction>, Integer> orderedTransactions = new Fun.Tuple2<>(new ArrayList<Transaction>(), 0);
 
@@ -46,12 +48,9 @@ public class SynchronizerTests {
     public void synchronizeNoCommonBlock() {
         //GENERATE 5 BLOCKS FROM ACCOUNT 1
 
-        //PROCESS GENESISBLOCK
         try {
-            genesisBlock.process(databaseSet);
+        blockChain = new BlockChain(databaseSet);
         } catch (Exception e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
         }
 
         //CREATE KNOWN ACCOUNT
@@ -66,12 +65,12 @@ public class SynchronizerTests {
 
         //GENERATE 5 NEXT BLOCKS
         Block lastBlock = genesisBlock;
-        BlockGenerator blockGenerator = new BlockGenerator(false);
+        BlockGenerator blockGenerator = new BlockGenerator(databaseSet,blockChain, false);
         List<Block> firstBlocks = new ArrayList<Block>();
         for (int i = 0; i < 5; i++) {
             //GENERATE NEXT BLOCK
             int height = i + 1;
-            Block newBlock = BlockGenerator.generateNextBlock(databaseSet, generator,
+            Block newBlock = blockGenerator.generateNextBlock(generator,
                     lastBlock, orderedTransactions,
                     height,  1000, 1000l, 1000l);
 
@@ -107,11 +106,12 @@ public class SynchronizerTests {
         //FORK
         DCSet fork = databaseSet.fork();
 
+        BlockGenerator blockGeneratorFork = new BlockGenerator(fork,blockChain, false);
         //GENERATE NEXT 5 BLOCKS
         List<Block> newBlocks = new ArrayList<Block>();
         for (int i = 0; i < 5; i++) {
             //GENERATE NEXT BLOCK
-            Block newBlock = BlockGenerator.generateNextBlock(fork, generator,
+            Block newBlock = blockGenerator.generateNextBlock(generator,
                     lastBlock, orderedTransactions,
                     i + 1,  1000, 1000l, 1000l);
 
@@ -220,13 +220,17 @@ public class SynchronizerTests {
         generator2.changeBalance(databaseSet1, false, ERM_KEY, BigDecimal.valueOf(1000), false);
         generator2.changeBalance(databaseSet2, false, ERM_KEY, BigDecimal.valueOf(1000), false);
 
+        try {
+            blockChain = new BlockChain(databaseSet);
+        } catch (Exception e1) {
+        }
 
         //GENERATE 5 NEXT BLOCKS
         Block lastBlock = gb1;
-        BlockGenerator blockGenerator = new BlockGenerator(false);
+        BlockGenerator blockGenerator1 = new BlockGenerator(databaseSet1, null, false);
         for (int i = 0; i < 5; i++) {
             //GENERATE NEXT BLOCK
-            Block newBlock = blockGenerator.generateNextBlock(databaseSet1, generator,
+            Block newBlock = blockGenerator1.generateNextBlock(generator,
                     lastBlock, orderedTransactions,
                     i + 1,  1000, 1000l, 1000l);
 
@@ -249,10 +253,11 @@ public class SynchronizerTests {
 
         //GENERATE NEXT 10 BLOCKS
         lastBlock = gb2;
+        BlockGenerator blockGenerator2 = new BlockGenerator(databaseSet2, null, false);
         List<Block> newBlocks = new ArrayList<Block>();
         for (int i = 0; i < 10; i++) {
             //GENERATE NEXT BLOCK
-            Block newBlock = BlockGenerator.generateNextBlock(databaseSet2, generator2,
+            Block newBlock = blockGenerator2.generateNextBlock(generator2,
                     lastBlock, orderedTransactions,
                     i + 1,  1000, 1000l, 1000l);
 
