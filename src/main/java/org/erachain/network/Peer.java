@@ -254,8 +254,10 @@ public class Peer extends Thread {
         try {
             //OPEN SOCKET
             step++;
-            if (this.socket != null)
+            if (this.socket != null) {
                 this.socket.close();
+                this.out.close();
+            }
 
             this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
 
@@ -878,12 +880,15 @@ public class Peer extends Thread {
                 //CHECK IF SOCKET IS CONNECTED
                 if (socket.isConnected()) {
                     //CLOSE SOCKET
-                    socket.close();
+                    this.socket.close();
+                    this.out.close();
+
                 }
-                socket = null;
+                this.socket = null;
+                this.out = null;
             }
         } catch (Exception e) {
-            //LOGGER.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
 
         }
     }
