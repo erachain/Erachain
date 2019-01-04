@@ -93,13 +93,15 @@ public class BlockGenerator extends Thread implements Observer {
         }
     }
 
+    /**
+     * если цепочка встала из-за патовой ситуации то попробовать ее решить
+     ^ путем выбора люолее сильной а не длинной
+     * так же кажые 10 блоков проверяеем самую толстую цепочку
+     */
     private void checkWeightPeers() {
         // MAY BE PAT SITUATION
-        // если цепочка встала из-за патовой ситуации то попробовать ее решить
-        // путем выбора люолее сильной а не длинной
-        // так же кажые 10 блоков проверяеем самую толстую цепочку
 
-        if (ctrl.getActivePeersCounter() < (BlockChain.DEVELOP_USE? 3 : 6))
+        if (ctrl.getActivePeersCounter() < (BlockChain.DEVELOP_USE? 3 : 5))
             return;
 
         LOGGER.debug("try check better WEIGHT peers");
@@ -151,6 +153,7 @@ public class BlockGenerator extends Thread implements Observer {
 
                     if (response == null) {
                         ////peer.ban(1, "Cannot retrieve headers - from UPDATE");
+                        LOGGER.debug("peers is null " + peer.getAddress().getAddress());
                         // remove HW from peers
                         ctrl.setWeightOfPeer(peer, null);
                         continue;
@@ -162,11 +165,14 @@ public class BlockGenerator extends Thread implements Observer {
                     if (headersSize == 2) {
                         if (Arrays.equals(headers.get(1), lastSignature)) {
                             // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
+                            LOGGER.debug("peers has same Weight " + peer.getAddress().getAddress());
                             ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
                             // продолжим поиск дальше
                             continue;
                         } else {
                             try {
+                                LOGGER.debug("I to orphaan - peers has better Weight " + peer.getAddress().getAddress()
+                                    + " = " + maxPeer);
                                 ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
                                 return;
                             } catch (Exception e) {
@@ -174,6 +180,8 @@ public class BlockGenerator extends Thread implements Observer {
                         }
                     } else if (headersSize < 2) {
                         try {
+                            LOGGER.debug("I to orphaan - peers has better Weight " + peer.getAddress().getAddress()
+                                    + " = " + maxPeer);
                             ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
                             return;
                         } catch (Exception e) {
