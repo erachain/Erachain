@@ -834,7 +834,8 @@ public class BlockGenerator extends Thread implements Observer {
                 }
 
                 /// CHECK PEERS HIGHER
-                ctrl.checkStatusAndObserve(shift_height);
+                // так как в девелопе все гоняют свои цепочки то посмотреть самыю жирную а не длинную
+                ctrl.checkStatusAndObserve(BlockChain.DEVELOP_USE? -2 : shift_height);
                 //CHECK IF WE ARE NOT UP TO DATE
                 if (ctrl.needUpToDate()) {
 
