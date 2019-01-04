@@ -72,7 +72,9 @@ public class BlockChain {
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
     // задержка на включение в блок для хорошей сортировки
     public static final int UNCONFIRMED_SORT_WAIT_MS = 15000;
-    public static final int UNCONFIRMED_DEADTIME_MS = 1000 * 60 * 30;
+    public static final int CHECK_PEERS_WEIGHT_AFTER_BLOCKS = DEVELOP_USE? 3 : 10; // проверить наше цепочку по силе с окружающими
+    // хранить неподтвержденные долше чем то время когда мы делаем обзор цепочки по силе
+    public static final int UNCONFIRMED_DEADTIME_MS = CHECK_PEERS_WEIGHT_AFTER_BLOCKS * (GENERATING_MIN_BLOCK_TIME_MS<<1);
     public static final int ON_CONNECT_SEND_UNCONFIRMED_NEED_COUNT = 10;
     public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE<<2;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_UNCONFIGMED_MAP_SIZE;

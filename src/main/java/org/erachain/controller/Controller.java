@@ -329,6 +329,8 @@ public class Controller extends Observable {
     public void setWeightOfPeer(Peer peer, Tuple2<Integer, Long> hWeight) {
         if (peerHWeight != null) {
             peerHWeight.put(peer, hWeight);
+        } else {
+            peerHWeight.remove(peer);
         }
     }
 
@@ -680,7 +682,7 @@ public class Controller extends Observable {
             about_frame.set_console_Text(Lang.getInstance().translate("Telegram OK"));
 
         // CREATE BLOCKGENERATOR
-        this.blockGenerator = new BlockGenerator(true);
+        this.blockGenerator = new BlockGenerator(this.dcSet, this.blockChain,true);
         // START UPDATES and BLOCK BLOCKGENERATOR
         this.blockGenerator.start();
 

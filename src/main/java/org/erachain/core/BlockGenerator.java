@@ -43,7 +43,14 @@ public class BlockGenerator extends Thread implements Observer {
     private int orphanto = 0;
     private static List<byte[]> needRemoveInvalids;
 
-    public BlockGenerator(boolean withObserve) {
+    private final DCSet dcSet;
+    private final BlockChain bchain;
+
+    public BlockGenerator(DCSet dcSet, BlockChain bchain, boolean withObserve) {
+
+        this.dcSet = dcSet;
+        this.bchain = bchain;
+
         if (Settings.getInstance().isGeneratorKeyCachingEnabled()) {
             this.cachedAccounts = new ArrayList<PrivateKeyAccount>();
         }
@@ -86,7 +93,99 @@ public class BlockGenerator extends Thread implements Observer {
         }
     }
 
-    public static Block generateNextBlock(DCSet dcSet, PrivateKeyAccount account,
+    private void checkWeightPeers() {
+        // MAY BE PAT SITUATION
+        // если цепочка встала из-за патовой ситуации то попробовать ее решить
+        // путем выбора люолее сильной а не длинной
+        // так же кажые 10 блоков проверяеем самую толстую цепочку
+
+        if (ctrl.getActivePeersCounter() < (BlockChain.DEVELOP_USE? 3 : 6))
+            return;
+
+        LOGGER.debug("try check better WEIGHT peers");
+
+        Peer peer = null;
+        Tuple3<Integer, Long, Peer> maxPeer;
+        Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+
+        do {
+
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+            }
+
+            if (ctrl.isOnStopping()) {
+                return;
+            }
+
+
+            maxPeer = ctrl.getMaxPeerHWeight(-1);
+            if (maxPeer == null)
+                return;
+
+            peer = maxPeer.c;
+            if (peer == null)
+                return;
+
+            if (myHW.a < maxPeer.a || myHW.b < maxPeer.b) {
+
+                if (myHW.a > 1) {
+
+                    LOGGER.debug("ctrl.getMaxPeerHWeight(-1) found: " + peer.getAddress().getHostAddress()
+                            + " - HW: " + maxPeer.a + ":" + maxPeer.b);
+
+                    SignaturesMessage response = null;
+                    try {
+
+                        byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1).reference;
+                        response = (SignaturesMessage) peer.getResponse(
+                                MessageFactory.getInstance().createGetHeadersMessage(prevSignature),
+                                Synchronizer.GET_BLOCK_TIMEOUT);
+                    } catch (java.lang.ClassCastException e) {
+                        ////peer.ban(1, "Cannot retrieve headers - from UPDATE");
+                        // remove HW from peers
+                        ctrl.setWeightOfPeer(peer, null);
+                        continue;
+                    }
+
+                    if (response == null) {
+                        ////peer.ban(1, "Cannot retrieve headers - from UPDATE");
+                        // remove HW from peers
+                        ctrl.setWeightOfPeer(peer, null);
+                        continue;
+                    }
+
+                    List<byte[]> headers = response.getSignatures();
+                    byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
+                    int headersSize = headers.size();
+                    if (headersSize == 2) {
+                        if (Arrays.equals(headers.get(1), lastSignature)) {
+                            // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
+                            ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
+                            // продолжим поиск дальше
+                            continue;
+                        } else {
+                            try {
+                                ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                                return;
+                            } catch (Exception e) {
+                            }
+                        }
+                    } else if (headersSize < 2) {
+                        try {
+                            ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                            return;
+                        } catch (Exception e) {
+                        }
+                    }
+                }
+            }
+        } while (true);
+
+    }
+
+    public Block generateNextBlock(PrivateKeyAccount account,
                   Block parentBlock, Tuple2<List<Transaction>, Integer> transactionsItem, int height, int forgingValue, long winValue, long previousTarget) {
 
         if (transactionsItem == null) {
@@ -107,7 +206,7 @@ public class BlockGenerator extends Thread implements Observer {
     }
 
 
-    public static Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(DCSet dcSet, long timestamp, BlockChain bchain, long max_winned_value) {
+    public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(long timestamp, BlockChain bchain, long max_winned_value) {
 
         long timrans1 = System.currentTimeMillis();
 
@@ -204,7 +303,7 @@ public class BlockGenerator extends Thread implements Observer {
         return new Tuple2<List<Transaction>, Integer>(transactionsList, counter);
     }
 
-    private static void clearInvalids(DCSet dcSet) {
+    private void clearInvalids() {
         if (needRemoveInvalids != null && !needRemoveInvalids.isEmpty()) {
             long start = System.currentTimeMillis();
             TransactionMap transactionsMap = dcSet.getTransactionMap();
@@ -221,7 +320,7 @@ public class BlockGenerator extends Thread implements Observer {
 
     }
 
-    public static void checkForRemove(DCSet dcSet, long timestamp) {
+    public void checkForRemove(long timestamp) {
 
         //CREATE FORK OF GIVEN DATABASE
         DCSet newBlockDC = dcSet.fork();
@@ -375,8 +474,6 @@ public class BlockGenerator extends Thread implements Observer {
     @Override
     public void run() {
 
-        BlockChain bchain = ctrl.getBlockChain();
-        DCSet dcSet = DCSet.getInstance();
         TransactionMap transactionsMap = dcSet.getTransactionMap();
 
         Peer peer = null;
@@ -638,9 +735,8 @@ public class BlockGenerator extends Thread implements Observer {
 
                                 generatedBlock = null;
                                 try {
-                                    generatedBlock = generateNextBlock(dcSet, acc_winner, solvingBlock,
-                                            getUnconfirmedTransactions(dcSet,
-                                                    timePointForGenerate,
+                                    generatedBlock = generateNextBlock(acc_winner, solvingBlock,
+                                            getUnconfirmedTransactions(timePointForGenerate,
                                                     bchain, winned_winValue),
                                             height, winned_forgingValue, winned_winValue, previousTarget);
                                 } catch (java.lang.OutOfMemoryError e) {
@@ -753,10 +849,10 @@ public class BlockGenerator extends Thread implements Observer {
 
 
                         if (needRemoveInvalids != null) {
-                            clearInvalids(dcSet);
+                            clearInvalids();
                         } else {
-                            checkForRemove(dcSet, timePointForGenerate);
-                            clearInvalids(dcSet);
+                            checkForRemove(timePointForGenerate);
+                            clearInvalids();
                         }
 
                     }
@@ -768,74 +864,17 @@ public class BlockGenerator extends Thread implements Observer {
                 if (timeUpdate > 0)
                     continue;
 
-                if (timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) < 0) {
-                    // MAY BE PAT SITUATION
-                    //shift_height = -1;
-
-                    peer = null;
-                    maxPeer = ctrl.getMaxPeerHWeight(-1);
-                    if (maxPeer != null) {
-                        peer = maxPeer.c;
-                    }
-
-                    if (peer != null && ctrl.getActivePeersCounter() > 3) {
-
-                        Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-                        if (myHW.a < maxPeer.a || myHW.b < maxPeer.b) {
-
-                            if (myHW.a > 1) {
-
-                                LOGGER.error("ctrl.getMaxPeerHWeight(-1) " + peer.getAddress() + " - " + maxPeer.a + ":" + maxPeer.b);
-
-                                response = null;
-                                try {
-                                    try {
-                                        Thread.sleep(10000);
-                                    } catch (InterruptedException e) {
-                                    }
-
-                                    byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1).reference;
-                                    response = (SignaturesMessage) peer.getResponse(
-                                            MessageFactory.getInstance().createGetHeadersMessage(prevSignature),
-                                            Synchronizer.GET_BLOCK_TIMEOUT);
-                                } catch (java.lang.ClassCastException e) {
-                                    peer.ban(1, "Cannot retrieve headers - from UPDATE");
-                                    throw new Exception("Failed to communicate with peer (retrieve headers) - response = null - from UPDATE");
-                                }
-
-                                if (response != null) {
-                                    List<byte[]> headers = response.getSignatures();
-                                    byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
-                                    int headersSize = headers.size();
-                                    if (headersSize == 2) {
-                                        if (Arrays.equals(headers.get(1), lastSignature)) {
-                                            ctrl.pingAllPeers(false);
-                                            ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
-                                            try {
-                                                Thread.sleep(15000);
-                                            } catch (InterruptedException e) {
-                                            }
-                                            continue;
-                                        } else {
-                                            ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                                        }
-                                    } else if (headersSize < 2) {
-                                        ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                                    }
-                                }
-                            } else {
-                                if (ctrl.getActivePeersCounter() < BlockChain.NEED_PEERS_FOR_UPDATE)
-                                    continue;
-                            }
-                        }
-                    }
-                } else {
-                    //shift_height = 0;
+                Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+                if ((timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) < 0)
+                            || myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
+                    // если случилась патовая ситуация или рах в ХХХ блоков ::
+                    // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
+                    checkWeightPeers();
                 }
 
                 /// CHECK PEERS HIGHER
                 // так как в девелопе все гоняют свои цепочки то посмотреть самыю жирную а не длинную
-                ctrl.checkStatusAndObserve(BlockChain.DEVELOP_USE? -2 : shift_height);
+                ctrl.checkStatusAndObserve(shift_height);
                 //CHECK IF WE ARE NOT UP TO DATE
                 if (ctrl.needUpToDate()) {
 
