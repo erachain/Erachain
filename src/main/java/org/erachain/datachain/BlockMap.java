@@ -3,7 +3,7 @@ package org.erachain.datachain;
 // 30/03
 
 import org.erachain.core.BlockChain;
-import org.erachain.core.BlockGenerator;;
+;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
@@ -11,11 +11,7 @@ import org.erachain.database.serializer.BlockSerializer;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.mapdb.*;
-import org.mapdb.Atomic.Var;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
-import org.erachain.utils.Converter;
 import org.erachain.utils.ObserverMessage;
 
 import java.util.*;
@@ -331,24 +327,25 @@ public class BlockMap extends DCMap<Integer, Block> {
     }
 
     public void notifyProcessChain(Block block) {
+
+        // образать список и по времени протухания
+        this.getDCSet().getTransactionMap().clearByDeadTimeAndLimit(block.getTimestamp(), true);
+
         LOGGER.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE");
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block.blockHead));
-
-        // образать список и по времени протухания
-        this.getDCSet().getTransactionMap().clear(block.getTimestamp(), true);
-        this.getDCSet().getEngineeSize();
 
         LOGGER.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE END");
     }
 
     public void notifyOrphanChain(Block block) {
+
+        // образать список только по максимальному размеру
+        this.getDCSet().getTransactionMap().clearByDeadTimeAndLimit(block.getTimestamp(), false);
+
         LOGGER.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE");
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block.blockHead));
-
-        // образать список только по максимальному размеру
-        this.getDCSet().getTransactionMap().clear(block.getTimestamp(), false);
 
         LOGGER.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE END");
     }

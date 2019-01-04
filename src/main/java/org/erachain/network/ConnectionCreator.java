@@ -56,7 +56,7 @@ public class ConnectionCreator extends Thread {
         int foreignPeersCounter = 0;
         //FOR ALL THE RECEIVED PEERS
 
-        for (Peer newPeer : peersMessage.getPeers()) {
+        for (Peer newPeer: peersMessage.getPeers()) {
 
             if (!this.isRun)
                 return 0;
@@ -101,24 +101,17 @@ public class ConnectionCreator extends Thread {
                 continue;
             }
 
-            // TODO small height not use
-            //Controller.getInstance().getMyHeight();
-            // newPeer.
             if (newPeer.isBanned())
                 continue;
 
             if (!this.isRun)
                 return 0;
 
-
             //CONNECT
-            newPeer.connect(callback);
-            if (newPeer.isUsed()) {
-                foreignPeersCounter++;
-
-                LOGGER.info("connected to BRANCH and recurse: " + newPeer.getAddress().getHostAddress());
+            if (newPeer.connect(callback, "connected in recurse +++ ")) {
 
                 // RECURSE to OTHER PEERS
+                foreignPeersCounter++;
                 connectToPeersOfThisPeer(newPeer, maxReceivePeers >> 1);
 
             }
@@ -212,8 +205,8 @@ public class ConnectionCreator extends Thread {
 
                     //CONNECT
                     //CHECK IF ALREADY CONNECTED TO PEER
-                    if (peer.connect(callback) == 0) {
-                        LOGGER.info("connected!!! " + peer.getAddress().getHostAddress());
+                    if (peer.connect(callback, "connected +++ ")) {
+
                         // TRY CONNECT to WHITE peers of this PEER
                         connectToPeersOfThisPeer(peer, 4);
                     }

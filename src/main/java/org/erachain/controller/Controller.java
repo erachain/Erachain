@@ -89,7 +89,7 @@ import java.util.Timer;
  */
 public class Controller extends Observable {
 
-    private static final String version = "4.11.07a1 beta";
+    private static final String version = "4.11.07a4 beta";
     private static final String buildTime = "2018-12-04 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -1113,7 +1113,7 @@ public class Controller extends Observable {
 
             if (counter % stepCount == 0) {
 
-                peer.tryPing(10000);
+                peer.tryQuickPing();
                 this.network.notifyObserveUpdatePeer(peer);
 
                 ping = peer.getPing();
@@ -1144,7 +1144,7 @@ public class Controller extends Observable {
 
         }
 
-        peer.tryPing(10000);
+        //peer.tryQuickPing();
         this.network.notifyObserveUpdatePeer(peer);
 
         // LOGGER.info(peer.getAddress() + " sended UNCONFIRMED counter: " +
@@ -1253,23 +1253,6 @@ public class Controller extends Observable {
     }
 
     public void actionAfterConnect() {
-
-        ///////// UNCONFIRMED MAP CLEAR
-        if (false && this.timerUnconfirmed == null) {
-            this.timerUnconfirmed = new Timer();
-
-            TimerTask actionUnconfirmed = new TimerTask() {
-                @Override
-                public void run() {
-
-                    // LOGGER.debug("timerUnconfirmed ---------------- ");
-                    Controller.getInstance().clearUnconfirmedRecords(false);
-
-                }
-            };
-
-            this.timerUnconfirmed.schedule(actionUnconfirmed, BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1);
-        }
 
         if (// BlockChain.HARD_WORK ||
                 !this.doesWalletExists() || !this.useGui)
@@ -1900,12 +1883,6 @@ public class Controller extends Observable {
             this.pingAllPeers(false);
             if (this.isStopping) return;
 
-            // после очередного синхрона передать все свои трнзакции всем пирам вокруг
-            this.clearUnconfirmedRecords(false);
-            for (Peer peerOut: this.getActivePeers()) {
-                if (this.isStopping) return;
-                this.broadcastUnconfirmedToPeer(peerOut);
-            }
         }
 
         // send to ALL my HW

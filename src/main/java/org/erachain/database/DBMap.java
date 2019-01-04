@@ -56,8 +56,19 @@ public abstract class DBMap<T, U> extends Observable {
 
     protected abstract void createIndexes(DB database);
 
+    /**
+     * Make SECODATY INDEX
+     * INDEX ID = 0 - its is PRIMARY - not use it here
+     *
+     * @param index index ID. Must be 1...9999
+     * @param indexSet
+     * @param descendingIndexSet
+     * @param function
+     * @param <V>
+     */
     @SuppressWarnings("unchecked")
     protected <V> void createIndex(int index, NavigableSet<?> indexSet, NavigableSet<?> descendingIndexSet, Function2<V, T, U> function) {
+        assert(index > 0 && index < 10000);
         Bind.secondaryKey((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) indexSet, function);
         this.indexes.put(index, (NavigableSet<Tuple2<?, T>>) indexSet);
 
@@ -65,8 +76,19 @@ public abstract class DBMap<T, U> extends Observable {
         this.indexes.put(index + 10000, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
     }
 
+    /**
+     * Make SECODATY INDEX
+     * INDEX ID = 0 - its is PRIMARY - not use it here
+     *
+     * @param index index ID. Must be 1...9999
+     * @param indexSet
+     * @param descendingIndexSet
+     * @param function
+     * @param <V>
+     */
     @SuppressWarnings("unchecked")
     protected <V> void createIndexes(int index, NavigableSet<?> indexSet, NavigableSet<?> descendingIndexSet, Function2<V[], T, U> function) {
+        assert(index > 0 && index < 10000);
         Bind.secondaryKeys((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) indexSet, function);
         this.indexes.put(index, (NavigableSet<Tuple2<?, T>>) indexSet);
 
@@ -231,6 +253,12 @@ public abstract class DBMap<T, U> extends Observable {
         this.outUses();
     }
 
+    /**
+     *
+     * @param index <b>primary Index = 0</b>, secondary index = 1...10000
+     * @param descending true if need descending sort
+     * @return
+     */
     public Iterator<T> getIterator(int index, boolean descending) {
         this.addUses();
 

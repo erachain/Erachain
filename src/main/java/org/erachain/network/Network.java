@@ -24,8 +24,8 @@ public class Network extends Observable implements ConnectionCallback {
 
 
     public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK ? 0 : 1;
-    private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 4096 << 4 : 4096;
-    private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 5 : 1024 << 4;
+    private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<4;
+    private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 12 : 1024 << 8;
     private static final Logger LOGGER = LoggerFactory.getLogger(Network.class);
     private static InetAddress myselfAddress;
     private ConnectionCreator creator;
@@ -81,7 +81,7 @@ public class Network extends Observable implements ConnectionCallback {
     }
 
     @Override
-    public void onConnect(Peer peer, boolean asNew) {
+    public void onConnect(Peer peer) {
 
         //LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer.getAddress());
 
@@ -91,6 +91,13 @@ public class Network extends Observable implements ConnectionCallback {
         } catch (InterruptedException e) {
         }
 
+        boolean asNew = true;
+        for (Peer peerKnown: this.knownPeers) {
+            if (peer.equals(peerKnown)) {
+                asNew = false;
+                break;
+            }
+        }
         if (asNew) {
             //ADD TO CONNECTED PEERS
             synchronized (this.knownPeers) {
@@ -125,6 +132,9 @@ public class Network extends Observable implements ConnectionCallback {
         if (!peer.isUsed())
             return;
 
+        //CLOSE CONNECTION
+        peer.close();
+
         if (banForMinutes != 0) {
             //ADD TO BLACKLIST
             PeerManager.getInstance().addPeer(peer, banForMinutes);
@@ -138,8 +148,6 @@ public class Network extends Observable implements ConnectionCallback {
             }
         }
 
-        //CLOSE CONNECTION IF STILL ACTIVE
-        peer.close();
 
         //PASS TO CONTROLLER
         Controller.getInstance().afterDisconnect(peer);
@@ -187,12 +195,12 @@ public class Network extends Observable implements ConnectionCallback {
     public Peer getKnownPeer(Peer peer) {
 
         try {
-            InetAddress address = peer.getAddress();
+            byte[] address = peer.getAddress().getAddress();
             synchronized (this.knownPeers) {
                 //FOR ALL connectedPeers
                 for (Peer knownPeer : knownPeers) {
                     //CHECK IF ADDRESS IS THE SAME
-                    if (address.equals(knownPeer.getAddress())) {
+                    if (Arrays.equals(address, knownPeer.getAddress().getAddress())) {
                         return knownPeer;
                     }
                 }
@@ -290,38 +298,34 @@ public class Network extends Observable implements ConnectionCallback {
     public Peer startPeer(Socket socket) {
 
         // REUSE known peer
-        InetAddress address = socket.getInetAddress();
+        byte[] addressIP = socket.getInetAddress().getAddress();
         synchronized (this.knownPeers) {
             //FOR ALL connectedPeers
             for (Peer knownPeer : knownPeers) {
                 //CHECK IF ADDRESS IS THE SAME
-                if (address.equals(knownPeer.getAddress())) {
-                    knownPeer.reconnect(socket);
+                if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
+                    knownPeer.reconnect(socket, "connected by restore!!! ");
+                    return knownPeer;
+                }
+            }
+        }
+
+        // use UNUSED peers
+        synchronized (this.knownPeers) {
+            for (Peer knownPeer : this.knownPeers) {
+                if (!knownPeer.isUsed()
+                    //|| !Network.isMyself(knownPeer.getAddress())
+                        ) {
+                    knownPeer.reconnect(socket, "connected by recircle!!! ");
                     return knownPeer;
                 }
             }
         }
 
         // ADD new peer
-        int maxPeers = Settings.getInstance().getMaxConnections();
-        if (maxPeers > this.knownPeers.size()) {
-            // make NEW PEER and use empty slots
-            return new Peer(this, socket);
-        }
-        if (maxPeers > this.getActivePeersCounter(false)) {
-            // use UNUSED peers
-            synchronized (this.knownPeers) {
-                for (Peer knownPeer : this.knownPeers) {
-                    if (!knownPeer.isUsed()
-                        //|| !Network.isMyself(knownPeer.getAddress())
-                            ) {
-                        knownPeer.reconnect(socket);
-                        return knownPeer;
-                    }
-                }
-            }
-        }
-        return null;
+        // make NEW PEER and use empty slots
+
+        return new Peer(this, socket, "connected as new!!! ");
 
     }
 

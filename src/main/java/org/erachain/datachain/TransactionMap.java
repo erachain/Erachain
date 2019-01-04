@@ -36,7 +36,7 @@ import java.util.*;
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
 public class TransactionMap extends DCMap<Long, Transaction> implements Observer {
-    public static final int TIMESTAMP_INDEX = 0;
+    public static final int TIMESTAMP_INDEX = 1;
 
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
@@ -239,7 +239,14 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     }
 
     private static long MAX_DEADTIME = 1000 * 60 * 60 * 24;
-    public void clear(long timestamp, boolean cutDeadTime) {
+
+    /**
+     * очищает  только по признаку протухания и ограничения на размер списка - без учета валидности
+     * С учетом валидности очистка идет в Генераторе после каждого запоминания блока
+     * @param timestamp
+     * @param cutDeadTime
+     */
+    public void clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime) {
 
         Iterator<Long> iterator = this.getIterator(0, false);
         Transaction transaction;

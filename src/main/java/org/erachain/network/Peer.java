@@ -34,7 +34,7 @@ public class Peer extends Thread {
     private static boolean KEEP_ALIVE = true;
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
     // поэтому нужно ожидание дольще делать
-    private static int SOCKET_BUFFER_SIZE = BlockChain.HARD_WORK ? 1024 << 11 : 1024 << 8;
+    private static int SOCKET_BUFFER_SIZE = BlockChain.HARD_WORK ? 1024 << 11 : 1024 << 9;
     private static int MAX_BEFORE_PING = SOCKET_BUFFER_SIZE << 1;
     public ConnectionCallback callback;
     private InetAddress address;
@@ -163,7 +163,15 @@ public class Peer extends Thread {
 	}
 */
 
-    public Peer(ConnectionCallback callback, Socket socket) {
+    /**
+     *  при коннекте во вне связь может порваться поэтому надо
+     *  сделать проверку песле выхода по isUsed
+     * @param callback
+     * @param socket
+     * @param description
+     */
+
+    public Peer(ConnectionCallback callback, Socket socket, String description) {
 
         //LOGGER.debug("@@@ new Peer(ConnectionCallback callback, Socket socket) : " + socket.getInetAddress().getHostAddress());
 
@@ -191,6 +199,9 @@ public class Peer extends Thread {
             //CREATE STRINGWRITER
             this.out = socket.getOutputStream();
 
+            // IT is STARTED
+            this.runed = true;
+
             //START COMMUNICATON THREAD
             this.start();
 
@@ -202,20 +213,18 @@ public class Peer extends Thread {
                 this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
             }
 
-
-            // IT is STARTED
-            this.runed = true;
-
-            //ON SOCKET CONNECT
-            this.callback.onConnect(this, true);
-
             this.setName("Peer: " + this.getAddress().getHostAddress() + " as socket"
                     + (this.isWhite()?" is White" : ""));
 
-            //LOGGER.debug("@@@ new Peer(ConnectionCallback callback, Socket socket) : " + socket.getInetAddress().getHostAddress());
+            LOGGER.info(description + address.getAddress());
+            // при коннекте во вне связь может порваться поэтому тут по runed
+            callback.onConnect(this);
 
         } catch (Exception e) {
             //FAILED TO CONNECT NO NEED TO BLACKLIST
+
+            this.runed = false;
+
             LOGGER.info("Failed to connect to : " + address);
             LOGGER.error(e.getMessage(), e);
 
@@ -224,9 +233,9 @@ public class Peer extends Thread {
     }
 
     // connect and run
-    public int connect(ConnectionCallback callback) {
+    public boolean connect(ConnectionCallback callback, String description) {
         if (Controller.getInstance().isOnStopping()) {
-            return 0;
+            return false;
         }
 
         // GOOD WORK
@@ -245,8 +254,10 @@ public class Peer extends Thread {
         try {
             //OPEN SOCKET
             step++;
-            if (this.socket != null)
+            if (this.socket != null) {
                 this.socket.close();
+                this.out.close();
+            }
 
             this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
 
@@ -274,7 +285,7 @@ public class Peer extends Thread {
                 LOGGER.debug("Failed to connect to : " + address + " on step: " + step);
             }
 
-            return step;
+            return false;
 
         }
 
@@ -282,16 +293,11 @@ public class Peer extends Thread {
             //START PINGER
             this.pinger = new Pinger(this);
 
-            //START COMMUNICATON THREAD
-            step++;
-            this.start();
-
             // IT is STARTED
             this.runed = true;
 
-            //ON SOCKET CONNECT
-            step++;
-            this.callback.onConnect(this, true);
+            this.start();
+
         } else {
             this.pinger.setPing(Integer.MAX_VALUE);
             this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
@@ -299,15 +305,17 @@ public class Peer extends Thread {
             // IT is STARTED
             this.runed = true;
 
-            // already started
-            this.callback.onConnect(this, false);
         }
 
-        return 0;
+        LOGGER.info(description + address.getHostAddress());
+        callback.onConnect(this);
+
+        // при коннекте во вне связь может порваться поэтому тут по runed
+        return this.runed;
     }
 
     // connect to old reused peer
-    public void reconnect(Socket socket) {
+    public boolean reconnect(Socket socket, String description) {
 
         //LOGGER.debug("@@@ reconnect(socket) : " + socket.getInetAddress().getHostAddress());
 
@@ -346,17 +354,22 @@ public class Peer extends Thread {
             this.runed = true;
 
             //ON SOCKET CONNECT
-            this.callback.onConnect(this, false);
-
             this.setName("Peer: " + this.getAddress().getHostAddress() + " reconnected"
                 + (this.isWhite()?" is White" : ""));
+
+            LOGGER.info(description + address.getHostAddress());
+            callback.onConnect(this);
 
         } catch (Exception e) {
             //FAILED TO CONNECT NO NEED TO BLACKLIST
             //LOGGER.info("Failed to connect to : " + address);
             //LOGGER.error(e.getMessage(), e);
 
+            return false;
         }
+
+        return this.runed;
+
     }
 
 
@@ -366,6 +379,15 @@ public class Peer extends Thread {
 
     public long getPingCounter() {
         return this.pingCounter;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Peer) {
+            return Arrays.equals(((Peer)obj).address.getAddress(),
+                    this.address.getAddress());
+        }
+        return false;
     }
 
     public int getErrors() {
@@ -414,6 +436,12 @@ public class Peer extends Thread {
     public boolean tryPing(long timer) {
         return this.pinger.tryPing(timer);
     }
+    public boolean tryPing() {
+        return this.pinger.tryPing();
+    }
+    public boolean tryQuickPing() {
+        return this.pinger.tryQuickPing();
+    }
 
     public boolean isPinger() {
         return this.pinger != null;
@@ -445,7 +473,7 @@ public class Peer extends Thread {
                 //this.setName("Peer: " + this.getAddress().getHostAddress() + " broken");
 
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(200);
                 } catch (Exception e) {
                 }
 
@@ -478,6 +506,10 @@ public class Peer extends Thread {
 
                 if (true) {
                     // MORE EFFECTIVE
+                    // в этом случае просто ожидаем прилета байтов в течении заданного времени ожидания
+                    // java.net.Socket.setSoTimeout
+                    // после чего ловим событие SocketTimeoutException т поаторяем ожидание
+                    // это работает без задержек и более эффективно и не ест время процессора
                     try {
                         in.readFully(messageMagic);
                     } catch (java.net.SocketTimeoutException timeOut) {
@@ -485,15 +517,17 @@ public class Peer extends Thread {
                         continue;
                     } catch (java.net.SocketException err) {
                         //callback.tryDisconnect(this, 1, " readFully - " + err.getMessage());
-                        callback.tryDisconnect(this, 0, "");
+                        callback.tryDisconnect(this, 0, err.getMessage());
                         continue;
                     } catch (java.io.IOException err) {
                         //LOGGER.error("readFully - " + err.getMessage(), err);
                         //callback.tryDisconnect(this, 1, " readFully - " + err.getMessage());
-                        callback.tryDisconnect(this, 0, "");
+                        callback.tryDisconnect(this, 0, err.getMessage());
                         continue;
                     }
                 } else {
+                    // BAD VARIAN of reslisation
+                    // этот вариант более плохой - эрет время процессора и задержка на отклик есть
                     if (in.available() > 0) {
                         in.readFully(messageMagic);
                     } else {
@@ -589,7 +623,7 @@ public class Peer extends Thread {
     public boolean sendMessage(Message message) {
         //CHECK IF SOCKET IS STILL ALIVE
         if (!this.runed || this.socket == null) {
-            callback.tryDisconnect(this, 0, "SEND - not runned");
+            ////callback.tryDisconnect(this, 0, "SEND - not runned");
             return false;
         }
 
@@ -610,7 +644,7 @@ public class Peer extends Thread {
                 this.out.write(bytes);
                 this.out.flush();
             } catch (java.net.SocketException eSock) {
-                callback.tryDisconnect(this, 0, eSock.getMessage());
+                callback.tryDisconnect(this, 0, "try write 1 - " + eSock.getMessage());
                 return false;
 
             } catch (IOException e) {
@@ -646,7 +680,7 @@ public class Peer extends Thread {
                 //ERROR
                 //LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
                 //callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
-                callback.tryDisconnect(this, 0, "try write 2");
+                callback.tryDisconnect(this, 0, "try write 2 - " + e.getMessage());
 
                 //RETURN
                 return false;
@@ -679,7 +713,7 @@ public class Peer extends Thread {
                         + " bytes:" + this.sendedBeforePing
                         + " maxBeforePing: " + this.maxBeforePing);
 
-                this.pinger.tryPing(10000);
+                this.pinger.tryQuickPing();
                 Controller.getInstance().notifyObserveUpdatePeer(this);
 
                 long ping = this.getPing();
@@ -807,6 +841,10 @@ public class Peer extends Thread {
         this.callback.tryDisconnect(this, banForMinutes, mess);
     }
 
+    public boolean isStoped() {
+        return stoped;
+    }
+
     public void close() {
 
         if (!runed) {
@@ -842,12 +880,15 @@ public class Peer extends Thread {
                 //CHECK IF SOCKET IS CONNECTED
                 if (socket.isConnected()) {
                     //CLOSE SOCKET
-                    socket.close();
+                    this.socket.close();
+                    this.out.close();
+
                 }
-                socket = null;
+                this.socket = null;
+                this.out = null;
             }
         } catch (Exception e) {
-            //LOGGER.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
 
         }
     }

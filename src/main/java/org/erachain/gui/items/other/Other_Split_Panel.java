@@ -83,8 +83,7 @@ public class Other_Split_Panel extends Split_Panel {
                 // TODO Auto-generated method stub
                 
                 // item_Peer_Menu.ban(10, "banned by user");
-                item_Peer_Menu.connect(item_Peer_Menu.callback);
-                
+                item_Peer_Menu.connect(item_Peer_Menu.callback, "connected as recircled by USER!!! ");
             }
             
         });

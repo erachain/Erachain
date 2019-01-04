@@ -50,7 +50,7 @@ public class Settings {
     private static final int DEFAULT_MAX_SENT_PEERS = DEFAULT_MAX_RECEIVE_PEERS;
     // BLOCK
     //public static final int BLOCK_MAX_SIGNATURES = 100; // blocks load onetime
-    private static final int DEFAULT_CONNECTION_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2; // 10000
+    private static final int DEFAULT_CONNECTION_TIMEOUT = 60000;
     private static final int DEFAULT_PING_INTERVAL = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
     private static final boolean DEFAULT_TRYING_CONNECT_TO_BAD_PEERS = true;
     private static final Integer DEFAULT_FONT_SIZE = 11;
