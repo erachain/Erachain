@@ -166,7 +166,7 @@ public class BlockGenerator extends Thread implements Observer {
             byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
             int headersSize = headers.size();
             if (headersSize == 3) {
-                if (Arrays.equals(headers.get(2), lastSignature)) {
+                if (Arrays.equals(headers.get(headersSize - 1), lastSignature)) {
                     // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
                     LOGGER.debug("peers has same Weight " + peer.getAddress().getHostAddress());
                     ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
