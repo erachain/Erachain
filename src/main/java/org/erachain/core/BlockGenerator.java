@@ -166,7 +166,7 @@ public class BlockGenerator extends Thread implements Observer {
             byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
             int headersSize = headers.size();
             if (headersSize == 3) {
-                if (Arrays.equals(headers.get(1), lastSignature)) {
+                if (Arrays.equals(headers.get(2), lastSignature)) {
                     // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
                     LOGGER.debug("peers has same Weight " + peer.getAddress().getHostAddress());
                     ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
@@ -930,7 +930,7 @@ public class BlockGenerator extends Thread implements Observer {
                         return;
                     }
                     Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-                    if (BlockChain.DEVELOP_USE ||
+                    if (//BlockChain.DEVELOP_USE ||
                             myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
                         // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
                         checkWeightPeers();
