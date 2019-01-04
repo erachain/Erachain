@@ -89,7 +89,7 @@ import java.util.Timer;
  */
 public class Controller extends Observable {
 
-    private static final String version = "4.11.07a3 beta";
+    private static final String version = "4.11.07a4 beta";
     private static final String buildTime = "2018-12-04 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
