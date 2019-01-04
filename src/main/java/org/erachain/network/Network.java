@@ -195,12 +195,12 @@ public class Network extends Observable implements ConnectionCallback {
     public Peer getKnownPeer(Peer peer) {
 
         try {
-            InetAddress address = peer.getAddress();
+            byte[] address = peer.getAddress().getAddress();
             synchronized (this.knownPeers) {
                 //FOR ALL connectedPeers
                 for (Peer knownPeer : knownPeers) {
                     //CHECK IF ADDRESS IS THE SAME
-                    if (address.equals(knownPeer.getAddress())) {
+                    if (Arrays.equals(address, knownPeer.getAddress().getAddress())) {
                         return knownPeer;
                     }
                 }
@@ -304,10 +304,8 @@ public class Network extends Observable implements ConnectionCallback {
             for (Peer knownPeer : knownPeers) {
                 //CHECK IF ADDRESS IS THE SAME
                 if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
-                    knownPeer.reconnect(socket, "reconnected!!! ");
-                    if (knownPeer.isUsed())
-                        return knownPeer;
-                    break;
+                    knownPeer.reconnect(socket, "connected by restore!!! ");
+                    return knownPeer;
                 }
             }
         }
@@ -318,11 +316,8 @@ public class Network extends Observable implements ConnectionCallback {
                 if (!knownPeer.isUsed()
                     //|| !Network.isMyself(knownPeer.getAddress())
                         ) {
-                    if (knownPeer.reconnect(socket)) {
-                        LOGGER.info("recicled connected!!! " + knownPeer.getAddress().getHostAddress());
-                        knownPeer.callback.onConnect(knownPeer);
-                        return knownPeer;
-                    }
+                    knownPeer.reconnect(socket, "connected by recircle!!! ");
+                    return knownPeer;
                 }
             }
         }
@@ -330,9 +325,8 @@ public class Network extends Observable implements ConnectionCallback {
         // ADD new peer
         // make NEW PEER and use empty slots
 
-        Peer peer = new Peer(this, socket, "connected start!!! ");
+        return new Peer(this, socket, "connected as new!!! ");
 
-        return peer;
     }
 
     private void addHandledMessage(String hash) {

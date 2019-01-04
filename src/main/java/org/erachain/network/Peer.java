@@ -163,6 +163,14 @@ public class Peer extends Thread {
 	}
 */
 
+    /**
+     *  при коннекте во вне связь может порваться поэтому надо
+     *  сделать проверку песле выхода по isUsed
+     * @param callback
+     * @param socket
+     * @param description
+     */
+
     public Peer(ConnectionCallback callback, Socket socket, String description) {
 
         //LOGGER.debug("@@@ new Peer(ConnectionCallback callback, Socket socket) : " + socket.getInetAddress().getHostAddress());
@@ -209,6 +217,7 @@ public class Peer extends Thread {
                     + (this.isWhite()?" is White" : ""));
 
             LOGGER.info(description + address.getAddress());
+            // при коннекте во вне связь может порваться поэтому тут по runed
             callback.onConnect(this);
 
         } catch (Exception e) {
@@ -224,9 +233,9 @@ public class Peer extends Thread {
     }
 
     // connect and run
-    public int connect(ConnectionCallback callback) {
+    public boolean connect(ConnectionCallback callback, String description) {
         if (Controller.getInstance().isOnStopping()) {
-            return 0;
+            return false;
         }
 
         // GOOD WORK
@@ -274,7 +283,7 @@ public class Peer extends Thread {
                 LOGGER.debug("Failed to connect to : " + address + " on step: " + step);
             }
 
-            return step;
+            return false;
 
         }
 
@@ -282,16 +291,11 @@ public class Peer extends Thread {
             //START PINGER
             this.pinger = new Pinger(this);
 
-            //START COMMUNICATON THREAD
-            step++;
-
             // IT is STARTED
             this.runed = true;
 
             this.start();
 
-            //ON SOCKET CONNECT
-            step++;
         } else {
             this.pinger.setPing(Integer.MAX_VALUE);
             this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
@@ -301,7 +305,11 @@ public class Peer extends Thread {
 
         }
 
-        return 0;
+        LOGGER.info(description + address.getHostAddress());
+        callback.onConnect(this);
+
+        // при коннекте во вне связь может порваться поэтому тут по runed
+        return this.runed;
     }
 
     // connect to old reused peer
@@ -347,7 +355,7 @@ public class Peer extends Thread {
             this.setName("Peer: " + this.getAddress().getHostAddress() + " reconnected"
                 + (this.isWhite()?" is White" : ""));
 
-            LOGGER.info(description + address.getAddress());
+            LOGGER.info(description + address.getHostAddress());
             callback.onConnect(this);
 
         } catch (Exception e) {
@@ -358,7 +366,7 @@ public class Peer extends Thread {
             return false;
         }
 
-        return true;
+        return this.runed;
 
     }
 
