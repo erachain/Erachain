@@ -35,7 +35,7 @@ public abstract class Message {
     public static final int FIND_MYSELF_TYPE = 13;
     public static final int TELEGRAM_TYPE = 14;
     public static final int TELEGRAM_GET_TYPE = 15;
-    public static final int TELEGRAM_GET_ANSVER_TYPE = 16;
+    public static final int TELEGRAM_GET_ANSWER_TYPE = 16;
 
     private int type;
     private Peer sender;

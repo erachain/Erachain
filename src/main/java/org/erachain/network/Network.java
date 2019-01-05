@@ -5,7 +5,6 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.message.*;
-import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -389,7 +388,7 @@ public class Network extends Observable implements ConnectionCallback {
            return;
            }
         // Ansver to get transaction
-        if ( message.getType() == Message.TELEGRAM_GET_ANSVER_TYPE){
+        if ( message.getType() == Message.TELEGRAM_GET_ANSWER_TYPE){
            ((TelegramGetAnswerMessage) message).saveToWallet();
             
             return; 

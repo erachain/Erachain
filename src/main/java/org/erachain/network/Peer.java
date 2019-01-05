@@ -580,21 +580,21 @@ public class Peer extends Thread {
                 }
 
                 if (false)
-                    LOGGER.info(this.getAddress().getHostAddress() + " ->> "
-                            + (message == null? "message: null" : "message: " + message.toString()));
+                    LOGGER.info(this + " ->> "
+                            + (message == null? "message: null" : "message: " + message));
 
                 if (message == null) {
                     // unknowm message
                     continue;
                 }
                 //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
-                if (!message.isRequest()
+                if (false // OLD VERSION
+                        && !message.isRequest()
                         && message.hasId()
                         && this.messages.containsKey(message.getId())) {
                     //ADD TO OUR OWN LIST
-                    //if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
-
-                    LOGGER.debug(this + " : " + message + " receive response for me & add to messages Queue");
+                    if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
+                        LOGGER.debug(this + " : " + message + " receive response for me & add to messages Queue");
 
                     try {
                         this.messages.get(message.getId()).add(message);
@@ -605,6 +605,25 @@ public class Peer extends Thread {
                         LOGGER.debug(" Id " + message.getId() + " containsKey: " + this.messages.containsKey(message.getId()));
                         LOGGER.error(e.getMessage(), e);
                     }
+                } else if (!message.isRequest() && message.hasId()) {
+                    // это ответ на наш запрос с ID
+                    if (this.messages.containsKey(message.getId())) {
+                        //ADD TO OUR OWN LIST
+                        if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
+                            LOGGER.debug(this + " : " + message + " receive response for me & add to messages Queue");
+
+                        try {
+                            this.messages.get(message.getId()).add(message);
+                            LOGGER.debug(this + " : " + message + " receive response added!!!");
+                        } catch (java.lang.IllegalStateException e) {
+                            LOGGER.debug("received message " + message.viewType() + " from " + this.address.toString());
+                            LOGGER.debug("isRequest " + message.isRequest() + " hasId " + message.hasId());
+                            LOGGER.debug(" Id " + message.getId() + " containsKey: " + this.messages.containsKey(message.getId()));
+                            LOGGER.error(e.getMessage(), e);
+                        }
+                    } else {
+                        // ответ прилетел поздно и он уже просроченный и не нужно его обрабатывать вообще
+                    }
                 } else {
                     //CALLBACK
                     // see in network.Network.onMessage(Message)
@@ -612,17 +631,20 @@ public class Peer extends Thread {
 
                     //if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
 
-                    LOGGER.debug(this + " : " + message + " receive, go solve");
+                    long timeStart = System.currentTimeMillis();
+                    ///LOGGER.debug(this + " : " + message + " receive, go solve");
 
                     this.callback.onMessage(message);
 
-                    LOGGER.debug(this + " : " + message +  "["
-                            + message.getId() + "] solved!!!");
+                    timeStart = NTP.getTime() - timeStart;
+                    if (timeStart > 100) {
+                        LOGGER.debug(this + " : " + message + "["
+                                + message.getId() + "] solved by period: " + timeStart);
+                    }
                 }
             } else {
                 //ERROR and BAN
                 callback.tryDisconnect(this, 3600, "parse - received message with wrong magic");
-                continue;
             }
             //messageMagic = null;
         }
@@ -798,7 +820,7 @@ public class Peer extends Thread {
 
         message.setId(thisRequestKey);
 
-        LOGGER.debug(" messages[" + this + "][ " + thisRequestKey + " ].put " + message.toString());
+        LOGGER.debug(this + " : " + message + ".put");
 
                 //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
         this.messages.put(thisRequestKey, blockingQueue);
@@ -808,7 +830,7 @@ public class Peer extends Thread {
         //WHEN FAILED TO SEND MESSAGE
         if (!this.sendMessage(message)) {
             this.messages.remove(thisRequestKey);
-            LOGGER.debug(" messages[" + this + "][ " + thisRequestKey + " ].remove by SEND ERROR"
+            LOGGER.debug(this + " : " + message + ".remove by SEND ERROR"
                 + " messages.SIZE: " + messages.size());
             return null;
         }
@@ -817,13 +839,13 @@ public class Peer extends Thread {
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
             this.messages.remove(thisRequestKey);
-            LOGGER.debug(" messages[" + this + "][ " + thisRequestKey + " ].remove by RESPONSE "
+            LOGGER.debug(this + " : " + message + ".remove by RESPONSE "
                     + " " + (response==null?"response NULL":"")
                     + " messages.SIZE: " + messages.size());
         } catch (InterruptedException e) {
             //NO MESSAGE RECEIVED WITHIN TIME;
             this.messages.remove(thisRequestKey);
-            LOGGER.debug(" messages[" + this + "][ " + thisRequestKey + " ].remove by ERRROR " + e.getMessage()
+            LOGGER.debug(this + " : " + message + ".remove by ERRROR " + e.getMessage()
                     + " messages.SIZE: " + messages.size());
         }
 

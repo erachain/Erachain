@@ -257,7 +257,7 @@ public class MessageFactory {
                 message = TelegramGetMessage.parse(data);
                 break;
 
-            case Message.TELEGRAM_GET_ANSVER_TYPE:
+            case Message.TELEGRAM_GET_ANSWER_TYPE:
                 message = TelegramGetAnswerMessage.parse(data);
                 break;
             default:
