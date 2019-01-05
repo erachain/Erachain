@@ -140,7 +140,7 @@ public class BlockGenerator extends Thread implements Observer {
                 return;
 
             LOGGER.debug("better WEIGHT peers found: "
-                    //+ peer.getAddress().getHostAddress()
+                    //+ peer
                     //+ " - HW: " + maxPeer.a + ":" + maxPeer.b);
                     + peer);
 

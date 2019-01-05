@@ -105,7 +105,7 @@ public class Network extends Observable implements ConnectionCallback {
             }
         }
 
-        peer.setName("Peer: " + peer.getAddress().getHostAddress()
+        peer.setName("Peer: " + peer
                 + (asNew? " as new" : " reconnected")
                 + (peer.isWhite()?" is White" : ""));
 

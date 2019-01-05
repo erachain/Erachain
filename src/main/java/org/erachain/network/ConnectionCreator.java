@@ -196,7 +196,7 @@ public class ConnectionCreator extends Thread {
                     /*
                     LOGGER.info(
                             Lang.getInstance().translate("Connecting to known peer %peer% :: %knownPeersCounter% / %allKnownPeers% :: Connections: %activeConnections%")
-                                .replace("%peer%", peer.getAddress().getHostAddress())
+                                .replace("%peer%", peer)
                                 .replace("%knownPeersCounter%", String.valueOf(knownPeersCounter))
                                 .replace("%allKnownPeers%", String.valueOf(knownPeers.size()))
                                 .replace("%activeConnections%", String.valueOf(callback.getActivePeersCounter(true)))

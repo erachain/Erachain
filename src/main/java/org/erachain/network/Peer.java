@@ -905,6 +905,6 @@ public class Peer extends Thread {
     public String toString() {
         return this.address.getHostAddress()
                 + (getPing() < 1000000? " ping: " + this.getPing() + "ms" : "")
-                + (isWhite()? " White" : "");
+                + (isWhite()? " [White]" : "");
     }
 }

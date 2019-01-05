@@ -44,7 +44,7 @@ public class AllowedTableModel extends AbstractTableModel implements Observer {
     public ArrayList<String> getPeers() {
         ArrayList<String> peersstr = new ArrayList<String>();
         for (Peer peer : peers) {
-            peersstr.add(peer.getAddress().getHostAddress().toString());
+            peersstr.add(peer.getAddress().getHostAddress());
         }
         return peersstr;
     }
