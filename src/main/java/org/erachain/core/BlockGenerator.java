@@ -498,6 +498,7 @@ public class BlockGenerator extends Thread implements Observer {
         Peer peer = null;
         Tuple3<Integer, Long, Peer> maxPeer;
         SignaturesMessage response;
+        long timeToPing = 0;
         long timeTmp;
         long timePoint = 0;
         long timePointForGenerate = 0;
@@ -575,8 +576,21 @@ public class BlockGenerator extends Thread implements Observer {
                     this.solvingReference = null;
                     status = 0;
 
+                    // осмотр сети по СИЛЕ
+                    // уже все узлы свою силу передали при Controller.flushNewBlockGenerated
+
+                    Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+                    if (BlockChain.DEVELOP_USE ||
+                            myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
+                        // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
+                        checkWeightPeers();
+                    }
+
                     // GET real HWeight
-                    ctrl.pingAllPeers(false);
+                    if (NTP.getTime() - timeToPing > 180000) {
+                        timeToPing = NTP.getTime();
+                        ctrl.pingAllPeers(false);
+                    }
 
                 }
 
@@ -847,8 +861,11 @@ public class BlockGenerator extends Thread implements Observer {
                             if (!ctrl.flushNewBlockGenerated()) {
                                 // NEW BLOCK not FLUSHED
                                 LOGGER.error("NEW BLOCK not FLUSHED");
-                            } else if (forgingStatus == ForgingStatus.FORGING_WAIT)
-                                setForgingStatus(ForgingStatus.FORGING);
+                            } else {
+                                if (forgingStatus == ForgingStatus.FORGING_WAIT)
+                                    setForgingStatus(ForgingStatus.FORGING);
+
+                            }
 
                             if (ctrl.isOnStopping()) {
                                 status = -1;
@@ -880,7 +897,10 @@ public class BlockGenerator extends Thread implements Observer {
                 ////////////////////////// UPDATE ////////////////////
 
                 timeUpdate = timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS - NTP.getTime();
-                 if (timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) < 0) {
+                if (timeUpdate > 0)
+                    continue;
+
+                if (timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) < 0) {
                     // если случилась патовая ситуация то найдем более сильную цепочку (не по высоте)
                     // если есть сильнее то сделаем откат у себя
                     checkWeightPeers();
@@ -917,24 +937,6 @@ public class BlockGenerator extends Thread implements Observer {
                     setForgingStatus(ForgingStatus.FORGING_WAIT);
 
                 } else {
-
-                    // осмотр сети по СИЛЕ
-
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                    }
-
-                    if (ctrl.isOnStopping()) {
-                        status = -1;
-                        return;
-                    }
-                    Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-                    if (//BlockChain.DEVELOP_USE ||
-                            myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
-                        // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
-                        checkWeightPeers();
-                    }
 
                 }
 
