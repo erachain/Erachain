@@ -50,6 +50,7 @@ public class Network extends Observable implements ConnectionCallback {
         try {
             ServerSocket socket = new ServerSocket(port);
             socket.close();
+
             return true;
         } catch (Exception e) {
             return false;
@@ -325,7 +326,12 @@ public class Network extends Observable implements ConnectionCallback {
         // ADD new peer
         // make NEW PEER and use empty slots
 
-        return new Peer(this, socket, "connected as new!!! ");
+        Peer peer = new Peer(this, socket, "connected as new!!! ");
+        LOGGER.info("connected as new!!! " + peer);
+        // при коннекте во вне связь может порваться поэтому тут по runed
+        ///onConnect(peer);
+
+        return peer;
 
     }
 

@@ -732,7 +732,10 @@ public class Wallet extends Observable implements Observer {
 			};
 
 			this.lockTimer.schedule(action, this.secondsToUnlock * 1000);
-		}
+		} else {
+            if (this.lockTimer != null)
+                this.lockTimer.cancel();
+        }
 		return true;
 	}
 

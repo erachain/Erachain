@@ -40,6 +40,7 @@ public class Peer extends Thread {
     private InetAddress address;
     private Socket socket;
     private OutputStream out;
+    private DataInputStream in;
     private Pinger pinger;
     private boolean white;
     private long pingCounter;
@@ -257,6 +258,7 @@ public class Peer extends Thread {
             if (this.socket != null) {
                 this.socket.close();
                 this.out.close();
+                if (in != null) this.in.close();
             }
 
             this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
@@ -453,7 +455,6 @@ public class Peer extends Thread {
 
     public void run() {
         byte[] messageMagic = null;
-        DataInputStream in = null;
 
         while (!stoped) {
 
@@ -591,11 +592,13 @@ public class Peer extends Thread {
                         && message.hasId()
                         && this.messages.containsKey(message.getId())) {
                     //ADD TO OUR OWN LIST
-                    if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
-                        LOGGER.debug(" response add ");
+                    //if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
+
+                    LOGGER.debug(this + " : " + message + " receive response for me & add to messages Queue");
 
                     try {
                         this.messages.get(message.getId()).add(message);
+                        LOGGER.debug(this + " : " + message + " receive response added!!!");
                     } catch (java.lang.IllegalStateException e) {
                         LOGGER.debug("received message " + message.viewType() + " from " + this.address.toString());
                         LOGGER.debug("isRequest " + message.isRequest() + " hasId " + message.hasId());
@@ -606,17 +609,22 @@ public class Peer extends Thread {
                     //CALLBACK
                     // see in network.Network.onMessage(Message)
                     // and then see controller.Controller.onMessage(Message)
-                    if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
-                        LOGGER.debug(" onMess solve ");
+
+                    //if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
+
+                    LOGGER.debug(this + " : " + message + " receive, go solve");
 
                     this.callback.onMessage(message);
+
+                    LOGGER.debug(this + " : " + message +  "["
+                            + message.getId() + "] solved!!!");
                 }
             } else {
                 //ERROR and BAN
                 callback.tryDisconnect(this, 3600, "parse - received message with wrong magic");
                 continue;
             }
-            messageMagic = null;
+            //messageMagic = null;
         }
     }
 
@@ -775,6 +783,10 @@ public class Peer extends Thread {
             LOGGER.error("getResponseKey find counter: " + counter);
         }
 
+        if (this.messages.size() == 0 && requestKey % 1000 == 0) {
+            this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
+        }
+
         return this.requestKey;
     }
 
@@ -786,29 +798,38 @@ public class Peer extends Thread {
 
         message.setId(thisRequestKey);
 
-        //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
+        LOGGER.debug(" messages[" + this + "][ " + thisRequestKey + " ].put " + message.toString());
+
+                //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
         this.messages.put(thisRequestKey, blockingQueue);
+
+        long startPing = System.currentTimeMillis();
 
         //WHEN FAILED TO SEND MESSAGE
         if (!this.sendMessage(message)) {
-            //LOGGER.debug(" messages.remove( " + thisRequestKey + " ) by SEND ERROR" + this.getAddress().getHostAddress());
             this.messages.remove(thisRequestKey);
+            LOGGER.debug(" messages[" + this + "][ " + thisRequestKey + " ].remove by SEND ERROR"
+                + " messages.SIZE: " + messages.size());
             return null;
         }
 
         Message response = null;
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
-            //LOGGER.debug(" messages.remove( " + thisRequestKey + " ) by good RESPONSE " + this.getAddress().getHostAddress()
-            //		 + " " + (response==null?"NULL":response.toString()));
             this.messages.remove(thisRequestKey);
+            LOGGER.debug(" messages[" + this + "][ " + thisRequestKey + " ].remove by RESPONSE "
+                    + " " + (response==null?"response NULL":"")
+                    + " messages.SIZE: " + messages.size());
         } catch (InterruptedException e) {
             //NO MESSAGE RECEIVED WITHIN TIME;
-            //LOGGER.debug(" messages.remove( " + thisRequestKey + " ) by ERRROR " + this.getAddress().getHostAddress() + e.getMessage());
             this.messages.remove(thisRequestKey);
-            //LOGGER.error(e.getMessage(), e);
+            LOGGER.debug(" messages[" + this + "][ " + thisRequestKey + " ].remove by ERRROR " + e.getMessage()
+                    + " messages.SIZE: " + messages.size());
         }
 
+        if (response != null && this.getPing() < 0) {
+            this.setPing((int)(NTP.getTime() - startPing));
+        }
         return response;
     }
 
@@ -851,29 +872,11 @@ public class Peer extends Thread {
             return;
         }
 
-        // CLEAR all messages BlockingQueue
-        //this.clearResponse();
-
         runed = false;
 
-        //LOGGER.info("Try close peer : " + address.getHostAddress());
+        LOGGER.info("Try close peer : " + this);
 
         try {
-			/*
-			//STOP PINGER
-			if(this.pinger != null)
-			{
-				//this.pinger.stopPing();
-				
-				synchronized (this.pinger) {
-					try {
-						this.pinger.wait();
-					} catch(Exception e) {
-						
-					}
-				}
-			}
-				*/
 
             //CHECK IS SOCKET EXISTS
             if (socket != null) {
@@ -882,6 +885,7 @@ public class Peer extends Thread {
                     //CLOSE SOCKET
                     this.socket.close();
                     this.out.close();
+                    if (in != null) this.in.close();
 
                 }
                 this.socket = null;

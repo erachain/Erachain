@@ -572,9 +572,9 @@ public class Synchronizer {
             } while (headers.size() > 0 && dcSet.getBlockSignsMap().contains(headers.get(0)));
 
             if (headers.size() == 0) {
-                String mess = "Peer is SAME as me";
                 cnt.resetWeightOfPeer(peer);
-                peer.ban(0, mess);
+                String mess = "Peer is SAME as me";
+                //peer.ban(0, mess);
                 throw new Exception(mess);
             }
 
