@@ -107,8 +107,11 @@ public class BlockGenerator extends Thread implements Observer {
         LOGGER.debug("try check better WEIGHT peers");
 
         Peer peer = null;
-        Tuple3<Integer, Long, Peer> maxPeer;
         Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+        Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, false);
+        if (maxPeer != null)
+            // если мы не в синхроне то выход
+            return;
 
         do {
 
@@ -136,7 +139,7 @@ public class BlockGenerator extends Thread implements Observer {
             if (myHW.a < 2)
                 return;
 
-            LOGGER.debug("ctrl.getMaxPeerHWeight(-1) found: " + peer.getAddress().getHostAddress()
+            LOGGER.debug("better WEIGHT peers found: " + peer.getAddress().getHostAddress()
                     + " - HW: " + maxPeer.a + ":" + maxPeer.b);
 
             SignaturesMessage response = null;
@@ -165,27 +168,28 @@ public class BlockGenerator extends Thread implements Observer {
             List<byte[]> headers = response.getSignatures();
             byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
             int headersSize = headers.size();
-            if (headersSize == 3) {
+            if (headersSize == 3 || headersSize == 2) {
                 if (Arrays.equals(headers.get(headersSize - 1), lastSignature)) {
                     // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
-                    LOGGER.debug("peers has same Weight " + peer.getAddress().getHostAddress());
+                    LOGGER.debug("peer has same Weight " + peer.getAddress().getHostAddress()
+                        + " = " + maxPeer);
                     ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
                     // продолжим поиск дальше
                     continue;
                 } else {
-                    LOGGER.debug("I to orphan x2 - peers has better Weight " + peer.getAddress().getHostAddress()
+                    LOGGER.debug("I to orphan x2 - peer has better Weight " + peer.getAddress().getHostAddress()
                             + " = " + maxPeer);
                     try {
                         ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                        ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                        //ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
                         return;
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
                         ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
                     }
                 }
-            } else if (headersSize < 3) {
-                LOGGER.debug("I to orphan - peers has better Weight " + peer.getAddress().getHostAddress()
+            } else if (headersSize < 2) {
+                LOGGER.debug("I to orphan - peer has better Weight " + peer.getAddress().getHostAddress()
                         + " = " + maxPeer);
                 try {
                     ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
@@ -900,9 +904,11 @@ public class BlockGenerator extends Thread implements Observer {
                 if (timeUpdate > 0)
                     continue;
 
-                if (timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) < 0) {
+                if (timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) < 0
+                        && ctrl.getActivePeersCounter() > (BlockChain.DEVELOP_USE? 1 : 3)) {
                     // если случилась патовая ситуация то найдем более сильную цепочку (не по высоте)
                     // если есть сильнее то сделаем откат у себя
+                    LOGGER.debug("try resolve PAT situation");
                     checkWeightPeers();
                 }
 

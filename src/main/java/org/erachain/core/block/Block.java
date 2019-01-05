@@ -1515,7 +1515,7 @@ public class Block {
 
             long tickets = System.currentTimeMillis() - timerStart;
             LOGGER.debug("[" + this.heightBlock + "] processing time: " + tickets * 0.001
-                    + " for org.erachain.records:" + this.transactionCount + " millsec/record:" + tickets / this.transactionCount);
+                    + " TXs = " + this.transactionCount + " millsec/record:" + tickets / this.transactionCount);
 
         }
 
@@ -1840,7 +1840,7 @@ public class Block {
 
             long tickets = System.currentTimeMillis() - start;
             LOGGER.debug("[" + this.heightBlock + "] processing time: " + tickets * 0.001
-                    + " for org.erachain.records:" + this.transactionCount + " millsec/record:" + tickets / this.transactionCount);
+                    + " TXs = " + this.transactionCount + " millsec/record:" + tickets / this.transactionCount);
 
         }
 
@@ -1913,7 +1913,7 @@ public class Block {
 
         long tickets = System.currentTimeMillis() - start;
         LOGGER.debug("[" + this.heightBlock + "] orphaning time: " + (System.currentTimeMillis() - start) * 0.001
-                + " for org.erachain.records:" + this.getTransactionCount() + " millsec/record:" + tickets / (this.getTransactionCount() + 1));
+                + " TXs = " + this.getTransactionCount() + " millsec/record:" + tickets / (this.getTransactionCount() + 1));
 
         //this.parentBlock = null;
         byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
