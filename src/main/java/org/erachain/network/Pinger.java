@@ -68,7 +68,7 @@ public class Pinger extends Thread {
 
     public boolean tryPing(long timeSOT) {
 
-        //LOGGER.info("try PING " + this.peer.getAddress());
+        //LOGGER.info("try PING " + this.peer);
 
         peer.addPingCounter();
 
@@ -96,8 +96,7 @@ public class Pinger extends Thread {
                     // если пинги не частые были то учтем как попытку
                     this.ping -= 1;
                 }
-            }
-            else
+            } else
                 this.ping = -1;
 
             //PING FAILES
@@ -111,7 +110,7 @@ public class Pinger extends Thread {
             this.ping = (int) (System.currentTimeMillis() - start);
         }
 
-        //LOGGER.info("PING " + this.peer.getAddress() + " @ms " + this.ping);
+        //LOGGER.info("PING " + this.peer);
         Controller.getInstance().getDBSet().getPeerMap().addPeer(peer, 0);
 
         if (response != null && response.getType() == Message.HWEIGHT_TYPE) {
@@ -183,7 +182,7 @@ public class Pinger extends Thread {
                 sleepStepTimeCounter--;
 
                 if (messageQueue != null) {
-                    //LOGGER.debug("try ASYNC sendMessage " + messageQueue.viewType() + " - " + this.peer.getAddress());
+                    //LOGGER.debug("try ASYNC sendMessage " + messageQueue.viewType() + " - " + this.peer);
 
                     resultSend = this.peer.sendMessage(messageQueue);
                     messageQueue = null;
@@ -196,7 +195,7 @@ public class Pinger extends Thread {
                 }
 
                 if (messageWinBlock != null) {
-                    //LOGGER.debug("try ASYNC send WINblock " + messageQueue.viewType() + " - " + this.peer.getAddress());
+                    //LOGGER.debug("try ASYNC send WINblock " + messageQueue.viewType() + " - " + this.peer);
 
                     resultSend = this.peer.sendMessage(messageWinBlock);
                     messageWinBlock = null;
@@ -204,13 +203,13 @@ public class Pinger extends Thread {
                     if (!resultSend)
                         continue;
 
-                    //LOGGER.debug("try ASYNC send WINblock " + messageQueue.viewType() + " " + this.peer.getAddress() + " @ms " + (System.currentTimeMillis() - start));
+                    //LOGGER.debug("try ASYNC send WINblock " + messageQueue.viewType() + " " + this.peer + " @ms " + (System.currentTimeMillis() - start));
 
                 }
 
                 if (this.messageQueuePing != null) {
                     // PING before and THEN send
-                    //LOGGER.debug("try ASYNC PING sendMessage " + messageQueuePing.viewType() + " - " + this.peer.getAddress());
+                    //LOGGER.debug("try ASYNC PING sendMessage " + messageQueuePing.viewType() + " - " + this.peer);
                     ///this.peer.so(message);
 
                     this.tryQuickPing();

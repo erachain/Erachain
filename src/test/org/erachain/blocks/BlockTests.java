@@ -1,6 +1,7 @@
 package org.erachain.blocks;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.BlockGenerator;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -52,18 +53,21 @@ public class BlockTests {
     Transaction payment;
     //CREATE EMPTY MEMORY DATABASE
     private DCSet db;
+    private BlockChain blockChain;
     private GenesisBlock gb;
+    private BlockGenerator blockGenerator;
     List<Transaction> gbTransactions;
 
     private void init() {
 
         db = DCSet.createEmptyDatabaseSet();
-        gb = new GenesisBlock();
-        gbTransactions = gb.getTransactions();
+        try {
+            blockChain = new BlockChain(db);
+        } catch (Exception e) {
+        }
 
-        Controller.getInstance().initBlockChain(db);
-        gb = Controller.getInstance().getBlockChain().getGenesisBlock();
-
+        blockGenerator = new BlockGenerator(db, blockChain, false);
+        gb = blockChain.getGenesisBlock();
         gbTransactions = gb.getTransactions();
 
         generator.setLastTimestamp(gb.getTimestamp(), db);
@@ -311,8 +315,8 @@ public class BlockTests {
 
         //GENERATE NEXT BLOCK
         //BigDecimal genBal = generator.getGeneratingBalance(db);
-        BlockGenerator blockGenerator = new BlockGenerator(false);
-        Block newBlock = BlockGenerator.generateNextBlock(db, generator, gb,
+        BlockGenerator blockGenerator = new BlockGenerator(db, null, false);
+        Block newBlock = blockGenerator.generateNextBlock(generator, gb,
                 orderedTransactions, 3,
                 1000, 1000l, 1000l);
         newBlock.sign(generator);
@@ -336,7 +340,7 @@ public class BlockTests {
 
         //INVALID GENERATOR SIGNATURE
         //newBlock = BlockFactory.getInstance().create(newBlock.getVersion(), newBlock.getReference(), generator, new byte[Crypto.HASH_LENGTH], new byte[0]);
-        newBlock = BlockGenerator.generateNextBlock(db, generator, gb,
+        newBlock = blockGenerator.generateNextBlock(generator, gb,
                 orderedTransactions, 3,
                 1000, 1000l, 1000l);
         newBlock.sign(generator);
@@ -346,7 +350,7 @@ public class BlockTests {
         assertEquals(false, newBlock.isSignatureValid());
 
         //VALID TRANSACTION SIGNATURE
-        newBlock = BlockGenerator.generateNextBlock(db, generator, gb,
+        newBlock = blockGenerator.generateNextBlock(generator, gb,
                 orderedTransactions, 3,
                 1000, 1000l, 1000l);
 
@@ -370,7 +374,7 @@ public class BlockTests {
         assertEquals(true, newBlock.isSignatureValid());
 
         //INVALID TRANSACTION SIGNATURE
-        newBlock = BlockGenerator.generateNextBlock(db, generator, gb,
+        newBlock = blockGenerator.generateNextBlock(generator, gb,
                 orderedTransactions, 3,
                 1000, 1000l, 1000l);
 
@@ -425,8 +429,8 @@ public class BlockTests {
 
         //GENERATE NEXT BLOCK
         //BigDecimal genBal = generator.getGeneratingBalance(db);
-        BlockGenerator blockGenerator = new BlockGenerator(false);
-        Block newBlock = BlockGenerator.generateNextBlock(db, generator, gb,
+        BlockGenerator blockGenerator = new BlockGenerator(db, null, false);
+        Block newBlock = blockGenerator.generateNextBlock(generator, gb,
                 orderedTransactions, 3,
                 1000, 1000l, 1000l);
 
@@ -439,7 +443,7 @@ public class BlockTests {
 
         //CHANGE REFERENCE
         ////Block invalidBlock = BlockFactory.getInstance().create(newBlock.getVersion(), new byte[128], newBlock.getCreator(), transactionsHash, atBytes);
-        Block invalidBlock = BlockGenerator.generateNextBlock(db, generator, gb,
+        Block invalidBlock = blockGenerator.generateNextBlock(generator, gb,
                 orderedTransactions, 3,
                 1000, 1000l, 1000l);
 
@@ -449,7 +453,7 @@ public class BlockTests {
         assertEquals(false, invalidBlock.isValid(db, false));
 
         //ADD INVALID TRANSACTION
-        invalidBlock = BlockGenerator.generateNextBlock(db, generator, gb,
+        invalidBlock = blockGenerator.generateNextBlock(generator, gb,
                 orderedTransactions, 3,
                 1000, 1000l, 1000l);
         Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
@@ -468,7 +472,7 @@ public class BlockTests {
         assertEquals(false, invalidBlock.isValid(db, false));
 
         //ADD GENESIS TRANSACTION
-        invalidBlock = BlockGenerator.generateNextBlock(db, generator, gb,
+        invalidBlock = blockGenerator.generateNextBlock(generator, gb,
                 orderedTransactions, 3,
                 1000, 1000l, 1000l);
 
@@ -508,7 +512,7 @@ public class BlockTests {
 
 
         //GENERATE NEXT BLOCK
-        Block block = BlockGenerator.generateNextBlock(db, generator, gb,
+        Block block = blockGenerator.generateNextBlock(generator, gb,
                 orderedTransactions, 3,
                 1000, 1000l, 1000l);
 
@@ -605,7 +609,7 @@ public class BlockTests {
         generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000), false);
 
         //GENERATE NEXT BLOCK
-        Block block = BlockGenerator.generateNextBlock(db, generator, gb,
+        Block block = blockGenerator.generateNextBlock(generator, gb,
                 orderedTransactions, 3,
                 1000, 1000l, 1000l);
 

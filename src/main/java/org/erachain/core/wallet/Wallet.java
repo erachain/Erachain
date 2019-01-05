@@ -1205,7 +1205,7 @@ public class Wallet extends Observable implements Observer {
             long tickets = System.currentTimeMillis() - start;
             processBlockLogged = start;
             LOGGER.debug("WALLET [" + blockHead.heightBlock + "] processing time: " + tickets * 0.001
-                    + " for org.erachain.records:" + blockHead.transactionsCount + " millsec/record:"
+                    + " TXs = " + blockHead.transactionsCount + " millsec/record:"
                     + tickets / (blockHead.transactionsCount + 1));
         }
 
@@ -1325,7 +1325,7 @@ public class Wallet extends Observable implements Observer {
 		// long tickets = System.currentTimeMillis() - start;
 		// LOGGER.info("WALLET [" + block.getHeightByParent(DCSet.getInstance())
 		// + "] orphaning time: " + tickets*0.001
-		// + " for org.erachain.records:" + block.getTransactionCount() + " millsec/record:"
+		// + " TXs = " + block.getTransactionCount() + " millsec/record:"
 		// + tickets/(block.getTransactionCount()+1) );
 
 	}

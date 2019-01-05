@@ -89,7 +89,7 @@ import java.util.Timer;
  */
 public class Controller extends Observable {
 
-    private static final String version = "4.11.07a4 beta";
+    private static final String version = "4.11.07a7 beta";
     private static final String buildTime = "2018-12-04 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -329,6 +329,8 @@ public class Controller extends Observable {
     public void setWeightOfPeer(Peer peer, Tuple2<Integer, Long> hWeight) {
         if (peerHWeight != null) {
             peerHWeight.put(peer, hWeight);
+        } else {
+            peerHWeight.remove(peer);
         }
     }
 
@@ -680,7 +682,7 @@ public class Controller extends Observable {
             about_frame.set_console_Text(Lang.getInstance().translate("Telegram OK"));
 
         // CREATE BLOCKGENERATOR
-        this.blockGenerator = new BlockGenerator(true);
+        this.blockGenerator = new BlockGenerator(this.dcSet, this.blockChain,true);
         // START UPDATES and BLOCK BLOCKGENERATOR
         this.blockGenerator.start();
 
@@ -1054,7 +1056,7 @@ public class Controller extends Observable {
 
     public boolean broadcastUnconfirmedToPeer(Peer peer) {
 
-        // LOGGER.info(peer.getAddress() + " sended UNCONFIRMED ++++ START ");
+        // LOGGER.info(peer + " sended UNCONFIRMED ++++ START ");
 
         byte[] peerByte = peer.getAddress().getAddress();
 
@@ -1131,12 +1133,12 @@ public class Controller extends Observable {
                         stepCount >>= 1;
                     }
 
-                    // LOGGER.debug(peer.getAddress() + " stepCount down " +
+                    // LOGGER.debug(peer + " stepCount down " +
                     // stepCount);
 
                 } else if (ping < 200) {
                     stepCount <<= 1;
-                    // LOGGER.debug(peer.getAddress() + " stepCount UP " +
+                    // LOGGER.debug(peer + " stepCount UP " +
                     // stepCount + " for PING: " + ping);
                 }
 
@@ -1147,7 +1149,7 @@ public class Controller extends Observable {
         //peer.tryQuickPing();
         this.network.notifyObserveUpdatePeer(peer);
 
-        // LOGGER.info(peer.getAddress() + " sended UNCONFIRMED counter: " +
+        // LOGGER.info(peer + " sended UNCONFIRMED counter: " +
         // counter);
 
         return true;
@@ -1689,7 +1691,7 @@ public class Controller extends Observable {
         }
 
         // withWinBuffer
-        Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight(shift);
+        Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight(shift, false);
         if (maxHW.c == null) {
             this.status = STATUS_OK;
             return true;
@@ -1825,6 +1827,8 @@ public class Controller extends Observable {
         // Settings.BLOCK_MAX_SIGNATURES;
         int checkPointHeight = BlockChain.getCheckPoint(dcSet);
 
+        Tuple2<Integer, Long> myHWeight = this.getBlockChain().getHWeightFull(dcSet);
+
         boolean isUpToDate;
         // WHILE NOT UPTODATE
         do {
@@ -1835,11 +1839,13 @@ public class Controller extends Observable {
 
             // START UPDATE FROM HIGHEST HEIGHT PEER
             // withWinBuffer = true
-            Tuple3<Integer, Long, Peer> peerHW = this.getMaxPeerHWeight(shift);
-            if (peerHW != null) {
+            // тут поиск длаем с учетом СИЛЫ
+            // но если найдено с такой же высотой как у нас то игнорируем
+            Tuple3<Integer, Long, Peer> peerHW = this.getMaxPeerHWeight(shift, true);
+            if (peerHW != null && peerHW.a > myHWeight.a) {
                 peer = peerHW.c;
                 if (peer != null) {
-                    info = "update from MaxHeightPeer:" + peer.getAddress().getHostAddress() + " WH: "
+                    info = "update from MaxHeightPeer:" + peer + " WH: "
                             + getHWeightOfPeer(peer);
                     LOGGER.info(info);
                     if (Controller.useGui && about_frame.isVisible())
@@ -1917,7 +1923,7 @@ public class Controller extends Observable {
      * return highestPeer; }
      */
 
-    public Tuple3<Integer, Long, Peer> getMaxPeerHWeight(int shift) {
+    public Tuple3<Integer, Long, Peer> getMaxPeerHWeight(int shift, boolean useWeight) {
 
         if (this.isStopping || this.dcSet.isStoped())
             return null;
@@ -1931,7 +1937,8 @@ public class Controller extends Observable {
             synchronized (this.peerHWeight) {
                 for (Peer peer : this.peerHWeight.keySet()) {
                     Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
-                    if (height < whPeer.a || (maxPeer != null && height == whPeer.a && weight < whPeer.b)) {
+                    if (height < whPeer.a
+                            || (useWeight && height == whPeer.a && weight < whPeer.b)) {
                         height = whPeer.a;
                         weight = whPeer.b;
                         maxPeer = peer;

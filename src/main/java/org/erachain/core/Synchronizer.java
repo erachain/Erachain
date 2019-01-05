@@ -179,12 +179,12 @@ public class Synchronizer {
                 if (Arrays.equals(block.getSignature(), fork.getBlockMap().getLastBlockSignature())) {
                     LOGGER.error("*** checkNewBlocks - already LAST! [" + height + "] "
                             + Base58.encode(block.getSignature())
-                            + " from peer: " + peer.getAddress());
+                            + " from peer: " + peer);
                     continue;
                 } else {
                     String mess = "*** checkNewBlocks - already LAST and not equal SIGN! [" + height + "] "
                             + Base58.encode(block.getSignature())
-                            + " from peer: " + peer.getAddress();
+                            + " from peer: " + peer;
                     peer.ban(BAN_BLOCK_TIMES >> 3, mess);
                     throw new Exception(mess);
                 }
@@ -193,7 +193,7 @@ public class Synchronizer {
                 if (fork.getBlockSignsMap().contains(block.getSignature())) {
                     LOGGER.error("*** checkNewBlocks - DUPLICATE SIGN! [" + height + "] "
                             + Base58.encode(block.getSignature())
-                            + " from peer: " + peer.getAddress());
+                            + " from peer: " + peer);
                     continue;
 
                 }
@@ -302,7 +302,7 @@ public class Synchronizer {
             if (dcSet.getBlockSignsMap().contains(block.getSignature())) {
                 LOGGER.error("*** add CHAIN - DUPLICATE SIGN! [" + block.getHeight() + "] "
                         + Base58.encode(block.getSignature())
-                        + " from peer: " + peer.getAddress());
+                        + " from peer: " + peer);
                 continue;
             }
 
@@ -359,7 +359,7 @@ public class Synchronizer {
 
         /*
          * LOGGER.error("Synchronizing from peer: " + peer.toString() + ":" +
-         * peer.getAddress().getHostAddress() + " - " + peer.getPing());
+         * peer);
          */
 
         fromPeer = peer;
@@ -368,9 +368,7 @@ public class Synchronizer {
 
         // FIND HEADERS for common CHAIN
         if (Arrays.equals(peer.getAddress().getAddress(), PEER_TEST)) {
-            LOGGER.info("Synchronizing from peer: " + peer.toString() + ":" + peer.getAddress().getHostAddress()
-                    // + ", ping: " + peer.getPing()
-            );
+            LOGGER.info("Synchronizing from peer: " + peer.toString() + ":" + peer);
         }
 
         Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
@@ -384,7 +382,7 @@ public class Synchronizer {
 
             // CREATE BLOCK BUFFER
             LOGGER.debug(
-                    "START BUFFER" + " peer: " + peer.getAddress().getHostName() + " for blocks: " + signatures.size());
+                    "START BUFFER" + " peer: " + peer + " for blocks: " + signatures.size());
             BlockBuffer blockBuffer = new BlockBuffer(signatures, peer);
             Block blockFromPeer;
 
@@ -414,7 +412,7 @@ public class Synchronizer {
                 }
 
                 LOGGER.debug("BLOCK getted " + " time ms: " + (System.currentTimeMillis() - time1) + " size kB: "
-                        + (blockFromPeer.getDataLength(false) / 1000) + " from " + peer.getAddress().getHostAddress());
+                        + (blockFromPeer.getDataLength(false) / 1000) + " from " + peer);
 
                 if (cnt.isOnStopping()) {
                     // STOP BLOCKBUFFER
@@ -558,7 +556,7 @@ public class Synchronizer {
         DCSet dcSet = DCSet.getInstance();
         Controller cnt = Controller.getInstance();
 
-        LOGGER.info("findHeaders(Peer: " + peer.getAddress().getHostAddress() + ", peerHeight: " + peerHeight
+        LOGGER.info("findHeaders(Peer: " + peer + ", peerHeight: " + peerHeight
                 + ", checkPointHeight: " + checkPointHeight);
 
         List<byte[]> headers = this.getBlockSignatures(lastBlockSignature, peer);
@@ -619,7 +617,7 @@ public class Synchronizer {
             // not need CHECK peer on ping = false
             checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer, false);
         } catch (Exception e) {
-            String mess = "in getBlock:\n" + e.getMessage() + "\n *** in Peer: " + peer.getAddress().getHostAddress();
+            String mess = "in getBlock:\n" + e.getMessage() + "\n *** in Peer: " + peer;
             //// banned in getBlock -- peer.ban(BAN_BLOCK_TIMES>>3, mess);
             throw new Exception(mess);
         }
@@ -658,7 +656,7 @@ public class Synchronizer {
 
             if (headers.size() > 1) {
                 if (maxChainHeight < checkPointHeight) {
-                    String mess = "Dishonest peer by maxChainHeight < checkPointHeight " + peer.getAddress().getHostAddress();
+                    String mess = "Dishonest peer by maxChainHeight < checkPointHeight " + peer;
                     peer.ban(BAN_BLOCK_TIMES, mess);
                     throw new Exception(mess);
                 }
@@ -685,7 +683,7 @@ public class Synchronizer {
 
     private List<Block> getBlocks(DCSet dcSet, List<byte[]> signatures, Peer peer) throws Exception {
 
-        LOGGER.debug("try get BLOCKS from common block SIZE:" + signatures.size() + " - " + peer.getAddress());
+        LOGGER.debug("try get BLOCKS from common block SIZE:" + signatures.size() + " - " + peer);
 
         List<Block> blocks = new ArrayList<Block>();
         Controller cnt = Controller.getInstance();
