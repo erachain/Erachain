@@ -96,8 +96,7 @@ public class Pinger extends Thread {
                     // если пинги не частые были то учтем как попытку
                     this.ping -= 1;
                 }
-            }
-            else
+            } else
                 this.ping = -1;
 
             //PING FAILES
@@ -111,7 +110,7 @@ public class Pinger extends Thread {
             this.ping = (int) (System.currentTimeMillis() - start);
         }
 
-        //LOGGER.info("PING " + this.peer.getAddress() + " @ms " + this.ping);
+        //LOGGER.info("PING " + this.peer);
         Controller.getInstance().getDBSet().getPeerMap().addPeer(peer, 0);
 
         if (response != null && response.getType() == Message.HWEIGHT_TYPE) {

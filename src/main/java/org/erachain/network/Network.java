@@ -83,7 +83,7 @@ public class Network extends Observable implements ConnectionCallback {
     @Override
     public void onConnect(Peer peer) {
 
-        //LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer.getAddress());
+        //LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer);
 
         // WAIT start PINGER
         try {
@@ -142,9 +142,9 @@ public class Network extends Observable implements ConnectionCallback {
 
         if (error != null && error.length() > 0) {
             if (banForMinutes != 0) {
-                LOGGER.info(peer.getAddress().getHostAddress() + " ban for minutes: " + banForMinutes + " - " + error);
+                LOGGER.info(peer + " ban for minutes: " + banForMinutes + " - " + error);
             } else {
-                LOGGER.info("tryDisconnect : " + peer.getAddress().getHostAddress() + " - " + error);
+                LOGGER.info("tryDisconnect : " + peer + " - " + error);
             }
         }
 
@@ -419,7 +419,7 @@ public class Network extends Observable implements ConnectionCallback {
                 //SEND BACK TO SENDER
                 boolean result = message.getSender().sendMessage(response);
                 if (!result) {
-                    LOGGER.debug("error on response GET_HWEIGHT_TYPE to " + message.getSender().getAddress());
+                    LOGGER.debug("error on response GET_HWEIGHT_TYPE to " + message.getSender());
                 }
 
                 break;
@@ -511,10 +511,10 @@ public class Network extends Observable implements ConnectionCallback {
             //EXCLUDE PEERS
             if (exclude == null || !exclude.contains(peer)) {
                 if (true || message.getDataLength() > PINGED_MESSAGES_SIZE) {
-                    //LOGGER.debug("PEER rty + Ping " + peer.getAddress().getHostAddress());
+                    //LOGGER.debug("PEER rty + Ping " + peer);
                     peer.setMessageQueuePing(message);
                 } else {
-                    //LOGGER.debug("PEER rty " + peer.getAddress().getHostAddress());
+                    //LOGGER.debug("PEER rty " + peer);
                     peer.setMessageQueue(message);
                 }
 

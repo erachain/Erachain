@@ -900,4 +900,11 @@ public class Peer extends Thread {
         this.setName("Peer: " + this.getAddress().getHostAddress() + " halted");
 
     }
+
+    @Override
+    public String toString() {
+        return this.address.getHostAddress()
+                + (getPing() < 1000000? " ping: " + this.getPing() + "ms" : "")
+                + (isWhite()? " White" : "");
+    }
 }

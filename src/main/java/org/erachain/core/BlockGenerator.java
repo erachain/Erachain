@@ -109,9 +109,11 @@ public class BlockGenerator extends Thread implements Observer {
         Peer peer = null;
         Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
         Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, false);
-        if (maxPeer != null)
+        if (maxPeer.c != null) {
             // если мы не в синхроне то выход
+            LOGGER.debug("need UPDATE from " + maxPeer );
             return;
+        }
 
         do {
 
@@ -126,12 +128,10 @@ public class BlockGenerator extends Thread implements Observer {
 
 
             maxPeer = ctrl.getMaxPeerHWeight(0, true);
-            if (maxPeer == null)
+            if (maxPeer.c == null)
                 return;
 
             peer = maxPeer.c;
-            if (peer == null)
-                return;
 
             if (myHW.a >= maxPeer.a && myHW.b >= maxPeer.b)
                 return;
@@ -139,8 +139,10 @@ public class BlockGenerator extends Thread implements Observer {
             if (myHW.a < 2)
                 return;
 
-            LOGGER.debug("better WEIGHT peers found: " + peer.getAddress().getHostAddress()
-                    + " - HW: " + maxPeer.a + ":" + maxPeer.b);
+            LOGGER.debug("better WEIGHT peers found: "
+                    //+ peer.getAddress().getHostAddress()
+                    //+ " - HW: " + maxPeer.a + ":" + maxPeer.b);
+                    + peer);
 
             SignaturesMessage response = null;
             try {
@@ -151,7 +153,7 @@ public class BlockGenerator extends Thread implements Observer {
                         Synchronizer.GET_BLOCK_TIMEOUT);
             } catch (Exception e) {
                 ////peer.ban(1, "Cannot retrieve headers - from UPDATE");
-                LOGGER.debug("peers response error " + peer.getAddress().getHostAddress());
+                LOGGER.debug("peers response error " + peer);
                 // remove HW from peers
                 ctrl.setWeightOfPeer(peer, null);
                 continue;
@@ -159,7 +161,7 @@ public class BlockGenerator extends Thread implements Observer {
 
             if (response == null) {
                 ////peer.ban(1, "Cannot retrieve headers - from UPDATE");
-                LOGGER.debug("peers is null " + peer.getAddress().getHostAddress());
+                LOGGER.debug("peers is null " + peer);
                 // remove HW from peers
                 ctrl.setWeightOfPeer(peer, null);
                 continue;
@@ -171,14 +173,12 @@ public class BlockGenerator extends Thread implements Observer {
             if (headersSize == 3 || headersSize == 2) {
                 if (Arrays.equals(headers.get(headersSize - 1), lastSignature)) {
                     // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
-                    LOGGER.debug("peer has same Weight " + peer.getAddress().getHostAddress()
-                        + " = " + maxPeer);
+                    LOGGER.debug("peer has same Weight " + maxPeer);
                     ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
                     // продолжим поиск дальше
                     continue;
                 } else {
-                    LOGGER.debug("I to orphan x2 - peer has better Weight " + peer.getAddress().getHostAddress()
-                            + " = " + maxPeer);
+                    LOGGER.debug("I to orphan x2 - peer has better Weight " + maxPeer);
                     try {
                         ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
                         //ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
@@ -189,8 +189,7 @@ public class BlockGenerator extends Thread implements Observer {
                     }
                 }
             } else if (headersSize < 2) {
-                LOGGER.debug("I to orphan - peer has better Weight " + peer.getAddress().getHostAddress()
-                        + " = " + maxPeer);
+                LOGGER.debug("I to orphan - peer has better Weight " + maxPeer);
                 try {
                     ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
                     return;
@@ -200,7 +199,7 @@ public class BlockGenerator extends Thread implements Observer {
                 }
             } else {
                 // more then 2 - need to UPDATE
-                LOGGER.debug("to update - peers " + peer.getAddress().getHostAddress()
+                LOGGER.debug("to update - peers " + maxPeer
                         + " headers: " + headersSize);
                 return;
             }

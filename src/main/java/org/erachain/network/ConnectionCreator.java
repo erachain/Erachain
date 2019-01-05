@@ -41,7 +41,7 @@ public class ConnectionCreator extends Thread {
             || (Settings.getInstance().getMaxConnections() >> 1) < callback.getActivePeersCounter(false))
             return 0;
 
-        LOGGER.info("GET peers from: " + peer.getName() + " get max: " + maxReceivePeers);
+        LOGGER.info("GET peers from: " + peer + " get max: " + maxReceivePeers);
 
         //ASK PEER FOR PEERS
         Message getPeersMessage = MessageFactory.getInstance().createGetPeersMessage();
@@ -191,7 +191,7 @@ public class ConnectionCreator extends Thread {
                     if (!this.isRun)
                         return;
 
-                    LOGGER.info("try connect to: " + peer.getAddress().getHostAddress());
+                    LOGGER.info("try connect to: " + peer);
 
                     /*
                     LOGGER.info(

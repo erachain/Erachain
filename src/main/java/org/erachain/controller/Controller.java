@@ -1056,7 +1056,7 @@ public class Controller extends Observable {
 
     public boolean broadcastUnconfirmedToPeer(Peer peer) {
 
-        // LOGGER.info(peer.getAddress() + " sended UNCONFIRMED ++++ START ");
+        // LOGGER.info(peer + " sended UNCONFIRMED ++++ START ");
 
         byte[] peerByte = peer.getAddress().getAddress();
 
@@ -1133,12 +1133,12 @@ public class Controller extends Observable {
                         stepCount >>= 1;
                     }
 
-                    // LOGGER.debug(peer.getAddress() + " stepCount down " +
+                    // LOGGER.debug(peer + " stepCount down " +
                     // stepCount);
 
                 } else if (ping < 200) {
                     stepCount <<= 1;
-                    // LOGGER.debug(peer.getAddress() + " stepCount UP " +
+                    // LOGGER.debug(peer + " stepCount UP " +
                     // stepCount + " for PING: " + ping);
                 }
 
@@ -1149,7 +1149,7 @@ public class Controller extends Observable {
         //peer.tryQuickPing();
         this.network.notifyObserveUpdatePeer(peer);
 
-        // LOGGER.info(peer.getAddress() + " sended UNCONFIRMED counter: " +
+        // LOGGER.info(peer + " sended UNCONFIRMED counter: " +
         // counter);
 
         return true;
@@ -1845,7 +1845,7 @@ public class Controller extends Observable {
             if (peerHW != null && peerHW.a > myHWeight.a) {
                 peer = peerHW.c;
                 if (peer != null) {
-                    info = "update from MaxHeightPeer:" + peer.getAddress().getHostAddress() + " WH: "
+                    info = "update from MaxHeightPeer:" + peer + " WH: "
                             + getHWeightOfPeer(peer);
                     LOGGER.info(info);
                     if (Controller.useGui && about_frame.isVisible())
