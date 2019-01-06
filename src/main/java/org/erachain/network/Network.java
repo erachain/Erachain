@@ -120,9 +120,6 @@ public class Network extends Observable implements ConnectionCallback {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_PEER_TYPE, peer));
 
-        //this.setChanged();
-        //this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
-
         Controller.getInstance().onConnect(peer);
 
     }
@@ -425,8 +422,7 @@ public class Network extends Observable implements ConnectionCallback {
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 10) {
-                    LOGGER.debug(this + " : " + message + "["
-                            + message.getId() + "] solved by period: " + timeCheck);
+                    LOGGER.debug(this + " : " + message + " solved by period: " + timeCheck);
                 }
                 timeCheck = System.currentTimeMillis();
 
@@ -438,8 +434,7 @@ public class Network extends Observable implements ConnectionCallback {
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 10) {
-                    LOGGER.debug(this + " : " + message + "["
-                            + message.getId() + "] solved by period: " + timeCheck);
+                    LOGGER.debug(this + " : " + message + " sended by period: " + timeCheck);
                 }
 
                 break;
@@ -456,8 +451,7 @@ public class Network extends Observable implements ConnectionCallback {
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 10) {
-                    LOGGER.debug(this + " : " + message + "["
-                            + message.getId() + "] solved by period: " + timeCheck);
+                    LOGGER.debug(this + " : " + message + " solved by period: " + timeCheck);
                 }
 
                 break;

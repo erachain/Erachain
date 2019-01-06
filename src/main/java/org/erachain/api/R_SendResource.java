@@ -353,8 +353,11 @@ public class R_SendResource {
                                 || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT)
                             continue;
 
-                        LOGGER.info(OnDealClick.resultMess(result));
-                        this.test1Delay = 0;
+                        // not work in Threads - LOGGER.info("TEST1: " + OnDealClick.resultMess(result));
+                        try {
+                            Thread.sleep(10000);
+                        } catch (InterruptedException e) {
+                        }
                         continue;
                     }
 

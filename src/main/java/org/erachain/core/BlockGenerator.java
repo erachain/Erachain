@@ -541,7 +541,7 @@ public class BlockGenerator extends Thread implements Observer {
                 }
 
                 // GET real HWeight
-                if (System.currentTimeMillis() - timeToPing > 100000) {
+                if (System.currentTimeMillis() - timeToPing > 20000) {
                     // нужно просмотривать пиги для синхронизации так же - если там -ХХ то не будет синхронизации
                     timeToPing = System.currentTimeMillis();
                     ctrl.pingAllPeers(false);
