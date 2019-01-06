@@ -143,6 +143,9 @@ public class Synchronizer {
             int bbb = fork.getBlockMap().size();
             int hhh = fork.getBlocksHeadsMap().size();
             int sss = fork.getBlockSignsMap().size();
+            assert (height == hhh);
+            assert (bbb == hhh);
+            assert (sss == hhh);
 
             // runedBlock = lastBlock; // FOR quick STOPPING
             countTransactionToOrphan += lastBlock.getTransactionCount();
@@ -152,6 +155,9 @@ public class Synchronizer {
             int bbb2 = fork.getBlockMap().size();
             int hhh2 = fork.getBlocksHeadsMap().size();
             int sss2 = fork.getBlockSignsMap().size();
+            assert (height2 == hhh2);
+            assert (bbb2 == hhh2);
+            assert (sss2 == hhh2);
 
             LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned! chain size: " + fork.getBlockMap().size());
             lastBlock = blockMap.last();
@@ -162,10 +168,11 @@ public class Synchronizer {
         // VALIDATE THE NEW BLOCKS
 
         // Height & Weight
-        int myHeight = myHW.a + 1;
+        int testHeight = myHW.a + 1; // высота на котрой тестировать СИЛУ цепочки
         long myWeight = myHW.b;
         int newHeight = lastBlock.getHeight() + newBlocks.size();
-        boolean checkFullWeight = newHeight < myHeight + 2;
+        // проверять СИЛУ цепочки только если лна не на много лучше моей высоты
+        boolean checkFullWeight = testHeight + 2 > newHeight;
 
         LOGGER.debug("*** checkNewBlocks - VALIDATE THE NEW BLOCKS in FORK");
 
@@ -174,6 +181,9 @@ public class Synchronizer {
             int bbb = fork.getBlockMap().size();
             int hhh = fork.getBlocksHeadsMap().size();
             int sss = fork.getBlockSignsMap().size();
+            assert (height == hhh);
+            assert (bbb == hhh);
+            assert (sss == hhh);
 
             if (height == fork.getBlockMap().size()) {
                 if (Arrays.equals(block.getSignature(), fork.getBlockMap().getLastBlockSignature())) {
@@ -208,11 +218,14 @@ public class Synchronizer {
                 int bbb2 = fork.getBlockMap().size();
                 int hhh2 = fork.getBlocksHeadsMap().size();
                 int sss2 = fork.getBlockSignsMap().size();
+                assert (height2 == hhh2);
+                assert (bbb2 == hhh2);
+                assert (sss2 == hhh2);
 
                 // PROCESS TO VALIDATE NEXT BLOCKS
                 // runedBlock = block;
                 /// already in Validate block.process(fork);
-                if (checkFullWeight && myHeight == height) {
+                if (checkFullWeight && testHeight == height) {
                     if (myWeight >= fork.getBlocksHeadsMap().getFullWeight()) {
                         // INVALID BLOCK THROW EXCEPTION
                         String mess = "Dishonest peer by weak FullWeight, heigh: " + height;

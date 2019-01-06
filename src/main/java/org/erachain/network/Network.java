@@ -5,6 +5,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.message.*;
+import org.erachain.ntp.NTP;
 import org.erachain.utils.ObserverMessage;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -410,6 +411,7 @@ public class Network extends Observable implements ConnectionCallback {
             }
         }
 
+        long timeCheck = System.currentTimeMillis();
         switch (message.getType()) {
             case Message.GET_HWEIGHT_TYPE:
 
@@ -421,10 +423,23 @@ public class Network extends Observable implements ConnectionCallback {
                 // CREATE RESPONSE WITH SAME ID
                 response.setId(message.getId());
 
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 10) {
+                    LOGGER.debug(this + " : " + message + "["
+                            + message.getId() + "] solved by period: " + timeCheck);
+                }
+                timeCheck = System.currentTimeMillis();
+
                 //SEND BACK TO SENDER
                 boolean result = message.getSender().sendMessage(response);
                 if (!result) {
                     LOGGER.debug("error on response GET_HWEIGHT_TYPE to " + message.getSender());
+                }
+
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 10) {
+                    LOGGER.debug(this + " : " + message + "["
+                            + message.getId() + "] solved by period: " + timeCheck);
                 }
 
                 break;
@@ -438,6 +453,13 @@ public class Network extends Observable implements ConnectionCallback {
 
                 //SEND TO SENDER
                 message.getSender().sendMessage(answer);
+
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 10) {
+                    LOGGER.debug(this + " : " + message + "["
+                            + message.getId() + "] solved by period: " + timeCheck);
+                }
+
                 break;
 
 

@@ -104,7 +104,7 @@ public class BlockGenerator extends Thread implements Observer {
         if (ctrl.getActivePeersCounter() < (BlockChain.DEVELOP_USE? 3 : 5))
             return;
 
-        LOGGER.debug("try check better WEIGHT peers");
+        //LOGGER.debug("try check better WEIGHT peers");
 
         Peer peer = null;
         Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
@@ -907,7 +907,16 @@ public class BlockGenerator extends Thread implements Observer {
                         && ctrl.getActivePeersCounter() > (BlockChain.DEVELOP_USE? 1 : 3)) {
                     // если случилась патовая ситуация то найдем более сильную цепочку (не по высоте)
                     // если есть сильнее то сделаем откат у себя
-                    LOGGER.debug("try resolve PAT situation");
+                    //LOGGER.debug("try resolve PAT situation");
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                    }
+
+                    if (ctrl.isOnStopping()) {
+                        status = -1;
+                        return;
+                    }
                     checkWeightPeers();
                 }
 

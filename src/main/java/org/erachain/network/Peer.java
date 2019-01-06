@@ -636,7 +636,7 @@ public class Peer extends Thread {
 
                     this.callback.onMessage(message);
 
-                    timeStart = NTP.getTime() - timeStart;
+                    timeStart = System.currentTimeMillis() - timeStart;
                     if (timeStart > 100) {
                         LOGGER.debug(this + " : " + message + "["
                                 + message.getId() + "] solved by period: " + timeStart);
@@ -795,18 +795,24 @@ public class Peer extends Thread {
             this.requestKey = 1;
         }
 
-        long counter = 0;
-        while (this.messages.containsKey(this.requestKey)) {
-            this.requestKey += 1;
-            counter++;
-        }
+        // OLD
+        if (false) {
+            long counter = 0;
+            while (this.messages.containsKey(this.requestKey)) {
+                this.requestKey += 1;
+                counter++;
+            }
 
-        if (counter > 100000) {
-            LOGGER.error("getResponseKey find counter: " + counter);
-        }
+            if (counter > 100000) {
+                LOGGER.error("getResponseKey find counter: " + counter);
+            }
+        } else {
 
-        if (this.messages.size() == 0 && requestKey % 1000 == 0) {
-            this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
+            // RECIRCLE keyq and MAP
+            if (requestKey > 100000 && this.messages.size() == 0) {
+                this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
+                requestKey = 1;
+            }
         }
 
         return this.requestKey;
