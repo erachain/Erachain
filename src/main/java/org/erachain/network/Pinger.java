@@ -47,15 +47,33 @@ public class Pinger extends Thread {
         this.needPing = true;
     }
 
-    public void setMessageQueue(Message message) {
+    public synchronized void setMessageQueue(Message message) {
+        while (messageQueue != null) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+            }
+        }
         this.messageQueue = message;
     }
 
-    public void setMessageWinBlock(Message message) {
+    public synchronized void setMessageWinBlock(Message message) {
+        while (messageWinBlock != null) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+            }
+        }
         this.messageWinBlock = message;
     }
 
-    public void setMessageQueuePing(Message message) {
+    public synchronized void setMessageQueuePing(Message message) {
+        while (messageQueuePing != null) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+            }
+        }
         this.messageQueuePing = message;
     }
 	

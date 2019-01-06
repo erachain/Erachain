@@ -1422,8 +1422,7 @@ public class Controller extends Observable {
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 10) {
-                    LOGGER.debug(this + " : " + message + "["
-                            + message.getId() + "] solved by period: " + timeCheck);
+                    LOGGER.debug(this + " : " + message + " solved by period: " + timeCheck);
                 }
 
                 break;
@@ -1537,6 +1536,12 @@ public class Controller extends Observable {
                     return;
                 }
 
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 3) {
+                    LOGGER.debug(message + "proccess 1 period: " + timeCheck);
+                }
+                timeCheck = System.currentTimeMillis();
+
                 // ALREADY EXIST
                 byte[] signature = transaction.getSignature();
                 if (this.dcSet.getTransactionMap().contains(signature)
@@ -1546,6 +1551,12 @@ public class Controller extends Observable {
                 // ADD TO UNCONFIRMED TRANSACTIONS
                 this.dcSet.getTransactionMap().add(transaction);
 
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 1) {
+                    LOGGER.debug(message + "proccess 2 period: " + timeCheck);
+                }
+                timeCheck = System.currentTimeMillis();
+
                 if (this.status == STATUS_OK) {
                     // если мы не в синхронизации - так как мы тогда
                     // не знаем время текущее цепочки и не понимаем можно ли борадкастить дальше трнзакцию
@@ -1554,7 +1565,12 @@ public class Controller extends Observable {
                     // BROADCAST
                     List<Peer> excludes = new ArrayList<Peer>();
                     excludes.add(message.getSender());
-                    this.network.broadcast(message, excludes, false);
+                    this.network.asyncBroadcast(message, excludes, false);
+                }
+
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 1) {
+                    LOGGER.debug(message + "proccess 3 period: " + timeCheck);
                 }
 
                 return;
