@@ -599,21 +599,17 @@ public class Peer extends Thread {
         return true;
     }
 
-    public synchronized int getResponseKey()
-    //public int getResponseKey()
+    public /* synchronized */ int getResponseKey()
     {
 
-        if (this.requestKey == Integer.MAX_VALUE) {
-            this.requestKey = 0;
-        }
-
-        // RECIRCLE keyq and MAP
         if (requestKey > 999999 && this.messages.size() == 0) {
+            // RECIRCLE keyq and MAP
             this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
-            requestKey = 1;
-        } else
+            this.requestKey = 1;
+        } else {
             //GENERATE ID
             this.requestKey += 1;
+        }
 
         return this.requestKey;
     }
