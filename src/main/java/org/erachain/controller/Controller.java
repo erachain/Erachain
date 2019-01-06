@@ -89,7 +89,7 @@ import java.util.Timer;
  */
 public class Controller extends Observable {
 
-    private static final String version = "4.11.07a8 beta";
+    private static final String version = "4.11.07b beta";
     private static final String buildTime = "2018-12-04 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -1568,7 +1568,7 @@ public class Controller extends Observable {
                     // BROADCAST
                     List<Peer> excludes = new ArrayList<Peer>();
                     excludes.add(message.getSender());
-                    this.network.asyncBroadcast(message, excludes, false);
+                    this.network.broadcast(message, excludes, false);
                 }
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
@@ -1671,7 +1671,7 @@ public class Controller extends Observable {
         Message messageHW = MessageFactory.getInstance().createHWeightMessage(HWeight);
 
         // BROADCAST MESSAGE
-        this.network.asyncBroadcast(messageHW, excludes, false);
+        this.network.broadcast(messageHW, excludes, false);
 
     }
 
@@ -1694,7 +1694,7 @@ public class Controller extends Observable {
         if (!store || !notAdded) {
             // BROADCAST MESSAGE
             List<Peer> excludes = new ArrayList<Peer>();
-            this.network.asyncBroadcast(telegram, excludes, false);
+            this.network.broadcast(telegram, excludes, false);
             // save DB
             Controller.getInstance().wallet.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
         }

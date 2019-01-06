@@ -362,7 +362,7 @@ public class Network extends Observable implements ConnectionCallback {
                 // BROADCAST
                 List<Peer> excludes = new ArrayList<Peer>();
                 excludes.add(message.getSender());
-                this.asyncBroadcast(message, excludes, false);
+                this.broadcast(message, excludes, false);
             }
 
             return;
@@ -515,70 +515,6 @@ public class Network extends Observable implements ConnectionCallback {
         //LOGGER.debug("Broadcasting PING ALL end");
     }
 
-    public void asyncBroadcastPing(Message message, List<Peer> exclude) {
-
-        //LOGGER.debug("ASYNC Broadcasting with Ping before " + message.viewType());
-
-        for (int i = 0; i < this.knownPeers.size(); i++) {
-
-            if (!this.run)
-                return;
-
-            Peer peer = this.knownPeers.get(i);
-            if (peer == null || !peer.isUsed()) {
-                continue;
-            }
-
-            //EXCLUDE PEERS
-            if (exclude == null || !exclude.contains(peer)) {
-                if (true || message.getDataLength() > PINGED_MESSAGES_SIZE) {
-                    //LOGGER.debug("PEER rty + Ping " + peer);
-                    peer.setMessageQueuePing(message);
-                } else {
-                    //LOGGER.debug("PEER rty " + peer);
-                    peer.setMessageQueue(message);
-                }
-
-            }
-        }
-
-        //LOGGER.debug("ASYNC Broadcasting with Ping before ENDED " + message.viewType());
-    }
-
-    public void asyncBroadcast(Message message, List<Peer> exclude, boolean onlySynchronized) {
-
-        //LOGGER.debug("ASYNC Broadcasting " + message.viewType());
-        Controller cnt = Controller.getInstance();
-        BlockChain chain = cnt.getBlockChain();
-        Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
-
-        for (int i = 0; i < this.knownPeers.size(); i++) {
-
-            if (!this.run)
-                return;
-
-            Peer peer = this.knownPeers.get(i);
-            if (peer == null || !peer.isUsed()) {
-                continue;
-            }
-
-            if (onlySynchronized) {
-                // USE PEERS than SYNCHRONIZED to ME
-                Tuple2<Integer, Long> peerHWeight = Controller.getInstance().getHWeightOfPeer(peer);
-                if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
-                    continue;
-                }
-            }
-
-            //EXCLUDE PEERS
-            if (exclude == null || !exclude.contains(peer)) {
-                peer.setMessageQueue(message);
-            }
-        }
-
-        //LOGGER.debug("ASYNC Broadcasting end " + message.viewType());
-    }
-
     public void broadcast(Message message, List<Peer> exclude, boolean onlySynchronized) {
         Controller cnt = Controller.getInstance();
         BlockChain chain = cnt.getBlockChain();
@@ -640,7 +576,7 @@ public class Network extends Observable implements ConnectionCallback {
 
             //EXCLUDE PEERS
             if (exclude == null || !exclude.contains(peer)) {
-                peer.setMessageWinBlock(message);
+                peer.sendMessage(message);
             }
         }
 

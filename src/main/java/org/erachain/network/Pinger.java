@@ -20,11 +20,7 @@ public class Pinger extends Thread {
 
     private Peer peer;
     private boolean needPing = false;
-    //private boolean run;
     private int ping;
-    private Message messageWinBlock;
-    private Message messageQueue;
-    private Message messageQueuePing;
 
     public Pinger(Peer peer) {
         this.peer = peer;
@@ -46,43 +42,6 @@ public class Pinger extends Thread {
     public void setNeedPing() {
         this.needPing = true;
     }
-
-    public synchronized void setMessageQueue(Message message) {
-        while (messageQueue != null) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-            }
-        }
-        this.messageQueue = message;
-    }
-
-    public synchronized void setMessageWinBlock(Message message) {
-        while (messageWinBlock != null) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-            }
-        }
-        this.messageWinBlock = message;
-    }
-
-    public synchronized void setMessageQueuePing(Message message) {
-        while (messageQueuePing != null) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-            }
-        }
-        this.messageQueuePing = message;
-    }
-	
-	/*
-	public boolean isRun()
-	{
-		return this.run;
-	}
-	*/
 
     public boolean tryPing(long timeSOT) {
 
@@ -155,7 +114,7 @@ public class Pinger extends Thread {
         BlockChain chain = cnt.getBlockChain();
 
         int sleepTimeFull = Settings.getInstance().getPingInterval();
-        int sleepTimestep = 1;
+        int sleepTimestep = 500;
         int sleepsteps = sleepTimeFull / sleepTimestep;
         int sleepStepTimeCounter;
         boolean resultSend;
@@ -186,7 +145,7 @@ public class Pinger extends Thread {
                     sleepStepTimeCounter = sleepsteps;
 
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         //FAILED TO SLEEP
                     }
@@ -197,58 +156,15 @@ public class Pinger extends Thread {
                     continue;
                 }
 
-                sleepStepTimeCounter--;
-
-                if (messageQueue != null) {
-                    //LOGGER.debug("try ASYNC sendMessage " + messageQueue.viewType() + " - " + this.peer);
-
-                    resultSend = this.peer.sendMessage(messageQueue);
-                    messageQueue = null;
-
-                    if (!resultSend)
-                        continue;
-
-                    //LOGGER.debug("try ASYNC send " + messageQueue.viewType() + " " + this.peer.getAddress() + " @ms " + (System.currentTimeMillis() - start));
-
-                }
-
-                if (messageWinBlock != null) {
-                    //LOGGER.debug("try ASYNC send WINblock " + messageQueue.viewType() + " - " + this.peer);
-
-                    resultSend = this.peer.sendMessage(messageWinBlock);
-                    messageWinBlock = null;
-
-                    if (!resultSend)
-                        continue;
-
-                    //LOGGER.debug("try ASYNC send WINblock " + messageQueue.viewType() + " " + this.peer + " @ms " + (System.currentTimeMillis() - start));
-
-                }
-
-                if (this.messageQueuePing != null) {
-                    // PING before and THEN send
-                    //LOGGER.debug("try ASYNC PING sendMessage " + messageQueuePing.viewType() + " - " + this.peer);
-                    ///this.peer.so(message);
-
-                    this.tryQuickPing();
-                    this.peer.sendMessage(this.messageQueuePing);
-
-                    this.needPing = false;
-                    this.messageQueuePing = null;
-                    sleepStepTimeCounter = sleepsteps;
-                    continue;
-
-                } else if (this.needPing) {
-                    // PING NOW
-                    this.needPing = false;
-                    this.tryPing();
-                    sleepStepTimeCounter = sleepsteps;
-                    continue;
-                }
+                if (this.needPing)
+                    sleepStepTimeCounter = 0;
+                else
+                    sleepStepTimeCounter--;
 
             }
 
             if (this.peer.isUsed()) {
+                this.needPing = false;
                 tryPing();
             }
 

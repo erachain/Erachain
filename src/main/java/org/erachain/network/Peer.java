@@ -291,18 +291,6 @@ public class Peer extends Thread {
         this.pinger.setNeedPing();
     }
 
-    public void setMessageQueue(Message message) {
-        this.pinger.setMessageQueue(message);
-    }
-
-    public void setMessageWinBlock(Message message) {
-        this.pinger.setMessageWinBlock(message);
-    }
-
-    public void setMessageQueuePing(Message message) {
-        this.pinger.setMessageQueuePing(message);
-    }
-
     public void addPingCounter() {
         this.pingCounter++;
     }
@@ -426,27 +414,10 @@ public class Peer extends Thread {
             }
 
             //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
-            if (false // OLD VERSION
-                    && !message.isRequest()
-                    && message.hasId()
-                    && this.messages.containsKey(message.getId())) {
-                //ADD TO OUR OWN LIST
-                if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
-                    LOGGER.debug(this + " : " + message + " receive response for me & add to messages Queue");
-
-                try {
-                    this.messages.get(message.getId()).add(message);
-                    ////LOGGER.debug(this + " : " + message + " receive response added!!!");
-                } catch (java.lang.IllegalStateException e) {
-                    LOGGER.debug("received message " + message.viewType() + " from " + this.address.toString());
-                    LOGGER.debug("isRequest " + message.isRequest() + " hasId " + message.hasId());
-                    LOGGER.debug(" Id " + message.getId() + " containsKey: " + this.messages.containsKey(message.getId()));
-                    LOGGER.error(e.getMessage(), e);
-                }
-            } else if (!message.isRequest() && message.hasId()) {
+            if (!message.isRequest() && message.hasId()) {
                 // это ответ на наш запрос с ID
 
-                if (true && message.getType() == Message.HWEIGHT_TYPE)
+                if (false && message.getType() == Message.HWEIGHT_TYPE)
                     LOGGER.debug(this + " >> " + message + " receive as RESPONSE for me & add to messages Queue");
 
                 if (this.messages.containsKey(message.getId())) {
@@ -464,7 +435,7 @@ public class Peer extends Thread {
                         LOGGER.debug(" Id " + message.getId() + " containsKey: " + this.messages.containsKey(message.getId()));
                         LOGGER.error(e.getMessage(), e);
                     }
-                } else {
+                } else if (false) {
                     // ответ прилетел поздно и он уже просроченный и не нужно его обрабатывать вообще
                     LOGGER.debug(this + " >> " + message + "  == my ENDED RESPONSE arrived...");
                 }
@@ -474,7 +445,7 @@ public class Peer extends Thread {
                 // see in network.Network.onMessage(Message)
                 // and then see controller.Controller.onMessage(Message)
 
-                if (true && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
+                if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
                     LOGGER.debug(this + " >> " + message + " received as SEND");
 
                 long timeStart = System.currentTimeMillis();
@@ -636,28 +607,13 @@ public class Peer extends Thread {
             this.requestKey = 0;
         }
 
-        //GENERATE ID
-        this.requestKey += 1;
-
-        // OLD
-        if (false) {
-            long counter = 0;
-            while (this.messages.containsKey(this.requestKey)) {
-                this.requestKey += 1;
-                counter++;
-            }
-
-            if (counter > 100000) {
-                LOGGER.error("getResponseKey find counter: " + counter);
-            }
-        } else {
-
-            // RECIRCLE keyq and MAP
-            if (requestKey > 100000 && this.messages.size() == 0) {
-                this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
-                requestKey = 1;
-            }
-        }
+        // RECIRCLE keyq and MAP
+        if (requestKey > 999999 && this.messages.size() == 0) {
+            this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
+            requestKey = 1;
+        } else
+            //GENERATE ID
+            this.requestKey += 1;
 
         return this.requestKey;
     }

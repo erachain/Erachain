@@ -143,7 +143,7 @@ public class TelegramStore extends Observable implements Observer {
         Message telegram = MessageFactory.getInstance().createTelegramGetMessage();
         // BROADCAST MESSAGE
         List<Peer> excludes = new ArrayList<Peer>();
-        Controller.getInstance().network.asyncBroadcast(telegram, excludes, false);
+        Controller.getInstance().network.broadcast(telegram, excludes, false);
     }
 
 }
