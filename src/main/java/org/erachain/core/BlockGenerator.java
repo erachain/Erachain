@@ -540,6 +540,13 @@ public class BlockGenerator extends Thread implements Observer {
                     return;
                 }
 
+                // GET real HWeight
+                if (System.currentTimeMillis() - timeToPing > 100000) {
+                    // нужно просмотривать пиги для синхронизации так же - если там -ХХ то не будет синхронизации
+                    timeToPing = System.currentTimeMillis();
+                    ctrl.pingAllPeers(false);
+                }
+
                 if (this.orphanto > 0) {
                     status = 9;
                     ctrl.setForgingStatus(ForgingStatus.FORGING_ENABLED);
@@ -587,12 +594,6 @@ public class BlockGenerator extends Thread implements Observer {
                             myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
                         // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
                         checkWeightPeers();
-                    }
-
-                    // GET real HWeight
-                    if (NTP.getTime() - timeToPing > 180000) {
-                        timeToPing = NTP.getTime();
-                        ctrl.pingAllPeers(false);
                     }
 
                 }

@@ -87,7 +87,7 @@ public class Peer extends Thread {
 			this.socket.setKeepAlive(KEEP_ALIVE);
 			
 			//TIMEOUT
-			this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
+			this.socket.setSoTimeout(0); //Settings.getInstance().getConnectionTimeout());
 			
 			this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
 			this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
@@ -192,7 +192,7 @@ public class Peer extends Thread {
             this.socket.setKeepAlive(KEEP_ALIVE);
 
             //TIMEOUT
-            this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
+            this.socket.setSoTimeout(0); //Settings.getInstance().getConnectionTimeout());
 
             this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
@@ -269,7 +269,7 @@ public class Peer extends Thread {
 
             //TIMEOUT
             step++;
-            this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
+            this.socket.setSoTimeout(0); //Settings.getInstance().getConnectionTimeout());
 
             this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
@@ -344,7 +344,7 @@ public class Peer extends Thread {
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
             //TIMEOUT
-            this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
+            this.socket.setSoTimeout(0); //Settings.getInstance().getConnectionTimeout());
 
             //CREATE STRINGWRITER
             this.out = socket.getOutputStream();
