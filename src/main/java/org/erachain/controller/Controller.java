@@ -1538,23 +1538,26 @@ public class Controller extends Observable {
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 3) {
-                    LOGGER.debug(message + "proccess 1 period: " + timeCheck);
+                    LOGGER.debug("TRANSACTION_TYPE proccess 1 period: " + timeCheck);
                 }
                 timeCheck = System.currentTimeMillis();
 
                 // ALREADY EXIST
                 byte[] signature = transaction.getSignature();
                 if (this.dcSet.getTransactionMap().contains(signature)
-                        || this.dcSet.getTransactionFinalMapSigns().contains(signature) || this.isStopping)
+                        || this.dcSet.getTransactionFinalMapSigns().contains(signature) || this.isStopping) {
+
+                    timeCheck = System.currentTimeMillis() - timeCheck;
+                    if (timeCheck > 3) {
+                        LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS period: " + timeCheck);
+                    }
                     return;
-
-                // ADD TO UNCONFIRMED TRANSACTIONS
-                this.dcSet.getTransactionMap().add(transaction);
-
-                timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 1) {
-                    LOGGER.debug(message + "proccess 2 period: " + timeCheck);
                 }
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 3) {
+                    LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS period: " + timeCheck);
+                }
+
                 timeCheck = System.currentTimeMillis();
 
                 if (this.status == STATUS_OK) {
@@ -1569,8 +1572,17 @@ public class Controller extends Observable {
                 }
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 1) {
-                    LOGGER.debug(message + "proccess 3 period: " + timeCheck);
+                if (timeCheck > 3) {
+                    LOGGER.debug("TRANSACTION_TYPE proccess BROADCAST period: " + timeCheck);
+                }
+                timeCheck = System.currentTimeMillis();
+
+                // ADD TO UNCONFIRMED TRANSACTIONS
+                this.dcSet.getTransactionMap().add(transaction);
+
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 20) {
+                    LOGGER.debug("TRANSACTION_TYPE proccess ADD period: " + timeCheck);
                 }
 
                 return;

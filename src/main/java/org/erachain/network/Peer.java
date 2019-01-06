@@ -369,11 +369,6 @@ public class Peer extends Thread {
 
             }
 
-            try {
-                Thread.sleep(1);
-            } catch (Exception e) {
-            }
-
             //READ FIRST 4 BYTES
             messageMagic = new byte[Message.MAGIC_LENGTH];
 
@@ -395,115 +390,105 @@ public class Peer extends Thread {
                 continue;
             }
 
-            if (Arrays.equals(messageMagic, Controller.getInstance().getMessageMagic())) {
-                //PROCESS NEW MESSAGE
-                Message message;
+            if (!Arrays.equals(messageMagic, Controller.getInstance().getMessageMagic())) {
+                //ERROR and BAN
+                callback.tryDisconnect(this, 3600, "parse - received message with wrong magic");
+                continue;
+            }
+
+            //PROCESS NEW MESSAGE
+            Message message;
+            try {
+                message = MessageFactory.getInstance().parse(this, in);
+            } catch (java.io.EOFException e) {
+                // DISCONNECT and BAN
+                //this.pinger.tryPing();
+                callback.tryDisconnect(this, 0, "parse EOFException - " + e.getMessage());
+                continue;
+
+            } catch (Exception e) {
+                //LOGGER.error(e.getMessage(), e);
+                //if (this.socket.isClosed())
+
+                //DISCONNECT and BAN
+                callback.tryDisconnect(this, 6, "parse message wrong - " + e.getMessage());
+                continue;
+            }
+
+            if (message == null) {
+                // unknowm message
+                LOGGER.debug(this + " : NULL message!!!");
+                continue;
+            }
+
+            if (true && message.getType() == Message.GET_HWEIGHT_TYPE) {
+                LOGGER.debug(this + " : " + message + " RECEIVED");
+            }
+
+            //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
+            if (false // OLD VERSION
+                    && !message.isRequest()
+                    && message.hasId()
+                    && this.messages.containsKey(message.getId())) {
+                //ADD TO OUR OWN LIST
+                if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
+                    LOGGER.debug(this + " : " + message + " receive response for me & add to messages Queue");
+
                 try {
-                    message = MessageFactory.getInstance().parse(this, in);
-                } catch (java.net.SocketTimeoutException timeOut) {
-                    //LOGGER.debug("parse SocketTimeoutException timeOut:: " + timeOut);
-
-                    //this.pinger.tryPing();
-                    continue;
-                } catch (java.io.EOFException e) {
-                    // DISCONNECT and BAN
-                    //this.pinger.tryPing();
-                    callback.tryDisconnect(this, 0, "parse EOFException - " + e.getMessage());
-                    continue;
-
-                } catch (Exception e) {
-                    //LOGGER.error(e.getMessage(), e);
-                    //if (this.socket.isClosed())
-
-                    //DISCONNECT and BAN
-                    callback.tryDisconnect(this, 6, "parse message wrong - " + e.getMessage());
-                    continue;
+                    this.messages.get(message.getId()).add(message);
+                    ////LOGGER.debug(this + " : " + message + " receive response added!!!");
+                } catch (java.lang.IllegalStateException e) {
+                    LOGGER.debug("received message " + message.viewType() + " from " + this.address.toString());
+                    LOGGER.debug("isRequest " + message.isRequest() + " hasId " + message.hasId());
+                    LOGGER.debug(" Id " + message.getId() + " containsKey: " + this.messages.containsKey(message.getId()));
+                    LOGGER.error(e.getMessage(), e);
                 }
+            } else if (!message.isRequest() && message.hasId()) {
+                // это ответ на наш запрос с ID
 
-                if (false)
-                    LOGGER.info(this + " ->> "
-                            + (message == null? "message: null" : "message: " + message));
+                if (true && message.getType() == Message.HWEIGHT_TYPE)
+                    LOGGER.debug(this + " >> " + message + " receive as RESPONSE for me & add to messages Queue");
 
-                if (message == null) {
-                    // unknowm message
-                    continue;
-                }
-
-                if (message.getType() == Message.GET_HWEIGHT_TYPE) {
-                    LOGGER.debug(this + " : " + message + " RECEIVED");
-                }
-
-                //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
-                if (false // OLD VERSION
-                        && !message.isRequest()
-                        && message.hasId()
-                        && this.messages.containsKey(message.getId())) {
+                if (this.messages.containsKey(message.getId())) {
                     //ADD TO OUR OWN LIST
-                    if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
-                        LOGGER.debug(this + " : " + message + " receive response for me & add to messages Queue");
 
                     try {
+
                         this.messages.get(message.getId()).add(message);
-                        LOGGER.debug(this + " : " + message + " receive response added!!!");
+
+                        ////LOGGER.debug(this + " : " + message + "  == my RESPONSE added!!!");
+
                     } catch (java.lang.IllegalStateException e) {
                         LOGGER.debug("received message " + message.viewType() + " from " + this.address.toString());
                         LOGGER.debug("isRequest " + message.isRequest() + " hasId " + message.hasId());
                         LOGGER.debug(" Id " + message.getId() + " containsKey: " + this.messages.containsKey(message.getId()));
                         LOGGER.error(e.getMessage(), e);
                     }
-                } else if (!message.isRequest() && message.hasId()) {
-                    // это ответ на наш запрос с ID
-                    long timeStart = System.currentTimeMillis();
-                    if (this.messages.containsKey(message.getId())) {
-                        //ADD TO OUR OWN LIST
-                        if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
-                            LOGGER.debug(this + " : " + message + " receive response for me & add to messages Queue");
-
-                        try {
-
-                            this.messages.get(message.getId()).add(message);
-
-                            LOGGER.debug(this + " : " + message + "  == my RESPONSE added!!!");
-                        } catch (java.lang.IllegalStateException e) {
-                            LOGGER.debug("received message " + message.viewType() + " from " + this.address.toString());
-                            LOGGER.debug("isRequest " + message.isRequest() + " hasId " + message.hasId());
-                            LOGGER.debug(" Id " + message.getId() + " containsKey: " + this.messages.containsKey(message.getId()));
-                            LOGGER.error(e.getMessage(), e);
-                        }
-                    } else {
-                        // ответ прилетел поздно и он уже просроченный и не нужно его обрабатывать вообще
-                        LOGGER.debug(this + " : " + message + "  == my ENDED RESPONSE arrived...");
-                    }
-                    timeStart = System.currentTimeMillis() - timeStart;
-                    if (timeStart > 10) {
-                        LOGGER.debug(this + " : " + message + " == my RESPONSE solved by period: " + timeStart);
-                    }
-
                 } else {
-                    //CALLBACK
-                    // see in network.Network.onMessage(Message)
-                    // and then see controller.Controller.onMessage(Message)
-
-                    //if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
-
-                    long timeStart = System.currentTimeMillis();
-                    ///LOGGER.debug(this + " : " + message + " receive, go solve");
-
-                    this.callback.onMessage(message);
-
-                    timeStart = System.currentTimeMillis() - timeStart;
-                    if (timeStart > 100) {
-                        LOGGER.debug(this + " : " + message + "["
-                                + message.getId() + "] solved by period: " + timeStart);
-                    }
-
-
+                    // ответ прилетел поздно и он уже просроченный и не нужно его обрабатывать вообще
+                    LOGGER.debug(this + " >> " + message + "  == my ENDED RESPONSE arrived...");
                 }
+
             } else {
-                //ERROR and BAN
-                callback.tryDisconnect(this, 3600, "parse - received message with wrong magic");
+                //CALLBACK
+                // see in network.Network.onMessage(Message)
+                // and then see controller.Controller.onMessage(Message)
+
+                if (true && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
+                    LOGGER.debug(this + " >> " + message + " received as SEND");
+
+                long timeStart = System.currentTimeMillis();
+                ///LOGGER.debug(this + " : " + message + " receive, go solve");
+
+                this.callback.onMessage(message);
+
+                timeStart = System.currentTimeMillis() - timeStart;
+                if (timeStart > 100
+                        || true && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
+                    LOGGER.debug(this + " >> " + message + " solved by period: " + timeStart);
+                }
+
             }
-            //messageMagic = null;
         }
     }
 
@@ -523,8 +508,8 @@ public class Peer extends Thread {
 
         byte[] bytes = message.toBytes();
 
-        if (message.getType() == Message.HWEIGHT_TYPE) {
-            LOGGER.debug(this + " : " + message + " try SEND");
+        if (true && message.getType() == Message.HWEIGHT_TYPE) {
+            LOGGER.debug(message + " try SEND to " + this);
         }
 
         //SEND MESSAGE
@@ -534,7 +519,7 @@ public class Peer extends Thread {
                 this.out.write(bytes);
                 this.out.flush();
             } catch (java.net.SocketException eSock) {
-                callback.tryDisconnect(this, 0, "try write 1 - " + eSock.getMessage());
+                callback.tryDisconnect(this, 0, "try out.write 1 - " + eSock.getMessage());
                 return false;
 
             } catch (IOException e) {
@@ -679,12 +664,7 @@ public class Peer extends Thread {
 
     public Message getResponse(Message message, long timeSOT) {
 
-        long timeCheck = System.currentTimeMillis();
         int thisRequestKey = this.getResponseKey();
-        timeCheck = System.currentTimeMillis() - timeCheck;
-        if (timeCheck > 1) {
-            LOGGER.debug(this + " : " + message + " getResponseKey period: " + timeCheck);
-        }
 
         BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(1);
 
@@ -692,47 +672,31 @@ public class Peer extends Thread {
 
         LOGGER.debug(this + " : " + message + ".put");
 
-        timeCheck = System.currentTimeMillis();
-
         //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
         this.messages.put(thisRequestKey, blockingQueue);
 
-        timeCheck = System.currentTimeMillis() - timeCheck;
-        if (timeCheck > 10) {
-            LOGGER.debug(this + " : " + message + ".put take period: " + timeCheck);
-        }
-
         long startPing = System.currentTimeMillis();
 
-        //WHEN FAILED TO SEND MESSAGE
         if (!this.sendMessage(message)) {
+            //WHEN FAILED TO SEND MESSAGE
             this.messages.remove(thisRequestKey);
-            LOGGER.debug(this + " : " + message + ".remove by SEND ERROR"
-                + " messages.SIZE: " + messages.size());
+            LOGGER.debug(this + " : " + message + " ERROR send");
             return null;
         }
 
         Message response = null;
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
-            if (this.messages.containsKey(thisRequestKey)) {
-                LOGGER.debug(message + ".remove thisRequestKey POLL and RESPONSE is: "
-                    + (response == null? "NULL" : "GOOD"));
-                this.messages.remove(thisRequestKey);
-            } else {
-                LOGGER.debug(message + "not GIUND thisRequestKey POLL and RESPONSE is: "
-                        + (response == null? "NULL" : "GOOD"));
-            }
         } catch (InterruptedException e) {
-            //NO MESSAGE RECEIVED WITHIN TIME;
-            this.messages.remove(thisRequestKey);
-            LOGGER.debug(this + " : " + message + ".remove by ERRROR " + e.getMessage()
-                    + " messages.SIZE: " + messages.size());
         }
 
         if (response != null && this.getPing() < 0) {
+            // SET PING by request period
             this.setPing((int)(System.currentTimeMillis() - startPing));
         }
+
+        this.messages.remove(thisRequestKey);
+
         return response;
     }
 
@@ -811,7 +775,7 @@ public class Peer extends Thread {
     @Override
     public String toString() {
         return this.address.getHostAddress()
-                + (getPing() < 1000000? " ping: " + this.getPing() + "ms" : "")
+                + (getPing() >= 0? " ping: " + this.getPing() + "ms" : " try" + getPing())
                 + (isWhite()? " [White]" : "");
     }
 }
