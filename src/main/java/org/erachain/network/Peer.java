@@ -258,7 +258,10 @@ public class Peer extends Thread {
             if (this.socket != null) {
                 this.socket.close();
                 this.out.close();
-                if (in != null) this.in.close();
+                if (in != null) {
+                    this.in.close();
+                    this.in = null;
+                }
             }
 
             this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
@@ -928,7 +931,10 @@ public class Peer extends Thread {
                     //CLOSE SOCKET
                     this.socket.close();
                     this.out.close();
-                    if (in != null) this.in.close();
+                    if (in != null) {
+                        this.in.close();
+                        this.in = null;
+                    }
 
                 }
                 this.socket = null;
