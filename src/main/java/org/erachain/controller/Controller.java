@@ -89,7 +89,7 @@ import java.util.Timer;
  */
 public class Controller extends Observable {
 
-    private static final String version = "4.11.07a7 beta";
+    private static final String version = "4.11.07a8 beta";
     private static final String buildTime = "2018-12-04 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -1498,7 +1498,7 @@ public class Controller extends Observable {
                     // BROADCAST
                     List<Peer> excludes = new ArrayList<Peer>();
                     excludes.add(message.getSender());
-                    this.network.asyncBroadcast(message, excludes, false);
+                    this.network.asyncBroadcastWinBlock(message, excludes, false);
                 } else {
                     // SEND my BLOCK
 
