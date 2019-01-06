@@ -820,6 +820,7 @@ public class Peer extends Thread {
 
     public Message getResponse(Message message, long timeSOT) {
 
+        long timeCheck = System.currentTimeMillis();
         int thisRequestKey = this.getResponseKey();
 
         BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(1);
@@ -828,8 +829,14 @@ public class Peer extends Thread {
 
         LOGGER.debug(this + " : " + message + ".put");
 
-                //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
+        //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
         this.messages.put(thisRequestKey, blockingQueue);
+
+        timeCheck = System.currentTimeMillis() - timeCheck;
+        if (timeCheck > 100) {
+            LOGGER.debug(this + " : " + message + "["
+                    + message.getId() + "] take period: " + timeCheck);
+        }
 
         long startPing = System.currentTimeMillis();
 

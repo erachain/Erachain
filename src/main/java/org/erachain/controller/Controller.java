@@ -1071,6 +1071,7 @@ public class Controller extends Observable {
         ///////// headers andblocks
         int stepCount = 64; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
         long dTime = this.blockChain.getTimestamp(this.dcSet);
+        boolean pinged = false;
 
         while (iterator.hasNext() && stepCount > 2) {
 
@@ -1115,6 +1116,8 @@ public class Controller extends Observable {
 
             if (counter % stepCount == 0) {
 
+
+                pinged = true;
                 peer.tryQuickPing();
                 this.network.notifyObserveUpdatePeer(peer);
 
@@ -1146,7 +1149,8 @@ public class Controller extends Observable {
 
         }
 
-        //peer.tryQuickPing();
+        if (!pinged) peer.tryQuickPing();
+
         this.network.notifyObserveUpdatePeer(peer);
 
         // LOGGER.info(peer + " sended UNCONFIRMED counter: " +
