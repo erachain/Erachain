@@ -1947,6 +1947,12 @@ public class Controller extends Observable {
         try {
             synchronized (this.peerHWeight) {
                 for (Peer peer : this.peerHWeight.keySet()) {
+                    if (peer.getPing() < 0) {
+                        // не использовать пиры которые не в быстром коннекте
+                        // - так как иначе они заморозят синхронизацию совсем
+                        // да и не понятно как с них данные получать
+                        continue;
+                    }
                     Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
                     if (height < whPeer.a
                             || (useWeight && height == whPeer.a && weight < whPeer.b)) {

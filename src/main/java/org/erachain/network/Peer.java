@@ -607,14 +607,17 @@ public class Peer extends Thread {
                     }
                 } else if (!message.isRequest() && message.hasId()) {
                     // это ответ на наш запрос с ID
+                    long timeStart = System.currentTimeMillis();
                     if (this.messages.containsKey(message.getId())) {
                         //ADD TO OUR OWN LIST
                         if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
                             LOGGER.debug(this + " : " + message + " receive response for me & add to messages Queue");
 
                         try {
+
                             this.messages.get(message.getId()).add(message);
-                            LOGGER.debug(this + " : " + message + " receive response added!!!");
+
+                            LOGGER.debug(this + " : " + message + "  == my RESPONSE added!!!");
                         } catch (java.lang.IllegalStateException e) {
                             LOGGER.debug("received message " + message.viewType() + " from " + this.address.toString());
                             LOGGER.debug("isRequest " + message.isRequest() + " hasId " + message.hasId());
@@ -624,6 +627,11 @@ public class Peer extends Thread {
                     } else {
                         // ответ прилетел поздно и он уже просроченный и не нужно его обрабатывать вообще
                     }
+                    timeStart = System.currentTimeMillis() - timeStart;
+                    if (timeStart > 10) {
+                        LOGGER.debug(this + " : " + message + " == my RESPONSE solved by period: " + timeStart);
+                    }
+
                 } else {
                     //CALLBACK
                     // see in network.Network.onMessage(Message)
@@ -852,7 +860,7 @@ public class Peer extends Thread {
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
             this.messages.remove(thisRequestKey);
-            LOGGER.debug(this + " : " + message + ".remove by RESPONSE "
+            LOGGER.debug(this + " : " + message + ".remove as my RESPONSE "
                     + " " + (response==null?"response NULL":"")
                     + " messages.SIZE: " + messages.size());
         } catch (InterruptedException e) {
