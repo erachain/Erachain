@@ -523,6 +523,9 @@ public class Peer extends Thread {
 
         byte[] bytes = message.toBytes();
 
+        if (message.getType() == Message.HWEIGHT_TYPE) {
+            LOGGER.debug(this + " : " + message + " try SEND");
+        }
 
         //SEND MESSAGE
         synchronized (this.out) {
@@ -713,8 +716,12 @@ public class Peer extends Thread {
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
             if (this.messages.containsKey(thisRequestKey)) {
-                LOGGER.debug(message + ".remove thisRequestKey POLL");
+                LOGGER.debug(message + ".remove thisRequestKey POLL and RESPONSE is: "
+                    + (response == null? "NULL" : "GOOD"));
                 this.messages.remove(thisRequestKey);
+            } else {
+                LOGGER.debug(message + "not GIUND thisRequestKey POLL and RESPONSE is: "
+                        + (response == null? "NULL" : "GOOD"));
             }
         } catch (InterruptedException e) {
             //NO MESSAGE RECEIVED WITHIN TIME;
