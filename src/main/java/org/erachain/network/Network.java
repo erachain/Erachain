@@ -322,9 +322,6 @@ public class Network extends Observable implements ConnectionCallback {
         // make NEW PEER and use empty slots
 
         Peer peer = new Peer(this, socket, "connected as new!!! ");
-        LOGGER.info("connected as new!!! " + peer);
-        // при коннекте во вне связь может порваться поэтому тут по runed
-        ///onConnect(peer);
 
         return peer;
 
