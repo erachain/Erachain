@@ -1540,26 +1540,37 @@ public class Controller extends Observable {
                 if (timeCheck > 3) {
                     LOGGER.debug("TRANSACTION_TYPE proccess 1 period: " + timeCheck);
                 }
-                timeCheck = System.currentTimeMillis();
 
                 // ALREADY EXIST
                 byte[] signature = transaction.getSignature();
-                if (this.dcSet.getTransactionMap().contains(signature)
-                        || this.dcSet.getTransactionFinalMapSigns().contains(signature) || this.isStopping) {
-
+                timeCheck = System.currentTimeMillis();
+                if (this.dcSet.getTransactionMap().contains(signature)) {
                     timeCheck = System.currentTimeMillis() - timeCheck;
                     if (timeCheck > 3) {
-                        LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS period: " + timeCheck);
+                        LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
                     }
                     return;
                 }
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 3) {
-                    LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS period: " + timeCheck);
+                    LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
                 }
 
                 timeCheck = System.currentTimeMillis();
+                if (this.dcSet.getTransactionFinalMapSigns().contains(signature) || this.isStopping) {
 
+                    timeCheck = System.currentTimeMillis() - timeCheck;
+                    if (timeCheck > 30) {
+                        LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in FINAL period: " + timeCheck);
+                    }
+                    return;
+                }
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 30) {
+                    LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in FINAL period: " + timeCheck);
+                }
+
+                timeCheck = System.currentTimeMillis();
                 if (this.status == STATUS_OK) {
                     // если мы не в синхронизации - так как мы тогда
                     // не знаем время текущее цепочки и не понимаем можно ли борадкастить дальше трнзакцию
@@ -1581,7 +1592,7 @@ public class Controller extends Observable {
                 this.dcSet.getTransactionMap().add(transaction);
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 20) {
+                if (timeCheck > 3) {
                     LOGGER.debug("TRANSACTION_TYPE proccess ADD period: " + timeCheck);
                 }
 

@@ -409,7 +409,7 @@ public class Peer extends Thread {
                 continue;
             }
 
-            if (true && message.getType() == Message.GET_HWEIGHT_TYPE) {
+            if (false && message.getType() == Message.GET_HWEIGHT_TYPE) {
                 LOGGER.debug(this + " : " + message + " RECEIVED");
             }
 
@@ -454,7 +454,7 @@ public class Peer extends Thread {
                 this.callback.onMessage(message);
 
                 timeStart = System.currentTimeMillis() - timeStart;
-                if (timeStart > 100
+                if (timeStart > 1000
                         || true && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
                     LOGGER.debug(this + " >> " + message + " solved by period: " + timeStart);
                 }
@@ -479,130 +479,53 @@ public class Peer extends Thread {
 
         byte[] bytes = message.toBytes();
 
-        if (true && message.getType() == Message.HWEIGHT_TYPE) {
+        if (false && message.getType() == Message.HWEIGHT_TYPE) {
             LOGGER.debug(message + " try SEND to " + this);
         }
 
         //SEND MESSAGE
+        long checkTime = System.currentTimeMillis();
         synchronized (this.out) {
 
             try {
                 this.out.write(bytes);
                 this.out.flush();
             } catch (java.net.SocketException eSock) {
+                checkTime = System.currentTimeMillis() - checkTime;
+                if (checkTime > bytes.length >> 3) {
+                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
+                }
                 callback.tryDisconnect(this, 0, "try out.write 1 - " + eSock.getMessage());
                 return false;
-
             } catch (IOException e) {
-                if (this.socket.isOutputShutdown()) {
-                    //ERROR
-                    LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType())
-                            + " (**isOutputShutdown**) ERROR: " + e.getMessage());
-
-                    callback.tryDisconnect(this, 0, "try write 2 - " + e.getMessage());
-                    return false;
-                } else {
-                    // INFO
-                    LOGGER.debug("TRACK: " + e.getMessage(), e);
-
-                    try {
-                        int newSendBufferSize = this.socket.getSendBufferSize() << 1;
-                        if (newSendBufferSize > BlockChain.MAX_BLOCK_SIZE_BYTE)
-                            return false;
-
-                        LOGGER.debug("try setSendBufferSize to " + this.address + " "
-                                + newSendBufferSize);
-                        this.socket.setSendBufferSize(newSendBufferSize);
-                        return false;
-                    } catch (IOException eSize) {
-                        LOGGER.debug("try setSendBufferSize to " + this.address + " on " + Message.viewType(message.getType())
-                                + " ERROR: " + eSize.getMessage());
-                        return false;
-                    }
+                checkTime = System.currentTimeMillis() - checkTime;
+                if (checkTime > bytes.length >> 3) {
+                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
+                callback.tryDisconnect(this, 0, "try out.write 2 - " + e.getMessage());
+                return false;
             } catch (Exception e) {
-                //ERROR
-                //LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
-                //callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
+                checkTime = System.currentTimeMillis() - checkTime;
+                if (checkTime > bytes.length >> 3) {
+                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
+                }
                 callback.tryDisconnect(this, 0, "try write 3 - " + e.getMessage());
-
-                //RETURN
                 return false;
             }
 
         }
-
-        // странно - если идет передача блоков в догоняющую ноду в ее буфер
-        // и тут пинговать то она зависает в ожидании надолго и синхронизация удаленной ноды встает на 30-50 секунд
-        // ели урать тут пинги то блоки передаются без останова быстро
-        // ХОТЯ! при передаче неподтвержденных заявок пингт нормально работают - видимо тут влоенный вызов запрещен по synchronized
-        int messageSize = bytes.length;
-        int type = message.getType();
-        if (type == Message.GET_PING_TYPE
-                || type == Message.GET_HWEIGHT_TYPE) {
-            this.sendedBeforePing = 0l;
-        } else {
-            this.sendedBeforePing += bytes.length;
+        checkTime = System.currentTimeMillis() - checkTime;
+        if (checkTime > bytes.length >> 3) {
+            LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
         }
 
-        if (false && type != Message.GET_PING_TYPE
-                && type != Message.GET_HWEIGHT_TYPE
-                && type != Message.HWEIGHT_TYPE
-                && type != Message.GET_BLOCK_TYPE
-                && this.sendedBeforePing > this.maxBeforePing) {
-
-            if (messageSize < this.maxBeforePing) {
-
-                LOGGER.debug("PING >> send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-                        + " bytes:" + this.sendedBeforePing
-                        + " maxBeforePing: " + this.maxBeforePing);
-
-                this.pinger.tryQuickPing();
-                Controller.getInstance().notifyObserveUpdatePeer(this);
-
-                long ping = this.getPing();
-
-                if (ping < 0) {
-                    if (this.maxBeforePing > MAX_BEFORE_PING >> 2) {
-                        this.maxBeforePing >>= 2;
-                    }
-                    LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-                            + " ms: " + ping
-                            + " maxBeforePing >>=2: " + this.maxBeforePing);
-                } else if (ping > 5000) {
-                    if (this.maxBeforePing > MAX_BEFORE_PING >> 2) {
-                        this.maxBeforePing >>= 1;
-                    }
-                    LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-                            + " ms: " + ping
-                            + " maxBeforePing >>=1: " + this.maxBeforePing);
-                } else if (ping < 50) {
-                    if (this.maxBeforePing < MAX_BEFORE_PING << 3) {
-                        this.maxBeforePing <<= 2;
-                    }
-                    LOGGER.debug("PING << send to <<=2" + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-                            + " ms: " + ping
-                            + " maxBeforePing: " + this.maxBeforePing);
-                } else if (ping < 100) {
-                    if (this.maxBeforePing < MAX_BEFORE_PING << 3) {
-                        this.maxBeforePing <<= 1;
-                    }
-                    LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-                            + " ms: " + ping
-                            + " maxBeforePing: <<=1" + this.maxBeforePing);
-                }
-            }
-
-        }
-
-        //RETURN
         return true;
     }
 
-    public /* synchronized */ int getResponseKey()
+    public int getResponseKey()
     {
 
-        if (requestKey > 999999 && this.messages.size() == 0) {
+        if (requestKey > 9999999 && this.messages.size() == 0) {
             // RECIRCLE keyq and MAP
             this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
             this.requestKey = 1;
@@ -622,8 +545,6 @@ public class Peer extends Thread {
 
         message.setId(thisRequestKey);
 
-        LOGGER.debug(this + " : " + message + ".put");
-
         //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
         this.messages.put(thisRequestKey, blockingQueue);
 
@@ -632,7 +553,6 @@ public class Peer extends Thread {
         if (!this.sendMessage(message)) {
             //WHEN FAILED TO SEND MESSAGE
             this.messages.remove(thisRequestKey);
-            LOGGER.debug(this + " : " + message + " ERROR send");
             return null;
         }
 
