@@ -133,10 +133,8 @@ public class Network extends Observable implements ConnectionCallback {
         //CLOSE CONNECTION
         peer.close();
 
-        if (banForMinutes != 0) {
-            //ADD TO BLACKLIST
-            PeerManager.getInstance().addPeer(peer, banForMinutes);
-        }
+        //ADD TO BLACKLIST
+        PeerManager.getInstance().addPeer(peer, banForMinutes);
 
         if (error != null && error.length() > 0) {
             if (banForMinutes != 0) {

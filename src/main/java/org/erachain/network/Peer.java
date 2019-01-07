@@ -208,7 +208,7 @@ public class Peer extends Thread {
     // connect to old reused peer
     public boolean reconnect(Socket socket, String description) {
 
-        //LOGGER.debug("@@@ reconnect(socket) : " + socket.getInetAddress().getHostAddress());
+        LOGGER.debug("@@@ reconnect(socket) : " + socket.getInetAddress().getHostAddress());
 
         try {
 
@@ -251,8 +251,8 @@ public class Peer extends Thread {
 
         } catch (Exception e) {
             //FAILED TO CONNECT NO NEED TO BLACKLIST
-            //LOGGER.info("Failed to connect to : " + address);
-            //LOGGER.error(e.getMessage(), e);
+            LOGGER.debug("Failed to connect to : " + address.getHostAddress());
+            LOGGER.error(e.getMessage(), e);
 
             return false;
         }
@@ -445,8 +445,8 @@ public class Peer extends Thread {
                 // see in network.Network.onMessage(Message)
                 // and then see controller.Controller.onMessage(Message)
 
-                if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
-                    LOGGER.debug(this + " >> " + message + " received as SEND");
+                if (true && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
+                    LOGGER.debug(this + " : " + message + " >> received");
 
                 long timeStart = System.currentTimeMillis();
                 ///LOGGER.debug(this + " : " + message + " receive, go solve");
@@ -456,7 +456,7 @@ public class Peer extends Thread {
                 timeStart = System.currentTimeMillis() - timeStart;
                 if (timeStart > 1000
                         || true && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
-                    LOGGER.debug(this + " >> " + message + " solved by period: " + timeStart);
+                    LOGGER.debug(this + " : " + message + " >> solved by period: " + timeStart);
                 }
 
             }
@@ -515,7 +515,7 @@ public class Peer extends Thread {
 
         }
         checkTime = System.currentTimeMillis() - checkTime;
-        if (checkTime > bytes.length >> 3) {
+        if (checkTime > (bytes.length >> 3) || (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
             LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
         }
 
