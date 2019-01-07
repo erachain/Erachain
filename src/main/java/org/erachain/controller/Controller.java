@@ -1537,7 +1537,7 @@ public class Controller extends Observable {
                 }
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 3) {
+                if (timeCheck > 10) {
                     LOGGER.debug("TRANSACTION_TYPE proccess 1 period: " + timeCheck);
                 }
 
@@ -1546,13 +1546,13 @@ public class Controller extends Observable {
                 timeCheck = System.currentTimeMillis();
                 if (this.dcSet.getTransactionMap().contains(signature)) {
                     timeCheck = System.currentTimeMillis() - timeCheck;
-                    if (timeCheck > 3) {
+                    if (timeCheck > 20) {
                         LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
                     }
                     return;
                 }
                 timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 3) {
+                if (timeCheck > 20) {
                     LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
                 }
 
@@ -1583,7 +1583,7 @@ public class Controller extends Observable {
                 }
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 3) {
+                if (timeCheck > 10) {
                     LOGGER.debug("TRANSACTION_TYPE proccess BROADCAST period: " + timeCheck);
                 }
                 timeCheck = System.currentTimeMillis();
@@ -1592,7 +1592,7 @@ public class Controller extends Observable {
                 this.dcSet.getTransactionMap().add(transaction);
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 3) {
+                if (timeCheck > 30) {
                     LOGGER.debug("TRANSACTION_TYPE proccess ADD period: " + timeCheck);
                 }
 

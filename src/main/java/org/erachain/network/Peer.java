@@ -521,10 +521,6 @@ public class Peer extends Thread {
 
     public synchronized Message getResponse(Message message, long timeSOT) {
 
-        if (this.getPing() < -2) {
-            out = null;
-        }
-
         if (this.requestKey > 999999 && this.messages.size() == 0) {
             // RECIRCLE keyq and MAP
             this.requestKey = 1;
