@@ -55,6 +55,11 @@ public class Pinger extends Thread {
         // TODO make wait SoTome 10 when ping
         Message pingMessage = MessageFactory.getInstance().createGetHWeightMessage();
 
+        if (this.ping >= 0) {
+            // на время пингования поставим сразу -1
+            this.ping = -1;
+        }
+
         //GET RESPONSE
         long start = System.currentTimeMillis();
         Message response = peer.getResponse(pingMessage, timeSOT);
@@ -79,7 +84,7 @@ public class Pinger extends Thread {
             //PING FAILES
             if (true && this.ping < -2) {
 
-                this.peer.ban(1, "on PING FAILES");
+                this.peer.ban(3, "on PING FAILES");
                 return false;
             }
 
