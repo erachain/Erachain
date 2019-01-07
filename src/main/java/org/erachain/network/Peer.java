@@ -86,9 +86,6 @@ public class Peer extends Thread {
             //ENABLE KEEPALIVE
             this.socket.setKeepAlive(true);
 
-            //TIMEOUT
-            this.socket.setSoTimeout(0); //Settings.getInstance().getConnectionTimeout());
-
             this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
@@ -362,7 +359,7 @@ public class Peer extends Thread {
 
             // MORE EFFECTIVE
             // в этом случае просто ожидаем прилета байтов в течении заданного времени ожидания
-            // java.net.Socket.setSoTimeout
+            // java.net.Socket.setSoTimeout(0)
             // после чего ловим событие SocketTimeoutException т поаторяем ожидание
             // это работает без задержек и более эффективно и не ест время процессора
             try {
@@ -522,37 +519,34 @@ public class Peer extends Thread {
         return true;
     }
 
-    public int getResponseKey()
-    {
+    public synchronized Message getResponse(Message message, long timeSOT) {
 
-        if (requestKey > 9999999 && this.messages.size() == 0) {
+        if (this.getPing() < -2) {
+            out = null;
+        }
+
+        if (this.requestKey > 999999 && this.messages.size() == 0) {
             // RECIRCLE keyq and MAP
-            this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
             this.requestKey = 1;
         } else {
             //GENERATE ID
             this.requestKey += 1;
         }
 
-        return this.requestKey;
-    }
-
-    public Message getResponse(Message message, long timeSOT) {
-
-        int thisRequestKey = this.getResponseKey();
-
         BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(1);
 
-        message.setId(thisRequestKey);
+        message.setId(this.requestKey);
 
         //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
-        this.messages.put(thisRequestKey, blockingQueue);
+        this.messages.put(this.requestKey, blockingQueue);
 
-        long startPing = System.currentTimeMillis();
+        long checkTime = System.currentTimeMillis();
 
         if (!this.sendMessage(message)) {
             //WHEN FAILED TO SEND MESSAGE
-            this.messages.remove(thisRequestKey);
+            //blockingQueue = null;
+            LOGGER.debug(this + " >> " + message + " sended ERROR by period: " + (System.currentTimeMillis() - checkTime));
+            this.messages.remove(this.requestKey);
             return null;
         }
 
@@ -560,14 +554,15 @@ public class Peer extends Thread {
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
+            return null;
         }
 
         if (response != null && this.getPing() < 0) {
             // SET PING by request period
-            this.setPing((int)(System.currentTimeMillis() - startPing));
+            this.setPing((int)(System.currentTimeMillis() - checkTime));
         }
 
-        this.messages.remove(thisRequestKey);
+        this.messages.remove(this.requestKey);
 
         return response;
     }
