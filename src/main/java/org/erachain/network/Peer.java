@@ -30,8 +30,6 @@ public class Peer extends Thread {
 
     private final static boolean need_wait = false;
     static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getName());
-    // KEEP_ALIVE = false - as web browser - getConnectionTimeout will break connection
-    private static boolean KEEP_ALIVE = true;
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
     // поэтому нужно ожидание дольще делать
     private static int SOCKET_BUFFER_SIZE = BlockChain.HARD_WORK ? 1024 << 11 : 1024 << 9;
@@ -40,6 +38,7 @@ public class Peer extends Thread {
     private InetAddress address;
     private Socket socket;
     private OutputStream out;
+    private DataInputStream in;
     private Pinger pinger;
     private boolean white;
     private long pingCounter;
@@ -59,109 +58,6 @@ public class Peer extends Thread {
         this.setName("Peer: " + this.getAddress().getHostAddress() + " as address");
 
     }
-	
-	/*
-
-	private void init(ConnectionCallback callback, Socket socket) {
-		
-		if (callback != null) {
-			this.callback = callback;
-		}
-		
-		this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
-		this.pingCounter = 0;
-		this.connectionTime = NTP.getTime();
-		this.errors = 0;
-		
-		try
-		{	
-			if (socket == null) {
-				this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
-			} else {
-				this.socket = socket;
-				this.address = socket.getInetAddress();
-			}
-
-			//ENABLE KEEPALIVE
-			this.socket.setKeepAlive(KEEP_ALIVE);
-			
-			//TIMEOUT
-			this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
-			
-			this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
-			this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
-
-			//CREATE STRINGWRITER
-			this.out = socket.getOutputStream();
-		}
-		catch(Exception e)
-		{
-			//FAILED TO CONNECT NO NEED TO BLACKLIST
-			//LOGGER.info("Failed to connect to : " + address);
-			//LOGGER.error(e.getMessage(), e);
-
-		}
-						
-		if (this.pinger == null) {
-
-			//START COMMUNICATON THREAD
-			this.start();
-
-			//START PINGER
-			this.pinger = new Pinger(this);
-
-			// IT is STARTED
-			this.runed = true;
-
-			//ON SOCKET CONNECT
-			this.callback.onConnect(this, true);			
-		} else {
-
-			// IT is STARTED
-			this.runed = true;
-
-			// already started
-			this.callback.onConnect(this, false);
-		}
-
-	}
-	
-	
-	public Peer(ConnectionCallback callback, Socket socket)
-	{
-
-		this.white = false;
-		init(callback, socket);
-
-	}
-	
-
-	// connect and run
-	public void connect(ConnectionCallback callback)
-	{
-		if(Controller.getInstance().isOnStopping()){
-			return;
-		}
-		
-		this.white = true;
-		init(callback, null);
-
-	}
-
-
-	// connect to old reused peer
-	public void reconnect(Socket socket)
-	{
-			
-		if (this.socket!=null) {
-			this.close();
-		}
-
-		this.white = false;
-		init(null, socket);
-
-	}
-*/
 
     /**
      *  при коннекте во вне связь может порваться поэтому надо
@@ -188,22 +84,14 @@ public class Peer extends Thread {
             this.maxBeforePing = MAX_BEFORE_PING;
 
             //ENABLE KEEPALIVE
-            this.socket.setKeepAlive(KEEP_ALIVE);
-
-            //TIMEOUT
-            this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
+            this.socket.setKeepAlive(true);
 
             this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
             //CREATE STRINGWRITER
             this.out = socket.getOutputStream();
-
-            // IT is STARTED
-            this.runed = true;
-
-            //START COMMUNICATON THREAD
-            this.start();
+            this.in = new DataInputStream(socket.getInputStream());
 
             //START PINGER
             if (this.pinger == null)
@@ -216,7 +104,14 @@ public class Peer extends Thread {
             this.setName("Peer: " + this.address.getHostAddress() + " as socket"
                     + (this.isWhite()?" is White" : ""));
 
+            // IT is STARTED
+            this.runed = true;
+
+            //START COMMUNICATON THREAD
+            this.start();
+
             LOGGER.info(description + address.getHostAddress());
+
             // при коннекте во вне связь может порваться поэтому тут по runed
             callback.onConnect(this);
 
@@ -238,9 +133,6 @@ public class Peer extends Thread {
             return false;
         }
 
-        // GOOD WORK
-        //LOGGER.debug("@@@ connect(ConnectionCallback callback) : " + address.getHostAddress());
-
         this.callback = callback;
         this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
         this.white = true;
@@ -257,17 +149,14 @@ public class Peer extends Thread {
             if (this.socket != null) {
                 this.socket.close();
                 this.out.close();
+                this.in.close();
             }
 
             this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
 
             //ENABLE KEEPALIVE
             step++;
-            this.socket.setKeepAlive(KEEP_ALIVE);
-
-            //TIMEOUT
-            step++;
-            this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
+            this.socket.setKeepAlive(true);
 
             this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
@@ -275,8 +164,7 @@ public class Peer extends Thread {
             //CREATE STRINGWRITER
             step++;
             this.out = socket.getOutputStream();
-
-            //LOGGER.debug("@@@ connect(callback) : " + address.getHostAddress());
+            this.in = new DataInputStream(socket.getInputStream());
 
         } catch (Exception e) {
             //FAILED TO CONNECT NO NEED TO BLACKLIST
@@ -317,7 +205,7 @@ public class Peer extends Thread {
     // connect to old reused peer
     public boolean reconnect(Socket socket, String description) {
 
-        //LOGGER.debug("@@@ reconnect(socket) : " + socket.getInetAddress().getHostAddress());
+        LOGGER.debug("@@@ reconnect(socket) : " + socket.getInetAddress().getHostAddress());
 
         try {
 
@@ -336,16 +224,14 @@ public class Peer extends Thread {
             this.maxBeforePing = MAX_BEFORE_PING;
 
             //ENABLE KEEPALIVE
-            this.socket.setKeepAlive(KEEP_ALIVE);
+            this.socket.setKeepAlive(true);
 
             this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
-            //TIMEOUT
-            this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
-
             //CREATE STRINGWRITER
             this.out = socket.getOutputStream();
+            this.in = new DataInputStream(socket.getInputStream());
 
             this.pinger.setPing(Integer.MAX_VALUE);
             this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.address.getHostAddress());
@@ -362,8 +248,8 @@ public class Peer extends Thread {
 
         } catch (Exception e) {
             //FAILED TO CONNECT NO NEED TO BLACKLIST
-            //LOGGER.info("Failed to connect to : " + address);
-            //LOGGER.error(e.getMessage(), e);
+            LOGGER.debug("Failed to connect to : " + address.getHostAddress());
+            LOGGER.error(e.getMessage(), e);
 
             return false;
         }
@@ -400,18 +286,6 @@ public class Peer extends Thread {
 
     public void setNeedPing() {
         this.pinger.setNeedPing();
-    }
-
-    public void setMessageQueue(Message message) {
-        this.pinger.setMessageQueue(message);
-    }
-
-    public void setMessageWinBlock(Message message) {
-        this.pinger.setMessageWinBlock(message);
-    }
-
-    public void setMessageQueuePing(Message message) {
-        this.pinger.setMessageQueuePing(message);
     }
 
     public void addPingCounter() {
@@ -453,7 +327,6 @@ public class Peer extends Thread {
 
     public void run() {
         byte[] messageMagic = null;
-        DataInputStream in = null;
 
         while (!stoped) {
 
@@ -477,146 +350,113 @@ public class Peer extends Thread {
                 } catch (Exception e) {
                 }
 
-                in = null;
                 continue;
 
-            }
-
-            try {
-                Thread.sleep(1);
-            } catch (Exception e) {
-            }
-
-            // CHECK stream
-            if (in == null) {
-                try {
-                    in = new DataInputStream(socket.getInputStream());
-                } catch (Exception e) {
-                    //LOGGER.error(e.getMessage(), e);
-
-                    //DISCONNECT
-                    callback.tryDisconnect(this, 0, e.getMessage());
-                    continue;
-                }
             }
 
             //READ FIRST 4 BYTES
             messageMagic = new byte[Message.MAGIC_LENGTH];
+
+            // MORE EFFECTIVE
+            // в этом случае просто ожидаем прилета байтов в течении заданного времени ожидания
+            // java.net.Socket.setSoTimeout(0)
+            // после чего ловим событие SocketTimeoutException т поаторяем ожидание
+            // это работает без задержек и более эффективно и не ест время процессора
             try {
-
-                if (true) {
-                    // MORE EFFECTIVE
-                    // в этом случае просто ожидаем прилета байтов в течении заданного времени ожидания
-                    // java.net.Socket.setSoTimeout
-                    // после чего ловим событие SocketTimeoutException т поаторяем ожидание
-                    // это работает без задержек и более эффективно и не ест время процессора
-                    try {
-                        in.readFully(messageMagic);
-                    } catch (java.net.SocketTimeoutException timeOut) {
-                        ///LOGGER.error("readFully - " + timeOut.getMessage(), timeOut);
-                        continue;
-                    } catch (java.net.SocketException err) {
-                        //callback.tryDisconnect(this, 1, " readFully - " + err.getMessage());
-                        callback.tryDisconnect(this, 0, err.getMessage());
-                        continue;
-                    } catch (java.io.IOException err) {
-                        //LOGGER.error("readFully - " + err.getMessage(), err);
-                        //callback.tryDisconnect(this, 1, " readFully - " + err.getMessage());
-                        callback.tryDisconnect(this, 0, err.getMessage());
-                        continue;
-                    }
-                } else {
-                    // BAD VARIAN of reslisation
-                    // этот вариант более плохой - эрет время процессора и задержка на отклик есть
-                    if (in.available() > 0) {
-                        in.readFully(messageMagic);
-                    } else {
-                        try {
-                            Thread.sleep(1);
-                        } catch (Exception e) {
-                        }
-
-                        continue;
-                    }
-                }
-            } catch (java.io.EOFException e) {
-                // DISCONNECT and BAN
-                //this.pinger.tryPing();
-                callback.tryDisconnect(this, 0, "readFully EOFException - " + e.getMessage());
+                in.readFully(messageMagic);
+            } catch (java.net.SocketException e) {
+                callback.tryDisconnect(this, 0, e.getMessage());
+                continue;
+            } catch (java.io.IOException e) {
+                callback.tryDisconnect(this, 0, e.getMessage());
                 continue;
             } catch (Exception e) {
-                //LOGGER.error("readFully - " + e.getMessage(), e);
-
-                // DISCONNECT and BAN
-                ////this.pinger.tryPing();
-                //callback.tryDisconnect(this, 0, "readFully wrong - " + e.getMessage());
+                callback.tryDisconnect(this, 0, e.getMessage());
                 continue;
             }
 
-            if (Arrays.equals(messageMagic, Controller.getInstance().getMessageMagic())) {
-                //PROCESS NEW MESSAGE
-                Message message;
-                try {
-                    message = MessageFactory.getInstance().parse(this, in);
-                } catch (java.net.SocketTimeoutException timeOut) {
-                    //LOGGER.debug("parse SocketTimeoutException timeOut:: " + timeOut);
+            if (!Arrays.equals(messageMagic, Controller.getInstance().getMessageMagic())) {
+                //ERROR and BAN
+                callback.tryDisconnect(this, 3600, "parse - received message with wrong magic");
+                continue;
+            }
 
-                    //this.pinger.tryPing();
-                    continue;
-                } catch (java.io.EOFException e) {
-                    // DISCONNECT and BAN
-                    //this.pinger.tryPing();
-                    callback.tryDisconnect(this, 0, "parse EOFException - " + e.getMessage());
-                    continue;
+            //PROCESS NEW MESSAGE
+            Message message;
+            try {
+                message = MessageFactory.getInstance().parse(this, in);
+            } catch (java.io.EOFException e) {
+                // DISCONNECT and BAN
+                //this.pinger.tryPing();
+                callback.tryDisconnect(this, 0, "parse EOFException - " + e.getMessage());
+                continue;
 
-                } catch (Exception e) {
-                    //LOGGER.error(e.getMessage(), e);
-                    //if (this.socket.isClosed())
+            } catch (Exception e) {
+                //LOGGER.error(e.getMessage(), e);
+                //if (this.socket.isClosed())
 
-                    //DISCONNECT and BAN
-                    callback.tryDisconnect(this, 6, "parse message wrong - " + e.getMessage());
-                    continue;
-                }
+                //DISCONNECT and BAN
+                callback.tryDisconnect(this, 6, "parse message wrong - " + e.getMessage());
+                continue;
+            }
 
-                if (false)
-                    LOGGER.info(this.getAddress().getHostAddress() + " ->> "
-                            + (message == null? "message: null" : "message: " + message.toString()));
+            if (message == null) {
+                // unknowm message
+                LOGGER.debug(this + " : NULL message!!!");
+                continue;
+            }
 
-                if (message == null) {
-                    // unknowm message
-                    continue;
-                }
-                //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
-                if (!message.isRequest()
-                        && message.hasId()
-                        && this.messages.containsKey(message.getId())) {
+            if (false && message.getType() == Message.GET_HWEIGHT_TYPE) {
+                LOGGER.debug(this + " : " + message + " RECEIVED");
+            }
+
+            //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
+            if (!message.isRequest() && message.hasId()) {
+                // это ответ на наш запрос с ID
+
+                if (false && message.getType() == Message.HWEIGHT_TYPE)
+                    LOGGER.debug(this + " >> " + message + " receive as RESPONSE for me & add to messages Queue");
+
+                if (this.messages.containsKey(message.getId())) {
                     //ADD TO OUR OWN LIST
-                    if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
-                        LOGGER.debug(" response add ");
 
                     try {
+
                         this.messages.get(message.getId()).add(message);
+
+                        ////LOGGER.debug(this + " : " + message + "  == my RESPONSE added!!!");
+
                     } catch (java.lang.IllegalStateException e) {
                         LOGGER.debug("received message " + message.viewType() + " from " + this.address.toString());
                         LOGGER.debug("isRequest " + message.isRequest() + " hasId " + message.hasId());
                         LOGGER.debug(" Id " + message.getId() + " containsKey: " + this.messages.containsKey(message.getId()));
                         LOGGER.error(e.getMessage(), e);
                     }
-                } else {
-                    //CALLBACK
-                    // see in network.Network.onMessage(Message)
-                    // and then see controller.Controller.onMessage(Message)
-                    if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
-                        LOGGER.debug(" onMess solve ");
-
-                    this.callback.onMessage(message);
+                } else if (false) {
+                    // ответ прилетел поздно и он уже просроченный и не нужно его обрабатывать вообще
+                    LOGGER.debug(this + " >> " + message + "  == my ENDED RESPONSE arrived...");
                 }
+
             } else {
-                //ERROR and BAN
-                callback.tryDisconnect(this, 3600, "parse - received message with wrong magic");
-                continue;
+                //CALLBACK
+                // see in network.Network.onMessage(Message)
+                // and then see controller.Controller.onMessage(Message)
+
+                if (true && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
+                    LOGGER.debug(this + " : " + message + " >> received");
+
+                long timeStart = System.currentTimeMillis();
+                ///LOGGER.debug(this + " : " + message + " receive, go solve");
+
+                this.callback.onMessage(message);
+
+                timeStart = System.currentTimeMillis() - timeStart;
+                if (timeStart > 1000
+                        || true && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
+                    LOGGER.debug(this + " : " + message + " >> solved by period: " + timeStart);
+                }
+
             }
-            messageMagic = null;
         }
     }
 
@@ -636,178 +476,89 @@ public class Peer extends Thread {
 
         byte[] bytes = message.toBytes();
 
+        if (false && message.getType() == Message.HWEIGHT_TYPE) {
+            LOGGER.debug(message + " try SEND to " + this);
+        }
 
         //SEND MESSAGE
+        long checkTime = System.currentTimeMillis();
         synchronized (this.out) {
 
             try {
                 this.out.write(bytes);
                 this.out.flush();
             } catch (java.net.SocketException eSock) {
-                callback.tryDisconnect(this, 0, "try write 1 - " + eSock.getMessage());
+                checkTime = System.currentTimeMillis() - checkTime;
+                if (checkTime > bytes.length >> 3) {
+                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
+                }
+                callback.tryDisconnect(this, 0, "try out.write 1 - " + eSock.getMessage());
                 return false;
-
             } catch (IOException e) {
-                if (this.socket.isOutputShutdown()) {
-                    //ERROR
-                    LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType())
-                            + " (**isOutputShutdown**) ERROR: " + e.getMessage());
-                    //callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
-                    /////callback.tryDisconnect(this, 0, "try write 1");
-
-                    //RETURN
-                    return false;
-                } else {
-                    // INFO
-                    LOGGER.debug("TRACK: " + e.getMessage(), e);
-
-                    try {
-                        int newSendBufferSize = this.socket.getSendBufferSize() << 1;
-                        if (newSendBufferSize > BlockChain.MAX_BLOCK_SIZE_BYTE)
-                            return false;
-
-                        LOGGER.debug("try setSendBufferSize to " + this.address + " "
-                                + newSendBufferSize);
-                        this.socket.setSendBufferSize(newSendBufferSize);
-                        return false;
-                    } catch (IOException eSize) {
-                        LOGGER.debug("try setSendBufferSize to " + this.address + " on " + Message.viewType(message.getType())
-                                + " ERROR: " + eSize.getMessage());
-                        return false;
-                    }
+                checkTime = System.currentTimeMillis() - checkTime;
+                if (checkTime > bytes.length >> 3) {
+                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
+                callback.tryDisconnect(this, 0, "try out.write 2 - " + e.getMessage());
+                return false;
             } catch (Exception e) {
-                //ERROR
-                //LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
-                //callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
-                callback.tryDisconnect(this, 0, "try write 2 - " + e.getMessage());
-
-                //RETURN
+                checkTime = System.currentTimeMillis() - checkTime;
+                if (checkTime > bytes.length >> 3) {
+                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
+                }
+                callback.tryDisconnect(this, 0, "try write 3 - " + e.getMessage());
                 return false;
             }
 
         }
-
-        // странно - если идет передача блоков в догоняющую ноду в ее буфер
-        // и тут пинговать то она зависает в ожидании надолго и синхронизация удаленной ноды встает на 30-50 секунд
-        // ели урать тут пинги то блоки передаются без останова быстро
-        // ХОТЯ! при передаче неподтвержденных заявок пингт нормально работают - видимо тут влоенный вызов запрещен по synchronized
-        int messageSize = bytes.length;
-        int type = message.getType();
-        if (type == Message.GET_PING_TYPE
-                || type == Message.GET_HWEIGHT_TYPE) {
-            this.sendedBeforePing = 0l;
-        } else {
-            this.sendedBeforePing += bytes.length;
+        checkTime = System.currentTimeMillis() - checkTime;
+        if (checkTime > (bytes.length >> 3) || (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
+            LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
         }
 
-        if (false && type != Message.GET_PING_TYPE
-                && type != Message.GET_HWEIGHT_TYPE
-                && type != Message.HWEIGHT_TYPE
-                && type != Message.GET_BLOCK_TYPE
-                && this.sendedBeforePing > this.maxBeforePing) {
-
-            if (messageSize < this.maxBeforePing) {
-
-                LOGGER.debug("PING >> send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-                        + " bytes:" + this.sendedBeforePing
-                        + " maxBeforePing: " + this.maxBeforePing);
-
-                this.pinger.tryQuickPing();
-                Controller.getInstance().notifyObserveUpdatePeer(this);
-
-                long ping = this.getPing();
-
-                if (ping < 0) {
-                    if (this.maxBeforePing > MAX_BEFORE_PING >> 2) {
-                        this.maxBeforePing >>= 2;
-                    }
-                    LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-                            + " ms: " + ping
-                            + " maxBeforePing >>=2: " + this.maxBeforePing);
-                } else if (ping > 5000) {
-                    if (this.maxBeforePing > MAX_BEFORE_PING >> 2) {
-                        this.maxBeforePing >>= 1;
-                    }
-                    LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-                            + " ms: " + ping
-                            + " maxBeforePing >>=1: " + this.maxBeforePing);
-                } else if (ping < 50) {
-                    if (this.maxBeforePing < MAX_BEFORE_PING << 3) {
-                        this.maxBeforePing <<= 2;
-                    }
-                    LOGGER.debug("PING << send to <<=2" + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-                            + " ms: " + ping
-                            + " maxBeforePing: " + this.maxBeforePing);
-                } else if (ping < 100) {
-                    if (this.maxBeforePing < MAX_BEFORE_PING << 3) {
-                        this.maxBeforePing <<= 1;
-                    }
-                    LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-                            + " ms: " + ping
-                            + " maxBeforePing: <<=1" + this.maxBeforePing);
-                }
-            }
-
-        }
-
-        //RETURN
         return true;
     }
 
-    public synchronized int getResponseKey()
-    //public int getResponseKey()
-    {
-        //GENERATE ID
-        this.requestKey += 1;
+    public synchronized Message getResponse(Message message, long timeSOT) {
 
-        if (this.requestKey < 1 || this.requestKey >= Integer.MAX_VALUE - 1) {
+        if (this.requestKey > 999999 && this.messages.size() == 0) {
+            // RECIRCLE keyq and MAP
             this.requestKey = 1;
-        }
-
-        long counter = 0;
-        while (this.messages.containsKey(this.requestKey)) {
+        } else {
+            //GENERATE ID
             this.requestKey += 1;
-            counter++;
         }
-
-        if (counter > 100000) {
-            LOGGER.error("getResponseKey find counter: " + counter);
-        }
-
-        return this.requestKey;
-    }
-
-    public Message getResponse(Message message, long timeSOT) {
-
-        int thisRequestKey = this.getResponseKey();
 
         BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(1);
 
-        message.setId(thisRequestKey);
+        message.setId(this.requestKey);
 
         //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
-        this.messages.put(thisRequestKey, blockingQueue);
+        this.messages.put(this.requestKey, blockingQueue);
 
-        //WHEN FAILED TO SEND MESSAGE
+        long checkTime = System.currentTimeMillis();
+
         if (!this.sendMessage(message)) {
-            //LOGGER.debug(" messages.remove( " + thisRequestKey + " ) by SEND ERROR" + this.getAddress().getHostAddress());
-            this.messages.remove(thisRequestKey);
+            //WHEN FAILED TO SEND MESSAGE
+            //blockingQueue = null;
+            LOGGER.debug(this + " >> " + message + " sended ERROR by period: " + (System.currentTimeMillis() - checkTime));
+            this.messages.remove(this.requestKey);
             return null;
         }
 
         Message response = null;
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
-            //LOGGER.debug(" messages.remove( " + thisRequestKey + " ) by good RESPONSE " + this.getAddress().getHostAddress()
-            //		 + " " + (response==null?"NULL":response.toString()));
-            this.messages.remove(thisRequestKey);
         } catch (InterruptedException e) {
-            //NO MESSAGE RECEIVED WITHIN TIME;
-            //LOGGER.debug(" messages.remove( " + thisRequestKey + " ) by ERRROR " + this.getAddress().getHostAddress() + e.getMessage());
-            this.messages.remove(thisRequestKey);
-            //LOGGER.error(e.getMessage(), e);
+            return null;
         }
+
+        if (response != null && this.getPing() < 0) {
+            // SET PING by request period
+            this.setPing((int)(System.currentTimeMillis() - checkTime));
+        }
+
+        this.messages.remove(this.requestKey);
 
         return response;
     }
@@ -851,29 +602,11 @@ public class Peer extends Thread {
             return;
         }
 
-        // CLEAR all messages BlockingQueue
-        //this.clearResponse();
-
         runed = false;
 
-        //LOGGER.info("Try close peer : " + address.getHostAddress());
+        LOGGER.info("Try close peer : " + this);
 
         try {
-			/*
-			//STOP PINGER
-			if(this.pinger != null)
-			{
-				//this.pinger.stopPing();
-				
-				synchronized (this.pinger) {
-					try {
-						this.pinger.wait();
-					} catch(Exception e) {
-						
-					}
-				}
-			}
-				*/
 
             //CHECK IS SOCKET EXISTS
             if (socket != null) {
@@ -882,14 +615,15 @@ public class Peer extends Thread {
                     //CLOSE SOCKET
                     this.socket.close();
                     this.out.close();
+                    this.in.close();
 
                 }
                 this.socket = null;
                 this.out = null;
+                this.in = null;
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-
         }
     }
 
@@ -904,7 +638,7 @@ public class Peer extends Thread {
     @Override
     public String toString() {
         return this.address.getHostAddress()
-                + (getPing() < 1000000? " ping: " + this.getPing() + "ms" : "")
+                + (getPing() >= 0? " ping: " + this.getPing() + "ms" : " try" + getPing())
                 + (isWhite()? " [White]" : "");
     }
 }

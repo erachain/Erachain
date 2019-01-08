@@ -89,7 +89,7 @@ import java.util.Timer;
  */
 public class Controller extends Observable {
 
-    private static final String version = "4.11.07a7 beta";
+    private static final String version = "4.11.07b beta";
     private static final String buildTime = "2018-12-04 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -1071,6 +1071,7 @@ public class Controller extends Observable {
         ///////// headers andblocks
         int stepCount = 64; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
         long dTime = this.blockChain.getTimestamp(this.dcSet);
+        boolean pinged = false;
 
         while (iterator.hasNext() && stepCount > 2) {
 
@@ -1115,6 +1116,8 @@ public class Controller extends Observable {
 
             if (counter % stepCount == 0) {
 
+
+                pinged = true;
                 peer.tryQuickPing();
                 this.network.notifyObserveUpdatePeer(peer);
 
@@ -1146,7 +1149,8 @@ public class Controller extends Observable {
 
         }
 
-        //peer.tryQuickPing();
+        if (!pinged) peer.tryQuickPing();
+
         this.network.notifyObserveUpdatePeer(peer);
 
         // LOGGER.info(peer + " sended UNCONFIRMED counter: " +
@@ -1343,244 +1347,290 @@ public class Controller extends Observable {
         if (this.isStopping)
             return;
 
-        //// synchronized (this) {
-        if (true) {
-            switch (message.getType()) {
+        long timeCheck = System.currentTimeMillis();
+
+        switch (message.getType()) {
+
+            /*
+             * case Message.HEIGHT_TYPE:
+             *
+             * HeightMessage heightMessage = (HeightMessage) message;
+             *
+             * // ADD TO LIST synchronized (this.peerHWeight) {
+             * this.peerHWeight.put(heightMessage.getSender(),
+             * heightMessage.getHeight()); }
+             *
+             * break;
+             */
+
+            case Message.HWEIGHT_TYPE:
+
+                HWeightMessage hWeightMessage = (HWeightMessage) message;
+
+                // TEST TIMESTAMP of PEER
+                Tuple2<Integer, Long> hW = hWeightMessage.getHWeight();
+                if (this.getBlockChain().getTimestamp(hW.a) - 2 * BlockChain.GENERATING_MIN_BLOCK_TIME_MS > NTP
+                        .getTime()) {
+                    // IT PEER from FUTURE
+                    this.banPeerOnError(hWeightMessage.getSender(), "peer from FUTURE");
+                    return;
+                }
+
+                // ADD TO LIST
+                synchronized (this.peerHWeight) {
+                    this.peerHWeight.put(hWeightMessage.getSender(), hWeightMessage.getHWeight());
+                }
+
+                // this.checkStatusAndObserve(0);
+
+                break;
+
+            case Message.GET_SIGNATURES_TYPE:
+
+                GetSignaturesMessage getHeadersMessage = (GetSignaturesMessage) message;
+
+                // ASK SIGNATURES FROM BLOCKCHAIN
+                long time1 = System.currentTimeMillis();
+                List<byte[]> headers = getNextHeaders(getHeadersMessage.getParent());
+                LOGGER.debug(message.getSender().getAddress() + " getNextHeaders time: "
+                        + (System.currentTimeMillis() - time1) + " for headers: " + headers.size()
+                        + " from Height: " + (headers.isEmpty() ? "-1"
+                        : this.dcSet.getBlockSignsMap().get(headers.get(0)) == null ? "CHECK"
+                        : this.dcSet.getBlockSignsMap().get(headers.get(0))));
 
                 /*
-                 * case Message.HEIGHT_TYPE:
+                 * LOGGER.error(message.getId() +
+                 * " controller.Controller.onMessage(Message).GET_SIGNATURES_TYPE ->"
+                 * + Base58.encode(getHeadersMessage.getParent()));
                  *
-                 * HeightMessage heightMessage = (HeightMessage) message;
-                 *
-                 * // ADD TO LIST synchronized (this.peerHWeight) {
-                 * this.peerHWeight.put(heightMessage.getSender(),
-                 * heightMessage.getHeight()); }
-                 *
-                 * break;
+                 * if (!headers.isEmpty()) {
+                 * LOGGER.error("this.blockChain.getSignatures.get(0) -> " +
+                 * Base58.encode( headers.get(0) )); LOGGER.
+                 * error("this.blockChain.getSignatures.get(headers.size()-1) -> "
+                 * + Base58.encode( headers.get(headers.size()-1) )); } else
+                 * { LOGGER.
+                 * error("controller.Controller.onMessage(Message).GET_SIGNATURES_TYPE -> NOT FOUND!"
+                 * ); }
                  */
 
-                case Message.HWEIGHT_TYPE:
+                // CREATE RESPONSE WITH SAME ID
+                response = MessageFactory.getInstance().createHeadersMessage(headers);
+                response.setId(message.getId());
 
-                    HWeightMessage hWeightMessage = (HWeightMessage) message;
+                // SEND RESPONSE BACK WITH SAME ID
+                message.getSender().sendMessage(response);
 
-                    // TEST TIMESTAMP of PEER
-                    Tuple2<Integer, Long> hW = hWeightMessage.getHWeight();
-                    if (this.getBlockChain().getTimestamp(hW.a) - 2 * BlockChain.GENERATING_MIN_BLOCK_TIME_MS > NTP
-                            .getTime()) {
-                        // IT PEER from FUTURE
-                        this.banPeerOnError(hWeightMessage.getSender(), "peer from FUTURE");
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 10) {
+                    LOGGER.debug(this + " : " + message + " solved by period: " + timeCheck);
+                }
+
+                break;
+
+            case Message.GET_BLOCK_TYPE:
+
+                GetBlockMessage getBlockMessage = (GetBlockMessage) message;
+
+                /*
+                 * LOGGER.
+                 * error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
+                 * + " form PEER: " + getBlockMessage.getSender().toString()
+                 * + " sign: " +
+                 * Base58.encode(getBlockMessage.getSignature()));
+                 */
+
+                // ASK BLOCK FROM BLOCKCHAIN
+                newBlock = this.blockChain.getBlock(dcSet, getBlockMessage.getSignature());
+
+                // CREATE RESPONSE WITH SAME ID
+                response = MessageFactory.getInstance().createBlockMessage(newBlock);
+                response.setId(message.getId());
+
+                // SEND RESPONSE BACK WITH SAME ID
+                message.getSender().sendMessage(response);
+
+                if (newBlock == null) {
+                    String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
+                    banPeerOnError(message.getSender(), mess);
+                }
+
+                break;
+
+            case Message.WIN_BLOCK_TYPE:
+
+                if (this.status != STATUS_OK) {
+                    break;
+                }
+
+                BlockWinMessage blockWinMessage = (BlockWinMessage) message;
+
+                // ASK BLOCK FROM BLOCKCHAIN
+                newBlock = blockWinMessage.getBlock();
+
+                // if already it block in process
+                String key = newBlock.getCreator().getBase58();
+
+                synchronized (this.waitWinBufferProcessed) {
+                    if (!waitWinBufferProcessed.add(key)
+                            || Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getSignature()))
                         return;
-                    }
+                }
 
-                    // ADD TO LIST
-                    synchronized (this.peerHWeight) {
-                        this.peerHWeight.put(hWeightMessage.getSender(), hWeightMessage.getHWeight());
-                    }
+                info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
+                        + newBlock.toString();
+                LOGGER.debug(info);
 
-                    // this.checkStatusAndObserve(0);
-
+                if (this.status == STATUS_SYNCHRONIZING) {
+                    // SET for FUTURE without CHECK
+                    blockChain.clearWaitWinBuffer();
+                    blockChain.setWaitWinBuffer(dcSet, newBlock, blockWinMessage.getSender());
                     break;
+                }
 
-                case Message.GET_SIGNATURES_TYPE:
-
-                    GetSignaturesMessage getHeadersMessage = (GetSignaturesMessage) message;
-
-                    // ASK SIGNATURES FROM BLOCKCHAIN
-                    long time1 = System.currentTimeMillis();
-                    List<byte[]> headers = getNextHeaders(getHeadersMessage.getParent());
-                    LOGGER.debug(message.getSender().getAddress() + " getNextHeaders time: "
-                            + (System.currentTimeMillis() - time1) + " for headers: " + headers.size()
-                            + " from Height: " + (headers.isEmpty() ? "-1"
-                            : this.dcSet.getBlockSignsMap().get(headers.get(0)) == null ? "CHECK"
-                            : this.dcSet.getBlockSignsMap().get(headers.get(0))));
-
-                    /*
-                     * LOGGER.error(message.getId() +
-                     * " controller.Controller.onMessage(Message).GET_SIGNATURES_TYPE ->"
-                     * + Base58.encode(getHeadersMessage.getParent()));
-                     *
-                     * if (!headers.isEmpty()) {
-                     * LOGGER.error("this.blockChain.getSignatures.get(0) -> " +
-                     * Base58.encode( headers.get(0) )); LOGGER.
-                     * error("this.blockChain.getSignatures.get(headers.size()-1) -> "
-                     * + Base58.encode( headers.get(headers.size()-1) )); } else
-                     * { LOGGER.
-                     * error("controller.Controller.onMessage(Message).GET_SIGNATURES_TYPE -> NOT FOUND!"
-                     * ); }
-                     */
-
-                    // CREATE RESPONSE WITH SAME ID
-                    response = MessageFactory.getInstance().createHeadersMessage(headers);
-                    response.setId(message.getId());
-
-                    // SEND RESPONSE BACK WITH SAME ID
-                    message.getSender().sendMessage(response);
-
-                    break;
-
-                case Message.GET_BLOCK_TYPE:
-
-                    GetBlockMessage getBlockMessage = (GetBlockMessage) message;
-
-                    /*
-                     * LOGGER.
-                     * error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
-                     * + " form PEER: " + getBlockMessage.getSender().toString()
-                     * + " sign: " +
-                     * Base58.encode(getBlockMessage.getSignature()));
-                     */
-
-                    // ASK BLOCK FROM BLOCKCHAIN
-                    newBlock = this.blockChain.getBlock(dcSet, getBlockMessage.getSignature());
-
-                    // CREATE RESPONSE WITH SAME ID
-                    response = MessageFactory.getInstance().createBlockMessage(newBlock);
-                    response.setId(message.getId());
-
-                    // SEND RESPONSE BACK WITH SAME ID
-                    message.getSender().sendMessage(response);
-
-                    if (newBlock == null) {
-                        String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
-                        banPeerOnError(message.getSender(), mess);
-                    }
-
-                    break;
-
-                case Message.WIN_BLOCK_TYPE:
-
-                    if (this.status != STATUS_OK) {
-                        break;
-                    }
-
-                    BlockWinMessage blockWinMessage = (BlockWinMessage) message;
-
-                    // ASK BLOCK FROM BLOCKCHAIN
-                    newBlock = blockWinMessage.getBlock();
-
-                    // if already it block in process
-                    String key = newBlock.getCreator().getBase58();
-
-                    synchronized (this.waitWinBufferProcessed) {
-                        if (!waitWinBufferProcessed.add(key)
-                                || Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getSignature()))
-                            return;
-                    }
-
-                    info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
-                            + newBlock.toString();
-                    LOGGER.debug(info);
-
-                    if (this.status == STATUS_SYNCHRONIZING) {
-                        // SET for FUTURE without CHECK
-                        blockChain.clearWaitWinBuffer();
-                        blockChain.setWaitWinBuffer(dcSet, newBlock, blockWinMessage.getSender());
-                        break;
-                    }
-
-                    if (!newBlock.isValidHead(dcSet)) {
-                        info = "Block (" + newBlock.toString() + ") is Invalid";
-                        banPeerOnError(message.getSender(), info);
-                        return;
-                    }
-
-                    if (blockChain.setWaitWinBuffer(dcSet, newBlock, message.getSender())) {
-                        // IF IT WIN
-                        // BROADCAST
-                        List<Peer> excludes = new ArrayList<Peer>();
-                        excludes.add(message.getSender());
-                        this.network.asyncBroadcast(message, excludes, false);
-                    } else {
-                        // SEND my BLOCK
-
-                        // GET till not NULL
-                        Block myWinBlock = blockChain.getWaitWinBuffer();
-                        if (myWinBlock != null) {
-                            // оказывается иногда там НУЛ случается
-                            // надо сначала взять, проскрить и потом слать
-                            Message messageBestWin = MessageFactory.getInstance()
-                                    .createWinBlockMessage(myWinBlock);
-                            message.getSender().sendMessage(messageBestWin);
-                        }
-                    }
+                if (!newBlock.isValidHead(dcSet)) {
+                    info = "Block (" + newBlock.toString() + ") is Invalid";
+                    banPeerOnError(message.getSender(), info);
                     return;
+                }
 
-                case Message.TRANSACTION_TYPE:
+                if (blockChain.setWaitWinBuffer(dcSet, newBlock, message.getSender())) {
+                    // IF IT WIN
+                    // BROADCAST
+                    List<Peer> excludes = new ArrayList<Peer>();
+                    excludes.add(message.getSender());
+                    this.network.asyncBroadcastWinBlock(message, excludes, false);
+                } else {
+                    // SEND my BLOCK
 
-                    TransactionMessage transactionMessage = (TransactionMessage) message;
-
-                    // GET TRANSACTION
-                    Transaction transaction = transactionMessage.getTransaction();
-
-                    // CHECK IF SIGNATURE IS VALID ////// ------- OR GENESIS TRANSACTION
-                    if (transaction.getCreator() == null
-                            || !transaction.isSignatureValid(DCSet.getInstance())) {
-                        // DISHONEST PEER
-                        banPeerOnError(message.getSender(), "invalid transaction signature");
-
-                        return;
+                    // GET till not NULL
+                    Block myWinBlock = blockChain.getWaitWinBuffer();
+                    if (myWinBlock != null) {
+                        // оказывается иногда там НУЛ случается
+                        // надо сначала взять, проскрить и потом слать
+                        Message messageBestWin = MessageFactory.getInstance()
+                                .createWinBlockMessage(myWinBlock);
+                        message.getSender().sendMessage(messageBestWin);
                     }
+                }
+                return;
 
-                    // DEADTIME
-                    if (transaction.getDeadline() < this.blockChain.getTimestamp(this.dcSet)) {
-                        // so OLD transaction
-                        return;
-                    }
+            case Message.TRANSACTION_TYPE:
 
-                    // ALREADY EXIST
-                    byte[] signature = transaction.getSignature();
-                    if (this.dcSet.getTransactionMap().contains(signature)
-                            || this.dcSet.getTransactionFinalMapSigns().contains(signature) || this.isStopping)
-                        return;
+                TransactionMessage transactionMessage = (TransactionMessage) message;
 
-                    // ADD TO UNCONFIRMED TRANSACTIONS
-                    this.dcSet.getTransactionMap().add(transaction);
+                // GET TRANSACTION
+                Transaction transaction = transactionMessage.getTransaction();
 
-                    if (this.status == STATUS_OK) {
-                        // если мы не в синхронизации - так как мы тогда
-                        // не знаем время текущее цепочки и не понимаем можно ли борадкастить дальше трнзакцию
-                        // так как непонятно - протухла она или нет
-
-                        // BROADCAST
-                        List<Peer> excludes = new ArrayList<Peer>();
-                        excludes.add(message.getSender());
-                        this.network.broadcast(message, excludes, false);
-                    }
+                // CHECK IF SIGNATURE IS VALID ////// ------- OR GENESIS TRANSACTION
+                if (transaction.getCreator() == null
+                        || !transaction.isSignatureValid(DCSet.getInstance())) {
+                    // DISHONEST PEER
+                    banPeerOnError(message.getSender(), "invalid transaction signature");
 
                     return;
+                }
 
-                case Message.VERSION_TYPE:
+                // DEADTIME
+                if (transaction.getDeadline() < this.blockChain.getTimestamp(this.dcSet)) {
+                    // so OLD transaction
+                    return;
+                }
 
-                    VersionMessage versionMessage = (VersionMessage) message;
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 10) {
+                    LOGGER.debug("TRANSACTION_TYPE proccess 1 period: " + timeCheck);
+                }
 
-                    // ADD TO LIST
-                    synchronized (this.peersVersions) {
-                        this.peersVersions.put(versionMessage.getSender(), new Pair<String, Long>(
-                                versionMessage.getStrVersion(), versionMessage.getBuildDateTime()));
+                // ALREADY EXIST
+                byte[] signature = transaction.getSignature();
+                timeCheck = System.currentTimeMillis();
+                if (this.dcSet.getTransactionMap().contains(signature)) {
+                    timeCheck = System.currentTimeMillis() - timeCheck;
+                    if (timeCheck > 20) {
+                        LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
                     }
+                    return;
+                }
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 20) {
+                    LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
+                }
 
-                    break;
+                timeCheck = System.currentTimeMillis();
+                if (this.dcSet.getTransactionFinalMapSigns().contains(signature) || this.isStopping) {
 
-                default:
-
-                    Tuple2<Integer, Long> HWeight = Controller.getInstance().getBlockChain().getHWeightFull(dcSet);
-                    if (HWeight == null)
-                        HWeight = new Tuple2<Integer, Long>(-1, -1L);
-
-                    // TODO - for OLD versions
-                    // CREATE PING
-                    response = MessageFactory.getInstance().createHWeightMessage(HWeight);
-                    // CREATE RESPONSE WITH SAME ID
-                    response.setId(message.getId());
-
-                    // SEND BACK TO SENDER
-                    boolean result11 = message.getSender().sendMessage(response);
-                    if (!result11) {
-                        LOGGER.debug("error on response GET_HWEIGHT_TYPE to " + message.getSender().getAddress());
+                    timeCheck = System.currentTimeMillis() - timeCheck;
+                    if (timeCheck > 30) {
+                        LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in FINAL period: " + timeCheck);
                     }
+                    return;
+                }
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 30) {
+                    LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in FINAL period: " + timeCheck);
+                }
 
-            }
+                timeCheck = System.currentTimeMillis();
+                if (this.status == STATUS_OK) {
+                    // если мы не в синхронизации - так как мы тогда
+                    // не знаем время текущее цепочки и не понимаем можно ли борадкастить дальше трнзакцию
+                    // так как непонятно - протухла она или нет
+
+                    // BROADCAST
+                    List<Peer> excludes = new ArrayList<Peer>();
+                    excludes.add(message.getSender());
+                    this.network.broadcast(message, excludes, false);
+                }
+
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 10) {
+                    LOGGER.debug("TRANSACTION_TYPE proccess BROADCAST period: " + timeCheck);
+                }
+                timeCheck = System.currentTimeMillis();
+
+                // ADD TO UNCONFIRMED TRANSACTIONS
+                this.dcSet.getTransactionMap().add(transaction);
+
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 30) {
+                    LOGGER.debug("TRANSACTION_TYPE proccess ADD period: " + timeCheck);
+                }
+
+                return;
+
+            case Message.VERSION_TYPE:
+
+                VersionMessage versionMessage = (VersionMessage) message;
+
+                // ADD TO LIST
+                synchronized (this.peersVersions) {
+                    this.peersVersions.put(versionMessage.getSender(), new Pair<String, Long>(
+                            versionMessage.getStrVersion(), versionMessage.getBuildDateTime()));
+                }
+
+                break;
+
+            default:
+
+                Tuple2<Integer, Long> HWeight = Controller.getInstance().getBlockChain().getHWeightFull(dcSet);
+                if (HWeight == null)
+                    HWeight = new Tuple2<Integer, Long>(-1, -1L);
+
+                // TODO - for OLD versions
+                // CREATE PING
+                response = MessageFactory.getInstance().createHWeightMessage(HWeight);
+                // CREATE RESPONSE WITH SAME ID
+                response.setId(message.getId());
+
+                // SEND BACK TO SENDER
+                boolean result11 = message.getSender().sendMessage(response);
+                if (!result11) {
+                    LOGGER.debug("error on response GET_HWEIGHT_TYPE to " + message.getSender().getAddress());
+                }
+
+
         }
+
     }
 
     public void banPeerOnError(Peer peer, String mess) {
@@ -1632,7 +1682,7 @@ public class Controller extends Observable {
         Message messageHW = MessageFactory.getInstance().createHWeightMessage(HWeight);
 
         // BROADCAST MESSAGE
-        this.network.asyncBroadcast(messageHW, excludes, false);
+        this.network.broadcast(messageHW, excludes, false);
 
     }
 
@@ -1655,7 +1705,7 @@ public class Controller extends Observable {
         if (!store || !notAdded) {
             // BROADCAST MESSAGE
             List<Peer> excludes = new ArrayList<Peer>();
-            this.network.asyncBroadcast(telegram, excludes, false);
+            this.network.broadcast(telegram, excludes, false);
             // save DB
             Controller.getInstance().wallet.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
         }
@@ -1936,6 +1986,12 @@ public class Controller extends Observable {
         try {
             synchronized (this.peerHWeight) {
                 for (Peer peer : this.peerHWeight.keySet()) {
+                    if (peer.getPing() < 0) {
+                        // не использовать пиры которые не в быстром коннекте
+                        // - так как иначе они заморозят синхронизацию совсем
+                        // да и не понятно как с них данные получать
+                        continue;
+                    }
                     Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
                     if (height < whPeer.a
                             || (useWeight && height == whPeer.a && weight < whPeer.b)) {

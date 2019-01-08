@@ -5,7 +5,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.message.*;
-import org.erachain.settings.Settings;
+import org.erachain.ntp.NTP;
 import org.erachain.utils.ObserverMessage;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -50,6 +50,7 @@ public class Network extends Observable implements ConnectionCallback {
         try {
             ServerSocket socket = new ServerSocket(port);
             socket.close();
+
             return true;
         } catch (Exception e) {
             return false;
@@ -119,9 +120,6 @@ public class Network extends Observable implements ConnectionCallback {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_PEER_TYPE, peer));
 
-        //this.setChanged();
-        //this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
-
         Controller.getInstance().onConnect(peer);
 
     }
@@ -135,10 +133,8 @@ public class Network extends Observable implements ConnectionCallback {
         //CLOSE CONNECTION
         peer.close();
 
-        if (banForMinutes != 0) {
-            //ADD TO BLACKLIST
-            PeerManager.getInstance().addPeer(peer, banForMinutes);
-        }
+        //ADD TO BLACKLIST
+        PeerManager.getInstance().addPeer(peer, banForMinutes);
 
         if (error != null && error.length() > 0) {
             if (banForMinutes != 0) {
@@ -325,7 +321,9 @@ public class Network extends Observable implements ConnectionCallback {
         // ADD new peer
         // make NEW PEER and use empty slots
 
-        return new Peer(this, socket, "connected as new!!! ");
+        Peer peer = new Peer(this, socket, "connected as new!!! ");
+
+        return peer;
 
     }
 
@@ -359,7 +357,7 @@ public class Network extends Observable implements ConnectionCallback {
                 // BROADCAST
                 List<Peer> excludes = new ArrayList<Peer>();
                 excludes.add(message.getSender());
-                this.asyncBroadcast(message, excludes, false);
+                this.broadcast(message, excludes, false);
             }
 
             return;
@@ -383,7 +381,7 @@ public class Network extends Observable implements ConnectionCallback {
            return;
            }
         // Ansver to get transaction
-        if ( message.getType() == Message.TELEGRAM_GET_ANSVER_TYPE){
+        if ( message.getType() == Message.TELEGRAM_GET_ANSWER_TYPE){
            ((TelegramGetAnswerMessage) message).saveToWallet();
             
             return; 
@@ -405,6 +403,7 @@ public class Network extends Observable implements ConnectionCallback {
             }
         }
 
+        long timeCheck = System.currentTimeMillis();
         switch (message.getType()) {
             case Message.GET_HWEIGHT_TYPE:
 
@@ -416,10 +415,21 @@ public class Network extends Observable implements ConnectionCallback {
                 // CREATE RESPONSE WITH SAME ID
                 response.setId(message.getId());
 
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 10) {
+                    LOGGER.debug(this + " : " + message + " solved by period: " + timeCheck);
+                }
+                timeCheck = System.currentTimeMillis();
+
                 //SEND BACK TO SENDER
                 boolean result = message.getSender().sendMessage(response);
                 if (!result) {
                     LOGGER.debug("error on response GET_HWEIGHT_TYPE to " + message.getSender());
+                }
+
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 10) {
+                    LOGGER.debug(this + " : " + message + " sended by period: " + timeCheck);
                 }
 
                 break;
@@ -433,6 +443,12 @@ public class Network extends Observable implements ConnectionCallback {
 
                 //SEND TO SENDER
                 message.getSender().sendMessage(answer);
+
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 10) {
+                    LOGGER.debug(this + " : " + message + " solved by period: " + timeCheck);
+                }
+
                 break;
 
 
@@ -492,70 +508,6 @@ public class Network extends Observable implements ConnectionCallback {
 
         peer = null;
         //LOGGER.debug("Broadcasting PING ALL end");
-    }
-
-    public void asyncBroadcastPing(Message message, List<Peer> exclude) {
-
-        //LOGGER.debug("ASYNC Broadcasting with Ping before " + message.viewType());
-
-        for (int i = 0; i < this.knownPeers.size(); i++) {
-
-            if (!this.run)
-                return;
-
-            Peer peer = this.knownPeers.get(i);
-            if (peer == null || !peer.isUsed()) {
-                continue;
-            }
-
-            //EXCLUDE PEERS
-            if (exclude == null || !exclude.contains(peer)) {
-                if (true || message.getDataLength() > PINGED_MESSAGES_SIZE) {
-                    //LOGGER.debug("PEER rty + Ping " + peer);
-                    peer.setMessageQueuePing(message);
-                } else {
-                    //LOGGER.debug("PEER rty " + peer);
-                    peer.setMessageQueue(message);
-                }
-
-            }
-        }
-
-        //LOGGER.debug("ASYNC Broadcasting with Ping before ENDED " + message.viewType());
-    }
-
-    public void asyncBroadcast(Message message, List<Peer> exclude, boolean onlySynchronized) {
-
-        //LOGGER.debug("ASYNC Broadcasting " + message.viewType());
-        Controller cnt = Controller.getInstance();
-        BlockChain chain = cnt.getBlockChain();
-        Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
-
-        for (int i = 0; i < this.knownPeers.size(); i++) {
-
-            if (!this.run)
-                return;
-
-            Peer peer = this.knownPeers.get(i);
-            if (peer == null || !peer.isUsed()) {
-                continue;
-            }
-
-            if (onlySynchronized) {
-                // USE PEERS than SYNCHRONIZED to ME
-                Tuple2<Integer, Long> peerHWeight = Controller.getInstance().getHWeightOfPeer(peer);
-                if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
-                    continue;
-                }
-            }
-
-            //EXCLUDE PEERS
-            if (exclude == null || !exclude.contains(peer)) {
-                peer.setMessageQueue(message);
-            }
-        }
-
-        //LOGGER.debug("ASYNC Broadcasting end " + message.viewType());
     }
 
     public void broadcast(Message message, List<Peer> exclude, boolean onlySynchronized) {
@@ -619,7 +571,7 @@ public class Network extends Observable implements ConnectionCallback {
 
             //EXCLUDE PEERS
             if (exclude == null || !exclude.contains(peer)) {
-                peer.setMessageWinBlock(message);
+                peer.sendMessage(message);
             }
         }
 

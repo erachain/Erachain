@@ -25,7 +25,7 @@ public class TelegramGetAnswerMessage extends Message {
    
 
     public TelegramGetAnswerMessage(JSONObject json) {
-        super(TELEGRAM_GET_ANSVER_TYPE);
+        super(TELEGRAM_GET_ANSWER_TYPE);
         // get list Telegrams
         telegransList = new ArrayList<Transaction>();
         if(json.containsKey("list")){
@@ -49,7 +49,7 @@ public class TelegramGetAnswerMessage extends Message {
     @SuppressWarnings("unchecked")
     public TelegramGetAnswerMessage(ArrayList<String> account) {
         // TODO Auto-generated constructor stub
-        super(TELEGRAM_GET_ANSVER_TYPE);
+        super(TELEGRAM_GET_ANSWER_TYPE);
      // TODO Auto-generated method stub
         telegransList = new ArrayList<Transaction>();
         

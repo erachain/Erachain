@@ -70,15 +70,20 @@ public class ConnectionAcceptor extends Thread {
                 //		+ " isMy:" + Network.isMyself(connectionSocket.getInetAddress())
                 //		+ " my:" + Network.getMyselfAddress());
 
-                callback.startPeer(connectionSocket);
+                Peer peer = callback.startPeer(connectionSocket);
+                if (!peer.isUsed()) {
+                    // если в процессе
+                    if (!peer.isBanned() || connectionSocket.isClosed())
+                        peer.ban(10, "WROND ACCEPT");
+                }
 
                 //CHECK IF WE HAVE MAX CONNECTIONS CONNECTIONS
                 if (Settings.getInstance().getMaxConnections() <= callback.getActivePeersCounter(false)) {
                     // get only income peers;
                     List<Peer> incomePeers = callback.getIncomedPeers();
                     if (incomePeers != null && !incomePeers.isEmpty()) {
-                        Peer peer = incomePeers.get(random.nextInt((incomePeers.size())));
-                        peer.ban(0, "Clear place for new connection");
+                        Peer peerForBan = incomePeers.get(random.nextInt((incomePeers.size())));
+                        peerForBan.ban(10, "Clear place for new connection");
                     }
                 }
 

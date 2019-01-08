@@ -104,7 +104,7 @@ public class BlockGenerator extends Thread implements Observer {
         if (ctrl.getActivePeersCounter() < (BlockChain.DEVELOP_USE? 3 : 5))
             return;
 
-        LOGGER.debug("try check better WEIGHT peers");
+        //LOGGER.debug("try check better WEIGHT peers");
 
         Peer peer = null;
         Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
@@ -540,6 +540,13 @@ public class BlockGenerator extends Thread implements Observer {
                     return;
                 }
 
+                // GET real HWeight
+                if (System.currentTimeMillis() - timeToPing > (BlockChain.DEVELOP_USE ? 20000 : 60000)) {
+                    // нужно просмотривать пиги для синхронизации так же - если там -ХХ то не будет синхронизации
+                    timeToPing = System.currentTimeMillis();
+                    ctrl.pingAllPeers(false);
+                }
+
                 if (this.orphanto > 0) {
                     status = 9;
                     ctrl.setForgingStatus(ForgingStatus.FORGING_ENABLED);
@@ -587,12 +594,6 @@ public class BlockGenerator extends Thread implements Observer {
                             myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
                         // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
                         checkWeightPeers();
-                    }
-
-                    // GET real HWeight
-                    if (NTP.getTime() - timeToPing > 180000) {
-                        timeToPing = NTP.getTime();
-                        ctrl.pingAllPeers(false);
                     }
 
                 }
@@ -907,7 +908,16 @@ public class BlockGenerator extends Thread implements Observer {
                         && ctrl.getActivePeersCounter() > (BlockChain.DEVELOP_USE? 1 : 3)) {
                     // если случилась патовая ситуация то найдем более сильную цепочку (не по высоте)
                     // если есть сильнее то сделаем откат у себя
-                    LOGGER.debug("try resolve PAT situation");
+                    //LOGGER.debug("try resolve PAT situation");
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                    }
+
+                    if (ctrl.isOnStopping()) {
+                        status = -1;
+                        return;
+                    }
                     checkWeightPeers();
                 }
 

@@ -275,7 +275,7 @@ public class R_SendResource {
 
     private static long test1Delay = 0;
     private static Thread threadTest1;
-    private static List<Account> test1Creators;
+    private static List<PrivateKeyAccount> test1Creators;
 
     @GET
     @Path("test1/{delay}")
@@ -284,7 +284,7 @@ public class R_SendResource {
         if (!BlockChain.DEVELOP_USE)
             return "not DEVELOP";
 
-        APIUtils.askAPICallAllowed(password, "GET test1\n ", request, false);
+        APIUtils.askAPICallAllowed(password, "GET test1\n ", request, true);
 
         this.test1Delay = delay;
 
@@ -295,7 +295,9 @@ public class R_SendResource {
             return out.toJSONString();
         }
 
-        test1Creators = Controller.getInstance().getAccounts();
+        // CACHE private keys
+        test1Creators = Controller.getInstance().getPrivateKeyAccounts();
+
 
         JSONObject out = new JSONObject();
 
@@ -305,10 +307,9 @@ public class R_SendResource {
             return out.toJSONString();
         }
 
-        Random random = new Random();
-
-
         threadTest1 = new Thread(() -> {
+
+            Random random = new Random();
 
             do {
 
@@ -325,20 +326,14 @@ public class R_SendResource {
                     if (Controller.getInstance().isOnStopping())
                         return;
 
-                    Account creator = test1Creators.get(random.nextInt(test1Creators.size()));
+                    PrivateKeyAccount creator = test1Creators.get(random.nextInt(test1Creators.size()));
                     Account recipient;
                     do {
                         recipient = test1Creators.get(random.nextInt(test1Creators.size()));
                     } while (recipient.equals(creator));
 
 
-                    PrivateKeyAccount privKey = Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress());
-                    if (privKey == null) {
-                        this.test1Delay = 0;
-                        LOGGER.info("TEST1: WALLET is locket");
-                        continue;
-                    }
-                    Transaction transaction = Controller.getInstance().r_Send(privKey,
+                    Transaction transaction = Controller.getInstance().r_Send(creator,
                             0, recipient,
                             2l, null, "TEST 1",
                             "TEST TEST TEST".getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
@@ -358,8 +353,11 @@ public class R_SendResource {
                                 || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT)
                             continue;
 
-                        LOGGER.info(OnDealClick.resultMess(result));
-                        this.test1Delay = 0;
+                        // not work in Threads - LOGGER.info("TEST1: " + OnDealClick.resultMess(result));
+                        try {
+                            Thread.sleep(10000);
+                        } catch (InterruptedException e) {
+                        }
                         continue;
                     }
 
@@ -372,7 +370,7 @@ public class R_SendResource {
                         return;
 
                 } catch (Exception e10) {
-                    LOGGER.error(e10.getMessage(), e10);
+                    // not see in Thread - LOGGER.error(e10.getMessage(), e10);
                 }
 
             } while (true);

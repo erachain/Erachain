@@ -732,7 +732,10 @@ public class Wallet extends Observable implements Observer {
 			};
 
 			this.lockTimer.schedule(action, this.secondsToUnlock * 1000);
-		}
+		} else {
+            if (this.lockTimer != null)
+                this.lockTimer.cancel();
+        }
 		return true;
 	}
 
@@ -1201,7 +1204,7 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		if (blockHead.transactionsCount > 0
-                && start - processBlockLogged > (BlockChain.DEVELOP_USE? 1000 : 10000)) {
+                && start - processBlockLogged > (BlockChain.DEVELOP_USE? 30000 : 30000)) {
             long tickets = System.currentTimeMillis() - start;
             processBlockLogged = start;
             LOGGER.debug("WALLET [" + blockHead.heightBlock + "] processing time: " + tickets * 0.001

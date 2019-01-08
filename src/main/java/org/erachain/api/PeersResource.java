@@ -2,9 +2,12 @@ package org.erachain.api;
 // 30/03
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.database.PeerMap.PeerInfo;
 import org.erachain.network.Peer;
 import org.erachain.network.PeerManager;
+import org.erachain.network.message.Message;
+import org.erachain.network.message.MessageFactory;
 import org.erachain.ntp.NTP;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -240,5 +243,26 @@ public class PeersResource {
         Controller.getInstance().getDBSet().getPeerMap().reset();
 
         return "OK";
+    }
+
+    @GET
+    @Path("/testghw/{address}")
+    public String testHW(@PathParam("address") String address) {
+
+        if (!BlockChain.DEVELOP_USE)
+            return "not develop";
+
+        List<Peer> activePeers = Controller.getInstance().getActivePeers();
+
+        for (Peer peer : activePeers) {
+            if (peer.getAddress().getHostAddress().equals(address)) {
+                Message pingMessage = MessageFactory.getInstance().createGetHWeightMessage();
+                pingMessage.setId(999999);
+                peer.sendMessage(pingMessage);
+                return "sended " + pingMessage;
+            }
+        }
+
+        return address + " - peer not active";
     }
 }

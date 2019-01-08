@@ -147,12 +147,12 @@ public class PeerMap extends DBMap<byte[], byte[]> {
 
             int cnt = peers.size();
             // show for mySelp in start only
-            if (cnt > 0 && allFromSettings)
-                LOGGER.info("White peers loaded from database : " + cnt);
+            //if (cnt > 0 && allFromSettings)
+            //    LOGGER.info("White peers loaded from database : " + cnt);
 
             if (allFromSettings) {
                 List<Peer> knownPeers = Settings.getInstance().getKnownPeers();
-                LOGGER.info("Peers loaded from settings and internet: " + knownPeers.size());
+                //LOGGER.info("Peers loaded from settings and internet: " + knownPeers.size());
 
                 int insertIndex = 0;
                 for (Peer knownPeer : knownPeers) {
@@ -235,8 +235,8 @@ public class PeerMap extends DBMap<byte[], byte[]> {
             }
 
             // Show only for mySelf on start
-            if (allFromSettings)
-                LOGGER.info("Peers loaded from database : " + (peers.size() - cnt));
+            //if (allFromSettings)
+                //LOGGER.info("Peers loaded from database : " + (peers.size() - cnt));
 
             //RETURN
             return peers;
