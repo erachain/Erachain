@@ -116,20 +116,33 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 
         lastUpdate = NTP.getTime();
 
-        long unconfTiming = Controller.getInstance().getUnconfigmedProcessTimingAverage();
+        String mess;
         if (counter > 0) {
             this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            setText("<HTML>| <A href = ' '>" + Lang.getInstance().translate("Unconfirmed Records") + ": " + counter
-                    + "</a> "
-                    + (unconfTiming > 0 ? 1000000 / Controller.getInstance().getUnconfigmedProcessTimingAverage() + " utx/sec |"
-                        : " |"));
-            return;
+            mess = "<HTML>| <A href = ' '>" + Lang.getInstance().translate("Unconfirmed Records") + ": " + counter
+                    + "</a>";
+        } else {
+
+            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            mess = "| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0";
         }
 
-        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        setText("| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0 "
-                + (unconfTiming > 0 ? 1000000 / Controller.getInstance().getUnconfigmedProcessTimingAverage() + " utx/sec |"
-                : " |"));
+        long timing = Controller.getInstance().getUnconfigmedMessageTimingAverage();
+        if (timing > 0) {
+            mess += " " + 1000000 / timing + "utx/s";
+        }
+
+        timing = Controller.getInstance().getTransactionMessageTimingAverage();
+        if (timing > 0) {
+            mess += " " + 1000000 / timing + "wtx/s";
+        }
+
+        timing = Controller.getInstance().getTransactionProcessTimingAverage();
+        if (timing > 0) {
+            mess += " " + 1000000 / timing + "ctx/s";
+        }
+
+        setText(mess + " |");
 
     }
 

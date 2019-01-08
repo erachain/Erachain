@@ -89,9 +89,9 @@ import java.util.Timer;
  */
 public class Controller extends Observable {
 
-    private static final String version = "4.11.07b beta";
+    private static final String version = "4.11.07b1 beta";
     private static final String buildTime = "2018-12-04 13:33:33 UTC";
-    private static final boolean LOG_UNCONFIRMED_PROCESS = true;
+    private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.DEVELOP_USE? false : false;
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -160,9 +160,11 @@ public class Controller extends Observable {
     private AboutFrame about_frame;
     private boolean isStopping = false;
     private String info;
-    private long onMessageProcessTiming;
-    private long unconfigmedProcessTimingAverage;
-
+    private long unconfigmedMessageTimingAverage;
+    private long transactionMessageTimingAverage;
+    private long transactionMessageTimingCounter;
+    private long transactionProcessTimingAverage;
+    private long transactionProcessTimingCounter;
 
     public static String getVersion() {
         return version;
@@ -312,8 +314,25 @@ public class Controller extends Observable {
      * Среднее время обработки неподтвержденной транзакции при ее прилете из сети
      * @return
      */
-    public long getUnconfigmedProcessTimingAverage() {
-        return unconfigmedProcessTimingAverage;
+    public long getUnconfigmedMessageTimingAverage() {
+        return unconfigmedMessageTimingAverage;
+    }
+
+    /**
+     * Среднее время обработки транзакции при прилете блока из сети. Блок считается как одна транзакция
+     * @return
+     */
+    public long getTransactionMessageTimingAverage() {
+        return transactionMessageTimingAverage;
+    }
+
+    /**
+     * Среднее время обработки транзакции при валидации и записи блока в базу. Блок считается как одна транзакция
+     *
+     * @return
+     */
+    public long getTransactionProcessTimingAverage() {
+        return transactionProcessTimingAverage;
     }
 
     public void sendMyHWeightToPeer(Peer peer) {
@@ -1474,6 +1493,8 @@ public class Controller extends Observable {
                     break;
                 }
 
+                long onMessageProcessTiming = System.nanoTime();
+
                 BlockWinMessage blockWinMessage = (BlockWinMessage) message;
 
                 // ASK BLOCK FROM BLOCKCHAIN
@@ -1493,10 +1514,15 @@ public class Controller extends Observable {
                 LOGGER.debug(info);
 
                 if (this.status == STATUS_SYNCHRONIZING) {
-                    // SET for FUTURE without CHECK
-                    blockChain.clearWaitWinBuffer();
-                    blockChain.setWaitWinBuffer(dcSet, newBlock, blockWinMessage.getSender());
-                    break;
+                    if (false) {
+                        // SET for FUTURE without CHECK
+                        blockChain.clearWaitWinBuffer();
+                        // тут он невалидный точно
+                        blockChain.setWaitWinBuffer(dcSet, newBlock, blockWinMessage.getSender());
+                        break;
+                    } else
+                        // нет нельзя его в буфер класть так как там нет проверки потом на валидность
+                        return;
                 }
 
                 if (!newBlock.isValidHead(dcSet)) {
@@ -1505,12 +1531,29 @@ public class Controller extends Observable {
                     return;
                 }
 
+                // тут внутри проверка полной валидности
                 if (blockChain.setWaitWinBuffer(dcSet, newBlock, message.getSender())) {
                     // IF IT WIN
                     // BROADCAST
                     List<Peer> excludes = new ArrayList<Peer>();
                     excludes.add(message.getSender());
                     this.network.asyncBroadcastWinBlock(message, excludes, false);
+
+                    onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
+
+                    if (onMessageProcessTiming < 999999999999l) {
+                        // при переполнении может быть минус
+                        // в миеросекундах подсчет делаем
+                        onMessageProcessTiming = onMessageProcessTiming / 1000 / (1 + newBlock.getTransactionCount());
+                        if (transactionMessageTimingCounter < 1 << 3) {
+                            transactionMessageTimingCounter++;
+                            transactionMessageTimingAverage = ((transactionMessageTimingAverage * transactionMessageTimingCounter)
+                                    + onMessageProcessTiming - transactionMessageTimingAverage) / transactionMessageTimingCounter;
+                        } else
+                            transactionMessageTimingAverage = ((transactionMessageTimingAverage << 3)
+                                    + onMessageProcessTiming - transactionMessageTimingAverage) >> 3;
+                    }
+
                 } else {
                     // SEND my BLOCK
 
@@ -1624,12 +1667,13 @@ public class Controller extends Observable {
                     }
                 }
 
-                onMessageProcessTiming = (System.nanoTime() - onMessageProcessTiming) / 1000;
-                if (onMessageProcessTiming < 99999999) {
+                onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
+                if (onMessageProcessTiming < 999999999999l) {
                     // при переполнении может быть минус
                     // в миеросекундах подсчет делаем
-                    unconfigmedProcessTimingAverage = ((unconfigmedProcessTimingAverage << 7)
-                            + onMessageProcessTiming - unconfigmedProcessTimingAverage) >> 7;
+                    onMessageProcessTiming /= 1000;
+                    unconfigmedMessageTimingAverage = ((unconfigmedMessageTimingAverage << 4)
+                            + onMessageProcessTiming - unconfigmedMessageTimingAverage) >> 4;
                 }
 
                 return;
@@ -2567,6 +2611,8 @@ public class Controller extends Observable {
     // FLUSH BLOCK from win Buffer - to MAP and NERWORK
     public boolean flushNewBlockGenerated() throws Exception {
 
+        long processTiming = System.nanoTime();
+
         Block newBlock = this.blockChain.popWaitWinBuffer();
         if (newBlock == null)
             return false;
@@ -2588,7 +2634,23 @@ public class Controller extends Observable {
                 throw new Exception("on stoping");
             } else {
                 LOGGER.error(e.getMessage(), e);
+                return false;
             }
+        }
+
+        processTiming = System.nanoTime() - processTiming;
+
+        if (processTiming < 999999999999l) {
+            // при переполнении может быть минус
+            // в миеросекундах подсчет делаем
+            processTiming = processTiming / 1000 / (1 + newBlock.getTransactionCount());
+            if (transactionProcessTimingCounter < 1 << 3) {
+                transactionProcessTimingCounter++;
+                transactionProcessTimingAverage = ((transactionProcessTimingAverage * transactionProcessTimingCounter)
+                        + processTiming - transactionProcessTimingAverage) / transactionProcessTimingCounter;
+            } else
+                transactionProcessTimingAverage = ((transactionProcessTimingAverage << 3)
+                        + processTiming - transactionProcessTimingAverage) >> 3;
         }
 
         LOGGER.debug("+++ flushNewBlockGenerated OK");

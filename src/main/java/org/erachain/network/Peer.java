@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class Peer extends Thread {
 
     private final static boolean need_wait = false;
+    private final static boolean logPings = false;
     static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getName());
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
     // поэтому нужно ожидание дольще делать
@@ -406,7 +407,7 @@ public class Peer extends Thread {
                 continue;
             }
 
-            if (false && message.getType() == Message.GET_HWEIGHT_TYPE) {
+            if (logPings && message.getType() == Message.GET_HWEIGHT_TYPE) {
                 LOGGER.debug(this + " : " + message + " RECEIVED");
             }
 
@@ -414,7 +415,7 @@ public class Peer extends Thread {
             if (!message.isRequest() && message.hasId()) {
                 // это ответ на наш запрос с ID
 
-                if (false && message.getType() == Message.HWEIGHT_TYPE)
+                if (logPings && message.getType() == Message.HWEIGHT_TYPE)
                     LOGGER.debug(this + " >> " + message + " receive as RESPONSE for me & add to messages Queue");
 
                 if (this.messages.containsKey(message.getId())) {
@@ -442,7 +443,7 @@ public class Peer extends Thread {
                 // see in network.Network.onMessage(Message)
                 // and then see controller.Controller.onMessage(Message)
 
-                if (true && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
+                if (logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
                     LOGGER.debug(this + " : " + message + " >> received");
 
                 long timeStart = System.currentTimeMillis();
@@ -452,7 +453,7 @@ public class Peer extends Thread {
 
                 timeStart = System.currentTimeMillis() - timeStart;
                 if (timeStart > 1000
-                        || true && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
+                        || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
                     LOGGER.debug(this + " : " + message + " >> solved by period: " + timeStart);
                 }
 
@@ -476,7 +477,7 @@ public class Peer extends Thread {
 
         byte[] bytes = message.toBytes();
 
-        if (false && message.getType() == Message.HWEIGHT_TYPE) {
+        if (logPings && message.getType() == Message.HWEIGHT_TYPE) {
             LOGGER.debug(message + " try SEND to " + this);
         }
 
@@ -512,7 +513,8 @@ public class Peer extends Thread {
 
         }
         checkTime = System.currentTimeMillis() - checkTime;
-        if (checkTime > (bytes.length >> 3) || (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
+        if (checkTime > (bytes.length >> 3)
+                || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
             LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
         }
 
