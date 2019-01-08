@@ -116,17 +116,20 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 
         lastUpdate = NTP.getTime();
 
+        long unconfTiming = Controller.getInstance().getUnconfigmedProcessTimingAverage();
         if (counter > 0) {
             this.setCursor(new Cursor(Cursor.HAND_CURSOR));
             setText("<HTML>| <A href = ' '>" + Lang.getInstance().translate("Unconfirmed Records") + ": " + counter
                     + "</a> "
-                    + Controller.getInstance().getUnconfigmedProcessTimingAverage() + " in usec |");
+                    + (unconfTiming > 0 ? 1000000 / Controller.getInstance().getUnconfigmedProcessTimingAverage() + " utx/sec |"
+                        : " |"));
             return;
         }
 
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         setText("| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0 "
-                + Controller.getInstance().getUnconfigmedProcessTimingAverage()  + " in usec |");
+                + (unconfTiming > 0 ? 1000000 / Controller.getInstance().getUnconfigmedProcessTimingAverage() + " utx/sec |"
+                : " |"));
 
     }
 

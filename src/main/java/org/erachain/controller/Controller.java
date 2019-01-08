@@ -1624,12 +1624,12 @@ public class Controller extends Observable {
                     }
                 }
 
-                onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
-                if (onMessageProcessTiming > 0) {
+                onMessageProcessTiming = (System.nanoTime() - onMessageProcessTiming) / 1000;
+                if (onMessageProcessTiming < 99999999) {
                     // при переполнении может быть минус
                     // в миеросекундах подсчет делаем
                     unconfigmedProcessTimingAverage = ((unconfigmedProcessTimingAverage << 7)
-                            + onMessageProcessTiming / 1000 - unconfigmedProcessTimingAverage) >> 7;
+                            + onMessageProcessTiming - unconfigmedProcessTimingAverage) >> 7;
                 }
 
                 return;
