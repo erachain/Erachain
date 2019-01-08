@@ -28,13 +28,13 @@ import java.util.Scanner;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-@SpringBootApplication(exclude = {org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration.class})
+///@SpringBootApplication(exclude = {org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration.class})
 public class Start {
 
-    @Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
-    public DispatcherServlet dispatcherServlet() {
-        return new Logging();
-    }
+    ///@Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
+    ///public DispatcherServlet dispatcherServlet() {
+    //    return new Logging();
+    //}
 
     public static boolean backUP = false;
     private static final Logger LOGGER = LoggerFactory.getLogger(Start.class);
@@ -44,9 +44,9 @@ public class Start {
 
     public static void main(String args[]) throws IOException {
 
-        SpringApplicationBuilder builder = new SpringApplicationBuilder(Start.class);
+        ////SpringApplicationBuilder builder = new SpringApplicationBuilder(Start.class);
 
-        builder.headless(false).run(args);
+        ///builder.headless(false).run(args);
 
         boolean cli = false;
 

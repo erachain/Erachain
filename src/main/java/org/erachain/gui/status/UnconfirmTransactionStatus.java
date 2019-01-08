@@ -1,5 +1,6 @@
 package org.erachain.gui.status;
 
+import org.erachain.controller.Controller;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.gui.*;
@@ -26,7 +27,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
     private int counter;
 
     public UnconfirmTransactionStatus() {
-        super("| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0 |");
+        super("| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0 0/usec");
 
         map = DCSet.getInstance().getTransactionMap();
         map.addObserver(this);
@@ -118,12 +119,14 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
         if (counter > 0) {
             this.setCursor(new Cursor(Cursor.HAND_CURSOR));
             setText("<HTML>| <A href = ' '>" + Lang.getInstance().translate("Unconfirmed Records") + ": " + counter
-                    + "</a> |");
+                    + "</a> "
+                    + Controller.getInstance().getUnconfigmedProcessTimingAverage() + " in usec |");
             return;
         }
 
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        setText("| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0 |");
+        setText("| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0 "
+                + Controller.getInstance().getUnconfigmedProcessTimingAverage()  + " in usec |");
 
     }
 

@@ -91,6 +91,7 @@ public class Controller extends Observable {
 
     private static final String version = "4.11.07b beta";
     private static final String buildTime = "2018-12-04 13:33:33 UTC";
+    private static final boolean LOG_UNCONFIRMED_PROCESS = true;
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -159,6 +160,9 @@ public class Controller extends Observable {
     private AboutFrame about_frame;
     private boolean isStopping = false;
     private String info;
+    private long onMessageProcessTiming;
+    private long unconfigmedProcessTimingAverage;
+
 
     public static String getVersion() {
         return version;
@@ -302,6 +306,14 @@ public class Controller extends Observable {
 
     public int getWalletSyncHeight() {
         return this.wallet.getSyncHeight();
+    }
+
+    /**
+     * Среднее время обработки неподтвержденной транзакции при ее прилете из сети
+     * @return
+     */
+    public long getUnconfigmedProcessTimingAverage() {
+        return unconfigmedProcessTimingAverage;
     }
 
     public void sendMyHWeightToPeer(Peer peer) {
@@ -1516,6 +1528,8 @@ public class Controller extends Observable {
 
             case Message.TRANSACTION_TYPE:
 
+                onMessageProcessTiming = System.nanoTime();
+
                 TransactionMessage transactionMessage = (TransactionMessage) message;
 
                 // GET TRANSACTION
@@ -1536,38 +1550,48 @@ public class Controller extends Observable {
                     return;
                 }
 
-                timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 10) {
-                    LOGGER.debug("TRANSACTION_TYPE proccess 1 period: " + timeCheck);
+                if (LOG_UNCONFIRMED_PROCESS) {
+                    timeCheck = System.currentTimeMillis() - timeCheck;
+                    if (timeCheck > 10) {
+                        LOGGER.debug("TRANSACTION_TYPE proccess 1 period: " + timeCheck);
+                    }
                 }
 
                 // ALREADY EXIST
                 byte[] signature = transaction.getSignature();
                 timeCheck = System.currentTimeMillis();
                 if (this.dcSet.getTransactionMap().contains(signature)) {
+                    if (LOG_UNCONFIRMED_PROCESS) {
+                        timeCheck = System.currentTimeMillis() - timeCheck;
+                        if (timeCheck > 20) {
+                            LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
+                        }
+                    }
+                    return;
+                }
+                if (LOG_UNCONFIRMED_PROCESS) {
                     timeCheck = System.currentTimeMillis() - timeCheck;
                     if (timeCheck > 20) {
                         LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
                     }
-                    return;
-                }
-                timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 20) {
-                    LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
                 }
 
                 timeCheck = System.currentTimeMillis();
                 if (this.dcSet.getTransactionFinalMapSigns().contains(signature) || this.isStopping) {
 
+                    if (LOG_UNCONFIRMED_PROCESS) {
+                        timeCheck = System.currentTimeMillis() - timeCheck;
+                        if (timeCheck > 30) {
+                            LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in FINAL period: " + timeCheck);
+                        }
+                    }
+                    return;
+                }
+                if (LOG_UNCONFIRMED_PROCESS) {
                     timeCheck = System.currentTimeMillis() - timeCheck;
                     if (timeCheck > 30) {
                         LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in FINAL period: " + timeCheck);
                     }
-                    return;
-                }
-                timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 30) {
-                    LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in FINAL period: " + timeCheck);
                 }
 
                 timeCheck = System.currentTimeMillis();
@@ -1582,18 +1606,30 @@ public class Controller extends Observable {
                     this.network.broadcast(message, excludes, false);
                 }
 
-                timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 10) {
-                    LOGGER.debug("TRANSACTION_TYPE proccess BROADCAST period: " + timeCheck);
+                if (LOG_UNCONFIRMED_PROCESS) {
+                    timeCheck = System.currentTimeMillis() - timeCheck;
+                    if (timeCheck > 10) {
+                        LOGGER.debug("TRANSACTION_TYPE proccess BROADCAST period: " + timeCheck);
+                    }
+                    timeCheck = System.currentTimeMillis();
                 }
-                timeCheck = System.currentTimeMillis();
 
                 // ADD TO UNCONFIRMED TRANSACTIONS
                 this.dcSet.getTransactionMap().add(transaction);
 
-                timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 30) {
-                    LOGGER.debug("TRANSACTION_TYPE proccess ADD period: " + timeCheck);
+                if (LOG_UNCONFIRMED_PROCESS) {
+                    timeCheck = System.currentTimeMillis() - timeCheck;
+                    if (timeCheck > 30) {
+                        LOGGER.debug("TRANSACTION_TYPE proccess ADD period: " + timeCheck);
+                    }
+                }
+
+                onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
+                if (onMessageProcessTiming > 0) {
+                    // при переполнении может быть минус
+                    // в миеросекундах подсчет делаем
+                    unconfigmedProcessTimingAverage = ((unconfigmedProcessTimingAverage << 7)
+                            + onMessageProcessTiming / 1000 - unconfigmedProcessTimingAverage) >> 7;
                 }
 
                 return;
