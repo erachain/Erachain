@@ -2,7 +2,7 @@
 set app=erachain-dev
 set xms=512
 set xmx=1024
-set pars=-pass=1
+set pars=-pass=1 -nogui
 
 IF EXIST java (
 	set run=java
