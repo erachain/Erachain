@@ -8,16 +8,12 @@ import org.erachain.gui.Gui;
 import org.erachain.gui.library.Issue_Confirm_Dialog;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.utils.Logging;
 import org.erachain.utils.SysTray;
 import org.erachain.webserver.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.swing.*;
 import java.io.File;
@@ -31,10 +27,10 @@ import java.util.jar.Manifest;
 @SpringBootApplication(exclude = {org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration.class})
 public class Start {
 
-    @Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
-    public DispatcherServlet dispatcherServlet() {
-        return new Logging();
-    }
+    //@Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
+    //public DispatcherServlet dispatcherServlet() {
+    //    return new Logging();
+    //}
 
     public static boolean backUP = false;
     private static final Logger LOGGER = LoggerFactory.getLogger(Start.class);
