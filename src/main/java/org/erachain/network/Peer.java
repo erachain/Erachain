@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
@@ -386,11 +387,18 @@ public class Peer extends Thread {
 
             // MORE EFFECTIVE
             // в этом случае просто ожидаем прилета байтов в течении заданного времени ожидания
-            // java.net.Socket.setSoTimeout(0)
+            // java.net.Socket.setSoTimeout(30000)
             // после чего ловим событие SocketTimeoutException т поаторяем ожидание
             // это работает без задержек и более эффективно и не ест время процессора
             try {
                 in.readFully(messageMagic);
+            } catch (java.net.SocketTimeoutException timeOut) {
+                /// просто дальше ждем - все нормально
+                continue;
+            } catch (EOFException e) {
+                // на там конце произошло отключение - делаем тоже дисконект
+                callback.tryDisconnect(this, 0, "peer is shutdownInput");
+                continue;
             } catch (java.net.SocketException e) {
                 callback.tryDisconnect(this, 0, e.getMessage());
                 continue;
@@ -398,7 +406,8 @@ public class Peer extends Thread {
                 callback.tryDisconnect(this, 0, e.getMessage());
                 continue;
             } catch (Exception e) {
-                callback.tryDisconnect(this, 0, e.getMessage());
+                //DISCONNECT and BAN
+                callback.tryDisconnect(this, 6, e.getMessage());
                 continue;
             }
 
@@ -412,16 +421,17 @@ public class Peer extends Thread {
             Message message;
             try {
                 message = MessageFactory.getInstance().parse(this, in);
-            } catch (java.io.EOFException e) {
-                // DISCONNECT and BAN
-                //this.pinger.tryPing();
-                callback.tryDisconnect(this, 0, "parse EOFException - " + e.getMessage());
+            } catch (java.net.SocketTimeoutException timeOut) {
+                // если сдесь по времени ожидания пришло то значит на том конце что-то не так и пора разрывать соединение
+                if (this.getPing() < -1) {
+                    callback.tryDisconnect(this, 3, "peer in TimeOut");
+                }
                 continue;
-
+            } catch (EOFException e) {
+                // на там конце произошло отключение - делаем тоже дисконект
+                callback.tryDisconnect(this, 0, "peer is shutdownInput");
+                continue;
             } catch (Exception e) {
-                //LOGGER.error(e.getMessage(), e);
-                //if (this.socket.isClosed())
-
                 //DISCONNECT and BAN
                 callback.tryDisconnect(this, 6, "parse message wrong - " + e.getMessage());
                 continue;
