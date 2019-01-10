@@ -5,9 +5,9 @@ import org.erachain.core.BlockChain;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.settings.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -87,6 +87,9 @@ public class Peer extends Thread {
             //ENABLE KEEPALIVE
             this.socket.setKeepAlive(true);
 
+            //TIMEOUT - нужно для разрыва соединения если на том конце не стали нам слать нужные байты
+            this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
+
             this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
@@ -159,6 +162,9 @@ public class Peer extends Thread {
             step++;
             this.socket.setKeepAlive(true);
 
+            //TIMEOUT - нужно для разрыва соединения если на том конце не стали нам слать нужные байты
+            this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
+
             this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
@@ -226,6 +232,9 @@ public class Peer extends Thread {
 
             //ENABLE KEEPALIVE
             this.socket.setKeepAlive(true);
+
+            //TIMEOUT - нужно для разрыва соединения если на том конце не стали нам слать нужные байты
+            this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
 
             this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
@@ -344,15 +353,32 @@ public class Peer extends Thread {
                     || !runed
             ) {
 
-                //this.setName("Peer: " + this.getAddress().getHostAddress() + " broken");
-
                 try {
-                    Thread.sleep(200);
+                    Thread.sleep(1000);
                 } catch (Exception e) {
                 }
 
+                in = null;
                 continue;
 
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (Exception e) {
+            }
+
+            // CHECK stream
+            if (in == null) {
+                try {
+                    in = new DataInputStream(socket.getInputStream());
+                } catch (Exception e) {
+                    //LOGGER.error(e.getMessage(), e);
+
+                    //DISCONNECT
+                    callback.tryDisconnect(this, 0, e.getMessage());
+                    continue;
+                }
             }
 
             //READ FIRST 4 BYTES
@@ -608,25 +634,45 @@ public class Peer extends Thread {
 
         LOGGER.info("Try close peer : " + this);
 
-        try {
-
-            //CHECK IS SOCKET EXISTS
-            if (socket != null) {
-                //CHECK IF SOCKET IS CONNECTED
-                if (socket.isConnected()) {
-                    //CLOSE SOCKET
-                    this.socket.close();
+        if (true) {
+            try {
+                try {
                     this.out.close();
-                    this.in.close();
-
+                } catch (Exception exc) {
                 }
-                this.socket = null;
-                this.out = null;
-                this.in = null;
+                if (this.in != null) {
+                    this.in.close();
+                }
+                if (socket != null) {
+                    //CHECK IF SOCKET IS CONNECTED
+                    if (socket.isConnected()) {
+                        //CLOSE SOCKET
+                        this.socket.shutdownInput();
+                    }
+                }
+
+            } catch (Exception ignored) {
             }
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+        } else {
+            try {
+
+                //CHECK IS SOCKET EXISTS
+                if (socket != null) {
+                    //CHECK IF SOCKET IS CONNECTED
+                    if (socket.isConnected()) {
+                        //CLOSE SOCKET
+                        this.socket.close();
+
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
         }
+
+        this.socket = null;
+        this.out = null;
+        this.in = null;
     }
 
     public void halt() {
