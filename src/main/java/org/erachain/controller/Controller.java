@@ -1149,7 +1149,7 @@ public class Controller extends Observable {
 
 
                 pinged = true;
-                peer.tryQuickPing();
+                peer.tryPing();
                 this.network.notifyObserveUpdatePeer(peer);
 
                 ping = peer.getPing();
@@ -1157,14 +1157,9 @@ public class Controller extends Observable {
 
                     stepCount >>= 1;
 
-                    if (ping < 0) {
-                        stepCount >>= 1;
-                        try {
-                            Thread.sleep(5000);
-                        } catch (Exception e) {
-                        }
-                    } else if (ping > 5000) {
-                        stepCount >>= 1;
+                    try {
+                        Thread.sleep(5000);
+                    } catch (Exception e) {
                     }
 
                     // LOGGER.debug(peer + " stepCount down " +
@@ -1179,8 +1174,6 @@ public class Controller extends Observable {
             }
 
         }
-
-        if (!pinged) peer.tryQuickPing();
 
         this.network.notifyObserveUpdatePeer(peer);
 
@@ -1201,10 +1194,8 @@ public class Controller extends Observable {
                 MessageFactory.getInstance().createFindMyselfMessage(Controller.getInstance().getFoundMyselfID())))
             return;
 
-        try {
-            Thread.sleep(300);
-        } catch (Exception e) {
-        }
+        if (!peer.tryPing())
+            return;
 
         // SEND VERSION MESSAGE
         if (!peer.sendMessage(
@@ -1222,33 +1213,6 @@ public class Controller extends Observable {
             this.network.tryDisconnect(peer, Synchronizer.BAN_BLOCK_TIMES << 2, "wrong GENESIS BLOCK");
             return;
         }
-
-        /*
-         * // SEND GENESIS BLOCK MESSAGE
-         * ////peer.sendMessage(MessageFactory.getInstance().
-         * createGetBlockMessage(genesisBlockSign)); //SEND MESSAGE TO PEER
-         * Message mess =
-         * MessageFactory.getInstance().createGetBlockMessage(genesisBlockSign);
-         * BlockMessage response = (BlockMessage) peer.getResponse(mess);
-         *
-         * //CHECK IF WE GOT RESPONSE if(response == null) { //ERROR //error =
-         * true; return; // WRONG GENESIS BLOCK }
-         *
-         * Block block = response.getBlock(); //CHECK BLOCK SIGNATURE if(block
-         * == null || !(block instanceof GenesisBlock)) { //error = true;
-         * return; // WRONG GENESIS BLOCK }
-         *
-         * // TODO CHECK GENESIS BLOCK on CONNECT Message mess =
-         * MessageFactory.getInstance().createGetHeadersMessage(genesisBlockSign
-         * ); GetSignaturesMessage response = (GetSignaturesMessage)
-         * peer.getResponse(mess);
-         *
-         * //CHECK IF WE GOT RESPONSE if(response == null) { //ERROR //error =
-         * true; return; // WRONG GENESIS BLOCK }
-         *
-         * byte[] header = response.getParent(); if (header == null) { return;
-         * // WRONG GENESIS BLOCK }
-         */
 
         // GET CURRENT WIN BLOCK
         Block winBlock = this.blockChain.getWaitWinBuffer();
@@ -1276,16 +1240,6 @@ public class Controller extends Observable {
         // BROADCAST UNCONFIRMED TRANSACTIONS to PEER
         if (!this.broadcastUnconfirmedToPeer(peer))
             this.network.tryDisconnect(peer, 1, "broken on SEND UNCONFIRMEDs");
-
-        /*
-         * // GET HEIGHT Tuple2<Integer, Long> HWeight =
-         * this.blockChain.getHWeightFull(dcSet); // SEND HEIGHT MESSAGE if
-         * (!peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(
-         * HWeight))) return;
-         *
-         * //peer.setNeedPing(); peer.tryPing(30000);
-         * this.network.notifyObserveUpdatePeer(peer);
-         */
 
     }
 

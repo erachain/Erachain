@@ -318,15 +318,15 @@ public class Peer extends Thread {
         this.pinger.setPing(ping);
     }
 
-    public boolean tryPing(long timer) {
-        return this.pinger.tryPing(timer);
-    }
+    //public boolean tryPing(long timer) {
+    //    return this.pinger.tryPing(timer);
+    //}
     public boolean tryPing() {
         return this.pinger.tryPing();
     }
-    public boolean tryQuickPing() {
-        return this.pinger.tryQuickPing();
-    }
+    //public boolean tryQuickPing() {
+    //    return this.pinger.tryQuickPing();
+    //}
 
     public boolean isPinger() {
         return this.pinger != null;
@@ -557,8 +557,11 @@ public class Peer extends Thread {
         return true;
     }
 
-    public synchronized Message getResponse(Message message, long timeSOT) {
-
+    /**
+     * берем новый уникальный ключ для запросов - с гарантией синхронности
+     * @return
+     */
+    private synchronized int getRequestKey() {
         if (this.requestKey > 999999 && this.messages.size() == 0) {
             // RECIRCLE keyq and MAP
             this.requestKey = 1;
@@ -567,12 +570,20 @@ public class Peer extends Thread {
             this.requestKey += 1;
         }
 
+        return this.requestKey;
+
+    }
+
+    public Message getResponse(Message message, long timeSOT) {
+
         BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(1);
 
-        message.setId(this.requestKey);
+        int localRequestKey = getRequestKey();
+
+        message.setId(localRequestKey);
 
         //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
-        this.messages.put(this.requestKey, blockingQueue);
+        this.messages.put(localRequestKey, blockingQueue);
 
         long checkTime = System.currentTimeMillis();
 
@@ -580,7 +591,7 @@ public class Peer extends Thread {
             //WHEN FAILED TO SEND MESSAGE
             //blockingQueue = null;
             LOGGER.debug(this + " >> " + message + " sended ERROR by period: " + (System.currentTimeMillis() - checkTime));
-            this.messages.remove(this.requestKey);
+            this.messages.remove(localRequestKey);
             return null;
         }
 
@@ -588,7 +599,6 @@ public class Peer extends Thread {
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            return null;
         }
 
         if (response != null && this.getPing() < 0) {
@@ -596,7 +606,7 @@ public class Peer extends Thread {
             this.setPing((int)(System.currentTimeMillis() - checkTime));
         }
 
-        this.messages.remove(this.requestKey);
+        this.messages.remove(localRequestKey);
 
         return response;
     }
@@ -621,7 +631,6 @@ public class Peer extends Thread {
     public boolean isBanned() {
         return Controller.getInstance().getDBSet().getPeerMap().isBanned(address.getAddress());
     }
-
 
     public void ban(int banForMinutes, String mess) {
         this.setName("Peer: " + this.getAddress().getHostAddress()

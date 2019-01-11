@@ -15,8 +15,8 @@ import org.erachain.settings.Settings;
 public class Pinger extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Pinger.class);
-    private static final int DEFAULT_PING_TIMEOUT = 15000;
-    private static final int DEFAULT_QUICK_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 4;
+    private static final int DEFAULT_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1;
+    private static final int DEFAULT_QUICK_PING_TIMEOUT = 1500; // BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 4;
 
     private Peer peer;
     private boolean needPing = false;
@@ -50,9 +50,6 @@ public class Pinger extends Thread {
         peer.addPingCounter();
 
         //CREATE PING
-        //Message pingMessage = MessageFactory.getInstance().createPingMessage();
-        // TODO remove it and set HWeigtn response
-        // TODO make wait SoTome 10 when ping
         Message pingMessage = MessageFactory.getInstance().createGetHWeightMessage();
 
         if (this.ping >= 0) {
@@ -74,23 +71,22 @@ public class Pinger extends Thread {
 
             //UPDATE PING
             if (this.ping < 0) {
-                if (DEFAULT_PING_TIMEOUT <= timeSOT) {
-                    // если пинги не частые были то учтем как попытку
-                    this.ping -= 1;
-                }
+                // учет отказа в секундах
+                this.ping -= timeSOT / 1000;
             } else
                 this.ping = -1;
 
             //PING FAILES
-            if (true && this.ping < -2) {
-
-                this.peer.ban(3, "on PING FAILES");
-                return false;
+            if (this.ping < -100) {
+                // если полный отказ уже больше чем ХХХ секнд то бан
+                this.peer.ban(10, "on PING FAILES");
             }
+
+            return false;
 
         } else {
             //UPDATE PING
-            this.ping = (int) (System.currentTimeMillis() - start);
+            this.ping = (int) (System.currentTimeMillis() - start) + 1;
         }
 
         //LOGGER.info("PING " + this.peer);
@@ -108,28 +104,26 @@ public class Pinger extends Thread {
     }
 
     public boolean tryPing() {
-        return tryPing(DEFAULT_PING_TIMEOUT);
-    }
-    public boolean tryQuickPing() {
         return tryPing(DEFAULT_QUICK_PING_TIMEOUT);
     }
+    //public boolean tryQuickPing() {
+    //    return tryPing(DEFAULT_QUICK_PING_TIMEOUT);
+    //}
 
     public void run() {
 
         Controller cnt = Controller.getInstance();
         BlockChain chain = cnt.getBlockChain();
 
-        int sleepTimeFull = Settings.getInstance().getPingInterval();
-        int sleepTimestep = 500;
-        int sleepsteps = sleepTimeFull / sleepTimestep;
+        //int sleepTimeFull = DEFAULT_PING_TIMEOUT; // Settings.getInstance().getPingInterval();
+        int sleepTimestep = DEFAULT_QUICK_PING_TIMEOUT >> 3;
+        int sleepsteps = DEFAULT_PING_TIMEOUT / sleepTimestep;
         int sleepStepTimeCounter;
         boolean resultSend;
         while (!this.peer.isStoped()) {
 
             if (this.ping < 0) {
-                sleepStepTimeCounter = (DEFAULT_PING_TIMEOUT<<2) / sleepTimestep;
-            } else if (this.ping > DEFAULT_PING_TIMEOUT) {
-                sleepStepTimeCounter = (DEFAULT_PING_TIMEOUT<<2) / sleepTimestep;
+                sleepStepTimeCounter = sleepsteps >> 3;
             } else {
                 sleepStepTimeCounter = sleepsteps;
             }
@@ -146,34 +140,19 @@ public class Pinger extends Thread {
                 if (this.peer.isStoped())
                     return;
 
-                if (!this.peer.isUsed()) {
-
-                    sleepStepTimeCounter = sleepsteps;
-
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        //FAILED TO SLEEP
-                    }
-
-                    if (this.peer.isStoped())
-                        return;
-
-                    continue;
-                }
-
                 if (this.needPing)
-                    sleepStepTimeCounter = 0;
-                else
-                    sleepStepTimeCounter--;
+                    break;
+
+                sleepStepTimeCounter--;
 
             }
 
             if (this.peer.isUsed()) {
                 this.needPing = false;
                 tryPing();
+            } else {
+                this.ping = 999999;
             }
-
         }
     }
 
