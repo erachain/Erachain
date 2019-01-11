@@ -561,15 +561,14 @@ public class Peer extends Thread {
      */
     private synchronized int getRequestKey() {
         //GENERATE ID
-        this.requestKey += 1;
-        return this.requestKey;
+        return this.requestKey++;
     }
 
     public Message getResponse(Message message, long timeSOT) {
 
         BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(1);
 
-        int localRequestKey = getRequestKey();
+        int localRequestKey = this.requestKey++; // а зачем тогда синхрон?? getRequestKey();
 
         message.setId(localRequestKey);
 
