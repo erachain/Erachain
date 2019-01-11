@@ -556,19 +556,13 @@ public class Peer extends Thread {
 
     /**
      * берем новый уникальный ключ для запросов - с гарантией синхронности
+     * по кругу с переполнением гоняться будет - норм
      * @return
      */
     private synchronized int getRequestKey() {
-        if (this.requestKey > 999999 && this.messages.size() == 0) {
-            // RECIRCLE keyq and MAP
-            this.requestKey = 1;
-        } else {
-            //GENERATE ID
-            this.requestKey += 1;
-        }
-
+        //GENERATE ID
+        this.requestKey += 1;
         return this.requestKey;
-
     }
 
     public Message getResponse(Message message, long timeSOT) {
