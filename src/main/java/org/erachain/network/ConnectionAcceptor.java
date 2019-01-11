@@ -5,6 +5,7 @@ import org.erachain.database.PeerMap;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.erachain.settings.Settings;
+import sun.nio.ch.Net;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -19,12 +20,12 @@ import java.util.Random;
 public class ConnectionAcceptor extends Thread {
 
     static Logger LOGGER = LoggerFactory.getLogger(ConnectionAcceptor.class.getName());
-    private ConnectionCallback callback;
+    private Network network;
     private ServerSocket socket;
     private boolean isRun;
 
-    public ConnectionAcceptor(ConnectionCallback callback) {
-        this.callback = callback;
+    public ConnectionAcceptor(Network network) {
+        this.network = network;
         this.setName("ConnectionAcceptor - " + this.getId());
     }
 
@@ -70,7 +71,7 @@ public class ConnectionAcceptor extends Thread {
                 //		+ " isMy:" + Network.isMyself(connectionSocket.getInetAddress())
                 //		+ " my:" + Network.getMyselfAddress());
 
-                Peer peer = callback.startPeer(connectionSocket);
+                Peer peer = network.startPeer(connectionSocket);
                 if (!peer.isUsed()) {
                     // если в процессе
                     if (!peer.isBanned() || connectionSocket.isClosed())
@@ -78,9 +79,9 @@ public class ConnectionAcceptor extends Thread {
                 }
 
                 //CHECK IF WE HAVE MAX CONNECTIONS CONNECTIONS
-                if (Settings.getInstance().getMaxConnections() <= callback.getActivePeersCounter(false)) {
+                if (Settings.getInstance().getMaxConnections() <= network.getActivePeersCounter(false)) {
                     // get only income peers;
-                    List<Peer> incomePeers = callback.getIncomedPeers();
+                    List<Peer> incomePeers = network.getIncomedPeers();
                     if (incomePeers != null && !incomePeers.isEmpty()) {
                         Peer peerForBan = incomePeers.get(random.nextInt((incomePeers.size())));
                         peerForBan.ban(10, "Clear place for new connection");

@@ -36,7 +36,7 @@ public class Peer extends Thread {
     // поэтому нужно ожидание дольще делать
     private static int SOCKET_BUFFER_SIZE = BlockChain.HARD_WORK ? 1024 << 11 : 1024 << 9;
     private static int MAX_BEFORE_PING = SOCKET_BUFFER_SIZE << 1;
-    public ConnectionCallback callback;
+    public Network network;
     private InetAddress address;
     private Socket socket;
     private OutputStream out;
@@ -64,17 +64,17 @@ public class Peer extends Thread {
     /**
      *  при коннекте во вне связь может порваться поэтому надо
      *  сделать проверку песле выхода по isUsed
-     * @param callback
+     * @param network
      * @param socket
      * @param description
      */
 
-    public Peer(ConnectionCallback callback, Socket socket, String description) {
+    public Peer(Network network, Socket socket, String description) {
 
         //LOGGER.debug("@@@ new Peer(ConnectionCallback callback, Socket socket) : " + socket.getInetAddress().getHostAddress());
 
         try {
-            this.callback = callback;
+            this.network = network;
             this.socket = socket;
             this.address = socket.getInetAddress();
             this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
@@ -118,7 +118,7 @@ public class Peer extends Thread {
             LOGGER.info(description + address.getHostAddress());
 
             // при коннекте во вне связь может порваться поэтому тут по runed
-            callback.onConnect(this);
+            network.onConnect(this);
 
         } catch (Exception e) {
             //FAILED TO CONNECT NO NEED TO BLACKLIST
@@ -133,12 +133,12 @@ public class Peer extends Thread {
     }
 
     // connect and run
-    public boolean connect(ConnectionCallback callback, String description) {
+    public boolean connect(Network network, String description) {
         if (Controller.getInstance().isOnStopping()) {
             return false;
         }
 
-        this.callback = callback;
+        this.network = network;
         this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
         this.white = true;
         this.pingCounter = 0;
@@ -204,7 +204,7 @@ public class Peer extends Thread {
         }
 
         LOGGER.info(description + address.getHostAddress());
-        callback.onConnect(this);
+        network.onConnect(this);
 
         // при коннекте во вне связь может порваться поэтому тут по runed
         return this.runed;
@@ -255,7 +255,7 @@ public class Peer extends Thread {
                 + (this.isWhite()?" is White" : ""));
 
             LOGGER.info(description + address.getHostAddress());
-            callback.onConnect(this);
+            network.onConnect(this);
 
         } catch (Exception e) {
             //FAILED TO CONNECT NO NEED TO BLACKLIST
@@ -377,7 +377,7 @@ public class Peer extends Thread {
                     //LOGGER.error(e.getMessage(), e);
 
                     //DISCONNECT
-                    callback.tryDisconnect(this, 0, e.getMessage());
+                    network.tryDisconnect(this, 0, e.getMessage());
                     continue;
                 }
             }
@@ -397,23 +397,23 @@ public class Peer extends Thread {
                 continue;
             } catch (EOFException e) {
                 // на там конце произошло отключение - делаем тоже дисконект
-                callback.tryDisconnect(this, 0, "peer is shutdownInput");
+                network.tryDisconnect(this, 0, "peer is shutdownInput");
                 continue;
             } catch (java.net.SocketException e) {
-                callback.tryDisconnect(this, 0, e.getMessage());
+                network.tryDisconnect(this, 0, e.getMessage());
                 continue;
             } catch (java.io.IOException e) {
-                callback.tryDisconnect(this, 0, e.getMessage());
+                network.tryDisconnect(this, 0, e.getMessage());
                 continue;
             } catch (Exception e) {
                 //DISCONNECT and BAN
-                callback.tryDisconnect(this, 6, e.getMessage());
+                network.tryDisconnect(this, 6, e.getMessage());
                 continue;
             }
 
             if (!Arrays.equals(messageMagic, Controller.getInstance().getMessageMagic())) {
                 //ERROR and BAN
-                callback.tryDisconnect(this, 3600, "parse - received message with wrong magic");
+                network.tryDisconnect(this, 3600, "parse - received message with wrong magic");
                 continue;
             }
 
@@ -424,16 +424,16 @@ public class Peer extends Thread {
             } catch (java.net.SocketTimeoutException timeOut) {
                 // если сдесь по времени ожидания пришло то значит на том конце что-то не так и пора разрывать соединение
                 if (this.getPing() < -1) {
-                    callback.tryDisconnect(this, 3, "peer in TimeOut");
+                    network.tryDisconnect(this, 3, "peer in TimeOut");
                 }
                 continue;
             } catch (EOFException e) {
                 // на там конце произошло отключение - делаем тоже дисконект
-                callback.tryDisconnect(this, 0, "peer is shutdownInput");
+                network.tryDisconnect(this, 0, "peer is shutdownInput");
                 continue;
             } catch (Exception e) {
                 //DISCONNECT and BAN
-                callback.tryDisconnect(this, 6, "parse message wrong - " + e.getMessage());
+                network.tryDisconnect(this, 6, "parse message wrong - " + e.getMessage());
                 continue;
             }
 
@@ -485,7 +485,7 @@ public class Peer extends Thread {
                 long timeStart = System.currentTimeMillis();
                 ///LOGGER.debug(this + " : " + message + " receive, go solve");
 
-                this.callback.onMessage(message);
+                this.network.onMessage(message);
 
                 timeStart = System.currentTimeMillis() - timeStart;
                 if (timeStart > 1000
@@ -506,7 +506,7 @@ public class Peer extends Thread {
 
         if (!this.socket.isConnected()) {
             //ERROR
-            callback.tryDisconnect(this, 0, "SEND - socket not still alive");
+            network.tryDisconnect(this, 0, "SEND - socket not still alive");
 
             return false;
         }
@@ -529,21 +529,21 @@ public class Peer extends Thread {
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                callback.tryDisconnect(this, 0, "try out.write 1 - " + eSock.getMessage());
+                network.tryDisconnect(this, 5, "try out.write 1 - " + eSock.getMessage());
                 return false;
             } catch (IOException e) {
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                callback.tryDisconnect(this, 0, "try out.write 2 - " + e.getMessage());
+                network.tryDisconnect(this, 5, "try out.write 2 - " + e.getMessage());
                 return false;
             } catch (Exception e) {
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                callback.tryDisconnect(this, 0, "try write 3 - " + e.getMessage());
+                network.tryDisconnect(this, 5, "try out.write 3 - " + e.getMessage());
                 return false;
             }
 
@@ -636,7 +636,7 @@ public class Peer extends Thread {
         this.setName("Peer: " + this.getAddress().getHostAddress()
                 + " banned for " + banForMinutes + " " + mess);
 
-        this.callback.tryDisconnect(this, banForMinutes, mess);
+        this.network.tryDisconnect(this, banForMinutes, mess);
     }
 
     public boolean isStoped() {
