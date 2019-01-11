@@ -397,17 +397,17 @@ public class Peer extends Thread {
                 continue;
             } catch (EOFException e) {
                 // на там конце произошло отключение - делаем тоже дисконект
-                network.tryDisconnect(this, 0, "peer is shutdownInput");
+                network.tryDisconnect(this, 0, "read-0 peer is shutdownInput");
                 continue;
             } catch (java.net.SocketException e) {
-                network.tryDisconnect(this, 0, e.getMessage());
+                network.tryDisconnect(this, 1, "read-2 " + e.getMessage());
                 continue;
             } catch (java.io.IOException e) {
-                network.tryDisconnect(this, 0, e.getMessage());
+                network.tryDisconnect(this, 1, "read-3 " + e.getMessage());
                 continue;
             } catch (Exception e) {
                 //DISCONNECT and BAN
-                network.tryDisconnect(this, 6, e.getMessage());
+                network.tryDisconnect(this, 6, "read-4 " + e.getMessage());
                 continue;
             }
 
@@ -424,12 +424,14 @@ public class Peer extends Thread {
             } catch (java.net.SocketTimeoutException timeOut) {
                 // если сдесь по времени ожидания пришло то значит на том конце что-то не так и пора разрывать соединение
                 if (this.getPing() < -1) {
-                    network.tryDisconnect(this, 3, "peer in TimeOut");
+                    network.tryDisconnect(this, 3, "peer in TimeOut and -ping");
+                } else {
+                    network.tryDisconnect(this, 1, "peer in TimeOut");
                 }
                 continue;
             } catch (EOFException e) {
                 // на там конце произошло отключение - делаем тоже дисконект
-                network.tryDisconnect(this, 0, "peer is shutdownInput");
+                network.tryDisconnect(this, 1, "peer is shutdownInput");
                 continue;
             } catch (Exception e) {
                 //DISCONNECT and BAN
@@ -448,30 +450,25 @@ public class Peer extends Thread {
             }
 
             //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
-            if (!message.isRequest() && message.hasId()) {
+            if (!message.isRequest() && message.hasId() && this.messages.containsKey(message.getId())) {
                 // это ответ на наш запрос с ID
 
                 if (logPings && message.getType() == Message.HWEIGHT_TYPE)
                     LOGGER.debug(this + " >> " + message + " receive as RESPONSE for me & add to messages Queue");
 
-                if (this.messages.containsKey(message.getId())) {
-                    //ADD TO OUR OWN LIST
+                //ADD TO OUR OWN LIST
 
-                    try {
+                try {
 
-                        this.messages.get(message.getId()).add(message);
+                    this.messages.get(message.getId()).add(message);
 
-                        ////LOGGER.debug(this + " : " + message + "  == my RESPONSE added!!!");
+                    ////LOGGER.debug(this + " : " + message + "  == my RESPONSE added!!!");
 
-                    } catch (java.lang.IllegalStateException e) {
-                        LOGGER.debug("received message " + message.viewType() + " from " + this.address.toString());
-                        LOGGER.debug("isRequest " + message.isRequest() + " hasId " + message.hasId());
-                        LOGGER.debug(" Id " + message.getId() + " containsKey: " + this.messages.containsKey(message.getId()));
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                } else if (false) {
-                    // ответ прилетел поздно и он уже просроченный и не нужно его обрабатывать вообще
-                    LOGGER.debug(this + " >> " + message + "  == my ENDED RESPONSE arrived...");
+                } catch (java.lang.IllegalStateException e) {
+                    LOGGER.debug("received message " + message.viewType() + " from " + this.address.toString());
+                    LOGGER.debug("isRequest " + message.isRequest() + " hasId " + message.hasId());
+                    LOGGER.debug(" Id " + message.getId() + " containsKey: " + this.messages.containsKey(message.getId()));
+                    LOGGER.error(e.getMessage(), e);
                 }
 
             } else {
