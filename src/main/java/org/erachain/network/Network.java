@@ -20,7 +20,7 @@ import java.util.*;
 /**
  * основной класс модуля Сети
  */
-public class Network extends Observable implements ConnectionCallback {
+public class Network extends Observable {
 
 
     public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK ? 0 : 1;
@@ -81,7 +81,6 @@ public class Network extends Observable implements ConnectionCallback {
         telegramer.start();
     }
 
-    @Override
     public void onConnect(Peer peer) {
 
         //LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer);
@@ -124,7 +123,6 @@ public class Network extends Observable implements ConnectionCallback {
 
     }
 
-    @Override
     public void tryDisconnect(Peer peer, int banForMinutes, String error) {
 
         if (!peer.isUsed())
@@ -156,7 +154,6 @@ public class Network extends Observable implements ConnectionCallback {
         this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
     }
 
-    @Override
     public boolean isKnownAddress(InetAddress address, boolean andUsed) {
 
         try {
@@ -179,14 +176,6 @@ public class Network extends Observable implements ConnectionCallback {
         return false;
     }
 
-	/*@Override
-	public List<Peer> getKnownPeers() {
-		
-		return this.knownPeers;
-	}
-	*/
-
-    @Override
     // IF PEER in exist in NETWORK - get it
     public Peer getKnownPeer(Peer peer) {
 
@@ -208,7 +197,6 @@ public class Network extends Observable implements ConnectionCallback {
         return peer;
     }
 
-    @Override
     public boolean isKnownPeer(Peer peer, boolean andUsed) {
 
         return this.isKnownAddress(peer.getAddress(), andUsed);
@@ -343,7 +331,6 @@ public class Network extends Observable implements ConnectionCallback {
         }
     }
 
-    @Override
     public void onMessage(Message message) {
 
         //CHECK IF WE ARE STILL PROCESSING MESSAGES
