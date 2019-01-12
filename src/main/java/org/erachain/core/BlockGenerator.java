@@ -234,7 +234,7 @@ public class BlockGenerator extends Thread implements Observer {
         long start = System.currentTimeMillis();
 
         //CREATE FORK OF GIVEN DATABASE
-        DCSet newBlockDC = dcSet.fork();
+        DCSet newBlockDC = null;
 
         Block waitWin;
 
@@ -274,7 +274,6 @@ public class BlockGenerator extends Thread implements Observer {
                 //CREATE FORK OF GIVEN DATABASE
                 newBlockDC = dcSet.fork();
             }
-
 
             if (!transaction.isSignatureValid(newBlockDC)) {
                 needRemoveInvalids.add(transaction.getSignature());
