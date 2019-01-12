@@ -403,11 +403,11 @@ public class Peer extends Thread {
                 network.tryDisconnect(this, 1, "read-2 " + e.getMessage());
                 continue;
             } catch (java.io.IOException e) {
-                network.tryDisconnect(this, 1, "read-3 " + e.getMessage());
+                network.tryDisconnect(this, 2, "read-3 " + e.getMessage());
                 continue;
             } catch (Exception e) {
                 //DISCONNECT and BAN
-                network.tryDisconnect(this, 6, "read-4 " + e.getMessage());
+                network.tryDisconnect(this, 3, "read-4 " + e.getMessage());
                 continue;
             }
 
@@ -526,21 +526,21 @@ public class Peer extends Thread {
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                network.tryDisconnect(this, 5, "try out.write 1 - " + eSock.getMessage());
+                network.tryDisconnect(this, 0, "try out.write 1 - " + eSock.getMessage());
                 return false;
             } catch (IOException e) {
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                network.tryDisconnect(this, 5, "try out.write 2 - " + e.getMessage());
+                network.tryDisconnect(this, 1, "try out.write 2 - " + e.getMessage());
                 return false;
             } catch (Exception e) {
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                network.tryDisconnect(this, 5, "try out.write 3 - " + e.getMessage());
+                network.tryDisconnect(this, 2, "try out.write 3 - " + e.getMessage());
                 return false;
             }
 
