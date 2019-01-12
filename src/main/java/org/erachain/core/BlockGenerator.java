@@ -498,6 +498,10 @@ public class BlockGenerator extends Thread implements Observer {
 
         TransactionMap transactionsMap = dcSet.getTransactionMap();
 
+        long processTiming;
+        long transactionMakeTimingCounter = 0;
+        long transactionMakeTimingAverage = 0;
+
         Peer peer = null;
         Tuple3<Integer, Long, Peer> maxPeer;
         SignaturesMessage response;
@@ -772,10 +776,29 @@ public class BlockGenerator extends Thread implements Observer {
 
                                 generatedBlock = null;
                                 try {
+                                    processTiming = System.nanoTime();
                                     generatedBlock = generateNextBlock(acc_winner, solvingBlock,
                                             getUnconfirmedTransactions(height, timePointForGenerate,
                                                     bchain, winned_winValue),
                                             height, winned_forgingValue, winned_winValue, previousTarget);
+
+                                    processTiming = System.nanoTime() - processTiming;
+
+                                    if (processTiming < 999999999999l) {
+                                        // при переполнении может быть минус
+                                        // в миеросекундах подсчет делаем
+                                        processTiming = processTiming / 1000 / (1 + generatedBlock.getTransactionCount());
+                                        if (transactionMakeTimingCounter < 1 << 3) {
+                                            transactionMakeTimingCounter++;
+                                            transactionMakeTimingAverage = ((transactionMakeTimingAverage * transactionMakeTimingCounter)
+                                                    + processTiming - transactionMakeTimingAverage) / transactionMakeTimingCounter;
+                                        } else
+                                            transactionMakeTimingAverage = ((transactionMakeTimingAverage << 3)
+                                                    + processTiming - transactionMakeTimingAverage) >> 3;
+
+                                        ctrl.setTransactionMakeTimingAverage(transactionMakeTimingAverage);
+                                    }
+
                                 } catch (java.lang.OutOfMemoryError e) {
                                     // TRY CATCH OUTofMemory error - heap space
                                     LOGGER.error(e.getMessage(), e);

@@ -163,6 +163,8 @@ public class Controller extends Observable {
     private long unconfigmedMessageTimingAverage;
     private long transactionMessageTimingAverage;
     private long transactionMessageTimingCounter;
+    private long transactionMakeTimingAverage;
+    private long transactionMakeTimingCounter;
     private long transactionProcessTimingAverage;
     private long transactionProcessTimingCounter;
 
@@ -324,6 +326,18 @@ public class Controller extends Observable {
      */
     public long getTransactionMessageTimingAverage() {
         return transactionMessageTimingAverage;
+    }
+
+    /**
+     * Среднее время обработки транзакции при создании нашего блока. Блок считается как одна транзакция
+     *
+     * @return
+     */
+    public long getTransactionMakeTimingAverage() {
+        return transactionMakeTimingAverage;
+    }
+    public void setTransactionMakeTimingAverage(long transactionMakeTimingAverage) {
+        this.transactionMakeTimingAverage = transactionMakeTimingAverage;
     }
 
     /**

@@ -137,6 +137,11 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
             mess += " " + 1000000 / timing + "wtx/s";
         }
 
+        timing = Controller.getInstance().getTransactionMakeTimingAverage();
+        if (timing > 0) {
+            mess += " " + 1000000 / timing + "mtx/s";
+        }
+
         timing = Controller.getInstance().getTransactionProcessTimingAverage();
         if (timing > 0) {
             mess += " " + 1000000 / timing + "ctx/s";
