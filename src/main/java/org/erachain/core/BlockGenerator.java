@@ -268,6 +268,14 @@ public class BlockGenerator extends Thread implements Observer {
 
             if (transaction.getTimestamp() > timestamp)
                 break;
+
+            // делать форк только если есть трнзакции - так как это сильно кушает память
+            if (newBlockDC == null) {
+                //CREATE FORK OF GIVEN DATABASE
+                newBlockDC = dcSet.fork();
+            }
+
+
             if (!transaction.isSignatureValid(newBlockDC)) {
                 needRemoveInvalids.add(transaction.getSignature());
                 continue;
@@ -318,7 +326,8 @@ public class BlockGenerator extends Thread implements Observer {
 
         }
 
-        newBlockDC.close();
+        if (newBlockDC != null )
+            newBlockDC.close();
 
         LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) + "ms for trans: " + counter);
 
@@ -786,10 +795,13 @@ public class BlockGenerator extends Thread implements Observer {
 
                                     processTiming = System.nanoTime() - processTiming;
 
-                                    if (processTiming < 999999999999l) {
+                                    // только если вблоке есть стрнзакции то вычислим
+                                    if (generatedBlock.getTransactionCount() > 0
+                                            && processTiming < 999999999999l) {
                                         // при переполнении может быть минус
                                         // в миеросекундах подсчет делаем
-                                        processTiming = processTiming / 1000 / (1 + generatedBlock.getTransactionCount());
+                                        // ++ 10 потому что там ФОРК базы делаем - он очень медленный
+                                        processTiming = processTiming / 1000 / (10 + generatedBlock.getTransactionCount());
                                         if (transactionMakeTimingCounter < 1 << 3) {
                                             transactionMakeTimingCounter++;
                                             transactionMakeTimingAverage = ((transactionMakeTimingAverage * transactionMakeTimingCounter)

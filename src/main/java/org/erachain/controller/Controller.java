@@ -1514,7 +1514,8 @@ public class Controller extends Observable {
                     if (onMessageProcessTiming < 999999999999l) {
                         // при переполнении может быть минус
                         // в миеросекундах подсчет делаем
-                        onMessageProcessTiming = onMessageProcessTiming / 1000 / (1 + newBlock.getTransactionCount());
+                        // ++ 10 потому что там ФОРК базы делаем - он очень медленный
+                        onMessageProcessTiming = onMessageProcessTiming / 1000 / (10 + newBlock.getTransactionCount());
                         if (transactionMessageTimingCounter < 1 << 3) {
                             transactionMessageTimingCounter++;
                             transactionMessageTimingAverage = ((transactionMessageTimingAverage * transactionMessageTimingCounter)
