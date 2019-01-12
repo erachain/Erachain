@@ -498,6 +498,8 @@ public class BlockGenerator extends Thread implements Observer {
 
         TransactionMap transactionsMap = dcSet.getTransactionMap();
 
+        int heapOverflowCount = 0;
+
         long processTiming;
         long transactionMakeTimingCounter = 0;
         long transactionMakeTimingAverage = 0;
@@ -799,7 +801,10 @@ public class BlockGenerator extends Thread implements Observer {
                                         ctrl.setTransactionMakeTimingAverage(transactionMakeTimingAverage);
                                     }
 
+                                    heapOverflowCount = 0;
+
                                 } catch (java.lang.OutOfMemoryError e) {
+                                    heapOverflowCount++;
                                     // TRY CATCH OUTofMemory error - heap space
                                     LOGGER.error(e.getMessage(), e);
                                 } finally {
@@ -813,6 +818,8 @@ public class BlockGenerator extends Thread implements Observer {
                                         this.status = -1;
                                         return;
                                     }
+                                    if (heapOverflowCount > 1)
+                                        ctrl.stopAll(97);
 
                                     LOGGER.error("generateNextBlock is NULL... try wait");
                                     try {

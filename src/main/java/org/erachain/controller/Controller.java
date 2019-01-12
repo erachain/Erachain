@@ -993,6 +993,8 @@ public class Controller extends Observable {
             return;
         this.isStopping = true;
 
+        deleteObservers();
+
         // STOP MESSAGE PROCESSOR
         LOGGER.info("Stopping message processor");
         this.network.stop();
@@ -1037,7 +1039,6 @@ public class Controller extends Observable {
         this.wallet.close();
 
         // CLOSE LOCAL
-
         LOGGER.info("Closing Local database");
         this.dbSet.close();
 
@@ -1049,6 +1050,7 @@ public class Controller extends Observable {
         // FORCE CLOSE
         LOGGER.info("EXIT parameter:" + par);
         System.exit(par);
+
         // bat
         // if %errorlevel% neq 0 exit /b %errorlevel%
 
