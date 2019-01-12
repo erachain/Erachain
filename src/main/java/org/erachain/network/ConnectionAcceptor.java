@@ -75,7 +75,7 @@ public class ConnectionAcceptor extends Thread {
                 if (!peer.isUsed()) {
                     // если в процессе
                     if (!peer.isBanned() || connectionSocket.isClosed())
-                        peer.ban(10, "WROND ACCEPT");
+                        peer.ban("WROND ACCEPT");
                 }
 
                 //CHECK IF WE HAVE MAX CONNECTIONS CONNECTIONS

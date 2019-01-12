@@ -77,9 +77,9 @@ public class Pinger extends Thread {
                 this.ping = -1;
 
             //PING FAILES
-            if (this.ping < -100) {
+            if (this.ping < -20) {
                 // если полный отказ уже больше чем ХХХ секнд то бан
-                this.peer.ban(10, "on PING FAILES");
+                this.peer.ban("on PING FAILES");
             }
 
             return false;

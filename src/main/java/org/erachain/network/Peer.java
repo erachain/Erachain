@@ -377,7 +377,7 @@ public class Peer extends Thread {
                     //LOGGER.error(e.getMessage(), e);
 
                     //DISCONNECT
-                    network.tryDisconnect(this, 0, e.getMessage());
+                    network.tryDisconnect(this, network.banForActivePeersCounter(), e.getMessage());
                     continue;
                 }
             }
@@ -397,18 +397,18 @@ public class Peer extends Thread {
                 continue;
             } catch (EOFException e) {
                 // на там конце произошло отключение - делаем тоже дисконект
-                network.tryDisconnect(this, 2, "read-0 peer is shutdownInput");
+                network.tryDisconnect(this, network.banForActivePeersCounter(), "read-0 peer is shutdownInput");
                 continue;
             } catch (java.net.SocketException e) {
                 // если туда уже не лезет иликанал побился
-                network.tryDisconnect(this, 2, "read-2 " + e.getMessage());
+                network.tryDisconnect(this, network.banForActivePeersCounter(), "read-2 " + e.getMessage());
                 continue;
             } catch (java.io.IOException e) {
-                network.tryDisconnect(this, 3, "read-3 " + e.getMessage());
+                network.tryDisconnect(this, network.banForActivePeersCounter(), "read-3 " + e.getMessage());
                 continue;
             } catch (Exception e) {
                 //DISCONNECT and BAN
-                network.tryDisconnect(this, 4, "read-4 " + e.getMessage());
+                network.tryDisconnect(this, network.banForActivePeersCounter(), "read-4 " + e.getMessage());
                 continue;
             }
 
@@ -425,18 +425,18 @@ public class Peer extends Thread {
             } catch (java.net.SocketTimeoutException timeOut) {
                 // если сдесь по времени ожидания пришло то значит на том конце что-то не так и пора разрывать соединение
                 if (this.getPing() < -1) {
-                    network.tryDisconnect(this, 3, "peer in TimeOut and -ping");
+                    network.tryDisconnect(this, network.banForActivePeersCounter(), "peer in TimeOut and -ping");
                 } else {
-                    network.tryDisconnect(this, 1, "peer in TimeOut");
+                    network.tryDisconnect(this, network.banForActivePeersCounter(), "peer in TimeOut");
                 }
                 continue;
             } catch (EOFException e) {
                 // на там конце произошло отключение - делаем тоже дисконект
-                network.tryDisconnect(this, 1, "peer is shutdownInput");
+                network.tryDisconnect(this, network.banForActivePeersCounter(), "peer is shutdownInput");
                 continue;
             } catch (Exception e) {
                 //DISCONNECT and BAN
-                network.tryDisconnect(this, 6, "parse message wrong - " + e.getMessage());
+                network.tryDisconnect(this, network.banForActivePeersCounter(), "parse message wrong - " + e.getMessage());
                 continue;
             }
 
@@ -498,13 +498,13 @@ public class Peer extends Thread {
     public boolean sendMessage(Message message) {
         //CHECK IF SOCKET IS STILL ALIVE
         if (!this.runed || this.socket == null) {
-            ////callback.tryDisconnect(this, 0, "SEND - not runned");
+            ////callback.tryDisconnect(this, network.banForActivePeersCounter(), "SEND - not runned");
             return false;
         }
 
         if (!this.socket.isConnected()) {
             //ERROR
-            network.tryDisconnect(this, 0, "SEND - socket not still alive");
+            network.tryDisconnect(this, network.banForActivePeersCounter(), "SEND - socket not still alive");
 
             return false;
         }
@@ -527,21 +527,21 @@ public class Peer extends Thread {
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                network.tryDisconnect(this, 1, "try out.write 1 - " + eSock.getMessage());
+                network.tryDisconnect(this, network.banForActivePeersCounter(), "try out.write 1 - " + eSock.getMessage());
                 return false;
             } catch (IOException e) {
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                network.tryDisconnect(this, 2, "try out.write 2 - " + e.getMessage());
+                network.tryDisconnect(this, network.banForActivePeersCounter(), "try out.write 2 - " + e.getMessage());
                 return false;
             } catch (Exception e) {
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                network.tryDisconnect(this, 3, "try out.write 3 - " + e.getMessage());
+                network.tryDisconnect(this, network.banForActivePeersCounter(), "try out.write 3 - " + e.getMessage());
                 return false;
             }
 
@@ -629,6 +629,13 @@ public class Peer extends Thread {
 
         this.network.tryDisconnect(this, banForMinutes, mess);
     }
+    public void ban(String mess) {
+        this.setName("Peer: " + this.getAddress().getHostAddress()
+                + " banned - " + mess);
+
+        this.network.tryDisconnect(this, network.banForActivePeersCounter(), mess);
+    }
+
 
     public boolean isStoped() {
         return stoped;

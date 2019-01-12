@@ -67,9 +67,8 @@ public class Synchronizer {
 
         Block block = response.getBlock();
         if (block == null) {
-            int banTime = BAN_BLOCK_TIMES >> 2;
-            String mess = "*** Dishonest peer - Block is NULL. Ban for " + banTime;
-            peer.ban(banTime, mess);
+            String mess = "*** Dishonest peer - Block is NULL";
+            peer.ban(mess);
             throw new Exception(mess);
         }
 
@@ -227,12 +226,13 @@ public class Synchronizer {
                 /// already in Validate block.process(fork);
                 if (checkFullWeight && testHeight == height) {
                     if (myWeight >= fork.getBlocksHeadsMap().getFullWeight()) {
+                        // суть в том что тут цепоска на этой высоте слабже моей,
+                        // поэтому мы ее пока забаним чтобы с ней постоянно не синхронизироваться
+                        // - может мы лучше цепочку собрем еще
+
                         // INVALID BLOCK THROW EXCEPTION
                         String mess = "Dishonest peer by weak FullWeight, heigh: " + height;
-                        if (cnt.getActivePeersCounter() + 4 > Settings.getInstance().getMaxConnections())
-                            peer.ban(BAN_BLOCK_TIMES, mess);
-                        else
-                            peer.ban(BAN_BLOCK_TIMES >> 3, mess);
+                        peer.ban(BAN_BLOCK_TIMES >> 3, mess);
 
                         throw new Exception(mess);
                     }
@@ -550,13 +550,13 @@ public class Synchronizer {
         try {
             response = (SignaturesMessage) peer.getResponse(message, GET_HEADERS_TIMEOUT);
         } catch (Exception e) {
-            peer.ban(1, "Cannot retrieve headers");
+            peer.ban("Cannot retrieve headers");
             throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");
         }
 
         if (response == null) {
             // cannot retrieve headers
-            peer.ban(5, "Cannot retrieve headers");
+            peer.ban("Cannot retrieve headers");
             throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");
         }
 

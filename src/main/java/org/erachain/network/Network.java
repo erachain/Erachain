@@ -6,6 +6,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
+import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -125,8 +126,11 @@ public class Network extends Observable {
 
     public void tryDisconnect(Peer peer, int banForMinutes, String error) {
 
-        if (!peer.isUsed())
+        if (!peer.isUsed()) {
+            //ADD TO BLACKLIST
+            PeerManager.getInstance().addPeer(peer, banForMinutes);
             return;
+        }
 
         //CLOSE CONNECTION
         peer.close();
@@ -227,6 +231,26 @@ public class Network extends Observable {
             }
         }
         return counter;
+    }
+
+    /**
+     * Выдает число минут для бана пира у котрого ошибка в канале:
+     *  если соединений очень мало - то не банить, если сединений не максимум то банить на небольшой срок,
+     *  иначе бан на 10 минут если осталось только 3 свободных места
+     * @return
+     */
+    public int banForActivePeersCounter() {
+
+        int active = getActivePeersCounter(false);
+        int difference = Settings.getInstance().getMinConnections() - active;
+        if (difference > 0)
+            return 0;
+
+        difference = Settings.getInstance().getMaxConnections() - active;
+        if (difference < 3) {
+            return 10;
+        }
+        return 3;
     }
 
     public List<Peer> getIncomedPeers() {
