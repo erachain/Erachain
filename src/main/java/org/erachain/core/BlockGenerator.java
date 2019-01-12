@@ -228,17 +228,17 @@ public class BlockGenerator extends Thread implements Observer {
     }
 
 
-    public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(long timestamp, BlockChain bchain, long max_winned_value) {
+    public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(int blockHeight, long timestamp, BlockChain bchain,
+                                                                         long max_winned_value) {
 
-        long timrans1 = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
 
         //CREATE FORK OF GIVEN DATABASE
         DCSet newBlockDC = dcSet.fork();
-        int blockHeight =  newBlockDC.getBlockMap().size() + 1;
 
         Block waitWin;
 
-        long start = System.currentTimeMillis();
+        start = System.currentTimeMillis();
 
         List<Transaction> transactionsList = new ArrayList<Transaction>();
 
@@ -773,7 +773,7 @@ public class BlockGenerator extends Thread implements Observer {
                                 generatedBlock = null;
                                 try {
                                     generatedBlock = generateNextBlock(acc_winner, solvingBlock,
-                                            getUnconfirmedTransactions(timePointForGenerate,
+                                            getUnconfirmedTransactions(height, timePointForGenerate,
                                                     bchain, winned_winValue),
                                             height, winned_forgingValue, winned_winValue, previousTarget);
                                 } catch (java.lang.OutOfMemoryError e) {
