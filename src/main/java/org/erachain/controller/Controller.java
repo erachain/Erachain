@@ -672,13 +672,15 @@ public class Controller extends Observable {
 
         if (Start.seedCommand != null && Start.seedCommand.length > 1) {
             /// 0 - Accounts number, 1 - seed, 2 - password, [3 - path]
-            byte[] seed = null;
-            try {
-                seed = Base58.decode(Start.seedCommand[1]);
-            } catch (Exception e) {
-                if (Start.seedCommand[1].equals("new")) {
-                    seed = new byte[32];
-                    this.random.nextBytes(seed);
+            byte[] seed;
+            if (Start.seedCommand[1].equals("new") || Start.seedCommand[1].length() < 30) {
+                seed = new byte[32];
+                this.random.nextBytes(seed);
+            } else {
+                try {
+                    seed = Base58.decode(Start.seedCommand[1]);
+                } catch (Exception e) {
+                    seed = null;
                 }
             }
 
