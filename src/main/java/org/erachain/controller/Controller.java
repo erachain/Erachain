@@ -498,8 +498,9 @@ public class Controller extends Observable {
     public void start() throws Exception {
 
         this.toOfflineTime = NTP.getTime();
-        if (Controller.useGui)
+        if (Controller.useGui) {
             about_frame = AboutFrame.getInstance();
+        }
         this.foundMyselfID = new byte[128];
         this.random.nextBytes(this.foundMyselfID);
 
@@ -979,20 +980,31 @@ public class Controller extends Observable {
             return;
         this.isStopping = true;
 
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing")));
         // STOP MESSAGE PROCESSOR
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping message processor")));
+
         LOGGER.info("Stopping message processor");
         this.network.stop();
 
         // delete temp Dir
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Delete files from TEMP dir")));
         LOGGER.info("Delete files from TEMP dir");
         for (File file : new File(Settings.getInstance().getTemDir()).listFiles())
             if (file.isFile()) file.delete();
 
         // STOP BLOCK PROCESSOR
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping block processor")));
         LOGGER.info("Stopping block processor");
         this.synchronizer.stop();
 
         // WAITING STOP MAIN PROCESS
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Waiting stopping processors")));
         LOGGER.info("Waiting stopping processors");
 
         int i = 0;
@@ -1004,6 +1016,8 @@ public class Controller extends Observable {
         }
 
         if (dcSet.isBusy())
+            this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DCSet is busy...")));
             LOGGER.info("DCSet is busy...");
 
         i = 0;
@@ -1015,19 +1029,26 @@ public class Controller extends Observable {
         }
 
         // CLOSE DATABABASE
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing database")));
         LOGGER.info("Closing database");
         this.dcSet.close();
 
         // CLOSE WALLET
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing wallet")));
         LOGGER.info("Closing wallet");
         this.wallet.close();
 
         // CLOSE LOCAL
-
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing Local database")));
         LOGGER.info("Closing Local database");
         this.dbSet.close();
 
         // CLOSE telegram
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing telegram")));
         LOGGER.info("Closing telegram");
         this.telegramStore.close();
 
@@ -3372,5 +3393,8 @@ public class Controller extends Observable {
         }
 
         return null;
+    }
+    public void addSingleObserver(Observer o){
+       super.addObserver(o);
     }
 }

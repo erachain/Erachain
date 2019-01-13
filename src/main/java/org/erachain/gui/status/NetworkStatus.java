@@ -28,15 +28,13 @@ public class NetworkStatus extends JLabel implements Observer {
 
     public NetworkStatus() {
         super();
-
+        try {
         //CREATE ICONS
         this.noConnectionsIcon = this.createIcon(Color.RED);
         this.synchronizingIcon = this.createIcon(Color.ORANGE);
         this.walletSynchronizingIcon = this.createIcon(Color.MAGENTA);
         this.okeIcon = this.createIcon(Color.GREEN);
-
-        ToolTipManager.sharedInstance().setDismissDelay((int) TimeUnit.SECONDS.toMillis(5));
-
+           ToolTipManager.sharedInstance().setDismissDelay((int) TimeUnit.SECONDS.toMillis(5));
         this.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent mEvt) {
                 String mess = Lang.getInstance().translate("Network Port") + ": " + BlockChain.getNetworkPort()
@@ -56,6 +54,9 @@ public class NetworkStatus extends JLabel implements Observer {
         //LISTEN ON STATUS
         Controller.getInstance().addObserver(this);
         //Controller.getInstance().addWalletListener(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private ImageIcon createIcon(Color color) {

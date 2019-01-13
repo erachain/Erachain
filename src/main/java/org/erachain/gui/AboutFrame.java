@@ -2,6 +2,7 @@ package org.erachain.gui;
 
 import org.erachain.controller.Controller;
 import org.erachain.lang.Lang;
+import org.erachain.utils.ObserverMessage;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,21 +13,20 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.*;
 import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 @SuppressWarnings("serial")
-public class AboutFrame extends JDialog {
+public class AboutFrame extends JDialog implements Observer {
 
     private static AboutFrame instance;
     protected boolean user_close = true;
     private AboutPanel aboutPanel;
     private JTextField console_Text;
 
-    private AboutFrame() {
+    public AboutFrame() {
         //CREATE FRAME
         setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Debug"));
         //setModalityType(DEFAULT_MODALITY_TYPE);
@@ -50,8 +50,8 @@ public class AboutFrame extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (user_close) {
-                    setVisible(false);
-                    dispose();
+                   setVisible(false);
+                   dispose();
                 }
             }
         });
@@ -60,7 +60,7 @@ public class AboutFrame extends JDialog {
             public void keyPressed(KeyEvent e) {
                 if (user_close) {
                     setVisible(false);
-                    dispose();
+                   dispose();
                 }
             }
         });
@@ -180,5 +180,13 @@ public class AboutFrame extends JDialog {
             return "Current Version";
         }
         return "Current Version";
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        ObserverMessage mes = (ObserverMessage) arg;
+        if (mes.getType() == ObserverMessage.GUI_ABOUT_TYPE){
+            console_Text.setText(mes.getValue().toString());
+        }
     }
 }

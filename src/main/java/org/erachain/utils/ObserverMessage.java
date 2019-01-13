@@ -313,6 +313,8 @@ public class ObserverMessage {
 
     public static final int  RPC_WORK_TYPE = 20000;
 
+    public static final int  GUI_ABOUT_TYPE = 1000000001;
+
 
     private int type;
     private Object value;
