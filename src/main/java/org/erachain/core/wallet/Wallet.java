@@ -628,6 +628,10 @@ public class Wallet extends Observable implements Observer {
 				if (height % (stepHeight) == 0) {
 					this.syncHeight = height;
 
+					if (Controller.getInstance().needUpToDate())
+						// если идет синхронизация цепочки - кошелек не синхронизируем
+						break;
+
 					Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
 
 					// LOGGER.info("Synchronize wallet: " + this.syncHeight);
