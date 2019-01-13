@@ -132,13 +132,84 @@ public class Peer extends Thread {
 
     }
 
-    // connect and run
+    /**
+     * Accept connection to reuse brocken peer
+     * @param socket
+     * @param description
+     * @return
+     */
+    public boolean reconnect(Socket socket, String description) {
+
+        LOGGER.debug("@@@ reconnect(socket) : " + socket.getInetAddress().getHostAddress());
+
+        try {
+
+            if (this.socket != null) {
+                this.close();
+            }
+
+            this.socket = socket;
+            this.address = socket.getInetAddress();
+            this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
+            this.white = false;
+            this.pingCounter = 0;
+            this.connectionTime = NTP.getTime();
+            this.errors = 0;
+            this.sendedBeforePing = 0l;
+            this.maxBeforePing = MAX_BEFORE_PING;
+
+            //ENABLE KEEPALIVE
+            this.socket.setKeepAlive(true);
+
+            //TIMEOUT - нужно для разрыва соединения если на том конце не стали нам слать нужные байты
+            this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
+
+            this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
+            this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
+
+            //CREATE STRINGWRITER
+            this.out = socket.getOutputStream();
+            this.in = new DataInputStream(socket.getInputStream());
+
+            this.pinger.setPing(Integer.MAX_VALUE);
+            this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.address.getHostAddress());
+
+            // IT is STARTED
+            this.runed = true;
+
+            //ON SOCKET CONNECT
+            this.setName("Peer: " + this.getAddress().getHostAddress() + " reconnected"
+                + (this.isWhite()?" is White" : ""));
+
+            LOGGER.info(description + address.getHostAddress());
+            network.onConnect(this);
+
+        } catch (Exception e) {
+            //FAILED TO CONNECT NO NEED TO BLACKLIST
+            LOGGER.debug("Failed to connect to : " + address.getHostAddress());
+            LOGGER.error(e.getMessage(), e);
+
+            return false;
+        }
+
+        return this.runed;
+
+    }
+
+    /**
+     * Приконнектиться к Премнику
+     * @param network
+     * @param description
+     * @return
+     */
     public boolean connect(Network network, String description) {
         if (Controller.getInstance().isOnStopping()) {
             return false;
         }
 
-        this.network = network;
+        if (this.network == null)
+            this.network = network;
+
         this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
         this.white = true;
         this.pingCounter = 0;
@@ -210,65 +281,10 @@ public class Peer extends Thread {
         return this.runed;
     }
 
-    // connect to old reused peer
-    public boolean reconnect(Socket socket, String description) {
-
-        LOGGER.debug("@@@ reconnect(socket) : " + socket.getInetAddress().getHostAddress());
-
-        try {
-
-            if (this.socket != null) {
-                this.close();
-            }
-
-            this.socket = socket;
-            this.address = socket.getInetAddress();
-            this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
-            this.white = false;
-            this.pingCounter = 0;
-            this.connectionTime = NTP.getTime();
-            this.errors = 0;
-            this.sendedBeforePing = 0l;
-            this.maxBeforePing = MAX_BEFORE_PING;
-
-            //ENABLE KEEPALIVE
-            this.socket.setKeepAlive(true);
-
-            //TIMEOUT - нужно для разрыва соединения если на том конце не стали нам слать нужные байты
-            this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
-
-            this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
-            this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
-
-            //CREATE STRINGWRITER
-            this.out = socket.getOutputStream();
-            this.in = new DataInputStream(socket.getInputStream());
-
-            this.pinger.setPing(Integer.MAX_VALUE);
-            this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.address.getHostAddress());
-
-            // IT is STARTED
-            this.runed = true;
-
-            //ON SOCKET CONNECT
-            this.setName("Peer: " + this.getAddress().getHostAddress() + " reconnected"
-                + (this.isWhite()?" is White" : ""));
-
-            LOGGER.info(description + address.getHostAddress());
-            network.onConnect(this);
-
-        } catch (Exception e) {
-            //FAILED TO CONNECT NO NEED TO BLACKLIST
-            LOGGER.debug("Failed to connect to : " + address.getHostAddress());
-            LOGGER.error(e.getMessage(), e);
-
-            return false;
-        }
-
-        return this.runed;
-
+    // connect and run
+    public boolean connect(String description) {
+        return connect(null, description);
     }
-
 
     public InetAddress getAddress() {
         return address;

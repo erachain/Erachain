@@ -317,8 +317,9 @@ public class Network extends Observable {
                         // будет накладка и затык - может не нужно прямо одинаковые имена тут выискивать тогда?
                         knownPeer.reconnect(socket, "connected by restore!!! ");
                         return knownPeer;
-                    } else
-                        break;
+                    }
+
+                    break;
                 }
             }
         }
@@ -351,7 +352,7 @@ public class Network extends Observable {
      * @param message
      * @return
      */
-    public synchronized Peer tryConnection(Socket socket, Peer peer, String message) {
+    public /* synchronized */ Peer tryConnection(Socket socket, Peer peer, String message) {
         if (socket != null)
             return startPeer(socket);
 

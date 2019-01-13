@@ -604,6 +604,7 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		int stepHeight = BlockChain.BLOCKS_PER_DAY;
+		long timePoint = System.currentTimeMillis();
 
 		try {
 			this.syncHeight = height;
@@ -623,14 +624,24 @@ public class Wallet extends Observable implements Observer {
 				// block));
 				Block.BlockHead blockHead = dcSet.getBlocksHeadsMap().get(height);
 
+				try {
 				this.processBlock(blockHead);
+                } catch (java.lang.OutOfMemoryError e) {
+                    this.database.rollback();
+                    this.syncHeight = this.database.getBlocksHeadMap().size();
+				    break;
+                }
 
-				if (height % (stepHeight) == 0) {
+
+                if (height % (stepHeight) == 0
+                        || System.currentTimeMillis() - timePoint > 10000) {
 					this.syncHeight = height;
 
 					if (Controller.getInstance().needUpToDate())
 						// если идет синхронизация цепочки - кошелек не синхронизируем
 						break;
+
+                    timePoint = System.currentTimeMillis();
 
 					Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
 

@@ -43,6 +43,7 @@ public class ConnectionAcceptor extends Thread {
             } catch (Exception e) {
             }
 
+            Socket connectionSocket = null;
             try {
 
                 if (socket == null) {
@@ -56,7 +57,7 @@ public class ConnectionAcceptor extends Thread {
                 }
 
                 //ACCEPT CONNECTION
-                Socket connectionSocket = socket.accept();
+                connectionSocket = socket.accept();
 
                 //CHECK IF SOCKET IS NOT LOCALHOST || WE ARE ALREADY CONNECTED TO THAT SOCKET || BLACKLISTED
                 if (
@@ -67,23 +68,43 @@ public class ConnectionAcceptor extends Thread {
                     connectionSocket.close();
                     continue;
                 }
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(90);
+                return;
 
-                if (!this.isRun)
-                    break;
+            } catch (Exception e) {
+                try {
+                    socket.close();
+                    socket = null;
+                } catch (Exception e1) {
+                }
 
+                continue;
+
+            }
+
+            if (!this.isRun)
+                break;
+
+            if (connectionSocket == null)
+                continue;
+
+            try {
                 //CREATE PEER
                 ////new Peer(callback, connectionSocket);
                 //LOGGER.info("START ACCEPT CONNECT FROM " + connectionSocket.getInetAddress().getHostAddress()
                 //		+ " isMy:" + Network.isMyself(connectionSocket.getInetAddress())
                 //		+ " my:" + Network.getMyselfAddress());
 
-                Peer peer = network.tryConnection(connectionSocket, null, null);
+                //Peer peer = network.tryConnection(connectionSocket, null, null);
+                Peer peer = network.startPeer(connectionSocket);
                 if (!peer.isUsed()) {
                     // если в процессе
-                    if (!peer.isBanned() || connectionSocket.isClosed()) {
-                        peer.ban("WROND ACCEPT");
-                        continue;
-                    }
+                    //if (!peer.isBanned() || connectionSocket.isClosed()) {
+                    //    peer.ban("WROND ACCEPT");
+                    //}
+
+                    continue;
                 }
 
                 //CHECK IF WE HAVE MAX CONNECTIONS CONNECTIONS
@@ -95,14 +116,10 @@ public class ConnectionAcceptor extends Thread {
                         peerForBan.ban(10, "Clear place for new connection");
                     }
                 }
-
             } catch (Exception e) {
-                if (false)
-                    try {
-                        socket.close();
-                    } catch (IOException e1) {
-                    }
+                LOGGER.error(e.getMessage(), e);
             }
+
         }
 
     }

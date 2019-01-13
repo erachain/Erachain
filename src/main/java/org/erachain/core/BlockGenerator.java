@@ -816,8 +816,11 @@ public class BlockGenerator extends Thread implements Observer {
 
                                 } catch (java.lang.OutOfMemoryError e) {
                                     heapOverflowCount++;
-                                    // TRY CATCH OUTofMemory error - heap space
-                                    LOGGER.error(e.getMessage(), e);
+                                    if (heapOverflowCount > 1) {
+                                        ctrl.stopAll(94);
+                                        status = -1;
+                                        return;
+                                    }
                                 } finally {
                                     System.gc();
                                 }
@@ -840,20 +843,27 @@ public class BlockGenerator extends Thread implements Observer {
 
                                     continue;
                                 } else {
-
                                     //PASS BLOCK TO CONTROLLER
-                                    ///ctrl.newBlockGenerated(block);
-                                    LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
-                                    if (bchain.setWaitWinBuffer(dcSet, generatedBlock, peer)) {
+                                    try {
+                                        LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
+                                        if (bchain.setWaitWinBuffer(dcSet, generatedBlock, peer)) {
 
-                                        // need to BROADCAST
-                                        status = 8;
-                                        ctrl.broadcastWinBlock(generatedBlock, null);
-                                        generatedBlock = null;
-                                        status = 0;
-                                    } else {
-                                        generatedBlock = null;
-                                        LOGGER.info("my BLOCK is weak ((...");
+                                            // need to BROADCAST
+                                            status = 8;
+                                            ctrl.broadcastWinBlock(generatedBlock, null);
+                                            generatedBlock = null;
+                                            status = 0;
+                                        } else {
+                                            generatedBlock = null;
+                                            LOGGER.info("my BLOCK is weak ((...");
+                                        }
+                                    } catch (java.lang.OutOfMemoryError e) {
+                                        heapOverflowCount++;
+                                        if (heapOverflowCount > 1) {
+                                            ctrl.stopAll(94);
+                                            status = -1;
+                                            return;
+                                        }
                                     }
                                 }
                             }
@@ -903,13 +913,21 @@ public class BlockGenerator extends Thread implements Observer {
                             }
 
                             status = 2;
-                            if (!ctrl.flushNewBlockGenerated()) {
-                                // NEW BLOCK not FLUSHED
-                                LOGGER.error("NEW BLOCK not FLUSHED");
-                            } else {
-                                if (forgingStatus == ForgingStatus.FORGING_WAIT)
-                                    setForgingStatus(ForgingStatus.FORGING);
-
+                            try {
+                                if (!ctrl.flushNewBlockGenerated()) {
+                                    // NEW BLOCK not FLUSHED
+                                    LOGGER.error("NEW BLOCK not FLUSHED");
+                                } else {
+                                    if (forgingStatus == ForgingStatus.FORGING_WAIT)
+                                        setForgingStatus(ForgingStatus.FORGING);
+                                }
+                            } catch (java.lang.OutOfMemoryError e) {
+                                heapOverflowCount++;
+                                if (heapOverflowCount > 1) {
+                                    ctrl.stopAll(94);
+                                    status = -1;
+                                    return;
+                                }
                             }
 
                             if (ctrl.isOnStopping()) {
