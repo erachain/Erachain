@@ -37,6 +37,12 @@ public class ConnectionAcceptor extends Thread {
         PeerMap map = Controller.getInstance().getDBSet().getPeerMap();
         while (this.isRun && !this.isInterrupted()) {
 
+            // на всякий случай чтобы атак не было с созданием множества конектов
+            try {
+                Thread.sleep(10);
+            } catch (Exception e) {
+            }
+
             try {
 
                 if (socket == null) {
