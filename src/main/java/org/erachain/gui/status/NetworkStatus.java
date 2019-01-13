@@ -28,7 +28,7 @@ public class NetworkStatus extends JLabel implements Observer {
 
     public NetworkStatus() {
         super();
-        try {
+
         //CREATE ICONS
         this.noConnectionsIcon = this.createIcon(Color.RED);
         this.synchronizingIcon = this.createIcon(Color.ORANGE);
@@ -41,22 +41,27 @@ public class NetworkStatus extends JLabel implements Observer {
                         + ", " + Lang.getInstance().translate("target")
                         + ": " + Controller.getInstance().getBlockChain().getTarget(DCSet.getInstance()) + ", ";
 
-                if (Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
-                    mess += Lang.getInstance().translate("Block height") + ": " + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a;
-                } else if (Controller.getInstance().getWalletSyncHeight() > 0) {
-                    mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false);
-                } else {
-                    mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight(0, false).a;
+                try {
+                    if (Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
+                        mess += Lang.getInstance().translate("Block height") + ": " + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a;
+                    } else if (Controller.getInstance().getWalletSyncHeight() > 0) {
+                        mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false);
+                    } else {
+                        Tuple3<Integer, Long, Peer> mm = Controller.getInstance().getMaxPeerHWeight(0, false);
+                        Integer mmm=0;
+                        if (mm!=null)mmm = mm.a;
+                        mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + mmm;
+                    }
+                    setToolTipText(mess);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                setToolTipText(mess);
             }
         });
         //LISTEN ON STATUS
         Controller.getInstance().addObserver(this);
         //Controller.getInstance().addWalletListener(this);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
     }
 
     private ImageIcon createIcon(Color color) {
