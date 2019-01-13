@@ -635,7 +635,6 @@ public class Wallet extends Observable implements Observer {
 
                 if (height % (stepHeight) == 0
                         || System.currentTimeMillis() - timePoint > 10000) {
-					this.syncHeight = height;
 
 					if (Controller.getInstance().needUpToDate())
 						// если идет синхронизация цепочки - кошелек не синхронизируем
@@ -647,6 +646,7 @@ public class Wallet extends Observable implements Observer {
 
 					// LOGGER.info("Synchronize wallet: " + this.syncHeight);
 					this.database.commit();
+                    this.syncHeight = this.database.getBlocksHeadMap().size();
 				}
 
 				// LOAD NEXT
@@ -667,9 +667,8 @@ public class Wallet extends Observable implements Observer {
 
 			Controller.getInstance().setProcessingWalletSynchronize(false);
 			this.database.commit();
-			// icreator this.syncHeight = -1;
-			this.syncHeight = height;
-			Controller.getInstance().walletSyncStatusUpdate(height);
+            this.syncHeight = this.database.getBlocksHeadMap().size();
+			Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
 		}
 
 		// RESET UNCONFIRMED BALANCE for accounts + assets
@@ -679,9 +678,6 @@ public class Wallet extends Observable implements Observer {
 
         LOGGER.info("Update Orders");
         this.database.getOrderMap().updateLefts();
-
-		/// ic Controller.getInstance().walletSyncStatusUpdate(-1);
-		//// Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
 
 		// NOW IF NOT SYNCHRONIZED SET STATUS
 		// CHECK IF WE ARE UPTODATE
