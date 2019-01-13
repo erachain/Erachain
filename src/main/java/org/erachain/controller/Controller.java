@@ -673,7 +673,7 @@ public class Controller extends Observable {
         if (Start.seedCommand != null && Start.seedCommand.length > 1) {
             /// 0 - Accounts number, 1 - seed, 2 - password, [3 - path]
             byte[] seed;
-            if (Start.seedCommand[1].equals("new") || Start.seedCommand[1].length() < 30) {
+            if (Start.seedCommand[1].length() < 30) {
                 seed = new byte[32];
                 this.random.nextBytes(seed);
             } else {
