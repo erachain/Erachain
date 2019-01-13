@@ -332,6 +332,14 @@ public class Peer extends Thread {
         return this.pinger != null;
     }
 
+    /**
+     * если хоть что-то есть то это используемый пир
+     * @return
+     */
+    public boolean isOnUsed() {
+        return this.socket != null || this.runed;
+    }
+
     public boolean isUsed() {
         return this.socket != null && this.socket.isConnected() && this.runed;
     }

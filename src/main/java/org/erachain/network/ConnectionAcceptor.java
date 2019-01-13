@@ -80,8 +80,10 @@ public class ConnectionAcceptor extends Thread {
                 Peer peer = network.tryConnection(connectionSocket, null, null);
                 if (!peer.isUsed()) {
                     // если в процессе
-                    if (!peer.isBanned() || connectionSocket.isClosed())
+                    if (!peer.isBanned() || connectionSocket.isClosed()) {
                         peer.ban("WROND ACCEPT");
+                        continue;
+                    }
                 }
 
                 //CHECK IF WE HAVE MAX CONNECTIONS CONNECTIONS
@@ -95,10 +97,11 @@ public class ConnectionAcceptor extends Thread {
                 }
 
             } catch (Exception e) {
-                try {
-                    socket.close();
-                } catch (IOException e1) {
-                }
+                if (false)
+                    try {
+                        socket.close();
+                    } catch (IOException e1) {
+                    }
             }
         }
 

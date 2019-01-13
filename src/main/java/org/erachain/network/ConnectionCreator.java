@@ -108,7 +108,8 @@ public class ConnectionCreator extends Thread {
                 return 0;
 
             //CONNECT
-            network.tryConnection(null, newPeer, "connected in recurse +++ ");
+            if (!newPeer.isOnUsed())
+                network.tryConnection(null, newPeer, "connected in recurse +++ ");
             if (newPeer.isUsed()) {
                 // RECURSE to OTHER PEERS
                 foreignPeersCounter++;
@@ -205,7 +206,9 @@ public class ConnectionCreator extends Thread {
 
                     //CONNECT
                     //CHECK IF ALREADY CONNECTED TO PEER
-                    network.tryConnection(null, peer, "connected +++ ");
+                    if (!peer.isOnUsed())
+                        network.tryConnection(null, peer, "connected +++ ");
+
                     if (peer.isUsed()) {
                         // TRY CONNECT to WHITE peers of this PEER
                         connectToPeersOfThisPeer(peer, 4);

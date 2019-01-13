@@ -312,12 +312,13 @@ public class Network extends Observable {
             for (Peer knownPeer : knownPeers) {
                 //CHECK IF ADDRESS IS THE SAME
                 if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
-                    if (!knownPeer.isUsed()) {
+                    if (!knownPeer.isOnUsed()) {
                         // возможно из-за того что одновременно и как приемник и как передатчик я начинаю выступать
                         // будет накладка и затык - может не нужно прямо одинаковые имена тут выискивать тогда?
                         knownPeer.reconnect(socket, "connected by restore!!! ");
-                    }
-                    return knownPeer;
+                        return knownPeer;
+                    } else
+                        break;
                 }
             }
         }
@@ -325,9 +326,7 @@ public class Network extends Observable {
         // use UNUSED peers
         synchronized (this.knownPeers) {
             for (Peer knownPeer : this.knownPeers) {
-                if (!knownPeer.isUsed()
-                    //|| !Network.isMyself(knownPeer.getAddress())
-                        ) {
+                if (!knownPeer.isOnUsed()) {
                     knownPeer.reconnect(socket, "connected by recircle!!! ");
                     return knownPeer;
                 }
@@ -356,7 +355,7 @@ public class Network extends Observable {
         if (socket != null)
             return startPeer(socket);
 
-        if (!peer.isUsed())
+        if (!peer.isOnUsed())
             peer.connect(this, message);
 
         return peer;
