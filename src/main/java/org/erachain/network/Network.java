@@ -305,14 +305,18 @@ public class Network extends Observable {
 
     public Peer startPeer(Socket socket) {
 
-        // REUSE known peer
         byte[] addressIP = socket.getInetAddress().getAddress();
+        // REUSE known peer
         synchronized (this.knownPeers) {
             //FOR ALL connectedPeers
             for (Peer knownPeer : knownPeers) {
                 //CHECK IF ADDRESS IS THE SAME
                 if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
-                    knownPeer.reconnect(socket, "connected by restore!!! ");
+                    if (!knownPeer.isUsed()) {
+                        // возможно из-за того что одновременно и как приемник и как передатчик я начинаю выступать
+                        // будет накладка и затык - может не нужно прямо одинаковые имена тут выискивать тогда?
+                        knownPeer.reconnect(socket, "connected by restore!!! ");
+                    }
                     return knownPeer;
                 }
             }
@@ -337,6 +341,25 @@ public class Network extends Observable {
 
         return peer;
 
+    }
+
+    /**
+     * нужно для того чтобы одновременно не коннектилось две трубы как приемник и как посылник
+     * и возможно и-за этого были затыки. Теперь
+     *
+     * @param socket
+     * @param peer
+     * @param message
+     * @return
+     */
+    public synchronized Peer tryConnection(Socket socket, Peer peer, String message) {
+        if (socket != null)
+            return startPeer(socket);
+
+        if (!peer.isUsed())
+            peer.connect(this, message);
+
+        return peer;
     }
 
     private void addHandledMessage(String hash) {

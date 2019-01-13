@@ -77,7 +77,7 @@ public class ConnectionAcceptor extends Thread {
                 //		+ " isMy:" + Network.isMyself(connectionSocket.getInetAddress())
                 //		+ " my:" + Network.getMyselfAddress());
 
-                Peer peer = network.startPeer(connectionSocket);
+                Peer peer = network.tryConnection(connectionSocket, null, null);
                 if (!peer.isUsed()) {
                     // если в процессе
                     if (!peer.isBanned() || connectionSocket.isClosed())
