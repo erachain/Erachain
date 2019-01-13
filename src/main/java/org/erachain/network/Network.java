@@ -632,6 +632,15 @@ public class Network extends Observable {
 
         knownPeers.clear();
         // wait for thread stop;
-        while (this.acceptor.isAlive()) ;
+        int count = 0;
+        while (this.acceptor.isAlive()) {
+            count++;
+            try {
+                Thread.sleep(100);
+            } catch (Exception e) {
+            }
+            if (count > 50) LOGGER.error("waiting halt acceptor");
+            if (count > 100) break;
+        }
     }
 }

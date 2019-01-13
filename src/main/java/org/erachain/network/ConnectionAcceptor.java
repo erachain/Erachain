@@ -89,18 +89,11 @@ public class ConnectionAcceptor extends Thread {
                 }
 
             } catch (Exception e) {
-
                 try {
                     socket.close();
                 } catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
                 }
-                //LOGGER.info(e.getMessage(),e);
-                //LOGGER.info(Lang.getInstance().translate("Error accepting new connection") + " - " + e.getMessage());
-                break;
             }
-            if (this.isInterrupted()) break;
         }
 
     }
@@ -112,8 +105,6 @@ public class ConnectionAcceptor extends Thread {
         try {
             socket.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
 
     }

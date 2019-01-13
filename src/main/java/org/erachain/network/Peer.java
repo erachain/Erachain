@@ -651,39 +651,44 @@ public class Peer extends Thread {
 
         LOGGER.info("Try close peer : " + this);
 
-        if (true) {
+        if (false) {
+            // new style
             try {
-                try {
-                    this.out.close();
-                } catch (Exception exc) {
-                }
-                if (this.in != null) {
-                    this.in.close();
-                }
-                if (socket != null) {
-                    //CHECK IF SOCKET IS CONNECTED
-                    if (socket.isConnected()) {
-                        //CLOSE SOCKET
-                        this.socket.shutdownInput();
-                    }
-                }
-
+                this.out.close();
             } catch (Exception ignored) {
             }
-        } else {
-            try {
-
-                //CHECK IS SOCKET EXISTS
-                if (socket != null) {
-                    //CHECK IF SOCKET IS CONNECTED
-                    if (socket.isConnected()) {
-                        //CLOSE SOCKET
-                        this.socket.close();
-
+            if (this.in != null) {
+                try {
+                this.in.close();
+                } catch (Exception ignored) {
+                }
+            }
+            if (socket != null) {
+                //CHECK IF SOCKET IS CONNECTED
+                if (socket.isConnected()) {
+                    //CLOSE SOCKET
+                    try {
+                    this.socket.shutdownInput();
+                    } catch (Exception ignored) {
                     }
                 }
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
+            }
+
+        } else {
+            // OLD style
+
+            //CHECK IS SOCKET EXISTS
+            if (socket != null) {
+                //CHECK IF SOCKET IS CONNECTED
+                if (socket.isConnected()) {
+                    //CLOSE SOCKET
+                    try {
+                        // and close IN and OUT
+                        this.socket.close();
+                    } catch (Exception e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
+                }
             }
         }
 
