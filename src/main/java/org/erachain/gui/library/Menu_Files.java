@@ -281,7 +281,7 @@ public class Menu_Files extends JMenu {
         aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
         aboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (Controller.useGui) {
+                if (Controller.getInstance().useGui) {
                     AboutFrame.getInstance().setCursor(new Cursor(Cursor.HAND_CURSOR));
                     AboutFrame.getInstance().set_console_Text("");
                     AboutFrame.getInstance().setUserClose(true);

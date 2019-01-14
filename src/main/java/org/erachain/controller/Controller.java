@@ -128,8 +128,8 @@ public class Controller extends Observable {
     public static final int STATUS_SYNCHRONIZING = 1;
     public static final int STATUS_OK = 2;
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
-    public static boolean useGui = true;
-    private static List<Thread> threads = new ArrayList<Thread>();
+    public  boolean useGui = true;
+    private List<Thread> threads = new ArrayList<Thread>();
     private static long buildTimestamp;
     private static Controller instance;
     public Wallet wallet;
@@ -161,7 +161,7 @@ public class Controller extends Observable {
 
     // private JSONObject Setting_Json;
 
-    public AboutFrame about_frame;
+    public AboutFrame about_frame = null;
     private boolean isStopping = false;
     private String info;
     private long unconfigmedMessageTimingAverage;
@@ -482,7 +482,7 @@ public class Controller extends Observable {
         if (!error && !backUped && Settings.getInstance().getbacUpEnabled()) {
             // если нет ошибок и не было восстановления и нужно делать копии то сделаем
 
-            if (Controller.useGui && Settings.getInstance().getbacUpAskToStart()) {
+            if (useGui && Settings.getInstance().getbacUpAskToStart()) {
                 // ask dialog
                 int n = JOptionPane.showConfirmDialog(null, Lang.getInstance().translate("BackUp Database?"),
                         Lang.getInstance().translate("Confirmation"), JOptionPane.OK_CANCEL_OPTION);
@@ -578,7 +578,7 @@ public class Controller extends Observable {
         }
 
 
-        if (error == 0 && Controller.useGui && Settings.getInstance().getbacUpEnabled()) {
+        if (error == 0 && useGui && Settings.getInstance().getbacUpEnabled()) {
 
             if (Settings.getInstance().getbacUpAskToStart()) {
                 // ask dialog
@@ -3423,7 +3423,7 @@ public class Controller extends Observable {
             }
 
             if (arg.equals("-nogui")) {
-                Controller.useGui = false;
+                useGui = false;
                 continue;
             }
 
@@ -3458,10 +3458,10 @@ public class Controller extends Observable {
             }
         }
 
-        if (Controller.useGui) {
+        if (useGui) {
 
             this.about_frame = AboutFrame.getInstance();
-            this.addSingleObserver( Controller.getInstance().about_frame);
+            this.addSingleObserver( about_frame);
             this.about_frame.setUserClose(false);
            this.about_frame.setModal(false);
             this.about_frame.setVisible(true);
@@ -3476,7 +3476,7 @@ public class Controller extends Observable {
 
                 LOGGER.info(Lang.getInstance().translate("Starting %app%")
                         .replace("%app%", Lang.getInstance().translate(Controller.APP_NAME)));
-                LOGGER.info(Controller.getManifestInfo());
+                LOGGER.info(getManifestInfo());
 
                 this.setChanged();
                 this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, info));
@@ -3500,14 +3500,14 @@ public class Controller extends Observable {
 
                 //unlock wallet
 
-                if (pass != null && Controller.getInstance().doesWalletDatabaseExists()) {
-                    if (Controller.getInstance().unlockWallet(pass))
-                        Controller.getInstance().lockWallet();
+                if (pass != null && doesWalletDatabaseExists()) {
+                    if (unlockWallet(pass))
+                        lockWallet();
                 }
 
                 Status.getinstance();
 
-                if (!Controller.useGui) {
+                if (!useGui) {
                     LOGGER.info("-nogui used");
                 } else {
 
@@ -3520,10 +3520,10 @@ public class Controller extends Observable {
 
                             SysTray.getInstance().createTrayIcon();
                             about_frame.setVisible(false);
-                            about_frame.getInstance().dispose();
+                   //         about_frame.getInstance().dispose();
                         }
                     } catch (Exception e1) {
-                        if (Controller.useGui) {
+                        if (about_frame!=null) {
                             about_frame.setVisible(false);
                             about_frame.dispose();
                         }
@@ -3536,7 +3536,7 @@ public class Controller extends Observable {
 
                 LOGGER.error(e.getMessage(), e);
                 // show error dialog
-                if (Controller.useGui) {
+                if (useGui) {
                     if (Settings.getInstance().isGuiEnabled()) {
                         Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, null,
                                 Lang.getInstance().translate("STARTUP ERROR") + ": " + e.getMessage(), 600, 400, Lang.getInstance().translate(" "));
@@ -3564,7 +3564,7 @@ public class Controller extends Observable {
                 }
 
 
-                if (Controller.useGui) {
+                if (about_frame!=null) {
                     about_frame.setVisible(false);
                     about_frame.dispose();
                 }
@@ -3582,7 +3582,7 @@ public class Controller extends Observable {
 
                 if (command.equals("quit")) {
 
-                    if (Controller.useGui) {
+                    if (about_frame!=null) {
                         about_frame.setVisible(false);
                         about_frame.dispose();
                     }
