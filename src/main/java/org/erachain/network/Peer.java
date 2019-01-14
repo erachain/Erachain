@@ -283,7 +283,7 @@ public class Peer extends Thread {
 
     // connect and run
     public boolean connect(String description) {
-        return connect(null, description);
+        return connect(Controller.getInstance().network, description);
     }
 
     public InetAddress getAddress() {
@@ -579,16 +579,6 @@ public class Peer extends Thread {
         return true;
     }
 
-    /**
-     * берем новый уникальный ключ для запросов - с гарантией синхронности
-     * по кругу с переполнением гоняться будет - норм
-     * @return
-     */
-    private synchronized int getRequestKey() {
-        //GENERATE ID
-        return this.requestKey++;
-    }
-
     public Message getResponse(Message message, long timeSOT) {
 
         BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(1);
@@ -605,7 +595,7 @@ public class Peer extends Thread {
         if (!this.sendMessage(message)) {
             //WHEN FAILED TO SEND MESSAGE
             //blockingQueue = null;
-            LOGGER.debug(this + " >> " + message + " sended ERROR by period: " + (System.currentTimeMillis() - checkTime));
+            LOGGER.debug(this + " >> " + message + " send ERROR by period: " + (System.currentTimeMillis() - checkTime));
             this.messages.remove(localRequestKey);
             return null;
         }

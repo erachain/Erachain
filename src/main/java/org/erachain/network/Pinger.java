@@ -14,7 +14,7 @@ public class Pinger extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Pinger.class);
     private static final int DEFAULT_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1;
-    private static final int DEFAULT_QUICK_PING_TIMEOUT = 1500; // BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 4;
+    private static final int DEFAULT_QUICK_PING_TIMEOUT = 2000; // BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 4;
 
     private Peer peer;
     private boolean needPing = false;
@@ -75,7 +75,7 @@ public class Pinger extends Thread {
                 this.ping = -1;
 
             //PING FAILES
-            if (this.ping < -10) {
+            if (this.ping < -20) {
                 // если полный отказ уже больше чем ХХХ секнд то ИМЕННО БАН
                 this.peer.ban(5, "on PING FAILES");
             }

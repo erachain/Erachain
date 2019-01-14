@@ -1196,6 +1196,9 @@ public class Controller extends Observable {
 
         }
 
+        if (!pinged)
+            peer.tryPing();
+
         this.network.notifyObserveUpdatePeer(peer);
 
         // LOGGER.info(peer + " sended UNCONFIRMED counter: " +
@@ -1213,9 +1216,6 @@ public class Controller extends Observable {
         // SEND FOUNDMYSELF MESSAGE
         if (!peer.sendMessage(
                 MessageFactory.getInstance().createFindMyselfMessage(Controller.getInstance().getFoundMyselfID())))
-            return;
-
-        if (!peer.tryPing())
             return;
 
         // SEND VERSION MESSAGE
