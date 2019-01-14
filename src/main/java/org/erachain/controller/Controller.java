@@ -89,7 +89,7 @@ import java.util.Timer;
  */
 public class Controller extends Observable {
 
-    private static final String version = "4.11.07b1 beta";
+    private static final String version = "4.11.07b2 beta";
     private static final String buildTime = "2018-12-04 13:33:33 UTC";
     private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.DEVELOP_USE? false : false;
 
