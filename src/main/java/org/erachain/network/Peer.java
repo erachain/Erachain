@@ -15,10 +15,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -388,6 +385,15 @@ public class Peer extends Thread {
 
             }
 
+            if (false) {
+                // необходимо дать время для того чтобы в Peer.getResponse успел КЛЮЧ пересчитаться
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    //ERROR SLEEPING
+                }
+            }
+
             // CHECK stream
             if (in == null) {
                 try {
@@ -574,11 +580,23 @@ public class Peer extends Thread {
         return true;
     }
 
+    /**
+     * synchronized - дает большую задержку - прямо видно что медленне начинают запросы лететь
+     * @return
+     */
+    private synchronized int incrementKey() {
+        return this.requestKey++; // а зачем тогда синхрон?? getRequestKey();
+    }
+
+    private Random random = new Random(Integer.MAX_VALUE - 10);
     public Message getResponse(Message message, long timeSOT) {
 
         BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(1);
 
-        int localRequestKey = this.requestKey++; // а зачем тогда синхрон?? getRequestKey();
+        //int localRequestKey = incrementKey(); //this.requestKey++; // а зачем тогда синхрон?? getRequestKey();
+        // int localRequestKey = random.nextInt();
+        int localRequestKey = this.requestKey++;
+
 
         message.setId(localRequestKey);
 
