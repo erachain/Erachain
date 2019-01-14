@@ -157,7 +157,7 @@ public class Controller extends Observable {
 
     // private JSONObject Setting_Json;
 
-    private AboutFrame about_frame;
+    public AboutFrame about_frame;
     private boolean isStopping = false;
     private String info;
     private long unconfigmedMessageTimingAverage;
@@ -430,16 +430,16 @@ public class Controller extends Observable {
 
         try {
             LOGGER.info("Open " + name);
-            if (Controller.useGui)
-                about_frame.set_console_Text(Lang.getInstance().translate("Open") + " " + name);
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open") + " " + name));
 
             //// должен быть метод
             ///// dbSet.open();
             /// this.dbSet = DBSet.getinstanse();
 
             LOGGER.info(name + " OK");
-            if (Controller.useGui)
-                about_frame.set_console_Text(name + " " + Lang.getInstance().translate("OK"));
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("OK")));
 
         } catch (Throwable e) {
 
@@ -480,14 +480,15 @@ public class Controller extends Observable {
                 int n = JOptionPane.showConfirmDialog(null, Lang.getInstance().translate("BackUp Database?"),
                         Lang.getInstance().translate("Confirmation"), JOptionPane.OK_CANCEL_OPTION);
                 if (n == JOptionPane.OK_OPTION) {
-                    about_frame.set_console_Text(Lang.getInstance().translate("BackUp datachain"));
+                    this.setChanged();
+                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("BackUp datachain")));
                     // delete & copy files in BackUp dir
 
                     //// у объекта должен быть этот метод сохранения dbSet.createDataCheckpoint();
                 }
             } else {
-                if (Controller.useGui)
-                    about_frame.set_console_Text(Lang.getInstance().translate("BackUp datachain"));
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("BackUp datachain")));
                 // delete & copy files in BackUp dir
                 //// у объекта должен быть этот метод сохранения dbSet.createDataCheckpoint();
             }
@@ -498,9 +499,6 @@ public class Controller extends Observable {
     public void start() throws Exception {
 
         this.toOfflineTime = NTP.getTime();
-        if (Controller.useGui) {
-            about_frame = AboutFrame.getInstance();
-        }
         this.foundMyselfID = new byte[128];
         this.random.nextBytes(this.foundMyselfID);
 
@@ -543,11 +541,11 @@ public class Controller extends Observable {
         /////////openDataBaseFile("DataLocale", "/datalocal", DCSet);
 
         try {
-            if (Controller.useGui)
-                about_frame.set_console_Text(Lang.getInstance().translate("Open DataLocale"));
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open DataLocale")));
             this.dbSet = DBSet.getinstanse();
-            if (Controller.useGui)
-                about_frame.set_console_Text(Lang.getInstance().translate("DataLocale OK"));
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataLocale OK")));
             LOGGER.info("DataLocale OK");
         } catch (Throwable e) {
             // TODO Auto-generated catch block
@@ -558,11 +556,11 @@ public class Controller extends Observable {
 
         // OPENING DATABASES
         try {
-            if (Controller.useGui)
-                about_frame.set_console_Text(Lang.getInstance().translate("Open DataChain"));
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open DataChain")));
             this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI);
-            if (Controller.useGui)
-                about_frame.set_console_Text(Lang.getInstance().translate("DataChain OK"));
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataChain OK")));
             LOGGER.info("DataChain OK");
         } catch (Throwable e) {
             // Error open DB
@@ -580,12 +578,14 @@ public class Controller extends Observable {
                 int n = JOptionPane.showConfirmDialog(null, Lang.getInstance().translate("BackUp Database?"),
                         Lang.getInstance().translate("Confirmation"), JOptionPane.OK_CANCEL_OPTION);
                 if (n == JOptionPane.OK_OPTION) {
-                    about_frame.set_console_Text(Lang.getInstance().translate("BackUp datachain"));
+                    this.setChanged();
+                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("BackUp datachain")));
                     // delete & copy files in BackUp dir
                     createDataCheckpoint();
                 }
             } else {
-                about_frame.set_console_Text(Lang.getInstance().translate("BackUp datachain"));
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("BackUp datachain")));
                 // delete & copy files in BackUp dir
                 createDataCheckpoint();
             }
@@ -600,8 +600,8 @@ public class Controller extends Observable {
             reCreateDC();
         }
 
-        if (Controller.useGui)
-            about_frame.set_console_Text(Lang.getInstance().translate("Datachain Ok"));
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Datachain Ok")));
         // createDataCheckpoint();
 
         // CHECK IF DB NEEDS UPDATE
@@ -636,8 +636,8 @@ public class Controller extends Observable {
 
         // START API SERVICE
         if (Settings.getInstance().isRpcEnabled()) {
-            if (Controller.useGui)
-                about_frame.set_console_Text(Lang.getInstance().translate("Start API Service"));
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Start API Service")));
             LOGGER.info(Lang.getInstance().translate("Start API Service"));
            this.rpcService = new ApiService();
             this.rpcServiceRestart();
@@ -645,16 +645,16 @@ public class Controller extends Observable {
 
         // START WEB SERVICE
         if (Settings.getInstance().isWebEnabled()) {
-            if (Controller.useGui)
-                about_frame.set_console_Text(Lang.getInstance().translate("Start WEB Service"));
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Start WEB Service")));
             LOGGER.info(Lang.getInstance().translate("Start WEB Service"));
             this.webService = new WebService();
             this.webService.start();
         }
 
         // CREATE WALLET
-        if (Controller.useGui)
-            about_frame.set_console_Text(Lang.getInstance().translate("Open Wallet"));
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open Wallet")));
         this.wallet = new Wallet();
 
         if (Start.seedCommand != null && Start.seedCommand.length > 1) {
@@ -696,8 +696,8 @@ public class Controller extends Observable {
         if (this.wallet.isWalletDatabaseExisting()) {
             this.wallet.initiateItemsFavorites();
         }
-        if (Controller.useGui)
-            about_frame.set_console_Text(Lang.getInstance().translate("Wallet OK"));
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Wallet OK")));
 
         if (Settings.getInstance().isTestnet() && this.wallet.isWalletDatabaseExisting()
                 && !this.wallet.getAccounts().isEmpty()) {
@@ -705,13 +705,13 @@ public class Controller extends Observable {
         }
         // create telegtam
 
-        if (Controller.useGui)
-            about_frame.set_console_Text(Lang.getInstance().translate("Open Telegram"));
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open Telegram")));
         this.telegramStore = TelegramStore.getInstanse();
 
 
-        if (Controller.useGui)
-            about_frame.set_console_Text(Lang.getInstance().translate("Telegram OK"));
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Telegram OK")));
 
         // CREATE BLOCKGENERATOR
         this.blockGenerator = new BlockGenerator(this.dcSet, this.blockChain,true);
@@ -1999,8 +1999,8 @@ public class Controller extends Observable {
                     info = "update from MaxHeightPeer:" + peer + " WH: "
                             + getHWeightOfPeer(peer);
                     LOGGER.info(info);
-                    if (Controller.useGui && about_frame.isVisible())
-                        about_frame.set_console_Text(info);
+                    this.setChanged();
+                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate(info)));
                     try {
                         // SYNCHRONIZE FROM PEER
                         if (!this.isOnStopping())

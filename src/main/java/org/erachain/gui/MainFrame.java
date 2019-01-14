@@ -1,10 +1,6 @@
 package org.erachain.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -59,9 +55,9 @@ public class MainFrame extends JFrame implements Observer {
         }
 
         th = this;
-
+    //    this.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         Controller.getInstance().addObserver(this);
-        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         settingsJSONbuf = new JSONObject();
         settingsJSONbuf = Settings.getInstance().Dump();
         initComponents();

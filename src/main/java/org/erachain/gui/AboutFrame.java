@@ -51,7 +51,7 @@ public class AboutFrame extends JDialog implements Observer {
             public void mouseClicked(MouseEvent e) {
                 if (user_close) {
                    setVisible(false);
-                   dispose();
+     //              dispose();
                 }
             }
         });
@@ -60,7 +60,7 @@ public class AboutFrame extends JDialog implements Observer {
             public void keyPressed(KeyEvent e) {
                 if (user_close) {
                     setVisible(false);
-                   dispose();
+     //              dispose();
                 }
             }
         });
