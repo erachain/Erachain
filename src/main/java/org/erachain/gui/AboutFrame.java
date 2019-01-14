@@ -186,7 +186,9 @@ public class AboutFrame extends JDialog implements Observer {
     public void update(Observable o, Object arg) {
         ObserverMessage mes = (ObserverMessage) arg;
         if (mes.getType() == ObserverMessage.GUI_ABOUT_TYPE){
-            console_Text.setText(mes.getValue().toString());
+            String str ="";
+            if(mes.getValue() != null) str = mes.getValue().toString();
+            console_Text.setText(str);
         }
     }
 }

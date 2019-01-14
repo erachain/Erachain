@@ -45,6 +45,7 @@ import org.erachain.database.DBSet;
 import org.erachain.datachain.*;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
+import org.erachain.gui.library.Issue_Confirm_Dialog;
 import org.erachain.lang.Lang;
 import org.erachain.network.Network;
 import org.erachain.network.Peer;
@@ -53,6 +54,7 @@ import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.traders.TradersManager;
 import org.erachain.utils.*;
+import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -81,6 +83,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.Timer;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 // 04/01 +-
 
@@ -165,6 +169,9 @@ public class Controller extends Observable {
     private long transactionMessageTimingCounter;
     private long transactionProcessTimingAverage;
     private long transactionProcessTimingCounter;
+
+    public boolean backUP = false;
+    public  String[] seedCommand;
 
     public static String getVersion() {
         return version;
@@ -657,11 +664,11 @@ public class Controller extends Observable {
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open Wallet")));
         this.wallet = new Wallet();
 
-        if (Start.seedCommand != null && Start.seedCommand.length > 1) {
+        if (this.seedCommand != null && this.seedCommand.length > 1) {
             /// 0 - Accounts number, 1 - seed, 2 - password, [3 - path]
             byte[] seed;
             try {
-                seed = Base58.decode(Start.seedCommand[1]);
+                seed = Base58.decode(this.seedCommand[1]);
             } catch (Exception e) {
                 seed = null;
             }
@@ -670,7 +677,7 @@ public class Controller extends Observable {
 
                 int accsNum;
                 try {
-                    accsNum = Ints.tryParse(Start.seedCommand[0]);
+                    accsNum = Ints.tryParse(this.seedCommand[0]);
                 } catch (Exception e) {
                     accsNum = 0;
                 }
@@ -678,16 +685,16 @@ public class Controller extends Observable {
                 if (accsNum > 0) {
 
                     String path;
-                    if (Start.seedCommand.length > 3) {
-                        path = Start.seedCommand[3];
+                    if (this.seedCommand.length > 3) {
+                        path = this.seedCommand[3];
                     } else {
                         path = Settings.getInstance().getWalletDir();
                     }
 
                     boolean res = recoverWallet(seed,
-                            Start.seedCommand.length > 2 ? Start.seedCommand[2] : "1",
+                            this.seedCommand.length > 2 ? this.seedCommand[2] : "1",
                             accsNum, path);
-                    Start.seedCommand = null;
+                    this.seedCommand = null;
                 }
             }
 
@@ -3396,5 +3403,218 @@ public class Controller extends Observable {
     }
     public void addSingleObserver(Observer o){
        super.addObserver(o);
+    }
+
+    public void startApplication(String args[]){
+        boolean cli = false;
+
+        String pass = null;
+
+        for (String arg : args) {
+            if (arg.equals("-cli")) {
+                cli = true;
+                continue;
+            }
+
+            if (arg.equals("-backup")) {
+                // backUP data
+                backUP = true;
+                continue;
+            }
+
+            if (arg.equals("-nogui")) {
+                Controller.useGui = false;
+                continue;
+            }
+
+            if (arg.startsWith("-seed=") && arg.length() > 6) {
+                seedCommand = arg.substring(6).split(":");
+                continue;
+            }
+            if (arg.startsWith("-pass=") && arg.length() > 6) {
+                pass = arg.substring(6);
+                continue;
+            }
+            if (arg.startsWith("-peers=") && arg.length() > 7) {
+                Settings.getInstance().setDefaultPeers(arg.substring(7).split(","));
+                continue;
+            }
+            if (arg.equals("-testnet")) {
+                Settings.getInstance().setGenesisStamp(System.currentTimeMillis());
+                continue;
+            }
+            if (arg.startsWith("-testnet=") && arg.length() > 9) {
+                try {
+                    long testnetstamp = Long.parseLong(arg.substring(9));
+
+                    if (testnetstamp == 0) {
+                        testnetstamp = System.currentTimeMillis();
+                    }
+
+                    Settings.getInstance().setGenesisStamp(testnetstamp);
+                } catch (Exception e) {
+                    Settings.getInstance().setGenesisStamp(BlockChain.DEFAULT_MAINNET_STAMP);
+                }
+            }
+        }
+
+        if (Controller.useGui) {
+
+            this.about_frame = AboutFrame.getInstance();
+            this.addSingleObserver( Controller.getInstance().about_frame);
+            this.about_frame.setUserClose(false);
+           this.about_frame.setModal(false);
+            this.about_frame.setVisible(true);
+        }
+        if (!cli) {
+            try {
+
+                //ONE MUST BE ENABLED
+                if (!Settings.getInstance().isGuiEnabled() && !Settings.getInstance().isRpcEnabled()) {
+                    throw new Exception(Lang.getInstance().translate("Both gui and rpc cannot be disabled!"));
+                }
+
+                LOGGER.info(Lang.getInstance().translate("Starting %app%")
+                        .replace("%app%", Lang.getInstance().translate(Controller.APP_NAME)));
+                LOGGER.info(Controller.getManifestInfo());
+
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, info));
+
+
+                String licenseFile = "Erachain Licence Agreement (genesis).txt";
+                File f = new File(licenseFile);
+                if(!f.exists()) {
+
+                    LOGGER.error("License file not found: " + licenseFile);
+
+                    //FORCE SHUTDOWN
+                    System.exit(3);
+
+                }
+
+
+                //STARTING NETWORK/BLOCKCHAIN/RPC
+
+                Controller.getInstance().start();
+
+                //unlock wallet
+
+                if (pass != null && Controller.getInstance().doesWalletDatabaseExists()) {
+                    if (Controller.getInstance().unlockWallet(pass))
+                        Controller.getInstance().lockWallet();
+                }
+
+                Status.getinstance();
+
+                if (!Controller.useGui) {
+                    LOGGER.info("-nogui used");
+                } else {
+
+                    try {
+                        Thread.sleep(100);
+
+                        //START GUI
+
+                        if (Gui.getInstance() != null && Settings.getInstance().isSysTrayEnabled()) {
+
+                            SysTray.getInstance().createTrayIcon();
+                            about_frame.setVisible(false);
+                            about_frame.getInstance().dispose();
+                        }
+                    } catch (Exception e1) {
+                        if (Controller.useGui) {
+                            about_frame.setVisible(false);
+                            about_frame.dispose();
+                        }
+                        LOGGER.error(Lang.getInstance().translate("GUI ERROR - at Start"), e1);
+                    }
+                }
+
+
+            } catch (Exception e) {
+
+                LOGGER.error(e.getMessage(), e);
+                // show error dialog
+                if (Controller.useGui) {
+                    if (Settings.getInstance().isGuiEnabled()) {
+                        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, null,
+                                Lang.getInstance().translate("STARTUP ERROR") + ": " + e.getMessage(), 600, 400, Lang.getInstance().translate(" "));
+                        dd.jButton1.setVisible(false);
+                        dd.jButton2.setText(Lang.getInstance().translate("Cancel"));
+                        dd.setLocationRelativeTo(null);
+                        dd.setVisible(true);
+                    }
+                }
+
+                //USE SYSTEM STYLE
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (Exception e2) {
+                    LOGGER.error(e2.getMessage(), e2);
+                }
+
+                //ERROR STARTING
+                LOGGER.error(Lang.getInstance().translate("STARTUP ERROR") + ": " + e.getMessage());
+
+                if (Gui.isGuiStarted()) {
+                    JOptionPane.showMessageDialog(null, e.getMessage(), Lang.getInstance().translate("Startup Error"), JOptionPane.ERROR_MESSAGE);
+
+
+                }
+
+
+                if (Controller.useGui) {
+                    about_frame.setVisible(false);
+                    about_frame.dispose();
+                }
+                //FORCE SHUTDOWN
+                System.exit(0);
+            }
+        } else {
+            Scanner scanner = new Scanner(System.in);
+            ApiClient client = new ApiClient();
+
+            while (true) {
+
+                System.out.print("[COMMAND] ");
+                String command = scanner.nextLine();
+
+                if (command.equals("quit")) {
+
+                    if (Controller.useGui) {
+                        about_frame.setVisible(false);
+                        about_frame.dispose();
+                    }
+                    scanner.close();
+                    System.exit(0);
+                }
+
+                String result = client.executeCommand(command);
+                LOGGER.info("[RESULT] " + result);
+            }
+        }
+
+    }
+
+    public static String getManifestInfo() throws IOException {
+        Enumeration<URL> resources = Thread.currentThread()
+                .getContextClassLoader()
+                .getResources("META-INF/MANIFEST.MF");
+        while (resources.hasMoreElements()) {
+            try {
+                Manifest manifest = new Manifest(resources.nextElement().openStream());
+                Attributes attributes = manifest.getMainAttributes();
+                String implementationTitle = attributes.getValue("Implementation-Title");
+                if (implementationTitle != null) { // && implementationTitle.equals(applicationName))
+                    String implementationVersion = attributes.getValue("Implementation-Version");
+                    String buildTime = attributes.getValue("Build-Time");
+                    return implementationVersion + " build " + buildTime;
+                }
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        return "Current Version";
     }
 }
