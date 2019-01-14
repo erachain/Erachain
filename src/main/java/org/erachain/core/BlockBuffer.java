@@ -100,7 +100,12 @@ public class BlockBuffer extends Thread {
     public Block getBlock(byte[] signature) throws Exception {
 
         Block block;
-        if (!this.blocks.containsKey(signature)) {
+        if (this.blocks.containsKey(signature)) {
+            //CHECK ERROR
+            if (this.error) {
+                throw new Exception("Block buffer error 0 - on contains");
+            }
+        } else {
             //CHECK ERROR
             if (this.error) {
                 throw new Exception("Block buffer error 1 - before loadBlock");
