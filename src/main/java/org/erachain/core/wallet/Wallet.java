@@ -719,7 +719,7 @@ public class Wallet extends Observable implements Observer {
 	public boolean unlock(SecureWalletDatabase secureDatabase) {
 		this.secureDatabase = secureDatabase;
 
-        if (Controller.useGui) {
+        if (Controller.getInstance().useGui) {
             // NOTIFY
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_STATUS, STATUS_UNLOCKED));
@@ -761,7 +761,7 @@ public class Wallet extends Observable implements Observer {
             this.secureDatabase = null;
         }
 
-        if (Controller.useGui) {
+        if (Controller.getInstance().useGui) {
             // NOTIFY
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_STATUS, STATUS_LOCKED));

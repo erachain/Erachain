@@ -1,10 +1,6 @@
 package org.erachain.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -36,10 +32,10 @@ import org.erachain.utils.SaveStrToFile;
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame implements Observer {
     private static MainFrame instance;
-    private JSONObject settingsJSONbuf;
+   private JSONObject settingsJSONbuf;
     private JSONObject main_Frame_settingsJSON;
     // Variables declaration - do not modify
-    private Menu_Files jMenu1;
+    public Menu_Files jMenu_Files;
     private Menu_Deals jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     public Main_Panel mainPanel;
@@ -59,16 +55,15 @@ public class MainFrame extends JFrame implements Observer {
         }
 
         th = this;
-
+    //    this.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         Controller.getInstance().addObserver(this);
-
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         settingsJSONbuf = new JSONObject();
         settingsJSONbuf = Settings.getInstance().Dump();
         initComponents();
 
         // WALLET STATS
         this.add(new StatusPanel(), BorderLayout.SOUTH);
-
         this.setVisible(true);
     }
 
@@ -80,8 +75,6 @@ public class MainFrame extends JFrame implements Observer {
         return instance;
     }
 
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">
     public void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
@@ -89,8 +82,9 @@ public class MainFrame extends JFrame implements Observer {
         mainPanel = Main_Panel.getInstance();
         // statusPanel = new StatusPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new Menu_Files();
+        jMenu_Files= new Menu_Files();
         jMenu2 = new Menu_Deals();
+
 
         // getContentPane().setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -126,8 +120,8 @@ public class MainFrame extends JFrame implements Observer {
         // getContentPane().add(jPanel2, gridBagConstraints);
         // this.add(new StatusPanel(), BorderLayout.SOUTH);
 
-        jMenu1.setText(Lang.getInstance().translate("File"));
-        jMenuBar1.add(jMenu1);
+        jMenu_Files.setText(Lang.getInstance().translate("File"));
+        jMenuBar1.add(jMenu_Files);
 
         jMenu2.setText(Lang.getInstance().translate("Deals"));
         jMenuBar1.add(jMenu2);
@@ -152,100 +146,18 @@ public class MainFrame extends JFrame implements Observer {
             public void windowClosing(WindowEvent arg0) {
                 // TODO Auto-generated method stub
                 // read settings
-                int lDiv;
-                int div;
-                Split_Panel sP;
-                HashMap outOpenTabbeds = new HashMap();
-                JSONObject settingsJSON = new JSONObject();
-                settingsJSONbuf = Settings.getInstance().getJSONObject();
-                if (settingsJSONbuf.containsKey("Main_Frame_Setting"))
-                    settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
-                if (th.getExtendedState() != MAXIMIZED_BOTH) {
-                    settingsJSON.put("Main_Frame_is_Max", "false");
-                    settingsJSON.put("Main_Frame_Height", getHeight() + ""); // высота
-                    settingsJSON.put("Main_Frame_Width", getWidth() + ""); // длина
-                    settingsJSON.put("Main_Frame_Loc_X", getX() + ""); // высота
-                    settingsJSON.put("Main_Frame_Loc_Y", getY() + ""); // высота
-                } else {
+                // You can still stop closing if you want to
+                int res = JOptionPane.showConfirmDialog(th, "Are you sure you want to close?", "Close?", JOptionPane.YES_NO_OPTION);
+                if ( res == 0 ) {
+                    closeFrame();
 
-                    settingsJSON.put("Main_Frame_is_Max", "true");
+                    java.awt.EventQueue.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            new ClosingDialog();
+                        }
+                    });
                 }
-
-                settingsJSON.put("Main_Frame_Div_Orientation", mainPanel.jSplitPane1.getOrientation() + "");
-                // horisontal - vertical orientation
-                lDiv = mainPanel.jSplitPane1.getLastDividerLocation();
-                div = mainPanel.jSplitPane1.getDividerLocation();
-
-                settingsJSON.put("Main_Frame_Div_Last_Loc", lDiv + "");
-                settingsJSON.put("Main_Frame_Div_Loc", div + "");
-                settingsJSON.remove("OpenTabbeds");
-                for (int i = 0; i < mainPanel.jTabbedPane1.getTabCount(); i++) {
-                    // write in setting opet tabbs
-                    Component comp = mainPanel.jTabbedPane1.getComponentAt(i);
-                    outOpenTabbeds.put(i, comp.getClass().getSimpleName());
-
-                    // write open tabbed settings Split panel
-                    if (comp instanceof Split_Panel) {
-                        HashMap outTabbedDiv = new HashMap();
-
-                        sP = ((Split_Panel) comp);
-                        outTabbedDiv.put("Div_Orientation", sP.jSplitPanel.getOrientation() + "");
-
-                        // write
-
-                        lDiv = sP.jSplitPanel.getLastDividerLocation();
-                        div = sP.jSplitPanel.getDividerLocation();
-
-                        outTabbedDiv.put("Div_Last_Loc", lDiv + "");
-                        outTabbedDiv.put("Div_Loc", div + "");
-
-                        settingsJSON.put(comp.getClass().getSimpleName(), outTabbedDiv);
-                    }
-
-                    settingsJSON.put("OpenTabbeds", outOpenTabbeds);
-
-                }
-                settingsJSON.put("Main_Frame_Selected_Tab", mainPanel.jTabbedPane1.getSelectedIndex() + "");
-
-                settingsJSONbuf.put("Main_Frame_Setting", settingsJSON);
-                settingsJSONbuf.put("FileChooser_Path", new String(My_JFileChooser.get_Default_Path()));
-                settingsJSONbuf.put("FileChooser_Wight", My_JFileChooser.get_Default_Width());
-                settingsJSONbuf.put("FileChooser_Height", My_JFileChooser.get_Default_Height());
-                
-                settingsJSONbuf.put("Telegram_Sender", Settings.getInstance().getTelegramDefaultSender());
-                settingsJSONbuf.put("Telegram_Reciever", Settings.getInstance().getTelegramDefaultReciever());
-                settingsJSONbuf.put("Telegram_Ratio_Reciever", Settings.getInstance().getTelegramRatioReciever());
-
-                // saving menu
-                int tree_Row = 0;
-                HashMap treeJSON = new HashMap();
-                for (int rr = 0; rr < mainPanel.mlp.tree.tree.getRowCount(); rr++) {
-
-                    if (mainPanel.mlp.tree.tree.isCollapsed(rr)) {
-                        // write to Json
-                        // TreePath tree_Component =
-                        // mainPanel.mlp.tree.tree.getPathForRow(rr);
-                        treeJSON.put(tree_Row++, rr);
-
-                    }
-                    ;
-
-                }
-                if (!treeJSON.isEmpty()) {
-                    settingsJSONbuf.put("Main_Tree", treeJSON);
-
-                }
-
-                // save setting to setting file
-                try {
-                    SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsJSONbuf);
-                } catch (IOException e) {
-                    JOptionPane.showMessageDialog(new JFrame(), "Error writing to the file: "
-                                    + Settings.getInstance().getSettingsPath() + "\nProbably there is no access.", "Error!",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-
-                new ClosingDialog();
 
             }
 
@@ -405,5 +317,99 @@ public class MainFrame extends JFrame implements Observer {
             }
         }
 
+    }
+    private void closeFrame(){
+        int lDiv;
+        int div;
+        Split_Panel sP;
+        HashMap outOpenTabbeds = new HashMap();
+        JSONObject settingsJSON = new JSONObject();
+        settingsJSONbuf = Settings.getInstance().getJSONObject();
+        if (settingsJSONbuf.containsKey("Main_Frame_Setting"))
+            settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
+        if (th.getExtendedState() != MAXIMIZED_BOTH) {
+            settingsJSON.put("Main_Frame_is_Max", "false");
+            settingsJSON.put("Main_Frame_Height", getHeight() + ""); // высота
+            settingsJSON.put("Main_Frame_Width", getWidth() + ""); // длина
+            settingsJSON.put("Main_Frame_Loc_X", getX() + ""); // высота
+            settingsJSON.put("Main_Frame_Loc_Y", getY() + ""); // высота
+        } else {
+
+            settingsJSON.put("Main_Frame_is_Max", "true");
+        }
+
+        settingsJSON.put("Main_Frame_Div_Orientation", mainPanel.jSplitPane1.getOrientation() + "");
+        // horisontal - vertical orientation
+        lDiv = mainPanel.jSplitPane1.getLastDividerLocation();
+        div = mainPanel.jSplitPane1.getDividerLocation();
+
+        settingsJSON.put("Main_Frame_Div_Last_Loc", lDiv + "");
+        settingsJSON.put("Main_Frame_Div_Loc", div + "");
+        settingsJSON.remove("OpenTabbeds");
+        for (int i = 0; i < mainPanel.jTabbedPane1.getTabCount(); i++) {
+            // write in setting opet tabbs
+            Component comp = mainPanel.jTabbedPane1.getComponentAt(i);
+            outOpenTabbeds.put(i, comp.getClass().getSimpleName());
+
+            // write open tabbed settings Split panel
+            if (comp instanceof Split_Panel) {
+                HashMap outTabbedDiv = new HashMap();
+
+                sP = ((Split_Panel) comp);
+                outTabbedDiv.put("Div_Orientation", sP.jSplitPanel.getOrientation() + "");
+
+                // write
+
+                lDiv = sP.jSplitPanel.getLastDividerLocation();
+                div = sP.jSplitPanel.getDividerLocation();
+
+                outTabbedDiv.put("Div_Last_Loc", lDiv + "");
+                outTabbedDiv.put("Div_Loc", div + "");
+
+                settingsJSON.put(comp.getClass().getSimpleName(), outTabbedDiv);
+            }
+
+            settingsJSON.put("OpenTabbeds", outOpenTabbeds);
+
+        }
+        settingsJSON.put("Main_Frame_Selected_Tab", mainPanel.jTabbedPane1.getSelectedIndex() + "");
+
+        settingsJSONbuf.put("Main_Frame_Setting", settingsJSON);
+        settingsJSONbuf.put("FileChooser_Path", new String(My_JFileChooser.get_Default_Path()));
+        settingsJSONbuf.put("FileChooser_Wight", My_JFileChooser.get_Default_Width());
+        settingsJSONbuf.put("FileChooser_Height", My_JFileChooser.get_Default_Height());
+
+        settingsJSONbuf.put("Telegram_Sender", Settings.getInstance().getTelegramDefaultSender());
+        settingsJSONbuf.put("Telegram_Reciever", Settings.getInstance().getTelegramDefaultReciever());
+        settingsJSONbuf.put("Telegram_Ratio_Reciever", Settings.getInstance().getTelegramRatioReciever());
+
+        // saving menu
+        int tree_Row = 0;
+        HashMap treeJSON = new HashMap();
+        for (int rr = 0; rr < mainPanel.mlp.tree.tree.getRowCount(); rr++) {
+
+            if (mainPanel.mlp.tree.tree.isCollapsed(rr)) {
+                // write to Json
+                // TreePath tree_Component =
+                // mainPanel.mlp.tree.tree.getPathForRow(rr);
+                treeJSON.put(tree_Row++, rr);
+
+            }
+            ;
+
+        }
+        if (!treeJSON.isEmpty()) {
+            settingsJSONbuf.put("Main_Tree", treeJSON);
+
+        }
+
+        // save setting to setting file
+        try {
+            SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsJSONbuf);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(new JFrame(), "Error writing to the file: "
+                            + Settings.getInstance().getSettingsPath() + "\nProbably there is no access.", "Error!",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

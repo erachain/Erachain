@@ -20,6 +20,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.apache.commons.io.FileUtils;
+import org.erachain.gui.MainFrame;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.json.simple.JSONArray;
@@ -387,8 +388,8 @@ public class SettingsFrame extends JDialog {
         if (settingsTabPane.settingsAllowedPanel.webServiceRestart) {
             Controller.getInstance().webServiceRestart();
 
-            Menu_Files.webServerItem.setVisible(Settings.getInstance().isWebEnabled());
-            Menu_Files.blockExplorerItem.setVisible(Settings.getInstance().isWebEnabled());
+            MainFrame.getInstance().jMenu_Files.webServerItem.setVisible(Settings.getInstance().isWebEnabled());
+            MainFrame.getInstance().jMenu_Files.blockExplorerItem.setVisible(Settings.getInstance().isWebEnabled());
         }
         Lang.getInstance().loadLang();
 
