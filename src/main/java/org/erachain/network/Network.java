@@ -126,29 +126,24 @@ public class Network extends Observable {
 
     public void tryDisconnect(Peer peer, int banForMinutes, String error) {
 
-        if (!peer.isUsed()) {
-            //ADD TO BLACKLIST
-            PeerManager.getInstance().addPeer(peer, banForMinutes);
-            return;
-        }
+        if (peer.isUsed()) {
+            //CLOSE CONNECTION
+            peer.close();
 
-        //CLOSE CONNECTION
-        peer.close();
+            if (error != null && error.length() > 0) {
+                if (banForMinutes != 0) {
+                    LOGGER.info(peer + " ban for minutes: " + banForMinutes + " - " + error);
+                } else {
+                    LOGGER.info("tryDisconnect : " + peer + " - " + error);
+                }
+            }
+
+            //PASS TO CONTROLLER
+            Controller.getInstance().afterDisconnect(peer);
+        }
 
         //ADD TO BLACKLIST
         PeerManager.getInstance().addPeer(peer, banForMinutes);
-
-        if (error != null && error.length() > 0) {
-            if (banForMinutes != 0) {
-                LOGGER.info(peer + " ban for minutes: " + banForMinutes + " - " + error);
-            } else {
-                LOGGER.info("tryDisconnect : " + peer + " - " + error);
-            }
-        }
-
-
-        //PASS TO CONTROLLER
-        Controller.getInstance().afterDisconnect(peer);
 
         //NOTIFY OBSERVERS
         this.setChanged();

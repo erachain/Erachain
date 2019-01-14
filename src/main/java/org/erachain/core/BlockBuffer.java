@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class BlockBuffer extends Thread {
     private static final int BUFFER_SIZE = 20;
+    private static final int BLOCK_TIMEOUT = 20000;
     private static final Logger LOGGER = LoggerFactory.getLogger(BlockBuffer.class);
     private List<byte[]> signatures;
     private Peer peer;
@@ -51,7 +52,7 @@ public class BlockBuffer extends Thread {
             }
 
             try {
-                Thread.sleep(10);
+                Thread.sleep(1);
             } catch (InterruptedException e) {
                 //ERROR SLEEPING
             }
@@ -70,7 +71,7 @@ public class BlockBuffer extends Thread {
                 Message message = MessageFactory.getInstance().createGetBlockMessage(signature);
 
                 //SEND MESSAGE TO PEER
-                BlockMessage response = (BlockMessage) peer.getResponse(message, Synchronizer.GET_BLOCK_TIMEOUT);
+                BlockMessage response = (BlockMessage) peer.getResponse(message, BLOCK_TIMEOUT);
 
                 //CHECK IF WE GOT RESPONSE
                 if (response == null) {
@@ -99,16 +100,10 @@ public class BlockBuffer extends Thread {
     public Block getBlock(byte[] signature) throws Exception {
 
         Block block;
-        if (this.blocks.containsKey(signature)) {
-            if (this.error) {
-                throw new Exception("Block buffer error 0");
-            }
-
-        } else {
-
+        if (!this.blocks.containsKey(signature)) {
             //CHECK ERROR
             if (this.error) {
-                throw new Exception("Block buffer error 1");
+                throw new Exception("Block buffer error 1 - before loadBlock");
             }
 
             //CHECK IF ALREADY LOADED BLOCK
@@ -117,7 +112,7 @@ public class BlockBuffer extends Thread {
 
             //GET BLOCK
             if (this.error) {
-                throw new Exception("Block buffer error 2");
+                throw new Exception("Block buffer error 2 - after loadBlock");
             }
 
         }
@@ -126,10 +121,10 @@ public class BlockBuffer extends Thread {
         this.counter = this.signatures.indexOf(signature);
 
         //
-        block = this.blocks.get(signature).poll(BlockChain.HARD_WORK?30000 : 5000, //Synchronizer.GET_BLOCK_TIMEOUT,
+        block = this.blocks.get(signature).poll(BlockChain.HARD_WORK?30000 : BLOCK_TIMEOUT,
                 TimeUnit.MILLISECONDS);
         if (block == null) {
-            throw new Exception("Block buffer error 3");
+            throw new Exception("Block buffer error 3 - TIMEOUT on this.blocks.POLL");
         }
 
         return block;
