@@ -379,18 +379,13 @@ public class Peer extends Thread {
             ) {
 
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                 } catch (Exception e) {
                 }
 
                 in = null;
                 continue;
 
-            }
-
-            try {
-                Thread.sleep(100);
-            } catch (Exception e) {
             }
 
             // CHECK stream
