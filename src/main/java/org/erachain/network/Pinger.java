@@ -3,14 +3,12 @@ package org.erachain.network;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
-import org.erachain.datachain.DCSet;
 import org.erachain.network.message.HWeightMessage;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.settings.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Pinger extends Thread {
 
@@ -77,9 +75,9 @@ public class Pinger extends Thread {
                 this.ping = -1;
 
             //PING FAILES
-            if (this.ping < -20) {
-                // если полный отказ уже больше чем ХХХ секнд то бан
-                this.peer.ban("on PING FAILES");
+            if (this.ping < -10) {
+                // если полный отказ уже больше чем ХХХ секнд то ИМЕННО БАН
+                this.peer.ban(5, "on PING FAILES");
             }
 
             return false;
