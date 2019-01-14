@@ -35,7 +35,7 @@ public class MainFrame extends JFrame implements Observer {
    private JSONObject settingsJSONbuf;
     private JSONObject main_Frame_settingsJSON;
     // Variables declaration - do not modify
-    private Menu_Files jMenu1;
+    public Menu_Files jMenu_Files;
     private Menu_Deals jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     public Main_Panel mainPanel;
@@ -82,8 +82,9 @@ public class MainFrame extends JFrame implements Observer {
         mainPanel = Main_Panel.getInstance();
         // statusPanel = new StatusPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new Menu_Files();
+        jMenu_Files= new Menu_Files();
         jMenu2 = new Menu_Deals();
+
 
         // getContentPane().setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -119,8 +120,8 @@ public class MainFrame extends JFrame implements Observer {
         // getContentPane().add(jPanel2, gridBagConstraints);
         // this.add(new StatusPanel(), BorderLayout.SOUTH);
 
-        jMenu1.setText(Lang.getInstance().translate("File"));
-        jMenuBar1.add(jMenu1);
+        jMenu_Files.setText(Lang.getInstance().translate("File"));
+        jMenuBar1.add(jMenu_Files);
 
         jMenu2.setText(Lang.getInstance().translate("Deals"));
         jMenuBar1.add(jMenu2);

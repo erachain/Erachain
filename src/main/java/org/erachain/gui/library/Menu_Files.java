@@ -34,9 +34,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class Menu_Files extends JMenu {
-    public static JMenuItem webServerItem;
-    public static JMenuItem blockExplorerItem;
-    public static JMenuItem lockItem;
+    public  JMenuItem webServerItem;
+    public  JMenuItem blockExplorerItem;
+    public  JMenuItem lockItem;
     public ImageIcon lockedIcon;
     public ImageIcon unlockedIcon;
     private Menu_Files th;
