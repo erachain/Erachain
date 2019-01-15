@@ -34,9 +34,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class Menu_Files extends JMenu {
-    public static JMenuItem webServerItem;
-    public static JMenuItem blockExplorerItem;
-    public static JMenuItem lockItem;
+    public  JMenuItem webServerItem;
+    public  JMenuItem blockExplorerItem;
+    public  JMenuItem lockItem;
     public ImageIcon lockedIcon;
     public ImageIcon unlockedIcon;
     private Menu_Files th;
@@ -281,16 +281,12 @@ public class Menu_Files extends JMenu {
         aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
         aboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (Controller.useGui) {
                     AboutFrame.getInstance().setCursor(new Cursor(Cursor.HAND_CURSOR));
                     AboutFrame.getInstance().set_console_Text("");
                     AboutFrame.getInstance().setUserClose(true);
                     AboutFrame.getInstance().setModal(true);
                     AboutFrame.getInstance().setVisible(true);
                 }
-
-
-            }
         });
         add(aboutItem);
 

@@ -2,6 +2,7 @@ package org.erachain.gui;
 
 import org.erachain.controller.Controller;
 import org.erachain.lang.Lang;
+import org.erachain.utils.ObserverMessage;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,21 +13,20 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.*;
 import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 @SuppressWarnings("serial")
-public class AboutFrame extends JDialog {
+public class AboutFrame extends JDialog implements Observer {
 
     private static AboutFrame instance;
     protected boolean user_close = true;
     private AboutPanel aboutPanel;
     private JTextField console_Text;
 
-    private AboutFrame() {
+    public AboutFrame() {
         //CREATE FRAME
         setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Debug"));
         //setModalityType(DEFAULT_MODALITY_TYPE);
@@ -50,8 +50,8 @@ public class AboutFrame extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (user_close) {
-                    setVisible(false);
-                    dispose();
+                   setVisible(false);
+     //              dispose();
                 }
             }
         });
@@ -60,7 +60,7 @@ public class AboutFrame extends JDialog {
             public void keyPressed(KeyEvent e) {
                 if (user_close) {
                     setVisible(false);
-                    dispose();
+     //              dispose();
                 }
             }
         });
@@ -100,7 +100,12 @@ public class AboutFrame extends JDialog {
         gbc_lbllversionLabel.gridy = 2;
         aboutPanel.add(lblversionLabel, gbc_lbllversionLabel);
 
-        JLabel label = new JLabel(Lang.getInstance().translate("Build date: ") + getManifestInfo());
+        JLabel label = null;
+        try {
+            label = new JLabel(Lang.getInstance().translate("Build date: ") + Controller.getManifestInfo());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setForeground(Color.RED);
         label.setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -153,32 +158,15 @@ public class AboutFrame extends JDialog {
 
     }
 
-    public static String getManifestInfo() {
 
-        try {
-            Enumeration<URL> resources = Thread.currentThread()
-                    .getContextClassLoader()
-                    .getResources("META-INF/MANIFEST.MF");
-            while (resources.hasMoreElements()) {
-                try {
-                    Manifest manifest = new Manifest(resources.nextElement().openStream());
-                    Attributes attributes = manifest.getMainAttributes();
-                    String implementationTitle = attributes.getValue("Implementation-Title");
-                    if (implementationTitle != null) { // && implementationTitle.equals(applicationName))
-                        String implementationVersion = attributes.getValue("Implementation-Version");
-                        String buildTime = attributes.getValue("Build-Time");
-                        if (buildTime == null)
-                            buildTime = LocalDateTime.now().toString();
-                        return buildTime + " " + implementationVersion;
 
-                    }
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-        } catch (Exception e) {
-            return "Current Version";
+    @Override
+    public void update(Observable o, Object arg) {
+        ObserverMessage mes = (ObserverMessage) arg;
+        if (mes.getType() == ObserverMessage.GUI_ABOUT_TYPE){
+            String str ="";
+            if(mes.getValue() != null) str = mes.getValue().toString();
+            console_Text.setText(str);
         }
-        return "Current Version";
     }
 }
