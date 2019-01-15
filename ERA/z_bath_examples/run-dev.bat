@@ -1,8 +1,8 @@
 @ECHO OFF
 set app=erachain-dev
-set xms=128
+set xms=512
 set xmx=1024
-set mms=512
+set mms=256
 
 IF EXIST java (
 	start "%app%" java -Xms%xms%m -Xmx%xmx%m -XX:MaxMetaspaceSize=%mms%m -XX:MaxMetaspaceSize=%mms%m -jar %app%.jar
