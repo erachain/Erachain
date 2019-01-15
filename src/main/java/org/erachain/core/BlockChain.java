@@ -784,7 +784,11 @@ public class BlockChain {
         // FULL VALIDATE because before was only HEAD validating
         if (!block.isValid(dcSet, false)) {
             LOGGER.info("new winBlock is BAD!");
-            Controller.getInstance().banPeerOnError(peer, "invalid block", 30);
+            if (peer != null)
+                Controller.getInstance().banPeerOnError(peer, "invalid block", 30);
+            else
+                LOGGER.error("new MY winBlock is INVALID!");
+
             return false;
         }
 
