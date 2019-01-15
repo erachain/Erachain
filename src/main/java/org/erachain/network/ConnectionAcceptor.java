@@ -2,10 +2,9 @@ package org.erachain.network;
 
 import org.erachain.controller.Controller;
 import org.erachain.database.PeerMap;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.settings.Settings;
-import sun.nio.ch.Net;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -75,10 +74,10 @@ public class ConnectionAcceptor extends Thread {
             } catch (Exception e) {
                 try {
                     socket.close();
-                    socket = null;
                 } catch (Exception e1) {
                 }
 
+                socket = null;
                 continue;
 
             }
