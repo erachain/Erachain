@@ -100,7 +100,12 @@ public class AboutFrame extends JDialog implements Observer {
         gbc_lbllversionLabel.gridy = 2;
         aboutPanel.add(lblversionLabel, gbc_lbllversionLabel);
 
-        JLabel label = new JLabel(Lang.getInstance().translate("Build date: ") + getManifestInfo());
+        JLabel label = null;
+        try {
+            label = new JLabel(Lang.getInstance().translate("Build date: ") + Controller.getManifestInfo());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setForeground(Color.RED);
         label.setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -153,34 +158,7 @@ public class AboutFrame extends JDialog implements Observer {
 
     }
 
-    public static String getManifestInfo() {
 
-        try {
-            Enumeration<URL> resources = Thread.currentThread()
-                    .getContextClassLoader()
-                    .getResources("META-INF/MANIFEST.MF");
-            while (resources.hasMoreElements()) {
-                try {
-                    Manifest manifest = new Manifest(resources.nextElement().openStream());
-                    Attributes attributes = manifest.getMainAttributes();
-                    String implementationTitle = attributes.getValue("Implementation-Title");
-                    if (implementationTitle != null) { // && implementationTitle.equals(applicationName))
-                        String implementationVersion = attributes.getValue("Implementation-Version");
-                        String buildTime = attributes.getValue("Build-Time");
-                        if (buildTime == null)
-                            buildTime = LocalDateTime.now().toString();
-                        return buildTime + " " + implementationVersion;
-
-                    }
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-        } catch (Exception e) {
-            return "Current Version";
-        }
-        return "Current Version";
-    }
 
     @Override
     public void update(Observable o, Object arg) {
