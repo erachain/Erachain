@@ -593,9 +593,13 @@ public class Peer extends Thread {
 
         BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(1);
 
-        //int localRequestKey = incrementKey(); //this.requestKey++; // а зачем тогда синхрон?? getRequestKey();
-        // int localRequestKey = random.nextInt();
-        int localRequestKey = this.requestKey++;
+        int localRequestKey = incrementKey(); // быстро и без колллизий
+
+        //int localRequestKey = random.nextInt(Integer.MAX_VALUE); - быстро но могут быть коллизии
+        //if (localRequestKey <= 0)
+        //    localRequestKey = 1;
+
+        //int localRequestKey = this.requestKey++;//  - очень быстрая синхронизация цепочки но с коллзиями
 
 
         message.setId(localRequestKey);
