@@ -148,15 +148,23 @@ public class ConnectionCreator extends Thread {
                 //GET LIST OF KNOWN PEERS
                 knownPeers = PeerManager.getInstance().getKnownPeers();
 
+                if(!isRun) {
+                    for (Peer peer : knownPeers) {
+                        // if halt close all peers Threads
+                        if (!this.isRun && peer.isAlive()) {
+                            peer.halt();
+                            while (peer.isAlive()) ;
+                            knownPeers.remove(peer);
+                            continue;
+                        }
+                    }
+                    return;
+                }
                 //ITERATE knownPeers
                 for (Peer peer : knownPeers) {
                     // if halt close all peers Threads
-                    if(!this.isRun && peer.isAlive()) {
-                        peer.halt();
-                        while(peer.isAlive());
-                        knownPeers.remove(peer);
+                    if (!this.isRun)
                         continue;
-                    }
                     //CHECK IF WE ALREADY HAVE MIN CONNECTIONS
                     if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true)) {
                         // stop use KNOWN peers
@@ -221,18 +229,7 @@ public class ConnectionCreator extends Thread {
                 }
             }
             // stop peers & return
-            if(!isRun) {
-                for (Peer peer : knownPeers) {
-                    // if halt close all peers Threads
-                    if (!this.isRun && peer.isAlive()) {
-                        peer.halt();
-                        while (peer.isAlive()) ;
-                        knownPeers.remove(peer);
-                        continue;
-                    }
-                }
-                return;
-            }
+
             //CHECK IF WE STILL NEED NEW CONNECTIONS
             // USE unknown peers from known peers
             if (this.isRun && Settings.getInstance().getMinConnections() > callback.getActivePeersCounter(true)) {
