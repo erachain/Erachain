@@ -59,7 +59,7 @@ public class ConnectionCreator extends Thread {
         for (Peer newPeer: peersMessage.getPeers()) {
 
             if (!this.isRun)
-                return 0;
+                break;
 
             if (foreignPeersCounter >= maxReceivePeers) {
                 // FROM EACH peer get only maxReceivePeers
@@ -105,7 +105,7 @@ public class ConnectionCreator extends Thread {
                 continue;
 
             if (!this.isRun)
-                return 0;
+                break;
 
             //CONNECT
             if (newPeer.connect(callback, "connected in recurse +++ ")) {
@@ -131,7 +131,8 @@ public class ConnectionCreator extends Thread {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                LOGGER.error(e.getMessage(), e);
+      //          LOGGER.error(e.getMessage(), e);
+                return;
             }
 
             if (!this.isRun)
@@ -149,7 +150,12 @@ public class ConnectionCreator extends Thread {
 
                 //ITERATE knownPeers
                 for (Peer peer : knownPeers) {
-
+                    // if halt close all peers Threads
+                    if(!this.isRun) {
+                        peer.halt();
+                        while(peer.isAlive());
+                        continue;
+                    }
                     //CHECK IF WE ALREADY HAVE MIN CONNECTIONS
                     if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true)) {
                         // stop use KNOWN peers
@@ -163,11 +169,12 @@ public class ConnectionCreator extends Thread {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
-                        LOGGER.error(e.getMessage(),e);
+                    //    LOGGER.error(e.getMessage(),e);
+                        continue;
                     }
 
                     if (!this.isRun)
-                        return;
+                        continue;
 
                     //CHECK IF SOCKET IS NOT LOCALHOST
                     //if(true)
@@ -189,7 +196,7 @@ public class ConnectionCreator extends Thread {
                         continue;
 
                     if (!this.isRun)
-                        return;
+                        continue;
 
                     LOGGER.info("try connect to: " + peer);
 
@@ -205,10 +212,10 @@ public class ConnectionCreator extends Thread {
 
                     //CONNECT
                     //CHECK IF ALREADY CONNECTED TO PEER
-                    if (peer.connect(callback, "connected +++ ")) {
+                    if (this.isRun) if (peer.connect(callback, "connected +++ ")) {
 
                         // TRY CONNECT to WHITE peers of this PEER
-                        connectToPeersOfThisPeer(peer, 4);
+                        if (this.isRun)   connectToPeersOfThisPeer(peer, 4);
                     }
                 }
             }
@@ -261,6 +268,7 @@ public class ConnectionCreator extends Thread {
                     Thread.sleep(60000);
             } catch (InterruptedException e) {
                 LOGGER.error(e.getMessage(), e);
+                return;
             }
 
         }
@@ -268,5 +276,6 @@ public class ConnectionCreator extends Thread {
 
     public void halt() {
         this.isRun = false;
+        this.interrupt();
     }
 }

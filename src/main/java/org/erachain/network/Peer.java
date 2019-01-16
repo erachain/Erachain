@@ -348,7 +348,8 @@ public class Peer extends Thread {
 
                 try {
                     Thread.sleep(200);
-                } catch (Exception e) {
+                } catch (InterruptedException e) {
+                    return;
                 }
 
                 continue;
@@ -532,14 +533,14 @@ public class Peer extends Thread {
         }
 
         BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(1);
-
+        if(!runed) return null;
         message.setId(this.requestKey);
 
         //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
         this.messages.put(this.requestKey, blockingQueue);
 
         long checkTime = System.currentTimeMillis();
-
+        if(!runed) return null;
         if (!this.sendMessage(message)) {
             //WHEN FAILED TO SEND MESSAGE
             //blockingQueue = null;
@@ -632,6 +633,7 @@ public class Peer extends Thread {
     public void halt() {
 
         this.stoped = true;
+        this.interrupt();
         this.close();
         this.setName("Peer: " + this.getAddress().getHostAddress() + " halted");
 

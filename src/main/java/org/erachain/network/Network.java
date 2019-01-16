@@ -595,32 +595,22 @@ public class Network extends Observable implements ConnectionCallback {
 
     public void stop() {
 
-        // stop thread
-        this.creator.halt();
-
-        // stop thread
-        this.acceptor.halt();
-
         this.telegramer.halt();
-
-        this.run = false;
-        this.onMessage(null);
-        int size = knownPeers.size();
-
-        for (int i =0; i<size; i++){
-           // HALT Peer
-            knownPeers.get(i).halt();
-            if (false) {
-                try {
-                    knownPeers.get(i).join();
-                } catch (Exception e) {
-                    LOGGER.error(e.getMessage(), e);
-                }
-            }
-        }
-
-        knownPeers.clear();
-        // wait for thread stop;
+        while (this.telegramer.isAlive()) ;
+        // stop thread
+       this.creator.halt();
+        while (this.creator.isAlive()) ;
+;
+        // stop thread
+       this.acceptor.halt();
         while (this.acceptor.isAlive()) ;
+
+  //      this.run = false;
+ //       this.onMessage(null);
+
+
+  //      knownPeers.clear();
+        // wait for thread stop;
+ //      while (this.acceptor.isAlive()) ;
     }
 }
