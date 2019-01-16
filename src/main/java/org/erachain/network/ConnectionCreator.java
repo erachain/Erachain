@@ -7,6 +7,7 @@ import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.PeersMessage;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
+import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +18,7 @@ import java.util.List;
  * класс поиска каналов связи - подключается к внешним узлам создавая пиры
  * смотрит сколько соединений во вне (white) уже есть и если еще недостаточно то цепляется ко всему что сможет
  */
-public class ConnectionCreator extends Thread {
+public class ConnectionCreator extends MonitoredThread {
 
     // как часто запрашивать все пиры у других пиров
     private static long GET_PEERS_PERIOD = 60 * 10 * 1000;
@@ -126,7 +127,9 @@ public class ConnectionCreator extends Thread {
 
         List<Peer> knownPeers = null;
 
+        this.initMonitor();
         while (isRun) {
+            this.setMonitorPoint();
 
             try {
                 Thread.sleep(1000);
@@ -205,7 +208,9 @@ public class ConnectionCreator extends Thread {
 
                     //CONNECT
                     //CHECK IF ALREADY CONNECTED TO PEER
+                    this.setMonitorStatus("peer.connect");
                     if (peer.connect(callback, "connected +++ ")) {
+                        this.setMonitorStatus("peer.connect >>");
 
                         // TRY CONNECT to WHITE peers of this PEER
                         connectToPeersOfThisPeer(peer, 4);
@@ -253,6 +258,8 @@ public class ConnectionCreator extends Thread {
 
             if (!this.isRun)
                 return;
+
+            this.setMonitorStatus("sleep");
 
             try {
                 if (counter < needMinConnections)

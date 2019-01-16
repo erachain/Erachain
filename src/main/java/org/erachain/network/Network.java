@@ -46,6 +46,14 @@ public class Network extends Observable implements ConnectionCallback {
         return myselfAddress;
     }
 
+    public ConnectionAcceptor getAcceptor() {
+        return acceptor;
+    }
+
+    public ConnectionCreator getCreator() {
+        return creator;
+    }
+
     public static boolean isPortAvailable(int port) {
         try {
             ServerSocket socket = new ServerSocket(port);
@@ -621,6 +629,6 @@ public class Network extends Observable implements ConnectionCallback {
 
         knownPeers.clear();
         // wait for thread stop;
-        while (this.acceptor.isAlive()) ;
+        //while (this.acceptor.isAlive()) ;
     }
 }

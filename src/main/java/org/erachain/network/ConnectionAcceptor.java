@@ -2,6 +2,7 @@ package org.erachain.network;
 
 import org.erachain.controller.Controller;
 import org.erachain.database.PeerMap;
+import org.erachain.utils.MonitoredThread;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.erachain.settings.Settings;
@@ -16,7 +17,7 @@ import java.util.Random;
  * приемник содинения - отвечает на входящие запросы и создает канал связи
  * запускает первый слушатель и ждет входящего соединения
  */
-public class ConnectionAcceptor extends Thread {
+public class ConnectionAcceptor extends MonitoredThread {
 
     static Logger LOGGER = LoggerFactory.getLogger(ConnectionAcceptor.class.getName());
     private ConnectionCallback callback;
@@ -34,7 +35,9 @@ public class ConnectionAcceptor extends Thread {
         Random random = new Random();
 
         PeerMap map = Controller.getInstance().getDBSet().getPeerMap();
+        this.initMonitor();
         while (this.isRun && !this.isInterrupted()) {
+            this.setMonitorPoint();
 
             try {
 
@@ -49,7 +52,9 @@ public class ConnectionAcceptor extends Thread {
                 }
 
                 //ACCEPT CONNECTION
+                this.setMonitorStatus("socket.accept");
                 Socket connectionSocket = socket.accept();
+                this.setMonitorStatus("socket.accept >>");
 
                 //CHECK IF SOCKET IS NOT LOCALHOST || WE ARE ALREADY CONNECTED TO THAT SOCKET || BLACKLISTED
                 if (
