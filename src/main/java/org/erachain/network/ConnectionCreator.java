@@ -126,17 +126,17 @@ public class ConnectionCreator extends Thread {
 
         List<Peer> knownPeers = null;
 
-        while (isRun) {
+        while (true) {
 
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
       //          LOGGER.error(e.getMessage(), e);
-                return;
+                continue;
             }
 
             if (!this.isRun)
-                return;
+                continue;
 
             this.setName("ConnectionCreator - " + this.getId()
                     + " white:" + callback.getActivePeersCounter(true)
@@ -151,9 +151,10 @@ public class ConnectionCreator extends Thread {
                 //ITERATE knownPeers
                 for (Peer peer : knownPeers) {
                     // if halt close all peers Threads
-                    if(!this.isRun) {
+                    if(!this.isRun && peer.isAlive()) {
                         peer.halt();
                         while(peer.isAlive());
+                        knownPeers.remove(peer);
                         continue;
                     }
                     //CHECK IF WE ALREADY HAVE MIN CONNECTIONS
@@ -219,7 +220,19 @@ public class ConnectionCreator extends Thread {
                     }
                 }
             }
-
+            // stop peers & return
+            if(!isRun) {
+                for (Peer peer : knownPeers) {
+                    // if halt close all peers Threads
+                    if (!this.isRun && peer.isAlive()) {
+                        peer.halt();
+                        while (peer.isAlive()) ;
+                        knownPeers.remove(peer);
+                        continue;
+                    }
+                }
+                return;
+            }
             //CHECK IF WE STILL NEED NEW CONNECTIONS
             // USE unknown peers from known peers
             if (this.isRun && Settings.getInstance().getMinConnections() > callback.getActivePeersCounter(true)) {
@@ -228,14 +241,13 @@ public class ConnectionCreator extends Thread {
                 List<Peer> peers = callback.getActivePeers(false);
                 for (Peer peer: peers) {
 
-                    if (!this.isRun)
-                        return;
+                    if (!this.isRun)         continue;
 
                     if (peer.isBanned())
                         continue;
 
                     if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true)) {
-                        break;
+                        continue;
                     }
 
                     long timesatmp = NTP.getTime();
