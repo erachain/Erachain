@@ -38,6 +38,8 @@ compileJava {
 }
 
 bootJar {
+    mainClassName = "org.erachain.Start"
+
     baseName = "erachain-dev"
     destinationDir project.file('build/libs/' + versionEra + '/bin')
 

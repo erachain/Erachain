@@ -419,7 +419,7 @@ public class Network extends Observable {
         if (message.getType() == Message.TRANSACTION_TYPE
                 || message.getType() == Message.BLOCK_TYPE
                 || message.getType() == Message.WIN_BLOCK_TYPE
-                ) {
+        ) {
             synchronized (this.handledMessages) {
                 //CHECK IF NOT HANDLED ALREADY
                 String key = new String(message.getHash());
@@ -624,6 +624,8 @@ public class Network extends Observable {
 
     public void stop() {
 
+        this.run = false;
+
         // stop thread
         this.creator.halt();
 
@@ -632,12 +634,11 @@ public class Network extends Observable {
 
         this.telegramer.halt();
 
-        this.run = false;
         this.onMessage(null);
         int size = knownPeers.size();
 
         for (int i =0; i<size; i++){
-           // HALT Peer
+            // HALT Peer
             knownPeers.get(i).halt();
             if (false) {
                 try {
@@ -660,5 +661,9 @@ public class Network extends Observable {
             if (count > 50) LOGGER.error("waiting halt acceptor");
             if (count > 100) break;
         }
+
+        LOGGER.info("halted");
+
     }
+
 }

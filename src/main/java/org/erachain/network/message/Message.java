@@ -1,13 +1,12 @@
 package org.erachain.network.message;
 
-import java.util.Arrays;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.network.Peer;
+
+import java.util.Arrays;
 
 public abstract class Message {
 
@@ -40,6 +39,7 @@ public abstract class Message {
     private int type;
     private Peer sender;
     private int id;
+    private int length;
 
     public Message(int type) {
         this.type = type;
@@ -116,6 +116,14 @@ public abstract class Message {
         this.sender = sender;
     }
 
+    public void setLength(int length) {
+        this.length = length;
+    }
+
+    public int getLength() {
+        return this.length;
+    }
+
     public byte[] getHash() {
         return Crypto.getInstance().digest(this.toBytes());
     }
@@ -158,7 +166,6 @@ public abstract class Message {
         return checksum;
     }
 
-    public int getDataLength() {
-        return 0;
-    }
+    public abstract int getDataLength();
+
 }

@@ -5,8 +5,8 @@ import org.erachain.network.Peer;
 import org.erachain.network.message.BlockMessage;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -70,6 +70,8 @@ public class BlockBuffer extends Thread {
                 //CREATE MESSAGE
                 Message message = MessageFactory.getInstance().createGetBlockMessage(signature);
 
+                long timePoint = System.currentTimeMillis();
+
                 //SEND MESSAGE TO PEER
                 BlockMessage response = (BlockMessage) peer.getResponse(message, Synchronizer.GET_BLOCK_TIMEOUT);
 
@@ -91,7 +93,13 @@ public class BlockBuffer extends Thread {
 
                 //ADD TO LIST
                 blockingQueue.add(block);
-                LOGGER.debug("block BUFFER added with RECS:" + block.getTransactionCount());
+
+                LOGGER.debug("block BUFFER added: "
+                        + block.getTransactionCount() + "tx, "
+                        + response.getLength() / 1000 + "kB, "
+                        + (System.currentTimeMillis() - timePoint) + "ms"
+                );
+                timePoint = System.currentTimeMillis();
 
             }
         }.start();

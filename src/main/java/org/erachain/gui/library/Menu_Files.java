@@ -2,10 +2,7 @@ package org.erachain.gui.library;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
-import org.erachain.gui.AboutFrame;
-import org.erachain.gui.ClosingDialog;
-import org.erachain.gui.DebugFrame;
-import org.erachain.gui.PasswordPane;
+import org.erachain.gui.*;
 import org.erachain.gui.create.License_JFrame;
 import org.erachain.gui.items.accounts.Account_Send_Dialog;
 import org.erachain.gui.settings.SettingsFrame;
@@ -311,7 +308,9 @@ public class Menu_Files extends JMenu {
         quitItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Quit the application"));
         quitItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new ClosingDialog();
+                MainFrame.getInstance().closeFrame();
+                MainFrame.getInstance().dispose();
+                 new ClosingDialog();
             }
         });
 

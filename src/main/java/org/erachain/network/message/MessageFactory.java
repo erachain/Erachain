@@ -269,6 +269,7 @@ public class MessageFactory {
 
         //SET SENDER
         message.setSender(sender);
+        message.setLength(length);
 
         //SET ID
         if (hasId == 1) {

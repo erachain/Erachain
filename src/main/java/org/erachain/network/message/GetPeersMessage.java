@@ -10,4 +10,8 @@ public class GetPeersMessage extends Message {
         return true;
     }
 
+    public int getDataLength() {
+        return 0;
+    }
+
 }

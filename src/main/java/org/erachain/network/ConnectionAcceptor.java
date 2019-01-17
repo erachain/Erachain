@@ -127,6 +127,8 @@ public class ConnectionAcceptor extends Thread {
         //this.interrupt();
         this.isRun = false;
 
+        LOGGER.info("on halt");
+
         try {
             socket.close();
         } catch (IOException e) {
