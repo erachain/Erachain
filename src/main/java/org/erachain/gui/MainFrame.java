@@ -57,7 +57,7 @@ public class MainFrame extends JFrame implements Observer {
         th = this;
     //    this.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         Controller.getInstance().addObserver(this);
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         settingsJSONbuf = new JSONObject();
         settingsJSONbuf = Settings.getInstance().Dump();
         initComponents();
@@ -147,19 +147,17 @@ public class MainFrame extends JFrame implements Observer {
                 // TODO Auto-generated method stub
                 // read settings
                 // You can still stop closing if you want to
-                int res = JOptionPane.showConfirmDialog(th, "Are you sure you want to close?", "Close?", JOptionPane.YES_NO_OPTION);
-                if ( res == 0 ) {
+                int res = JOptionPane.showConfirmDialog(th, Lang.getInstance().translate("Are you sure you want to close?"),  Lang.getInstance().translate("Close?"), JOptionPane.YES_NO_OPTION);
+                if ( res != 0 ) return;
                     closeFrame();
-
+                    th.dispose();
                     java.awt.EventQueue.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             new ClosingDialog();
                         }
                     });
-                }
-
-            }
+             }
 
             @Override
             public void windowDeactivated(WindowEvent arg0) {
@@ -318,7 +316,7 @@ public class MainFrame extends JFrame implements Observer {
         }
 
     }
-    private void closeFrame(){
+    public void closeFrame(){
         int lDiv;
         int div;
         Split_Panel sP;

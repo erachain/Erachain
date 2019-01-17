@@ -242,7 +242,7 @@ public class Peer extends Thread {
 
             //ON SOCKET CONNECT
             this.setName("Peer: " + this.getAddress().getHostAddress() + " reconnected"
-                + (this.isWhite()?" is White" : ""));
+                    + (this.isWhite()?" is White" : ""));
 
             LOGGER.info(description + address.getHostAddress());
             callback.onConnect(this);
@@ -333,10 +333,10 @@ public class Peer extends Thread {
 
             if (false)
                 LOGGER.info(this.getAddress().getHostAddress()
-                    + (this.isUsed()?" is Used" : "")
-                    + (this.isBanned()?" is Banned" : "")
-                    + (this.isBad()?" is Bad" : "")
-                    + (this.isWhite()?" is White" : ""));
+                        + (this.isUsed()?" is Used" : "")
+                        + (this.isBanned()?" is Banned" : "")
+                        + (this.isBad()?" is Bad" : "")
+                        + (this.isWhite()?" is White" : ""));
 
 
             // CHECK connection

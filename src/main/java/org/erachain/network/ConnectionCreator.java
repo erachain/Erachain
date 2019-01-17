@@ -38,7 +38,7 @@ public class ConnectionCreator extends Thread {
 
         //CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE
         if (Settings.getInstance().getMinConnections() < callback.getActivePeersCounter(true)
-            || (Settings.getInstance().getMaxConnections() >> 1) < callback.getActivePeersCounter(false))
+                || (Settings.getInstance().getMaxConnections() >> 1) < callback.getActivePeersCounter(false))
             return 0;
 
         LOGGER.info("GET peers from: " + peer + " get max: " + maxReceivePeers);
