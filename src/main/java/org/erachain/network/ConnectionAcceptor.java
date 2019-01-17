@@ -2,10 +2,10 @@ package org.erachain.network;
 
 import org.erachain.controller.Controller;
 import org.erachain.database.PeerMap;
-import org.erachain.utils.MonitoredThread;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.settings.Settings;
+import org.erachain.utils.MonitoredThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -74,7 +74,7 @@ public class ConnectionAcceptor extends MonitoredThread {
                 }
             } catch (java.lang.OutOfMemoryError e) {
                 Controller.getInstance().stopAll(90);
-                return;
+                break;
 
             } catch (Exception e) {
                 try {
@@ -120,11 +120,16 @@ public class ConnectionAcceptor extends MonitoredThread {
                         peerForBan.ban(10, "Clear place for new connection");
                     }
                 }
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(89);
+                break;
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             }
 
         }
+
+        LOGGER.info("halted");
 
     }
 

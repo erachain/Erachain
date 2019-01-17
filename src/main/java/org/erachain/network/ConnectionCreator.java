@@ -140,7 +140,7 @@ public class ConnectionCreator extends MonitoredThread {
             }
 
             if (!this.isRun)
-                return;
+                break;
 
             this.setName("ConnectionCreator - " + this.getId()
                     + " white:" + network.getActivePeersCounter(true)
@@ -172,7 +172,7 @@ public class ConnectionCreator extends MonitoredThread {
                     }
 
                     if (!this.isRun)
-                        return;
+                        break;
 
                     //CHECK IF SOCKET IS NOT LOCALHOST
                     //if(true)
@@ -194,7 +194,7 @@ public class ConnectionCreator extends MonitoredThread {
                         continue;
 
                     if (!this.isRun)
-                        return;
+                        break;
 
                     LOGGER.info("try connect to: " + peer);
 
@@ -232,7 +232,7 @@ public class ConnectionCreator extends MonitoredThread {
                 for (Peer peer: peers) {
 
                     if (!this.isRun)
-                        return;
+                        break;
 
                     if (peer.isBanned())
                         continue;
@@ -262,7 +262,7 @@ public class ConnectionCreator extends MonitoredThread {
                     + " total:" + network.getActivePeersCounter(false));
 
             if (!this.isRun)
-                return;
+                break;
 
             this.setMonitorStatus("sleep");
 
@@ -276,6 +276,9 @@ public class ConnectionCreator extends MonitoredThread {
             }
 
         }
+
+        LOGGER.info("halted");
+
     }
 
     public void halt() {
