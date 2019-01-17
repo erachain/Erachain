@@ -1,6 +1,7 @@
 package org.erachain.network;
 // 30/03
 
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
@@ -78,8 +79,10 @@ public class ConnectionCreator extends MonitoredThread {
 
             try {
                 Thread.sleep(10);
-            } catch (InterruptedException e) {
-                LOGGER.error(e.getMessage(), e);
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(94);
+                break;
+            } catch (Exception e) {
             }
 
             //CHECK IF THAT PEER IS NOT BLACKLISTED
@@ -134,7 +137,10 @@ public class ConnectionCreator extends MonitoredThread {
             this.setMonitorPoint();
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(96);
+                break;
             } catch (InterruptedException e) {
                 LOGGER.error(e.getMessage(), e);
             }
@@ -268,11 +274,13 @@ public class ConnectionCreator extends MonitoredThread {
 
             try {
                 if (counter < needMinConnections)
-                    Thread.sleep(BlockChain.DEVELOP_USE ? 10000 : 1000);
+                    Thread.sleep(BlockChain.DEVELOP_USE ? 10000 : 5000);
                 else
-                    Thread.sleep(60000);
-            } catch (InterruptedException e) {
-                LOGGER.error(e.getMessage(), e);
+                    Thread.sleep(30000);
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(95);
+                return;
+            } catch (Exception e) {
             }
 
         }

@@ -15,7 +15,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -376,7 +379,7 @@ public class Peer extends Thread {
             ) {
 
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(100);
                 } catch (Exception e) {
                 }
 
@@ -385,22 +388,14 @@ public class Peer extends Thread {
 
             }
 
-            if (false) {
-                // необходимо дать время для того чтобы в Peer.getResponse успел КЛЮЧ пересчитаться
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    //ERROR SLEEPING
-                }
-            }
-
             // CHECK stream
             if (in == null) {
                 try {
                     in = new DataInputStream(socket.getInputStream());
+                } catch (java.lang.OutOfMemoryError e) {
+                    Controller.getInstance().stopAll(81);
+                    break;
                 } catch (Exception e) {
-                    //LOGGER.error(e.getMessage(), e);
-
                     //DISCONNECT
                     network.tryDisconnect(this, network.banForActivePeersCounter(), e.getMessage());
                     continue;
@@ -420,6 +415,9 @@ public class Peer extends Thread {
             } catch (java.net.SocketTimeoutException timeOut) {
                 /// просто дальше ждем - все нормально
                 continue;
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(82);
+                break;
             } catch (EOFException e) {
                 // на там конце произошло отключение - делаем тоже дисконект
                 network.tryDisconnect(this, network.banForActivePeersCounter(), "read-0 peer is shutdownInput");
@@ -455,6 +453,9 @@ public class Peer extends Thread {
                     network.tryDisconnect(this, network.banForActivePeersCounter(), "peer in TimeOut");
                 }
                 continue;
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(83);
+                break;
             } catch (EOFException e) {
                 // на там конце произошло отключение - делаем тоже дисконект
                 network.tryDisconnect(this, network.banForActivePeersCounter(), "peer is shutdownInput");
@@ -489,8 +490,11 @@ public class Peer extends Thread {
                     this.messages.get(message.getId()).add(message);
 
                     ////LOGGER.debug(this + " : " + message + "  == my RESPONSE added!!!");
+                } catch (java.lang.OutOfMemoryError e) {
+                    Controller.getInstance().stopAll(84);
+                    break;
 
-                } catch (java.lang.IllegalStateException e) {
+                } catch (Exception e) {
                     LOGGER.debug("received message " + message.viewType() + " from " + this.address.toString());
                     LOGGER.debug("isRequest " + message.isRequest() + " hasId " + message.hasId());
                     LOGGER.debug(" Id " + message.getId() + " containsKey: " + this.messages.containsKey(message.getId()));
@@ -550,6 +554,9 @@ public class Peer extends Thread {
             try {
                 this.out.write(bytes);
                 this.out.flush();
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(85);
+                return false;
             } catch (java.net.SocketException eSock) {
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
@@ -588,22 +595,17 @@ public class Peer extends Thread {
      * @return
      */
     private synchronized int incrementKey() {
-        return this.requestKey++; // а зачем тогда синхрон?? getRequestKey();
+        if (this.requestKey == 99999)
+            return 1;
+
+        return this.requestKey++;
     }
 
-    private Random random = new Random(Integer.MAX_VALUE - 10);
     public Message getResponse(Message message, long timeSOT) {
 
         BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(1);
 
         int localRequestKey = incrementKey(); // быстро и без колллизий
-
-        //int localRequestKey = random.nextInt(Integer.MAX_VALUE); - быстро но могут быть коллизии
-        //if (localRequestKey <= 0)
-        //    localRequestKey = 1;
-
-        //int localRequestKey = this.requestKey++;//  - очень быстрая синхронизация цепочки но с коллзиями
-
 
         message.setId(localRequestKey);
 
@@ -623,6 +625,9 @@ public class Peer extends Thread {
         Message response = null;
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
+        } catch (java.lang.OutOfMemoryError e) {
+            Controller.getInstance().stopAll(86);
+            return null;
         } catch (InterruptedException e) {
         }
 
