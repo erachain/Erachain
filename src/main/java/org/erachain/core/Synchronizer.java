@@ -222,33 +222,7 @@ public class Synchronizer {
             // CHECK IF VALID
             if (block.isSignatureValid()) {
                 try {
-                    if (block.isValid(fork, true)) {
-
-                        int height2 = block.getHeight();
-                        int bbb2 = fork.getBlockMap().size();
-                        int hhh2 = fork.getBlocksHeadsMap().size();
-                        int sss2 = fork.getBlockSignsMap().size();
-                        assert (height2 == hhh2);
-                        assert (bbb2 == hhh2);
-                        assert (sss2 == hhh2);
-
-                        // PROCESS TO VALIDATE NEXT BLOCKS
-                        // runedBlock = block;
-                        /// already in Validate block.process(fork);
-                        if (checkFullWeight && testHeight == height) {
-                            if (myWeight >= fork.getBlocksHeadsMap().getFullWeight()) {
-                                // суть в том что тут цепоска на этой высоте слабже моей,
-                                // поэтому мы ее пока забаним чтобы с ней постоянно не синхронизироваться
-                                // - может мы лучше цепочку собрем еще
-
-                                // INVALID BLOCK THROW EXCEPTION
-                                String mess = "Dishonest peer by weak FullWeight, heigh: " + height;
-                                peer.ban(BAN_BLOCK_TIMES >> 3, mess);
-
-                                throw new Exception(mess);
-                            }
-                        }
-                    }
+                    block.getTransactions();
                 } catch (Exception e) {
                     LOGGER.debug(e.getMessage(), e);
                     String mess = "Dishonest peer error PARSE: " + height;
@@ -256,6 +230,33 @@ public class Synchronizer {
                     throw new Exception(mess);
                 }
 
+                if (block.isValid(fork, true)) {
+
+                    int height2 = block.getHeight();
+                    int bbb2 = fork.getBlockMap().size();
+                    int hhh2 = fork.getBlocksHeadsMap().size();
+                    int sss2 = fork.getBlockSignsMap().size();
+                    assert (height2 == hhh2);
+                    assert (bbb2 == hhh2);
+                    assert (sss2 == hhh2);
+
+                    // PROCESS TO VALIDATE NEXT BLOCKS
+                    // runedBlock = block;
+                    /// already in Validate block.process(fork);
+                    if (checkFullWeight && testHeight == height) {
+                        if (myWeight >= fork.getBlocksHeadsMap().getFullWeight()) {
+                            // суть в том что тут цепоска на этой высоте слабже моей,
+                            // поэтому мы ее пока забаним чтобы с ней постоянно не синхронизироваться
+                            // - может мы лучше цепочку собрем еще
+
+                            // INVALID BLOCK THROW EXCEPTION
+                            String mess = "Dishonest peer by weak FullWeight, heigh: " + height;
+                            peer.ban(BAN_BLOCK_TIMES >> 3, mess);
+
+                            throw new Exception(mess);
+                        }
+                    }
+                }
 
             } else {
 
@@ -469,15 +470,17 @@ public class Synchronizer {
 
                 try {
                     // тут может парсинг транзакций упасть
-                    if (!blockFromPeer.isValid(dcSet, false)) {
-                        errorMess = "invalid BLOCK";
-                        banTime = BAN_BLOCK_TIMES;
-                        break;
-                    }
+                    blockFromPeer.getTransactions();
                 } catch (Exception e) {
                     LOGGER.debug(e.getMessage(), e);
                     errorMess = "invalid PARSE! " + e.getMessage();
                     banTime = BAN_BLOCK_TIMES << 1;
+                    break;
+                }
+
+                if (!blockFromPeer.isValid(dcSet, false)) {
+                    errorMess = "invalid BLOCK";
+                    banTime = BAN_BLOCK_TIMES;
                     break;
                 }
                 LOGGER.debug("BLOCK is Valid");
