@@ -10,6 +10,7 @@ import org.erachain.utils.APIUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -92,6 +93,35 @@ public class CoreResource {
     @Path("/notranslate")
     public String getNoTranslate() {
         return JSONValue.toJSONString(Lang.getInstance().getNoTranslate());
+    }
+
+    @GET
+    @Path("/monitor/{path}")
+    public String getMonitorPath(@PathParam("path") String path) {
+        JSONObject jsonObject = new JSONObject();
+
+        Controller cnt = Controller.getInstance();
+
+        if (path.equals("netwirk_acceptor"))
+            return cnt.network.getAcceptor().monitorToJson().toJSONString();
+        else if (path.equals("netwirk_creator"))
+            return cnt.network.getCreator().monitorToJson().toJSONString();
+        else
+            return getMonitor();
+
+    }
+
+    @GET
+    @Path("/monitor")
+    public String getMonitor() {
+        JSONObject jsonObject = new JSONObject();
+
+        Controller cnt = Controller.getInstance();
+
+        jsonObject.put("netwirk_acceptor", cnt.network.getAcceptor().monitorToJson());
+        jsonObject.put("netwirk_creator", cnt.network.getCreator().monitorToJson());
+
+        return jsonObject.toJSONString();
     }
 
 }
