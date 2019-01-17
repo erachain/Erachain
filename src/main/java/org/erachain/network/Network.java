@@ -47,6 +47,14 @@ public class Network extends Observable {
         return myselfAddress;
     }
 
+    public ConnectionAcceptor getAcceptor() {
+        return acceptor;
+    }
+
+    public ConnectionCreator getCreator() {
+        return creator;
+    }
+
     public static boolean isPortAvailable(int port) {
         try {
             ServerSocket socket = new ServerSocket(port);
