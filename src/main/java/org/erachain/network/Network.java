@@ -5,7 +5,6 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.message.*;
-import org.erachain.ntp.NTP;
 import org.erachain.utils.ObserverMessage;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -595,6 +594,8 @@ public class Network extends Observable implements ConnectionCallback {
 
     public void stop() {
 
+        this.run = false;
+
         // stop thread
         this.creator.halt();
 
@@ -603,7 +604,6 @@ public class Network extends Observable implements ConnectionCallback {
 
         this.telegramer.halt();
 
-        this.run = false;
         this.onMessage(null);
         int size = knownPeers.size();
 
@@ -621,6 +621,10 @@ public class Network extends Observable implements ConnectionCallback {
 
         knownPeers.clear();
         // wait for thread stop;
-        while (this.acceptor.isAlive()) ;
+        //while (this.acceptor.isAlive()) ;
+
+        LOGGER.info("halted");
+
     }
+
 }

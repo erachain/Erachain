@@ -268,5 +268,6 @@ public class ConnectionCreator extends Thread {
 
     public void halt() {
         this.isRun = false;
+        LOGGER.info("on halt");
     }
 }
