@@ -181,7 +181,7 @@ public class Network extends Observable implements ConnectionCallback {
 
 	/*@Override
 	public List<Peer> getKnownPeers() {
-		
+
 		return this.knownPeers;
 	}
 	*/
@@ -311,7 +311,7 @@ public class Network extends Observable implements ConnectionCallback {
             for (Peer knownPeer : this.knownPeers) {
                 if (!knownPeer.isUsed()
                     //|| !Network.isMyself(knownPeer.getAddress())
-                        ) {
+                ) {
                     knownPeer.reconnect(socket, "connected by recircle!!! ");
                     return knownPeer;
                 }
@@ -362,35 +362,35 @@ public class Network extends Observable implements ConnectionCallback {
 
             return;
         }
-        
+
         // GET telegrams
         if(message.getType()== Message.TELEGRAM_GET_TYPE){
-          //address
-             JSONObject address = ((TelegramGetMessage) message).getAddress();
-             // create ansver
-             ArrayList<String> ca = new ArrayList<String>();
-             Set keys = address.keySet();
-             for(int i = 0; i<keys.size(); i++){
-                  
-                 ca.add((String) address.get(i));
-             }
+            //address
+            JSONObject address = ((TelegramGetMessage) message).getAddress();
+            // create ansver
+            ArrayList<String> ca = new ArrayList<String>();
+            Set keys = address.keySet();
+            for(int i = 0; i<keys.size(); i++){
+
+                ca.add((String) address.get(i));
+            }
             Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage(ca);
             answer.setId(message.getId());
             // send answer
             message.getSender().sendMessage(answer);
-           return;
-           }
+            return;
+        }
         // Ansver to get transaction
         if ( message.getType() == Message.TELEGRAM_GET_ANSWER_TYPE){
-           ((TelegramGetAnswerMessage) message).saveToWallet();
-            
-            return; 
+            ((TelegramGetAnswerMessage) message).saveToWallet();
+
+            return;
         }
         //ONLY HANDLE BLOCK AND TRANSACTION MESSAGES ONCE
         if (message.getType() == Message.TRANSACTION_TYPE
                 || message.getType() == Message.BLOCK_TYPE
                 || message.getType() == Message.WIN_BLOCK_TYPE
-                ) {
+        ) {
             synchronized (this.handledMessages) {
                 //CHECK IF NOT HANDLED ALREADY
                 String key = new String(message.getHash());
@@ -595,22 +595,32 @@ public class Network extends Observable implements ConnectionCallback {
 
     public void stop() {
 
+        // stop thread
+        this.creator.halt();
+
+        // stop thread
+        this.acceptor.halt();
+
         this.telegramer.halt();
-        while (this.telegramer.isAlive()) ;
-        // stop thread
-       this.creator.halt();
-        while (this.creator.isAlive()) ;
-;
-        // stop thread
-       this.acceptor.halt();
-        while (this.acceptor.isAlive()) ;
 
-  //      this.run = false;
- //       this.onMessage(null);
+        this.run = false;
+        this.onMessage(null);
+        int size = knownPeers.size();
 
+        for (int i =0; i<size; i++){
+            // HALT Peer
+            knownPeers.get(i).halt();
+            if (false) {
+                try {
+                    knownPeers.get(i).join();
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+        }
 
-  //      knownPeers.clear();
+        knownPeers.clear();
         // wait for thread stop;
- //      while (this.acceptor.isAlive()) ;
+        while (this.acceptor.isAlive()) ;
     }
 }

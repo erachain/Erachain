@@ -38,7 +38,7 @@ public class ConnectionCreator extends Thread {
 
         //CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE
         if (Settings.getInstance().getMinConnections() < callback.getActivePeersCounter(true)
-            || (Settings.getInstance().getMaxConnections() >> 1) < callback.getActivePeersCounter(false))
+                || (Settings.getInstance().getMaxConnections() >> 1) < callback.getActivePeersCounter(false))
             return 0;
 
         LOGGER.info("GET peers from: " + peer + " get max: " + maxReceivePeers);
@@ -59,7 +59,7 @@ public class ConnectionCreator extends Thread {
         for (Peer newPeer: peersMessage.getPeers()) {
 
             if (!this.isRun)
-                break;
+                return 0;
 
             if (foreignPeersCounter >= maxReceivePeers) {
                 // FROM EACH peer get only maxReceivePeers
@@ -105,7 +105,7 @@ public class ConnectionCreator extends Thread {
                 continue;
 
             if (!this.isRun)
-                break;
+                return 0;
 
             //CONNECT
             if (newPeer.connect(callback, "connected in recurse +++ ")) {
@@ -126,17 +126,16 @@ public class ConnectionCreator extends Thread {
 
         List<Peer> knownPeers = null;
 
-        while (true) {
+        while (isRun) {
 
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-      //          LOGGER.error(e.getMessage(), e);
-                continue;
+                LOGGER.error(e.getMessage(), e);
             }
 
             if (!this.isRun)
-                continue;
+                return;
 
             this.setName("ConnectionCreator - " + this.getId()
                     + " white:" + callback.getActivePeersCounter(true)
@@ -148,23 +147,9 @@ public class ConnectionCreator extends Thread {
                 //GET LIST OF KNOWN PEERS
                 knownPeers = PeerManager.getInstance().getKnownPeers();
 
-                if(!isRun) {
-                    for (Peer peer : knownPeers) {
-                        // if halt close all peers Threads
-                        if (!this.isRun && peer.isAlive()) {
-                            peer.halt();
-                            while (peer.isAlive()) ;
-                            knownPeers.remove(peer);
-                            continue;
-                        }
-                    }
-                    return;
-                }
                 //ITERATE knownPeers
                 for (Peer peer : knownPeers) {
-                    // if halt close all peers Threads
-                    if (!this.isRun)
-                        continue;
+
                     //CHECK IF WE ALREADY HAVE MIN CONNECTIONS
                     if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true)) {
                         // stop use KNOWN peers
@@ -178,12 +163,11 @@ public class ConnectionCreator extends Thread {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
-                    //    LOGGER.error(e.getMessage(),e);
-                        continue;
+                        LOGGER.error(e.getMessage(),e);
                     }
 
                     if (!this.isRun)
-                        continue;
+                        return;
 
                     //CHECK IF SOCKET IS NOT LOCALHOST
                     //if(true)
@@ -205,7 +189,7 @@ public class ConnectionCreator extends Thread {
                         continue;
 
                     if (!this.isRun)
-                        continue;
+                        return;
 
                     LOGGER.info("try connect to: " + peer);
 
@@ -221,14 +205,13 @@ public class ConnectionCreator extends Thread {
 
                     //CONNECT
                     //CHECK IF ALREADY CONNECTED TO PEER
-                    if (this.isRun) if (peer.connect(callback, "connected +++ ")) {
+                    if (peer.connect(callback, "connected +++ ")) {
 
                         // TRY CONNECT to WHITE peers of this PEER
-                        if (this.isRun)   connectToPeersOfThisPeer(peer, 4);
+                        connectToPeersOfThisPeer(peer, 4);
                     }
                 }
             }
-            // stop peers & return
 
             //CHECK IF WE STILL NEED NEW CONNECTIONS
             // USE unknown peers from known peers
@@ -238,13 +221,14 @@ public class ConnectionCreator extends Thread {
                 List<Peer> peers = callback.getActivePeers(false);
                 for (Peer peer: peers) {
 
-                    if (!this.isRun)         continue;
+                    if (!this.isRun)
+                        return;
 
                     if (peer.isBanned())
                         continue;
 
                     if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true)) {
-                        continue;
+                        break;
                     }
 
                     long timesatmp = NTP.getTime();
@@ -277,7 +261,6 @@ public class ConnectionCreator extends Thread {
                     Thread.sleep(60000);
             } catch (InterruptedException e) {
                 LOGGER.error(e.getMessage(), e);
-                return;
             }
 
         }
@@ -285,6 +268,5 @@ public class ConnectionCreator extends Thread {
 
     public void halt() {
         this.isRun = false;
-        this.interrupt();
     }
 }
