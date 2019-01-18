@@ -40,6 +40,8 @@ public class SysTray implements Observer {
     private TrayIcon icon = null;
     private PopupMenu createPopupMenu;
 
+    private long timePoint;
+
     public SysTray() {
         Controller.getInstance().addObserver(this);
     }
@@ -326,7 +328,26 @@ public class SysTray implements Observer {
         } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
             // непонятно в каких случаях когда это прилетает делать
             if (Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
-                String toolTipText = networkStatus + " " + syncProcent;
+
+                if (System.currentTimeMillis() - timePoint < 2000)
+                    return;
+
+                timePoint = System.currentTimeMillis();
+
+                String networkStatus = "";
+                String syncProcent = "";
+                String toolTipText = "erachain.org " + Controller.getInstance().getVersion() + "\n";
+
+                if (Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
+                    networkStatus = Lang.getInstance().translate("No connections");
+                    syncProcent = "";
+                } else if (Controller.getInstance().getStatus() == Controller.STATUS_SYNCHRONIZING) {
+                    networkStatus = Lang.getInstance().translate("Synchronizing");
+                } else if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
+                    networkStatus = Lang.getInstance().translate("OK");
+                    syncProcent = "";
+                }
+                toolTipText = networkStatus + " " + syncProcent;
                 toolTipText += "\n" + Lang.getInstance().translate("Height") + ": " + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a;
                 setToolTipText(toolTipText);
             }
