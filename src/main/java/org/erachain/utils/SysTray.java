@@ -300,6 +300,13 @@ public class SysTray implements Observer {
         ObserverMessage message = (ObserverMessage) arg1;
 
         if (message.getType() == ObserverMessage.WALLET_SYNC_STATUS) {
+
+
+            if (System.currentTimeMillis() - timePoint < 2000)
+                return;
+
+            timePoint = System.currentTimeMillis();
+
             int currentHeight = (int) message.getValue();
             if (currentHeight == -1) {
                 this.update(null, new ObserverMessage(
@@ -314,6 +321,12 @@ public class SysTray implements Observer {
             setToolTipText(toolTipText);
 
         } else if (message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS) {
+
+            if (System.currentTimeMillis() - timePoint < 2000)
+                return;
+
+            timePoint = System.currentTimeMillis();
+
             int currentHeight = (int) message.getValue();
 
             String syncProcent = "";
@@ -356,6 +369,5 @@ public class SysTray implements Observer {
             }
         }
     }
-
 
 }
