@@ -6,6 +6,7 @@ import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
+import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,9 @@ import java.util.concurrent.TimeUnit;
  * вертает общение с внешним пиром - чтение и запись
  *
  */
-public class Peer extends Thread {
+public class Peer extends MonitoredThread {
+
+    private final static boolean USE_MONITOR = true;
 
     private final static boolean need_wait = false;
     private final static boolean logPings = false;
@@ -363,7 +366,9 @@ public class Peer extends Thread {
     public void run() {
         byte[] messageMagic = null;
 
+        this.initMonitor();
         while (!stoped) {
+            if (USE_MONITOR) this.setMonitorPoint();
 
             if (false)
                 LOGGER.info(this.getAddress().getHostAddress()
@@ -384,12 +389,14 @@ public class Peer extends Thread {
                 }
 
                 if (in != null) {
+                    if (USE_MONITOR) this.setMonitorStatusBefore("in.close");
                     try {
                         in.close();
                         in = null;
                     } catch (Exception e) {
                         in = null;
                     }
+                    if (USE_MONITOR) this.setMonitorStatusAfter();
                 }
                 continue;
 
@@ -397,6 +404,7 @@ public class Peer extends Thread {
 
             // CHECK stream
             if (in == null) {
+                if (USE_MONITOR) this.setMonitorStatusBefore("in = DataInputStream");
                 try {
                     in = new DataInputStream(socket.getInputStream());
                 } catch (java.lang.OutOfMemoryError e) {
@@ -407,10 +415,13 @@ public class Peer extends Thread {
                     network.tryDisconnect(this, network.banForActivePeersCounter(), e.getMessage());
                     continue;
                 }
+                if (USE_MONITOR) this.setMonitorStatusAfter();
             }
 
             //READ FIRST 4 BYTES
             messageMagic = new byte[Message.MAGIC_LENGTH];
+
+            if (USE_MONITOR) this.setMonitorStatus("in.readFully");
 
             // MORE EFFECTIVE
             // в этом случае просто ожидаем прилета байтов в течении заданного времени ожидания
@@ -483,12 +494,21 @@ public class Peer extends Thread {
                 LOGGER.debug(this + " : " + message + " RECEIVED");
             }
 
+            if (USE_MONITOR) this.setMonitorStatus("in.message process");
+
             //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
             if (!message.isRequest() && message.hasId()) {
 
                 if (!this.messages.containsKey(message.getId())) {
+                    // может еще не внесли ключ запроса в список? подождем и еще раз проверим
+                    try {
+                        Thread.sleep(3);
+                    } catch (Exception e) {
+                    }
                     // уже посроченный ответ словили - ничего не делаем
-                    continue;
+                    if (!this.messages.containsKey(message.getId())) {
+                        continue;
+                    }
                 }
 
                 // это ответ на наш запрос с ID
@@ -534,6 +554,7 @@ public class Peer extends Thread {
             }
         }
 
+        if (USE_MONITOR) this.setMonitorStatus("halted");
         LOGGER.info("halted");
 
     }
@@ -563,6 +584,8 @@ public class Peer extends Thread {
             // если пинг хреновый то ничего не шлем кроме пингования
             return false;
         }
+
+        if (USE_MONITOR) this.setMonitorStatusBefore("write");
 
         //SEND MESSAGE
         long checkTime = System.currentTimeMillis();
@@ -598,6 +621,9 @@ public class Peer extends Thread {
             }
 
         }
+
+        if (USE_MONITOR) this.setMonitorStatusAfter();
+
         checkTime = System.currentTimeMillis() - checkTime;
         if (checkTime > (bytes.length >> 3)
                 || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
@@ -612,10 +638,16 @@ public class Peer extends Thread {
      * @return
      */
     private synchronized int incrementKey() {
-        if (this.requestKey == 99999)
-            return 1;
 
-        return this.requestKey++;
+        if (this.requestKey == 99999) {
+            this.requestKey = 1;
+        }
+        else
+            this.requestKey++;
+
+        if (USE_MONITOR) this.setMonitorStatus("incrementKey: " + this.requestKey);
+        return this.requestKey;
+
     }
 
     public Message getResponse(Message message, long timeSOT) {
@@ -626,40 +658,47 @@ public class Peer extends Thread {
 
         message.setId(localRequestKey);
 
-        //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
-        this.messages.put(localRequestKey, blockingQueue);
-
         long checkTime = System.currentTimeMillis();
 
+        if (USE_MONITOR) this.setMonitorStatusBefore("response.write " + message.toString() + ", messages.size: " + messages.size());
         if (!this.sendMessage(message)) {
+            if (USE_MONITOR) this.setMonitorStatusAfter();
             //WHEN FAILED TO SEND MESSAGE
             //blockingQueue = null;
             LOGGER.debug(this + " >> " + message + " send ERROR by period: " + (System.currentTimeMillis() - checkTime));
-            this.messages.remove(localRequestKey);
+            ////this.messages.remove(localRequestKey);
             return null;
         }
+        if (USE_MONITOR) this.setMonitorStatusAfter();
+
+        //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
+        this.messages.put(localRequestKey, blockingQueue);
 
         Message response = null;
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
-            // если ответ есть то в читателе уже удалили его из очереди
-            if (response == null) {
-                this.messages.remove(localRequestKey);
-            }
         } catch (java.lang.OutOfMemoryError e) {
             Controller.getInstance().stopAll(86);
             return null;
         } catch (InterruptedException e) {
             this.messages.remove(localRequestKey);
+            return null;
         } catch (Exception e) {
             this.messages.remove(localRequestKey);
             LOGGER.error(e.getMessage(), e);
+            return null;
         }
 
-        if (response != null && this.getPing() < 0) {
+        if (response == null) {
+            // НУЛЬ значит не дождались - пора удалять идентификатор запроса из списка
+            this.messages.remove(localRequestKey);
+        } else if (this.getPing() < 0) {
+            // если ответ есть то в читателе уже удалили его из очереди
             // SET PING by request period
             this.setPing((int)(System.currentTimeMillis() - checkTime));
         }
+
+        if (USE_MONITOR) this.setMonitorStatus("response.done " + message.toString());
 
         return response;
     }

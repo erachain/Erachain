@@ -60,6 +60,8 @@ public class ConnectionCreator extends MonitoredThread {
 
         for (Peer newPeer: peersMessage.getPeers()) {
 
+            this.setMonitorStatus("peer.recurse " + newPeer.toString());
+
             if (!this.isRun)
                 return 0;
 
@@ -112,8 +114,11 @@ public class ConnectionCreator extends MonitoredThread {
                 return 0;
 
             //CONNECT
-            if (!newPeer.isOnUsed())
-                newPeer.connect(network,"connected in recurse +++ ");
+            if (!newPeer.isOnUsed()) {
+                this.setMonitorStatusBefore("peer.connect.recurse");
+                newPeer.connect(network, "connected in recurse +++ ");
+                this.setMonitorStatusAfter();
+            }
 
             if (newPeer.isUsed()) {
                 // RECURSE to OTHER PEERS
@@ -217,9 +222,9 @@ public class ConnectionCreator extends MonitoredThread {
                     //CONNECT
                     //CHECK IF ALREADY CONNECTED TO PEER
                     if (!peer.isOnUsed()) {
-                        this.setMonitorStatus("peer.connect");
+                        this.setMonitorStatusBefore("peer.connect");
                         peer.connect(network, "connected +++ ");
-                        this.setMonitorStatus("peer.connect >>");
+                        this.setMonitorStatusAfter();
                     }
 
                     if (peer.isUsed()) {
@@ -285,6 +290,7 @@ public class ConnectionCreator extends MonitoredThread {
 
         }
 
+        this.setMonitorStatus("halted");
         LOGGER.info("halted");
 
     }
