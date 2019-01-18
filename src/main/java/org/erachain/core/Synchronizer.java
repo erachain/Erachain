@@ -1,15 +1,5 @@
 package org.erachain.core;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.TreeMap;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.mapdb.Fun.Tuple2;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
@@ -25,6 +15,15 @@ import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.SignaturesMessage;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
+import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.TreeMap;
 
 /**
  * функционал скачки цепочки с других узлов - догоняние сети
@@ -77,6 +76,16 @@ public class Synchronizer {
         if (!block.isSignatureValid()) {
             int banTime = BAN_BLOCK_TIMES;
             String mess = "*** Dishonest peer - Invalid block --signature. Ban for " + banTime;
+            peer.ban(banTime, mess);
+            throw new Exception(mess);
+        }
+
+        // проверим - парсятся ли транзакции нормально
+        try {
+            block.getTransactions();
+        } catch (Exception e) {
+            int banTime = BAN_BLOCK_TIMES << 1;
+            String mess = "*** Dishonest peer - Invalid block --зфкыу Екфтыфсешщты. Ban for " + banTime;
             peer.ban(banTime, mess);
             throw new Exception(mess);
         }
@@ -423,9 +432,6 @@ public class Synchronizer {
                     banTime = BAN_BLOCK_TIMES >> 4;
                     break;
                 }
-
-                LOGGER.debug("BLOCK getted " + " time ms: " + (System.currentTimeMillis() - time1) + " size kB: "
-                        + (blockFromPeer.getDataLength(false) / 1000) + " from " + peer);
 
                 if (cnt.isOnStopping()) {
                     // STOP BLOCKBUFFER

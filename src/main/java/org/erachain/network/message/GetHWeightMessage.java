@@ -10,4 +10,7 @@ public class GetHWeightMessage extends Message {
         return true;
     }
 
+    public int getDataLength() {
+        return 0;
+    }
 }

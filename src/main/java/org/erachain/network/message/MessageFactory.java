@@ -1,21 +1,19 @@
 package org.erachain.network.message;
 
-import java.io.DataInputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.mapdb.Fun.Tuple2;
-
 import com.google.common.primitives.Ints;
-
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
+import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.DataInputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class MessageFactory {
 
@@ -270,6 +268,7 @@ public class MessageFactory {
 
         //SET SENDER
         message.setSender(sender);
+        message.setLength(length);
 
         //SET ID
         if (hasId == 1) {
