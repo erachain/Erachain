@@ -1,8 +1,6 @@
 package org.erachain.utils;
 // 30/03
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.wallet.TransactionMap;
@@ -16,6 +14,8 @@ import org.erachain.gui.settings.SettingsFrame;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -291,7 +291,7 @@ public class SysTray implements Observer {
     @Override
     public void update(Observable arg0, Object arg1) {
 
-        if (this.icon == null) {
+        if (Controller.getInstance().isOnStopping() || this.icon == null) {
             return;
         }
 
