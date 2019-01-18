@@ -339,10 +339,10 @@ public class SysTray implements Observer {
             setToolTipText(toolTipText);
 
         } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE
-                || message.getType() == ObserverMessage.WALLET_SYNC_STATUS || message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS) {
+                || message.getType() == ObserverMessage.NETWORK_STATUS) {
 
             // непонятно в каких случаях когда это прилетает делать
-            if (Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS
+            if (true || Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS
             ) {
 
                 if (System.currentTimeMillis() - timePoint < 2000)
