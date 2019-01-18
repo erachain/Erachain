@@ -40,6 +40,8 @@ public class SysTray implements Observer {
     private TrayIcon icon = null;
     private PopupMenu createPopupMenu;
 
+    private long timePoint;
+
     public SysTray() {
         Controller.getInstance().addObserver(this);
     }
@@ -297,57 +299,75 @@ public class SysTray implements Observer {
 
         ObserverMessage message = (ObserverMessage) arg1;
 
-        int currentHeight;
-        String networkStatus = "";
-        String syncProcent = "";
-        String toolTipText = "erachain.org " + Controller.getInstance().getVersion() + "\n";
-
-
-        if (Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
-            networkStatus = Lang.getInstance().translate("No connections");
-            syncProcent = "";
-        } else if (Controller.getInstance().getStatus() == Controller.STATUS_SYNCHRONIZING) {
-            networkStatus = Lang.getInstance().translate("Synchronizing");
-        } else if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
-            networkStatus = Lang.getInstance().translate("OK");
-            syncProcent = "";
-        }
-
         if (message.getType() == ObserverMessage.WALLET_SYNC_STATUS) {
-            currentHeight = (int) message.getValue();
+
+
+            if (System.currentTimeMillis() - timePoint < 2000)
+                return;
+
+            timePoint = System.currentTimeMillis();
+
+            int currentHeight = (int) message.getValue();
             if (currentHeight == -1) {
                 this.update(null, new ObserverMessage(
                         ObserverMessage.NETWORK_STATUS, Controller.getInstance().getStatus()));
-                currentHeight = Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a;
                 return;
             }
-            networkStatus = Lang.getInstance().translate("Wallet Synchronizing");
+            String networkStatus = Lang.getInstance().translate("Wallet Synchronizing");
+            String syncProcent = 100 * currentHeight / Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "%";
 
-            syncProcent = 100 * currentHeight / Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "%";
-
-            toolTipText += networkStatus + " " + syncProcent;
+            String toolTipText = networkStatus + " " + syncProcent;
             toolTipText += "\n" + Lang.getInstance().translate("Height") + ": " + currentHeight + "/" + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false).a;
             setToolTipText(toolTipText);
 
         } else if (message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS) {
-            currentHeight = (int) message.getValue();
 
+            if (System.currentTimeMillis() - timePoint < 2000)
+                return;
+
+            timePoint = System.currentTimeMillis();
+
+            int currentHeight = (int) message.getValue();
+
+            String syncProcent = "";
             if (Controller.getInstance().getStatus() == Controller.STATUS_SYNCHRONIZING) {
                 syncProcent = 100 * currentHeight / Controller.getInstance().getMaxPeerHWeight(0, false).a + "%";
             }
 
-            toolTipText += networkStatus + " " + syncProcent;
+            String toolTipText = syncProcent;
             toolTipText += "\n" + Lang.getInstance().translate("Height") + ": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight(0, false);
             setToolTipText(toolTipText);
 
-        } else {
-            if (Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
-                toolTipText += networkStatus + " " + syncProcent;
+        } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE
+                || message.getType() == ObserverMessage.WALLET_SYNC_STATUS || message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS) {
+
+            // непонятно в каких случаях когда это прилетает делать
+            if (Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS
+            ) {
+
+                if (System.currentTimeMillis() - timePoint < 2000)
+                    return;
+
+                timePoint = System.currentTimeMillis();
+
+                String networkStatus = "";
+                String syncProcent = "";
+                String toolTipText = "erachain.org " + Controller.getInstance().getVersion() + "\n";
+
+                if (Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
+                    networkStatus = Lang.getInstance().translate("No connections");
+                    syncProcent = "";
+                } else if (Controller.getInstance().getStatus() == Controller.STATUS_SYNCHRONIZING) {
+                    networkStatus = Lang.getInstance().translate("Synchronizing");
+                } else if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
+                    networkStatus = Lang.getInstance().translate("OK");
+                    syncProcent = "";
+                }
+                toolTipText = networkStatus + " " + syncProcent;
                 toolTipText += "\n" + Lang.getInstance().translate("Height") + ": " + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a;
                 setToolTipText(toolTipText);
             }
         }
     }
-
 
 }
