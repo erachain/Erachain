@@ -477,19 +477,24 @@ public class Peer extends Thread {
             }
 
             //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
-            if (!message.isRequest() && message.hasId() && this.messages.containsKey(message.getId())) {
-                // это ответ на наш запрос с ID
+            if (!message.isRequest() && message.hasId()) {
 
+                if (!this.messages.containsKey(message.getId())) {
+                    // уже посроченный ответ словили - ничего не делаем
+                    continue;
+                }
+
+                // это ответ на наш запрос с ID
                 if (logPings && message.getType() == Message.HWEIGHT_TYPE)
                     LOGGER.debug(this + " >> " + message + " receive as RESPONSE for me & add to messages Queue");
 
-                //ADD TO OUR OWN LIST
-
                 try {
 
-                    this.messages.get(message.getId()).add(message);
+                    // get WAITING POLL
+                    BlockingQueue<Message> poll = this.messages.remove(message.getId());
+                    // invoke WAITING POLL
+                    poll.add(message);
 
-                    ////LOGGER.debug(this + " : " + message + "  == my RESPONSE added!!!");
                 } catch (java.lang.OutOfMemoryError e) {
                     Controller.getInstance().stopAll(84);
                     break;
@@ -497,7 +502,7 @@ public class Peer extends Thread {
                 } catch (Exception e) {
                     LOGGER.debug("received message " + message.viewType() + " from " + this.address.toString());
                     LOGGER.debug("isRequest " + message.isRequest() + " hasId " + message.hasId());
-                    LOGGER.debug(" Id " + message.getId() + " containsKey: " + this.messages.containsKey(message.getId()));
+                    LOGGER.debug(" Id " + message.getId());
                     LOGGER.error(e.getMessage(), e);
                 }
 
@@ -519,7 +524,6 @@ public class Peer extends Thread {
                         || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
                     LOGGER.debug(this + " : " + message + " >> solved by period: " + timeStart);
                 }
-
             }
         }
 
@@ -545,6 +549,12 @@ public class Peer extends Thread {
 
         if (logPings && message.getType() == Message.HWEIGHT_TYPE) {
             LOGGER.debug(message + " try SEND to " + this);
+        }
+
+        if (this.getPing() < -5 && message.getType() != Message.HWEIGHT_TYPE
+                && message.getType() != Message.GET_HWEIGHT_TYPE) {
+            // если пинг хреновый то ничего не шлем кроме пингования
+            return false;
         }
 
         //SEND MESSAGE
@@ -625,18 +635,24 @@ public class Peer extends Thread {
         Message response = null;
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
+            // если ответ есть то в читателе уже удалили его из очереди
+            if (response == null) {
+                this.messages.remove(localRequestKey);
+            }
         } catch (java.lang.OutOfMemoryError e) {
             Controller.getInstance().stopAll(86);
             return null;
         } catch (InterruptedException e) {
+            this.messages.remove(localRequestKey);
+        } catch (Exception e) {
+            this.messages.remove(localRequestKey);
+            LOGGER.error(e.getMessage(), e);
         }
 
         if (response != null && this.getPing() < 0) {
             // SET PING by request period
             this.setPing((int)(System.currentTimeMillis() - checkTime));
         }
-
-        this.messages.remove(localRequestKey);
 
         return response;
     }
