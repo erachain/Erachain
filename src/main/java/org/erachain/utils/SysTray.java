@@ -325,9 +325,12 @@ public class SysTray implements Observer {
             toolTipText += "\n" + Lang.getInstance().translate("Height") + ": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight(0, false);
             setToolTipText(toolTipText);
 
-        } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
+        } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE
+                || message.getType() == ObserverMessage.WALLET_SYNC_STATUS || message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS) {
+
             // непонятно в каких случаях когда это прилетает делать
-            if (Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
+            if (Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS
+            ) {
 
                 if (System.currentTimeMillis() - timePoint < 2000)
                     return;
