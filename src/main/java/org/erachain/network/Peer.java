@@ -383,7 +383,14 @@ public class Peer extends Thread {
                 } catch (Exception e) {
                 }
 
-                in = null;
+                if (in != null) {
+                    try {
+                        in.close();
+                        in = null;
+                    } catch (Exception e) {
+                        in = null;
+                    }
+                }
                 continue;
 
             }
