@@ -5,7 +5,6 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.message.*;
-import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.json.simple.JSONObject;
@@ -657,18 +656,6 @@ public class Network extends Observable {
         }
 
         knownPeers.clear();
-        // wait for thread stop;
-        int count = 0;
-        while (this.acceptor.isAlive()) {
-            count++;
-            try {
-                Thread.sleep(100);
-            } catch (Exception e) {
-            }
-            if (count > 50) LOGGER.error("waiting halt acceptor");
-            if (count > 100) break;
-        }
-
         LOGGER.info("halted");
 
     }
