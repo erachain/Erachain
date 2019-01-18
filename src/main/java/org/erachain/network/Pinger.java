@@ -38,7 +38,9 @@ public class Pinger extends Thread {
     }
 
     public void setNeedPing() {
-        this.needPing = true;
+        // пингуем только те что еще нормальные
+        if (ping > 0)
+            this.needPing = true;
     }
 
     public boolean tryPing(long timeSOT) {
@@ -138,7 +140,9 @@ public class Pinger extends Thread {
                 if (this.peer.isStoped())
                     return;
 
-                if (this.needPing)
+                // если нужно пингануь - но не часто все равно - так как там могут быстро блоки собираться
+                // чтобы не запинговать канал
+                if (this.needPing && sleepStepTimeCounter > (sleepsteps >> 4))
                     break;
 
                 sleepStepTimeCounter--;

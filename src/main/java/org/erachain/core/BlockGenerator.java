@@ -600,6 +600,9 @@ public class BlockGenerator extends Thread implements Observer {
                     this.solvingReference = null;
                     status = 0;
 
+                    // пинганем тут все что
+                    ctrl.pingAllPeers(true);
+
                     // осмотр сети по СИЛЕ
                     // уже все узлы свою силу передали при Controller.flushNewBlockGenerated
 

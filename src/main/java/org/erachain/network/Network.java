@@ -543,7 +543,6 @@ public class Network extends Observable {
             }
         }
 
-        peer = null;
         //LOGGER.debug("Broadcasting PING ALL end");
     }
 
