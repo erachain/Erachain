@@ -361,6 +361,13 @@ public class DWSet implements IDB {
 
     }
 
+    public void rollback() {
+        this.uses++;
+        this.database.rollback();
+        this.uses--;
+
+    }
+
     @Override
     public void close() {
         if (this.database != null) {

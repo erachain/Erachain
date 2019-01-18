@@ -4,7 +4,6 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.erachain.Start;
 import org.erachain.api.ApiClient;
 import org.erachain.api.ApiService;
 import org.erachain.at.AT;
@@ -93,7 +92,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    private static final String version = "4.11.07b1 beta";
+    private static final String version = "4.11.07b4 PEER";
     private static final String buildTime = "2018-12-04 13:33:33 UTC";
     private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.DEVELOP_USE? false : false;
 
@@ -167,6 +166,8 @@ public class Controller extends Observable {
     private long unconfigmedMessageTimingAverage;
     private long transactionMessageTimingAverage;
     private long transactionMessageTimingCounter;
+    private long transactionMakeTimingAverage;
+    private long transactionMakeTimingCounter;
     private long transactionProcessTimingAverage;
     private long transactionProcessTimingCounter;
 
@@ -331,6 +332,18 @@ public class Controller extends Observable {
      */
     public long getTransactionMessageTimingAverage() {
         return transactionMessageTimingAverage;
+    }
+
+    /**
+     * Среднее время обработки транзакции при создании нашего блока. Блок считается как одна транзакция
+     *
+     * @return
+     */
+    public long getTransactionMakeTimingAverage() {
+        return transactionMakeTimingAverage;
+    }
+    public void setTransactionMakeTimingAverage(long transactionMakeTimingAverage) {
+        this.transactionMakeTimingAverage = transactionMakeTimingAverage;
     }
 
     /**
@@ -667,10 +680,15 @@ public class Controller extends Observable {
         if (this.seedCommand != null && this.seedCommand.length > 1) {
             /// 0 - Accounts number, 1 - seed, 2 - password, [3 - path]
             byte[] seed;
-            try {
-                seed = Base58.decode(this.seedCommand[1]);
-            } catch (Exception e) {
-                seed = null;
+            if (this.seedCommand[1].length() < 30) {
+                seed = new byte[32];
+                this.random.nextBytes(seed);
+            } else {
+                try {
+                    seed = Base58.decode(this.seedCommand[1]);
+                } catch (Exception e) {
+                    seed = null;
+                }
             }
 
             if (seed != null) {
@@ -1177,7 +1195,7 @@ public class Controller extends Observable {
 
 
                 pinged = true;
-                peer.tryQuickPing();
+                peer.tryPing();
                 this.network.notifyObserveUpdatePeer(peer);
 
                 ping = peer.getPing();
@@ -1185,14 +1203,9 @@ public class Controller extends Observable {
 
                     stepCount >>= 1;
 
-                    if (ping < 0) {
-                        stepCount >>= 1;
-                        try {
-                            Thread.sleep(5000);
-                        } catch (Exception e) {
-                        }
-                    } else if (ping > 5000) {
-                        stepCount >>= 1;
+                    try {
+                        Thread.sleep(5000);
+                    } catch (Exception e) {
                     }
 
                     // LOGGER.debug(peer + " stepCount down " +
@@ -1208,7 +1221,8 @@ public class Controller extends Observable {
 
         }
 
-        if (!pinged) peer.tryQuickPing();
+        if (!pinged)
+            peer.tryPing();
 
         this.network.notifyObserveUpdatePeer(peer);
 
@@ -1219,6 +1233,12 @@ public class Controller extends Observable {
 
     }
 
+    /**
+     * при установке коннекта нельзя сразу пинговать - это тормозит и толку ноль - пинги не проходят
+     * а вот после уже передачи неподтвержденных трнзакций - можно пингануть - тогда вроде норм все проходит
+     *
+     * @param peer
+     */
     public void onConnect(Peer peer) {
 
         if (this.isStopping)
@@ -1228,11 +1248,6 @@ public class Controller extends Observable {
         if (!peer.sendMessage(
                 MessageFactory.getInstance().createFindMyselfMessage(Controller.getInstance().getFoundMyselfID())))
             return;
-
-        try {
-            Thread.sleep(300);
-        } catch (Exception e) {
-        }
 
         // SEND VERSION MESSAGE
         if (!peer.sendMessage(
@@ -1250,33 +1265,6 @@ public class Controller extends Observable {
             this.network.tryDisconnect(peer, Synchronizer.BAN_BLOCK_TIMES << 2, "wrong GENESIS BLOCK");
             return;
         }
-
-        /*
-         * // SEND GENESIS BLOCK MESSAGE
-         * ////peer.sendMessage(MessageFactory.getInstance().
-         * createGetBlockMessage(genesisBlockSign)); //SEND MESSAGE TO PEER
-         * Message mess =
-         * MessageFactory.getInstance().createGetBlockMessage(genesisBlockSign);
-         * BlockMessage response = (BlockMessage) peer.getResponse(mess);
-         *
-         * //CHECK IF WE GOT RESPONSE if(response == null) { //ERROR //error =
-         * true; return; // WRONG GENESIS BLOCK }
-         *
-         * Block block = response.getBlock(); //CHECK BLOCK SIGNATURE if(block
-         * == null || !(block instanceof GenesisBlock)) { //error = true;
-         * return; // WRONG GENESIS BLOCK }
-         *
-         * // TODO CHECK GENESIS BLOCK on CONNECT Message mess =
-         * MessageFactory.getInstance().createGetHeadersMessage(genesisBlockSign
-         * ); GetSignaturesMessage response = (GetSignaturesMessage)
-         * peer.getResponse(mess);
-         *
-         * //CHECK IF WE GOT RESPONSE if(response == null) { //ERROR //error =
-         * true; return; // WRONG GENESIS BLOCK }
-         *
-         * byte[] header = response.getParent(); if (header == null) { return;
-         * // WRONG GENESIS BLOCK }
-         */
 
         // GET CURRENT WIN BLOCK
         Block winBlock = this.blockChain.getWaitWinBuffer();
@@ -1303,17 +1291,7 @@ public class Controller extends Observable {
 
         // BROADCAST UNCONFIRMED TRANSACTIONS to PEER
         if (!this.broadcastUnconfirmedToPeer(peer))
-            this.network.tryDisconnect(peer, 1, "broken on SEND UNCONFIRMEDs");
-
-        /*
-         * // GET HEIGHT Tuple2<Integer, Long> HWeight =
-         * this.blockChain.getHWeightFull(dcSet); // SEND HEIGHT MESSAGE if
-         * (!peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(
-         * HWeight))) return;
-         *
-         * //peer.setNeedPing(); peer.tryPing(30000);
-         * this.network.notifyObserveUpdatePeer(peer);
-         */
+            this.network.tryDisconnect(peer, network.banForActivePeersCounter(), "broken on SEND UNCONFIRMEDs");
 
     }
 
@@ -1572,7 +1550,8 @@ public class Controller extends Observable {
                     if (onMessageProcessTiming < 999999999999l) {
                         // при переполнении может быть минус
                         // в миеросекундах подсчет делаем
-                        onMessageProcessTiming = onMessageProcessTiming / 1000 / (1 + newBlock.getTransactionCount());
+                        // ++ 10 потому что там ФОРК базы делаем - он очень медленный
+                        onMessageProcessTiming = onMessageProcessTiming / 1000 / (10 + newBlock.getTransactionCount());
                         if (transactionMessageTimingCounter < 1 << 3) {
                             transactionMessageTimingCounter++;
                             transactionMessageTimingAverage = ((transactionMessageTimingAverage * transactionMessageTimingCounter)
@@ -1744,7 +1723,7 @@ public class Controller extends Observable {
     public void banPeerOnError(Peer peer, String mess) {
         if (Settings.getInstance().getMaxConnections() - this.network.getActivePeersCounter(false) < 1) {
             // BAN if ALL connection USED
-            this.network.tryDisconnect(peer, Synchronizer.BAN_BLOCK_TIMES >> 2, "ban PeerOnError - " + mess);
+            this.network.tryDisconnect(peer, network.banForActivePeersCounter(), "ban PeerOnError - " + mess);
         }
     }
 

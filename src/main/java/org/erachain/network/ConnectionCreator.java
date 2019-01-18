@@ -1,12 +1,14 @@
 package org.erachain.network;
 // 30/03
 
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.PeersMessage;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
+import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,17 +19,17 @@ import java.util.List;
  * класс поиска каналов связи - подключается к внешним узлам создавая пиры
  * смотрит сколько соединений во вне (white) уже есть и если еще недостаточно то цепляется ко всему что сможет
  */
-public class ConnectionCreator extends Thread {
+public class ConnectionCreator extends MonitoredThread {
 
     // как часто запрашивать все пиры у других пиров
     private static long GET_PEERS_PERIOD = 60 * 10 * 1000;
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionCreator.class);
-    private ConnectionCallback callback;
+    private Network network;
     private static long getPeersTimestamp;
     private boolean isRun;
 
-    public ConnectionCreator(ConnectionCallback callback) {
-        this.callback = callback;
+    public ConnectionCreator(Network network) {
+        this.network = network;
         this.setName("ConnectionCreator - " + this.getId());
     }
 
@@ -37,8 +39,8 @@ public class ConnectionCreator extends Thread {
             return 0;
 
         //CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE
-        if (Settings.getInstance().getMinConnections() < callback.getActivePeersCounter(true)
-                || (Settings.getInstance().getMaxConnections() >> 1) < callback.getActivePeersCounter(false))
+        if (Settings.getInstance().getMinConnections() < network.getActivePeersCounter(true)
+            || (Settings.getInstance().getMaxConnections() >> 1) < network.getActivePeersCounter(false))
             return 0;
 
         LOGGER.info("GET peers from: " + peer + " get max: " + maxReceivePeers);
@@ -71,14 +73,16 @@ public class ConnectionCreator extends Thread {
             }
 
             //CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE
-            if (Settings.getInstance().getMinConnections() < callback.getActivePeersCounter(true)
-                    || (Settings.getInstance().getMaxConnections() >> 1) < callback.getActivePeersCounter(false))
+            if (Settings.getInstance().getMinConnections() < network.getActivePeersCounter(true)
+                    || (Settings.getInstance().getMaxConnections() >> 1) < network.getActivePeersCounter(false))
                 break;
 
             try {
                 Thread.sleep(10);
-            } catch (InterruptedException e) {
-                LOGGER.error(e.getMessage(), e);
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(94);
+                break;
+            } catch (Exception e) {
             }
 
             //CHECK IF THAT PEER IS NOT BLACKLISTED
@@ -96,7 +100,7 @@ public class ConnectionCreator extends Thread {
 
             //CHECK IF ALREADY CONNECTED TO PEER
             //CHECK IF PEER ALREADY used
-            newPeer = callback.getKnownPeer(newPeer);
+            newPeer = network.getKnownPeer(newPeer);
             if (newPeer.isUsed()) {
                 continue;
             }
@@ -108,8 +112,10 @@ public class ConnectionCreator extends Thread {
                 return 0;
 
             //CONNECT
-            if (newPeer.connect(callback, "connected in recurse +++ ")) {
+            if (!newPeer.isOnUsed())
+                newPeer.connect(network,"connected in recurse +++ ");
 
+            if (newPeer.isUsed()) {
                 // RECURSE to OTHER PEERS
                 foreignPeersCounter++;
                 connectToPeersOfThisPeer(newPeer, maxReceivePeers >> 1);
@@ -126,23 +132,28 @@ public class ConnectionCreator extends Thread {
 
         List<Peer> knownPeers = null;
 
+        this.initMonitor();
         while (isRun) {
+            this.setMonitorPoint();
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(96);
+                break;
             } catch (InterruptedException e) {
                 LOGGER.error(e.getMessage(), e);
             }
 
             if (!this.isRun)
-                return;
+                break;
 
             this.setName("ConnectionCreator - " + this.getId()
-                    + " white:" + callback.getActivePeersCounter(true)
-                    + " total:" + callback.getActivePeersCounter(false));
+                    + " white:" + network.getActivePeersCounter(true)
+                    + " total:" + network.getActivePeersCounter(false));
 
             //CHECK IF WE NEED NEW CONNECTIONS
-            if (this.isRun && Settings.getInstance().getMinConnections() > callback.getActivePeersCounter(true)) {
+            if (this.isRun && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true)) {
 
                 //GET LIST OF KNOWN PEERS
                 knownPeers = PeerManager.getInstance().getKnownPeers();
@@ -151,7 +162,7 @@ public class ConnectionCreator extends Thread {
                 for (Peer peer : knownPeers) {
 
                     //CHECK IF WE ALREADY HAVE MIN CONNECTIONS
-                    if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true)) {
+                    if (Settings.getInstance().getMinConnections() <= network.getActivePeersCounter(true)) {
                         // stop use KNOWN peers
                         break;
                     }
@@ -167,7 +178,7 @@ public class ConnectionCreator extends Thread {
                     }
 
                     if (!this.isRun)
-                        return;
+                        break;
 
                     //CHECK IF SOCKET IS NOT LOCALHOST
                     //if(true)
@@ -180,7 +191,7 @@ public class ConnectionCreator extends Thread {
                     //CHECK IF ALREADY CONNECTED TO PEER
                     //CHECK IF PEER ALREADY used
                     // new PEER from NETWORK poll or original from DB
-                    peer = callback.getKnownPeer(peer);
+                    peer = network.getKnownPeer(peer);
                     if (peer.isUsed()) {
                         continue;
                     }
@@ -189,7 +200,7 @@ public class ConnectionCreator extends Thread {
                         continue;
 
                     if (!this.isRun)
-                        return;
+                        break;
 
                     LOGGER.info("try connect to: " + peer);
 
@@ -205,8 +216,13 @@ public class ConnectionCreator extends Thread {
 
                     //CONNECT
                     //CHECK IF ALREADY CONNECTED TO PEER
-                    if (peer.connect(callback, "connected +++ ")) {
+                    if (!peer.isOnUsed()) {
+                        this.setMonitorStatus("peer.connect");
+                        peer.connect(network, "connected +++ ");
+                        this.setMonitorStatus("peer.connect >>");
+                    }
 
+                    if (peer.isUsed()) {
                         // TRY CONNECT to WHITE peers of this PEER
                         connectToPeersOfThisPeer(peer, 4);
                     }
@@ -215,19 +231,19 @@ public class ConnectionCreator extends Thread {
 
             //CHECK IF WE STILL NEED NEW CONNECTIONS
             // USE unknown peers from known peers
-            if (this.isRun && Settings.getInstance().getMinConnections() > callback.getActivePeersCounter(true)) {
+            if (this.isRun && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true)) {
                 //OLD SCHOOL ITERATE activeConnections
                 //avoids Exception when adding new elements
-                List<Peer> peers = callback.getActivePeers(false);
+                List<Peer> peers = network.getActivePeers(false);
                 for (Peer peer: peers) {
 
                     if (!this.isRun)
-                        return;
+                        break;
 
                     if (peer.isBanned())
                         continue;
 
-                    if (Settings.getInstance().getMinConnections() <= callback.getActivePeersCounter(true)) {
+                    if (Settings.getInstance().getMinConnections() <= network.getActivePeersCounter(true)) {
                         break;
                     }
 
@@ -241,7 +257,7 @@ public class ConnectionCreator extends Thread {
             }
 
             //SLEEP
-            int counter = callback.getActivePeersCounter(true);
+            int counter = network.getActivePeersCounter(true);
             if (counter == 0
                     || counter < 6 && !BlockChain.DEVELOP_USE)
                 continue;
@@ -249,21 +265,28 @@ public class ConnectionCreator extends Thread {
             int needMinConnections = Settings.getInstance().getMinConnections();
 
             this.setName("Thread ConnectionCreator - " + this.getId() + " white:" + counter
-                    + " total:" + callback.getActivePeersCounter(false));
+                    + " total:" + network.getActivePeersCounter(false));
 
             if (!this.isRun)
-                return;
+                break;
+
+            this.setMonitorStatus("sleep");
 
             try {
                 if (counter < needMinConnections)
-                    Thread.sleep(BlockChain.DEVELOP_USE ? 10000 : 1000);
+                    Thread.sleep(BlockChain.DEVELOP_USE ? 10000 : 5000);
                 else
-                    Thread.sleep(60000);
-            } catch (InterruptedException e) {
-                LOGGER.error(e.getMessage(), e);
+                    Thread.sleep(30000);
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(95);
+                return;
+            } catch (Exception e) {
             }
 
         }
+
+        LOGGER.info("halted");
+
     }
 
     public void halt() {

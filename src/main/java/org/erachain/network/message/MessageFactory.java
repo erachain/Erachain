@@ -95,6 +95,7 @@ public class MessageFactory {
         //READ MESSAGE TYPE
         byte[] typeBytes = new byte[Message.TYPE_LENGTH];
         inputStream.readFully(typeBytes);
+
         int type = Ints.fromByteArray(typeBytes);
 
         //READ HAS ID

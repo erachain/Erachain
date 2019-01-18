@@ -5,6 +5,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.message.*;
+import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -19,7 +20,7 @@ import java.util.*;
 /**
  * основной класс модуля Сети
  */
-public class Network extends Observable implements ConnectionCallback {
+public class Network extends Observable {
 
 
     public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK ? 0 : 1;
@@ -43,6 +44,14 @@ public class Network extends Observable implements ConnectionCallback {
 
     public static InetAddress getMyselfAddress() {
         return myselfAddress;
+    }
+
+    public ConnectionAcceptor getAcceptor() {
+        return acceptor;
+    }
+
+    public ConnectionCreator getCreator() {
+        return creator;
     }
 
     public static boolean isPortAvailable(int port) {
@@ -80,7 +89,6 @@ public class Network extends Observable implements ConnectionCallback {
         telegramer.start();
     }
 
-    @Override
     public void onConnect(Peer peer) {
 
         //LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer);
@@ -123,29 +131,26 @@ public class Network extends Observable implements ConnectionCallback {
 
     }
 
-    @Override
     public void tryDisconnect(Peer peer, int banForMinutes, String error) {
 
-        if (!peer.isUsed())
-            return;
+        if (peer.isUsed()) {
+            //CLOSE CONNECTION
+            peer.close();
 
-        //CLOSE CONNECTION
-        peer.close();
+            if (error != null && error.length() > 0) {
+                if (banForMinutes != 0) {
+                    LOGGER.info(peer + " ban for minutes: " + banForMinutes + " - " + error);
+                } else {
+                    LOGGER.info("tryDisconnect : " + peer + " - " + error);
+                }
+            }
+
+            //PASS TO CONTROLLER
+            Controller.getInstance().afterDisconnect(peer);
+        }
 
         //ADD TO BLACKLIST
         PeerManager.getInstance().addPeer(peer, banForMinutes);
-
-        if (error != null && error.length() > 0) {
-            if (banForMinutes != 0) {
-                LOGGER.info(peer + " ban for minutes: " + banForMinutes + " - " + error);
-            } else {
-                LOGGER.info("tryDisconnect : " + peer + " - " + error);
-            }
-        }
-
-
-        //PASS TO CONTROLLER
-        Controller.getInstance().afterDisconnect(peer);
 
         //NOTIFY OBSERVERS
         this.setChanged();
@@ -155,7 +160,6 @@ public class Network extends Observable implements ConnectionCallback {
         this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
     }
 
-    @Override
     public boolean isKnownAddress(InetAddress address, boolean andUsed) {
 
         try {
@@ -178,14 +182,6 @@ public class Network extends Observable implements ConnectionCallback {
         return false;
     }
 
-	/*@Override
-	public List<Peer> getKnownPeers() {
-
-		return this.knownPeers;
-	}
-	*/
-
-    @Override
     // IF PEER in exist in NETWORK - get it
     public Peer getKnownPeer(Peer peer) {
 
@@ -207,7 +203,6 @@ public class Network extends Observable implements ConnectionCallback {
         return peer;
     }
 
-    @Override
     public boolean isKnownPeer(Peer peer, boolean andUsed) {
 
         return this.isKnownAddress(peer.getAddress(), andUsed);
@@ -238,6 +233,26 @@ public class Network extends Observable implements ConnectionCallback {
             }
         }
         return counter;
+    }
+
+    /**
+     * Выдает число минут для бана пира у котрого ошибка в канале:
+     *  если соединений очень мало - то не банить, если сединений не максимум то банить на небольшой срок,
+     *  иначе бан на 10 минут если осталось только 3 свободных места
+     * @return
+     */
+    public int banForActivePeersCounter() {
+
+        int active = getActivePeersCounter(false);
+        int difference = Settings.getInstance().getMinConnections() - active;
+        if (difference > 0)
+            return 0;
+
+        difference = Settings.getInstance().getMaxConnections() - active;
+        if (difference < 3) {
+            return 10;
+        }
+        return 3;
     }
 
     public List<Peer> getIncomedPeers() {
@@ -292,15 +307,21 @@ public class Network extends Observable implements ConnectionCallback {
 
     public Peer startPeer(Socket socket) {
 
-        // REUSE known peer
         byte[] addressIP = socket.getInetAddress().getAddress();
+        // REUSE known peer
         synchronized (this.knownPeers) {
             //FOR ALL connectedPeers
             for (Peer knownPeer : knownPeers) {
                 //CHECK IF ADDRESS IS THE SAME
                 if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
-                    knownPeer.reconnect(socket, "connected by restore!!! ");
-                    return knownPeer;
+                    if (!knownPeer.isOnUsed()) {
+                        // возможно из-за того что одновременно и как приемник и как передатчик я начинаю выступать
+                        // будет накладка и затык - может не нужно прямо одинаковые имена тут выискивать тогда?
+                        knownPeer.reconnect(socket, "connected by restore!!! ");
+                        return knownPeer;
+                    }
+
+                    break;
                 }
             }
         }
@@ -308,9 +329,7 @@ public class Network extends Observable implements ConnectionCallback {
         // use UNUSED peers
         synchronized (this.knownPeers) {
             for (Peer knownPeer : this.knownPeers) {
-                if (!knownPeer.isUsed()
-                    //|| !Network.isMyself(knownPeer.getAddress())
-                ) {
+                if (!knownPeer.isOnUsed()) {
                     knownPeer.reconnect(socket, "connected by recircle!!! ");
                     return knownPeer;
                 }
@@ -324,6 +343,25 @@ public class Network extends Observable implements ConnectionCallback {
 
         return peer;
 
+    }
+
+    /**
+     * нужно для того чтобы одновременно не коннектилось две трубы как приемник и как посылник
+     * и возможно и-за этого были затыки. Теперь
+     *
+     * @param socket
+     * @param peer
+     * @param message
+     * @return
+     */
+    public /* synchronized */ Peer tryConnection(Socket socket, Peer peer, String message) {
+        if (socket != null)
+            return startPeer(socket);
+
+        if (!peer.isOnUsed())
+            peer.connect(this, message);
+
+        return peer;
     }
 
     private void addHandledMessage(String hash) {
@@ -342,7 +380,6 @@ public class Network extends Observable implements ConnectionCallback {
         }
     }
 
-    @Override
     public void onMessage(Message message) {
 
         //CHECK IF WE ARE STILL PROCESSING MESSAGES
@@ -361,29 +398,29 @@ public class Network extends Observable implements ConnectionCallback {
 
             return;
         }
-
+        
         // GET telegrams
         if(message.getType()== Message.TELEGRAM_GET_TYPE){
-            //address
-            JSONObject address = ((TelegramGetMessage) message).getAddress();
-            // create ansver
-            ArrayList<String> ca = new ArrayList<String>();
-            Set keys = address.keySet();
-            for(int i = 0; i<keys.size(); i++){
-
-                ca.add((String) address.get(i));
-            }
+          //address
+             JSONObject address = ((TelegramGetMessage) message).getAddress();
+             // create ansver
+             ArrayList<String> ca = new ArrayList<String>();
+             Set keys = address.keySet();
+             for(int i = 0; i<keys.size(); i++){
+                  
+                 ca.add((String) address.get(i));
+             }
             Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage(ca);
             answer.setId(message.getId());
             // send answer
             message.getSender().sendMessage(answer);
-            return;
-        }
+           return;
+           }
         // Ansver to get transaction
         if ( message.getType() == Message.TELEGRAM_GET_ANSWER_TYPE){
-            ((TelegramGetAnswerMessage) message).saveToWallet();
-
-            return;
+           ((TelegramGetAnswerMessage) message).saveToWallet();
+            
+            return; 
         }
         //ONLY HANDLE BLOCK AND TRANSACTION MESSAGES ONCE
         if (message.getType() == Message.TRANSACTION_TYPE
@@ -505,7 +542,6 @@ public class Network extends Observable implements ConnectionCallback {
             }
         }
 
-        peer = null;
         //LOGGER.debug("Broadcasting PING ALL end");
     }
 
@@ -620,9 +656,6 @@ public class Network extends Observable implements ConnectionCallback {
         }
 
         knownPeers.clear();
-        // wait for thread stop;
-        //while (this.acceptor.isAlive()) ;
-
         LOGGER.info("halted");
 
     }

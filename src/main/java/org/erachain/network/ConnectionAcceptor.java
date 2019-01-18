@@ -3,6 +3,7 @@ package org.erachain.network;
 import org.erachain.controller.Controller;
 import org.erachain.database.PeerMap;
 import org.erachain.settings.Settings;
+import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,15 +17,15 @@ import java.util.Random;
  * приемник содинения - отвечает на входящие запросы и создает канал связи
  * запускает первый слушатель и ждет входящего соединения
  */
-public class ConnectionAcceptor extends Thread {
+public class ConnectionAcceptor extends MonitoredThread {
 
     static Logger LOGGER = LoggerFactory.getLogger(ConnectionAcceptor.class.getName());
-    private ConnectionCallback callback;
+    private Network network;
     private ServerSocket socket;
     private boolean isRun;
 
-    public ConnectionAcceptor(ConnectionCallback callback) {
-        this.callback = callback;
+    public ConnectionAcceptor(Network network) {
+        this.network = network;
         this.setName("ConnectionAcceptor - " + this.getId());
     }
 
@@ -34,8 +35,17 @@ public class ConnectionAcceptor extends Thread {
         Random random = new Random();
 
         PeerMap map = Controller.getInstance().getDBSet().getPeerMap();
+        this.initMonitor();
         while (this.isRun && !this.isInterrupted()) {
+            this.setMonitorPoint();
 
+            // на всякий случай чтобы атак не было с созданием множества конектов
+            try {
+                Thread.sleep(10);
+            } catch (Exception e) {
+            }
+
+            Socket connectionSocket = null;
             try {
 
                 if (socket == null) {
@@ -49,7 +59,9 @@ public class ConnectionAcceptor extends Thread {
                 }
 
                 //ACCEPT CONNECTION
-                Socket connectionSocket = socket.accept();
+                this.setMonitorStatus("socket.accept");
+                connectionSocket = socket.accept();
+                this.setMonitorStatus("socket.accept >>");
 
                 //CHECK IF SOCKET IS NOT LOCALHOST || WE ARE ALREADY CONNECTED TO THAT SOCKET || BLACKLISTED
                 if (
@@ -60,47 +72,64 @@ public class ConnectionAcceptor extends Thread {
                     connectionSocket.close();
                     continue;
                 }
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(90);
+                break;
 
-                if (!this.isRun)
-                    break;
+            } catch (Exception e) {
+                try {
+                    socket.close();
+                } catch (Exception e1) {
+                }
 
+                socket = null;
+                continue;
+
+            }
+
+            if (!this.isRun)
+                break;
+
+            if (connectionSocket == null)
+                continue;
+
+            try {
                 //CREATE PEER
                 ////new Peer(callback, connectionSocket);
                 //LOGGER.info("START ACCEPT CONNECT FROM " + connectionSocket.getInetAddress().getHostAddress()
                 //		+ " isMy:" + Network.isMyself(connectionSocket.getInetAddress())
                 //		+ " my:" + Network.getMyselfAddress());
 
-                Peer peer = callback.startPeer(connectionSocket);
+                //Peer peer = network.tryConnection(connectionSocket, null, null);
+                Peer peer = network.startPeer(connectionSocket);
                 if (!peer.isUsed()) {
                     // если в процессе
-                    if (!peer.isBanned() || connectionSocket.isClosed())
-                        peer.ban(10, "WROND ACCEPT");
+                    //if (!peer.isBanned() || connectionSocket.isClosed()) {
+                    //    peer.ban("WROND ACCEPT");
+                    //}
+
+                    continue;
                 }
 
                 //CHECK IF WE HAVE MAX CONNECTIONS CONNECTIONS
-                if (Settings.getInstance().getMaxConnections() <= callback.getActivePeersCounter(false)) {
+                if (Settings.getInstance().getMaxConnections() <= network.getActivePeersCounter(false)) {
                     // get only income peers;
-                    List<Peer> incomePeers = callback.getIncomedPeers();
+                    List<Peer> incomePeers = network.getIncomedPeers();
                     if (incomePeers != null && !incomePeers.isEmpty()) {
                         Peer peerForBan = incomePeers.get(random.nextInt((incomePeers.size())));
                         peerForBan.ban(10, "Clear place for new connection");
                     }
                 }
-
-            } catch (Exception e) {
-
-                try {
-                    socket.close();
-                } catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-                //LOGGER.info(e.getMessage(),e);
-                //LOGGER.info(Lang.getInstance().translate("Error accepting new connection") + " - " + e.getMessage());
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(89);
                 break;
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
             }
-            if (this.isInterrupted()) break;
+
         }
+
+        LOGGER.info("halted");
 
     }
 
@@ -113,8 +142,6 @@ public class ConnectionAcceptor extends Thread {
         try {
             socket.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
 
     }

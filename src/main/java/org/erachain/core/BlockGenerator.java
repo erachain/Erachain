@@ -228,17 +228,17 @@ public class BlockGenerator extends Thread implements Observer {
     }
 
 
-    public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(long timestamp, BlockChain bchain, long max_winned_value) {
+    public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(int blockHeight, long timestamp, BlockChain bchain,
+                                                                         long max_winned_value) {
 
-        long timrans1 = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
 
         //CREATE FORK OF GIVEN DATABASE
-        DCSet newBlockDC = dcSet.fork();
-        int blockHeight =  newBlockDC.getBlockMap().size() + 1;
+        DCSet newBlockDC = null;
 
         Block waitWin;
 
-        long start = System.currentTimeMillis();
+        start = System.currentTimeMillis();
 
         List<Transaction> transactionsList = new ArrayList<Transaction>();
 
@@ -268,6 +268,13 @@ public class BlockGenerator extends Thread implements Observer {
 
             if (transaction.getTimestamp() > timestamp)
                 break;
+
+            // делать форк только если есть трнзакции - так как это сильно кушает память
+            if (newBlockDC == null) {
+                //CREATE FORK OF GIVEN DATABASE
+                newBlockDC = dcSet.fork();
+            }
+
             if (!transaction.isSignatureValid(newBlockDC)) {
                 needRemoveInvalids.add(transaction.getSignature());
                 continue;
@@ -318,7 +325,8 @@ public class BlockGenerator extends Thread implements Observer {
 
         }
 
-        newBlockDC.close();
+        if (newBlockDC != null )
+            newBlockDC.close();
 
         LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) + "ms for trans: " + counter);
 
@@ -498,6 +506,12 @@ public class BlockGenerator extends Thread implements Observer {
 
         TransactionMap transactionsMap = dcSet.getTransactionMap();
 
+        int heapOverflowCount = 0;
+
+        long processTiming;
+        long transactionMakeTimingCounter = 0;
+        long transactionMakeTimingAverage = 0;
+
         Peer peer = null;
         Tuple3<Integer, Long, Peer> maxPeer;
         SignaturesMessage response;
@@ -585,6 +599,9 @@ public class BlockGenerator extends Thread implements Observer {
                     flushPoint = BlockChain.FLUSH_TIMEPOINT + timePoint;
                     this.solvingReference = null;
                     status = 0;
+
+                    // пинганем тут все что
+                    ctrl.pingAllPeers(true);
 
                     // осмотр сети по СИЛЕ
                     // уже все узлы свою силу передали при Controller.flushNewBlockGenerated
@@ -772,13 +789,41 @@ public class BlockGenerator extends Thread implements Observer {
 
                                 generatedBlock = null;
                                 try {
+                                    processTiming = System.nanoTime();
                                     generatedBlock = generateNextBlock(acc_winner, solvingBlock,
-                                            getUnconfirmedTransactions(timePointForGenerate,
+                                            getUnconfirmedTransactions(height, timePointForGenerate,
                                                     bchain, winned_winValue),
                                             height, winned_forgingValue, winned_winValue, previousTarget);
+
+                                    processTiming = System.nanoTime() - processTiming;
+
+                                    // только если вблоке есть стрнзакции то вычислим
+                                    if (generatedBlock.getTransactionCount() > 0
+                                            && processTiming < 999999999999l) {
+                                        // при переполнении может быть минус
+                                        // в миеросекундах подсчет делаем
+                                        // ++ 10 потому что там ФОРК базы делаем - он очень медленный
+                                        processTiming = processTiming / 1000 / (10 + generatedBlock.getTransactionCount());
+                                        if (transactionMakeTimingCounter < 1 << 3) {
+                                            transactionMakeTimingCounter++;
+                                            transactionMakeTimingAverage = ((transactionMakeTimingAverage * transactionMakeTimingCounter)
+                                                    + processTiming - transactionMakeTimingAverage) / transactionMakeTimingCounter;
+                                        } else
+                                            transactionMakeTimingAverage = ((transactionMakeTimingAverage << 3)
+                                                    + processTiming - transactionMakeTimingAverage) >> 3;
+
+                                        ctrl.setTransactionMakeTimingAverage(transactionMakeTimingAverage);
+                                    }
+
+                                    heapOverflowCount = 0;
+
                                 } catch (java.lang.OutOfMemoryError e) {
-                                    // TRY CATCH OUTofMemory error - heap space
-                                    LOGGER.error(e.getMessage(), e);
+                                    heapOverflowCount++;
+                                    if (heapOverflowCount > 1) {
+                                        ctrl.stopAll(94);
+                                        status = -1;
+                                        return;
+                                    }
                                 } finally {
                                     System.gc();
                                 }
@@ -790,6 +835,8 @@ public class BlockGenerator extends Thread implements Observer {
                                         this.status = -1;
                                         return;
                                     }
+                                    if (heapOverflowCount > 1)
+                                        ctrl.stopAll(97);
 
                                     LOGGER.error("generateNextBlock is NULL... try wait");
                                     try {
@@ -799,20 +846,27 @@ public class BlockGenerator extends Thread implements Observer {
 
                                     continue;
                                 } else {
-
                                     //PASS BLOCK TO CONTROLLER
-                                    ///ctrl.newBlockGenerated(block);
-                                    LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
-                                    if (bchain.setWaitWinBuffer(dcSet, generatedBlock, peer)) {
+                                    try {
+                                        LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
+                                        if (bchain.setWaitWinBuffer(dcSet, generatedBlock, peer)) {
 
-                                        // need to BROADCAST
-                                        status = 8;
-                                        ctrl.broadcastWinBlock(generatedBlock, null);
-                                        generatedBlock = null;
-                                        status = 0;
-                                    } else {
-                                        generatedBlock = null;
-                                        LOGGER.info("my BLOCK is weak ((...");
+                                            // need to BROADCAST
+                                            status = 8;
+                                            ctrl.broadcastWinBlock(generatedBlock, null);
+                                            generatedBlock = null;
+                                            status = 0;
+                                        } else {
+                                            generatedBlock = null;
+                                            LOGGER.info("my BLOCK is weak ((...");
+                                        }
+                                    } catch (java.lang.OutOfMemoryError e) {
+                                        heapOverflowCount++;
+                                        if (heapOverflowCount > 1) {
+                                            ctrl.stopAll(94);
+                                            status = -1;
+                                            return;
+                                        }
                                     }
                                 }
                             }
@@ -862,13 +916,21 @@ public class BlockGenerator extends Thread implements Observer {
                             }
 
                             status = 2;
-                            if (!ctrl.flushNewBlockGenerated()) {
-                                // NEW BLOCK not FLUSHED
-                                LOGGER.error("NEW BLOCK not FLUSHED");
-                            } else {
-                                if (forgingStatus == ForgingStatus.FORGING_WAIT)
-                                    setForgingStatus(ForgingStatus.FORGING);
-
+                            try {
+                                if (!ctrl.flushNewBlockGenerated()) {
+                                    // NEW BLOCK not FLUSHED
+                                    LOGGER.error("NEW BLOCK not FLUSHED");
+                                } else {
+                                    if (forgingStatus == ForgingStatus.FORGING_WAIT)
+                                        setForgingStatus(ForgingStatus.FORGING);
+                                }
+                            } catch (java.lang.OutOfMemoryError e) {
+                                heapOverflowCount++;
+                                if (heapOverflowCount > 1) {
+                                    ctrl.stopAll(94);
+                                    status = -1;
+                                    return;
+                                }
                             }
 
                             if (ctrl.isOnStopping()) {

@@ -604,6 +604,7 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		int stepHeight = BlockChain.BLOCKS_PER_DAY;
+		long timePoint = System.currentTimeMillis();
 
 		try {
 			this.syncHeight = height;
@@ -623,15 +624,29 @@ public class Wallet extends Observable implements Observer {
 				// block));
 				Block.BlockHead blockHead = dcSet.getBlocksHeadsMap().get(height);
 
+				try {
 				this.processBlock(blockHead);
+                } catch (java.lang.OutOfMemoryError e) {
+                    this.database.rollback();
+                    this.syncHeight = this.database.getBlocksHeadMap().size();
+				    break;
+                }
 
-				if (height % (stepHeight) == 0) {
-					this.syncHeight = height;
+
+                if (height % (stepHeight) == 0
+                        || System.currentTimeMillis() - timePoint > 10000) {
+
+					if (Controller.getInstance().needUpToDate())
+						// если идет синхронизация цепочки - кошелек не синхронизируем
+						break;
+
+                    timePoint = System.currentTimeMillis();
 
 					Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
 
 					// LOGGER.info("Synchronize wallet: " + this.syncHeight);
 					this.database.commit();
+                    this.syncHeight = this.database.getBlocksHeadMap().size();
 				}
 
 				// LOAD NEXT
@@ -652,9 +667,8 @@ public class Wallet extends Observable implements Observer {
 
 			Controller.getInstance().setProcessingWalletSynchronize(false);
 			this.database.commit();
-			// icreator this.syncHeight = -1;
-			this.syncHeight = height;
-			Controller.getInstance().walletSyncStatusUpdate(height);
+            this.syncHeight = this.database.getBlocksHeadMap().size();
+			Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
 		}
 
 		// RESET UNCONFIRMED BALANCE for accounts + assets
@@ -664,9 +678,6 @@ public class Wallet extends Observable implements Observer {
 
         LOGGER.info("Update Orders");
         this.database.getOrderMap().updateLefts();
-
-		/// ic Controller.getInstance().walletSyncStatusUpdate(-1);
-		//// Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
 
 		// NOW IF NOT SYNCHRONIZED SET STATUS
 		// CHECK IF WE ARE UPTODATE

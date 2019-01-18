@@ -85,7 +85,8 @@ public class Other_Split_Panel extends Split_Panel {
                 
                 // item_Peer_Menu.ban(10, "banned by user");
                 PeerManager.getInstance().addPeer(item_Peer_Menu, 0); // reset BAN if exists
-                item_Peer_Menu.connect(item_Peer_Menu.callback, "connected as recircled by USER!!! ");
+                if (!item_Peer_Menu.isOnUsed())
+                    item_Peer_Menu.connect("connected as recircled by USER!!! ");
             }
             
         });
