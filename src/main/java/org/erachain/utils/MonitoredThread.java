@@ -67,17 +67,21 @@ public class MonitoredThread extends Thread {
         return this.logKey++;
     }
 
-    public void setMonitorStatus(String status) {
+    public synchronized void setMonitorStatus(String status) {
         this.status = new Object[]{status, System.currentTimeMillis()};
-        if (this.statusLog.size() > 100)
-            this.statusLog.remove(100);
 
+        if (this.statusLog.size() > 100) {
+            try {
+                this.statusLog.remove(100);
+            } catch (Exception e) {
+            }
+        }
         this.statusLog.add(this.status);
 
     }
 
     private long statusPoint;
-    public long setMonitorStatusBefore(String status) {
+    public synchronized long setMonitorStatusBefore(String status) {
         //long key = upKey();
         //this.logKeys.add(key);
 
@@ -93,7 +97,7 @@ public class MonitoredThread extends Thread {
 
     }
 
-    public void setMonitorStatusAfter() {
+    public synchronized void setMonitorStatusAfter() {
 
         long pointNew = System.nanoTime();
         long period;

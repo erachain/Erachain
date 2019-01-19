@@ -1715,16 +1715,12 @@ public class Controller extends Observable {
                     LOGGER.debug("error on response GET_HWEIGHT_TYPE to " + message.getSender().getAddress());
                 }
 
-
         }
 
     }
 
     public void banPeerOnError(Peer peer, String mess) {
-        if (Settings.getInstance().getMaxConnections() - this.network.getActivePeersCounter(false) < 1) {
-            // BAN if ALL connection USED
-            peer.ban("ban PeerOnError - " + mess);
-        }
+        peer.ban("ban PeerOnError - " + mess);
     }
 
     public void banPeerOnError(Peer peer, String mess, int minutes) {

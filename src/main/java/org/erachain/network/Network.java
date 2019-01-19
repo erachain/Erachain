@@ -99,6 +99,14 @@ public class Network extends Observable {
         } catch (InterruptedException e) {
         }
 
+        LOGGER.debug(peer + " SOCKET: "
+                + (peer.socket.isBound()? " isBound " : "")
+                + (peer.socket.isConnected()? " isConnected " : "")
+                + (peer.socket.isInputShutdown()? " isInputShutdown " : "")
+                + (peer.socket.isOutputShutdown()? " isOutputShutdown " : "")
+                + (peer.socket.isClosed()? " isClosed " : "")
+        );
+
         boolean asNew = true;
         for (Peer peerKnown: this.knownPeers) {
             if (peer.equals(peerKnown)) {
@@ -315,14 +323,11 @@ public class Network extends Observable {
             for (Peer knownPeer : knownPeers) {
                 //CHECK IF ADDRESS IS THE SAME
                 if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
-                    if (!knownPeer.isOnUsed()) {
-                        // возможно из-за того что одновременно и как приемник и как передатчик я начинаю выступать
-                        // будет накладка и затык - может не нужно прямо одинаковые имена тут выискивать тогда?
+                    if (!knownPeer.isOnUsed() && !knownPeer.isUsed()) {
+                        // IF PEER not USED and not onUSED
                         knownPeer.reconnect(socket, "connected by restore!!! ");
-                        return knownPeer;
                     }
-
-                    break;
+                    return knownPeer;
                 }
             }
         }
@@ -330,7 +335,7 @@ public class Network extends Observable {
         // use UNUSED peers
         synchronized (this.knownPeers) {
             for (Peer knownPeer : this.knownPeers) {
-                if (!knownPeer.isOnUsed()) {
+                if (!knownPeer.isOnUsed() && !knownPeer.isUsed()) {
                     knownPeer.reconnect(socket, "connected by recircle!!! ");
                     return knownPeer;
                 }
@@ -355,11 +360,11 @@ public class Network extends Observable {
      * @param message
      * @return
      */
-    public /* synchronized */ Peer tryConnection(Socket socket, Peer peer, String message) {
+    public synchronized Peer tryConnection(Socket socket, Peer peer, String message) {
         if (socket != null)
             return startPeer(socket);
 
-        if (!peer.isOnUsed())
+        if (!peer.isOnUsed() && !peer.isUsed())
             peer.connect(this, message);
 
         return peer;

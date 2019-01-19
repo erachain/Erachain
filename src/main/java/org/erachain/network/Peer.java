@@ -41,7 +41,7 @@ public class Peer extends MonitoredThread {
     private static int MAX_BEFORE_PING = SOCKET_BUFFER_SIZE >> 2;
     public Network network;
     private InetAddress address;
-    private Socket socket;
+    public Socket socket;
     private OutputStream out;
     private DataInputStream in;
     private Pinger pinger;
@@ -150,8 +150,8 @@ public class Peer extends MonitoredThread {
             if (this.socket != null) {
                 this.close("befor reconnect");
             }
-
             this.socket = socket;
+
             this.address = socket.getInetAddress();
             this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
             this.white = false;
@@ -225,10 +225,10 @@ public class Peer extends MonitoredThread {
         try {
             //OPEN SOCKET
             step++;
+
             if (this.socket != null) {
                 this.close("before new connect");
             }
-
             this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
 
             //ENABLE KEEPALIVE
@@ -280,11 +280,6 @@ public class Peer extends MonitoredThread {
 
         // при коннекте во вне связь может порваться поэтому тут по runed
         return this.runed;
-    }
-
-    // connect and run
-    public boolean connect(String description) {
-        return connect(Controller.getInstance().network, description);
     }
 
     public InetAddress getAddress() {
@@ -354,7 +349,7 @@ public class Peer extends MonitoredThread {
      * @return
      */
     public boolean isOnUsed() {
-        return this.socket != null || this.runed;
+        return this.socket != null && !this.runed;
     }
 
     public boolean isUsed() {
@@ -635,7 +630,7 @@ public class Peer extends MonitoredThread {
             if (USE_MONITOR) this.setMonitorStatusAfter();
             //WHEN FAILED TO SEND MESSAGE
             //blockingQueue = null;
-            LOGGER.debug(this + " >> " + message + " send ERROR by period: " + (System.currentTimeMillis() - checkTime));
+            //LOGGER.debug(this + " >> " + message + " send ERROR by period: " + (System.currentTimeMillis() - checkTime));
             ////this.messages.remove(localRequestKey);
             return null;
         }
@@ -727,13 +722,24 @@ public class Peer extends MonitoredThread {
         LOGGER.info("Try close peer : " + this + " - " + message);
 
         if (socket != null) {
+            LOGGER.debug(this + " SOCKET: "
+                    + (this.socket.isBound()? " isBound " : "")
+                    + (this.socket.isConnected()? " isConnected " : "")
+                    + (this.socket.isInputShutdown()? " isInputShutdown " : "")
+                    + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
+                    + (this.socket.isClosed()? " isClosed " : "")
+            );
             //CHECK IF SOCKET IS CONNECTED
             if (socket.isConnected()) {
                 //CLOSE SOCKET
                 try {
                     // this close IN and OUT streams
                     // and notyfy receiver with EOFException
-                    this.socket.shutdownInput();
+                    //this.socket.shutdownInput(); - закрывает канал так что его нужно потом 2-й раз открывать
+                    //this.socket.shutdownOutput(); - не дает переконнектиться
+                    //this.out.close(); - не дает пототм переконнектиться
+                    this.socket.close();
+
                 } catch (Exception ignored) {
                     LOGGER.error(this + " - " + ignored.getMessage(), ignored);
                 }
