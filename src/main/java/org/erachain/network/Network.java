@@ -131,18 +131,6 @@ public class Network extends Observable {
 
     }
 
-    public void tryDisconnect(Peer peer, int banForMinutes, String message) {
-
-        //CLOSE CONNECTION
-        peer.close(message);
-
-        afterDisconnect(peer, banForMinutes, message);
-    }
-
-    public void tryDisconnect(Peer peer, String message) {
-        afterDisconnect(peer, banForActivePeersCounter(), message);
-    }
-
     public void afterDisconnect(Peer peer, int banForMinutes, String message) {
 
         if (message != null && message.length() > 0) {
@@ -168,6 +156,10 @@ public class Network extends Observable {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
     }
+    public void afterDisconnect(Peer peer, String message) {
+        afterDisconnect(peer, banForActivePeersCounter(), message);
+    }
+
 
     public boolean isKnownAddress(InetAddress address, boolean andUsed) {
 
@@ -502,10 +494,8 @@ public class Network extends Observable {
                 FindMyselfMessage findMyselfMessage = (FindMyselfMessage) message;
 
                 if (Arrays.equals(findMyselfMessage.getFoundMyselfID(), Controller.getInstance().getFoundMyselfID())) {
-                    //LOGGER.info("network.onMessage - Connected to self. Disconnection.");
-
                     Network.myselfAddress = message.getSender().getAddress();
-                    tryDisconnect(message.getSender(), 99999, null);
+                    message.getSender().ban(999999, null);
                 }
 
                 break;

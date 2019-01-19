@@ -1262,7 +1262,7 @@ public class Controller extends Observable {
             ; // MAY BE IT HARD BUSY
         else if (response.getSignatures().isEmpty()) {
             // NO
-            this.network.tryDisconnect(peer, Synchronizer.BAN_BLOCK_TIMES << 2, "wrong GENESIS BLOCK");
+            peer.ban(Synchronizer.BAN_BLOCK_TIMES << 2, "wrong GENESIS BLOCK");
             return;
         }
 
@@ -1291,7 +1291,7 @@ public class Controller extends Observable {
 
         // BROADCAST UNCONFIRMED TRANSACTIONS to PEER
         if (!this.broadcastUnconfirmedToPeer(peer))
-            this.network.tryDisconnect(peer, network.banForActivePeersCounter(), "broken on SEND UNCONFIRMEDs");
+            peer.ban(network.banForActivePeersCounter(), "broken on SEND UNCONFIRMEDs");
 
     }
 
@@ -1723,12 +1723,12 @@ public class Controller extends Observable {
     public void banPeerOnError(Peer peer, String mess) {
         if (Settings.getInstance().getMaxConnections() - this.network.getActivePeersCounter(false) < 1) {
             // BAN if ALL connection USED
-            this.network.tryDisconnect(peer, network.banForActivePeersCounter(), "ban PeerOnError - " + mess);
+            peer.ban("ban PeerOnError - " + mess);
         }
     }
 
     public void banPeerOnError(Peer peer, String mess, int minutes) {
-        this.network.tryDisconnect(peer, minutes, "ban PeerOnError - " + mess);
+        peer.ban(minutes, "ban PeerOnError - " + mess);
     }
 
     public void addActivePeersObserver(Observer o) {

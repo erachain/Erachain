@@ -694,17 +694,20 @@ public class Peer extends MonitoredThread {
         return Controller.getInstance().getDBSet().getPeerMap().isBanned(address.getAddress());
     }
 
-    public void ban(int banForMinutes, String mess) {
+    public void ban(int banForMinutes, String message) {
         this.setName("Peer: " + this.getAddress().getHostAddress()
-                + " banned for " + banForMinutes + " " + mess);
+                + " banned for " + banForMinutes + " " + message);
 
-        this.network.tryDisconnect(this, banForMinutes, mess);
+        this.close(message);
+        this.network.afterDisconnect(this, banForMinutes, message);
+
     }
-    public void ban(String mess) {
+    public void ban(String message) {
         this.setName("Peer: " + this.getAddress().getHostAddress()
-                + " banned - " + mess);
+                + " banned - " + message);
 
-        this.network.tryDisconnect(this, mess);
+        this.close(message);
+        this.network.afterDisconnect(this, message);
     }
 
 
@@ -712,6 +715,7 @@ public class Peer extends MonitoredThread {
         return stoped;
     }
 
+    // синхронизированное закрытие чтобы по несольку раз не входило
     public synchronized void close(String message) {
 
         if (!runed) {
@@ -722,57 +726,16 @@ public class Peer extends MonitoredThread {
 
         LOGGER.info("Try close peer : " + this + " - " + message);
 
-        if (true) {
-            if (socket != null) {
-                //CHECK IF SOCKET IS CONNECTED
-                if (socket.isConnected()) {
-                    //CLOSE SOCKET
-                    try {
-                        // this close IN and OUT streams
-                        // and notyfy receiver with EOFException
-                        this.socket.shutdownInput();
-                    } catch (Exception ignored) {
-                        LOGGER.error(this + " - " + ignored.getMessage(), ignored);
-                    }
-                }
-            }
-        } else if (false) {
-            // new style
-            try {
-                this.out.close();
-            } catch (Exception ignored) {
-            }
-            if (this.in != null) {
+        if (socket != null) {
+            //CHECK IF SOCKET IS CONNECTED
+            if (socket.isConnected()) {
+                //CLOSE SOCKET
                 try {
-                this.in.close();
-                } catch (Exception ignored) {
-                }
-            }
-            if (socket != null) {
-                //CHECK IF SOCKET IS CONNECTED
-                if (socket.isConnected()) {
-                    //CLOSE SOCKET
-                    try {
+                    // this close IN and OUT streams
+                    // and notyfy receiver with EOFException
                     this.socket.shutdownInput();
-                    } catch (Exception ignored) {
-                    }
-                }
-            }
-
-        } else {
-            // OLD style
-
-            //CHECK IS SOCKET EXISTS
-            if (socket != null) {
-                //CHECK IF SOCKET IS CONNECTED
-                if (socket.isConnected()) {
-                    //CLOSE SOCKET
-                    try {
-                        // and close IN and OUT
-                        this.socket.close();
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
-                    }
+                } catch (Exception ignored) {
+                    LOGGER.error(this + " - " + ignored.getMessage(), ignored);
                 }
             }
         }
