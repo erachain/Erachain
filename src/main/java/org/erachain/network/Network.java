@@ -99,14 +99,6 @@ public class Network extends Observable {
         } catch (InterruptedException e) {
         }
 
-        LOGGER.debug(peer + " SOCKET: "
-                + (peer.socket.isBound()? " isBound " : "")
-                + (peer.socket.isConnected()? " isConnected " : "")
-                + (peer.socket.isInputShutdown()? " isInputShutdown " : "")
-                + (peer.socket.isOutputShutdown()? " isOutputShutdown " : "")
-                + (peer.socket.isClosed()? " isClosed " : "")
-        );
-
         boolean asNew = true;
         for (Peer peerKnown: this.knownPeers) {
             if (peer.equals(peerKnown)) {
