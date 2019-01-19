@@ -148,7 +148,7 @@ public class Peer extends MonitoredThread {
         try {
 
             if (this.socket != null) {
-                this.close();
+                this.close("befor reconnect");
             }
 
             this.socket = socket;
@@ -226,9 +226,7 @@ public class Peer extends MonitoredThread {
             //OPEN SOCKET
             step++;
             if (this.socket != null) {
-                this.socket.close();
-                this.out.close();
-                this.in.close();
+                this.close("before new connect");
             }
 
             this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
@@ -387,35 +385,8 @@ public class Peer extends MonitoredThread {
                     Thread.sleep(100);
                 } catch (Exception e) {
                 }
-
-                if (in != null) {
-                    if (USE_MONITOR) this.setMonitorStatusBefore("in.close");
-                    try {
-                        in.close();
-                        in = null;
-                    } catch (Exception e) {
-                        in = null;
-                    }
-                    if (USE_MONITOR) this.setMonitorStatusAfter();
-                }
                 continue;
 
-            }
-
-            // CHECK stream
-            if (in == null) {
-                if (USE_MONITOR) this.setMonitorStatusBefore("in = DataInputStream");
-                try {
-                    in = new DataInputStream(socket.getInputStream());
-                } catch (java.lang.OutOfMemoryError e) {
-                    Controller.getInstance().stopAll(81);
-                    break;
-                } catch (Exception e) {
-                    //DISCONNECT
-                    network.tryDisconnect(this, network.banForActivePeersCounter(), e.getMessage());
-                    continue;
-                }
-                if (USE_MONITOR) this.setMonitorStatusAfter();
             }
 
             //READ FIRST 4 BYTES
@@ -438,24 +409,24 @@ public class Peer extends MonitoredThread {
                 break;
             } catch (EOFException e) {
                 // на там конце произошло отключение - делаем тоже дисконект
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "read-0 peer is shutdownInput");
+                ban(network.banForActivePeersCounter(), "read-0 peer is shutdownInput");
                 continue;
             } catch (java.net.SocketException e) {
                 // если туда уже не лезет иликанал побился
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "read-2 " + e.getMessage());
+                ban(network.banForActivePeersCounter(), "read-2 " + e.getMessage());
                 continue;
             } catch (java.io.IOException e) {
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "read-3 " + e.getMessage());
+                ban(network.banForActivePeersCounter(), "read-3 " + e.getMessage());
                 continue;
             } catch (Exception e) {
                 //DISCONNECT and BAN
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "read-4 " + e.getMessage());
+                ban(network.banForActivePeersCounter(), "read-4 " + e.getMessage());
                 continue;
             }
 
             if (!Arrays.equals(messageMagic, Controller.getInstance().getMessageMagic())) {
                 //ERROR and BAN
-                network.tryDisconnect(this, 3600, "parse - received message with wrong magic");
+                ban(3600, "parse - received message with wrong magic");
                 continue;
             }
 
@@ -466,9 +437,9 @@ public class Peer extends MonitoredThread {
             } catch (java.net.SocketTimeoutException timeOut) {
                 // если сдесь по времени ожидания пришло то значит на том конце что-то не так и пора разрывать соединение
                 if (this.getPing() < -1) {
-                    network.tryDisconnect(this, network.banForActivePeersCounter(), "peer in TimeOut and -ping");
+                    ban(network.banForActivePeersCounter(), "peer in TimeOut and -ping");
                 } else {
-                    network.tryDisconnect(this, network.banForActivePeersCounter(), "peer in TimeOut");
+                    ban(network.banForActivePeersCounter(), "peer in TimeOut");
                 }
                 continue;
             } catch (java.lang.OutOfMemoryError e) {
@@ -476,11 +447,11 @@ public class Peer extends MonitoredThread {
                 break;
             } catch (EOFException e) {
                 // на там конце произошло отключение - делаем тоже дисконект
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "peer is shutdownInput");
+                ban(network.banForActivePeersCounter(), "peer is shutdownInput");
                 continue;
             } catch (Exception e) {
                 //DISCONNECT and BAN
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "parse message wrong - " + e.getMessage());
+                ban(network.banForActivePeersCounter(), "parse message wrong - " + e.getMessage());
                 continue;
             }
 
@@ -568,7 +539,7 @@ public class Peer extends MonitoredThread {
 
         if (!this.socket.isConnected()) {
             //ERROR
-            network.tryDisconnect(this, network.banForActivePeersCounter(), "SEND - socket not still alive");
+            ban(network.banForActivePeersCounter(), "SEND - socket not still alive");
 
             return false;
         }
@@ -579,8 +550,7 @@ public class Peer extends MonitoredThread {
             LOGGER.debug(message + " try SEND to " + this);
         }
 
-        if (this.getPing() < -5 && message.getType() != Message.HWEIGHT_TYPE
-                && message.getType() != Message.GET_HWEIGHT_TYPE) {
+        if (this.getPing() < -6 && message.getType() == Message.WIN_BLOCK_TYPE) {
             // если пинг хреновый то ничего не шлем кроме пингования
             return false;
         }
@@ -602,21 +572,21 @@ public class Peer extends MonitoredThread {
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "try out.write 1 - " + eSock.getMessage());
+                ban(network.banForActivePeersCounter(), "try out.write 1 - " + eSock.getMessage());
                 return false;
             } catch (IOException e) {
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "try out.write 2 - " + e.getMessage());
+                ban(network.banForActivePeersCounter(), "try out.write 2 - " + e.getMessage());
                 return false;
             } catch (Exception e) {
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "try out.write 3 - " + e.getMessage());
+                ban(network.banForActivePeersCounter(), "try out.write 3 - " + e.getMessage());
                 return false;
             }
 
@@ -734,7 +704,7 @@ public class Peer extends MonitoredThread {
         this.setName("Peer: " + this.getAddress().getHostAddress()
                 + " banned - " + mess);
 
-        this.network.tryDisconnect(this, network.banForActivePeersCounter(), mess);
+        this.network.tryDisconnect(this, mess);
     }
 
 
@@ -742,7 +712,7 @@ public class Peer extends MonitoredThread {
         return stoped;
     }
 
-    public void close() {
+    public synchronized void close(String message) {
 
         if (!runed) {
             return;
@@ -750,9 +720,23 @@ public class Peer extends MonitoredThread {
 
         runed = false;
 
-        LOGGER.info("Try close peer : " + this);
+        LOGGER.info("Try close peer : " + this + " - " + message);
 
-        if (false) {
+        if (true) {
+            if (socket != null) {
+                //CHECK IF SOCKET IS CONNECTED
+                if (socket.isConnected()) {
+                    //CLOSE SOCKET
+                    try {
+                        // this close IN and OUT streams
+                        // and notyfy receiver with EOFException
+                        this.socket.shutdownInput();
+                    } catch (Exception ignored) {
+                        LOGGER.error(this + " - " + ignored.getMessage(), ignored);
+                    }
+                }
+            }
+        } else if (false) {
             // new style
             try {
                 this.out.close();
@@ -793,23 +777,23 @@ public class Peer extends MonitoredThread {
             }
         }
 
-        this.socket = null;
-        this.out = null;
         this.in = null;
+        this.out = null;
+        this.socket = null;
     }
 
     public void halt() {
 
         this.stoped = true;
-        this.close();
-        this.setName("Peer: " + this.getAddress().getHostAddress() + " halted");
+        this.close("halt");
+        //this.setName("Peer: " + this.getAddress().getHostAddress() + " halted");
 
     }
 
     @Override
     public String toString() {
         return this.address.getHostAddress()
-                + (getPing() >= 0? " ping: " + this.getPing() + "ms" : " try" + getPing())
+                + (getPing() >= 0 && getPing() < 99999? " ping: " + this.getPing() + "ms" : " try" + getPing())
                 + (isWhite()? " [White]" : "");
     }
 }

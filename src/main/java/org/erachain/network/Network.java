@@ -93,9 +93,9 @@ public class Network extends Observable {
 
         //LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer);
 
-        // WAIT start PINGER
+        // WAIT start PINGER and InputStream
         try {
-            Thread.sleep(100);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
         }
 
@@ -131,26 +131,35 @@ public class Network extends Observable {
 
     }
 
-    public void tryDisconnect(Peer peer, int banForMinutes, String error) {
+    public void tryDisconnect(Peer peer, int banForMinutes, String message) {
 
-        if (peer.isUsed()) {
-            //CLOSE CONNECTION
-            peer.close();
+        //CLOSE CONNECTION
+        peer.close(message);
 
-            if (error != null && error.length() > 0) {
-                if (banForMinutes != 0) {
-                    LOGGER.info(peer + " ban for minutes: " + banForMinutes + " - " + error);
-                } else {
-                    LOGGER.info("tryDisconnect : " + peer + " - " + error);
-                }
+        afterDisconnect(peer, banForMinutes, message);
+    }
+
+    public void tryDisconnect(Peer peer, String message) {
+        afterDisconnect(peer, banForActivePeersCounter(), message);
+    }
+
+    public void afterDisconnect(Peer peer, int banForMinutes, String message) {
+
+        if (message != null && message.length() > 0) {
+            if (banForMinutes > 0) {
+                LOGGER.info("BANed: " + peer + " for: " + banForMinutes + "[min] - " + message);
+            } else {
+                LOGGER.info("disconnected: " + peer + " - " + message);
             }
-
-            //PASS TO CONTROLLER
-            Controller.getInstance().afterDisconnect(peer);
         }
 
-        //ADD TO BLACKLIST
-        PeerManager.getInstance().addPeer(peer, banForMinutes);
+        if (banForMinutes > 0) {
+            //ADD TO BLACKLIST
+            PeerManager.getInstance().addPeer(peer, banForMinutes);
+        }
+
+        //PASS TO CONTROLLER
+        Controller.getInstance().afterDisconnect(peer);
 
         //NOTIFY OBSERVERS
         this.setChanged();
