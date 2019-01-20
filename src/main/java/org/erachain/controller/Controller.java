@@ -1249,6 +1249,15 @@ public class Controller extends Observable {
                 MessageFactory.getInstance().createFindMyselfMessage(Controller.getInstance().getFoundMyselfID())))
             return;
 
+        try {
+            Thread.sleep(100);
+        } catch (Exception e) {
+        }
+
+        // проверим - может забанили уже если к себе приконнектились
+        if (!peer.isUsed())
+            return;
+
         // SEND VERSION MESSAGE
         if (!peer.sendMessage(
                 MessageFactory.getInstance().createVersionMessage(Controller.getVersion(), getBuildTimestamp())))

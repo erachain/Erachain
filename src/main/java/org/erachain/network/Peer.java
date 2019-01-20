@@ -199,7 +199,9 @@ public class Peer extends MonitoredThread {
     }
 
     /**
-     * Приконнектиться к Премнику
+     * synchronized - дает результат хоть и медленный
+     * Приконнектиться к Премнику или принять на этот Пир новый входящий Сокет
+     * @param acceptedSocket если задан то это прием в данный Пир соединение извне
      * @param network
      * @param description
      * @return
@@ -238,6 +240,14 @@ public class Peer extends MonitoredThread {
                 this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
                 this.white = true;
             }
+
+            LOGGER.debug(this + " SOCKET: \n"
+                    + (this.socket.isBound()? " isBound " : "")
+                    + (this.socket.isConnected()? " isConnected " : "")
+                    + (this.socket.isInputShutdown()? " isInputShutdown " : "")
+                    + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
+                    + (this.socket.isClosed()? " isClosed " : "")
+            );
 
             //ENABLE KEEPALIVE
             step++;
@@ -284,6 +294,14 @@ public class Peer extends MonitoredThread {
         }
 
         LOGGER.info(this + description);
+        LOGGER.debug(this + " SOCKET at end: \n"
+                + (this.socket.isBound()? " isBound " : "")
+                + (this.socket.isConnected()? " isConnected " : "")
+                + (this.socket.isInputShutdown()? " isInputShutdown " : "")
+                + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
+                + (this.socket.isClosed()? " isClosed " : "")
+        );
+
         network.onConnect(this);
 
         // при коннекте во вне связь может порваться поэтому тут по runed
@@ -411,14 +429,21 @@ public class Peer extends MonitoredThread {
                 Controller.getInstance().stopAll(82);
                 break;
             } catch (EOFException e) {
+                if (!this.runed)
+                    // это наш дисконект
+                    continue;
                 // на там конце произошло отключение - делаем тоже дисконект
                 ban(network.banForActivePeersCounter(), "read-0 peer is shutdownInput");
                 continue;
             } catch (java.net.SocketException e) {
+                if (!this.runed)
+                    // это наш дисконект
                 // если туда уже не лезет иликанал побился
                 ban(network.banForActivePeersCounter(), "read-2 " + e.getMessage());
                 continue;
             } catch (java.io.IOException e) {
+                if (!this.runed)
+                    // это наш дисконект
                 ban(network.banForActivePeersCounter(), "read-3 " + e.getMessage());
                 continue;
             } catch (Exception e) {
@@ -438,6 +463,10 @@ public class Peer extends MonitoredThread {
             try {
                 message = MessageFactory.getInstance().parse(this, in);
             } catch (java.net.SocketTimeoutException timeOut) {
+                if (!this.runed)
+                    // это наш дисконект
+                    continue;
+
                 // если сдесь по времени ожидания пришло то значит на том конце что-то не так и пора разрывать соединение
                 if (this.getPing() < -1) {
                     ban(network.banForActivePeersCounter(), "peer in TimeOut and -ping");
@@ -449,8 +478,20 @@ public class Peer extends MonitoredThread {
                 Controller.getInstance().stopAll(83);
                 break;
             } catch (EOFException e) {
+                if (!this.runed)
+                    // это наш дисконект
+                    continue;
+
                 // на там конце произошло отключение - делаем тоже дисконект
                 ban(network.banForActivePeersCounter(), "peer is shutdownInput");
+                continue;
+            } catch (IOException e) {
+                if (!this.runed)
+                    // это наш дисконект
+                    continue;
+
+                // на там конце произошло отключение - делаем тоже дисконект
+                ban(network.banForActivePeersCounter(), e.getMessage());
                 continue;
             } catch (Exception e) {
                 //DISCONNECT and BAN
@@ -466,7 +507,7 @@ public class Peer extends MonitoredThread {
 
             if (message.getType() != Message.TRANSACTION_TYPE
                     && message.getType() != Message.TELEGRAM_TYPE) {
-                LOGGER.debug(this + " : " + message + " RECEIVED");
+                LOGGER.debug(this + " RECEIVED: " + message);
             }
 
             if (logPings && message.getType() == Message.GET_HWEIGHT_TYPE) {
@@ -572,6 +613,9 @@ public class Peer extends MonitoredThread {
 
         //SEND MESSAGE
         long checkTime = System.currentTimeMillis();
+        if (!this.runed || this.out == null)
+            return false;
+
         synchronized (this.out) {
 
             try {
@@ -581,6 +625,10 @@ public class Peer extends MonitoredThread {
                 Controller.getInstance().stopAll(85);
                 return false;
             } catch (java.net.SocketException eSock) {
+                if (!this.runed)
+                    // это наш дисконект
+                    return false;
+
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
@@ -588,6 +636,10 @@ public class Peer extends MonitoredThread {
                 ban(network.banForActivePeersCounter(), "try out.write 1 - " + eSock.getMessage());
                 return false;
             } catch (IOException e) {
+                if (!this.runed)
+                    // это наш дисконект
+                    return false;
+
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
@@ -706,21 +758,35 @@ public class Peer extends MonitoredThread {
     public boolean isBanned() {
         return Controller.getInstance().getDBSet().getPeerMap().isBanned(address.getAddress());
     }
+    public int getBanMinutes() {
+        return Controller.getInstance().getDBSet().getPeerMap().getBanMinutes(this);
+    }
 
     public void ban(int banForMinutes, String message) {
+
+        if (!runed)
+            return;
+
         this.setName("Peer: " + this.getAddress().getHostAddress()
                 + " banned for " + banForMinutes + " " + message);
 
-        this.close(message);
-        this.network.afterDisconnect(this, banForMinutes, message);
+        // если там уже было закрыто то не вызывать After
+        // или если нужно забанить
+        if (this.close(message) || banForMinutes > this.getBanMinutes())
+            this.network.afterDisconnect(this, banForMinutes, message);
 
     }
     public void ban(String message) {
+
+        if (!runed)
+            return;
+
         this.setName("Peer: " + this.getAddress().getHostAddress()
                 + " banned - " + message);
 
-        this.close(message);
-        this.network.afterDisconnect(this, message);
+        // если там уже было закрыто то не вызывать After
+        if (this.close(message))
+            this.network.afterDisconnect(this, message);
     }
 
 
@@ -728,11 +794,18 @@ public class Peer extends MonitoredThread {
         return stoped;
     }
 
-    // синхронизированное закрытие чтобы по несольку раз не входило
-    public synchronized void close(String message) {
+
+    /**
+     * синхронизированное закрытие чтобы по несольку раз не входило
+     *  и если уже закрывается то выход с FALSE
+     *
+     * @param message
+     * @return
+     */
+    public synchronized boolean close(String message) {
 
         if (!runed) {
-            return;
+            return false;
         }
 
         runed = false;
@@ -740,7 +813,7 @@ public class Peer extends MonitoredThread {
         LOGGER.info("Try close peer : " + this + " - " + message);
 
         if (socket != null) {
-            LOGGER.debug(this + " SOCKET: "
+            LOGGER.debug(this + " SOCKET: \n"
                     + (this.socket.isBound()? " isBound " : "")
                     + (this.socket.isConnected()? " isConnected " : "")
                     + (this.socket.isInputShutdown()? " isInputShutdown " : "")
@@ -772,6 +845,8 @@ public class Peer extends MonitoredThread {
         this.in = null;
         this.out = null;
         this.socket = null;
+
+        return true;
     }
 
     public void halt() {

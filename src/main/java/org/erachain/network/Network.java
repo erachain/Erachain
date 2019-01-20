@@ -193,7 +193,12 @@ public class Network extends Observable {
                 for (Peer knownPeer : knownPeers) {
                     //CHECK IF ADDRESS IS THE SAME
                     if (Arrays.equals(address, knownPeer.getAddress().getAddress())) {
-                        return knownPeer;
+                        if (knownPeer.isUsed() || !knownPeer.isWhite())
+                            return knownPeer;
+
+                        // тут еще могут быть такие же Адреса из-за одновременного коннекта друг к другу
+                        peer = knownPeer;
+
                     }
                 }
             }
@@ -314,22 +319,27 @@ public class Network extends Observable {
             //FOR ALL connectedPeers
             for (Peer knownPeer : knownPeers) {
                 //CHECK IF ADDRESS IS THE SAME
-                if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
-                    if (!knownPeer.isOnUsed() && !knownPeer.isUsed()) {
-                        // IF PEER not USED and not onUSED
-                        knownPeer.connect(socket, this,"connected by restore!!! ");
+                if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())
+                        && !knownPeer.isWhite()) {
+                    if (knownPeer.isUsed()) {
+                        knownPeer.close("before accept anew");
                     }
+                    // IF PEER not USED and not onUSED
+                    knownPeer.connect(socket, this,"connected by restore!!! ");
                     return knownPeer;
                 }
             }
         }
 
-        // use UNUSED peers
-        synchronized (this.knownPeers) {
-            for (Peer knownPeer : this.knownPeers) {
-                if (!knownPeer.isOnUsed() && !knownPeer.isUsed()) {
-                    knownPeer.connect(socket, this, "connected by recircle!!! ");
-                    return knownPeer;
+        // Если пустых мест уже мало то начинаем переиспользовать
+        if (this.banForActivePeersCounter() + 3 > Settings.getInstance().getMaxConnections() ) {
+            // use UNUSED peers
+            synchronized (this.knownPeers) {
+                for (Peer knownPeer : this.knownPeers) {
+                    if (!knownPeer.isOnUsed() && !knownPeer.isUsed()) {
+                        knownPeer.connect(socket, this, "connected by recircle!!! ");
+                        return knownPeer;
+                    }
                 }
             }
         }
@@ -473,7 +483,7 @@ public class Network extends Observable {
 
                 if (Arrays.equals(findMyselfMessage.getFoundMyselfID(), Controller.getInstance().getFoundMyselfID())) {
                     Network.myselfAddress = message.getSender().getAddress();
-                    message.getSender().ban(999999, null);
+                    message.getSender().ban(999999, "MYSELF");
                 }
 
                 break;
