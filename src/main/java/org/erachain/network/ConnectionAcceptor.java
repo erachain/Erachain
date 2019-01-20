@@ -41,7 +41,7 @@ public class ConnectionAcceptor extends MonitoredThread {
 
             // на всякий случай чтобы атак не было с созданием множества конектов
             try {
-                Thread.sleep(100);
+                Thread.sleep(10);
             } catch (Exception e) {
             }
 

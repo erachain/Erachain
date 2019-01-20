@@ -505,13 +505,10 @@ public class Peer extends MonitoredThread {
                 continue;
             }
 
-            if (message.getType() != Message.TRANSACTION_TYPE
-                    && message.getType() != Message.TELEGRAM_TYPE) {
+            if (logPings && (message.getType() != Message.TRANSACTION_TYPE
+                    && message.getType() != Message.TELEGRAM_TYPE
+                    || message.getType() == Message.HWEIGHT_TYPE)) {
                 LOGGER.debug(this + " RECEIVED: " + message);
-            }
-
-            if (logPings && message.getType() == Message.GET_HWEIGHT_TYPE) {
-                LOGGER.debug(this + " : " + message + " RECEIVED");
             }
 
             if (USE_MONITOR) this.setMonitorStatus("in.message process");
@@ -575,7 +572,7 @@ public class Peer extends MonitoredThread {
         }
 
         if (USE_MONITOR) this.setMonitorStatus("halted");
-        LOGGER.info("halted");
+        LOGGER.info(this + "halted");
 
     }
 
@@ -595,12 +592,9 @@ public class Peer extends MonitoredThread {
 
         byte[] bytes = message.toBytes();
 
-        if (message.getType() != Message.TRANSACTION_TYPE
-                && message.getType() != Message.TELEGRAM_TYPE) {
-            LOGGER.debug(message + " try SEND to " + this);
-        }
-
-        if (logPings && message.getType() == Message.HWEIGHT_TYPE) {
+        if (logPings && (message.getType() != Message.TRANSACTION_TYPE
+                && message.getType() != Message.TELEGRAM_TYPE
+                || message.getType() == Message.HWEIGHT_TYPE)) {
             LOGGER.debug(message + " try SEND to " + this);
         }
 
