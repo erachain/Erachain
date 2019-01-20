@@ -116,7 +116,7 @@ public class ConnectionCreator extends MonitoredThread {
             //CONNECT
             if (!newPeer.isOnUsed() && !newPeer.isUsed()) {
                 this.setMonitorStatusBefore("peer.connect.recurse");
-                newPeer.connect(network, "connected in recurse +++ ");
+                newPeer.connect(null, network, "connected in recurse +++ ");
                 //network.tryConnection(null, newPeer, "connected in recurse +++ "); - тормозит коннект
 
                 this.setMonitorStatusAfter();
@@ -225,7 +225,7 @@ public class ConnectionCreator extends MonitoredThread {
                     //CHECK IF ALREADY CONNECTED TO PEER
                     if (!peer.isOnUsed() && !peer.isUsed()) {
                         this.setMonitorStatusBefore("peer.connect");
-                        peer.connect(network, "connected +++ ");
+                        peer.connect(null, network, "connected +++ ");
                         //network.tryConnection(null, peer, "connected +++ "); - тормозит коннект
 
                         this.setMonitorStatusAfter();

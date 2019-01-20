@@ -102,7 +102,6 @@ public class ConnectionAcceptor extends MonitoredThread {
 
                 setMonitorStatusBefore("startPeer");
                 Peer peer = network.startPeer(connectionSocket);
-                //Peer peer = network.tryConnection(connectionSocket, null, null); - тормозит коннект
                 setMonitorStatusAfter();
                 if (!peer.isUsed()) {
                     // если в процессе

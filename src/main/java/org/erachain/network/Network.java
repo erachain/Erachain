@@ -317,7 +317,7 @@ public class Network extends Observable {
                 if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
                     if (!knownPeer.isOnUsed() && !knownPeer.isUsed()) {
                         // IF PEER not USED and not onUSED
-                        knownPeer.reconnect(socket, "connected by restore!!! ");
+                        knownPeer.connect(socket, this,"connected by restore!!! ");
                     }
                     return knownPeer;
                 }
@@ -328,7 +328,7 @@ public class Network extends Observable {
         synchronized (this.knownPeers) {
             for (Peer knownPeer : this.knownPeers) {
                 if (!knownPeer.isOnUsed() && !knownPeer.isUsed()) {
-                    knownPeer.reconnect(socket, "connected by recircle!!! ");
+                    knownPeer.connect(socket, this, "connected by recircle!!! ");
                     return knownPeer;
                 }
             }
@@ -341,25 +341,6 @@ public class Network extends Observable {
 
         return peer;
 
-    }
-
-    /**
-     * нужно для того чтобы одновременно не коннектилось две трубы как приемник и как посылник
-     * и возможно и-за этого были затыки. Теперь
-     *
-     * @param socket
-     * @param peer
-     * @param message
-     * @return
-     */
-    public synchronized Peer tryConnection(Socket socket, Peer peer, String message) {
-        if (socket != null)
-            return startPeer(socket);
-
-        if (!peer.isOnUsed() && !peer.isUsed())
-            peer.connect(this, message);
-
-        return peer;
     }
 
     private void addHandledMessage(String hash) {

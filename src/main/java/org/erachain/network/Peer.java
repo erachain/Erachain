@@ -141,7 +141,7 @@ public class Peer extends MonitoredThread {
      * @param description
      * @return
      */
-    public boolean reconnect(Socket socket, String description) {
+    public boolean reconnect_old(Socket socket, String description) {
 
         LOGGER.debug("@@@ reconnect(socket) : " + socket.getInetAddress().getHostAddress());
 
@@ -181,10 +181,9 @@ public class Peer extends MonitoredThread {
             this.runed = true;
 
             //ON SOCKET CONNECT
-            this.setName("Peer: " + this.getAddress().getHostAddress() + " reconnected"
-                + (this.isWhite()?" is White" : ""));
+            this.setName("Peer: " + this + " reconnected");
 
-            LOGGER.info(description + address.getHostAddress());
+            LOGGER.info(this + description);
             network.onConnect(this);
 
         } catch (Exception e) {
@@ -205,16 +204,20 @@ public class Peer extends MonitoredThread {
      * @param description
      * @return
      */
-    public boolean connect(Network network, String description) {
+    public synchronized boolean connect(Socket acceptedSocket, Network networkIn, String description) {
         if (Controller.getInstance().isOnStopping()) {
             return false;
         }
 
-        if (this.network == null)
-            this.network = network;
+        if (this.socket != null) {
+            LOGGER.debug("ALREADY connected: " + this);
+            return this.runed;
+        }
+
+        if (networkIn != null)
+            this.network = networkIn;
 
         this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
-        this.white = true;
         this.pingCounter = 0;
         this.connectionTime = NTP.getTime();
         this.errors = 0;
@@ -226,10 +229,15 @@ public class Peer extends MonitoredThread {
             //OPEN SOCKET
             step++;
 
-            if (this.socket != null) {
-                this.close("before new connect");
+            if (acceptedSocket != null) {
+                // ME is ACCEPTOR
+                this.socket = acceptedSocket;
+                this.address = this.socket.getInetAddress();
+                this.white = false;
+            } else {
+                this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
+                this.white = true;
             }
-            this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
 
             //ENABLE KEEPALIVE
             step++;
@@ -243,8 +251,8 @@ public class Peer extends MonitoredThread {
 
             //CREATE STRINGWRITER
             step++;
-            this.out = socket.getOutputStream();
-            this.in = new DataInputStream(socket.getInputStream());
+            this.out = this.socket.getOutputStream();
+            this.in = new DataInputStream(this.socket.getInputStream());
 
         } catch (Exception e) {
             //FAILED TO CONNECT NO NEED TO BLACKLIST
@@ -275,7 +283,7 @@ public class Peer extends MonitoredThread {
 
         }
 
-        LOGGER.info(description + address.getHostAddress());
+        LOGGER.info(this + description);
         network.onConnect(this);
 
         // при коннекте во вне связь может порваться поэтому тут по runed
@@ -456,6 +464,11 @@ public class Peer extends MonitoredThread {
                 continue;
             }
 
+            if (message.getType() != Message.TRANSACTION_TYPE
+                    && message.getType() != Message.TELEGRAM_TYPE) {
+                LOGGER.debug(this + " : " + message + " RECEIVED");
+            }
+
             if (logPings && message.getType() == Message.GET_HWEIGHT_TYPE) {
                 LOGGER.debug(this + " : " + message + " RECEIVED");
             }
@@ -540,6 +553,11 @@ public class Peer extends MonitoredThread {
         }
 
         byte[] bytes = message.toBytes();
+
+        if (message.getType() != Message.TRANSACTION_TYPE
+                && message.getType() != Message.TELEGRAM_TYPE) {
+            LOGGER.debug(message + " try SEND to " + this);
+        }
 
         if (logPings && message.getType() == Message.HWEIGHT_TYPE) {
             LOGGER.debug(message + " try SEND to " + this);
@@ -737,7 +755,12 @@ public class Peer extends MonitoredThread {
                     // and notyfy receiver with EOFException
                     //this.socket.shutdownInput(); - закрывает канал так что его нужно потом 2-й раз открывать
                     //this.socket.shutdownOutput(); - не дает переконнектиться
+                    //this.in.close(); - не дает пототм переконнектиться
                     //this.out.close(); - не дает пототм переконнектиться
+
+                    // тут нельзя закрывать Стримы у Сокета так как при встречном переконнекте
+                    // иначе Стримы больше не откроются
+                    // и нужно просто сокет закрыть
                     this.socket.close();
 
                 } catch (Exception ignored) {
@@ -761,8 +784,9 @@ public class Peer extends MonitoredThread {
 
     @Override
     public String toString() {
+
         return this.address.getHostAddress()
-                + (getPing() >= 0 && getPing() < 99999? " ping: " + this.getPing() + "ms" : " try" + getPing())
+                + (getPing() >= 0? " ping: " + this.getPing() + "ms" : (getPing() < 0?" try" + getPing() : ""))
                 + (isWhite()? " [White]" : "");
     }
 }
