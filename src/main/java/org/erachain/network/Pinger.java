@@ -57,6 +57,8 @@ public class Pinger extends Thread {
             this.ping = -1;
         }
 
+        this.peer.setName("Peer: " + this.peer);
+
         //GET RESPONSE
         long start = System.currentTimeMillis();
         Message response = peer.getResponse(pingMessage, timeSOT);

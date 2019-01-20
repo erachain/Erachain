@@ -60,7 +60,7 @@ public class Peer extends MonitoredThread {
         this.address = address;
         this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
         //LOGGER.debug("@@@ new Peer(InetAddress address) : " + address.getHostAddress());
-        this.setName("Peer: " + this.getAddress().getHostAddress() + " as address");
+        this.setName("Peer: " + " as address");
 
     }
 
@@ -109,8 +109,7 @@ public class Peer extends MonitoredThread {
                 this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
             }
 
-            this.setName("Peer: " + this.address.getHostAddress() + " as socket"
-                    + (this.isWhite()?" is White" : ""));
+            this.setName("Peer: " + this);
 
             // IT is STARTED
             this.runed = true;
@@ -241,13 +240,13 @@ public class Peer extends MonitoredThread {
                 this.white = true;
             }
 
-            LOGGER.debug(this + " SOCKET: \n"
-                    + (this.socket.isBound()? " isBound " : "")
-                    + (this.socket.isConnected()? " isConnected " : "")
-                    + (this.socket.isInputShutdown()? " isInputShutdown " : "")
-                    + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
-                    + (this.socket.isClosed()? " isClosed " : "")
-            );
+            //LOGGER.debug(this + " SOCKET: \n"
+            //        + (this.socket.isBound()? " isBound " : "")
+            //        + (this.socket.isConnected()? " isConnected " : "")
+            //        + (this.socket.isInputShutdown()? " isInputShutdown " : "")
+            //        + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
+            //        + (this.socket.isClosed()? " isClosed " : "")
+            //);
 
             //ENABLE KEEPALIVE
             step++;
@@ -293,14 +292,17 @@ public class Peer extends MonitoredThread {
 
         }
 
+        this.setName("Peer: " + this + " connected");
+
         LOGGER.info(this + description);
-        LOGGER.debug(this + " SOCKET at end: \n"
-                + (this.socket.isBound()? " isBound " : "")
-                + (this.socket.isConnected()? " isConnected " : "")
-                + (this.socket.isInputShutdown()? " isInputShutdown " : "")
-                + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
-                + (this.socket.isClosed()? " isClosed " : "")
-        );
+
+        //LOGGER.debug(this + " SOCKET at end: \n"
+        //        + (this.socket.isBound()? " isBound " : "")
+        //        + (this.socket.isConnected()? " isConnected " : "")
+        //        + (this.socket.isInputShutdown()? " isInputShutdown " : "")
+        //        + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
+        //       + (this.socket.isClosed()? " isClosed " : "")
+        //);
 
         network.onConnect(this);
 
@@ -517,15 +519,8 @@ public class Peer extends MonitoredThread {
             if (!message.isRequest() && message.hasId()) {
 
                 if (!this.messages.containsKey(message.getId())) {
-                    // может еще не внесли ключ запроса в список? подождем и еще раз проверим
-                    try {
-                        Thread.sleep(3);
-                    } catch (Exception e) {
-                    }
-                    // уже посроченный ответ словили - ничего не делаем
-                    if (!this.messages.containsKey(message.getId())) {
-                        continue;
-                    }
+                    // просроченное сообщение
+                    continue;
                 }
 
                 // это ответ на наш запрос с ID
@@ -689,8 +684,13 @@ public class Peer extends MonitoredThread {
 
         long checkTime = System.currentTimeMillis();
 
+
         if (USE_MONITOR) this.setMonitorStatusBefore("response.write " + message.toString() + ", messages.size: " + messages.size());
+
+        //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
+        this.messages.put(localRequestKey, blockingQueue);
         if (!this.sendMessage(message)) {
+            this.messages.remove(localRequestKey);
             if (USE_MONITOR) this.setMonitorStatusAfter();
             //WHEN FAILED TO SEND MESSAGE
             //blockingQueue = null;
@@ -699,9 +699,6 @@ public class Peer extends MonitoredThread {
             return null;
         }
         if (USE_MONITOR) this.setMonitorStatusAfter();
-
-        //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
-        this.messages.put(localRequestKey, blockingQueue);
 
         Message response = null;
         try {
@@ -758,10 +755,13 @@ public class Peer extends MonitoredThread {
 
     public void ban(int banForMinutes, String message) {
 
-        if (!runed)
+        if (!runed) {
+            if (banForMinutes > this.getBanMinutes())
+                this.network.afterDisconnect(this, banForMinutes, message);
             return;
+        }
 
-        this.setName("Peer: " + this.getAddress().getHostAddress()
+        this.setName("Peer: " + this
                 + " banned for " + banForMinutes + " " + message);
 
         // если там уже было закрыто то не вызывать After
@@ -772,10 +772,11 @@ public class Peer extends MonitoredThread {
     }
     public void ban(String message) {
 
-        if (!runed)
+        if (!runed) {
             return;
+        }
 
-        this.setName("Peer: " + this.getAddress().getHostAddress()
+        this.setName("Peer: " + this
                 + " banned - " + message);
 
         // если там уже было закрыто то не вызывать After
@@ -807,13 +808,13 @@ public class Peer extends MonitoredThread {
         LOGGER.info("Try close peer : " + this + " - " + message);
 
         if (socket != null) {
-            LOGGER.debug(this + " SOCKET: \n"
-                    + (this.socket.isBound()? " isBound " : "")
-                    + (this.socket.isConnected()? " isConnected " : "")
-                    + (this.socket.isInputShutdown()? " isInputShutdown " : "")
-                    + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
-                    + (this.socket.isClosed()? " isClosed " : "")
-            );
+            //LOGGER.debug(this + " SOCKET: \n"
+            //        + (this.socket.isBound()? " isBound " : "")
+            //        + (this.socket.isConnected()? " isConnected " : "")
+            //        + (this.socket.isInputShutdown()? " isInputShutdown " : "")
+            //        + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
+            //        + (this.socket.isClosed()? " isClosed " : "")
+            //);
             //CHECK IF SOCKET IS CONNECTED
             if (socket.isConnected()) {
                 //CLOSE SOCKET
