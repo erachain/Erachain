@@ -2,6 +2,8 @@ package org.erachain.network;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.network.message.BlockMessage;
+import org.erachain.network.message.BlockWinMessage;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.ntp.NTP;
@@ -594,7 +596,11 @@ public class Peer extends MonitoredThread {
 
     }
 
-    public boolean sendMessage(Message message) {
+    public void sendWinBlock(BlockWinMessage message) {
+        this.sender.sendWinBlock(message);
+    }
+
+        public boolean sendMessage(Message message) {
         return this.sender.putMessage(message);
 
         /*

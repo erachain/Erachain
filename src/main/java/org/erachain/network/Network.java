@@ -566,7 +566,7 @@ public class Network extends Observable {
         }
     }
 
-    public void asyncBroadcastWinBlock(Message message, List<Peer> exclude, boolean onlySynchronized) {
+    public void asyncBroadcastWinBlock(BlockWinMessage winBlock, List<Peer> exclude, boolean onlySynchronized) {
 
         //LOGGER.debug("ASYNC Broadcasting " + message.viewType());
         Controller cnt = Controller.getInstance();
@@ -593,7 +593,7 @@ public class Network extends Observable {
 
             //EXCLUDE PEERS
             if (exclude == null || !exclude.contains(peer)) {
-                peer.sendMessage(message);
+                peer.sendWinBlock(winBlock);
             }
         }
 

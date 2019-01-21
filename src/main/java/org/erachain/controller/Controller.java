@@ -1552,7 +1552,7 @@ public class Controller extends Observable {
                     // BROADCAST
                     List<Peer> excludes = new ArrayList<Peer>();
                     excludes.add(message.getSender());
-                    this.network.asyncBroadcastWinBlock(message, excludes, false);
+                    this.network.asyncBroadcastWinBlock(blockWinMessage, excludes, false);
 
                     onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
 
@@ -1749,13 +1749,13 @@ public class Controller extends Observable {
         LOGGER.info("broadcast winBlock " + newBlock.toString() + " size:" + newBlock.getTransactionCount());
 
         // CREATE MESSAGE
-        Message message = MessageFactory.getInstance().createWinBlockMessage(newBlock);
+        BlockWinMessage blockWinMessage = (BlockWinMessage)MessageFactory.getInstance().createWinBlockMessage(newBlock);
 
         if (this.isOnStopping())
             return;
 
         // BROADCAST MESSAGE
-        this.network.asyncBroadcastWinBlock(message, excludes, false);
+        this.network.asyncBroadcastWinBlock(blockWinMessage, excludes, false);
 
         LOGGER.info("broadcasted!");
 

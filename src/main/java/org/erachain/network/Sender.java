@@ -5,10 +5,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
 import org.erachain.datachain.BlockMap;
-import org.erachain.network.message.BlockMessage;
-import org.erachain.network.message.HWeightMessage;
-import org.erachain.network.message.Message;
-import org.erachain.network.message.MessageFactory;
+import org.erachain.network.message.*;
 import org.erachain.utils.MonitoredThread;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
@@ -39,7 +36,7 @@ public class Sender extends MonitoredThread {
     private boolean stoped;
 
     private HWeightMessage hWeightMessage;
-    private BlockMessage winBlockToSend;
+    private BlockWinMessage winBlockToSend;
 
     public Sender(Peer peer) {
         this.peer = peer;
@@ -82,6 +79,14 @@ public class Sender extends MonitoredThread {
         // пингуем только те что еще нормальные
         if (ping > 0)
             this.needPing = true;
+    }
+
+    public void sendHWeight(HWeightMessage hWeightMessage) {
+        this.hWeightMessage = hWeightMessage;
+    }
+
+    public void sendWinBlock(BlockWinMessage winBlock) {
+        this.winBlockToSend = winBlock;
     }
 
     public boolean sendMessage(Message message) {
