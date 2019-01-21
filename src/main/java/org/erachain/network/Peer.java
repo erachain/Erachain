@@ -42,7 +42,7 @@ public class Peer extends MonitoredThread {
     public Network network;
     private InetAddress address;
     public Socket socket;
-    private OutputStream out;
+    //public OutputStream out;
     private DataInputStream in;
     private Pinger pinger;
     private boolean white;
