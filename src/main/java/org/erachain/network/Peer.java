@@ -6,6 +6,7 @@ import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
+import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,9 @@ import java.util.concurrent.TimeUnit;
  * вертает общение с внешним пиром - чтение и запись
  *
  */
-public class Peer extends Thread {
+public class Peer extends MonitoredThread {
+
+    private final static boolean USE_MONITOR = true;
 
     private final static boolean need_wait = false;
     private final static boolean logPings = false;
@@ -38,7 +41,7 @@ public class Peer extends Thread {
     private static int MAX_BEFORE_PING = SOCKET_BUFFER_SIZE >> 2;
     public Network network;
     private InetAddress address;
-    private Socket socket;
+    public Socket socket;
     private OutputStream out;
     private DataInputStream in;
     private Pinger pinger;
@@ -57,7 +60,7 @@ public class Peer extends Thread {
         this.address = address;
         this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
         //LOGGER.debug("@@@ new Peer(InetAddress address) : " + address.getHostAddress());
-        this.setName("Peer: " + this.getAddress().getHostAddress() + " as address");
+        this.setName("Peer: " + " as address");
 
     }
 
@@ -106,8 +109,7 @@ public class Peer extends Thread {
                 this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
             }
 
-            this.setName("Peer: " + this.address.getHostAddress() + " as socket"
-                    + (this.isWhite()?" is White" : ""));
+            this.setName("Peer: " + this);
 
             // IT is STARTED
             this.runed = true;
@@ -138,17 +140,17 @@ public class Peer extends Thread {
      * @param description
      * @return
      */
-    public boolean reconnect(Socket socket, String description) {
+    public boolean reconnect_old(Socket socket, String description) {
 
         LOGGER.debug("@@@ reconnect(socket) : " + socket.getInetAddress().getHostAddress());
 
         try {
 
             if (this.socket != null) {
-                this.close();
+                this.close("befor reconnect");
             }
-
             this.socket = socket;
+
             this.address = socket.getInetAddress();
             this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
             this.white = false;
@@ -178,10 +180,9 @@ public class Peer extends Thread {
             this.runed = true;
 
             //ON SOCKET CONNECT
-            this.setName("Peer: " + this.getAddress().getHostAddress() + " reconnected"
-                + (this.isWhite()?" is White" : ""));
+            this.setName("Peer: " + this + " reconnected");
 
-            LOGGER.info(description + address.getHostAddress());
+            LOGGER.info(this + description);
             network.onConnect(this);
 
         } catch (Exception e) {
@@ -197,21 +198,27 @@ public class Peer extends Thread {
     }
 
     /**
-     * Приконнектиться к Премнику
+     * synchronized - дает результат хоть и медленный
+     * Приконнектиться к Премнику или принять на этот Пир новый входящий Сокет
+     * @param acceptedSocket если задан то это прием в данный Пир соединение извне
      * @param network
      * @param description
      * @return
      */
-    public boolean connect(Network network, String description) {
+    public synchronized boolean connect(Socket acceptedSocket, Network networkIn, String description) {
         if (Controller.getInstance().isOnStopping()) {
             return false;
         }
 
-        if (this.network == null)
-            this.network = network;
+        if (this.socket != null) {
+            LOGGER.debug("ALREADY connected: " + this);
+            return this.runed;
+        }
+
+        if (networkIn != null)
+            this.network = networkIn;
 
         this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
-        this.white = true;
         this.pingCounter = 0;
         this.connectionTime = NTP.getTime();
         this.errors = 0;
@@ -222,13 +229,24 @@ public class Peer extends Thread {
         try {
             //OPEN SOCKET
             step++;
-            if (this.socket != null) {
-                this.socket.close();
-                this.out.close();
-                this.in.close();
+
+            if (acceptedSocket != null) {
+                // ME is ACCEPTOR
+                this.socket = acceptedSocket;
+                this.address = this.socket.getInetAddress();
+                this.white = false;
+            } else {
+                this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
+                this.white = true;
             }
 
-            this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
+            //LOGGER.debug(this + " SOCKET: \n"
+            //        + (this.socket.isBound()? " isBound " : "")
+            //        + (this.socket.isConnected()? " isConnected " : "")
+            //        + (this.socket.isInputShutdown()? " isInputShutdown " : "")
+            //        + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
+            //        + (this.socket.isClosed()? " isClosed " : "")
+            //);
 
             //ENABLE KEEPALIVE
             step++;
@@ -242,8 +260,8 @@ public class Peer extends Thread {
 
             //CREATE STRINGWRITER
             step++;
-            this.out = socket.getOutputStream();
-            this.in = new DataInputStream(socket.getInputStream());
+            this.out = this.socket.getOutputStream();
+            this.in = new DataInputStream(this.socket.getInputStream());
 
         } catch (Exception e) {
             //FAILED TO CONNECT NO NEED TO BLACKLIST
@@ -274,16 +292,22 @@ public class Peer extends Thread {
 
         }
 
-        LOGGER.info(description + address.getHostAddress());
+        this.setName("Peer: " + this + " connected");
+
+        LOGGER.info(this + description);
+
+        //LOGGER.debug(this + " SOCKET at end: \n"
+        //        + (this.socket.isBound()? " isBound " : "")
+        //        + (this.socket.isConnected()? " isConnected " : "")
+        //        + (this.socket.isInputShutdown()? " isInputShutdown " : "")
+        //        + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
+        //       + (this.socket.isClosed()? " isClosed " : "")
+        //);
+
         network.onConnect(this);
 
         // при коннекте во вне связь может порваться поэтому тут по runed
         return this.runed;
-    }
-
-    // connect and run
-    public boolean connect(String description) {
-        return connect(Controller.getInstance().network, description);
     }
 
     public InetAddress getAddress() {
@@ -353,7 +377,7 @@ public class Peer extends Thread {
      * @return
      */
     public boolean isOnUsed() {
-        return this.socket != null || this.runed;
+        return this.socket != null && !this.runed;
     }
 
     public boolean isUsed() {
@@ -363,7 +387,9 @@ public class Peer extends Thread {
     public void run() {
         byte[] messageMagic = null;
 
+        this.initMonitor();
         while (!stoped) {
+            if (USE_MONITOR) this.setMonitorPoint();
 
             if (false)
                 LOGGER.info(this.getAddress().getHostAddress()
@@ -382,35 +408,14 @@ public class Peer extends Thread {
                     Thread.sleep(100);
                 } catch (Exception e) {
                 }
-
-                if (in != null) {
-                    try {
-                        in.close();
-                        in = null;
-                    } catch (Exception e) {
-                        in = null;
-                    }
-                }
                 continue;
 
             }
 
-            // CHECK stream
-            if (in == null) {
-                try {
-                    in = new DataInputStream(socket.getInputStream());
-                } catch (java.lang.OutOfMemoryError e) {
-                    Controller.getInstance().stopAll(81);
-                    break;
-                } catch (Exception e) {
-                    //DISCONNECT
-                    network.tryDisconnect(this, network.banForActivePeersCounter(), e.getMessage());
-                    continue;
-                }
-            }
-
             //READ FIRST 4 BYTES
             messageMagic = new byte[Message.MAGIC_LENGTH];
+
+            if (USE_MONITOR) this.setMonitorStatus("in.readFully");
 
             // MORE EFFECTIVE
             // в этом случае просто ожидаем прилета байтов в течении заданного времени ожидания
@@ -426,25 +431,32 @@ public class Peer extends Thread {
                 Controller.getInstance().stopAll(82);
                 break;
             } catch (EOFException e) {
+                if (!this.runed)
+                    // это наш дисконект
+                    continue;
                 // на там конце произошло отключение - делаем тоже дисконект
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "read-0 peer is shutdownInput");
+                ban(network.banForActivePeersCounter(), "read-0 peer is shutdownInput");
                 continue;
             } catch (java.net.SocketException e) {
+                if (!this.runed)
+                    // это наш дисконект
                 // если туда уже не лезет иликанал побился
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "read-2 " + e.getMessage());
+                ban(network.banForActivePeersCounter(), "read-2 " + e.getMessage());
                 continue;
             } catch (java.io.IOException e) {
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "read-3 " + e.getMessage());
+                if (!this.runed)
+                    // это наш дисконект
+                ban(network.banForActivePeersCounter(), "read-3 " + e.getMessage());
                 continue;
             } catch (Exception e) {
                 //DISCONNECT and BAN
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "read-4 " + e.getMessage());
+                ban(network.banForActivePeersCounter(), "read-4 " + e.getMessage());
                 continue;
             }
 
             if (!Arrays.equals(messageMagic, Controller.getInstance().getMessageMagic())) {
                 //ERROR and BAN
-                network.tryDisconnect(this, 3600, "parse - received message with wrong magic");
+                ban(3600, "parse - received message with wrong magic");
                 continue;
             }
 
@@ -453,23 +465,39 @@ public class Peer extends Thread {
             try {
                 message = MessageFactory.getInstance().parse(this, in);
             } catch (java.net.SocketTimeoutException timeOut) {
+                if (!this.runed)
+                    // это наш дисконект
+                    continue;
+
                 // если сдесь по времени ожидания пришло то значит на том конце что-то не так и пора разрывать соединение
                 if (this.getPing() < -1) {
-                    network.tryDisconnect(this, network.banForActivePeersCounter(), "peer in TimeOut and -ping");
+                    ban(network.banForActivePeersCounter(), "peer in TimeOut and -ping");
                 } else {
-                    network.tryDisconnect(this, network.banForActivePeersCounter(), "peer in TimeOut");
+                    ban(network.banForActivePeersCounter(), "peer in TimeOut");
                 }
                 continue;
             } catch (java.lang.OutOfMemoryError e) {
                 Controller.getInstance().stopAll(83);
                 break;
             } catch (EOFException e) {
+                if (!this.runed)
+                    // это наш дисконект
+                    continue;
+
                 // на там конце произошло отключение - делаем тоже дисконект
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "peer is shutdownInput");
+                ban(network.banForActivePeersCounter(), "peer is shutdownInput");
+                continue;
+            } catch (IOException e) {
+                if (!this.runed)
+                    // это наш дисконект
+                    continue;
+
+                // на там конце произошло отключение - делаем тоже дисконект
+                ban(network.banForActivePeersCounter(), e.getMessage());
                 continue;
             } catch (Exception e) {
                 //DISCONNECT and BAN
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "parse message wrong - " + e.getMessage());
+                ban(network.banForActivePeersCounter(), "parse message wrong - " + e.getMessage());
                 continue;
             }
 
@@ -479,15 +507,19 @@ public class Peer extends Thread {
                 continue;
             }
 
-            if (logPings && message.getType() == Message.GET_HWEIGHT_TYPE) {
-                LOGGER.debug(this + " : " + message + " RECEIVED");
+            if (logPings && (message.getType() != Message.TRANSACTION_TYPE
+                    && message.getType() != Message.TELEGRAM_TYPE
+                    || message.getType() == Message.HWEIGHT_TYPE)) {
+                LOGGER.debug(this + " RECEIVED: " + message);
             }
+
+            if (USE_MONITOR) this.setMonitorStatus("in.message process");
 
             //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
             if (!message.isRequest() && message.hasId()) {
 
                 if (!this.messages.containsKey(message.getId())) {
-                    // уже посроченный ответ словили - ничего не делаем
+                    // просроченное сообщение
                     continue;
                 }
 
@@ -534,7 +566,8 @@ public class Peer extends Thread {
             }
         }
 
-        LOGGER.info("halted");
+        if (USE_MONITOR) this.setMonitorStatus("halted");
+        LOGGER.info(this + "halted");
 
     }
 
@@ -547,25 +580,31 @@ public class Peer extends Thread {
 
         if (!this.socket.isConnected()) {
             //ERROR
-            network.tryDisconnect(this, network.banForActivePeersCounter(), "SEND - socket not still alive");
+            ban(network.banForActivePeersCounter(), "SEND - socket not still alive");
 
             return false;
         }
 
         byte[] bytes = message.toBytes();
 
-        if (logPings && message.getType() == Message.HWEIGHT_TYPE) {
+        if (logPings && (message.getType() != Message.TRANSACTION_TYPE
+                && message.getType() != Message.TELEGRAM_TYPE
+                || message.getType() == Message.HWEIGHT_TYPE)) {
             LOGGER.debug(message + " try SEND to " + this);
         }
 
-        if (this.getPing() < -5 && message.getType() != Message.HWEIGHT_TYPE
-                && message.getType() != Message.GET_HWEIGHT_TYPE) {
+        if (this.getPing() < -6 && message.getType() == Message.WIN_BLOCK_TYPE) {
             // если пинг хреновый то ничего не шлем кроме пингования
             return false;
         }
 
+        if (USE_MONITOR) this.setMonitorStatusBefore("write");
+
         //SEND MESSAGE
         long checkTime = System.currentTimeMillis();
+        if (!this.runed || this.out == null)
+            return false;
+
         synchronized (this.out) {
 
             try {
@@ -575,29 +614,40 @@ public class Peer extends Thread {
                 Controller.getInstance().stopAll(85);
                 return false;
             } catch (java.net.SocketException eSock) {
+                if (!this.runed)
+                    // это наш дисконект
+                    return false;
+
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "try out.write 1 - " + eSock.getMessage());
+                ban(network.banForActivePeersCounter(), "try out.write 1 - " + eSock.getMessage());
                 return false;
             } catch (IOException e) {
+                if (!this.runed)
+                    // это наш дисконект
+                    return false;
+
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "try out.write 2 - " + e.getMessage());
+                ban(network.banForActivePeersCounter(), "try out.write 2 - " + e.getMessage());
                 return false;
             } catch (Exception e) {
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                network.tryDisconnect(this, network.banForActivePeersCounter(), "try out.write 3 - " + e.getMessage());
+                ban(network.banForActivePeersCounter(), "try out.write 3 - " + e.getMessage());
                 return false;
             }
 
         }
+
+        if (USE_MONITOR) this.setMonitorStatusAfter();
+
         checkTime = System.currentTimeMillis() - checkTime;
         if (checkTime > (bytes.length >> 3)
                 || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
@@ -612,10 +662,16 @@ public class Peer extends Thread {
      * @return
      */
     private synchronized int incrementKey() {
-        if (this.requestKey == 99999)
-            return 1;
 
-        return this.requestKey++;
+        if (this.requestKey == 99999) {
+            this.requestKey = 1;
+        }
+        else
+            this.requestKey++;
+
+        if (USE_MONITOR) this.setMonitorStatus("incrementKey: " + this.requestKey);
+        return this.requestKey;
+
     }
 
     public Message getResponse(Message message, long timeSOT) {
@@ -626,40 +682,49 @@ public class Peer extends Thread {
 
         message.setId(localRequestKey);
 
-        //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
-        this.messages.put(localRequestKey, blockingQueue);
-
         long checkTime = System.currentTimeMillis();
 
+
+        if (USE_MONITOR) this.setMonitorStatusBefore("response.write " + message.toString() + ", messages.size: " + messages.size());
+
+        //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
+        this.messages.put(localRequestKey, blockingQueue);
         if (!this.sendMessage(message)) {
+            this.messages.remove(localRequestKey);
+            if (USE_MONITOR) this.setMonitorStatusAfter();
             //WHEN FAILED TO SEND MESSAGE
             //blockingQueue = null;
-            LOGGER.debug(this + " >> " + message + " send ERROR by period: " + (System.currentTimeMillis() - checkTime));
-            this.messages.remove(localRequestKey);
+            //LOGGER.debug(this + " >> " + message + " send ERROR by period: " + (System.currentTimeMillis() - checkTime));
+            ////this.messages.remove(localRequestKey);
             return null;
         }
+        if (USE_MONITOR) this.setMonitorStatusAfter();
 
         Message response = null;
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
-            // если ответ есть то в читателе уже удалили его из очереди
-            if (response == null) {
-                this.messages.remove(localRequestKey);
-            }
         } catch (java.lang.OutOfMemoryError e) {
             Controller.getInstance().stopAll(86);
             return null;
         } catch (InterruptedException e) {
             this.messages.remove(localRequestKey);
+            return null;
         } catch (Exception e) {
             this.messages.remove(localRequestKey);
             LOGGER.error(e.getMessage(), e);
+            return null;
         }
 
-        if (response != null && this.getPing() < 0) {
+        if (response == null) {
+            // НУЛЬ значит не дождались - пора удалять идентификатор запроса из списка
+            this.messages.remove(localRequestKey);
+        } else if (this.getPing() < 0) {
+            // если ответ есть то в читателе уже удалили его из очереди
             // SET PING by request period
             this.setPing((int)(System.currentTimeMillis() - checkTime));
         }
+
+        if (USE_MONITOR) this.setMonitorStatus("response.done " + message.toString());
 
         return response;
     }
@@ -684,18 +749,39 @@ public class Peer extends Thread {
     public boolean isBanned() {
         return Controller.getInstance().getDBSet().getPeerMap().isBanned(address.getAddress());
     }
-
-    public void ban(int banForMinutes, String mess) {
-        this.setName("Peer: " + this.getAddress().getHostAddress()
-                + " banned for " + banForMinutes + " " + mess);
-
-        this.network.tryDisconnect(this, banForMinutes, mess);
+    public int getBanMinutes() {
+        return Controller.getInstance().getDBSet().getPeerMap().getBanMinutes(this);
     }
-    public void ban(String mess) {
-        this.setName("Peer: " + this.getAddress().getHostAddress()
-                + " banned - " + mess);
 
-        this.network.tryDisconnect(this, network.banForActivePeersCounter(), mess);
+    public void ban(int banForMinutes, String message) {
+
+        if (!runed) {
+            if (banForMinutes > this.getBanMinutes())
+                this.network.afterDisconnect(this, banForMinutes, message);
+            return;
+        }
+
+        this.setName("Peer: " + this
+                + " banned for " + banForMinutes + " " + message);
+
+        // если там уже было закрыто то не вызывать After
+        // или если нужно забанить
+        if (this.close(message) || banForMinutes > this.getBanMinutes())
+            this.network.afterDisconnect(this, banForMinutes, message);
+
+    }
+    public void ban(String message) {
+
+        if (!runed) {
+            return;
+        }
+
+        this.setName("Peer: " + this
+                + " banned - " + message);
+
+        // если там уже было закрыто то не вызывать After
+        if (this.close(message))
+            this.network.afterDisconnect(this, message);
     }
 
 
@@ -703,74 +789,74 @@ public class Peer extends Thread {
         return stoped;
     }
 
-    public void close() {
+
+    /**
+     * синхронизированное закрытие чтобы по несольку раз не входило
+     *  и если уже закрывается то выход с FALSE
+     *
+     * @param message
+     * @return
+     */
+    public synchronized boolean close(String message) {
 
         if (!runed) {
-            return;
+            return false;
         }
 
         runed = false;
 
-        LOGGER.info("Try close peer : " + this);
+        LOGGER.info("Try close peer : " + this + " - " + message);
 
-        if (false) {
-            // new style
-            try {
-                this.out.close();
-            } catch (Exception ignored) {
-            }
-            if (this.in != null) {
+        if (socket != null) {
+            //LOGGER.debug(this + " SOCKET: \n"
+            //        + (this.socket.isBound()? " isBound " : "")
+            //        + (this.socket.isConnected()? " isConnected " : "")
+            //        + (this.socket.isInputShutdown()? " isInputShutdown " : "")
+            //        + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
+            //        + (this.socket.isClosed()? " isClosed " : "")
+            //);
+            //CHECK IF SOCKET IS CONNECTED
+            if (socket.isConnected()) {
+                //CLOSE SOCKET
                 try {
-                this.in.close();
+                    // this close IN and OUT streams
+                    // and notyfy receiver with EOFException
+                    //this.socket.shutdownInput(); - закрывает канал так что его нужно потом 2-й раз открывать
+                    //this.socket.shutdownOutput(); - не дает переконнектиться
+                    //this.in.close(); - не дает пототм переконнектиться
+                    //this.out.close(); - не дает пототм переконнектиться
+
+                    // тут нельзя закрывать Стримы у Сокета так как при встречном переконнекте
+                    // иначе Стримы больше не откроются
+                    // и нужно просто сокет закрыть
+                    this.socket.close();
+
                 } catch (Exception ignored) {
-                }
-            }
-            if (socket != null) {
-                //CHECK IF SOCKET IS CONNECTED
-                if (socket.isConnected()) {
-                    //CLOSE SOCKET
-                    try {
-                    this.socket.shutdownInput();
-                    } catch (Exception ignored) {
-                    }
-                }
-            }
-
-        } else {
-            // OLD style
-
-            //CHECK IS SOCKET EXISTS
-            if (socket != null) {
-                //CHECK IF SOCKET IS CONNECTED
-                if (socket.isConnected()) {
-                    //CLOSE SOCKET
-                    try {
-                        // and close IN and OUT
-                        this.socket.close();
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
-                    }
+                    LOGGER.error(this + " - " + ignored.getMessage(), ignored);
                 }
             }
         }
 
-        this.socket = null;
-        this.out = null;
         this.in = null;
+        this.out = null;
+        this.socket = null;
+
+        return true;
     }
 
     public void halt() {
 
         this.stoped = true;
-        this.close();
-        this.setName("Peer: " + this.getAddress().getHostAddress() + " halted");
+        this.close("halt");
+        //this.setName("Peer: " + this.getAddress().getHostAddress() + " halted");
 
     }
 
     @Override
     public String toString() {
+
         return this.address.getHostAddress()
-                + (getPing() >= 0? " ping: " + this.getPing() + "ms" : " try" + getPing())
+                + (getPing() >= 0? " ping: " + this.getPing() + "ms" : (getPing() < 0?" try" + getPing() : ""))
                 + (isWhite()? " [White]" : "");
     }
 }

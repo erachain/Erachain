@@ -60,6 +60,8 @@ public class ConnectionCreator extends MonitoredThread {
 
         for (Peer newPeer: peersMessage.getPeers()) {
 
+            this.setMonitorStatus("peer.recurse " + newPeer.toString());
+
             if (!this.isRun)
                 return 0;
 
@@ -98,22 +100,23 @@ public class ConnectionCreator extends MonitoredThread {
             if (!Settings.getInstance().isTryingConnectToBadPeers() && newPeer.isBad())
                 continue;
 
-            //CHECK IF ALREADY CONNECTED TO PEER
             //CHECK IF PEER ALREADY used
             newPeer = network.getKnownPeer(newPeer);
-            if (newPeer.isUsed()) {
-                continue;
-            }
 
-            if (newPeer.isBanned())
+            //CHECK IF ALREADY CONNECTED TO PEER
+            if (newPeer.isUsed() || newPeer.isBanned())
                 continue;
 
             if (!this.isRun)
                 return 0;
 
             //CONNECT
-            if (!newPeer.isOnUsed())
-                newPeer.connect(network,"connected in recurse +++ ");
+            this.setMonitorStatusBefore("peer.connect.recurse");
+            if (!newPeer.connect(null, network, "connected in recurse +++ "))
+                continue;
+            //network.tryConnection(null, newPeer, "connected in recurse +++ "); - тормозит коннект
+
+            this.setMonitorStatusAfter();
 
             if (newPeer.isUsed()) {
                 // RECURSE to OTHER PEERS
@@ -188,15 +191,12 @@ public class ConnectionCreator extends MonitoredThread {
                         continue;
                     }
 
-                    //CHECK IF ALREADY CONNECTED TO PEER
                     //CHECK IF PEER ALREADY used
                     // new PEER from NETWORK poll or original from DB
                     peer = network.getKnownPeer(peer);
-                    if (peer.isUsed()) {
-                        continue;
-                    }
 
-                    if (peer.isBanned())
+                    //CHECK IF ALREADY CONNECTED TO PEER
+                    if (peer.isUsed() || peer.isBanned())
                         continue;
 
                     if (!this.isRun)
@@ -204,23 +204,12 @@ public class ConnectionCreator extends MonitoredThread {
 
                     LOGGER.info("try connect to: " + peer);
 
-                    /*
-                    LOGGER.info(
-                            Lang.getInstance().translate("Connecting to known peer %peer% :: %knownPeersCounter% / %allKnownPeers% :: Connections: %activeConnections%")
-                                .replace("%peer%", peer)
-                                .replace("%knownPeersCounter%", String.valueOf(knownPeersCounter))
-                                .replace("%allKnownPeers%", String.valueOf(knownPeers.size()))
-                                .replace("%activeConnections%", String.valueOf(callback.getActivePeersCounter(true)))
-                                );
-                                */
-
                     //CONNECT
-                    //CHECK IF ALREADY CONNECTED TO PEER
-                    if (!peer.isOnUsed()) {
-                        this.setMonitorStatus("peer.connect");
-                        peer.connect(network, "connected +++ ");
-                        this.setMonitorStatus("peer.connect >>");
-                    }
+                    this.setMonitorStatusBefore("peer.connect");
+                    if(!peer.connect(null, network, "connected +++ "))
+                        continue;
+
+                    this.setMonitorStatusAfter();
 
                     if (peer.isUsed()) {
                         // TRY CONNECT to WHITE peers of this PEER
@@ -285,6 +274,7 @@ public class ConnectionCreator extends MonitoredThread {
 
         }
 
+        this.setMonitorStatus("halted");
         LOGGER.info("halted");
 
     }

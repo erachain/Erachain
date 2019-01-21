@@ -57,6 +57,8 @@ public class Pinger extends Thread {
             this.ping = -1;
         }
 
+        this.peer.setName("Peer: " + this.peer);
+
         //GET RESPONSE
         long start = System.currentTimeMillis();
         Message response = peer.getResponse(pingMessage, timeSOT);
@@ -77,9 +79,10 @@ public class Pinger extends Thread {
                 this.ping = -1;
 
             //PING FAILES
-            if (this.ping < -20) {
+            // чем меньше пиров на связи тем дольше пингуем перед разрвом
+            if (this.ping < -3 -20/(1 + peer.network.banForActivePeersCounter())) {
                 // если полный отказ уже больше чем ХХХ секнд то ИМЕННО БАН
-                this.peer.ban(5, "on PING FAILES");
+                this.peer.ban("on PING FAILES");
             }
 
             return false;

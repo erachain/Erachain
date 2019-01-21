@@ -93,9 +93,9 @@ public class Network extends Observable {
 
         //LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer);
 
-        // WAIT start PINGER
+        // WAIT start PINGER and InputStream
         try {
-            Thread.sleep(100);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
         }
 
@@ -131,26 +131,23 @@ public class Network extends Observable {
 
     }
 
-    public void tryDisconnect(Peer peer, int banForMinutes, String error) {
+    public void afterDisconnect(Peer peer, int banForMinutes, String message) {
 
-        if (peer.isUsed()) {
-            //CLOSE CONNECTION
-            peer.close();
-
-            if (error != null && error.length() > 0) {
-                if (banForMinutes != 0) {
-                    LOGGER.info(peer + " ban for minutes: " + banForMinutes + " - " + error);
-                } else {
-                    LOGGER.info("tryDisconnect : " + peer + " - " + error);
-                }
+        if (message != null && message.length() > 0) {
+            if (banForMinutes > 0) {
+                LOGGER.info("BANed: " + peer + " for: " + banForMinutes + "[min] - " + message);
+            } else {
+                LOGGER.info("disconnected: " + peer + " - " + message);
             }
-
-            //PASS TO CONTROLLER
-            Controller.getInstance().afterDisconnect(peer);
         }
 
-        //ADD TO BLACKLIST
-        PeerManager.getInstance().addPeer(peer, banForMinutes);
+        if (banForMinutes > peer.getBanMinutes()) {
+            //ADD TO BLACKLIST
+            PeerManager.getInstance().addPeer(peer, banForMinutes);
+        }
+
+        //PASS TO CONTROLLER
+        Controller.getInstance().afterDisconnect(peer);
 
         //NOTIFY OBSERVERS
         this.setChanged();
@@ -159,6 +156,10 @@ public class Network extends Observable {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
     }
+    public void afterDisconnect(Peer peer, String message) {
+        afterDisconnect(peer, banForActivePeersCounter(), message);
+    }
+
 
     public boolean isKnownAddress(InetAddress address, boolean andUsed) {
 
@@ -192,7 +193,12 @@ public class Network extends Observable {
                 for (Peer knownPeer : knownPeers) {
                     //CHECK IF ADDRESS IS THE SAME
                     if (Arrays.equals(address, knownPeer.getAddress().getAddress())) {
-                        return knownPeer;
+                        if (knownPeer.isUsed() || !knownPeer.isWhite())
+                            return knownPeer;
+
+                        // тут еще могут быть такие же Адреса из-за одновременного коннекта друг к другу
+                        peer = knownPeer;
+
                     }
                 }
             }
@@ -313,25 +319,27 @@ public class Network extends Observable {
             //FOR ALL connectedPeers
             for (Peer knownPeer : knownPeers) {
                 //CHECK IF ADDRESS IS THE SAME
-                if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
-                    if (!knownPeer.isOnUsed()) {
-                        // возможно из-за того что одновременно и как приемник и как передатчик я начинаю выступать
-                        // будет накладка и затык - может не нужно прямо одинаковые имена тут выискивать тогда?
-                        knownPeer.reconnect(socket, "connected by restore!!! ");
-                        return knownPeer;
+                if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())
+                        && !knownPeer.isWhite()) {
+                    if (knownPeer.isUsed()) {
+                        knownPeer.close("before accept anew");
                     }
-
-                    break;
+                    // IF PEER not USED and not onUSED
+                    knownPeer.connect(socket, this,"connected by restore!!! ");
+                    return knownPeer;
                 }
             }
         }
 
-        // use UNUSED peers
-        synchronized (this.knownPeers) {
-            for (Peer knownPeer : this.knownPeers) {
-                if (!knownPeer.isOnUsed()) {
-                    knownPeer.reconnect(socket, "connected by recircle!!! ");
-                    return knownPeer;
+        // Если пустых мест уже мало то начинаем переиспользовать
+        if (this.banForActivePeersCounter() + 3 > Settings.getInstance().getMaxConnections() ) {
+            // use UNUSED peers
+            synchronized (this.knownPeers) {
+                for (Peer knownPeer : this.knownPeers) {
+                    if (!knownPeer.isOnUsed() && !knownPeer.isUsed()) {
+                        knownPeer.connect(socket, this, "connected by recircle!!! ");
+                        return knownPeer;
+                    }
                 }
             }
         }
@@ -343,25 +351,6 @@ public class Network extends Observable {
 
         return peer;
 
-    }
-
-    /**
-     * нужно для того чтобы одновременно не коннектилось две трубы как приемник и как посылник
-     * и возможно и-за этого были затыки. Теперь
-     *
-     * @param socket
-     * @param peer
-     * @param message
-     * @return
-     */
-    public /* synchronized */ Peer tryConnection(Socket socket, Peer peer, String message) {
-        if (socket != null)
-            return startPeer(socket);
-
-        if (!peer.isOnUsed())
-            peer.connect(this, message);
-
-        return peer;
     }
 
     private void addHandledMessage(String hash) {
@@ -493,10 +482,8 @@ public class Network extends Observable {
                 FindMyselfMessage findMyselfMessage = (FindMyselfMessage) message;
 
                 if (Arrays.equals(findMyselfMessage.getFoundMyselfID(), Controller.getInstance().getFoundMyselfID())) {
-                    //LOGGER.info("network.onMessage - Connected to self. Disconnection.");
-
                     Network.myselfAddress = message.getSender().getAddress();
-                    tryDisconnect(message.getSender(), 99999, null);
+                    message.getSender().ban(999999, "MYSELF");
                 }
 
                 break;

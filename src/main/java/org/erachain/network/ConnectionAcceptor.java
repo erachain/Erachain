@@ -59,9 +59,9 @@ public class ConnectionAcceptor extends MonitoredThread {
                 }
 
                 //ACCEPT CONNECTION
-                this.setMonitorStatus("socket.accept");
+                this.setMonitorStatusBefore("socket.accept");
                 connectionSocket = socket.accept();
-                this.setMonitorStatus("socket.accept >>");
+                this.setMonitorStatusAfter();
 
                 //CHECK IF SOCKET IS NOT LOCALHOST || WE ARE ALREADY CONNECTED TO THAT SOCKET || BLACKLISTED
                 if (
@@ -100,8 +100,9 @@ public class ConnectionAcceptor extends MonitoredThread {
                 //		+ " isMy:" + Network.isMyself(connectionSocket.getInetAddress())
                 //		+ " my:" + Network.getMyselfAddress());
 
-                //Peer peer = network.tryConnection(connectionSocket, null, null);
+                setMonitorStatusBefore("startPeer");
                 Peer peer = network.startPeer(connectionSocket);
+                setMonitorStatusAfter();
                 if (!peer.isUsed()) {
                     // если в процессе
                     //if (!peer.isBanned() || connectionSocket.isClosed()) {
@@ -117,7 +118,9 @@ public class ConnectionAcceptor extends MonitoredThread {
                     List<Peer> incomePeers = network.getIncomedPeers();
                     if (incomePeers != null && !incomePeers.isEmpty()) {
                         Peer peerForBan = incomePeers.get(random.nextInt((incomePeers.size())));
+                        setMonitorStatusBefore("peerForBan.ban");
                         peerForBan.ban(10, "Clear place for new connection");
+                        setMonitorStatusAfter();
                     }
                 }
             } catch (java.lang.OutOfMemoryError e) {
@@ -129,6 +132,7 @@ public class ConnectionAcceptor extends MonitoredThread {
 
         }
 
+        setMonitorStatus("halted");
         LOGGER.info("halted");
 
     }
@@ -139,10 +143,12 @@ public class ConnectionAcceptor extends MonitoredThread {
 
         LOGGER.info("on halt");
 
+        setMonitorStatusBefore("halt socket.close");
         try {
             socket.close();
         } catch (IOException e) {
         }
+        setMonitorStatusAfter();
 
     }
 }

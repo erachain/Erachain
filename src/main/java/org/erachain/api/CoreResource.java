@@ -2,16 +2,14 @@ package org.erachain.api;
 
 import org.erachain.controller.Controller;
 import org.erachain.lang.Lang;
+import org.erachain.network.Peer;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.erachain.settings.Settings;
 import org.erachain.utils.APIUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
@@ -97,29 +95,33 @@ public class CoreResource {
 
     @GET
     @Path("/monitor/{path}")
-    public String getMonitorPath(@PathParam("path") String path) {
+    public String getMonitorPath(@PathParam("path") String path, @QueryParam("log") String log) {
         JSONObject jsonObject = new JSONObject();
 
         Controller cnt = Controller.getInstance();
 
-        if (path.equals("netwirk_acceptor"))
-            return cnt.network.getAcceptor().monitorToJson().toJSONString();
-        else if (path.equals("netwirk_creator"))
-            return cnt.network.getCreator().monitorToJson().toJSONString();
+        if (path.equals("network_acceptor"))
+            return cnt.network.getAcceptor().monitorToJson("true".equals(log)).toJSONString();
+        else if (path.equals("network_creator"))
+            return cnt.network.getCreator().monitorToJson("true".equals(log)).toJSONString();
         else
-            return getMonitor();
+            return getMonitor(log);
 
     }
 
     @GET
     @Path("/monitor")
-    public String getMonitor() {
+    public String getMonitor(@QueryParam("log") String log) {
         JSONObject jsonObject = new JSONObject();
 
         Controller cnt = Controller.getInstance();
 
-        jsonObject.put("netwirk_acceptor", cnt.network.getAcceptor().monitorToJson());
-        jsonObject.put("netwirk_creator", cnt.network.getCreator().monitorToJson());
+        jsonObject.put("network_acceptor", cnt.network.getAcceptor().monitorToJson("true".equals(log)));
+        jsonObject.put("network_creator", cnt.network.getCreator().monitorToJson("true".equals(log)));
+
+        for (Peer peer: Controller.getInstance().network.getActivePeers(false)) {
+            jsonObject.put(peer.toString(), peer.monitorToJson("true".equals(log)));
+        }
 
         return jsonObject.toJSONString();
     }
