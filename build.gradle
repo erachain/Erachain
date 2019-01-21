@@ -20,7 +20,7 @@ ext {
     springbootVersion = '2.0.5.RELEASE'
 }
 
-String versionEra = "4.11.05-${git.head().abbreviatedId}"
+String versionEra = "4.11.08-${git.head().abbreviatedId}"
 archivesBaseName = 'erachain-dev'
 group 'org.erachain'
 version versionEra
