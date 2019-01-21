@@ -19,21 +19,69 @@ public abstract class Message {
     public static final int MESSAGE_LENGTH = 4;
     public static final int CHECKSUM_LENGTH = 4;
 
+    /**
+     * Запрос: Получить список пиров с узла
+     */
     public static final int GET_PEERS_TYPE = 1;
+    /**
+     * Ответ: Списое пиров узла
+     */
     public static final int PEERS_TYPE = 2;
+    /**
+     * Запрос: Взять высоту и силу цепочки узла
+     */
     public static final int GET_HWEIGHT_TYPE = 3;
+    /**
+     * Ответ: Высота и Сила цепочки узла
+     */
     public static final int HWEIGHT_TYPE = 4;
+    /**
+     * Запрос: взять подписи блоков начиная с данной. В запросе посылается подпись блока для поиска в цепочке узла
+     */
     public static final int GET_SIGNATURES_TYPE = 5;
+    /**
+     * Ответ: список подписей блоков
+     */
     public static final int SIGNATURES_TYPE = 6;
+    /**
+     * Запрос: взять блок по его подписи. В запросе пересылается подпись блока
+     */
     public static final int GET_BLOCK_TYPE = 7;
+    /**
+     * Ответ: блок победитель
+     */
     public static final int WIN_BLOCK_TYPE = 8;
+    /**
+     * Ответ: Блок
+     */
     public static final int BLOCK_TYPE = 9;
+    /**
+     * Ответ: Транзакция неподтвержденная
+     */
     public static final int TRANSACTION_TYPE = 10;
+    /**
+     * не используется
+     */
     public static final int GET_PING_TYPE = 11;
+    /**
+     * Ответ: версия узла и другая информация
+     */
     public static final int VERSION_TYPE = 12;
+    /**
+     * Ответ: Сетевой Идентификатор узла. Используется для идентификации самого себя
+     */
     public static final int FIND_MYSELF_TYPE = 13;
+    /**
+     * Телеграмма
+     */
     public static final int TELEGRAM_TYPE = 14;
+    /**
+     * Запрос: дать телеграммы по фильтру
+     */
     public static final int TELEGRAM_GET_TYPE = 15;
+    /**
+     * Ответ: список телеграмм
+     */
     public static final int TELEGRAM_GET_ANSWER_TYPE = 16;
 
     private int type;
