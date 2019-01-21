@@ -44,7 +44,10 @@ public class Peer extends MonitoredThread {
     public Socket socket;
     //public OutputStream out;
     private DataInputStream in;
+
+    private Sender sender;
     private Pinger pinger;
+
     private boolean white;
     private long pingCounter;
     private long connectionTime;
@@ -98,15 +101,22 @@ public class Peer extends MonitoredThread {
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
             //CREATE STRINGWRITER
-            this.out = socket.getOutputStream();
+            //this.out = socket.getOutputStream();
             this.in = new DataInputStream(socket.getInputStream());
 
-            //START PINGER
-            if (this.pinger == null)
+            //START SENDER and PINGER
+            if (this.sender == null) {
+                this.sender = new Sender(this, socket.getOutputStream());
+
                 this.pinger = new Pinger(this);
-            else {
+
+            } else {
+                this.sender.setOut(socket.getOutputStream());
+                this.sender.setName("Sender - " + this.sender.getId() + " for: " + this.getAddress().getHostAddress());
+
                 this.pinger.setPing(Integer.MAX_VALUE);
                 this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
+
             }
 
             this.setName("Peer: " + this);
@@ -170,8 +180,11 @@ public class Peer extends MonitoredThread {
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
             //CREATE STRINGWRITER
-            this.out = socket.getOutputStream();
+            ///this.out = socket.getOutputStream();
             this.in = new DataInputStream(socket.getInputStream());
+
+            this.sender.setOut(socket.getOutputStream());
+            this.sender.setName("Sender - " + this.sender.getId() + " for: " + this.getAddress().getHostAddress());
 
             this.pinger.setPing(Integer.MAX_VALUE);
             this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.address.getHostAddress());
@@ -260,7 +273,7 @@ public class Peer extends MonitoredThread {
 
             //CREATE STRINGWRITER
             step++;
-            this.out = this.socket.getOutputStream();
+            //this.out = this.socket.getOutputStream();
             this.in = new DataInputStream(this.socket.getInputStream());
 
         } catch (Exception e) {
@@ -274,25 +287,32 @@ public class Peer extends MonitoredThread {
 
         }
 
-        if (this.pinger == null) {
-            //START PINGER
+        //START SENDER and PINGER
+        if (this.sender == null) {
+            try {
+                this.sender = new Sender(this, this.socket.getOutputStream());
+            } catch (IOException e) {
+                return false;
+            }
+
             this.pinger = new Pinger(this);
 
-            // IT is STARTED
-            this.runed = true;
-
-            this.start();
-
         } else {
+            try {
+                this.sender.setOut(this.socket.getOutputStream());
+            } catch (IOException e) {
+                return false;
+            }
+            this.sender.setName("Sender - " + this.sender.getId() + " for: " + this.getAddress().getHostAddress());
+
             this.pinger.setPing(Integer.MAX_VALUE);
             this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
-
-            // IT is STARTED
-            this.runed = true;
 
         }
 
         this.setName("Peer: " + this + " connected");
+
+        this.runed = true;
 
         LOGGER.info(this + description);
 
@@ -572,6 +592,9 @@ public class Peer extends MonitoredThread {
     }
 
     public boolean sendMessage(Message message) {
+        return this.sender.putMessage(message);
+
+        /*
         //CHECK IF SOCKET IS STILL ALIVE
         if (!this.runed || this.socket == null) {
             ////callback.tryDisconnect(this, network.banForActivePeersCounter(), "SEND - not runned");
@@ -655,6 +678,7 @@ public class Peer extends MonitoredThread {
         }
 
         return true;
+*/
     }
 
     /**
@@ -817,6 +841,9 @@ public class Peer extends MonitoredThread {
             //);
             //CHECK IF SOCKET IS CONNECTED
             if (socket.isConnected()) {
+
+                this.sender.close();
+
                 //CLOSE SOCKET
                 try {
                     // this close IN and OUT streams
@@ -838,7 +865,7 @@ public class Peer extends MonitoredThread {
         }
 
         this.in = null;
-        this.out = null;
+        //this.out = null;
         this.socket = null;
 
         return true;
@@ -847,6 +874,7 @@ public class Peer extends MonitoredThread {
     public void halt() {
 
         this.stoped = true;
+        this.sender.halt();
         this.close("halt");
         //this.setName("Peer: " + this.getAddress().getHostAddress() + " halted");
 

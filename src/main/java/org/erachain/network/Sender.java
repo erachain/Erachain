@@ -24,6 +24,7 @@ public class Sender extends MonitoredThread {
 
     private final static boolean USE_MONITOR = true;
     private final static boolean logPings = false;
+    private static final int SEND_WAIT = 20000;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class);
     private static final int QUEUE_LENGTH = 20;
@@ -48,12 +49,33 @@ public class Sender extends MonitoredThread {
         this.start();
     }
 
+    public Sender(Peer peer, OutputStream out) {
+        this.peer = peer;
+        this.ping = Integer.MAX_VALUE;
+        this.setName("Sender - " + this.getId() + " for: " + peer.getAddress().getHostAddress());
+        this.out = out;
+
+        this.start();
+    }
+
+    public void setOut(OutputStream out) {
+        this.out = out;
+    }
+
     public long getPing() {
         return this.ping;
     }
 
-    public void putMessage(Message message) {
-        this.ping = ping;
+    /**
+     *
+     * @param message
+     */
+    public boolean putMessage(Message message) {
+        try {
+            return blockingQueue.offer(message, SEND_WAIT, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            return false;
+        }
     }
 
     public void setNeedPing() {
@@ -182,6 +204,7 @@ public class Sender extends MonitoredThread {
 
     public void halt() {
         this.stoped = true;
+        this.close();
     }
 
 }
