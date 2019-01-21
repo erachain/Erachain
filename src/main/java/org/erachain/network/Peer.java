@@ -33,7 +33,7 @@ public class Peer extends MonitoredThread {
     private final static boolean USE_MONITOR = true;
 
     private final static boolean need_wait = false;
-    private final static boolean logPings = false;
+    private final static boolean logPings = true;
     static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getName());
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
     // поэтому нужно ожидание дольще делать
@@ -296,6 +296,9 @@ public class Peer extends MonitoredThread {
             }
 
             this.pinger = new Pinger(this);
+
+            //START COMMUNICATON THREAD
+            this.start();
 
         } else {
             try {

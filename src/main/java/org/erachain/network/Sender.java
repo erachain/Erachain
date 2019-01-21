@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class Sender extends MonitoredThread {
 
     private final static boolean USE_MONITOR = true;
-    private final static boolean logPings = false;
+    private final static boolean logPings = true;
     private static final int SEND_WAIT = 20000;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class);
@@ -70,7 +70,7 @@ public class Sender extends MonitoredThread {
      *
      * @param message
      */
-    public boolean putMessage(Message message) {
+    public synchronized boolean putMessage(Message message) {
         try {
             return blockingQueue.offer(message, SEND_WAIT, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
@@ -85,6 +85,7 @@ public class Sender extends MonitoredThread {
     }
 
     public boolean sendMessage(Message message) {
+
         //CHECK IF SOCKET IS STILL ALIVE
         if (this.out == null) {
             return false;
@@ -92,12 +93,10 @@ public class Sender extends MonitoredThread {
 
         if (!this.peer.socket.isConnected()) {
             //ERROR
-            peer.ban(0, "SEND - socket not still alive");
+            //peer.ban(0, "SEND - socket not still alive");
 
             return false;
         }
-
-        byte[] bytes = message.toBytes();
 
         if (logPings && (message.getType() != Message.TRANSACTION_TYPE
                 && message.getType() != Message.TELEGRAM_TYPE
@@ -117,6 +116,7 @@ public class Sender extends MonitoredThread {
         if (this.out == null)
             return false;
 
+        byte[] bytes = message.toBytes();
         try {
             this.out.write(bytes);
             this.out.flush();
@@ -167,7 +167,7 @@ public class Sender extends MonitoredThread {
 
     public void run() {
 
-        Controller cnt = Controller.getInstance();
+        //Controller cnt = Controller.getInstance();
 
         while (!this.stoped) {
 
@@ -190,14 +190,15 @@ public class Sender extends MonitoredThread {
             if (message == null)
                 continue;
 
-            sendMessage(message);
+            if (!sendMessage(message))
+                continue;
         }
     }
 
     public void close() {
         try {
             this.out.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
         }
         this.out = null;
     }
