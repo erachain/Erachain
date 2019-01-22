@@ -43,7 +43,7 @@ public class Pinger extends Thread {
             this.needPing = true;
     }
 
-    public boolean tryPing(long timeSOT) {
+    private boolean tryPing(long timeSOT) {
 
         //LOGGER.info("try PING " + this.peer);
 

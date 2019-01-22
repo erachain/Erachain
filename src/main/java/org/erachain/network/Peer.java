@@ -2,6 +2,7 @@ package org.erachain.network;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.network.message.BlockWinMessage;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.ntp.NTP;
@@ -13,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Arrays;
@@ -33,7 +33,7 @@ public class Peer extends MonitoredThread {
     private final static boolean USE_MONITOR = true;
 
     private final static boolean need_wait = false;
-    private final static boolean logPings = false;
+    private final static boolean logPings = true;
     static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getName());
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
     // поэтому нужно ожидание дольще делать
@@ -42,9 +42,14 @@ public class Peer extends MonitoredThread {
     public Network network;
     private InetAddress address;
     public Socket socket;
-    private OutputStream out;
+    //public OutputStream out;
     private DataInputStream in;
+
+    BlockingQueue<Object> startReading = new ArrayBlockingQueue<Object>(1);
+
+    private Sender sender;
     private Pinger pinger;
+
     private boolean white;
     private long pingCounter;
     private long connectionTime;
@@ -98,15 +103,22 @@ public class Peer extends MonitoredThread {
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
             //CREATE STRINGWRITER
-            this.out = socket.getOutputStream();
+            //this.out = socket.getOutputStream();
             this.in = new DataInputStream(socket.getInputStream());
 
-            //START PINGER
-            if (this.pinger == null)
+            //START SENDER and PINGER
+            if (this.sender == null) {
+                this.sender = new Sender(this, socket.getOutputStream());
+
                 this.pinger = new Pinger(this);
-            else {
+
+            } else {
+                this.sender.setOut(socket.getOutputStream());
+                this.sender.setName("Sender - " + this.sender.getId() + " for: " + this.getAddress().getHostAddress());
+
                 this.pinger.setPing(Integer.MAX_VALUE);
                 this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
+
             }
 
             this.setName("Peer: " + this);
@@ -116,6 +128,12 @@ public class Peer extends MonitoredThread {
 
             //START COMMUNICATON THREAD
             this.start();
+
+            // START READING
+            try {
+                this.startReading.put(1L);
+            } catch (InterruptedException e) {
+            }
 
             LOGGER.info(description + address.getHostAddress());
 
@@ -170,14 +188,23 @@ public class Peer extends MonitoredThread {
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
             //CREATE STRINGWRITER
-            this.out = socket.getOutputStream();
+            ///this.out = socket.getOutputStream();
             this.in = new DataInputStream(socket.getInputStream());
+
+            this.sender.setOut(socket.getOutputStream());
+            this.sender.setName("Sender - " + this.sender.getId() + " for: " + this.getAddress().getHostAddress());
 
             this.pinger.setPing(Integer.MAX_VALUE);
             this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.address.getHostAddress());
 
             // IT is STARTED
             this.runed = true;
+
+            // START READING
+            try {
+                this.startReading.put(1L);
+            } catch (InterruptedException e) {
+            }
 
             //ON SOCKET CONNECT
             this.setName("Peer: " + this + " reconnected");
@@ -201,7 +228,7 @@ public class Peer extends MonitoredThread {
      * synchronized - дает результат хоть и медленный
      * Приконнектиться к Премнику или принять на этот Пир новый входящий Сокет
      * @param acceptedSocket если задан то это прием в данный Пир соединение извне
-     * @param network
+     * @param networkIn
      * @param description
      * @return
      */
@@ -260,7 +287,7 @@ public class Peer extends MonitoredThread {
 
             //CREATE STRINGWRITER
             step++;
-            this.out = this.socket.getOutputStream();
+            //this.out = this.socket.getOutputStream();
             this.in = new DataInputStream(this.socket.getInputStream());
 
         } catch (Exception e) {
@@ -274,25 +301,41 @@ public class Peer extends MonitoredThread {
 
         }
 
-        if (this.pinger == null) {
-            //START PINGER
+        //START SENDER and PINGER
+        if (this.sender == null) {
+            try {
+                this.sender = new Sender(this, this.socket.getOutputStream());
+            } catch (IOException e) {
+                return false;
+            }
+
             this.pinger = new Pinger(this);
 
-            // IT is STARTED
-            this.runed = true;
-
+            //START COMMUNICATON THREAD
             this.start();
 
         } else {
+            try {
+                this.sender.setOut(this.socket.getOutputStream());
+            } catch (IOException e) {
+                return false;
+            }
+            this.sender.setName("Sender - " + this.sender.getId() + " for: " + this.getAddress().getHostAddress());
+
             this.pinger.setPing(Integer.MAX_VALUE);
             this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
-
-            // IT is STARTED
-            this.runed = true;
 
         }
 
         this.setName("Peer: " + this + " connected");
+
+        this.runed = true;
+
+        // START READING
+        try {
+            this.startReading.put(1);
+        } catch (InterruptedException e) {
+        }
 
         LOGGER.info(this + description);
 
@@ -398,18 +441,13 @@ public class Peer extends MonitoredThread {
                     + (this.isBad()?" is Bad" : "")
                     + (this.isWhite()?" is White" : ""));
 
-
-            // CHECK connection
-            if (socket == null || !socket.isConnected() || socket.isClosed()
-                    || !runed
-            ) {
-
+            if (!this.runed) {
                 try {
-                    Thread.sleep(100);
+                    startReading.take();
                 } catch (Exception e) {
+                    if (stoped)
+                        break;
                 }
-                continue;
-
             }
 
             //READ FIRST 4 BYTES
@@ -571,7 +609,14 @@ public class Peer extends MonitoredThread {
 
     }
 
-    public boolean sendMessage(Message message) {
+    public void sendWinBlock(BlockWinMessage message) {
+        this.sender.sendWinBlock(message);
+    }
+
+        public boolean sendMessage(Message message) {
+        return this.sender.putMessage(message);
+
+        /*
         //CHECK IF SOCKET IS STILL ALIVE
         if (!this.runed || this.socket == null) {
             ////callback.tryDisconnect(this, network.banForActivePeersCounter(), "SEND - not runned");
@@ -655,10 +700,11 @@ public class Peer extends MonitoredThread {
         }
 
         return true;
+*/
     }
 
     /**
-     * synchronized - дает большую задержку - прямо видно что медленне начинают запросы лететь
+     * synchronized - дает задержку но работает четко
      * @return
      */
     private synchronized int incrementKey() {
@@ -817,6 +863,9 @@ public class Peer extends MonitoredThread {
             //);
             //CHECK IF SOCKET IS CONNECTED
             if (socket.isConnected()) {
+
+                this.sender.close();
+
                 //CLOSE SOCKET
                 try {
                     // this close IN and OUT streams
@@ -838,7 +887,7 @@ public class Peer extends MonitoredThread {
         }
 
         this.in = null;
-        this.out = null;
+        //this.out = null;
         this.socket = null;
 
         return true;
@@ -847,6 +896,7 @@ public class Peer extends MonitoredThread {
     public void halt() {
 
         this.stoped = true;
+        this.sender.halt();
         this.close("halt");
         //this.setName("Peer: " + this.getAddress().getHostAddress() + " halted");
 

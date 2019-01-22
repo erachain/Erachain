@@ -3,10 +3,10 @@ package org.erachain.api;
 import org.erachain.controller.Controller;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.erachain.settings.Settings;
 import org.erachain.utils.APIUtils;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -22,12 +22,7 @@ public class CoreResource {
     @GET
     @Path("/stop")
     public String stop() {
-        String password = null;
-        APIUtils.askAPICallAllowed(password, "GET core/stop", request, true);
-
-        if (Controller.getInstance().doesWalletExists() && !Controller.getInstance().isWalletUnlocked()) {
-            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
-        }
+        APIUtils.askAPICallAllowed(null, "GET core/stop", request, true);
 
         //STOP
         Controller.getInstance().stopAll(0);

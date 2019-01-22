@@ -1350,6 +1350,7 @@ public class Controller extends Observable {
         this.notifyObservers(new ObserverMessage(ObserverMessage.FORGING_STATUS, status));
     }
 
+    private long statusObserveTime;
     // used from NETWORK
     public void afterDisconnect(Peer peer) {
         synchronized (this.peerHWeight) {
@@ -1357,20 +1358,24 @@ public class Controller extends Observable {
             this.peerHWeight.remove(peer);
 
             this.peersVersions.remove(peer);
+        }
 
-            if (this.peerHWeight.isEmpty()) {
+        if (this.peerHWeight.isEmpty()) {
 
-                if (this.getToOfflineTime() == 0L) {
-                    // SET START OFFLINE TIME
-                    this.setToOfflineTime(NTP.getTime());
-                }
+            if (this.getToOfflineTime() == 0L) {
+                // SET START OFFLINE TIME
+                this.setToOfflineTime(NTP.getTime());
+            }
 
-                // UPDATE STATUS
-                if (isTestNet())
-                    this.status = STATUS_OK;
-                else
-                    this.status = STATUS_NO_CONNECTIONS;
+            // UPDATE STATUS
+            if (isTestNet())
+                this.status = STATUS_OK;
+            else
+                this.status = STATUS_NO_CONNECTIONS;
 
+            if (System.currentTimeMillis() - statusObserveTime > 2000) {
+                // чтобы не генерилось часто
+                statusObserveTime = System.currentTimeMillis();
                 // NOTIFY
                 this.setChanged();
                 this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
@@ -1402,18 +1407,6 @@ public class Controller extends Observable {
         long timeCheck = System.currentTimeMillis();
 
         switch (message.getType()) {
-
-            /*
-             * case Message.HEIGHT_TYPE:
-             *
-             * HeightMessage heightMessage = (HeightMessage) message;
-             *
-             * // ADD TO LIST synchronized (this.peerHWeight) {
-             * this.peerHWeight.put(heightMessage.getSender(),
-             * heightMessage.getHeight()); }
-             *
-             * break;
-             */
 
             case Message.HWEIGHT_TYPE:
 
@@ -1682,13 +1675,13 @@ public class Controller extends Observable {
         LOGGER.info("broadcast winBlock " + newBlock.toString() + " size:" + newBlock.getTransactionCount());
 
         // CREATE MESSAGE
-        Message message = MessageFactory.getInstance().createWinBlockMessage(newBlock);
+        BlockWinMessage blockWinMessage = (BlockWinMessage)MessageFactory.getInstance().createWinBlockMessage(newBlock);
 
         if (this.isOnStopping())
             return;
 
         // BROADCAST MESSAGE
-        this.network.asyncBroadcastWinBlock(message, excludes, false);
+        this.network.asyncBroadcastWinBlock(blockWinMessage, excludes, false);
 
         LOGGER.info("broadcasted!");
 

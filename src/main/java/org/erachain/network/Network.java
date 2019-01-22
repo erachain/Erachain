@@ -100,15 +100,15 @@ public class Network extends Observable {
         }
 
         boolean asNew = true;
-        for (Peer peerKnown: this.knownPeers) {
-            if (peer.equals(peerKnown)) {
-                asNew = false;
-                break;
+        synchronized (this.knownPeers) {
+            for (Peer peerKnown : this.knownPeers) {
+                if (peer.equals(peerKnown)) {
+                    asNew = false;
+                    break;
+                }
             }
-        }
-        if (asNew) {
-            //ADD TO CONNECTED PEERS
-            synchronized (this.knownPeers) {
+            if (asNew) {
+                //ADD TO CONNECTED PEERS
                 this.knownPeers.add(peer);
             }
         }
@@ -311,6 +311,12 @@ public class Network extends Observable {
         return this.telegramer.getTelegram(signature);
     }
 
+    /**
+     * запускает Пир на входящее соединение
+     *
+     * @param socket
+     * @return
+     */
     public Peer startPeer(Socket socket) {
 
         byte[] addressIP = socket.getInetAddress().getAddress();
@@ -566,7 +572,7 @@ public class Network extends Observable {
         }
     }
 
-    public void asyncBroadcastWinBlock(Message message, List<Peer> exclude, boolean onlySynchronized) {
+    public void asyncBroadcastWinBlock(BlockWinMessage winBlock, List<Peer> exclude, boolean onlySynchronized) {
 
         //LOGGER.debug("ASYNC Broadcasting " + message.viewType());
         Controller cnt = Controller.getInstance();
@@ -593,7 +599,7 @@ public class Network extends Observable {
 
             //EXCLUDE PEERS
             if (exclude == null || !exclude.contains(peer)) {
-                peer.sendMessage(message);
+                peer.sendWinBlock(winBlock);
             }
         }
 
