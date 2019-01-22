@@ -258,7 +258,23 @@ public class PeersResource {
                 //Message pingMessage = MessageFactory.getInstance().createGetHWeightMessage();
                 //pingMessage.setId(999999);
                 //peer.sendMessage(pingMessage);
-                return "sended " + res;
+                return "sended " + res + " " + peer.getPing() + "ms";
+            }
+        }
+
+        return address + " - peer not active";
+    }
+
+    @GET
+    @Path("/ping/{address}")
+    public String ping(@PathParam("address") String address) {
+
+        List<Peer> activePeers = Controller.getInstance().getActivePeers();
+
+        for (Peer peer : activePeers) {
+            if (peer.getAddress().getHostAddress().equals(address)) {
+                boolean res = peer.tryPing();
+                return "sended " + res + " " + peer.getPing() + "ms";
             }
         }
 

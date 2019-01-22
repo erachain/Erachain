@@ -417,9 +417,10 @@ public class Network extends Observable {
             
             return; 
         }
-        //ONLY HANDLE BLOCK AND TRANSACTION MESSAGES ONCE
-        if (message.getType() == Message.TRANSACTION_TYPE
-                || message.getType() == Message.BLOCK_TYPE
+        //ONLY HANDLE WINBLOCK, TELEGRAMS AND TRANSACTION MESSAGES ONCE
+        if (
+                message.getType() == Message.TELEGRAM_TYPE
+                || message.getType() == Message.TRANSACTION_TYPE
                 || message.getType() == Message.WIN_BLOCK_TYPE
         ) {
             synchronized (this.handledMessages) {
@@ -447,7 +448,7 @@ public class Network extends Observable {
                 response.setId(message.getId());
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 10) {
+                if (true || timeCheck > 10) {
                     LOGGER.debug(this + " : " + message + " solved by period: " + timeCheck);
                 }
                 timeCheck = System.currentTimeMillis();
@@ -459,7 +460,7 @@ public class Network extends Observable {
                 }
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 10) {
+                if (true || timeCheck > 10) {
                     LOGGER.debug(this + " : " + message + " sended by period: " + timeCheck);
                 }
 
