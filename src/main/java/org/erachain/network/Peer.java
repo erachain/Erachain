@@ -2,7 +2,6 @@ package org.erachain.network;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
-import org.erachain.network.message.BlockMessage;
 import org.erachain.network.message.BlockWinMessage;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
@@ -15,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Arrays;
@@ -46,6 +44,8 @@ public class Peer extends MonitoredThread {
     public Socket socket;
     //public OutputStream out;
     private DataInputStream in;
+
+    BlockingQueue<Object> startReading = new ArrayBlockingQueue<Object>(1);
 
     private Sender sender;
     private Pinger pinger;
@@ -129,6 +129,12 @@ public class Peer extends MonitoredThread {
             //START COMMUNICATON THREAD
             this.start();
 
+            // START READING
+            try {
+                this.startReading.put(1L);
+            } catch (InterruptedException e) {
+            }
+
             LOGGER.info(description + address.getHostAddress());
 
             // при коннекте во вне связь может порваться поэтому тут по runed
@@ -194,6 +200,12 @@ public class Peer extends MonitoredThread {
             // IT is STARTED
             this.runed = true;
 
+            // START READING
+            try {
+                this.startReading.put(1L);
+            } catch (InterruptedException e) {
+            }
+
             //ON SOCKET CONNECT
             this.setName("Peer: " + this + " reconnected");
 
@@ -216,7 +228,7 @@ public class Peer extends MonitoredThread {
      * synchronized - дает результат хоть и медленный
      * Приконнектиться к Премнику или принять на этот Пир новый входящий Сокет
      * @param acceptedSocket если задан то это прием в данный Пир соединение извне
-     * @param network
+     * @param networkIn
      * @param description
      * @return
      */
@@ -318,6 +330,12 @@ public class Peer extends MonitoredThread {
         this.setName("Peer: " + this + " connected");
 
         this.runed = true;
+
+        // START READING
+        try {
+            this.startReading.put(1);
+        } catch (InterruptedException e) {
+        }
 
         LOGGER.info(this + description);
 
@@ -423,18 +441,13 @@ public class Peer extends MonitoredThread {
                     + (this.isBad()?" is Bad" : "")
                     + (this.isWhite()?" is White" : ""));
 
-
-            // CHECK connection
-            if (socket == null || !socket.isConnected() || socket.isClosed()
-                    || !runed
-            ) {
-
+            if (!this.runed) {
                 try {
-                    Thread.sleep(100);
+                    startReading.take();
                 } catch (Exception e) {
+                    if (stoped)
+                        break;
                 }
-                continue;
-
             }
 
             //READ FIRST 4 BYTES
