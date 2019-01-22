@@ -108,7 +108,7 @@ public class WinBlockSelector extends MonitoredThread {
             // BROADCAST
             List<Peer> excludes = new ArrayList<Peer>();
             excludes.add(message.getSender());
-            message.getSender().network.asyncBroadcastWinBlock(message, excludes, false);
+            message.getSender().network.asyncBroadcastWinBlock(blockWinMessage, excludes, false);
 
             onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
 
