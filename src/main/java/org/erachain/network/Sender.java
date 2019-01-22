@@ -2,12 +2,10 @@ package org.erachain.network;
 // 30/03
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
-import org.erachain.core.block.Block;
-import org.erachain.datachain.BlockMap;
-import org.erachain.network.message.*;
+import org.erachain.network.message.BlockWinMessage;
+import org.erachain.network.message.HWeightMessage;
+import org.erachain.network.message.Message;
 import org.erachain.utils.MonitoredThread;
-import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -184,13 +182,21 @@ public class Sender extends MonitoredThread {
                 break;
             }
 
-            if (hWeightMessage != null)
-                if (!sendMessage(hWeightMessage))
+            if (hWeightMessage != null) {
+                if (!sendMessage(hWeightMessage)) {
+                    hWeightMessage = null;
                     continue;
+                }
+                hWeightMessage = null;
+            }
 
-            if (winBlockToSend != null)
-                if (!sendMessage(winBlockToSend))
+            if (winBlockToSend != null) {
+                if (!sendMessage(winBlockToSend)) {
+                    winBlockToSend = null;
                     continue;
+                }
+                winBlockToSend = null;
+            }
 
             if (message == null)
                 continue;
