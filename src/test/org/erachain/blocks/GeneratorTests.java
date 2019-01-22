@@ -2,7 +2,7 @@ package org.erachain.blocks;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
-import org.erachain.core.BlockGenerator;;
+import org.erachain.core.BlockGenerator;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.Block;
@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.TreeMap;
 
 import static org.junit.Assert.assertEquals;
+
+;
 
 //import org.erachain.core.transaction.GenesisTransaction;
 @Ignore
@@ -606,7 +608,7 @@ public class GeneratorTests {
 
         }
 
-        Tuple2<List<Transaction>, Integer> transactionsItem = blockGenerator.getUnconfirmedTransactions(newBlock.getTimestamp(), null, 0l);
+        Tuple2<List<Transaction>, Integer> transactionsItem = blockGenerator.getUnconfirmedTransactions(2, newBlock.getTimestamp(), null, 0l);
         transactions = transactionsItem.a;
         // CALCULATE HASH for that transactions
         byte[] transactionsHash = Block.makeTransactionsHash(generator.getPrivateKey(), transactions, null);
@@ -684,7 +686,7 @@ public class GeneratorTests {
         }
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
-        transactions = blockGenerator.getUnconfirmedTransactions(newBlock.getTimestamp(), null, 0l).a;
+        transactions = blockGenerator.getUnconfirmedTransactions(2, newBlock.getTimestamp(), null, 0l).a;
 
         //CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
         assertEquals(true, max_count > transactions.size());
@@ -753,7 +755,7 @@ public class GeneratorTests {
         dcSet.getTransactionMap().add(payment);
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
-        transactions = blockGenerator.getUnconfirmedTransactions(newBlock.getTimestamp(), null, 0l).a;
+        transactions = blockGenerator.getUnconfirmedTransactions(2, newBlock.getTimestamp(), null, 0l).a;
 
         // CALCULATE HASH for that transactions
         byte[] transactionsHash = Block.makeTransactionsHash(userAccount1.getPrivateKey(), transactions, null);
