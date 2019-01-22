@@ -141,9 +141,6 @@ public class WinBlockSelector extends MonitoredThread {
                 message.getSender().sendMessage(messageBestWin);
             }
         }
-
-
-        return;
     }
 
     public void run() {

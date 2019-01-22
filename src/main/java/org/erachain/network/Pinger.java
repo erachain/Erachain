@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 public class Pinger extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Pinger.class);
-    private static final int DEFAULT_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1;
-    private static final int DEFAULT_QUICK_PING_TIMEOUT = 2000; // BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 4;
+    private static final int DEFAULT_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+    private static final int DEFAULT_QUICK_PING_TIMEOUT = 5000; // BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 4;
 
     private Peer peer;
     private boolean needPing = false;
@@ -119,7 +119,7 @@ public class Pinger extends Thread {
         BlockChain chain = cnt.getBlockChain();
 
         //int sleepTimeFull = DEFAULT_PING_TIMEOUT; // Settings.getInstance().getPingInterval();
-        int sleepTimestep = DEFAULT_QUICK_PING_TIMEOUT >> 3;
+        int sleepTimestep = DEFAULT_QUICK_PING_TIMEOUT >> 2;
         int sleepsteps = DEFAULT_PING_TIMEOUT / sleepTimestep;
         int sleepStepTimeCounter;
         boolean resultSend;
