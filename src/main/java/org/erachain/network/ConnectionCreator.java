@@ -33,7 +33,7 @@ public class ConnectionCreator extends MonitoredThread {
         this.setName("ConnectionCreator - " + this.getId());
     }
 
-    private int connectToPeersOfThisPeer(Peer peer, int maxReceivePeers) {
+    private int connectToPeersOfThisPeer(Peer peer, int maxReceivePeers, boolean onlyWhite) {
 
         if (!this.isRun)
             return 0;
@@ -107,6 +107,9 @@ public class ConnectionCreator extends MonitoredThread {
             if (newPeer.isUsed() || newPeer.isBanned())
                 continue;
 
+            if (onlyWhite && !newPeer.isWhite())
+                continue;
+
             if (!this.isRun)
                 return 0;
 
@@ -121,7 +124,7 @@ public class ConnectionCreator extends MonitoredThread {
             if (newPeer.isUsed()) {
                 // RECURSE to OTHER PEERS
                 foreignPeersCounter++;
-                connectToPeersOfThisPeer(newPeer, maxReceivePeers >> 1);
+                connectToPeersOfThisPeer(newPeer, maxReceivePeers >> 1, onlyWhite);
 
             }
         }
@@ -213,7 +216,7 @@ public class ConnectionCreator extends MonitoredThread {
 
                     if (peer.isUsed()) {
                         // TRY CONNECT to WHITE peers of this PEER
-                        connectToPeersOfThisPeer(peer, 4);
+                        connectToPeersOfThisPeer(peer, 4, true);
                     }
                 }
             }
@@ -238,7 +241,7 @@ public class ConnectionCreator extends MonitoredThread {
 
                     long timesatmp = NTP.getTime();
                     if (timesatmp - getPeersTimestamp > GET_PEERS_PERIOD) {
-                        connectToPeersOfThisPeer(peer, Settings.getInstance().getMaxConnections());
+                        connectToPeersOfThisPeer(peer, Settings.getInstance().getMaxConnections(), false);
                         getPeersTimestamp = timesatmp;
                     }
 
