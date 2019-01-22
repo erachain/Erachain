@@ -7,11 +7,8 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.erachain.api.ApiClient;
 import org.erachain.api.ApiService;
 import org.erachain.at.AT;
-import org.erachain.core.BlockChain;
-import org.erachain.core.BlockGenerator;
+import org.erachain.core.*;
 import org.erachain.core.BlockGenerator.ForgingStatus;
-import org.erachain.core.Synchronizer;
-import org.erachain.core.TransactionCreator;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
@@ -141,6 +138,7 @@ public class Controller extends Observable {
     private TradersManager tradersManager;
     private ApiService rpcService;
     private WebService webService;
+    private WinBlockSelector winBlockSelector;
     private BlockChain blockChain;
     private BlockGenerator blockGenerator;
     private Synchronizer synchronizer;
@@ -154,7 +152,6 @@ public class Controller extends Observable {
     private long toOfflineTime;
     private Map<Peer, Tuple2<Integer, Long>> peerHWeight;
     private Map<Peer, Pair<String, Long>> peersVersions;
-    private HashSet<String> waitWinBufferProcessed = new HashSet<String>();
     private DBSet dbSet; // = DBSet.getInstance();
     private DCSet dcSet; // = DBSet.getInstance();
 
@@ -164,8 +161,8 @@ public class Controller extends Observable {
     private boolean isStopping = false;
     private String info;
     private long unconfigmedMessageTimingAverage;
-    private long transactionMessageTimingAverage;
-    private long transactionMessageTimingCounter;
+    public long transactionMessageTimingAverage;
+    public long transactionMessageTimingCounter;
     private long transactionMakeTimingAverage;
     private long transactionMakeTimingCounter;
     private long transactionProcessTimingAverage;
@@ -651,6 +648,9 @@ public class Controller extends Observable {
         // CREATE SYNCHRONIZOR
         this.synchronizer = new Synchronizer();
 
+        // CREATE WinBlock SELECTOR
+        this.winBlockSelector = new WinBlockSelector(this, blockChain, dcSet);
+
         // CREATE BLOCKCHAIN
         this.blockChain = new BlockChain(dcSet);
 
@@ -1021,6 +1021,12 @@ public class Controller extends Observable {
         for (File file : new File(Settings.getInstance().getTemDir()).listFiles())
             if (file.isFile()) file.delete();
 
+        // STOP WIN BLOCK SELECTOR
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping WinBlock Selector")));
+        LOGGER.info("Stopping WinBlock Selector");
+        this.winBlockSelector.stop();
+
         // STOP BLOCK PROCESSOR
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping block processor")));
@@ -1382,7 +1388,7 @@ public class Controller extends Observable {
     }
 
     public void clearWaitWinBufferProcessed() {
-        waitWinBufferProcessed = new HashSet<String>();
+        this.winBlockSelector.clearWaitWinBufferProcessed();
     }
 
     // SYNCHRONIZED DO NOT PROCESSS MESSAGES SIMULTANEOUSLY
@@ -1508,86 +1514,13 @@ public class Controller extends Observable {
                     break;
                 }
 
-                long onMessageProcessTiming = System.nanoTime();
+                this.winBlockSelector.putMessage(message);
 
-                BlockWinMessage blockWinMessage = (BlockWinMessage) message;
-
-                // ASK BLOCK FROM BLOCKCHAIN
-                newBlock = blockWinMessage.getBlock();
-
-                // if already it block in process
-                String key = newBlock.getCreator().getBase58();
-
-                synchronized (this.waitWinBufferProcessed) {
-                    if (!waitWinBufferProcessed.add(key)
-                            || Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getSignature()))
-                        return;
-                }
-
-                info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
-                        + newBlock.toString();
-                LOGGER.debug(info);
-
-                if (this.status == STATUS_SYNCHRONIZING) {
-                    if (false) {
-                        // SET for FUTURE without CHECK
-                        blockChain.clearWaitWinBuffer();
-                        // тут он невалидный точно
-                        blockChain.setWaitWinBuffer(dcSet, newBlock, blockWinMessage.getSender());
-                        break;
-                    } else
-                        // нет нельзя его в буфер класть так как там нет проверки потом на валидность
-                        return;
-                }
-
-                if (!newBlock.isValidHead(dcSet)) {
-                    info = "Block (" + newBlock.toString() + ") is Invalid";
-                    banPeerOnError(message.getSender(), info);
-                    return;
-                }
-
-                // тут внутри проверка полной валидности
-                if (blockChain.setWaitWinBuffer(dcSet, newBlock, message.getSender())) {
-                    // IF IT WIN
-                    // BROADCAST
-                    List<Peer> excludes = new ArrayList<Peer>();
-                    excludes.add(message.getSender());
-                    this.network.asyncBroadcastWinBlock(message, excludes, false);
-
-                    onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
-
-                    if (onMessageProcessTiming < 999999999999l) {
-                        // при переполнении может быть минус
-                        // в миеросекундах подсчет делаем
-                        // ++ 10 потому что там ФОРК базы делаем - он очень медленный
-                        onMessageProcessTiming = onMessageProcessTiming / 1000 / (10 + newBlock.getTransactionCount());
-                        if (transactionMessageTimingCounter < 1 << 3) {
-                            transactionMessageTimingCounter++;
-                            transactionMessageTimingAverage = ((transactionMessageTimingAverage * transactionMessageTimingCounter)
-                                    + onMessageProcessTiming - transactionMessageTimingAverage) / transactionMessageTimingCounter;
-                        } else
-                            transactionMessageTimingAverage = ((transactionMessageTimingAverage << 3)
-                                    + onMessageProcessTiming - transactionMessageTimingAverage) >> 3;
-                    }
-
-                } else {
-                    // SEND my BLOCK
-
-                    // GET till not NULL
-                    Block myWinBlock = blockChain.getWaitWinBuffer();
-                    if (myWinBlock != null) {
-                        // оказывается иногда там НУЛ случается
-                        // надо сначала взять, проскрить и потом слать
-                        Message messageBestWin = MessageFactory.getInstance()
-                                .createWinBlockMessage(myWinBlock);
-                        message.getSender().sendMessage(messageBestWin);
-                    }
-                }
                 return;
 
             case Message.TRANSACTION_TYPE:
 
-                onMessageProcessTiming = System.nanoTime();
+                long onMessageProcessTiming = System.nanoTime();
 
                 TransactionMessage transactionMessage = (TransactionMessage) message;
 
