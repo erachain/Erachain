@@ -613,94 +613,25 @@ public class Peer extends MonitoredThread {
         this.sender.sendWinBlock(message);
     }
 
-        public boolean sendMessage(Message message) {
+    public boolean sendMessage(Message message) {
         return this.sender.putMessage(message);
 
-        /*
-        //CHECK IF SOCKET IS STILL ALIVE
-        if (!this.runed || this.socket == null) {
-            ////callback.tryDisconnect(this, network.banForActivePeersCounter(), "SEND - not runned");
-            return false;
-        }
+    }
 
-        if (!this.socket.isConnected()) {
-            //ERROR
-            ban(network.banForActivePeersCounter(), "SEND - socket not still alive");
-
-            return false;
-        }
-
-        byte[] bytes = message.toBytes();
-
-        if (logPings && (message.getType() != Message.TRANSACTION_TYPE
-                && message.getType() != Message.TELEGRAM_TYPE
-                || message.getType() == Message.HWEIGHT_TYPE)) {
-            LOGGER.debug(message + " try SEND to " + this);
-        }
-
-        if (this.getPing() < -6 && message.getType() == Message.WIN_BLOCK_TYPE) {
-            // если пинг хреновый то ничего не шлем кроме пингования
-            return false;
-        }
-
-        if (USE_MONITOR) this.setMonitorStatusBefore("write");
-
-        //SEND MESSAGE
-        long checkTime = System.currentTimeMillis();
-        if (!this.runed || this.out == null)
+    /**
+     * прямая пересылка - без очереди
+     * @param message
+     * @return
+     */
+    public boolean directSendMessage(Message message) {
+        long point = System.currentTimeMillis();
+        if (this.sender.sendMessage(message)) {
+            point = System.currentTimeMillis() - point;
+            this.pinger.setPing((int)point);
+            return true;
+        } else
             return false;
 
-        synchronized (this.out) {
-
-            try {
-                this.out.write(bytes);
-                this.out.flush();
-            } catch (java.lang.OutOfMemoryError e) {
-                Controller.getInstance().stopAll(85);
-                return false;
-            } catch (java.net.SocketException eSock) {
-                if (!this.runed)
-                    // это наш дисконект
-                    return false;
-
-                checkTime = System.currentTimeMillis() - checkTime;
-                if (checkTime > bytes.length >> 3) {
-                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
-                }
-                ban(network.banForActivePeersCounter(), "try out.write 1 - " + eSock.getMessage());
-                return false;
-            } catch (IOException e) {
-                if (!this.runed)
-                    // это наш дисконект
-                    return false;
-
-                checkTime = System.currentTimeMillis() - checkTime;
-                if (checkTime > bytes.length >> 3) {
-                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
-                }
-                ban(network.banForActivePeersCounter(), "try out.write 2 - " + e.getMessage());
-                return false;
-            } catch (Exception e) {
-                checkTime = System.currentTimeMillis() - checkTime;
-                if (checkTime > bytes.length >> 3) {
-                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
-                }
-                ban(network.banForActivePeersCounter(), "try out.write 3 - " + e.getMessage());
-                return false;
-            }
-
-        }
-
-        if (USE_MONITOR) this.setMonitorStatusAfter();
-
-        checkTime = System.currentTimeMillis() - checkTime;
-        if (checkTime > (bytes.length >> 3)
-                || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
-            LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
-        }
-
-        return true;
-*/
     }
 
     /**

@@ -120,41 +120,43 @@ public class Sender extends MonitoredThread {
             return false;
 
         byte[] bytes = message.toBytes();
-        try {
-            this.out.write(bytes);
-            this.out.flush();
-        } catch (java.lang.OutOfMemoryError e) {
-            Controller.getInstance().stopAll(85);
-            return false;
-        } catch (java.net.SocketException eSock) {
-            if (this.out == null)
-                // это наш дисконект
+        synchronized (this.out) {
+            try {
+                this.out.write(bytes);
+                this.out.flush();
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(85);
                 return false;
+            } catch (java.net.SocketException eSock) {
+                if (this.out == null)
+                    // это наш дисконект
+                    return false;
 
-            checkTime = System.currentTimeMillis() - checkTime;
-            if (checkTime > bytes.length >> 3) {
-                LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
-            }
-            peer.ban("try out.write 1 - " + eSock.getMessage());
-            return false;
-        } catch (IOException e) {
-            if (this.out == null)
-                // это наш дисконект
+                checkTime = System.currentTimeMillis() - checkTime;
+                if (checkTime > bytes.length >> 3) {
+                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
+                }
+                peer.ban("try out.write 1 - " + eSock.getMessage());
                 return false;
+            } catch (IOException e) {
+                if (this.out == null)
+                    // это наш дисконект
+                    return false;
 
-            checkTime = System.currentTimeMillis() - checkTime;
-            if (checkTime > bytes.length >> 3) {
-                LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
+                checkTime = System.currentTimeMillis() - checkTime;
+                if (checkTime > bytes.length >> 3) {
+                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
+                }
+                peer.ban("try out.write 2 - " + e.getMessage());
+                return false;
+            } catch (Exception e) {
+                checkTime = System.currentTimeMillis() - checkTime;
+                if (checkTime > bytes.length >> 3) {
+                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
+                }
+                peer.ban("try out.write 3 - " + e.getMessage());
+                return false;
             }
-            peer.ban("try out.write 2 - " + e.getMessage());
-            return false;
-        } catch (Exception e) {
-            checkTime = System.currentTimeMillis() - checkTime;
-            if (checkTime > bytes.length >> 3) {
-                LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
-            }
-            peer.ban("try out.write 3 - " + e.getMessage());
-            return false;
         }
 
         if (USE_MONITOR) this.setMonitorStatusAfter();
@@ -172,9 +174,15 @@ public class Sender extends MonitoredThread {
 
         //Controller cnt = Controller.getInstance();
 
+        Message message = null;
+
         while (!this.stoped) {
 
-            Message message = null;
+            if (this.out == null) {
+                // очистить остатки запросов если обнулили вывод
+                blockingQueue.clear();
+            }
+
             try {
                 message = blockingQueue.poll(500, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {

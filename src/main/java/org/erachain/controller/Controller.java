@@ -1156,7 +1156,9 @@ public class Controller extends Observable {
         long dTime = this.blockChain.getTimestamp(this.dcSet);
         boolean pinged = false;
 
-        while (iterator.hasNext() && stepCount > 2) {
+        while (iterator.hasNext() && stepCount > 2 && peer.isUsed()) {
+
+            counter++;
 
             if (this.isStopping) {
                 return false;
@@ -1183,12 +1185,16 @@ public class Controller extends Observable {
             Message message = MessageFactory.getInstance().createTransactionMessage(transaction);
 
             try {
-                if (peer.sendMessage(message)) {
-                    counter++;
+                // воспользуемся тут прямой пересылкой - так как нам надо именно ждать всю обработку
+                if (peer.directSendMessage(message)) {
                     map.addBroadcastedPeer(transaction, peerByte);
                 } else {
-                    // DISCONNECT
-                    return false;
+                    if (!peer.isUsed()) {
+                        // DISCONNECT
+                        return false;
+                    } else {
+                        counter = stepCount;
+                    }
                 }
             } catch (Exception e) {
                 if (this.isStopping) {
@@ -1198,7 +1204,6 @@ public class Controller extends Observable {
             }
 
             if (counter % stepCount == 0) {
-
 
                 pinged = true;
                 peer.tryPing();
@@ -1227,15 +1232,15 @@ public class Controller extends Observable {
 
         }
 
-        if (!pinged)
+        if (!pinged && peer.isUsed()) {
             peer.tryPing();
-
-        this.network.notifyObserveUpdatePeer(peer);
+            this.network.notifyObserveUpdatePeer(peer);
+        }
 
         // LOGGER.info(peer + " sended UNCONFIRMED counter: " +
         // counter);
 
-        return true;
+        return peer.isUsed();
 
     }
 

@@ -52,7 +52,7 @@ public class Pinger extends Thread {
         //CREATE PING
         Message pingMessage = MessageFactory.getInstance().createGetHWeightMessage();
 
-        if (this.ping >= 0) {
+        if (false && this.ping >= 0) {
             // на время пингования поставим сразу -1
             this.ping = -1;
         }
@@ -80,7 +80,7 @@ public class Pinger extends Thread {
 
             //PING FAILES
             // чем меньше пиров на связи тем дольше пингуем перед разрвом
-            if (this.ping < -3 -20/(1 + peer.network.banForActivePeersCounter())) {
+            if (this.ping < -10 -20/(1 + peer.network.banForActivePeersCounter())) {
                 // если полный отказ уже больше чем ХХХ секнд то ИМЕННО БАН
                 this.peer.ban("on PING FAILES");
             }
@@ -125,7 +125,7 @@ public class Pinger extends Thread {
         boolean resultSend;
         while (!this.peer.isStoped()) {
 
-            if (this.ping < 0) {
+            if (this.ping < -1) {
                 sleepStepTimeCounter = sleepsteps >> 3;
             } else {
                 sleepStepTimeCounter = sleepsteps;
