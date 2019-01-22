@@ -704,7 +704,7 @@ public class Peer extends MonitoredThread {
     }
 
     /**
-     * synchronized - дает большую задержку - прямо видно что медленне начинают запросы лететь
+     * synchronized - дает задержку но работает четко
      * @return
      */
     private synchronized int incrementKey() {

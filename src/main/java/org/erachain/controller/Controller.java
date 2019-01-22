@@ -1402,18 +1402,6 @@ public class Controller extends Observable {
 
         switch (message.getType()) {
 
-            /*
-             * case Message.HEIGHT_TYPE:
-             *
-             * HeightMessage heightMessage = (HeightMessage) message;
-             *
-             * // ADD TO LIST synchronized (this.peerHWeight) {
-             * this.peerHWeight.put(heightMessage.getSender(),
-             * heightMessage.getHeight()); }
-             *
-             * break;
-             */
-
             case Message.HWEIGHT_TYPE:
 
                 HWeightMessage hWeightMessage = (HWeightMessage) message;
