@@ -120,6 +120,7 @@ public class Sender extends MonitoredThread {
             return false;
 
         byte[] bytes = message.toBytes();
+        String error = null;
         synchronized (this.out) {
             try {
                 this.out.write(bytes);
@@ -136,8 +137,7 @@ public class Sender extends MonitoredThread {
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                peer.ban("try out.write 1 - " + eSock.getMessage());
-                return false;
+                error = "try out.write 1 - " + eSock.getMessage();
             } catch (IOException e) {
                 if (this.out == null)
                     // это наш дисконект
@@ -147,16 +147,19 @@ public class Sender extends MonitoredThread {
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                peer.ban("try out.write 2 - " + e.getMessage());
-                return false;
+                error = "try out.write 2 - " + e.getMessage();
             } catch (Exception e) {
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
                     LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
                 }
-                peer.ban("try out.write 3 - " + e.getMessage());
-                return false;
+                error = "try out.write 3 - " + e.getMessage();
             }
+        }
+
+        if (error != null) {
+            peer.ban(error);
+            return false;
         }
 
         if (USE_MONITOR) this.setMonitorStatusAfter();

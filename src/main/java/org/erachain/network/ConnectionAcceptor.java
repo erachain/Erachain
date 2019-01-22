@@ -69,6 +69,7 @@ public class ConnectionAcceptor extends MonitoredThread {
                         ) {
                     //DO NOT CONNECT TO OURSELF/EXISTING CONNECTION
                     // or BANNED
+                    connectionSocket.shutdownOutput();
                     connectionSocket.close();
                     continue;
                 }
@@ -77,6 +78,8 @@ public class ConnectionAcceptor extends MonitoredThread {
                 break;
 
             } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+
                 try {
                     socket.close();
                 } catch (Exception e1) {

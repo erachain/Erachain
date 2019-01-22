@@ -1256,7 +1256,7 @@ public class Controller extends Observable {
             return;
 
         // SEND FOUNDMYSELF MESSAGE
-        if (!peer.sendMessage(
+        if (!peer.directSendMessage(
                 MessageFactory.getInstance().createFindMyselfMessage(Controller.getInstance().getFoundMyselfID())))
             return;
 
@@ -1270,14 +1270,16 @@ public class Controller extends Observable {
             return;
 
         // SEND VERSION MESSAGE
-        if (!peer.sendMessage(
+        if (!peer.directSendMessage(
                 MessageFactory.getInstance().createVersionMessage(Controller.getVersion(), getBuildTimestamp())))
             return;
 
         // CHECK GENESIS BLOCK on CONNECT
         Message mess = MessageFactory.getInstance()
                 .createGetHeadersMessage(this.blockChain.getGenesisBlock().getSignature());
-        SignaturesMessage response = (SignaturesMessage) peer.getResponse(mess, 20000);
+        //SignaturesMessage response = (SignaturesMessage) peer.getResponse(mess, 20000);
+        SignaturesMessage response = null;
+
         if (response == null)
             ; // MAY BE IT HARD BUSY
         else if (response.getSignatures().isEmpty()) {
@@ -1290,7 +1292,7 @@ public class Controller extends Observable {
         Block winBlock = this.blockChain.getWaitWinBuffer();
         if (winBlock != null) {
             // SEND MESSAGE
-            if (!peer.sendMessage(MessageFactory.getInstance().createWinBlockMessage(winBlock)))
+            if (!peer.directSendMessage(MessageFactory.getInstance().createWinBlockMessage(winBlock)))
                 return;
         }
 
