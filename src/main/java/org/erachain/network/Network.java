@@ -438,7 +438,7 @@ public class Network extends Observable {
                 if (HWeight == null)
                     HWeight = new Tuple2<Integer, Long>(-1, -1L);
 
-                Message response = MessageFactory.getInstance().createHWeightMessage(HWeight);
+                HWeightMessage response = (HWeightMessage) MessageFactory.getInstance().createHWeightMessage(HWeight);
                 // CREATE RESPONSE WITH SAME ID
                 response.setId(message.getId());
 
@@ -449,7 +449,7 @@ public class Network extends Observable {
                 timeCheck = System.currentTimeMillis();
 
                 //SEND BACK TO SENDER
-                message.getSender().offerMessage(response, Network.SEND_WAIT);
+                message.getSender().sendHWeight(response);
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (true || timeCheck > 10) {

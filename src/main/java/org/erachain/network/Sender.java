@@ -76,7 +76,7 @@ public class Sender extends MonitoredThread {
         }
     }
 
-    public void sendHGetWeight(GetHWeightMessage GetHWeightMessage) {
+    public void sendGetHWeight(GetHWeightMessage GetHWeightMessage) {
         this.getHWeightMessage = GetHWeightMessage;
     }
 
@@ -235,7 +235,7 @@ public class Sender extends MonitoredThread {
 
     public void close() {
         try {
-            this.out.close();
+            //this.out.close();
         } catch (Exception e) {
         }
         this.out = null;

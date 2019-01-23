@@ -2,10 +2,7 @@ package org.erachain.network;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
-import org.erachain.network.message.BlockWinMessage;
-import org.erachain.network.message.HWeightMessage;
-import org.erachain.network.message.Message;
-import org.erachain.network.message.MessageFactory;
+import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MonitoredThread;
@@ -584,6 +581,10 @@ public class Peer extends MonitoredThread {
 
     }
 
+    public void sendGetHWeight(GetHWeightMessage getHWeightMessage) {
+        this.sender.sendGetHWeight(getHWeightMessage);
+    }
+
     public void sendHWeight(HWeightMessage hWeightMessage) {
         this.sender.sendHWeight(hWeightMessage);
     }
@@ -648,7 +649,14 @@ public class Peer extends MonitoredThread {
 
         //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
         this.messages.put(localRequestKey, blockingQueue);
-        if (!this.offerMessage(message, timeSOT)) {
+        boolean sended;
+        if (message.getType() == Message.GET_HWEIGHT_TYPE) {
+            this.sendGetHWeight((GetHWeightMessage) message);
+            sended = true;
+        } else
+            sended = this.offerMessage(message, timeSOT<<1);
+
+        if (!sended) {
             this.messages.remove(localRequestKey);
             if (USE_MONITOR) this.setMonitorStatusAfter();
             //WHEN FAILED TO SEND MESSAGE
@@ -765,6 +773,9 @@ public class Peer extends MonitoredThread {
             //        + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
             //        + (this.socket.isClosed()? " isClosed " : "")
             //);
+
+            this.sender.close();
+
             //CHECK IF SOCKET IS CONNECTED
             if (socket.isConnected()) {
 
