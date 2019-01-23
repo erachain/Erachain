@@ -146,12 +146,10 @@ public class WinBlockSelector extends MonitoredThread {
     public void run() {
 
         while (true) {
-            while (true) {
-                try {
-                    processMessage(blockingQueue.take());
-                } catch (InterruptedException e) {
-                    break;
-                }
+            try {
+                processMessage(blockingQueue.take());
+            } catch (InterruptedException e) {
+                break;
             }
         }
     }
