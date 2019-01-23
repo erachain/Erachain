@@ -92,8 +92,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    private static final String version = "4.11.8 RC";
-    private static final String buildTime = "2019-01-22 13:33:33 UTC";
+    private static final String version = "4.11.08 beta";
+    private static final String buildTime = "2019-01-23 13:33:33 UTC";
     private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.DEVELOP_USE? false : false;
 
     public static final char DECIMAL_SEPARATOR = '.';
