@@ -23,7 +23,6 @@ public class WinBlockSelector extends MonitoredThread {
 
     private final static boolean USE_MONITOR = true;
     private final static boolean logPings = true;
-    private static final int OFFER_WAIT = 20000;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WinBlockSelector.class);
 
@@ -54,11 +53,10 @@ public class WinBlockSelector extends MonitoredThread {
     /**
      * @param message
      */
-    public synchronized boolean putMessage(Message message) {
+    public synchronized void putMessage(Message message) {
         try {
-            return blockingQueue.offer(message, OFFER_WAIT, TimeUnit.MILLISECONDS);
+            blockingQueue.put(message);
         } catch (InterruptedException e) {
-            return false;
         }
     }
 
@@ -94,9 +92,9 @@ public class WinBlockSelector extends MonitoredThread {
             } else
                 // нет нельзя его в буфер класть так как там нет проверки потом на валидность
                 return;
-        }
-
-        if (!newBlock.isValidHead(dcSet)) {
+        } else if (!newBlock.isValidHead(dcSet)) {
+            // есди синхронизация цепочки не идет
+            // то проверим заголовок
             info = "Block (" + newBlock.toString() + ") is Invalid";
             message.getSender().ban(30, info);
             return;
@@ -130,15 +128,9 @@ public class WinBlockSelector extends MonitoredThread {
 
         } else {
             // SEND my BLOCK
-
-            // GET till not NULL
             Block myWinBlock = blockChain.getWaitWinBuffer();
             if (myWinBlock != null) {
-                // оказывается иногда там НУЛ случается
-                // надо сначала взять, проскрить и потом слать
-                Message messageBestWin = MessageFactory.getInstance()
-                        .createWinBlockMessage(myWinBlock);
-                message.getSender().putMessage(messageBestWin);
+                message.getSender().sendWinBlock((BlockWinMessage)MessageFactory.getInstance().createWinBlockMessage(myWinBlock));
             }
         }
     }
