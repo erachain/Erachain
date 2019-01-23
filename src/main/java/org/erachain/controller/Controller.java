@@ -648,11 +648,11 @@ public class Controller extends Observable {
         // CREATE SYNCHRONIZOR
         this.synchronizer = new Synchronizer();
 
-        // CREATE WinBlock SELECTOR
-        this.winBlockSelector = new WinBlockSelector(this, blockChain, dcSet);
-
         // CREATE BLOCKCHAIN
         this.blockChain = new BlockChain(dcSet);
+
+        // CREATE WinBlock SELECTOR
+        this.winBlockSelector = new WinBlockSelector(this, blockChain, dcSet);
 
         // START API SERVICE
         if (Settings.getInstance().isRpcEnabled()) {
@@ -1191,9 +1191,11 @@ public class Controller extends Observable {
                 if (peer.directSendMessage(message)) {
                     map.addBroadcastedPeer(transaction, peerByte);
                     timePoint = System.currentTimeMillis() - timePoint;
+                    peer.setPing((int) timePoint);
                     if (timePoint > 1000) {
                         peer.setPing((int) timePoint);
                         this.network.notifyObserveUpdatePeer(peer);
+                        LOGGER.debug(" bad ping " + timePoint + "ms for:" + counter);
 
                         try {
                             Thread.sleep(1000);
@@ -1219,10 +1221,10 @@ public class Controller extends Observable {
             if (counter % stepCount == 0) {
 
                 pinged = true;
-                peer.tryPing();
-                this.network.notifyObserveUpdatePeer(peer);
-
+                //peer.tryPing();
+                //this.network.notifyObserveUpdatePeer(peer);
                 ping = peer.getPing();
+
                 if (ping < 0 || ping > 1000) {
 
                     stepCount >>= 1;
@@ -1232,13 +1234,11 @@ public class Controller extends Observable {
                     } catch (Exception e) {
                     }
 
-                    // LOGGER.debug(peer + " stepCount down " +
-                    // stepCount);
+                    LOGGER.debug(peer + " stepCount down " + stepCount);
 
                 } else if (ping < 200) {
                     stepCount <<= 1;
-                    // LOGGER.debug(peer + " stepCount UP " +
-                    // stepCount + " for PING: " + ping);
+                    LOGGER.debug(peer + " stepCount UP " + stepCount + " for PING: " + ping);
                 }
 
             }
