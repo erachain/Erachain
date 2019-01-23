@@ -648,11 +648,11 @@ public class Controller extends Observable {
         // CREATE SYNCHRONIZOR
         this.synchronizer = new Synchronizer();
 
-        // CREATE WinBlock SELECTOR
-        this.winBlockSelector = new WinBlockSelector(this, blockChain, dcSet);
-
         // CREATE BLOCKCHAIN
         this.blockChain = new BlockChain(dcSet);
+
+        // CREATE WinBlock SELECTOR
+        this.winBlockSelector = new WinBlockSelector(this, blockChain, dcSet);
 
         // START API SERVICE
         if (Settings.getInstance().isRpcEnabled()) {
@@ -1155,6 +1155,7 @@ public class Controller extends Observable {
         int stepCount = 64; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
         long dTime = this.blockChain.getTimestamp(this.dcSet);
         boolean pinged = false;
+        long timePoint;
 
         while (iterator.hasNext() && stepCount > 2 && peer.isUsed()) {
 
@@ -1188,13 +1189,18 @@ public class Controller extends Observable {
                 // воспользуемся тут прямой пересылкой - так как нам надо именно ждать всю обработку
                 if (peer.directSendMessage(message)) {
                     map.addBroadcastedPeer(transaction, peerByte);
-                } else {
-                    if (!peer.isUsed()) {
-                        // DISCONNECT
-                        return false;
-                    } else {
-                        counter = stepCount;
+                    if (peer.getPing() > 1000) {
+                        this.network.notifyObserveUpdatePeer(peer);
+                        LOGGER.debug(" bad ping " + peer.getPing() + "ms for:" + counter);
+
+                        try {
+                            Thread.sleep(1000);
+                        } catch (Exception e) {
+                        }
                     }
+
+                } else {
+                    return false;
                 }
             } catch (Exception e) {
                 if (this.isStopping) {
@@ -1206,10 +1212,10 @@ public class Controller extends Observable {
             if (counter % stepCount == 0) {
 
                 pinged = true;
-                peer.tryPing();
-                this.network.notifyObserveUpdatePeer(peer);
-
+                //peer.tryPing();
+                //this.network.notifyObserveUpdatePeer(peer);
                 ping = peer.getPing();
+
                 if (ping < 0 || ping > 1000) {
 
                     stepCount >>= 1;
@@ -1219,22 +1225,15 @@ public class Controller extends Observable {
                     } catch (Exception e) {
                     }
 
-                    // LOGGER.debug(peer + " stepCount down " +
-                    // stepCount);
+                    LOGGER.debug(peer + " stepCount down " + stepCount);
 
                 } else if (ping < 200) {
                     stepCount <<= 1;
-                    // LOGGER.debug(peer + " stepCount UP " +
-                    // stepCount + " for PING: " + ping);
+                    LOGGER.debug(peer + " stepCount UP " + stepCount + " for PING: " + ping);
                 }
 
             }
 
-        }
-
-        if (!pinged && peer.isUsed()) {
-            peer.tryPing();
-            this.network.notifyObserveUpdatePeer(peer);
         }
 
         // LOGGER.info(peer + " sended UNCONFIRMED counter: " +
@@ -1252,54 +1251,52 @@ public class Controller extends Observable {
      */
     public void onConnect(Peer peer) {
 
-        if (this.isStopping)
+        if (this.isStopping) {
             return;
+        }
 
         // SEND FOUNDMYSELF MESSAGE
         if (!peer.directSendMessage(
-                MessageFactory.getInstance().createFindMyselfMessage(Controller.getInstance().getFoundMyselfID())))
+                MessageFactory.getInstance().createFindMyselfMessage(Controller.getInstance().getFoundMyselfID()))) {
+            peer.ban(network.banForActivePeersCounter(), "connection - break on MY ID send");
             return;
-
-        try {
-            Thread.sleep(100);
-        } catch (Exception e) {
         }
-
-        // проверим - может забанили уже если к себе приконнектились
-        if (!peer.isUsed())
-            return;
 
         // SEND VERSION MESSAGE
         if (!peer.directSendMessage(
-                MessageFactory.getInstance().createVersionMessage(Controller.getVersion(), getBuildTimestamp())))
+                MessageFactory.getInstance().createVersionMessage(Controller.getVersion(), getBuildTimestamp()))) {
+            peer.ban(network.banForActivePeersCounter(), "connection - break on Version send");
             return;
+        }
 
-        // CHECK GENESIS BLOCK on CONNECT
-        Message mess = MessageFactory.getInstance()
-                .createGetHeadersMessage(this.blockChain.getGenesisBlock().getSignature());
-        //SignaturesMessage response = (SignaturesMessage) peer.getResponse(mess, 20000);
-        SignaturesMessage response = null;
+        if (false) {
+            // CHECK GENESIS BLOCK on CONNECT
+            Message mess = MessageFactory.getInstance()
+                    .createGetHeadersMessage(this.blockChain.getGenesisBlock().getSignature());
+            SignaturesMessage response = (SignaturesMessage) peer.getResponse(mess, 20000); // AWAIT!
 
-        if (response == null)
-            ; // MAY BE IT HARD BUSY
-        else if (response.getSignatures().isEmpty()) {
-            // NO
-            peer.ban(Synchronizer.BAN_BLOCK_TIMES << 2, "wrong GENESIS BLOCK");
-            return;
+            if (this.isStopping)
+                return;
+            if (response == null) {
+                peer.ban(network.banForActivePeersCounter(), "connection - break on POINTs get");
+                return;
+            } else if (response.getSignatures().isEmpty()) {
+                // NO
+                peer.ban(Synchronizer.BAN_BLOCK_TIMES << 2, "connection - wrong GENESIS BLOCK");
+                return;
+            }
+
+            if (this.isStopping || response == null)
+                return; // MAY BE IT HARD BUSY
+
         }
 
         // GET CURRENT WIN BLOCK
         Block winBlock = this.blockChain.getWaitWinBuffer();
         if (winBlock != null) {
             // SEND MESSAGE
-            if (!peer.directSendMessage(MessageFactory.getInstance().createWinBlockMessage(winBlock)))
-                return;
+            peer.sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(winBlock));
         }
-
-        if (this.isStopping)
-            return;
-
-        this.actionAfterConnect();
 
         if (this.status == STATUS_NO_CONNECTIONS) {
             // UPDATE STATUS
@@ -1312,8 +1309,12 @@ public class Controller extends Observable {
         }
 
         // BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-        if (!this.broadcastUnconfirmedToPeer(peer))
+        if (!this.broadcastUnconfirmedToPeer(peer)) {
             peer.ban(network.banForActivePeersCounter(), "broken on SEND UNCONFIRMEDs");
+            return;
+        }
+
+        this.actionAfterConnect();
 
     }
 

@@ -58,6 +58,7 @@ public class Peer extends MonitoredThread {
     private boolean stoped;
     private int errors;
     private int requestKey = 0;
+
     private long sendedBeforePing = 0l;
     private long maxBeforePing;
     Map<Integer, BlockingQueue<Message>> messages;
@@ -107,28 +108,19 @@ public class Peer extends MonitoredThread {
             //this.out = socket.getOutputStream();
             this.in = new DataInputStream(socket.getInputStream());
 
-            //START SENDER and PINGER
-            if (this.sender == null) {
-                this.sender = new Sender(this, socket.getOutputStream());
+            // START SENDER
+            this.sender = new Sender(this, socket.getOutputStream());
 
-                this.pinger = new Pinger(this);
-
-            } else {
-                this.sender.setOut(socket.getOutputStream());
-                this.sender.setName("Sender - " + this.sender.getId() + " for: " + this.getAddress().getHostAddress());
-
-                this.pinger.setPing(Integer.MAX_VALUE);
-                this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
-
-            }
+            // START PINGER
+            this.pinger = new Pinger(this);
 
             this.setName("Peer: " + this);
 
-            // IT is STARTED
-            this.runed = true;
-
             //START COMMUNICATON THREAD
             this.start();
+
+            // IT is STARTED
+            this.runed = true;
 
             // START READING
             try {
@@ -268,14 +260,6 @@ public class Peer extends MonitoredThread {
                 this.white = true;
             }
 
-            //LOGGER.debug(this + " SOCKET: \n"
-            //        + (this.socket.isBound()? " isBound " : "")
-            //        + (this.socket.isConnected()? " isConnected " : "")
-            //        + (this.socket.isInputShutdown()? " isInputShutdown " : "")
-            //        + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
-            //        + (this.socket.isClosed()? " isClosed " : "")
-            //);
-
             //ENABLE KEEPALIVE
             step++;
             this.socket.setKeepAlive(true);
@@ -339,14 +323,6 @@ public class Peer extends MonitoredThread {
         }
 
         LOGGER.info(this + description);
-
-        //LOGGER.debug(this + " SOCKET at end: \n"
-        //        + (this.socket.isBound()? " isBound " : "")
-        //        + (this.socket.isConnected()? " isConnected " : "")
-        //        + (this.socket.isInputShutdown()? " isInputShutdown " : "")
-        //        + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
-        //       + (this.socket.isClosed()? " isClosed " : "")
-        //);
 
         network.onConnect(this);
 
@@ -546,10 +522,10 @@ public class Peer extends MonitoredThread {
                 continue;
             }
 
-            if (logPings && (message.getType() != Message.TRANSACTION_TYPE
+            if (logPings && message.getType() != Message.TRANSACTION_TYPE
                     && message.getType() != Message.TELEGRAM_TYPE
-                    || message.getType() == Message.HWEIGHT_TYPE)) {
-                LOGGER.debug(this + " RECEIVED: " + message);
+            ) {
+                LOGGER.debug(this + " <-- " + message);
             }
 
             if (USE_MONITOR) this.setMonitorStatus("in.message process");
@@ -561,10 +537,6 @@ public class Peer extends MonitoredThread {
                     // просроченное сообщение
                     continue;
                 }
-
-                // это ответ на наш запрос с ID
-                if (logPings && message.getType() == Message.HWEIGHT_TYPE)
-                    LOGGER.debug(this + " >> " + message + " receive as RESPONSE for me & add to messages Queue");
 
                 try {
 
@@ -578,11 +550,13 @@ public class Peer extends MonitoredThread {
                     break;
 
                 } catch (Exception e) {
-                    LOGGER.debug("received message " + message.viewType() + " from " + this.address.toString());
-                    LOGGER.debug("isRequest " + message.isRequest() + " hasId " + message.hasId());
-                    LOGGER.debug(" Id " + message.getId());
+                    LOGGER.error(this + " <-- " + message);
                     LOGGER.error(e.getMessage(), e);
                 }
+
+                // это ответ на наш запрос с ID
+                if (logPings && message.getType() == Message.HWEIGHT_TYPE)
+                    LOGGER.debug(this + " <<< " + message + " receive as RESPONSE for me & add to messages Queue");
 
             } else {
                 //CALLBACK
@@ -590,7 +564,7 @@ public class Peer extends MonitoredThread {
                 // and then see controller.Controller.onMessage(Message)
 
                 if (logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
-                    LOGGER.debug(this + " : " + message + " >> received");
+                    LOGGER.debug(this + " <-- " + message);
 
                 long timeStart = System.currentTimeMillis();
                 ///LOGGER.debug(this + " : " + message + " receive, go solve");
@@ -600,7 +574,7 @@ public class Peer extends MonitoredThread {
                 timeStart = System.currentTimeMillis() - timeStart;
                 if (timeStart > 1000
                         || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
-                    LOGGER.debug(this + " : " + message + " >> solved by period: " + timeStart);
+                    LOGGER.debug(this + " <-- " + message + " solved by period: " + timeStart);
                 }
             }
         }
@@ -636,7 +610,7 @@ public class Peer extends MonitoredThread {
      */
     public boolean directSendMessage(Message message) {
         long point = System.currentTimeMillis();
-        this.sender.put(message);
+        this.sender.sendMessage(message);
         point = System.currentTimeMillis() - point;
         this.pinger.setPing((int)point);
         return this.runed;
@@ -755,18 +729,9 @@ public class Peer extends MonitoredThread {
             this.network.afterDisconnect(this, banForMinutes, message);
 
     }
+
     public void ban(String message) {
-
-        if (!runed) {
-            return;
-        }
-
-        this.setName("Peer: " + this
-                + " banned - " + message);
-
-        // если там уже было закрыто то не вызывать After
-        if (this.close(message))
-            this.network.afterDisconnect(this, message);
+        ban(network.banForActivePeersCounter(), message);
     }
 
 
@@ -803,8 +768,6 @@ public class Peer extends MonitoredThread {
             //CHECK IF SOCKET IS CONNECTED
             if (socket.isConnected()) {
 
-                this.sender.close();
-
                 //CLOSE SOCKET
                 try {
                     // this close IN and OUT streams
@@ -817,6 +780,12 @@ public class Peer extends MonitoredThread {
                     // тут нельзя закрывать Стримы у Сокета так как при встречном переконнекте
                     // иначе Стримы больше не откроются
                     // и нужно просто сокет закрыть
+
+                    // сообщим что закрыли соединение другому узлу
+                    this.socket.shutdownOutput();
+
+                    this.sender.close();
+
                     this.socket.close();
 
                 } catch (Exception ignored) {

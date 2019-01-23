@@ -3,6 +3,7 @@ package org.erachain.network;
 
 import org.erachain.controller.Controller;
 import org.erachain.network.message.BlockWinMessage;
+import org.erachain.network.message.GetHWeightMessage;
 import org.erachain.network.message.HWeightMessage;
 import org.erachain.network.message.Message;
 import org.erachain.utils.MonitoredThread;
@@ -31,17 +32,14 @@ public class Sender extends MonitoredThread {
     private Peer peer;
     public OutputStream out;
 
-    private boolean needPing = false;
-    private int ping;
-
     private boolean stoped;
 
+    private GetHWeightMessage getHWeightMessage;
     private HWeightMessage hWeightMessage;
     private BlockWinMessage winBlockToSend;
 
     public Sender(Peer peer) {
         this.peer = peer;
-        this.ping = Integer.MAX_VALUE;
         this.setName("Sender - " + this.getId() + " for: " + peer.getAddress().getHostAddress());
 
         this.start();
@@ -49,7 +47,6 @@ public class Sender extends MonitoredThread {
 
     public Sender(Peer peer, OutputStream out) {
         this.peer = peer;
-        this.ping = Integer.MAX_VALUE;
         this.setName("Sender - " + this.getId() + " for: " + peer.getAddress().getHostAddress());
         this.out = out;
 
@@ -58,10 +55,6 @@ public class Sender extends MonitoredThread {
 
     public void setOut(OutputStream out) {
         this.out = out;
-    }
-
-    public long getPing() {
-        return this.ping;
     }
 
     public boolean offer(Message message) {
@@ -83,6 +76,10 @@ public class Sender extends MonitoredThread {
         }
     }
 
+    public void sendHGetWeight(GetHWeightMessage GetHWeightMessage) {
+        this.getHWeightMessage = GetHWeightMessage;
+    }
+
     public void sendHWeight(HWeightMessage hWeightMessage) {
         this.hWeightMessage = hWeightMessage;
     }
@@ -91,7 +88,7 @@ public class Sender extends MonitoredThread {
         this.winBlockToSend = winBlock;
     }
 
-    private boolean sendMessage(Message message) {
+    boolean sendMessage(Message message) {
 
         //CHECK IF SOCKET IS STILL ALIVE
         if (this.out == null) {
@@ -108,10 +105,10 @@ public class Sender extends MonitoredThread {
         if (logPings && (message.getType() != Message.TRANSACTION_TYPE
                 && message.getType() != Message.TELEGRAM_TYPE
                 || message.getType() == Message.HWEIGHT_TYPE)) {
-            LOGGER.debug(message + " try SEND to " + this);
+            LOGGER.debug(this.peer + " --> " + message);
         }
 
-        if (this.getPing() < -10 && message.getType() == Message.WIN_BLOCK_TYPE) {
+        if (peer.getPing() < -10 && message.getType() == Message.WIN_BLOCK_TYPE) {
             // если пинг хреновый то ничего не шлем кроме пингования
             return false;
         }
@@ -125,7 +122,9 @@ public class Sender extends MonitoredThread {
 
         byte[] bytes = message.toBytes();
         String error = null;
-        //synchronized (this.out) {
+
+        // пока есть входы по sendMessage - нужно ждать синхрон
+        synchronized (this.out) {
             try {
                 this.out.write(bytes);
                 this.out.flush();
@@ -138,8 +137,8 @@ public class Sender extends MonitoredThread {
                     return false;
 
                 checkTime = System.currentTimeMillis() - checkTime;
-                if (checkTime > bytes.length >> 3) {
-                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
+                if (checkTime - 3 > bytes.length >> 3) {
+                    LOGGER.debug(this.peer + " --> " + message + " sended by period: " + checkTime);
                 }
                 error = "try out.write 1 - " + eSock.getMessage();
             } catch (IOException e) {
@@ -148,18 +147,18 @@ public class Sender extends MonitoredThread {
                     return false;
 
                 checkTime = System.currentTimeMillis() - checkTime;
-                if (checkTime > bytes.length >> 3) {
-                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
+                if (checkTime - 3 > bytes.length >> 3) {
+                    LOGGER.debug(this.peer + " --> " + message + " sended by period: " + checkTime);
                 }
                 error = "try out.write 2 - " + e.getMessage();
             } catch (Exception e) {
                 checkTime = System.currentTimeMillis() - checkTime;
-                if (checkTime > bytes.length >> 3) {
-                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
+                if (checkTime - 3 > bytes.length >> 3) {
+                    LOGGER.debug(this.peer + " --> " + message + " sended by period: " + checkTime);
                 }
                 error = "try out.write 3 - " + e.getMessage();
             }
-        //}
+        }
 
         if (error != null) {
             peer.ban(error);
@@ -169,9 +168,9 @@ public class Sender extends MonitoredThread {
         if (USE_MONITOR) this.setMonitorStatusAfter();
 
         checkTime = System.currentTimeMillis() - checkTime;
-        if (checkTime > (bytes.length >> 3)
+        if (checkTime - 3 > (bytes.length >> 3)
                 || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
-            LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
+            LOGGER.debug(this.peer + " --> " + message + " sended by period: " + checkTime);
         }
 
         return true;
@@ -195,6 +194,14 @@ public class Sender extends MonitoredThread {
             } catch (InterruptedException e) {
                 //if (this.stoped)
                 break;
+            }
+
+            if (getHWeightMessage != null) {
+                if (!sendMessage(getHWeightMessage)) {
+                    getHWeightMessage = null;
+                    continue;
+                }
+                getHWeightMessage = null;
             }
 
             if (hWeightMessage != null) {

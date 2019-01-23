@@ -29,6 +29,10 @@ public class Pinger extends Thread {
         this.start();
     }
 
+    public void init() {
+        this.ping = Integer.MAX_VALUE;
+    }
+
     public long getPing() {
         return this.ping;
     }
@@ -118,15 +122,17 @@ public class Pinger extends Thread {
         Controller cnt = Controller.getInstance();
         BlockChain chain = cnt.getBlockChain();
 
-        //int sleepTimeFull = DEFAULT_PING_TIMEOUT; // Settings.getInstance().getPingInterval();
-        int sleepTimestep = DEFAULT_QUICK_PING_TIMEOUT >> 2;
+        int sleepTimestep = 100;
         int sleepsteps = DEFAULT_PING_TIMEOUT / sleepTimestep;
         int sleepStepTimeCounter;
         boolean resultSend;
         while (!this.peer.isStoped()) {
 
+
             if (this.ping < -1) {
-                sleepStepTimeCounter = sleepsteps >> 3;
+                sleepStepTimeCounter = sleepsteps >> 2;
+            } else if (this.peer.isUsed()) {
+                sleepStepTimeCounter = sleepsteps;
             } else {
                 sleepStepTimeCounter = sleepsteps;
             }
@@ -143,6 +149,11 @@ public class Pinger extends Thread {
                 if (this.peer.isStoped())
                     return;
 
+                if (this.ping == Integer.MAX_VALUE && this.peer.isUsed()) {
+                    Controller.getInstance().onConnect(this.peer);
+                    sleepStepTimeCounter = 0;
+                }
+
                 // если нужно пингануь - но не часто все равно - так как там могут быстро блоки собираться
                 // чтобы не запинговать канал
                 if (this.needPing && sleepStepTimeCounter > (sleepsteps >> 4))
@@ -155,8 +166,6 @@ public class Pinger extends Thread {
             if (this.peer.isUsed()) {
                 this.needPing = false;
                 tryPing();
-            } else {
-                this.ping = 999999;
             }
         }
     }
