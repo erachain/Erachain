@@ -41,7 +41,7 @@ public class ConnectionAcceptor extends MonitoredThread {
 
             // на всякий случай чтобы атак не было с созданием множества конектов
             try {
-                Thread.sleep(10);
+                Thread.sleep(100);
             } catch (Exception e) {
             }
 
@@ -77,6 +77,14 @@ public class ConnectionAcceptor extends MonitoredThread {
                 Controller.getInstance().stopAll(90);
                 break;
             } catch (java.net.SocketException e) {
+                LOGGER.error(e.getMessage(), e);
+
+                try {
+                    socket.close();
+                } catch (Exception e1) {
+                }
+
+                socket = null;
                 continue;
 
             } catch (Exception e) {
