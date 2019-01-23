@@ -768,8 +768,6 @@ public class Peer extends MonitoredThread {
             //CHECK IF SOCKET IS CONNECTED
             if (socket.isConnected()) {
 
-                this.sender.close();
-
                 //CLOSE SOCKET
                 try {
                     // this close IN and OUT streams
@@ -782,6 +780,12 @@ public class Peer extends MonitoredThread {
                     // тут нельзя закрывать Стримы у Сокета так как при встречном переконнекте
                     // иначе Стримы больше не откроются
                     // и нужно просто сокет закрыть
+
+                    // сообщим что закрыли соединение другому узлу
+                    this.socket.shutdownOutput();
+
+                    this.sender.close();
+
                     this.socket.close();
 
                 } catch (Exception ignored) {

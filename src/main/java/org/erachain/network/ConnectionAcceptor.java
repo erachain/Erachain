@@ -69,8 +69,10 @@ public class ConnectionAcceptor extends MonitoredThread {
                         ) {
                     //DO NOT CONNECT TO OURSELF/EXISTING CONNECTION
                     // or BANNED
-                    //connectionSocket.shutdownOutput();
+                    connectionSocket.shutdownOutput();
                     connectionSocket.close();
+                    socket.close();
+                    socket = null;
                     continue;
                 }
             } catch (java.lang.OutOfMemoryError e) {
