@@ -652,7 +652,7 @@ public class Peer extends MonitoredThread {
         //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
         this.messages.put(localRequestKey, blockingQueue);
         boolean sended;
-        if (false && message.getType() == Message.GET_HWEIGHT_TYPE) {
+        if (message.getType() == Message.GET_HWEIGHT_TYPE) {
             this.sendGetHWeight((GetHWeightMessage) message);
             sended = true;
         } else

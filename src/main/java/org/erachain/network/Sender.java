@@ -77,26 +77,38 @@ public class Sender extends MonitoredThread {
     }
 
     public void sendGetHWeight(GetHWeightMessage getHWeightMessage) {
-        if (this.blockingQueue.isEmpty()) {
+        if (false) {
+            synchronized (this.blockingQueue) {
+                if (this.blockingQueue.isEmpty()) {
+                    blockingQueue.offer(getHWeightMessage);
+                } else {
+                    this.getHWeightMessage = getHWeightMessage;
+                }
+            }
+        } else
             blockingQueue.offer(getHWeightMessage);
-        } else {
-            this.getHWeightMessage = getHWeightMessage;
-        }
     }
 
     public void sendHWeight(HWeightMessage hWeightMessage) {
-        if (true || this.blockingQueue.isEmpty()) {
+        if (false) {
+            synchronized (this.blockingQueue) {
+                if (this.blockingQueue.isEmpty()) {
+                    blockingQueue.offer(hWeightMessage);
+                } else {
+                    this.hWeightMessage = hWeightMessage;
+                }
+            }
+        } else
             blockingQueue.offer(hWeightMessage);
-        } else {
-            this.hWeightMessage = hWeightMessage;
-        }
     }
 
     public void sendWinBlock(BlockWinMessage winBlock) {
-        if (this.blockingQueue.isEmpty()) {
-            blockingQueue.offer(winBlock);
-        } else {
-            this.winBlockToSend = winBlock;
+        synchronized (this.blockingQueue) {
+            if (this.blockingQueue.isEmpty()) {
+                blockingQueue.offer(winBlock);
+            } else {
+                this.winBlockToSend = winBlock;
+            }
         }
     }
 
