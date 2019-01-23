@@ -3582,6 +3582,8 @@ public class Controller extends Observable {
     }
 
     public static String getManifestInfo() throws IOException {
+        String impTitle = "Gradle Build: ERA";
+
         Enumeration<URL> resources = Thread.currentThread()
                 .getContextClassLoader()
                 .getResources("META-INF/MANIFEST.MF");
@@ -3590,7 +3592,7 @@ public class Controller extends Observable {
                 Manifest manifest = new Manifest(resources.nextElement().openStream());
                 Attributes attributes = manifest.getMainAttributes();
                 String implementationTitle = attributes.getValue("Implementation-Title");
-                if (implementationTitle != null) { // && implementationTitle.equals(applicationName))
+                if (implementationTitle != null && implementationTitle.equals(impTitle)) {
                     String implementationVersion = attributes.getValue("Implementation-Version");
                     String buildTime = attributes.getValue("Build-Time");
                     return implementationVersion + " build " + buildTime;
@@ -3599,6 +3601,6 @@ public class Controller extends Observable {
                 System.out.println(e.getMessage());
             }
         }
-        return "Current Version";
+        return impTitle;
     }
 }
