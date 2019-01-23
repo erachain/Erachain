@@ -522,10 +522,10 @@ public class Peer extends MonitoredThread {
                 continue;
             }
 
-            if (logPings && (message.getType() != Message.TRANSACTION_TYPE
+            if (logPings && message.getType() != Message.TRANSACTION_TYPE
                     && message.getType() != Message.TELEGRAM_TYPE
-                    || message.getType() == Message.HWEIGHT_TYPE)) {
-                LOGGER.debug(this + " RECEIVED: " + message);
+            ) {
+                LOGGER.debug(this + " <-- " + message);
             }
 
             if (USE_MONITOR) this.setMonitorStatus("in.message process");
@@ -537,10 +537,6 @@ public class Peer extends MonitoredThread {
                     // просроченное сообщение
                     continue;
                 }
-
-                // это ответ на наш запрос с ID
-                if (logPings && message.getType() == Message.HWEIGHT_TYPE)
-                    LOGGER.debug(this + " >> " + message + " receive as RESPONSE for me & add to messages Queue");
 
                 try {
 
@@ -554,11 +550,13 @@ public class Peer extends MonitoredThread {
                     break;
 
                 } catch (Exception e) {
-                    LOGGER.debug("received message " + message.viewType() + " from " + this.address.toString());
-                    LOGGER.debug("isRequest " + message.isRequest() + " hasId " + message.hasId());
-                    LOGGER.debug(" Id " + message.getId());
+                    LOGGER.error(this + " <-- " + message);
                     LOGGER.error(e.getMessage(), e);
                 }
+
+                // это ответ на наш запрос с ID
+                if (logPings && message.getType() == Message.HWEIGHT_TYPE)
+                    LOGGER.debug(this + " <<< " + message + " receive as RESPONSE for me & add to messages Queue");
 
             } else {
                 //CALLBACK
@@ -566,7 +564,7 @@ public class Peer extends MonitoredThread {
                 // and then see controller.Controller.onMessage(Message)
 
                 if (logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
-                    LOGGER.debug(this + " : " + message + " >> received");
+                    LOGGER.debug(this + " <-- " + message);
 
                 long timeStart = System.currentTimeMillis();
                 ///LOGGER.debug(this + " : " + message + " receive, go solve");
@@ -576,7 +574,7 @@ public class Peer extends MonitoredThread {
                 timeStart = System.currentTimeMillis() - timeStart;
                 if (timeStart > 1000
                         || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
-                    LOGGER.debug(this + " : " + message + " >> solved by period: " + timeStart);
+                    LOGGER.debug(this + " <-- " + message + " solved by period: " + timeStart);
                 }
             }
         }

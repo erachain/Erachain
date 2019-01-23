@@ -138,7 +138,7 @@ public class Sender extends MonitoredThread {
 
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
-                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
+                    LOGGER.debug(this + " --> " + message + " sended by period: " + checkTime);
                 }
                 error = "try out.write 1 - " + eSock.getMessage();
             } catch (IOException e) {
@@ -148,13 +148,13 @@ public class Sender extends MonitoredThread {
 
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
-                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
+                    LOGGER.debug(this + " --> " + message + " sended by period: " + checkTime);
                 }
                 error = "try out.write 2 - " + e.getMessage();
             } catch (Exception e) {
                 checkTime = System.currentTimeMillis() - checkTime;
                 if (checkTime > bytes.length >> 3) {
-                    LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
+                    LOGGER.debug(this + " --> " + message + " sended by period: " + checkTime);
                 }
                 error = "try out.write 3 - " + e.getMessage();
             }
@@ -170,7 +170,7 @@ public class Sender extends MonitoredThread {
         checkTime = System.currentTimeMillis() - checkTime;
         if (checkTime > (bytes.length >> 3)
                 || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
-            LOGGER.debug(this + " >> " + message + " sended by period: " + checkTime);
+            LOGGER.debug(this + " >>> " + message + " sended by period: " + checkTime);
         }
 
         return true;
