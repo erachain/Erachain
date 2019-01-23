@@ -85,7 +85,7 @@ public class Sender extends MonitoredThread {
     }
 
     public void sendHWeight(HWeightMessage hWeightMessage) {
-        if (this.blockingQueue.isEmpty()) {
+        if (true || this.blockingQueue.isEmpty()) {
             blockingQueue.offer(hWeightMessage);
         } else {
             this.hWeightMessage = hWeightMessage;
@@ -202,7 +202,7 @@ public class Sender extends MonitoredThread {
             }
 
             try {
-                message = blockingQueue.poll(500, TimeUnit.MILLISECONDS);
+                message = blockingQueue.poll(100, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 //if (this.stoped)
                 break;
