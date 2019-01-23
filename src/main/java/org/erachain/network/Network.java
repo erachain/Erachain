@@ -114,10 +114,6 @@ public class Network extends Observable {
             }
         }
 
-        peer.setName("Peer: " + peer
-                + (asNew? " as new" : " reconnected")
-                + (peer.isWhite()?" is White" : ""));
-
         //ADD TO DATABASE
         PeerManager.getInstance().addPeer(peer, 0);
 
@@ -127,8 +123,6 @@ public class Network extends Observable {
         //NOTIFY OBSERVERS
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_PEER_TYPE, peer));
-
-        Controller.getInstance().onConnect(peer);
 
     }
 
@@ -450,7 +444,7 @@ public class Network extends Observable {
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (true || timeCheck > 10) {
-                    LOGGER.debug(this + " : " + message + " solved by period: " + timeCheck);
+                    LOGGER.debug(message.getSender() + ": " + message + " solver by period: " + timeCheck);
                 }
                 timeCheck = System.currentTimeMillis();
 
@@ -459,7 +453,7 @@ public class Network extends Observable {
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (true || timeCheck > 10) {
-                    LOGGER.debug(this + " : " + message + " sended by period: " + timeCheck);
+                    LOGGER.debug(message.getSender() + ": " + message + " >>> by period: " + timeCheck);
                 }
 
                 break;
@@ -476,7 +470,7 @@ public class Network extends Observable {
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 10) {
-                    LOGGER.debug(this + " : " + message + " solved by period: " + timeCheck);
+                    LOGGER.debug(message.getSender() + ": " + message + " solved by period: " + timeCheck);
                 }
 
                 break;

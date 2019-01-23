@@ -32,9 +32,6 @@ public class Sender extends MonitoredThread {
     private Peer peer;
     public OutputStream out;
 
-    private boolean needPing = false;
-    private int ping;
-
     private boolean stoped;
 
     private GetHWeightMessage getHWeightMessage;
@@ -43,7 +40,6 @@ public class Sender extends MonitoredThread {
 
     public Sender(Peer peer) {
         this.peer = peer;
-        this.ping = Integer.MAX_VALUE;
         this.setName("Sender - " + this.getId() + " for: " + peer.getAddress().getHostAddress());
 
         this.start();
@@ -51,7 +47,6 @@ public class Sender extends MonitoredThread {
 
     public Sender(Peer peer, OutputStream out) {
         this.peer = peer;
-        this.ping = Integer.MAX_VALUE;
         this.setName("Sender - " + this.getId() + " for: " + peer.getAddress().getHostAddress());
         this.out = out;
 
@@ -60,10 +55,6 @@ public class Sender extends MonitoredThread {
 
     public void setOut(OutputStream out) {
         this.out = out;
-    }
-
-    public long getPing() {
-        return this.ping;
     }
 
     public boolean offer(Message message) {
@@ -117,7 +108,7 @@ public class Sender extends MonitoredThread {
             LOGGER.debug(message + " try SEND to " + this);
         }
 
-        if (this.getPing() < -10 && message.getType() == Message.WIN_BLOCK_TYPE) {
+        if (peer.getPing() < -10 && message.getType() == Message.WIN_BLOCK_TYPE) {
             // если пинг хреновый то ничего не шлем кроме пингования
             return false;
         }

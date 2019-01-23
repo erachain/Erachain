@@ -131,7 +131,7 @@ public abstract class Message {
     }
 
     public String toString() {
-        return viewType(this.type) + (this.id < 0?"":"[" + this.id + "]");
+        return viewType(this.type) + (this.id < 0 ? "[-]" : "[" + this.id + "]");
     }
 
     public abstract boolean isRequest();
