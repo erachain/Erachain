@@ -449,7 +449,10 @@ public class Network extends Observable {
                 timeCheck = System.currentTimeMillis();
 
                 //SEND BACK TO SENDER
-                message.getSender().sendHWeight(response);
+                if (false)
+                    message.getSender().sendHWeight(response);
+                else
+                    message.getSender().offerMessage(response);
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (true || timeCheck > 10) {
