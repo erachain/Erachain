@@ -519,11 +519,11 @@ public class Controller extends Observable {
         this.foundMyselfID = new byte[128];
         this.random.nextBytes(this.foundMyselfID);
 
-        this.peerHWeight = new LinkedHashMap<Peer, Tuple2<Integer, Long>>();
+        this.peerHWeight = Collections.synchronizedMap(new LinkedHashMap<Peer, Tuple2<Integer, Long>>());
         // LINKED TO PRESERVE ORDER WHEN SYNCHRONIZING (PRIORITIZE SYNCHRONIZING
         // FROM LONGEST CONNECTION ALIVE)
 
-        this.peersVersions = new LinkedHashMap<Peer, Pair<String, Long>>();
+        this.peersVersions = Collections.synchronizedMap(new LinkedHashMap<Peer, Pair<String, Long>>());
 
         // CHECK NETWORK PORT AVAILABLE
         if (!Network.isPortAvailable(Controller.getInstance().getNetworkPort())) {
@@ -1361,12 +1361,9 @@ public class Controller extends Observable {
     private long statusObserveTime;
     // used from NETWORK
     public void afterDisconnect(Peer peer) {
-        synchronized (this.peerHWeight) {
 
-            this.peerHWeight.remove(peer);
-
-            this.peersVersions.remove(peer);
-        }
+        this.peerHWeight.remove(peer);
+        this.peersVersions.remove(peer);
 
         if (this.peerHWeight.isEmpty()) {
 
@@ -1430,9 +1427,7 @@ public class Controller extends Observable {
                 }
 
                 // ADD TO LIST
-                synchronized (this.peerHWeight) {
-                    this.peerHWeight.put(hWeightMessage.getSender(), hWeightMessage.getHWeight());
-                }
+                this.peerHWeight.put(hWeightMessage.getSender(), hWeightMessage.getHWeight());
 
                 // this.checkStatusAndObserve(0);
 
@@ -2007,21 +2002,19 @@ public class Controller extends Observable {
         Peer maxPeer = null;
 
         try {
-            synchronized (this.peerHWeight) {
-                for (Peer peer : this.peerHWeight.keySet()) {
-                    if (peer.getPing() < 0) {
-                        // не использовать пиры которые не в быстром коннекте
-                        // - так как иначе они заморозят синхронизацию совсем
-                        // да и не понятно как с них данные получать
-                        continue;
-                    }
-                    Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
-                    if (height < whPeer.a
-                            || (useWeight && height == whPeer.a && weight < whPeer.b)) {
-                        height = whPeer.a;
-                        weight = whPeer.b;
-                        maxPeer = peer;
-                    }
+            for (Peer peer : this.peerHWeight.keySet()) {
+                if (peer.getPing() < 0) {
+                    // не использовать пиры которые не в быстром коннекте
+                    // - так как иначе они заморозят синхронизацию совсем
+                    // да и не понятно как с них данные получать
+                    continue;
+                }
+                Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
+                if (height < whPeer.a
+                        || (useWeight && height == whPeer.a && weight < whPeer.b)) {
+                    height = whPeer.a;
+                    weight = whPeer.b;
+                    maxPeer = peer;
                 }
             }
         } catch (Exception e) {

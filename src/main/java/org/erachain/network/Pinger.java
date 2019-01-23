@@ -42,9 +42,7 @@ public class Pinger extends Thread {
     }
 
     public void setNeedPing() {
-        // пингуем только те что еще нормальные
-        if (ping > 0)
-            this.needPing = true;
+        this.needPing = true;
     }
 
     private boolean tryPing(long timeSOT) {
@@ -55,13 +53,6 @@ public class Pinger extends Thread {
 
         //CREATE PING
         Message pingMessage = MessageFactory.getInstance().createGetHWeightMessage();
-
-        if (false && this.ping >= 0) {
-            // на время пингования поставим сразу -1
-            this.ping = -1;
-        }
-
-        this.peer.setName("Peer: " + this.peer);
 
         //GET RESPONSE
         long start = System.currentTimeMillis();
@@ -99,7 +90,7 @@ public class Pinger extends Thread {
         //LOGGER.info("PING " + this.peer);
         Controller.getInstance().getDBSet().getPeerMap().addPeer(peer, 0);
 
-        if (response != null && response.getType() == Message.HWEIGHT_TYPE) {
+        if (response.getType() == Message.HWEIGHT_TYPE) {
             HWeightMessage hWeightMessage = (HWeightMessage) response;
             Tuple2<Integer, Long> hW = hWeightMessage.getHWeight();
 

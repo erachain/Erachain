@@ -519,12 +519,6 @@ public class Peer extends MonitoredThread {
                 continue;
             }
 
-            if (logPings && message.getType() != Message.TRANSACTION_TYPE
-                    && message.getType() != Message.TELEGRAM_TYPE
-            ) {
-                LOGGER.debug(this + " <-- " + message);
-            }
-
             if (USE_MONITOR) this.setMonitorStatus("in.message process");
 
             //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
@@ -532,7 +526,20 @@ public class Peer extends MonitoredThread {
 
                 if (!this.messages.containsKey(message.getId())) {
                     // просроченное сообщение
+                    // это ответ на наш запрос с ID
+                    if (logPings && message.getType() != Message.TRANSACTION_TYPE
+                            && message.getType() != Message.TELEGRAM_TYPE
+                    ) {
+                        LOGGER.debug(this + " <... " + message);
+                    }
                     continue;
+                }
+
+                // это ответ на наш запрос с ID
+                if (logPings && message.getType() != Message.TRANSACTION_TYPE
+                        && message.getType() != Message.TELEGRAM_TYPE
+                ) {
+                    LOGGER.debug(this + " <+++ " + message);
                 }
 
                 try {
@@ -547,21 +554,17 @@ public class Peer extends MonitoredThread {
                     break;
 
                 } catch (Exception e) {
-                    LOGGER.error(this + " <-- " + message);
+                    LOGGER.error(this + " <+++ " + message);
                     LOGGER.error(e.getMessage(), e);
                 }
 
-                // это ответ на наш запрос с ID
-                if (logPings && message.getType() == Message.HWEIGHT_TYPE)
-                    LOGGER.debug(this + " <<< " + message + " receive as RESPONSE for me & add to messages Queue");
-
             } else {
-                //CALLBACK
-                // see in network.Network.onMessage(Message)
-                // and then see controller.Controller.onMessage(Message)
 
-                if (logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
-                    LOGGER.debug(this + " <-- " + message);
+                if (logPings && message.getType() != Message.TRANSACTION_TYPE
+                        && message.getType() != Message.TELEGRAM_TYPE
+                ) {
+                    LOGGER.debug(this + " <--- " + message);
+                }
 
                 long timeStart = System.currentTimeMillis();
                 ///LOGGER.debug(this + " : " + message + " receive, go solve");
@@ -569,9 +572,8 @@ public class Peer extends MonitoredThread {
                 this.network.onMessage(message);
 
                 timeStart = System.currentTimeMillis() - timeStart;
-                if (timeStart > 1000
-                        || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
-                    LOGGER.debug(this + " <-- " + message + " solved by period: " + timeStart);
+                if (timeStart > 500) {
+                    LOGGER.debug(this + " <--- " + message + " solved by period: " + timeStart);
                 }
             }
         }
