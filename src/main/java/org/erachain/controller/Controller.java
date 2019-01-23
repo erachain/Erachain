@@ -1014,6 +1014,9 @@ public class Controller extends Observable {
         LOGGER.info("Stopping message processor");
         this.network.stop();
 
+        LOGGER.info("Stopping WinBlock selector");
+        this.winBlockSelector.halt();
+
         // delete temp Dir
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Delete files from TEMP dir")));

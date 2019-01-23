@@ -23,6 +23,7 @@ public class WinBlockSelector extends MonitoredThread {
 
     private final static boolean USE_MONITOR = true;
     private final static boolean logPings = true;
+    private boolean runned;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WinBlockSelector.class);
 
@@ -61,6 +62,9 @@ public class WinBlockSelector extends MonitoredThread {
     }
 
     public void processMessage(Message message) {
+
+        if (message == null)
+            return;
 
         long onMessageProcessTiming = System.nanoTime();
 
@@ -137,12 +141,21 @@ public class WinBlockSelector extends MonitoredThread {
 
     public void run() {
 
-        while (true) {
+        runned = true;
+        while (runned) {
             try {
                 processMessage(blockingQueue.take());
             } catch (InterruptedException e) {
                 break;
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+                break;
             }
         }
     }
+
+    public void halt() {
+        this.runned = false;
+    }
+
 }
