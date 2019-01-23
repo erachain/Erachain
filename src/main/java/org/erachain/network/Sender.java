@@ -91,7 +91,7 @@ public class Sender extends MonitoredThread {
         this.winBlockToSend = winBlock;
     }
 
-    public boolean sendMessage(Message message) {
+    private boolean sendMessage(Message message) {
 
         //CHECK IF SOCKET IS STILL ALIVE
         if (this.out == null) {
