@@ -138,7 +138,7 @@ public class WinBlockSelector extends MonitoredThread {
                 // надо сначала взять, проскрить и потом слать
                 Message messageBestWin = MessageFactory.getInstance()
                         .createWinBlockMessage(myWinBlock);
-                message.getSender().sendMessage(messageBestWin);
+                message.getSender().putMessage(messageBestWin);
             }
         }
     }

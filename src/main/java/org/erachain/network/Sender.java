@@ -15,11 +15,14 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * тут можно сделать несколько очередей с приоритетом
+ * и отказаться от synchronized (this.out)
+ */
 public class Sender extends MonitoredThread {
 
     private final static boolean USE_MONITOR = true;
     private final static boolean logPings = true;
-    private static final int SEND_WAIT = 20000;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class);
     private static final int QUEUE_LENGTH = 20;
@@ -61,22 +64,23 @@ public class Sender extends MonitoredThread {
         return this.ping;
     }
 
-    /**
-     *
-     * @param message
-     */
-    public synchronized boolean putMessage(Message message) {
+    public boolean offer(Message message) {
+        return blockingQueue.offer(message);
+    }
+
+    public boolean offer(Message message, long SOT) {
         try {
-            return blockingQueue.offer(message, SEND_WAIT, TimeUnit.MILLISECONDS);
+            return blockingQueue.offer(message, SOT, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             return false;
         }
     }
 
-    public void setNeedPing() {
-        // пингуем только те что еще нормальные
-        if (ping > 0)
-            this.needPing = true;
+    public void put(Message message) {
+        try {
+            blockingQueue.put(message);
+        } catch (InterruptedException e) {
+        }
     }
 
     public void sendHWeight(HWeightMessage hWeightMessage) {
@@ -121,7 +125,7 @@ public class Sender extends MonitoredThread {
 
         byte[] bytes = message.toBytes();
         String error = null;
-        synchronized (this.out) {
+        //synchronized (this.out) {
             try {
                 this.out.write(bytes);
                 this.out.flush();
@@ -155,7 +159,7 @@ public class Sender extends MonitoredThread {
                 }
                 error = "try out.write 3 - " + e.getMessage();
             }
-        }
+        //}
 
         if (error != null) {
             peer.ban(error);
@@ -211,6 +215,11 @@ public class Sender extends MonitoredThread {
 
             if (message == null)
                 continue;
+
+            if (message.isRequest() && !this.peer.messages.containsKey(message.getId())) {
+                // просроченный запрос - можно не отправлять его
+                continue;
+            }
 
             if (!sendMessage(message))
                 continue;

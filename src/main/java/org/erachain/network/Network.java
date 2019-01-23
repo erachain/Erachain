@@ -23,6 +23,7 @@ import java.util.*;
 public class Network extends Observable {
 
 
+    public static final int SEND_WAIT = 20000;
     public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK ? 0 : 1;
     private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<4;
     private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 12 : 1024 << 8;
@@ -408,7 +409,7 @@ public class Network extends Observable {
             Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage(ca);
             answer.setId(message.getId());
             // send answer
-            message.getSender().sendMessage(answer);
+            message.getSender().putMessage(answer);
            return;
            }
         // Ansver to get transaction
@@ -454,10 +455,7 @@ public class Network extends Observable {
                 timeCheck = System.currentTimeMillis();
 
                 //SEND BACK TO SENDER
-                boolean result = message.getSender().sendMessage(response);
-                if (!result) {
-                    LOGGER.debug("error on response GET_HWEIGHT_TYPE to " + message.getSender());
-                }
+                message.getSender().offerMessage(response, Network.SEND_WAIT);
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (true || timeCheck > 10) {
@@ -474,7 +472,7 @@ public class Network extends Observable {
                 answer.setId(message.getId());
 
                 //SEND TO SENDER
-                message.getSender().sendMessage(answer);
+                message.getSender().putMessage(answer);
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 10) {
@@ -565,7 +563,7 @@ public class Network extends Observable {
             //EXCLUDE PEERS
             if (exclude == null || !exclude.contains(peer)) {
                 try {
-                    peer.sendMessage(message);
+                    peer.putMessage(message);
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
                 }

@@ -3,6 +3,7 @@ package org.erachain.network;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.network.message.BlockWinMessage;
+import org.erachain.network.message.HWeightMessage;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.ntp.NTP;
@@ -59,7 +60,7 @@ public class Peer extends MonitoredThread {
     private int requestKey = 0;
     private long sendedBeforePing = 0l;
     private long maxBeforePing;
-    private Map<Integer, BlockingQueue<Message>> messages;
+    Map<Integer, BlockingQueue<Message>> messages;
 
     public Peer(InetAddress address) {
         this.address = address;
@@ -609,13 +610,23 @@ public class Peer extends MonitoredThread {
 
     }
 
-    public void sendWinBlock(BlockWinMessage message) {
-        this.sender.sendWinBlock(message);
+    public void sendHWeight(HWeightMessage hWeightMessage) {
+        this.sender.sendHWeight(hWeightMessage);
     }
 
-    public boolean sendMessage(Message message) {
-        return this.sender.putMessage(message);
+    public void sendWinBlock(BlockWinMessage winBlock) {
+        this.sender.sendWinBlock(winBlock);
+    }
 
+    public void putMessage(Message message) {
+        this.sender.put(message);
+    }
+
+    public boolean offerMessage(Message message, long SOT) {
+        return this.sender.offer(message, SOT);
+    }
+    public boolean offerMessage(Message message) {
+        return this.sender.offer(message);
     }
 
     /**
@@ -666,7 +677,7 @@ public class Peer extends MonitoredThread {
 
         //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
         this.messages.put(localRequestKey, blockingQueue);
-        if (!this.sendMessage(message)) {
+        if (!this.offerMessage(message, timeSOT)) {
             this.messages.remove(localRequestKey);
             if (USE_MONITOR) this.setMonitorStatusAfter();
             //WHEN FAILED TO SEND MESSAGE
