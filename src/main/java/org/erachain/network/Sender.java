@@ -105,7 +105,7 @@ public class Sender extends MonitoredThread {
         if (logPings && (message.getType() != Message.TRANSACTION_TYPE
                 && message.getType() != Message.TELEGRAM_TYPE
                 || message.getType() == Message.HWEIGHT_TYPE)) {
-            LOGGER.debug(message + " try SEND to " + this);
+            LOGGER.debug(this.peer + " --> " + message);
         }
 
         if (peer.getPing() < -10 && message.getType() == Message.WIN_BLOCK_TYPE) {
@@ -137,8 +137,8 @@ public class Sender extends MonitoredThread {
                     return false;
 
                 checkTime = System.currentTimeMillis() - checkTime;
-                if (checkTime > bytes.length >> 3) {
-                    LOGGER.debug(this + " --> " + message + " sended by period: " + checkTime);
+                if (checkTime - 3 > bytes.length >> 3) {
+                    LOGGER.debug(this.peer + " --> " + message + " sended by period: " + checkTime);
                 }
                 error = "try out.write 1 - " + eSock.getMessage();
             } catch (IOException e) {
@@ -147,14 +147,14 @@ public class Sender extends MonitoredThread {
                     return false;
 
                 checkTime = System.currentTimeMillis() - checkTime;
-                if (checkTime > bytes.length >> 3) {
-                    LOGGER.debug(this + " --> " + message + " sended by period: " + checkTime);
+                if (checkTime - 3 > bytes.length >> 3) {
+                    LOGGER.debug(this.peer + " --> " + message + " sended by period: " + checkTime);
                 }
                 error = "try out.write 2 - " + e.getMessage();
             } catch (Exception e) {
                 checkTime = System.currentTimeMillis() - checkTime;
-                if (checkTime > bytes.length >> 3) {
-                    LOGGER.debug(this + " --> " + message + " sended by period: " + checkTime);
+                if (checkTime - 3 > bytes.length >> 3) {
+                    LOGGER.debug(this.peer + " --> " + message + " sended by period: " + checkTime);
                 }
                 error = "try out.write 3 - " + e.getMessage();
             }
@@ -168,9 +168,9 @@ public class Sender extends MonitoredThread {
         if (USE_MONITOR) this.setMonitorStatusAfter();
 
         checkTime = System.currentTimeMillis() - checkTime;
-        if (checkTime > (bytes.length >> 3)
+        if (checkTime - 3 > (bytes.length >> 3)
                 || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
-            LOGGER.debug(this + " >>> " + message + " sended by period: " + checkTime);
+            LOGGER.debug(this.peer + " --> " + message + " sended by period: " + checkTime);
         }
 
         return true;
