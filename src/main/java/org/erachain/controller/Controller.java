@@ -1155,6 +1155,7 @@ public class Controller extends Observable {
         int stepCount = 64; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
         long dTime = this.blockChain.getTimestamp(this.dcSet);
         boolean pinged = false;
+        long timePoint;
 
         while (iterator.hasNext() && stepCount > 2 && peer.isUsed()) {
 
@@ -1186,8 +1187,20 @@ public class Controller extends Observable {
 
             try {
                 // воспользуемся тут прямой пересылкой - так как нам надо именно ждать всю обработку
+                timePoint = System.currentTimeMillis();
                 if (peer.directSendMessage(message)) {
                     map.addBroadcastedPeer(transaction, peerByte);
+                    timePoint = System.currentTimeMillis() - timePoint;
+                    if (timePoint > 1000) {
+                        peer.setPing((int) timePoint);
+                        this.network.notifyObserveUpdatePeer(peer);
+
+                        try {
+                            Thread.sleep(1000);
+                        } catch (Exception e) {
+                        }
+                    }
+
                 } else {
                     if (!peer.isUsed()) {
                         // DISCONNECT
@@ -1277,11 +1290,11 @@ public class Controller extends Observable {
         // CHECK GENESIS BLOCK on CONNECT
         Message mess = MessageFactory.getInstance()
                 .createGetHeadersMessage(this.blockChain.getGenesisBlock().getSignature());
-        //SignaturesMessage response = (SignaturesMessage) peer.getResponse(mess, 20000);
-        SignaturesMessage response = null;
+        SignaturesMessage response = (SignaturesMessage) peer.getResponse(mess, 20000); // AWAIT!
+        //SignaturesMessage response = null;
 
         if (response == null)
-            ; // MAY BE IT HARD BUSY
+            return; // MAY BE IT HARD BUSY
         else if (response.getSignatures().isEmpty()) {
             // NO
             peer.ban(Synchronizer.BAN_BLOCK_TIMES << 2, "wrong GENESIS BLOCK");
@@ -1292,8 +1305,7 @@ public class Controller extends Observable {
         Block winBlock = this.blockChain.getWaitWinBuffer();
         if (winBlock != null) {
             // SEND MESSAGE
-            if (!peer.directSendMessage(MessageFactory.getInstance().createWinBlockMessage(winBlock)))
-                return;
+            peer.sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(winBlock));
         }
 
         if (this.isStopping)

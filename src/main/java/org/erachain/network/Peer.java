@@ -636,7 +636,7 @@ public class Peer extends MonitoredThread {
      */
     public boolean directSendMessage(Message message) {
         long point = System.currentTimeMillis();
-        this.sender.put(message);
+        this.sender.sendMessage(message);
         point = System.currentTimeMillis() - point;
         this.pinger.setPing((int)point);
         return this.runed;

@@ -3,6 +3,7 @@ package org.erachain.network;
 
 import org.erachain.controller.Controller;
 import org.erachain.network.message.BlockWinMessage;
+import org.erachain.network.message.GetHWeightMessage;
 import org.erachain.network.message.HWeightMessage;
 import org.erachain.network.message.Message;
 import org.erachain.utils.MonitoredThread;
@@ -36,6 +37,7 @@ public class Sender extends MonitoredThread {
 
     private boolean stoped;
 
+    private GetHWeightMessage getHWeightMessage;
     private HWeightMessage hWeightMessage;
     private BlockWinMessage winBlockToSend;
 
@@ -83,6 +85,10 @@ public class Sender extends MonitoredThread {
         }
     }
 
+    public void sendHGetWeight(GetHWeightMessage GetHWeightMessage) {
+        this.getHWeightMessage = GetHWeightMessage;
+    }
+
     public void sendHWeight(HWeightMessage hWeightMessage) {
         this.hWeightMessage = hWeightMessage;
     }
@@ -91,7 +97,7 @@ public class Sender extends MonitoredThread {
         this.winBlockToSend = winBlock;
     }
 
-    private boolean sendMessage(Message message) {
+    boolean sendMessage(Message message) {
 
         //CHECK IF SOCKET IS STILL ALIVE
         if (this.out == null) {
@@ -125,7 +131,9 @@ public class Sender extends MonitoredThread {
 
         byte[] bytes = message.toBytes();
         String error = null;
-        //synchronized (this.out) {
+
+        // пока есть входы по sendMessage - нужно ждать синхрон
+        synchronized (this.out) {
             try {
                 this.out.write(bytes);
                 this.out.flush();
@@ -159,7 +167,7 @@ public class Sender extends MonitoredThread {
                 }
                 error = "try out.write 3 - " + e.getMessage();
             }
-        //}
+        }
 
         if (error != null) {
             peer.ban(error);
@@ -195,6 +203,14 @@ public class Sender extends MonitoredThread {
             } catch (InterruptedException e) {
                 //if (this.stoped)
                 break;
+            }
+
+            if (getHWeightMessage != null) {
+                if (!sendMessage(getHWeightMessage)) {
+                    getHWeightMessage = null;
+                    continue;
+                }
+                getHWeightMessage = null;
             }
 
             if (hWeightMessage != null) {
