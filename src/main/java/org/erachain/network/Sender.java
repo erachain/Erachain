@@ -10,6 +10,7 @@ import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -77,38 +78,32 @@ public class Sender extends MonitoredThread {
     }
 
     public void sendGetHWeight(GetHWeightMessage getHWeightMessage) {
-        if (false) {
-            synchronized (this.blockingQueue) {
-                if (this.blockingQueue.isEmpty()) {
-                    blockingQueue.offer(getHWeightMessage);
-                } else {
-                    this.getHWeightMessage = getHWeightMessage;
-                }
+        if (true) {
+            if (this.blockingQueue.isEmpty()) {
+                blockingQueue.offer(getHWeightMessage);
+            } else {
+                this.getHWeightMessage = getHWeightMessage;
             }
         } else
             blockingQueue.offer(getHWeightMessage);
     }
 
     public void sendHWeight(HWeightMessage hWeightMessage) {
-        if (false) {
-            synchronized (this.blockingQueue) {
-                if (this.blockingQueue.isEmpty()) {
-                    blockingQueue.offer(hWeightMessage);
-                } else {
-                    this.hWeightMessage = hWeightMessage;
-                }
+        if (true) {
+            if (this.blockingQueue.isEmpty()) {
+                blockingQueue.offer(hWeightMessage);
+            } else {
+                this.hWeightMessage = hWeightMessage;
             }
         } else
             blockingQueue.offer(hWeightMessage);
     }
 
     public void sendWinBlock(BlockWinMessage winBlock) {
-        synchronized (this.blockingQueue) {
-            if (this.blockingQueue.isEmpty()) {
-                blockingQueue.offer(winBlock);
-            } else {
-                this.winBlockToSend = winBlock;
-            }
+        if (this.blockingQueue.isEmpty()) {
+            blockingQueue.offer(winBlock);
+        } else {
+            this.winBlockToSend = winBlock;
         }
     }
 
@@ -147,14 +142,27 @@ public class Sender extends MonitoredThread {
         byte[] bytes = message.toBytes();
         String error = null;
 
-        // пока есть входы по sendMessage - нужно ждать синхрон
+        // пока есть входы по sendMessage (org.erachain.network.Peer.directSendMessage) - нужно ждать синхрон
         synchronized (this.out) {
             try {
+                if (this.out == null) {
+                    return false;
+                }
                 this.out.write(bytes);
                 this.out.flush();
             } catch (java.lang.OutOfMemoryError e) {
                 Controller.getInstance().stopAll(85);
                 return false;
+            } catch (EOFException e) {
+                if (this.out == null)
+                    // это наш дисконект
+                    return false;
+
+                checkTime = System.currentTimeMillis() - checkTime;
+                if (checkTime - 3 > bytes.length >> 3) {
+                    LOGGER.debug(this.peer + " --> " + message + " sended by period: " + checkTime);
+                }
+                error = "try out.write 1a - " + e.getMessage();
             } catch (java.net.SocketException eSock) {
                 if (this.out == null)
                     // это наш дисконект
@@ -175,12 +183,6 @@ public class Sender extends MonitoredThread {
                     LOGGER.debug(this.peer + " --> " + message + " sended by period: " + checkTime);
                 }
                 error = "try out.write 2 - " + e.getMessage();
-            } catch (Exception e) {
-                checkTime = System.currentTimeMillis() - checkTime;
-                if (checkTime - 3 > bytes.length >> 3) {
-                    LOGGER.debug(this.peer + " --> " + message + " sended by period: " + checkTime);
-                }
-                error = "try out.write 3 - " + e.getMessage();
             }
         }
 
@@ -258,12 +260,6 @@ public class Sender extends MonitoredThread {
     }
 
     public void close() {
-        if (false) {
-            try {
-                this.out.close();
-            } catch (Exception e) {
-            }
-        }
         this.out = null;
     }
 

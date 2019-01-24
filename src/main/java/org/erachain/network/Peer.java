@@ -503,7 +503,7 @@ public class Peer extends MonitoredThread {
     public boolean directSendMessage(Message message) {
         long point = System.currentTimeMillis();
         if (this.sender.sendMessage(message)) {
-            point = System.currentTimeMillis() - point + 1;
+            point = ((System.currentTimeMillis() - point) << 1) + 1 ;
             this.pinger.setPing((int) point);
         }
         return this.runed;
@@ -716,7 +716,7 @@ public class Peer extends MonitoredThread {
     public String toString() {
 
         return this.address.getHostAddress()
-                + (getPing() >= 0? " ping: " + this.getPing() + "ms" : (getPing() < 0?" try" + getPing() : ""))
-                + (isWhite()? " [White]" : "");
+                + (getPing() >= 0 && getPing() < 99999? " " + this.getPing() + "ms" : (getPing() < 0?" try" + getPing() : ""))
+                + (isWhite()? "+" : "");
     }
 }
