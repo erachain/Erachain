@@ -39,9 +39,8 @@ public class Peer extends MonitoredThread {
     public Network network;
     private InetAddress address;
     public Socket socket;
-    private DataInputStream in;
 
-    BlockingQueue<Object> startReading = new ArrayBlockingQueue<Object>(1);
+    BlockingQueue<DataInputStream> startReading = new ArrayBlockingQueue<DataInputStream>(1);
 
     private Sender sender;
     private Pinger pinger;
@@ -99,9 +98,6 @@ public class Peer extends MonitoredThread {
             this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
-            //CREATE STRINGWRITER
-            this.in = new DataInputStream(socket.getInputStream());
-
             // START SENDER
             this.sender = new Sender(this, socket.getOutputStream());
 
@@ -117,10 +113,7 @@ public class Peer extends MonitoredThread {
             this.runed = true;
 
             // START READING
-            try {
-                this.startReading.put(1L);
-            } catch (InterruptedException e) {
-            }
+            this.startReading.offer(new DataInputStream(socket.getInputStream()));
 
             LOGGER.info(description + address.getHostAddress());
 
@@ -136,77 +129,6 @@ public class Peer extends MonitoredThread {
             LOGGER.error(e.getMessage(), e);
 
         }
-
-    }
-
-    /**
-     * Accept connection to reuse brocken peer
-     * @param socket
-     * @param description
-     * @return
-     */
-    public boolean reconnect_old(Socket socket, String description) {
-
-        LOGGER.debug("@@@ reconnect(socket) : " + socket.getInetAddress().getHostAddress());
-
-        try {
-
-            if (this.socket != null) {
-                this.close("befor reconnect");
-            }
-            this.socket = socket;
-
-            this.address = socket.getInetAddress();
-            this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
-            this.white = false;
-            this.pingCounter = 0;
-            this.connectionTime = NTP.getTime();
-            this.errors = 0;
-            this.sendedBeforePing = 0l;
-            this.maxBeforePing = MAX_BEFORE_PING;
-
-            //ENABLE KEEPALIVE
-            this.socket.setKeepAlive(true);
-
-            //TIMEOUT - нужно для разрыва соединения если на том конце не стали нам слать нужные байты
-            this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
-
-            this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
-            this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
-
-            //CREATE STRINGWRITER
-            this.in = new DataInputStream(socket.getInputStream());
-
-            this.sender.setOut(socket.getOutputStream());
-            this.sender.setName("Sender - " + this.sender.getId() + " for: " + this.getAddress().getHostAddress());
-
-            this.pinger.setPing(Integer.MAX_VALUE);
-            this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.address.getHostAddress());
-
-            // IT is STARTED
-            this.runed = true;
-
-            // START READING
-            try {
-                this.startReading.put(1L);
-            } catch (InterruptedException e) {
-            }
-
-            //ON SOCKET CONNECT
-            this.setName("Peer: " + this + " reconnected");
-
-            LOGGER.info(this + description);
-            network.onConnect(this);
-
-        } catch (Exception e) {
-            //FAILED TO CONNECT NO NEED TO BLACKLIST
-            LOGGER.debug("Failed to connect to : " + address.getHostAddress());
-            LOGGER.error(e.getMessage(), e);
-
-            return false;
-        }
-
-        return this.runed;
 
     }
 
@@ -263,10 +185,6 @@ public class Peer extends MonitoredThread {
             this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
-            //CREATE STRINGWRITER
-            step++;
-            this.in = new DataInputStream(this.socket.getInputStream());
-
         } catch (Exception e) {
             //FAILED TO CONNECT NO NEED TO BLACKLIST
             if (step != 1) {
@@ -310,8 +228,9 @@ public class Peer extends MonitoredThread {
 
         // START READING
         try {
-            this.startReading.put(1);
-        } catch (InterruptedException e) {
+            this.startReading.offer(new DataInputStream(socket.getInputStream()));
+        } catch (IOException e) {
+            return false;
         }
 
         LOGGER.info(this + description);
@@ -403,172 +322,147 @@ public class Peer extends MonitoredThread {
         while (!stoped) {
             if (USE_MONITOR) this.setMonitorPoint();
 
-            if (false)
-                LOGGER.info(this.getAddress().getHostAddress()
-                    + (this.isUsed()?" is Used" : "")
-                    + (this.isBanned()?" is Banned" : "")
-                    + (this.isBad()?" is Bad" : "")
-                    + (this.isWhite()?" is White" : ""));
+            DataInputStream in = null;
+            try {
+                in = startReading.take();
+            } catch (Exception e) {
+                if (stoped)
+                    break;
+            }
 
-            if (!this.runed) {
+            while (this.runed) {
+
+                //READ FIRST 4 BYTES
+                messageMagic = new byte[Message.MAGIC_LENGTH];
+
+                if (USE_MONITOR) this.setMonitorStatus("in.readFully");
+
+                // MORE EFFECTIVE
+                // в этом случае просто ожидаем прилета байтов в течении заданного времени ожидания
+                // java.net.Socket.setSoTimeout(30000)
+                // после чего ловим событие SocketTimeoutException т поаторяем ожидание
+                // это работает без задержек и более эффективно и не ест время процессора
                 try {
-                    startReading.take();
-                } catch (Exception e) {
-                    if (stoped)
-                        break;
+                    in.readFully(messageMagic);
+                } catch (java.net.SocketTimeoutException timeOut) {
+                    /// просто дальше ждем - все нормально
+                    continue;
+                } catch (java.lang.OutOfMemoryError e) {
+                    Controller.getInstance().stopAll(82);
+                    return;
+                } catch (EOFException e) {
+                    if (this.runed)
+                        // на ТОМ конце произошло отключение - делаем тоже дисконект
+                        ban(network.banForActivePeersCounter(), "read-0 peer is shutdownInput");
+
+                    break;
+                } catch (java.net.SocketException e) {
+                    if (this.runed)
+                        ban(network.banForActivePeersCounter(), "read-2 " + e.getMessage());
+                    break;
+                } catch (java.io.IOException e) {
+                    if (this.runed)
+                        // это наш дисконект
+                        ban(network.banForActivePeersCounter(), "read-3 " + e.getMessage());
+                    break;
                 }
-            }
 
-            //READ FIRST 4 BYTES
-            messageMagic = new byte[Message.MAGIC_LENGTH];
+                if (!Arrays.equals(messageMagic, Controller.getInstance().getMessageMagic())) {
+                    //ERROR and BAN
+                    ban(3600, "parse - received message with wrong magic");
+                    break;
+                }
 
-            if (USE_MONITOR) this.setMonitorStatus("in.readFully");
-
-            // MORE EFFECTIVE
-            // в этом случае просто ожидаем прилета байтов в течении заданного времени ожидания
-            // java.net.Socket.setSoTimeout(30000)
-            // после чего ловим событие SocketTimeoutException т поаторяем ожидание
-            // это работает без задержек и более эффективно и не ест время процессора
-            try {
-                in.readFully(messageMagic);
-            } catch (java.net.SocketTimeoutException timeOut) {
-                /// просто дальше ждем - все нормально
-                continue;
-            } catch (java.lang.OutOfMemoryError e) {
-                Controller.getInstance().stopAll(82);
-                break;
-            } catch (EOFException e) {
-                if (!this.runed)
-                    // это наш дисконект
-                    continue;
-                // на там конце произошло отключение - делаем тоже дисконект
-                ban(network.banForActivePeersCounter(), "read-0 peer is shutdownInput");
-                continue;
-            } catch (java.net.SocketException e) {
-                if (!this.runed)
-                    // это наш дисконект
-                // если туда уже не лезет иликанал побился
-                ban(network.banForActivePeersCounter(), "read-2 " + e.getMessage());
-                continue;
-            } catch (java.io.IOException e) {
-                if (!this.runed)
-                    // это наш дисконект
-                ban(network.banForActivePeersCounter(), "read-3 " + e.getMessage());
-                continue;
-            } catch (Exception e) {
-                //DISCONNECT and BAN
-                ban(network.banForActivePeersCounter(), "read-4 " + e.getMessage());
-                continue;
-            }
-
-            if (!Arrays.equals(messageMagic, Controller.getInstance().getMessageMagic())) {
-                //ERROR and BAN
-                ban(3600, "parse - received message with wrong magic");
-                continue;
-            }
-
-            //PROCESS NEW MESSAGE
-            Message message;
-            try {
-                message = MessageFactory.getInstance().parse(this, in);
-            } catch (java.net.SocketTimeoutException timeOut) {
-                if (!this.runed)
-                    // это наш дисконект
-                    continue;
-
-                // если сдесь по времени ожидания пришло то значит на том конце что-то не так и пора разрывать соединение
-                if (this.getPing() < -1) {
+                //PROCESS NEW MESSAGE
+                Message message;
+                try {
+                    message = MessageFactory.getInstance().parse(this, in);
+                } catch (java.net.SocketTimeoutException timeOut) {
                     ban(network.banForActivePeersCounter(), "peer in TimeOut and -ping");
-                } else {
-                    ban(network.banForActivePeersCounter(), "peer in TimeOut");
+                    break;
+                } catch (java.lang.OutOfMemoryError e) {
+                    Controller.getInstance().stopAll(83);
+                    break;
+                } catch (EOFException e) {
+                    if (this.runed)
+                        // на ТОМ конце произошло отключение - делаем тоже дисконект
+                        ban(network.banForActivePeersCounter(), "peer is shutdownInput");
+                    break;
+                } catch (IOException e) {
+                    if (this.runed)
+                        // на ТОМ конце произошло отключение - делаем тоже дисконект
+                        ban(network.banForActivePeersCounter(), e.getMessage());
+                    break;
+                } catch (Exception e) {
+                    //DISCONNECT and BAN
+                    ban(network.banForActivePeersCounter(), "parse message wrong - " + e.getMessage());
+                    break;
                 }
-                continue;
-            } catch (java.lang.OutOfMemoryError e) {
-                Controller.getInstance().stopAll(83);
-                break;
-            } catch (EOFException e) {
-                if (!this.runed)
-                    // это наш дисконект
+
+                /*
+                if (message == null) {
+                    // unknowm message
+                    LOGGER.debug(this + " : NULL message!!!");
                     continue;
+                }
+                */
 
-                // на там конце произошло отключение - делаем тоже дисконект
-                ban(network.banForActivePeersCounter(), "peer is shutdownInput");
-                continue;
-            } catch (IOException e) {
-                if (!this.runed)
-                    // это наш дисконект
-                    continue;
+                if (USE_MONITOR) this.setMonitorStatus("in.message process");
 
-                // на там конце произошло отключение - делаем тоже дисконект
-                ban(network.banForActivePeersCounter(), e.getMessage());
-                continue;
-            } catch (Exception e) {
-                //DISCONNECT and BAN
-                ban(network.banForActivePeersCounter(), "parse message wrong - " + e.getMessage());
-                continue;
-            }
+                //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
+                if (!message.isRequest() && message.hasId()) {
 
-            if (message == null) {
-                // unknowm message
-                LOGGER.debug(this + " : NULL message!!!");
-                continue;
-            }
+                    if (!this.messages.containsKey(message.getId())) {
+                        // просроченное сообщение
+                        // это ответ на наш запрос с ID
+                        if (logPings && message.getType() != Message.TRANSACTION_TYPE
+                                && message.getType() != Message.TELEGRAM_TYPE
+                        ) {
+                            LOGGER.debug(this + " <... " + message);
+                        }
+                        continue;
+                    }
 
-            if (USE_MONITOR) this.setMonitorStatus("in.message process");
-
-            //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
-            if (!message.isRequest() && message.hasId()) {
-
-                if (!this.messages.containsKey(message.getId())) {
-                    // просроченное сообщение
                     // это ответ на наш запрос с ID
                     if (logPings && message.getType() != Message.TRANSACTION_TYPE
                             && message.getType() != Message.TELEGRAM_TYPE
                     ) {
-                        LOGGER.debug(this + " <... " + message);
+                        LOGGER.debug(this + " <+++ " + message);
                     }
-                    continue;
-                }
 
-                // это ответ на наш запрос с ID
-                if (logPings && message.getType() != Message.TRANSACTION_TYPE
-                        && message.getType() != Message.TELEGRAM_TYPE
-                ) {
-                    LOGGER.debug(this + " <+++ " + message);
-                }
+                    try {
 
-                try {
+                        // get WAITING POLL
+                        BlockingQueue<Message> poll = this.messages.remove(message.getId());
+                        // invoke WAITING POLL
+                        poll.add(message);
 
-                    // get WAITING POLL
-                    BlockingQueue<Message> poll = this.messages.remove(message.getId());
-                    // invoke WAITING POLL
-                    poll.add(message);
+                    } catch (java.lang.OutOfMemoryError e) {
+                        Controller.getInstance().stopAll(84);
+                        break;
 
-                } catch (java.lang.OutOfMemoryError e) {
-                    Controller.getInstance().stopAll(84);
-                    break;
+                    } catch (Exception e) {
+                        LOGGER.error(this + " <+++ " + message);
+                        LOGGER.error(e.getMessage(), e);
+                    }
 
-                } catch (Exception e) {
-                    LOGGER.error(this + " <+++ " + message);
-                    LOGGER.error(e.getMessage(), e);
-                }
+                } else {
 
-            } else {
+                    if (logPings && message.getType() != Message.TRANSACTION_TYPE
+                            && message.getType() != Message.TELEGRAM_TYPE
+                    ) {
+                        LOGGER.debug(this + " <--- " + message);
+                    }
 
-                if (logPings && message.getType() != Message.TRANSACTION_TYPE
-                        && message.getType() != Message.TELEGRAM_TYPE
-                ) {
-                    LOGGER.debug(this + " <--- " + message);
-                }
+                    long timeStart = System.currentTimeMillis();
+                    ///LOGGER.debug(this + " : " + message + " receive, go solve");
 
-                long timeStart = System.currentTimeMillis();
-                ///LOGGER.debug(this + " : " + message + " receive, go solve");
+                    this.network.onMessage(message);
 
-                this.network.onMessage(message);
-
-                timeStart = System.currentTimeMillis() - timeStart;
-                if (timeStart > 500) {
-                    LOGGER.debug(this + " <--- " + message + " solved by period: " + timeStart);
+                    timeStart = System.currentTimeMillis() - timeStart;
+                    if (timeStart > 100) {
+                        LOGGER.debug(this + " <--- " + message + " solved by period: " + timeStart);
+                    }
                 }
             }
         }
@@ -790,6 +684,9 @@ public class Peer extends MonitoredThread {
                     // иначе Стримы больше не откроются
                     // и нужно просто сокет закрыть
 
+                    // сообщим в свой цикл что закрыли соединение
+                    this.socket.shutdownInput();
+
                     // сообщим что закрыли соединение другому узлу
                     this.socket.shutdownOutput();
 
@@ -801,7 +698,6 @@ public class Peer extends MonitoredThread {
             }
         }
 
-        this.in = null;
         this.socket = null;
 
         return true;

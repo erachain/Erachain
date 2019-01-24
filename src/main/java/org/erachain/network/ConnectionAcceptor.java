@@ -79,7 +79,6 @@ public class ConnectionAcceptor extends MonitoredThread {
                 Controller.getInstance().stopAll(90);
                 break;
             } catch (java.net.SocketException e) {
-                //LOGGER.error(e.getMessage(), e);
 
                 if (!socket.isClosed())
                     try {
