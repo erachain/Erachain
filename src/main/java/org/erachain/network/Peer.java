@@ -28,10 +28,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class Peer extends MonitoredThread {
 
-    private final static boolean USE_MONITOR = true;
+    private final static boolean USE_MONITOR = false;
+    private final static boolean logPings = false;
 
-    private final static boolean need_wait = false;
-    private final static boolean logPings = true;
     static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getName());
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
     // поэтому нужно ожидание дольще делать
@@ -40,7 +39,6 @@ public class Peer extends MonitoredThread {
     public Network network;
     private InetAddress address;
     public Socket socket;
-    //public OutputStream out;
     private DataInputStream in;
 
     BlockingQueue<Object> startReading = new ArrayBlockingQueue<Object>(1);
@@ -102,7 +100,6 @@ public class Peer extends MonitoredThread {
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
             //CREATE STRINGWRITER
-            //this.out = socket.getOutputStream();
             this.in = new DataInputStream(socket.getInputStream());
 
             // START SENDER
@@ -178,7 +175,6 @@ public class Peer extends MonitoredThread {
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
             //CREATE STRINGWRITER
-            ///this.out = socket.getOutputStream();
             this.in = new DataInputStream(socket.getInputStream());
 
             this.sender.setOut(socket.getOutputStream());
@@ -269,7 +265,6 @@ public class Peer extends MonitoredThread {
 
             //CREATE STRINGWRITER
             step++;
-            //this.out = this.socket.getOutputStream();
             this.in = new DataInputStream(this.socket.getInputStream());
 
         } catch (Exception e) {
@@ -613,9 +608,10 @@ public class Peer extends MonitoredThread {
      */
     public boolean directSendMessage(Message message) {
         long point = System.currentTimeMillis();
-        this.sender.sendMessage(message);
-        point = System.currentTimeMillis() - point;
-        this.pinger.setPing((int)point);
+        if (this.sender.sendMessage(message)) {
+            point = System.currentTimeMillis() - point + 1;
+            this.pinger.setPing((int) point);
+        }
         return this.runed;
     }
 
@@ -797,8 +793,6 @@ public class Peer extends MonitoredThread {
                     // сообщим что закрыли соединение другому узлу
                     this.socket.shutdownOutput();
 
-                    this.sender.close();
-
                     this.socket.close();
 
                 } catch (Exception ignored) {
@@ -808,7 +802,6 @@ public class Peer extends MonitoredThread {
         }
 
         this.in = null;
-        //this.out = null;
         this.socket = null;
 
         return true;
@@ -817,7 +810,7 @@ public class Peer extends MonitoredThread {
     public void halt() {
 
         this.stoped = true;
-        this.sender.halt();
+        //this.sender.halt();
         this.close("halt");
         //this.setName("Peer: " + this.getAddress().getHostAddress() + " halted");
 

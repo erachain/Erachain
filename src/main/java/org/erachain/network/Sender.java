@@ -22,8 +22,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class Sender extends MonitoredThread {
 
-    private final static boolean USE_MONITOR = true;
-    private final static boolean logPings = true;
+    private final static boolean USE_MONITOR = false;
+    private final static boolean logPings = false;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class);
     private static final int QUEUE_LENGTH = 20;
@@ -258,9 +258,11 @@ public class Sender extends MonitoredThread {
     }
 
     public void close() {
-        try {
-            //this.out.close();
-        } catch (Exception e) {
+        if (false) {
+            try {
+                this.out.close();
+            } catch (Exception e) {
+            }
         }
         this.out = null;
     }

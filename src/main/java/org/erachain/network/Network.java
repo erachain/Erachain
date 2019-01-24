@@ -36,6 +36,11 @@ public class Network extends Observable {
     private SortedSet<String> handledMessages;
     private boolean run;
 
+    public static final int WHITE_TYPE = 1;
+    public static final int NOWHITE_TYPE = -1;
+    public static final int NOUSE_WHITE_TYPE = 0;
+
+
     public Network() {
         this.knownPeers = new ArrayList<Peer>();
         this.run = true;
@@ -179,7 +184,7 @@ public class Network extends Observable {
     }
 
     // IF PEER in exist in NETWORK - get it
-    public Peer getKnownPeer(Peer peer) {
+    public Peer getKnownPeer(Peer peer, int type) {
 
         try {
             byte[] address = peer.getAddress().getAddress();
@@ -188,12 +193,15 @@ public class Network extends Observable {
                 for (Peer knownPeer : knownPeers) {
                     //CHECK IF ADDRESS IS THE SAME
                     if (Arrays.equals(address, knownPeer.getAddress().getAddress())) {
-                        if (knownPeer.isUsed() || !knownPeer.isWhite())
+                        if (knownPeer.isUsed()) {
+                            if (type != NOUSE_WHITE_TYPE) {
+                                if (type == WHITE_TYPE && !knownPeer.isWhite())
+                                    continue;
+                                if (type == NOWHITE_TYPE && knownPeer.isWhite())
+                                    continue;
+                            }
                             return knownPeer;
-
-                        // тут еще могут быть такие же Адреса из-за одновременного коннекта друг к другу
-                        peer = knownPeer;
-
+                        }
                     }
                 }
             }
