@@ -96,8 +96,8 @@ public class WinBlockSelector extends MonitoredThread {
         } else if (!newBlock.isValidHead(dcSet)) {
             // есди синхронизация цепочки не идет
             // то проверим заголовок
-            info = "Block (" + newBlock.toString() + ") is Invalid";
-            message.getSender().ban(30, info);
+            info = "Block (" + newBlock.toString() + ") is Invalid - ignore";
+            LOGGER.debug(info);
             return;
         }
 
