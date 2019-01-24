@@ -101,7 +101,7 @@ public class ConnectionCreator extends MonitoredThread {
                 continue;
 
             //CHECK IF PEER ALREADY used
-            newPeer = network.getKnownPeer(newPeer);
+            newPeer = network.getKnownPeer(newPeer, Network.WHITE_TYPE);
 
             //CHECK IF ALREADY CONNECTED TO PEER
             if (newPeer.isUsed() || newPeer.isBanned())
@@ -196,7 +196,7 @@ public class ConnectionCreator extends MonitoredThread {
 
                     //CHECK IF PEER ALREADY used
                     // new PEER from NETWORK poll or original from DB
-                    peer = network.getKnownPeer(peer);
+                    peer = network.getKnownPeer(peer, Network.WHITE_TYPE);
 
                     //CHECK IF ALREADY CONNECTED TO PEER
                     if (peer.isUsed() || peer.isBanned())
