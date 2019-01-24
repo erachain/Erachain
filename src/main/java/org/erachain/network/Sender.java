@@ -258,9 +258,11 @@ public class Sender extends MonitoredThread {
     }
 
     public void close() {
-        try {
-            //this.out.close();
-        } catch (Exception e) {
+        if (false) {
+            try {
+                this.out.close();
+            } catch (Exception e) {
+            }
         }
         this.out = null;
     }

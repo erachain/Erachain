@@ -53,7 +53,7 @@ public class WinBlockSelector extends MonitoredThread {
     /**
      * @param message
      */
-    public synchronized void putMessage(Message message) {
+    public void putMessage(Message message) {
         try {
             blockingQueue.put(message);
         } catch (InterruptedException e) {
@@ -75,11 +75,9 @@ public class WinBlockSelector extends MonitoredThread {
         // if already it block in process
         String key = newBlock.getCreator().getBase58();
 
-        synchronized (this.waitWinBufferProcessed) {
-            if (!waitWinBufferProcessed.add(key)
-                    || Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getSignature()))
-                return;
-        }
+        if (!waitWinBufferProcessed.add(key)
+                || Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getSignature()))
+            return;
 
         String info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
                 + newBlock.toString();
@@ -152,7 +150,7 @@ public class WinBlockSelector extends MonitoredThread {
                 Controller.getInstance().stopAll(86);
                 break;
             } catch (Exception e) {
-                break;
+                LOGGER.error(e.getMessage(), e);
             }
 
             if (message == null || !runned)
