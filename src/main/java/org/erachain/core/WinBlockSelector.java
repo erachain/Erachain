@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 public class WinBlockSelector extends MonitoredThread {
 
@@ -142,16 +141,22 @@ public class WinBlockSelector extends MonitoredThread {
     public void run() {
 
         runned = true;
+        Message message;
         while (runned) {
             try {
                 processMessage(blockingQueue.take());
-            } catch (InterruptedException e) {
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(86);
                 break;
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
+            } catch (java.lang.IllegalMonitorStateException e) {
+                break;
+            } catch (java.lang.InterruptedException e) {
                 break;
             }
+
         }
+
+        LOGGER.info("WinBlock Selector halted");
     }
 
     public void halt() {
