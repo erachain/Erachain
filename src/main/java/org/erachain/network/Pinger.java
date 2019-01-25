@@ -151,11 +151,13 @@ public class Pinger extends Thread {
                 tryPing();
             }
         }
+
+        LOGGER.info(this + "halted");
+
     }
 
     public void close() {
         startPinging.offer(-1);
     }
-
 
 }

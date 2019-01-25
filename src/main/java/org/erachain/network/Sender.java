@@ -258,6 +258,8 @@ public class Sender extends MonitoredThread {
             if (!sendMessage(message))
                 continue;
         }
+
+        LOGGER.info(this + "halted");
     }
 
     public void close() {
