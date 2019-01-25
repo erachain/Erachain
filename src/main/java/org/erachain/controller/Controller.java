@@ -1272,27 +1272,24 @@ public class Controller extends Observable {
             return;
         }
 
-        if (false) {
-            // CHECK GENESIS BLOCK on CONNECT
-            Message mess = MessageFactory.getInstance()
-                    .createGetHeadersMessage(this.blockChain.getGenesisBlock().getSignature());
-            SignaturesMessage response = (SignaturesMessage) peer.getResponse(mess, 20000); // AWAIT!
+        // CHECK GENESIS BLOCK on CONNECT
+        Message mess = MessageFactory.getInstance()
+                .createGetHeadersMessage(this.blockChain.getGenesisBlock().getSignature());
+        SignaturesMessage response = (SignaturesMessage) peer.getResponse(mess, 20000); // AWAIT!
 
-            if (this.isStopping)
-                return;
-            if (response == null) {
-                peer.ban(network.banForActivePeersCounter(), "connection - break on POINTs get");
-                return;
-            } else if (response.getSignatures().isEmpty()) {
-                // NO
-                peer.ban(Synchronizer.BAN_BLOCK_TIMES << 2, "connection - wrong GENESIS BLOCK");
-                return;
-            }
-
-            if (this.isStopping || response == null)
-                return; // MAY BE IT HARD BUSY
-
+        if (this.isStopping)
+            return;
+        if (response == null) {
+            peer.ban(network.banForActivePeersCounter(), "connection - break on POINTs get");
+            return;
+        } else if (response.getSignatures().isEmpty()) {
+            // NO
+            peer.ban(Synchronizer.BAN_BLOCK_TIMES << 2, "connection - wrong GENESIS BLOCK");
+            return;
         }
+
+        if (this.isStopping || response == null)
+            return; // MAY BE IT HARD BUSY
 
         // GET CURRENT WIN BLOCK
         Block winBlock = this.blockChain.getWaitWinBuffer();
