@@ -25,10 +25,6 @@ public class PeerManager extends MonitoredThread {
         this.network = network;
     }
 
-    public static PeerManager getInstance() {
-        return null;
-    }
-
     public List<Peer> getBestPeers() {
         return Controller.getInstance().getDBSet().getPeerMap().getBestPeers(Settings.getInstance().getMaxSentPeers() << 2, false);
     }
@@ -80,11 +76,9 @@ public class PeerManager extends MonitoredThread {
 
         }
 
-        LOGGER.info("WinBlock Selector halted");
+        LOGGER.info("Peer Manager halted");
 
     }
-
-}
 
 
     public void halt() {

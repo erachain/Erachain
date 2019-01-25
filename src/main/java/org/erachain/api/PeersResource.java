@@ -195,7 +195,7 @@ public class PeersResource {
     @GET
     @Path("best")
     public String getTopPeers() {
-        List<Peer> peers = Controller..getInstance().getBestPeers();
+        List<Peer> peers = Controller.getInstance().network.getBestPeers();
         JSONArray array = new JSONArray();
 
         for (Peer peer : peers) {

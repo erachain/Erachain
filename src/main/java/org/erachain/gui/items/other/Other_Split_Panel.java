@@ -82,10 +82,16 @@ public class Other_Split_Panel extends Split_Panel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                
-                // item_Peer_Menu.ban(10, "banned by user");
-                PeerManager.getInstance().addPeer(item_Peer_Menu, 0); // reset BAN if exists
-                item_Peer_Menu.connect(null, Controller.getInstance().network, "connected as recircled by USER!!! ");
+
+                // чтобы развязат задержку и не тормозить GUI
+                new Thread() {
+                    @Override
+                    public void run() {
+                        // item_Peer_Menu.ban(10, "banned by user");
+                        Controller.getInstance().network.addPeer(item_Peer_Menu, 0); // reset BAN if exists
+                        item_Peer_Menu.connect(null, Controller.getInstance().network, "connected as recircled by USER!!! ");
+                    }
+                }.start();
 
             }
             

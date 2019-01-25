@@ -124,7 +124,7 @@ public class Network extends Observable {
         }
 
         //ADD TO DATABASE
-        PeerManager.getInstance().addPeer(peer, 0);
+        peerManager.addPeer(peer, 0);
 
         if (Controller.getInstance().isOnStopping())
             return;
@@ -147,7 +147,7 @@ public class Network extends Observable {
 
         if (banForMinutes > peer.getBanMinutes()) {
             //ADD TO BLACKLIST
-            PeerManager.getInstance().addPeer(peer, banForMinutes);
+            peerManager.addPeer(peer, banForMinutes);
         }
 
         //PASS TO CONTROLLER
@@ -246,6 +246,18 @@ public class Network extends Observable {
             }
         }
         return counter;
+    }
+
+    public List<Peer> getBestPeers() {
+        return this.peerManager.getBestPeers();
+    }
+
+    public List<Peer> getKnownPeers() {
+        return this.peerManager.getKnownPeers();
+    }
+
+    public void addPeer(Peer peer, int banForMinutes) {
+        this.peerManager.addPeer(peer, banForMinutes);
     }
 
     /**
@@ -477,7 +489,7 @@ public class Network extends Observable {
             case Message.GET_PEERS_TYPE:
 
                 //CREATE NEW PEERS MESSAGE WITH PEERS
-                Message answer = MessageFactory.getInstance().createPeersMessage(PeerManager.getInstance().getBestPeers());
+                Message answer = MessageFactory.getInstance().createPeersMessage(peerManager.getBestPeers());
                 answer.setId(message.getId());
 
                 //SEND TO SENDER
