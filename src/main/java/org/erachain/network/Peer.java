@@ -327,9 +327,8 @@ public class Peer extends MonitoredThread {
                 in = startReading.take();
                 // INIT PINGER
                 pinger.init();
-            } catch (Exception e) {
-                if (stoped)
-                    break;
+            } catch (InterruptedException e) {
+                break;
             }
 
             while (this.runed) {
@@ -470,7 +469,7 @@ public class Peer extends MonitoredThread {
         }
 
         if (USE_MONITOR) this.setMonitorStatus("halted");
-        LOGGER.info(this + "halted");
+        LOGGER.info(this + " - halted");
 
     }
 
@@ -661,6 +660,8 @@ public class Peer extends MonitoredThread {
 
         this.pinger.close();
 
+        this.sender.close();
+
         if (socket != null) {
             //LOGGER.debug(this + " SOCKET: \n"
             //        + (this.socket.isBound()? " isBound " : "")
@@ -669,8 +670,6 @@ public class Peer extends MonitoredThread {
             //        + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
             //        + (this.socket.isClosed()? " isClosed " : "")
             //);
-
-            this.sender.close();
 
             //CHECK IF SOCKET IS CONNECTED
             if (socket.isConnected()) {

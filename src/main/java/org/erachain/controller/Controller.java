@@ -1242,6 +1242,10 @@ public class Controller extends Observable {
         // LOGGER.info(peer + " sended UNCONFIRMED counter: " +
         // counter);
 
+        //NOTIFY OBSERVERS
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_PEER_TYPE, peer));
+
         return peer.isUsed();
 
     }
