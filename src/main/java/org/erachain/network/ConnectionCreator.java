@@ -88,7 +88,7 @@ public class ConnectionCreator extends MonitoredThread {
             }
 
             //CHECK IF THAT PEER IS NOT BLACKLISTED
-            if (PeerManager.getInstance().isBanned(newPeer))
+            if (newPeer.isBanned())
                 continue;
 
             //CHECK IF SOCKET IS NOT LOCALHOST
@@ -162,7 +162,7 @@ public class ConnectionCreator extends MonitoredThread {
             if (this.isRun && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true)) {
 
                 //GET LIST OF KNOWN PEERS
-                knownPeers = PeerManager.getInstance().getKnownPeers();
+                knownPeers = network.getKnownPeers();
 
                 //ITERATE knownPeers
                 for (Peer peer : knownPeers) {

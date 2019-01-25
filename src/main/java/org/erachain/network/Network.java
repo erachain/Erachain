@@ -31,6 +31,7 @@ public class Network extends Observable {
     private static InetAddress myselfAddress;
     private ConnectionCreator creator;
     private ConnectionAcceptor acceptor;
+    private PeerManager peerManager;
     private TelegramManager telegramer;
     private List<Peer> knownPeers;
     private SortedSet<String> handledMessages;
@@ -91,6 +92,9 @@ public class Network extends Observable {
         acceptor = new ConnectionAcceptor(this);
         acceptor.start();
 
+        peerManager = new PeerManager(this);
+        peerManager.start();
+
         telegramer = new TelegramManager(this);
         telegramer.start();
     }
@@ -100,10 +104,13 @@ public class Network extends Observable {
         //LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer);
 
         // WAIT start PINGER and InputStream
+
+        /*
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
         }
+        */
 
         boolean asNew = true;
         synchronized (this.knownPeers) {
@@ -120,7 +127,7 @@ public class Network extends Observable {
         }
 
         //ADD TO DATABASE
-        PeerManager.getInstance().addPeer(peer, 0);
+        peerManager.addPeer(peer, 0);
 
         if (Controller.getInstance().isOnStopping())
             return;
@@ -143,7 +150,7 @@ public class Network extends Observable {
 
         if (banForMinutes > peer.getBanMinutes()) {
             //ADD TO BLACKLIST
-            PeerManager.getInstance().addPeer(peer, banForMinutes);
+            peerManager.addPeer(peer, banForMinutes);
         }
 
         //PASS TO CONTROLLER
@@ -242,6 +249,18 @@ public class Network extends Observable {
             }
         }
         return counter;
+    }
+
+    public List<Peer> getBestPeers() {
+        return this.peerManager.getBestPeers();
+    }
+
+    public List<Peer> getKnownPeers() {
+        return this.peerManager.getKnownPeers();
+    }
+
+    public void addPeer(Peer peer, int banForMinutes) {
+        this.peerManager.addPeer(peer, banForMinutes);
     }
 
     /**
@@ -473,7 +492,7 @@ public class Network extends Observable {
             case Message.GET_PEERS_TYPE:
 
                 //CREATE NEW PEERS MESSAGE WITH PEERS
-                Message answer = MessageFactory.getInstance().createPeersMessage(PeerManager.getInstance().getBestPeers());
+                Message answer = MessageFactory.getInstance().createPeersMessage(peerManager.getBestPeers());
                 answer.setId(message.getId());
 
                 //SEND TO SENDER
@@ -634,6 +653,9 @@ public class Network extends Observable {
 
         // stop thread
         this.acceptor.halt();
+
+        //
+        this.peerManager.halt();
 
         this.telegramer.halt();
 

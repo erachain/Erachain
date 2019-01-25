@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class Sender extends MonitoredThread {
 
     private final static boolean USE_MONITOR = false;
-    private final static boolean logPings = false;
+    private final static boolean logPings = true;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class);
     private static final int QUEUE_LENGTH = 20;
@@ -134,15 +134,16 @@ public class Sender extends MonitoredThread {
 
         if (USE_MONITOR) this.setMonitorStatusBefore("write");
 
-        //SEND MESSAGE
-        long checkTime = System.currentTimeMillis();
-        if (this.out == null)
-            return false;
 
         byte[] bytes = message.toBytes();
         String error = null;
 
+        //SEND MESSAGE
+        long checkTime = System.currentTimeMillis();
+
         // пока есть входы по sendMessage (org.erachain.network.Peer.directSendMessage) - нужно ждать синхрон
+        if (this.out == null)
+            return false;
         synchronized (this.out) {
             try {
                 if (this.out == null) {

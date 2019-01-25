@@ -1,28 +1,28 @@
 package org.erachain.network;
 
 import org.erachain.controller.Controller;
+import org.erachain.network.message.Message;
 import org.erachain.settings.Settings;
+import org.erachain.utils.MonitoredThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
-public class PeerManager {
+public class PeerManager extends MonitoredThread {
 
-    private static PeerManager instance;
-    //private Map<String, Long> blacListeddWait = new TreeMap<String, Long>(); // bat not time
-    //private final static long banTime = 3 * 60 * 60 * 1000;
+    private Network network;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PeerManager.class);
 
-    private PeerManager() {
+    private static final int QUEUE_LENGTH = 20;
+    BlockingQueue<Peer> blockingQueue = new ArrayBlockingQueue<Peer>(QUEUE_LENGTH);
 
-    }
-
-    public static PeerManager getInstance() {
-        if (instance == null) {
-            instance = new PeerManager();
-        }
-
-        return instance;
+    public PeerManager(Network network) {
+        this.network = network;
     }
 
     public List<Peer> getBestPeers() {
@@ -52,4 +52,37 @@ public class PeerManager {
     public boolean isBanned(Peer peer) {
         return Controller.getInstance().getDBSet().getPeerMap().isBanned(peer.getAddress());
     }
+
+    private void processPeers(Peer peer) {
+    }
+
+    public void run() {
+
+        //Controller cnt = Controller.getInstance();
+
+        Message message = null;
+
+        while (this.network != null) {
+            try {
+                processPeers(blockingQueue.take());
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(86);
+                break;
+            } catch (java.lang.IllegalMonitorStateException e) {
+                break;
+            } catch (java.lang.InterruptedException e) {
+                break;
+            }
+
+        }
+
+        LOGGER.info("Peer Manager halted");
+
+    }
+
+
+    public void halt() {
+        this.network = null;
+    }
+
 }
