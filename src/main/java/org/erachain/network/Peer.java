@@ -112,13 +112,13 @@ public class Peer extends MonitoredThread {
             // IT is STARTED
             this.runed = true;
 
+            // при коннекте во вне связь может порваться поэтому тут по runed
+            network.onConnect(this);
+
             // START READING
             this.startReading.offer(new DataInputStream(socket.getInputStream()));
 
             LOGGER.info(description + address.getHostAddress());
-
-            // при коннекте во вне связь может порваться поэтому тут по runed
-            network.onConnect(this);
 
         } catch (Exception e) {
             //FAILED TO CONNECT NO NEED TO BLACKLIST
@@ -226,6 +226,8 @@ public class Peer extends MonitoredThread {
 
         this.runed = true;
 
+        network.onConnect(this);
+
         // START READING
         try {
             this.startReading.offer(new DataInputStream(socket.getInputStream()));
@@ -234,8 +236,6 @@ public class Peer extends MonitoredThread {
         }
 
         LOGGER.info(this + description);
-
-        network.onConnect(this);
 
         // при коннекте во вне связь может порваться поэтому тут по runed
         return this.runed;

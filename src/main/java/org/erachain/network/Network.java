@@ -104,10 +104,13 @@ public class Network extends Observable {
         //LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer);
 
         // WAIT start PINGER and InputStream
+
+        /*
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
         }
+        */
 
         boolean asNew = true;
         synchronized (this.knownPeers) {
