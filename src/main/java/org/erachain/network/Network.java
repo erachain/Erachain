@@ -31,6 +31,7 @@ public class Network extends Observable {
     private static InetAddress myselfAddress;
     private ConnectionCreator creator;
     private ConnectionAcceptor acceptor;
+    private PeerManager peerManager;
     private TelegramManager telegramer;
     private List<Peer> knownPeers;
     private SortedSet<String> handledMessages;
@@ -90,6 +91,9 @@ public class Network extends Observable {
         //START ConnectionAcceptor THREAD
         acceptor = new ConnectionAcceptor(this);
         acceptor.start();
+
+        peerManager = new PeerManager(this);
+        peerManager.start();
 
         telegramer = new TelegramManager(this);
         telegramer.start();
@@ -634,6 +638,9 @@ public class Network extends Observable {
 
         // stop thread
         this.acceptor.halt();
+
+        //
+        this.peerManager.halt();
 
         this.telegramer.halt();
 

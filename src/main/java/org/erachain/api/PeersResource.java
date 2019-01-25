@@ -5,7 +5,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.database.PeerMap.PeerInfo;
 import org.erachain.network.Peer;
-import org.erachain.network.PeerManager;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.APIUtils;
@@ -196,7 +195,7 @@ public class PeersResource {
     @GET
     @Path("best")
     public String getTopPeers() {
-        List<Peer> peers = PeerManager.getInstance().getBestPeers();
+        List<Peer> peers = Controller..getInstance().getBestPeers();
         JSONArray array = new JSONArray();
 
         for (Peer peer : peers) {
