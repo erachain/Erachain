@@ -1541,6 +1541,11 @@ public class Controller extends Observable {
                 }
 
                 if (!newBlock.isValidHead(dcSet)) {
+                    byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
+                    if (!Arrays.equals(lastSignature, newBlock.getReference())) {
+                        // это просто блок с параллельной ветки - не баним ее
+                        return;
+                    }
                     info = "Block (" + newBlock.toString() + ") is Invalid";
                     banPeerOnError(message.getSender(), info);
                     return;
