@@ -10,6 +10,10 @@ import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+
 public class Pinger extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Pinger.class);
@@ -20,9 +24,10 @@ public class Pinger extends Thread {
     private boolean needPing = false;
     private int ping;
 
+    BlockingQueue<Integer> startPinging = new ArrayBlockingQueue<Integer>(1);
+
     public Pinger(Peer peer) {
         this.peer = peer;
-        //this.run = true;
         this.ping = Integer.MAX_VALUE;
         this.setName("Pinger - " + this.getId() + " for: " + peer.getAddress().getHostAddress());
 
@@ -31,6 +36,7 @@ public class Pinger extends Thread {
 
     public void init() {
         this.ping = Integer.MAX_VALUE;
+        startPinging.offer(0);
     }
 
     public long getPing() {
@@ -39,6 +45,7 @@ public class Pinger extends Thread {
 
     public void setPing(int ping) {
         this.ping = ping;
+        startPinging.offer(-1);
     }
 
     public void setNeedPing() {
@@ -104,9 +111,6 @@ public class Pinger extends Thread {
     public boolean tryPing() {
         return tryPing(DEFAULT_QUICK_PING_TIMEOUT);
     }
-    //public boolean tryQuickPing() {
-    //    return tryPing(DEFAULT_QUICK_PING_TIMEOUT);
-    //}
 
     public void run() {
 
@@ -117,48 +121,41 @@ public class Pinger extends Thread {
         int sleepsteps = DEFAULT_PING_TIMEOUT / sleepTimestep;
         int sleepStepTimeCounter;
         boolean resultSend;
+
+        Integer deal = 0;
         while (!this.peer.isStoped()) {
 
-
-            if (this.ping < -1) {
-                sleepStepTimeCounter = sleepsteps >> 2;
-            } else if (this.peer.isUsed()) {
-                sleepStepTimeCounter = sleepsteps;
-            } else {
-                sleepStepTimeCounter = sleepsteps;
+            try {
+                startPinging.take();
+            } catch (InterruptedException e) {
+                break;
             }
 
-            while (sleepStepTimeCounter > 0) {
+            Controller.getInstance().onConnect(this.peer);
 
-                //SLEEP
+            while (this.peer.isUsed()) {
+
                 try {
-                    Thread.sleep(sleepTimestep);
+                    deal = startPinging.poll(DEFAULT_PING_TIMEOUT, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
-                    //FAILED TO SLEEP
+                    break;
                 }
 
-                if (this.peer.isStoped())
-                    return;
+                if (deal != null && deal < 0)
+                    // сбросить ожидание счетчика
+                    continue;
 
-                if (this.ping == Integer.MAX_VALUE && this.peer.isUsed()) {
-                    Controller.getInstance().onConnect(this.peer);
-                    sleepStepTimeCounter = 0;
-                }
-
-                // если нужно пингануь - но не часто все равно - так как там могут быстро блоки собираться
-                // чтобы не запинговать канал
-                if (this.needPing && sleepStepTimeCounter > (sleepsteps >> 4))
+                if (!this.peer.isUsed())
                     break;
 
-                sleepStepTimeCounter--;
-
-            }
-
-            if (this.peer.isUsed()) {
-                this.needPing = false;
                 tryPing();
             }
         }
     }
+
+    public void close() {
+        startPinging.offer(-1);
+    }
+
 
 }

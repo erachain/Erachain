@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class Peer extends MonitoredThread {
 
     private final static boolean USE_MONITOR = false;
-    private final static boolean logPings = false;
+    private final static boolean logPings = true;
 
     static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getName());
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
@@ -325,6 +325,8 @@ public class Peer extends MonitoredThread {
             DataInputStream in = null;
             try {
                 in = startReading.take();
+                // INIT PINGER
+                pinger.init();
             } catch (Exception e) {
                 if (stoped)
                     break;
@@ -657,6 +659,8 @@ public class Peer extends MonitoredThread {
 
         LOGGER.info("Try close peer : " + this + " - " + message);
 
+        this.pinger.close();
+
         if (socket != null) {
             //LOGGER.debug(this + " SOCKET: \n"
             //        + (this.socket.isBound()? " isBound " : "")
@@ -706,6 +710,7 @@ public class Peer extends MonitoredThread {
     public void halt() {
 
         this.stoped = true;
+
         //this.sender.halt();
         this.close("halt");
         //this.setName("Peer: " + this.getAddress().getHostAddress() + " halted");
