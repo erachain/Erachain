@@ -83,18 +83,7 @@ public class WinBlockSelector extends MonitoredThread {
                 + newBlock.toString();
         LOGGER.debug(info);
 
-        if (controller.getStatus() == controller.STATUS_SYNCHRONIZING) {
-            if (false) {
-                // SET for FUTURE without CHECK
-                blockChain.clearWaitWinBuffer();
-                // тут он невалидный точно
-                blockChain.setWaitWinBuffer(dcSet, newBlock, blockWinMessage.getSender());
-                return;
-            } else
-                // нет нельзя его в буфер класть так как там нет проверки потом на валидность
-                return;
-        } else if (!newBlock.isValidHead(dcSet)) {
-            // есди синхронизация цепочки не идет
+        if (!newBlock.isValidHead(dcSet)) {
             // то проверим заголовок
             info = "Block (" + newBlock.toString() + ") is Invalid - ignore";
             LOGGER.debug(info);
