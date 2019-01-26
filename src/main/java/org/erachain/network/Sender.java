@@ -2,6 +2,7 @@ package org.erachain.network;
 // 30/03
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.network.message.BlockWinMessage;
 import org.erachain.network.message.GetHWeightMessage;
 import org.erachain.network.message.HWeightMessage;
@@ -27,7 +28,7 @@ public class Sender extends MonitoredThread {
     private final static boolean logPings = true;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class);
-    private static final int QUEUE_LENGTH = 20;
+    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE? 200 : 40;
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
     private Peer peer;
