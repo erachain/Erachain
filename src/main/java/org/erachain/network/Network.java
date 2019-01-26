@@ -22,7 +22,6 @@ import java.util.*;
  */
 public class Network extends Observable {
 
-
     public static final int SEND_WAIT = 20000;
     public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK ? 0 : 1;
     private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<4;
@@ -35,11 +34,12 @@ public class Network extends Observable {
     private TelegramManager telegramer;
     private List<Peer> knownPeers;
     private SortedSet<String> handledMessages;
+    //boolean tryRun; // попытка запуска
     boolean run;
 
     public static final int WHITE_TYPE = 1;
-    public static final int NOWHITE_TYPE = -1;
-    public static final int NOUSE_WHITE_TYPE = 0;
+    public static final int NO_WHITE_TYPE = -1;
+    public static final int NO_USE_WHITE_TYPE = 0;
 
 
     public Network() {
@@ -101,16 +101,10 @@ public class Network extends Observable {
 
     public void onConnect(Peer peer) {
 
+        if (!run)
+            return;
+
         //LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer);
-
-        // WAIT start PINGER and InputStream
-
-        /*
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-        }
-        */
 
         boolean asNew = true;
         synchronized (this.knownPeers) {
@@ -129,7 +123,7 @@ public class Network extends Observable {
         //ADD TO DATABASE
         peerManager.addPeer(peer, 0);
 
-        if (Controller.getInstance().isOnStopping())
+        if (!run)
             return;
 
         //NOTIFY OBSERVERS
@@ -166,10 +160,6 @@ public class Network extends Observable {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
     }
-    public void afterDisconnect(Peer peer, String message) {
-        afterDisconnect(peer, banForActivePeersCounter(), message);
-    }
-
 
     public boolean isKnownAddress(InetAddress address, boolean andUsed) {
 
@@ -196,6 +186,7 @@ public class Network extends Observable {
     // IF PEER in exist in NETWORK - get it
     public Peer getKnownPeer(Peer peer, int type) {
 
+        Peer knowmPeer = null;
         try {
             byte[] address = peer.getAddress().getAddress();
             synchronized (this.knownPeers) {
@@ -203,15 +194,24 @@ public class Network extends Observable {
                 for (Peer knownPeer : knownPeers) {
                     //CHECK IF ADDRESS IS THE SAME
                     if (Arrays.equals(address, knownPeer.getAddress().getAddress())) {
-                        if (knownPeer.isUsed()) {
-                            if (type != NOUSE_WHITE_TYPE) {
-                                if (type == WHITE_TYPE && !knownPeer.isWhite())
-                                    continue;
-                                if (type == NOWHITE_TYPE && knownPeer.isWhite())
-                                    continue;
-                            }
-                            return knownPeer;
+                        if (knowmPeer == null) {
+                            // если еще не нашли, то первый берем любой
+                            knowmPeer = knownPeer;
+                            continue;
                         }
+
+                        if (type == WHITE_TYPE && !knownPeer.isWhite())
+                            // если нужно только белые то пропустим не белые
+                            continue;
+                        if (type == NO_WHITE_TYPE && knownPeer.isWhite())
+                            // если нужно только НЕбелые то пропустим белые
+                            continue;
+
+                        if (knownPeer.isOnUsed() || knownPeer.isUsed()) {
+                            // иначе толькое сли он уже используется
+                            knowmPeer = knownPeer;
+                        }
+
                     }
                 }
             }
