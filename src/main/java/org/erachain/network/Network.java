@@ -194,29 +194,9 @@ public class Network extends Observable {
                 for (Peer knownPeer : knownPeers) {
                     //CHECK IF ADDRESS IS THE SAME
                     if (Arrays.equals(address, knownPeer.getAddress().getAddress())) {
-                        if (true)
-                            // иначе тут не сработате правильно org.erachain.network.Network.onConnect
-                            return knownPeer;
-
-
-                        if (knowmPeer == null) {
-                            // если еще не нашли, то первый берем любой
-                            knowmPeer = knownPeer;
-                            continue;
-                        }
-
-                        if (type == WHITE_TYPE && !knownPeer.isWhite())
-                            // если нужно только белые то пропустим не белые
-                            continue;
-                        if (type == NO_WHITE_TYPE && knownPeer.isWhite())
-                            // если нужно только НЕбелые то пропустим белые
-                            continue;
-
-                        if (knownPeer.isOnUsed() || knownPeer.isUsed()) {
-                            // иначе толькое сли он уже используется
-                            knowmPeer = knownPeer;
-                        }
-
+                        // иначе тут не сработате правильно org.erachain.network.Network.onConnect
+                        // поэтому сразу выдаем первый что нашли без каких либо условий
+                        return knownPeer;
                     }
                 }
             }
