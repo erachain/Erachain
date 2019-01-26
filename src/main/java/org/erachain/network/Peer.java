@@ -198,9 +198,11 @@ public class Peer extends MonitoredThread {
 
         //START SENDER and PINGER
         if (this.sender == null) {
+            // если они еще не созданы - значит это пустой объект и его тоже нужно стартануть
             try {
                 this.sender = new Sender(this, this.socket.getOutputStream());
             } catch (IOException e) {
+                this.sender = null;
                 return false;
             }
 
@@ -215,7 +217,6 @@ public class Peer extends MonitoredThread {
             } catch (IOException e) {
                 return false;
             }
-            this.sender.setName("Sender - " + this.sender.getId() + " for: " + this.getName());
 
             this.pinger.setPing(Integer.MAX_VALUE);
             this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getName());

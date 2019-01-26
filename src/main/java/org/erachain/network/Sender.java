@@ -49,7 +49,7 @@ public class Sender extends MonitoredThread {
 
     public Sender(Peer peer, OutputStream out) {
         this.peer = peer;
-        this.setName("Sender - " + this.getId() + " for: " + peer.getAddress().getHostAddress());
+        this.setName("Sender - " + this.getId() + " for: " + peer.getName());
         this.out = out;
 
         this.start();
@@ -57,6 +57,7 @@ public class Sender extends MonitoredThread {
 
     public void setOut(OutputStream out) {
         this.out = out;
+        this.setName("Sender - " + this.getId() + " for: " + peer.getName());
     }
 
     public boolean offer(Message message) {
