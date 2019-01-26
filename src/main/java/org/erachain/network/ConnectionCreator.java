@@ -79,14 +79,6 @@ public class ConnectionCreator extends MonitoredThread {
                     || (Settings.getInstance().getMaxConnections() >> 1) < network.getActivePeersCounter(false))
                 break;
 
-            try {
-                Thread.sleep(10);
-            } catch (java.lang.OutOfMemoryError e) {
-                Controller.getInstance().stopAll(94);
-                break;
-            } catch (Exception e) {
-            }
-
             //CHECK IF THAT PEER IS NOT BLACKLISTED
             if (newPeer.isBanned())
                 continue;
@@ -100,11 +92,19 @@ public class ConnectionCreator extends MonitoredThread {
             if (!Settings.getInstance().isTryingConnectToBadPeers() && newPeer.isBad())
                 continue;
 
+            try {
+                Thread.sleep(100);
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(94);
+                break;
+            } catch (Exception e) {
+            }
+
             //CHECK IF PEER ALREADY used
             newPeer = network.getKnownPeer(newPeer, Network.WHITE_TYPE);
 
             //CHECK IF ALREADY CONNECTED TO PEER
-            if (newPeer.isUsed() || newPeer.isBanned())
+            if (newPeer.isOnUsed() || newPeer.isUsed() || newPeer.isBanned())
                 continue;
 
             if (onlyWhite && !newPeer.isWhite())
