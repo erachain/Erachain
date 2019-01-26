@@ -29,7 +29,7 @@ public class Pinger extends Thread {
     public Pinger(Peer peer) {
         this.peer = peer;
         this.ping = Integer.MAX_VALUE;
-        this.setName("Pinger - " + this.getId() + " for: " + peer.getAddress().getHostAddress());
+        this.setName("Pinger - " + this.getId() + " for: " + peer.getName());
 
         this.start();
     }
@@ -123,7 +123,7 @@ public class Pinger extends Thread {
         boolean resultSend;
 
         Integer deal = 0;
-        while (!this.peer.isStoped()) {
+        while (this.peer.network.run) {
 
             try {
                 startPinging.take();
@@ -140,6 +140,9 @@ public class Pinger extends Thread {
                 } catch (InterruptedException e) {
                     break;
                 }
+
+                if (!this.peer.network.run)
+                    break;
 
                 if (deal != null && deal < 0)
                     // сбросить ожидание счетчика

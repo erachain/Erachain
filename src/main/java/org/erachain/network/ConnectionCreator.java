@@ -139,7 +139,7 @@ public class ConnectionCreator extends MonitoredThread {
         List<Peer> knownPeers = null;
 
         this.initMonitor();
-        while (isRun) {
+        while (this.network.run) {
             this.setMonitorPoint();
 
             try {

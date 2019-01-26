@@ -62,7 +62,7 @@ public class PeerManager extends MonitoredThread {
 
         Message message = null;
 
-        while (this.network != null) {
+        while (this.network.run) {
             try {
                 processPeers(blockingQueue.take());
             } catch (java.lang.OutOfMemoryError e) {
@@ -82,7 +82,6 @@ public class PeerManager extends MonitoredThread {
 
 
     public void halt() {
-        this.network = null;
     }
 
 }

@@ -71,8 +71,6 @@ public class ConnectionAcceptor extends MonitoredThread {
                     // or BANNED
                     connectionSocket.shutdownOutput();
                     connectionSocket.close();
-                    //socket.close();
-                    //socket = null;
                     continue;
                 }
             } catch (java.lang.OutOfMemoryError e) {

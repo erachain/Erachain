@@ -61,7 +61,7 @@ public class Peer extends MonitoredThread {
         this.address = address;
         this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
         //LOGGER.debug("@@@ new Peer(InetAddress address) : " + address.getHostAddress());
-        this.setName("Peer: " + " as address");
+        this.setName("Peer-" + this.getId() + " as address " + address.getHostAddress());
 
     }
 
@@ -104,7 +104,7 @@ public class Peer extends MonitoredThread {
             // START PINGER
             this.pinger = new Pinger(this);
 
-            this.setName("Peer: " + this);
+            this.setName("Peer-" + this.getId() + " new <<< " + address.getHostAddress());
 
             //START COMMUNICATON THREAD
             this.start();
@@ -170,9 +170,12 @@ public class Peer extends MonitoredThread {
                 this.socket = acceptedSocket;
                 this.address = this.socket.getInetAddress();
                 this.white = false;
+                this.setName("Peer-" + this.getId() + " <<< " + address.getHostAddress());
             } else {
                 this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
                 this.white = true;
+                this.setName("Peer-" + this.getId() + " >>> " + address.getHostAddress());
+
             }
 
             //ENABLE KEEPALIVE
@@ -215,14 +218,12 @@ public class Peer extends MonitoredThread {
             } catch (IOException e) {
                 return false;
             }
-            this.sender.setName("Sender - " + this.sender.getId() + " for: " + this.getAddress().getHostAddress());
+            this.sender.setName("Sender - " + this.sender.getId() + " for: " + this.getName());
 
             this.pinger.setPing(Integer.MAX_VALUE);
-            this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
+            this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getName());
 
         }
-
-        this.setName("Peer: " + this + " connected");
 
         this.runed = true;
 
@@ -319,7 +320,7 @@ public class Peer extends MonitoredThread {
         byte[] messageMagic = null;
 
         this.initMonitor();
-        while (!stoped) {
+        while (this.network.run) {
             if (USE_MONITOR) this.setMonitorPoint();
 
             DataInputStream in = null;
@@ -621,7 +622,7 @@ public class Peer extends MonitoredThread {
             return;
         }
 
-        this.setName("Peer: " + this
+        this.setName(this.getName()
                 + " banned for " + banForMinutes + " " + message);
 
         // если там уже было закрыто то не вызывать After
@@ -712,15 +713,15 @@ public class Peer extends MonitoredThread {
 
         //this.sender.halt();
         this.close("halt");
-        //this.setName("Peer: " + this.getAddress().getHostAddress() + " halted");
+        this.setName(this.getName() + " halted");
 
     }
 
     @Override
     public String toString() {
 
-        return this.address.getHostAddress()
-                + (getPing() >= 0 && getPing() < 99999? " " + this.getPing() + "ms" : (getPing() < 0?" try" + getPing() : ""))
-                + (isWhite()? "+" : "");
+        return this.getName()
+                + (getPing() >= 0 && getPing() < 99999? " " + this.getPing() + "ms" : (getPing() < 0?" try" + getPing() : "")
+        );
     }
 }

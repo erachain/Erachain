@@ -42,7 +42,7 @@ public class Sender extends MonitoredThread {
 
     public Sender(Peer peer) {
         this.peer = peer;
-        this.setName("Sender - " + this.getId() + " for: " + peer.getAddress().getHostAddress());
+        this.setName("Sender - " + this.getId() + " for: " + peer.getName());
 
         this.start();
     }
@@ -147,13 +147,12 @@ public class Sender extends MonitoredThread {
             return false;
         synchronized (this.out) {
             try {
-                if (this.out == null) {
-                    return false;
-                }
                 this.out.write(bytes);
                 this.out.flush();
             } catch (java.lang.OutOfMemoryError e) {
                 Controller.getInstance().stopAll(85);
+                return false;
+            } catch (java.lang.NullPointerException e) {
                 return false;
             } catch (EOFException e) {
                 if (this.out == null)
@@ -210,7 +209,7 @@ public class Sender extends MonitoredThread {
 
         Message message = null;
 
-        while (!this.stoped) {
+        while (this.peer.network.run) {
 
             if (this.out == null) {
                 // очистить остатки запросов если обнулили вывод

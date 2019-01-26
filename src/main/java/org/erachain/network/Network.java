@@ -35,7 +35,7 @@ public class Network extends Observable {
     private TelegramManager telegramer;
     private List<Peer> knownPeers;
     private SortedSet<String> handledMessages;
-    private boolean run;
+    boolean run;
 
     public static final int WHITE_TYPE = 1;
     public static final int NOWHITE_TYPE = -1;
@@ -139,6 +139,9 @@ public class Network extends Observable {
     }
 
     public void afterDisconnect(Peer peer, int banForMinutes, String message) {
+
+        if (!run)
+            return;
 
         if (message != null && message.length() > 0) {
             if (banForMinutes > 0) {
