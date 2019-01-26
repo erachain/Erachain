@@ -379,6 +379,8 @@ public class Network extends Observable {
         // make NEW PEER and use empty slots
 
         Peer peer = new Peer(this, socket, "connected as new!!! ");
+        // запомним в базе данных
+        onConnect(peer);
 
         return peer;
 

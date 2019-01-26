@@ -112,9 +112,6 @@ public class Peer extends MonitoredThread {
             // IT is STARTED
             this.runed = true;
 
-            // при коннекте во вне связь может порваться поэтому тут по runed
-            network.onConnect(this);
-
             // START READING
             this.startReading.offer(new DataInputStream(socket.getInputStream()));
 
@@ -227,8 +224,6 @@ public class Peer extends MonitoredThread {
 
         this.runed = true;
 
-        network.onConnect(this);
-
         // START READING
         try {
             this.startReading.offer(new DataInputStream(socket.getInputStream()));
@@ -237,6 +232,9 @@ public class Peer extends MonitoredThread {
         }
 
         LOGGER.info(this + description);
+
+        // запомним в базе данных
+        network.onConnect(this);
 
         // при коннекте во вне связь может порваться поэтому тут по runed
         return this.runed;
