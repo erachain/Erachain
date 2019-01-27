@@ -109,8 +109,9 @@ public class Network extends Observable {
         boolean asNew = true;
         synchronized (this.knownPeers) {
             for (Peer peerKnown : this.knownPeers) {
-                if (peer.equals(peerKnown)
-                        && peer.getId() == peerKnown.getId()) {
+                if (//peer.equals(peerKnown)
+                        // новый поток мог быть создан - поэтому хдесь провереи его
+                        peer.getId() == peerKnown.getId()) {
                     asNew = false;
                     break;
                 }
@@ -349,7 +350,7 @@ public class Network extends Observable {
         }
 
         // Если пустых мест уже мало то начинаем переиспользовать
-        if (this.banForActivePeersCounter() + 3 > Settings.getInstance().getMaxConnections() ) {
+        if (this.getActivePeersCounter(false) + 3 > Settings.getInstance().getMaxConnections() ) {
             // use UNUSED peers
             synchronized (this.knownPeers) {
                 for (Peer knownPeer : this.knownPeers) {
