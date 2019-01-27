@@ -106,6 +106,18 @@ public class ConnectionAcceptor extends MonitoredThread {
             if (connectionSocket == null)
                 continue;
 
+            // проверим - может уже есть такое соединение в котром мы мнмцматор
+            Peer peer = this.network.getKnownWhitePeer(connectionSocket.getInetAddress().getAddress());
+            if (peer != null && (peer.isOnUsed() || peer.isUsed())) {
+                try {
+                    // сообщим об закрытии на тот конец
+                    connectionSocket.shutdownOutput();
+                    connectionSocket.close();
+                } catch (IOException e) {
+                }
+                continue;
+            }
+
             try {
                 //CREATE PEER
                 ////new Peer(callback, connectionSocket);
@@ -114,7 +126,7 @@ public class ConnectionAcceptor extends MonitoredThread {
                 //		+ " my:" + Network.getMyselfAddress());
 
                 setMonitorStatusBefore("startPeer");
-                Peer peer = network.startPeer(connectionSocket);
+                peer = network.startPeer(connectionSocket);
                 setMonitorStatusAfter();
                 if (!peer.isUsed()) {
                     // если в процессе

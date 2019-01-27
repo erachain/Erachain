@@ -38,8 +38,8 @@ public class Network extends Observable {
     boolean run;
 
     public static final int WHITE_TYPE = 1;
-    public static final int NO_WHITE_TYPE = -1;
-    public static final int NO_USE_WHITE_TYPE = 0;
+    public static final int NON_WHITE_TYPE = -1;
+    public static final int ANY_TYPE = 0;
 
 
     public Network() {
@@ -197,7 +197,10 @@ public class Network extends Observable {
                 for (Peer knownPeer : knownPeers) {
                     //CHECK IF ADDRESS IS THE SAME
                     if (knowmPeer.isAlive()
-                        && Arrays.equals(address, knownPeer.getAddress().getAddress())) {
+                        && Arrays.equals(address, knownPeer.getAddress().getAddress())
+                            && (type == ANY_TYPE || type == WHITE_TYPE && knownPeer.isWhite()
+                                    || !knowmPeer.isWhite())
+                    ) {
                         // иначе тут не сработате правильно org.erachain.network.Network.onConnect
                         // поэтому сразу выдаем первый что нашли без каких либо условий
                         return knownPeer;
@@ -209,6 +212,54 @@ public class Network extends Observable {
         }
 
         return peer;
+    }
+
+    // IF PEER in exist in NETWORK - get it
+    public Peer getKnownPeer(byte[] addressIP) {
+
+        synchronized (this.knownPeers) {
+            //FOR ALL connectedPeers
+            for (Peer knownPeer : knownPeers) {
+                //CHECK IF ADDRESS IS THE SAME
+                if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
+                    return knownPeer;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // IF PEER in exist in NETWORK - get it
+    public Peer getKnownWhitePeer(byte[] addressIP) {
+
+        synchronized (this.knownPeers) {
+            //FOR ALL connectedPeers
+            for (Peer knownPeer : knownPeers) {
+                //CHECK IF ADDRESS IS THE SAME
+                if (knownPeer.isWhite() && Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
+                    return knownPeer;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // IF PEER in exist in NETWORK - get it
+    public Peer getKnownNonWhitePeer(byte[] addressIP) {
+
+        synchronized (this.knownPeers) {
+            //FOR ALL connectedPeers
+            for (Peer knownPeer : knownPeers) {
+                //CHECK IF ADDRESS IS THE SAME
+                if (!knownPeer.isWhite() && Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
+                    return knownPeer;
+                }
+            }
+        }
+
+        return null;
     }
 
     public boolean isKnownPeer(Peer peer, boolean andUsed) {
@@ -339,8 +390,8 @@ public class Network extends Observable {
             //FOR ALL connectedPeers
             for (Peer knownPeer : knownPeers) {
                 //CHECK IF ADDRESS IS THE SAME
-                if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())
-                        && !knownPeer.isWhite()) {
+                if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
+
                     if (knownPeer.isUsed()) {
                         knownPeer.close("before accept anew");
                     }

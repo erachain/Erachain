@@ -199,7 +199,7 @@ public class ConnectionCreator extends MonitoredThread {
                     peer = network.getKnownPeer(peer, Network.WHITE_TYPE);
 
                     //CHECK IF ALREADY CONNECTED TO PEER
-                    if (peer.isUsed() || peer.isBanned())
+                    if (peer.isOnUsed()  || peer.isUsed() || peer.isBanned())
                         continue;
 
                     if (!this.isRun)
