@@ -109,7 +109,8 @@ public class Network extends Observable {
         boolean asNew = true;
         synchronized (this.knownPeers) {
             for (Peer peerKnown : this.knownPeers) {
-                if (peer.equals(peerKnown)) {
+                if (peer.equals(peerKnown)
+                        && peer.getId() == peerKnown.getId()) {
                     asNew = false;
                     break;
                 }
