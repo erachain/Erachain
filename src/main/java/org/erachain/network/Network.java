@@ -111,6 +111,7 @@ public class Network extends Observable {
             for (Peer peerKnown : this.knownPeers) {
                 if (//peer.equals(peerKnown)
                         // новый поток мог быть создан - поэтому хдесь провереи его
+                        //peer.isAlive()
                         peer.getId() == peerKnown.getId()) {
                     asNew = false;
                     break;
