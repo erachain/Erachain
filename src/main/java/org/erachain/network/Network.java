@@ -196,7 +196,8 @@ public class Network extends Observable {
                 //FOR ALL connectedPeers
                 for (Peer knownPeer : knownPeers) {
                     //CHECK IF ADDRESS IS THE SAME
-                    if (Arrays.equals(address, knownPeer.getAddress().getAddress())) {
+                    if (knowmPeer.isAlive()
+                        && Arrays.equals(address, knownPeer.getAddress().getAddress())) {
                         // иначе тут не сработате правильно org.erachain.network.Network.onConnect
                         // поэтому сразу выдаем первый что нашли без каких либо условий
                         return knownPeer;
