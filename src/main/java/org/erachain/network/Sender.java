@@ -34,8 +34,6 @@ public class Sender extends MonitoredThread {
     private Peer peer;
     public OutputStream out;
 
-    private boolean stoped;
-
     private GetHWeightMessage getHWeightMessage;
     private HWeightMessage hWeightMessage;
     private BlockWinMessage winBlockToSend;
@@ -220,7 +218,6 @@ public class Sender extends MonitoredThread {
             try {
                 message = blockingQueue.poll(100, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
-                //if (this.stoped)
                 break;
             }
 
@@ -268,7 +265,6 @@ public class Sender extends MonitoredThread {
     }
 
     public void halt() {
-        this.stoped = true;
         this.close();
     }
 

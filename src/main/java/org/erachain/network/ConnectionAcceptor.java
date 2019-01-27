@@ -128,6 +128,7 @@ public class ConnectionAcceptor extends MonitoredThread {
                 setMonitorStatusBefore("startPeer");
                 peer = network.startPeer(connectionSocket);
                 setMonitorStatusAfter();
+
                 if (!peer.isUsed()) {
                     // если в процессе
                     //if (!peer.isBanned() || connectionSocket.isClosed()) {

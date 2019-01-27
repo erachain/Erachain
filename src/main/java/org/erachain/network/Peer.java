@@ -635,7 +635,6 @@ public class Peer extends MonitoredThread {
         ban(network.banForActivePeersCounter(), message);
     }
 
-
     public boolean isStoped() {
         return stoped;
     }

@@ -100,14 +100,9 @@ public class ConnectionCreator extends MonitoredThread {
             } catch (Exception e) {
             }
 
-            //CHECK IF PEER ALREADY used
-            newPeer = network.getKnownPeer(newPeer, Network.WHITE_TYPE);
+            newPeer = network.getKnownPeer(newPeer, Network.ANY_TYPE);
 
-            //CHECK IF ALREADY CONNECTED TO PEER
-            if (newPeer.isOnUsed() || newPeer.isUsed() || newPeer.isBanned())
-                continue;
-
-            if (onlyWhite && !newPeer.isWhite())
+            if (!network.isGoodForConnect(newPeer))
                 continue;
 
             if (!this.isRun)
@@ -196,13 +191,12 @@ public class ConnectionCreator extends MonitoredThread {
 
                     //CHECK IF PEER ALREADY used
                     // new PEER from NETWORK poll or original from DB
-                    peer = network.getKnownPeer(peer, Network.WHITE_TYPE);
+                    peer = network.getKnownPeer(peer, Network.ANY_TYPE);
 
-                    //CHECK IF ALREADY CONNECTED TO PEER
-                    if (peer.isOnUsed()  || peer.isUsed() || peer.isBanned())
+                    if (!network.isGoodForConnect(peer))
                         continue;
 
-                    if (!this.isRun)
+                    if (!this.network.run)
                         break;
 
                     LOGGER.info("try connect to: " + peer);

@@ -5,6 +5,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.message.*;
+import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.json.simple.JSONObject;
@@ -30,9 +31,9 @@ public class Network extends Observable {
     private static InetAddress myselfAddress;
     private ConnectionCreator creator;
     private ConnectionAcceptor acceptor;
-    private PeerManager peerManager;
+    PeerManager peerManager;
     private TelegramManager telegramer;
-    private List<Peer> knownPeers;
+    List<Peer> knownPeers;
     private SortedSet<String> handledMessages;
     //boolean tryRun; // попытка запуска
     boolean run;
@@ -196,8 +197,7 @@ public class Network extends Observable {
                 //FOR ALL connectedPeers
                 for (Peer knownPeer : knownPeers) {
                     //CHECK IF ADDRESS IS THE SAME
-                    if (knowmPeer.isAlive()
-                        && Arrays.equals(address, knownPeer.getAddress().getAddress())
+                    if (Arrays.equals(address, knownPeer.getAddress().getAddress())
                             && (type == ANY_TYPE || type == WHITE_TYPE && knownPeer.isWhite()
                                     || !knowmPeer.isWhite())
                     ) {
@@ -212,22 +212,6 @@ public class Network extends Observable {
         }
 
         return peer;
-    }
-
-    // IF PEER in exist in NETWORK - get it
-    public Peer getKnownPeer(byte[] addressIP) {
-
-        synchronized (this.knownPeers) {
-            //FOR ALL connectedPeers
-            for (Peer knownPeer : knownPeers) {
-                //CHECK IF ADDRESS IS THE SAME
-                if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
-                    return knownPeer;
-                }
-            }
-        }
-
-        return null;
     }
 
     // IF PEER in exist in NETWORK - get it
@@ -267,6 +251,31 @@ public class Network extends Observable {
         return this.isKnownAddress(peer.getAddress(), andUsed);
     }
 
+    public boolean isGoodForConnect(Peer peer) {
+
+        if (peer.isOnUsed() || peer.isUsed() || peer.isBanned())
+            return false;
+
+        //CHECK IF ALREADY CONNECTED TO PEER
+        byte[] address = peer.getAddress().getAddress();
+        synchronized (this.knownPeers) {
+            //FOR ALL connectedPeers
+            for (Peer knownPeer : this.knownPeers) {
+                //CHECK IF ADDRESS IS THE SAME
+                if (!knownPeer.isAlive()
+                        || peer.getId() == knownPeer.getId()
+                        || !Arrays.equals(address, knownPeer.getAddress().getAddress())
+                        || NTP.getTime() - knownPeer.getConnectionTime() < 1000
+                )
+                    continue;
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     //
     public List<Peer> getActivePeers(boolean onlyWhite) {
 
@@ -299,7 +308,15 @@ public class Network extends Observable {
     }
 
     public List<Peer> getKnownPeers() {
-        return this.peerManager.getKnownPeers();
+        List<Peer> knownPeers = new ArrayList<Peer>();
+        //ASK DATABASE FOR A LIST OF PEERS
+        if (!Controller.getInstance().isOnStopping()) {
+            knownPeers = Controller.getInstance().getDBSet().getPeerMap().getBestPeers(
+                    0, true);
+        }
+
+        //RETURN
+        return knownPeers;
     }
 
     public void addPeer(Peer peer, int banForMinutes) {
