@@ -65,7 +65,7 @@ public class ConnectionCreator extends MonitoredThread {
             if (!this.isRun)
                 return 0;
 
-            if (foreignPeersCounter >= maxReceivePeers) {
+            if (maxReceivePeers > 0 && foreignPeersCounter >= maxReceivePeers) {
                 // FROM EACH peer get only maxReceivePeers
                 break;
             }
@@ -108,6 +108,10 @@ public class ConnectionCreator extends MonitoredThread {
             if (!this.isRun)
                 return 0;
 
+            // огрничим перебор тут так как в ответе из текущего пира может быть очень много стрых пиров
+            // которые уже отвечают. Лучше это делать позже при последующей проверке
+            foreignPeersCounter++;
+
             //CONNECT
             this.setMonitorStatusBefore("peer.connect.recurse");
             if (!newPeer.connect(null, network, "connected in recurse +++ "))
@@ -116,7 +120,7 @@ public class ConnectionCreator extends MonitoredThread {
 
             this.setMonitorStatusAfter();
 
-            if (newPeer.isUsed()) {
+            if (newPeer.isUsed() && maxReceivePeers > 1) {
                 // RECURSE to OTHER PEERS
                 foreignPeersCounter++;
                 connectToPeersOfThisPeer(newPeer, maxReceivePeers >> 1, onlyWhite);
@@ -235,7 +239,7 @@ public class ConnectionCreator extends MonitoredThread {
 
                     long timesatmp = NTP.getTime();
                     if (timesatmp - getPeersTimestamp > GET_PEERS_PERIOD) {
-                        connectToPeersOfThisPeer(peer, Settings.getInstance().getMaxConnections(), false);
+                        connectToPeersOfThisPeer(peer, -1, false);
                         getPeersTimestamp = timesatmp;
                     }
 
