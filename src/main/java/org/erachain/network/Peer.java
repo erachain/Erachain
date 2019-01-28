@@ -323,7 +323,7 @@ public class Peer extends MonitoredThread {
                 break;
             }
 
-            while (this.runed) {
+            while (this.runed && this.network.run) {
 
                 //READ FIRST 4 BYTES
                 messageMagic = new byte[Message.MAGIC_LENGTH];

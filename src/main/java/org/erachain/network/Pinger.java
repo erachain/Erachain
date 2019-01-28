@@ -133,7 +133,7 @@ public class Pinger extends Thread {
 
             Controller.getInstance().onConnect(this.peer);
 
-            while (this.peer.isUsed()) {
+            while (this.peer.isUsed() && this.peer.network.run) {
 
                 try {
                     deal = startPinging.poll(DEFAULT_PING_TIMEOUT, TimeUnit.MILLISECONDS);
