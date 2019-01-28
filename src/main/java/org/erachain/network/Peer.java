@@ -420,7 +420,7 @@ public class Peer extends MonitoredThread {
                     if (logPings && message.getType() != Message.TRANSACTION_TYPE
                             && message.getType() != Message.TELEGRAM_TYPE
                     ) {
-                        LOGGER.debug(this + " <+++ " + message);
+                        LOGGER.debug(this + message.viewPref(false) + message);
                     }
 
                     try {
@@ -435,7 +435,7 @@ public class Peer extends MonitoredThread {
                         break;
 
                     } catch (Exception e) {
-                        LOGGER.error(this + " <+++ " + message);
+                        LOGGER.error(this + message.viewPref(false) + message);
                         LOGGER.error(e.getMessage(), e);
                     }
 
@@ -444,17 +444,16 @@ public class Peer extends MonitoredThread {
                     if (logPings && message.getType() != Message.TRANSACTION_TYPE
                             && message.getType() != Message.TELEGRAM_TYPE
                     ) {
-                        LOGGER.debug(this + " <--- " + message);
+                        LOGGER.debug(this + message.viewPref(false) + message);
                     }
 
                     long timeStart = System.currentTimeMillis();
-                    ///LOGGER.debug(this + " : " + message + " receive, go solve");
 
                     this.network.onMessage(message);
 
                     timeStart = System.currentTimeMillis() - timeStart;
                     if (timeStart > 100) {
-                        LOGGER.debug(this + " <--- " + message + " solved by period: " + timeStart);
+                        LOGGER.debug(this + message.viewPref(false) + message + " solved by period: " + timeStart);
                     }
                 }
             }
