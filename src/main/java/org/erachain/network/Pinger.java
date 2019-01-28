@@ -66,7 +66,7 @@ public class Pinger extends Thread {
         Message response = peer.getResponse(pingMessage, timeSOT);
 
         if (Controller.getInstance().isOnStopping()
-                || this.peer.isStoped()
+                || !this.peer.network.run
                 || !this.peer.isUsed())
             return false;
 
@@ -141,17 +141,18 @@ public class Pinger extends Thread {
                     break;
                 }
 
-                if (!this.peer.network.run)
-                    break;
-
                 if (deal != null && deal < 0)
                     // сбросить ожидание счетчика
                     continue;
 
-                if (!this.peer.isUsed())
+                if (!this.peer.isUsed() || !this.peer.network.run)
                     break;
 
                 tryPing();
+
+                if (!this.peer.isUsed() || !this.peer.network.run)
+                    break;
+
             }
         }
 

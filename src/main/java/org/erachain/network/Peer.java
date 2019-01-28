@@ -49,18 +49,14 @@ public class Peer extends MonitoredThread {
     private long pingCounter;
     private long connectionTime;
     private boolean runed;
-    private boolean stoped;
     private int errors;
     private int requestKey = 0;
 
-    private long sendedBeforePing = 0l;
-    private long maxBeforePing;
     Map<Integer, BlockingQueue<Message>> messages;
 
     public Peer(InetAddress address) {
         this.address = address;
         this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
-        //LOGGER.debug("@@@ new Peer(InetAddress address) : " + address.getHostAddress());
         this.setName("Peer-" + this.getId() + " as address " + address.getHostAddress());
 
     }
@@ -86,8 +82,6 @@ public class Peer extends MonitoredThread {
             this.pingCounter = 0;
             this.connectionTime = NTP.getTime();
             this.errors = 0;
-            this.sendedBeforePing = 0l;
-            this.maxBeforePing = MAX_BEFORE_PING;
 
             //ENABLE KEEPALIVE
             this.socket.setKeepAlive(true);
@@ -154,8 +148,6 @@ public class Peer extends MonitoredThread {
         this.pingCounter = 0;
         this.connectionTime = NTP.getTime();
         this.errors = 0;
-        this.sendedBeforePing = 0l;
-        this.maxBeforePing = MAX_BEFORE_PING;
 
         int step = 0;
         try {
@@ -635,10 +627,6 @@ public class Peer extends MonitoredThread {
         ban(network.banForActivePeersCounter(), message);
     }
 
-    public boolean isStoped() {
-        return stoped;
-    }
-
 
     /**
      * синхронизированное закрытие чтобы по несольку раз не входило
@@ -707,9 +695,6 @@ public class Peer extends MonitoredThread {
 
     public void halt() {
 
-        this.stoped = true;
-
-        //this.sender.halt();
         this.close("halt");
         this.setName(this.getName() + " halted");
 
