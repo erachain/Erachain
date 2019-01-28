@@ -92,13 +92,14 @@ public class Peer extends MonitoredThread {
             this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
             this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
+            // NEED for NEW SENDER and PINGER
+            this.setName("Peer-" + this.getId() + " new <<< " + address.getHostAddress());
+
             // START SENDER
             this.sender = new Sender(this, socket.getOutputStream());
 
             // START PINGER
             this.pinger = new Pinger(this);
-
-            this.setName("Peer-" + this.getId() + " new <<< " + address.getHostAddress());
 
             //START COMMUNICATON THREAD
             this.start();
