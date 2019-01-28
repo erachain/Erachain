@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class Peer extends MonitoredThread {
 
     private final static boolean USE_MONITOR = false;
-    private final static boolean logPings = false;
+    private final static boolean logPings = true;
 
     static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getName());
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
@@ -61,7 +61,7 @@ public class Peer extends MonitoredThread {
         this.address = address;
         this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
         //LOGGER.debug("@@@ new Peer(InetAddress address) : " + address.getHostAddress());
-        this.setName("Peer: " + " as address");
+        this.setName("Peer-" + this.getId() + " as address " + address.getHostAddress());
 
     }
 
@@ -104,7 +104,7 @@ public class Peer extends MonitoredThread {
             // START PINGER
             this.pinger = new Pinger(this);
 
-            this.setName("Peer: " + this);
+            this.setName("Peer-" + this.getId() + " new <<< " + address.getHostAddress());
 
             //START COMMUNICATON THREAD
             this.start();
@@ -116,9 +116,6 @@ public class Peer extends MonitoredThread {
             this.startReading.offer(new DataInputStream(socket.getInputStream()));
 
             LOGGER.info(description + address.getHostAddress());
-
-            // при коннекте во вне связь может порваться поэтому тут по runed
-            network.onConnect(this);
 
         } catch (Exception e) {
             //FAILED TO CONNECT NO NEED TO BLACKLIST
@@ -170,9 +167,12 @@ public class Peer extends MonitoredThread {
                 this.socket = acceptedSocket;
                 this.address = this.socket.getInetAddress();
                 this.white = false;
+                this.setName("Peer-" + this.getId() + " <<< " + address.getHostAddress());
             } else {
                 this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
                 this.white = true;
+                this.setName("Peer-" + this.getId() + " >>> " + address.getHostAddress());
+
             }
 
             //ENABLE KEEPALIVE
@@ -198,9 +198,11 @@ public class Peer extends MonitoredThread {
 
         //START SENDER and PINGER
         if (this.sender == null) {
+            // если они еще не созданы - значит это пустой объект и его тоже нужно стартануть
             try {
                 this.sender = new Sender(this, this.socket.getOutputStream());
             } catch (IOException e) {
+                this.sender = null;
                 return false;
             }
 
@@ -215,14 +217,11 @@ public class Peer extends MonitoredThread {
             } catch (IOException e) {
                 return false;
             }
-            this.sender.setName("Sender - " + this.sender.getId() + " for: " + this.getAddress().getHostAddress());
 
             this.pinger.setPing(Integer.MAX_VALUE);
-            this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getAddress().getHostAddress());
+            this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getName());
 
         }
-
-        this.setName("Peer: " + this + " connected");
 
         this.runed = true;
 
@@ -235,6 +234,7 @@ public class Peer extends MonitoredThread {
 
         LOGGER.info(this + description);
 
+        // запомним в базе данных
         network.onConnect(this);
 
         // при коннекте во вне связь может порваться поэтому тут по runed
@@ -319,15 +319,16 @@ public class Peer extends MonitoredThread {
         byte[] messageMagic = null;
 
         this.initMonitor();
-        while (!stoped) {
+        while (this.network.run) {
             if (USE_MONITOR) this.setMonitorPoint();
 
             DataInputStream in = null;
             try {
                 in = startReading.take();
-            } catch (Exception e) {
-                if (stoped)
-                    break;
+                // INIT PINGER
+                pinger.init();
+            } catch (InterruptedException e) {
+                break;
             }
 
             while (this.runed) {
@@ -468,7 +469,7 @@ public class Peer extends MonitoredThread {
         }
 
         if (USE_MONITOR) this.setMonitorStatus("halted");
-        LOGGER.info(this + "halted");
+        LOGGER.info(this + " - halted");
 
     }
 
@@ -620,7 +621,7 @@ public class Peer extends MonitoredThread {
             return;
         }
 
-        this.setName("Peer: " + this
+        this.setName(this.getName()
                 + " banned for " + banForMinutes + " " + message);
 
         // если там уже было закрыто то не вызывать After
@@ -633,7 +634,6 @@ public class Peer extends MonitoredThread {
     public void ban(String message) {
         ban(network.banForActivePeersCounter(), message);
     }
-
 
     public boolean isStoped() {
         return stoped;
@@ -657,6 +657,10 @@ public class Peer extends MonitoredThread {
 
         LOGGER.info("Try close peer : " + this + " - " + message);
 
+        this.pinger.close();
+
+        this.sender.close();
+
         if (socket != null) {
             //LOGGER.debug(this + " SOCKET: \n"
             //        + (this.socket.isBound()? " isBound " : "")
@@ -665,8 +669,6 @@ public class Peer extends MonitoredThread {
             //        + (this.socket.isOutputShutdown()? " isOutputShutdown " : "")
             //        + (this.socket.isClosed()? " isClosed " : "")
             //);
-
-            this.sender.close();
 
             //CHECK IF SOCKET IS CONNECTED
             if (socket.isConnected()) {
@@ -706,17 +708,18 @@ public class Peer extends MonitoredThread {
     public void halt() {
 
         this.stoped = true;
+
         //this.sender.halt();
         this.close("halt");
-        //this.setName("Peer: " + this.getAddress().getHostAddress() + " halted");
+        this.setName(this.getName() + " halted");
 
     }
 
     @Override
     public String toString() {
 
-        return this.address.getHostAddress()
-                + (getPing() >= 0 && getPing() < 99999? " " + this.getPing() + "ms" : (getPing() < 0?" try" + getPing() : ""))
-                + (isWhite()? "+" : "");
+        return this.getName()
+                + (getPing() >= 0 && getPing() < 99999? " " + this.getPing() + "ms" : (getPing() < 0?" try" + getPing() : "")
+        );
     }
 }

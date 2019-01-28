@@ -79,16 +79,8 @@ public class ConnectionCreator extends MonitoredThread {
                     || (Settings.getInstance().getMaxConnections() >> 1) < network.getActivePeersCounter(false))
                 break;
 
-            try {
-                Thread.sleep(10);
-            } catch (java.lang.OutOfMemoryError e) {
-                Controller.getInstance().stopAll(94);
-                break;
-            } catch (Exception e) {
-            }
-
             //CHECK IF THAT PEER IS NOT BLACKLISTED
-            if (PeerManager.getInstance().isBanned(newPeer))
+            if (newPeer.isBanned())
                 continue;
 
             //CHECK IF SOCKET IS NOT LOCALHOST
@@ -100,14 +92,17 @@ public class ConnectionCreator extends MonitoredThread {
             if (!Settings.getInstance().isTryingConnectToBadPeers() && newPeer.isBad())
                 continue;
 
-            //CHECK IF PEER ALREADY used
-            newPeer = network.getKnownPeer(newPeer, Network.WHITE_TYPE);
+            try {
+                Thread.sleep(100);
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(94);
+                break;
+            } catch (Exception e) {
+            }
 
-            //CHECK IF ALREADY CONNECTED TO PEER
-            if (newPeer.isUsed() || newPeer.isBanned())
-                continue;
+            newPeer = network.getKnownPeer(newPeer, Network.ANY_TYPE);
 
-            if (onlyWhite && !newPeer.isWhite())
+            if (!network.isGoodForConnect(newPeer))
                 continue;
 
             if (!this.isRun)
@@ -139,7 +134,7 @@ public class ConnectionCreator extends MonitoredThread {
         List<Peer> knownPeers = null;
 
         this.initMonitor();
-        while (isRun) {
+        while (this.network.run) {
             this.setMonitorPoint();
 
             try {
@@ -162,7 +157,7 @@ public class ConnectionCreator extends MonitoredThread {
             if (this.isRun && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true)) {
 
                 //GET LIST OF KNOWN PEERS
-                knownPeers = PeerManager.getInstance().getKnownPeers();
+                knownPeers = network.getKnownPeers();
 
                 //ITERATE knownPeers
                 for (Peer peer : knownPeers) {
@@ -196,13 +191,12 @@ public class ConnectionCreator extends MonitoredThread {
 
                     //CHECK IF PEER ALREADY used
                     // new PEER from NETWORK poll or original from DB
-                    peer = network.getKnownPeer(peer, Network.WHITE_TYPE);
+                    peer = network.getKnownPeer(peer, Network.ANY_TYPE);
 
-                    //CHECK IF ALREADY CONNECTED TO PEER
-                    if (peer.isUsed() || peer.isBanned())
+                    if (!network.isGoodForConnect(peer))
                         continue;
 
-                    if (!this.isRun)
+                    if (!this.network.run)
                         break;
 
                     LOGGER.info("try connect to: " + peer);

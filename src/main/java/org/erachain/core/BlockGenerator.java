@@ -555,7 +555,8 @@ public class BlockGenerator extends Thread implements Observer {
                 }
 
                 // GET real HWeight
-                if (System.currentTimeMillis() - timeToPing > (BlockChain.DEVELOP_USE ? 20000 : 60000)) {
+                // пингуем всех тут чтобы знать кому слать свои транакции
+                if (System.currentTimeMillis() - timeToPing > (BlockChain.DEVELOP_USE ? 60000 : 120000)) {
                     // нужно просмотривать пиги для синхронизации так же - если там -ХХ то не будет синхронизации
                     timeToPing = System.currentTimeMillis();
                     ctrl.pingAllPeers(false);
@@ -600,7 +601,8 @@ public class BlockGenerator extends Thread implements Observer {
                     this.solvingReference = null;
                     status = 0;
 
-                    // пинганем тут все что
+                    // пинганем тут все чтобы знать кому слать вобедный блок
+                    timeToPing = System.currentTimeMillis();
                     ctrl.pingAllPeers(true);
 
                     // осмотр сети по СИЛЕ

@@ -2,6 +2,7 @@ package org.erachain.network;
 // 30/03
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.network.message.BlockWinMessage;
 import org.erachain.network.message.GetHWeightMessage;
 import org.erachain.network.message.HWeightMessage;
@@ -24,16 +25,14 @@ import java.util.concurrent.TimeUnit;
 public class Sender extends MonitoredThread {
 
     private final static boolean USE_MONITOR = false;
-    private final static boolean logPings = false;
+    private final static boolean logPings = true;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class);
-    private static final int QUEUE_LENGTH = 20;
+    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE? 200 : 40;
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
     private Peer peer;
     public OutputStream out;
-
-    private boolean stoped;
 
     private GetHWeightMessage getHWeightMessage;
     private HWeightMessage hWeightMessage;
@@ -41,14 +40,14 @@ public class Sender extends MonitoredThread {
 
     public Sender(Peer peer) {
         this.peer = peer;
-        this.setName("Sender - " + this.getId() + " for: " + peer.getAddress().getHostAddress());
+        this.setName("Sender - " + this.getId() + " for: " + peer.getName());
 
         this.start();
     }
 
     public Sender(Peer peer, OutputStream out) {
         this.peer = peer;
-        this.setName("Sender - " + this.getId() + " for: " + peer.getAddress().getHostAddress());
+        this.setName("Sender - " + this.getId() + " for: " + peer.getName());
         this.out = out;
 
         this.start();
@@ -56,6 +55,7 @@ public class Sender extends MonitoredThread {
 
     public void setOut(OutputStream out) {
         this.out = out;
+        this.setName("Sender - " + this.getId() + " for: " + peer.getName());
     }
 
     public boolean offer(Message message) {
@@ -134,24 +134,24 @@ public class Sender extends MonitoredThread {
 
         if (USE_MONITOR) this.setMonitorStatusBefore("write");
 
-        //SEND MESSAGE
-        long checkTime = System.currentTimeMillis();
-        if (this.out == null)
-            return false;
 
         byte[] bytes = message.toBytes();
         String error = null;
 
+        //SEND MESSAGE
+        long checkTime = System.currentTimeMillis();
+
         // пока есть входы по sendMessage (org.erachain.network.Peer.directSendMessage) - нужно ждать синхрон
+        if (this.out == null)
+            return false;
         synchronized (this.out) {
             try {
-                if (this.out == null) {
-                    return false;
-                }
                 this.out.write(bytes);
                 this.out.flush();
             } catch (java.lang.OutOfMemoryError e) {
                 Controller.getInstance().stopAll(85);
+                return false;
+            } catch (java.lang.NullPointerException e) {
                 return false;
             } catch (EOFException e) {
                 if (this.out == null)
@@ -208,7 +208,7 @@ public class Sender extends MonitoredThread {
 
         Message message = null;
 
-        while (!this.stoped) {
+        while (this.peer.network.run) {
 
             if (this.out == null) {
                 // очистить остатки запросов если обнулили вывод
@@ -218,7 +218,6 @@ public class Sender extends MonitoredThread {
             try {
                 message = blockingQueue.poll(100, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
-                //if (this.stoped)
                 break;
             }
 
@@ -257,6 +256,8 @@ public class Sender extends MonitoredThread {
             if (!sendMessage(message))
                 continue;
         }
+
+        LOGGER.info(this + " - halted");
     }
 
     public void close() {
@@ -264,7 +265,6 @@ public class Sender extends MonitoredThread {
     }
 
     public void halt() {
-        this.stoped = true;
         this.close();
     }
 

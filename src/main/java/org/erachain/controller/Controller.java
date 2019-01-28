@@ -89,7 +89,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    private static final String version = "4.11.8 RC.02";
+    private static final String version = "4.11.8 RC.04";
     private static final String buildTime = "2019-01-22 13:33:33 UTC";
     private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.DEVELOP_USE? false : false;
 
@@ -1242,6 +1242,10 @@ public class Controller extends Observable {
         // LOGGER.info(peer + " sended UNCONFIRMED counter: " +
         // counter);
 
+        //NOTIFY OBSERVERS
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_PEER_TYPE, peer));
+
         return peer.isUsed();
 
     }
@@ -1272,27 +1276,24 @@ public class Controller extends Observable {
             return;
         }
 
-        if (false) {
-            // CHECK GENESIS BLOCK on CONNECT
-            Message mess = MessageFactory.getInstance()
-                    .createGetHeadersMessage(this.blockChain.getGenesisBlock().getSignature());
-            SignaturesMessage response = (SignaturesMessage) peer.getResponse(mess, 20000); // AWAIT!
+        // CHECK GENESIS BLOCK on CONNECT
+        Message mess = MessageFactory.getInstance()
+                .createGetHeadersMessage(this.blockChain.getGenesisBlock().getSignature());
+        SignaturesMessage response = (SignaturesMessage) peer.getResponse(mess, 20000); // AWAIT!
 
-            if (this.isStopping)
-                return;
-            if (response == null) {
-                peer.ban(network.banForActivePeersCounter(), "connection - break on POINTs get");
-                return;
-            } else if (response.getSignatures().isEmpty()) {
-                // NO
-                peer.ban(Synchronizer.BAN_BLOCK_TIMES << 2, "connection - wrong GENESIS BLOCK");
-                return;
-            }
-
-            if (this.isStopping || response == null)
-                return; // MAY BE IT HARD BUSY
-
+        if (this.isStopping)
+            return;
+        if (response == null) {
+            peer.ban(network.banForActivePeersCounter(), "connection - break on POINTs get");
+            return;
+        } else if (response.getSignatures().isEmpty()) {
+            // NO
+            peer.ban(Synchronizer.BAN_BLOCK_TIMES << 2, "connection - wrong GENESIS BLOCK");
+            return;
         }
+
+        if (this.isStopping || response == null)
+            return; // MAY BE IT HARD BUSY
 
         // GET CURRENT WIN BLOCK
         Block winBlock = this.blockChain.getWaitWinBuffer();
