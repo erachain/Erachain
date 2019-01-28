@@ -1279,13 +1279,14 @@ public class Controller extends Observable {
         // CHECK GENESIS BLOCK on CONNECT
         Message mess = MessageFactory.getInstance()
                 .createGetHeadersMessage(this.blockChain.getGenesisBlock().getSignature());
-        SignaturesMessage response = (SignaturesMessage) peer.getResponse(mess, 20000); // AWAIT!
+        SignaturesMessage response = (SignaturesMessage) peer.getResponse(mess, 10000); // AWAIT!
 
         if (this.isStopping)
             return;
         if (response == null) {
-            peer.ban(network.banForActivePeersCounter(), "connection - break on POINTs get");
-            return;
+            // TODO в новой версии 4.11.9 включить это обратно
+            //peer.ban(network.banForActivePeersCounter(), "connection - break on POINTs get");
+            //return;
         } else if (response.getSignatures().isEmpty()) {
             // NO
             peer.ban(Synchronizer.BAN_BLOCK_TIMES << 2, "connection - wrong GENESIS BLOCK");
