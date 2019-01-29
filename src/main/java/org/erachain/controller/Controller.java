@@ -7,11 +7,8 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.erachain.api.ApiClient;
 import org.erachain.api.ApiService;
 import org.erachain.at.AT;
-import org.erachain.core.BlockChain;
-import org.erachain.core.BlockGenerator;
+import org.erachain.core.*;
 import org.erachain.core.BlockGenerator.ForgingStatus;
-import org.erachain.core.Synchronizer;
-import org.erachain.core.TransactionCreator;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
@@ -92,8 +89,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    private static final String version = "4.11.08 beta";
-    private static final String buildTime = "2019-01-23 13:33:33 UTC";
+    private static final String version = "4.11.8 beta 2";
+    private static final String buildTime = "2019-01-22 13:33:33 UTC";
     private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.DEVELOP_USE? false : false;
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -141,6 +138,7 @@ public class Controller extends Observable {
     private TradersManager tradersManager;
     private ApiService rpcService;
     private WebService webService;
+    private WinBlockSelector winBlockSelector;
     private BlockChain blockChain;
     private BlockGenerator blockGenerator;
     private Synchronizer synchronizer;
@@ -154,7 +152,6 @@ public class Controller extends Observable {
     private long toOfflineTime;
     private Map<Peer, Tuple2<Integer, Long>> peerHWeight;
     private Map<Peer, Pair<String, Long>> peersVersions;
-    private HashSet<String> waitWinBufferProcessed = new HashSet<String>();
     private DBSet dbSet; // = DBSet.getInstance();
     private DCSet dcSet; // = DBSet.getInstance();
 
@@ -164,8 +161,8 @@ public class Controller extends Observable {
     private boolean isStopping = false;
     private String info;
     private long unconfigmedMessageTimingAverage;
-    private long transactionMessageTimingAverage;
-    private long transactionMessageTimingCounter;
+    public long transactionMessageTimingAverage;
+    public long transactionMessageTimingCounter;
     private long transactionMakeTimingAverage;
     private long transactionMakeTimingCounter;
     private long transactionProcessTimingAverage;
@@ -358,7 +355,7 @@ public class Controller extends Observable {
     public void sendMyHWeightToPeer(Peer peer) {
 
         // SEND HEIGHT MESSAGE
-        peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(this.blockChain.getHWeightFull(dcSet)));
+        peer.putMessage(MessageFactory.getInstance().createHWeightMessage(this.blockChain.getHWeightFull(dcSet)));
     }
 
     public TransactionCreator getTransactionCreator() {
@@ -522,11 +519,11 @@ public class Controller extends Observable {
         this.foundMyselfID = new byte[128];
         this.random.nextBytes(this.foundMyselfID);
 
-        this.peerHWeight = new LinkedHashMap<Peer, Tuple2<Integer, Long>>();
+        this.peerHWeight = Collections.synchronizedMap(new LinkedHashMap<Peer, Tuple2<Integer, Long>>());
         // LINKED TO PRESERVE ORDER WHEN SYNCHRONIZING (PRIORITIZE SYNCHRONIZING
         // FROM LONGEST CONNECTION ALIVE)
 
-        this.peersVersions = new LinkedHashMap<Peer, Pair<String, Long>>();
+        this.peersVersions = Collections.synchronizedMap(new LinkedHashMap<Peer, Pair<String, Long>>());
 
         // CHECK NETWORK PORT AVAILABLE
         if (!Network.isPortAvailable(Controller.getInstance().getNetworkPort())) {
@@ -653,6 +650,9 @@ public class Controller extends Observable {
 
         // CREATE BLOCKCHAIN
         this.blockChain = new BlockChain(dcSet);
+
+        // CREATE WinBlock SELECTOR
+        this.winBlockSelector = new WinBlockSelector(this, blockChain, dcSet);
 
         // START API SERVICE
         if (Settings.getInstance().isRpcEnabled()) {
@@ -1014,12 +1014,21 @@ public class Controller extends Observable {
         LOGGER.info("Stopping message processor");
         this.network.stop();
 
+        LOGGER.info("Stopping WinBlock selector");
+        this.winBlockSelector.halt();
+
         // delete temp Dir
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Delete files from TEMP dir")));
         LOGGER.info("Delete files from TEMP dir");
         for (File file : new File(Settings.getInstance().getTemDir()).listFiles())
             if (file.isFile()) file.delete();
+
+        // STOP WIN BLOCK SELECTOR
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping WinBlock Selector")));
+        LOGGER.info("Stopping WinBlock Selector");
+        this.winBlockSelector.stop();
 
         // STOP BLOCK PROCESSOR
         this.setChanged();
@@ -1149,8 +1158,11 @@ public class Controller extends Observable {
         int stepCount = 64; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
         long dTime = this.blockChain.getTimestamp(this.dcSet);
         boolean pinged = false;
+        long timePoint;
 
-        while (iterator.hasNext() && stepCount > 2) {
+        while (iterator.hasNext() && stepCount > 2 && peer.isUsed()) {
+
+            counter++;
 
             if (this.isStopping) {
                 return false;
@@ -1177,11 +1189,20 @@ public class Controller extends Observable {
             Message message = MessageFactory.getInstance().createTransactionMessage(transaction);
 
             try {
-                if (peer.sendMessage(message)) {
-                    counter++;
+                // воспользуемся тут прямой пересылкой - так как нам надо именно ждать всю обработку
+                if (peer.directSendMessage(message)) {
                     map.addBroadcastedPeer(transaction, peerByte);
+                    if (peer.getPing() > 1000) {
+                        this.network.notifyObserveUpdatePeer(peer);
+                        LOGGER.debug(" bad ping " + peer.getPing() + "ms for:" + counter);
+
+                        try {
+                            Thread.sleep(1000);
+                        } catch (Exception e) {
+                        }
+                    }
+
                 } else {
-                    // DISCONNECT
                     return false;
                 }
             } catch (Exception e) {
@@ -1193,12 +1214,11 @@ public class Controller extends Observable {
 
             if (counter % stepCount == 0) {
 
-
                 pinged = true;
-                peer.tryPing();
-                this.network.notifyObserveUpdatePeer(peer);
-
+                //peer.tryPing();
+                //this.network.notifyObserveUpdatePeer(peer);
                 ping = peer.getPing();
+
                 if (ping < 0 || ping > 1000) {
 
                     stepCount >>= 1;
@@ -1208,28 +1228,25 @@ public class Controller extends Observable {
                     } catch (Exception e) {
                     }
 
-                    // LOGGER.debug(peer + " stepCount down " +
-                    // stepCount);
+                    LOGGER.debug(peer + " stepCount down " + stepCount);
 
                 } else if (ping < 200) {
                     stepCount <<= 1;
-                    // LOGGER.debug(peer + " stepCount UP " +
-                    // stepCount + " for PING: " + ping);
+                    LOGGER.debug(peer + " stepCount UP " + stepCount + " for PING: " + ping);
                 }
 
             }
 
         }
 
-        if (!pinged)
-            peer.tryPing();
-
-        this.network.notifyObserveUpdatePeer(peer);
-
         // LOGGER.info(peer + " sended UNCONFIRMED counter: " +
         // counter);
 
-        return true;
+        //NOTIFY OBSERVERS
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_PEER_TYPE, peer));
+
+        return peer.isUsed();
 
     }
 
@@ -1241,52 +1258,52 @@ public class Controller extends Observable {
      */
     public void onConnect(Peer peer) {
 
-        if (this.isStopping)
+        if (this.isStopping) {
             return;
+        }
 
         // SEND FOUNDMYSELF MESSAGE
-        if (!peer.sendMessage(
-                MessageFactory.getInstance().createFindMyselfMessage(Controller.getInstance().getFoundMyselfID())))
+        if (!peer.directSendMessage(
+                MessageFactory.getInstance().createFindMyselfMessage(Controller.getInstance().getFoundMyselfID()))) {
+            peer.ban(network.banForActivePeersCounter(), "connection - break on MY ID send");
             return;
-
-        try {
-            Thread.sleep(100);
-        } catch (Exception e) {
         }
-
-        // проверим - может забанили уже если к себе приконнектились
-        if (!peer.isUsed())
-            return;
 
         // SEND VERSION MESSAGE
-        if (!peer.sendMessage(
-                MessageFactory.getInstance().createVersionMessage(Controller.getVersion(), getBuildTimestamp())))
-            return;
-
-        // CHECK GENESIS BLOCK on CONNECT
-        Message mess = MessageFactory.getInstance()
-                .createGetHeadersMessage(this.blockChain.getGenesisBlock().getSignature());
-        SignaturesMessage response = (SignaturesMessage) peer.getResponse(mess, 20000);
-        if (response == null)
-            ; // MAY BE IT HARD BUSY
-        else if (response.getSignatures().isEmpty()) {
-            // NO
-            peer.ban(Synchronizer.BAN_BLOCK_TIMES << 2, "wrong GENESIS BLOCK");
+        if (!peer.directSendMessage(
+                MessageFactory.getInstance().createVersionMessage(Controller.getVersion(), getBuildTimestamp()))) {
+            peer.ban(network.banForActivePeersCounter(), "connection - break on Version send");
             return;
         }
+
+        // TODO в новой версии 4.11.9 включить это обратно
+        if (false) {
+            // CHECK GENESIS BLOCK on CONNECT
+            Message mess = MessageFactory.getInstance()
+                    .createGetHeadersMessage(this.blockChain.getGenesisBlock().getSignature());
+            SignaturesMessage response = (SignaturesMessage) peer.getResponse(mess, 10000); // AWAIT!
+
+            if (this.isStopping)
+                return;
+            if (response == null) {
+                peer.ban(network.banForActivePeersCounter(), "connection - break on POINTs get");
+                return;
+            } else if (response.getSignatures().isEmpty()) {
+                // NO
+                peer.ban(Synchronizer.BAN_BLOCK_TIMES << 2, "connection - wrong GENESIS BLOCK");
+                return;
+            }
+        }
+
+        if (this.isStopping)
+            return; // MAY BE IT HARD BUSY
 
         // GET CURRENT WIN BLOCK
         Block winBlock = this.blockChain.getWaitWinBuffer();
         if (winBlock != null) {
             // SEND MESSAGE
-            if (!peer.sendMessage(MessageFactory.getInstance().createWinBlockMessage(winBlock)))
-                return;
+            peer.sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(winBlock));
         }
-
-        if (this.isStopping)
-            return;
-
-        this.actionAfterConnect();
 
         if (this.status == STATUS_NO_CONNECTIONS) {
             // UPDATE STATUS
@@ -1299,8 +1316,12 @@ public class Controller extends Observable {
         }
 
         // BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-        if (!this.broadcastUnconfirmedToPeer(peer))
+        if (!this.broadcastUnconfirmedToPeer(peer)) {
             peer.ban(network.banForActivePeersCounter(), "broken on SEND UNCONFIRMEDs");
+            return;
+        }
+
+        this.actionAfterConnect();
 
     }
 
@@ -1344,27 +1365,29 @@ public class Controller extends Observable {
         this.notifyObservers(new ObserverMessage(ObserverMessage.FORGING_STATUS, status));
     }
 
+    private long statusObserveTime;
     // used from NETWORK
     public void afterDisconnect(Peer peer) {
-        synchronized (this.peerHWeight) {
 
-            this.peerHWeight.remove(peer);
+        this.peerHWeight.remove(peer);
+        this.peersVersions.remove(peer);
 
-            this.peersVersions.remove(peer);
+        if (this.peerHWeight.isEmpty()) {
 
-            if (this.peerHWeight.isEmpty()) {
+            if (this.getToOfflineTime() == 0L) {
+                // SET START OFFLINE TIME
+                this.setToOfflineTime(NTP.getTime());
+            }
 
-                if (this.getToOfflineTime() == 0L) {
-                    // SET START OFFLINE TIME
-                    this.setToOfflineTime(NTP.getTime());
-                }
+            // UPDATE STATUS
+            if (isTestNet())
+                this.status = STATUS_OK;
+            else
+                this.status = STATUS_NO_CONNECTIONS;
 
-                // UPDATE STATUS
-                if (isTestNet())
-                    this.status = STATUS_OK;
-                else
-                    this.status = STATUS_NO_CONNECTIONS;
-
+            if (System.currentTimeMillis() - statusObserveTime > 2000) {
+                // чтобы не генерилось часто
+                statusObserveTime = System.currentTimeMillis();
                 // NOTIFY
                 this.setChanged();
                 this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
@@ -1382,7 +1405,7 @@ public class Controller extends Observable {
     }
 
     public void clearWaitWinBufferProcessed() {
-        waitWinBufferProcessed = new HashSet<String>();
+        this.winBlockSelector.clearWaitWinBufferProcessed();
     }
 
     // SYNCHRONIZED DO NOT PROCESSS MESSAGES SIMULTANEOUSLY
@@ -1396,18 +1419,6 @@ public class Controller extends Observable {
         long timeCheck = System.currentTimeMillis();
 
         switch (message.getType()) {
-
-            /*
-             * case Message.HEIGHT_TYPE:
-             *
-             * HeightMessage heightMessage = (HeightMessage) message;
-             *
-             * // ADD TO LIST synchronized (this.peerHWeight) {
-             * this.peerHWeight.put(heightMessage.getSender(),
-             * heightMessage.getHeight()); }
-             *
-             * break;
-             */
 
             case Message.HWEIGHT_TYPE:
 
@@ -1423,9 +1434,7 @@ public class Controller extends Observable {
                 }
 
                 // ADD TO LIST
-                synchronized (this.peerHWeight) {
-                    this.peerHWeight.put(hWeightMessage.getSender(), hWeightMessage.getHWeight());
-                }
+                this.peerHWeight.put(hWeightMessage.getSender(), hWeightMessage.getHWeight());
 
                 // this.checkStatusAndObserve(0);
 
@@ -1464,7 +1473,7 @@ public class Controller extends Observable {
                 response.setId(message.getId());
 
                 // SEND RESPONSE BACK WITH SAME ID
-                message.getSender().sendMessage(response);
+                message.getSender().putMessage(response);
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 10) {
@@ -1493,7 +1502,7 @@ public class Controller extends Observable {
                 response.setId(message.getId());
 
                 // SEND RESPONSE BACK WITH SAME ID
-                message.getSender().sendMessage(response);
+                message.getSender().putMessage(response);
 
                 if (newBlock == null) {
                     String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
@@ -1508,91 +1517,13 @@ public class Controller extends Observable {
                     break;
                 }
 
-                long onMessageProcessTiming = System.nanoTime();
+                this.winBlockSelector.putMessage(message);
 
-                BlockWinMessage blockWinMessage = (BlockWinMessage) message;
-
-                // ASK BLOCK FROM BLOCKCHAIN
-                newBlock = blockWinMessage.getBlock();
-
-                // if already it block in process
-                String key = newBlock.getCreator().getBase58();
-
-                synchronized (this.waitWinBufferProcessed) {
-                    if (!waitWinBufferProcessed.add(key)
-                            || Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getSignature()))
-                        return;
-                }
-
-                info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
-                        + newBlock.toString();
-                LOGGER.debug(info);
-
-                if (this.status == STATUS_SYNCHRONIZING) {
-                    if (false) {
-                        // SET for FUTURE without CHECK
-                        blockChain.clearWaitWinBuffer();
-                        // тут он невалидный точно
-                        blockChain.setWaitWinBuffer(dcSet, newBlock, blockWinMessage.getSender());
-                        break;
-                    } else
-                        // нет нельзя его в буфер класть так как там нет проверки потом на валидность
-                        return;
-                }
-
-                if (!newBlock.isValidHead(dcSet)) {
-                    byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
-                    if (!Arrays.equals(lastSignature, newBlock.getReference())) {
-                        // это просто блок с параллельной ветки - не баним ее
-                        return;
-                    }
-                    info = "Block (" + newBlock.toString() + ") is Invalid";
-                    banPeerOnError(message.getSender(), info);
-                    return;
-                }
-
-                // тут внутри проверка полной валидности
-                if (blockChain.setWaitWinBuffer(dcSet, newBlock, message.getSender())) {
-                    // IF IT WIN
-                    // BROADCAST
-                    List<Peer> excludes = new ArrayList<Peer>();
-                    excludes.add(message.getSender());
-                    this.network.asyncBroadcastWinBlock(message, excludes, false);
-
-                    onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
-
-                    if (onMessageProcessTiming < 999999999999l) {
-                        // при переполнении может быть минус
-                        // в миеросекундах подсчет делаем
-                        // ++ 10 потому что там ФОРК базы делаем - он очень медленный
-                        onMessageProcessTiming = onMessageProcessTiming / 1000 / (10 + newBlock.getTransactionCount());
-                        if (transactionMessageTimingCounter < 1 << 3) {
-                            transactionMessageTimingCounter++;
-                            transactionMessageTimingAverage = ((transactionMessageTimingAverage * transactionMessageTimingCounter)
-                                    + onMessageProcessTiming - transactionMessageTimingAverage) / transactionMessageTimingCounter;
-                        } else
-                            transactionMessageTimingAverage = ((transactionMessageTimingAverage << 3)
-                                    + onMessageProcessTiming - transactionMessageTimingAverage) >> 3;
-                    }
-
-                } else {
-                    // SEND my BLOCK
-
-                    // GET till not NULL
-                    Block myWinBlock = blockChain.getWaitWinBuffer();
-                    if (myWinBlock != null) {
-                        // оказывается иногда там НУЛ случается
-                        // надо сначала взять, проскрить и потом слать
-                        Message messageBestWin = MessageFactory.getInstance()
-                                .createWinBlockMessage(myWinBlock);
-                        message.getSender().sendMessage(messageBestWin);
-                    }
-                }
                 return;
 
             case Message.TRANSACTION_TYPE:
 
-                onMessageProcessTiming = System.nanoTime();
+                long onMessageProcessTiming = System.nanoTime();
 
                 TransactionMessage transactionMessage = (TransactionMessage) message;
 
@@ -1724,10 +1655,7 @@ public class Controller extends Observable {
                 response.setId(message.getId());
 
                 // SEND BACK TO SENDER
-                boolean result11 = message.getSender().sendMessage(response);
-                if (!result11) {
-                    LOGGER.debug("error on response GET_HWEIGHT_TYPE to " + message.getSender().getAddress());
-                }
+                message.getSender().offerMessage(response, Network.SEND_WAIT);
 
         }
 
@@ -1754,13 +1682,13 @@ public class Controller extends Observable {
         LOGGER.info("broadcast winBlock " + newBlock.toString() + " size:" + newBlock.getTransactionCount());
 
         // CREATE MESSAGE
-        Message message = MessageFactory.getInstance().createWinBlockMessage(newBlock);
+        BlockWinMessage blockWinMessage = (BlockWinMessage)MessageFactory.getInstance().createWinBlockMessage(newBlock);
 
         if (this.isOnStopping())
             return;
 
         // BROADCAST MESSAGE
-        this.network.asyncBroadcastWinBlock(message, excludes, false);
+        this.network.asyncBroadcastWinBlock(blockWinMessage, excludes, false);
 
         LOGGER.info("broadcasted!");
 
@@ -2081,21 +2009,19 @@ public class Controller extends Observable {
         Peer maxPeer = null;
 
         try {
-            synchronized (this.peerHWeight) {
-                for (Peer peer : this.peerHWeight.keySet()) {
-                    if (peer.getPing() < 0) {
-                        // не использовать пиры которые не в быстром коннекте
-                        // - так как иначе они заморозят синхронизацию совсем
-                        // да и не понятно как с них данные получать
-                        continue;
-                    }
-                    Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
-                    if (height < whPeer.a
-                            || (useWeight && height == whPeer.a && weight < whPeer.b)) {
-                        height = whPeer.a;
-                        weight = whPeer.b;
-                        maxPeer = peer;
-                    }
+            for (Peer peer : this.peerHWeight.keySet()) {
+                if (peer.getPing() < 0) {
+                    // не использовать пиры которые не в быстром коннекте
+                    // - так как иначе они заморозят синхронизацию совсем
+                    // да и не понятно как с них данные получать
+                    continue;
+                }
+                Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
+                if (height < whPeer.a
+                        || (useWeight && height == whPeer.a && weight < whPeer.b)) {
+                    height = whPeer.a;
+                    weight = whPeer.b;
+                    maxPeer = peer;
                 }
             }
         } catch (Exception e) {

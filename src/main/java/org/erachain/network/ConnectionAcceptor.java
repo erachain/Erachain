@@ -41,7 +41,7 @@ public class ConnectionAcceptor extends MonitoredThread {
 
             // на всякий случай чтобы атак не было с созданием множества конектов
             try {
-                Thread.sleep(10);
+                Thread.sleep(100);
             } catch (Exception e) {
             }
 
@@ -69,14 +69,27 @@ public class ConnectionAcceptor extends MonitoredThread {
                         ) {
                     //DO NOT CONNECT TO OURSELF/EXISTING CONNECTION
                     // or BANNED
+                    connectionSocket.shutdownOutput();
                     connectionSocket.close();
                     continue;
                 }
             } catch (java.lang.OutOfMemoryError e) {
                 Controller.getInstance().stopAll(90);
                 break;
+            } catch (java.net.SocketException e) {
+
+                if (!socket.isClosed())
+                    try {
+                        socket.close();
+                    } catch (Exception e1) {
+                    }
+
+                socket = null;
+                continue;
 
             } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+
                 try {
                     socket.close();
                 } catch (Exception e1) {
@@ -93,6 +106,18 @@ public class ConnectionAcceptor extends MonitoredThread {
             if (connectionSocket == null)
                 continue;
 
+            // проверим - может уже есть такое соединение в котром мы мнмцматор
+            Peer peer = this.network.getKnownWhitePeer(connectionSocket.getInetAddress().getAddress());
+            if (peer != null && (peer.isOnUsed() || peer.isUsed())) {
+                try {
+                    // сообщим об закрытии на тот конец
+                    connectionSocket.shutdownOutput();
+                    connectionSocket.close();
+                } catch (IOException e) {
+                }
+                continue;
+            }
+
             try {
                 //CREATE PEER
                 ////new Peer(callback, connectionSocket);
@@ -101,8 +126,9 @@ public class ConnectionAcceptor extends MonitoredThread {
                 //		+ " my:" + Network.getMyselfAddress());
 
                 setMonitorStatusBefore("startPeer");
-                Peer peer = network.startPeer(connectionSocket);
+                peer = network.startPeer(connectionSocket);
                 setMonitorStatusAfter();
+
                 if (!peer.isUsed()) {
                     // если в процессе
                     //if (!peer.isBanned() || connectionSocket.isClosed()) {
