@@ -26,7 +26,6 @@ public class ConnectionCreator extends MonitoredThread {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionCreator.class);
     private Network network;
     private static long getPeersTimestamp;
-    private boolean isRun;
 
     public ConnectionCreator(Network network) {
         this.network = network;
@@ -35,7 +34,7 @@ public class ConnectionCreator extends MonitoredThread {
 
     private int connectToPeersOfThisPeer(Peer peer, int maxReceivePeers, boolean onlyWhite) {
 
-        if (!this.isRun)
+        if (!this.network.run)
             return 0;
 
         //CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE
@@ -62,7 +61,7 @@ public class ConnectionCreator extends MonitoredThread {
 
             this.setMonitorStatus("peer.recurse " + newPeer.toString());
 
-            if (!this.isRun)
+            if (!this.network.run)
                 return 0;
 
             if (maxReceivePeers > 0 && foreignPeersCounter >= maxReceivePeers) {
@@ -97,7 +96,8 @@ public class ConnectionCreator extends MonitoredThread {
             } catch (java.lang.OutOfMemoryError e) {
                 Controller.getInstance().stopAll(94);
                 break;
-            } catch (Exception e) {
+            } catch (InterruptedException e) {
+                break;
             }
 
             newPeer = network.getKnownPeer(newPeer, Network.ANY_TYPE);
@@ -105,7 +105,7 @@ public class ConnectionCreator extends MonitoredThread {
             if (!network.isGoodForConnect(newPeer))
                 continue;
 
-            if (!this.isRun)
+            if (!this.network.run)
                 return 0;
 
             // огрничим перебор тут так как в ответе из текущего пира может быть очень много стрых пиров
@@ -133,7 +133,6 @@ public class ConnectionCreator extends MonitoredThread {
     }
 
     public void run() {
-        this.isRun = true;
 
         List<Peer> knownPeers = null;
 
@@ -147,10 +146,10 @@ public class ConnectionCreator extends MonitoredThread {
                 Controller.getInstance().stopAll(96);
                 break;
             } catch (InterruptedException e) {
-                LOGGER.error(e.getMessage(), e);
+                break;
             }
 
-            if (!this.isRun)
+            if (!this.network.run)
                 break;
 
             this.setName("ConnectionCreator - " + this.getId()
@@ -158,7 +157,7 @@ public class ConnectionCreator extends MonitoredThread {
                     + " total:" + network.getActivePeersCounter(false));
 
             //CHECK IF WE NEED NEW CONNECTIONS
-            if (this.isRun && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true)) {
+            if (this.network.run && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true)) {
 
                 //GET LIST OF KNOWN PEERS
                 knownPeers = network.getKnownPeers();
@@ -179,10 +178,10 @@ public class ConnectionCreator extends MonitoredThread {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
-                        LOGGER.error(e.getMessage(),e);
+                        break;
                     }
 
-                    if (!this.isRun)
+                    if (!this.network.run)
                         break;
 
                     //CHECK IF SOCKET IS NOT LOCALHOST
@@ -199,9 +198,6 @@ public class ConnectionCreator extends MonitoredThread {
 
                     if (!network.isGoodForConnect(peer))
                         continue;
-
-                    if (!this.network.run)
-                        break;
 
                     LOGGER.info("try connect to: " + peer);
 
@@ -221,13 +217,13 @@ public class ConnectionCreator extends MonitoredThread {
 
             //CHECK IF WE STILL NEED NEW CONNECTIONS
             // USE unknown peers from known peers
-            if (this.isRun && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true)) {
+            if (this.network.run && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true)) {
                 //OLD SCHOOL ITERATE activeConnections
                 //avoids Exception when adding new elements
                 List<Peer> peers = network.getActivePeers(false);
                 for (Peer peer: peers) {
 
-                    if (!this.isRun)
+                    if (!this.network.run)
                         break;
 
                     if (peer.isBanned())
@@ -257,20 +253,21 @@ public class ConnectionCreator extends MonitoredThread {
             this.setName("Thread ConnectionCreator - " + this.getId() + " white:" + counter
                     + " total:" + network.getActivePeersCounter(false));
 
-            if (!this.isRun)
+            if (!this.network.run)
                 break;
 
             this.setMonitorStatus("sleep");
 
             try {
                 if (counter < needMinConnections)
-                    Thread.sleep(BlockChain.DEVELOP_USE ? 10000 : 5000);
+                    Thread.sleep(BlockChain.DEVELOP_USE ? 5000 : 5000);
                 else
-                    Thread.sleep(30000);
+                    Thread.sleep(10000);
             } catch (java.lang.OutOfMemoryError e) {
                 Controller.getInstance().stopAll(95);
                 return;
-            } catch (Exception e) {
+            } catch (InterruptedException e) {
+                break;
             }
 
         }
@@ -281,7 +278,6 @@ public class ConnectionCreator extends MonitoredThread {
     }
 
     public void halt() {
-        this.isRun = false;
         LOGGER.info("on halt");
     }
 }
