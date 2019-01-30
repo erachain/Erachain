@@ -3,9 +3,11 @@ package org.erachain.core.account;
 import org.erachain.core.crypto.Base32;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.utils.Pair;
 
+import java.math.BigInteger;
 import java.util.Arrays;
+
+//import org.erachain.core.crypto.Base64;
 
 //import java.math.BigDecimal;
 //import org.mapdb.Fun.Tuple2;
@@ -63,6 +65,12 @@ public class PublicKeyAccount extends Account {
 
     public byte[] getPublicKey() {
         return publicKey;
+    }
+
+    @Override
+    public int hashCode() {
+        // more effective VS Base58 or Base64
+        return new BigInteger(publicKey).hashCode();
     }
 
     //EQUALS

@@ -32,6 +32,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
+//import org.erachain.core.crypto.Base64;
+
 //04/01 +-
 
 /**
@@ -802,7 +804,8 @@ public class Account {
 
     @Override
     public int hashCode() {
-        return this.getAddress().hashCode();
+        // more effective VS Base58 or Base64
+        return new BigInteger(shortBytes).hashCode();
     }
 
     // EQUALS
