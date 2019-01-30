@@ -43,6 +43,8 @@ public class ConnectionCreator extends MonitoredThread {
             return 0;
 
         LOGGER.info("GET peers from: " + peer + " get max: " + maxReceivePeers);
+        this.setMonitorStatus("recourse peer " + peer + " maxReceivePeers: " + maxReceivePeers);
+
 
         //ASK PEER FOR PEERS
         Message getPeersMessage = MessageFactory.getInstance().createGetPeersMessage();
@@ -59,9 +61,11 @@ public class ConnectionCreator extends MonitoredThread {
 
         for (Peer newPeer: peersMessage.getPeers()) {
 
-            this.setMonitorStatus("peer.recurse " + newPeer.toString());
-
             if (!this.network.run)
+                return 0;
+
+            // если произошел полныцй разрыв сети - то прекратим поиск по рекурсии
+            if (network.getActivePeersCounter(false) == 0)
                 return 0;
 
             if (maxReceivePeers > 0 && foreignPeersCounter >= maxReceivePeers) {
@@ -113,7 +117,9 @@ public class ConnectionCreator extends MonitoredThread {
             foreignPeersCounter++;
 
             //CONNECT
-            this.setMonitorStatusBefore("peer.connect.recurse");
+            this.setMonitorStatusBefore("recourse peer " + peer + " maxReceivePeers: " + maxReceivePeers
+                    + " foreignPeersCounter: " + foreignPeersCounter
+                    + " try connect to " + newPeer);
             if (!newPeer.connect(null, network, "connected in recurse +++ "))
                 continue;
             //network.tryConnection(null, newPeer, "connected in recurse +++ "); - тормозит коннект
@@ -202,7 +208,7 @@ public class ConnectionCreator extends MonitoredThread {
                     LOGGER.info("try connect to: " + peer);
 
                     //CONNECT
-                    this.setMonitorStatusBefore("peer.connect");
+                    this.setMonitorStatusBefore("peer.connect " + peer);
                     if(!peer.connect(null, network, "connected +++ "))
                         continue;
 
@@ -224,6 +230,10 @@ public class ConnectionCreator extends MonitoredThread {
                 for (Peer peer: peers) {
 
                     if (!this.network.run)
+                        break;
+
+                    // если произошел полныцй разрыв сети - то прекратим поиск тут
+                    if (network.getActivePeersCounter(false) == 0)
                         break;
 
                     if (peer.isBanned())
