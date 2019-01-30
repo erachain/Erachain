@@ -1691,6 +1691,7 @@ public class Controller extends Observable {
             case Message.TRANSACTION_TYPE:
 
                 onMessageTransaction(message);
+                break;
 
             case Message.VERSION_TYPE:
 
