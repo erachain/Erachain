@@ -26,7 +26,21 @@ public class PublicKeyAccountTest {
         int hash2 = pub2.hashCode();
         assertNotEquals(hash1, hash2);
 
-        boolean equals1 = pub1.equals(pub2);
+        Account acc1 = new Account(pub1.getAddress());
+        Account acc2 = new Account(pub2.getAddress());
+
+        Account acc1a = new Account(pub1.getAddress());
+
+
+        assertEquals(acc1.equals(acc1a), true);
+        assertEquals(acc1.equals(acc2), false);
+
+        assertEquals(acc1, acc1a);
+        assertNotEquals(acc1, acc2);
+
+        assertEquals(acc1.hashCode(), acc1a.hashCode());
+
+        assertNotEquals(acc1.hashCode(), acc2.hashCode());
 
 
     }

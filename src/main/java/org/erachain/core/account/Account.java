@@ -804,8 +804,7 @@ public class Account {
 
     @Override
     public int hashCode() {
-        // more effective VS Base58 or Base64
-        return new BigInteger(shortBytes).hashCode();
+        return address.hashCode();
     }
 
     // EQUALS
