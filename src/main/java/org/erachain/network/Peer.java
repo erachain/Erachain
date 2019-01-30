@@ -212,7 +212,7 @@ public class Peer extends MonitoredThread {
             }
 
             this.pinger.setPing(Integer.MAX_VALUE);
-            this.pinger.setName("Pinger - " + this.pinger.getId() + " for: " + this.getName());
+            this.pinger.setName("Pinger-" + this.pinger.getId() + " for: " + this.getName());
 
         }
 
