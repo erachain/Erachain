@@ -439,7 +439,7 @@ public class Wallet extends Observable implements Observer {
 		if (!this.accountExists(account.getAddress())) {
 			// ADD TO DATABASE
 			this.secureDatabase.getAccountSeedMap().add(account);
-			this.database.getAccountMap().add(account);
+			this.database.getAccountMap().add(account, -1);
 			// set name
 			ob.put("description", Lang.getInstance().translate("Created by default Account") + " " + (nonce + 1));
 			this.database.getAccountsPropertisMap().set(account.getAddress(), new Tuple2<String, String>(
@@ -795,7 +795,7 @@ public class Wallet extends Observable implements Observer {
 		if (!this.accountExists(account.getAddress())) {
 			// ADD TO DATABASE
 			this.secureDatabase.getAccountSeedMap().add(account);
-			this.database.getAccountMap().add(account);
+			this.database.getAccountMap().add(account, -1);
 
 			// SAVE TO DISK
 			this.secureDatabase.commit();

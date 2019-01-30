@@ -46,10 +46,11 @@ public class Wallet_Sync_Button extends JButton implements Observer {
                     }
                 }
 
+                int number = 0;
                 for (PrivateKeyAccount privateAccount : Controller.getInstance().getPrivateKeyAccounts()) {
                     if (Controller.getInstance().wallet.accountExists(privateAccount.getAddress()))
                         continue;
-                    Controller.getInstance().wallet.database.getAccountMap().add(privateAccount);
+                    Controller.getInstance().wallet.database.getAccountMap().add(privateAccount, number++);
                 }
 
                 int n = JOptionPane.showConfirmDialog(
