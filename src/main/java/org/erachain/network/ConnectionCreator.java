@@ -65,7 +65,7 @@ public class ConnectionCreator extends MonitoredThread {
                 return 0;
 
             // если произошел полныцй разрыв сети - то прекратим поиск по рекурсии
-            if (network.getActivePeersCounter(false) == 0)
+            if (network.getActivePeersCounter(false) == 0 && foreignPeersCounter > 4)
                 return 0;
 
             if (maxReceivePeers > 0 && foreignPeersCounter >= maxReceivePeers) {
