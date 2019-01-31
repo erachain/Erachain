@@ -3,7 +3,6 @@ package org.erachain.gui.items.statement;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.R_SignNote;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.Split_Panel;
 import org.erachain.gui.items.persons.TableModelPersons;
 import org.erachain.gui.library.Issue_Confirm_Dialog;
@@ -207,7 +206,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
                         .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
                 if (statement == null)
                     return;
-                DCSet db = DCSet.getInstance();
+                //statement.setDC(DCSet.getInstance());
                 new VouchRecordDialog(statement.getBlockHeight(), statement.getSeqNo());
 
             }
