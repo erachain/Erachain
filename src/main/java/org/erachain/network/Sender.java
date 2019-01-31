@@ -70,12 +70,12 @@ public class Sender extends MonitoredThread {
         }
     }
 
-    public void put(Message message) {
-        try {
-            blockingQueue.put(message);
-        } catch (InterruptedException e) {
-        }
-    }
+    //public void put(Message message) {
+    //    try {
+    //        blockingQueue.put(message);
+    //    } catch (InterruptedException e) {
+    //    }
+    //}
 
     public void sendGetHWeight(GetHWeightMessage getHWeightMessage) {
         if (true) {

@@ -477,9 +477,9 @@ public class Peer extends MonitoredThread {
         this.sender.sendWinBlock(winBlock);
     }
 
-    public void putMessage(Message message) {
-        this.sender.put(message);
-    }
+    //public void putMessage(Message message) {
+    //    this.sender.put(message);
+    //}
 
     public boolean offerMessage(Message message, long SOT) {
         return this.sender.offer(message, SOT);
@@ -534,20 +534,12 @@ public class Peer extends MonitoredThread {
 
         //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
         this.messages.put(localRequestKey, blockingQueue);
-        boolean sended;
-        if (false && message.getType() == Message.GET_HWEIGHT_TYPE) {
-            this.sendGetHWeight((GetHWeightMessage) message);
-            sended = true;
-        } else
-            sended = this.offerMessage(message, timeSOT<<1);
+        boolean sended = this.offerMessage(message);
 
         if (!sended) {
+            //WHEN FAILED TO SEND MESSAGE
             this.messages.remove(localRequestKey);
             if (USE_MONITOR) this.setMonitorStatusAfter();
-            //WHEN FAILED TO SEND MESSAGE
-            //blockingQueue = null;
-            //LOGGER.debug(this + " >> " + message + " send ERROR by period: " + (System.currentTimeMillis() - checkTime));
-            ////this.messages.remove(localRequestKey);
             return null;
         }
         if (USE_MONITOR) this.setMonitorStatusAfter();
