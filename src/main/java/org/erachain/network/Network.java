@@ -492,7 +492,7 @@ public class Network extends Observable {
             Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage(ca);
             answer.setId(message.getId());
             // send answer
-            message.getSender().putMessage(answer);
+            message.getSender().offerMessage(answer);
            return;
            }
         // Ansver to get transaction
@@ -558,7 +558,7 @@ public class Network extends Observable {
                 answer.setId(message.getId());
 
                 //SEND TO SENDER
-                message.getSender().putMessage(answer);
+                message.getSender().offerMessage(answer);
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 10) {
@@ -649,7 +649,7 @@ public class Network extends Observable {
             //EXCLUDE PEERS
             if (exclude == null || !exclude.contains(peer)) {
                 try {
-                    peer.putMessage(message);
+                    peer.offerMessage(message);
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
                 }

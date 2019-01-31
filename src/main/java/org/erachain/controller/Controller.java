@@ -355,7 +355,7 @@ public class Controller extends Observable {
     public void sendMyHWeightToPeer(Peer peer) {
 
         // SEND HEIGHT MESSAGE
-        peer.putMessage(MessageFactory.getInstance().createHWeightMessage(this.blockChain.getHWeightFull(dcSet)));
+        peer.offerMessage(MessageFactory.getInstance().createHWeightMessage(this.blockChain.getHWeightFull(dcSet)));
     }
 
     public TransactionCreator getTransactionCreator() {
@@ -1473,7 +1473,7 @@ public class Controller extends Observable {
                 response.setId(message.getId());
 
                 // SEND RESPONSE BACK WITH SAME ID
-                message.getSender().putMessage(response);
+                message.getSender().offerMessage(response);
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 10) {
@@ -1502,7 +1502,7 @@ public class Controller extends Observable {
                 response.setId(message.getId());
 
                 // SEND RESPONSE BACK WITH SAME ID
-                message.getSender().putMessage(response);
+                message.getSender().offerMessage(response);
 
                 if (newBlock == null) {
                     String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
