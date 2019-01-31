@@ -1655,7 +1655,7 @@ public class Controller extends Observable {
                 response.setId(message.getId());
 
                 // SEND BACK TO SENDER
-                message.getSender().offerMessage(response, Network.SEND_WAIT);
+                message.getSender().offerMessage(response);
 
         }
 

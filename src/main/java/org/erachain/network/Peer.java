@@ -534,7 +534,7 @@ public class Peer extends MonitoredThread {
 
         //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
         this.messages.put(localRequestKey, blockingQueue);
-        boolean sended = this.offerMessage(message, timeSOT << 1);
+        boolean sended = this.offerMessage(message);
 
         if (!sended) {
             //WHEN FAILED TO SEND MESSAGE
