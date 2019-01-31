@@ -206,7 +206,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
                         .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
                 if (statement == null)
                     return;
-                //statement.setDC(DCSet.getInstance());
+
                 new VouchRecordDialog(statement.getBlockHeight(), statement.getSeqNo());
 
             }
