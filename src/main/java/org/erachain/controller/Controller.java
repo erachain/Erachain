@@ -1408,6 +1408,118 @@ public class Controller extends Observable {
         this.winBlockSelector.clearWaitWinBufferProcessed();
     }
 
+    public void onMessageTransaction(Message message) {
+
+        long timeCheck = System.nanoTime();
+        long onMessageProcessTiming = timeCheck;
+
+        TransactionMessage transactionMessage = (TransactionMessage) message;
+
+        // GET TRANSACTION
+        Transaction transaction = transactionMessage.getTransaction();
+
+        // CHECK IF SIGNATURE IS VALID ////// ------- OR GENESIS TRANSACTION
+        if (transaction.getCreator() == null
+                || !transaction.isSignatureValid(DCSet.getInstance())) {
+            // DISHONEST PEER
+            banPeerOnError(message.getSender(), "invalid transaction signature");
+
+            return;
+        }
+
+        // DEADTIME
+        if (transaction.getDeadline() < this.blockChain.getTimestamp(this.dcSet)) {
+            // so OLD transaction
+            return;
+        }
+
+        if (LOG_UNCONFIRMED_PROCESS) {
+            timeCheck = System.currentTimeMillis() - timeCheck;
+            if (timeCheck > 10) {
+                LOGGER.debug("TRANSACTION_TYPE proccess 1 period: " + timeCheck);
+            }
+        }
+
+        // ALREADY EXIST
+        byte[] signature = transaction.getSignature();
+        timeCheck = System.currentTimeMillis();
+        if (this.dcSet.getTransactionMap().contains(signature)) {
+            if (LOG_UNCONFIRMED_PROCESS) {
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 20) {
+                    LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
+                }
+            }
+            return;
+        }
+        if (LOG_UNCONFIRMED_PROCESS) {
+            timeCheck = System.currentTimeMillis() - timeCheck;
+            if (timeCheck > 20) {
+                LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
+            }
+        }
+
+        timeCheck = System.currentTimeMillis();
+        if (this.dcSet.getTransactionFinalMapSigns().contains(signature) || this.isStopping) {
+
+            if (LOG_UNCONFIRMED_PROCESS) {
+                timeCheck = System.currentTimeMillis() - timeCheck;
+                if (timeCheck > 30) {
+                    LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in FINAL period: " + timeCheck);
+                }
+            }
+            return;
+        }
+        if (LOG_UNCONFIRMED_PROCESS) {
+            timeCheck = System.currentTimeMillis() - timeCheck;
+            if (timeCheck > 30) {
+                LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in FINAL period: " + timeCheck);
+            }
+        }
+
+        timeCheck = System.currentTimeMillis();
+        if (this.status == STATUS_OK) {
+            // если мы не в синхронизации - так как мы тогда
+            // не знаем время текущее цепочки и не понимаем можно ли борадкастить дальше трнзакцию
+            // так как непонятно - протухла она или нет
+
+            // BROADCAST
+            List<Peer> excludes = new ArrayList<Peer>();
+            excludes.add(message.getSender());
+            this.network.broadcast(message, excludes, false);
+        }
+
+        if (LOG_UNCONFIRMED_PROCESS) {
+            timeCheck = System.currentTimeMillis() - timeCheck;
+            if (timeCheck > 10) {
+                LOGGER.debug("TRANSACTION_TYPE proccess BROADCAST period: " + timeCheck);
+            }
+            timeCheck = System.currentTimeMillis();
+        }
+
+        // ADD TO UNCONFIRMED TRANSACTIONS
+        this.dcSet.getTransactionMap().add(transaction);
+
+        if (LOG_UNCONFIRMED_PROCESS) {
+            timeCheck = System.currentTimeMillis() - timeCheck;
+            if (timeCheck > 30) {
+                LOGGER.debug("TRANSACTION_TYPE proccess ADD period: " + timeCheck);
+            }
+        }
+
+        onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
+        if (onMessageProcessTiming < 999999999999l) {
+            // при переполнении может быть минус
+            // в миеросекундах подсчет делаем
+            onMessageProcessTiming /= 1000;
+            unconfigmedMessageTimingAverage = ((unconfigmedMessageTimingAverage << 4)
+                    + onMessageProcessTiming - unconfigmedMessageTimingAverage) >> 4;
+        }
+
+        return;
+
+    }
+
     // SYNCHRONIZED DO NOT PROCESSS MESSAGES SIMULTANEOUSLY
     public void onMessage(Message message) {
         Message response;
@@ -1523,112 +1635,8 @@ public class Controller extends Observable {
 
             case Message.TRANSACTION_TYPE:
 
-                long onMessageProcessTiming = System.nanoTime();
-
-                TransactionMessage transactionMessage = (TransactionMessage) message;
-
-                // GET TRANSACTION
-                Transaction transaction = transactionMessage.getTransaction();
-
-                // CHECK IF SIGNATURE IS VALID ////// ------- OR GENESIS TRANSACTION
-                if (transaction.getCreator() == null
-                        || !transaction.isSignatureValid(DCSet.getInstance())) {
-                    // DISHONEST PEER
-                    banPeerOnError(message.getSender(), "invalid transaction signature");
-
-                    return;
-                }
-
-                // DEADTIME
-                if (transaction.getDeadline() < this.blockChain.getTimestamp(this.dcSet)) {
-                    // so OLD transaction
-                    return;
-                }
-
-                if (LOG_UNCONFIRMED_PROCESS) {
-                    timeCheck = System.currentTimeMillis() - timeCheck;
-                    if (timeCheck > 10) {
-                        LOGGER.debug("TRANSACTION_TYPE proccess 1 period: " + timeCheck);
-                    }
-                }
-
-                // ALREADY EXIST
-                byte[] signature = transaction.getSignature();
-                timeCheck = System.currentTimeMillis();
-                if (this.dcSet.getTransactionMap().contains(signature)) {
-                    if (LOG_UNCONFIRMED_PROCESS) {
-                        timeCheck = System.currentTimeMillis() - timeCheck;
-                        if (timeCheck > 20) {
-                            LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
-                        }
-                    }
-                    return;
-                }
-                if (LOG_UNCONFIRMED_PROCESS) {
-                    timeCheck = System.currentTimeMillis() - timeCheck;
-                    if (timeCheck > 20) {
-                        LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
-                    }
-                }
-
-                timeCheck = System.currentTimeMillis();
-                if (this.dcSet.getTransactionFinalMapSigns().contains(signature) || this.isStopping) {
-
-                    if (LOG_UNCONFIRMED_PROCESS) {
-                        timeCheck = System.currentTimeMillis() - timeCheck;
-                        if (timeCheck > 30) {
-                            LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in FINAL period: " + timeCheck);
-                        }
-                    }
-                    return;
-                }
-                if (LOG_UNCONFIRMED_PROCESS) {
-                    timeCheck = System.currentTimeMillis() - timeCheck;
-                    if (timeCheck > 30) {
-                        LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in FINAL period: " + timeCheck);
-                    }
-                }
-
-                timeCheck = System.currentTimeMillis();
-                if (this.status == STATUS_OK) {
-                    // если мы не в синхронизации - так как мы тогда
-                    // не знаем время текущее цепочки и не понимаем можно ли борадкастить дальше трнзакцию
-                    // так как непонятно - протухла она или нет
-
-                    // BROADCAST
-                    List<Peer> excludes = new ArrayList<Peer>();
-                    excludes.add(message.getSender());
-                    this.network.broadcast(message, excludes, false);
-                }
-
-                if (LOG_UNCONFIRMED_PROCESS) {
-                    timeCheck = System.currentTimeMillis() - timeCheck;
-                    if (timeCheck > 10) {
-                        LOGGER.debug("TRANSACTION_TYPE proccess BROADCAST period: " + timeCheck);
-                    }
-                    timeCheck = System.currentTimeMillis();
-                }
-
-                // ADD TO UNCONFIRMED TRANSACTIONS
-                this.dcSet.getTransactionMap().add(transaction);
-
-                if (LOG_UNCONFIRMED_PROCESS) {
-                    timeCheck = System.currentTimeMillis() - timeCheck;
-                    if (timeCheck > 30) {
-                        LOGGER.debug("TRANSACTION_TYPE proccess ADD period: " + timeCheck);
-                    }
-                }
-
-                onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
-                if (onMessageProcessTiming < 999999999999l) {
-                    // при переполнении может быть минус
-                    // в миеросекундах подсчет делаем
-                    onMessageProcessTiming /= 1000;
-                    unconfigmedMessageTimingAverage = ((unconfigmedMessageTimingAverage << 4)
-                            + onMessageProcessTiming - unconfigmedMessageTimingAverage) >> 4;
-                }
-
-                return;
+                onMessageTransaction(message);
+                break;
 
             case Message.VERSION_TYPE:
 
