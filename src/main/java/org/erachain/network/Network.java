@@ -462,11 +462,11 @@ public class Network extends Observable {
     public void onMessagePeers(Peer sender, int messageID) {
 
         //CREATE NEW PEERS MESSAGE WITH PEERS
-        Message answer = MessageFactory.getInstance().createPeersMessage(PeerManager.getInstance().getBestPeers());
+        Message answer = MessageFactory.getInstance().createPeersMessage(peerManager.getBestPeers());
         answer.setId(messageID);
 
         //SEND TO SENDER
-        sender.sendMessage(answer);
+        sender.offerMessage(answer);
 
     }
 
@@ -476,7 +476,7 @@ public class Network extends Observable {
             //LOGGER.info("network.onMessage - Connected to self. Disconnection.");
 
             Network.myselfAddress = sender.getAddress();
-            tryDisconnect(sender, 99999, null);
+            sender.ban(99999, null);
         }
 
     }
