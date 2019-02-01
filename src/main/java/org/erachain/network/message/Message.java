@@ -82,7 +82,7 @@ public abstract class Message {
     /**
      * Ответ: список телеграмм
      */
-    public static final int TELEGRAM_GET_ANSWER_TYPE = 16;
+    public static final int TELEGRAM_ANSWER_TYPE = 16;
 
     private int type;
     private Peer sender;

@@ -85,9 +85,9 @@ public class MessageFactory {
     public Message createTelegramGetMessage() {
         return new TelegramGetMessage();
     }
-    
-    public Message createTelegramGetAnswerMessage(ArrayList<String> address) {
-        return new TelegramGetAnswerMessage(address);
+
+    public Message createTelegramGetAnswerMessage(ArrayList<String> addresses) {
+        return new TelegramAnswerMessage(addresses);
     }
     
 
@@ -256,8 +256,8 @@ public class MessageFactory {
                 message = TelegramGetMessage.parse(data);
                 break;
 
-            case Message.TELEGRAM_GET_ANSWER_TYPE:
-                message = TelegramGetAnswerMessage.parse(data);
+            case Message.TELEGRAM_ANSWER_TYPE:
+                message = TelegramAnswerMessage.parse(data);
                 break;
             default:
 
