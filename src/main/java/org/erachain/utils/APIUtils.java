@@ -72,6 +72,8 @@ public class APIUtils {
                     return;
 
                 if (!ServletUtils.isRemoteRequest(request, ipAddress)) {
+                    if (messageToDisplay.equals("GET core/stop"))
+                        return;
                     min_length = 4;
                 } else {
                     min_length = 8;

@@ -5,17 +5,14 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.database.PeerMap.PeerInfo;
 import org.erachain.network.Peer;
-import org.erachain.network.PeerManager;
-import org.erachain.network.message.Message;
-import org.erachain.network.message.MessageFactory;
 import org.erachain.ntp.NTP;
+import org.erachain.settings.Settings;
+import org.erachain.utils.APIUtils;
+import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.settings.Settings;
-import org.erachain.utils.APIUtils;
-import org.erachain.utils.DateTimeFormat;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -198,7 +195,7 @@ public class PeersResource {
     @GET
     @Path("best")
     public String getTopPeers() {
-        List<Peer> peers = PeerManager.getInstance().getBestPeers();
+        List<Peer> peers = Controller.getInstance().network.getBestPeers();
         JSONArray array = new JSONArray();
 
         for (Peer peer : peers) {
@@ -256,10 +253,27 @@ public class PeersResource {
 
         for (Peer peer : activePeers) {
             if (peer.getAddress().getHostAddress().equals(address)) {
-                Message pingMessage = MessageFactory.getInstance().createGetHWeightMessage();
-                pingMessage.setId(999999);
-                peer.sendMessage(pingMessage);
-                return "sended " + pingMessage;
+                boolean res = peer.tryPing();
+                //Message pingMessage = MessageFactory.getInstance().createGetHWeightMessage();
+                //pingMessage.setId(999999);
+                //peer.sendMessage(pingMessage);
+                return "sended " + res + " " + peer.getPing() + "ms";
+            }
+        }
+
+        return address + " - peer not active";
+    }
+
+    @GET
+    @Path("/ping/{address}")
+    public String ping(@PathParam("address") String address) {
+
+        List<Peer> activePeers = Controller.getInstance().getActivePeers();
+
+        for (Peer peer : activePeers) {
+            if (peer.getAddress().getHostAddress().equals(address)) {
+                boolean res = peer.tryPing();
+                return "sended " + res + " " + peer.getPing() + "ms";
             }
         }
 

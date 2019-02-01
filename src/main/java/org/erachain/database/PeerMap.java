@@ -207,7 +207,7 @@ public class PeerMap extends DBMap<byte[], byte[]> {
 
             // 1. we have not reached the amount of peers
             // 2. we have read all org.erachain.records
-            while (iterator.hasNext() && peers.size() < amount) {
+            while (iterator.hasNext() && (amount == 0 || peers.size() < amount)) {
                 //GET ADDRESS
                 byte[] addressBI = iterator.next();
                 boolean found = false;

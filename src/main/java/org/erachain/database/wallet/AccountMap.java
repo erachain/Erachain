@@ -1,13 +1,11 @@
 package org.erachain.database.wallet;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Observable;
-import java.util.Set;
-
+import com.google.common.primitives.UnsignedBytes;
+import org.erachain.controller.Controller;
+import org.erachain.core.account.Account;
+import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.utils.ObserverMessage;
 import org.mapdb.Atomic.Var;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
@@ -16,13 +14,8 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
-import com.google.common.primitives.UnsignedBytes;
-
-import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
-import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.utils.ObserverMessage;
+import java.math.BigDecimal;
+import java.util.*;
 
 // UNCONFIRMED balances for accounts in owner wallet only
 public class AccountMap extends Observable {
@@ -296,19 +289,15 @@ public class AccountMap extends Observable {
 	 */
 
     // ADD AN PUBLIC KEY ACCOUNT in wallet
-    public void add(PublicKeyAccount account) {
-		/*
-		if(this.publickKeys == null)
-		{
-			this.loadPublickKeys();
-		}
-		 */
+    public void add(PublicKeyAccount account, int number) {
 
         synchronized (this.publickKeys) {
             if (!this.publickKeys.contains(account.getPublicKey())) {
                 this.publickKeys.add(account.getPublicKey());
-                int n = Controller.getInstance().wallet.getAccountNonce();
-                acountsNoMap.put(account.getAddress(), n);
+                if (number < 0) {
+                    number = Controller.getInstance().wallet.getAccountNonce();
+                }
+                acountsNoMap.put(account.getAddress(), number);
                 this.setChanged();
                 this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
 
@@ -316,9 +305,9 @@ public class AccountMap extends Observable {
         }
     }
 
-    public int getAccountNo(String pubkey) {
+    public int getAccountNo(String account) {
 
-        return acountsNoMap.get(pubkey);
+        return acountsNoMap.get(account);
     }
 
 	/*

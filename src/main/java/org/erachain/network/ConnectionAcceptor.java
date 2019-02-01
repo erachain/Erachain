@@ -41,7 +41,7 @@ public class ConnectionAcceptor extends MonitoredThread {
 
             // на всякий случай чтобы атак не было с созданием множества конектов
             try {
-                Thread.sleep(10);
+                Thread.sleep(100);
             } catch (Exception e) {
             }
 
@@ -59,9 +59,9 @@ public class ConnectionAcceptor extends MonitoredThread {
                 }
 
                 //ACCEPT CONNECTION
-                this.setMonitorStatus("socket.accept");
+                this.setMonitorStatusBefore("socket.accept");
                 connectionSocket = socket.accept();
-                this.setMonitorStatus("socket.accept >>");
+                this.setMonitorStatusAfter();
 
                 //CHECK IF SOCKET IS NOT LOCALHOST || WE ARE ALREADY CONNECTED TO THAT SOCKET || BLACKLISTED
                 if (
@@ -69,14 +69,27 @@ public class ConnectionAcceptor extends MonitoredThread {
                         ) {
                     //DO NOT CONNECT TO OURSELF/EXISTING CONNECTION
                     // or BANNED
+                    connectionSocket.shutdownOutput();
                     connectionSocket.close();
                     continue;
                 }
             } catch (java.lang.OutOfMemoryError e) {
                 Controller.getInstance().stopAll(90);
                 break;
+            } catch (java.net.SocketException e) {
+
+                if (!socket.isClosed())
+                    try {
+                        socket.close();
+                    } catch (Exception e1) {
+                    }
+
+                socket = null;
+                continue;
 
             } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+
                 try {
                     socket.close();
                 } catch (Exception e1) {
@@ -93,6 +106,18 @@ public class ConnectionAcceptor extends MonitoredThread {
             if (connectionSocket == null)
                 continue;
 
+            // проверим - может уже есть такое соединение в котром мы мнмцматор
+            Peer peer = this.network.getKnownWhitePeer(connectionSocket.getInetAddress().getAddress());
+            if (peer != null && (peer.isOnUsed() || peer.isUsed())) {
+                try {
+                    // сообщим об закрытии на тот конец
+                    connectionSocket.shutdownOutput();
+                    connectionSocket.close();
+                } catch (IOException e) {
+                }
+                continue;
+            }
+
             try {
                 //CREATE PEER
                 ////new Peer(callback, connectionSocket);
@@ -100,8 +125,10 @@ public class ConnectionAcceptor extends MonitoredThread {
                 //		+ " isMy:" + Network.isMyself(connectionSocket.getInetAddress())
                 //		+ " my:" + Network.getMyselfAddress());
 
-                //Peer peer = network.tryConnection(connectionSocket, null, null);
-                Peer peer = network.startPeer(connectionSocket);
+                setMonitorStatusBefore("startPeer");
+                peer = network.startPeer(connectionSocket);
+                setMonitorStatusAfter();
+
                 if (!peer.isUsed()) {
                     // если в процессе
                     //if (!peer.isBanned() || connectionSocket.isClosed()) {
@@ -117,7 +144,9 @@ public class ConnectionAcceptor extends MonitoredThread {
                     List<Peer> incomePeers = network.getIncomedPeers();
                     if (incomePeers != null && !incomePeers.isEmpty()) {
                         Peer peerForBan = incomePeers.get(random.nextInt((incomePeers.size())));
+                        setMonitorStatusBefore("peerForBan.ban");
                         peerForBan.ban(10, "Clear place for new connection");
+                        setMonitorStatusAfter();
                     }
                 }
             } catch (java.lang.OutOfMemoryError e) {
@@ -129,6 +158,7 @@ public class ConnectionAcceptor extends MonitoredThread {
 
         }
 
+        setMonitorStatus("halted");
         LOGGER.info("halted");
 
     }
@@ -139,10 +169,12 @@ public class ConnectionAcceptor extends MonitoredThread {
 
         LOGGER.info("on halt");
 
+        setMonitorStatusBefore("halt socket.close");
         try {
             socket.close();
         } catch (IOException e) {
         }
+        setMonitorStatusAfter();
 
     }
 }

@@ -6,10 +6,10 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.SortableList;
 import org.erachain.lang.Lang;
+import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple3;
-import org.erachain.utils.Pair;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
@@ -169,13 +169,13 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
                     if (str != null && !str.equals("")) {
 
                         if (filter_str(str, statement, b)) {
-                            statement.setDC(dcSet);
+                            statement.setDC_HeightSeq(dcSet);
                             tran.add(statement);
                         }
                     }
                     if (key > 0) {
                         if (statement.getKey() == key) {
-                            statement.setDC(dcSet);
+                            statement.setDC_HeightSeq(dcSet);
                             tran.add(statement);
                         }
                     }
