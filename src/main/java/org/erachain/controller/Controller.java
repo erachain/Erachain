@@ -90,7 +90,7 @@ import java.util.jar.Manifest;
 public class Controller extends Observable {
 
     public static String version = "4.11.08 beta 3";
-    public static String buildTime = "2019-01-22 13:33:33 UTC";
+    public static String buildTime = "2019-01-31 13:33:33 UTC";
     private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.DEVELOP_USE? false : false;
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -3532,7 +3532,7 @@ public class Controller extends Observable {
                     String implementationTitle = attributes.getValue("Implementation-Title");
                     if (implementationTitle != null && implementationTitle.equals(impTitle)) {
                         version = attributes.getValue("Implementation-Version");
-                        String buildTimeStr = attributes.getValue("Build-Time");
+                        buildTime = attributes.getValue("Build-Time");
 
                         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
                         try {
