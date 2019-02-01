@@ -89,8 +89,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    private static final String version = "4.11.08 beta 3";
-    private static final String buildTime = "2019-01-22 13:33:33 UTC";
+    public static String version = "4.11.08 beta 3";
+    public static String buildTime = "2019-01-22 13:33:33 UTC";
     private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.DEVELOP_USE? false : false;
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -126,7 +126,7 @@ public class Controller extends Observable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
     public  boolean useGui = true;
     private List<Thread> threads = new ArrayList<Thread>();
-    private static long buildTimestamp;
+    public static long buildTimestamp;
     private static Controller instance;
     public Wallet wallet;
     public TelegramStore telegramStore;
@@ -176,11 +176,11 @@ public class Controller extends Observable {
     }
 
     public static String getBuildDateTimeString() {
-        return DateTimeFormat.timestamptoString(getBuildTimestamp(), "yyyy-MM-dd HH:mm:ss z", "UTC");
+        return DateTimeFormat.timestamptoString(buildTimestamp, "yyyy-MM-dd HH:mm:ss z", "UTC");
     }
 
     public static String getBuildDateString() {
-        return DateTimeFormat.timestamptoString(getBuildTimestamp(), "yyyy-MM-dd", "UTC");
+        return DateTimeFormat.timestamptoString(buildTimestamp, "yyyy-MM-dd", "UTC");
     }
 
     public static long getBuildTimestamp() {
@@ -1271,7 +1271,7 @@ public class Controller extends Observable {
 
         // SEND VERSION MESSAGE
         if (!peer.directSendMessage(
-                MessageFactory.getInstance().createVersionMessage(Controller.getVersion(), getBuildTimestamp()))) {
+                MessageFactory.getInstance().createVersionMessage(Controller.getVersion(), buildTimestamp))) {
             peer.ban(network.banForActivePeersCounter(), "connection - break on Version send");
             return;
         }
@@ -3323,6 +3323,11 @@ public class Controller extends Observable {
     public void startApplication(String args[]){
         boolean cli = false;
 
+        // get local file time
+        getBuildTimestamp();
+        // get GRADLE bild time
+        getManifestInfo();
+
         String pass = null;
 
         for (String arg : args) {
@@ -3391,7 +3396,8 @@ public class Controller extends Observable {
 
                 LOGGER.info(Lang.getInstance().translate("Starting %app%")
                         .replace("%app%", Lang.getInstance().translate(Controller.APP_NAME)));
-                LOGGER.info(getManifestInfo());
+                LOGGER.info(version + Lang.getInstance().translate(" build ")
+                        + buildTime);
 
                 this.setChanged();
                 this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, info));
@@ -3512,26 +3518,37 @@ public class Controller extends Observable {
 
     }
 
-    public static String getManifestInfo() throws IOException {
+    public static void getManifestInfo() {
         String impTitle = "Gradle Build: ERA";
 
-        Enumeration<URL> resources = Thread.currentThread()
-                .getContextClassLoader()
-                .getResources("META-INF/MANIFEST.MF");
-        while (resources.hasMoreElements()) {
-            try {
-                Manifest manifest = new Manifest(resources.nextElement().openStream());
-                Attributes attributes = manifest.getMainAttributes();
-                String implementationTitle = attributes.getValue("Implementation-Title");
-                if (implementationTitle != null && implementationTitle.equals(impTitle)) {
-                    String implementationVersion = attributes.getValue("Implementation-Version");
-                    String buildTime = attributes.getValue("Build-Time");
-                    return implementationVersion + " build " + buildTime;
+        try {
+            Enumeration<URL> resources = Thread.currentThread()
+                    .getContextClassLoader()
+                    .getResources("META-INF/MANIFEST.MF");
+            while (resources.hasMoreElements()) {
+                try {
+                    Manifest manifest = new Manifest(resources.nextElement().openStream());
+                    Attributes attributes = manifest.getMainAttributes();
+                    String implementationTitle = attributes.getValue("Implementation-Title");
+                    if (implementationTitle != null && implementationTitle.equals(impTitle)) {
+                        version = attributes.getValue("Implementation-Version");
+                        String buildTimeStr = attributes.getValue("Build-Time");
+
+                        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+                        try {
+                            Date date = formatter.parse(buildTime);
+                            buildTimestamp = date.getTime();
+                        } catch (ParseException e) {
+                            LOGGER.error(e.getMessage(), e);
+                        }
+
+                    }
+                } catch (IOException e) {
+                    System.out.println(e.getMessage());
                 }
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
             }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
-        return impTitle;
     }
 }
