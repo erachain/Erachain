@@ -218,11 +218,18 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
 
     @Override
     public Object getItem(int k) {
+        if (this.orders == null)
+            return null;
+
         // TODO Auto-generated method stub
         return this.orders.get(k).getB();
     }
 
     public void getInterval(int start, int step) {
+
+        if (this.orders == null || orders.isEmpty())
+            pp = new ArrayList<>();
+
         // pp.c.clear();
         int end = start + step;
         //if (start > orders.size()) start = orders.size();

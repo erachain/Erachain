@@ -150,12 +150,13 @@ public class Templates_Favorite_TableModel extends TableModelCls<Tuple2<String, 
     }
 
     public void removeObservers() {
+        if (Controller.getInstance().doesWalletDatabaseExists())
         Controller.getInstance().wallet.database.getTemplateFavoritesSet().deleteObserver(this);
     }
 
     public void addObservers() {
-
-        Controller.getInstance().wallet.database.getTemplateFavoritesSet().addObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getTemplateFavoritesSet().addObserver(this);
     }
 
 

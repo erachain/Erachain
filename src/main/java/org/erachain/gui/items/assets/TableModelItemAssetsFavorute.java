@@ -70,6 +70,9 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
 
     @Override
     public int getRowCount() {
+        if (this.assets == null)
+            return 0;
+
         return this.assets.size();
 
     }

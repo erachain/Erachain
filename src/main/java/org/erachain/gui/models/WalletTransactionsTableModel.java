@@ -407,6 +407,9 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
     public void addObservers() {
 
+        if (!Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
         //REGISTER ON WALLET TRANSACTIONS
         Controller.getInstance().getWallet().database.getTransactionMap().addObserver(this);
         // for UNCONFIRMEDs
@@ -418,6 +421,9 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
 
     public void removeObservers() {
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
 
         Controller.getInstance().getWallet().database.getTransactionMap().deleteObserver(this);
         DCSet.getInstance().getTransactionMap().addObserver(this);
