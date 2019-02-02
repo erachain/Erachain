@@ -29,6 +29,9 @@ Not use secret wallet Keys - speed up - not forging
 -nodatawallet
 Not use data Wallet - speed up
 
+-opi
+Only Protocol Indexing - speed up
+
 
 example foe Windows:
 	start "erachain" java -jar erachain.jar -pass=1 -seed=3:AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy:1

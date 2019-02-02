@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.*;
 import org.erachain.database.serializer.OrderSerializer;
 import org.mapdb.BTreeMap;
@@ -81,6 +82,32 @@ public class OrderMap extends DCMap<Long, Order> {
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
+        //HAVE/WANT KEY
+        this.haveWantKeyMap = database.createTreeMap("orders_key_have_want")
+                .comparator(Fun.COMPARATOR)
+                .makeOrGet();
+
+        ///////////////////// HERE PROTOCOL INDEX
+
+        //BIND HAVE/WANT KEY
+        Bind.secondaryKey(map, this.haveWantKeyMap,
+                new Fun.Function2<Fun.Tuple4<Long, Long, BigDecimal, Long>, Long,
+                        Order>() {
+                    @Override
+                    public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
+                            Long key, Order value) {
+                        return new Fun.Tuple4<>(value.getHave(), value.getWant(),
+                                Order.calcPrice(value.getAmountHave(), value.getAmountWant()),
+                                value.getId());
+                    }
+                });
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return map;
+
+        ///////////////////// HERE NOT PROTOCOL INDEXES
+
         // ADDRESS HAVE/WANT KEY
         this.addressHaveWantKeyMap = database.createTreeMap("orders_key_address_have_want")
                 .comparator(Fun.COMPARATOR)
@@ -95,24 +122,6 @@ public class OrderMap extends DCMap<Long, Order> {
                         return new Fun.Tuple5<String, Long, Long, BigDecimal, Long>
                                 (value.getCreator().getAddress(), value.getHave(), value.getWant(), value.getPrice(),
                                         key);
-                    }
-                });
-
-        //HAVE/WANT KEY
-        this.haveWantKeyMap = database.createTreeMap("orders_key_have_want")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
-
-        //BIND HAVE/WANT KEY
-        Bind.secondaryKey(map, this.haveWantKeyMap,
-                new Fun.Function2<Fun.Tuple4<Long, Long, BigDecimal, Long>, Long,
-                        Order>() {
-                    @Override
-                    public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
-                            Long key, Order value) {
-                        return new Fun.Tuple4<>(value.getHave(), value.getWant(),
-                                Order.calcPrice(value.getAmountHave(), value.getAmountWant()),
-                                value.getId());
                     }
                 });
 
@@ -133,7 +142,6 @@ public class OrderMap extends DCMap<Long, Order> {
                                 value.getId());
             }
         });
-
 
         //RETURN
         return map;

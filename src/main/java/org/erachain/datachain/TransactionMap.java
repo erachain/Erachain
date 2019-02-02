@@ -73,6 +73,11 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes(DB database) {
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return;
+
         // TIMESTAMP INDEX
         Tuple2Comparator<Long, Long> comparator = new Fun.Tuple2Comparator<Long, Long>(Fun.COMPARATOR,
                 //UnsignedBytes.lexicographicalComparator()
@@ -114,6 +119,10 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return map;
 
         this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
         Bind.secondaryKey(map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {

@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import org.erachain.controller.Controller;
 import org.erachain.database.DBMap;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
@@ -73,6 +74,10 @@ public class _BalanceMap extends DCMap<Tuple2<Long, Long>,
                 .comparator(Fun.COMPARATOR)
                 .counterEnable()
                 .makeOrGet();
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return map;
 
         //BIND ASSET KEY
 		/*

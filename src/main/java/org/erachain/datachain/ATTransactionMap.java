@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.at.AT_Transaction;
+import org.erachain.controller.Controller;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.ATTransactionSerializer;
 import org.mapdb.*;
@@ -60,6 +61,11 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         BTreeMap<Tuple2<Integer, Integer>, AT_Transaction> map = database.createTreeMap("at_txs")
                 .valueSerializer(new ATTransactionSerializer())
                 .makeOrGet();
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return map;
+
 
         this.senderKey = database.createTreeSet("sender_at_txs")
                 .comparator(Fun.COMPARATOR)

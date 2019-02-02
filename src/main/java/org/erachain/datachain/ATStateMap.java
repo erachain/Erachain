@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.at.AT_Constants;
+import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
@@ -43,6 +44,11 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
         //OPEN MAP
         BTreeMap<Tuple2<Integer, String>, byte[]> map = database.createTreeMap("at_state")
                 .makeOrGet();
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return map;
+
 
         allATStates = database.createTreeSet("at_id_to_height").comparator(Fun.COMPARATOR).makeOrGet();
 

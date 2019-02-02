@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.database.serializer.ItemSerializer;
@@ -55,6 +56,10 @@ public class ItemPersonMap extends Item_Map {
                 //.valueSerializer(new PersonSerializer())
                 .makeOrGet();
 
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return map;
+
         // open name index
         this.person_Name_Index = database.createTreeSet("person_name_index")
                 .comparator(Fun.COMPARATOR)
@@ -76,6 +81,11 @@ public class ItemPersonMap extends Item_Map {
 
     @SuppressWarnings("unchecked")
     protected void createIndexes(DB database) {
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return;
+
         //NAME INDEX
         name_Index = database.createTreeSet("pp")
                 .comparator(Fun.COMPARATOR)

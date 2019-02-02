@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 
 import com.google.common.primitives.UnsignedBytes;
+import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.database.DBMap;
@@ -87,6 +88,9 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
                 //.comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return map;
 
         //CHECK IF NOT MEMORY DATABASE
         if (parent == null) {
