@@ -33,13 +33,16 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
     public static final int COLUMN_FEE = 2;
     private static final int MAX_ROWS = 1000;
     private static final Logger LOGGER = LoggerFactory.getLogger(Debug_Transactions_Table_Model.class);
+
+    long timePoint;
+
     private List<Transaction> transactions;
-    SortableList <Long, Transaction> list;
+    SortableList<Long, Transaction> list;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Fee"});
 
     public Debug_Transactions_Table_Model() {
         DCSet.getInstance().getTransactionMap().addObserver(this);
-  }
+    }
 
     public Class<? extends Object> getColumnClass(int c) {     // set column type
         Object o = getValueAt(0, c);
@@ -126,26 +129,30 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
 
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
+
+        if (System.currentTimeMillis() - timePoint < 2000)
+            return;
+
+        timePoint = System.currentTimeMillis();
+
         ObserverMessage message = (ObserverMessage) arg;
         int type = message.getType();
 
         if (type == ObserverMessage.LIST_UNC_TRANSACTION_TYPE) {
             //CHECK IF NEW LIST
-    //        LOGGER.error("gui.models.Debug_Transactions_Table_Model.syncUpdate - LIST_UNC_TRANSACTION_TYPE");
+            //        LOGGER.error("gui.models.Debug_Transactions_Table_Model.syncUpdate - LIST_UNC_TRANSACTION_TYPE");
             if (this.list == null) {
                 this.list = (SortableList<Long, Transaction>) message.getValue();
                 this.list.registerObserver();
             }
             this.fireTableDataChanged();
         } else if (type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
-              this.fireTableDataChanged();
+            this.fireTableDataChanged();
         } else if (type == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
-               this.fireTableDataChanged();
+            this.fireTableDataChanged();
         }
 
     }
-
-   
 
     public void removeObservers() {
         //this.transactions.removeObserver();

@@ -763,7 +763,7 @@ public class Synchronizer {
         }
 
         dcSet.getBlockMap().setProcessing(true);
-        boolean observOn = !cnt.noDataWallet && cnt.doesWalletExists() && cnt.useGui;
+        boolean observOn = cnt.doesWalletExists() && cnt.useGui;
         Integer countObserv_ADD = null;
         Integer countObserv_REMOVE = null;
         Integer countObserv_COUNT = null;

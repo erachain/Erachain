@@ -301,7 +301,6 @@ public class SysTray implements Observer {
 
         if (message.getType() == ObserverMessage.WALLET_SYNC_STATUS) {
 
-
             if (System.currentTimeMillis() - timePoint < 2000)
                 return;
 

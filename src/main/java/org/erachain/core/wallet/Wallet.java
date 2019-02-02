@@ -195,7 +195,7 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	public boolean exists() {
-		if (Controller.getInstance().noDataWallet)
+		if (Controller.getInstance().noUseWallet)
 			return false;
 
 		String p = Settings.getInstance().getWalletDir();
@@ -1785,6 +1785,10 @@ public class Wallet extends Observable implements Observer {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void update(Observable o, Object arg) {
+
+        if (this.database == null)
+            return;
+
 		ObserverMessage message = (ObserverMessage) arg;
 
 		Controller cnt = Controller.getInstance();
