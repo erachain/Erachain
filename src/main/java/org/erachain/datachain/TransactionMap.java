@@ -74,9 +74,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes(DB database) {
 
-        if (Controller.getInstance().onlyProtocolIndexing)
-            // NOT USE SECONDARY INDEXES
-            return;
+        //////////// HERE PROTOCOL INDEX - for GENERATE BLOCL
 
         // TIMESTAMP INDEX
         Tuple2Comparator<Long, Long> comparator = new Fun.Tuple2Comparator<Long, Long>(Fun.COMPARATOR,
