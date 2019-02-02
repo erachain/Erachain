@@ -30,7 +30,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
     public static final int COLUMN_LEFT = 7;
     public static final int COLUMN_CREATOR = 8;
     public static final int COLUMN_STATUS = 9;
-    int start =0,step=100;
+    int start = 0, step = 100;
 
     private SortableList<Tuple2<String, Long>, Order> orders;
     List<Pair<Tuple2<String, Long>, Order>> pp = new ArrayList<Pair<Tuple2<String, Long>, Order>>();
@@ -105,7 +105,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
             case COLUMN_HAVE:
 
                 AssetCls asset = DCSet.getInstance().getItemAssetMap().get(order.getHave());
-                return asset == null? "[" + order.getHave() + "]" : asset.getShort();
+                return asset == null ? "[" + order.getHave() + "]" : asset.getShort();
 
             case COLUMN_PRICE:
 
@@ -114,7 +114,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
             case COLUMN_WANT:
 
                 asset = DCSet.getInstance().getItemAssetMap().get(order.getWant());
-                return asset == null? "[" + order.getWant() + "]" : asset.getShort();
+                return asset == null ? "[" + order.getWant() + "]" : asset.getShort();
 
             case COLUMN_AMOUNT_WANT:
 
@@ -151,7 +151,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
 
             case COLUMN_BLOCK:
 
-                return blockDBref == null? "?-?" : blockDBref.a + "-" + blockDBref.b ;
+                return blockDBref == null ? "?-?" : blockDBref.a + "-" + blockDBref.b;
 
         }
 
@@ -182,29 +182,38 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
                 this.orders.sort(0, true);
                 this.orders.registerObserver();
             }
-            getInterval(start,step);
+            getInterval(start, step);
             this.fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE) {
             //CHECK IF LIST UPDATED
             Pair<Tuple2<String, Long>, Order> item = (Pair<Tuple2<String, Long>, Order>) message.getValue();
             //this.pp.add(0, item);
             //this.fireTableRowsInserted(0, 0);
-            getInterval(start,step);
+            getInterval(start, step);
             this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE) {
             //CHECK IF LIST UPDATED
             //this.pp.remove(0);
             //this.fireTableRowsDeleted(0, 0);
-            getInterval(start,step);
+            getInterval(start, step);
             this.fireTableDataChanged();
         }
 
     }
 
+    public void addObservers() {
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            this.orders.registerObserver();
+            Controller.getInstance().addWalletListener(this);
+        }
+    }
+
     public void removeObservers() {
-        this.orders.removeObserver();
-        Controller.getInstance().deleteWalletObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            this.orders.removeObserver();
+            Controller.getInstance().deleteWalletObserver(this);
+        }
     }
 
     @Override
@@ -213,7 +222,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
         return this.orders.get(k).getB();
     }
 
-    public void getInterval(int start,int step){
+    public void getInterval(int start, int step) {
         // pp.c.clear();
         int end = start + step;
         //if (start > orders.size()) start = orders.size();
@@ -227,8 +236,8 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
 
     }
 
-    public void setInterval(int start, int step){
-        getInterval(start,step);
+    public void setInterval(int start, int step) {
+        getInterval(start, step);
     }
 
 }
