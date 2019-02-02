@@ -126,10 +126,16 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	public List<Account> getAccounts() {
-		return this.database.getAccountMap().getAccounts();
+        if (this.database == null)
+            return new ArrayList<>();
+
+        return this.database.getAccountMap().getAccounts();
 	}
 
 	public List<PublicKeyAccount> getPublicKeyAccounts() {
+        if (this.database == null)
+            return new ArrayList<>();
+
 		return this.database.getAccountMap().getPublicKeyAccounts();
 	}
 
@@ -189,6 +195,9 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	public boolean exists() {
+		if (Controller.getInstance().noDataWallet)
+			return false;
+
 		String p = Settings.getInstance().getWalletDir();
 		return new File(p).exists();
 	}
@@ -692,6 +701,9 @@ public class Wallet extends Observable implements Observer {
 	// UNLOCK
 	public boolean unlock(String password) {
 
+	    if (Controller.getInstance().noUseWallet)
+	        return false;
+
 		if (this.secureDatabase != null) {
 			// CLOSE secure WALLET
 			lock();
@@ -843,61 +855,66 @@ public class Wallet extends Observable implements Observer {
 
 	@Override
 	public void addObserver(Observer o) {
-		super.addObserver(o);
 
-		// REGISTER ON ACCOUNTS
-		this.database.getAccountMap().addObserver(o);
+        super.addObserver(o);
 
-		// REGISTER ON TRANSACTIONS
-		this.database.getTransactionMap().addObserver(o);
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
 
-		// REGISTER ON BLOCKS
-		this.database.getBlocksHeadMap().addObserver(o);
+            // REGISTER ON ACCOUNTS
+            this.database.getAccountMap().addObserver(o);
 
-		// REGISTER ON NAMES
-		this.database.getNameMap().addObserver(o);
+            // REGISTER ON TRANSACTIONS
+            this.database.getTransactionMap().addObserver(o);
 
-		// REGISTER ON NAME SALES
-		this.database.getNameSaleMap().addObserver(o);
+            // REGISTER ON BLOCKS
+            this.database.getBlocksHeadMap().addObserver(o);
 
-		// REGISTER ON POLLS
-		this.database.getPollMap().addObserver(o);
+            // REGISTER ON NAMES
+            this.database.getNameMap().addObserver(o);
 
-		// REGISTER ON ASSETS
-		this.database.getAssetMap().addObserver(o);
+            // REGISTER ON NAME SALES
+            this.database.getNameSaleMap().addObserver(o);
 
-		// REGISTER ON IMPRINTS
-		this.database.getImprintMap().addObserver(o);
+            // REGISTER ON POLLS
+            this.database.getPollMap().addObserver(o);
 
-		// REGISTER ON TEMPLATES
-		this.database.getTemplateMap().addObserver(o);
+            // REGISTER ON ASSETS
+            this.database.getAssetMap().addObserver(o);
 
-		// REGISTER ON PERSONS
-		this.database.getPersonMap().addObserver(o);
+            // REGISTER ON IMPRINTS
+            this.database.getImprintMap().addObserver(o);
 
-		// REGISTER ON STATUS
-		this.database.getStatusMap().addObserver(o);
+            // REGISTER ON TEMPLATES
+            this.database.getTemplateMap().addObserver(o);
 
-		// REGISTER ON UNION
-		this.database.getUnionMap().addObserver(o);
+            // REGISTER ON PERSONS
+            this.database.getPersonMap().addObserver(o);
 
-		// REGISTER ON ORDERS
-		this.database.getOrderMap().addObserver(o);
+            // REGISTER ON STATUS
+            this.database.getStatusMap().addObserver(o);
 
-		// REGISTER ON ASSET FAVORITES
-		this.database.getAssetFavoritesSet().addObserver(o);
+            // REGISTER ON UNION
+            this.database.getUnionMap().addObserver(o);
 
-		// REGISTER ON PLATE FAVORITES
-		this.database.getTemplateFavoritesSet().addObserver(o);
+            // REGISTER ON ORDERS
+            this.database.getOrderMap().addObserver(o);
 
-		// REGISTER ON PERSON FAVORITES
-		this.database.getPersonFavoritesSet().addObserver(o);
+            // REGISTER ON ASSET FAVORITES
+            this.database.getAssetFavoritesSet().addObserver(o);
 
-		// REGISTER ON STATUS FAVORITES
-		this.database.getStatusFavoritesSet().addObserver(o);
+            // REGISTER ON PLATE FAVORITES
+            this.database.getTemplateFavoritesSet().addObserver(o);
 
-		// REGISTER ON UNION FAVORITES
-		this.database.getUnionFavoritesSet().addObserver(o);
+            // REGISTER ON PERSON FAVORITES
+            this.database.getPersonFavoritesSet().addObserver(o);
+
+            // REGISTER ON STATUS FAVORITES
+            this.database.getStatusFavoritesSet().addObserver(o);
+
+            // REGISTER ON UNION FAVORITES
+            this.database.getUnionFavoritesSet().addObserver(o);
+
+        }
 
 		// SEND STATUS
 		int status = STATUS_LOCKED;

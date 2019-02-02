@@ -64,7 +64,8 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
         // trans_List = new ArrayList<Trans>();
 
        // r_Trans = new ArrayList<Transaction>();
-        Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
         // Controller.getInstance().addObserver(this);
     }
 

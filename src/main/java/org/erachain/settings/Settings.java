@@ -193,9 +193,10 @@ public class Settings {
 
     public String getWalletDir() {
         try {
-			if (this.getWalletPath.equals("")) return this.userPath + DEFAULT_WALLET_DIR;
-			return this.getWalletPath;
-		} catch (Exception e) {
+            if (this.getWalletPath.equals(""))
+                return this.userPath + DEFAULT_WALLET_DIR;
+            return this.getWalletPath;
+        } catch (Exception e) {
 			return this.userPath + DEFAULT_WALLET_DIR;
 		}
     }

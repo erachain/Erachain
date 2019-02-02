@@ -170,6 +170,9 @@ public class Controller extends Observable {
 
     public boolean backUP = false;
     public  String[] seedCommand;
+    public boolean noUseWallet;
+    public boolean noDataWallet;
+    public boolean onlyProtocolIndexing;
 
     public static String getVersion() {
         return version;
@@ -2055,6 +2058,10 @@ public class Controller extends Observable {
 
     // use license KEY
     public boolean createWallet(long licenseKey, byte[] seed, String password, int amount, String path) {
+
+        if (noUseWallet)
+            return true;
+
         // IF NEW WALLET CREADED
         if (this.wallet.create(seed, password, amount, false, path)) {
             this.setWalletLicense(licenseKey);
@@ -2064,6 +2071,10 @@ public class Controller extends Observable {
     }
 
     public boolean recoverWallet(byte[] seed, String password, int amount, String path) {
+
+        if (noUseWallet)
+            return true;
+
         if (this.wallet.create(seed, password, amount, false, path)) {
             LOGGER.info("Wallet needs to synchronize!");
             this.actionAfterConnect();
@@ -3333,6 +3344,21 @@ public class Controller extends Observable {
         for (String arg : args) {
             if (arg.equals("-cli")) {
                 cli = true;
+                continue;
+            }
+
+            if (arg.toLowerCase().equals("-nousewallet")) {
+                noUseWallet = true;
+                continue;
+            }
+
+            if (arg.toLowerCase().equals("-nodatawallet")) {
+                noDataWallet = true;
+                continue;
+            }
+
+            if (arg.toLowerCase().equals("-opi")) {
+                onlyProtocolIndexing = true;
                 continue;
             }
 

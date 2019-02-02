@@ -1,6 +1,7 @@
 package org.erachain.gui.models;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -37,8 +38,12 @@ public class AccountsTableModel extends AbstractTableModel implements Observer {
     private Account account;
 
     public AccountsTableModel() {
-        this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
-        Controller.getInstance().wallet.database.getAccountMap().addObserver(this);
+        if (!Controller.getInstance().doesWalletDatabaseExists()) {
+            this.publicKeyAccounts = new ArrayList<>();
+        } else {
+            this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+            Controller.getInstance().wallet.database.getAccountMap().addObserver(this);
+        }
 
     }
 

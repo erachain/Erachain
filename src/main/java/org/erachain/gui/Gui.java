@@ -48,7 +48,7 @@ public class Gui extends JFrame {
         Set_GUI_Look_And_Feel("");
 
         //CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().noUseWallet && !Controller.getInstance().doesWalletExists()) {
             //OPEN WALLET CREATION SCREEN
             new NoWalletFrame(this);
         } else if (Settings.getInstance().isGuiEnabled()) {
