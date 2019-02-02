@@ -3565,7 +3565,13 @@ public class Controller extends Observable {
                             Date date = formatter.parse(buildTime);
                             buildTimestamp = date.getTime();
                         } catch (ParseException e) {
-                            LOGGER.error(e.getMessage(), e);
+                            formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
+                            try {
+                                Date date = formatter.parse(buildTime);
+                                buildTimestamp = date.getTime();
+                            } catch (ParseException e1) {
+                                LOGGER.error(e.getMessage(), e1);
+                            }
                         }
 
                     }

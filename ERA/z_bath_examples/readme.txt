@@ -23,6 +23,12 @@ example for auto make wallet keys: -seed=3:new:1
 -nogui
 Start without GUI
 
+-nousewallet
+Not use secret wallet Keys - speed up - not forging
+
+-nodatawallet
+Not use data Wallet - speed up
+
 
 example foe Windows:
 	start "erachain" java -jar erachain.jar -pass=1 -seed=3:AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy:1
