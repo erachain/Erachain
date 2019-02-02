@@ -27,7 +27,7 @@ public class ItemPersonMap extends Item_Map {
     static final String NAME = "item_persons";
     static final int TYPE = ItemCls.PERSON_TYPE;
     private NavigableSet person_Name_Index;
-    private BTreeMap<Long, ItemCls> person_Map;
+    //private BTreeMap<Long, ItemCls> person_Map;
     private NavigableSet<Tuple2<String, Long>> name_Index;
     private NavigableSet<Tuple2<String, Long>> name_descending_Index;
 
@@ -51,7 +51,7 @@ public class ItemPersonMap extends Item_Map {
     protected Map<Long, ItemCls> getMap(DB database) {
 
         //OPEN MAP
-        person_Map = database.createTreeMap(NAME)
+        map = database.createTreeMap(NAME)
                 .valueSerializer(new ItemSerializer(TYPE))
                 //.valueSerializer(new PersonSerializer())
                 .makeOrGet();
@@ -64,8 +64,10 @@ public class ItemPersonMap extends Item_Map {
         this.person_Name_Index = database.createTreeSet("person_name_index")
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
+
+        /*
         // create index
-        Bind.secondaryKey(person_Map, this.person_Name_Index, new Fun.Function2<String, Long, ItemCls>() {
+        Bind.secondaryKey(map, this.person_Name_Index, new Fun.Function2<String, Long, ItemCls>() {
             @Override
             public String run(Long a, ItemCls b) {
                 // TODO Auto-generated method stub
@@ -73,9 +75,10 @@ public class ItemPersonMap extends Item_Map {
                 return person.getName();
             }
         });
+        */
 
 
-        return person_Map;
+        return map;
     }
 
 
