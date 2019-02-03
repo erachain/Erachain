@@ -384,7 +384,8 @@ public class DCSet implements Observer, IDB {
                 //.asyncWriteFlushDelay(100)
                 //.cacheHardRefEnable()
 
-                .freeSpaceReclaimQ(3) // не нагружать процессор для поиска свободного места в базе данных
+                // если при записи на доск блока процессор сильно нагружается - то уменьшить это
+                .freeSpaceReclaimQ(0) // не нагружать процессор для поиска свободного места в базе данных
 
                 /*
                 .cacheSize(CASH_SIZE)

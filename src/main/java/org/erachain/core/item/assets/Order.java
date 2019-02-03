@@ -665,18 +665,6 @@ public class Order implements Comparable<Order> {
 
                 //ADD TRADE TO DATABASE
                 tradesMap.add(trade);
-                // TODO: delete it check
-                if (!tradesMap.contains(new Tuple2<Long, Long>(this.getId(), order.getId()))) {
-                    Long error = null;
-                    error++;
-                }
-                if (!this.dcSet.isFork()) {
-                    List<Trade> trades = this.dcSet.getTradeMap().getTrades(this.haveKey, this.wantKey);
-                    if (trades.size() == 0) {
-                        Long error = null;
-                        error++;
-                    }
-                }
 
                 //UPDATE FULFILLED HAVE
                 order.setFulfilledHave(order.getFulfilledHave().add(tradeAmountForHave)); // this.amountHave));

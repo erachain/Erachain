@@ -88,9 +88,34 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
                 //.comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
+        ///////////////////////////// HERE PROTOCOL INDEXES
+
+        //REVERSE KEY
+        this.reverseKeyMap = database.createTreeMap("trades_key_reverse")
+                //.comparator(new Fun.Tuple2Comparator(Fun.BYTE_ARRAY_COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR))
+                .comparator(Fun.TUPLE2_COMPARATOR)
+                .makeOrGet();
+
+        //BIND REVERSE KEY
+        Bind.secondaryKey(map, this.reverseKeyMap, new Fun.Function2<Tuple2<Long, Long>, Tuple2<Long, Long>, Trade>() {
+            @Override
+            public Tuple2<Long, Long> run(Tuple2<Long, Long> key, Trade value) {
+
+                return new Tuple2<Long, Long>(key.b, key.a);
+            }
+        });
+        Bind.secondaryKey(map, this.reverseKeyMap, new Fun.Function2<Tuple2<Long, Long>, Tuple2<Long, Long>, Trade>() {
+            @Override
+            public Tuple2<Long, Long> run(Tuple2<Long, Long> key, Trade value) {
+                return new Tuple2<Long, Long>(key.a, key.b);
+            }
+        });
+
         if (Controller.getInstance().onlyProtocolIndexing)
             // NOT USE SECONDARY INDEXES
             return map;
+
+        //////////////// NOT PROTOCOL INDEXES
 
         //CHECK IF NOT MEMORY DATABASE
         if (parent == null) {
@@ -155,26 +180,6 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
                 }
             });
 
-            //REVERSE KEY
-            this.reverseKeyMap = database.createTreeMap("trades_key_reverse")
-                    //.comparator(new Fun.Tuple2Comparator(Fun.BYTE_ARRAY_COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR))
-                    .comparator(Fun.TUPLE2_COMPARATOR)
-                    .makeOrGet();
-
-            //BIND REVERSE KEY
-            Bind.secondaryKey(map, this.reverseKeyMap, new Fun.Function2<Tuple2<Long, Long>, Tuple2<Long, Long>, Trade>() {
-                @Override
-                public Tuple2<Long, Long> run(Tuple2<Long, Long> key, Trade value) {
-
-                    return new Tuple2<Long, Long>(key.b, key.a);
-                }
-            });
-            Bind.secondaryKey(map, this.reverseKeyMap, new Fun.Function2<Tuple2<Long, Long>, Tuple2<Long, Long>, Trade>() {
-                @Override
-                public Tuple2<Long, Long> run(Tuple2<Long, Long> key, Trade value) {
-                    return new Tuple2<Long, Long>(key.a, key.b);
-                }
-            });
         }
 
         //RETURN
