@@ -161,6 +161,7 @@ public class Controller extends Observable {
     private boolean isStopping = false;
     private String info;
     private long unconfigmedMessageTimingAverage;
+    public static final int BLOCK_AS_TX_COUNT = 3;
     public long transactionMessageTimingAverage;
     public long transactionMessageTimingCounter;
     private long transactionMakeTimingAverage;
