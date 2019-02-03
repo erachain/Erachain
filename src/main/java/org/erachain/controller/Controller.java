@@ -165,8 +165,6 @@ public class Controller extends Observable {
     public long transactionMessageTimingCounter;
     private long transactionMakeTimingAverage;
     private long transactionMakeTimingCounter;
-    private long transactionProcessTimingAverage;
-    private long transactionProcessTimingCounter;
 
     public boolean backUP = false;
     public  String[] seedCommand;
@@ -352,7 +350,7 @@ public class Controller extends Observable {
      * @return
      */
     public long getTransactionProcessTimingAverage() {
-        return transactionProcessTimingAverage;
+        return synchronizer.transactionProcessTimingAverage;
     }
 
     public void sendMyHWeightToPeer(Peer peer) {
@@ -2565,8 +2563,6 @@ public class Controller extends Observable {
     // FLUSH BLOCK from win Buffer - to MAP and NERWORK
     public boolean flushNewBlockGenerated() throws Exception {
 
-        long processTiming = System.nanoTime();
-
         Block newBlock = this.blockChain.popWaitWinBuffer();
         if (newBlock == null)
             return false;
@@ -2590,21 +2586,6 @@ public class Controller extends Observable {
                 LOGGER.error(e.getMessage(), e);
                 return false;
             }
-        }
-
-        processTiming = System.nanoTime() - processTiming;
-
-        if (processTiming < 999999999999l) {
-            // при переполнении может быть минус
-            // в миеросекундах подсчет делаем
-            processTiming = processTiming / 1000 / (1 + newBlock.getTransactionCount());
-            if (transactionProcessTimingCounter < 1 << 3) {
-                transactionProcessTimingCounter++;
-                transactionProcessTimingAverage = ((transactionProcessTimingAverage * transactionProcessTimingCounter)
-                        + processTiming - transactionProcessTimingAverage) / transactionProcessTimingCounter;
-            } else
-                transactionProcessTimingAverage = ((transactionProcessTimingAverage << 3)
-                        + processTiming - transactionProcessTimingAverage) >> 3;
         }
 
         LOGGER.debug("+++ flushNewBlockGenerated OK");

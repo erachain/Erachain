@@ -41,6 +41,9 @@ public class Synchronizer {
     // private Block runedBlock;
     private Peer fromPeer;
 
+    public long transactionProcessTimingAverage;
+    public long transactionProcessTimingCounter;
+
     public Synchronizer() {
         // this.run = true;
     }
@@ -762,6 +765,8 @@ public class Synchronizer {
             throw new Exception("on stoping");
         }
 
+        long processTiming = System.nanoTime();
+
         dcSet.getBlockMap().setProcessing(true);
         boolean observOn = cnt.doesWalletExists() && cnt.useGui;
         Integer countObserv_ADD = null;
@@ -881,6 +886,22 @@ public class Synchronizer {
                 }
             }
         }
+
+        processTiming = System.nanoTime() - processTiming;
+
+        if (processTiming < 999999999999l) {
+            // при переполнении может быть минус
+            // в миеросекундах подсчет делаем
+            processTiming = processTiming / 1000 / (1 + block.getTransactionCount());
+            if (transactionProcessTimingCounter < 1 << 3) {
+                transactionProcessTimingCounter++;
+                transactionProcessTimingAverage = ((transactionProcessTimingAverage * transactionProcessTimingCounter)
+                        + processTiming - transactionProcessTimingAverage) / transactionProcessTimingCounter;
+            } else
+                transactionProcessTimingAverage = ((transactionProcessTimingAverage << 3)
+                        + processTiming - transactionProcessTimingAverage) >> 3;
+        }
+
 
     }
 
