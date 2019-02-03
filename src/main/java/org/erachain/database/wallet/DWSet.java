@@ -73,6 +73,9 @@ public class DWSet implements IDB {
                 .mmapFileEnableIfSupported() // ++
                 /// ICREATOR
                 .commitFileSyncDisable() // ++
+
+                .compressionEnable()
+
                 .make();
 
         uses = 0;

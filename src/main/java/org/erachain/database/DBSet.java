@@ -48,6 +48,9 @@ public class DBSet implements IDB {
                 .mmapFileEnableIfSupported() // ++
                 /// ICREATOR
                 .commitFileSyncDisable() // ++
+
+                .compressionEnable()
+
                 .transactionDisable()
                 .make();
 
