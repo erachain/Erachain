@@ -571,23 +571,30 @@ public class Order implements Comparable<Order> {
             compare = thisPrice.compareTo(orderReversePrice);
             if (compare > 0) {
                 if (height > NEW_FLOR) {
-
                     // пытаемся поиграть с точностью округления - см примеры в тестах
                     // org.erachain.core.transaction.OrderTestsMy.price33 и org.erachain.core.transaction.OrderTestsMy.price33_1
-                    int thisPriceScale = orderPrice.stripTrailingZeros().scale();
-                    int orderPriceRevScale = orderReversePrice.stripTrailingZeros().scale();
+                    int thisPriceScale = thisPrice.stripTrailingZeros().scale();
 
-                    if (thisPriceScale > orderPriceRevScale) {
-                        BigDecimal thisPriceScaled = thisPrice.setScale(orderPriceRevScale, RoundingMode.HALF_DOWN);
-                        if (thisPriceScaled.compareTo(orderReversePrice) > 0) {
+                    // если точность у заказа больше чем у нас - то он не сыграет
+                    // например 1 / 3 = 0.00333333
+                    // поэтому надо обрfтную цену проверить
+                    if (thisPriceScale < orderReversePrice.stripTrailingZeros().scale()) {
+                        // если обртаная цена к нам у ордера меньше точность - попробуем сравнить обратные цены
+                        // но при этом точность у нашей цены снизим до точности Заказа
+                        BigDecimal scaledThisPriceRev = Order.calcPrice(this.amountWant, this.amountHave)
+                                .setScale(orderPrice.scale(), RoundingMode.HALF_DOWN);
+                        if (scaledThisPriceRev.compareTo(orderPrice) == 0) {
+                            BigDecimal scaledOrderReversePrice = orderReversePrice
+                                    .setScale(thisPriceScale, RoundingMode.HALF_DOWN);
+                            // и сравним так же по прямой цене со сниженной точностью у Заказа
+                            if (thisPrice.compareTo(scaledOrderReversePrice) == 0)
+                                ;
+                            else
+                                break;
+                        } else
                             break;
-                        }
-                    } else {
-                        BigDecimal orderPriceRevScaled = orderReversePrice.setScale(thisPriceScale, RoundingMode.HALF_DOWN);
-                        if (thisPrice.compareTo(orderPriceRevScaled) > 0) {
-                            break;
-                        }
-                    }
+                    } else
+                        break;
                 } else
                     break;
             }

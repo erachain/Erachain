@@ -565,8 +565,8 @@ public class OrderTestsMy {
     public void price33() {
 
 
-        BigDecimal amountHave = new BigDecimal("0.33333333");
-        BigDecimal amountWant = new BigDecimal("10.00000000");
+        BigDecimal amountHave = new BigDecimal("0.00010000");
+        BigDecimal amountWant = new BigDecimal("0.00000333");
 
         BigDecimal price = Order.calcPrice(amountHave, amountWant, 3);
         BigDecimal price1 = Order.calcPrice(amountHave, amountWant, 1);
@@ -576,8 +576,8 @@ public class OrderTestsMy {
         BigDecimal price1Rev = Order.calcPrice(amountWant, amountHave, 1);
         BigDecimal thisPriceRev = Order.calcPrice(amountWant, amountHave, 0);
 
-        BigDecimal orderAmountHave = new BigDecimal("30.00000000");
-        BigDecimal orderAmountWant = new BigDecimal("1.00000000");
+        BigDecimal orderAmountHave = new BigDecimal("1.00000000");
+        BigDecimal orderAmountWant = new BigDecimal("30.00000000");
 
         BigDecimal price10 = Order.calcPrice(orderAmountHave, orderAmountWant, 3);
         BigDecimal price101 = Order.calcPrice(orderAmountHave, orderAmountWant, 1);
@@ -587,22 +587,20 @@ public class OrderTestsMy {
         BigDecimal price101rev = Order.calcPrice(orderAmountWant, orderAmountHave, 1);
         BigDecimal orderPriceRev = Order.calcPrice(orderAmountWant, orderAmountHave, 0);
 
-
-        int thisPriceScale = thisPrice.stripTrailingZeros().scale();
+        int orderPriceScale = orderPrice.stripTrailingZeros().scale();
         int orderPriceRevScale = orderPriceRev.stripTrailingZeros().scale();
+        int thisPriceScale = thisPrice.scale();
 
         boolean needBreak = false;
 
-        if (thisPriceScale > orderPriceRevScale) {
-            BigDecimal thisPriceScaled = thisPrice.setScale(orderPriceRevScale, RoundingMode.HALF_DOWN);
-            if (thisPriceScaled.compareTo(orderPriceRev) > 0) {
+        if (thisPriceScale < orderPriceRevScale) {
+            BigDecimal scaledThisPriceRev = thisPriceRev.setScale(orderPriceScale, RoundingMode.HALF_DOWN);
+            BigDecimal scaledOrderPriceRev = orderPriceRev.setScale(orderPriceScale, RoundingMode.HALF_DOWN);
+            if (scaledThisPriceRev.compareTo(orderPrice) == 0
+                && thisPrice.compareTo(scaledOrderPriceRev) == 0)
+                ;
+            else
                 needBreak = true;
-            }
-        } else {
-            BigDecimal orderPriceRevScaled = orderPriceRev.setScale(thisPriceScale, RoundingMode.HALF_DOWN);
-            if (thisPrice.compareTo(orderPriceRevScaled) > 0) {
-                needBreak = true;
-            }
         }
 
         assertEquals(needBreak, false);
