@@ -6,7 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.TransactionFactory;
+import org.erachain.core.web.ServletUtils;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
@@ -281,8 +281,9 @@ public class R_SendResource {
     @Path("test1/{delay}")
     public String test1(@PathParam("delay") long delay, @QueryParam("password") String password) {
 
-        if (!BlockChain.DEVELOP_USE)
-            return "not DEVELOP";
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
+                && !BlockChain.DEVELOP_USE)
+            return "not LOCAL && not DEVELOP";
 
         APIUtils.askAPICallAllowed(password, "GET test1\n ", request, true);
 
