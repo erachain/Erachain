@@ -152,13 +152,16 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
     }
 
     public void addObservers() {
-        Controller.getInstance().wallet.database.getPersonMap().addObserver(this);
-
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getPersonMap().addObserver(this);
 
     }
 
 
     public void removeObservers() {
+        if (!Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
         //this.persons.removeObserver();
         //Controller.getInstance().deleteWalletObserver(this);
         Controller.getInstance().wallet.database.getPersonMap().deleteObserver(this);

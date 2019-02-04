@@ -62,7 +62,10 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
         GridBagLayout gridBagLayout = (GridBagLayout) leftPanel.getLayout();
         gridBagLayout.rowWeights = new double[]{0.0, 0.0};
         gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0};
-        db = Controller.getInstance().wallet.database.getAccountsPropertisMap();
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            db = Controller.getInstance().wallet.database.getAccountsPropertisMap();
+
         setName(Lang.getInstance().translate("Favorite Accounts"));
         searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         searthLabel_SearchToolBar_LeftPanel.setVisible(true);

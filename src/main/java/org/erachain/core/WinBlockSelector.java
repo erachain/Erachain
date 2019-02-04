@@ -104,7 +104,8 @@ public class WinBlockSelector extends MonitoredThread {
                 // при переполнении может быть минус
                 // в миеросекундах подсчет делаем
                 // ++ 10 потому что там ФОРК базы делаем - он очень медленный
-                onMessageProcessTiming = onMessageProcessTiming / 1000 / (10 + newBlock.getTransactionCount());
+                onMessageProcessTiming = onMessageProcessTiming / 1000
+                        / (Controller.BLOCK_AS_TX_COUNT + newBlock.getTransactionCount());
                 if (controller.transactionMessageTimingCounter < 1 << 3) {
                     controller.transactionMessageTimingCounter++;
                     controller.transactionMessageTimingAverage = ((controller.transactionMessageTimingAverage

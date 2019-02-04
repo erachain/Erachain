@@ -70,6 +70,9 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
 
     @Override
     public int getRowCount() {
+        if (this.assets == null)
+            return 0;
+
         return this.assets.size();
 
     }
@@ -161,12 +164,14 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
     }
 
     public void removeObservers() {
-        Controller.getInstance().wallet.database.getAssetFavoritesSet().deleteObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getAssetFavoritesSet().deleteObserver(this);
     }
 
     public void addObservers() {
-
-        Controller.getInstance().wallet.database.getAssetFavoritesSet().addObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            Controller.getInstance().wallet.database.getAssetFavoritesSet().addObserver(this);
+        }
     }
 
     @Override

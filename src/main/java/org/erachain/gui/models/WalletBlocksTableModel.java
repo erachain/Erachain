@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Null;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -35,11 +36,14 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, true, false};
 
     public WalletBlocksTableModel() {
-        //Controller.getInstance().addWalletListener(this);
-        Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this);
-        Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.blocks);
-        this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
-        this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+        if (!Controller.getInstance().doesWalletDatabaseExists()) {
+            this.blocks = null;
+        } else {
+            Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this);
+            Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.blocks);
+            this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
+            this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+        }
     }
 
     @Override

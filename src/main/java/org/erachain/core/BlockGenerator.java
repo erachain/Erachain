@@ -805,7 +805,8 @@ public class BlockGenerator extends Thread implements Observer {
                                         // при переполнении может быть минус
                                         // в миеросекундах подсчет делаем
                                         // ++ 10 потому что там ФОРК базы делаем - он очень медленный
-                                        processTiming = processTiming / 1000 / (10 + generatedBlock.getTransactionCount());
+                                        processTiming = processTiming / 1000 /
+                                                (Controller.BLOCK_AS_TX_COUNT + generatedBlock.getTransactionCount());
                                         if (transactionMakeTimingCounter < 1 << 3) {
                                             transactionMakeTimingCounter++;
                                             transactionMakeTimingAverage = ((transactionMakeTimingAverage * transactionMakeTimingCounter)

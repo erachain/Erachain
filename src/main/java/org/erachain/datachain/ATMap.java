@@ -3,6 +3,7 @@ package org.erachain.datachain;
 
 import org.erachain.at.AT;
 import com.google.common.collect.Lists;
+import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBMap;
@@ -72,6 +73,11 @@ public class ATMap extends DCMap<String, AT> {
         BTreeMap<String, AT> map = database.createTreeMap("ats")
                 .valueSerializer(new ATSerializer())
                 .makeOrGet();
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return map;
+
 
         this.typeATs = database.createTreeSet("type_ats")
                 .comparator(Fun.COMPARATOR)

@@ -291,24 +291,24 @@ public class NoWalletFrame extends JFrame {
     }
 
     public void goAfterLicence(int createWallet) {
-        if (createWallet ==1)
+        if (createWallet == 1)
             new CreateWalletFrame(this);
-        else if (createWallet ==2)
+        else if (createWallet == 2)
             new RecoverWalletFrame(this);
-        else if (createWallet ==3) {
+        else if (createWallet == 3) {
             // open file dialog
-       Integer res = Controller.getInstance().wallet.loadFromDir();
-       if (res > 1){
-    	   JOptionPane.showMessageDialog(
-                   new JFrame(), Lang.getInstance().translate("wallet does not exist") + "!",
-                   "Error!",
-                   JOptionPane.ERROR_MESSAGE);
-    	   this.setVisible(true);
-       }else{
-        onWalletCreated();
-        this.dispose();
-       }
-       }
+            Integer res = Controller.getInstance().wallet.loadFromDir();
+            if (res > 1) {
+                JOptionPane.showMessageDialog(
+                        new JFrame(), Lang.getInstance().translate("wallet does not exist") + "!",
+                        "Error!",
+                        JOptionPane.ERROR_MESSAGE);
+                this.setVisible(true);
+            } else {
+                onWalletCreated();
+                this.dispose();
+            }
+        }
     }
 
     public void onNextClick() {

@@ -234,14 +234,15 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
 
     public void removeObservers() {
 
-        // Controller.getInstance().deleteObserver(this);
-        Controller.getInstance().wallet.database.getDocumentFavoritesSet().deleteObserver(this);
-        transactions.removeObserver();
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            Controller.getInstance().wallet.database.getDocumentFavoritesSet().deleteObserver(this);
+            transactions.removeObserver();
+        }
     }
 
     public void addObservers() {
-        // Controller.getInstance().addObserver(this);
-        Controller.getInstance().wallet.database.getDocumentFavoritesSet().addObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getDocumentFavoritesSet().addObserver(this);
     }
 
 }
