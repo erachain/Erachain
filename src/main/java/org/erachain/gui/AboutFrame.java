@@ -101,11 +101,10 @@ public class AboutFrame extends JDialog implements Observer {
         aboutPanel.add(lblversionLabel, gbc_lbllversionLabel);
 
         JLabel label = null;
-        try {
-            label = new JLabel(Lang.getInstance().translate("Build date: ") + Controller.getManifestInfo());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        label = new JLabel(
+            Controller.version + Lang.getInstance().translate(" build ")
+                    + Controller.buildTime);
+
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setForeground(Color.RED);
         label.setFont(new Font("Tahoma", Font.PLAIN, 13));

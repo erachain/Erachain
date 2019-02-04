@@ -5,6 +5,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.message.*;
+import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.json.simple.JSONObject;
@@ -22,7 +23,7 @@ import java.util.*;
  */
 public class Network extends Observable {
 
-
+    public static final int SEND_WAIT = 20000;
     public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK ? 0 : 1;
     private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<4;
     private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 12 : 1024 << 8;
@@ -30,10 +31,17 @@ public class Network extends Observable {
     private static InetAddress myselfAddress;
     private ConnectionCreator creator;
     private ConnectionAcceptor acceptor;
+    PeerManager peerManager;
     private TelegramManager telegramer;
-    private List<Peer> knownPeers;
+    List<Peer> knownPeers;
     private SortedSet<String> handledMessages;
-    private boolean run;
+    //boolean tryRun; // попытка запуска
+    boolean run;
+
+    public static final int WHITE_TYPE = 1;
+    public static final int NON_WHITE_TYPE = -1;
+    public static final int ANY_TYPE = 0;
+
 
     public Network() {
         this.knownPeers = new ArrayList<Peer>();
@@ -85,72 +93,69 @@ public class Network extends Observable {
         acceptor = new ConnectionAcceptor(this);
         acceptor.start();
 
+        peerManager = new PeerManager(this);
+        peerManager.start();
+
         telegramer = new TelegramManager(this);
         telegramer.start();
     }
 
     public void onConnect(Peer peer) {
 
+        if (!run)
+            return;
+
         //LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer);
 
-        // WAIT start PINGER
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-        }
-
         boolean asNew = true;
-        for (Peer peerKnown: this.knownPeers) {
-            if (peer.equals(peerKnown)) {
-                asNew = false;
-                break;
+        synchronized (this.knownPeers) {
+            for (Peer peerKnown : this.knownPeers) {
+                if (//peer.equals(peerKnown)
+                        // новый поток мог быть создан - поэтому хдесь провереи его
+                        //peer.isAlive()
+                        peer.getId() == peerKnown.getId()) {
+                    asNew = false;
+                    break;
+                }
             }
-        }
-        if (asNew) {
-            //ADD TO CONNECTED PEERS
-            synchronized (this.knownPeers) {
+            if (asNew) {
+                //ADD TO CONNECTED PEERS
                 this.knownPeers.add(peer);
             }
         }
 
-        peer.setName("Peer: " + peer
-                + (asNew? " as new" : " reconnected")
-                + (peer.isWhite()?" is White" : ""));
-
         //ADD TO DATABASE
-        PeerManager.getInstance().addPeer(peer, 0);
+        peerManager.addPeer(peer, 0);
 
-        if (Controller.getInstance().isOnStopping())
+        if (!run)
             return;
 
         //NOTIFY OBSERVERS
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_PEER_TYPE, peer));
 
-        Controller.getInstance().onConnect(peer);
-
     }
 
-    public void tryDisconnect(Peer peer, int banForMinutes, String error) {
+    public void afterDisconnect(Peer peer, int banForMinutes, String message) {
 
-        if (peer.isUsed()) {
-            //CLOSE CONNECTION
-            peer.close();
+        if (!run)
+            return;
 
-            if (error != null && error.length() > 0) {
-                if (banForMinutes != 0) {
-                    LOGGER.info(peer + " ban for minutes: " + banForMinutes + " - " + error);
-                } else {
-                    LOGGER.info("tryDisconnect : " + peer + " - " + error);
-                }
+        if (message != null && message.length() > 0) {
+            if (banForMinutes > 0) {
+                LOGGER.info("BANed: " + peer + " for: " + banForMinutes + "[min] - " + message);
+            } else {
+                LOGGER.info("disconnected: " + peer + " - " + message);
             }
-
-            //PASS TO CONTROLLER
-            Controller.getInstance().afterDisconnect(peer);
         }
 
-        //ADD TO BLACKLIST
-        PeerManager.getInstance().addPeer(peer, banForMinutes);
+        if (banForMinutes > peer.getBanMinutes()) {
+            //ADD TO BLACKLIST
+            peerManager.addPeer(peer, banForMinutes);
+        }
+
+        //PASS TO CONTROLLER
+        Controller.getInstance().afterDisconnect(peer);
 
         //NOTIFY OBSERVERS
         this.setChanged();
@@ -183,15 +188,21 @@ public class Network extends Observable {
     }
 
     // IF PEER in exist in NETWORK - get it
-    public Peer getKnownPeer(Peer peer) {
+    public Peer getKnownPeer(Peer peer, int type) {
 
+        Peer knowmPeer = null;
         try {
             byte[] address = peer.getAddress().getAddress();
             synchronized (this.knownPeers) {
                 //FOR ALL connectedPeers
                 for (Peer knownPeer : knownPeers) {
                     //CHECK IF ADDRESS IS THE SAME
-                    if (Arrays.equals(address, knownPeer.getAddress().getAddress())) {
+                    if (Arrays.equals(address, knownPeer.getAddress().getAddress())
+                            && (type == ANY_TYPE || type == WHITE_TYPE && knownPeer.isWhite()
+                                    || !knowmPeer.isWhite())
+                    ) {
+                        // иначе тут не сработате правильно org.erachain.network.Network.onConnect
+                        // поэтому сразу выдаем первый что нашли без каких либо условий
                         return knownPeer;
                     }
                 }
@@ -203,9 +214,66 @@ public class Network extends Observable {
         return peer;
     }
 
+    // IF PEER in exist in NETWORK - get it
+    public Peer getKnownWhitePeer(byte[] addressIP) {
+
+        synchronized (this.knownPeers) {
+            //FOR ALL connectedPeers
+            for (Peer knownPeer : knownPeers) {
+                //CHECK IF ADDRESS IS THE SAME
+                if (knownPeer.isWhite() && Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
+                    return knownPeer;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // IF PEER in exist in NETWORK - get it
+    public Peer getKnownNonWhitePeer(byte[] addressIP) {
+
+        synchronized (this.knownPeers) {
+            //FOR ALL connectedPeers
+            for (Peer knownPeer : knownPeers) {
+                //CHECK IF ADDRESS IS THE SAME
+                if (!knownPeer.isWhite() && Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
+                    return knownPeer;
+                }
+            }
+        }
+
+        return null;
+    }
+
     public boolean isKnownPeer(Peer peer, boolean andUsed) {
 
         return this.isKnownAddress(peer.getAddress(), andUsed);
+    }
+
+    public boolean isGoodForConnect(Peer peer) {
+
+        if (peer.isOnUsed() || peer.isUsed() || peer.isBanned())
+            return false;
+
+        //CHECK IF ALREADY CONNECTED TO PEER
+        byte[] address = peer.getAddress().getAddress();
+        synchronized (this.knownPeers) {
+            //FOR ALL connectedPeers
+            for (Peer knownPeer : this.knownPeers) {
+                //CHECK IF ADDRESS IS THE SAME
+                if (!knownPeer.isAlive()
+                        || peer.getId() == knownPeer.getId()
+                        || !Arrays.equals(address, knownPeer.getAddress().getAddress())
+                        || NTP.getTime() - knownPeer.getConnectionTime() < 1000
+                )
+                    continue;
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     //
@@ -233,6 +301,26 @@ public class Network extends Observable {
             }
         }
         return counter;
+    }
+
+    public List<Peer> getBestPeers() {
+        return this.peerManager.getBestPeers();
+    }
+
+    public List<Peer> getKnownPeers() {
+        List<Peer> knownPeers = new ArrayList<Peer>();
+        //ASK DATABASE FOR A LIST OF PEERS
+        if (!Controller.getInstance().isOnStopping()) {
+            knownPeers = Controller.getInstance().getDBSet().getPeerMap().getBestPeers(
+                    0, true);
+        }
+
+        //RETURN
+        return knownPeers;
+    }
+
+    public void addPeer(Peer peer, int banForMinutes) {
+        this.peerManager.addPeer(peer, banForMinutes);
     }
 
     /**
@@ -305,6 +393,12 @@ public class Network extends Observable {
         return this.telegramer.getTelegram(signature);
     }
 
+    /**
+     * запускает Пир на входящее соединение
+     *
+     * @param socket
+     * @return
+     */
     public Peer startPeer(Socket socket) {
 
         byte[] addressIP = socket.getInetAddress().getAddress();
@@ -314,24 +408,26 @@ public class Network extends Observable {
             for (Peer knownPeer : knownPeers) {
                 //CHECK IF ADDRESS IS THE SAME
                 if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
-                    if (!knownPeer.isOnUsed()) {
-                        // возможно из-за того что одновременно и как приемник и как передатчик я начинаю выступать
-                        // будет накладка и затык - может не нужно прямо одинаковые имена тут выискивать тогда?
-                        knownPeer.reconnect(socket, "connected by restore!!! ");
-                        return knownPeer;
-                    }
 
-                    break;
+                    if (knownPeer.isUsed()) {
+                        knownPeer.close("before accept anew");
+                    }
+                    // IF PEER not USED and not onUSED
+                    knownPeer.connect(socket, this,"connected by restore!!! ");
+                    return knownPeer;
                 }
             }
         }
 
-        // use UNUSED peers
-        synchronized (this.knownPeers) {
-            for (Peer knownPeer : this.knownPeers) {
-                if (!knownPeer.isOnUsed()) {
-                    knownPeer.reconnect(socket, "connected by recircle!!! ");
-                    return knownPeer;
+        // Если пустых мест уже мало то начинаем переиспользовать
+        if (this.getActivePeersCounter(false) + 3 > Settings.getInstance().getMaxConnections() ) {
+            // use UNUSED peers
+            synchronized (this.knownPeers) {
+                for (Peer knownPeer : this.knownPeers) {
+                    if (!knownPeer.isOnUsed() && !knownPeer.isUsed()) {
+                        knownPeer.connect(socket, this, "connected by recircle!!! ");
+                        return knownPeer;
+                    }
                 }
             }
         }
@@ -340,28 +436,11 @@ public class Network extends Observable {
         // make NEW PEER and use empty slots
 
         Peer peer = new Peer(this, socket, "connected as new!!! ");
+        // запомним в базе данных
+        onConnect(peer);
 
         return peer;
 
-    }
-
-    /**
-     * нужно для того чтобы одновременно не коннектилось две трубы как приемник и как посылник
-     * и возможно и-за этого были затыки. Теперь
-     *
-     * @param socket
-     * @param peer
-     * @param message
-     * @return
-     */
-    public /* synchronized */ Peer tryConnection(Socket socket, Peer peer, String message) {
-        if (socket != null)
-            return startPeer(socket);
-
-        if (!peer.isOnUsed())
-            peer.connect(this, message);
-
-        return peer;
     }
 
     private void addHandledMessage(String hash) {
@@ -434,7 +513,7 @@ public class Network extends Observable {
             Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage(ca);
             answer.setId(message.getId());
             // send answer
-            message.getSender().sendMessage(answer);
+            message.getSender().offerMessage(answer);
            return;
            }
         // Ansver to get transaction
@@ -443,9 +522,10 @@ public class Network extends Observable {
             
             return; 
         }
-        //ONLY HANDLE BLOCK AND TRANSACTION MESSAGES ONCE
-        if (message.getType() == Message.TRANSACTION_TYPE
-                || message.getType() == Message.BLOCK_TYPE
+        //ONLY HANDLE WINBLOCK, TELEGRAMS AND TRANSACTION MESSAGES ONCE
+        if (
+                message.getType() == Message.TELEGRAM_TYPE
+                || message.getType() == Message.TRANSACTION_TYPE
                 || message.getType() == Message.WIN_BLOCK_TYPE
         ) {
             synchronized (this.handledMessages) {
@@ -468,25 +548,25 @@ public class Network extends Observable {
                 if (HWeight == null)
                     HWeight = new Tuple2<Integer, Long>(-1, -1L);
 
-                Message response = MessageFactory.getInstance().createHWeightMessage(HWeight);
+                HWeightMessage response = (HWeightMessage) MessageFactory.getInstance().createHWeightMessage(HWeight);
                 // CREATE RESPONSE WITH SAME ID
                 response.setId(message.getId());
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 10) {
-                    LOGGER.debug(this + " : " + message + " solved by period: " + timeCheck);
+                if (true || timeCheck > 10) {
+                    LOGGER.debug(message.getSender() + ": " + message + " solver by period: " + timeCheck);
                 }
                 timeCheck = System.currentTimeMillis();
 
                 //SEND BACK TO SENDER
-                boolean result = message.getSender().sendMessage(response);
-                if (!result) {
-                    LOGGER.debug("error on response GET_HWEIGHT_TYPE to " + message.getSender());
-                }
+                if (false)
+                    message.getSender().sendHWeight(response);
+                else
+                    message.getSender().offerMessage(response);
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 10) {
-                    LOGGER.debug(this + " : " + message + " sended by period: " + timeCheck);
+                if (true || timeCheck > 10) {
+                    LOGGER.debug(message.getSender() + ": " + message + " >>> by period: " + timeCheck);
                 }
 
                 break;
@@ -577,7 +657,7 @@ public class Network extends Observable {
             //EXCLUDE PEERS
             if (exclude == null || !exclude.contains(peer)) {
                 try {
-                    peer.sendMessage(message);
+                    peer.offerMessage(message);
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
                 }
@@ -585,7 +665,7 @@ public class Network extends Observable {
         }
     }
 
-    public void asyncBroadcastWinBlock(Message message, List<Peer> exclude, boolean onlySynchronized) {
+    public void asyncBroadcastWinBlock(BlockWinMessage winBlock, List<Peer> exclude, boolean onlySynchronized) {
 
         //LOGGER.debug("ASYNC Broadcasting " + message.viewType());
         Controller cnt = Controller.getInstance();
@@ -612,7 +692,7 @@ public class Network extends Observable {
 
             //EXCLUDE PEERS
             if (exclude == null || !exclude.contains(peer)) {
-                peer.sendMessage(message);
+                peer.sendWinBlock(winBlock);
             }
         }
 
@@ -643,6 +723,9 @@ public class Network extends Observable {
 
         // stop thread
         this.acceptor.halt();
+
+        //
+        this.peerManager.halt();
 
         this.telegramer.halt();
 

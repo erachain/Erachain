@@ -787,7 +787,7 @@ public class BlockChain {
             if (peer != null)
                 Controller.getInstance().banPeerOnError(peer, "invalid block", 30);
             else
-                LOGGER.error("new MY winBlock is INVALID!");
+                LOGGER.error("MY WinBlock is INVALID! ignore...");
 
             return false;
         }

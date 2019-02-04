@@ -11,7 +11,7 @@ public class LangFile {
     public LangFile() {
         this.name = "English";
         this.filename = "en.json";
-        this.timestamp = Controller.getInstance().getBuildTimestamp();
+        this.timestamp = Controller.buildTimestamp;
     }
 
     public LangFile(String name, String filename, long timestamp) {

@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  * класс для сохранения блоков при асинхронной скачки цепочки с другого пира
  */
 public class BlockBuffer extends Thread {
-    private static final int BUFFER_SIZE = 100;
+    private static final int BUFFER_SIZE = 20;
     private static final Logger LOGGER = LoggerFactory.getLogger(BlockBuffer.class);
     private List<byte[]> signatures;
     private Peer peer;

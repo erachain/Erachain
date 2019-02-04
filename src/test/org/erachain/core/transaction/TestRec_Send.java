@@ -503,7 +503,8 @@ public class TestRec_Send {
                 head, data,
                 isText,
                 encrypted,
-                timestamp, maker.getLastTimestamp(db)
+                1547048069000l,//timestamp,
+                maker.getLastTimestamp(db)
         );
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);

@@ -1,3 +1,5 @@
+import org.ajoberstar.grgit.Grgit
+
 buildscript {
     repositories {
         jcenter()
@@ -14,16 +16,18 @@ plugins {
 }
 
 ext {
-    git = org.ajoberstar.grgit.Grgit.open()
-    //rev = git.head().id
+    //git = org.ajoberstar.grgit.Grgit.open()
+    git = Grgit.open(dir: rootProject.rootDir)
+    rev = git.head().id
     rev = git.head().getAbbreviatedId(8)
     springbootVersion = '2.0.5.RELEASE'
 }
 
-String versionEra = "4.11.05-${git.head().abbreviatedId}"
-archivesBaseName = 'erachain-dev'
+//String versionEra = "4.11.08-${git.head().abbreviatedId}"
+String versionEra = "4.11.08 beta 3"
+archivesBaseName = 'Erachain'
 group 'org.erachain'
-version versionEra
+//version versionEra
 sourceCompatibility = 1.8
 
 repositories {
@@ -40,15 +44,15 @@ compileJava {
 bootJar {
     mainClassName = "org.erachain.Start"
 
-    baseName = "erachain-dev"
-    destinationDir project.file('build/libs/' + versionEra + '/bin')
+    baseName = "erachain"
+    destinationDir project.file('build/libs/' + versionEra + '/Erachain')
 
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
 
     manifest {
         attributes(
                 'Implementation-Title': 'Gradle Build: ' + project.name,
-                'Implementation-Version': project.version,
+                'Implementation-Version': versionEra,
                 'Build-Time': new Date().format("yyyy-MM-dd HH:mm:ssZ"),
                 'Git-Commit': rev,
                 'Git-Branch': git.branch.current.getName()
@@ -78,42 +82,41 @@ task CopyResourse {
 
     copy {
             from 'ERA'
-            into 'build/libs/' + versionEra + '/bin'
+            into 'build/libs/' + versionEra + '/Erachain'
             include 'Erachain Licence*'
             include 'peers*'
         }
 
     copy {
             from 'ERA/web'
-            into 'build/libs/' + versionEra + '/bin/web'
+            into 'build/libs/' + versionEra + '/Erachain/web'
         }
     copy {
         from 'ERA/languages'
-        into 'build/libs/' + versionEra + '/bin/languages'
+        into 'build/libs/' + versionEra + '/Erachain/languages'
     }
     copy {
         from 'ERA/themes'
-        into 'build/libs/' + versionEra + '/bin/themes'
+        into 'build/libs/' + versionEra + '/Erachain/themes'
     }
     copy {
         from 'ERA/sounds'
-        into 'build/libs/' + versionEra + '/bin/sounds'
+        into 'build/libs/' + versionEra + '/Erachain/sounds'
     }
     copy {
         from 'ERA/images'
-        into 'build/libs/' + versionEra + '/bin/images'
+        into 'build/libs/' + versionEra + '/Erachain/images'
     }
     copy {
         from 'ERA/z_bath_examples'
-        into 'build/libs/' + versionEra + '/bin/z_bath_examples'
+        into 'build/libs/' + versionEra + '/Erachain/z_bath_examples'
     }
 }
 task CreateZip(type: Zip) {
 
-    from 'build/libs/' + versionEra + '/bin'
-    include '*'
-    include '*/*'
-    archiveName versionEra + '.zip'
+    from 'build/libs/' + versionEra
+    include 'Erachain/'
+    archiveName 'Erachain' + '.zip'
     destinationDir(file('build/libs/' + versionEra))
 }
 

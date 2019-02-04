@@ -1,7 +1,8 @@
 package org.erachain.gui.library;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockGenerator;;
+import org.erachain.core.BlockGenerator;
+import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.lang.Lang;
@@ -12,6 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Observable;
 import java.util.Observer;
+
+;
 
 public class Wallet_Sync_Button extends JButton implements Observer {
 
@@ -43,6 +46,12 @@ public class Wallet_Sync_Button extends JButton implements Observer {
                     }
                 }
 
+                int number = 0;
+                for (PrivateKeyAccount privateAccount : Controller.getInstance().getPrivateKeyAccounts()) {
+                    if (Controller.getInstance().wallet.accountExists(privateAccount.getAddress()))
+                        continue;
+                    Controller.getInstance().wallet.database.getAccountMap().add(privateAccount, ++number);
+                }
 
                 int n = JOptionPane.showConfirmDialog(
                         new JFrame(), Lang.getInstance().translate("Sync wallet") + "?",
@@ -81,9 +90,14 @@ public class Wallet_Sync_Button extends JButton implements Observer {
         } else if (message.getType() == ObserverMessage.FORGING_STATUS) {
             BlockGenerator.ForgingStatus status = (BlockGenerator.ForgingStatus) message.getValue();
 
+            int networkStatus = Controller.getInstance().getStatus();
+
 
             if (status == BlockGenerator.ForgingStatus.FORGING_WAIT || status == BlockGenerator.ForgingStatus.FORGING_ENABLED)
-                th.setEnabled(false);
+                if (Controller.STATUS_SYNCHRONIZING == networkStatus)
+                    th.setEnabled(true);
+                else
+                    th.setEnabled(true);
             else {
                 th.setEnabled(true);
             }

@@ -10,23 +10,33 @@ import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+
 public class Pinger extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Pinger.class);
-    private static final int DEFAULT_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1;
-    private static final int DEFAULT_QUICK_PING_TIMEOUT = 2000; // BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 4;
+    private static final int DEFAULT_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+    private static final int DEFAULT_QUICK_PING_TIMEOUT = 5000; // BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 4;
 
     private Peer peer;
     private boolean needPing = false;
     private int ping;
 
+    BlockingQueue<Integer> startPinging = new ArrayBlockingQueue<Integer>(1);
+
     public Pinger(Peer peer) {
         this.peer = peer;
-        //this.run = true;
         this.ping = Integer.MAX_VALUE;
-        this.setName("Pinger - " + this.getId() + " for: " + peer.getAddress().getHostAddress());
+        this.setName("Pinger - " + this.getId() + " for: " + peer.getName());
 
         this.start();
+    }
+
+    public void init() {
+        this.ping = Integer.MAX_VALUE;
+        startPinging.offer(0);
     }
 
     public long getPing() {
@@ -35,15 +45,14 @@ public class Pinger extends Thread {
 
     public void setPing(int ping) {
         this.ping = ping;
+        startPinging.offer(-1);
     }
 
     public void setNeedPing() {
-        // пингуем только те что еще нормальные
-        if (ping > 0)
-            this.needPing = true;
+        this.needPing = true;
     }
 
-    public boolean tryPing(long timeSOT) {
+    private boolean tryPing(long timeSOT) {
 
         //LOGGER.info("try PING " + this.peer);
 
@@ -52,17 +61,12 @@ public class Pinger extends Thread {
         //CREATE PING
         Message pingMessage = MessageFactory.getInstance().createGetHWeightMessage();
 
-        if (this.ping >= 0) {
-            // на время пингования поставим сразу -1
-            this.ping = -1;
-        }
-
         //GET RESPONSE
         long start = System.currentTimeMillis();
         Message response = peer.getResponse(pingMessage, timeSOT);
 
         if (Controller.getInstance().isOnStopping()
-                || this.peer.isStoped()
+                || !this.peer.network.run
                 || !this.peer.isUsed())
             return false;
 
@@ -77,9 +81,10 @@ public class Pinger extends Thread {
                 this.ping = -1;
 
             //PING FAILES
-            if (this.ping < -20) {
+            // чем меньше пиров на связи тем дольше пингуем перед разрвом
+            if (this.ping < -10 -20/(1 + peer.network.banForActivePeersCounter())) {
                 // если полный отказ уже больше чем ХХХ секнд то ИМЕННО БАН
-                this.peer.ban(5, "on PING FAILES");
+                this.peer.ban("on PING FAILES");
             }
 
             return false;
@@ -92,7 +97,7 @@ public class Pinger extends Thread {
         //LOGGER.info("PING " + this.peer);
         Controller.getInstance().getDBSet().getPeerMap().addPeer(peer, 0);
 
-        if (response != null && response.getType() == Message.HWEIGHT_TYPE) {
+        if (response.getType() == Message.HWEIGHT_TYPE) {
             HWeightMessage hWeightMessage = (HWeightMessage) response;
             Tuple2<Integer, Long> hW = hWeightMessage.getHWeight();
 
@@ -106,56 +111,57 @@ public class Pinger extends Thread {
     public boolean tryPing() {
         return tryPing(DEFAULT_QUICK_PING_TIMEOUT);
     }
-    //public boolean tryQuickPing() {
-    //    return tryPing(DEFAULT_QUICK_PING_TIMEOUT);
-    //}
 
     public void run() {
 
         Controller cnt = Controller.getInstance();
         BlockChain chain = cnt.getBlockChain();
 
-        //int sleepTimeFull = DEFAULT_PING_TIMEOUT; // Settings.getInstance().getPingInterval();
-        int sleepTimestep = DEFAULT_QUICK_PING_TIMEOUT >> 3;
+        int sleepTimestep = 100;
         int sleepsteps = DEFAULT_PING_TIMEOUT / sleepTimestep;
         int sleepStepTimeCounter;
         boolean resultSend;
-        while (!this.peer.isStoped()) {
 
-            if (this.ping < 0) {
-                sleepStepTimeCounter = sleepsteps >> 3;
-            } else {
-                sleepStepTimeCounter = sleepsteps;
+        Integer deal = 0;
+        while (this.peer.network.run) {
+
+            try {
+                startPinging.take();
+            } catch (InterruptedException e) {
+                break;
             }
 
-            while (sleepStepTimeCounter > 0) {
+            Controller.getInstance().onConnect(this.peer);
 
-                //SLEEP
+            while (this.peer.isUsed() && this.peer.network.run) {
+
                 try {
-                    Thread.sleep(sleepTimestep);
+                    deal = startPinging.poll(DEFAULT_PING_TIMEOUT, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
-                    //FAILED TO SLEEP
+                    break;
                 }
 
-                if (this.peer.isStoped())
-                    return;
+                if (deal != null && deal < 0)
+                    // сбросить ожидание счетчика
+                    continue;
 
-                // если нужно пингануь - но не часто все равно - так как там могут быстро блоки собираться
-                // чтобы не запинговать канал
-                if (this.needPing && sleepStepTimeCounter > (sleepsteps >> 4))
+                if (!this.peer.isUsed() || !this.peer.network.run)
                     break;
 
-                sleepStepTimeCounter--;
-
-            }
-
-            if (this.peer.isUsed()) {
-                this.needPing = false;
                 tryPing();
-            } else {
-                this.ping = 999999;
+
+                if (!this.peer.isUsed() || !this.peer.network.run)
+                    break;
+
             }
         }
+
+        LOGGER.info(this + " - halted");
+
+    }
+
+    public void close() {
+        startPinging.offer(-1);
     }
 
 }
