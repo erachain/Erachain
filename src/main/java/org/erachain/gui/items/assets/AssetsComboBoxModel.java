@@ -14,11 +14,12 @@ public class AssetsComboBoxModel extends DefaultComboBoxModel<AssetCls> implemen
     Lock lock = new ReentrantLock();
 
     public AssetsComboBoxModel() {
-        Controller.getInstance().wallet.database.getAssetFavoritesSet().addObserver(this);
+        if (Controller.getInstance().wallet.database != null)
+            Controller.getInstance().wallet.database.getAssetFavoritesSet().addObserver(this);
     }
 
     public void deleteObserver() {
-
+        if (Controller.getInstance().wallet.database != null)
         Controller.getInstance().wallet.database.getAssetFavoritesSet().deleteObserver(this);
 
     }

@@ -31,8 +31,8 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
         this.incoming = incoming;
         transactions = new ArrayList<R_Send>();
-        //	DCSet.getInstance().getTransactionMap().addObserver(this);
-        Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
 
     }
 
@@ -132,7 +132,9 @@ public class TableModelMails extends AbstractTableModel implements Observer {
     }
 
     public void removeObservers() {
-        DCSet.getInstance().getTransactionMap().deleteObserver(this);
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            DCSet.getInstance().getTransactionMap().deleteObserver(this);
     }
 
     public void filter(ObserverMessage message) {
@@ -190,7 +192,6 @@ public class TableModelMails extends AbstractTableModel implements Observer {
                 return (int) (o2.getTimestamp() - o1.getTimestamp());
             }
         });
-
 
     }
 }

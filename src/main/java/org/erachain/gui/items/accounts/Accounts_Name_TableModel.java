@@ -33,27 +33,28 @@ public class Accounts_Name_TableModel extends AbstractTableModel implements Obse
     //public static final int COLUMN_FEE_BALANCE = 4;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"No.", "Account", "Name", "Description", "Person"}); // "Waiting"
     private Boolean[] column_AutuHeight = new Boolean[]{true, false, false, false};
-    private AccountsPropertisMap db;
+    private AccountsPropertisMap dbAccounts;
     private Account accountCLS;
     private SortableList<String, Tuple2<String, String>> accounts;
     private Pair<String, Tuple2<String, String>> account;
 
 
     public Accounts_Name_TableModel() {
-     init();   
-
+        init();
 
     }
-    
+
     public Accounts_Name_TableModel(String[] columnNames) {
         this.columnNames = columnNames;
-      init(); 
-      this.fireTableStructureChanged();
+        init();
+        this.fireTableStructureChanged();
     }
 
-    private void init(){
-        db = Controller.getInstance().wallet.database.getAccountsPropertisMap();
-        db.addObserver(this);
+    private void init() {
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            dbAccounts = Controller.getInstance().wallet.database.getAccountsPropertisMap();
+            dbAccounts.addObserver(this);
+        }
     }
 
     @Override
@@ -73,11 +74,9 @@ public class Accounts_Name_TableModel extends AbstractTableModel implements Obse
         this.column_AutuHeight = arg0;
     }
 
-
     public Pair<String, Tuple2<String, String>> getAccount(int row) {
         return accounts.get(row);
     }
-
 
     @Override
     public int getColumnCount() {
@@ -91,6 +90,9 @@ public class Accounts_Name_TableModel extends AbstractTableModel implements Obse
 
     @Override
     public int getRowCount() {
+
+        if (this.accounts == null)
+            return 0;
 
         return this.accounts.size();
     }
@@ -178,7 +180,6 @@ public class Accounts_Name_TableModel extends AbstractTableModel implements Obse
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
-
         if (message.getType() == ObserverMessage.WALLET_ACCOUNT_PROPERTIES_LIST) {
 
 
@@ -204,8 +205,10 @@ public class Accounts_Name_TableModel extends AbstractTableModel implements Obse
 
     public void deleteObserver() {
 
-        db.deleteObserver(this);
-        this.accounts.removeObserver();
+        if (dbAccounts != null) {
+            dbAccounts.deleteObserver(this);
+            this.accounts.removeObserver();
+        }
 
     }
 }

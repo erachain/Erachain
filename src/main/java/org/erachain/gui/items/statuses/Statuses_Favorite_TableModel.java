@@ -168,14 +168,13 @@ public class Statuses_Favorite_TableModel extends TableModelCls<Tuple2<String, S
 
 
     public void removeObservers() {
-
-        Controller.getInstance().wallet.database.getStatusFavoritesSet().deleteObserver(this);
-
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getStatusFavoritesSet().deleteObserver(this);
     }
 
     public void addObservers() {
-
-        Controller.getInstance().wallet.database.getStatusFavoritesSet().addObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getStatusFavoritesSet().addObserver(this);
     }
 
 

@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.naming.NameSale;
 import org.erachain.database.DBMap;
 import org.mapdb.DB;
@@ -40,6 +41,11 @@ public class NameExchangeMap extends DCMap<String, BigDecimal> {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes(DB database) {
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return;
+
         //AMOUNT INDEX
         NavigableSet<Tuple2<BigDecimal, String>> namesIndex = database.createTreeSet("namesales_index_amount")
                 .comparator(Fun.COMPARATOR)

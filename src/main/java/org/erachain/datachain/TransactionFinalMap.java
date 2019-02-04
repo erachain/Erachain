@@ -5,6 +5,7 @@ package org.erachain.datachain;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.ArbitraryTransaction;
@@ -86,6 +87,10 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return map;
 
         this.senderKey = database.createTreeSet("sender_txs").comparator(Fun.COMPARATOR).makeOrGet();
 

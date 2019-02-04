@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.database.DBMap;
 import org.mapdb.*;
@@ -73,6 +74,11 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple5<
                 .keySerializer(BTreeKeySerializer.TUPLE2)
                 .counterEnable()
                 .makeOrGet();
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return map;
+
 
         //HAVE/WANT KEY
         this.assetKeyMap = database.createTreeMap("balances_key_asset")

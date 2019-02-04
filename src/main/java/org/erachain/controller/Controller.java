@@ -161,15 +161,17 @@ public class Controller extends Observable {
     private boolean isStopping = false;
     private String info;
     private long unconfigmedMessageTimingAverage;
+    public static final int BLOCK_AS_TX_COUNT = 10;
     public long transactionMessageTimingAverage;
     public long transactionMessageTimingCounter;
     private long transactionMakeTimingAverage;
     private long transactionMakeTimingCounter;
-    private long transactionProcessTimingAverage;
-    private long transactionProcessTimingCounter;
 
     public boolean backUP = false;
     public  String[] seedCommand;
+    public boolean noUseWallet;
+    public boolean noDataWallet;
+    public boolean onlyProtocolIndexing;
 
     public static String getVersion() {
         return version;
@@ -349,7 +351,7 @@ public class Controller extends Observable {
      * @return
      */
     public long getTransactionProcessTimingAverage() {
-        return transactionProcessTimingAverage;
+        return synchronizer.transactionProcessTimingAverage;
     }
 
     public void sendMyHWeightToPeer(Peer peer) {
@@ -2055,6 +2057,10 @@ public class Controller extends Observable {
 
     // use license KEY
     public boolean createWallet(long licenseKey, byte[] seed, String password, int amount, String path) {
+
+        if (noUseWallet)
+            return true;
+
         // IF NEW WALLET CREADED
         if (this.wallet.create(seed, password, amount, false, path)) {
             this.setWalletLicense(licenseKey);
@@ -2064,6 +2070,10 @@ public class Controller extends Observable {
     }
 
     public boolean recoverWallet(byte[] seed, String password, int amount, String path) {
+
+        if (noUseWallet)
+            return true;
+
         if (this.wallet.create(seed, password, amount, false, path)) {
             LOGGER.info("Wallet needs to synchronize!");
             this.actionAfterConnect();
@@ -2554,8 +2564,6 @@ public class Controller extends Observable {
     // FLUSH BLOCK from win Buffer - to MAP and NERWORK
     public boolean flushNewBlockGenerated() throws Exception {
 
-        long processTiming = System.nanoTime();
-
         Block newBlock = this.blockChain.popWaitWinBuffer();
         if (newBlock == null)
             return false;
@@ -2579,21 +2587,6 @@ public class Controller extends Observable {
                 LOGGER.error(e.getMessage(), e);
                 return false;
             }
-        }
-
-        processTiming = System.nanoTime() - processTiming;
-
-        if (processTiming < 999999999999l) {
-            // при переполнении может быть минус
-            // в миеросекундах подсчет делаем
-            processTiming = processTiming / 1000 / (1 + newBlock.getTransactionCount());
-            if (transactionProcessTimingCounter < 1 << 3) {
-                transactionProcessTimingCounter++;
-                transactionProcessTimingAverage = ((transactionProcessTimingAverage * transactionProcessTimingCounter)
-                        + processTiming - transactionProcessTimingAverage) / transactionProcessTimingCounter;
-            } else
-                transactionProcessTimingAverage = ((transactionProcessTimingAverage << 3)
-                        + processTiming - transactionProcessTimingAverage) >> 3;
         }
 
         LOGGER.debug("+++ flushNewBlockGenerated OK");
@@ -3336,6 +3329,21 @@ public class Controller extends Observable {
                 continue;
             }
 
+            if (arg.toLowerCase().equals("-nousewallet")) {
+                noUseWallet = true;
+                continue;
+            }
+
+            if (arg.toLowerCase().equals("-nodatawallet")) {
+                noDataWallet = true;
+                continue;
+            }
+
+            if (arg.toLowerCase().equals("-opi")) {
+                onlyProtocolIndexing = true;
+                continue;
+            }
+
             if (arg.equals("-backup")) {
                 // backUP data
                 backUP = true;
@@ -3539,7 +3547,13 @@ public class Controller extends Observable {
                             Date date = formatter.parse(buildTime);
                             buildTimestamp = date.getTime();
                         } catch (ParseException e) {
-                            LOGGER.error(e.getMessage(), e);
+                            formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
+                            try {
+                                Date date = formatter.parse(buildTime);
+                                buildTimestamp = date.getTime();
+                            } catch (ParseException e1) {
+                                LOGGER.error(e.getMessage(), e1);
+                            }
                         }
 
                     }

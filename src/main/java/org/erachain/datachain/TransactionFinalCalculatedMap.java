@@ -11,6 +11,7 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.erachain.controller.Controller;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
@@ -92,6 +93,10 @@ public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer
                 .keySerializer(BTreeKeySerializer.TUPLE3).valueSerializer(new CalculatedSerializer())
                 .counterEnable()
                 .makeOrGet();
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return map;
 
         this.senderKey = database.createTreeSet("sender_txs").comparator(Fun.COMPARATOR).makeOrGet();
 

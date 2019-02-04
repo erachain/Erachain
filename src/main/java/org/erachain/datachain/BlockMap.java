@@ -67,6 +67,8 @@ public class BlockMap extends DCMap<Integer, Block> {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes(DB database) {
+
+
         generatorMap = database.createTreeMap("generators_index").makeOrGet();
 
         /*
