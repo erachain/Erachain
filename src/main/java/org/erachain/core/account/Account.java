@@ -32,6 +32,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
+//import org.erachain.core.crypto.Base64;
+
 //04/01 +-
 
 /**
@@ -802,7 +804,7 @@ public class Account {
 
     @Override
     public int hashCode() {
-        return this.getAddress().hashCode();
+        return address.hashCode();
     }
 
     // EQUALS
