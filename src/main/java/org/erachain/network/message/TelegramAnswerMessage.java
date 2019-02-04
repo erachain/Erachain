@@ -15,17 +15,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class TelegramGetAnswerMessage extends Message {
+public class TelegramAnswerMessage extends Message {
 
     private ArrayList<String> senderAccount;
     private ArrayList<Transaction> telegransList;
     private JSONObject json;
     private byte[] dataBytes;
 
-   
 
-    public TelegramGetAnswerMessage(JSONObject json) {
-        super(TELEGRAM_GET_ANSWER_TYPE);
+    public TelegramAnswerMessage(JSONObject json) {
+        super(TELEGRAM_ANSWER_TYPE);
         // get list Telegrams
         telegransList = new ArrayList<Transaction>();
         if(json.containsKey("list")){
@@ -47,13 +46,13 @@ public class TelegramGetAnswerMessage extends Message {
          
     }
     @SuppressWarnings("unchecked")
-    public TelegramGetAnswerMessage(ArrayList<String> account) {
+    public TelegramAnswerMessage(ArrayList<String> accounts) {
         // TODO Auto-generated constructor stub
-        super(TELEGRAM_GET_ANSWER_TYPE);
+        super(TELEGRAM_ANSWER_TYPE);
      // TODO Auto-generated method stub
         telegransList = new ArrayList<Transaction>();
-        
-        this.senderAccount=account;
+
+        this.senderAccount = accounts;
                 
         // read telegram
         json = new JSONObject();
@@ -88,16 +87,15 @@ public class TelegramGetAnswerMessage extends Message {
         
     }
 
-   
 
-       public static TelegramGetAnswerMessage parse(byte[] data) throws Exception {
+    public static TelegramAnswerMessage parse(byte[] data) throws Exception {
         //PARSE TRANSACTION
         
         // convert byte to  String
         String jsonString = Strings.fromByteArray(data);
          // convert String to JSONOblect       
         JSONObject jsonObj = (JSONObject) JSONValue.parse(jsonString);
-        return new TelegramGetAnswerMessage(jsonObj);
+        return new TelegramAnswerMessage(jsonObj);
     }
 
     public boolean isRequest() {
