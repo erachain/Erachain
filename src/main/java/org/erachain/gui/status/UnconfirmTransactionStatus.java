@@ -3,14 +3,13 @@ package org.erachain.gui.status;
 import org.erachain.controller.Controller;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
-import org.erachain.gui.*;
 import org.erachain.gui.items.records.Records_UnConfirmed_Panel;
 import org.erachain.gui2.Main_Panel;
 import org.erachain.lang.Lang;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.utils.ObserverMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -93,21 +92,25 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
                 if (NTP.getTime() - lastUpdate > 2000) {
                     refresh();
                 }
-                break;
+                return;
             case ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE:
                 counter--;
                 if (NTP.getTime() - lastUpdate > 2000) {
                     refresh();
                 }
-                break;
+                return;
             case ObserverMessage.CHAIN_ADD_BLOCK_TYPE:
-                counter = map.size();
-                refresh();
-                break;
+                if (NTP.getTime() - lastUpdate > 2000) {
+                    counter = map.size();
+                    refresh();
+                }
+                return;
             case ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE:
-                counter = map.size();
-                refresh();
-                break;
+                if (NTP.getTime() - lastUpdate > 2000) {
+                    counter = map.size();
+                    refresh();
+                }
+                return;
 
         }
     }
