@@ -462,11 +462,11 @@ public class Network extends Observable {
     public void onMessagePeers(Peer sender, int messageID) {
 
         //CREATE NEW PEERS MESSAGE WITH PEERS
-        Message answer = MessageFactory.getInstance().createPeersMessage(PeerManager.getInstance().getBestPeers());
+        Message answer = MessageFactory.getInstance().createPeersMessage(peerManager.getBestPeers());
         answer.setId(messageID);
 
         //SEND TO SENDER
-        sender.sendMessage(answer);
+        sender.offerMessage(answer);
 
     }
 
@@ -476,7 +476,7 @@ public class Network extends Observable {
             //LOGGER.info("network.onMessage - Connected to self. Disconnection.");
 
             Network.myselfAddress = sender.getAddress();
-            tryDisconnect(sender, 99999, null);
+            sender.ban(99999, null);
         }
 
     }
@@ -487,46 +487,11 @@ public class Network extends Observable {
             return;
         }
 
-        if (message.getType() == Message.TELEGRAM_TYPE) {
-
-            if (!this.telegramer.pipeAddRemove((TelegramMessage) message, null, 0)) {
-                // BROADCAST
-                List<Peer> excludes = new ArrayList<Peer>();
-                excludes.add(message.getSender());
-                this.broadcast(message, excludes, false);
-            }
-
-            return;
-        }
-        
-        // GET telegrams
-        if(message.getType()== Message.TELEGRAM_GET_TYPE){
-          //address
-             JSONObject address = ((TelegramGetMessage) message).getAddress();
-             // create ansver
-             ArrayList<String> ca = new ArrayList<String>();
-             Set keys = address.keySet();
-             for(int i = 0; i<keys.size(); i++){
-                  
-                 ca.add((String) address.get(i));
-             }
-            Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage(ca);
-            answer.setId(message.getId());
-            // send answer
-            message.getSender().offerMessage(answer);
-           return;
-           }
-        // Ansver to get transaction
-        if ( message.getType() == Message.TELEGRAM_GET_ANSWER_TYPE){
-           ((TelegramGetAnswerMessage) message).saveToWallet();
-            
-            return; 
-        }
         //ONLY HANDLE WINBLOCK, TELEGRAMS AND TRANSACTION MESSAGES ONCE
         if (
                 message.getType() == Message.TELEGRAM_TYPE
-                || message.getType() == Message.TRANSACTION_TYPE
-                || message.getType() == Message.WIN_BLOCK_TYPE
+                        || message.getType() == Message.TRANSACTION_TYPE
+                        || message.getType() == Message.WIN_BLOCK_TYPE
         ) {
             synchronized (this.handledMessages) {
                 //CHECK IF NOT HANDLED ALREADY
@@ -542,6 +507,39 @@ public class Network extends Observable {
 
         long timeCheck = System.currentTimeMillis();
         switch (message.getType()) {
+            case Message.TELEGRAM_TYPE:
+                // telegram
+                if (!this.telegramer.pipeAddRemove((TelegramMessage) message, null, 0)) {
+                    // BROADCAST
+                    List<Peer> excludes = new ArrayList<Peer>();
+                    excludes.add(message.getSender());
+                    this.broadcast(message, excludes, false);
+                }
+
+                return;
+            case Message.TELEGRAM_GET_TYPE:
+                // GET telegrams
+                //address
+                JSONObject address = ((TelegramGetMessage) message).getAddress();
+                // create ansver
+                ArrayList<String> addressFilter = new ArrayList<String>();
+                Set keys = address.keySet();
+                for (int i = 0; i < keys.size(); i++) {
+
+                    addressFilter.add((String) address.get(i));
+                }
+                Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage(addressFilter);
+                answer.setId(message.getId());
+                // send answer
+                message.getSender().offerMessage(answer);
+                return;
+
+            case Message.TELEGRAM_ANSWER_TYPE:
+                // Answer to get telegrams
+                ((TelegramAnswerMessage) message).saveToWallet();
+
+                return;
+
             case Message.GET_HWEIGHT_TYPE:
 
                 Tuple2<Integer, Long> HWeight = Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance());

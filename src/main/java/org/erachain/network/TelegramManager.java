@@ -468,7 +468,14 @@ public class TelegramManager extends Thread {
 
     }
 
-    // TRUE if not added
+    /**
+     * Заносит телеграмму в память Ноды или удаляет по списку
+     *
+     * @param telegram  телеграмма котрую надо добавить
+     * @param firstItem если залан то будет удаление
+     * @param timeKey   ключ времени с которой удалять
+     * @return TRUE if not added
+     */
     public synchronized boolean pipeAddRemove(TelegramMessage telegram, List<TelegramMessage> firstItem,
                                               long timeKey) {
 
