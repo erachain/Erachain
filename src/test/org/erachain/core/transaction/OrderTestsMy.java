@@ -1,27 +1,10 @@
 package org.erachain.core.transaction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.math.BigDecimal;
-//import java.math.Long;
-import java.math.BigInteger;
-import java.math.MathContext;
-import java.math.RoundingMode;
-import java.util.Arrays;
-import java.util.List;
-
-import org.erachain.core.account.Account;
-import org.erachain.core.crypto.Base58;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple5;
-
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
@@ -29,6 +12,23 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple5;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+//import java.math.Long;
 
 public class OrderTestsMy {
     Long releaserReference = null;
@@ -558,6 +558,102 @@ public class OrderTestsMy {
             // CHECK IF ORDER CREATION IS INVALID
             assertEquals(Transaction.INVALID_REFERENCE, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
         }
+
+    }
+
+    @Test
+    public void price33() {
+
+
+        BigDecimal amountHave = new BigDecimal("0.33333333");
+        BigDecimal amountWant = new BigDecimal("10.00000000");
+
+        BigDecimal price = Order.calcPrice(amountHave, amountWant, 3);
+        BigDecimal price1 = Order.calcPrice(amountHave, amountWant, 1);
+        BigDecimal thisPrice = Order.calcPrice(amountHave, amountWant, 0);
+
+        BigDecimal priceRev = Order.calcPrice(amountWant, amountHave, 3);
+        BigDecimal price1Rev = Order.calcPrice(amountWant, amountHave, 1);
+        BigDecimal thisPriceRev = Order.calcPrice(amountWant, amountHave, 0);
+
+        BigDecimal orderAmountHave = new BigDecimal("30.00000000");
+        BigDecimal orderAmountWant = new BigDecimal("1.00000000");
+
+        BigDecimal price10 = Order.calcPrice(orderAmountHave, orderAmountWant, 3);
+        BigDecimal price101 = Order.calcPrice(orderAmountHave, orderAmountWant, 1);
+        BigDecimal orderPrice = Order.calcPrice(orderAmountHave, orderAmountWant, 0);
+
+        BigDecimal price10rev = Order.calcPrice(orderAmountWant, orderAmountHave, 3);
+        BigDecimal price101rev = Order.calcPrice(orderAmountWant, orderAmountHave, 1);
+        BigDecimal orderPriceRev = Order.calcPrice(orderAmountWant, orderAmountHave, 0);
+
+
+        int thisPriceScale = thisPrice.stripTrailingZeros().scale();
+        int orderPriceRevScale = orderPriceRev.stripTrailingZeros().scale();
+
+        boolean needBreak = false;
+
+        if (thisPriceScale > orderPriceRevScale) {
+            BigDecimal thisPriceScaled = thisPrice.setScale(orderPriceRevScale, RoundingMode.HALF_DOWN);
+            if (thisPriceScaled.compareTo(orderPriceRev) > 0) {
+                needBreak = true;
+            }
+        } else {
+            BigDecimal orderPriceRevScaled = orderPriceRev.setScale(thisPriceScale, RoundingMode.HALF_DOWN);
+            if (thisPrice.compareTo(orderPriceRevScaled) > 0) {
+                needBreak = true;
+            }
+        }
+
+        assertEquals(needBreak, false);
+
+    }
+
+    @Test
+    public void price33_1() {
+
+
+        BigDecimal amountHave = new BigDecimal("10.00000000");
+        BigDecimal amountWant = new BigDecimal("0.33333333");
+
+        BigDecimal price = Order.calcPrice(amountHave, amountWant, 3);
+        BigDecimal price1 = Order.calcPrice(amountHave, amountWant, 1);
+        BigDecimal thisPrice = Order.calcPrice(amountHave, amountWant, 0);
+
+        BigDecimal priceRev = Order.calcPrice(amountWant, amountHave, 3);
+        BigDecimal price1Rev = Order.calcPrice(amountWant, amountHave, 1);
+        BigDecimal thisPriceRev = Order.calcPrice(amountWant, amountHave, 0);
+
+        BigDecimal orderAmountHave = new BigDecimal("1.00000000");
+        BigDecimal orderAmountWant = new BigDecimal("30.00000000");
+
+        BigDecimal price10 = Order.calcPrice(orderAmountHave, orderAmountWant, 3);
+        BigDecimal price101 = Order.calcPrice(orderAmountHave, orderAmountWant, 1);
+        BigDecimal orderPrice = Order.calcPrice(orderAmountHave, orderAmountWant, 0);
+
+        BigDecimal price10rev = Order.calcPrice(orderAmountWant, orderAmountHave, 3);
+        BigDecimal price101rev = Order.calcPrice(orderAmountWant, orderAmountHave, 1);
+        BigDecimal orderPriceRev = Order.calcPrice(orderAmountWant, orderAmountHave, 0);
+
+
+        int thisPriceScale = thisPrice.stripTrailingZeros().scale();
+        int orderPriceRevScale = orderPriceRev.stripTrailingZeros().scale();
+
+        boolean needBreak = false;
+
+        if (thisPriceScale > orderPriceRevScale) {
+            BigDecimal thisPriceScaled = thisPrice.setScale(orderPriceRevScale, RoundingMode.HALF_DOWN);
+            if (thisPriceScaled.compareTo(orderPriceRev) > 0) {
+                needBreak = true;
+            }
+        } else {
+            BigDecimal orderPriceRevScaled = orderPriceRev.setScale(thisPriceScale, RoundingMode.HALF_DOWN);
+            if (thisPrice.compareTo(orderPriceRevScaled) > 0) {
+                needBreak = true;
+            }
+        }
+
+        assertEquals(needBreak, false);
 
     }
 

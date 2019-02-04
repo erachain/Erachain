@@ -11,7 +11,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TradeMap;
 import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -26,7 +25,12 @@ public class Order implements Comparable<Order> {
 
     final private static BigDecimal precisionUnit = BigDecimal.ONE.scaleByPowerOfTen(-BlockChain.TRADE_PRECISION + 1);
 
-    public static final int ID_LENGTH = 8; //Crypto.SIGNATURE_LENGTH;
+    /**
+     * с какого номера блока включить новое округление
+     */
+    public static final int NEW_FLOR = BlockChain.DEVELOP_USE ? 317000 : 200000;
+
+    public static final int ID_LENGTH = 8;
     private static final int CREATOR_LENGTH = 20; // as SHORT (old - 25)
     private static final int HAVE_LENGTH = 8;
     private static final int WANT_LENGTH = 8;
@@ -46,7 +50,10 @@ public class Order implements Comparable<Order> {
     public static final int ORPHANED = -1;
 
     protected DCSet dcSet;
-    //protected long timestamp;
+
+    /**
+     * height[int] + SeqNo[int]
+     */
     private Long id;
     private Account creator;
     private long haveKey;
@@ -69,7 +76,10 @@ public class Order implements Comparable<Order> {
 
         this.fulfilledHave = BigDecimal.ZERO.setScale(amountHave.scale());
 
-        this.price = calcPrice(amountHave, amountWant, 1);
+        if (true || (id >> 32) < NEW_FLOR)
+            this.price = calcPrice(amountHave, amountWant, 1);
+        else
+            this.price = calcPrice(amountHave, amountWant);
 
     }
 
@@ -94,7 +104,10 @@ public class Order implements Comparable<Order> {
 
         this.status = status;
 
-        this.price = calcPrice(amountHave, amountWant);
+        if (true || (id >> 32) < NEW_FLOR)
+            this.price = calcPrice(amountHave, amountWant, 1);
+        else
+            this.price = calcPrice(amountHave, amountWant);
 
     }
 
@@ -432,6 +445,9 @@ public class Order implements Comparable<Order> {
 
     public void process(Transaction transaction) {
 
+        // GET HEIGHT from ID
+        int height = (int) (this.id >> 32);
+
         CompletedOrderMap completedMap = this.dcSet.getCompletedOrderMap();
         OrderMap ordersMap = this.dcSet.getOrderMap();
         TradeMap tradesMap = this.dcSet.getTradeMap();
@@ -459,6 +475,7 @@ public class Order implements Comparable<Order> {
         this.creator.changeBalance(this.dcSet, true, this.haveKey, this.amountHave, true);
 
         BigDecimal thisPrice = this.price;
+
         //BigDecimal tempPrice;
         BigDecimal thisIncrement;
         //boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
@@ -552,14 +569,28 @@ public class Order implements Comparable<Order> {
             ///////////////
             //CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
             compare = thisPrice.compareTo(orderReversePrice);
-            if (compare > 0)
-                break;
-            else if (compare == 0)
-                // заказы с одинаковой ценой со своего же счета не схлопываем
-                if (false && this.creator.equals(order.getCreator())) {
-                    // IGNORE my self orders
-                    continue;
-                }
+            if (compare > 0) {
+                if (height > NEW_FLOR) {
+
+                    // пытаемся поиграть с точностью округления - см примеры в тестах
+                    // org.erachain.core.transaction.OrderTestsMy.price33 и org.erachain.core.transaction.OrderTestsMy.price33_1
+                    int thisPriceScale = orderPrice.stripTrailingZeros().scale();
+                    int orderPriceRevScale = orderReversePrice.stripTrailingZeros().scale();
+
+                    if (thisPriceScale > orderPriceRevScale) {
+                        BigDecimal thisPriceScaled = thisPrice.setScale(orderPriceRevScale, RoundingMode.HALF_DOWN);
+                        if (thisPriceScaled.compareTo(orderReversePrice) > 0) {
+                            break;
+                        }
+                    } else {
+                        BigDecimal orderPriceRevScaled = orderReversePrice.setScale(thisPriceScale, RoundingMode.HALF_DOWN);
+                        if (thisPrice.compareTo(orderPriceRevScaled) > 0) {
+                            break;
+                        }
+                    }
+                } else
+                    break;
+            }
 
             thisIncrement = orderPrice.scaleByPowerOfTen(-wantScale);
             if (thisAmountHaveLeft.compareTo(thisIncrement) < 0) {
