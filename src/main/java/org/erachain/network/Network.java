@@ -459,6 +459,27 @@ public class Network extends Observable {
         }
     }
 
+    public void onMessagePeers(Peer sender, int messageID) {
+
+        //CREATE NEW PEERS MESSAGE WITH PEERS
+        Message answer = MessageFactory.getInstance().createPeersMessage(PeerManager.getInstance().getBestPeers());
+        answer.setId(messageID);
+
+        //SEND TO SENDER
+        sender.sendMessage(answer);
+
+    }
+
+    public void onMessageMySelf(Peer sender, byte[] remoteID) {
+
+        if (Arrays.equals(remoteID, Controller.getInstance().getFoundMyselfID())) {
+            //LOGGER.info("network.onMessage - Connected to self. Disconnection.");
+
+            Network.myselfAddress = sender.getAddress();
+            tryDisconnect(sender, 99999, null);
+        }
+
+    }
     public void onMessage(Message message) {
 
         //CHECK IF WE ARE STILL PROCESSING MESSAGES
@@ -553,17 +574,7 @@ public class Network extends Observable {
             //GETPEERS
             case Message.GET_PEERS_TYPE:
 
-                //CREATE NEW PEERS MESSAGE WITH PEERS
-                Message answer = MessageFactory.getInstance().createPeersMessage(peerManager.getBestPeers());
-                answer.setId(message.getId());
-
-                //SEND TO SENDER
-                message.getSender().offerMessage(answer);
-
-                timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 10) {
-                    LOGGER.debug(message.getSender() + ": " + message + " solved by period: " + timeCheck);
-                }
+                onMessagePeers(message.getSender(), message.getId());
 
                 break;
 
@@ -572,10 +583,7 @@ public class Network extends Observable {
 
                 FindMyselfMessage findMyselfMessage = (FindMyselfMessage) message;
 
-                if (Arrays.equals(findMyselfMessage.getFoundMyselfID(), Controller.getInstance().getFoundMyselfID())) {
-                    Network.myselfAddress = message.getSender().getAddress();
-                    message.getSender().ban(999999, "MYSELF");
-                }
+                onMessageMySelf(message.getSender(), findMyselfMessage.getFoundMyselfID());
 
                 break;
 
