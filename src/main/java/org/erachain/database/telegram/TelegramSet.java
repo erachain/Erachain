@@ -34,6 +34,9 @@ public class TelegramSet implements IDB {
                 // .cacheDisable()
                 .checksumEnable()
                 .mmapFileEnableIfSupported()
+
+                //.compressionEnable()
+
                 .transactionDisable() // DISABLE TRANSACTIONS
                 .make();
 

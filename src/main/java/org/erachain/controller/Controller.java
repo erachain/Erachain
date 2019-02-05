@@ -89,7 +89,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.11.08 beta 3";
+    public static String version = "4.11.09 beta dev";
     public static String buildTime = "2019-01-31 13:33:33 UTC";
     private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.DEVELOP_USE? false : false;
 
@@ -160,12 +160,11 @@ public class Controller extends Observable {
     public AboutFrame about_frame = null;
     private boolean isStopping = false;
     private String info;
+
     private long unconfigmedMessageTimingAverage;
     public static final int BLOCK_AS_TX_COUNT = 4;
     public long transactionMessageTimingAverage;
-    public long transactionMessageTimingCounter;
     private long transactionMakeTimingAverage;
-    private long transactionMakeTimingCounter;
 
     public boolean backUP = false;
     public  String[] seedCommand;
@@ -326,14 +325,6 @@ public class Controller extends Observable {
     }
 
     /**
-     * Среднее время обработки транзакции при прилете блока из сети. Блок считается как одна транзакция
-     * @return
-     */
-    public long getTransactionMessageTimingAverage() {
-        return transactionMessageTimingAverage;
-    }
-
-    /**
      * Среднее время обработки транзакции при создании нашего блока. Блок считается как одна транзакция
      *
      * @return
@@ -345,14 +336,6 @@ public class Controller extends Observable {
         this.transactionMakeTimingAverage = transactionMakeTimingAverage;
     }
 
-    /**
-     * Среднее время обработки транзакции при валидации и записи блока в базу. Блок считается как одна транзакция
-     *
-     * @return
-     */
-    public long getTransactionProcessTimingAverage() {
-        return synchronizer.transactionProcessTimingAverage;
-    }
 
     public void sendMyHWeightToPeer(Peer peer) {
 
@@ -1514,8 +1497,8 @@ public class Controller extends Observable {
             // при переполнении может быть минус
             // в миеросекундах подсчет делаем
             onMessageProcessTiming /= 1000;
-            unconfigmedMessageTimingAverage = ((unconfigmedMessageTimingAverage << 4)
-                    + onMessageProcessTiming - unconfigmedMessageTimingAverage) >> 4;
+            unconfigmedMessageTimingAverage = ((unconfigmedMessageTimingAverage << 8)
+                    + onMessageProcessTiming - unconfigmedMessageTimingAverage) >> 8;
         }
 
         return;
@@ -3393,6 +3376,15 @@ public class Controller extends Observable {
                 }
             }
         }
+
+        if (onlyProtocolIndexing)
+            LOGGER.info("-only protocol indexing");
+
+        if (noDataWallet)
+            LOGGER.info("-no data wallet");
+
+        if (noUseWallet)
+            LOGGER.info("-no use wallet");
 
         if (useGui) {
 

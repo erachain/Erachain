@@ -1,13 +1,10 @@
 package org.erachain.datachain;
 
 import org.erachain.database.DBMap;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.mapdb.Fun.Tuple2;
-
-import org.erachain.core.item.assets.Order;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -47,6 +44,10 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
     }
 
     public SortableList(DCMap<T, U> db, Collection<T> keys) {
+
+        if (keys == null)
+            keys = new ArrayList<>();
+
         this.db = db;
         this.keys = keys;
 

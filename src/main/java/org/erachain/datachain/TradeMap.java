@@ -1,20 +1,15 @@
 package org.erachain.datachain;
 
-import com.google.common.primitives.UnsignedBytes;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.database.DBMap;
-import org.erachain.database.serializer.OrderSerializer;
 import org.erachain.database.serializer.TradeSerializer;
+import org.erachain.utils.ObserverMessage;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
-import org.erachain.utils.ObserverMessage;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -275,6 +270,9 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
     // get trades for order as HAVE and as WANT
     {
 
+        if (this.haveKeyMap == null)
+            return new ArrayList<Trade>();
+
         String haveKey = String.valueOf(haveWant);
         HashSet<Tuple2<Long, Long>> tradesKeys = new HashSet<Tuple2<Long, Long>>(((BTreeMap<Tuple3, Tuple2<Long, Long>>)
                 this.haveKeyMap).subMap(
@@ -308,17 +306,25 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
             pairKey = want + "/" + have;
         }
 
-        //FILTER ALL KEYS
-        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
-                Fun.t3(pairKey, null, null),
-                Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
+        if (this.pairKeyMap != null) {
+            //FILTER ALL KEYS
+            Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
+                    Fun.t3(pairKey, null, null),
+                    Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
 
-        //RETURN
-        return new SortableList<Tuple2<Long, Long>, Trade>(this, keys);
+            //RETURN
+            return new SortableList<Tuple2<Long, Long>, Trade>(this, keys);
+        }
+
+        return new SortableList<Tuple2<Long, Long>, Trade>(this, new ArrayList<>());
     }
 
     @SuppressWarnings("unchecked")
     public List<Trade> getTrades(long have, long want) {
+
+        if (this.pairKeyMap == null)
+            return new ArrayList<Trade>();
+
         String pairKey;
         if (have > want) {
             pairKey = have + "/" + want;
@@ -349,6 +355,10 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
      * @param timestamp is time
      */
     public List<Trade> getTradesByTimestamp(long have, long want, long timestamp) {
+
+        if (this.pairKeyMap == null)
+            return new ArrayList<Trade>();
+
         String pairKey;
         if (have > want)
             pairKey = have + "/" + want;

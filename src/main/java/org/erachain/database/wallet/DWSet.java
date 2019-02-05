@@ -77,7 +77,7 @@ public class DWSet implements IDB {
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
                 .freeSpaceReclaimQ(3) // не нагружать процессор для поиска свободного места в базе данных
 
-                .compressionEnable()
+                //.compressionEnable()
 
                 .make();
 

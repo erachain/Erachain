@@ -49,7 +49,7 @@ public class DBSet implements IDB {
                 /// ICREATOR
                 .commitFileSyncDisable() // ++
 
-                .compressionEnable()
+                //.compressionEnable()
 
                 .transactionDisable()
                 .make();
