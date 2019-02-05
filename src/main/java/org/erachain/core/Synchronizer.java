@@ -41,9 +41,6 @@ public class Synchronizer {
     // private Block runedBlock;
     private Peer fromPeer;
 
-    public long transactionProcessTimingAverage;
-    public long transactionProcessTimingCounter;
-
     public Synchronizer() {
         // this.run = true;
     }
@@ -887,19 +884,14 @@ public class Synchronizer {
             }
         }
 
-        processTiming = System.nanoTime() - processTiming;
-
-        if (processTiming < 999999999999l) {
-            // при переполнении может быть минус
-            // в миеросекундах подсчет делаем
-            processTiming = processTiming / 1000 / (Controller.BLOCK_AS_TX_COUNT + block.getTransactionCount());
-            if (transactionProcessTimingCounter < 1 << 3) {
-                transactionProcessTimingCounter++;
-                transactionProcessTimingAverage = ((transactionProcessTimingAverage * transactionProcessTimingCounter)
-                        + processTiming - transactionProcessTimingAverage) / transactionProcessTimingCounter;
-            } else
-                transactionProcessTimingAverage = ((transactionProcessTimingAverage << 3)
-                        + processTiming - transactionProcessTimingAverage) >> 3;
+        if (!dcSet.isFork()) {
+            // только запись в нашу цепочку
+            processTiming = System.nanoTime() - processTiming;
+            if (processTiming < 999999999999l) {
+                // при переполнении может быть минус
+                // в миеросекундах подсчет делаем
+                cnt.getBlockChain().updateTXProcessTimingAverage(processTiming, block.getTransactionCount());
+            }
         }
 
 

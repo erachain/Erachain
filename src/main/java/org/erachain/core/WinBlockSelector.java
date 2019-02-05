@@ -99,22 +99,10 @@ public class WinBlockSelector extends MonitoredThread {
             message.getSender().network.asyncBroadcastWinBlock(blockWinMessage, excludes, false);
 
             onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
-
             if (onMessageProcessTiming < 999999999999l) {
                 // при переполнении может быть минус
                 // в миеросекундах подсчет делаем
-                // ++ 10 потому что там ФОРК базы делаем - он очень медленный
-                onMessageProcessTiming = onMessageProcessTiming / 1000
-                        / (Controller.BLOCK_AS_TX_COUNT + newBlock.getTransactionCount());
-                if (controller.transactionMessageTimingCounter < 1 << 3) {
-                    controller.transactionMessageTimingCounter++;
-                    controller.transactionMessageTimingAverage = ((controller.transactionMessageTimingAverage
-                            * controller.transactionMessageTimingCounter)
-                            + onMessageProcessTiming - controller.transactionMessageTimingAverage)
-                            / controller.transactionMessageTimingCounter;
-                } else
-                    controller.transactionMessageTimingAverage = ((controller.transactionMessageTimingAverage << 3)
-                            + onMessageProcessTiming - controller.transactionMessageTimingAverage) >> 3;
+                Controller.getInstance().getBlockChain().updateTXWinnedTimingAverage(onMessageProcessTiming, newBlock.getTransactionCount());
             }
 
         } else {

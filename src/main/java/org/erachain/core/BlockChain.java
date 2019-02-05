@@ -253,6 +253,14 @@ public class BlockChain {
     //private byte[] lastBlockSignature;
     //private Tuple2<Integer, Long> HWeight;
 
+    public long transactionWinnedTimingAverage;
+    public long transactionWinnedTimingCounter;
+
+    public long transactionValidateTimingAverage;
+    public long transactionValidateTimingCounter;
+
+    public long transactionProcessTimingAverage;
+    public long transactionProcessTimingCounter;
 
     //private DBSet dcSet;
 
@@ -855,6 +863,51 @@ public class BlockChain {
     public Block getBlock(DCSet dcSet, int height) {
 
         return dcSet.getBlockMap().get(height);
+    }
+
+    /**
+     * Среднее время обработки транзакции при прилете блока из сети. Блок считается как одна транзакция
+     *
+     * @return
+     */
+    public void updateTXWinnedTimingAverage(long processTiming, int counter) {
+        // при переполнении может быть минус
+        // в миеросекундах подсчет делаем
+        processTiming = processTiming / 1000 / (Controller.BLOCK_AS_TX_COUNT + counter);
+        if (transactionWinnedTimingCounter < 1 << 5) {
+            transactionWinnedTimingCounter++;
+            transactionWinnedTimingAverage = ((transactionWinnedTimingAverage * transactionWinnedTimingCounter)
+                    + processTiming - transactionWinnedTimingAverage) / transactionWinnedTimingCounter;
+        } else
+            transactionWinnedTimingAverage = ((transactionWinnedTimingAverage << 5)
+                    + processTiming - transactionWinnedTimingAverage) >> 5;
+    }
+
+    public void updateTXValidateTimingAverage(long processTiming, int counter) {
+        // тут всегда Количество больше 0 приходит
+        processTiming = processTiming / 1000 / counter;
+        if (transactionValidateTimingCounter < 1 << 5) {
+            transactionValidateTimingCounter++;
+            transactionValidateTimingAverage = ((transactionValidateTimingAverage * transactionValidateTimingCounter)
+                    + processTiming - transactionValidateTimingAverage) / transactionValidateTimingCounter;
+        } else
+            transactionValidateTimingAverage = ((transactionValidateTimingAverage << 5)
+                    + processTiming - transactionValidateTimingAverage) >> 5;
+    }
+
+    public void updateTXProcessTimingAverage(long processTiming, int counter) {
+        if (processTiming < 999999999999l) {
+            // при переполнении может быть минус
+            // в миеросекундах подсчет делаем
+            processTiming = processTiming / 1000 / (Controller.BLOCK_AS_TX_COUNT + counter);
+            if (transactionProcessTimingCounter < 1 << 5) {
+                transactionProcessTimingCounter++;
+                transactionProcessTimingAverage = ((transactionProcessTimingAverage * transactionProcessTimingCounter)
+                        + processTiming - transactionProcessTimingAverage) / transactionProcessTimingCounter;
+            } else
+                transactionProcessTimingAverage = ((transactionProcessTimingAverage << 5)
+                        + processTiming - transactionProcessTimingAverage) >> 5;
+        }
     }
 
     public Pair<Block, List<Transaction>> scanTransactions(DCSet dcSet, Block block, int blockLimit, int transactionLimit, int type, int service, Account account) {
