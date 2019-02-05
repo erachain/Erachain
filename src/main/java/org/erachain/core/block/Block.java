@@ -1321,6 +1321,8 @@ public class Block {
 
         LOGGER.debug("*** Block[" + this.heightBlock + "] try Validate");
 
+        long processTiming = System.nanoTime();
+
         // TRY CHECK HEAD
         if (!this.isValidHead(dcSet))
             return false;
@@ -1532,6 +1534,15 @@ public class Block {
             dcSet.getBlockMap().add(this);
             LOGGER.debug("BlockMap add timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
 
+        }
+
+        if (this.transactionCount > 0) {
+            processTiming = System.nanoTime() - processTiming;
+            if (processTiming < 999999999999l) {
+                // при переполнении может быть минус
+                // в миеросекундах подсчет делаем
+                Controller.getInstance().getBlockChain().updateTXValidateTimingAverage(processTiming, this.transactionCount);
+            }
         }
 
         return true;

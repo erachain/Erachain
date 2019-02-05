@@ -135,7 +135,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
             mess += " " + 1000000 / timing + "utx/s";
         }
 
-        timing = Controller.getInstance().getTransactionMessageTimingAverage();
+        timing = Controller.getInstance().getBlockChain().transactionWinnedTimingAverage;
         if (timing > 0) {
             mess += " " + 1000000 / timing + "wtx/s";
         }
@@ -144,8 +144,12 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
         if (timing > 0) {
             mess += " " + 1000000 / timing + "mtx/s";
         }
+        timing = Controller.getInstance().getBlockChain().transactionValidateTimingAverage;
+        if (timing > 0) {
+            mess += " " + 1000000 / timing + "vtx/s";
+        }
 
-        timing = Controller.getInstance().getTransactionProcessTimingAverage();
+        timing = Controller.getInstance().getBlockChain().transactionProcessTimingAverage;
         if (timing > 0) {
             mess += " " + 1000000 / timing + "ctx/s";
         }

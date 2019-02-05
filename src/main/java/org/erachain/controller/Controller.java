@@ -160,12 +160,11 @@ public class Controller extends Observable {
     public AboutFrame about_frame = null;
     private boolean isStopping = false;
     private String info;
+
     private long unconfigmedMessageTimingAverage;
     public static final int BLOCK_AS_TX_COUNT = 4;
     public long transactionMessageTimingAverage;
-    public long transactionMessageTimingCounter;
     private long transactionMakeTimingAverage;
-    private long transactionMakeTimingCounter;
 
     public boolean backUP = false;
     public  String[] seedCommand;
@@ -326,14 +325,6 @@ public class Controller extends Observable {
     }
 
     /**
-     * Среднее время обработки транзакции при прилете блока из сети. Блок считается как одна транзакция
-     * @return
-     */
-    public long getTransactionMessageTimingAverage() {
-        return transactionMessageTimingAverage;
-    }
-
-    /**
      * Среднее время обработки транзакции при создании нашего блока. Блок считается как одна транзакция
      *
      * @return
@@ -345,14 +336,6 @@ public class Controller extends Observable {
         this.transactionMakeTimingAverage = transactionMakeTimingAverage;
     }
 
-    /**
-     * Среднее время обработки транзакции при валидации и записи блока в базу. Блок считается как одна транзакция
-     *
-     * @return
-     */
-    public long getTransactionProcessTimingAverage() {
-        return synchronizer.transactionProcessTimingAverage;
-    }
 
     public void sendMyHWeightToPeer(Peer peer) {
 
@@ -1514,8 +1497,8 @@ public class Controller extends Observable {
             // при переполнении может быть минус
             // в миеросекундах подсчет делаем
             onMessageProcessTiming /= 1000;
-            unconfigmedMessageTimingAverage = ((unconfigmedMessageTimingAverage << 4)
-                    + onMessageProcessTiming - unconfigmedMessageTimingAverage) >> 4;
+            unconfigmedMessageTimingAverage = ((unconfigmedMessageTimingAverage << 8)
+                    + onMessageProcessTiming - unconfigmedMessageTimingAverage) >> 8;
         }
 
         return;
