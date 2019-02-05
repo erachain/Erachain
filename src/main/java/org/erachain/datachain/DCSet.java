@@ -1,7 +1,6 @@
 package org.erachain.datachain;
 // upd 09/03
 
-import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.web.NameStorageMap;
@@ -10,7 +9,6 @@ import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.IDB;
 import org.erachain.settings.Settings;
-import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.slf4j.Logger;
@@ -387,7 +385,7 @@ public class DCSet implements Observer, IDB {
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
                 .freeSpaceReclaimQ(3) // не нагружать процессор для поиска свободного места в базе данных
 
-                .compressionEnable()
+                //.compressionEnable()
 
                 /*
                 .cacheSize(CASH_SIZE)
