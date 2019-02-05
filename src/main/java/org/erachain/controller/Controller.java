@@ -3394,6 +3394,15 @@ public class Controller extends Observable {
             }
         }
 
+        if (onlyProtocolIndexing)
+            LOGGER.info("-only protocol indexing");
+
+        if (noDataWallet)
+            LOGGER.info("-no data wallet");
+
+        if (noUseWallet)
+            LOGGER.info("-no use wallet");
+
         if (useGui) {
 
             this.about_frame = AboutFrame.getInstance();
