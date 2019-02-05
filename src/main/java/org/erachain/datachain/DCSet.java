@@ -383,7 +383,7 @@ public class DCSet implements Observer, IDB {
                 //.cacheHardRefEnable()
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(8) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(3) // не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
 
