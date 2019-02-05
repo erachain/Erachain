@@ -587,7 +587,7 @@ public class OrderTestsMy {
         BigDecimal price101rev = Order.calcPrice(orderAmountWant, orderAmountHave, 1);
         BigDecimal orderPriceRev = Order.calcPrice(orderAmountWant, orderAmountHave, 0);
 
-        int orderPriceScale = orderPrice.stripTrailingZeros().scale();
+        int thisPriceRevScale = thisPriceRev.stripTrailingZeros().scale();
         int orderPriceRevScale = orderPriceRev.stripTrailingZeros().scale();
         int thisPriceScale = thisPrice.scale();
 
@@ -596,7 +596,7 @@ public class OrderTestsMy {
         if (thisPriceScale > orderPriceRevScale) {
             BigDecimal scaleThisPrice = thisPrice.setScale(orderPriceRevScale, RoundingMode.HALF_DOWN);
             if (scaleThisPrice.compareTo(orderPriceRev) == 0) {
-                BigDecimal scaledOrderPrice = orderPrice.setScale(thisPriceScale, RoundingMode.HALF_DOWN);
+                BigDecimal scaledOrderPrice = orderPrice.setScale(thisPriceRevScale, RoundingMode.HALF_DOWN);
                 if (scaledOrderPrice.compareTo(thisPriceRev) == 0)
                     ;
                 else
