@@ -884,11 +884,14 @@ public class Synchronizer {
             }
         }
 
-        processTiming = System.nanoTime() - processTiming;
-        if (processTiming < 999999999999l) {
-            // при переполнении может быть минус
-            // в миеросекундах подсчет делаем
-            cnt.getBlockChain().updateTXProcessTimingAverage(processTiming, block.getTransactionCount());
+        if (!dcSet.isFork()) {
+            // только запись в нашу цепочку
+            processTiming = System.nanoTime() - processTiming;
+            if (processTiming < 999999999999l) {
+                // при переполнении может быть минус
+                // в миеросекундах подсчет делаем
+                cnt.getBlockChain().updateTXProcessTimingAverage(processTiming, block.getTransactionCount());
+            }
         }
 
 

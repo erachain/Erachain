@@ -1321,8 +1321,6 @@ public class Block {
 
         LOGGER.debug("*** Block[" + this.heightBlock + "] try Validate");
 
-        long processTiming = System.nanoTime();
-
         // TRY CHECK HEAD
         if (!this.isValidHead(dcSet))
             return false;
@@ -1336,6 +1334,7 @@ public class Block {
         if (this.transactionCount == 0) {
             // empty transactions
         } else {
+
             int seq = 1;
             byte[] blockSignature = this.getSignature();
             byte[] transactionSignature;
@@ -1370,6 +1369,8 @@ public class Block {
                 validatingDC = dcSet.fork();
                 this.txCalculated = null;
             }
+
+            long processTiming = System.nanoTime();
 
             //DBSet dbSet = Controller.getInstance().getDBSet();
             TransactionMap unconfirmedMap = validatingDC.getTransactionMap();
@@ -1519,6 +1520,20 @@ public class Block {
             LOGGER.debug("[" + this.heightBlock + "] processing time: " + tickets * 0.001
                     + " TXs = " + this.transactionCount + " millsec/record:" + tickets / this.transactionCount);
 
+            if (!dcSet.isFork()) {
+                // если это просчет уже для записи в нашу базу данных а не при выборе Цепочки для синхронизации
+                processTiming = System.nanoTime() - processTiming;
+                if (processTiming < 999999999999l) {
+                    // при переполнении может быть минус
+                    // в миеросекундах подсчет делаем
+                    ////////// сдесь очень много времени занимает форканье базы данных - поэтому Счетчик трнзакций = 10 сразу
+                    // не выше поставил точку времени после создания форка базы данных - чтобы не влияло
+                    // так как форкнуть базу можно заранее - хотя для каждого блока который прилетает это нужно отдельно делать и
+                    // это тоже время требует...
+                    Controller.getInstance().getBlockChain().updateTXValidateTimingAverage(processTiming, this.transactionCount);
+                }
+            }
+
         }
 
         //BLOCK IS VALID
@@ -1534,15 +1549,6 @@ public class Block {
             dcSet.getBlockMap().add(this);
             LOGGER.debug("BlockMap add timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
 
-        }
-
-        if (this.transactionCount > 0) {
-            processTiming = System.nanoTime() - processTiming;
-            if (processTiming < 999999999999l) {
-                // при переполнении может быть минус
-                // в миеросекундах подсчет делаем
-                Controller.getInstance().getBlockChain().updateTXValidateTimingAverage(processTiming, this.transactionCount);
-            }
         }
 
         return true;

@@ -884,9 +884,8 @@ public class BlockChain {
     }
 
     public void updateTXValidateTimingAverage(long processTiming, int counter) {
-        // при переполнении может быть минус
-        // в миеросекундах подсчет делаем
-        processTiming = processTiming / 1000 / (1 + counter);
+        // тут всегда Количество больше 0 приходит
+        processTiming = processTiming / 1000 / counter;
         if (transactionValidateTimingCounter < 1 << 5) {
             transactionValidateTimingCounter++;
             transactionValidateTimingAverage = ((transactionValidateTimingAverage * transactionValidateTimingCounter)
