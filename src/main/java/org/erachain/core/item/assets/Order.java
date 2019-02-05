@@ -574,11 +574,12 @@ public class Order implements Comparable<Order> {
                     // пытаемся поиграть с точностью округления - см примеры в тестах
                     // org.erachain.core.transaction.OrderTestsMy.price33 и org.erachain.core.transaction.OrderTestsMy.price33_1
                     int thisPriceScale = thisPrice.stripTrailingZeros().scale();
+                    int orderReversePriceScale = orderReversePrice.stripTrailingZeros().scale();
 
                     // если точность у заказа больше чем у нас - то он не сыграет
                     // например 1 / 3 = 0.00333333
                     // поэтому надо обрfтную цену проверить
-                    if (thisPriceScale < orderReversePrice.stripTrailingZeros().scale()) {
+                    if (thisPriceScale > orderReversePriceScale) {
                         // если обртаная цена к нам у ордера меньше точность - попробуем сравнить обратные цены
                         // но при этом точность у нашей цены снизим до точности Заказа
                         BigDecimal scaledThisPriceRev = Order.calcPrice(this.amountWant, this.amountHave)

@@ -565,8 +565,8 @@ public class OrderTestsMy {
     public void price33() {
 
 
-        BigDecimal amountHave = new BigDecimal("0.00010000");
-        BigDecimal amountWant = new BigDecimal("0.00000333");
+        BigDecimal amountHave = new BigDecimal("0.00000333");
+        BigDecimal amountWant = new BigDecimal("0.00010000");
 
         BigDecimal price = Order.calcPrice(amountHave, amountWant, 3);
         BigDecimal price1 = Order.calcPrice(amountHave, amountWant, 1);
@@ -576,8 +576,8 @@ public class OrderTestsMy {
         BigDecimal price1Rev = Order.calcPrice(amountWant, amountHave, 1);
         BigDecimal thisPriceRev = Order.calcPrice(amountWant, amountHave, 0);
 
-        BigDecimal orderAmountHave = new BigDecimal("1.00000000");
-        BigDecimal orderAmountWant = new BigDecimal("30.00000000");
+        BigDecimal orderAmountHave = new BigDecimal("30.00000000");
+        BigDecimal orderAmountWant = new BigDecimal("1.00000000");
 
         BigDecimal price10 = Order.calcPrice(orderAmountHave, orderAmountWant, 3);
         BigDecimal price101 = Order.calcPrice(orderAmountHave, orderAmountWant, 1);
@@ -593,14 +593,15 @@ public class OrderTestsMy {
 
         boolean needBreak = false;
 
-        if (thisPriceScale < orderPriceRevScale) {
-            BigDecimal scaledThisPriceRev = thisPriceRev.setScale(orderPriceScale, RoundingMode.HALF_DOWN);
-            BigDecimal scaledOrderPriceRev = orderPriceRev.setScale(orderPriceScale, RoundingMode.HALF_DOWN);
-            if (scaledThisPriceRev.compareTo(orderPrice) == 0
-                && thisPrice.compareTo(scaledOrderPriceRev) == 0)
-                ;
-            else
-                needBreak = true;
+        if (thisPriceScale > orderPriceRevScale) {
+            BigDecimal scaleThisPrice = thisPrice.setScale(orderPriceRevScale, RoundingMode.HALF_DOWN);
+            if (scaleThisPrice.compareTo(orderPriceRev) == 0) {
+                BigDecimal scaledOrderPrice = orderPrice.setScale(thisPriceScale, RoundingMode.HALF_DOWN);
+                if (scaledOrderPrice.compareTo(thisPriceRev) == 0)
+                    ;
+                else
+                    needBreak = true;
+            }
         }
 
         assertEquals(needBreak, false);
