@@ -1371,6 +1371,8 @@ public class Block {
             }
 
             long processTiming = System.nanoTime();
+            long processTimingLocal;
+            long processTimingLocalDiff;
 
             //DBSet dbSet = Controller.getInstance().getDBSet();
             TransactionMap unconfirmedMap = validatingDC.getTransactionMap();
@@ -1430,7 +1432,7 @@ public class Block {
                         return false;
                     }
 
-                    timerStart = System.currentTimeMillis();
+                    processTimingLocal = System.nanoTime();
                     try {
                         transaction.process(this, Transaction.FOR_NETWORK);
                     } catch (Exception e) {
@@ -1441,7 +1443,10 @@ public class Block {
                                 + ":" + transaction.viewFullTypeName() + e.getMessage(), e);
                         return false;
                     }
-                    timerProcess += System.currentTimeMillis() - timerStart;
+
+                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                    if (processTimingLocalDiff < 999999999999l)
+                        timerProcess += processTimingLocalDiff / 1000;
 
                 } else {
 
@@ -1462,22 +1467,25 @@ public class Block {
                     if (isPrimarySet) {
                         //REMOVE FROM UNCONFIRMED DATABASE
                         ///LOGGER.debug("[" + seq + "] try unconfirmedMap delete" );
-                        timerStart = System.currentTimeMillis();
+                        processTimingLocal = System.nanoTime();
                         unconfirmedMap.delete(transactionSignature);
-                        timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
+                        processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                        if (processTimingLocalDiff < 999999999999l)
+                            timerUnconfirmedMap_delete += processTimingLocalDiff / 1000;
                     }
-
-                    Long key = Transaction.makeDBRef(this.heightBlock, seq);
 
                     if (cnt.isOnStopping())
                         return false;
 
                     ///LOGGER.debug("[" + seq + "] try finalMap.set" );
-                    timerStart = System.currentTimeMillis();
+                    processTimingLocal = System.nanoTime();
+                    Long key = Transaction.makeDBRef(this.heightBlock, seq);
                     finalMap.set(key, transaction);
-                    timerFinalMap_set += System.currentTimeMillis() - timerStart;
-                    //LOGGER.debug("[" + seq + "] try transFinalMapSinds.set" );
-                    timerStart = System.currentTimeMillis();
+                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                    if (processTimingLocalDiff < 999999999999l)
+                        timerFinalMap_set += processTimingLocalDiff / 1000;
+
+                    processTimingLocal = System.nanoTime();
                     transFinalMapSinds.set(transactionSignature, key);
                     List<byte[]> signatures = transaction.getSignatures();
                     if (signatures != null) {
@@ -1485,15 +1493,22 @@ public class Block {
                             transFinalMapSinds.set(itemSignature, key);
                         }
                     }
-                    timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
+                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                    if (processTimingLocalDiff < 999999999999l)
+                        timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
 
                 } else {
                     // for some TRANSACTIONs need add to FINAM MAP etc.
                     // R_SertifyPubKeys - in same BLOCK with IssuePersonRecord
 
+                    processTimingLocal = System.nanoTime();
                     Long key = Transaction.makeDBRef(this.heightBlock, seq);
-
                     finalMap.set(key, transaction);
+                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                    if (processTimingLocalDiff < 999999999999l)
+                        timerFinalMap_set += processTimingLocalDiff / 1000;
+
+                    processTimingLocal = System.nanoTime();
                     transFinalMapSinds.set(transactionSignature, key);
                     List<byte[]> signatures = transaction.getSignatures();
                     if (signatures != null) {
@@ -1501,6 +1516,9 @@ public class Block {
                             transFinalMapSinds.set(itemSignature, key);
                         }
                     }
+                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                    if (processTimingLocalDiff < 999999999999l)
+                        timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
                 }
 
                 transactionsSignatures = Bytes.concat(transactionsSignatures, transactionSignature);
@@ -1516,10 +1534,6 @@ public class Block {
                 return false;
             }
 
-            long tickets = System.currentTimeMillis() - timerStart;
-            LOGGER.debug("[" + this.heightBlock + "] processing time: " + tickets * 0.001
-                    + " TXs = " + this.transactionCount + " millsec/record:" + tickets / this.transactionCount);
-
             if (!dcSet.isFork()) {
                 // если это просчет уже для записи в нашу базу данных а не при выборе Цепочки для синхронизации
                 processTiming = System.nanoTime() - processTiming;
@@ -1534,6 +1548,17 @@ public class Block {
                 }
             }
 
+            long tickets = System.currentTimeMillis() - timerStart;
+            LOGGER.debug("VALIDATING[" + this.heightBlock + "]="
+                    + this.transactionCount + " " + tickets + "[ms] " + tickets / this.transactionCount + "[ms/tx]"
+                    + " Proc[mm]: " + timerProcess
+                    + (andProcess ?
+                    " UnconfDel[mm]: " + timerUnconfirmedMap_delete
+                    : "")
+                    + " SignsKey[mm]: " + timerTransFinalMapSinds_set
+                    + " FinalSet[mm]: " + timerFinalMap_set
+            );
+
         }
 
         //BLOCK IS VALID
@@ -1545,9 +1570,11 @@ public class Block {
                 return false;
             }
 
-            timerStart = System.currentTimeMillis();
+            timerStart = System.nanoTime();
             dcSet.getBlockMap().add(this);
-            LOGGER.debug("BlockMap add timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
+            timerStart = System.nanoTime() - timerStart;
+            if (timerStart < 999999999999l)
+                LOGGER.debug("BlockMap add timer [mm]: " + timerStart / 1000 + " [" + this.heightBlock + "]");
 
         }
 
