@@ -28,7 +28,7 @@ public class Order implements Comparable<Order> {
     /**
      * с какого номера блока включить новое округление
      */
-    public static final int NEW_FLOR = BlockChain.DEVELOP_USE ? 317000 : 200000;
+    public static final int NEW_FLOR = BlockChain.DEVELOP_USE ? 317000 : 190000;
 
     public static final int ID_LENGTH = 8;
     private static final int CREATOR_LENGTH = 20; // as SHORT (old - 25)
