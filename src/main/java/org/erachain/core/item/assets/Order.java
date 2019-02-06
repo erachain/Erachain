@@ -76,10 +76,7 @@ public class Order implements Comparable<Order> {
 
         this.fulfilledHave = BigDecimal.ZERO.setScale(amountHave.scale());
 
-        if (true || (id >> 32) < NEW_FLOR)
-            this.price = calcPrice(amountHave, amountWant, 1);
-        else
-            this.price = calcPrice(amountHave, amountWant);
+        this.price = calcPrice(amountHave, amountWant, 1);
 
     }
 
@@ -104,10 +101,7 @@ public class Order implements Comparable<Order> {
 
         this.status = status;
 
-        if (true || (id >> 32) < NEW_FLOR)
-            this.price = calcPrice(amountHave, amountWant, 1);
-        else
-            this.price = calcPrice(amountHave, amountWant);
+        this.price = calcPrice(amountHave, amountWant, 1);
 
     }
 
@@ -524,6 +518,7 @@ public class Order implements Comparable<Order> {
         int wantScale = this.getWantAsset().getScale();
 
         int compare = 0;
+        int compareLeft = 0;
 
         if (debug) {
             debug = true;
@@ -578,18 +573,19 @@ public class Order implements Comparable<Order> {
 
                     // если точность у заказа больше чем у нас - то он не сыграет
                     // например 1 / 3 = 0.00333333
-                    // поэтому надо обрfтную цену проверить
+                    // поэтому надо обрeтную цену проверить
                     if (thisPriceScale > orderReversePriceScale) {
                         // если обртаная цена к нам у ордера меньше точность - попробуем сравнить обратные цены
                         // но при этом точность у нашей цены снизим до точности Заказа
-                        BigDecimal scaledThisPriceRev = Order.calcPrice(this.amountWant, this.amountHave)
-                                .setScale(orderPrice.scale(), RoundingMode.HALF_DOWN);
-                        if (scaledThisPriceRev.compareTo(orderPrice) == 0) {
-                            BigDecimal scaledOrderReversePrice = orderReversePrice
-                                    .setScale(thisPriceScale, RoundingMode.HALF_DOWN);
+                        BigDecimal scaledThisPrice = thisPrice.setScale(orderReversePriceScale, RoundingMode.HALF_DOWN);
+                        if (scaledThisPrice.compareTo(orderReversePrice) == 0) {
+                            // да цены совпали
+                            // тогда еще так же обратные цены проверим
+                            BigDecimal thisReversePrice = Order.calcPrice(this.amountWant, this.amountHave);
+                            BigDecimal scaledOrderPrice = orderPrice.setScale(thisReversePrice.scale(), RoundingMode.HALF_DOWN);
                             // и сравним так же по прямой цене со сниженной точностью у Заказа
-                            if (thisPrice.compareTo(scaledOrderReversePrice) == 0)
-                                ;
+                            if (scaledOrderPrice.compareTo(thisReversePrice) == 0)
+                                compare = 0;
                             else
                                 break;
                         } else
@@ -618,33 +614,41 @@ public class Order implements Comparable<Order> {
             // SCALE for HAVE in ORDER
             orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(haveScale, RoundingMode.HALF_UP);
 
-            compare = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
-            if (compare >= 0) {
+            compareLeft = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
+            if (compareLeft >= 0) {
 
                 tradeAmountForWant = thisAmountHaveLeft;
-                if (compare == 0)
 
-                tradeAmountForHave = orderAmountHaveLeft;
+                if (compareLeft == 0)
+
+                    tradeAmountForHave = orderAmountHaveLeft;
+
                 else {
 
                     if (debug) {
                         debug = true;
                     }
 
-                    // RESOLVE amount with SCALE
-                    tradeAmountAccurate = tradeAmountForWant.multiply(orderReversePrice)
-                            .setScale(wantScale + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
-                    tradeAmountForHave = tradeAmountAccurate.setScale(wantScale, RoundingMode.HALF_DOWN);
+                    if (compare == 0) {
+                        // цена совпала (возможно с округлением)
+                        tradeAmountForHave = this.getAmountWantLeft();
 
-                    // PRECISON is WRONG!!! int tradeAmountPrecision = tradeAmount.precision();
-                    int tradeAmountPrecision = Order.precision(tradeAmountForHave);
-                    if (tradeAmountPrecision < BlockChain.TRADE_PRECISION) {
-                        // PRECISION soo SMALL
-                        differenceTrade = tradeAmountForHave.divide(tradeAmountAccurate, BlockChain.TRADE_PRECISION + 1, RoundingMode.HALF_DOWN);
-                        differenceTrade = differenceTrade.subtract(BigDecimal.ONE).abs();
-                        if (differenceTrade.compareTo(precisionUnit) > 0) {
-                            // it is BAD ACCURACY
-                            continue;
+                    } else {
+                        // RESOLVE amount with SCALE
+                        tradeAmountAccurate = tradeAmountForWant.multiply(orderReversePrice)
+                                .setScale(wantScale + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
+                        tradeAmountForHave = tradeAmountAccurate.setScale(wantScale, RoundingMode.HALF_DOWN);
+
+                        // PRECISON is WRONG!!! int tradeAmountPrecision = tradeAmount.precision();
+                        int tradeAmountPrecision = Order.precision(tradeAmountForHave);
+                        if (tradeAmountPrecision < BlockChain.TRADE_PRECISION) {
+                            // PRECISION soo SMALL
+                            differenceTrade = tradeAmountForHave.divide(tradeAmountAccurate, BlockChain.TRADE_PRECISION + 1, RoundingMode.HALF_DOWN);
+                            differenceTrade = differenceTrade.subtract(BigDecimal.ONE).abs();
+                            if (differenceTrade.compareTo(precisionUnit) > 0) {
+                                // it is BAD ACCURACY
+                                continue;
+                            }
                         }
                     }
                 }
