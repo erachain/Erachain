@@ -728,6 +728,10 @@ public class ApiClient {
                     },
                     /// telegrams
                     {
+                            "GET telegrams",
+                            "Returns an array of telegrams in the last 100 minutes."
+                    },
+                    {
                             "GET telegrams/address/<address>?filter={filter}",
                             "Returns an array of the telegrams of a specific address.",
                             "Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - address does not exist in wallet"
