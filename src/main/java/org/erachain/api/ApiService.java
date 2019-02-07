@@ -5,14 +5,10 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
-import javafx.beans.InvalidationListener;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.IPAccessHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.erachain.controller.Controller;
-import org.erachain.database.DBMap;
-import org.erachain.datachain.SortableList;
 import org.erachain.utils.ObserverMessage;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
