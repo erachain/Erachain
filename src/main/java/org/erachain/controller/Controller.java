@@ -1342,7 +1342,7 @@ public class Controller extends Observable {
                 }
             };
 
-            this.timer.schedule(action, 30000);
+            this.timer.schedule(action, 30000, 30000);
         }
 
     }

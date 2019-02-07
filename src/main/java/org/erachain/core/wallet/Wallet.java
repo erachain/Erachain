@@ -520,7 +520,7 @@ public class Wallet extends Observable implements Observer {
 		Controller.getInstance().setProcessingWalletSynchronize(true);
 		Controller.getInstance().setNeedSyncWallet(false);
 
-		Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
+		Controller.getInstance().walletSyncStatusUpdate(-1);
 
 		LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet...");
 
@@ -641,8 +641,11 @@ public class Wallet extends Observable implements Observer {
 				return;
 			}
 
-			height = block.getHeight();
 		}
+
+		height = block.getHeight();
+		int steepHeight = dcSet.getBlockMap().size() / 100;
+		int lastHeight = 0;
 
 		long timePoint = System.currentTimeMillis();
 
@@ -664,13 +667,15 @@ public class Wallet extends Observable implements Observer {
 				}
 
 
-                if (System.currentTimeMillis() - timePoint > 10000) {
+				if (System.currentTimeMillis() - timePoint > 10000
+						|| steepHeight < height - lastHeight) {
 
 					if (Controller.getInstance().needUpToDate())
 						// если идет синхронизация цепочки - кошелек не синхронизируем
 						break;
 
 					timePoint = System.currentTimeMillis();
+					lastHeight = height;
 
 					this.database.commit();
 					this.syncHeight = height;
