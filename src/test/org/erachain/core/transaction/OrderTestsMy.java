@@ -1,27 +1,10 @@
 package org.erachain.core.transaction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.math.BigDecimal;
-//import java.math.Long;
-import java.math.BigInteger;
-import java.math.MathContext;
-import java.math.RoundingMode;
-import java.util.Arrays;
-import java.util.List;
-
-import org.erachain.core.account.Account;
-import org.erachain.core.crypto.Base58;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple5;
-
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
@@ -29,6 +12,23 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple5;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+//import java.math.Long;
 
 public class OrderTestsMy {
     Long releaserReference = null;
@@ -562,6 +562,101 @@ public class OrderTestsMy {
     }
 
     @Test
+    public void price33() {
+
+
+        BigDecimal amountHave = new BigDecimal("0.00000333");
+        BigDecimal amountWant = new BigDecimal("0.00010000");
+
+        BigDecimal price = Order.calcPrice(amountHave, amountWant, 3);
+        BigDecimal price1 = Order.calcPrice(amountHave, amountWant, 1);
+        BigDecimal thisPrice = Order.calcPrice(amountHave, amountWant, 0);
+
+        BigDecimal priceRev = Order.calcPrice(amountWant, amountHave, 3);
+        BigDecimal price1Rev = Order.calcPrice(amountWant, amountHave, 1);
+        BigDecimal thisPriceRev = Order.calcPrice(amountWant, amountHave, 0);
+
+        BigDecimal orderAmountHave = new BigDecimal("30.00000000");
+        BigDecimal orderAmountWant = new BigDecimal("1.00000000");
+
+        BigDecimal price10 = Order.calcPrice(orderAmountHave, orderAmountWant, 3);
+        BigDecimal price101 = Order.calcPrice(orderAmountHave, orderAmountWant, 1);
+        BigDecimal orderPrice = Order.calcPrice(orderAmountHave, orderAmountWant, 0);
+
+        BigDecimal price10rev = Order.calcPrice(orderAmountWant, orderAmountHave, 3);
+        BigDecimal price101rev = Order.calcPrice(orderAmountWant, orderAmountHave, 1);
+        BigDecimal orderPriceRev = Order.calcPrice(orderAmountWant, orderAmountHave, 0);
+
+        int thisPriceRevScale = thisPriceRev.stripTrailingZeros().scale();
+        int orderPriceRevScale = orderPriceRev.stripTrailingZeros().scale();
+        int thisPriceScale = thisPrice.scale();
+
+        boolean needBreak = false;
+
+        if (thisPriceScale > orderPriceRevScale) {
+            BigDecimal scaleThisPrice = thisPrice.setScale(orderPriceRevScale, RoundingMode.HALF_DOWN);
+            if (scaleThisPrice.compareTo(orderPriceRev) == 0) {
+                BigDecimal scaledOrderPrice = orderPrice.setScale(thisPriceRevScale, RoundingMode.HALF_DOWN);
+                if (scaledOrderPrice.compareTo(thisPriceRev) == 0)
+                    ;
+                else
+                    needBreak = true;
+            }
+        }
+
+        assertEquals(needBreak, false);
+
+    }
+
+    @Test
+    public void price33_1() {
+
+
+        BigDecimal amountHave = new BigDecimal("10.00000000");
+        BigDecimal amountWant = new BigDecimal("0.33333333");
+
+        BigDecimal price = Order.calcPrice(amountHave, amountWant, 3);
+        BigDecimal price1 = Order.calcPrice(amountHave, amountWant, 1);
+        BigDecimal thisPrice = Order.calcPrice(amountHave, amountWant, 0);
+
+        BigDecimal priceRev = Order.calcPrice(amountWant, amountHave, 3);
+        BigDecimal price1Rev = Order.calcPrice(amountWant, amountHave, 1);
+        BigDecimal thisPriceRev = Order.calcPrice(amountWant, amountHave, 0);
+
+        BigDecimal orderAmountHave = new BigDecimal("1.00000000");
+        BigDecimal orderAmountWant = new BigDecimal("30.00000000");
+
+        BigDecimal price10 = Order.calcPrice(orderAmountHave, orderAmountWant, 3);
+        BigDecimal price101 = Order.calcPrice(orderAmountHave, orderAmountWant, 1);
+        BigDecimal orderPrice = Order.calcPrice(orderAmountHave, orderAmountWant, 0);
+
+        BigDecimal price10rev = Order.calcPrice(orderAmountWant, orderAmountHave, 3);
+        BigDecimal price101rev = Order.calcPrice(orderAmountWant, orderAmountHave, 1);
+        BigDecimal orderPriceRev = Order.calcPrice(orderAmountWant, orderAmountHave, 0);
+
+
+        int thisPriceScale = thisPrice.stripTrailingZeros().scale();
+        int orderPriceRevScale = orderPriceRev.stripTrailingZeros().scale();
+
+        boolean needBreak = false;
+
+        if (thisPriceScale > orderPriceRevScale) {
+            BigDecimal thisPriceScaled = thisPrice.setScale(orderPriceRevScale, RoundingMode.HALF_DOWN);
+            if (thisPriceScaled.compareTo(orderPriceRev) > 0) {
+                needBreak = true;
+            }
+        } else {
+            BigDecimal orderPriceRevScaled = orderPriceRev.setScale(thisPriceScale, RoundingMode.HALF_DOWN);
+            if (thisPrice.compareTo(orderPriceRevScaled) > 0) {
+                needBreak = true;
+            }
+        }
+
+        assertEquals(needBreak, false);
+
+    }
+
+    @Test
     public void parseCreateOrderTransaction1() {
 
         byte[] seed = Crypto.getInstance().digest("test_A".getBytes());
@@ -977,8 +1072,50 @@ public class OrderTestsMy {
 
     }
 
+    //////////////////////////// когда цена в пери
+    @Test
+    public void testOrderProcessing_33period() {
+
+        init();
+
+        // CREATE ORDER ONE (SELLING 100 A FOR B AT A PRICE OF 10)
+        // amountHAVE 100 - amountWant 1000
+        orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, new BigDecimal("30"),
+                new BigDecimal("0.1"), (byte) 0, timestamp++, 0l, new byte[64]);
+        orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+        orderCreation.setDC(db, Transaction.FOR_NETWORK, Order.NEW_FLOR + 1, ++seqNo);
+        orderCreation.process(null, Transaction.FOR_NETWORK);
+
+        Long order_AB_1_ID = orderCreation.makeOrder().getId();
+
+        // CREATE ORDER TWO (SELLING 4995 B FOR A AT A PRICE OF 0.05))
+        // GENERATES TRADE 100 B FOR 1000 A
+        orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, new BigDecimal("0.00000333"),
+                new BigDecimal("0.00100"), (byte) 0, timestamp++, 0l, new byte[]{5, 6});
+        orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+        orderCreation.setDC(db, Transaction.FOR_NETWORK, Order.NEW_FLOR + 1, ++seqNo);
+        orderCreation.process(null, Transaction.FOR_NETWORK);
+        Long order_BA_1_ID = orderCreation.makeOrder().getId();
+
+        // CHECK BALANCES
+        Assert.assertEquals(accountA.getBalanceUSE(keyA, db), new BigDecimal("49970.00000000")); // BALANCE
+        Assert.assertEquals(accountA.getBalanceUSE(keyB, db), new BigDecimal("0.00000333")); // BALANCE
+
+        Assert.assertEquals(accountB.getBalanceUSE(keyB, db), new BigDecimal("49999.99999667")); // BALANCE
+        Assert.assertEquals(accountB.getBalanceUSE(keyA, db), new BigDecimal("0.001")); // BALANCE
+
+        Assert.assertEquals(accountA.getBalanceUSE(keyB, db)
+                        .add(accountB.getBalanceUSE(keyB, db)),
+                new BigDecimal("50000.00000000")); // BALANCE
+
+        Assert.assertEquals(accountB.getBalanceUSE(keyA, db)
+                        .add(accountA.getBalanceUSE(keyA, db)),
+                new BigDecimal("49970.00100000")); // BALANCE
+
+    }
+
     @Ignore
-//TODO actualize the test
+    //TODO actualize the test
     //////////////////////////// reverse price
     @Test
     public void testOrderProcessingDivisible2() {
