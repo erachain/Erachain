@@ -593,6 +593,8 @@ public class Wallet extends Observable implements Observer {
 
 		} else {
 
+			LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet...");
+
 			byte[] lastSignature = this.database.getLastBlockSignature();
 			if (lastSignature == null) {
 				synchronize(true);
