@@ -6,9 +6,9 @@ import org.erachain.core.BlockChain;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
-import org.mapdb.Fun.Tuple3;
 import org.erachain.utils.GUIUtils;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun.Tuple3;
 
 import javax.swing.*;
 import java.awt.*;
@@ -93,7 +93,6 @@ public class NetworkStatus extends JLabel implements Observer {
             if (currentHeight == 0 || currentHeight == height) {
                 this.update(null, new ObserverMessage(
                         ObserverMessage.NETWORK_STATUS, Controller.getInstance().getStatus()));
-                //currentHeight = Controller.getInstance().getMyHWeight(false).a;
                 return;
             }
 

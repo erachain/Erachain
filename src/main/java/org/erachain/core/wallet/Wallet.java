@@ -68,7 +68,7 @@ public class Wallet extends Observable implements Observer {
 
 	public Wallet() {
 
-        this.syncHeight = -1;
+		//this.syncHeight = ;
 
 		// CHECK IF EXISTS
 		if (this.exists()) {
@@ -520,6 +520,8 @@ public class Wallet extends Observable implements Observer {
 		Controller.getInstance().setProcessingWalletSynchronize(true);
 		Controller.getInstance().setNeedSyncWallet(false);
 
+		Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
+
 		LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet...");
 
 		DCSet dcSet = DCSet.getInstance();
@@ -605,8 +607,6 @@ public class Wallet extends Observable implements Observer {
 			if (block == null) {
 				// TODO подбор последнего блока проверять
 
-				Controller.getInstance().walletSyncStatusUpdate(-1);
-
 				BlocksHeadMap walletHeadsMap = this.database.getBlocksHeadMap();
 				BlockSignsMap chainSignsMap = dcSet.getBlockSignsMap();
 				Block.BlockHead head;
@@ -634,9 +634,9 @@ public class Wallet extends Observable implements Observer {
 			block = block.getChild(dcSet);
 			if (block == null) {
 				Controller.getInstance().setProcessingWalletSynchronize(false);
-				this.database.commit();
 
-				this.syncHeight = -1;
+				this.database.commit();
+				this.syncHeight = 0;
                 Controller.getInstance().walletSyncStatusUpdate(0);
 				return;
 			}
@@ -648,7 +648,6 @@ public class Wallet extends Observable implements Observer {
 		long timePoint = System.currentTimeMillis();
 
 		try {
-			this.syncHeight = height;
 			do {
 				int maxHeight = Controller.getInstance().getMyHeight();
 				if (maxHeight < stepHeight)
@@ -668,9 +667,8 @@ public class Wallet extends Observable implements Observer {
 				try {
 					this.processBlock(blockHead);
 				} catch (java.lang.OutOfMemoryError e) {
-					this.database.rollback();
-					this.syncHeight = this.database.getBlocksHeadMap().size();
-					break;
+					Controller.getInstance().stopAll(44);
+					return;
 				}
 
 
@@ -684,9 +682,8 @@ public class Wallet extends Observable implements Observer {
 					timePoint = System.currentTimeMillis();
 
 					this.database.commit();
-					this.syncHeight = this.database.getBlocksHeadMap().size();
-
-					Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
+					this.syncHeight = height;
+					Controller.getInstance().walletSyncStatusUpdate(height);
 
 				}
 
@@ -708,8 +705,8 @@ public class Wallet extends Observable implements Observer {
 
 			Controller.getInstance().setProcessingWalletSynchronize(false);
 			this.database.commit();
-			this.syncHeight = this.database.getBlocksHeadMap().size();
-			Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
+			this.syncHeight = height; // this.database.getBlocksHeadMap().size();
+			Controller.getInstance().walletSyncStatusUpdate(height);
 
 		}
 
