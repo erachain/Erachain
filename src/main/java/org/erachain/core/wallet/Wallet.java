@@ -586,6 +586,7 @@ public class Wallet extends Observable implements Observer {
 			block = new GenesisBlock();
 			this.database.setLastBlockSignature(block.getReference());
 			height = 1;
+
 		} else {
 
 			LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet...");
