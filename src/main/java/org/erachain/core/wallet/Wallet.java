@@ -565,10 +565,8 @@ public class Wallet extends Observable implements Observer {
 		Block block;
 		int height;
 
-		LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet...");
-
 		if (reset) {
-			LOGGER.info("   >>>>   Resetted maps");
+			LOGGER.info("   >>>>  Resetted maps");
 
 			// RESET MAPS
 			this.database.getTransactionMap().reset();
@@ -589,6 +587,9 @@ public class Wallet extends Observable implements Observer {
 			this.database.setLastBlockSignature(block.getReference());
 			height = 1;
 		} else {
+
+			LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet...");
+
 			byte[] lastSignature = this.database.getLastBlockSignature();
 			if (lastSignature == null) {
 				synchronize(true);
@@ -932,6 +933,13 @@ public class Wallet extends Observable implements Observer {
 		long absKey = key < 0 ? -key : key;
 		String address = account.getAddress();
 
+		if (!asOrphan && transaction instanceof R_Send) {
+			// ADD to FAVORITES
+			if (!this.database.getAssetFavoritesSet().contains(transaction.getAbsKey()))
+				this.database.getAssetFavoritesSet().add(transaction.getAbsKey());
+
+		}
+
 		BigDecimal fee = transaction.getFee(account);
 		if (absKey != 0) {
 			// ASSET TRANSFERED + FEE
@@ -1074,7 +1082,13 @@ public class Wallet extends Observable implements Observer {
 	}
 	*/
 
+	// TODO: our woier
+	private int needSyncWalletFrom = 0;
 	public boolean checkNeedSyncWallet(byte[] reference) {
+
+		if (needSyncWalletFrom != 0)
+			// ALREADY on SYNCHRONIZE
+			return false;
 
 		// CHECK IF WE NEED TO RESYNC
 		byte[] lastBlockSignature = this.database.getLastBlockSignature();
@@ -1086,6 +1100,7 @@ public class Wallet extends Observable implements Observer {
 			Controller.getInstance().setNeedSyncWallet(true);
 			return true;
 		}
+
 
 		return false;
 
@@ -1572,6 +1587,9 @@ public class Wallet extends Observable implements Observer {
 		if (this.accountExists(creator.getAddress())) {
 			// ADD ASSET
 			this.database.getItemMap(item).add(creator.getAddress(), issueItem.getSignature(), item);
+
+			// ADD to FAVORITES
+			this.database.getItemFavoritesSet(item).add(item.getKey());
 		}
 	}
 
