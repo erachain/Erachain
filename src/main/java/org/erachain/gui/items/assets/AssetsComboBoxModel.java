@@ -60,7 +60,10 @@ public class AssetsComboBoxModel extends DefaultComboBoxModel<AssetCls> implemen
             List<AssetCls> assets = new ArrayList<AssetCls>();
             int i = 0;
             for (Long key : keys) {
-                if (key == 0) continue;
+                if (key == 0
+                        || key > 2 && key < 10
+                )
+                    continue;
 
                 //GET ASSET
                 AssetCls asset = Controller.getInstance().getAsset(key);
