@@ -204,9 +204,9 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                 Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
 
                 Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, createOrder,
-                        Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
-                        (int) (MainFrame.getInstance().getHeight() / 1.2), "",
-                        Lang.getInstance().translate("Create Order Transaction"));
+                        (int) (MainFrame.getInstance().getWidth() / 1.2),
+                        (int) (MainFrame.getInstance().getHeight() / 1.2),
+                        "");
 
                 CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) createOrder);
                 dd.jScrollPane1.setViewportView(ww);
@@ -353,9 +353,9 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                 Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
 
                 Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, createOrder,
-                        Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
-                        (int) (MainFrame.getInstance().getHeight() / 1.2), "",
-                        Lang.getInstance().translate("Create Order Transaction"));
+                        (int) (MainFrame.getInstance().getWidth() / 1.2),
+                        (int) (MainFrame.getInstance().getHeight() / 1.2),
+                        "");
 
                 CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) createOrder);
                 dd.jScrollPane1.setViewportView(ww);
