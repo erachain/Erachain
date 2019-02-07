@@ -1,6 +1,7 @@
 package org.erachain.api;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
 import org.erachain.settings.Settings;
@@ -22,7 +23,9 @@ public class CoreResource {
     @GET
     @Path("/stop")
     public String stop() {
-        APIUtils.askAPICallAllowed(null, "GET core/stop", request, true);
+
+        if (!BlockChain.DEVELOP_USE)
+            APIUtils.askAPICallAllowed(null, "GET core/stop", request, true);
 
         //STOP
         Controller.getInstance().stopAll(0);
