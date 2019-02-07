@@ -1083,12 +1083,7 @@ public class Wallet extends Observable implements Observer {
 	*/
 
 	// TODO: our woier
-	private int needSyncWalletFrom = 0;
 	public boolean checkNeedSyncWallet(byte[] reference) {
-
-		if (needSyncWalletFrom != 0)
-			// ALREADY on SYNCHRONIZE
-			return false;
 
 		// CHECK IF WE NEED TO RESYNC
 		byte[] lastBlockSignature = this.database.getLastBlockSignature();
