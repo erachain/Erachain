@@ -512,7 +512,7 @@ public class Wallet extends Observable implements Observer {
 
 	// asynchronous RUN from BlockGenerator
 	public void synchronize(boolean reset) {
-		if (Controller.getInstance().isProcessingWalletSynchronize()) {
+        if (!reset && Controller.getInstance().isProcessingWalletSynchronize()) {
 			return;
 		}
 
@@ -595,8 +595,6 @@ public class Wallet extends Observable implements Observer {
 
 		} else {
 
-			LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet...");
-
 			byte[] lastSignature = this.database.getLastBlockSignature();
 			if (lastSignature == null) {
 				synchronize(true);
@@ -615,18 +613,22 @@ public class Wallet extends Observable implements Observer {
 				while (!chainSignsMap.contains(lastSignature)) {
 
 					head = walletHeadsMap.getLast();
-					if (head == null)
-						break;
+                    if (head == null) {
+                        synchronize(true);
+                        return;
+                    }
 
 					this.orphanBlock(head);
 					lastSignature = this.database.getLastBlockSignature();
 
-					if (lastSignature == null)
-						break;
+                    if (lastSignature == null) {
+                        synchronize(true);
+                        return;
+                    }
 				}
 
-				synchronize(false);
-				return;
+                block = dcSet.getBlockSignsMap().getBlock(lastSignature);
+
 			}
 
 			block = block.getChild(dcSet);
@@ -635,7 +637,7 @@ public class Wallet extends Observable implements Observer {
 				this.database.commit();
 
 				this.syncHeight = -1;
-				Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
+                Controller.getInstance().walletSyncStatusUpdate(0);
 				return;
 			}
 
@@ -714,7 +716,7 @@ public class Wallet extends Observable implements Observer {
 		// RESET UNCONFIRMED BALANCE for accounts + assets
 		LOGGER.info("Resetted balances");
 		update_account_assets();
-		Controller.getInstance().walletSyncStatusUpdate(-1);
+        Controller.getInstance().walletSyncStatusUpdate(0);
 
 		LOGGER.info("Update Orders");
 		this.database.getOrderMap().updateLefts();
