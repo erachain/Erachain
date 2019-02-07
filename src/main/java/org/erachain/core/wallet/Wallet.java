@@ -68,6 +68,8 @@ public class Wallet extends Observable implements Observer {
 
 	public Wallet() {
 
+        this.syncHeight = -1;
+
 		// CHECK IF EXISTS
 		if (this.exists()) {
 			// OPEN WALLET
