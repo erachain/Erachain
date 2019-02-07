@@ -605,6 +605,8 @@ public class Wallet extends Observable implements Observer {
 			if (block == null) {
 				// TODO подбор последнего блока проверять
 
+				Controller.getInstance().walletSyncStatusUpdate(-1);
+
 				BlocksHeadMap walletHeadsMap = this.database.getBlocksHeadMap();
 				BlockSignsMap chainSignsMap = dcSet.getBlockSignsMap();
 				Block.BlockHead head;
@@ -630,8 +632,8 @@ public class Wallet extends Observable implements Observer {
 				Controller.getInstance().setProcessingWalletSynchronize(false);
 				this.database.commit();
 
-				this.syncHeight = 0;
-				Controller.getInstance().walletSyncStatusUpdate(0);
+				this.syncHeight = -1;
+				Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
 				return;
 			}
 
@@ -677,10 +679,11 @@ public class Wallet extends Observable implements Observer {
 
 					timePoint = System.currentTimeMillis();
 
-					Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
-
 					this.database.commit();
 					this.syncHeight = this.database.getBlocksHeadMap().size();
+
+					Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
+
 				}
 
 				// LOAD NEXT
@@ -709,7 +712,7 @@ public class Wallet extends Observable implements Observer {
 		// RESET UNCONFIRMED BALANCE for accounts + assets
 		LOGGER.info("Resetted balances");
 		update_account_assets();
-		Controller.getInstance().walletSyncStatusUpdate(0);
+		Controller.getInstance().walletSyncStatusUpdate(-1);
 
 		LOGGER.info("Update Orders");
 		this.database.getOrderMap().updateLefts();
