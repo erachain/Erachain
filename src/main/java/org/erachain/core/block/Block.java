@@ -1364,7 +1364,12 @@ public class Block {
 
             if (andProcess) {
                 validatingDC = dcSet;
-                this.txCalculated = new ArrayList<R_Calculated>();
+                if (dcSet.isFork() || cnt.noCalculated) {
+                    this.txCalculated = null;
+                } else {
+                    // make pool for calculated
+                    this.txCalculated = new ArrayList<R_Calculated>();
+                }
             } else {
                 validatingDC = dcSet.fork();
                 this.txCalculated = null;
@@ -1802,7 +1807,7 @@ public class Block {
         this.getTransactions();
 
         if (this.transactionCount > 0) {
-            if (dcSet.isFork()) {
+            if (dcSet.isFork() || cnt.noCalculated) {
                 this.txCalculated = null;
             } else {
                 // make pool for calculated
