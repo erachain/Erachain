@@ -19,6 +19,7 @@ import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -788,6 +789,9 @@ public class Synchronizer {
                 if (cnt.isOnStopping())
                     return;
 
+            } catch (IOException e) {
+                cnt.stopAll(22);
+
             } catch (Exception e) {
 
                 if (cnt.isOnStopping()) {
@@ -844,6 +848,9 @@ public class Synchronizer {
                     return;
 
                 // NOTIFY to WALLET
+
+            } catch (IOException e) {
+                cnt.stopAll(22);
 
             } catch (Exception e) {
 
