@@ -89,6 +89,9 @@ public class ObserverMessage {
     public static final int REMOVE_AT_TX = 98;
     public static final int LIST_AT_TXS = 99;
 
+    /**
+     * -1 - start Synchr; height - stop; 0 - stop or unLock buttons
+     */
     public static final int WALLET_SYNC_STATUS = 101;
     public static final int BLOCKCHAIN_SYNC_STATUS = 102;
 

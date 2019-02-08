@@ -5,16 +5,16 @@ import org.erachain.core.block.Block;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.BlockHeadSerializer;
 import org.erachain.datachain.DCMap;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
+import org.erachain.utils.ReverseComparator;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
-import org.erachain.utils.ReverseComparator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -156,6 +156,17 @@ public class BlocksHeadMap extends DCMap<Tuple2<String, String>, Block.BlockHead
     @Override
     protected Map<Integer, Integer> getObservableData() {
         return this.observableData;
+    }
+
+    public Block.BlockHead getLast() {
+
+        List<Pair<Account, Block.BlockHead>> blocks = new ArrayList<Pair<Account, Block.BlockHead>>();
+
+        Iterator<Tuple2<String, String>> iterator = this.getIterator(1, true);
+        if (!iterator.hasNext())
+            return null;
+
+        return this.get(iterator.next());
     }
 
     // TODO - SORT by HEIGHT !!!
