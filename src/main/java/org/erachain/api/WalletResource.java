@@ -2,11 +2,11 @@ package org.erachain.api;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.APIUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.erachain.utils.APIUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -72,7 +72,7 @@ public class WalletResource {
         if (!Controller.getInstance().isProcessingWalletSynchronize()) {
 
             // TODO: was
-            Controller.getInstance().synchronizeWallet();
+            //Controller.getInstance().synchronizeWallet();
             Controller.getInstance().setNeedSyncWallet(true);
 
             return String.valueOf(true);

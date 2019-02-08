@@ -1313,7 +1313,9 @@ public class Controller extends Observable {
     public void actionAfterConnect() {
 
         if (// BlockChain.HARD_WORK ||
-                !this.doesWalletExists() || !this.useGui)
+                !this.doesWalletExists()
+                        || !this.useGui
+        )
             return;
 
         if (this.timer == null) {
@@ -1340,7 +1342,7 @@ public class Controller extends Observable {
                 }
             };
 
-            this.timer.schedule(action, BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1);
+            this.timer.schedule(action, 30000, 30000);
         }
 
     }

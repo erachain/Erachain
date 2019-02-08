@@ -307,7 +307,8 @@ public class SysTray implements Observer {
             timePoint = System.currentTimeMillis();
 
             int currentHeight = (int) message.getValue();
-            if (currentHeight == -1) {
+            int height = DCSet.getInstance().getBlockMap().size();
+            if (currentHeight == 0 || currentHeight == height) {
                 this.update(null, new ObserverMessage(
                         ObserverMessage.NETWORK_STATUS, Controller.getInstance().getStatus()));
                 return;
