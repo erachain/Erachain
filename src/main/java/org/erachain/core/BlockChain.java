@@ -433,6 +433,7 @@ public class BlockChain {
                     dcSet = Controller.getInstance().reCreateDC();
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
+                    Controller.getInstance().stopAll(6);
                 }
             }
 

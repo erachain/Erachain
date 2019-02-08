@@ -573,7 +573,11 @@ public class Controller extends Observable {
             error = 1;
             LOGGER.error(e.getMessage(), e);
             LOGGER.error("Error during startup detected trying to restore backup DataChain...");
-            reCreateDC();
+            try {
+                reCreateDC();
+            } catch (Throwable e1) {
+                stopAll(5);
+            }
         }
 
 
@@ -603,7 +607,11 @@ public class Controller extends Observable {
             } catch (Throwable e) {
                 LOGGER.error(e.getMessage(), e);
             }
-            reCreateDC();
+            try {
+                reCreateDC();
+            } catch (Throwable e) {
+                stopAll(5);
+            }
         }
 
         this.setChanged();
