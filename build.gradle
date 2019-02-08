@@ -24,7 +24,7 @@ ext {
 }
 
 //String versionEra = "4.11.08-${git.head().abbreviatedId}"
-String versionEra = "4.11.08 beta 3"
+String versionEra = "4.11.09 beta"
 archivesBaseName = 'Erachain'
 group 'org.erachain'
 //version versionEra
@@ -45,7 +45,7 @@ bootJar {
     mainClassName = "org.erachain.Start"
 
     baseName = "erachain"
-    destinationDir project.file('build/libs/' + versionEra + '/Erachain')
+    destinationDir project.file('build/libs/Erachain')
 
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
 
@@ -82,42 +82,42 @@ task CopyResourse {
 
     copy {
             from 'ERA'
-            into 'build/libs/' + versionEra + '/Erachain'
+            into 'build/libs/Erachain'
             include 'Erachain Licence*'
             include 'peers*'
         }
 
     copy {
             from 'ERA/web'
-            into 'build/libs/' + versionEra + '/Erachain/web'
+            into 'build/libs/Erachain/web'
         }
     copy {
         from 'ERA/languages'
-        into 'build/libs/' + versionEra + '/Erachain/languages'
+        into 'build/libs/Erachain/languages'
     }
     copy {
         from 'ERA/themes'
-        into 'build/libs/' + versionEra + '/Erachain/themes'
+        into 'build/libs/Erachain/themes'
     }
     copy {
         from 'ERA/sounds'
-        into 'build/libs/' + versionEra + '/Erachain/sounds'
+        into 'build/libs/Erachain/sounds'
     }
     copy {
         from 'ERA/images'
-        into 'build/libs/' + versionEra + '/Erachain/images'
+        into 'build/libs/Erachain/images'
     }
     copy {
         from 'ERA/z_bath_examples'
-        into 'build/libs/' + versionEra + '/Erachain/z_bath_examples'
+        into 'build/libs/Erachain/z_bath_examples'
     }
 }
 task CreateZip(type: Zip) {
 
-    from 'build/libs/' + versionEra
+    from 'build/libs/'
     include 'Erachain/'
     archiveName 'Erachain' + '.zip'
-    destinationDir(file('build/libs/' + versionEra))
+    destinationDir(file('build/libs/'))
 }
 
 dependencies {
