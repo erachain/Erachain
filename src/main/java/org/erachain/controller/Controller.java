@@ -3307,10 +3307,12 @@ public class Controller extends Observable {
     public void startApplication(String args[]){
         boolean cli = false;
 
-        // get local file time
-        getBuildTimestamp();
         // get GRADLE bild time
         getManifestInfo();
+
+        if (buildTimestamp == 0)
+            // get local file time
+            getBuildTimestamp();
 
         String pass = null;
 
@@ -3555,14 +3557,11 @@ public class Controller extends Observable {
                                 LOGGER.error(e.getMessage(), e1);
                             }
                         }
-
                     }
                 } catch (IOException e) {
-                    System.out.println(e.getMessage());
                 }
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
         }
     }
 }
