@@ -80,7 +80,11 @@ public class Wallet extends Observable implements Observer {
 			DCSet.getInstance().getTransactionMap().addObserver(this);
 			DCSet.getInstance().getBlockMap().addObserver(this);
 			// DCSet.getInstance().getCompletedOrderMap().addObserver(this);
-		}
+
+        }
+
+        stertProcessForSynchronize();
+
 	}
 
 	// GETTERS/SETTERS
@@ -426,6 +430,34 @@ public class Wallet extends Observable implements Observer {
 
 		return true;
 	}
+
+    private Timer timerSynchronize;
+
+    public void stertProcessForSynchronize() {
+
+        if (this.timerSynchronize == null) {
+            this.timerSynchronize = new Timer();
+
+            TimerTask action = new TimerTask() {
+                @Override
+                public void run() {
+
+                    if (Controller.getInstance().isStatusWaiting()) {
+
+                        checkNeedSyncWallet(Controller.getInstance().getLastBlockSignature());
+                        if (Controller.getInstance().isNeedSyncWallet() // || checkNeedSyncWallet()
+                                && !Controller.getInstance().isProcessingWalletSynchronize()) {
+
+                            Controller.getInstance().synchronizeWallet();
+                        }
+                    }
+                }
+            };
+
+            this.timerSynchronize.schedule(action, 30000, 30000);
+        }
+
+    }
 
 	public int getAccountNonce() {
 		return this.secureDatabase.getNonce();

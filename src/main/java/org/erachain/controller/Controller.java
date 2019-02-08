@@ -144,7 +144,7 @@ public class Controller extends Observable {
     private Synchronizer synchronizer;
     private TransactionCreator transactionCreator;
     private boolean needSyncWallet = false;
-    private Timer timer;
+    private Timer connectTimer;
     private Timer timerUnconfirmed;
     private Random random = new SecureRandom();
     private byte[] foundMyselfID = new byte[128];
@@ -402,6 +402,10 @@ public class Controller extends Observable {
 
     public boolean isStatusOK() {
         return this.status == STATUS_OK;
+    }
+
+    public boolean isStatusWaiting() {
+        return this.status != STATUS_SYNCHRONIZING;
     }
 
     public void checkNeedSyncWallet() {
@@ -1310,39 +1314,27 @@ public class Controller extends Observable {
 
     }
 
+    /**
+     * учет времени полного длисконекта ноды
+     */
     public void actionAfterConnect() {
 
-        if (// BlockChain.HARD_WORK ||
-                !this.doesWalletExists()
-                        || !this.useGui
-        )
-            return;
-
-        if (this.timer == null) {
-            this.timer = new Timer();
+        if (this.connectTimer == null) {
+            this.connectTimer = new Timer();
 
             TimerTask action = new TimerTask() {
                 @Override
                 public void run() {
 
-                    // LOGGER.error("actionAfterConnect --->>>>>> ");
-
                     if (Controller.getInstance().getStatus() == STATUS_OK) {
-                        // Controller.getInstance().statusInfo();
 
                         Controller.getInstance().setToOfflineTime(0L);
 
-                        if (Controller.getInstance().isNeedSyncWallet() // || checkNeedSyncWallet()
-                                && !Controller.getInstance().isProcessingWalletSynchronize()) {
-                            // LOGGER.error("actionAfterConnect --->>>>>>
-                            // synchronizeWallet");
-                            Controller.getInstance().synchronizeWallet();
-                        }
                     }
                 }
             };
 
-            this.timer.schedule(action, 30000, 30000);
+            this.connectTimer.schedule(action, 30000, 30000);
         }
 
     }
@@ -2069,7 +2061,6 @@ public class Controller extends Observable {
 
         if (this.wallet.create(seed, password, amount, false, path)) {
             LOGGER.info("Wallet needs to synchronize!");
-            this.actionAfterConnect();
             this.setNeedSyncWallet(true);
 
             return true;
@@ -2517,6 +2508,13 @@ public class Controller extends Observable {
         if (block == null)
             return this.blockChain.getGenesisBlock();
         return block;
+    }
+
+    public byte[] getLastBlockSignature() {
+        byte[] signature = this.blockChain.getLastBlockSignature(dcSet);
+        if (signature == null)
+            return this.blockChain.getGenesisBlock().getSignature();
+        return signature;
     }
 
     public byte[] getWalletLastBlockSign() {
