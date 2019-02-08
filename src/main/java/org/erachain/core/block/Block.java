@@ -1623,7 +1623,7 @@ public class Block {
                     totalFee, true);
 
             // MAKE CALCULATED TRANSACTIONS
-            if (!dcSet.isFork() && !asOrphan) {
+            if (!dcSet.isFork() && !asOrphan && !Controller.getInstance().noCalculated) {
                 if (this.txCalculated == null)
                     this.txCalculated = new ArrayList<R_Calculated>();
 
