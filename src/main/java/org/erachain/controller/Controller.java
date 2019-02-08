@@ -3394,7 +3394,7 @@ public class Controller extends Observable {
         }
 
         if (noCalculated)
-            LOGGER.info("-no store calculated TXs");
+            LOGGER.info("-not store calculated TXs");
 
         if (onlyProtocolIndexing)
             LOGGER.info("-only protocol indexing");
