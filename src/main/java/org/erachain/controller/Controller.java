@@ -168,6 +168,7 @@ public class Controller extends Observable {
 
     public boolean backUP = false;
     public  String[] seedCommand;
+    public boolean noCalculated;
     public boolean noUseWallet;
     public boolean noDataWallet;
     public boolean onlyProtocolIndexing;
@@ -3330,6 +3331,11 @@ public class Controller extends Observable {
                 continue;
             }
 
+            if (arg.toLowerCase().equals("-nocalculated")) {
+                noCalculated = true;
+                continue;
+            }
+
             if (arg.toLowerCase().equals("-nousewallet")) {
                 noUseWallet = true;
                 continue;
@@ -3386,6 +3392,9 @@ public class Controller extends Observable {
                 }
             }
         }
+
+        if (noCalculated)
+            LOGGER.info("-not store calculated TXs");
 
         if (onlyProtocolIndexing)
             LOGGER.info("-only protocol indexing");

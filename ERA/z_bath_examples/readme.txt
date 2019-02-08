@@ -6,6 +6,7 @@ Copy bath-file to root folder for use it.
 Start Commands
 
 -cli
+start as Command Line Interpretator.
 
 -pass=PASSWORD
 start forging
@@ -32,6 +33,8 @@ Not use data Wallet - speed up
 -opi
 Only Protocol Indexing - speed up
 
+-nocalculated
+not store calculated transactions in DB. Make speed up
 
 example foe Windows:
 	start "erachain" java -jar erachain.jar -pass=1 -seed=3:AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy:1
