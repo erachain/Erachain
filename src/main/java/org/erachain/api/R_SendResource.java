@@ -44,6 +44,8 @@ public class R_SendResource {
                 "make and broadcast SEND asset amount and mail");
         help.put("POST r_send/raw {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"encoding\": <encoding>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
                 "make RAW for SEND asset amount and mail");
+        help.put("GET r_send/test1/{delay}?password={password}",
+                "Stert test; dekay = 0 - stop");
 
         return StrJSonFine.convert(help);
     }

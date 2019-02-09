@@ -1,6 +1,7 @@
 package org.erachain.api;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
@@ -8,7 +9,11 @@ import org.erachain.core.crypto.Base32;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.R_Send;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.web.ServletUtils;
 import org.erachain.gui.transaction.OnDealClick;
+import org.erachain.network.Peer;
+import org.erachain.network.message.Message;
+import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.TelegramMessage;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.APIUtils;
@@ -33,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Random;
 
 @Path("telegrams")
 @Produces(MediaType.APPLICATION_JSON)
@@ -645,4 +651,109 @@ public class TelegramsResource {
                 .entity(jsonObject.toJSONString())
                 .build();
     }
+
+    private static long test1Delay = 0;
+    private static Thread threadTest1;
+    private static List<PrivateKeyAccount> test1Creators;
+
+    @GET
+    @Path("test1/{delay}")
+    public String test1(@PathParam("delay") long delay, @QueryParam("password") String password) {
+
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
+                && !BlockChain.DEVELOP_USE)
+            return "not LOCAL && not DEVELOP";
+
+        APIUtils.askAPICallAllowed(password, "GET telegrams/test1\n ", request, true);
+
+        this.test1Delay = delay;
+
+        if (threadTest1 != null) {
+            JSONObject out = new JSONObject();
+            out.put("delay", delay);
+            LOGGER.info("TEST1 DELAY UPDATE:" + delay);
+            return out.toJSONString();
+        }
+
+        // CACHE private keys
+        test1Creators = Controller.getInstance().getPrivateKeyAccounts();
+
+
+        JSONObject out = new JSONObject();
+
+        if (test1Creators.size() <= 1) {
+            out.put("error", "too small accounts");
+
+            return out.toJSONString();
+        }
+
+        threadTest1 = new Thread(() -> {
+
+            Random random = new Random();
+            Controller cnt = Controller.getInstance();
+
+            do {
+
+                try {
+
+                    if (this.test1Delay <= 0) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            return;
+                        }
+                        continue;
+                    }
+
+                    if (cnt.isOnStopping())
+                        return;
+
+                    PrivateKeyAccount creator = test1Creators.get(random.nextInt(test1Creators.size()));
+                    Account recipient;
+                    do {
+                        recipient = test1Creators.get(random.nextInt(test1Creators.size()));
+                    } while (recipient.equals(creator));
+
+                    // MAKE TELEGRAM
+                    Transaction transaction = new R_Send(creator, (byte) 0, recipient, 0, null,
+                            "TEST 1", "TEST TEST TEST".getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                            new byte[]{(byte) 1},
+                            NTP.getTime(), 0l);
+                    transaction.sign(creator, Transaction.FOR_NETWORK);
+
+                    if (cnt.isOnStopping())
+                        return;
+
+                    // CREATE MESSAGE
+                    Message telegram = MessageFactory.getInstance().createTelegramMessage(transaction);
+                    boolean notAdded = cnt.network.addTelegram((TelegramMessage) telegram);
+                    // BROADCAST MESSAGE
+                    List<Peer> excludes = new ArrayList<Peer>();
+                    cnt.network.broadcast(telegram, excludes, true);
+
+                    try {
+                        Thread.sleep(this.test1Delay);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+
+                    if (cnt.isOnStopping())
+                        return;
+
+                } catch (Exception e10) {
+                    // not see in Thread - LOGGER.error(e10.getMessage(), e10);
+                }
+
+            } while (true);
+        });
+
+        threadTest1.start();
+
+        out.put("delay", test1Delay);
+        LOGGER.info("TEST1: STARTED for delay: " + test1Delay);
+
+        return out.toJSONString();
+
+    }
+
 }
