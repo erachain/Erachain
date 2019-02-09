@@ -32,7 +32,7 @@ public class Network extends Observable {
     private ConnectionCreator creator;
     private ConnectionAcceptor acceptor;
     PeerManager peerManager;
-    private TelegramManager telegramer;
+    public TelegramManager telegramer;
     List<Peer> knownPeers;
     private SortedSet<String> handledMessages;
     //boolean tryRun; // попытка запуска
@@ -96,8 +96,10 @@ public class Network extends Observable {
         peerManager = new PeerManager(this);
         peerManager.start();
 
-        telegramer = new TelegramManager(this);
-        telegramer.start();
+        telegramer = new TelegramManager(Controller.getInstance(),
+                Controller.getInstance().getBlockChain(),
+                DCSet.getInstance(),
+                this);
     }
 
     public void onConnect(Peer peer) {
@@ -489,8 +491,8 @@ public class Network extends Observable {
 
         //ONLY HANDLE WINBLOCK, TELEGRAMS AND TRANSACTION MESSAGES ONCE
         if (
-                message.getType() == Message.TELEGRAM_TYPE
-                        || message.getType() == Message.TRANSACTION_TYPE
+                // message.getType() == Message.TELEGRAM_TYPE - in org.erachain.network.TelegramManager.putMessage
+                        message.getType() == Message.TRANSACTION_TYPE
                         || message.getType() == Message.WIN_BLOCK_TYPE
         ) {
             synchronized (this.handledMessages) {
@@ -508,15 +510,11 @@ public class Network extends Observable {
         long timeCheck = System.currentTimeMillis();
         switch (message.getType()) {
             case Message.TELEGRAM_TYPE:
-                // telegram
-                if (!this.telegramer.pipeAddRemove((TelegramMessage) message, null, 0)) {
-                    // BROADCAST
-                    List<Peer> excludes = new ArrayList<Peer>();
-                    excludes.add(message.getSender());
-                    this.broadcast(message, excludes, false);
-                }
 
+                // telegram
+                this.telegramer.offerMessage(message);
                 return;
+
             case Message.TELEGRAM_GET_TYPE:
                 // GET telegrams
                 //address

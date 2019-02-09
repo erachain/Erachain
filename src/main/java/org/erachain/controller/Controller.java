@@ -1617,7 +1617,7 @@ public class Controller extends Observable {
                     break;
                 }
 
-                this.winBlockSelector.putMessage(message);
+                this.winBlockSelector.offerMessage(message);
 
                 return;
 

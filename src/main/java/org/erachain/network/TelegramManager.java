@@ -21,19 +21,25 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class TelegramManager extends Thread {
     /**
      * count telegrams
      */
     private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK ? 1 << 20 : 8000;
+
+    private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<5;
+
     /**
      * time to live telegram
      */
     private static final int KEEP_TIME = 60000 * 60 * (BlockChain.HARD_WORK ? 2 : 8);
     static Logger LOGGER = LoggerFactory.getLogger(TelegramManager.class.getName());
     private Network network;
-    private boolean isRun;
+    private boolean run;
     // pool of messages
     private Map<String, TelegramMessage> handledTelegrams;
     // timestamp lists for clear
@@ -43,7 +49,22 @@ public class TelegramManager extends Thread {
     // counts for CREATORs COUNT
     private Map<String, Integer> telegramsCounts;
 
-    public TelegramManager(Network network) {
+    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE? 2000 : 300;
+    BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
+    private SortedSet<String> handledMessages;
+
+    private Controller controller;
+    private BlockChain blockChain;
+    private DCSet dcSet;
+    public long messageTimingAverage;
+
+    public TelegramManager(Controller controller, BlockChain blockChain, DCSet dcSet, Network network) {
+
+        this.controller = controller;
+        this.blockChain = blockChain;
+        this.dcSet = dcSet;
+
+        this.setName("WinBlockSelector[" + this.getId() + "]");
 
         this.network = network;
         this.handledTelegrams = new HashMap<String, TelegramMessage>();
@@ -52,6 +73,73 @@ public class TelegramManager extends Thread {
         this.telegramsCounts = new HashMap<String, Integer>();
 
         this.setName("TelegramManager - " + this.getId());
+
+        this.handledMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
+
+        this.start();
+
+    }
+
+    private void addHandledMessage(String hash) {
+        try {
+            synchronized (this.handledMessages) {
+                //CHECK IF LIST IS FULL
+                if (this.handledMessages.size() > MAX_HANDLED_MESSAGES_SIZE) {
+                    this.handledMessages.remove(this.handledMessages.first());
+                    ///LOGGER.error("handledMessages size OVERHEAT! ");
+                }
+
+                this.handledMessages.add(hash);
+            }
+        } catch (Exception e) {
+            //LOGGER.error(e.getMessage(),e);
+        }
+    }
+
+    /**
+     * @param message
+     */
+    public void offerMessage(Message message) {
+
+        synchronized (this.handledMessages) {
+            //CHECK IF NOT HANDLED ALREADY
+            String key = new String(message.getHash());
+            if (this.handledMessages.contains(key)) {
+                return;
+            }
+
+            //ADD TO HANDLED MESSAGES
+            this.addHandledMessage(key);
+        }
+
+        blockingQueue.offer(message);
+    }
+
+    public void processMessage(Message message) {
+
+        if (message == null)
+            return;
+
+        long onMessageProcessTiming = System.nanoTime();
+
+        TelegramMessage telegramMessage = (TelegramMessage) message;
+
+        if (pipeAddRemove((TelegramMessage) message, null, 0))
+            return;
+
+        onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
+        if (onMessageProcessTiming < 999999999999l) {
+            // при переполнении может быть минус
+            // в миеросекундах подсчет делаем
+            onMessageProcessTiming /= 1000;
+            messageTimingAverage = ((messageTimingAverage << 5)
+                    + onMessageProcessTiming - messageTimingAverage) >> 5;
+        }
+
+        // BROADCAST
+        List<Peer> excludes = new ArrayList<Peer>();
+        excludes.add(message.getSender());
+        this.network.broadcast(message, excludes, false);
 
     }
 
@@ -656,13 +744,18 @@ public class TelegramManager extends Thread {
      */
 
     public void run() {
-        this.isRun = true;
+        this.run = true;
 
-        while (this.isRun && !this.isInterrupted()) {
+        while (this.run && !this.isInterrupted()) {
             try {
-                Thread.sleep(1000);
-            } catch (InterruptedException es) {
-                return;
+                processMessage(blockingQueue.poll(1000, TimeUnit.MILLISECONDS));
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(81);
+                break;
+            } catch (java.lang.IllegalMonitorStateException e) {
+                break;
+            } catch (java.lang.InterruptedException e) {
+                break;
             }
 
             long timestamp = NTP.getTime();
@@ -683,11 +776,15 @@ public class TelegramManager extends Thread {
                     }
                 } while (true);
             }
+
         }
+
+        LOGGER.info("Telegram Manager halted");
+
     }
 
     public void halt() {
-        this.isRun = false;
+        this.run = false;
     }
 
 }

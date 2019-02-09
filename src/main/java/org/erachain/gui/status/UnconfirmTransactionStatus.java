@@ -130,7 +130,12 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
             mess = "| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0";
         }
 
-        long timing = Controller.getInstance().getUnconfigmedMessageTimingAverage();
+        long timing = Controller.getInstance().network.telegramer.messageTimingAverage;
+        if (timing > 0) {
+            mess += " " + 1000 / timing + "tlg/ms";
+        }
+
+        timing = Controller.getInstance().getUnconfigmedMessageTimingAverage();
         if (timing > 0) {
             mess += " " + 1000000 / timing + "utx/s";
         }

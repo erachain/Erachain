@@ -53,11 +53,8 @@ public class WinBlockSelector extends MonitoredThread {
     /**
      * @param message
      */
-    public void putMessage(Message message) {
-        try {
-            blockingQueue.put(message);
-        } catch (InterruptedException e) {
-        }
+    public void offerMessage(Message message) {
+        blockingQueue.offer(message);
     }
 
     public void processMessage(Message message) {
