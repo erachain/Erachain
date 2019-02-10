@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class Peer extends MonitoredThread {
 
     private final static boolean USE_MONITOR = false;
-    private final static boolean logPings = true;
+    private final static boolean logPings = false;
 
     static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getName());
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
