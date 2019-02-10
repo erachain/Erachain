@@ -28,6 +28,7 @@ public class Network extends Observable {
     private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 6 : 1024<<4;
     private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<5;
     private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 6 : 1024<<3;
+    private static final int MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE = BlockChain.HARD_WORK ? 100 : 200;
     private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 12 : 1024 << 8;
     private static final Logger LOGGER = LoggerFactory.getLogger(Network.class);
     private static InetAddress myselfAddress;
@@ -37,9 +38,10 @@ public class Network extends Observable {
     public TelegramManager telegramer;
     List<Peer> knownPeers;
 
-    private SortedSet<String> handledMessages;
+    //private SortedSet<String> handledMessages;
     private SortedSet<String> handledTelegramMessages;
     private SortedSet<String> handledTransactionMessages;
+    private SortedSet<String> handledWinBlockMessages;
 
     //boolean tryRun; // попытка запуска
     boolean run;
@@ -89,9 +91,11 @@ public class Network extends Observable {
     }
 
     private void start() {
-        this.handledMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
+        //this.handledMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
         this.handledTelegramMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
         this.handledTransactionMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
+        this.handledWinBlockMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
+
 
         //START ConnectionCreator THREAD
         creator = new ConnectionCreator(this);
@@ -453,22 +457,6 @@ public class Network extends Observable {
 
     }
 
-    private void addHandledMessage(String hash) {
-        try {
-            synchronized (this.handledMessages) {
-                //CHECK IF LIST IS FULL
-                if (this.handledMessages.size() > MAX_HANDLED_MESSAGES_SIZE) {
-                    this.handledMessages.remove(this.handledMessages.first());
-                    ///LOGGER.error("handledMessages size OVERHEAT! ");
-                }
-
-                this.handledMessages.add(hash);
-            }
-        } catch (Exception e) {
-            //LOGGER.error(e.getMessage(),e);
-        }
-    }
-
     public void onMessagePeers(Peer sender, int messageID) {
 
         //CREATE NEW PEERS MESSAGE WITH PEERS
@@ -497,19 +485,6 @@ public class Network extends Observable {
             return;
         }
 
-        //ONLY HANDLE WINBLOCK, TELEGRAMS AND TRANSACTION MESSAGES ONCE
-        if (message.getType() == Message.WIN_BLOCK_TYPE) {
-            synchronized (this.handledMessages) {
-                //CHECK IF NOT HANDLED ALREADY
-                String key = new String(message.getHash());
-                if (this.handledMessages.contains(key)) {
-                    return;
-                }
-
-                //ADD TO HANDLED MESSAGES
-                this.addHandledMessage(key);
-            }
-        }
 
         long timeCheck = System.currentTimeMillis();
         switch (message.getType()) {
@@ -632,6 +607,37 @@ public class Network extends Observable {
                 onMessageMySelf(message.getSender(), findMyselfMessage.getFoundMyselfID());
 
                 break;
+
+            case Message.WIN_BLOCK_TYPE:
+
+                synchronized (this.handledWinBlockMessages) {
+                    //CHECK IF NOT HANDLED ALREADY
+                    String key = new String(message.getHash());
+                    if (this.handledWinBlockMessages.contains(key)) {
+                        return;
+                    }
+
+                    //ADD TO HANDLED MESSAGES
+                    try {
+                        synchronized (this.handledWinBlockMessages) {
+                            //CHECK IF LIST IS FULL
+                            if (this.handledWinBlockMessages.size() > MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE) {
+                                this.handledWinBlockMessages.remove(this.handledWinBlockMessages.first());
+                                ///LOGGER.error("handledMessages size OVERHEAT! ");
+                            }
+
+                            this.handledWinBlockMessages.add(key);
+                        }
+                    } catch (Exception e) {
+                        //LOGGER.error(e.getMessage(),e);
+                    }
+                }
+
+                if (Controller.getInstance().isStatusOK()) {
+                    Controller.getInstance().winBlockSelector.offerMessage(message);
+                }
+
+                return;
 
             //SEND TO CONTROLLER
             default:

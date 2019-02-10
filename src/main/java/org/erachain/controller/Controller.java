@@ -138,7 +138,7 @@ public class Controller extends Observable {
     private TradersManager tradersManager;
     private ApiService rpcService;
     private WebService webService;
-    private WinBlockSelector winBlockSelector;
+    public WinBlockSelector winBlockSelector;
     private BlockChain blockChain;
     private BlockGenerator blockGenerator;
     private Synchronizer synchronizer;
@@ -1610,16 +1610,6 @@ public class Controller extends Observable {
                 }
 
                 break;
-
-            case Message.WIN_BLOCK_TYPE:
-
-                if (this.status != STATUS_OK) {
-                    break;
-                }
-
-                this.winBlockSelector.offerMessage(message);
-
-                return;
 
             case Message.VERSION_TYPE:
 
