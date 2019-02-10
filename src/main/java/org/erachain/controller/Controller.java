@@ -1621,11 +1621,6 @@ public class Controller extends Observable {
 
                 return;
 
-            case Message.TRANSACTION_TYPE:
-
-                onMessageTransaction(message);
-                break;
-
             case Message.VERSION_TYPE:
 
                 VersionMessage versionMessage = (VersionMessage) message;

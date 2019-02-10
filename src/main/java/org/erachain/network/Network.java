@@ -515,6 +515,11 @@ public class Network extends Observable {
                 this.telegramer.offerMessage(message);
                 return;
 
+            case Message.TRANSACTION_TYPE:
+
+                Controller.getInstance().onMessageTransaction(message);
+                break;
+
             case Message.TELEGRAM_GET_TYPE:
                 // GET telegrams
                 //address
