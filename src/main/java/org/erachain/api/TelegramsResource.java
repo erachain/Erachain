@@ -13,6 +13,7 @@ import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.network.Peer;
+import org.erachain.network.TelegramManager;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.TelegramMessage;
@@ -729,10 +730,7 @@ public class TelegramsResource {
 
                     // CREATE MESSAGE
                     Message telegram = MessageFactory.getInstance().createTelegramMessage(transaction);
-                    if(!cnt.network.addTelegram((TelegramMessage) telegram)) {
-                        // BROADCAST MESSAGE
-                        cnt.network.broadcast(telegram, excludes, false);
-                    }
+                    cnt.network.telegramer.offerMessage(telegram);
 
                     try {
                         Thread.sleep(this.test1Delay);

@@ -101,15 +101,17 @@ public class TelegramManager extends Thread {
      */
     public void offerMessage(Message message) {
 
-        synchronized (this.handledMessages) {
-            //CHECK IF NOT HANDLED ALREADY
-            String key = new String(message.getHash());
-            if (this.handledMessages.contains(key)) {
-                return;
-            }
+        if (message.getSender() != null) {
+            synchronized (this.handledMessages) {
+                //CHECK IF NOT HANDLED ALREADY
+                String key = new String(message.getHash());
+                if (this.handledMessages.contains(key)) {
+                    return;
+                }
 
-            //ADD TO HANDLED MESSAGES
-            this.addHandledMessage(key);
+                //ADD TO HANDLED MESSAGES
+                this.addHandledMessage(key);
+            }
         }
 
         blockingQueue.offer(message);
@@ -130,16 +132,18 @@ public class TelegramManager extends Thread {
         onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
         if (onMessageProcessTiming < 999999999999l) {
             // при переполнении может быть минус
-            // в миеросекундах подсчет делаем
-            onMessageProcessTiming /= 1000;
             messageTimingAverage = ((messageTimingAverage << 5)
                     + onMessageProcessTiming - messageTimingAverage) >> 5;
         }
 
         // BROADCAST
-        List<Peer> excludes = new ArrayList<Peer>();
-        excludes.add(message.getSender());
-        this.network.broadcast(message, excludes, false);
+        if (message.getSender() != null) {
+            List<Peer> excludes = new ArrayList<Peer>();
+            excludes.add(message.getSender());
+            this.network.broadcast(message, excludes, false);
+        } else {
+            this.network.broadcast(message, null, false);
+        }
 
     }
 
