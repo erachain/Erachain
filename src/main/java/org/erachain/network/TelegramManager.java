@@ -21,9 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class TelegramManager extends Thread {
     /**
@@ -41,17 +39,16 @@ public class TelegramManager extends Thread {
     private Network network;
     private boolean run;
     // pool of messages
-    private Map<String, TelegramMessage> handledTelegrams;
+    private ConcurrentHashMap<String, TelegramMessage> handledTelegrams;
     // timestamp lists for clear
-    private TreeMap<Long, List<TelegramMessage>> telegramsForTime;
+    private ConcurrentSkipListMap<Long, List<TelegramMessage>> telegramsForTime;
     // lists for RECIPIENTS only address
-    private Map<String, List<TelegramMessage>> telegramsForAddress;
+    private ConcurrentHashMap<String, List<TelegramMessage>> telegramsForAddress;
     // counts for CREATORs COUNT
-    private Map<String, Integer> telegramsCounts;
+    private ConcurrentHashMap<String, Integer> telegramsCounts;
 
     private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE? 2000 : 300;
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
-    private SortedSet<String> handledMessages;
 
     private Controller controller;
     private BlockChain blockChain;
@@ -67,52 +64,21 @@ public class TelegramManager extends Thread {
         this.setName("WinBlockSelector[" + this.getId() + "]");
 
         this.network = network;
-        this.handledTelegrams = new HashMap<String, TelegramMessage>();
-        this.telegramsForTime = new TreeMap<Long, List<TelegramMessage>>();
-        this.telegramsForAddress = new HashMap<String, List<TelegramMessage>>();
-        this.telegramsCounts = new HashMap<String, Integer>();
+        this.handledTelegrams = new ConcurrentHashMap<String, TelegramMessage>();
+        this.telegramsForTime = new ConcurrentSkipListMap<Long, List<TelegramMessage>>();
+        this.telegramsForAddress = new ConcurrentHashMap<String, List<TelegramMessage>>();
+        this.telegramsCounts = new ConcurrentHashMap<String, Integer>();
 
         this.setName("TelegramManager - " + this.getId());
 
-        this.handledMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
-
         this.start();
 
-    }
-
-    private void addHandledMessage(String hash) {
-        try {
-            synchronized (this.handledMessages) {
-                //CHECK IF LIST IS FULL
-                if (this.handledMessages.size() > MAX_HANDLED_MESSAGES_SIZE) {
-                    this.handledMessages.remove(this.handledMessages.first());
-                    ///LOGGER.error("handledMessages size OVERHEAT! ");
-                }
-
-                this.handledMessages.add(hash);
-            }
-        } catch (Exception e) {
-            //LOGGER.error(e.getMessage(),e);
-        }
     }
 
     /**
      * @param message
      */
     public void offerMessage(Message message) {
-
-        if (message.getSender() != null) {
-            synchronized (this.handledMessages) {
-                //CHECK IF NOT HANDLED ALREADY
-                String key = new String(message.getHash());
-                if (this.handledMessages.contains(key)) {
-                    return;
-                }
-
-                //ADD TO HANDLED MESSAGES
-                this.addHandledMessage(key);
-            }
-        }
 
         blockingQueue.offer(message);
     }
@@ -567,7 +533,7 @@ public class TelegramManager extends Thread {
      * @param timeKey   ключ времени с которой удалять
      * @return TRUE if not added
      */
-    public synchronized boolean pipeAddRemove(TelegramMessage telegram, List<TelegramMessage> firstItem,
+    public boolean pipeAddRemove(TelegramMessage telegram, List<TelegramMessage> firstItem,
                                               long timeKey) {
 
         Transaction transaction;
@@ -763,22 +729,19 @@ public class TelegramManager extends Thread {
 
             long timestamp = NTP.getTime();
 
-            synchronized (this.handledTelegrams) {
+            do {
+                Entry<Long, List<TelegramMessage>> firstItem = this.telegramsForTime.firstEntry();
+                if (firstItem == null)
+                    break;
 
-                do {
-                    Entry<Long, List<TelegramMessage>> firstItem = this.telegramsForTime.firstEntry();
-                    if (firstItem == null)
-                        break;
+                long timeKey = firstItem.getKey();
 
-                    long timeKey = firstItem.getKey();
-
-                    if (timeKey + KEEP_TIME < timestamp) {
-                        pipeAddRemove(null, firstItem.getValue(), timeKey);
-                    } else {
-                        break;
-                    }
-                } while (true);
-            }
+                if (timeKey + KEEP_TIME < timestamp) {
+                    pipeAddRemove(null, firstItem.getValue(), timeKey);
+                } else {
+                    break;
+                }
+            } while (true);
 
         }
 

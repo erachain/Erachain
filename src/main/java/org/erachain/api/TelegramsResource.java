@@ -694,7 +694,7 @@ public class TelegramsResource {
             Random random = new Random();
             Controller cnt = Controller.getInstance();
             DCSet dcSet = DCSet.getInstance();
-            List<Peer> excludes = new ArrayList<Peer>();
+            //List<Peer> excludes = new ArrayList<Peer>();
 
             do {
 
