@@ -10,6 +10,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.R_Send;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.network.Peer;
 import org.erachain.network.message.Message;
@@ -691,6 +692,8 @@ public class TelegramsResource {
 
             Random random = new Random();
             Controller cnt = Controller.getInstance();
+            DCSet dcSet = DCSet.getInstance();
+            List<Peer> excludes = new ArrayList<Peer>();
 
             do {
 
@@ -726,10 +729,10 @@ public class TelegramsResource {
 
                     // CREATE MESSAGE
                     Message telegram = MessageFactory.getInstance().createTelegramMessage(transaction);
-                    boolean notAdded = cnt.network.addTelegram((TelegramMessage) telegram);
-                    // BROADCAST MESSAGE
-                    List<Peer> excludes = new ArrayList<Peer>();
-                    cnt.network.broadcast(telegram, excludes, true);
+                    if(!cnt.network.addTelegram((TelegramMessage) telegram)) {
+                        // BROADCAST MESSAGE
+                        cnt.network.broadcast(telegram, excludes, false);
+                    }
 
                     try {
                         Thread.sleep(this.test1Delay);

@@ -1392,10 +1392,6 @@ public class Controller extends Observable {
         this.blockGenerator.setOrphanTo(height);
     }
 
-    public void clearWaitWinBufferProcessed() {
-        this.winBlockSelector.clearWaitWinBufferProcessed();
-    }
-
     public void onMessageTransaction(Message message) {
 
         long timeCheck = System.nanoTime();
@@ -1669,7 +1665,7 @@ public class Controller extends Observable {
             return;
 
         // BROADCAST MESSAGE
-        this.network.asyncBroadcastWinBlock(blockWinMessage, excludes, false);
+        this.network.broadcastWinBlock(blockWinMessage, excludes, false);
 
         LOGGER.info("broadcasted!");
 
@@ -2563,7 +2559,7 @@ public class Controller extends Observable {
 
         try {
             this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true);
-            this.clearWaitWinBufferProcessed();
+            this.network.clearHandledWinBlockMessages();
 
         } catch (Exception e) {
             if (this.isOnStopping()) {

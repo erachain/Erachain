@@ -12,8 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -33,8 +31,6 @@ public class WinBlockSelector extends MonitoredThread {
     private BlockChain blockChain;
     private DCSet dcSet;
 
-    private HashSet<String> waitWinBufferProcessed = new HashSet<String>();
-
     public WinBlockSelector(Controller controller, BlockChain blockChain, DCSet dcSet) {
         this.controller = controller;
         this.blockChain = blockChain;
@@ -44,11 +40,6 @@ public class WinBlockSelector extends MonitoredThread {
 
         this.start();
     }
-
-    public void clearWaitWinBufferProcessed() {
-        waitWinBufferProcessed = new HashSet<String>();
-    }
-
 
     /**
      * @param message
@@ -69,13 +60,6 @@ public class WinBlockSelector extends MonitoredThread {
         // ASK BLOCK FROM BLOCKCHAIN
         Block newBlock = blockWinMessage.getBlock();
 
-        // if already it block in process
-        String key = newBlock.getCreator().getBase58();
-
-        if (!waitWinBufferProcessed.add(key)
-                || Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getSignature()))
-            return;
-
         String info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
                 + newBlock.toString();
         LOGGER.debug(info);
@@ -93,7 +77,7 @@ public class WinBlockSelector extends MonitoredThread {
             // BROADCAST
             List<Peer> excludes = new ArrayList<Peer>();
             excludes.add(message.getSender());
-            message.getSender().network.asyncBroadcastWinBlock(blockWinMessage, excludes, false);
+            message.getSender().network.broadcastWinBlock(blockWinMessage, excludes, false);
 
             onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
             if (onMessageProcessTiming < 999999999999l) {
