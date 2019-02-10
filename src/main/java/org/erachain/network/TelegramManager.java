@@ -117,14 +117,13 @@ public class TelegramManager extends Thread {
         blockingQueue.offer(message);
     }
 
+    private long onMessageProcessTiming;
     public void processMessage(Message message) {
 
         if (message == null)
             return;
 
-        long onMessageProcessTiming = System.nanoTime();
-
-        TelegramMessage telegramMessage = (TelegramMessage) message;
+        onMessageProcessTiming = System.nanoTime();
 
         if (pipeAddRemove((TelegramMessage) message, null, 0))
             return;

@@ -17,6 +17,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * основной класс модуля Сети
@@ -36,9 +37,10 @@ public class Network extends Observable {
     public TelegramManager telegramer;
     List<Peer> knownPeers;
 
-    private SortedSet<String> handledTelegramMessages;
-    private SortedSet<String> handledTransactionMessages;
-    private SortedSet<String> handledWinBlockMessages;
+    //private SortedSet<String> handledTelegramMessages;
+    private ConcurrentSkipListSet<String> handledTelegramMessages;
+    private ConcurrentSkipListSet<String> handledTransactionMessages;
+    private ConcurrentSkipListSet<String> handledWinBlockMessages;
 
     //boolean tryRun; // попытка запуска
     boolean run;
@@ -88,9 +90,9 @@ public class Network extends Observable {
     }
 
     private void start() {
-        this.handledTelegramMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
-        this.handledTransactionMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
-        this.handledWinBlockMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
+        this.handledTelegramMessages = new ConcurrentSkipListSet<String>();
+        this.handledTransactionMessages = new ConcurrentSkipListSet();
+        this.handledWinBlockMessages = new ConcurrentSkipListSet();
 
 
         //START ConnectionCreator THREAD
@@ -509,60 +511,44 @@ public class Network extends Observable {
             return;
         }
 
-
         long timeCheck = System.currentTimeMillis();
         switch (message.getType()) {
 
             case Message.TELEGRAM_TYPE:
 
                 //CHECK IF NOT HANDLED ALREADY
-                synchronized (this.handledTelegramMessages) {
-                    String key = new String(message.getHash());
-                    if (this.handledTelegramMessages.contains(key)) {
-                        return;
-                    }
-
+                String key = new String(message.getHash());
+                if (this.handledTelegramMessages.add(key)) {
                     //ADD TO HANDLED MESSAGES
-                    try {
-                        //CHECK IF LIST IS FULL
-                        if (this.handledTelegramMessages.size() > MAX_HANDLED_TELEGRAM_MESSAGES_SIZE) {
-                            this.handledTelegramMessages.remove(this.handledTelegramMessages.first());
-                        }
 
-                        this.handledTelegramMessages.add(key);
-                    } catch (Exception e) {
-                        //LOGGER.error(e.getMessage(),e);
+                    //CHECK IF LIST IS FULL
+                    if (this.handledTelegramMessages.size() > MAX_HANDLED_TELEGRAM_MESSAGES_SIZE) {
+                        this.handledTelegramMessages.remove(this.handledTelegramMessages.first());
                     }
+
+                    // telegram
+                    this.telegramer.offerMessage(message);
                 }
 
-                // telegram
-                this.telegramer.offerMessage(message);
                 return;
 
             case Message.TRANSACTION_TYPE:
 
                 //CHECK IF NOT HANDLED ALREADY
-                synchronized (this.handledTransactionMessages) {
-                    String key = new String(message.getHash());
-                    if (this.handledTransactionMessages.contains(key)) {
-                        return;
-                    }
-
+                key = new String(message.getHash());
+                if (this.handledTransactionMessages.add(key)) {
                     //ADD TO HANDLED MESSAGES
-                    try {
-                        //CHECK IF LIST IS FULL
-                        if (this.handledTransactionMessages.size() > MAX_HANDLED_TRANSACTION_MESSAGES_SIZE) {
-                            this.handledTransactionMessages.remove(this.handledTransactionMessages.first());
-                        }
 
-                        this.handledTransactionMessages.add(key);
-                    } catch (Exception e) {
-                        //LOGGER.error(e.getMessage(),e);
+                    //CHECK IF LIST IS FULL
+                    if (this.handledTransactionMessages.size() > MAX_HANDLED_TRANSACTION_MESSAGES_SIZE) {
+                        this.handledTransactionMessages.remove(this.handledTransactionMessages.first());
                     }
+
+                    Controller.getInstance().onMessageTransaction(message);
+
                 }
 
-                Controller.getInstance().onMessageTransaction(message);
-                break;
+                return;
 
             case Message.TELEGRAM_GET_TYPE:
                 // GET telegrams
@@ -634,30 +620,19 @@ public class Network extends Observable {
 
             case Message.WIN_BLOCK_TYPE:
 
-                synchronized (this.handledWinBlockMessages) {
-                    //CHECK IF NOT HANDLED ALREADY
-                    String key = new String(message.getHash());
-                    if (this.handledWinBlockMessages.contains(key)) {
-                        return;
-                    }
-
+                //CHECK IF NOT HANDLED ALREADY
+                key = new String(message.getHash());
+                if (this.handledWinBlockMessages.add(key)) {
                     //ADD TO HANDLED MESSAGES
-                    try {
-                        synchronized (this.handledWinBlockMessages) {
-                            //CHECK IF LIST IS FULL
-                            if (this.handledWinBlockMessages.size() > MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE) {
-                                this.handledWinBlockMessages.remove(this.handledWinBlockMessages.first());
-                            }
 
-                            this.handledWinBlockMessages.add(key);
-                        }
-                    } catch (Exception e) {
-                        //LOGGER.error(e.getMessage(),e);
+                    //CHECK IF LIST IS FULL
+                    if (this.handledWinBlockMessages.size() > MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE) {
+                        this.handledWinBlockMessages.remove(this.handledWinBlockMessages.first());
                     }
-                }
 
-                if (Controller.getInstance().isStatusOK()) {
-                    Controller.getInstance().winBlockSelector.offerMessage(message);
+                    if (Controller.getInstance().isStatusOK()) {
+                        Controller.getInstance().winBlockSelector.offerMessage(message);
+                    }
                 }
 
                 return;
