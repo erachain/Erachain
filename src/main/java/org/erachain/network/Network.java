@@ -27,6 +27,7 @@ public class Network extends Observable {
     public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK ? 0 : 1;
     private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 6 : 1024<<4;
     private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<5;
+    private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 6 : 1024<<3;
     private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 12 : 1024 << 8;
     private static final Logger LOGGER = LoggerFactory.getLogger(Network.class);
     private static InetAddress myselfAddress;
@@ -38,6 +39,7 @@ public class Network extends Observable {
 
     private SortedSet<String> handledMessages;
     private SortedSet<String> handledTelegramMessages;
+    private SortedSet<String> handledTransactionMessages;
 
     //boolean tryRun; // попытка запуска
     boolean run;
@@ -89,6 +91,7 @@ public class Network extends Observable {
     private void start() {
         this.handledMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
         this.handledTelegramMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
+        this.handledTransactionMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
 
         //START ConnectionCreator THREAD
         creator = new ConnectionCreator(this);
@@ -495,11 +498,7 @@ public class Network extends Observable {
         }
 
         //ONLY HANDLE WINBLOCK, TELEGRAMS AND TRANSACTION MESSAGES ONCE
-        if (
-                // message.getType() == Message.TELEGRAM_TYPE - in org.erachain.network.TelegramManager.putMessage
-                        message.getType() == Message.TRANSACTION_TYPE
-                        || message.getType() == Message.WIN_BLOCK_TYPE
-        ) {
+        if (message.getType() == Message.WIN_BLOCK_TYPE) {
             synchronized (this.handledMessages) {
                 //CHECK IF NOT HANDLED ALREADY
                 String key = new String(message.getHash());
@@ -542,6 +541,26 @@ public class Network extends Observable {
                 return;
 
             case Message.TRANSACTION_TYPE:
+
+                //CHECK IF NOT HANDLED ALREADY
+                synchronized (this.handledTransactionMessages) {
+                    String key = new String(message.getHash());
+                    if (this.handledTransactionMessages.contains(key)) {
+                        return;
+                    }
+
+                    //ADD TO HANDLED MESSAGES
+                    try {
+                        //CHECK IF LIST IS FULL
+                        if (this.handledTransactionMessages.size() > MAX_HANDLED_TRANSACTION_MESSAGES_SIZE) {
+                            this.handledTransactionMessages.remove(this.handledTransactionMessages.first());
+                        }
+
+                        this.handledTransactionMessages.add(key);
+                    } catch (Exception e) {
+                        //LOGGER.error(e.getMessage(),e);
+                    }
+                }
 
                 Controller.getInstance().onMessageTransaction(message);
                 break;
