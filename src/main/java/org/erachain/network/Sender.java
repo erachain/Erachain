@@ -121,9 +121,7 @@ public class Sender extends MonitoredThread {
             return false;
         }
 
-        if (logPings && (message.getType() != Message.TRANSACTION_TYPE
-                && message.getType() != Message.TELEGRAM_TYPE
-                || message.getType() == Message.HWEIGHT_TYPE)) {
+        if (logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
             LOGGER.debug(this.peer + message.viewPref(true) + message);
         }
 
