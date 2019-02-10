@@ -753,7 +753,7 @@ public class TelegramsResource {
         threadTest1.start();
 
         out.put("delay", test1Delay);
-        LOGGER.info("TEST1: STARTED for delay: " + test1Delay);
+        LOGGER.info("telegrams/test1 STARTED for delay: " + test1Delay);
 
         return out.toJSONString();
 

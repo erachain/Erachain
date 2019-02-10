@@ -7,7 +7,9 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.transaction.OnDealClick;
+import org.erachain.network.Peer;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
@@ -313,6 +315,7 @@ public class R_SendResource {
         threadTest1 = new Thread(() -> {
 
             Random random = new Random();
+            Controller cnt = Controller.getInstance();
 
             do {
 
@@ -326,7 +329,7 @@ public class R_SendResource {
                         continue;
                     }
 
-                    if (Controller.getInstance().isOnStopping())
+                    if (cnt.isOnStopping())
                         return;
 
                     PrivateKeyAccount creator = test1Creators.get(random.nextInt(test1Creators.size()));
@@ -336,16 +339,16 @@ public class R_SendResource {
                     } while (recipient.equals(creator));
 
 
-                    Transaction transaction = Controller.getInstance().r_Send(creator,
+                    Transaction transaction = cnt.r_Send(creator,
                             0, recipient,
                             2l, null, "TEST 1",
                             "TEST TEST TEST".getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
                             new byte[]{(byte) 1});
 
-                    if (Controller.getInstance().isOnStopping())
+                    if (cnt.isOnStopping())
                         return;
 
-                    Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+                    Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
                     // CHECK VALIDATE MESSAGE
                     if (result != Transaction.VALIDATE_OK) {
@@ -369,7 +372,7 @@ public class R_SendResource {
                     } catch (InterruptedException e) {
                     }
 
-                    if (Controller.getInstance().isOnStopping())
+                    if (cnt.isOnStopping())
                         return;
 
                 } catch (Exception e10) {
@@ -382,7 +385,7 @@ public class R_SendResource {
         threadTest1.start();
 
         out.put("delay", test1Delay);
-        LOGGER.info("TEST1: STARTED for delay: " + test1Delay);
+        LOGGER.info("r_send/test1 STARTED for delay: " + test1Delay);
 
         return out.toJSONString();
 
