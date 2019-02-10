@@ -585,7 +585,7 @@ public class Network extends Observable {
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 10) {
-                    LOGGER.debug(message.getSender() + ": " + message + " solver by period: " + timeCheck);
+                    LOGGER.debug(message.getSender() + ": " + message + " solved by period: " + timeCheck);
                 }
 
                 //SEND BACK TO SENDER
