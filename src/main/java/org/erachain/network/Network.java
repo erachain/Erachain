@@ -25,7 +25,8 @@ public class Network extends Observable {
 
     public static final int SEND_WAIT = 20000;
     public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK ? 0 : 1;
-    private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<4;
+    private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 6 : 1024<<4;
+    private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<5;
     private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 12 : 1024 << 8;
     private static final Logger LOGGER = LoggerFactory.getLogger(Network.class);
     private static InetAddress myselfAddress;
@@ -34,7 +35,10 @@ public class Network extends Observable {
     PeerManager peerManager;
     public TelegramManager telegramer;
     List<Peer> knownPeers;
+
     private SortedSet<String> handledMessages;
+    private SortedSet<String> handledTelegramMessages;
+
     //boolean tryRun; // попытка запуска
     boolean run;
 
@@ -84,6 +88,7 @@ public class Network extends Observable {
 
     private void start() {
         this.handledMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
+        this.handledTelegramMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
 
         //START ConnectionCreator THREAD
         creator = new ConnectionCreator(this);
@@ -509,7 +514,28 @@ public class Network extends Observable {
 
         long timeCheck = System.currentTimeMillis();
         switch (message.getType()) {
+
             case Message.TELEGRAM_TYPE:
+
+                //CHECK IF NOT HANDLED ALREADY
+                synchronized (this.handledTelegramMessages) {
+                    String key = new String(message.getHash());
+                    if (this.handledTelegramMessages.contains(key)) {
+                        return;
+                    }
+
+                    //ADD TO HANDLED MESSAGES
+                    try {
+                        //CHECK IF LIST IS FULL
+                        if (this.handledTelegramMessages.size() > MAX_HANDLED_TELEGRAM_MESSAGES_SIZE) {
+                            this.handledTelegramMessages.remove(this.handledTelegramMessages.first());
+                        }
+
+                        this.handledTelegramMessages.add(key);
+                    } catch (Exception e) {
+                        //LOGGER.error(e.getMessage(),e);
+                    }
+                }
 
                 // telegram
                 this.telegramer.offerMessage(message);
