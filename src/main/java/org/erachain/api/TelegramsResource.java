@@ -672,7 +672,7 @@ public class TelegramsResource {
         if (threadTest1 != null) {
             JSONObject out = new JSONObject();
             out.put("delay", delay);
-            LOGGER.info("TEST1 DELAY UPDATE:" + delay);
+            LOGGER.info("telegrams/test1 DELAY UPDATE:" + delay);
             return out.toJSONString();
         }
 
