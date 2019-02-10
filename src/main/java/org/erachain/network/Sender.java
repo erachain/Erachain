@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class Sender extends MonitoredThread {
 
     private final static boolean USE_MONITOR = false;
-    private final static boolean logPings = true;
+    private final static boolean logPings = false;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class);
     private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE? 200 : 40;
