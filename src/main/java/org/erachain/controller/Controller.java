@@ -79,6 +79,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.Timer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -150,8 +151,8 @@ public class Controller extends Observable {
     private byte[] foundMyselfID = new byte[128];
     private byte[] messageMagic;
     private long toOfflineTime;
-    private Map<Peer, Tuple2<Integer, Long>> peerHWeight;
-    private Map<Peer, Pair<String, Long>> peersVersions;
+    private ConcurrentHashMap<Peer, Tuple2<Integer, Long>> peerHWeight;
+    private ConcurrentHashMap<Peer, Pair<String, Long>> peersVersions;
     private DBSet dbSet; // = DBSet.getInstance();
     private DCSet dcSet; // = DBSet.getInstance();
 
@@ -509,11 +510,11 @@ public class Controller extends Observable {
         this.foundMyselfID = new byte[128];
         this.random.nextBytes(this.foundMyselfID);
 
-        this.peerHWeight = Collections.synchronizedMap(new LinkedHashMap<Peer, Tuple2<Integer, Long>>());
+        this.peerHWeight = new ConcurrentHashMap<Peer, Tuple2<Integer, Long>>();
         // LINKED TO PRESERVE ORDER WHEN SYNCHRONIZING (PRIORITIZE SYNCHRONIZING
         // FROM LONGEST CONNECTION ALIVE)
 
-        this.peersVersions = Collections.synchronizedMap(new LinkedHashMap<Peer, Pair<String, Long>>());
+        this.peersVersions = new ConcurrentHashMap<Peer, Pair<String, Long>>();
 
         // CHECK NETWORK PORT AVAILABLE
         if (!Network.isPortAvailable(Controller.getInstance().getNetworkPort())) {
@@ -1612,10 +1613,8 @@ public class Controller extends Observable {
                 VersionMessage versionMessage = (VersionMessage) message;
 
                 // ADD TO LIST
-                synchronized (this.peersVersions) {
                     this.peersVersions.put(versionMessage.getSender(), new Pair<String, Long>(
                             versionMessage.getStrVersion(), versionMessage.getBuildDateTime()));
-                }
 
                 break;
 

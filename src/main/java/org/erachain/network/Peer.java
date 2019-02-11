@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Arrays;
@@ -240,6 +241,34 @@ public class Peer extends MonitoredThread {
 
     public long getPingCounter() {
         return this.pingCounter;
+    }
+
+
+    public int compareTo(Peer peer) {
+
+        if (this.address.getAddress()[0] > peer.address.getAddress()[0])
+            return 1;
+        else if (this.address.getAddress()[0] < peer.address.getAddress()[0])
+            return -1;
+        else if (this.address.getAddress()[1] > peer.address.getAddress()[1])
+            return 1;
+        else if (this.address.getAddress()[1] < peer.address.getAddress()[1])
+            return -1;
+        else if (this.address.getAddress()[2] > peer.address.getAddress()[2])
+            return 1;
+        else if (this.address.getAddress()[2] < peer.address.getAddress()[2])
+            return -1;
+        else if (this.address.getAddress()[3] > peer.address.getAddress()[3])
+            return 1;
+        else if (this.address.getAddress()[3] < peer.address.getAddress()[3])
+            return -1;
+        else
+            return 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return new BigInteger(this.address.getAddress()).hashCode();
     }
 
     @Override
