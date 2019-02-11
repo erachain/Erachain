@@ -421,6 +421,7 @@ public class CreateOrderTransaction extends Transaction {
         }
         
         if (this.wantAsset.isInsideBonus() ^ this.haveAsset.isInsideBonus()) {
+            if (this.haveKey != AssetCls.FEE_KEY && this.wantKey != AssetCls.FEE_KEY)
             return INVALID_ECXHANGE_PAIR;
         }
 
