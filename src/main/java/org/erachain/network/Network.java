@@ -18,6 +18,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * основной класс модуля Сети
@@ -35,7 +36,7 @@ public class Network extends Observable {
     private ConnectionAcceptor acceptor;
     PeerManager peerManager;
     public TelegramManager telegramer;
-    ConcurrentSkipListSet<Peer> knownPeers;
+    CopyOnWriteArrayList<Peer> knownPeers;
 
     //private SortedSet<String> handledTelegramMessages;
     private ConcurrentSkipListSet<String> handledTelegramMessages;
@@ -51,7 +52,7 @@ public class Network extends Observable {
 
 
     public Network() {
-        this.knownPeers = new ConcurrentSkipListSet<Peer>();
+        this.knownPeers = new CopyOnWriteArrayList<Peer>();
         this.handledTelegramMessages = new ConcurrentSkipListSet<String>();
         this.handledTransactionMessages = new ConcurrentSkipListSet();
         this.handledWinBlockMessages = new ConcurrentSkipListSet();
