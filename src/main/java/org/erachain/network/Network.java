@@ -369,7 +369,7 @@ public class Network extends Observable {
     }
 
     public boolean addTelegram(TelegramMessage telegram) {
-        return this.telegramer.pipeAddRemove(telegram, null, 0);
+        return this.telegramer.add(telegram);
     }
 
     public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp, String filter) {
@@ -769,7 +769,7 @@ public class Network extends Observable {
 
         this.telegramer.halt();
 
-        this.onMessage(null);
+        //this.onMessage(null);
         int size = knownPeers.size();
 
         for (int i =0; i<size; i++){
