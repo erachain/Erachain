@@ -748,6 +748,7 @@ public class Controller extends Observable {
         Runtime.getRuntime().addShutdownHook(new Thread(null, null, "ShutdownHook") {
             @Override
             public void run() {
+                // -999999 - not use System.exit() - if freeze exit
                 stopAll(-999999);
                 //Runtime.getRuntime().removeShutdownHook(currentThread());
             }
