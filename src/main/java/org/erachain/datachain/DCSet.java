@@ -1357,10 +1357,21 @@ public class DCSet implements Observer, IDB {
      */
     public DCSet forkinFile() {
         this.addUses();
-        DCSet fork = new DCSet(this, createForkbase());
-        this.outUses();
+        try {
+            DCSet fork = new DCSet(this, createForkbase());
 
-        return fork;
+            this.outUses();
+
+            return fork;
+        } catch (java.lang.OutOfMemoryError e) {
+            LOGGER.error(e.getMessage(), e);
+
+            this.outUses();
+
+            Controller.getInstance().stopAll(14);
+            return null;
+        }
+
     }
     @Override
     public void close() {
