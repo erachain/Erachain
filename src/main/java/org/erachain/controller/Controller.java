@@ -146,7 +146,6 @@ public class Controller extends Observable {
     private TransactionCreator transactionCreator;
     private boolean needSyncWallet = false;
     private Timer connectTimer;
-    //private Timer timerUnconfirmed;
     private Random random = new SecureRandom();
     private byte[] foundMyselfID = new byte[128];
     private byte[] messageMagic;
@@ -1004,8 +1003,8 @@ public class Controller extends Observable {
             return;
         this.isStopping = true;
 
-        this.connectTimer.cancel();
-        //this.timerUnconfirmed.cancel();
+        if (this.connectTimer != null)
+            this.connectTimer.cancel();
 
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing")));
