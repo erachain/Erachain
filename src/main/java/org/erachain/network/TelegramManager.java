@@ -718,7 +718,9 @@ public class TelegramManager extends Thread {
     public void run() {
         this.run = true;
 
-        while (this.run && !this.isInterrupted()) {
+        long timeWaiter = 0;
+        long timestamp;
+        while (this.run) {
             try {
                 processMessage(blockingQueue.poll(1000, TimeUnit.MILLISECONDS));
             } catch (java.lang.OutOfMemoryError e) {
@@ -730,21 +732,26 @@ public class TelegramManager extends Thread {
                 break;
             }
 
-            long timestamp = NTP.getTime();
+            timestamp = NTP.getTime();
+            if (timestamp - timeWaiter > 1000) {
 
-            do {
-                Entry<Long, List<TelegramMessage>> firstItem = this.telegramsForTime.firstEntry();
-                if (firstItem == null)
-                    break;
+                do {
 
-                long timeKey = firstItem.getKey();
+                    timeWaiter = timestamp;
 
-                if (timeKey + KEEP_TIME < timestamp) {
-                    remove(firstItem.getValue(), timeKey);
-                } else {
-                    break;
-                }
-            } while (true);
+                    Entry<Long, List<TelegramMessage>> firstItem = this.telegramsForTime.firstEntry();
+                    if (firstItem == null)
+                        break;
+
+                    long timeKey = firstItem.getKey();
+
+                    if (timeKey + KEEP_TIME < timestamp) {
+                        remove(firstItem.getValue(), timeKey);
+                    } else {
+                        break;
+                    }
+                } while (true);
+            }
 
         }
 
