@@ -146,7 +146,7 @@ public class Controller extends Observable {
     private TransactionCreator transactionCreator;
     private boolean needSyncWallet = false;
     private Timer connectTimer;
-    private Timer timerUnconfirmed;
+    //private Timer timerUnconfirmed;
     private Random random = new SecureRandom();
     private byte[] foundMyselfID = new byte[128];
     private byte[] messageMagic;
@@ -1004,6 +1004,9 @@ public class Controller extends Observable {
             return;
         this.isStopping = true;
 
+        this.connectTimer.cancel();
+        //this.timerUnconfirmed.cancel();
+
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing")));
         // STOP MESSAGE PROCESSOR
@@ -1013,8 +1016,15 @@ public class Controller extends Observable {
         LOGGER.info("Stopping message processor");
         this.network.stop();
 
-        LOGGER.info("Stopping WinBlock selector");
-        this.winBlockSelector.halt();
+        if (this.webService != null) {
+            LOGGER.info("Stopping WEB server");
+            this.webService.stop();
+        }
+
+        if (this.rpcService != null) {
+            LOGGER.info("Stopping RPC server");
+            this.rpcService.stop();
+        }
 
         // delete temp Dir
         this.setChanged();
@@ -1031,8 +1041,8 @@ public class Controller extends Observable {
 
         // STOP BLOCK PROCESSOR
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping block processor")));
-        LOGGER.info("Stopping block processor");
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping block synchronizer")));
+        LOGGER.info("Stopping block synchronizer");
         this.synchronizer.stop();
 
         // WAITING STOP MAIN PROCESS

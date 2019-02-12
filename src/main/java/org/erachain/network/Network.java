@@ -116,8 +116,10 @@ public class Network extends Observable {
 
     public void onConnect(Peer peer) {
 
-        if (!run)
+        if (!run) {
+            peer.close("network is stopped");
             return;
+        }
 
         //LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer);
 
@@ -744,9 +746,6 @@ public class Network extends Observable {
         this.peerManager.halt();
 
         this.telegramer.halt();
-
-        //this.onMessage(null);
-        int size = knownPeers.size();
 
         for (Peer peer : knownPeers) {
             // HALT Peer

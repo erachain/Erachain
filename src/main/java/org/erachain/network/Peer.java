@@ -41,7 +41,7 @@ public class Peer extends MonitoredThread {
     private InetAddress address;
     public Socket socket;
 
-    BlockingQueue<DataInputStream> startReading = new ArrayBlockingQueue<DataInputStream>(1);
+    BlockingQueue<Object> startReading = new ArrayBlockingQueue<Object>(1);
 
     private Sender sender;
     private Pinger pinger;
@@ -345,8 +345,14 @@ public class Peer extends MonitoredThread {
             if (USE_MONITOR) this.setMonitorPoint();
 
             DataInputStream in = null;
+            Object starter;
             try {
-                in = startReading.take();
+                starter = startReading.take();
+                if (starter instanceof DataInputStream) {
+                    in = (DataInputStream) starter;
+                } else
+                    break;
+
                 // INIT PINGER
                 pinger.init();
             } catch (InterruptedException e) {
@@ -716,6 +722,8 @@ public class Peer extends MonitoredThread {
 
     public void halt() {
 
+        this.pinger.close();
+        this.startReading.offer(-1);
         this.close("halt");
         this.setName(this.getName() + " halted");
 
