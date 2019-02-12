@@ -1015,6 +1015,7 @@ public class Controller extends Observable {
         LOGGER.info("Stopping message processor");
         this.network.stop();
 
+
         if (this.webService != null) {
             LOGGER.info("Stopping WEB server");
             this.webService.stop();
