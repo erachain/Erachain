@@ -29,8 +29,6 @@ public class TelegramManager extends Thread {
      */
     private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK ? 1 << 20 : 8000;
 
-    private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<5;
-
     /**
      * time to live telegram
      */
@@ -60,8 +58,6 @@ public class TelegramManager extends Thread {
         this.controller = controller;
         this.blockChain = blockChain;
         this.dcSet = dcSet;
-
-        this.setName("WinBlockSelector[" + this.getId() + "]");
 
         this.network = network;
         this.handledTelegrams = new ConcurrentHashMap<String, TelegramMessage>();
@@ -567,44 +563,36 @@ public class TelegramManager extends Thread {
 
         String signatureKey;
 
+        // signatureKey =
+        // java.util.Base64.getEncoder().encodeToString(transaction.getSignature());
+        signatureKey = Base58.encode(transaction.getSignature());
+
+        if (this.handledTelegrams.containsKey(signatureKey))
+            return true;
+
         // CHECK IF LIST IS FULL
         if (this.handledTelegrams.size() > MAX_HANDLED_TELEGRAMS_SIZE) {
             List<TelegramMessage> telegrams = this.telegramsForTime.remove(this.telegramsForTime.firstKey());
             remove(telegrams, 0);
         }
 
-        // signatureKey =
-        // java.util.Base64.getEncoder().encodeToString(transaction.getSignature());
-        signatureKey = Base58.encode(transaction.getSignature());
+        this.handledTelegrams.put(signatureKey, telegram);
 
-        if (false) {
-            Message old_value = this.handledTelegrams.put(signatureKey, telegram.copy());
-            if (old_value != null)
-                return true;
-        } else {
-            if (this.handledTelegrams.containsKey(signatureKey))
-                return true;
+        if (Settings.getInstance().getTelegramStoreUse() && Settings.getInstance().getTelegramStorePeriod() > 0) {
+            // IF MY STORE is USED
+            if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
 
-
-            this.handledTelegrams.put(signatureKey, telegram);
-
-            if (Settings.getInstance().getTelegramStoreUse() && Settings.getInstance().getTelegramStorePeriod() > 0) {
-                // IF MY STORE is USED
-                if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
-
-                    // save telegram to wallet DB
-                    Transaction trans = telegram.getTransaction();
-                    if (Controller.getInstance().wallet.accountExists(trans.getCreator().getAddress())) {
-                        // add as my OUTCOME
-                        Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
-                    } else {
-                        // TRY ADD as my INCOME
-                        HashSet<Account> recipients = trans.getRecipientAccounts();
-                        for (Account recipient : recipients) {
-                            if (Controller.getInstance().wallet.accountExists(recipient.getAddress())) {
-                                Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
-                                break;
-                            }
+                // save telegram to wallet DB
+                if (Controller.getInstance().wallet.accountExists(transaction.getCreator().getAddress())) {
+                    // add as my OUTCOME
+                    Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, transaction);
+                } else {
+                    // TRY ADD as my INCOME
+                    HashSet<Account> recipients = transaction.getRecipientAccounts();
+                    for (Account recipient : recipients) {
+                        if (Controller.getInstance().wallet.accountExists(recipient.getAddress())) {
+                            Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, transaction);
+                            break;
                         }
                     }
                 }
@@ -674,7 +662,7 @@ public class TelegramManager extends Thread {
                         if (addressTelegrams != null) {
                             i = 0;
                             for (TelegramMessage addressTelegram : addressTelegrams) {
-                                if (addressTelegram.getTransaction().getSignature().equals(signature)) {
+                                if (Arrays.equals(addressTelegram.getTransaction().getSignature(), signature)) {
                                     addressTelegrams.remove(i);
                                     break;
                                 }
