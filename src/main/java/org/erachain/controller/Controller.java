@@ -745,10 +745,11 @@ public class Controller extends Observable {
         this.network = new Network();
 
         // CLOSE ON UNEXPECTED SHUTDOWN
-        Runtime.getRuntime().addShutdownHook(new Thread() {
+        Runtime.getRuntime().addShutdownHook(new Thread(null, null, "ShutdownHook") {
             @Override
             public void run() {
-                stopAll(0);
+                stopAll(-999999);
+                //Runtime.getRuntime().removeShutdownHook(currentThread());
             }
         });
 
@@ -1097,12 +1098,15 @@ public class Controller extends Observable {
 
         LOGGER.info("Closed.");
         // FORCE CLOSE
-        LOGGER.info("EXIT parameter:" + par);
-        System.exit(par);
-        //System.
-        // bat
-        // if %errorlevel% neq 0 exit /b %errorlevel%
-
+        if (par != -999999) {
+            LOGGER.info("EXIT parameter:" + par);
+            System.exit(par);
+            //System.
+            // bat
+            // if %errorlevel% neq 0 exit /b %errorlevel%
+        } else {
+            LOGGER.info("EXIT parameter:" + 0);
+        }
     }
 
 

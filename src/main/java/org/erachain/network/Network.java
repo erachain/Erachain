@@ -738,38 +738,18 @@ public class Network extends Observable {
 
         // stop thread
         this.creator.halt();
-        try {
-            this.creator.join();
-        } catch (Exception e) {
-        }
 
         // stop thread
         this.acceptor.halt();
-        try {
-            this.acceptor.join();
-        } catch (Exception e) {
-        }
 
         //
         this.peerManager.halt();
-        try {
-            this.peerManager.join();
-        } catch (Exception e) {
-        }
 
         this.telegramer.halt();
-        try {
-            this.telegramer.join();
-        } catch (Exception e) {
-        }
 
         for (Peer peer : knownPeers) {
             // HALT Peer
             peer.halt();
-            try {
-                peer.join();
-            } catch (Exception e) {
-            }
         }
 
         knownPeers.clear();
