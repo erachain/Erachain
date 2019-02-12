@@ -722,35 +722,40 @@ public class TelegramManager extends Thread {
         long timestamp;
         while (this.run) {
             try {
-                processMessage(blockingQueue.poll(1000, TimeUnit.MILLISECONDS));
+                try {
+                    processMessage(blockingQueue.poll(1000, TimeUnit.MILLISECONDS));
+                } catch (java.lang.OutOfMemoryError e) {
+                    Controller.getInstance().stopAll(81);
+                    break;
+                } catch (java.lang.IllegalMonitorStateException e) {
+                    break;
+                } catch (java.lang.InterruptedException e) {
+                    break;
+                }
+
+                timestamp = NTP.getTime();
+                if (timestamp - timeWaiter > 1000) {
+
+                    do {
+
+                        timeWaiter = timestamp;
+
+                        Entry<Long, List<TelegramMessage>> firstItem = this.telegramsForTime.firstEntry();
+                        if (firstItem == null)
+                            break;
+
+                        long timeKey = firstItem.getKey();
+
+                        if (timeKey + KEEP_TIME < timestamp) {
+                            remove(firstItem.getValue(), timeKey);
+                        } else {
+                            break;
+                        }
+                    } while (true);
+                }
             } catch (java.lang.OutOfMemoryError e) {
-                Controller.getInstance().stopAll(81);
+                Controller.getInstance().stopAll(82);
                 break;
-            } catch (java.lang.IllegalMonitorStateException e) {
-                break;
-            } catch (java.lang.InterruptedException e) {
-                break;
-            }
-
-            timestamp = NTP.getTime();
-            if (timestamp - timeWaiter > 1000) {
-
-                do {
-
-                    timeWaiter = timestamp;
-
-                    Entry<Long, List<TelegramMessage>> firstItem = this.telegramsForTime.firstEntry();
-                    if (firstItem == null)
-                        break;
-
-                    long timeKey = firstItem.getKey();
-
-                    if (timeKey + KEEP_TIME < timestamp) {
-                        remove(firstItem.getValue(), timeKey);
-                    } else {
-                        break;
-                    }
-                } while (true);
             }
 
         }

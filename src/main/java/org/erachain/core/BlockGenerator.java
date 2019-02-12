@@ -920,8 +920,8 @@ public class BlockGenerator extends Thread implements Observer {
                                         setForgingStatus(ForgingStatus.FORGING);
                                 }
                             } catch (java.lang.OutOfMemoryError e) {
-                                ctrl.stopAll(94);
                                 status = -1;
+                                ctrl.stopAll(94);
                                 return;
                             }
 
@@ -1009,11 +1009,19 @@ public class BlockGenerator extends Thread implements Observer {
 
                 }
 
-            } catch (Exception e) {
+            } catch (java.lang.OutOfMemoryError e) {
+                this.status = -1;
+
+                LOGGER.error(e.getMessage(), e);
+
+                ctrl.stopAll(96);
+                return;
+            } catch (Throwable e) {
                 if (ctrl.isOnStopping()) {
                     this.status = -1;
                     return;
                 }
+
                 LOGGER.error(e.getMessage(), e);
 
             }

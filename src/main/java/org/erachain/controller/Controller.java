@@ -3390,7 +3390,7 @@ public class Controller extends Observable {
             this.about_frame = AboutFrame.getInstance();
             this.addSingleObserver( about_frame);
             this.about_frame.setUserClose(false);
-           this.about_frame.setModal(false);
+            this.about_frame.setModal(false);
             this.about_frame.setVisible(true);
         }
         if (!cli) {
