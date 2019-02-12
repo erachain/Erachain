@@ -11,10 +11,7 @@ import org.erachain.settings.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 
 
 /**
@@ -25,6 +22,8 @@ public class TelegramStore extends Observable implements Observer {
     static Logger LOGGER = LoggerFactory.getLogger(TelegramStore.class.getName());
 	public TelegramSet database;
     private static TelegramStore th;
+
+    Timer timer;
 
     public static TelegramStore getInstanse() {
         if (th == null) th = new TelegramStore();
@@ -58,11 +57,19 @@ public class TelegramStore extends Observable implements Observer {
         new Thread() {
             @Override
             public void run() {
-                try {
-                    sleep(60 * 1000);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+
+                int i = 0;
+                while (i++ < 60) {
+                    try {
+                        sleep(1000);
+                    } catch (InterruptedException e) {
+                        // need for EXIT
+                        return;
+                    }
+
+                    if (Controller.getInstance().isOnStopping())
+                        return;
+
                 }
 
                 if (Controller.getInstance().isOnStopping())

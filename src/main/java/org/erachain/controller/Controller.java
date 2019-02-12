@@ -1098,6 +1098,7 @@ public class Controller extends Observable {
         // FORCE CLOSE
         LOGGER.info("EXIT parameter:" + par);
         System.exit(par);
+        //System.
         // bat
         // if %errorlevel% neq 0 exit /b %errorlevel%
 

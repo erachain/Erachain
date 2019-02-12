@@ -2008,7 +2008,10 @@ public class Wallet extends Observable implements Observer {
         if (this.timerSynchronize != null)
             this.timerSynchronize.cancel();
 
-		if (this.database != null) {
+        if (this.lockTimer != null)
+            this.lockTimer.cancel();
+
+        if (this.database != null) {
 			this.database.close();
 		}
 
