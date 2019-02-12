@@ -21,37 +21,90 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.*;
 
 public class TelegramManager extends Thread {
     /**
      * count telegrams
      */
     private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK ? 1 << 20 : 8000;
+
     /**
      * time to live telegram
      */
     private static final int KEEP_TIME = 60000 * 60 * (BlockChain.HARD_WORK ? 2 : 8);
     static Logger LOGGER = LoggerFactory.getLogger(TelegramManager.class.getName());
     private Network network;
-    private boolean isRun;
+    private boolean run;
     // pool of messages
-    private Map<String, TelegramMessage> handledTelegrams;
+    private ConcurrentHashMap<String, TelegramMessage> handledTelegrams;
     // timestamp lists for clear
-    private TreeMap<Long, List<TelegramMessage>> telegramsForTime;
+    private ConcurrentSkipListMap<Long, List<TelegramMessage>> telegramsForTime;
     // lists for RECIPIENTS only address
-    private Map<String, List<TelegramMessage>> telegramsForAddress;
+    private ConcurrentHashMap<String, List<TelegramMessage>> telegramsForAddress;
     // counts for CREATORs COUNT
-    private Map<String, Integer> telegramsCounts;
+    private ConcurrentHashMap<String, Integer> telegramsCounts;
 
-    public TelegramManager(Network network) {
+    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE? 2000 : 300;
+    BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
+
+    private Controller controller;
+    private BlockChain blockChain;
+    private DCSet dcSet;
+    public long messageTimingAverage;
+
+    public TelegramManager(Controller controller, BlockChain blockChain, DCSet dcSet, Network network) {
+
+        this.controller = controller;
+        this.blockChain = blockChain;
+        this.dcSet = dcSet;
 
         this.network = network;
-        this.handledTelegrams = new HashMap<String, TelegramMessage>();
-        this.telegramsForTime = new TreeMap<Long, List<TelegramMessage>>();
-        this.telegramsForAddress = new HashMap<String, List<TelegramMessage>>();
-        this.telegramsCounts = new HashMap<String, Integer>();
+        this.handledTelegrams = new ConcurrentHashMap<String, TelegramMessage>();
+        this.telegramsForTime = new ConcurrentSkipListMap<Long, List<TelegramMessage>>();
+        this.telegramsForAddress = new ConcurrentHashMap<String, List<TelegramMessage>>();
+        this.telegramsCounts = new ConcurrentHashMap<String, Integer>();
 
         this.setName("TelegramManager - " + this.getId());
+
+        this.start();
+
+    }
+
+    /**
+     * @param message
+     */
+    public void offerMessage(Message message) {
+
+        blockingQueue.offer(message);
+    }
+
+    private long onMessageProcessTiming;
+    public void processMessage(Message message) {
+
+        if (message == null)
+            return;
+
+        onMessageProcessTiming = System.nanoTime();
+
+        if (add((TelegramMessage) message))
+            return;
+
+        onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
+        if (onMessageProcessTiming < 999999999999l) {
+            // при переполнении может быть минус
+            messageTimingAverage = ((messageTimingAverage << 5)
+                    + onMessageProcessTiming - messageTimingAverage) >> 5;
+        }
+
+        // BROADCAST
+        if (message.getSender() != null) {
+            List<Peer> excludes = new ArrayList<Peer>();
+            excludes.add(message.getSender());
+            this.network.broadcast(message, excludes, false);
+        } else {
+            this.network.broadcast(message, null, false);
+        }
 
     }
 
@@ -469,183 +522,178 @@ public class TelegramManager extends Thread {
     }
 
     /**
-     * Заносит телеграмму в память Ноды или удаляет по списку
+     * Заносит телеграмму в память Ноды
      *
      * @param telegram  телеграмма котрую надо добавить
-     * @param firstItem если залан то будет удаление
-     * @param timeKey   ключ времени с которой удалять
      * @return TRUE if not added
      */
-    public synchronized boolean pipeAddRemove(TelegramMessage telegram, List<TelegramMessage> firstItem,
-                                              long timeKey) {
+    public boolean add(TelegramMessage telegram) {
 
         Transaction transaction;
 
-        if (firstItem == null) {
+        transaction = telegram.getTransaction();
 
-            transaction = telegram.getTransaction();
+        // CHECK IF SIGNATURE IS VALID OR GENESIS TRANSACTION
+        Account creator = transaction.getCreator();
+        if (creator == null || !transaction.isSignatureValid(DCSet.getInstance())) {
+            // DISHONEST PEER
+            ///this.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
+            ///		"ban PeerOnError - invalid telegram signature");
+            return true;
+        }
 
-            // CHECK IF SIGNATURE IS VALID OR GENESIS TRANSACTION
-            Account creator = transaction.getCreator();
-            if (creator == null || !transaction.isSignatureValid(DCSet.getInstance())) {
-                // DISHONEST PEER
-                ///this.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
-                ///		"ban PeerOnError - invalid telegram signature");
-                return true;
+        long timestamp = transaction.getTimestamp();
+        if (timestamp > NTP.getTime() + 10000) {
+            // DISHONEST PEER
+            ///this.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
+            ///		"ban PeerOnError - invalid telegram timestamp >>");
+            return true;
+        } else if (30000 + timestamp < NTP.getTime()) {
+            // DISHONEST PEER
+            ///this.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
+            ///		"ban PeerOnError - invalid telegram timestamp <<");
+            return true;
+        }
+
+        // TRY DO COMMANDS
+        if (!try_command(transaction)) {
+            // go broadcast
+            return false;
+        }
+
+        String signatureKey;
+
+        // signatureKey =
+        // java.util.Base64.getEncoder().encodeToString(transaction.getSignature());
+        signatureKey = Base58.encode(transaction.getSignature());
+
+        if (this.handledTelegrams.containsKey(signatureKey))
+            return true;
+
+        // CHECK IF LIST IS FULL
+        if (this.handledTelegrams.size() > MAX_HANDLED_TELEGRAMS_SIZE) {
+            List<TelegramMessage> telegrams = this.telegramsForTime.remove(this.telegramsForTime.firstKey());
+            remove(telegrams, 0);
+        }
+
+        this.handledTelegrams.put(signatureKey, telegram);
+
+        if (Settings.getInstance().getTelegramStoreUse() && Settings.getInstance().getTelegramStorePeriod() > 0) {
+            // IF MY STORE is USED
+            if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
+
+                // save telegram to wallet DB
+                if (Controller.getInstance().wallet.accountExists(transaction.getCreator().getAddress())) {
+                    // add as my OUTCOME
+                    Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, transaction);
+                } else {
+                    // TRY ADD as my INCOME
+                    HashSet<Account> recipients = transaction.getRecipientAccounts();
+                    for (Account recipient : recipients) {
+                        if (Controller.getInstance().wallet.accountExists(recipient.getAddress())) {
+                            Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, transaction);
+                            break;
+                        }
+                    }
+                }
             }
+        }
 
-            long timestamp = transaction.getTimestamp();
-            if (timestamp > NTP.getTime() + 10000) {
-                // DISHONEST PEER
-                ///this.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
-                ///		"ban PeerOnError - invalid telegram timestamp >>");
-                return true;
-            } else if (30000 + timestamp < NTP.getTime()) {
-                // DISHONEST PEER
-                ///this.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
-                ///		"ban PeerOnError - invalid telegram timestamp <<");
-                return true;
+        // MAP timestamps
+        List<TelegramMessage> timestampTelegrams = this.telegramsForTime.get(timestamp);
+        if (timestampTelegrams == null) {
+            timestampTelegrams = new ArrayList<TelegramMessage>();
+        }
+
+        timestampTelegrams.add(telegram);
+        this.telegramsForTime.put((Long) timestamp, timestampTelegrams);
+
+        HashSet<Account> recipients;
+        String address;
+
+        // MAP addresses
+        recipients = transaction.getRecipientAccounts();
+        if (recipients != null) {
+            for (Account recipient : recipients) {
+                address = recipient.getAddress();
+                List<TelegramMessage> addressTelegrams = this.telegramsForAddress.get(address);
+                if (addressTelegrams == null) {
+                    addressTelegrams = new ArrayList<TelegramMessage>();
+                }
+                addressTelegrams.add(telegram);
+                this.telegramsForAddress.put(address, addressTelegrams);
             }
+        }
 
-            // TRY DO COMMANDS
-            if (!try_command(transaction)) {
-                // go broadcast
-                return false;
-            }
-
-            String signatureKey;
-
-            // CHECK IF LIST IS FULL
-            if (this.handledTelegrams.size() > MAX_HANDLED_TELEGRAMS_SIZE) {
-                List<TelegramMessage> telegrams = this.telegramsForTime.remove(this.telegramsForTime.firstKey());
-                pipeAddRemove(null, telegrams, 0);
-            }
-
-            // signatureKey =
-            // java.util.Base64.getEncoder().encodeToString(transaction.getSignature());
-            signatureKey = Base58.encode(transaction.getSignature());
-
-            if (false) {
-                Message old_value = this.handledTelegrams.put(signatureKey, telegram.copy());
-                if (old_value != null)
-                    return true;
-            } else {
-                if (this.handledTelegrams.containsKey(signatureKey))
-                    return true;
+        address = transaction.getCreator().getAddress();
+        if (this.telegramsCounts.containsKey(address)) {
+            this.telegramsCounts.put(address, this.telegramsCounts.get(address) + 1);
+        } else {
+            this.telegramsCounts.put(address, 1);
+        }
 
 
-                this.handledTelegrams.put(signatureKey, telegram);
+        return false;
 
-                if (Settings.getInstance().getTelegramStoreUse() && Settings.getInstance().getTelegramStorePeriod() > 0) {
-                    // IF MY STORE is USED
-                    if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
+    }
 
-                        // save telegram to wallet DB
-                        Transaction trans = telegram.getTransaction();
-                        if (Controller.getInstance().wallet.accountExists(trans.getCreator().getAddress())) {
-                            // add as my OUTCOME
-                            Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
-                        } else {
-                            // TRY ADD as my INCOME
-                            HashSet<Account> recipients = trans.getRecipientAccounts();
-                            for (Account recipient : recipients) {
-                                if (Controller.getInstance().wallet.accountExists(recipient.getAddress())) {
-                                    Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, telegram.getTransaction());
+    public boolean remove(List<TelegramMessage> firstItem,
+                          long timeKey) {
+
+        Transaction transaction;
+        TelegramMessage telegram;
+
+        HashSet<Account> recipients;
+        String address;
+        int i;
+
+        List<TelegramMessage> telegrams = firstItem;
+        // for all signatures on this TIME
+        for (TelegramMessage telegram_item : telegrams) {
+            telegram = this.handledTelegrams.remove(Base58.encode(telegram_item.getTransaction().getSignature()));
+            if (telegram != null) {
+                transaction = telegram.getTransaction();
+                byte[] signature = transaction.getSignature();
+                recipients = transaction.getRecipientAccounts();
+                if (recipients != null) {
+                    for (Account recipient : recipients) {
+                        address = recipient.getAddress();
+                        List<TelegramMessage> addressTelegrams = this.telegramsForAddress.get(address);
+                        if (addressTelegrams != null) {
+                            i = 0;
+                            for (TelegramMessage addressTelegram : addressTelegrams) {
+                                if (Arrays.equals(addressTelegram.getTransaction().getSignature(), signature)) {
+                                    addressTelegrams.remove(i);
                                     break;
                                 }
+                                i++;
                             }
                         }
-                    }
-                }
-            }
-
-            // MAP timestamps
-            List<TelegramMessage> timestampTelegrams = this.telegramsForTime.get(timestamp);
-            if (timestampTelegrams == null) {
-                timestampTelegrams = new ArrayList<TelegramMessage>();
-            }
-
-            timestampTelegrams.add(telegram);
-            this.telegramsForTime.put((Long) timestamp, timestampTelegrams);
-
-            HashSet<Account> recipients;
-            String address;
-
-            // MAP addresses
-            recipients = transaction.getRecipientAccounts();
-            if (recipients != null) {
-                for (Account recipient : recipients) {
-                    address = recipient.getAddress();
-                    List<TelegramMessage> addressTelegrams = this.telegramsForAddress.get(address);
-                    if (addressTelegrams == null) {
-                        addressTelegrams = new ArrayList<TelegramMessage>();
-                    }
-                    addressTelegrams.add(telegram);
-                    this.telegramsForAddress.put(address, addressTelegrams);
-                }
-            }
-
-            address = transaction.getCreator().getAddress();
-            if (this.telegramsCounts.containsKey(address)) {
-                this.telegramsCounts.put(address, this.telegramsCounts.get(address) + 1);
-            } else {
-                this.telegramsCounts.put(address, 1);
-            }
-
-        } else {
-
-            HashSet<Account> recipients;
-            String address;
-            int i;
-
-            List<TelegramMessage> telegrams = firstItem;
-            // for all signatures on this TIME
-            for (TelegramMessage telegram_item : telegrams) {
-                telegram = this.handledTelegrams.remove(Base58.encode(telegram_item.getTransaction().getSignature()));
-                if (telegram != null) {
-                    transaction = telegram.getTransaction();
-                    byte[] signature = transaction.getSignature();
-                    recipients = transaction.getRecipientAccounts();
-                    if (recipients != null) {
-                        for (Account recipient : recipients) {
-                            address = recipient.getAddress();
-                            List<TelegramMessage> addressTelegrams = this.telegramsForAddress.get(address);
-                            if (addressTelegrams != null) {
-                                i = 0;
-                                for (TelegramMessage addressTelegram : addressTelegrams) {
-                                    if (addressTelegram.getTransaction().getSignature().equals(signature)) {
-                                        addressTelegrams.remove(i);
-                                        break;
-                                    }
-                                    i++;
-                                }
-                            }
-                            // IF list is empty
-                            if (addressTelegrams.isEmpty()) {
-                                this.telegramsForAddress.remove(address);
-                            } else {
-                                this.telegramsForAddress.put(address, addressTelegrams);
-                            }
-                        }
-                    }
-
-                    // CREATOR counts
-                    address = transaction.getCreator().getAddress();
-                    Integer count = this.telegramsCounts.get(address);
-                    if (count != null) {
-                        if (count < 2) {
-                            this.telegramsCounts.remove(address);
+                        // IF list is empty
+                        if (addressTelegrams.isEmpty()) {
+                            this.telegramsForAddress.remove(address);
                         } else {
-                            this.telegramsCounts.put(address, count - 1);
+                            this.telegramsForAddress.put(address, addressTelegrams);
                         }
                     }
                 }
-            }
 
-            // by TIME
-            if (timeKey > 0)
-                this.telegramsForTime.remove(timeKey);
+                // CREATOR counts
+                address = transaction.getCreator().getAddress();
+                Integer count = this.telegramsCounts.get(address);
+                if (count != null) {
+                    if (count < 2) {
+                        this.telegramsCounts.remove(address);
+                    } else {
+                        this.telegramsCounts.put(address, count - 1);
+                    }
+                }
+            }
         }
+
+        // by TIME
+        if (timeKey > 0)
+            this.telegramsForTime.remove(timeKey);
 
         return false;
 
@@ -656,38 +704,56 @@ public class TelegramManager extends Thread {
      */
 
     public void run() {
-        this.isRun = true;
+        this.run = true;
 
-        while (this.isRun && !this.isInterrupted()) {
+        long timeWaiter = 0;
+        long timestamp;
+        while (this.run) {
             try {
-                Thread.sleep(1000);
-            } catch (InterruptedException es) {
-                return;
+                try {
+                    processMessage(blockingQueue.poll(1000, TimeUnit.MILLISECONDS));
+                } catch (java.lang.OutOfMemoryError e) {
+                    Controller.getInstance().stopAll(81);
+                    break;
+                } catch (java.lang.IllegalMonitorStateException e) {
+                    break;
+                } catch (java.lang.InterruptedException e) {
+                    break;
+                }
+
+                timestamp = NTP.getTime();
+                if (timestamp - timeWaiter > 1000) {
+
+                    do {
+
+                        timeWaiter = timestamp;
+
+                        Entry<Long, List<TelegramMessage>> firstItem = this.telegramsForTime.firstEntry();
+                        if (firstItem == null)
+                            break;
+
+                        long timeKey = firstItem.getKey();
+
+                        if (timeKey + KEEP_TIME < timestamp) {
+                            remove(firstItem.getValue(), timeKey);
+                        } else {
+                            break;
+                        }
+                    } while (true);
+                }
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(82);
+                break;
             }
 
-            long timestamp = NTP.getTime();
-
-            synchronized (this.handledTelegrams) {
-
-                do {
-                    Entry<Long, List<TelegramMessage>> firstItem = this.telegramsForTime.firstEntry();
-                    if (firstItem == null)
-                        break;
-
-                    long timeKey = firstItem.getKey();
-
-                    if (timeKey + KEEP_TIME < timestamp) {
-                        pipeAddRemove(null, firstItem.getValue(), timeKey);
-                    } else {
-                        break;
-                    }
-                } while (true);
-            }
         }
+
+        LOGGER.info("Telegram Manager halted");
+
     }
 
     public void halt() {
-        this.isRun = false;
+        this.run = false;
     }
 
 }

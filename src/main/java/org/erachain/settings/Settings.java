@@ -84,6 +84,11 @@ public class Settings {
     private static final String DEFAULT_BIRTH_TIME_FORMAT = "yyyy-MM-dd HH:mm z";
     private static final boolean DEFAULT_NS_UPDATE = false;
     private static final boolean DEFAULT_FORGING_ENABLED = true;
+
+    /**
+     * нельзя тут использовать localhost - только 127....
+     * ex: http://127.0.0.1/7pay_in/tools/block_proc/ERA
+     */
     private static final String NOTIFY_INCOMING_URL = "http://127.0.0.1:8000/exhange/era/income";
     private static final int NOTIFY_INCOMING_CONFIRMATIONS = 0;
     public static String DEFAULT_LANGUAGE = "en";

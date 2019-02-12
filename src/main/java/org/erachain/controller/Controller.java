@@ -79,6 +79,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.Timer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -138,20 +139,19 @@ public class Controller extends Observable {
     private TradersManager tradersManager;
     private ApiService rpcService;
     private WebService webService;
-    private WinBlockSelector winBlockSelector;
+    public WinBlockSelector winBlockSelector;
     private BlockChain blockChain;
     private BlockGenerator blockGenerator;
     private Synchronizer synchronizer;
     private TransactionCreator transactionCreator;
     private boolean needSyncWallet = false;
     private Timer connectTimer;
-    private Timer timerUnconfirmed;
     private Random random = new SecureRandom();
     private byte[] foundMyselfID = new byte[128];
     private byte[] messageMagic;
     private long toOfflineTime;
-    private Map<Peer, Tuple2<Integer, Long>> peerHWeight;
-    private Map<Peer, Pair<String, Long>> peersVersions;
+    private ConcurrentHashMap<Peer, Tuple2<Integer, Long>> peerHWeight;
+    private ConcurrentHashMap<Peer, Pair<String, Long>> peersVersions;
     private DBSet dbSet; // = DBSet.getInstance();
     private DCSet dcSet; // = DBSet.getInstance();
 
@@ -509,11 +509,11 @@ public class Controller extends Observable {
         this.foundMyselfID = new byte[128];
         this.random.nextBytes(this.foundMyselfID);
 
-        this.peerHWeight = Collections.synchronizedMap(new LinkedHashMap<Peer, Tuple2<Integer, Long>>());
+        this.peerHWeight = new ConcurrentHashMap<Peer, Tuple2<Integer, Long>>();
         // LINKED TO PRESERVE ORDER WHEN SYNCHRONIZING (PRIORITIZE SYNCHRONIZING
         // FROM LONGEST CONNECTION ALIVE)
 
-        this.peersVersions = Collections.synchronizedMap(new LinkedHashMap<Peer, Pair<String, Long>>());
+        this.peersVersions = new ConcurrentHashMap<Peer, Pair<String, Long>>();
 
         // CHECK NETWORK PORT AVAILABLE
         if (!Network.isPortAvailable(Controller.getInstance().getNetworkPort())) {
@@ -745,10 +745,12 @@ public class Controller extends Observable {
         this.network = new Network();
 
         // CLOSE ON UNEXPECTED SHUTDOWN
-        Runtime.getRuntime().addShutdownHook(new Thread() {
+        Runtime.getRuntime().addShutdownHook(new Thread(null, null, "ShutdownHook") {
             @Override
             public void run() {
-                stopAll(0);
+                // -999999 - not use System.exit() - if freeze exit
+                stopAll(-999999);
+                //Runtime.getRuntime().removeShutdownHook(currentThread());
             }
         });
 
@@ -1003,6 +1005,9 @@ public class Controller extends Observable {
             return;
         this.isStopping = true;
 
+        if (this.connectTimer != null)
+            this.connectTimer.cancel();
+
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing")));
         // STOP MESSAGE PROCESSOR
@@ -1012,8 +1017,16 @@ public class Controller extends Observable {
         LOGGER.info("Stopping message processor");
         this.network.stop();
 
-        LOGGER.info("Stopping WinBlock selector");
-        this.winBlockSelector.halt();
+
+        if (this.webService != null) {
+            LOGGER.info("Stopping WEB server");
+            this.webService.stop();
+        }
+
+        if (this.rpcService != null) {
+            LOGGER.info("Stopping RPC server");
+            this.rpcService.stop();
+        }
 
         // delete temp Dir
         this.setChanged();
@@ -1030,8 +1043,8 @@ public class Controller extends Observable {
 
         // STOP BLOCK PROCESSOR
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping block processor")));
-        LOGGER.info("Stopping block processor");
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping block synchronizer")));
+        LOGGER.info("Stopping block synchronizer");
         this.synchronizer.stop();
 
         // WAITING STOP MAIN PROCESS
@@ -1086,11 +1099,15 @@ public class Controller extends Observable {
 
         LOGGER.info("Closed.");
         // FORCE CLOSE
-        LOGGER.info("EXIT parameter:" + par);
-        System.exit(par);
-        // bat
-        // if %errorlevel% neq 0 exit /b %errorlevel%
-
+        if (par != -999999) {
+            LOGGER.info("EXIT parameter:" + par);
+            System.exit(par);
+            //System.
+            // bat
+            // if %errorlevel% neq 0 exit /b %errorlevel%
+        } else {
+            LOGGER.info("EXIT parameter:" + 0);
+        }
     }
 
 
@@ -1392,10 +1409,6 @@ public class Controller extends Observable {
         this.blockGenerator.setOrphanTo(height);
     }
 
-    public void clearWaitWinBufferProcessed() {
-        this.winBlockSelector.clearWaitWinBufferProcessed();
-    }
-
     public void onMessageTransaction(Message message) {
 
         long timeCheck = System.nanoTime();
@@ -1611,30 +1624,13 @@ public class Controller extends Observable {
 
                 break;
 
-            case Message.WIN_BLOCK_TYPE:
-
-                if (this.status != STATUS_OK) {
-                    break;
-                }
-
-                this.winBlockSelector.putMessage(message);
-
-                return;
-
-            case Message.TRANSACTION_TYPE:
-
-                onMessageTransaction(message);
-                break;
-
             case Message.VERSION_TYPE:
 
                 VersionMessage versionMessage = (VersionMessage) message;
 
                 // ADD TO LIST
-                synchronized (this.peersVersions) {
                     this.peersVersions.put(versionMessage.getSender(), new Pair<String, Long>(
                             versionMessage.getStrVersion(), versionMessage.getBuildDateTime()));
-                }
 
                 break;
 
@@ -1684,7 +1680,7 @@ public class Controller extends Observable {
             return;
 
         // BROADCAST MESSAGE
-        this.network.asyncBroadcastWinBlock(blockWinMessage, excludes, false);
+        this.network.broadcastWinBlock(blockWinMessage, excludes, false);
 
         LOGGER.info("broadcasted!");
 
@@ -2578,7 +2574,7 @@ public class Controller extends Observable {
 
         try {
             this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true);
-            this.clearWaitWinBufferProcessed();
+            this.network.clearHandledWinBlockMessages();
 
         } catch (Exception e) {
             if (this.isOnStopping()) {
@@ -3410,7 +3406,7 @@ public class Controller extends Observable {
             this.about_frame = AboutFrame.getInstance();
             this.addSingleObserver( about_frame);
             this.about_frame.setUserClose(false);
-           this.about_frame.setModal(false);
+            this.about_frame.setModal(false);
             this.about_frame.setVisible(true);
         }
         if (!cli) {

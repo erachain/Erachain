@@ -67,7 +67,7 @@ public class TelegramManagerTest {
     private void init() {
 
         dcSet = DCSet.createEmptyDatabaseSet();
-        telegramer = new TelegramManager(null);
+        telegramer = new TelegramManager(null, null, null, null);
         telegramer.start();
     }
 

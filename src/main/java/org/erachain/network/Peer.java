@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Arrays;
@@ -29,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 public class Peer extends MonitoredThread {
 
     private final static boolean USE_MONITOR = false;
-    private final static boolean logPings = true;
+    private final static boolean logPings = false;
 
     static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getName());
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
@@ -40,7 +41,7 @@ public class Peer extends MonitoredThread {
     private InetAddress address;
     public Socket socket;
 
-    BlockingQueue<DataInputStream> startReading = new ArrayBlockingQueue<DataInputStream>(1);
+    BlockingQueue<Object> startReading = new ArrayBlockingQueue<Object>(1);
 
     private Sender sender;
     private Pinger pinger;
@@ -242,6 +243,34 @@ public class Peer extends MonitoredThread {
         return this.pingCounter;
     }
 
+
+    public int compareTo(Peer peer) {
+
+        if (this.address.getAddress()[0] > peer.address.getAddress()[0])
+            return 1;
+        else if (this.address.getAddress()[0] < peer.address.getAddress()[0])
+            return -1;
+        else if (this.address.getAddress()[1] > peer.address.getAddress()[1])
+            return 1;
+        else if (this.address.getAddress()[1] < peer.address.getAddress()[1])
+            return -1;
+        else if (this.address.getAddress()[2] > peer.address.getAddress()[2])
+            return 1;
+        else if (this.address.getAddress()[2] < peer.address.getAddress()[2])
+            return -1;
+        else if (this.address.getAddress()[3] > peer.address.getAddress()[3])
+            return 1;
+        else if (this.address.getAddress()[3] < peer.address.getAddress()[3])
+            return -1;
+        else
+            return 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return new BigInteger(this.address.getAddress()).hashCode();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Peer) {
@@ -316,8 +345,14 @@ public class Peer extends MonitoredThread {
             if (USE_MONITOR) this.setMonitorPoint();
 
             DataInputStream in = null;
+            Object starter;
             try {
-                in = startReading.take();
+                starter = startReading.take();
+                if (starter instanceof DataInputStream) {
+                    in = (DataInputStream) starter;
+                } else
+                    break;
+
                 // INIT PINGER
                 pinger.init();
             } catch (InterruptedException e) {
@@ -687,6 +722,8 @@ public class Peer extends MonitoredThread {
 
     public void halt() {
 
+        this.pinger.close();
+        this.startReading.offer(-1);
         this.close("halt");
         this.setName(this.getName() + " halted");
 

@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 // upd 09/03
 
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.web.NameStorageMap;
@@ -1332,10 +1333,22 @@ public class DCSet implements Observer, IDB {
      */
     public DCSet fork() {
         this.addUses();
-        DCSet fork = new DCSet(this, null);
-        this.outUses();
 
-        return fork;
+        try {
+            DCSet fork = new DCSet(this, null);
+
+            this.outUses();
+            return fork;
+
+        } catch (java.lang.OutOfMemoryError e) {
+            LOGGER.error(e.getMessage(), e);
+
+            this.outUses();
+
+            Controller.getInstance().stopAll(13);
+            return null;
+        }
+
     }
 
     /**
@@ -1344,10 +1357,21 @@ public class DCSet implements Observer, IDB {
      */
     public DCSet forkinFile() {
         this.addUses();
-        DCSet fork = new DCSet(this, createForkbase());
-        this.outUses();
+        try {
+            DCSet fork = new DCSet(this, createForkbase());
 
-        return fork;
+            this.outUses();
+
+            return fork;
+        } catch (java.lang.OutOfMemoryError e) {
+            LOGGER.error(e.getMessage(), e);
+
+            this.outUses();
+
+            Controller.getInstance().stopAll(14);
+            return null;
+        }
+
     }
     @Override
     public void close() {

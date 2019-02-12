@@ -821,14 +821,9 @@ public class BlockGenerator extends Thread implements Observer {
                                     heapOverflowCount = 0;
 
                                 } catch (java.lang.OutOfMemoryError e) {
-                                    heapOverflowCount++;
-                                    if (heapOverflowCount > 1) {
-                                        ctrl.stopAll(94);
-                                        status = -1;
-                                        return;
-                                    }
-                                } finally {
-                                    System.gc();
+                                    ctrl.stopAll(94);
+                                    status = -1;
+                                    return;
                                 }
 
                                 solvingBlock = null;
@@ -864,12 +859,9 @@ public class BlockGenerator extends Thread implements Observer {
                                             LOGGER.info("my BLOCK is weak ((...");
                                         }
                                     } catch (java.lang.OutOfMemoryError e) {
-                                        heapOverflowCount++;
-                                        if (heapOverflowCount > 1) {
-                                            ctrl.stopAll(94);
-                                            status = -1;
-                                            return;
-                                        }
+                                        ctrl.stopAll(94);
+                                        status = -1;
+                                        return;
                                     }
                                 }
                             }
@@ -928,12 +920,9 @@ public class BlockGenerator extends Thread implements Observer {
                                         setForgingStatus(ForgingStatus.FORGING);
                                 }
                             } catch (java.lang.OutOfMemoryError e) {
-                                heapOverflowCount++;
-                                if (heapOverflowCount > 1) {
-                                    ctrl.stopAll(94);
-                                    status = -1;
-                                    return;
-                                }
+                                status = -1;
+                                ctrl.stopAll(94);
+                                return;
                             }
 
                             if (ctrl.isOnStopping()) {
@@ -1020,11 +1009,19 @@ public class BlockGenerator extends Thread implements Observer {
 
                 }
 
-            } catch (Exception e) {
+            } catch (java.lang.OutOfMemoryError e) {
+                this.status = -1;
+
+                LOGGER.error(e.getMessage(), e);
+
+                ctrl.stopAll(96);
+                return;
+            } catch (Throwable e) {
                 if (ctrl.isOnStopping()) {
                     this.status = -1;
                     return;
                 }
+
                 LOGGER.error(e.getMessage(), e);
 
             }

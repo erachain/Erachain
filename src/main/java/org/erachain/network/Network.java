@@ -17,6 +17,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * основной класс модуля Сети
@@ -25,16 +27,22 @@ public class Network extends Observable {
 
     public static final int SEND_WAIT = 20000;
     public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK ? 0 : 1;
-    private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<4;
-    private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 12 : 1024 << 8;
+    private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<5;
+    private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 6 : 1024<<3;
+    private static final int MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE = BlockChain.HARD_WORK ? 100 : 200;
     private static final Logger LOGGER = LoggerFactory.getLogger(Network.class);
     private static InetAddress myselfAddress;
     private ConnectionCreator creator;
     private ConnectionAcceptor acceptor;
     PeerManager peerManager;
-    private TelegramManager telegramer;
-    List<Peer> knownPeers;
-    private SortedSet<String> handledMessages;
+    public TelegramManager telegramer;
+    CopyOnWriteArrayList<Peer> knownPeers;
+
+    //private SortedSet<String> handledTelegramMessages;
+    private ConcurrentSkipListSet<String> handledTelegramMessages;
+    private ConcurrentSkipListSet<String> handledTransactionMessages;
+    private ConcurrentSkipListSet<String> handledWinBlockMessages;
+
     //boolean tryRun; // попытка запуска
     boolean run;
 
@@ -44,7 +52,11 @@ public class Network extends Observable {
 
 
     public Network() {
-        this.knownPeers = new ArrayList<Peer>();
+        this.knownPeers = new CopyOnWriteArrayList<Peer>();
+        this.handledTelegramMessages = new ConcurrentSkipListSet<String>();
+        this.handledTransactionMessages = new ConcurrentSkipListSet();
+        this.handledWinBlockMessages = new ConcurrentSkipListSet();
+
         this.run = true;
 
         this.start();
@@ -83,7 +95,7 @@ public class Network extends Observable {
     }
 
     private void start() {
-        this.handledMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
+
 
         //START ConnectionCreator THREAD
         creator = new ConnectionCreator(this);
@@ -96,32 +108,34 @@ public class Network extends Observable {
         peerManager = new PeerManager(this);
         peerManager.start();
 
-        telegramer = new TelegramManager(this);
-        telegramer.start();
+        telegramer = new TelegramManager(Controller.getInstance(),
+                Controller.getInstance().getBlockChain(),
+                DCSet.getInstance(),
+                this);
     }
 
     public void onConnect(Peer peer) {
 
-        if (!run)
+        if (!run) {
+            peer.close("network is stopped");
             return;
+        }
 
         //LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer);
 
         boolean asNew = true;
-        synchronized (this.knownPeers) {
-            for (Peer peerKnown : this.knownPeers) {
-                if (//peer.equals(peerKnown)
-                        // новый поток мог быть создан - поэтому хдесь провереи его
-                        //peer.isAlive()
-                        peer.getId() == peerKnown.getId()) {
-                    asNew = false;
-                    break;
-                }
+        for (Peer peerKnown : this.knownPeers) {
+            if (//peer.equals(peerKnown)
+                // новый поток мог быть создан - поэтому хдесь провереи его
+                //peer.isAlive()
+                    peer.getId() == peerKnown.getId()) {
+                asNew = false;
+                break;
             }
-            if (asNew) {
-                //ADD TO CONNECTED PEERS
-                this.knownPeers.add(peer);
-            }
+        }
+        if (asNew) {
+            //ADD TO CONNECTED PEERS
+            this.knownPeers.add(peer);
         }
 
         //ADD TO DATABASE
@@ -168,16 +182,14 @@ public class Network extends Observable {
     public boolean isKnownAddress(InetAddress address, boolean andUsed) {
 
         try {
-            synchronized (this.knownPeers) {
-                //FOR ALL connectedPeers
-                for (Peer knownPeer : knownPeers) {
-                    //CHECK IF ADDRESS IS THE SAME
-                    if (address.equals(knownPeer.getAddress())) {
-                        if (andUsed) {
-                            return knownPeer.isUsed();
-                        }
-                        return true;
+            //FOR ALL connectedPeers
+            for (Peer knownPeer : knownPeers) {
+                //CHECK IF ADDRESS IS THE SAME
+                if (address.equals(knownPeer.getAddress())) {
+                    if (andUsed) {
+                        return knownPeer.isUsed();
                     }
+                    return true;
                 }
             }
         } catch (Exception e) {
@@ -193,18 +205,16 @@ public class Network extends Observable {
         Peer knowmPeer = null;
         try {
             byte[] address = peer.getAddress().getAddress();
-            synchronized (this.knownPeers) {
-                //FOR ALL connectedPeers
-                for (Peer knownPeer : knownPeers) {
-                    //CHECK IF ADDRESS IS THE SAME
-                    if (Arrays.equals(address, knownPeer.getAddress().getAddress())
-                            && (type == ANY_TYPE || type == WHITE_TYPE && knownPeer.isWhite()
-                                    || !knowmPeer.isWhite())
-                    ) {
-                        // иначе тут не сработате правильно org.erachain.network.Network.onConnect
-                        // поэтому сразу выдаем первый что нашли без каких либо условий
-                        return knownPeer;
-                    }
+            //FOR ALL connectedPeers
+            for (Peer knownPeer : knownPeers) {
+                //CHECK IF ADDRESS IS THE SAME
+                if (Arrays.equals(address, knownPeer.getAddress().getAddress())
+                        && (type == ANY_TYPE || type == WHITE_TYPE && knownPeer.isWhite()
+                        || !knowmPeer.isWhite())
+                ) {
+                    // иначе тут не сработате правильно org.erachain.network.Network.onConnect
+                    // поэтому сразу выдаем первый что нашли без каких либо условий
+                    return knownPeer;
                 }
             }
         } catch (Exception e) {
@@ -217,13 +227,11 @@ public class Network extends Observable {
     // IF PEER in exist in NETWORK - get it
     public Peer getKnownWhitePeer(byte[] addressIP) {
 
-        synchronized (this.knownPeers) {
-            //FOR ALL connectedPeers
-            for (Peer knownPeer : knownPeers) {
-                //CHECK IF ADDRESS IS THE SAME
-                if (knownPeer.isWhite() && Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
-                    return knownPeer;
-                }
+        //FOR ALL connectedPeers
+        for (Peer knownPeer : knownPeers) {
+            //CHECK IF ADDRESS IS THE SAME
+            if (knownPeer.isWhite() && Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
+                return knownPeer;
             }
         }
 
@@ -233,13 +241,11 @@ public class Network extends Observable {
     // IF PEER in exist in NETWORK - get it
     public Peer getKnownNonWhitePeer(byte[] addressIP) {
 
-        synchronized (this.knownPeers) {
-            //FOR ALL connectedPeers
-            for (Peer knownPeer : knownPeers) {
-                //CHECK IF ADDRESS IS THE SAME
-                if (!knownPeer.isWhite() && Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
-                    return knownPeer;
-                }
+        //FOR ALL connectedPeers
+        for (Peer knownPeer : knownPeers) {
+            //CHECK IF ADDRESS IS THE SAME
+            if (!knownPeer.isWhite() && Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
+                return knownPeer;
             }
         }
 
@@ -258,19 +264,17 @@ public class Network extends Observable {
 
         //CHECK IF ALREADY CONNECTED TO PEER
         byte[] address = peer.getAddress().getAddress();
-        synchronized (this.knownPeers) {
-            //FOR ALL connectedPeers
-            for (Peer knownPeer : this.knownPeers) {
-                //CHECK IF ADDRESS IS THE SAME
-                if (!knownPeer.isAlive()
-                        || peer.getId() == knownPeer.getId()
-                        || !Arrays.equals(address, knownPeer.getAddress().getAddress())
-                        || NTP.getTime() - knownPeer.getConnectionTime() < 1000
-                )
-                    continue;
+        //FOR ALL connectedPeers
+        for (Peer knownPeer : this.knownPeers) {
+            //CHECK IF ADDRESS IS THE SAME
+            if (!knownPeer.isAlive()
+                    || peer.getId() == knownPeer.getId()
+                    || !Arrays.equals(address, knownPeer.getAddress().getAddress())
+                    || NTP.getTime() - knownPeer.getConnectionTime() < 1000
+            )
+                continue;
 
-                return false;
-            }
+            return false;
         }
 
         return true;
@@ -280,12 +284,10 @@ public class Network extends Observable {
     public List<Peer> getActivePeers(boolean onlyWhite) {
 
         List<Peer> activePeers = new ArrayList<Peer>();
-        synchronized (this.knownPeers) {
-            for (Peer peer : this.knownPeers) {
-                if (peer.isUsed())
-                    if (!onlyWhite || peer.isWhite())
-                        activePeers.add(peer);
-            }
+        for (Peer peer : this.knownPeers) {
+            if (peer.isUsed())
+                if (!onlyWhite || peer.isWhite())
+                    activePeers.add(peer);
         }
         return activePeers;
     }
@@ -293,12 +295,10 @@ public class Network extends Observable {
     public int getActivePeersCounter(boolean onlyWhite) {
 
         int counter = 0;
-        synchronized (this.knownPeers) {
-            for (Peer peer : this.knownPeers) {
-                if (peer.isUsed())
-                    if (!onlyWhite || peer.isWhite())
-                        counter++;
-            }
+        for (Peer peer : this.knownPeers) {
+            if (peer.isUsed())
+                if (!onlyWhite || peer.isWhite())
+                    counter++;
         }
         return counter;
     }
@@ -346,18 +346,16 @@ public class Network extends Observable {
     public List<Peer> getIncomedPeers() {
 
         List<Peer> incomedPeers = new ArrayList<Peer>();
-        synchronized (this.knownPeers) {
-            for (Peer peer : this.knownPeers) {
-                if (peer.isUsed())
-                    if (!peer.isWhite())
-                        incomedPeers.add(peer);
-            }
+        for (Peer peer : this.knownPeers) {
+            if (peer.isUsed())
+                if (!peer.isWhite())
+                    incomedPeers.add(peer);
         }
         return incomedPeers;
     }
 
     public boolean addTelegram(TelegramMessage telegram) {
-        return this.telegramer.pipeAddRemove(telegram, null, 0);
+        return this.telegramer.add(telegram);
     }
 
     public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp, String filter) {
@@ -403,31 +401,27 @@ public class Network extends Observable {
 
         byte[] addressIP = socket.getInetAddress().getAddress();
         // REUSE known peer
-        synchronized (this.knownPeers) {
-            //FOR ALL connectedPeers
-            for (Peer knownPeer : knownPeers) {
-                //CHECK IF ADDRESS IS THE SAME
-                if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
+        //FOR ALL connectedPeers
+        for (Peer knownPeer : knownPeers) {
+            //CHECK IF ADDRESS IS THE SAME
+            if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
 
-                    if (knownPeer.isUsed()) {
-                        knownPeer.close("before accept anew");
-                    }
-                    // IF PEER not USED and not onUSED
-                    knownPeer.connect(socket, this,"connected by restore!!! ");
-                    return knownPeer;
+                if (knownPeer.isUsed()) {
+                    knownPeer.close("before accept anew");
                 }
+                // IF PEER not USED and not onUSED
+                knownPeer.connect(socket, this, "connected by restore!!! ");
+                return knownPeer;
             }
         }
 
         // Если пустых мест уже мало то начинаем переиспользовать
         if (this.getActivePeersCounter(false) + 3 > Settings.getInstance().getMaxConnections() ) {
             // use UNUSED peers
-            synchronized (this.knownPeers) {
-                for (Peer knownPeer : this.knownPeers) {
-                    if (!knownPeer.isOnUsed() && !knownPeer.isUsed()) {
-                        knownPeer.connect(socket, this, "connected by recircle!!! ");
-                        return knownPeer;
-                    }
+            for (Peer knownPeer : this.knownPeers) {
+                if (!knownPeer.isOnUsed() && !knownPeer.isUsed()) {
+                    knownPeer.connect(socket, this, "connected by recircle!!! ");
+                    return knownPeer;
                 }
             }
         }
@@ -443,20 +437,32 @@ public class Network extends Observable {
 
     }
 
-    private void addHandledMessage(String hash) {
-        try {
-            synchronized (this.handledMessages) {
-                //CHECK IF LIST IS FULL
-                if (this.handledMessages.size() > MAX_HANDLED_MESSAGES_SIZE) {
-                    this.handledMessages.remove(this.handledMessages.first());
-                    ///LOGGER.error("handledMessages size OVERHEAT! ");
-                }
+    // очишаем потихоньку
+    public void clearHandledTelegramMessages() {
+        int size = handledTelegramMessages.size();
+        if (size > 100)
+            size >>= 3;
 
-                this.handledMessages.add(hash);
-            }
-        } catch (Exception e) {
-            //LOGGER.error(e.getMessage(),e);
-        }
+        for (int i = 0; i < size; i++)
+            this.handledTelegramMessages.remove(this.handledTelegramMessages.first());
+
+    }
+
+    // очишаем потихоньку
+    public void clearHandledTransactionMessages() {
+        int size = handledTransactionMessages.size();
+        if (size > 32)
+            size >>= 3;
+
+        for (int i = 0; i < size; i++)
+            this.handledTransactionMessages.remove(this.handledTransactionMessages.first());
+
+    }
+
+    public void clearHandledWinBlockMessages() {
+        handledWinBlockMessages.clear();
+        clearHandledTransactionMessages();
+        clearHandledTelegramMessages();
     }
 
     public void onMessagePeers(Peer sender, int messageID) {
@@ -487,36 +493,45 @@ public class Network extends Observable {
             return;
         }
 
-        //ONLY HANDLE WINBLOCK, TELEGRAMS AND TRANSACTION MESSAGES ONCE
-        if (
-                message.getType() == Message.TELEGRAM_TYPE
-                        || message.getType() == Message.TRANSACTION_TYPE
-                        || message.getType() == Message.WIN_BLOCK_TYPE
-        ) {
-            synchronized (this.handledMessages) {
-                //CHECK IF NOT HANDLED ALREADY
-                String key = new String(message.getHash());
-                if (this.handledMessages.contains(key)) {
-                    return;
-                }
-
-                //ADD TO HANDLED MESSAGES
-                this.addHandledMessage(key);
-            }
-        }
-
         long timeCheck = System.currentTimeMillis();
         switch (message.getType()) {
+
             case Message.TELEGRAM_TYPE:
-                // telegram
-                if (!this.telegramer.pipeAddRemove((TelegramMessage) message, null, 0)) {
-                    // BROADCAST
-                    List<Peer> excludes = new ArrayList<Peer>();
-                    excludes.add(message.getSender());
-                    this.broadcast(message, excludes, false);
+
+                //CHECK IF NOT HANDLED ALREADY
+                String key = new String(message.getHash());
+                if (this.handledTelegramMessages.add(key)) {
+                    //ADD TO HANDLED MESSAGES
+
+                    //CHECK IF LIST IS FULL
+                    if (this.handledTelegramMessages.size() > MAX_HANDLED_TELEGRAM_MESSAGES_SIZE) {
+                        this.handledTelegramMessages.remove(this.handledTelegramMessages.first());
+                    }
+
+                    // telegram
+                    this.telegramer.offerMessage(message);
                 }
 
                 return;
+
+            case Message.TRANSACTION_TYPE:
+
+                //CHECK IF NOT HANDLED ALREADY
+                key = new String(message.getHash());
+                if (this.handledTransactionMessages.add(key)) {
+                    //ADD TO HANDLED MESSAGES
+
+                    //CHECK IF LIST IS FULL
+                    if (this.handledTransactionMessages.size() > MAX_HANDLED_TRANSACTION_MESSAGES_SIZE) {
+                        this.handledTransactionMessages.remove(this.handledTransactionMessages.first());
+                    }
+
+                    Controller.getInstance().onMessageTransaction(message);
+
+                }
+
+                return;
+
             case Message.TELEGRAM_GET_TYPE:
                 // GET telegrams
                 //address
@@ -551,21 +566,12 @@ public class Network extends Observable {
                 response.setId(message.getId());
 
                 timeCheck = System.currentTimeMillis() - timeCheck;
-                if (true || timeCheck > 10) {
-                    LOGGER.debug(message.getSender() + ": " + message + " solver by period: " + timeCheck);
+                if (timeCheck > 10) {
+                    LOGGER.debug(message.getSender() + ": " + message + " solved by period: " + timeCheck);
                 }
-                timeCheck = System.currentTimeMillis();
 
                 //SEND BACK TO SENDER
-                if (false)
-                    message.getSender().sendHWeight(response);
-                else
-                    message.getSender().offerMessage(response);
-
-                timeCheck = System.currentTimeMillis() - timeCheck;
-                if (true || timeCheck > 10) {
-                    LOGGER.debug(message.getSender() + ": " + message + " >>> by period: " + timeCheck);
-                }
+                message.getSender().offerMessage(response);
 
                 break;
 
@@ -585,6 +591,25 @@ public class Network extends Observable {
 
                 break;
 
+            case Message.WIN_BLOCK_TYPE:
+
+                //CHECK IF NOT HANDLED ALREADY
+                key = new String(message.getHash());
+                if (this.handledWinBlockMessages.add(key)) {
+                    //ADD TO HANDLED MESSAGES
+
+                    //CHECK IF LIST IS FULL
+                    if (this.handledWinBlockMessages.size() > MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE) {
+                        this.handledWinBlockMessages.remove(this.handledWinBlockMessages.first());
+                    }
+
+                    if (Controller.getInstance().isStatusOK()) {
+                        Controller.getInstance().winBlockSelector.offerMessage(message);
+                    }
+                }
+
+                return;
+
             //SEND TO CONTROLLER
             default:
 
@@ -599,15 +624,13 @@ public class Network extends Observable {
         Controller cnt = Controller.getInstance();
         BlockChain chain = cnt.getBlockChain();
         Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
-        Peer peer;
         Tuple2<Integer, Long> peerHWeight;
 
-        for (int i = 0; i < this.knownPeers.size(); i++) {
+        for (Peer peer : this.knownPeers) {
 
             if (!this.run)
                 return;
 
-            peer = this.knownPeers.get(i);
             if (peer == null || !peer.isUsed()) {
                 continue;
             }
@@ -634,12 +657,11 @@ public class Network extends Observable {
         BlockChain chain = cnt.getBlockChain();
         Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
 
-        for (int i = 0; i < this.knownPeers.size(); i++) {
+        for (Peer peer : this.knownPeers) {
 
             if (!this.run)
                 return;
 
-            Peer peer = this.knownPeers.get(i);
             if (peer == null || !peer.isUsed()) {
                 continue;
             }
@@ -663,19 +685,17 @@ public class Network extends Observable {
         }
     }
 
-    public void asyncBroadcastWinBlock(BlockWinMessage winBlock, List<Peer> exclude, boolean onlySynchronized) {
+    public void broadcastWinBlock(BlockWinMessage winBlock, List<Peer> exclude, boolean onlySynchronized) {
 
-        //LOGGER.debug("ASYNC Broadcasting " + message.viewType());
         Controller cnt = Controller.getInstance();
         BlockChain chain = cnt.getBlockChain();
         Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
 
-        for (int i = 0; i < this.knownPeers.size(); i++) {
+        for (Peer peer : this.knownPeers) {
 
             if (!this.run)
                 return;
 
-            Peer peer = this.knownPeers.get(i);
             if (peer == null || !peer.isUsed()) {
                 continue;
             }
@@ -727,19 +747,9 @@ public class Network extends Observable {
 
         this.telegramer.halt();
 
-        this.onMessage(null);
-        int size = knownPeers.size();
-
-        for (int i =0; i<size; i++){
+        for (Peer peer : knownPeers) {
             // HALT Peer
-            knownPeers.get(i).halt();
-            if (false) {
-                try {
-                    knownPeers.get(i).join();
-                } catch (Exception e) {
-                    LOGGER.error(e.getMessage(), e);
-                }
-            }
+            peer.halt();
         }
 
         knownPeers.clear();

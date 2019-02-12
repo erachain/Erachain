@@ -1,8 +1,8 @@
 package org.erachain.utils;
 
 import org.erachain.controller.Controller;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MemoryViewer extends Thread {
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
@@ -18,17 +18,29 @@ public class MemoryViewer extends Thread {
 
     public void run() {
 
-        try {
-            sleep(100000);
-        } catch (Exception e) {
+        int i = 0;
+        while (i++ < 100) {
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {
+                // need for EXIT
+                return;
+            }
+            if (Controller.getInstance().isOnStopping())
+                return;
         }
+        if (Controller.getInstance().isOnStopping())
+            return;
 
         // if memory !Ok
         while (true) {
             try {
                 sleep(1000);
             } catch (InterruptedException e) {
+                return;
             }
+            if (Controller.getInstance().isOnStopping())
+                return;
 
             //threads
             if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
