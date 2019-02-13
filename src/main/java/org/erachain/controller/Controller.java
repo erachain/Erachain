@@ -90,7 +90,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.12.01 beta rc";
+    public static String version = "4.11.09 beta rc";
     public static String buildTime = "2019-02-13 13:33:33 UTC";
     private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.DEVELOP_USE? false : false;
 
