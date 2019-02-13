@@ -49,10 +49,10 @@ public class BlocksRequest extends MonitoredThread {
         blockingQueue.offer(message);
     }
 
-    public void processMessage(Message message) {
+    public int processMessage(Message message) {
 
         if (message == null)
-            return;
+            return 0;
 
         GetBlockMessage getBlockMessage = (GetBlockMessage) message;
 
@@ -79,6 +79,7 @@ public class BlocksRequest extends MonitoredThread {
             //banPeerOnError(message.getSender(), mess);
         }
 
+        return 3 + newBlock.getTransactionCount();
     }
 
     public void run() {
@@ -86,9 +87,10 @@ public class BlocksRequest extends MonitoredThread {
         try {
             runned = true;
             Message message;
+            int counter = 0;
             while (runned) {
                 try {
-                    processMessage(blockingQueue.take());
+                    counter += processMessage(blockingQueue.take());
                 } catch (OutOfMemoryError e) {
                     Controller.getInstance().stopAll(86);
                     break;
@@ -98,6 +100,15 @@ public class BlocksRequest extends MonitoredThread {
                     break;
                 }
 
+                // FREEZE sometimes
+                if (counter > 1000) {
+                    counter = 0;
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
             }
         } catch (OutOfMemoryError e) {
             controller.stopAll(44);
