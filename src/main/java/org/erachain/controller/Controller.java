@@ -1617,7 +1617,7 @@ public class Controller extends Observable {
                 // SEND RESPONSE BACK WITH SAME ID
                 message.getSender().offerMessage(response);
 
-                if (newBlock == null) {
+                if (false && newBlock == null) {
                     String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
                     banPeerOnError(message.getSender(), mess);
                 }
