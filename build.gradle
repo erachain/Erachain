@@ -6,17 +6,19 @@ buildscript {
     }
     dependencies {
         classpath 'org.ajoberstar:grgit:1.7.2'
+//        classpath 'org.slf4j:slf4j-api:1.6.1'
     }
 }
 
 plugins {
     id 'java'
     id 'idea'
-    id 'org.springframework.boot' version '2.0.5.RELEASE'
+    //id 'org.springframework.boot' version '2.0.5.RELEASE'
 }
 
 ext {
     //git = org.ajoberstar.grgit.Grgit.open()
+    slf4jVersion = '1.7.25'
     git = Grgit.open(dir: rootProject.rootDir)
     rev = git.head().id
     rev = git.head().getAbbreviatedId(8)
@@ -41,8 +43,8 @@ compileJava {
     options.encoding = "UTF-8"
 }
 
-bootJar {
-    mainClassName = "org.erachain.Start"
+jar {
+    //mainClassName = "org.erachain.Start"
 
     baseName = "erachain"
     destinationDir project.file('build/libs/Erachain')
@@ -51,6 +53,7 @@ bootJar {
 
     manifest {
         attributes(
+                'Main-Class':'org.erachain.Start',
                 'Implementation-Title': 'Gradle Build: ' + project.name,
                 'Implementation-Version': versionEra,
                 'Build-Time': new Date().format("yyyy-MM-dd HH:mm:ssZ"),
@@ -151,6 +154,10 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'jetty-util', version: '9.3.7.v20160115'
     compile group: 'org.swinglabs', name: 'pdf-renderer', version: '1.0.5'
 
-    compile "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
-    compile "org.springframework.boot:spring-boot:${springbootVersion}"
+    //compile "org.slf4j:slf4j-api:${slf4jVersion}"
+    //compile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+    compile "org.slf4j:slf4j-log4j12:${slf4jVersion}"
+
+    //compile "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
+    //compile "org.springframework.boot:spring-boot:${springbootVersion}"
 }
