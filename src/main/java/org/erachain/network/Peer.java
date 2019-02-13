@@ -485,7 +485,12 @@ public class Peer extends MonitoredThread {
 
                     long timeStart = System.currentTimeMillis();
 
-                    this.network.onMessage(message);
+                    try {
+                        this.network.onMessage(message);
+                    } catch (java.lang.OutOfMemoryError e) {
+                        Controller.getInstance().stopAll(88);
+                        break;
+                    }
 
                     timeStart = System.currentTimeMillis() - timeStart;
                     if (timeStart > 100) {
