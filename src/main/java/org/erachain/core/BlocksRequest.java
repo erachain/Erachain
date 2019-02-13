@@ -101,7 +101,7 @@ public class BlocksRequest extends MonitoredThread {
                 }
 
                 // FREEZE sometimes
-                if (counter > 1000) {
+                if (counter > 333) {
                     counter = 0;
                     try {
                         Thread.sleep(100);
