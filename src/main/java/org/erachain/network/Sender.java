@@ -38,8 +38,8 @@ public class Sender extends MonitoredThread {
     private HWeightMessage hWeightMessage;
     private BlockWinMessage winBlockToSend;
 
-    static final int MAX_FLUSH_LENGTH = 2000;
-    static final int MAX_FLUSH_TIME = 200;
+    static final int MAX_FLUSH_LENGTH = 20000;
+    static final int MAX_FLUSH_TIME = 300;
     private int out_flush_length;
     private long out_flush_time;
 
@@ -202,7 +202,9 @@ public class Sender extends MonitoredThread {
 
         long checkTime = System.currentTimeMillis();
 
-        if (!writeAndFlush(bytes, message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
+        if (!writeAndFlush(bytes, message.getType() == Message.GET_HWEIGHT_TYPE
+                || message.getType() == Message.HWEIGHT_TYPE
+                || message.getType() == Message.WIN_BLOCK_TYPE))
             return false;
 
         checkTime = System.currentTimeMillis() - checkTime;
