@@ -5,13 +5,13 @@ import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedBytes;
 import org.erachain.network.Peer;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.mapdb.BTreeKeySerializer;
-import org.mapdb.DB;
 import org.erachain.settings.Settings;
 import org.erachain.utils.PeerInfoComparator;
 import org.erachain.utils.ReverseComparator;
+import org.mapdb.BTreeKeySerializer;
+import org.mapdb.DB;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.util.*;
@@ -54,7 +54,7 @@ public class PeerMap extends DBMap<byte[], byte[]> {
         return this.observableData;
     }
 
-    public List<Peer> getKnownPeers(int amount) {
+    public List<Peer> getAllPeers(int amount) {
         try {
             //GET ITERATOR
             Iterator<byte[]> iterator = this.getKeys().iterator();
@@ -64,7 +64,7 @@ public class PeerMap extends DBMap<byte[], byte[]> {
 
             //ITERATE AS LONG AS:
             // 1. we have not reached the amount of peers
-            // 2. we have read all org.erachain.records
+            // 2. we have read all records
             while (iterator.hasNext() && peers.size() < amount) {
                 //GET ADDRESS
                 byte[] addressBI = iterator.next();
@@ -93,7 +93,14 @@ public class PeerMap extends DBMap<byte[], byte[]> {
         }
     }
 
+    private List<Peer> bestPeers;
+    private long lasTimeForBestPeers = 0;
     public List<Peer> getBestPeers(int amount, boolean allFromSettings) {
+
+        if (bestPeers != null && System.currentTimeMillis() - lasTimeForBestPeers < 30000) {
+            return bestPeers;
+        }
+
         try {
             //PEERS
             List<Peer> peers = new ArrayList<Peer>();
@@ -107,7 +114,7 @@ public class PeerMap extends DBMap<byte[], byte[]> {
                 //ITERATE AS LONG AS:
 
                 // 1. we have not reached the amount of peers
-                // 2. we have read all org.erachain.records
+                // 2. we have read all records
                 while (iterator.hasNext()
                     //&& listPeerInfo.size() < amount - take all known before SORT
                         ) {
@@ -238,6 +245,10 @@ public class PeerMap extends DBMap<byte[], byte[]> {
             //if (allFromSettings)
                 //LOGGER.info("Peers loaded from database : " + (peers.size() - cnt));
 
+            // STORE in CACHE
+            bestPeers = peers;
+            lasTimeForBestPeers = System.currentTimeMillis();
+
             //RETURN
             return peers;
         } catch (Exception e) {
@@ -263,7 +274,7 @@ public class PeerMap extends DBMap<byte[], byte[]> {
         }
     }
 
-    public List<PeerInfo> getAllPeers(int amount) {
+    public List<PeerInfo> getAllInfoPeers(int amount) {
         try {
             //GET ITERATOR
             Iterator<byte[]> iterator = this.getKeys().iterator();

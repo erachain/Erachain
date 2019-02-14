@@ -610,6 +610,12 @@ public class Network extends Observable {
 
                 return;
 
+            case Message.GET_BLOCK_TYPE:
+
+                Controller.getInstance().blockRequester.offerMessage(message);
+
+                return;
+
             //SEND TO CONTROLLER
             default:
 

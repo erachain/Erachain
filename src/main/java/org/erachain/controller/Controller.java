@@ -140,6 +140,7 @@ public class Controller extends Observable {
     private ApiService rpcService;
     private WebService webService;
     public WinBlockSelector winBlockSelector;
+    public BlocksRequest blockRequester;
     private BlockChain blockChain;
     private BlockGenerator blockGenerator;
     private Synchronizer synchronizer;
@@ -652,6 +653,9 @@ public class Controller extends Observable {
         // CREATE WinBlock SELECTOR
         this.winBlockSelector = new WinBlockSelector(this, blockChain, dcSet);
 
+        // CREATE Block REQUESTER
+        this.blockRequester = new BlocksRequest(this, blockChain, dcSet);
+
         // START API SERVICE
         if (Settings.getInstance().isRpcEnabled()) {
             this.setChanged();
@@ -1039,7 +1043,13 @@ public class Controller extends Observable {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping WinBlock Selector")));
         LOGGER.info("Stopping WinBlock Selector");
-        this.winBlockSelector.stop();
+        this.winBlockSelector.halt();
+
+        // STOP BLOCK REQUESTER
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping Block Requester")));
+        LOGGER.info("Stopping Block Requester");
+        this.blockRequester.halt();
 
         // STOP BLOCK PROCESSOR
         this.setChanged();
@@ -1591,35 +1601,6 @@ public class Controller extends Observable {
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 10) {
                     LOGGER.debug(this + " : " + message + " solved by period: " + timeCheck);
-                }
-
-                break;
-
-            case Message.GET_BLOCK_TYPE:
-
-                GetBlockMessage getBlockMessage = (GetBlockMessage) message;
-
-                /*
-                 * LOGGER.
-                 * error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
-                 * + " form PEER: " + getBlockMessage.getSender().toString()
-                 * + " sign: " +
-                 * Base58.encode(getBlockMessage.getSignature()));
-                 */
-
-                // ASK BLOCK FROM BLOCKCHAIN
-                newBlock = this.blockChain.getBlock(dcSet, getBlockMessage.getSignature());
-
-                // CREATE RESPONSE WITH SAME ID
-                response = MessageFactory.getInstance().createBlockMessage(newBlock);
-                response.setId(message.getId());
-
-                // SEND RESPONSE BACK WITH SAME ID
-                message.getSender().offerMessage(response);
-
-                if (newBlock == null) {
-                    String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
-                    banPeerOnError(message.getSender(), mess);
                 }
 
                 break;
