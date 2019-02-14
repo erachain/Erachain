@@ -160,6 +160,6 @@ dependencies {
     //compile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
     compile "org.slf4j:slf4j-log4j12:${slf4jVersion}"
 
-    compile "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
-    compile "org.springframework.boot:spring-boot:${springbootVersion}"
+    //compile "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
+    //compile "org.springframework.boot:spring-boot:${springbootVersion}"
 }
