@@ -38,6 +38,8 @@ public class Sender extends MonitoredThread {
     private HWeightMessage hWeightMessage;
     private BlockWinMessage winBlockToSend;
 
+    static final int MAX_FLUSH_LENGTH = 2000;
+    static final int MAX_FLUSH_TIME = 200;
     private int out_flush_length;
     private long out_flush_time;
 
@@ -110,7 +112,7 @@ public class Sender extends MonitoredThread {
         }
     }
 
-    private synchronized boolean writeAndFlush(byte[] bytes) {
+    private synchronized boolean writeAndFlush(byte[] bytes, boolean needFlush) {
         // пока есть входы по sendMessage (org.erachain.network.Peer.directSendMessage) - нужно ждать синхрон
         if (this.out == null)
             return false;
@@ -127,8 +129,9 @@ public class Sender extends MonitoredThread {
                 }
 
                 // FLUSH if NEED
-                if (System.currentTimeMillis() - out_flush_time > 300
-                        || out_flush_length > 2000) {
+                if (needFlush
+                        || System.currentTimeMillis() - out_flush_time > MAX_FLUSH_TIME
+                        || out_flush_length > MAX_FLUSH_LENGTH) {
                     out_flush_time = System.currentTimeMillis();
                     this.out.flush();
                     out_flush_length = 0;
@@ -199,7 +202,7 @@ public class Sender extends MonitoredThread {
 
         long checkTime = System.currentTimeMillis();
 
-        if (!writeAndFlush(bytes))
+        if (!writeAndFlush(bytes, message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE))
             return false;
 
         checkTime = System.currentTimeMillis() - checkTime;
@@ -269,9 +272,9 @@ public class Sender extends MonitoredThread {
                 continue;
 
             // FLUSH if NEED
-            if (System.currentTimeMillis() - out_flush_time > 300
-                    || out_flush_length > 100000) {
-                writeAndFlush(null);
+            if (System.currentTimeMillis() - out_flush_time > MAX_FLUSH_TIME
+                    || out_flush_length > MAX_FLUSH_LENGTH) {
+                writeAndFlush(null, true);
             }
 
         }
