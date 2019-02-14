@@ -38,6 +38,9 @@ public class Sender extends MonitoredThread {
     private HWeightMessage hWeightMessage;
     private BlockWinMessage winBlockToSend;
 
+    private int out_flush_length;
+    private long out_flush_time;
+
     public Sender(Peer peer) {
         this.peer = peer;
         this.setName("Sender-" + this.getId() + " for: " + peer.getName());
@@ -107,6 +110,65 @@ public class Sender extends MonitoredThread {
         }
     }
 
+    private synchronized boolean writeAndFlush(byte[] bytes) {
+        // пока есть входы по sendMessage (org.erachain.network.Peer.directSendMessage) - нужно ждать синхрон
+        if (this.out == null)
+            return false;
+
+        String error = null;
+
+        synchronized (this.out) {
+            try {
+                //SEND MESSAGE
+
+                if (bytes != null) {
+                    this.out.write(bytes);
+                    out_flush_length += bytes.length;
+                }
+
+                // FLUSH if NEED
+                if (System.currentTimeMillis() - out_flush_time > 300
+                        || out_flush_length > 100000) {
+                    out_flush_time = System.currentTimeMillis();
+                    this.out.flush();
+                    out_flush_length = 0;
+                }
+
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(85);
+                return false;
+            } catch (java.lang.NullPointerException e) {
+                return false;
+            } catch (EOFException e) {
+                if (this.out == null)
+                    // это наш дисконект
+                    return false;
+
+                error = "try out.write 1a - " + e.getMessage();
+            } catch (java.net.SocketException eSock) {
+                if (this.out == null)
+                    // это наш дисконект
+                    return false;
+
+                error = "try out.write 1 - " + eSock.getMessage();
+            } catch (IOException e) {
+                if (this.out == null)
+                    // это наш дисконект
+                    return false;
+
+                error = "try out.write 2 - " + e.getMessage();
+            }
+        }
+
+        if (error != null) {
+            peer.ban(error);
+            return false;
+        }
+
+        return true;
+
+    }
+
     boolean sendMessage(Message message) {
 
         //CHECK IF SOCKET IS STILL ALIVE
@@ -134,69 +196,20 @@ public class Sender extends MonitoredThread {
 
 
         byte[] bytes = message.toBytes();
-        String error = null;
 
-        //SEND MESSAGE
         long checkTime = System.currentTimeMillis();
 
-        // пока есть входы по sendMessage (org.erachain.network.Peer.directSendMessage) - нужно ждать синхрон
-        if (this.out == null)
+        if (!writeAndFlush(bytes))
             return false;
-        synchronized (this.out) {
-            try {
-                this.out.write(bytes);
-                this.out.flush();
-            } catch (java.lang.OutOfMemoryError e) {
-                Controller.getInstance().stopAll(85);
-                return false;
-            } catch (java.lang.NullPointerException e) {
-                return false;
-            } catch (EOFException e) {
-                if (this.out == null)
-                    // это наш дисконект
-                    return false;
-
-                checkTime = System.currentTimeMillis() - checkTime;
-                if (checkTime - 3 > bytes.length >> 3) {
-                    LOGGER.debug(this.peer + message.viewPref(true)
-                            + message + " sended by period: " + checkTime);
-                }
-                error = "try out.write 1a - " + e.getMessage();
-            } catch (java.net.SocketException eSock) {
-                if (this.out == null)
-                    // это наш дисконект
-                    return false;
-
-                checkTime = System.currentTimeMillis() - checkTime;
-                if (checkTime - 3 > bytes.length >> 3) {
-                    LOGGER.debug(this.peer + message.viewPref(true) + message + " sended by period: " + checkTime);
-                }
-                error = "try out.write 1 - " + eSock.getMessage();
-            } catch (IOException e) {
-                if (this.out == null)
-                    // это наш дисконект
-                    return false;
-
-                checkTime = System.currentTimeMillis() - checkTime;
-                if (checkTime - 3 > bytes.length >> 3) {
-                    LOGGER.debug(this.peer + message.viewPref(true) + message + " sended by period: " + checkTime);
-                }
-                error = "try out.write 2 - " + e.getMessage();
-            }
-        }
-
-        if (error != null) {
-            peer.ban(error);
-            return false;
-        }
-
-        if (USE_MONITOR) this.setMonitorStatusAfter();
 
         checkTime = System.currentTimeMillis() - checkTime;
         if (checkTime - 3 > (bytes.length >> 3)
                 || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
             LOGGER.debug(this.peer + message.viewPref(true) + message + " sended by period: " + checkTime);
         }
+
+        if (USE_MONITOR) this.setMonitorStatusAfter();
+
 
         return true;
     }
@@ -254,6 +267,13 @@ public class Sender extends MonitoredThread {
 
             if (!sendMessage(message))
                 continue;
+
+            // FLUSH if NEED
+            if (System.currentTimeMillis() - out_flush_time > 300
+                    || out_flush_length > 100000) {
+                writeAndFlush(null);
+            }
+
         }
 
         LOGGER.info(this + " - halted");
