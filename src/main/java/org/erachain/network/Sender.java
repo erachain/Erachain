@@ -38,8 +38,8 @@ public class Sender extends MonitoredThread {
     private HWeightMessage hWeightMessage;
     private BlockWinMessage winBlockToSend;
 
-    static final int MAX_FLUSH_LENGTH = 20000;
-    static final int MAX_FLUSH_TIME = 300;
+    static final int MAX_FLUSH_LENGTH = 5000;
+    static final int MAX_FLUSH_TIME = 500;
     private int out_flush_length;
     private long out_flush_time;
 
