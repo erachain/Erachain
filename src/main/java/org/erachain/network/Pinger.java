@@ -21,7 +21,7 @@ public class Pinger extends Thread {
     private static final int DEFAULT_QUICK_PING_TIMEOUT = 5000; // BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 4;
 
     private Peer peer;
-    private boolean needPing = false;
+    //private boolean needPing = false;
     private int ping;
 
     BlockingQueue<Integer> startPinging = new ArrayBlockingQueue<Integer>(1);
@@ -49,7 +49,7 @@ public class Pinger extends Thread {
     }
 
     public void setNeedPing() {
-        this.needPing = true;
+        this.startPinging.offer(1);
     }
 
     private boolean tryPing(long timeSOT) {

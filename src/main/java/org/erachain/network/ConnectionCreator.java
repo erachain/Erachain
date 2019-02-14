@@ -126,7 +126,7 @@ public class ConnectionCreator extends MonitoredThread {
 
             this.setMonitorStatusAfter();
 
-            newPeer.tryPing();
+            newPeer.setNeedPing();
 
             if (newPeer.isUsed() && maxReceivePeers > 1) {
                 // RECURSE to OTHER PEERS
@@ -218,7 +218,7 @@ public class ConnectionCreator extends MonitoredThread {
 
                     if (peer.isUsed()) {
 
-                        peer.tryPing();
+                        peer.setNeedPing();
 
                         // TRY CONNECT to WHITE peers of this PEER
                         connectToPeersOfThisPeer(peer, 4, true);
