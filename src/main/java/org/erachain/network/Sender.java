@@ -132,8 +132,8 @@ public class Sender extends MonitoredThread {
                 if (needFlush
                         || System.currentTimeMillis() - out_flush_time > MAX_FLUSH_TIME
                         || out_flush_length > MAX_FLUSH_LENGTH) {
-                    out_flush_time = System.currentTimeMillis();
                     this.out.flush();
+                    out_flush_time = System.currentTimeMillis();
                     out_flush_length = 0;
                 }
 
