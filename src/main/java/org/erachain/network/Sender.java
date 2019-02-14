@@ -112,6 +112,14 @@ public class Sender extends MonitoredThread {
         }
     }
 
+    /**
+     * копит буфер а потом его разом выплевывает - так чтобы слишком маньникие пакеты TCP ну были
+     * - так как у них заголовок в 200 сразу
+     *
+     * @param bytes
+     * @param needFlush
+     * @return
+     */
     private synchronized boolean writeAndFlush(byte[] bytes, boolean needFlush) {
         // пока есть входы по sendMessage (org.erachain.network.Peer.directSendMessage) - нужно ждать синхрон
         if (this.out == null)
