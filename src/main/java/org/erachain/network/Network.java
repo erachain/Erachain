@@ -526,7 +526,7 @@ public class Network extends Observable {
                         this.handledTransactionMessages.remove(this.handledTransactionMessages.first());
                     }
 
-                    Controller.getInstance().onMessageTransaction(message);
+                    Controller.getInstance().transactionsPool.offerMessage(message);
 
                 }
 
