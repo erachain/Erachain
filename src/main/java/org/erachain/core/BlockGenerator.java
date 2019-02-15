@@ -116,6 +116,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             return;
         }
 
+        this.setMonitorStatus("checkWeightPeers");
+
         do {
 
             try {
@@ -252,6 +254,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         needRemoveInvalids = new ArrayList<byte[]>();
 
+        this.setMonitorStatusBefore("getUnconfirmedTransactions");
+
         while (iterator.hasNext()) {
 
             if (ctrl.isOnStopping()) {
@@ -331,6 +335,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) + "ms for trans: " + counter);
 
+        this.setMonitorStatusAfter();
+
         return new Tuple2<List<Transaction>, Integer>(transactionsList, counter);
     }
 
@@ -367,6 +373,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         Iterator<Long> iterator = map.getTimestampIterator();
 
         needRemoveInvalids = new ArrayList<byte[]>();
+
+        this.setMonitorStatusBefore("checkForRemove");
 
         while (iterator.hasNext()) {
 
@@ -426,6 +434,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         }
 
         newBlockDC.close();
+
+        this.setMonitorStatusAfter();
 
         LOGGER.debug("get check for Remove = " + (System.currentTimeMillis() - start) + "ms for trans: " + counter);
 
@@ -603,6 +613,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     Timestamp timestampPoit = new Timestamp(timePoint);
                     LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit);
+                    this.setMonitorStatus("+ + + + + START GENERATE POINT on " + timestampPoit);
 
                     flushPoint = BlockChain.FLUSH_TIMEPOINT + timePoint;
                     this.solvingReference = null;
@@ -767,6 +778,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 LOGGER.info("@@@@@@@@ wait for new winner and BROADCAST: " + wait_new_block_broadcast / 1000);
                                 // SLEEP and WATCH break
                                 wait_step = wait_new_block_broadcast / 100;
+
+                                this.setMonitorStatus("wait for new winner and BROADCAST: " + wait_new_block_broadcast / 1000);
+
                                 do {
                                     try {
                                         Thread.sleep(100);

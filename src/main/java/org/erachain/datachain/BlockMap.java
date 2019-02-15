@@ -2,19 +2,26 @@ package org.erachain.datachain;
 
 // 30/03
 
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
-;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.database.serializer.BlockSerializer;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.mapdb.*;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.Atomic;
+import org.mapdb.BTreeKeySerializer;
+import org.mapdb.BTreeMap;
+import org.mapdb.DB;
+import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
+;
 
 //import com.sun.media.jfxmedia.logging.Logger;
 
@@ -330,8 +337,9 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     public void notifyProcessChain(Block block) {
 
-        // образать список и по времени протухания
-        this.getDCSet().getTransactionMap().clearByDeadTimeAndLimit(block.getTimestamp(), true);
+        if (Controller.getInstance().isOnStopping()) {
+            return;
+        }
 
         LOGGER.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE");
         this.setChanged();
@@ -342,8 +350,9 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     public void notifyOrphanChain(Block block) {
 
-        // образать список только по максимальному размеру
-        this.getDCSet().getTransactionMap().clearByDeadTimeAndLimit(block.getTimestamp(), false);
+        if (Controller.getInstance().isOnStopping()) {
+            return;
+        }
 
         LOGGER.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE");
         this.setChanged();

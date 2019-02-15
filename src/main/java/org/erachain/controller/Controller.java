@@ -2194,7 +2194,7 @@ public class Controller extends Observable {
     }
 
     public void clearUnconfirmedRecords(boolean cutDeadTime) {
-        this.blockChain.clearUnconfirmedRecords(this, this.dcSet, cutDeadTime);
+        this.blockChain.clearUnconfirmedRecords(this.dcSet, cutDeadTime);
 
     }
 

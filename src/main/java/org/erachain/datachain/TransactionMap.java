@@ -260,13 +260,14 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         List<Long> keys = new ArrayList<Long>();
 
+        timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
 
         while (iterator.hasNext()) {
             Long key = iterator.next();
             transaction = this.map.get(key);
-            long deadtime = transaction.getDeadline();
-            if (((BlockChain.HARD_WORK || cutDeadTime) && deadtime < timestamp)
-                    || !BlockChain.HARD_WORK && deadtime + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
+            long deadline = transaction.getDeadline();
+            if (((BlockChain.HARD_WORK || cutDeadTime) && deadline < timestamp)
+                    || !BlockChain.HARD_WORK && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
                     || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
                 keys.add(key);
             } else {
