@@ -7,9 +7,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.transaction.OnDealClick;
-import org.erachain.network.Peer;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
@@ -317,6 +315,8 @@ public class R_SendResource {
             Random random = new Random();
             Controller cnt = Controller.getInstance();
 
+            int counter = 0;
+
             do {
 
                 try {
@@ -341,7 +341,7 @@ public class R_SendResource {
 
                     Transaction transaction = cnt.r_Send(creator,
                             0, recipient,
-                            2l, null, "TEST 1",
+                            2l, null, "Safe-Pay " + ++counter,
                             "TEST TEST TEST".getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
                             new byte[]{(byte) 1});
 

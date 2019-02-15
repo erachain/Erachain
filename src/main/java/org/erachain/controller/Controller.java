@@ -2194,7 +2194,7 @@ public class Controller extends Observable {
     }
 
     public void clearUnconfirmedRecords(boolean cutDeadTime) {
-        this.blockChain.clearUnconfirmedRecords(this, this.dcSet, cutDeadTime);
+        this.blockChain.clearUnconfirmedRecords(this.dcSet, cutDeadTime);
 
     }
 
@@ -2460,6 +2460,10 @@ public class Controller extends Observable {
 
     public void startBlockGenerator() {
         this.blockGenerator.start();
+    }
+
+    public BlockGenerator getBlockGenerator() {
+        return this.blockGenerator;
     }
 
     public void BlockGeneratorCacheAccounts() {

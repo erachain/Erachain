@@ -1134,11 +1134,9 @@ public class BlockChain {
     }
 
     // CLEAR UNCONFIRMED TRANSACTION from Invalid and DEAD
-    public void clearUnconfirmedRecords(Controller ctrl, DCSet dcSetOriginal, boolean cutDeadTime) {
+    public void clearUnconfirmedRecords(DCSet dcSet, boolean cutDeadTime) {
 
-        long timestamp = this.getTimestamp(dcSetOriginal);
-
-        dcSetOriginal.getTransactionMap().clearByDeadTimeAndLimit(timestamp, cutDeadTime);
+        dcSet.getTransactionMap().clearByDeadTimeAndLimit(this.getTimestamp(dcSet), cutDeadTime);
 
     }
 }

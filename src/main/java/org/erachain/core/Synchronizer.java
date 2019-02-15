@@ -486,6 +486,11 @@ public class Synchronizer {
                 }
                 LOGGER.debug("BLOCK is Valid");
 
+                if (cnt.isOnStopping()) {
+                    blockBuffer.stopThread();
+                    throw new Exception("on stoping");
+                }
+
                 try {
                     // PROCESS BLOCK
 
@@ -517,6 +522,10 @@ public class Synchronizer {
                 String mess = "Dishonest peer on block " + errorMess;
                 peer.ban(banTime, mess);
                 throw new Exception(mess);
+            }
+
+            if (cnt.isOnStopping()) {
+                throw new Exception("on stoping");
             }
 
             // RECURSIVE CALL if new block is GENERATED
@@ -789,6 +798,12 @@ public class Synchronizer {
                 if (cnt.isOnStopping())
                     return;
 
+                // образать список только по максимальному размеру
+                dcSet.getTransactionMap().clearByDeadTimeAndLimit(block.getTimestamp(), false);
+
+                if (cnt.isOnStopping())
+                    return;
+
             } catch (IOException e) {
                 cnt.stopAll(22);
 
@@ -837,9 +852,17 @@ public class Synchronizer {
                 block.process(dcSet);
                 dcSet.getBlockMap().setProcessing(false);
                 dcSet.updateTxCounter(block.getTransactionCount());
-                // FARDFLUSH not use in each case - only after accumulate size
+
+                // FLUSH not use in each case - only after accumulate size
                 int blockSize = (1 + block.getTransactionCount()) * 1000 + block.getDataLength(false);
                 dcSet.flush(blockSize, false);
+
+                // образать список и по времени протухания
+                dcSet.getTransactionMap().clearByDeadTimeAndLimit(block.getTimestamp(), true);
+
+                if (cnt.isOnStopping())
+                    return;
+
                 if (Settings.getInstance().getNotifyIncomingConfirmations() > 0) {
                     cnt.NotifyIncoming(block.getTransactions());
                 }

@@ -45,7 +45,7 @@ public class TelegramManager extends Thread {
     // counts for CREATORs COUNT
     private ConcurrentHashMap<String, Integer> telegramsCounts;
 
-    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE? 2000 : 300;
+    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE ? 3000 : 3000;
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
     private Controller controller;
