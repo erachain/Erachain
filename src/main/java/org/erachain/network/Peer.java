@@ -637,7 +637,7 @@ public class Peer extends MonitoredThread {
         return Controller.getInstance().getDBSet().getPeerMap().getBanMinutes(this);
     }
 
-    public void ban(int banForMinutes, String message) {
+    public synchronized void ban(int banForMinutes, String message) {
 
         if (!runed) {
             if (banForMinutes > this.getBanMinutes())
