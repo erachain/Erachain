@@ -6,14 +6,15 @@ buildscript {
     }
     dependencies {
         classpath 'org.ajoberstar:grgit:1.7.2'
-//        classpath 'org.slf4j:slf4j-api:1.6.1'
     }
 }
 
 plugins {
     id 'java'
-    id 'idea'
-//    id 'org.springframework.boot' version '2.0.5.RELEASE'
+    //id 'fatJar'
+    //id 'idea'
+    //id 'groovy'
+    //    id 'org.springframework.boot' version '2.0.5.RELEASE'
 }
 
 ext {
@@ -45,9 +46,9 @@ compileJava {
 
 jar {
     //mainClassName = "org.erachain.Start"
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
+//    from {
+//        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+//    }
     baseName = "erachain"
     destinationDir project.file('build/libs/Erachain')
 
