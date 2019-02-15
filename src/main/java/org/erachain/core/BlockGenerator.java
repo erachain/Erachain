@@ -352,7 +352,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 if (transactionsMap.contains(signature))
                     transactionsMap.delete(signature);
             }
-            LOGGER.debug("clear Unconfirmed Transactions = " + (System.currentTimeMillis() - start) + "ms for removed: " + needRemoveInvalids.size());
+            LOGGER.debug("clear Unconfirmed Transactions = " + (System.currentTimeMillis() - start) + "ms for removed: " + needRemoveInvalids.size()
+                    + " LEFT: " + transactionsMap.size());
             needRemoveInvalids = null;
         }
 
@@ -438,7 +439,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         this.setMonitorStatusAfter();
 
-        LOGGER.debug("get check for Remove = " + (System.currentTimeMillis() - start) + "ms for trans: " + counter);
+        LOGGER.debug("get check for Remove = " + (System.currentTimeMillis() - start) + "ms for trans: " + counter
+                + " LEFT:" + map.size());
 
     }
 
