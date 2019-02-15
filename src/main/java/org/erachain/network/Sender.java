@@ -38,6 +38,11 @@ public class Sender extends MonitoredThread {
     private HWeightMessage hWeightMessage;
     private BlockWinMessage winBlockToSend;
 
+    static final int MAX_FLUSH_LENGTH = 5000;
+    static final int MAX_FLUSH_TIME = 500;
+    private int out_flush_length;
+    private long out_flush_time;
+
     public Sender(Peer peer) {
         this.peer = peer;
         this.setName("Sender-" + this.getId() + " for: " + peer.getName());
@@ -107,6 +112,74 @@ public class Sender extends MonitoredThread {
         }
     }
 
+    /**
+     * копит буфер а потом его разом выплевывает - так чтобы слишком маньникие пакеты TCP ну были
+     * - так как у них заголовок в 200 сразу
+     *
+     * @param bytes
+     * @param needFlush
+     * @return
+     */
+    private synchronized boolean writeAndFlush(byte[] bytes, boolean needFlush) {
+        // пока есть входы по sendMessage (org.erachain.network.Peer.directSendMessage) - нужно ждать синхрон
+        if (this.out == null)
+            return false;
+
+        String error = null;
+
+        synchronized (this.out) {
+            try {
+                //SEND MESSAGE
+
+                if (bytes != null) {
+                    this.out.write(bytes);
+                    out_flush_length += bytes.length;
+                }
+
+                // FLUSH if NEED
+                if (needFlush
+                        || System.currentTimeMillis() - out_flush_time > MAX_FLUSH_TIME
+                        || out_flush_length > MAX_FLUSH_LENGTH) {
+                    this.out.flush();
+                    out_flush_time = System.currentTimeMillis();
+                    out_flush_length = 0;
+                }
+
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(85);
+                return false;
+            } catch (java.lang.NullPointerException e) {
+                return false;
+            } catch (EOFException e) {
+                if (this.out == null)
+                    // это наш дисконект
+                    return false;
+
+                error = "try out.write 1a - " + e.getMessage();
+            } catch (java.net.SocketException eSock) {
+                if (this.out == null)
+                    // это наш дисконект
+                    return false;
+
+                error = "try out.write 1 - " + eSock.getMessage();
+            } catch (IOException e) {
+                if (this.out == null)
+                    // это наш дисконект
+                    return false;
+
+                error = "try out.write 2 - " + e.getMessage();
+            }
+        }
+
+        if (error != null) {
+            peer.ban(error);
+            return false;
+        }
+
+        return true;
+
+    }
+
     boolean sendMessage(Message message) {
 
         //CHECK IF SOCKET IS STILL ALIVE
@@ -134,69 +207,22 @@ public class Sender extends MonitoredThread {
 
 
         byte[] bytes = message.toBytes();
-        String error = null;
 
-        //SEND MESSAGE
         long checkTime = System.currentTimeMillis();
 
-        // пока есть входы по sendMessage (org.erachain.network.Peer.directSendMessage) - нужно ждать синхрон
-        if (this.out == null)
+        if (!writeAndFlush(bytes, message.getType() == Message.GET_HWEIGHT_TYPE
+                || message.getType() == Message.HWEIGHT_TYPE
+                || message.getType() == Message.WIN_BLOCK_TYPE))
             return false;
-        synchronized (this.out) {
-            try {
-                this.out.write(bytes);
-                this.out.flush();
-            } catch (java.lang.OutOfMemoryError e) {
-                Controller.getInstance().stopAll(85);
-                return false;
-            } catch (java.lang.NullPointerException e) {
-                return false;
-            } catch (EOFException e) {
-                if (this.out == null)
-                    // это наш дисконект
-                    return false;
-
-                checkTime = System.currentTimeMillis() - checkTime;
-                if (checkTime - 3 > bytes.length >> 3) {
-                    LOGGER.debug(this.peer + message.viewPref(true)
-                            + message + " sended by period: " + checkTime);
-                }
-                error = "try out.write 1a - " + e.getMessage();
-            } catch (java.net.SocketException eSock) {
-                if (this.out == null)
-                    // это наш дисконект
-                    return false;
-
-                checkTime = System.currentTimeMillis() - checkTime;
-                if (checkTime - 3 > bytes.length >> 3) {
-                    LOGGER.debug(this.peer + message.viewPref(true) + message + " sended by period: " + checkTime);
-                }
-                error = "try out.write 1 - " + eSock.getMessage();
-            } catch (IOException e) {
-                if (this.out == null)
-                    // это наш дисконект
-                    return false;
-
-                checkTime = System.currentTimeMillis() - checkTime;
-                if (checkTime - 3 > bytes.length >> 3) {
-                    LOGGER.debug(this.peer + message.viewPref(true) + message + " sended by period: " + checkTime);
-                }
-                error = "try out.write 2 - " + e.getMessage();
-            }
-        }
-
-        if (error != null) {
-            peer.ban(error);
-            return false;
-        }
-
-        if (USE_MONITOR) this.setMonitorStatusAfter();
 
         checkTime = System.currentTimeMillis() - checkTime;
         if (checkTime - 3 > (bytes.length >> 3)
                 || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
             LOGGER.debug(this.peer + message.viewPref(true) + message + " sended by period: " + checkTime);
         }
+
+        if (USE_MONITOR) this.setMonitorStatusAfter();
+
 
         return true;
     }
@@ -254,6 +280,13 @@ public class Sender extends MonitoredThread {
 
             if (!sendMessage(message))
                 continue;
+
+            // FLUSH if NEED
+            if (System.currentTimeMillis() - out_flush_time > MAX_FLUSH_TIME
+                    || out_flush_length > MAX_FLUSH_LENGTH) {
+                writeAndFlush(null, true);
+            }
+
         }
 
         LOGGER.info(this + " - halted");
