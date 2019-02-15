@@ -1,70 +1,12 @@
 package org.erachain.webserver;
 // 30/03
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-
+import com.google.common.base.Charsets;
+import com.mitchellbosecke.pebble.error.PebbleException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.eclipse.jetty.util.StringUtil;
-import org.erachain.core.web.*;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.json.simple.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.mapdb.Fun.Tuple2;
-
-import com.google.common.base.Charsets;
-import com.mitchellbosecke.pebble.error.PebbleException;
-
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.api.BlogPostResource;
 import org.erachain.api.NameStorageResource;
@@ -80,7 +22,7 @@ import org.erachain.core.naming.Name;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
-
+import org.erachain.core.web.*;
 import org.erachain.core.web.blog.BlogEntry;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
@@ -88,17 +30,36 @@ import org.erachain.datachain.ItemPersonMap;
 import org.erachain.datachain.NameMap;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.utils.AccountBalanceComparator;
-import org.erachain.utils.BlogUtils;
-import org.erachain.utils.Corekeys;
-import org.erachain.utils.DiffHelper;
-import org.erachain.utils.NameUtils;
+import org.erachain.utils.*;
 import org.erachain.utils.NameUtils.NameResult;
-import org.erachain.utils.Pair;
-import org.erachain.utils.PebbleHelper;
-import org.erachain.utils.StorageUtils;
-import org.erachain.utils.StrJSonFine;
-import org.erachain.utils.UpdateUtil;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.json.simple.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import java.io.*;
+import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Path("/")
 public class WebResource {
@@ -385,7 +346,7 @@ public class WebResource {
 
         if (lang != null) {
 
-            LOGGER.error("try lang file: " + lang + ".json");
+            LOGGER.error("try lang file: " + lang + ".json for " + request.getRemoteUser() + " " + request.getRequestURL());
             langObj = Lang.openLangFile(lang + ".json");
 
      /*   // translate select
