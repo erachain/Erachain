@@ -34,6 +34,7 @@ public class Network extends Observable {
     private static InetAddress myselfAddress;
     private ConnectionCreator creator;
     private ConnectionAcceptor acceptor;
+    private MessagesProcessor messagesProcessor;
     PeerManager peerManager;
     public TelegramManager telegramer;
     CopyOnWriteArrayList<Peer> knownPeers;
@@ -112,6 +113,9 @@ public class Network extends Observable {
                 Controller.getInstance().getBlockChain(),
                 DCSet.getInstance(),
                 this);
+
+        this.messagesProcessor = new MessagesProcessor(this);
+
     }
 
     public void onConnect(Peer peer) {
@@ -493,7 +497,6 @@ public class Network extends Observable {
             return;
         }
 
-        long timeCheck = System.currentTimeMillis();
         switch (message.getType()) {
 
             case Message.TELEGRAM_TYPE:
@@ -532,65 +535,6 @@ public class Network extends Observable {
 
                 return;
 
-            case Message.TELEGRAM_GET_TYPE:
-                // GET telegrams
-                //address
-                JSONObject address = ((TelegramGetMessage) message).getAddress();
-                // create ansver
-                ArrayList<String> addressFilter = new ArrayList<String>();
-                Set keys = address.keySet();
-                for (int i = 0; i < keys.size(); i++) {
-
-                    addressFilter.add((String) address.get(i));
-                }
-                Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage(addressFilter);
-                answer.setId(message.getId());
-                // send answer
-                message.getSender().offerMessage(answer);
-                return;
-
-            case Message.TELEGRAM_ANSWER_TYPE:
-                // Answer to get telegrams
-                ((TelegramAnswerMessage) message).saveToWallet();
-
-                return;
-
-            case Message.GET_HWEIGHT_TYPE:
-
-                Tuple2<Integer, Long> HWeight = Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance());
-                if (HWeight == null)
-                    HWeight = new Tuple2<Integer, Long>(-1, -1L);
-
-                HWeightMessage response = (HWeightMessage) MessageFactory.getInstance().createHWeightMessage(HWeight);
-                // CREATE RESPONSE WITH SAME ID
-                response.setId(message.getId());
-
-                timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 10) {
-                    LOGGER.debug(message.getSender() + ": " + message + " solved by period: " + timeCheck);
-                }
-
-                //SEND BACK TO SENDER
-                message.getSender().offerMessage(response);
-
-                break;
-
-            //GETPEERS
-            case Message.GET_PEERS_TYPE:
-
-                onMessagePeers(message.getSender(), message.getId());
-
-                break;
-
-
-            case Message.FIND_MYSELF_TYPE:
-
-                FindMyselfMessage findMyselfMessage = (FindMyselfMessage) message;
-
-                onMessageMySelf(message.getSender(), findMyselfMessage.getFoundMyselfID());
-
-                break;
-
             case Message.WIN_BLOCK_TYPE:
 
                 //CHECK IF NOT HANDLED ALREADY
@@ -616,11 +560,9 @@ public class Network extends Observable {
 
                 return;
 
-            //SEND TO CONTROLLER
             default:
 
-                Controller.getInstance().onMessage(message);
-                break;
+                this.messagesProcessor.offerMessage(message);
         }
     }
 
@@ -741,6 +683,9 @@ public class Network extends Observable {
     public void stop() {
 
         this.run = false;
+
+        // STOP MESSAGES PROCESSOR
+        messagesProcessor.halt();
 
         // stop thread
         this.creator.halt();
