@@ -118,6 +118,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         this.setMonitorStatus("checkWeightPeers");
 
+        int counter = ctrl.getActivePeersCounter();
         do {
 
             try {
@@ -206,7 +207,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         + " headers: " + headersSize);
                 return;
             }
-        } while (true);
+        } while (--counter > 0);
 
     }
 
@@ -470,7 +471,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
-                        //						does not matter
+                        return;
                     }
                 }
 
@@ -554,14 +555,16 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         this.initMonitor();
 
         while (!ctrl.isOnStopping()) {
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                break;
+            }
+
             try {
 
                 this.setMonitorPoint();
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                }
 
                 if (ctrl.isOnStopping()) {
                     local_status = -1;
@@ -618,7 +621,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     flushPoint = BlockChain.FLUSH_TIMEPOINT + timePoint;
                     this.solvingReference = null;
                     local_status = 0;
-                    this.setMonitorStatus("local_status " + viewStatus());
 
                     // пинганем тут все чтобы знать кому слать вобедный блок
                     timeToPing = System.currentTimeMillis();
@@ -937,7 +939,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         try {
                             if (flushPoint + BlockChain.FLUSH_TIMEPOINT < NTP.getTime()) {
                                 try {
-                                    Thread.sleep(BlockChain.DEVELOP_USE ? 1000 : 10000);
+                                    Thread.sleep(BlockChain.DEVELOP_USE ? 1000 : 2000);
                                 } catch (InterruptedException e) {
                                 }
                             }
@@ -1065,6 +1067,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         // EXITED
         this.local_status = -1;
+        this.setMonitorStatus("local_status " + viewStatus());
+
     }
 
     @Override
@@ -1078,7 +1082,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             }
 
             if (walletOnceUnlocked) {
-                // WALLET UNLOCKED OR GENERATORCACHING TRUE
+                // WALLET UNLOCKED OR GENERATOR CACHING TRUE
                 syncForgingStatus();
             }
         }
