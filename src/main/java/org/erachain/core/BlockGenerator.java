@@ -13,6 +13,7 @@ import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.SignaturesMessage;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
+import org.erachain.utils.MonitoredThread;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -26,14 +27,14 @@ import java.util.*;
  * основной верт, решающий последовательно три задачи - либо собираем блок, проверяем отставание от сети
  * и синхронизируемся с сетью если не догнали ее, либо ловим новый блок из сети и заносим его в цепочку блоков
  */
-public class BlockGenerator extends Thread implements Observer {
+public class BlockGenerator extends MonitoredThread implements Observer {
 
     public static final boolean TEST_001 = true;
 
     static Logger LOGGER = LoggerFactory.getLogger(BlockGenerator.class.getName());
 
     private static Controller ctrl = Controller.getInstance();
-    private static int status = 0;
+    private static int local_status = 0;
     private PrivateKeyAccount acc_winner;
     //private List<Block> lastBlocksForTarget;
     private byte[] solvingReference;
@@ -60,12 +61,12 @@ public class BlockGenerator extends Thread implements Observer {
     }
 
     public static int getStatus() {
-        return status;
+        return local_status;
     }
 
     public static String viewStatus() {
 
-        switch (status) {
+        switch (local_status) {
             case -1:
                 return "-1 STOPed";
             case 1:
@@ -540,9 +541,12 @@ public class BlockGenerator extends Thread implements Observer {
         long wait_step;
         boolean newWinner;
 
+        this.initMonitor();
 
         while (!ctrl.isOnStopping()) {
             try {
+
+                this.setMonitorPoint();
 
                 try {
                     Thread.sleep(1000);
@@ -550,7 +554,7 @@ public class BlockGenerator extends Thread implements Observer {
                 }
 
                 if (ctrl.isOnStopping()) {
-                    status = -1;
+                    local_status = -1;
                     return;
                 }
 
@@ -563,7 +567,8 @@ public class BlockGenerator extends Thread implements Observer {
                 }
 
                 if (this.orphanto > 0) {
-                    status = 9;
+                    this.setMonitorStatusBefore("orphan to " + orphanto);
+                    local_status = 9;
                     ctrl.setForgingStatus(ForgingStatus.FORGING_ENABLED);
                     try {
                         while (bchain.getHeight(dcSet) >= this.orphanto
@@ -580,6 +585,8 @@ public class BlockGenerator extends Thread implements Observer {
                     }
                     this.orphanto = 0;
                     ctrl.checkStatusAndObserve(0);
+
+                    this.setMonitorStatusAfter();
 
                 }
 
@@ -599,7 +606,8 @@ public class BlockGenerator extends Thread implements Observer {
 
                     flushPoint = BlockChain.FLUSH_TIMEPOINT + timePoint;
                     this.solvingReference = null;
-                    status = 0;
+                    local_status = 0;
+                    this.setMonitorStatus("local_status " + viewStatus());
 
                     // пинганем тут все чтобы знать кому слать вобедный блок
                     timeToPing = System.currentTimeMillis();
@@ -625,7 +633,8 @@ public class BlockGenerator extends Thread implements Observer {
                         continue;
                     }
 
-                    status = 41;
+                    local_status = 41;
+                    this.setMonitorStatus("local_status " + viewStatus());
 
                     //CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
                     ////syncForgingStatus();
@@ -652,7 +661,7 @@ public class BlockGenerator extends Thread implements Observer {
                         /////////////////////////////// TRY FORGING ////////////////////////
 
                         if (ctrl.isOnStopping()) {
-                            status = -1;
+                            local_status = -1;
                             return;
                         }
 
@@ -661,7 +670,7 @@ public class BlockGenerator extends Thread implements Observer {
                         solvingBlock = dcSet.getBlockMap().last();
 
                         if (ctrl.isOnStopping()) {
-                            status = -1;
+                            local_status = -1;
                             return;
                         }
 
@@ -681,7 +690,8 @@ public class BlockGenerator extends Thread implements Observer {
                          *
                          */
 
-                        status = 4;
+                        local_status = 4;
+                        this.setMonitorStatus("local_status " + viewStatus());
 
                         //GENERATE NEW BLOCKS
                         //this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dcSet);
@@ -701,7 +711,8 @@ public class BlockGenerator extends Thread implements Observer {
                         List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
                         synchronized (knownAccounts) {
 
-                            status = 5;
+                            local_status = 5;
+                            this.setMonitorStatus("local_status " + viewStatus());
 
                             for (PrivateKeyAccount account : knownAccounts) {
 
@@ -728,7 +739,7 @@ public class BlockGenerator extends Thread implements Observer {
                         if (acc_winner != null) {
 
                             if (ctrl.isOnStopping()) {
-                                status = -1;
+                                local_status = -1;
                                 return;
                             }
 
@@ -750,7 +761,8 @@ public class BlockGenerator extends Thread implements Observer {
                             newWinner = false;
                             if (wait_new_block_broadcast > 0) {
 
-                                status = 6;
+                                local_status = 6;
+                                this.setMonitorStatus("local_status " + viewStatus());
 
                                 LOGGER.info("@@@@@@@@ wait for new winner and BROADCAST: " + wait_new_block_broadcast / 1000);
                                 // SLEEP and WATCH break
@@ -762,7 +774,7 @@ public class BlockGenerator extends Thread implements Observer {
                                     }
 
                                     if (ctrl.isOnStopping()) {
-                                        status = -1;
+                                        local_status = -1;
                                         return;
                                     }
 
@@ -784,7 +796,8 @@ public class BlockGenerator extends Thread implements Observer {
                                 LOGGER.info("NEW WINER RECEIVED - drop my block");
                             } else {
                                 /////////////////////    MAKING NEW BLOCK  //////////////////////
-                                status = 7;
+                                local_status = 7;
+                                this.setMonitorStatus("local_status " + viewStatus());
 
                                 // GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
                                 LOGGER.info("GENERATE my BLOCK");
@@ -822,7 +835,7 @@ public class BlockGenerator extends Thread implements Observer {
 
                                 } catch (java.lang.OutOfMemoryError e) {
                                     ctrl.stopAll(94);
-                                    status = -1;
+                                    local_status = -1;
                                     return;
                                 }
 
@@ -830,7 +843,7 @@ public class BlockGenerator extends Thread implements Observer {
 
                                 if (generatedBlock == null) {
                                     if (ctrl.isOnStopping()) {
-                                        this.status = -1;
+                                        this.local_status = -1;
                                         return;
                                     }
                                     if (heapOverflowCount > 1)
@@ -850,17 +863,21 @@ public class BlockGenerator extends Thread implements Observer {
                                         if (bchain.setWaitWinBuffer(dcSet, generatedBlock, peer)) {
 
                                             // need to BROADCAST
-                                            status = 8;
+                                            local_status = 8;
+                                            this.setMonitorStatus("local_status " + viewStatus());
+
                                             ctrl.broadcastWinBlock(generatedBlock, null);
                                             generatedBlock = null;
-                                            status = 0;
+                                            local_status = 0;
+                                            this.setMonitorStatus("local_status " + viewStatus());
+
                                         } else {
                                             generatedBlock = null;
                                             LOGGER.info("my BLOCK is weak ((...");
                                         }
                                     } catch (java.lang.OutOfMemoryError e) {
                                         ctrl.stopAll(94);
-                                        status = -1;
+                                        local_status = -1;
                                         return;
                                     }
                                 }
@@ -882,7 +899,8 @@ public class BlockGenerator extends Thread implements Observer {
                         // FLUSH WINER to DB MAP
                         LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime()) / 1000);
 
-                        status = 1;
+                        local_status = 1;
+                        this.setMonitorStatus("local_status " + viewStatus());
 
                         while (this.orphanto <= 0 && flushPoint > NTP.getTime()) {
                             try {
@@ -891,7 +909,7 @@ public class BlockGenerator extends Thread implements Observer {
                             }
 
                             if (ctrl.isOnStopping()) {
-                                status = -1;
+                                local_status = -1;
                                 return;
                             }
                         }
@@ -910,7 +928,9 @@ public class BlockGenerator extends Thread implements Observer {
                                 }
                             }
 
-                            status = 2;
+                            local_status = 2;
+                            this.setMonitorStatus("local_status " + viewStatus());
+
                             try {
                                 if (!ctrl.flushNewBlockGenerated()) {
                                     // NEW BLOCK not FLUSHED
@@ -920,20 +940,20 @@ public class BlockGenerator extends Thread implements Observer {
                                         setForgingStatus(ForgingStatus.FORGING);
                                 }
                             } catch (java.lang.OutOfMemoryError e) {
-                                status = -1;
+                                local_status = -1;
                                 ctrl.stopAll(94);
                                 return;
                             }
 
                             if (ctrl.isOnStopping()) {
-                                status = -1;
+                                local_status = -1;
                                 return;
                             }
 
                         } catch (Exception e) {
                             // TODO Auto-generated catch block
                             if (ctrl.isOnStopping()) {
-                                status = -1;
+                                local_status = -1;
                                 return;
                             }
                             // if FLUSH out of memory
@@ -969,7 +989,7 @@ public class BlockGenerator extends Thread implements Observer {
                     }
 
                     if (ctrl.isOnStopping()) {
-                        status = -1;
+                        local_status = -1;
                         return;
                     }
                     checkWeightPeers();
@@ -982,21 +1002,23 @@ public class BlockGenerator extends Thread implements Observer {
                 if (ctrl.needUpToDate()) {
 
                     if (ctrl.isOnStopping()) {
-                        status = -1;
+                        local_status = -1;
                         return;
                     }
 
-                    status = 3;
+                    local_status = 3;
+                    this.setMonitorStatus("local_status " + viewStatus());
 
                     this.solvingReference = null;
                     bchain.clearWaitWinBuffer();
 
                     ctrl.update(shift_height);
 
-                    status = 0;
+                    local_status = 0;
+                    this.setMonitorStatus("local_status " + viewStatus());
 
                     if (ctrl.isOnStopping()) {
-                        status = -1;
+                        local_status = -1;
                         return;
                     }
 
@@ -1010,7 +1032,7 @@ public class BlockGenerator extends Thread implements Observer {
                 }
 
             } catch (java.lang.OutOfMemoryError e) {
-                this.status = -1;
+                this.local_status = -1;
 
                 LOGGER.error(e.getMessage(), e);
 
@@ -1018,7 +1040,7 @@ public class BlockGenerator extends Thread implements Observer {
                 return;
             } catch (Throwable e) {
                 if (ctrl.isOnStopping()) {
-                    this.status = -1;
+                    this.local_status = -1;
                     return;
                 }
 
@@ -1028,7 +1050,7 @@ public class BlockGenerator extends Thread implements Observer {
         }
 
         // EXITED
-        this.status = -1;
+        this.local_status = -1;
     }
 
     @Override

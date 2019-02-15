@@ -102,7 +102,10 @@ public class CoreResource {
             return cnt.network.getAcceptor().monitorToJson("true".equals(log)).toJSONString();
         else if (path.equals("network_creator"))
             return cnt.network.getCreator().monitorToJson("true".equals(log)).toJSONString();
+        else if (path.equals("block_generator"))
+            return cnt.getBlockGenerator().monitorToJson("true".equals(log)).toJSONString();
         else
+
             return getMonitor(log);
 
     }
@@ -116,6 +119,7 @@ public class CoreResource {
 
         jsonObject.put("network_acceptor", cnt.network.getAcceptor().monitorToJson("true".equals(log)));
         jsonObject.put("network_creator", cnt.network.getCreator().monitorToJson("true".equals(log)));
+        jsonObject.put("block_generator", cnt.getBlockGenerator().monitorToJson("true".equals(log)));
 
         for (Peer peer: Controller.getInstance().network.getActivePeers(false)) {
             jsonObject.put(peer.toString(), peer.monitorToJson("true".equals(log)));

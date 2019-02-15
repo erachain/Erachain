@@ -2462,6 +2462,10 @@ public class Controller extends Observable {
         this.blockGenerator.start();
     }
 
+    public BlockGenerator getBlockGenerator() {
+        return this.blockGenerator;
+    }
+
     public void BlockGeneratorCacheAccounts() {
         this.blockGenerator.cacheKnownAccounts();
     }
