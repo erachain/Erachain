@@ -55,8 +55,8 @@ public class Network extends Observable {
     public Network() {
         this.knownPeers = new CopyOnWriteArrayList<Peer>();
         this.handledTelegramMessages = new ConcurrentSkipListSet<Long>();
-        this.handledTransactionMessages = new ConcurrentSkipListSet();
-        this.handledWinBlockMessages = new ConcurrentSkipListSet();
+        this.handledTransactionMessages = new ConcurrentSkipListSet<Long>();
+        this.handledWinBlockMessages = new ConcurrentSkipListSet<Long>();
 
         this.run = true;
 
