@@ -290,9 +290,9 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         Long key = Longs.fromByteArray(signature);
 
-        if (this.map.containsKey(key)) {
-            return true;
-        }
+        //if (this.map.containsKey(key)) {
+        //    return true;
+        //}
 
         //this.getDCSet().updateUncTxCounter(1);
 
