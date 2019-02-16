@@ -1371,7 +1371,13 @@ public class Block {
                     this.txCalculated = new ArrayList<R_Calculated>();
                 }
             } else {
+                long processTiming = System.nanoTime();
                 validatingDC = dcSet.fork();
+                processTiming = (System.nanoTime() - processTiming) / 1000;
+                if (processTiming < 999999999999l) {
+                    LOGGER.debug("VALIDATING[" + this.heightBlock + "]="
+                            + this.transactionCount + " db.FORK: " + processTiming + "[us]");
+                }
                 this.txCalculated = null;
             }
 
@@ -1551,18 +1557,18 @@ public class Block {
                     // это тоже время требует...
                     Controller.getInstance().getBlockChain().updateTXValidateTimingAverage(processTiming, this.transactionCount);
                 }
-            }
 
-            long tickets = System.currentTimeMillis() - timerStart;
-            LOGGER.debug("VALIDATING[" + this.heightBlock + "]="
-                    + this.transactionCount + " " + tickets + "[ms] " + tickets / this.transactionCount + "[ms/tx]"
-                    + " Proc[mm]: " + timerProcess
-                    + (andProcess ?
-                    " UnconfDel[mm]: " + timerUnconfirmedMap_delete
-                    : "")
-                    + " SignsKey[mm]: " + timerTransFinalMapSinds_set
-                    + " FinalSet[mm]: " + timerFinalMap_set
-            );
+                long tickets = System.currentTimeMillis() - timerStart;
+                LOGGER.debug("VALIDATING[" + this.heightBlock + "]="
+                        + this.transactionCount + " " + tickets + "[ms] " + tickets / this.transactionCount + "[ms/tx]"
+                        + " Proc[us]: " + timerProcess
+                        + (andProcess ?
+                        " UnconfDel[us]: " + timerUnconfirmedMap_delete
+                        : "")
+                        + " SignsKey[us]: " + timerTransFinalMapSinds_set
+                        + " FinalSet[us]: " + timerFinalMap_set
+                );
+            }
 
         }
 
@@ -1579,7 +1585,7 @@ public class Block {
             dcSet.getBlockMap().add(this);
             timerStart = System.nanoTime() - timerStart;
             if (timerStart < 999999999999l)
-                LOGGER.debug("BlockMap add timer [mm]: " + timerStart / 1000 + " [" + this.heightBlock + "]");
+                LOGGER.debug("BlockMap add timer [us]: " + timerStart / 1000 + " [" + this.heightBlock + "]");
 
         }
 

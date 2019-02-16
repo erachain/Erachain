@@ -294,7 +294,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             return true;
         }
 
-        this.getDCSet().updateUncTxCounter(1);
+        //this.getDCSet().updateUncTxCounter(1);
 
         return this.set(key, transaction);
 
@@ -387,8 +387,8 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         // delete BROADCASTS
         this.peersBroadcasted.remove(key);
 
-        if (this.contains(key))
-            this.getDCSet().updateUncTxCounter(-1);
+        //if (this.contains(key))
+        //    this.getDCSet().updateUncTxCounter(-1);
 
         return super.delete(key);
     }

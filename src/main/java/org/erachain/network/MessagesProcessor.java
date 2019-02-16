@@ -26,7 +26,7 @@ public class MessagesProcessor extends MonitoredThread {
     private Network network;
     private static final Logger LOGGER = LoggerFactory.getLogger(MessagesProcessor.class);
 
-    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE ? 200 : 200;
+    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE ? 100 : 100;
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
     private long unconfigmedMessageTimingAverage;
