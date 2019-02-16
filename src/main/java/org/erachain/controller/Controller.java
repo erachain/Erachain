@@ -1225,8 +1225,6 @@ public class Controller extends Observable {
             try {
                 // воспользуемся тут прямой пересылкой - так как нам надо именно ждать всю обработку
                 if (peer.directSendMessage(message)) {
-                    if (false)
-                        map.addBroadcastedPeer(transaction, peerByte);
 
                     if (peer.getPing() > 300) {
                         this.network.notifyObserveUpdatePeer(peer);
