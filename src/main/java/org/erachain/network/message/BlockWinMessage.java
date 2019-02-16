@@ -3,8 +3,10 @@ package org.erachain.network.message;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 
@@ -24,6 +26,11 @@ public class BlockWinMessage extends Message {
 
         this.block = block;
         this.height = block.heightBlock;
+    }
+
+    @Override
+    public Long getHash() {
+        return Longs.fromByteArray(this.block.getCreator().getShortAddressBytes());
     }
 
     public static BlockWinMessage parse(byte[] data) throws Exception {

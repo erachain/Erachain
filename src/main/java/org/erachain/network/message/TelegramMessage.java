@@ -1,6 +1,7 @@
 package org.erachain.network.message;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.json.simple.JSONObject;
@@ -14,6 +15,11 @@ public class TelegramMessage extends Message {
     public TelegramMessage(Transaction transaction) {
         super(TELEGRAM_TYPE);
         this.transaction = transaction;
+    }
+
+    @Override
+    public Long getHash() {
+        return Longs.fromByteArray(this.transaction.getSignature());
     }
 
     public static TelegramMessage parse(byte[] data) throws Exception {

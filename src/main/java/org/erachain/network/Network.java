@@ -40,9 +40,9 @@ public class Network extends Observable {
     CopyOnWriteArrayList<Peer> knownPeers;
 
     //private SortedSet<String> handledTelegramMessages;
-    private ConcurrentSkipListSet<String> handledTelegramMessages;
-    private ConcurrentSkipListSet<String> handledTransactionMessages;
-    private ConcurrentSkipListSet<String> handledWinBlockMessages;
+    private ConcurrentSkipListSet<Long> handledTelegramMessages;
+    private ConcurrentSkipListSet<Long> handledTransactionMessages;
+    private ConcurrentSkipListSet<Long> handledWinBlockMessages;
 
     //boolean tryRun; // попытка запуска
     boolean run;
@@ -54,7 +54,7 @@ public class Network extends Observable {
 
     public Network() {
         this.knownPeers = new CopyOnWriteArrayList<Peer>();
-        this.handledTelegramMessages = new ConcurrentSkipListSet<String>();
+        this.handledTelegramMessages = new ConcurrentSkipListSet<Long>();
         this.handledTransactionMessages = new ConcurrentSkipListSet();
         this.handledWinBlockMessages = new ConcurrentSkipListSet();
 
@@ -502,7 +502,7 @@ public class Network extends Observable {
             case Message.TELEGRAM_TYPE:
 
                 //CHECK IF NOT HANDLED ALREADY
-                String key = new String(message.getHash());
+                Long key = message.getHash();
                 if (this.handledTelegramMessages.add(key)) {
                     //ADD TO HANDLED MESSAGES
 
@@ -520,7 +520,7 @@ public class Network extends Observable {
             case Message.TRANSACTION_TYPE:
 
                 //CHECK IF NOT HANDLED ALREADY
-                key = new String(message.getHash());
+                key = message.getHash();
                 if (this.handledTransactionMessages.add(key)) {
                     //ADD TO HANDLED MESSAGES
 
@@ -538,7 +538,7 @@ public class Network extends Observable {
             case Message.WIN_BLOCK_TYPE:
 
                 //CHECK IF NOT HANDLED ALREADY
-                key = new String(message.getHash());
+                key = message.getHash();
                 if (this.handledWinBlockMessages.add(key)) {
                     //ADD TO HANDLED MESSAGES
 
