@@ -1225,8 +1225,10 @@ public class Controller extends Observable {
             try {
                 // воспользуемся тут прямой пересылкой - так как нам надо именно ждать всю обработку
                 if (peer.directSendMessage(message)) {
-                    map.addBroadcastedPeer(transaction, peerByte);
-                    if (peer.getPing() > 1000) {
+                    if (false)
+                        map.addBroadcastedPeer(transaction, peerByte);
+
+                    if (peer.getPing() > 300) {
                         this.network.notifyObserveUpdatePeer(peer);
                         LOGGER.debug(" bad ping " + peer.getPing() + "ms for:" + counter);
 
@@ -1253,18 +1255,18 @@ public class Controller extends Observable {
                 //this.network.notifyObserveUpdatePeer(peer);
                 ping = peer.getPing();
 
-                if (ping < 0 || ping > 1000) {
+                if (ping < 0 || ping > 300) {
 
                     stepCount >>= 1;
 
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(2000);
                     } catch (Exception e) {
                     }
 
                     LOGGER.debug(peer + " stepCount down " + stepCount);
 
-                } else if (ping < 200) {
+                } else if (ping < 100) {
                     stepCount <<= 1;
                     LOGGER.debug(peer + " stepCount UP " + stepCount + " for PING: " + ping);
                 }
