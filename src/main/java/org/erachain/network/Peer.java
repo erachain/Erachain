@@ -438,7 +438,7 @@ public class Peer extends MonitoredThread {
 
                 parsePoint = (System.nanoTime() - parsePoint) / 1000;
                 if (parsePoint < 999999999l) {
-                    if (logPings && parsePoint > 100) {
+                    if (parsePoint > 1000) {
                             LOGGER.debug(this + message.viewPref(false) + message
                                 + " PARSE: " + parsePoint + "[us]");
                     }
