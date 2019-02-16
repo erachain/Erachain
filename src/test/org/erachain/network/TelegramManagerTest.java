@@ -96,7 +96,7 @@ public class TelegramManagerTest {
             // CREATE MESSAGE
             telegram = (TelegramMessage)MessageFactory.getInstance().createTelegramMessage(transaction);
 
-            telegramer.pipeAddRemove(telegram, null, 0);
+            telegramer.add(telegram);
 
         }
 
@@ -198,7 +198,7 @@ public class TelegramManagerTest {
 
             Message telegram = MessageFactory.getInstance().createTelegramMessage(transaction);
 
-            telegramer.pipeAddRemove((TelegramMessage) telegram, null, 0);
+            telegramer.add((TelegramMessage) telegram);
         }
 
         long date2 = System.currentTimeMillis();
@@ -263,7 +263,7 @@ public class TelegramManagerTest {
 
         Message telegram = MessageFactory.getInstance().createTelegramMessage(transaction);
 
-        telegramer.pipeAddRemove((TelegramMessage) telegram, null, 0);
+        telegramer.add((TelegramMessage) telegram);
 
         assertEquals((int) telegramer.telegramCount(), 1);
 
@@ -278,7 +278,7 @@ public class TelegramManagerTest {
 
         telegram = MessageFactory.getInstance().createTelegramMessage(transaction);
 
-        telegramer.pipeAddRemove((TelegramMessage) telegram, null, 0);
+        telegramer.add((TelegramMessage) telegram);
 
         assertEquals((int) telegramer.telegramCount(), 1);
 
