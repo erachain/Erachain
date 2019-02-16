@@ -340,6 +340,8 @@ public class Peer extends MonitoredThread {
     public void run() {
         byte[] messageMagic = null;
 
+        long parsePoint;
+
         this.initMonitor();
         while (this.network.run) {
             if (USE_MONITOR) this.setMonitorPoint();
@@ -402,6 +404,7 @@ public class Peer extends MonitoredThread {
                     break;
                 }
 
+                parsePoint = System.nanoTime();
                 //PROCESS NEW MESSAGE
                 Message message;
                 try {
@@ -431,6 +434,14 @@ public class Peer extends MonitoredThread {
                 if (message == null) {
                     // уже обрабатывали такое сообщение - игнорируем
                     continue;
+                }
+
+                parsePoint = (System.nanoTime() - parsePoint) / 1000;
+                if (parsePoint < 999999999l) {
+                    if (logPings && parsePoint > 100) {
+                            LOGGER.debug(this + message.viewPref(false) + message
+                                + " PARSE: " + parsePoint + "[us]");
+                    }
                 }
 
                 if (USE_MONITOR) this.setMonitorStatus("in.message process");
