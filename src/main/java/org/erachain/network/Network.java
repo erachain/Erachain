@@ -1,8 +1,14 @@
 package org.erachain.network;
 
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
@@ -42,7 +48,7 @@ public class Network extends Observable {
     //private SortedSet<String> handledTelegramMessages;
     private ConcurrentSkipListSet<Long> handledTelegramMessages;
     private ConcurrentSkipListSet<Long> handledTransactionMessages;
-    private ConcurrentSkipListSet<Long> handledWinBlockMessages;
+    private ConcurrentSkipListSet<Integer> handledWinBlockMessages;
 
     //boolean tryRun; // попытка запуска
     boolean run;
@@ -56,7 +62,7 @@ public class Network extends Observable {
         this.knownPeers = new CopyOnWriteArrayList<Peer>();
         this.handledTelegramMessages = new ConcurrentSkipListSet<Long>();
         this.handledTransactionMessages = new ConcurrentSkipListSet<Long>();
-        this.handledWinBlockMessages = new ConcurrentSkipListSet<Long>();
+        this.handledWinBlockMessages = new ConcurrentSkipListSet<Integer>();
 
         this.run = true;
 
@@ -441,6 +447,91 @@ public class Network extends Observable {
 
     }
 
+    // берем подпись с трнзакции и трансформируем в Целое  исразу проверяем - есть ли?
+    public boolean checkHandledTelegramMessages(byte[] data, Peer sender) {
+
+        int position = Transaction.TYPE_LENGTH
+                + Transaction.TIMESTAMP_LENGTH
+                + Transaction.REFERENCE_LENGTH
+                + Transaction.CREATOR_LENGTH
+                + 1 // Power Fee
+        ;
+
+        Long key = Longs.fromBytes(data[position+1], data[position+2], data[position+3], data[position+4],
+                data[position+5], data[position+6], data[position+7], data[position+8]);
+
+        if (this.handledTelegramMessages.add(key)) {
+            //ADD TO HANDLED MESSAGES
+
+            //CHECK IF LIST IS FULL
+            if (this.handledTelegramMessages.size() > MAX_HANDLED_TELEGRAM_MESSAGES_SIZE) {
+                this.handledTelegramMessages.remove(this.handledTelegramMessages.first());
+            }
+
+            return true;
+        }
+
+        return false;
+
+    }
+
+    // берем подпись с трнзакции и трансформируем в Целое  исразу проверяем - есть ли?
+    public boolean checkHandledTransactionMessages(byte[] data, Peer sender) {
+
+        int position = Transaction.TYPE_LENGTH
+                + Transaction.TIMESTAMP_LENGTH
+                + Transaction.REFERENCE_LENGTH
+                + Transaction.CREATOR_LENGTH
+                + 1 // Power Fee
+                ;
+
+        Long key = Longs.fromBytes(data[position+1], data[position+2], data[position+3], data[position+4],
+                data[position+5], data[position+6], data[position+7], data[position+8]);
+
+        if (this.handledTransactionMessages.add(key)) {
+            //ADD TO HANDLED MESSAGES
+
+            //CHECK IF LIST IS FULL
+            if (this.handledTransactionMessages.size() > MAX_HANDLED_TRANSACTION_MESSAGES_SIZE) {
+                this.handledTransactionMessages.remove(this.handledTransactionMessages.first());
+            }
+
+            return true;
+        }
+
+        return false;
+
+    }
+
+    // берем подпись с трнзакции и трансформируем в Целое  исразу проверяем - есть ли?
+    public boolean checkHandledWinBlockMessages(byte[] data, Peer sender) {
+
+        // KEY BY CREATOR
+        int position = Block.HEIGHT_LENGTH
+                + Block.VERSION_LENGTH
+                + Block.REFERENCE_LENGTH
+                //+ Block.CREATOR_LENGTH
+                //+ Block.HEIGHT_LENGTH
+                //+ Block.TRANSACTIONS_HASH_LENGTH
+                ;
+
+        Integer key = Ints.fromBytes(data[position+1], data[position+2], data[position+3], data[position+4]);
+
+        if (this.handledWinBlockMessages.add(key)) {
+            //ADD TO HANDLED MESSAGES
+
+            //CHECK IF LIST IS FULL
+            if (this.handledWinBlockMessages.size() > MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE) {
+                this.handledWinBlockMessages.remove(this.handledWinBlockMessages.first());
+            }
+
+            return true;
+        }
+
+        return false;
+
+    }
+
     // очишаем потихоньку
     public void clearHandledTelegramMessages() {
         int size = handledTelegramMessages.size();
@@ -501,56 +592,19 @@ public class Network extends Observable {
 
             case Message.TELEGRAM_TYPE:
 
-                //CHECK IF NOT HANDLED ALREADY
-                Long key = message.getHash();
-                if (this.handledTelegramMessages.add(key)) {
-                    //ADD TO HANDLED MESSAGES
-
-                    //CHECK IF LIST IS FULL
-                    if (this.handledTelegramMessages.size() > MAX_HANDLED_TELEGRAM_MESSAGES_SIZE) {
-                        this.handledTelegramMessages.remove(this.handledTelegramMessages.first());
-                    }
-
-                    // telegram
-                    this.telegramer.offerMessage(message);
-                }
+                this.telegramer.offerMessage(message);
 
                 return;
 
             case Message.TRANSACTION_TYPE:
 
-                //CHECK IF NOT HANDLED ALREADY
-                key = message.getHash();
-                if (this.handledTransactionMessages.add(key)) {
-                    //ADD TO HANDLED MESSAGES
-
-                    //CHECK IF LIST IS FULL
-                    if (this.handledTransactionMessages.size() > MAX_HANDLED_TRANSACTION_MESSAGES_SIZE) {
-                        this.handledTransactionMessages.remove(this.handledTransactionMessages.first());
-                    }
-
-                    Controller.getInstance().transactionsPool.offerMessage(message);
-
-                }
+                Controller.getInstance().transactionsPool.offerMessage(message);
 
                 return;
 
             case Message.WIN_BLOCK_TYPE:
 
-                //CHECK IF NOT HANDLED ALREADY
-                key = message.getHash();
-                if (this.handledWinBlockMessages.add(key)) {
-                    //ADD TO HANDLED MESSAGES
-
-                    //CHECK IF LIST IS FULL
-                    if (this.handledWinBlockMessages.size() > MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE) {
-                        this.handledWinBlockMessages.remove(this.handledWinBlockMessages.first());
-                    }
-
-                    if (Controller.getInstance().isStatusOK()) {
-                        Controller.getInstance().winBlockSelector.offerMessage(message);
-                    }
-                }
+                Controller.getInstance().winBlockSelector.offerMessage(message);
 
                 return;
 

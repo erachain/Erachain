@@ -336,7 +336,7 @@ public abstract class Transaction {
     protected static final int TODO_h1 = 69000;
     // PROPERTIES LENGTH
     protected static final int SIMPLE_TYPE_LENGTH = 1;
-    protected static final int TYPE_LENGTH = 4;
+    public static final int TYPE_LENGTH = 4;
     protected static final int HEIGHT_LENGTH = 4;
     protected static final int DATA_JSON_PART_LENGTH = 4;
     protected static final int DATA_VERSION_PART_LENGTH = 6;

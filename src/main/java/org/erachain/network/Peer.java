@@ -428,13 +428,10 @@ public class Peer extends MonitoredThread {
                     break;
                 }
 
-                /*
                 if (message == null) {
-                    // unknowm message
-                    LOGGER.debug(this + " : NULL message!!!");
+                    // уже обрабатывали такое сообщение - игнорируем
                     continue;
                 }
-                */
 
                 if (USE_MONITOR) this.setMonitorStatus("in.message process");
 
