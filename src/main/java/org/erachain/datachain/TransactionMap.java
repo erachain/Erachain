@@ -40,9 +40,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-    // PEERS for transaction signature
-    private Map<Long, List<byte[]>> peersBroadcasted = new HashMap<Long, List<byte[]>>();
-
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
     @SuppressWarnings("rawtypes")
@@ -306,86 +303,10 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     }
 
-    // ADD broadcasted PEER
-    public void addBroadcastedPeer(Transaction transaction, byte[] peer) {
-
-        byte[] signature = transaction.getSignature();
-        Long key = Longs.fromByteArray(signature);
-
-        List<byte[]> peers;
-        if (!this.peersBroadcasted.containsKey(key)) {
-            peers = new ArrayList<byte[]>();
-        } else {
-            peers = this.peersBroadcasted.get(key);
-            if (peers == null)
-                peers = new ArrayList<byte[]>();
-        }
-
-        if (peers.add(peer))
-            this.peersBroadcasted.put(key, peers);
-    }
-
-    public boolean needBroadcasting(Transaction transaction, byte[] peerBYtes) {
-
-        byte[] signature = transaction.getSignature();
-        Long key = Longs.fromByteArray(signature);
-
-        List<byte[]> peers = this.peersBroadcasted.get(key);
-        if (peers == null || peers.isEmpty()
-                || (!peers.contains(peerBYtes) && peers.size() < BlockChain.ON_CONNECT_SEND_UNCONFIRMED_NEED_COUNT)) {
-            return true;
-        }
-
-        return false;
-
-    }
-
-    // HOW many PEERS broadcasted by this TRANSACTION
-    public int getBroadcasts(Transaction transaction) {
-
-        byte[] signature = transaction.getSignature();
-        Long key = Longs.fromByteArray(signature);
-
-        List<byte[]> peers = this.peersBroadcasted.get(key);
-        if (peers == null || peers.isEmpty())
-            return 0;
-
-        return peers.size();
-
-    }
-
-    // HOW many PEERS broadcasted by this TRANSACTION
-    public List<byte[]> getBroadcastedPeers(Transaction transaction) {
-
-        byte[] signature = transaction.getSignature();
-        Long key = Longs.fromByteArray(signature);
-
-        if (!this.peersBroadcasted.containsKey(key)) {
-            return new ArrayList<byte[]>();
-        } else {
-            return this.peersBroadcasted.get(key);
-        }
-
-    }
-
-    // is this TRANSACTION is broadcasted to this PEER
-    public boolean isBroadcastedToPeer(Transaction transaction, byte[] peer) {
-
-        byte[] signature = transaction.getSignature();
-        Long key = Longs.fromByteArray(signature);
-
-        if (!this.peersBroadcasted.containsKey(key)) {
-            return false;
-        } else {
-            return this.peersBroadcasted.get(key).contains(peer);
-        }
-
-    }
-
     public Transaction delete(Long key) {
 
         // delete BROADCASTS
-        this.peersBroadcasted.remove(key);
+        //this.peersBroadcasted.remove(key);
 
         //if (this.contains(key))
         //    this.getDCSet().updateUncTxCounter(-1);

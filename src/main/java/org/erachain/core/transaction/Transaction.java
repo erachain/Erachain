@@ -1496,11 +1496,12 @@ public abstract class Transaction {
             return 1 + db.getBlockMap().size() - this.height;
 
 
+        /*
         if (this.getType() != Transaction.CALCULATED_TRANSACTION) {
             if (db.getTransactionMap().contains(this)) {
                 return -db.getTransactionMap().getBroadcasts(this);
             }
-        }
+        }*/
 
         Block block = this.getBlock(db);
 
