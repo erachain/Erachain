@@ -455,15 +455,7 @@ public class Network extends Observable {
     // берем подпись с трнзакции и трансформируем в Целое  исразу проверяем - есть ли?
     public boolean checkHandledTelegramMessages(byte[] data, Peer sender) {
 
-        int position = Transaction.TYPE_LENGTH
-                + Transaction.TIMESTAMP_LENGTH
-                + Transaction.REFERENCE_LENGTH
-                + Transaction.CREATOR_LENGTH
-                + 1 // Power Fee
-        ;
-
-        Long key = Longs.fromBytes(data[position+1], data[position+2], data[position+3], data[position+4],
-                data[position+5], data[position+6], data[position+7], data[position+8]);
+        Long key = TelegramMessage.getHandledID(data);
 
         if (this.handledTelegramMessages.addHandledItem(key, sender)) {
             //ADD TO HANDLED MESSAGES
@@ -484,15 +476,7 @@ public class Network extends Observable {
     // берем подпись с трнзакции и трансформируем в Целое  исразу проверяем - есть ли?
     public boolean checkHandledTransactionMessages(byte[] data, Peer sender) {
 
-        int position = Transaction.TYPE_LENGTH
-                + Transaction.TIMESTAMP_LENGTH
-                + Transaction.REFERENCE_LENGTH
-                + Transaction.CREATOR_LENGTH
-                + 1 // Power Fee
-                ;
-
-        Long key = Longs.fromBytes(data[position+1], data[position+2], data[position+3], data[position+4],
-                data[position+5], data[position+6], data[position+7], data[position+8]);
+        Long key = TransactionMessage.getHandledID(data);
 
         if (this.handledTransactionMessages.addHandledItem(key, sender)) {
             //ADD TO HANDLED MESSAGES
@@ -513,15 +497,7 @@ public class Network extends Observable {
     public boolean checkHandledWinBlockMessages(byte[] data, Peer sender) {
 
         // KEY BY CREATOR
-        int position = Block.HEIGHT_LENGTH
-                + Block.VERSION_LENGTH
-                + Block.REFERENCE_LENGTH
-                //+ Block.CREATOR_LENGTH
-                //+ Block.HEIGHT_LENGTH
-                //+ Block.TRANSACTIONS_HASH_LENGTH
-                ;
-
-        Integer key = Ints.fromBytes(data[position+1], data[position+2], data[position+3], data[position+4]);
+        Integer key = BlockWinMessage.getHandledID(data);
 
         if (this.handledWinBlockMessages.addHandledItem(key, sender)) {
             //ADD TO HANDLED MESSAGES

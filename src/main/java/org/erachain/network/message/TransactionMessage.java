@@ -39,17 +39,7 @@ public class TransactionMessage extends Message {
     }
 
     // берем подпись с трнзакции и трансформируем в Целое  исразу проверяем - есть ли?
-    public boolean checkHandledTransactionMessages(byte[] data, Peer sender) {
-
-        int position = Transaction.TYPE_LENGTH
-                + Transaction.TIMESTAMP_LENGTH
-                + Transaction.REFERENCE_LENGTH
-                + Transaction.CREATOR_LENGTH
-                + 1 // Power Fee
-                ;
-
-        Long key = Longs.fromBytes(data[position+1], data[position+2], data[position+3], data[position+4],
-                data[position+5], data[position+6], data[position+7], data[position+8]);
+    public boolean checkHandledMessages(byte[] data, Peer sender) {
 
         if (this.handledTransactionMessages.addHandledItem(key, sender)) {
             //ADD TO HANDLED MESSAGES
