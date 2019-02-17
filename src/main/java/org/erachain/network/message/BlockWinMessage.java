@@ -34,7 +34,8 @@ public class BlockWinMessage extends Message {
         return Longs.fromByteArray(this.block.getCreator().getShortAddressBytes());
     }
 
-    public static boolean isHandled() { return true; }
+    @Override
+    public boolean isHandled() { return true; }
 
     // берем создателя с транзакции и трансформируем в Целое
     public static Integer getHandledID(byte[] data) {

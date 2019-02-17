@@ -184,7 +184,7 @@ public abstract class Message {
         return Longs.fromByteArray(this.toBytes());
     }
 
-    public static boolean isHandled() { return false; }
+    public boolean isHandled() { return false; }
 
     public byte[] toBytes() {
         byte[] data = new byte[0];

@@ -27,7 +27,8 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
 
             // Если еще нет данных
             itemsList = new CopyOnWriteArrayList();
-            itemsList.add(item);
+            if (item != null)
+                itemsList.add(item);
 
             // добавит если пусто или выдаст список который уже есть
             itemsList = (CopyOnWriteArrayList)super.putIfAbsent(key, itemsList);
@@ -48,7 +49,8 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
             itemsList = (CopyOnWriteArrayList)super.get(key);
         }
 
-        itemsList.add(item);
+        if (item != null)
+            itemsList.add(item);
 
         return false;
 

@@ -24,7 +24,8 @@ public class TelegramMessage extends Message {
         return Longs.fromByteArray(this.transaction.getSignature());
     }
 
-    public static boolean isHandled() { return true; }
+    @Override
+    public boolean isHandled() { return true; }
 
     // берем подпись с транзакции и трансформируем в Целое
     public static Long getHandledID(byte[] data) {

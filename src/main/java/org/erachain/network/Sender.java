@@ -208,6 +208,35 @@ public class Sender extends MonitoredThread {
 
         byte[] bytes = message.toBytes();
 
+        // проверим - может уже такое сообщение было нами принято, или
+        // если нет - то оно будет запомнено уже в списке обработанных входящих сообщений
+        // и не будет повторно обрабатываться при прилете к нас опять
+        if (message.isHandled()) {
+            switch (message.getId()) {
+                case Message.TELEGRAM_TYPE:
+                    // может быть это повтор?
+                    if (!this.peer.network.checkHandledTelegramMessages(bytes, null)) {
+                        LOGGER.debug(this.peer + " --> Telegram ALREADY EXIST...");
+                        return true;
+                    }
+                    break;
+                case Message.TRANSACTION_TYPE:
+                    // может быть это повтор?
+                    if (!this.peer.network.checkHandledTransactionMessages(bytes, null)) {
+                        LOGGER.debug(this.peer + " --> Transaction ALREADY EXIST...");
+                        return true;
+                    }
+                    break;
+                case Message.WIN_BLOCK_TYPE:
+                    // может быть это повтор?
+                    if (!this.peer.network.checkHandledWinBlockMessages(bytes, null)) {
+                        LOGGER.debug(this.peer + " --> Win Block ALREADY EXIST...");
+                        return true;
+                    }
+                    break;
+            }
+        }
+
         long checkTime = System.currentTimeMillis();
 
         if (!writeAndFlush(bytes, message.getType() == Message.GET_HWEIGHT_TYPE
