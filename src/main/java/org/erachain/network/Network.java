@@ -646,6 +646,9 @@ public class Network extends Observable {
             exclude = null;
         }
 
+        if (exclude != null && !exclude.isEmpty())
+            LOGGER.debug(message + " exclude: " + exclude.size());
+
         for (Peer peer : this.knownPeers) {
 
             if (!this.run)
@@ -676,6 +679,9 @@ public class Network extends Observable {
         Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
 
         HashSet<Peer> exclude = (HashSet<Peer>)this.handledWinBlockMessages.get(winBlock.getHandledID());
+
+        if (exclude != null && !exclude.isEmpty())
+            LOGGER.debug(winBlock + " exclude: " + exclude.size());
 
         for (Peer peer : this.knownPeers) {
 
