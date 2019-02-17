@@ -52,35 +52,6 @@ public class BlockWinMessage extends Message {
 
     }
 
-    // берем подпись с трнзакции и трансформируем в Целое  исразу проверяем - есть ли?
-    public boolean checkHandledWinBlockMessages(byte[] data, Peer sender) {
-
-        // KEY BY CREATOR
-        int position = Block.HEIGHT_LENGTH
-                + Block.VERSION_LENGTH
-                + Block.REFERENCE_LENGTH
-                //+ Block.CREATOR_LENGTH
-                //+ Block.HEIGHT_LENGTH
-                //+ Block.TRANSACTIONS_HASH_LENGTH
-                ;
-
-        Integer key = Ints.fromBytes(data[position+1], data[position+2], data[position+3], data[position+4]);
-
-        if (this.handledWinBlockMessages.addHandledItem(key, sender)) {
-            //ADD TO HANDLED MESSAGES
-
-            //CHECK IF LIST IS FULL
-            if (this.handledWinBlockMessages.size() > MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE) {
-                this.handledWinBlockMessages.remove(this.handledWinBlockMessages.firstKey());
-            }
-
-            return true;
-        }
-
-        return false;
-
-    }
-
     public static BlockWinMessage parse(byte[] data) throws Exception {
         //PARSE HEIGHT
         byte[] heightBytes = Arrays.copyOfRange(data, 0, HEIGHT_LENGTH);

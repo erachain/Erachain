@@ -40,35 +40,6 @@ public class TelegramMessage extends Message {
                 data[position + 5], data[position + 6], data[position + 7], data[position + 8]);
     }
 
-    // берем подпись с трнзакции и трансформируем в Целое  исразу проверяем - есть ли?
-    public boolean checkHandledTelegramMessages(Long key, Peer sender) {
-
-        int position = Transaction.TYPE_LENGTH
-                + Transaction.TIMESTAMP_LENGTH
-                + Transaction.REFERENCE_LENGTH
-                + Transaction.CREATOR_LENGTH
-                + 1 // Power Fee
-                ;
-
-        Long key = Longs.fromBytes(data[position+1], data[position+2], data[position+3], data[position+4],
-                data[position+5], data[position+6], data[position+7], data[position+8]);
-
-        if (this.handledTelegramMessages.addHandledItem(key, sender)) {
-            //ADD TO HANDLED MESSAGES
-
-            //CHECK IF LIST IS FULL
-            if (this.handledTelegramMessages.size() > MAX_HANDLED_TELEGRAM_MESSAGES_SIZE) {
-                ((NavigableMap)this.handledTelegramMessages).firstEntry();
-                this.handledTelegramMessages.remove(this.handledTelegramMessages.firstKey());
-            }
-
-            return true;
-        }
-
-        return false;
-
-    }
-
     public static TelegramMessage parse(byte[] data) throws Exception {
         //PARSE TRANSACTION
         int length = data.length;

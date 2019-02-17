@@ -38,24 +38,6 @@ public class TransactionMessage extends Message {
 
     }
 
-    // берем подпись с трнзакции и трансформируем в Целое  исразу проверяем - есть ли?
-    public boolean checkHandledMessages(byte[] data, Peer sender) {
-
-        if (this.handledTransactionMessages.addHandledItem(key, sender)) {
-            //ADD TO HANDLED MESSAGES
-
-            //CHECK IF LIST IS FULL
-            if (this.handledTransactionMessages.size() > MAX_HANDLED_TRANSACTION_MESSAGES_SIZE) {
-                this.handledTransactionMessages.remove(this.handledTransactionMessages.firstKey());
-            }
-
-            return true;
-        }
-
-        return false;
-
-    }
-
     public static TransactionMessage parse(byte[] data) throws Exception {
         //PARSE TRANSACTION
         Transaction transaction = TransactionFactory.getInstance().parse(data, Transaction.FOR_NETWORK);

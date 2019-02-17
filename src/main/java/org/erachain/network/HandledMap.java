@@ -1,10 +1,18 @@
 package org.erachain.network;
 
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class HandledMap<K, V> extends ConcurrentSkipListMap {
+public class HandledMap<K, V> extends ConcurrentHashMap {
 
+    private int max_size;
+    private List<K> handledList;
+
+    public HandledMap(int max_size) {
+        this.max_size = max_size;
+    }
     /**
      * Тут значение по ссылке - как только создали Список - его не меняем как объект, а меняем внутри его список
      * @param key
@@ -15,25 +23,53 @@ public class HandledMap<K, V> extends ConcurrentSkipListMap {
 
         CopyOnWriteArrayList itemsList;
 
-        if (!this.containsKey(key)) {
+        if (!super.containsKey(key)) {
 
             // Если еще нет данных
             itemsList = new CopyOnWriteArrayList();
             itemsList.add(item);
 
             // добавит если пусто или выдаст список который уже есть
-            itemsList = (CopyOnWriteArrayList)this.putIfAbsent(key, itemsList);
+            itemsList = (CopyOnWriteArrayList)super.putIfAbsent(key, itemsList);
 
-            if (itemsList == null)
+            if (itemsList == null) {
+                handledList.add((K)key);
+                if (handledList.size() > this.max_size) {
+                    // REMOVE first KEY
+                    key = this.handledList.remove(0);
+                    // REMOVE this KEY in HANDLED HASHMAP
+                    super.remove(key);
+
+                }
                 return true;
+            }
 
         } else {
-            itemsList = (CopyOnWriteArrayList)this.get(key);
+            itemsList = (CopyOnWriteArrayList)super.get(key);
         }
 
         itemsList.add(item);
 
         return false;
 
+    }
+
+    public boolean removeFirst() {
+
+        if (handledList.isEmpty())
+            return false;
+
+        // REMOVE first KEY
+        Object key = this.handledList.remove(0);
+        // REMOVE this KEY in HANDLED HASHMAP
+        super.remove(key);
+
+        return true;
+    }
+
+    public void clear() {
+
+        handledList.clear();
+        super.clear();
     }
 }

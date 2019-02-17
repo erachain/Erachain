@@ -65,9 +65,10 @@ public class Network extends Observable {
         this.controller = controller;
 
         this.knownPeers = new CopyOnWriteArrayList<Peer>();
-        this.handledTelegramMessages = new HandledMap<Long, List<Peer>>();
-        this.handledTransactionMessages = new HandledMap<Long, List<Peer>>();
-        this.handledWinBlockMessages = new HandledMap<Integer, List<Peer>>();
+
+        this.handledTelegramMessages = new HandledMap<Long, List<Peer>>(MAX_HANDLED_TELEGRAM_MESSAGES_SIZE);
+        this.handledTransactionMessages = new HandledMap<Long, List<Peer>>(MAX_HANDLED_TRANSACTION_MESSAGES_SIZE);
+        this.handledWinBlockMessages = new HandledMap<Integer, List<Peer>>(MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE);
 
         this.run = true;
 
@@ -457,15 +458,8 @@ public class Network extends Observable {
 
         Long key = TelegramMessage.getHandledID(data);
 
+        //ADD TO HANDLED MESSAGES
         if (this.handledTelegramMessages.addHandledItem(key, sender)) {
-            //ADD TO HANDLED MESSAGES
-
-            //CHECK IF LIST IS FULL
-            if (this.handledTelegramMessages.size() > MAX_HANDLED_TELEGRAM_MESSAGES_SIZE) {
-                ((NavigableMap)this.handledTelegramMessages).firstEntry();
-                this.handledTelegramMessages.remove(this.handledTelegramMessages.firstKey());
-            }
-
             return true;
         }
 
@@ -478,14 +472,8 @@ public class Network extends Observable {
 
         Long key = TransactionMessage.getHandledID(data);
 
+        //ADD TO HANDLED MESSAGES
         if (this.handledTransactionMessages.addHandledItem(key, sender)) {
-            //ADD TO HANDLED MESSAGES
-
-            //CHECK IF LIST IS FULL
-            if (this.handledTransactionMessages.size() > MAX_HANDLED_TRANSACTION_MESSAGES_SIZE) {
-                this.handledTransactionMessages.remove(this.handledTransactionMessages.firstKey());
-            }
-
             return true;
         }
 
@@ -499,14 +487,8 @@ public class Network extends Observable {
         // KEY BY CREATOR
         Integer key = BlockWinMessage.getHandledID(data);
 
+        //ADD TO HANDLED MESSAGES
         if (this.handledWinBlockMessages.addHandledItem(key, sender)) {
-            //ADD TO HANDLED MESSAGES
-
-            //CHECK IF LIST IS FULL
-            if (this.handledWinBlockMessages.size() > MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE) {
-                this.handledWinBlockMessages.remove(this.handledWinBlockMessages.firstKey());
-            }
-
             return true;
         }
 
@@ -523,7 +505,7 @@ public class Network extends Observable {
             size >>= 3;
 
         for (int i = 0; i < size; i++)
-            this.handledTelegramMessages.remove(this.handledTelegramMessages.firstKey());
+            this.handledTelegramMessages.removeFirst();
 
     }
 
@@ -536,7 +518,7 @@ public class Network extends Observable {
             size >>= 3;
 
         for (int i = 0; i < size; i++)
-            this.handledTransactionMessages.remove(this.handledTransactionMessages.firstKey());
+            this.handledTransactionMessages.removeFirst();
 
     }
 
