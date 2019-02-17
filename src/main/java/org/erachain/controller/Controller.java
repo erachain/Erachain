@@ -749,7 +749,7 @@ public class Controller extends Observable {
         this.blockGenerator.start();
 
         // CREATE NETWORK
-        this.network = new Network();
+        this.network = new Network(this);
 
         // CLOSE ON UNEXPECTED SHUTDOWN
         Runtime.getRuntime().addShutdownHook(new Thread(null, null, "ShutdownHook") {

@@ -23,6 +23,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -37,6 +38,8 @@ public class Network extends Observable {
     private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 6 : 1024;
     private static final int MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE = BlockChain.HARD_WORK ? 100 : 200;
     private static final Logger LOGGER = LoggerFactory.getLogger(Network.class);
+
+    private Controller controller;
     private static InetAddress myselfAddress;
     private ConnectionCreator creator;
     private ConnectionAcceptor acceptor;
@@ -46,9 +49,9 @@ public class Network extends Observable {
     CopyOnWriteArrayList<Peer> knownPeers;
 
     //private SortedSet<String> handledTelegramMessages;
-    private ConcurrentSkipListSet<Long> handledTelegramMessages;
-    private ConcurrentSkipListSet<Long> handledTransactionMessages;
-    private ConcurrentSkipListSet<Integer> handledWinBlockMessages;
+    private HandledMap<Long, List<Peer>> handledTelegramMessages;
+    private HandledMap<Long, List<Peer>> handledTransactionMessages;
+    private HandledMap<Integer, List<Peer>> handledWinBlockMessages;
 
     //boolean tryRun; // попытка запуска
     boolean run;
@@ -58,11 +61,13 @@ public class Network extends Observable {
     public static final int ANY_TYPE = 0;
 
 
-    public Network() {
+    public Network(Controller controller) {
+        this.controller = controller;
+
         this.knownPeers = new CopyOnWriteArrayList<Peer>();
-        this.handledTelegramMessages = new ConcurrentSkipListSet<Long>();
-        this.handledTransactionMessages = new ConcurrentSkipListSet<Long>();
-        this.handledWinBlockMessages = new ConcurrentSkipListSet<Integer>();
+        this.handledTelegramMessages = new HandledMap<Long, List<Peer>>();
+        this.handledTransactionMessages = new HandledMap<Long, List<Peer>>();
+        this.handledWinBlockMessages = new HandledMap<Integer, List<Peer>>();
 
         this.run = true;
 
@@ -115,8 +120,8 @@ public class Network extends Observable {
         peerManager = new PeerManager(this);
         peerManager.start();
 
-        telegramer = new TelegramManager(Controller.getInstance(),
-                Controller.getInstance().getBlockChain(),
+        telegramer = new TelegramManager(controller,
+                controller.getBlockChain(),
                 DCSet.getInstance(),
                 this);
 
@@ -179,7 +184,7 @@ public class Network extends Observable {
         }
 
         //PASS TO CONTROLLER
-        Controller.getInstance().afterDisconnect(peer);
+        controller.afterDisconnect(peer);
 
         //NOTIFY OBSERVERS
         this.setChanged();
@@ -320,8 +325,8 @@ public class Network extends Observable {
     public List<Peer> getKnownPeers() {
         List<Peer> knownPeers = new ArrayList<Peer>();
         //ASK DATABASE FOR A LIST OF PEERS
-        if (!Controller.getInstance().isOnStopping()) {
-            knownPeers = Controller.getInstance().getDBSet().getPeerMap().getBestPeers(
+        if (!controller.isOnStopping()) {
+            knownPeers = controller.getDBSet().getPeerMap().getBestPeers(
                     0, true);
         }
 
@@ -460,12 +465,13 @@ public class Network extends Observable {
         Long key = Longs.fromBytes(data[position+1], data[position+2], data[position+3], data[position+4],
                 data[position+5], data[position+6], data[position+7], data[position+8]);
 
-        if (this.handledTelegramMessages.add(key)) {
+        if (this.handledTelegramMessages.addHandledItem(key, sender)) {
             //ADD TO HANDLED MESSAGES
 
             //CHECK IF LIST IS FULL
             if (this.handledTelegramMessages.size() > MAX_HANDLED_TELEGRAM_MESSAGES_SIZE) {
-                this.handledTelegramMessages.remove(this.handledTelegramMessages.first());
+                ((NavigableMap)this.handledTelegramMessages).firstEntry();
+                this.handledTelegramMessages.remove(this.handledTelegramMessages.firstKey());
             }
 
             return true;
@@ -488,12 +494,12 @@ public class Network extends Observable {
         Long key = Longs.fromBytes(data[position+1], data[position+2], data[position+3], data[position+4],
                 data[position+5], data[position+6], data[position+7], data[position+8]);
 
-        if (this.handledTransactionMessages.add(key)) {
+        if (this.handledTransactionMessages.addHandledItem(key, sender)) {
             //ADD TO HANDLED MESSAGES
 
             //CHECK IF LIST IS FULL
             if (this.handledTransactionMessages.size() > MAX_HANDLED_TRANSACTION_MESSAGES_SIZE) {
-                this.handledTransactionMessages.remove(this.handledTransactionMessages.first());
+                this.handledTransactionMessages.remove(this.handledTransactionMessages.firstKey());
             }
 
             return true;
@@ -517,12 +523,12 @@ public class Network extends Observable {
 
         Integer key = Ints.fromBytes(data[position+1], data[position+2], data[position+3], data[position+4]);
 
-        if (this.handledWinBlockMessages.add(key)) {
+        if (this.handledWinBlockMessages.addHandledItem(key, sender)) {
             //ADD TO HANDLED MESSAGES
 
             //CHECK IF LIST IS FULL
             if (this.handledWinBlockMessages.size() > MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE) {
-                this.handledWinBlockMessages.remove(this.handledWinBlockMessages.first());
+                this.handledWinBlockMessages.remove(this.handledWinBlockMessages.firstKey());
             }
 
             return true;
@@ -535,22 +541,26 @@ public class Network extends Observable {
     // очишаем потихоньку
     public void clearHandledTelegramMessages() {
         int size = handledTelegramMessages.size();
-        if (size > 100)
+        if (size < MAX_HANDLED_TELEGRAM_MESSAGES_SIZE >> 4)
+            size = MAX_HANDLED_TELEGRAM_MESSAGES_SIZE >> 4;
+        else
             size >>= 3;
 
         for (int i = 0; i < size; i++)
-            this.handledTelegramMessages.remove(this.handledTelegramMessages.first());
+            this.handledTelegramMessages.remove(this.handledTelegramMessages.firstKey());
 
     }
 
     // очишаем потихоньку
     public void clearHandledTransactionMessages() {
         int size = handledTransactionMessages.size();
-        if (size > 32)
+        if (size < MAX_HANDLED_TRANSACTION_MESSAGES_SIZE >> 4)
+            size = MAX_HANDLED_TRANSACTION_MESSAGES_SIZE >> 4;
+        else
             size >>= 3;
 
         for (int i = 0; i < size; i++)
-            this.handledTransactionMessages.remove(this.handledTransactionMessages.first());
+            this.handledTransactionMessages.remove(this.handledTransactionMessages.firstKey());
 
     }
 
@@ -573,7 +583,7 @@ public class Network extends Observable {
 
     public void onMessageMySelf(Peer sender, byte[] remoteID) {
 
-        if (Arrays.equals(remoteID, Controller.getInstance().getFoundMyselfID())) {
+        if (Arrays.equals(remoteID, controller.getFoundMyselfID())) {
             //LOGGER.info("network.onMessage - Connected to self. Disconnection.");
 
             Network.myselfAddress = sender.getAddress();
@@ -598,19 +608,19 @@ public class Network extends Observable {
 
             case Message.TRANSACTION_TYPE:
 
-                Controller.getInstance().transactionsPool.offerMessage(message);
+                controller.transactionsPool.offerMessage(message);
 
                 return;
 
             case Message.WIN_BLOCK_TYPE:
 
-                Controller.getInstance().winBlockSelector.offerMessage(message);
+                controller.winBlockSelector.offerMessage(message);
 
                 return;
 
             case Message.GET_BLOCK_TYPE:
 
-                Controller.getInstance().blockRequester.offerMessage(message);
+                controller.blockRequester.offerMessage(message);
 
                 return;
 
@@ -623,8 +633,7 @@ public class Network extends Observable {
     public void pingAllPeers(List<Peer> exclude, boolean onlySynchronized) {
         //LOGGER.debug("Broadcasting PING ALL");
 
-        Controller cnt = Controller.getInstance();
-        BlockChain chain = cnt.getBlockChain();
+        BlockChain chain = controller.getBlockChain();
         Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
         Tuple2<Integer, Long> peerHWeight;
 
@@ -639,7 +648,7 @@ public class Network extends Observable {
 
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
-                peerHWeight = cnt.getHWeightOfPeer(peer);
+                peerHWeight = controller.getHWeightOfPeer(peer);
                 if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
                     continue;
                 }
@@ -655,8 +664,7 @@ public class Network extends Observable {
     }
 
     public void broadcast(Message message, List<Peer> exclude, boolean onlySynchronized) {
-        Controller cnt = Controller.getInstance();
-        BlockChain chain = cnt.getBlockChain();
+        BlockChain chain = controller.getBlockChain();
         Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
 
         for (Peer peer : this.knownPeers) {
@@ -670,7 +678,7 @@ public class Network extends Observable {
 
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
-                Tuple2<Integer, Long> peerHWeight = Controller.getInstance().getHWeightOfPeer(peer);
+                Tuple2<Integer, Long> peerHWeight = controller.getHWeightOfPeer(peer);
                 if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
                     continue;
                 }
@@ -689,8 +697,7 @@ public class Network extends Observable {
 
     public void broadcastWinBlock(BlockWinMessage winBlock, List<Peer> exclude, boolean onlySynchronized) {
 
-        Controller cnt = Controller.getInstance();
-        BlockChain chain = cnt.getBlockChain();
+        BlockChain chain = controller.getBlockChain();
         Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
 
         for (Peer peer : this.knownPeers) {
@@ -704,7 +711,7 @@ public class Network extends Observable {
 
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
-                Tuple2<Integer, Long> peerHWeight = Controller.getInstance().getHWeightOfPeer(peer);
+                Tuple2<Integer, Long> peerHWeight = controller.getHWeightOfPeer(peer);
                 if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
                     continue;
                 }
