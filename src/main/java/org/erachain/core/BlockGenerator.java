@@ -882,7 +882,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                             local_status = 8;
                                             this.setMonitorStatus("local_status " + viewStatus());
 
-                                            ctrl.broadcastWinBlock(generatedBlock, null);
+                                            ctrl.broadcastWinBlock(generatedBlock);
                                             generatedBlock = null;
                                             local_status = 0;
                                             this.setMonitorStatus("local_status " + viewStatus());

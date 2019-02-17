@@ -205,8 +205,13 @@ public class Sender extends MonitoredThread {
 
         if (USE_MONITOR) this.setMonitorStatusBefore("write");
 
-
-        byte[] bytes = message.toBytes();
+        byte[] bytes;
+        if (message.getBytes() == null) {
+            bytes = message.toBytes();
+            message.setBytes(bytes);
+        } else {
+            bytes = message.getBytes();
+        }
 
         // проверим - может уже такое сообщение было нами принято, или
         // если нет - то оно будет запомнено уже в списке обработанных входящих сообщений

@@ -41,6 +41,11 @@ public class TelegramMessage extends Message {
                 data[position + 5], data[position + 6], data[position + 7], data[position + 8]);
     }
 
+    @Override
+    public Long getHandledID() {
+        return getHandledID(this.getBytes());
+    }
+
     public static TelegramMessage parse(byte[] data) throws Exception {
         //PARSE TRANSACTION
         int length = data.length;

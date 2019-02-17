@@ -666,7 +666,9 @@ public class Wallet extends Observable implements Observer {
 
 			}
 
-			block = block.getChild(dcSet);
+			if (block != null)
+			    block = block.getChild(dcSet);
+
 			if (block == null) {
 				Controller.getInstance().setProcessingWalletSynchronize(false);
 

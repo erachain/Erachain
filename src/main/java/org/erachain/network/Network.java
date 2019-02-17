@@ -49,9 +49,9 @@ public class Network extends Observable {
     CopyOnWriteArrayList<Peer> knownPeers;
 
     //private SortedSet<String> handledTelegramMessages;
-    private HandledMap<Long, List<Peer>> handledTelegramMessages;
-    private HandledMap<Long, List<Peer>> handledTransactionMessages;
-    private HandledMap<Integer, List<Peer>> handledWinBlockMessages;
+    private HandledMap<Long, HashSet<Peer>> handledTelegramMessages;
+    private HandledMap<Long, HashSet<Peer>> handledTransactionMessages;
+    private HandledMap<Integer, HashSet<Peer>> handledWinBlockMessages;
 
     //boolean tryRun; // попытка запуска
     boolean run;
@@ -66,9 +66,9 @@ public class Network extends Observable {
 
         this.knownPeers = new CopyOnWriteArrayList<Peer>();
 
-        this.handledTelegramMessages = new HandledMap<Long, List<Peer>>(MAX_HANDLED_TELEGRAM_MESSAGES_SIZE);
-        this.handledTransactionMessages = new HandledMap<Long, List<Peer>>(MAX_HANDLED_TRANSACTION_MESSAGES_SIZE);
-        this.handledWinBlockMessages = new HandledMap<Integer, List<Peer>>(MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE);
+        this.handledTelegramMessages = new HandledMap<Long, HashSet<Peer>>(MAX_HANDLED_TELEGRAM_MESSAGES_SIZE);
+        this.handledTransactionMessages = new HandledMap<Long, HashSet<Peer>>(MAX_HANDLED_TRANSACTION_MESSAGES_SIZE);
+        this.handledWinBlockMessages = new HandledMap<Integer, HashSet<Peer>>(MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE);
 
         this.run = true;
 
@@ -500,7 +500,7 @@ public class Network extends Observable {
     public void clearHandledTelegramMessages() {
         int size = handledTelegramMessages.size();
         if (size < MAX_HANDLED_TELEGRAM_MESSAGES_SIZE >> 4)
-            size = MAX_HANDLED_TELEGRAM_MESSAGES_SIZE >> 4;
+            size >>= 1;
         else
             size >>= 3;
 
@@ -513,7 +513,7 @@ public class Network extends Observable {
     public void clearHandledTransactionMessages() {
         int size = handledTransactionMessages.size();
         if (size < MAX_HANDLED_TRANSACTION_MESSAGES_SIZE >> 4)
-            size = MAX_HANDLED_TRANSACTION_MESSAGES_SIZE >> 4;
+            size >>= 1;
         else
             size >>= 3;
 
@@ -588,7 +588,7 @@ public class Network extends Observable {
         }
     }
 
-    public void pingAllPeers(List<Peer> exclude, boolean onlySynchronized) {
+    public void pingAllPeers(boolean onlySynchronized) {
         //LOGGER.debug("Broadcasting PING ALL");
 
         BlockChain chain = controller.getBlockChain();
@@ -612,18 +612,39 @@ public class Network extends Observable {
                 }
             }
 
-            //EXCLUDE PEERS
-            if (exclude == null || !exclude.contains(peer)) {
-                peer.setNeedPing();
-            }
+            peer.setNeedPing();
+
         }
 
         //LOGGER.debug("Broadcasting PING ALL end");
     }
 
-    public void broadcast(Message message, List<Peer> exclude, boolean onlySynchronized) {
+    public void broadcast(Message message, boolean onlySynchronized) {
         BlockChain chain = controller.getBlockChain();
         Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
+
+        HashSet exclude;
+        if (message.isHandled()) {
+
+            switch (message.getId()) {
+                case Message.TELEGRAM_TYPE:
+                    // может быть это повтор?
+                    exclude = (HashSet<Peer>)this.handledTelegramMessages.get(message.getHandledID());
+                    break;
+                case Message.TRANSACTION_TYPE:
+                    // может быть это повтор?
+                    exclude = (HashSet<Peer>)this.handledTransactionMessages.get(message.getHandledID());
+                    break;
+                case Message.WIN_BLOCK_TYPE:
+                    // может быть это повтор?
+                    exclude = (HashSet<Peer>)this.handledWinBlockMessages.get(message.getHandledID());
+                    break;
+                default:
+                    exclude = null;
+            }
+        } else {
+            exclude = null;
+        }
 
         for (Peer peer : this.knownPeers) {
 
@@ -643,20 +664,18 @@ public class Network extends Observable {
             }
 
             //EXCLUDE PEERS
-            if (exclude == null || !exclude.contains(peer)) {
-                try {
-                    peer.offerMessage(message);
-                } catch (Exception e) {
-                    LOGGER.error(e.getMessage(), e);
-                }
+            if (exclude == null || exclude.isEmpty() || !exclude.contains(peer)) {
+                peer.offerMessage(message);
             }
         }
     }
 
-    public void broadcastWinBlock(BlockWinMessage winBlock, List<Peer> exclude, boolean onlySynchronized) {
+    public void broadcastWinBlock(BlockWinMessage winBlock, boolean onlySynchronized) {
 
         BlockChain chain = controller.getBlockChain();
         Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
+
+        HashSet<Peer> exclude = (HashSet<Peer>)this.handledWinBlockMessages.get(winBlock.getHandledID());
 
         for (Peer peer : this.knownPeers) {
 
@@ -676,7 +695,7 @@ public class Network extends Observable {
             }
 
             //EXCLUDE PEERS
-            if (exclude == null || !exclude.contains(peer)) {
+            if (exclude == null || exclude.isEmpty() || !exclude.contains(peer)) {
                 peer.sendWinBlock(winBlock);
             }
         }

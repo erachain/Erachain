@@ -103,11 +103,14 @@ public class MessageFactory {
         int hasId = inputStream.read();
         int id = -1;
 
+        byte[] idBytes;
         if (hasId == 1) {
             //READ ID
-            byte[] idBytes = new byte[Message.ID_LENGTH];
+            idBytes = new byte[Message.ID_LENGTH];
             inputStream.readFully(idBytes);
             id = Ints.fromByteArray(idBytes);
+        } else {
+            idBytes = null;
         }
 
         //READ LENGTH
@@ -117,9 +120,10 @@ public class MessageFactory {
 
         //IF MESSAGE CONTAINS DATA READ DATA AND VALIDATE CHECKSUM
         byte[] data = new byte[length];
+        byte[] checksum;
         if (length > 0) {
             //READ CHECKSUM
-            byte[] checksum = new byte[Message.CHECKSUM_LENGTH];
+            checksum = new byte[Message.CHECKSUM_LENGTH];
             inputStream.readFully(checksum);
 
             //READ DATA
@@ -153,6 +157,8 @@ public class MessageFactory {
             if (!Arrays.equals(checksum, digest)) {
                 throw new Exception(Lang.getInstance().translate("Invalid data checksum length=") + length);
             }
+        } else {
+            checksum = null;
         }
 
         Message message = null;
@@ -291,6 +297,7 @@ public class MessageFactory {
         //SET SENDER
         message.setSender(sender);
         message.setLength(length);
+        message.setBytes(typeBytes, hasId, idBytes, length, checksum, data);
 
         //SET ID
         if (hasId == 1) {

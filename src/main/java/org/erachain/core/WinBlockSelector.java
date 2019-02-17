@@ -75,9 +75,9 @@ public class WinBlockSelector extends MonitoredThread {
         if (blockChain.setWaitWinBuffer(dcSet, newBlock, message.getSender())) {
             // IF IT WIN
             // BROADCAST
-            List<Peer> excludes = new ArrayList<Peer>();
-            excludes.add(message.getSender());
-            message.getSender().network.broadcastWinBlock(blockWinMessage, excludes, false);
+            //List<Peer> excludes = new ArrayList<Peer>();
+            //excludes.add(message.getSender());
+            message.getSender().network.broadcastWinBlock(blockWinMessage, false);
 
             onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
             if (onMessageProcessTiming < 999999999999l) {

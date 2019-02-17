@@ -90,6 +90,7 @@ public abstract class Message {
     private Peer sender;
     private int id;
     private int length;
+    private byte[] bytes;
 
     public Message(int type) {
         this.type = type;
@@ -186,7 +187,55 @@ public abstract class Message {
 
     public boolean isHandled() { return false; }
 
+    public Object getHandledID() {
+        return null;
+    }
+
+    public void setBytes(byte[] typeBytes, int hasId, byte[] idBytes, int length, byte[] checksum, byte[] body_data) {
+        byte[] data = new byte[0];
+
+        //WRITE MAGIC
+        data = Bytes.concat(data, Controller.getInstance().getMessageMagic());
+
+        //WRITE MESSAGE TYPE
+        data = Bytes.concat(data, typeBytes);
+
+        //WRITE HASID
+        data = Bytes.concat(data, new byte[]{(byte)hasId});
+        if (hasId == 1) {
+            //WRITE ID
+            data = Bytes.concat(data, idBytes);
+        }
+
+        //WRITE LENGTH
+        byte[] lengthBytes = Ints.toByteArray(length);
+        data = Bytes.concat(data, lengthBytes);
+
+        if (checksum != null) {
+            data = Bytes.concat(data, checksum);
+            data = Bytes.concat(data, body_data);
+        }
+
+        this.bytes = data;
+
+    }
+
+    public void setBytes(byte[] data) {
+        if (data == null)
+            data = this.toBytes();
+
+        this.bytes = data;
+    }
+
+    public byte[] getBytes() {
+        if (this.bytes == null)
+            this.bytes = this.toBytes();
+
+        return this.bytes;
+    }
+
     public byte[] toBytes() {
+
         byte[] data = new byte[0];
 
         //WRITE MAGIC

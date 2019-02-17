@@ -53,6 +53,11 @@ public class BlockWinMessage extends Message {
 
     }
 
+    @Override
+    public Integer getHandledID() {
+        return getHandledID(this.getBytes());
+    }
+
     public static BlockWinMessage parse(byte[] data) throws Exception {
         //PARSE HEIGHT
         byte[] heightBytes = Arrays.copyOfRange(data, 0, HEIGHT_LENGTH);

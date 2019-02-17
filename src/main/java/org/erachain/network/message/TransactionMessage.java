@@ -39,6 +39,11 @@ public class TransactionMessage extends Message {
 
     }
 
+    @Override
+    public Long getHandledID() {
+        return getHandledID(this.getBytes());
+    }
+
     public static TransactionMessage parse(byte[] data) throws Exception {
         //PARSE TRANSACTION
         Transaction transaction = TransactionFactory.getInstance().parse(data, Transaction.FOR_NETWORK);
