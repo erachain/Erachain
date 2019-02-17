@@ -49,9 +49,9 @@ public class Network extends Observable {
     CopyOnWriteArrayList<Peer> knownPeers;
 
     //private SortedSet<String> handledTelegramMessages;
-    private HandledMap<Long, HashSet<Peer>> handledTelegramMessages;
-    private HandledMap<Long, HashSet<Peer>> handledTransactionMessages;
-    private HandledMap<Integer, HashSet<Peer>> handledWinBlockMessages;
+    private HandledMap<Long, Set<Peer>> handledTelegramMessages;
+    private HandledMap<Long, Set<Peer>> handledTransactionMessages;
+    private HandledMap<Integer, Set<Peer>> handledWinBlockMessages;
 
     //boolean tryRun; // попытка запуска
     boolean run;
@@ -66,9 +66,9 @@ public class Network extends Observable {
 
         this.knownPeers = new CopyOnWriteArrayList<Peer>();
 
-        this.handledTelegramMessages = new HandledMap<Long, HashSet<Peer>>(MAX_HANDLED_TELEGRAM_MESSAGES_SIZE);
-        this.handledTransactionMessages = new HandledMap<Long, HashSet<Peer>>(MAX_HANDLED_TRANSACTION_MESSAGES_SIZE);
-        this.handledWinBlockMessages = new HandledMap<Integer, HashSet<Peer>>(MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE);
+        this.handledTelegramMessages = new HandledMap<Long, Set<Peer>>(MAX_HANDLED_TELEGRAM_MESSAGES_SIZE);
+        this.handledTransactionMessages = new HandledMap<Long, Set<Peer>>(MAX_HANDLED_TRANSACTION_MESSAGES_SIZE);
+        this.handledWinBlockMessages = new HandledMap<Integer, Set<Peer>>(MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE);
 
         this.run = true;
 

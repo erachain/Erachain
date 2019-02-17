@@ -1,9 +1,6 @@
 package org.erachain.network;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -15,7 +12,9 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
 
     public HandledMap(int max_size) {
         this.max_size = max_size;
+        this.handledList = new ArrayList<>();
     }
+
     /**
      * Тут значение по ссылке - как только создали Список - его не меняем как объект, а меняем внутри его список
      * @param key
@@ -25,19 +24,19 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
     public boolean addHandledItem(Object key, Peer sender) {
 
         //CopyOnWriteArrayList sendersSet;
-        HashSet<Peer> sendersSet;
+        Set<Peer> sendersSet;
 
         if (!super.containsKey(key)) {
 
             // Если еще нет данных
             //sendersSet = new CopyOnWriteArrayList();
-            sendersSet = (HashSet<Peer>)Collections.synchronizedSet(new HashSet<Peer>());
+            sendersSet = Collections.synchronizedSet(new HashSet<Peer>());
 
             if (sender != null)
                 sendersSet.add(sender);
 
             // добавит если пусто или выдаст список который уже есть
-            sendersSet = (HashSet<Peer>)super.putIfAbsent(key, sendersSet);
+            sendersSet = (Set<Peer>)super.putIfAbsent(key, sendersSet);
 
             if (sendersSet == null) {
                 handledList.add((K)key);
@@ -52,7 +51,7 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
             }
 
         } else {
-            sendersSet = (HashSet<Peer>)super.get(key);
+            sendersSet = (Set<Peer>)super.get(key);
         }
 
         if (sender != null)

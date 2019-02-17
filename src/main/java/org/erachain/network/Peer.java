@@ -427,8 +427,9 @@ public class Peer extends MonitoredThread {
                     break;
                 } catch (Exception e) {
                     //DISCONNECT and BAN
-                    ban(network.banForActivePeersCounter(), "parse message wrong - " + e.getMessage());
-                    break;
+                    LOGGER.error(e.getMessage(), e);
+                    //ban(network.banForActivePeersCounter(), "parse message wrong - " + e.getMessage());
+                    continue;
                 }
 
                 if (message == null) {
