@@ -170,7 +170,7 @@ public class MessageFactory {
 
                 // может быть это повтор?
                 if (!sender.network.checkHandledTelegramMessages(data, sender, false)) {
-                    //LOGGER.debug(sender + " <-- Telegram REPEATED...");
+                    LOGGER.debug(sender + " <-- Telegram REPEATED...");
                     return null;
                 }
 
@@ -183,7 +183,7 @@ public class MessageFactory {
 
                 // может быть это повтор?
                 if (!sender.network.checkHandledTransactionMessages(data, sender, false)) {
-                    //LOGGER.debug(sender + " <-- Transaction REPEATED...");
+                    LOGGER.debug(sender + " <-- Transaction REPEATED...");
                     return null;
                 }
 

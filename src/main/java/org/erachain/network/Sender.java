@@ -214,25 +214,23 @@ public class Sender extends MonitoredThread {
             switch (message.getId()) {
                 case Message.TELEGRAM_TYPE:
                     // может быть это повтор?
-                    Object key = message.getHandledID();
-
 
                     if (!this.peer.network.checkHandledTelegramMessages(message.getLoadBytes(), this.peer, true)) {
-                        LOGGER.debug(this.peer + " --> Telegram ALREADY EXIST...");
+                        LOGGER.debug(this.peer + " --> Telegram ALREADY SENDED...");
                         return true;
                     }
                     break;
                 case Message.TRANSACTION_TYPE:
                     // может быть это повтор?
                     if (!this.peer.network.checkHandledTransactionMessages(message.getLoadBytes(), this.peer, true)) {
-                        LOGGER.debug(this.peer + " --> Transaction ALREADY EXIST...");
+                        LOGGER.debug(this.peer + " --> Transaction ALREADY SENDED...");
                         return true;
                     }
                     break;
                 case Message.WIN_BLOCK_TYPE:
                     // может быть это повтор?
                     if (!this.peer.network.checkHandledWinBlockMessages(message.getLoadBytes(), this.peer, true)) {
-                        LOGGER.debug(this.peer + " --> Win Block ALREADY EXIST...");
+                        LOGGER.debug(this.peer + " --> Win Block ALREADY SENDED...");
                         return true;
                     }
                     break;
