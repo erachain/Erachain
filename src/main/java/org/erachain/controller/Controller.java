@@ -749,7 +749,7 @@ public class Controller extends Observable {
         this.blockGenerator.start();
 
         // CREATE NETWORK
-        this.network = new Network();
+        this.network = new Network(this);
 
         // CLOSE ON UNEXPECTED SHUTDOWN
         Runtime.getRuntime().addShutdownHook(new Thread(null, null, "ShutdownHook") {
@@ -1140,7 +1140,7 @@ public class Controller extends Observable {
     public void pingAllPeers(boolean onlySynchronized) {
         // PINF ALL ACTIVE PEERS
         if (this.network != null)
-            this.network.pingAllPeers(null, onlySynchronized);
+            this.network.pingAllPeers(onlySynchronized);
     }
 
     public int getActivePeersCounter() {
@@ -1547,7 +1547,7 @@ public class Controller extends Observable {
         this.network.deleteObserver(o);
     }
 
-    public void broadcastWinBlock(Block newBlock, List<Peer> excludes) {
+    public void broadcastWinBlock(Block newBlock) {
 
         LOGGER.info("broadcast winBlock " + newBlock.toString() + " size:" + newBlock.getTransactionCount());
 
@@ -1558,13 +1558,13 @@ public class Controller extends Observable {
             return;
 
         // BROADCAST MESSAGE
-        this.network.broadcastWinBlock(blockWinMessage, excludes, false);
+        this.network.broadcastWinBlock(blockWinMessage, false);
 
         LOGGER.info("broadcasted!");
 
     }
 
-    public void broadcastHWeightFull(List<Peer> excludes) {
+    public void broadcastHWeightFull() {
 
         // LOGGER.info("broadcast winBlock " + newBlock.toString(this.dcSet));
 
@@ -1577,7 +1577,7 @@ public class Controller extends Observable {
         Message messageHW = MessageFactory.getInstance().createHWeightMessage(HWeight);
 
         // BROADCAST MESSAGE
-        this.network.broadcast(messageHW, excludes, false);
+        this.network.broadcast(messageHW, false);
 
     }
 
@@ -1587,8 +1587,7 @@ public class Controller extends Observable {
         Message message = MessageFactory.getInstance().createTransactionMessage(transaction);
 
         // BROADCAST MESSAGE
-        List<Peer> excludes = new ArrayList<Peer>();
-        this.network.broadcast(message, excludes, false);
+        this.network.broadcast(message, false);
     }
 
     public boolean broadcastTelegram(Transaction transaction, boolean store) {
@@ -1599,8 +1598,7 @@ public class Controller extends Observable {
 
         if (!store || !notAdded) {
             // BROADCAST MESSAGE
-            List<Peer> excludes = new ArrayList<Peer>();
-            this.network.broadcast(telegram, excludes, false);
+            this.network.broadcast(telegram, false);
             // save DB
             Controller.getInstance().wallet.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
         }
@@ -2472,7 +2470,7 @@ public class Controller extends Observable {
         /// LOGGER.info("and broadcast it");
 
         // broadcast my HW
-        broadcastHWeightFull(null);
+        broadcastHWeightFull();
 
         return true;
     }

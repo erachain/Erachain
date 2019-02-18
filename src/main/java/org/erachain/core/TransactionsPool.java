@@ -128,9 +128,7 @@ public class TransactionsPool extends MonitoredThread {
             // так как непонятно - протухла она или нет
 
             // BROADCAST
-            List<Peer> excludes = new ArrayList<Peer>();
-            excludes.add(message.getSender());
-            controller.network.broadcast(message, excludes, false);
+            controller.network.broadcast(message, false);
         }
 
         if (LOG_UNCONFIRMED_PROCESS) {

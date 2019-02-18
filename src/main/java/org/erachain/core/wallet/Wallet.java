@@ -544,7 +544,8 @@ public class Wallet extends Observable implements Observer {
 
 	// asynchronous RUN from BlockGenerator
 	public void synchronize(boolean reset) {
-        if (!reset && Controller.getInstance().isProcessingWalletSynchronize()) {
+        if (!reset && Controller.getInstance().isProcessingWalletSynchronize()
+                || Controller.getInstance().isOnStopping()) {
 			return;
 		}
 
@@ -622,6 +623,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.getUnionMap().reset();
 			this.database.getOrderMap().reset();
 
+
 			// REPROCESS BLOCKS
 			block = new GenesisBlock();
 			this.database.setLastBlockSignature(block.getReference());
@@ -666,13 +668,18 @@ public class Wallet extends Observable implements Observer {
 
 			}
 
-			block = block.getChild(dcSet);
+			if (block != null)
+			    block = block.getChild(dcSet);
+
 			if (block == null) {
+                /*
 				Controller.getInstance().setProcessingWalletSynchronize(false);
 
 				this.database.commit();
 				this.syncHeight = 0;
                 Controller.getInstance().walletSyncStatusUpdate(0);
+                */
+                synchronize(true);
 				return;
 			}
 

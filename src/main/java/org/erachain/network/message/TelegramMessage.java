@@ -22,6 +22,28 @@ public class TelegramMessage extends Message {
         return Longs.fromByteArray(this.transaction.getSignature());
     }
 
+    @Override
+    public boolean isHandled() { return true; }
+
+    // берем подпись с транзакции и трансформируем в Целое
+    public static Long getHandledID(byte[] data) {
+
+        int position = Transaction.TYPE_LENGTH
+                + Transaction.TIMESTAMP_LENGTH
+                + Transaction.REFERENCE_LENGTH
+                + Transaction.CREATOR_LENGTH
+                + 1 // FEE POWER
+                ;
+
+        return Longs.fromBytes(data[position + 1], data[position + 2], data[position + 3], data[position + 4],
+                data[position + 5], data[position + 6], data[position + 7], data[position + 8]);
+    }
+
+    @Override
+    public Long getHandledID() {
+        return getHandledID(this.getLoadBytes());
+    }
+
     public static TelegramMessage parse(byte[] data) throws Exception {
         //PARSE TRANSACTION
         int length = data.length;

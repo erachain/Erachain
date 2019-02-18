@@ -1,6 +1,7 @@
 package org.erachain.network.message;
 
 import com.google.common.primitives.Ints;
+import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
@@ -102,11 +103,14 @@ public class MessageFactory {
         int hasId = inputStream.read();
         int id = -1;
 
+        byte[] idBytes;
         if (hasId == 1) {
             //READ ID
-            byte[] idBytes = new byte[Message.ID_LENGTH];
+            idBytes = new byte[Message.ID_LENGTH];
             inputStream.readFully(idBytes);
             id = Ints.fromByteArray(idBytes);
+        } else {
+            idBytes = null;
         }
 
         //READ LENGTH
@@ -116,9 +120,10 @@ public class MessageFactory {
 
         //IF MESSAGE CONTAINS DATA READ DATA AND VALIDATE CHECKSUM
         byte[] data = new byte[length];
+        byte[] checksum;
         if (length > 0) {
             //READ CHECKSUM
-            byte[] checksum = new byte[Message.CHECKSUM_LENGTH];
+            checksum = new byte[Message.CHECKSUM_LENGTH];
             inputStream.readFully(checksum);
 
             //READ DATA
@@ -152,6 +157,8 @@ public class MessageFactory {
             if (!Arrays.equals(checksum, digest)) {
                 throw new Exception(Lang.getInstance().translate("Invalid data checksum length=") + length);
             }
+        } else {
+            checksum = null;
         }
 
         Message message = null;
@@ -161,8 +168,42 @@ public class MessageFactory {
             // TELEGRAM
             case Message.TELEGRAM_TYPE:
 
+                // может быть это повтор?
+                if (!sender.network.checkHandledTelegramMessages(data, sender, false)) {
+                    //LOGGER.debug(sender + " <-- Telegram REPEATED...");
+                    return null;
+                }
+
                 //CREATE MESSAGE FROM DATA
                 message = TelegramMessage.parse(data);
+                break;
+
+            //TRANSACTION
+            case Message.TRANSACTION_TYPE:
+
+                // может быть это повтор?
+                if (!sender.network.checkHandledTransactionMessages(data, sender, false)) {
+                    //LOGGER.debug(sender + " <-- Transaction REPEATED...");
+                    return null;
+                }
+
+                //CREATE MESSAGE FROM MDATA
+                message = TransactionMessage.parse(data);
+                break;
+
+            //BLOCK
+            case Message.WIN_BLOCK_TYPE:
+
+                // может быть это повтор?
+                if (!Controller.getInstance().isStatusOK()
+                        || !sender.network.checkHandledWinBlockMessages(data, sender, false)
+                ) {
+                    LOGGER.debug(sender + " <-- Win Block REPEATED...");
+                    return null;
+                }
+
+                //CREATE MESSAGE FROM DATA
+                message = BlockWinMessage.parse(data);
                 break;
 
             //TODO: delete PING and GET HWeight
@@ -219,24 +260,10 @@ public class MessageFactory {
                 break;
 
             //BLOCK
-            case Message.WIN_BLOCK_TYPE:
-
-                //CREATE MESSAGE FROM DATA
-                message = BlockWinMessage.parse(data);
-                break;
-
-            //BLOCK
             case Message.BLOCK_TYPE:
 
                 //CREATE MESSAGE FROM DATA
                 message = BlockMessage.parse(data);
-                break;
-
-            //TRANSACTION
-            case Message.TRANSACTION_TYPE:
-
-                //CREATE MESSAGE FRO MDATA
-                message = TransactionMessage.parse(data);
                 break;
 
             //VERSION
@@ -270,6 +297,7 @@ public class MessageFactory {
         //SET SENDER
         message.setSender(sender);
         message.setLength(length);
+        message.setLoadBytes(data);
 
         //SET ID
         if (hasId == 1) {

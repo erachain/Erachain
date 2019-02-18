@@ -24,8 +24,6 @@ public class BlockFactory {
     public Block parse(byte[] data, int height) throws Exception {
         //READ VERSION
         byte[] versionBytes = Arrays.copyOfRange(data, 0, Block.VERSION_LENGTH);
-
-
         int version = Ints.fromByteArray(versionBytes);
 
         if (version == 0) {

@@ -90,6 +90,7 @@ public abstract class Message {
     private Peer sender;
     private int id;
     private int length;
+    private byte[] loadBytes;
 
     public Message(int type) {
         this.type = type;
@@ -184,7 +185,29 @@ public abstract class Message {
         return Longs.fromByteArray(this.toBytes());
     }
 
+    public boolean isHandled() { return false; }
+
+    public Object getHandledID() {
+        return null;
+    }
+
+    public void setLoadBytes(byte[] loadData) {
+
+        this.loadBytes = loadData;
+
+    }
+
+    public byte[] getLoadBytes() {
+        if (this.loadBytes == null && isHandled()) {
+            // тут генерится Нагрузка и в generateChecksum сохраняется
+            this.toBytes();
+        }
+
+        return this.loadBytes;
+    }
+
     public byte[] toBytes() {
+
         byte[] data = new byte[0];
 
         //WRITE MAGIC
@@ -217,6 +240,7 @@ public abstract class Message {
     }
 
     protected byte[] generateChecksum(byte[] data) {
+        this.loadBytes = data;
         byte[] checksum = Crypto.getInstance().digest(data);
         checksum = Arrays.copyOfRange(checksum, 0, CHECKSUM_LENGTH);
         return checksum;

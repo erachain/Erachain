@@ -98,13 +98,7 @@ public class TelegramManager extends Thread {
         }
 
         // BROADCAST
-        if (message.getSender() != null) {
-            List<Peer> excludes = new ArrayList<Peer>();
-            excludes.add(message.getSender());
-            this.network.broadcast(message, excludes, false);
-        } else {
-            this.network.broadcast(message, null, false);
-        }
+        this.network.broadcast(message, false);
 
     }
 

@@ -6,12 +6,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
-import org.erachain.core.crypto.Crypto;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 
-import javax.naming.ldap.Control;
-import java.awt.*;
 import java.util.Arrays;
 
 public class BlockWinMessage extends Message {
@@ -31,6 +26,30 @@ public class BlockWinMessage extends Message {
     @Override
     public Long getHash() {
         return Longs.fromByteArray(this.block.getCreator().getShortAddressBytes());
+    }
+
+    @Override
+    public boolean isHandled() { return true; }
+
+    // берем создателя с транзакции и трансформируем в Целое
+    public static Integer getHandledID(byte[] data) {
+
+        // KEY BY CREATOR
+        int position = Block.HEIGHT_LENGTH
+                + Block.VERSION_LENGTH
+                + Block.REFERENCE_LENGTH
+                //+ Block.CREATOR_LENGTH
+                //+ Block.HEIGHT_LENGTH
+                //+ Block.TRANSACTIONS_HASH_LENGTH
+                ;
+
+        return Ints.fromBytes(data[position + 1], data[position + 2], data[position + 3], data[position + 4]);
+
+    }
+
+    @Override
+    public Integer getHandledID() {
+        return getHandledID(this.getLoadBytes());
     }
 
     public static BlockWinMessage parse(byte[] data) throws Exception {
