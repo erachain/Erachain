@@ -90,7 +90,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.11.09 beta rc";
+    public static String version = "4.11.10 beta RC";
     public static String buildTime = "2019-02-13 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
