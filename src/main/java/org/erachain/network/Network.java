@@ -27,21 +27,22 @@ public class Network extends Observable {
 
     public static final int SEND_WAIT = 20000;
     public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK ? 0 : 1;
-    private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<5;
-    private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 6 : 1024<<3;
+    private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<2;
+    private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 6 : 1024;
     private static final int MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE = BlockChain.HARD_WORK ? 100 : 200;
     private static final Logger LOGGER = LoggerFactory.getLogger(Network.class);
     private static InetAddress myselfAddress;
     private ConnectionCreator creator;
     private ConnectionAcceptor acceptor;
+    private MessagesProcessor messagesProcessor;
     PeerManager peerManager;
     public TelegramManager telegramer;
     CopyOnWriteArrayList<Peer> knownPeers;
 
     //private SortedSet<String> handledTelegramMessages;
-    private ConcurrentSkipListSet<String> handledTelegramMessages;
-    private ConcurrentSkipListSet<String> handledTransactionMessages;
-    private ConcurrentSkipListSet<String> handledWinBlockMessages;
+    private ConcurrentSkipListSet<Long> handledTelegramMessages;
+    private ConcurrentSkipListSet<Long> handledTransactionMessages;
+    private ConcurrentSkipListSet<Long> handledWinBlockMessages;
 
     //boolean tryRun; // попытка запуска
     boolean run;
@@ -53,9 +54,9 @@ public class Network extends Observable {
 
     public Network() {
         this.knownPeers = new CopyOnWriteArrayList<Peer>();
-        this.handledTelegramMessages = new ConcurrentSkipListSet<String>();
-        this.handledTransactionMessages = new ConcurrentSkipListSet();
-        this.handledWinBlockMessages = new ConcurrentSkipListSet();
+        this.handledTelegramMessages = new ConcurrentSkipListSet<Long>();
+        this.handledTransactionMessages = new ConcurrentSkipListSet<Long>();
+        this.handledWinBlockMessages = new ConcurrentSkipListSet<Long>();
 
         this.run = true;
 
@@ -112,6 +113,9 @@ public class Network extends Observable {
                 Controller.getInstance().getBlockChain(),
                 DCSet.getInstance(),
                 this);
+
+        this.messagesProcessor = new MessagesProcessor(this);
+
     }
 
     public void onConnect(Peer peer) {
@@ -493,13 +497,12 @@ public class Network extends Observable {
             return;
         }
 
-        long timeCheck = System.currentTimeMillis();
         switch (message.getType()) {
 
             case Message.TELEGRAM_TYPE:
 
                 //CHECK IF NOT HANDLED ALREADY
-                String key = new String(message.getHash());
+                Long key = message.getHash();
                 if (this.handledTelegramMessages.add(key)) {
                     //ADD TO HANDLED MESSAGES
 
@@ -517,7 +520,7 @@ public class Network extends Observable {
             case Message.TRANSACTION_TYPE:
 
                 //CHECK IF NOT HANDLED ALREADY
-                key = new String(message.getHash());
+                key = message.getHash();
                 if (this.handledTransactionMessages.add(key)) {
                     //ADD TO HANDLED MESSAGES
 
@@ -526,75 +529,16 @@ public class Network extends Observable {
                         this.handledTransactionMessages.remove(this.handledTransactionMessages.first());
                     }
 
-                    Controller.getInstance().onMessageTransaction(message);
+                    Controller.getInstance().transactionsPool.offerMessage(message);
 
                 }
 
                 return;
-
-            case Message.TELEGRAM_GET_TYPE:
-                // GET telegrams
-                //address
-                JSONObject address = ((TelegramGetMessage) message).getAddress();
-                // create ansver
-                ArrayList<String> addressFilter = new ArrayList<String>();
-                Set keys = address.keySet();
-                for (int i = 0; i < keys.size(); i++) {
-
-                    addressFilter.add((String) address.get(i));
-                }
-                Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage(addressFilter);
-                answer.setId(message.getId());
-                // send answer
-                message.getSender().offerMessage(answer);
-                return;
-
-            case Message.TELEGRAM_ANSWER_TYPE:
-                // Answer to get telegrams
-                ((TelegramAnswerMessage) message).saveToWallet();
-
-                return;
-
-            case Message.GET_HWEIGHT_TYPE:
-
-                Tuple2<Integer, Long> HWeight = Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance());
-                if (HWeight == null)
-                    HWeight = new Tuple2<Integer, Long>(-1, -1L);
-
-                HWeightMessage response = (HWeightMessage) MessageFactory.getInstance().createHWeightMessage(HWeight);
-                // CREATE RESPONSE WITH SAME ID
-                response.setId(message.getId());
-
-                timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 10) {
-                    LOGGER.debug(message.getSender() + ": " + message + " solved by period: " + timeCheck);
-                }
-
-                //SEND BACK TO SENDER
-                message.getSender().offerMessage(response);
-
-                break;
-
-            //GETPEERS
-            case Message.GET_PEERS_TYPE:
-
-                onMessagePeers(message.getSender(), message.getId());
-
-                break;
-
-
-            case Message.FIND_MYSELF_TYPE:
-
-                FindMyselfMessage findMyselfMessage = (FindMyselfMessage) message;
-
-                onMessageMySelf(message.getSender(), findMyselfMessage.getFoundMyselfID());
-
-                break;
 
             case Message.WIN_BLOCK_TYPE:
 
                 //CHECK IF NOT HANDLED ALREADY
-                key = new String(message.getHash());
+                key = message.getHash();
                 if (this.handledWinBlockMessages.add(key)) {
                     //ADD TO HANDLED MESSAGES
 
@@ -616,11 +560,9 @@ public class Network extends Observable {
 
                 return;
 
-            //SEND TO CONTROLLER
             default:
 
-                Controller.getInstance().onMessage(message);
-                break;
+                this.messagesProcessor.offerMessage(message);
         }
     }
 
@@ -741,6 +683,9 @@ public class Network extends Observable {
     public void stop() {
 
         this.run = false;
+
+        // STOP MESSAGES PROCESSOR
+        messagesProcessor.halt();
 
         // stop thread
         this.creator.halt();

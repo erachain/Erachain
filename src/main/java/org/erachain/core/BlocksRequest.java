@@ -84,35 +84,30 @@ public class BlocksRequest extends MonitoredThread {
 
     public void run() {
 
-        try {
-            runned = true;
-            Message message;
-            int counter = 0;
-            while (runned) {
+        runned = true;
+        //Message message;
+        int counter = 0;
+        while (runned) {
+            try {
+                counter += processMessage(blockingQueue.take());
+            } catch (OutOfMemoryError e) {
+                Controller.getInstance().stopAll(76);
+                return;
+            } catch (IllegalMonitorStateException e) {
+                break;
+            } catch (InterruptedException e) {
+                break;
+            }
+
+            // FREEZE sometimes
+            if (counter > 333) {
+                counter = 0;
                 try {
-                    counter += processMessage(blockingQueue.take());
-                } catch (OutOfMemoryError e) {
-                    Controller.getInstance().stopAll(76);
-                    break;
-                } catch (IllegalMonitorStateException e) {
-                    break;
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     break;
                 }
-
-                // FREEZE sometimes
-                if (counter > 333) {
-                    counter = 0;
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                }
             }
-        } catch (OutOfMemoryError e) {
-            controller.stopAll(44);
-            return;
         }
 
         LOGGER.info("Block Request halted");

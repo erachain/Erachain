@@ -1496,7 +1496,7 @@ public class BlockExplorer {
         // startTime = System.currentTimeMillis();
         // output.put("totaltransactions",
         // dcSet.getTransactionRef_BlockRef_Map().size());
-        output.put("totaltransactions", dcSet.getTxCounter());
+        output.put("totaltransactions", dcSet.getTransactionFinalMap().size());
         // LOGGER.debug("refsCount time: " + (System.currentTimeMillis() -
         // startTime)*0.001);
         // startTime = System.currentTimeMillis();

@@ -493,7 +493,8 @@ public class Peer extends MonitoredThread {
                     }
 
                     timeStart = System.currentTimeMillis() - timeStart;
-                    if (timeStart > 100) {
+                    if (timeStart > 100
+                            || message.getType() == Message.WIN_BLOCK_TYPE) {
                         LOGGER.debug(this + message.viewPref(false) + message + " solved by period: " + timeStart);
                     }
                 }

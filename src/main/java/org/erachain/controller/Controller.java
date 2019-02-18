@@ -92,7 +92,6 @@ public class Controller extends Observable {
 
     public static String version = "4.11.09 beta rc";
     public static String buildTime = "2019-02-13 13:33:33 UTC";
-    private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.DEVELOP_USE? false : false;
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -139,6 +138,7 @@ public class Controller extends Observable {
     private TradersManager tradersManager;
     private ApiService rpcService;
     private WebService webService;
+    public TransactionsPool transactionsPool;
     public WinBlockSelector winBlockSelector;
     public BlocksRequest blockRequester;
     private BlockChain blockChain;
@@ -162,7 +162,7 @@ public class Controller extends Observable {
     private boolean isStopping = false;
     private String info;
 
-    private long unconfigmedMessageTimingAverage;
+    public long unconfigmedMessageTimingAverage;
     public static final int BLOCK_AS_TX_COUNT = 4;
     public long transactionMessageTimingAverage;
     private long transactionMakeTimingAverage;
@@ -650,6 +650,9 @@ public class Controller extends Observable {
         // CREATE BLOCKCHAIN
         this.blockChain = new BlockChain(dcSet);
 
+        // CREATE TRANSACTIONS POOL
+        this.transactionsPool = new TransactionsPool(this, blockChain, dcSet);
+
         // CREATE WinBlock SELECTOR
         this.winBlockSelector = new WinBlockSelector(this, blockChain, dcSet);
 
@@ -1039,6 +1042,12 @@ public class Controller extends Observable {
         for (File file : new File(Settings.getInstance().getTemDir()).listFiles())
             if (file.isFile()) file.delete();
 
+        // STOP TRANSACTIONS POOL
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping Transactions Pool")));
+        LOGGER.info("Stopping Transactions Pool");
+        this.transactionsPool.halt();
+
         // STOP WIN BLOCK SELECTOR
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping WinBlock Selector")));
@@ -1216,8 +1225,8 @@ public class Controller extends Observable {
             try {
                 // воспользуемся тут прямой пересылкой - так как нам надо именно ждать всю обработку
                 if (peer.directSendMessage(message)) {
-                    map.addBroadcastedPeer(transaction, peerByte);
-                    if (peer.getPing() > 1000) {
+
+                    if (peer.getPing() > 300) {
                         this.network.notifyObserveUpdatePeer(peer);
                         LOGGER.debug(" bad ping " + peer.getPing() + "ms for:" + counter);
 
@@ -1244,18 +1253,18 @@ public class Controller extends Observable {
                 //this.network.notifyObserveUpdatePeer(peer);
                 ping = peer.getPing();
 
-                if (ping < 0 || ping > 1000) {
+                if (ping < 0 || ping > 300) {
 
                     stepCount >>= 1;
 
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(2000);
                     } catch (Exception e) {
                     }
 
                     LOGGER.debug(peer + " stepCount down " + stepCount);
 
-                } else if (ping < 200) {
+                } else if (ping < 100) {
                     stepCount <<= 1;
                     LOGGER.debug(peer + " stepCount UP " + stepCount + " for PING: " + ping);
                 }
@@ -1417,118 +1426,6 @@ public class Controller extends Observable {
     public void setOrphanTo(int height) {
         this.blockChain.clearWaitWinBuffer();
         this.blockGenerator.setOrphanTo(height);
-    }
-
-    public void onMessageTransaction(Message message) {
-
-        long timeCheck = System.nanoTime();
-        long onMessageProcessTiming = timeCheck;
-
-        TransactionMessage transactionMessage = (TransactionMessage) message;
-
-        // GET TRANSACTION
-        Transaction transaction = transactionMessage.getTransaction();
-
-        // CHECK IF SIGNATURE IS VALID ////// ------- OR GENESIS TRANSACTION
-        if (transaction.getCreator() == null
-                || !transaction.isSignatureValid(DCSet.getInstance())) {
-            // DISHONEST PEER
-            banPeerOnError(message.getSender(), "invalid transaction signature");
-
-            return;
-        }
-
-        // DEADTIME
-        if (transaction.getDeadline() < this.blockChain.getTimestamp(this.dcSet)) {
-            // so OLD transaction
-            return;
-        }
-
-        if (LOG_UNCONFIRMED_PROCESS) {
-            timeCheck = System.currentTimeMillis() - timeCheck;
-            if (timeCheck > 10) {
-                LOGGER.debug("TRANSACTION_TYPE proccess 1 period: " + timeCheck);
-            }
-        }
-
-        // ALREADY EXIST
-        byte[] signature = transaction.getSignature();
-        timeCheck = System.currentTimeMillis();
-        if (this.dcSet.getTransactionMap().contains(signature)) {
-            if (LOG_UNCONFIRMED_PROCESS) {
-                timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 20) {
-                    LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
-                }
-            }
-            return;
-        }
-        if (LOG_UNCONFIRMED_PROCESS) {
-            timeCheck = System.currentTimeMillis() - timeCheck;
-            if (timeCheck > 20) {
-                LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
-            }
-        }
-
-        timeCheck = System.currentTimeMillis();
-        if (this.dcSet.getTransactionFinalMapSigns().contains(signature) || this.isStopping) {
-
-            if (LOG_UNCONFIRMED_PROCESS) {
-                timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 30) {
-                    LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in FINAL period: " + timeCheck);
-                }
-            }
-            return;
-        }
-        if (LOG_UNCONFIRMED_PROCESS) {
-            timeCheck = System.currentTimeMillis() - timeCheck;
-            if (timeCheck > 30) {
-                LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in FINAL period: " + timeCheck);
-            }
-        }
-
-        timeCheck = System.currentTimeMillis();
-        if (this.status == STATUS_OK) {
-            // если мы не в синхронизации - так как мы тогда
-            // не знаем время текущее цепочки и не понимаем можно ли борадкастить дальше трнзакцию
-            // так как непонятно - протухла она или нет
-
-            // BROADCAST
-            List<Peer> excludes = new ArrayList<Peer>();
-            excludes.add(message.getSender());
-            this.network.broadcast(message, excludes, false);
-        }
-
-        if (LOG_UNCONFIRMED_PROCESS) {
-            timeCheck = System.currentTimeMillis() - timeCheck;
-            if (timeCheck > 10) {
-                LOGGER.debug("TRANSACTION_TYPE proccess BROADCAST period: " + timeCheck);
-            }
-            timeCheck = System.currentTimeMillis();
-        }
-
-        // ADD TO UNCONFIRMED TRANSACTIONS
-        this.dcSet.getTransactionMap().add(transaction);
-
-        if (LOG_UNCONFIRMED_PROCESS) {
-            timeCheck = System.currentTimeMillis() - timeCheck;
-            if (timeCheck > 30) {
-                LOGGER.debug("TRANSACTION_TYPE proccess ADD period: " + timeCheck);
-            }
-        }
-
-        onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
-        if (onMessageProcessTiming < 999999999999l) {
-            // при переполнении может быть минус
-            // в миеросекундах подсчет делаем
-            onMessageProcessTiming /= 1000;
-            unconfigmedMessageTimingAverage = ((unconfigmedMessageTimingAverage << 8)
-                    + onMessageProcessTiming - unconfigmedMessageTimingAverage) >> 8;
-        }
-
-        return;
-
     }
 
     // SYNCHRONIZED DO NOT PROCESSS MESSAGES SIMULTANEOUSLY

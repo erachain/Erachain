@@ -2,6 +2,7 @@ package org.erachain.network.message;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.network.Peer;
@@ -18,6 +19,7 @@ public abstract class Message {
     public static final int ID_LENGTH = 4;
     public static final int MESSAGE_LENGTH = 4;
     public static final int CHECKSUM_LENGTH = 4;
+    //public static final int HASH_LENGTH = 8;
 
     /**
      * Запрос: Получить список пиров с узла
@@ -177,8 +179,9 @@ public abstract class Message {
         return this.length;
     }
 
-    public byte[] getHash() {
-        return Crypto.getInstance().digest(this.toBytes());
+    public Long getHash() {
+        //return Crypto.getInstance().digest(this.toBytes());
+        return Longs.fromByteArray(this.toBytes());
     }
 
     public byte[] toBytes() {

@@ -642,8 +642,11 @@ public class Wallet extends Observable implements Observer {
 				BlocksHeadMap walletHeadsMap = this.database.getBlocksHeadMap();
 				BlockSignsMap chainSignsMap = dcSet.getBlockSignsMap();
 				Block.BlockHead head;
-				while (!chainSignsMap.contains(lastSignature)) {
-
+				while (!chainSignsMap.contains(lastSignature)
+						&& !Controller.getInstance().needUpToDate()
+						&& !Controller.getInstance().isStatusOK()
+					) {
+					// если идет синхронизация цепочки - кошелек не синхронизируем
 					head = walletHeadsMap.getLast();
                     if (head == null) {
                         synchronize(true);
@@ -684,7 +687,6 @@ public class Wallet extends Observable implements Observer {
 		try {
 			do {
 
-
 				// UPDATE
 				// this.update(this, new
 				// ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE,
@@ -702,7 +704,7 @@ public class Wallet extends Observable implements Observer {
 				if (System.currentTimeMillis() - timePoint > 10000
 						|| steepHeight < height - lastHeight) {
 
-					if (Controller.getInstance().needUpToDate())
+					if (Controller.getInstance().needUpToDate() || !Controller.getInstance().isStatusOK())
 						// если идет синхронизация цепочки - кошелек не синхронизируем
 						break;
 
