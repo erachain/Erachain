@@ -205,13 +205,7 @@ public class Sender extends MonitoredThread {
 
         if (USE_MONITOR) this.setMonitorStatusBefore("write");
 
-        byte[] bytes;
-        if (message.getBytes() == null) {
-            bytes = message.toBytes();
-            message.setBytes(bytes);
-        } else {
-            bytes = message.getBytes();
-        }
+        byte[] bytes = message.toBytes();
 
         // проверим - может уже такое сообщение было нами принято, или
         // если нет - то оно будет запомнено уже в списке обработанных входящих сообщений
@@ -220,21 +214,24 @@ public class Sender extends MonitoredThread {
             switch (message.getId()) {
                 case Message.TELEGRAM_TYPE:
                     // может быть это повтор?
-                    if (!this.peer.network.checkHandledTelegramMessages(bytes, null)) {
+                    Object key = message.getHandledID();
+
+
+                    if (!this.peer.network.checkHandledTelegramMessages(message.getLoadBytes(), this.peer, true)) {
                         LOGGER.debug(this.peer + " --> Telegram ALREADY EXIST...");
                         return true;
                     }
                     break;
                 case Message.TRANSACTION_TYPE:
                     // может быть это повтор?
-                    if (!this.peer.network.checkHandledTransactionMessages(bytes, null)) {
+                    if (!this.peer.network.checkHandledTransactionMessages(message.getLoadBytes(), this.peer, true)) {
                         LOGGER.debug(this.peer + " --> Transaction ALREADY EXIST...");
                         return true;
                     }
                     break;
                 case Message.WIN_BLOCK_TYPE:
                     // может быть это повтор?
-                    if (!this.peer.network.checkHandledWinBlockMessages(bytes, null)) {
+                    if (!this.peer.network.checkHandledWinBlockMessages(message.getLoadBytes(), this.peer, true)) {
                         LOGGER.debug(this.peer + " --> Win Block ALREADY EXIST...");
                         return true;
                     }

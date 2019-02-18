@@ -169,7 +169,7 @@ public class MessageFactory {
             case Message.TELEGRAM_TYPE:
 
                 // может быть это повтор?
-                if (!sender.network.checkHandledTelegramMessages(data, sender)) {
+                if (!sender.network.checkHandledTelegramMessages(data, sender, false)) {
                     //LOGGER.debug(sender + " <-- Telegram REPEATED...");
                     return null;
                 }
@@ -182,7 +182,7 @@ public class MessageFactory {
             case Message.TRANSACTION_TYPE:
 
                 // может быть это повтор?
-                if (!sender.network.checkHandledTransactionMessages(data, sender)) {
+                if (!sender.network.checkHandledTransactionMessages(data, sender, false)) {
                     //LOGGER.debug(sender + " <-- Transaction REPEATED...");
                     return null;
                 }
@@ -196,7 +196,7 @@ public class MessageFactory {
 
                 // может быть это повтор?
                 if (!Controller.getInstance().isStatusOK()
-                        || !sender.network.checkHandledWinBlockMessages(data, sender)
+                        || !sender.network.checkHandledWinBlockMessages(data, sender, false)
                 ) {
                     LOGGER.debug(sender + " <-- Win Block REPEATED...");
                     return null;
@@ -297,7 +297,7 @@ public class MessageFactory {
         //SET SENDER
         message.setSender(sender);
         message.setLength(length);
-        message.setBytes(typeBytes, hasId, idBytes, length, checksum, data);
+        message.setLoadBytes(data);
 
         //SET ID
         if (hasId == 1) {

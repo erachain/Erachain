@@ -1,9 +1,10 @@
 package org.erachain.network;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class HandledMap<K, V> extends ConcurrentHashMap {
 
@@ -19,9 +20,10 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
      * Тут значение по ссылке - как только создали Список - его не меняем как объект, а меняем внутри его список
      * @param key
      * @param sender
+     * @param forThisPeer если установлен то проверяем для конкретного Пира было ли принято такое сообщение?
      * @return true if LIST was empty
      */
-    public boolean addHandledItem(Object key, Peer sender) {
+    public boolean addHandledItem(Object key, Peer sender, boolean forThisPeer) {
 
         //CopyOnWriteArrayList sendersSet;
         Set<Peer> sendersSet;
@@ -30,7 +32,8 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
 
             // Если еще нет данных
             //sendersSet = new CopyOnWriteArrayList();
-            sendersSet = Collections.synchronizedSet(new HashSet<Peer>());
+            //sendersSet = Collections.synchronizedSet(new HashSet<Peer>());
+            sendersSet = new HashSet<Peer>();
 
             if (sender != null)
                 sendersSet.add(sender);
@@ -54,8 +57,11 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
             sendersSet = (Set<Peer>)super.get(key);
         }
 
-        if (sender != null)
-            sendersSet.add(sender);
+        if (sender != null) {
+            boolean result = sendersSet.add(sender);
+            if (forThisPeer)
+                return result;
+        }
 
         return false;
 

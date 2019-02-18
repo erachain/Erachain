@@ -4,7 +4,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
-import org.erachain.network.Peer;
 
 public class TransactionMessage extends Message {
 
@@ -41,7 +40,7 @@ public class TransactionMessage extends Message {
 
     @Override
     public Long getHandledID() {
-        return getHandledID(this.getBytes());
+        return getHandledID(this.getLoadBytes());
     }
 
     public static TransactionMessage parse(byte[] data) throws Exception {

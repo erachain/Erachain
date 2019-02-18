@@ -4,11 +4,9 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
-import org.erachain.network.Peer;
 import org.json.simple.JSONObject;
 
 import java.util.Arrays;
-import java.util.NavigableMap;
 
 public class TelegramMessage extends Message {
 
@@ -43,7 +41,7 @@ public class TelegramMessage extends Message {
 
     @Override
     public Long getHandledID() {
-        return getHandledID(this.getBytes());
+        return getHandledID(this.getLoadBytes());
     }
 
     public static TelegramMessage parse(byte[] data) throws Exception {

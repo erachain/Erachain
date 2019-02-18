@@ -90,7 +90,7 @@ public abstract class Message {
     private Peer sender;
     private int id;
     private int length;
-    private byte[] bytes;
+    private byte[] loadBytes;
 
     public Message(int type) {
         this.type = type;
@@ -191,47 +191,19 @@ public abstract class Message {
         return null;
     }
 
-    public void setBytes(byte[] typeBytes, int hasId, byte[] idBytes, int length, byte[] checksum, byte[] body_data) {
-        byte[] data = new byte[0];
+    public void setLoadBytes(byte[] loadData) {
 
-        //WRITE MAGIC
-        data = Bytes.concat(data, Controller.getInstance().getMessageMagic());
-
-        //WRITE MESSAGE TYPE
-        data = Bytes.concat(data, typeBytes);
-
-        //WRITE HASID
-        data = Bytes.concat(data, new byte[]{(byte)hasId});
-        if (hasId == 1) {
-            //WRITE ID
-            data = Bytes.concat(data, idBytes);
-        }
-
-        //WRITE LENGTH
-        byte[] lengthBytes = Ints.toByteArray(length);
-        data = Bytes.concat(data, lengthBytes);
-
-        if (checksum != null) {
-            data = Bytes.concat(data, checksum);
-            data = Bytes.concat(data, body_data);
-        }
-
-        this.bytes = data;
+        this.loadBytes = loadData;
 
     }
 
-    public void setBytes(byte[] data) {
-        if (data == null)
-            data = this.toBytes();
+    public byte[] getLoadBytes() {
+        if (this.loadBytes == null && isHandled()) {
+            // тут генерится Нагрузка и в generateChecksum сохраняется
+            this.toBytes();
+        }
 
-        this.bytes = data;
-    }
-
-    public byte[] getBytes() {
-        if (this.bytes == null)
-            this.bytes = this.toBytes();
-
-        return this.bytes;
+        return this.loadBytes;
     }
 
     public byte[] toBytes() {
@@ -268,6 +240,7 @@ public abstract class Message {
     }
 
     protected byte[] generateChecksum(byte[] data) {
+        this.loadBytes = data;
         byte[] checksum = Crypto.getInstance().digest(data);
         checksum = Arrays.copyOfRange(checksum, 0, CHECKSUM_LENGTH);
         return checksum;

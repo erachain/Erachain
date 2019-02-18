@@ -1,20 +1,13 @@
 package org.erachain.network;
 
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
-import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.transaction.R_Send;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
-import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +16,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -454,12 +445,12 @@ public class Network extends Observable {
     }
 
     // берем подпись с трнзакции и трансформируем в Целое  исразу проверяем - есть ли?
-    public boolean checkHandledTelegramMessages(byte[] data, Peer sender) {
+    public boolean checkHandledTelegramMessages(byte[] data, Peer sender, boolean forThisPeer) {
 
         Long key = TelegramMessage.getHandledID(data);
 
         //ADD TO HANDLED MESSAGES
-        if (this.handledTelegramMessages.addHandledItem(key, sender)) {
+        if (this.handledTelegramMessages.addHandledItem(key, sender, forThisPeer)) {
             return true;
         }
 
@@ -468,12 +459,12 @@ public class Network extends Observable {
     }
 
     // берем подпись с трнзакции и трансформируем в Целое  исразу проверяем - есть ли?
-    public boolean checkHandledTransactionMessages(byte[] data, Peer sender) {
+    public boolean checkHandledTransactionMessages(byte[] data, Peer sender, boolean forThisPeer) {
 
         Long key = TransactionMessage.getHandledID(data);
 
         //ADD TO HANDLED MESSAGES
-        if (this.handledTransactionMessages.addHandledItem(key, sender)) {
+        if (this.handledTransactionMessages.addHandledItem(key, sender, forThisPeer)) {
             return true;
         }
 
@@ -482,13 +473,13 @@ public class Network extends Observable {
     }
 
     // берем подпись с трнзакции и трансформируем в Целое  исразу проверяем - есть ли?
-    public boolean checkHandledWinBlockMessages(byte[] data, Peer sender) {
+    public boolean checkHandledWinBlockMessages(byte[] data, Peer sender, boolean forThisPeer) {
 
         // KEY BY CREATOR
         Integer key = BlockWinMessage.getHandledID(data);
 
         //ADD TO HANDLED MESSAGES
-        if (this.handledWinBlockMessages.addHandledItem(key, sender)) {
+        if (this.handledWinBlockMessages.addHandledItem(key, sender, forThisPeer)) {
             return true;
         }
 
