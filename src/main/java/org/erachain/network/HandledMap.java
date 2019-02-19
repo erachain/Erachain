@@ -11,6 +11,11 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
     private int max_size;
     private List<K> handledList;
 
+    /**
+     * https://habr.com/ru/post/132884/
+     *
+     * @param max_size
+     */
     public HandledMap(int max_size) {
         this.max_size = max_size;
         this.handledList = new ArrayList<>();
