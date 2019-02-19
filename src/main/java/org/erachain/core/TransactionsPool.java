@@ -119,6 +119,27 @@ public class TransactionsPool extends MonitoredThread {
             }
         }
 
+        // ADD TO UNCONFIRMED TRANSACTIONS
+        this.dcSet.getTransactionMap().add(transaction);
+
+        if (LOG_UNCONFIRMED_PROCESS) {
+            timeCheck = System.currentTimeMillis() - timeCheck;
+            if (timeCheck > 30) {
+                LOGGER.debug("TRANSACTION_TYPE proccess ADD period: " + timeCheck);
+            }
+        }
+
+        // время обработки считаем тут
+        onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
+        if (onMessageProcessTiming < 999999999999l) {
+            // при переполнении может быть минус
+            // в миеросекундах подсчет делаем
+            onMessageProcessTiming /= 1000;
+            this.controller.unconfigmedMessageTimingAverage = ((this.controller.unconfigmedMessageTimingAverage << 8)
+                    + onMessageProcessTiming - this.controller.unconfigmedMessageTimingAverage) >> 8;
+        }
+
+
         timeCheck = System.currentTimeMillis();
         if (controller.isStatusOK()) {
             // если мы не в синхронизации - так как мы тогда
@@ -135,25 +156,6 @@ public class TransactionsPool extends MonitoredThread {
                 LOGGER.debug("TRANSACTION_TYPE proccess BROADCAST period: " + timeCheck);
             }
             timeCheck = System.currentTimeMillis();
-        }
-
-        // ADD TO UNCONFIRMED TRANSACTIONS
-        this.dcSet.getTransactionMap().add(transaction);
-
-        if (LOG_UNCONFIRMED_PROCESS) {
-            timeCheck = System.currentTimeMillis() - timeCheck;
-            if (timeCheck > 30) {
-                LOGGER.debug("TRANSACTION_TYPE proccess ADD period: " + timeCheck);
-            }
-        }
-
-        onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
-        if (onMessageProcessTiming < 999999999999l) {
-            // при переполнении может быть минус
-            // в миеросекундах подсчет делаем
-            onMessageProcessTiming /= 1000;
-            this.controller.unconfigmedMessageTimingAverage = ((this.controller.unconfigmedMessageTimingAverage << 8)
-                    + onMessageProcessTiming - this.controller.unconfigmedMessageTimingAverage) >> 8;
         }
 
         return;
