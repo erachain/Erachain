@@ -57,7 +57,7 @@ public class Peer extends MonitoredThread {
 
     public Peer(InetAddress address) {
         this.address = address;
-        this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
+        this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
         this.setName("Peer-" + this.getId() + " as address " + address.getHostAddress());
 
     }
@@ -78,7 +78,7 @@ public class Peer extends MonitoredThread {
             this.network = network;
             this.socket = socket;
             this.address = socket.getInetAddress();
-            this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
+            this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
             this.white = false;
             this.pingCounter = 0;
             this.connectionTime = NTP.getTime();
@@ -146,7 +146,7 @@ public class Peer extends MonitoredThread {
         if (networkIn != null)
             this.network = networkIn;
 
-        this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
+        this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
         this.pingCounter = 0;
         this.connectionTime = NTP.getTime();
         this.errors = 0;

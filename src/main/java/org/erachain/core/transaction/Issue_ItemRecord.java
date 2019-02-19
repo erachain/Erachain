@@ -206,7 +206,7 @@ public abstract class Issue_ItemRecord extends Transaction {
 
     @Override
     public HashSet<Account> getRecipientAccounts() {
-        HashSet<Account> accounts = new HashSet<>();
+        HashSet<Account> accounts = new HashSet<>(3, 1);
         if (!this.item.getOwner().equals(this.creator)) {
             accounts.add(this.item.getOwner());
         }

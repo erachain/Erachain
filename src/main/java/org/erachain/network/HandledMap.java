@@ -16,7 +16,8 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
      *
      * @param max_size
      */
-    public HandledMap(int max_size) {
+    public HandledMap(int initialCapacity, float loadFactor, int max_size) {
+        super(initialCapacity, loadFactor, 8);
         this.max_size = max_size;
         this.handledList = new ArrayList<>();
     }
@@ -38,7 +39,7 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
             // Если еще нет данных
             //sendersSet = new CopyOnWriteArrayList();
             //sendersSet = Collections.synchronizedSet(new HashSet<Peer>());
-            sendersSet = new HashSet<Peer>();
+            sendersSet = new HashSet<Peer>(10, 1f);
 
             sendersSet.add(sender);
 

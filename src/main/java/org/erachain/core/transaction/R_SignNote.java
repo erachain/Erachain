@@ -636,14 +636,14 @@ public class R_SignNote extends Transaction {
 
     @Override
     public HashSet<Account> getInvolvedAccounts() {
-        HashSet<Account> accounts = new HashSet<Account>();
+        HashSet<Account> accounts = new HashSet<Account>(2, 1);
         accounts.add(this.creator);
         return accounts;
     }
 
     @Override
     public HashSet<Account> getRecipientAccounts() {
-        return new HashSet<>();
+        return new HashSet<>(1, 1);
     }
 
     @Override

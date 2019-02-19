@@ -64,9 +64,12 @@ public class Network extends Observable {
 
         this.knownPeers = new CopyOnWriteArrayList<Peer>();
 
-        this.handledTelegramMessages = new HandledMap<Long, Set<Peer>>(MAX_HANDLED_TELEGRAM_MESSAGES_SIZE);
-        this.handledTransactionMessages = new HandledMap<Long, Set<Peer>>(MAX_HANDLED_TRANSACTION_MESSAGES_SIZE);
-        this.handledWinBlockMessages = new HandledMap<Integer, Set<Peer>>(MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE);
+        this.handledTelegramMessages = new HandledMap<Long, Set<Peer>>
+                (1000, 0.8f, MAX_HANDLED_TELEGRAM_MESSAGES_SIZE);
+        this.handledTransactionMessages = new HandledMap<Long, Set<Peer>>
+                (300, 0.8f, MAX_HANDLED_TRANSACTION_MESSAGES_SIZE);
+        this.handledWinBlockMessages = new HandledMap<Integer, Set<Peer>>
+                (50, 1f, MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE);
 
         this.run = true;
 
