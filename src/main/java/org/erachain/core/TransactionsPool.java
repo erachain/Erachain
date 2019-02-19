@@ -139,8 +139,6 @@ public class TransactionsPool extends MonitoredThread {
                     + onMessageProcessTiming - this.controller.unconfigmedMessageTimingAverage) >> 8;
         }
 
-
-        timeCheck = System.currentTimeMillis();
         if (controller.isStatusOK()) {
             // если мы не в синхронизации - так как мы тогда
             // не знаем время текущее цепочки и не понимаем можно ли борадкастить дальше трнзакцию
@@ -148,14 +146,6 @@ public class TransactionsPool extends MonitoredThread {
 
             // BROADCAST
             controller.network.broadcast(message, false);
-        }
-
-        if (LOG_UNCONFIRMED_PROCESS) {
-            timeCheck = System.currentTimeMillis() - timeCheck;
-            if (timeCheck > 10) {
-                LOGGER.debug("TRANSACTION_TYPE proccess BROADCAST period: " + timeCheck);
-            }
-            timeCheck = System.currentTimeMillis();
         }
 
         return;
