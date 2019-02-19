@@ -57,11 +57,9 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
             sendersSet = (Set<Peer>)super.get(key);
         }
 
-        if (sender != null) {
-            boolean result = sendersSet.add(sender);
-            if (forThisPeer)
-                return result;
-        }
+        boolean result = sendersSet.add(sender);
+        if (forThisPeer)
+            return result;
 
         return false;
 
