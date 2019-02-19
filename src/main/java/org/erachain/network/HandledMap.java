@@ -35,8 +35,7 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
             //sendersSet = Collections.synchronizedSet(new HashSet<Peer>());
             sendersSet = new HashSet<Peer>();
 
-            if (sender != null)
-                sendersSet.add(sender);
+            sendersSet.add(sender);
 
             // добавит если пусто или выдаст список который уже есть
             sendersSet = (Set<Peer>)super.putIfAbsent(key, sendersSet);
@@ -47,7 +46,8 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
                     // REMOVE first KEY
                     key = this.handledList.remove(0);
                     // REMOVE this KEY in HANDLED HASHMAP
-                    super.remove(key);
+                    if (key != null)
+                        super.remove(key);
 
                 }
                 return true;
