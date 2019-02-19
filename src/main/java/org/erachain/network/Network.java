@@ -45,10 +45,11 @@ public class Network extends Observable {
     private HandledMap<Long, Set<Peer>> handledTransactionMessages;
     private HandledMap<Integer, Set<Peer>> handledWinBlockMessages;
 
-    public AtomicLong missedMessages = new AtomicLong(0);
+    public AtomicLong missedSendes = new AtomicLong(0);
     public AtomicLong missedTelegrams = new AtomicLong(0);
     public AtomicLong missedTransactions = new AtomicLong(0);
     public AtomicLong missedWinBlocks = new AtomicLong(0);
+    public AtomicLong missedMessages = new AtomicLong(0);
 
     //boolean tryRun; // попытка запуска
     boolean run;

@@ -152,6 +152,11 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
             missedMessagesTmp = Controller.getInstance().network.missedMessages.get();
             if (missedMessagesTmp > 0)
                 mess += " " + missedMessagesTmp + "-me";
+
+            // MISSED SENDS
+            missedMessagesTmp = Controller.getInstance().network.missedSendes.get();
+            if (missedMessagesTmp > 0)
+                mess += " " + missedMessagesTmp + "-sd";
         }
 
         long timing = Controller.getInstance().network.telegramer.messageTimingAverage;

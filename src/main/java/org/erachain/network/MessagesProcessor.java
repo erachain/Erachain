@@ -2,7 +2,6 @@ package org.erachain.network;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.message.*;
 import org.erachain.utils.MonitoredThread;
@@ -12,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -43,8 +41,12 @@ public class MessagesProcessor extends MonitoredThread {
     /**
      * @param message
      */
-    public void offerMessage(Message message) {
-        blockingQueue.offer(message);
+    public boolean offerMessage(Message message) {
+        boolean result = blockingQueue.offer(message);
+        if (!result) {
+            this.network.missedMessages.incrementAndGet();
+        }
+        return result;
     }
 
     public void processMessage(Message message) {

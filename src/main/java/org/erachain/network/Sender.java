@@ -67,7 +67,7 @@ public class Sender extends MonitoredThread {
     public boolean offer(Message message) {
         boolean result = blockingQueue.offer(message);
         if (!result) {
-            this.peer.network.missedMessages.incrementAndGet();
+            this.peer.network.missedSendes.incrementAndGet();
         }
         return result;
     }
