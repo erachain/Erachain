@@ -39,6 +39,7 @@ public class Sender extends MonitoredThread {
     private BlockWinMessage winBlockToSend;
 
     static final int MAX_FLUSH_LENGTH = 5000;
+    static final int MAX_FLUSH_LENGTH_EMPTY = 1000;
     static final int MAX_FLUSH_TIME = 500;
     private int out_flush_length;
     private long out_flush_time;
@@ -64,7 +65,11 @@ public class Sender extends MonitoredThread {
     }
 
     public boolean offer(Message message) {
-        return blockingQueue.offer(message);
+        boolean result = blockingQueue.offer(message);
+        if (!result) {
+            this.peer.network.missedMessages.incrementAndGet();
+        }
+        return result;
     }
 
     public boolean offer(Message message, long SOT) {
@@ -138,8 +143,13 @@ public class Sender extends MonitoredThread {
 
                 // FLUSH if NEED
                 if (needFlush
-                        || System.currentTimeMillis() - out_flush_time > MAX_FLUSH_TIME
-                        || out_flush_length > MAX_FLUSH_LENGTH) {
+                        || blockingQueue.isEmpty() ?
+                        System.currentTimeMillis() - out_flush_time > MAX_FLUSH_TIME
+                                || out_flush_length > MAX_FLUSH_LENGTH_EMPTY
+                        :
+                        out_flush_length > MAX_FLUSH_LENGTH
+
+                ) {
                     this.out.flush();
                     out_flush_time = System.currentTimeMillis();
                     out_flush_length = 0;
@@ -278,7 +288,6 @@ public class Sender extends MonitoredThread {
             if (getHWeightMessage != null) {
                 if (!sendMessage(getHWeightMessage)) {
                     getHWeightMessage = null;
-                    continue;
                 }
                 getHWeightMessage = null;
             }
@@ -286,7 +295,6 @@ public class Sender extends MonitoredThread {
             if (hWeightMessage != null) {
                 if (!sendMessage(hWeightMessage)) {
                     hWeightMessage = null;
-                    continue;
                 }
                 hWeightMessage = null;
             }
@@ -294,13 +302,17 @@ public class Sender extends MonitoredThread {
             if (winBlockToSend != null) {
                 if (!sendMessage(winBlockToSend)) {
                     winBlockToSend = null;
-                    continue;
                 }
                 winBlockToSend = null;
             }
 
-            if (message == null)
+            if (message == null) {
+                // FLUSH if NEED
+                if (out_flush_length > 0 && System.currentTimeMillis() - out_flush_time > MAX_FLUSH_TIME) {
+                    writeAndFlush(null, true);
+                }
                 continue;
+            }
 
             if (message.isRequest() && !this.peer.messages.containsKey(message.getId())) {
                 // просроченный запрос - можно не отправлять его
@@ -310,11 +322,6 @@ public class Sender extends MonitoredThread {
             if (!sendMessage(message))
                 continue;
 
-            // FLUSH if NEED
-            if (System.currentTimeMillis() - out_flush_time > MAX_FLUSH_TIME
-                    || out_flush_length > MAX_FLUSH_LENGTH) {
-                writeAndFlush(null, true);
-            }
 
         }
 

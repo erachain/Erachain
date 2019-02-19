@@ -17,6 +17,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * основной класс модуля Сети
@@ -43,6 +44,11 @@ public class Network extends Observable {
     private HandledMap<Long, Set<Peer>> handledTelegramMessages;
     private HandledMap<Long, Set<Peer>> handledTransactionMessages;
     private HandledMap<Integer, Set<Peer>> handledWinBlockMessages;
+
+    public AtomicLong missedMessages = new AtomicLong(0);
+    public AtomicLong missedTelegrams = new AtomicLong(0);
+    public AtomicLong missedTransactions = new AtomicLong(0);
+    public AtomicLong missedWinBlocks = new AtomicLong(0);
 
     //boolean tryRun; // попытка запуска
     boolean run;

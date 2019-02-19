@@ -74,9 +74,13 @@ public class TelegramManager extends Thread {
     /**
      * @param message
      */
-    public void offerMessage(Message message) {
+    public boolean offerMessage(Message message) {
 
-        blockingQueue.offer(message);
+        boolean result = blockingQueue.offer(message);
+        if (!result) {
+            this.network.missedTelegrams.incrementAndGet();
+        }
+        return result;
     }
 
     private long onMessageProcessTiming;

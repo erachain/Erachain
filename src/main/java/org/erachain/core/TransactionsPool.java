@@ -1,20 +1,14 @@
 package org.erachain.core;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.block.Block;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.network.Peer;
-import org.erachain.network.message.BlockWinMessage;
 import org.erachain.network.message.Message;
-import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.TransactionMessage;
 import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -46,8 +40,12 @@ public class TransactionsPool extends MonitoredThread {
     /**
      * @param message
      */
-    public void offerMessage(Message message) {
-        blockingQueue.offer(message);
+    public boolean offerMessage(Message message) {
+        boolean result = blockingQueue.offer(message);
+        if (!result) {
+            this.controller.network.missedTransactions.incrementAndGet();
+        }
+        return result;
     }
 
     public void processMessage(Message message) {
