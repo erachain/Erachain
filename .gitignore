@@ -9,6 +9,7 @@
 ERA/settings.json
 ERA/*.jar
 /build/
+/logs/
 .gradle
 /ERA/logs
 /ERA/build/
