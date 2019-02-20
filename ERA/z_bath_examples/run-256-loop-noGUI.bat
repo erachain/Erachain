@@ -1,9 +1,8 @@
 @ECHO OFF
 set app=erachain-dev
-set xms=700
-set xmx=1500
-set opt=-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dlog4j.configuration=file:log4j-dev.properties
-set pars=-nogui -pass=123456789
+set xms=128
+set xmx=256
+set pars=-nogui -pass=1 -seed=5:new:1
 
 IF EXIST java (
 	set run=java
@@ -32,7 +31,7 @@ IF EXIST "%JAVAHOME%\bin\java.exe" (
 
 REG QUERY "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.8" /v "JavaHome" >nul 2>nul || ( GOTO NOTFOUND3 )
 	for /f "tokens=1,2,*" %%a in ('reg query "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.8" /v "JavaHome"') do if "%%a"=="JavaHome" set JAVAHOME=%%c
-
+	
 IF EXIST "%JAVAHOME%\bin\java.exe" (
 	set run="%JAVAHOME%\bin\java.exe"
 	goto continue
@@ -49,11 +48,11 @@ IF EXIST "%JAVAHOME%\bin\java.exe" (
 )
 
 :continue
-%run% -Xms%xms%m -Xmx%xmx%m %opt% -jar %app%.jar %pars%
+%run% -Xms%xms%m -Xmx%xmx%m -jar %app%.jar %pars%
 timeout /t 30
 goto continue
 
-
+	
 :NOTFOUND4
 
 ECHO Java software not found on your system. Please go to http://java.com to download a copy of Java.
