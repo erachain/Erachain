@@ -3,7 +3,7 @@ package org.erachain.utils;
 
 import org.erachain.api.BlogPostResource;
 import com.google.common.collect.Lists;
-import com.twitter.Extractor;
+//import com.twitter.Extractor;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.ArbitraryTransaction;
@@ -145,7 +145,8 @@ public class BlogUtils {
     }
 
     public static List<String> getHashTags(String text) {
-        List<String> extractHashtags = new Extractor().extractHashtags(text);
+        //List<String> extractHashtags = new Extractor().extractHashtags(text);
+        List<String> extractHashtags = null;
         List<String> result = new ArrayList<String>();
         for (String hashTag : extractHashtags) {
             result.add("#" + hashTag);
@@ -154,8 +155,9 @@ public class BlogUtils {
     }
 
     public static List<String> getBlogTags(String text) {
-        List<String> extractScreenNames = new Extractor()
-                .extractMentionedScreennames(text);
+//        List<String> extractScreenNames = new Extractor()
+//                .extractMentionedScreennames(text);
+        List<String> extractScreenNames = null;
         List<String> result = new ArrayList<String>();
         for (String screenNames : extractScreenNames) {
             result.add("@" + screenNames);
