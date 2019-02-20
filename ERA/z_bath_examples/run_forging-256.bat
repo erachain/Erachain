@@ -2,6 +2,8 @@
 set app=erachain
 set xms=256
 set xmx=512
+set pars=-pass=1
+set jpars=
 
 IF EXIST java (
 	set run=java
@@ -47,7 +49,7 @@ IF EXIST "%JAVAHOME%\bin\java.exe" (
 )
 
 :continue
-%run% -Xms%xms%m -Xmx%xmx%m -jar %app%.jar -pass=1
+%run% -Xms%xms%m %jpars% -Xmx%xmx%m -jar %app%.jar %pars%
 timeout /t 30
 goto continue
 
