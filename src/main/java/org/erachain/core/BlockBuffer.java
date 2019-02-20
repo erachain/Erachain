@@ -34,7 +34,7 @@ public class BlockBuffer extends Thread {
         this.counter = 0;
         this.error = false;
         this.setName("Thread BlockBuffer - " + this.getId());
-        this.blocks = new HashMap<byte[], BlockingQueue<Block>>();
+        this.blocks = new HashMap<byte[], BlockingQueue<Block>>(BUFFER_SIZE << 1, 1);
         this.start();
     }
 

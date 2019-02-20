@@ -90,7 +90,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.11.09 beta rc";
+    public static String version = "4.11.10 beta RC";
     public static String buildTime = "2019-02-13 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -98,13 +98,13 @@ public class Controller extends Observable {
     // IF new abilities is made - new license insert in CHAIN and set this KEY
     public static final long LICENSE_VERS = 107; // versopn of LICENSE
     public static HashMap<String, Long> LICENSE_LANG_REFS = BlockChain.DEVELOP_USE ?
-            new HashMap<String, Long>() {
+            new HashMap<String, Long>(3, 1) {
                 {
                     put("en", Transaction.makeDBRef(148450, 1));
                     put("ru", Transaction.makeDBRef(191502, 1));
                 }
             } :
-            new HashMap<String, Long>() {
+            new HashMap<String, Long>(3, 1) {
                 {
                     put("en", Transaction.makeDBRef(159719, 1));
                     put("ru", Transaction.makeDBRef(159727, 1));
@@ -510,11 +510,11 @@ public class Controller extends Observable {
         this.foundMyselfID = new byte[128];
         this.random.nextBytes(this.foundMyselfID);
 
-        this.peerHWeight = new ConcurrentHashMap<Peer, Tuple2<Integer, Long>>();
+        this.peerHWeight = new ConcurrentHashMap<Peer, Tuple2<Integer, Long>>(20, 1);
         // LINKED TO PRESERVE ORDER WHEN SYNCHRONIZING (PRIORITIZE SYNCHRONIZING
         // FROM LONGEST CONNECTION ALIVE)
 
-        this.peersVersions = new ConcurrentHashMap<Peer, Pair<String, Long>>();
+        this.peersVersions = new ConcurrentHashMap<Peer, Pair<String, Long>>(20, 1);
 
         // CHECK NETWORK PORT AVAILABLE
         if (!Network.isPortAvailable(Controller.getInstance().getNetworkPort())) {
@@ -1085,10 +1085,11 @@ public class Controller extends Observable {
             LOGGER.info("DCSet is busy...");
 
         i = 0;
-        while (i++ < 20 && dcSet.isBusy()) {
+        while (i++ < 10 && dcSet.isBusy()) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (Exception e) {
+                break;
             }
         }
 

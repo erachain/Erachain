@@ -11,7 +11,13 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
     private int max_size;
     private List<K> handledList;
 
-    public HandledMap(int max_size) {
+    /**
+     * https://habr.com/ru/post/132884/
+     *
+     * @param max_size
+     */
+    public HandledMap(int initialCapacity, float loadFactor, int max_size) {
+        super(initialCapacity, loadFactor, 8);
         this.max_size = max_size;
         this.handledList = new ArrayList<>();
     }
@@ -33,10 +39,9 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
             // Если еще нет данных
             //sendersSet = new CopyOnWriteArrayList();
             //sendersSet = Collections.synchronizedSet(new HashSet<Peer>());
-            sendersSet = new HashSet<Peer>();
+            sendersSet = new HashSet<Peer>(10, 1f);
 
-            if (sender != null)
-                sendersSet.add(sender);
+            sendersSet.add(sender);
 
             // добавит если пусто или выдаст список который уже есть
             sendersSet = (Set<Peer>)super.putIfAbsent(key, sendersSet);
@@ -47,7 +52,8 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
                     // REMOVE first KEY
                     key = this.handledList.remove(0);
                     // REMOVE this KEY in HANDLED HASHMAP
-                    super.remove(key);
+                    if (key != null)
+                        super.remove(key);
 
                 }
                 return true;
@@ -57,11 +63,9 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
             sendersSet = (Set<Peer>)super.get(key);
         }
 
-        if (sender != null) {
-            boolean result = sendersSet.add(sender);
-            if (forThisPeer)
-                return result;
-        }
+        boolean result = sendersSet.add(sender);
+        if (forThisPeer)
+            return result;
 
         return false;
 

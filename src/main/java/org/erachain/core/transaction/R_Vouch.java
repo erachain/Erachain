@@ -329,7 +329,7 @@ public class R_Vouch extends Transaction {
 
     @Override
     public HashSet<Account> getInvolvedAccounts() {
-        HashSet<Account> accounts = new HashSet<Account>();
+        HashSet<Account> accounts = new HashSet<Account>(4, 1);
         accounts.add(this.creator);
         accounts.addAll(this.getRecipientAccounts());
         return accounts;
@@ -338,7 +338,7 @@ public class R_Vouch extends Transaction {
     @Override
     public HashSet<Account> getRecipientAccounts() {
 
-        HashSet<Account> accounts = new HashSet<Account>();
+        HashSet<Account> accounts = new HashSet<Account>(2, 1);
 
         Transaction record = dcSet.getTransactionFinalMap().get(vouchHeight, vouchSeqNo);
         if (record == null) {

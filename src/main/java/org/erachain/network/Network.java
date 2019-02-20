@@ -17,6 +17,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * основной класс модуля Сети
@@ -25,9 +26,9 @@ public class Network extends Observable {
 
     public static final int SEND_WAIT = 20000;
     public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK ? 0 : 1;
-    private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024<<2;
-    private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 6 : 1024;
-    private static final int MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE = BlockChain.HARD_WORK ? 100 : 200;
+    private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024 << 3;
+    private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 6 : 1024 << 1;
+    private static final int MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE = BlockChain.HARD_WORK ? 100 : 300;
     private static final Logger LOGGER = LoggerFactory.getLogger(Network.class);
 
     private Controller controller;
@@ -44,6 +45,12 @@ public class Network extends Observable {
     private HandledMap<Long, Set<Peer>> handledTransactionMessages;
     private HandledMap<Integer, Set<Peer>> handledWinBlockMessages;
 
+    public AtomicLong missedSendes = new AtomicLong(0);
+    public AtomicLong missedTelegrams = new AtomicLong(0);
+    public AtomicLong missedTransactions = new AtomicLong(0);
+    public AtomicLong missedWinBlocks = new AtomicLong(0);
+    public AtomicLong missedMessages = new AtomicLong(0);
+
     //boolean tryRun; // попытка запуска
     boolean run;
 
@@ -57,9 +64,12 @@ public class Network extends Observable {
 
         this.knownPeers = new CopyOnWriteArrayList<Peer>();
 
-        this.handledTelegramMessages = new HandledMap<Long, Set<Peer>>(MAX_HANDLED_TELEGRAM_MESSAGES_SIZE);
-        this.handledTransactionMessages = new HandledMap<Long, Set<Peer>>(MAX_HANDLED_TRANSACTION_MESSAGES_SIZE);
-        this.handledWinBlockMessages = new HandledMap<Integer, Set<Peer>>(MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE);
+        this.handledTelegramMessages = new HandledMap<Long, Set<Peer>>
+                (1000, 0.8f, MAX_HANDLED_TELEGRAM_MESSAGES_SIZE);
+        this.handledTransactionMessages = new HandledMap<Long, Set<Peer>>
+                (300, 0.8f, MAX_HANDLED_TRANSACTION_MESSAGES_SIZE);
+        this.handledWinBlockMessages = new HandledMap<Integer, Set<Peer>>
+                (50, 1f, MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE);
 
         this.run = true;
 
@@ -617,7 +627,7 @@ public class Network extends Observable {
         HashSet exclude;
         if (message.isHandled()) {
 
-            switch (message.getId()) {
+            switch (message.getType()) {
                 case Message.TELEGRAM_TYPE:
                     // может быть это повтор?
                     exclude = (HashSet<Peer>)this.handledTelegramMessages.get(message.getHandledID());
@@ -637,8 +647,8 @@ public class Network extends Observable {
             exclude = null;
         }
 
-        if (exclude != null && !exclude.isEmpty())
-            LOGGER.debug(message + " exclude: " + exclude.size());
+        //if (exclude != null && !exclude.isEmpty())
+        //    LOGGER.debug(message + " exclude: " + exclude.size());
 
         for (Peer peer : this.knownPeers) {
 
@@ -671,8 +681,8 @@ public class Network extends Observable {
 
         HashSet<Peer> exclude = (HashSet<Peer>)this.handledWinBlockMessages.get(winBlock.getHandledID());
 
-        if (exclude != null && !exclude.isEmpty())
-            LOGGER.debug(winBlock + " exclude: " + exclude.size());
+        //if (exclude != null && !exclude.isEmpty())
+        //    LOGGER.debug(winBlock + " exclude: " + exclude.size());
 
         for (Peer peer : this.knownPeers) {
 

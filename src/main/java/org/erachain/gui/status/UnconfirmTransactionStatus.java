@@ -1,6 +1,7 @@
 package org.erachain.gui.status;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.gui.items.records.Records_UnConfirmed_Panel;
@@ -115,6 +116,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
         }
     }
 
+    long missedMessages = 0l;
     private void refresh() {
 
         lastUpdate = NTP.getTime();
@@ -128,6 +130,33 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 
             this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             mess = "| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0";
+        }
+
+        if (BlockChain.DEVELOP_USE) {
+            // MISSED TELEGRAMS
+            long missedMessagesTmp = Controller.getInstance().network.missedTelegrams.get();
+            if (missedMessagesTmp > 0)
+                mess += " " + missedMessagesTmp + "-tg";
+
+            // MISSED TRANSACTIONS
+            missedMessagesTmp = Controller.getInstance().network.missedTransactions.get();
+            if (missedMessagesTmp > 0)
+                mess += " " + missedMessagesTmp + "-tx";
+
+            // MISSED WIN BLOCKS
+            missedMessagesTmp = Controller.getInstance().network.missedWinBlocks.get();
+            if (missedMessagesTmp > 0)
+                mess += " " + missedMessagesTmp + "-wb";
+
+            // MISSED MESSAGES
+            missedMessagesTmp = Controller.getInstance().network.missedMessages.get();
+            if (missedMessagesTmp > 0)
+                mess += " " + missedMessagesTmp + "-me";
+
+            // MISSED SENDS
+            missedMessagesTmp = Controller.getInstance().network.missedSendes.get();
+            if (missedMessagesTmp > 0)
+                mess += " " + missedMessagesTmp + "-sd";
         }
 
         long timing = Controller.getInstance().network.telegramer.messageTimingAverage;

@@ -1,20 +1,14 @@
 package org.erachain.core;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.block.Block;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.network.Peer;
-import org.erachain.network.message.BlockWinMessage;
 import org.erachain.network.message.Message;
-import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.TransactionMessage;
 import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -46,8 +40,12 @@ public class TransactionsPool extends MonitoredThread {
     /**
      * @param message
      */
-    public void offerMessage(Message message) {
-        blockingQueue.offer(message);
+    public boolean offerMessage(Message message) {
+        boolean result = blockingQueue.offer(message);
+        if (!result) {
+            this.controller.network.missedTransactions.incrementAndGet();
+        }
+        return result;
     }
 
     public void processMessage(Message message) {
@@ -121,24 +119,6 @@ public class TransactionsPool extends MonitoredThread {
             }
         }
 
-        timeCheck = System.currentTimeMillis();
-        if (controller.isStatusOK()) {
-            // если мы не в синхронизации - так как мы тогда
-            // не знаем время текущее цепочки и не понимаем можно ли борадкастить дальше трнзакцию
-            // так как непонятно - протухла она или нет
-
-            // BROADCAST
-            controller.network.broadcast(message, false);
-        }
-
-        if (LOG_UNCONFIRMED_PROCESS) {
-            timeCheck = System.currentTimeMillis() - timeCheck;
-            if (timeCheck > 10) {
-                LOGGER.debug("TRANSACTION_TYPE proccess BROADCAST period: " + timeCheck);
-            }
-            timeCheck = System.currentTimeMillis();
-        }
-
         // ADD TO UNCONFIRMED TRANSACTIONS
         this.dcSet.getTransactionMap().add(transaction);
 
@@ -149,6 +129,7 @@ public class TransactionsPool extends MonitoredThread {
             }
         }
 
+        // время обработки считаем тут
         onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
         if (onMessageProcessTiming < 999999999999l) {
             // при переполнении может быть минус
@@ -156,6 +137,15 @@ public class TransactionsPool extends MonitoredThread {
             onMessageProcessTiming /= 1000;
             this.controller.unconfigmedMessageTimingAverage = ((this.controller.unconfigmedMessageTimingAverage << 8)
                     + onMessageProcessTiming - this.controller.unconfigmedMessageTimingAverage) >> 8;
+        }
+
+        if (controller.isStatusOK()) {
+            // если мы не в синхронизации - так как мы тогда
+            // не знаем время текущее цепочки и не понимаем можно ли борадкастить дальше трнзакцию
+            // так как непонятно - протухла она или нет
+
+            // BROADCAST
+            controller.network.broadcast(message, false);
         }
 
         return;

@@ -361,7 +361,7 @@ public abstract class TransactionAmount extends Transaction {
     
     @Override
     public HashSet<Account> getInvolvedAccounts() {
-        HashSet<Account> accounts = new HashSet<Account>();
+        HashSet<Account> accounts = new HashSet<Account>(3, 1);
         if (this.creator != null)
             accounts.add(this.creator);
 
@@ -371,7 +371,7 @@ public abstract class TransactionAmount extends Transaction {
     
     @Override
     public HashSet<Account> getRecipientAccounts() {
-        HashSet<Account> accounts = new HashSet<Account>();
+        HashSet<Account> accounts = new HashSet<Account>(2,1);
         accounts.add(this.recipient);
         return accounts;
     }

@@ -67,6 +67,7 @@ public class PublicKeyAccount extends Account {
         return publicKey;
     }
 
+    /*
     @Override
     public int hashCode() {
         // more effective VS Base58 or Base64
@@ -95,6 +96,7 @@ public class PublicKeyAccount extends Account {
 
         return false;
     }
+    */
 
     public String getBase58() {
         return Base58.encode(publicKey);

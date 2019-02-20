@@ -327,14 +327,14 @@ public class CancelOrderTransaction extends Transaction {
 
     @Override
     public HashSet<Account> getInvolvedAccounts() {
-        HashSet<Account> accounts = new HashSet<>();
+        HashSet<Account> accounts = new HashSet<>(2,1);
         accounts.add(this.creator);
         return accounts;
     }
 
     @Override
     public HashSet<Account> getRecipientAccounts() {
-        return new HashSet<>();
+        return new HashSet<>(1,1);
     }
 
     @Override

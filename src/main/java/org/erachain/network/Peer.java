@@ -57,7 +57,7 @@ public class Peer extends MonitoredThread {
 
     public Peer(InetAddress address) {
         this.address = address;
-        this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
+        this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
         this.setName("Peer-" + this.getId() + " as address " + address.getHostAddress());
 
     }
@@ -78,7 +78,7 @@ public class Peer extends MonitoredThread {
             this.network = network;
             this.socket = socket;
             this.address = socket.getInetAddress();
-            this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
+            this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
             this.white = false;
             this.pingCounter = 0;
             this.connectionTime = NTP.getTime();
@@ -146,7 +146,7 @@ public class Peer extends MonitoredThread {
         if (networkIn != null)
             this.network = networkIn;
 
-        this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
+        this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
         this.pingCounter = 0;
         this.connectionTime = NTP.getTime();
         this.errors = 0;
@@ -439,7 +439,9 @@ public class Peer extends MonitoredThread {
 
                 parsePoint = (System.nanoTime() - parsePoint) / 1000;
                 if (parsePoint < 999999999l) {
-                    if (parsePoint > 1000) {
+                    if ((message.getType() == Message.TELEGRAM_TYPE || message.getType() == Message.TRANSACTION_TYPE) && parsePoint > 10000
+                            || parsePoint > 1000000
+                    ) {
                             LOGGER.debug(this + message.viewPref(false) + message
                                 + " PARSE: " + parsePoint + "[us]");
                     }
@@ -527,13 +529,6 @@ public class Peer extends MonitoredThread {
         this.sender.sendWinBlock(winBlock);
     }
 
-    //public void putMessage(Message message) {
-    //    this.sender.put(message);
-    //}
-
-    public boolean offerMessage(Message message, long SOT) {
-        return this.sender.offer(message, SOT);
-    }
     public boolean offerMessage(Message message) {
         return this.sender.offer(message);
     }
@@ -584,9 +579,8 @@ public class Peer extends MonitoredThread {
 
         //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
         this.messages.put(localRequestKey, blockingQueue);
-        boolean sended = this.offerMessage(message);
 
-        if (!sended) {
+        if (!this.offerMessage(message)) {
             //WHEN FAILED TO SEND MESSAGE
             this.messages.remove(localRequestKey);
             if (USE_MONITOR) this.setMonitorStatusAfter();
