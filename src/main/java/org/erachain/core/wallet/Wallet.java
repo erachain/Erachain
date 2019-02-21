@@ -278,21 +278,23 @@ public class Wallet extends Observable implements Observer {
 		return this.database.getNameSaleMap().get(account);
 	}
 
+	@Deprecated
 	public List<Pair<Account, Poll>> getPolls() {
 		if (!this.exists()) {
 			return new ArrayList<Pair<Account, Poll>>();
 		}
 
 		List<Account> accounts = this.getAccounts();
-		return this.database.getPollMap().get(accounts);
+		return this.database.getPollMap_old().get(accounts);
 	}
 
+	@Deprecated
 	public List<Poll> getPolls(Account account) {
 		if (!this.exists()) {
 			return new ArrayList<Poll>();
 		}
 
-		return this.database.getPollMap().get(account);
+		return this.database.getPollMap_old().get(account);
 	}
 
 	public void addItemFavorite(ItemCls item) {
@@ -614,7 +616,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.getBlocksHeadMap().reset();
 			this.database.getNameMap().reset();
 			this.database.getNameSaleMap().reset();
-			this.database.getPollMap().reset();
+			this.database.getPollMap_old().reset();
 			this.database.getAssetMap().reset();
 			this.database.getImprintMap().reset();
 			this.database.getTemplateMap().reset();
@@ -945,7 +947,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.getNameSaleMap().addObserver(o);
 
 			// REGISTER ON POLLS
-			this.database.getPollMap().addObserver(o);
+			this.database.getPollMap_old().addObserver(o);
 
 			// REGISTER ON ASSETS
 			this.database.getAssetMap().addObserver(o);
@@ -1471,7 +1473,7 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF WE ARE OWNER
 		if (this.accountExists(pollCreation.getPoll().getCreator().getAddress())) {
 			// ADD POLL
-			this.database.getPollMap().add(pollCreation.getPoll());
+			this.database.getPollMap_old().add(pollCreation.getPoll());
 		}
 	}
 
@@ -1484,7 +1486,7 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF WE ARE OWNER
 		if (this.accountExists(pollCreation.getPoll().getCreator().getAddress())) {
 			// DELETE POLL
-			this.database.getPollMap().delete(pollCreation.getPoll());
+			this.database.getPollMap_old().delete(pollCreation.getPoll());
 		}
 	}
 
@@ -1498,7 +1500,7 @@ public class Wallet extends Observable implements Observer {
 		Poll poll = DCSet.getInstance().getPollMap().get(pollVote.getPoll());
 		if (this.accountExists(poll.getCreator().getAddress())) {
 			// UPDATE POLL
-			this.database.getPollMap().add(poll);
+			this.database.getPollMap_old().add(poll);
 		}
 	}
 
@@ -1512,7 +1514,7 @@ public class Wallet extends Observable implements Observer {
 		Poll poll = DCSet.getInstance().getPollMap().get(pollVote.getPoll());
 		if (this.accountExists(poll.getCreator().getAddress())) {
 			// UPDATE POLL
-			this.database.getPollMap().add(poll);
+			this.database.getPollMap_old().add(poll);
 		}
 	}
 
