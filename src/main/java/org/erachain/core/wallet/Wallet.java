@@ -542,69 +542,13 @@ public class Wallet extends Observable implements Observer {
 
 	}
 
-	// asynchronous RUN from BlockGenerator
-	public void synchronize(boolean reset) {
-        if (!reset && Controller.getInstance().isProcessingWalletSynchronize()
-                || Controller.getInstance().isOnStopping()) {
-			return;
-		}
-
-		// here ICREATOR
-		Controller.getInstance().setProcessingWalletSynchronize(true);
-		Controller.getInstance().setNeedSyncWallet(false);
-
-		Controller.getInstance().walletSyncStatusUpdate(-1);
-
-		LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet...");
-
+	boolean synchronizeBodyStop;
+	public synchronized void synchronizeBody(boolean reset) {
 		DCSet dcSet = DCSet.getInstance();
-
-		///////////////////////////////////// IS CHAIN VALID
-		if (CHECK_CHAIN_BROKENS_ON_SYNC_WALLET) {
-			LOGGER.info("TEST CHAIN .... ");
-			for (int i = 1; i <= dcSet.getBlockMap().size(); i++) {
-				Block block = dcSet.getBlockMap().get(i);
-				if (block.getHeight() != i) {
-					Long error = null;
-					++error;
-				}
-				if (block.blockHead.heightBlock != i) {
-					Long error = null;
-					++error;
-				}
-				Block.BlockHead head = dcSet.getBlocksHeadsMap().get(i);
-				if (head.heightBlock != i) {
-					Long error = null;
-					++error;
-				}
-				if (i > 1) {
-					byte[] reference = block.getReference();
-					Block parent = dcSet.getBlockSignsMap().getBlock(reference);
-					if (parent == null) {
-						Long error = null;
-						++error;
-					}
-					if (parent.getHeight() != i - 1) {
-						Long error = null;
-						++error;
-					}
-					parent = dcSet.getBlockMap().get(i - 1);
-					if (!Arrays.equals(parent.getSignature(), reference)) {
-						Long error = null;
-						++error;
-					}
-				}
-				byte[] signature = block.getSignature();
-				int signHeight = dcSet.getBlockSignsMap().get(signature);
-				if (signHeight != i) {
-					Long error = null;
-					++error;
-				}
-			}
-		}
 
 		Block block;
 		int height;
+        synchronizeBodyStop = false;
 
 		if (reset) {
 			LOGGER.info("   >>>>  Resetted maps");
@@ -629,63 +573,12 @@ public class Wallet extends Observable implements Observer {
 			this.database.setLastBlockSignature(block.getReference());
 			height = 1;
 
-		} else {
-
-			byte[] lastSignature = this.database.getLastBlockSignature();
-			if (lastSignature == null) {
-				synchronize(true);
-				return;
-			}
-
-			block = dcSet.getBlockSignsMap().getBlock(lastSignature);
-			if (block == null) {
-				// TODO подбор последнего блока проверять
-
-				BlocksHeadMap walletHeadsMap = this.database.getBlocksHeadMap();
-				BlockSignsMap chainSignsMap = dcSet.getBlockSignsMap();
-				Block.BlockHead head;
-				while (!chainSignsMap.contains(lastSignature)
-						&& !Controller.getInstance().needUpToDate()
-						&& !Controller.getInstance().isStatusOK()
-					) {
-					// если идет синхронизация цепочки - кошелек не синхронизируем
-					head = walletHeadsMap.getLast();
-                    if (head == null) {
-                        synchronize(true);
-                        return;
-                    }
-
-					this.orphanBlock(head);
-					lastSignature = this.database.getLastBlockSignature();
-
-                    if (lastSignature == null) {
-                        synchronize(true);
-                        return;
-                    }
-				}
-
-                block = dcSet.getBlockSignsMap().getBlock(lastSignature);
-
-			}
-
-			if (block != null)
-			    block = block.getChild(dcSet);
-
-			if (block == null) {
-                /*
-				Controller.getInstance().setProcessingWalletSynchronize(false);
-
-				this.database.commit();
-				this.syncHeight = 0;
-                Controller.getInstance().walletSyncStatusUpdate(0);
-                */
-                synchronize(true);
-				return;
-			}
-
 		}
 
-		height = block.getHeight();
+        byte[] lastSignature = this.database.getLastBlockSignature();
+        block = dcSet.getBlockSignsMap().getBlock(lastSignature);
+
+        height = block.getHeight();
 		int steepHeight = dcSet.getBlockMap().size() / 100;
 		int lastHeight = 0;
 
@@ -731,7 +624,7 @@ public class Wallet extends Observable implements Observer {
 				height++;
 				block = dcSet.getBlockMap().get(height);
 
-			} while (block != null);
+			} while (block != null && !synchronizeBodyStop);
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 
@@ -767,7 +660,131 @@ public class Wallet extends Observable implements Observer {
 
 	}
 
-	// UNLOCK
+    // asynchronous RUN from BlockGenerator
+    public void synchronize(boolean reset) {
+        if (!reset && Controller.getInstance().isProcessingWalletSynchronize()
+                || Controller.getInstance().isOnStopping()) {
+            return;
+        }
+
+        // break current synchronization if exists
+        synchronizeBodyStop = true;
+
+        // here ICREATOR
+        Controller.getInstance().setProcessingWalletSynchronize(true);
+        Controller.getInstance().setNeedSyncWallet(false);
+
+        Controller.getInstance().walletSyncStatusUpdate(-1);
+
+        LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet...");
+
+        DCSet dcSet = DCSet.getInstance();
+
+        ///////////////////////////////////// IS CHAIN VALID
+        if (CHECK_CHAIN_BROKENS_ON_SYNC_WALLET) {
+            LOGGER.info("TEST CHAIN .... ");
+            for (int i = 1; i <= dcSet.getBlockMap().size(); i++) {
+                Block block = dcSet.getBlockMap().get(i);
+                if (block.getHeight() != i) {
+                    Long error = null;
+                    ++error;
+                }
+                if (block.blockHead.heightBlock != i) {
+                    Long error = null;
+                    ++error;
+                }
+                Block.BlockHead head = dcSet.getBlocksHeadsMap().get(i);
+                if (head.heightBlock != i) {
+                    Long error = null;
+                    ++error;
+                }
+                if (i > 1) {
+                    byte[] reference = block.getReference();
+                    Block parent = dcSet.getBlockSignsMap().getBlock(reference);
+                    if (parent == null) {
+                        Long error = null;
+                        ++error;
+                    }
+                    if (parent.getHeight() != i - 1) {
+                        Long error = null;
+                        ++error;
+                    }
+                    parent = dcSet.getBlockMap().get(i - 1);
+                    if (!Arrays.equals(parent.getSignature(), reference)) {
+                        Long error = null;
+                        ++error;
+                    }
+                }
+                byte[] signature = block.getSignature();
+                int signHeight = dcSet.getBlockSignsMap().get(signature);
+                if (signHeight != i) {
+                    Long error = null;
+                    ++error;
+                }
+            }
+        }
+
+        Block block;
+        int height;
+
+        if (reset) {
+
+            synchronizeBody(reset);
+            return;
+
+        } else {
+
+            byte[] lastSignature = this.database.getLastBlockSignature();
+            if (lastSignature == null) {
+                synchronize(true);
+                return;
+            }
+
+            block = dcSet.getBlockSignsMap().getBlock(lastSignature);
+            if (block == null) {
+                // TODO подбор последнего блока проверять
+
+                BlocksHeadMap walletHeadsMap = this.database.getBlocksHeadMap();
+                BlockSignsMap chainSignsMap = dcSet.getBlockSignsMap();
+                Block.BlockHead head;
+                while (!chainSignsMap.contains(lastSignature)
+                        && !Controller.getInstance().needUpToDate()
+                        && !Controller.getInstance().isStatusOK()
+                ) {
+                    // если идет синхронизация цепочки - кошелек не синхронизируем
+                    head = walletHeadsMap.getLast();
+                    if (head == null) {
+                        synchronize(true);
+                        return;
+                    }
+
+                    this.orphanBlock(head);
+                    lastSignature = this.database.getLastBlockSignature();
+
+                    if (lastSignature == null) {
+                        synchronize(true);
+                        return;
+                    }
+                }
+
+                block = dcSet.getBlockSignsMap().getBlock(lastSignature);
+
+            }
+
+            if (block != null)
+                block = block.getChild(dcSet);
+
+        }
+        if (block == null) {
+            synchronize(true);
+            return;
+        }
+
+        synchronize(false);
+
+    }
+
+    // UNLOCK
 	public boolean unlock(String password) {
 
 		if (Controller.getInstance().noUseWallet)
