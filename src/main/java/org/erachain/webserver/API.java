@@ -62,12 +62,6 @@ public class API {
     private Controller cntrl = Controller.getInstance();
 
     @GET
-    @Path("height")
-    public static String getHeight() {
-        return String.valueOf(Controller.getInstance().getMyHeight());
-    }
-
-    @GET
     public Response Default() {
 
         Map help = new LinkedHashMap();
@@ -156,6 +150,13 @@ public class API {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(StrJSonFine.convert(help))
                 .build();
+    }
+
+
+    @GET
+    @Path("height")
+    public static String getHeight() {
+        return String.valueOf(Controller.getInstance().getMyHeight());
     }
 
     @GET
