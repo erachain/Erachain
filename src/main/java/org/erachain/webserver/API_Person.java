@@ -150,6 +150,8 @@ public class API_Person {
         JSONObject out = new JSONObject();
         out.put("last", lastJSON);
 
+        out.put("text", DCSet.getInstance().getItemStatusMap().get(statusKey).toString(DCSet.getInstance(), last.c));
+
         if (history) {
             JSONArray historyJSON = new JSONArray();
             Iterator<Fun.Tuple5<Long, Long, byte[], Integer, Integer>> iterator = status.iterator();
@@ -157,11 +159,15 @@ public class API_Person {
 
             while (iterator.hasNext()) {
                 Fun.Tuple5<Long, Long, byte[], Integer, Integer> item = iterator.next();
-                historyJSON.add(item.a);
-                historyJSON.add(item.b);
-                lastJSON.add(R_SetStatusToItem.unpackDataJSON(last.c));
-                historyJSON.add(item.d);
-                historyJSON.add(item.e);
+                JSONArray historyItemJSON = new JSONArray();
+
+                historyItemJSON.add(item.a);
+                historyItemJSON.add(item.b);
+                historyItemJSON.add(R_SetStatusToItem.unpackDataJSON(last.c));
+                historyItemJSON.add(item.d);
+                historyItemJSON.add(item.e);
+
+                historyJSON.add(historyItemJSON);
             }
             out.put("history", historyJSON);
         }
