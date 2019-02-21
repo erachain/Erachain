@@ -5,8 +5,6 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
-
 public class MessageTest {
 
     @Test
@@ -14,7 +12,7 @@ public class MessageTest {
         //message.getBytes();
         Block block = null;
         Message message = new BlockWinMessage(block);
-        Arrays.equals(message.toBytes(), message.getBytes());
+        Arrays.equals(message.toBytes(), message.getLoadBytes());
 
     }
 
