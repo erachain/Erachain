@@ -1,6 +1,7 @@
 package org.erachain.gui.library;
 
 import com.github.rjeschke.txtmark.Processor;
+//import net.sf.tinylaf.Theme;
 import net.sf.tinylaf.Theme;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
@@ -85,7 +86,8 @@ public class library {
 
             try {
 
-                UIManager.setLookAndFeel("de.muntjak.tinylookandfeel.TinyLookAndFeel");
+                //UIManager.setLookAndFeel("de.muntjak.tinylookandfeel.TinyLookAndFeel");
+                UIManager.setLookAndFeel("net.sf.tinylaf.TinyLookAndFeel");
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
