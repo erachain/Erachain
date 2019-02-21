@@ -1,7 +1,7 @@
 package org.erachain.webserver;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.crypto.Base58;
+import org.erachain.core.transaction.R_SetStatusToItem;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.KKPersonStatusMap;
@@ -34,6 +34,8 @@ public class API_Person {
 
         help.put("apiperson/balance/{personKey}/{assetKey}/{position}",
                 "Get Asset Key balance in Position [1..5] for Person Key.");
+        help.put("apiperson/status/{personKey}/{statusKey}?history=true",
+                "Get Status data for Person Key. JSON ARRAY format: [timeFrom, timeTo, [par1, par2, str1, str2, reference, description], block, txNo]");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -107,6 +109,10 @@ public class API_Person {
 
     /**
      * Get Status for Person
+     *                 block = value.b.d;
+     *                 recNo = value.b.e;
+     *                 record = Transaction.findByHeightSeqNo(dcSet, block, recNo);
+     *                 return record == null ? null : record.viewTimestamp();
      * @param personKey
      * @param statusKey
      * @param history true - get history of changes
@@ -118,9 +124,6 @@ public class API_Person {
     public Response getStatus(@PathParam("person") long personKey, @PathParam("status") long statusKey,
                               @QueryParam("history") boolean history) {
 
-        Set<String> addresses = DCSet.getInstance().getPersonAddressMap().getItems(personKey).keySet();
-
-        Controller cont = Controller.getInstance();
         KKPersonStatusMap map = DCSet.getInstance().getPersonStatusMap();
         TreeMap<Long, Stack<Fun.Tuple5<Long, Long, byte[], Integer, Integer>>> statuses = map.get(personKey);
         if (statuses == null)
@@ -140,7 +143,7 @@ public class API_Person {
         JSONArray lastJSON = new JSONArray();
         lastJSON.add(last.a);
         lastJSON.add(last.b);
-        lastJSON.add(Base58.encode(last.c));
+        lastJSON.add(R_SetStatusToItem.unpackDataJSON(last.c));
         lastJSON.add(last.d);
         lastJSON.add(last.e);
 
@@ -156,7 +159,7 @@ public class API_Person {
                 Fun.Tuple5<Long, Long, byte[], Integer, Integer> item = iterator.next();
                 historyJSON.add(item.a);
                 historyJSON.add(item.b);
-                historyJSON.add(Base58.encode(item.c));
+                lastJSON.add(R_SetStatusToItem.unpackDataJSON(last.c));
                 historyJSON.add(item.d);
                 historyJSON.add(item.e);
             }
