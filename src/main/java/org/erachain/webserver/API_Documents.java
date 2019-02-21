@@ -5,13 +5,11 @@ import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.R_SignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-
+import org.erachain.utils.StrJSonFine;
+import org.erachain.utils.Zip_Bytes;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple4;
-
-import org.erachain.utils.StrJSonFine;
-import org.erachain.utils.Zip_Bytes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -21,7 +19,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -30,7 +27,10 @@ import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.zip.DataFormatException;
 
@@ -61,8 +61,8 @@ public class API_Documents {
      * <h3>example request:</h3>
      * apidocuments/getFiles?blockl=1&txt=1
      *
-     * @param block is number Block
-     * @param txt is num Transaction from Block
+     * @param blockN is number Block
+     * @param txtN is num Transaction from Block
      * @return JSOM format
      * 
      */
