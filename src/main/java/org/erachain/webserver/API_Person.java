@@ -55,51 +55,72 @@ public class API_Person {
 
         Set<String> addresses = DCSet.getInstance().getPersonAddressMap().getItems(personKey).keySet();
 
-        Controller cont = Controller.getInstance();
+        //Controller cont = Controller.getInstance();
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
-        BigDecimal sum = BigDecimal.ZERO;
-        switch (pos) {
-            case 1:
-                for (String address : addresses) {
-                    Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
-                            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balances = map.get(address, assetKey);
-                    sum = sum.add(balances.a.b);
-                }
-                break;
-            case 2:
-                for (String address : addresses) {
-                    Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
-                            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balances = map.get(address, assetKey);
-                    sum = sum.add(balances.b.b);
-                }
-                break;
-            case 3:
-                for (String address : addresses) {
-                    Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
-                            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balances = map.get(address, assetKey);
-                    sum = sum.add(balances.c.b);
-                }
-                break;
-            case 4:
-                for (String address : addresses) {
-                    Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
-                            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balances = map.get(address, assetKey);
-                    sum = sum.add(balances.d.b);
-                }
-                break;
-            case 5:
-                for (String address : addresses) {
-                    Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
-                            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balances = map.get(address, assetKey);
-                    sum = sum.add(balances.e.b);
-                }
-                break;
-            default:
-                return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-                        .header("Access-Control-Allow-Origin", "*")
-                        .entity("position not found").build();
 
-        }
+        BigDecimal sum = addresses.stream()
+                .map((address)->map.get(address, assetKey))
+                .map((balances)->{
+                    switch (pos) {
+                        case 1:
+                            return balances.a.b;
+                        case 2:
+                            return balances.b.b;
+                        case 3:
+                            return balances.c.b;
+                        case 4:
+                            return balances.d.b;
+                        case 5:
+                            return balances.e.b;
+                        default:
+                            return BigDecimal.ZERO;
+                    }
+                })
+                .reduce(BigDecimal.ZERO,BigDecimal::add);
+
+//        BigDecimal sum = BigDecimal.ZERO;
+//        switch (pos) {
+//            case 1:
+//                for (String address : addresses) {
+//                    Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
+//                            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balances = map.get(address, assetKey);
+//                    sum = sum.add(balances.a.b);
+//                }
+//                break;
+//            case 2:
+//                for (String address : addresses) {
+//                    Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
+//                            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balances = map.get(address, assetKey);
+//                    sum = sum.add(balances.b.b);
+//                }
+//                break;
+//            case 3:
+//                for (String address : addresses) {
+//                    Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
+//                            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balances = map.get(address, assetKey);
+//                    sum = sum.add(balances.c.b);
+//                }
+//                break;
+//            case 4:
+//                for (String address : addresses) {
+//                    Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
+//                            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balances = map.get(address, assetKey);
+//                    sum = sum.add(balances.d.b);
+//                }
+//                break;
+//            case 5:
+//                for (String address : addresses) {
+//                    Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
+//                            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balances = map.get(address, assetKey);
+//                    sum = sum.add(balances.e.b);
+//                }
+//                break;
+//            default:
+//                return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+//                        .header("Access-Control-Allow-Origin", "*")
+//                        .entity("position not found").build();
+//
+//        }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
