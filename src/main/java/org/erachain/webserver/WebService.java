@@ -4,10 +4,10 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.IPAccessHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.erachain.settings.Settings;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
-import org.erachain.settings.Settings;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,6 +24,7 @@ public class WebService {
         s.add(API_TransactionsResource.class);
         s.add(API_Trade.class);
         s.add(API_TelegramsResource.class);
+        s.add(API_Person.class);
         s.add(API_Poll.class);
         s.add(API_Documents.class);
 
