@@ -249,7 +249,11 @@ function asyncAjax (url, type){
 				{
 					document.getElementById('main').innerHTML = person(data);
 				}
-				
+				if (type == 'person_asset')
+				{
+					document.getElementById('main').innerHTML = person_asset(data);
+				}
+
 				
 				if(type == 'mainQuery')
 				{
@@ -1404,7 +1408,7 @@ function mainQuery(data) {
 		}
 		
 		
-			if(data.type == 'person')
+		if(data.type == 'person')
 		{
 			if(data.allOnOnePage)
 			{
@@ -1424,7 +1428,7 @@ function mainQuery(data) {
 			output += '<br><br>';
 		}
 	
-	if(data.type == 'statement')
+		if(data.type == 'statement')
 		{
 		output += statement(data);
 		}
@@ -3416,6 +3420,25 @@ function parseUrlQuery() {
 }
 
 
+function person_asset(data)
+{
+var output = '';
+output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+output += '<tr><td align=left>';
+output += '<table><tr><td>';
+
+
+output += '<img src="data:image/gif;base64,' + data.img+ '" width = "350" /></td><td style ="padding-left:20px">';
+output += 	data.Label_key+ ':  &nbsp&nbsp<b>' + data.key +'</b><br>';
+output +=   data.Label_name + ': &nbsp&nbsp <b>' + data.name + '</b><br>';
+
+output +=   '</td>';
+output +=   '</tr>';
+output +=   '</table>';
+
+return output;
+}
+
 function person(data)
 {
 var output = '';
@@ -3876,20 +3899,30 @@ function start() {
 	
 	if(params.hasOwnProperty('asset'))
 	{
-		var assets = getQueryParams('asset');
-		if(assets.length == 2)
+		if(params.hasOwnProperty('person'))
 		{
-			asyncAjax('blockexplorer.json?asset=' + assets[0] + '&asset='+assets[1]+'&lang='+params['lang'], 'trades');
-			
-			document.title = title + ' - Trades - ' + assets[0] + ' - '+ assets[1];
-		}
-		else
-		{
-			asyncAjax('blockexplorer.json?asset=' + params['asset']+'&lang='+params['lang'], 'asset');
-			
-			document.title = title + ' - Asset - ' + params['asset'];
-			
-		}
+			asyncAjax('blockexplorer.json?person=' + params['person']
+				+ '&asset=' + params['asset']
+				+ '&position=' + params['position']
+				+'&lang='+params['lang'], 'person_asset');
+
+                document.title = title + ' - Person Balances - ';
+		} else {
+            var assets = getQueryParams('asset');
+            if(assets.length == 2)
+            {
+                asyncAjax('blockexplorer.json?asset=' + assets[0] + '&asset='+assets[1]+'&lang='+params['lang'], 'trades');
+
+                document.title = title + ' - Trades - ' + assets[0] + ' - '+ assets[1];
+            }
+            else
+            {
+                asyncAjax('blockexplorer.json?asset=' + params['asset']+'&lang='+params['lang'], 'asset');
+
+                document.title = title + ' - Asset - ' + params['asset'];
+
+            }
+        }
 		
 		document.getElementById('menuAssets').setAttribute('class', 'active');
 		
@@ -3994,9 +4027,18 @@ function start() {
 	
 	if(params.hasOwnProperty('person'))
 	{
-		asyncAjax('blockexplorer.json?person=' + params['person']+'&lang='+params['lang'], 'person');
-		document.title = title ;
-		return;
+		if(params.hasOwnProperty('asset'))
+		{
+			asyncAjax('blockexplorer.json?person=' + params['person']
+				+ '&asset=' + params['asset']
+				+ '&position=' + params['position']
+				+'&lang='+params['lang'], 'person_asset');
+                document.title = title + ' - Person Balances - ';
+		} else {
+			asyncAjax('blockexplorer.json?person=' + params['person']+'&lang='+params['lang'], 'person');
+			document.title = title ;
+			return;
+		}
 	}
 	
 	if(params.hasOwnProperty('peers'))

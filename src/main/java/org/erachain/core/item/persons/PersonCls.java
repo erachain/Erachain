@@ -1,8 +1,11 @@
 package org.erachain.core.item.persons;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.util.Set;
 
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.json.simple.JSONObject;
 
 //import java.math.BigDecimal;
@@ -176,6 +179,35 @@ public abstract class PersonCls extends ItemCls {
 
     }
 
+    public static BigDecimal getBalance(long personKey, long assetKey, int pos) {
+
+        Set<String> addresses = DCSet.getInstance().getPersonAddressMap().getItems(personKey).keySet();
+
+        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+
+        BigDecimal sum = addresses.stream()
+                .map((address) -> map.get(address, assetKey))
+                .map((balances) -> {
+                    switch (pos) {
+                        case 1:
+                            return balances.a.b;
+                        case 2:
+                            return balances.b.b;
+                        case 3:
+                            return balances.c.b;
+                        case 4:
+                            return balances.d.b;
+                        case 5:
+                            return balances.e.b;
+                        default:
+                            return BigDecimal.ZERO;
+                    }
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return sum;
+
+    }
 
 
     // DB

@@ -29,6 +29,7 @@ import org.erachain.gui.models.PersonAccountsModel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.*;
+import org.erachain.webserver.API_Person;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -37,6 +38,7 @@ import org.mapdb.Fun.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -174,23 +176,33 @@ public class BlockExplorer {
             output.putAll(jsonQueryPools(info));
         // asset
         } else if (info.getQueryParameters().containsKey("asset")) {
-            output.put("search", "asset");
-          if (info.getQueryParameters().get("asset").size() == 1) {
-                try {
-                    output.put("asset", jsonQueryAsset(Long.valueOf((info.getQueryParameters().getFirst("asset")))));
-                } catch (Exception e) {
-                    output.put("error", e.getMessage());
-                    LOGGER.error(e.getMessage(), e);
-                    //output.put("queryTimeMs", stopwatchAll.elapsedTime());
-                    return output;
+
+            // person asset balance
+            if (info.getQueryParameters().containsKey("person")) {
+                output.put("search", "person");
+                output.putAll(jsonQueryPersonBalance(new Long(info.getQueryParameters().getFirst("person")),
+                        new Long(info.getQueryParameters().getFirst("asset")),
+                        new Integer(info.getQueryParameters().getFirst("position"))
+                ));
+            } else {
+                output.put("search", "asset");
+                if (info.getQueryParameters().get("asset").size() == 1) {
+                    try {
+                        output.put("asset", jsonQueryAsset(Long.valueOf((info.getQueryParameters().getFirst("asset")))));
+                    } catch (Exception e) {
+                        output.put("error", e.getMessage());
+                        LOGGER.error(e.getMessage(), e);
+                        //output.put("queryTimeMs", stopwatchAll.elapsedTime());
+                        return output;
+                    }
                 }
-            }
 
-            if (info.getQueryParameters().get("asset").size() == 2) {
-                long have = Integer.valueOf(info.getQueryParameters().get("asset").get(0));
-                long want = Integer.valueOf(info.getQueryParameters().get("asset").get(1));
+                if (info.getQueryParameters().get("asset").size() == 2) {
+                    long have = Integer.valueOf(info.getQueryParameters().get("asset").get(0));
+                    long want = Integer.valueOf(info.getQueryParameters().get("asset").get(1));
 
-                output.putAll(jsonQueryTrades(have, want));
+                    output.putAll(jsonQueryTrades(have, want));
+                }
             }
         } else if (info.getQueryParameters().containsKey("blocks")) {
             output.put("search", "block");
@@ -309,8 +321,19 @@ public class BlockExplorer {
         // person
         else if (info.getQueryParameters().containsKey("person")) {
             output.put("search", "person");
-            output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
+
+            // person asset balance
+            if (info.getQueryParameters().containsKey("asset")) {
+                output.put("search", "person");
+                output.putAll(jsonQueryPersonBalance(new Long(info.getQueryParameters().getFirst("person")),
+                        new Long(info.getQueryParameters().getFirst("asset")),
+                        new Integer(info.getQueryParameters().getFirst("position"))
+                ));
+            } else {
+                output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
+            }
         }
+
         // templates list
         else if (info.getQueryParameters().containsKey("templates")) {
             int start = -1;
@@ -1551,6 +1574,36 @@ public class BlockExplorer {
             counter--;
             block = block.getParent(dcSet);
         } while (block != null && counter >= start - 20);
+
+        return output;
+    }
+
+    // new Long(personKey)
+    private Map jsonQueryPersonBalance(Long personKey, Long assetKey, int position) {
+        // TODO Auto-generated method stub
+        Map output = new HashMap();
+        PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(new Long(personKey));
+        if (person == null)
+            return null;
+
+        AssetCls asset = (AssetCls) dcSet.getItemAssetMap().get(new Long(assetKey));
+        if (asset == null)
+            return null;
+
+        byte[] b = person.getImage();
+        String a = Base64.encodeBase64String(b);
+
+        output.put("Label_key", Lang.getInstance().translate_from_langObj("Key", langObj));
+        output.put("Label_name", Lang.getInstance().translate_from_langObj("Name", langObj));
+
+        output.put("person_img", a);
+        output.put("person_key", person.getKey());
+        output.put("person_name", person.getName());
+
+        output.put("asset_key", asset.getKey());
+        output.put("asset_name", asset.getName());
+
+        BigDecimal sum = PersonCls.getBalance(personKey, assetKey, position);
 
         return output;
     }
