@@ -3,7 +3,7 @@ set app=erachain-dev
 set xms=700
 set xmx=1500
 set opt=-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dlog4j.configuration=file:log4j-dev.properties
-set pars=-nogui -pass=123456789
+set pars=-pass=123456789 -seed=5:new:1
 
 IF EXIST java (
 	set run=java

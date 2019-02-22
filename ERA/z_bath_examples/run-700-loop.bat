@@ -2,8 +2,9 @@
 set app=erachain-dev
 set xms=700
 set xmx=1500
-set opt=-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dlog4j.configuration=file:log4j-dev.properties
-set pars=-nogui -pass=123456789
+set opt=
+set pars=-pass=1 -seed=5:new:1
+set jpars=-Dlog4j.configuration=file:log4j-dev.properties
 
 IF EXIST java (
 	set run=java
@@ -49,7 +50,7 @@ IF EXIST "%JAVAHOME%\bin\java.exe" (
 )
 
 :continue
-%run% -Xms%xms%m -Xmx%xmx%m %opt% -jar %app%.jar %pars%
+%run% %jpars% -Xms%xms%m -Xmx%xmx%m %opt% -jar %app%.jar %pars%
 timeout /t 30
 goto continue
 
