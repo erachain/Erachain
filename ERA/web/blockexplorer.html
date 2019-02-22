@@ -3428,9 +3428,14 @@ output += '<tr><td align=left>';
 output += '<table><tr><td>';
 
 
-output += '<img src="data:image/gif;base64,' + data.img+ '" width = "350" /></td><td style ="padding-left:20px">';
-output += 	data.Label_key+ ':  &nbsp&nbsp<b>' + data.key +'</b><br>';
-output +=   data.Label_name + ': &nbsp&nbsp <b>' + data.name + '</b><br>';
+output += '<img src="data:image/gif;base64,' + data.person_img+ '" width = "350" /></td><td style ="padding-left:20px">';
+output += 	data.Label_key+ ':  &nbsp&nbsp<b>' + data.person_key +'</b><br>';
+output +=   data.Label_name + ': &nbsp&nbsp <b>' + data.person_name + '</b><br>';
+
+output += 	data.Label_key+ ':  &nbsp&nbsp<b>' + data.asset_key +'</b><br>';
+output +=   data.Label_name + ': &nbsp&nbsp <b>' + data.asset_name + '</b><br>';
+
+output +=   data.Label_sum + ': &nbsp&nbsp <b>' + data.sum + '</b><br>';
 
 output +=   '</td>';
 output +=   '</tr>';

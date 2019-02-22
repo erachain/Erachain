@@ -1603,7 +1603,9 @@ public class BlockExplorer {
         output.put("asset_key", asset.getKey());
         output.put("asset_name", asset.getName());
 
+        output.put("Label_sum", Lang.getInstance().translate_from_langObj("SUM", langObj));
         BigDecimal sum = PersonCls.getBalance(personKey, assetKey, position);
+        output.put("sum", sum);
 
         return output;
     }
