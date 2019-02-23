@@ -1580,15 +1580,24 @@ public class BlockExplorer {
 
     // new Long(personKey)
     private Map jsonQueryPersonBalance(Long personKey, Long assetKey, int position) {
-        // TODO Auto-generated method stub
+
         Map output = new HashMap();
+        if (position < 1 || position > 5) {
+            output.put("error", "wrong position");
+            return output;
+        }
+
         PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(new Long(personKey));
-        if (person == null)
-            return null;
+        if (person == null) {
+            output.put("error", "person not found");
+            return output;
+        }
 
         AssetCls asset = (AssetCls) dcSet.getItemAssetMap().get(new Long(assetKey));
-        if (asset == null)
-            return null;
+        if (asset == null) {
+            output.put("error", "person not found");
+            return output;
+        }
 
         byte[] b = person.getImage();
         String a = Base64.encodeBase64String(b);
