@@ -187,6 +187,7 @@ public abstract class PersonCls extends ItemCls {
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
 
         if (false) {
+            // тут переключение внутри цикла идет - так же слишком ресурсно
             BigDecimal sum = addresses.stream()
                     .map((address) -> map.get(address, assetKey))
                     .map((balances) -> {
