@@ -1043,9 +1043,7 @@ public abstract class Transaction {
         }
 
         if (height > 0) {
-            transaction.put("sequence", this.getSeqNo());
-            transaction.put("block", Base58.encode(block.getSignature()));
-            transaction.put("block_seq", viewHeightSeq());
+            transaction.put("seqNo", this.getSeqNo());
             transaction.put("height", height);
         }
 

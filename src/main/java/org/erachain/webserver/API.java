@@ -94,7 +94,8 @@ public class API {
         help.put("GET Record", "record/{signature}");
         help.put("GET Record by Height and Sequence", "recordbynumber/{height-sequence}");
         help.put("GET Record RAW", "recordraw/{signature}");
-        help.put("GET Record RAW by Height and Sequence", "recordrawbynumber/{height-sequence}");
+        help.put("GET Record RAW by Height and Sequence", "recordrawbynumber/{block-seqNo]");
+        help.put("GET Record RAW by Height and Sequence", "recordrawbynumber/{block]/[seqNo]");
 
         help.put("*** ADDRESS ***", "");
         help.put("GET Address Validate", "addressvalidate/{address}");
@@ -634,6 +635,8 @@ public class API {
 
             ++step;
             Transaction record = dcSet.getTransactionFinalMap().get(height, seq);
+
+            ++step;
             out = record.rawToJson();
 
         } catch (Exception e) {
@@ -645,6 +648,29 @@ public class API {
                 out.put("message", "record not found");
             else
                 out.put("message", e.getMessage());
+        }
+
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(out))
+                .build();
+    }
+
+    @GET
+    @Path("recordrawbynumber/{block}/{seqNo}")
+    public Response recodRawBySeqNo(@PathParam("block") int block, @PathParam("seqNo") int seqNo) {
+
+        Map out = new LinkedHashMap();
+
+        try {
+
+            Transaction record = dcSet.getTransactionFinalMap().get(block, seqNo);
+            out = record.rawToJson();
+
+        } catch (Exception e) {
+            out.put("message", e.getMessage());
         }
 
 

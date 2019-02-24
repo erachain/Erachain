@@ -3893,8 +3893,8 @@ public class BlockExplorer {
                         ss = (JSONObject) params.get(s);
 
                         files +=  i + " " + ss.get("FN");
-                        files += "<a href ='../apidocuments/getFile?download=false&block=" + block + "&txt=" + seqNo + "&name=" + ss.get("FN")  + "'> " + Lang.getInstance().translate_from_langObj("View", langObj) + " </a>";
-                        files += "<a href ='../apidocuments/getFile?download=true&block=" + block + "&txt=" + seqNo + "&name=" + ss.get("FN") + "'> " + Lang.getInstance().translate_from_langObj("Download", langObj) + "</a><br>";
+                        files += "<a href ='../apidocuments/getFile?download=false&block=" + block + "&seqNo=" + seqNo + "&name=" + ss.get("FN")  + "'> " + Lang.getInstance().translate_from_langObj("View", langObj) + " </a>";
+                        files += "<a href ='../apidocuments/getFile?download=true&block=" + block + "&seqNo=" + seqNo + "&name=" + ss.get("FN") + "'> " + Lang.getInstance().translate_from_langObj("Download", langObj) + "</a><br>";
                     }
 
                     output.put("files", files);
@@ -3920,8 +3920,8 @@ public class BlockExplorer {
                         ss = (JSONObject) params.get(s);
 
                         files += i + " " + ss.get("File_Name");
-                        files += "<a href = '../apidocuments/getFile?download=false&block=" + block + "&txt=" + seqNo + "&name=" + ss.get("File_Name") + "'> " + Lang.getInstance().translate_from_langObj("View", langObj) + " </a><br>";
-                        files += "<a href = '../apidocuments/getFile?download=true&block=" + block + "&txt=" + seqNo + "&name=" + ss.get("File_Name") + "'> " + Lang.getInstance().translate_from_langObj("Download", langObj) + " </a><br>";
+                        files += "<a href = '../apidocuments/getFile?download=false&block=" + block + "&seqNo=" + seqNo + "&name=" + ss.get("File_Name") + "'> " + Lang.getInstance().translate_from_langObj("View", langObj) + " </a><br>";
+                        files += "<a href = '../apidocuments/getFile?download=true&block=" + block + "&seqNo=" + seqNo + "&name=" + ss.get("File_Name") + "'> " + Lang.getInstance().translate_from_langObj("Download", langObj) + " </a><br>";
                     }
 
                     output.put("files", files);

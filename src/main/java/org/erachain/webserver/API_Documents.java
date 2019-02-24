@@ -69,10 +69,14 @@ public class API_Documents {
 
     @GET
     @Path("getFiles")
-    public Response getFiles(@QueryParam("block") int block, @QueryParam("seqNo") int seqNo ) {
+    public Response getFiles(@QueryParam("block") int block, @QueryParam("seqNo") int seqNo,
+                             @QueryParam("txt") int seqNo_old) {
        JSONObject result = new JSONObject();
         try {
             //READ TXT
+            if (seqNo == 0 && seqNo_old > 0) {
+                seqNo = seqNo_old;
+            }
            Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(block, seqNo);
            if (tx instanceof R_SignNote){
                R_SignNote statement = (R_SignNote)tx; 
@@ -128,19 +132,18 @@ public class API_Documents {
     }
 
     @GET
-    @Path("getFiles")
-    public Response getFiles_old(@QueryParam("block") int block, @QueryParam("txt") int seqNo ) {
-        return getFiles(block, seqNo);
-    }
-
-
-    @GET
     @Path("getFile")
     @Produces("application/zip")
-    public Response getFile(@QueryParam("block") int block, @QueryParam("seqNo") int seqNo, @QueryParam("name") String name, @QueryParam("download") String downloadParam ) {
+    public Response getFile(@QueryParam("block") int block, @QueryParam("seqNo") int seqNo,
+                            @QueryParam("txt") int seqNo_old,
+                            @QueryParam("name") String name, @QueryParam("download") String downloadParam ) {
        JSONObject result = new JSONObject();
        byte[] resultByte = null;
         try {
+            if (seqNo == 0 && seqNo_old > 0) {
+                seqNo = seqNo_old;
+            }
+
             //READ TXT
            Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(block, seqNo);
            if (tx instanceof R_SignNote){
@@ -251,13 +254,6 @@ public class API_Documents {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(result.toJSONString()).build();
-    }
-
-    @GET
-    @Path("getFile")
-    @Produces("application/zip")
-    public Response getFile_old(@QueryParam("block") int block, @QueryParam("txt") int seqNo, @QueryParam("name") String name, @QueryParam("download") String downloadParam ) {
-        return getFile(block, seqNo, name, downloadParam);
     }
 
 }

@@ -48,7 +48,7 @@ public class WEB_Transactions_HTML {
 
         String out = "<font size='+1'> <b>" + Lang.getInstance().translate_from_langObj("Transaction", langObj) + ": </b>" + tras_json.get("type");
         out += " (" + Lang.getInstance().translate_from_langObj("Block", langObj) + ": </b><a href=?block=" + tras_json.get("block") + get_Lang(langObj) + ">" + tras_json.get("block") + "</a>";
-        out += ", " + Lang.getInstance().translate_from_langObj("seqNo", langObj) + ": </b><a href=?tx=" + tras_json.get("block") + "-" + tras_json.get("seq") + get_Lang(langObj) + ">" + tras_json.get("block") + "-" + tras_json.get("seq") + "</a> ) </font><br>";
+        out += ", " + Lang.getInstance().translate_from_langObj("seqNo", langObj) + ": </b><a href=?tx=" + tras_json.get("block") + "-" + tras_json.get("seqNo") + get_Lang(langObj) + ">" + tras_json.get("block") + "-" + tras_json.get("seqNo") + "</a> ) </font><br>";
         out += "<br><b>" + Lang.getInstance().translate_from_langObj("Type", langObj) + ": </b>" + tras_json.get("type_name");
         out += "<br><b>" + Lang.getInstance().translate_from_langObj("Confirmations", langObj) + ": </b>" + tras_json.get("confirmations");
         out += "<br><b>" + Lang.getInstance().translate_from_langObj("Date", langObj) + ": </b>" + tras_json.get("date");
@@ -133,7 +133,7 @@ public class WEB_Transactions_HTML {
                 out += "<br>" + transaction.toJson();
         }
         //		out += "<br>" +transaction.toJson();
-        out += "<br><a href ='/api/recordrawbynumber/" + tras_json.get("block") + "-" + tras_json.get("seq") + "'> RAW </a>";
+        out += "<br><a href ='/api/recordrawbynumber/" + tras_json.get("block") + "-" + tras_json.get("seqNo") + "'> RAW </a>";
         return out;
     }
 
@@ -379,7 +379,7 @@ public class WEB_Transactions_HTML {
         R_Vouch vouchRecord = (R_Vouch) transaction;
         Transaction record = DCSet.getInstance().getTransactionFinalMap().get(vouchRecord.getVouchHeight(),
                 vouchRecord.getVouchSeqNo());
-		/*out += "<b>" + Lang.getInstance().translate_from_langObj("height-seq.", langObj) + ":</b> <a href=?tx="
+		/*out += "<b>" + Lang.getInstance().translate_from_langObj("height-seqNo", langObj) + ":</b> <a href=?tx="
 				+  Base58.encode(record.getSignature()) + get_Lang(langObj) + ">" + vouchRecord.getVouchHeight() + "-"
 				+ vouchRecord.getVouchSeqNo() + "</a><br>"; */
         //out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b>";
