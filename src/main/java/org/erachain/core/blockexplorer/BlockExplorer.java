@@ -558,12 +558,12 @@ public class BlockExplorer {
         if (query.indexOf(':') != -1) {
 
             int blockHeight = Integer.valueOf(query.split(":")[0]);
-            int seq = Integer.valueOf(query.split(":")[1]);
+            int seqNo = Integer.valueOf(query.split(":")[1]);
 
             LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = dcSet.getATTransactionMap()
                     .getATTransactions(blockHeight);
 
-            if (atTxs.size() > seq) {
+            if (atTxs.size() > seqNo) {
                 i++;
                 outputItem = new LinkedHashMap();
                 outputItem.put(1, "atTx");
@@ -587,7 +587,7 @@ public class BlockExplorer {
                     outputItem.put(2, Lang.getInstance().translate_from_langObj("Statement", langObj));
                 } else {
                     outputItem.put(1, "block");
-                    outputItem.put(2, Lang.getInstance().translate_from_langObj("Transaction Seq No", langObj));
+                    outputItem.put(2, Lang.getInstance().translate_from_langObj("Transaction SeqNo", langObj));
 
                 }
                 foundList.put(i, outputItem);
@@ -2091,7 +2091,7 @@ public class BlockExplorer {
                 : transactions.subList(fromIndex, Math.min(toIndex, transactions.size()));
         for (Transaction trans : transactions2) {
 
-            // SET + HEIGHT + SEQ
+            // SET + HEIGHT + SEQNO
             if (trans.getType() == 100) {
                 trans.setDC(dcSet);
             }
@@ -2144,7 +2144,7 @@ public class BlockExplorer {
 
             transactionJSON.put("block", trans.getBlockHeight());// .getSeqNo(dcSet));
 
-            transactionJSON.put("seq", trans.getSeqNo());
+            transactionJSON.put("seqNo", trans.getSeqNo());
 
             if (trans.getType() == Transaction.CALCULATED_TRANSACTION) {
                 R_Calculated txCalculated = (R_Calculated) trans;
@@ -2241,7 +2241,7 @@ public class BlockExplorer {
         output.put("label_confirmations", Lang.getInstance().translate_from_langObj("Confirmations", langObj));
         output.put("label_recipient", Lang.getInstance().translate_from_langObj("Recipient", langObj));
         output.put("label_size", Lang.getInstance().translate_from_langObj("Size", langObj));
-        output.put("label_seq", Lang.getInstance().translate_from_langObj("Seq", langObj));
+        output.put("label_seqNo", Lang.getInstance().translate_from_langObj("SeqNo", langObj));
         output.put("label_signature", Lang.getInstance().translate_from_langObj("Signature", langObj));
         // output.put("label_reference",Lang.getInstance().translate_from_langObj("Reference",langObj));
         output.put("label_amount_key", Lang.getInstance().translate_from_langObj("Amount:Key", langObj));
@@ -2620,7 +2620,7 @@ public class BlockExplorer {
 
         Block block = new GenesisBlock();
         do {
-            int seq = 1;
+            int seqNo = 1;
             for (Transaction transaction : block.getTransactions()) {
                 if ((transaction.getType() == Transaction.REGISTER_NAME_TRANSACTION
                         && ((RegisterNameTransaction) transaction).getName().toString().equals(name))
@@ -2632,10 +2632,10 @@ public class BlockExplorer {
                                 && ((CancelSellNameTransaction) transaction).getName().equals(name))
                         || (transaction.getType() == Transaction.BUY_NAME_TRANSACTION
                                 && ((BuyNameTransaction) transaction).getNameSale().toString().equals(name))) {
-                    all.add(new BlExpUnit(height, seq, transaction));
+                    all.add(new BlExpUnit(height, seqNo, transaction));
                     txsTypeCount[transaction.getType() - 1]++;
                 }
-                seq++;
+                seqNo++;
             }
             block = block.getChild(dcSet);
             height++;
@@ -2841,14 +2841,14 @@ public class BlockExplorer {
             Block block = Controller.getInstance().getBlockByHeight(at.getCreationBlockHeight());
             long aTtimestamp = block.getTimestamp();
             BigDecimal aTbalanceCreation = BigDecimal.ZERO;
-            int seq = 0;
+            int seqNo = 0;
             for (Transaction transaction : block.getTransactions()) {
-                seq++;
+                seqNo++;
                 if (transaction.getType() == Transaction.DEPLOY_AT_TRANSACTION) {
                     Account atAccount = ((DeployATTransaction) transaction).getATaccount(dcSet);
 
                     if (atAccount.getAddress().equals(address)) {
-                        transaction.setBlock(block, dcSet, block.heightBlock, seq);
+                        transaction.setBlock(block, dcSet, block.heightBlock, seqNo);
                         all.add(new BlExpUnit(at.getCreationBlockHeight(), 0, transaction));
                         aTbalanceCreation = ((DeployATTransaction) transaction).getAmount();
                     }
@@ -4146,9 +4146,9 @@ public class BlockExplorer {
             block = Controller.getInstance().getBlock(Base58.decode(query));
         }
 
-        int seq = 0;
+        int seqNo = 0;
         for (Transaction transaction : block.getTransactions()) {
-            transaction.setBlock(block, dcSet, block.heightBlock, ++seq);
+            transaction.setBlock(block, dcSet, block.heightBlock, ++seqNo);
             all.add(transaction);
             txsTypeCount[transaction.getType() - 1]++;
         }
@@ -4211,9 +4211,9 @@ public class BlockExplorer {
         output.put("countTx", txCountJSON);
 
         BigDecimal totalAmount = BigDecimal.ZERO;
-        //seq = 0;
+        //seqNo = 0;
         for (Transaction transaction : block.getTransactions()) {
-            /// выше уже они инициализированы transaction.setBlock(block, dcSet, block.heightBlock, ++seq);
+            /// выше уже они инициализированы transaction.setBlock(block, dcSet, block.heightBlock, ++seqNo);
             for (Account account : transaction.getInvolvedAccounts()) {
                 BigDecimal amount = transaction.getAmount(account);
                 if (amount.compareTo(BigDecimal.ZERO) > 0) {

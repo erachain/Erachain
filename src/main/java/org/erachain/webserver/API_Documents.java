@@ -48,8 +48,8 @@ public class API_Documents {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
-        help.put("apidocuments/getFiles?block={block}&txt={transaction}", "get files from transaction");
-        help.put("apidocuments/getFile?download={true/false}block={block}&txt={transaction}&name={name]", "get file (name) from transaction");
+        help.put("apidocuments/getFiles?block={block}&seqNo={seqNo}", "get files from transaction");
+        help.put("apidocuments/getFile?download={true/false}block={block}&seqNo={seqNo}&name={name]", "get file (name) from transaction");
                
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -62,18 +62,18 @@ public class API_Documents {
      * apidocuments/getFiles?blockl=1&txt=1
      *
      * @param block is number Block
-     * @param txt is num Transaction from Block
+     * @param seqNo is num Transaction from Block
      * @return JSOM format
      * 
      */
 
     @GET
     @Path("getFiles")
-    public Response getFiles(@QueryParam("block") int blockN, @QueryParam("txt") int txtN ) {
+    public Response getFiles(@QueryParam("block") int block, @QueryParam("seqNo") int seqNo ) {
        JSONObject result = new JSONObject();
         try {
             //READ TXT
-           Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(blockN, txtN);
+           Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(block, seqNo);
            if (tx instanceof R_SignNote){
                R_SignNote statement = (R_SignNote)tx; 
                if (statement.getVersion() == 2) {
@@ -127,17 +127,22 @@ public class API_Documents {
                 .entity(result.toJSONString()).build();
     }
 
-   
+    @GET
+    @Path("getFiles")
+    public Response getFiles_old(@QueryParam("block") int block, @QueryParam("txt") int seqNo ) {
+        return getFiles(block, seqNo);
+    }
+
 
     @GET
     @Path("getFile")
     @Produces("application/zip")
-    public Response getFile(@QueryParam("block") int blockN, @QueryParam("txt") int txtN, @QueryParam("name") String name, @QueryParam("download") String downloadParam ) {
+    public Response getFile(@QueryParam("block") int block, @QueryParam("seqNo") int seqNo, @QueryParam("name") String name, @QueryParam("download") String downloadParam ) {
        JSONObject result = new JSONObject();
        byte[] resultByte = null;
         try {
             //READ TXT
-           Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(blockN, txtN);
+           Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(block, seqNo);
            if (tx instanceof R_SignNote){
                R_SignNote statement = (R_SignNote)tx; 
                if (statement.getVersion() == 2) {
@@ -247,5 +252,12 @@ public class API_Documents {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(result.toJSONString()).build();
     }
-   
+
+    @GET
+    @Path("getFile")
+    @Produces("application/zip")
+    public Response getFile_old(@QueryParam("block") int block, @QueryParam("txt") int seqNo, @QueryParam("name") String name, @QueryParam("download") String downloadParam ) {
+        return getFile(block, seqNo, name, downloadParam);
+    }
+
 }
