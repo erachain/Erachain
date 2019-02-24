@@ -2174,6 +2174,9 @@ public class BlockExplorer {
                     }
 
                 } else {
+
+                    transactionJSON.put("publickey", Base58.encode(trans.getCreator().getPublicKey()));
+
                     Account atSideAccount;
                     atSideAccount = trans.getCreator();
                     if (account != null) {
@@ -4079,6 +4082,7 @@ public class BlockExplorer {
                 output.put("type", "transaction");
                 output.put("body", WEB_Transactions_HTML.getInstance().get_HTML(transaction, langObj));
                 output.put("Label_Transaction", Lang.getInstance().translate_from_langObj("Transaction", langObj));
+                output.put("heightSeqNo", transaction.viewHeightSeq());
             }
             // output.put("Json", transaction.toJson().toString());
 

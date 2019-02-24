@@ -22,9 +22,7 @@ import org.erachain.utils.DateTimeFormat;
 import javax.swing.*;
 import javax.swing.table.TableRowSorter;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 public class WEB_Transactions_HTML {
     private static WEB_Transactions_HTML instance;
@@ -39,17 +37,21 @@ public class WEB_Transactions_HTML {
         return instance;
     }
 
-    public String get_HTML(Transaction transaction, JSONObject langObj) {
+    public HashMap get_HTML(Transaction transaction, JSONObject langObj) {
         this.langObj = langObj;
         List<Transaction> tt = new ArrayList<Transaction>();
         tt.add(transaction);
         LinkedHashMap json = BlockExplorer.getInstance().Transactions_JSON(null, tt);
         LinkedHashMap tras_json = (LinkedHashMap) ((LinkedHashMap) json.get("transactions")).get(0);
 
+        HashMap output = new HashMap();
+
         String out = "<font size='+1'> <b>" + Lang.getInstance().translate_from_langObj("Transaction", langObj) + ": </b>" + tras_json.get("type");
         out += " (" + Lang.getInstance().translate_from_langObj("Block", langObj) + ": </b><a href=?block=" + tras_json.get("block") + get_Lang(langObj) + ">" + tras_json.get("block") + "</a>";
         out += ", " + Lang.getInstance().translate_from_langObj("seqNo", langObj) + ": </b><a href=?tx=" + tras_json.get("block") + "-" + tras_json.get("seqNo") + get_Lang(langObj) + ">" + tras_json.get("block") + "-" + tras_json.get("seqNo") + "</a> ) </font><br>";
-        out += "<br><b>" + Lang.getInstance().translate_from_langObj("Type", langObj) + ": </b>" + tras_json.get("type_name");
+
+        // она и так в заголовке будет
+        //out += "<br><b>" + Lang.getInstance().translate_from_langObj("Type", langObj) + ": </b>" + tras_json.get("type_name");
         out += "<br><b>" + Lang.getInstance().translate_from_langObj("Confirmations", langObj) + ": </b>" + tras_json.get("confirmations");
         out += "<br><b>" + Lang.getInstance().translate_from_langObj("Date", langObj) + ": </b>" + tras_json.get("date");
         out += "<br><b>" + Lang.getInstance().translate_from_langObj("Size", langObj) + ": </b>" + tras_json.get("size");
@@ -59,82 +61,91 @@ public class WEB_Transactions_HTML {
         out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + tras_json.get("fee");
         out += "<br> ";
         out += "<b>" + Lang.getInstance().translate_from_langObj("Creator", langObj) + ": </b><a href=?addr=" + tras_json.get("creator_addr") + get_Lang(langObj) + ">" + tras_json.get("creator") + "</a>";
-        out += "<br>";
+
+        output.put("head", out);
 
         int type = transaction.getType();
         switch (type) {
             case Transaction.SEND_ASSET_TRANSACTION:
-                out = out + r_Send_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", r_Send_HTML(transaction, langObj));
+                output.put("message", ((R_Send)transaction).viewData());
+
                 break;
             case Transaction.ISSUE_ASSET_TRANSACTION:
-                out = out + issue_Asset_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", issue_Asset_HTML(transaction, langObj));
+                output.put("message", ((Issue_ItemRecord)transaction).getItemDescription());
                 break;
             case Transaction.ISSUE_PERSON_TRANSACTION:
-                out = out + issue_Person_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", issue_Person_HTML(transaction, langObj));
+                output.put("message", ((Issue_ItemRecord)transaction).getItemDescription());
                 break;
             case Transaction.ISSUE_POLL_TRANSACTION:
-                //out= out+ issue_Person_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
                 break;
             case Transaction.ISSUE_IMPRINT_TRANSACTION:
-                out = out + issue_Imprint_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", issue_Imprint_HTML(transaction, langObj));
+                output.put("message", ((Issue_ItemRecord)transaction).getItemDescription());
                 break;
             case Transaction.ISSUE_TEMPLATE_TRANSACTION:
-                out = out + issue_Template_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", issue_Template_HTML(transaction, langObj));
+                output.put("message", ((Issue_ItemRecord)transaction).getItemDescription());
                 break;
             case Transaction.ISSUE_STATUS_TRANSACTION:
-                out = out + issue_Status_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", issue_Status_HTML(transaction, langObj));
+                output.put("message", ((Issue_ItemRecord)transaction).getItemDescription());
                 break;
             case Transaction.ISSUE_UNION_TRANSACTION:
-                out = out + issue_Union_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", issue_Union_HTML(transaction, langObj));
+                output.put("message", ((Issue_ItemRecord)transaction).getItemDescription());
                 break;
             case Transaction.VOUCH_TRANSACTION:
-                out = out + vouch_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", vouch_HTML(transaction, langObj));
                 break;
             case Transaction.SIGN_NOTE_TRANSACTION:
-                out = out + sign_Note_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", sign_Note_HTML(transaction, langObj));
                 break;
             case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
-                out = out + serttify_Pub_Key_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", serttify_Pub_Key_HTML(transaction, langObj));
                 break;
             case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
-                out = out + set_Status_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", set_Status_HTML(transaction, langObj));
                 break;
             case Transaction.HASHES_RECORD:
-                out = out + hash_Record_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", hash_Record_HTML(transaction, langObj));
                 break;
             case Transaction.CREATE_ORDER_TRANSACTION:
-                out = out + create_Order_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", create_Order_HTML(transaction, langObj));
                 break;
             case Transaction.CANCEL_ORDER_TRANSACTION:
-                out = out + cancel_Order_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", cancel_Order_HTML(transaction, langObj));
                 break;
             case Transaction.CREATE_POLL_TRANSACTION:
-                out = out + create_Poll_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", create_Poll_HTML(transaction, langObj));
                 break;
             case Transaction.VOTE_ON_POLL_TRANSACTION:
-                out = out + vate_On_Poll_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", vote_On_Poll_HTML(transaction, langObj));
                 break;
             case Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION:
-                out = out + genesis_Certify_Person_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", genesis_Certify_Person_HTML(transaction, langObj));
                 break;
             case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
-                out = out + genesis_Issue_Asset_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", genesis_Issue_Asset_HTML(transaction, langObj));
                 break;
             case Transaction.GENESIS_ISSUE_TEMPLATE_TRANSACTION:
-                out = out + genesis_Issue_Template_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", genesis_Issue_Template_HTML(transaction, langObj));
                 break;
             case Transaction.GENESIS_ISSUE_PERSON_TRANSACTION:
-                out = out + genesis_Certify_Person_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", genesis_Certify_Person_HTML(transaction, langObj));
                 break;
             case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
-                out = out + genesis_Send_Asset_HTML(transaction, langObj) + get_Vouches(transaction,langObj);
+                output.put("body", genesis_Send_Asset_HTML(transaction, langObj));
                 break;
             default:
-                out += "<br>" + transaction.toJson();
+                output.put("body", transaction.toJson());
         }
-        //		out += "<br>" +transaction.toJson();
-        out += "<br><a href ='/api/recordrawbynumber/" + tras_json.get("block") + "-" + tras_json.get("seqNo") + "'> RAW </a>";
-        return out;
+
+        output.put("vouches", get_Vouches(transaction,langObj));
+
+        return output;
     }
 
     private String genesis_Send_Asset_HTML(Transaction transaction, JSONObject langObj) {
@@ -218,7 +229,7 @@ public class WEB_Transactions_HTML {
         return out;
     }
 
-    private String vate_On_Poll_HTML(Transaction transaction, JSONObject langObj) {
+    private String vote_On_Poll_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
         String out = "";
         VoteOnPollTransaction pollVote = (VoteOnPollTransaction) transaction;
@@ -459,7 +470,7 @@ public class WEB_Transactions_HTML {
             out += Lang.getInstance().translate_from_langObj("Female", langObj);
         out += "<br>";
         out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-                + personIssue.getItem().getDescription() + "<br>";
+                + person.getDescription() + "<br>";
         if (person.getOwner().getPerson() != null) {
             // out += "<b>" + Lang.getInstance().translate_from_langObj("Owner",
             // langObj) + ":</b> <a href=?person="
@@ -480,20 +491,19 @@ public class WEB_Transactions_HTML {
         // TODO Auto-generated method stub
         IssueAssetTransaction tr = (IssueAssetTransaction) transaction;
         String out = "";
+        AssetCls asset = (AssetCls)tr.getItem();
         out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> <a href=?asset="
-                + tr.getAssetKey() + get_Lang(langObj) + ">" + tr.getItem().viewName() + "</a><br>";
-        out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-                //+ tr.getItem().getDescription() + "<br>";
-                + Lang.getInstance().translate_from_langObj(tr.getItem().viewDescription(), langObj) + "<br>";
+                + asset.getKey() + get_Lang(langObj) + ">" + tr.getItem().viewName() + "</a><br>";
+        //out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
+        //        + Lang.getInstance().translate_from_langObj(tr.getItem().viewDescription(), langObj) + "<br>";
         out += "<b>" + Lang.getInstance().translate_from_langObj("Quantity", langObj) + ":</b> "
-                + ((AssetCls) tr.getItem()).getQuantity().toString() + "<br>";
+                + asset.getQuantity().toString() + "<br>";
         out += "<b>" + Lang.getInstance().translate_from_langObj("Scale", langObj) + ":</b> "
-                + Lang.getInstance().translate_from_langObj(((AssetCls) tr.getItem()).getScale() + "", langObj)
+                + Lang.getInstance().translate_from_langObj(asset.getScale() + "", langObj)
                 + "<br>";
         out += "<b>" + Lang.getInstance().translate_from_langObj("Asset Type", langObj) + ":</b> "
-                + Lang.getInstance().translate_from_langObj(((AssetCls) tr.getItem()).viewAssetType() + "", langObj)
+                + Lang.getInstance().translate_from_langObj(asset.viewAssetType() + "", langObj)
                 + "<br>";
-
 
         return out;
     }
@@ -515,11 +525,6 @@ public class WEB_Transactions_HTML {
 
         if (!tr.getHead().equals(""))
             out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Title", langObj) + ":</b> " + tr.getHead();
-
-        if (!tr.viewData().equals(""))
-            out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Message", langObj) + ":</b> "
-                    + tr.viewData();
-
 
         return out;
 
