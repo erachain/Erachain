@@ -5,6 +5,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
@@ -57,7 +58,6 @@ public class WEB_Transactions_HTML {
         out += "<br><b>" + Lang.getInstance().translate_from_langObj("Size", langObj) + ": </b>" + tras_json.get("size");
         out += "<br><b>" + Lang.getInstance().translate_from_langObj("Publick Key", langObj) + ": </b>" + tras_json.get("publickey");
         out += "<br><b>" + Lang.getInstance().translate_from_langObj("Signature", langObj) + ": </b>" + tras_json.get("signature");
-        out += "<br><b>" + Lang.getInstance().translate_from_langObj("Reference", langObj) + ": </b>" + tras_json.get("reference");
         out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + tras_json.get("fee");
         out += "<br> ";
         out += "<b>" + Lang.getInstance().translate_from_langObj("Creator", langObj) + ": </b><a href=?addr=" + tras_json.get("creator_addr") + get_Lang(langObj) + ">" + tras_json.get("creator") + "</a>";
@@ -80,6 +80,8 @@ public class WEB_Transactions_HTML {
                 output.put("message", ((Issue_ItemRecord)transaction).getItemDescription());
                 break;
             case Transaction.ISSUE_POLL_TRANSACTION:
+                output.put("body", issue_Poll_HTML(transaction, langObj));
+                output.put("message", ((Issue_ItemRecord)transaction).getItemDescription());
                 break;
             case Transaction.ISSUE_IMPRINT_TRANSACTION:
                 output.put("body", issue_Imprint_HTML(transaction, langObj));
@@ -492,10 +494,9 @@ public class WEB_Transactions_HTML {
         IssueAssetTransaction tr = (IssueAssetTransaction) transaction;
         String out = "";
         AssetCls asset = (AssetCls)tr.getItem();
-        out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> <a href=?asset="
-                + asset.getKey() + get_Lang(langObj) + ">" + tr.getItem().viewName() + "</a><br>";
-        //out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-        //        + Lang.getInstance().translate_from_langObj(tr.getItem().viewDescription(), langObj) + "<br>";
+        out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj)
+                + ":</b> <a href=?asset=" + asset.getKey()
+                + get_Lang(langObj) + ">" + asset.viewName() + "</a><br>";
         out += "<b>" + Lang.getInstance().translate_from_langObj("Quantity", langObj) + ":</b> "
                 + asset.getQuantity().toString() + "<br>";
         out += "<b>" + Lang.getInstance().translate_from_langObj("Scale", langObj) + ":</b> "
@@ -504,6 +505,18 @@ public class WEB_Transactions_HTML {
         out += "<b>" + Lang.getInstance().translate_from_langObj("Asset Type", langObj) + ":</b> "
                 + Lang.getInstance().translate_from_langObj(asset.viewAssetType() + "", langObj)
                 + "<br>";
+
+        return out;
+    }
+
+    private String issue_Poll_HTML(Transaction transaction, JSONObject langObj) {
+        // TODO Auto-generated method stub
+        IssuePollRecord tr = (IssuePollRecord) transaction;
+        String out = "";
+        ItemCls item = tr.getItem();
+        out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj)
+                + ":</b> <a href=?poll=" + item.getKey()
+                + get_Lang(langObj) + ">" + item.viewName() + "</a><br>";
 
         return out;
     }
