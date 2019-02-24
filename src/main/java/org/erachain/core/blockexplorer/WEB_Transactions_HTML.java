@@ -47,18 +47,20 @@ public class WEB_Transactions_HTML {
         LinkedHashMap tras_json = (LinkedHashMap) ((LinkedHashMap) json.get("transactions")).get(0);
 
         String out = "<font size='+1'> <b>" + Lang.getInstance().translate_from_langObj("Transaction", langObj) + ": </b>" + tras_json.get("type");
-        out += "       (" + Lang.getInstance().translate_from_langObj("Block", langObj) + ": </b><a href=?block=" + tras_json.get("block") + get_Lang(langObj) + ">" + tras_json.get("block") + "</a>";
-        out += " - " + tras_json.get("seq") + ") </font><br>";
+        out += " (" + Lang.getInstance().translate_from_langObj("Block", langObj) + ": </b><a href=?block=" + tras_json.get("block") + get_Lang(langObj) + ">" + tras_json.get("block") + "</a>";
+        out += ", " + Lang.getInstance().translate_from_langObj("seqNo", langObj) + ": </b><a href=?tx=" + tras_json.get("block") + "-" + tras_json.get("seq") + get_Lang(langObj) + ">" + tras_json.get("block") + "-" + tras_json.get("seq") + "</a> ) </font><br>";
+        out += "<br><b>" + Lang.getInstance().translate_from_langObj("Type", langObj) + ": </b>" + tras_json.get("type_name");
         out += "<br><b>" + Lang.getInstance().translate_from_langObj("Confirmations", langObj) + ": </b>" + tras_json.get("confirmations");
         out += "<br><b>" + Lang.getInstance().translate_from_langObj("Date", langObj) + ": </b>" + tras_json.get("date");
         out += "<br><b>" + Lang.getInstance().translate_from_langObj("Size", langObj) + ": </b>" + tras_json.get("size");
-        out += "<br><b>" + Lang.getInstance().translate_from_langObj("Publick Key", langObj) + ": </b>" + tras_json.get("pub_key");
+        out += "<br><b>" + Lang.getInstance().translate_from_langObj("Publick Key", langObj) + ": </b>" + tras_json.get("publickey");
         out += "<br><b>" + Lang.getInstance().translate_from_langObj("Signature", langObj) + ": </b>" + tras_json.get("signature");
         out += "<br><b>" + Lang.getInstance().translate_from_langObj("Reference", langObj) + ": </b>" + tras_json.get("reference");
         out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + tras_json.get("fee");
         out += "<br> ";
         out += "<b>" + Lang.getInstance().translate_from_langObj("Creator", langObj) + ": </b><a href=?addr=" + tras_json.get("creator_addr") + get_Lang(langObj) + ">" + tras_json.get("creator") + "</a>";
         out += "<br>";
+
         int type = transaction.getType();
         switch (type) {
             case Transaction.SEND_ASSET_TRANSACTION:

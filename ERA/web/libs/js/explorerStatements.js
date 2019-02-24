@@ -99,47 +99,49 @@ function statement(data){
 
 	output += '<table><tr><td>';
 	output +='<div style="word-wrap: break-word;  width: 800px;">';
-	output +=  '<b>'+data.Label_statement +'</b>';
-	output +='<br><br>' + data.Label_block + ':&nbsp&nbsp <a href=?block='+ data.block + get_lang()+'><b>' + data.block +'</b></a>';
-	output +='<br>' + data.Label_date + ':&nbsp&nbsp'+ data.date;
+	output +=  data.Label_type +':<b>' + data.type + '</b>';
+	output +=' &nbsp&nbsp'+data.Label_block + ': <a href=?block='+ data.block + get_lang()+'><b>' + data.block +'</b></a>';
+	output +=' &nbsp&nbsp'+data.Label_seqNo+': <a href=?tx='+data.block+'-'+data.seqNo+get_lang()+'><b>'+data.block+'-'+data.seqNo+'</b></a>';
+	output +=' &nbsp&nbsp'+data.Label_date + ': <b>'+ data.date+'</b>';
 	
 	if (data.creator_key !="") {
 		output += '<br>'  + data.Label_creator + ':&nbsp&nbsp <a href=?person='+ data.creator_key + get_lang()+'><b>' + data.creator +'</b></a>';
 	} else {
 		output +='<br>' + data.Label_creator + ':&nbsp&nbsp' + data.creator ;
 	}
-// vouches	
-	output +='<br><br>' + data.statement;
+
+	if(data.hasOwnProperty('statement')){
+    	output +='<hr>' + data.statement;
+    } else if(data.hasOwnProperty('title')){
+        output +='<br><b>' + data.Label_title + '</b>:' + data.title;
+    }
+
+
+	if(data.hasOwnProperty('body')){
+    	output += fformat(data.body);
+    }
+
+	if(data.hasOwnProperty('message')){
+    	output +='<br>' + fformat(data.message);
+    }
+
+	if(data.hasOwnProperty('hashes')){
+    	output +='<br><hr><b>' + data.Label_hashes + '</b>:<br>' + data.hashes;
+    }
+
+	if(data.hasOwnProperty('files')){
+    	output +='<br><hr><b>' + data.Label_files + '</b>:<br>' + data.files;
+    }
+
+
 	output +='</div>';
-/*	output +=   '</td></tr></table>';
-	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
-	output += '<tr><td align=left>';
-	output += '<br>' + data.Label_vouchs +':<br>';
-	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;  width: 800px;">';
-	output += '<tr><td><b>'+ data.Label_No+'<td><b>'+ data.Label_block  +'</td><td><b>'+ data.Label_accounts_table_creator +' <td><b>'+data.Label_accounts_table_data; 
-	minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
-	for(var i in data.vouches)
-	{
-		output += '<tr><td>'+ i;
-		output += '<td><a href=?block='+ data.vouches[i].block + get_lang() +'>'+ data.vouches[i].block+'</a>';
-		output += '<td>'+ data.vouches[i].creator;
-		if (data.vouches[i].hasOwnProperty("creator_name")) 
-		{
-			output += '<a href = ?person='+ data.vouches[i].creator_key+ get_lang() +'>';
-			output += '<br>'+data.vouches[i].creator_name+ '<a>';
-		}	
-		output += '<td>'+ data.vouches[i].date ;
 
-	}
-	
-	output += '</table><br>';
-	*/
+    // vouches
 	if(data.hasOwnProperty('vouches_table')){
- output +=data.vouches_table;
- 
- }	
-	return output;
+        output +='<hr>' + data.vouches_table;
+    }
 
+	return output;
 
 }
 
