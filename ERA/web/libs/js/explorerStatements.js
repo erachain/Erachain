@@ -25,7 +25,7 @@ function statements(data){
 		output += '<td>'+ data.Statements[i].Timestamp;
 		output += '<td><a href =?block='+data.Statements[i].Block+get_lang() + '>' +data.Statements[i].Block +'</a>';
 		output += '<td>'+data.Statements[i].Template; 
-		output += '<td><a href = ?statement='+data.Statements[i].Block+'&Seg_No='+data.Statements[i].Seg_No+ get_lang() + '>';
+		output += '<td><a href = ?statement='+data.Statements[i].Block+'&seqNo='+data.Statements[i].seqNo+ get_lang() + '>';
 		output +='<div style="word-wrap: break-word;  width: 300px;">'+ data.Statements[i].Statement +'</div></a>';
 		if (data.Statements[i].person_key !=""){
 		output +='<td><a href =?person='+ data.Statements[i].person_key + get_lang() +'>'+ data.Statements[i].Creator +'</a>';
@@ -82,7 +82,7 @@ function statements2(data){
 function openStatement(){
 	var params = document.getElementById('statement_search_q').value.split('-');
 	if (params.length > 1){
-		document.location.href = '?statement=' + params[0] + '&Seg_No=' + params[1] + get_lang() ;
+		document.location.href = '?statement=' + params[0] + '&seqNo=' + params[1] + get_lang() ;
 	}
 }
 

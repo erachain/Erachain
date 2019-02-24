@@ -1805,7 +1805,7 @@ function mainQuery(data) {
 					{
 						message = '<b>no</b>';
 					}
-					output += '<tr><td colspan=3><b>Message:</b> ' + wordwrap(message, 80, '<br>', true);
+					output += '<tr><td colspan=3><b>Message:</b> ' + fformat(message); //wordwrap(message, 80, '<br>', true);
 					
 					output += '</table>';
 					
@@ -2597,7 +2597,7 @@ function mainQuery(data) {
 						}
 						else
 						{
-							output += wordwrap(data[i].transaction.data, 120, '\n', true);
+							output += fformat(data[i].transaction.data); // wordwrap(data[i].transaction.data, 120, '\n', true);
 						}
 												
 						output += '</pre></td>';
@@ -3355,8 +3355,8 @@ function search(data)
 				break	
 			case 'statement':
 				var params = data.query.split('-');
-				foundList += '<li><a href="?statement='+params[0]+'&Seg_No='+params[1]+get_lang()+'">'+row[2]+ ': '+htmlFilter(data.query)+'</a></li>';
-				foundOne = '?statement='+params[0]+'&Seg_No='+params[1];
+				foundList += '<li><a href="?statement='+params[0]+'&seqNo='+params[1]+get_lang()+'">'+row[2]+ ': '+htmlFilter(data.query)+'</a></li>';
+				foundOne = '?statement='+params[0]+'&seqNo='+params[1];
 				break	
 			case 'person':
 				foundList += '<li><a href="?person='+encodeURIComponent(data.query)+get_lang()+'">'+row[2]+ ': '+htmlFilter(data.query)+'</a></li>';
@@ -4021,7 +4021,7 @@ function start() {
 	
 	if(params.hasOwnProperty('statement'))
 	{
-		asyncAjax('blockexplorer.json?statement=' + params['statement']+'&Seg_No=' + params['Seg_No']+'&lang='+params['lang'], 'statement');
+		asyncAjax('blockexplorer.json?statement=' + params['statement']+'&seqNo=' + params['seqNo']+'&lang='+params['lang'], 'statement');
 		document.title = title ;
 		return;
 	}

@@ -345,15 +345,15 @@ public class BlockExplorer {
             output.putAll(jsonQueryStatus(Long.valueOf(info.getQueryParameters().getFirst("status"))));
         }
         // tx from seq-No
-        else if (info.getQueryParameters().containsKey("Seg_No")) {
+        else if (info.getQueryParameters().containsKey("seqNo")) {
             if (info.getQueryParameters().containsKey("statement")) {
                 output.putAll(jsonQueryStatement(info.getQueryParameters().getFirst("statement"),
-                        info.getQueryParameters().getFirst("Seg_No")));
+                        info.getQueryParameters().getFirst("seqNo")));
             } else {
 
                 Transaction transaction = dcSet.getTransactionFinalMap().get(
                         new Integer(info.getQueryParameters().getFirst("block")),
-                        new Integer(info.getQueryParameters().getFirst("Seg_No")));
+                        new Integer(info.getQueryParameters().getFirst("seqNo")));
                 output.put("body", WEB_Transactions_HTML.getInstance().get_HTML(transaction, langObj));
             }
         }
@@ -3528,7 +3528,7 @@ public class BlockExplorer {
             Map out_statement = new LinkedHashMap();
             Transaction statement = model_Statements.get_Statement(row);
             out_statement.put("Block", statement.getBlockHeight());
-            out_statement.put("Seg_No", statement.getSeqNo());
+            out_statement.put("seqNo", statement.getSeqNo());
             out_statement.put("person_key", model_Statements.get_person_key(row));
 
             for (int column = 0; column < column_Count; column++) {
@@ -3711,23 +3711,23 @@ public class BlockExplorer {
         return output;
     }
 
-    private Map jsonQueryStatement(String block, String seg_No) {
+    private Map jsonQueryStatement(String block, String seqNo) {
         // TODO Auto-generated method stub
         Map output = new LinkedHashMap();
 
         R_SignNote trans = (R_SignNote) dcSet.getTransactionFinalMap().get(new Integer(block),
-                new Integer(seg_No));
+                new Integer(seqNo));
         // output.put("Label_title",
         // Lang.getInstance().translate_from_langObj("Title",langObj));
         output.put("Label_statement", Lang.getInstance().translate_from_langObj("Statement", langObj));
         output.put("Label_creator", Lang.getInstance().translate_from_langObj("Creator", langObj));
         output.put("Label_date", Lang.getInstance().translate_from_langObj("Date", langObj));
         output.put("Label_block", Lang.getInstance().translate_from_langObj("Block", langObj));
-        output.put("Label_seg_No", Lang.getInstance().translate_from_langObj("Seg_no", langObj));
+        output.put("Label_seqNo", Lang.getInstance().translate_from_langObj("seqNo", langObj));
         output.put("Label_No", Lang.getInstance().translate_from_langObj("No.", langObj));
 
         output.put("block", block);
-        output.put("Seg_No", seg_No);
+        output.put("seqNo", seqNo);
 
         TemplateCls statement = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
 
@@ -3894,8 +3894,8 @@ public class BlockExplorer {
                       //  hasHes += i + " " + ss.get("File_Name") + "<br>";
 
                         hasHes += i + " " + ss.get("File_Name");
-                        hasHes += "<a href = '../apidocuments/getFile?download=false&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("File_Name") + "'> " + Lang.getInstance().translate_from_langObj("View", langObj) + " </a><br>";
-                        hasHes += "<a href = '../apidocuments/getFile?download=true&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("File_Name") + "'> " + Lang.getInstance().translate_from_langObj("Download", langObj) + " </a><br>";
+                        hasHes += "<a href = '../apidocuments/getFile?download=false&block=" + block + "&txt=" + seqNo + "&name=" + ss.get("File_Name") + "'> " + Lang.getInstance().translate_from_langObj("View", langObj) + " </a><br>";
+                        hasHes += "<a href = '../apidocuments/getFile?download=true&block=" + block + "&txt=" + seqNo + "&name=" + ss.get("File_Name") + "'> " + Lang.getInstance().translate_from_langObj("Download", langObj) + " </a><br>";
                     }
 
                     str_HTML += hasHes + "<br>";
@@ -3924,8 +3924,8 @@ public class BlockExplorer {
 
                     //    hasHes += i + " " + ss.get("FN") + "<br>";
                         hasHes +=  i + " " + ss.get("FN");
-                        hasHes += "<a href ='../apidocuments/getFile?download=false&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("FN")  + "'> " + Lang.getInstance().translate_from_langObj("View", langObj) + " </a>";
-                        hasHes += "<a href ='../apidocuments/getFile?download=true&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("FN") + "'> " + Lang.getInstance().translate_from_langObj("Download", langObj) + "</a><br>";
+                        hasHes += "<a href ='../apidocuments/getFile?download=false&block=" + block + "&txt=" + seqNo + "&name=" + ss.get("FN")  + "'> " + Lang.getInstance().translate_from_langObj("View", langObj) + " </a>";
+                        hasHes += "<a href ='../apidocuments/getFile?download=true&block=" + block + "&txt=" + seqNo + "&name=" + ss.get("FN") + "'> " + Lang.getInstance().translate_from_langObj("Download", langObj) + "</a><br>";
                     }
 
                     str_HTML += hasHes + "<br>";
@@ -4020,7 +4020,7 @@ public class BlockExplorer {
                 Map vouchJSON = new LinkedHashMap();
                 vouchJSON.put("date", vouch_Tr.viewTimestamp());
                 vouchJSON.put("block", "" + vouch_Tr.getBlockHeight());
-                vouchJSON.put("Seg_No", "" + vouch_Tr.getSeqNo());
+                vouchJSON.put("seqNo", "" + vouch_Tr.getSeqNo());
                 vouchJSON.put("creator", vouch_Tr.getCreator().getAddress());
 
                 Tuple2<Integer, PersonCls> personInfo = vouch_Tr.getCreator().getPerson();
@@ -4075,7 +4075,7 @@ public class BlockExplorer {
                 output.putAll(jsonQueryStatement(block+"",seqNo+""));
                 output.put("type", "statement");
 
-            }else {
+            } else {
                 output.put("type", "transaction");
                 output.put("body", WEB_Transactions_HTML.getInstance().get_HTML(transaction, langObj));
                 output.put("Label_Transaction", Lang.getInstance().translate_from_langObj("Transaction", langObj));
