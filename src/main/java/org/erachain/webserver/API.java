@@ -631,10 +631,10 @@ public class API {
 
             String[] strA = numberStr.split("\\-");
             int height = Integer.parseInt(strA[0]);
-            int seq = Integer.parseInt(strA[1]);
+            int seqNo = Integer.parseInt(strA[1]);
 
             ++step;
-            Transaction record = dcSet.getTransactionFinalMap().get(height, seq);
+            Transaction record = dcSet.getTransactionFinalMap().get(height, seqNo);
 
             ++step;
             out = record.rawToJson();
