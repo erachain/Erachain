@@ -1,25 +1,29 @@
 package org.erachain.api;
 
+import com.google.gson.Gson;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.voting.Poll;
 import org.erachain.core.voting.PollOption;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.APIUtils;
+import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.erachain.utils.APIUtils;
-import org.erachain.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,12 +37,27 @@ public class PollsResource {
     @Context
     HttpServletRequest request;
 
+    /**
+     * Create new poll.
+     * <br>
+     * <h3>example request:</h3>
+     * {"creator":"", "name":"", "description":"", "options":["1","2","3"], "feePow":""}
+     *
+     * @param poll is poll in json format
+     * @return record trades
+     * <h3>  example param poll : {"creator":"", "name":"", "description":"", "options":["1","2","3"], "feePow":""}</h3>
+     */
+
     @POST
     @Consumes(MediaType.WILDCARD)
-    public String createPoll(String x) {
+    public String createPoll(String poll) {
+
+        String password = null;
+        APIUtils.askAPICallAllowed(password, "POST polls " + poll, request, true);
+
         try {
             //READ JSON
-            JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
+            JSONObject jsonObject = (JSONObject) JSONValue.parse(poll);
             String creator = (String) jsonObject.get("creator");
             String name = (String) jsonObject.get("name");
             String description = (String) jsonObject.get("description");
@@ -70,8 +89,6 @@ public class PollsResource {
                 throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
             }
 
-            String password = null;
-            APIUtils.askAPICallAllowed(password, "POST polls " + x, request, true);
             Controller controller = new Controller().getInstance();
             //CHECK IF WALLET EXISTS
             if (!controller.doesWalletExists()) {
@@ -90,7 +107,7 @@ public class PollsResource {
             }
 
             //CREATE POLL
-            IssuePollRecord issue_voiting = (IssuePollRecord) controller.createPoll_old(account, name, description, options, feePow);
+            IssuePollRecord issue_voiting = (IssuePollRecord) controller.issuePoll(account, name, description, options, null, null, feePow);
 
             //VALIDATE AND PROCESS
             int validate = controller.getTransactionCreator().afterCreate(issue_voiting, Transaction.FOR_NETWORK);
@@ -104,10 +121,89 @@ public class PollsResource {
         return "ok";
     }
 
+    /**
+     * Create new poll.
+     * <br>
+     * <h3>example request:</h3>
+     * ApiPoll/CreatePoll?poll={"creator":"", "name":"", "description":"", "options":["1","2","3"], "feePow":""}
+     *
+     * @param poll is poll in json format
+     * @return record trades
+     * @author Ruslan
+     * <h3>  example param poll : {"creator":"", "name":"", "description":"", "options":["1","2","3"], "feePow":""}</h3>
+     */
+
+    @GET
+    @Path("create")
+    public Response createPollGet(@QueryParam("poll") String poll) {
+
+        String password = null;
+        APIUtils.askAPICallAllowed(password, "GET polls " + poll, request, true);
+
+        Gson result = new Gson();
+        try {
+            //READ JSON
+            JSONObject jsonObject = (JSONObject) JSONValue.parse(poll);
+            String creator = (String) jsonObject.get("creator");
+            String name = (String) jsonObject.get("name");
+            String description = (String) jsonObject.get("description");
+            JSONArray optionsJSON = (JSONArray) jsonObject.get("options");
+            String feePowStr = (String) jsonObject.get("feePow");
+
+            //PARSE FEE
+            int feePow;
+            try {
+                feePow = Integer.parseInt(feePowStr);
+            } catch (Exception e) {
+                throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_FEE_POWER);
+            }
+
+            //PARSE OPTIONS
+            List<String> options = new ArrayList<String>();
+            try {
+                for (int i = 0; i < optionsJSON.size(); i++) {
+                    String option = (String) optionsJSON.get(i);
+                    options.add(option);
+                }
+            } catch (Exception e) {
+                throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+            }
+
+            //CHECK CREATOR
+            if (!Crypto.getInstance().isValidAddress(creator))
+                throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
+
+            //CHECK IF WALLET EXISTS
+            if (!Controller.getInstance().doesWalletExists())
+                throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+
+            //GET ACCOUNT
+            PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(creator);
+            if (account == null)
+                throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
+
+            //CREATE POLL
+            Controller.getInstance().issuePoll(account, name, description, options, null, null, feePow);
+
+        } catch (NullPointerException | ClassCastException e) {
+            //JSON EXCEPTION
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+
+        }
+        result.toJson("ok");
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(result).build();
+    }
+
     @POST
     @Path("/vote/{name}")
     @Consumes(MediaType.WILDCARD)
     public String createPollVote(String x, @PathParam("name") String name) {
+
+        String password = null;
+        APIUtils.askAPICallAllowed(password, "POST polls/vote/" + name + "\n" + x, request, true);
+
         try {
             //READ JSON
             JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
@@ -128,9 +224,6 @@ public class PollsResource {
             if (!Crypto.getInstance().isValidAddress(voter)) {
                 throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
             }
-
-            String password = null;
-            APIUtils.askAPICallAllowed(password, "POST polls/vote/" + name + "\n" + x, request, true);
 
             //CHECK IF WALLET EXISTS
             if (!Controller.getInstance().doesWalletExists()) {
@@ -175,22 +268,72 @@ public class PollsResource {
         }
     }
 
+    /**
+     * @param voter
+     * @param feePow
+     * @param pollKey
+     * @param option
+     * @return
+     */
+    @GET
+    @Path("vote/{voter}")
+    public Response createPollVoteGet(@PathParam("voter") String voter, @QueryParam("feePow") Integer feePow,
+                                      @QueryParam("poll") long pollKey, @QueryParam("option") int option) {
+
+        String password = null;
+        APIUtils.askAPICallAllowed(password, "GET polls/vote/" + pollKey + "\n", request, true);
+
+        //CHECK VOTERa
+        if (!Crypto.getInstance().isValidAddress(voter))
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
+
+        //CHECK IF WALLET EXISTS
+        if (!Controller.getInstance().doesWalletExists())
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+
+        //GET ACCOUNT
+        PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(voter);
+        if (account == null)
+            throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
+
+        //GET POLL
+        PollCls poll = Controller.getInstance().getPoll(pollKey);
+        if (poll == null)
+            throw ApiErrorFactory.getInstance().createError(Transaction.POLL_NOT_EXISTS);
+
+        //GET OPTION
+        String pollOption = poll.getOptions().get(option);
+        if (pollOption == null)
+            throw ApiErrorFactory.getInstance().createError(Transaction.POLL_OPTION_NOT_EXISTS);
+
+        //CREATE POLL
+        Transaction transaction = Controller.getInstance().createItemPollVote(account, pollKey, option, feePow);
+        int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+        if (result == Transaction.VALIDATE_OK) {
+
+            return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(transaction.toJson().toJSONString()).build();
+        } else
+            throw ApiErrorFactory.getInstance().createError(result);
+
+    }
+
     @SuppressWarnings("unchecked")
     @GET
     public String getPolls() {
-        String password = null;
-        APIUtils.askAPICallAllowed(password, "GET polls", request, true);
 
         //CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 
-        List<Pair<Account, Poll>> polls = Controller.getInstance().getPolls();
+        Collection<ItemCls> polls = Controller.getInstance().getAllItems(ItemCls.POLL_TYPE);
         JSONArray array = new JSONArray();
 
-        for (Pair<Account, Poll> poll : polls) {
-            array.add(poll.getB().toJson());
+        for (ItemCls poll : polls) {
+            array.add(((PollCls) poll).toJson());
         }
 
         return array.toJSONString();
@@ -200,8 +343,6 @@ public class PollsResource {
     @GET
     @Path("/address/{address}")
     public String getPolls(@PathParam("address") String address) {
-        String password = null;
-        APIUtils.askAPICallAllowed(password, "GET polls/address/" + address, request, true);
 
         //CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {
@@ -220,12 +361,13 @@ public class PollsResource {
         }
 
         JSONArray array = new JSONArray();
-        for (Poll poll : Controller.getInstance().getPolls(account)) {
-            array.add(poll.toJson());
+        for (ItemCls poll : Controller.getInstance().getAllItems(ItemCls.POLL_TYPE, account)) {
+            array.add(((PollCls) poll).toJson());
         }
 
         return array.toJSONString();
     }
+
 
     @GET
     @Path("/{name}")
@@ -240,17 +382,4 @@ public class PollsResource {
         return poll.toJson().toJSONString();
     }
 
-    @SuppressWarnings("unchecked")
-    @GET
-    @Path("/network")
-    public String getAllPolls() {
-        Collection<Poll> polls = Controller.getInstance().getAllPolls();
-        JSONArray array = new JSONArray();
-
-        for (Poll poll : polls) {
-            array.add(poll.getName());
-        }
-
-        return array.toJSONString();
-    }
 }

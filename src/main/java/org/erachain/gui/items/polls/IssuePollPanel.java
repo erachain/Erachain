@@ -326,8 +326,8 @@ public class IssuePollPanel extends JPanel {
         // CREATE POLL
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
         IssuePollRecord issuePoll = (IssuePollRecord) Controller.getInstance().issuePoll(creator,
-                this.txtName.getText(), icon, image, this.txtareaDescription.getText(),
-                this.optionsTableModel.getOptions(), feePow);
+                this.txtName.getText(), this.txtareaDescription.getText(),
+                this.optionsTableModel.getOptions(), icon, image, feePow);
 
         // Issue_Asset_Confirm_Dialog(issueAssetTransaction);
         String text = "<HTML><body>";
