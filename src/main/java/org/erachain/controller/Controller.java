@@ -408,6 +408,9 @@ public class Controller extends Observable {
     public boolean isStatusWaiting() {
         return this.status != STATUS_SYNCHRONIZING;
     }
+    public boolean isStatusSynchronizing() {
+        return this.status == STATUS_SYNCHRONIZING;
+    }
 
     public void checkNeedSyncWallet() {
         if (this.wallet == null || this.wallet.database == null)
@@ -1831,6 +1834,12 @@ public class Controller extends Observable {
             this.status = STATUS_OK;
             this.pingAllPeers(false);
             if (this.isStopping) return;
+
+            // если в момент синхронизации прилетал победный блок
+            // то его вынем и поновой вставим со всеми проверками
+            Block winBlockUnchecked = this.blockChain.popWaitWinBuffer();
+            if (winBlockUnchecked != null)
+                this.blockChain.setWaitWinBuffer(this.dcSet, winBlockUnchecked, null);
 
         }
 
