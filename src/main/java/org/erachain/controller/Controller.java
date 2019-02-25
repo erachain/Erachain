@@ -408,6 +408,7 @@ public class Controller extends Observable {
     public boolean isStatusWaiting() {
         return this.status != STATUS_SYNCHRONIZING;
     }
+
     public boolean isStatusSynchronizing() {
         return this.status == STATUS_SYNCHRONIZING;
     }

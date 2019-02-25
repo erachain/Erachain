@@ -810,6 +810,7 @@ public class BlockChain {
 
     /**
      * если идет синхронизация то записываем без проверки
+     *
      * @param block
      */
     public void setWaitWinBufferUnchecked(Block block) {

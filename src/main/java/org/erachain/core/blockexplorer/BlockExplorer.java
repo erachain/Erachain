@@ -29,7 +29,6 @@ import org.erachain.gui.models.PersonAccountsModel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.*;
-import org.erachain.webserver.API_Person;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -38,7 +37,6 @@ import org.mapdb.Fun.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -1490,9 +1488,9 @@ public class BlockExplorer {
         return output;
     }
 
-     public Map jsonQueryBlocks(UriInfo info) {
-         int start =-1;
-         try {
+    public Map jsonQueryBlocks(UriInfo info) {
+        int start = -1;
+        try {
             start = Integer.valueOf(info.getQueryParameters().getFirst("start"));
         } catch (NumberFormatException e1) {
             // TODO Auto-generated catch block
@@ -1542,7 +1540,7 @@ public class BlockExplorer {
         output.put("Label_Fee", Lang.getInstance().translate_from_langObj("Fee", langObj));
         output.put("Label_AT_Amount", Lang.getInstance().translate_from_langObj("AT Amount", langObj));
         output.put("Label_Amount", Lang.getInstance().translate_from_langObj("Amount", langObj));
-         output.put("Label_Target", Lang.getInstance().translate_from_langObj("Target", langObj));
+        output.put("Label_Target", Lang.getInstance().translate_from_langObj("Target", langObj));
         output.put("Label_Later", Lang.getInstance().translate_from_langObj("Later", langObj));
         output.put("Label_Previous", Lang.getInstance().translate_from_langObj("Previous", langObj));
 
