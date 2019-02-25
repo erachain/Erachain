@@ -21,6 +21,7 @@ import org.erachain.core.voting.Poll;
 import org.erachain.database.wallet.BlocksHeadMap;
 import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.SecureWalletDatabase;
+import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.BlockSignsMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
@@ -83,7 +84,7 @@ public class Wallet extends Observable implements Observer {
 
         }
 
-        stertProcessForSynchronize();
+        startProcessForSynchronize();
 
 	}
 
@@ -433,7 +434,7 @@ public class Wallet extends Observable implements Observer {
 
     private Timer timerSynchronize;
 
-    public void stertProcessForSynchronize() {
+    public void startProcessForSynchronize() {
 
         if (this.timerSynchronize == null) {
             this.timerSynchronize = new Timer();
@@ -633,10 +634,10 @@ public class Wallet extends Observable implements Observer {
 			if (Controller.getInstance().isOnStopping())
 				return;
 
+            this.syncHeight = height;
+            Controller.getInstance().walletSyncStatusUpdate(height);
 			Controller.getInstance().setProcessingWalletSynchronize(false);
 			this.database.commit();
-			this.syncHeight = height; // this.database.getBlocksHeadMap().size();
-			Controller.getInstance().walletSyncStatusUpdate(height);
 
 		}
 
@@ -1132,17 +1133,27 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
-	/*
-	private boolean findLastBlockOff(byte[] lastBlockSignature, Block block) {
+	private boolean findLastBlockOff(byte[] lastBlockSignature, byte[] signatureORreference) {
 
-		datachain.BlockSignsMap blockSignsMap = DCSet.getInstance().getBlockSignsMap();
+		BlockSignsMap blockSignsMap = DCSet.getInstance().getBlockSignsMap();
+
+        TransactionMap txMap = database.getTransactionMap();
 
 		// LOGGER.error("findLastBlockOff for [" +
 		// block.getHeightByParent(DCSet.getInstance()) + "]");
 
-		int i = 0;
-		byte[] reference = block.getReference();
-		while (i++ < 3) {
+		int height = 0;
+		int currentHeight;
+		while (true) {
+
+            Iterator<Tuple2<String, String>> iterator = txMap.getIterator(1, true);
+            while (iterator.hasNext()) {
+                Transaction transaction = txMap.get(iterator.next());
+                currentHeight = transaction.getBlockHeight();
+                if (currentHeight < height)
+                    break;
+            }
+
 			if (Arrays.equals(lastBlockSignature, reference))
 				return true;
 
@@ -1165,16 +1176,15 @@ public class Wallet extends Observable implements Observer {
 
 		return false;
 	}
-	*/
 
 	// TODO: our woier
-	public boolean checkNeedSyncWallet(byte[] reference) {
+	public boolean checkNeedSyncWallet(byte[] signatureORreference) {
 
 		// CHECK IF WE NEED TO RESYNC
 		byte[] lastBlockSignature = this.database.getLastBlockSignature();
 		if (lastBlockSignature == null
-				///// || !findLastBlockOff(lastBlockSignature, block)
-				|| !Arrays.equals(lastBlockSignature, reference)) {
+				 || !findLastBlockOff(lastBlockSignature, signatureORreference)
+				|| !Arrays.equals(lastBlockSignature, signatureORreference)) {
 			Controller.getInstance().setNeedSyncWallet(true);
 			return true;
 		}
