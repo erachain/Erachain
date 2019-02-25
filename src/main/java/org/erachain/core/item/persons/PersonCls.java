@@ -1,27 +1,26 @@
 package org.erachain.core.item.persons;
 
-import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
-
-import org.json.simple.JSONObject;
-
-//import java.math.BigDecimal;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.Issue_ItemMap;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.Item_Map;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ByteArrayUtils;
 import org.erachain.utils.DateTimeFormat;
+import org.json.simple.JSONObject;
 
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.util.Set;
+
+//import java.math.BigDecimal;
 //import java.util.Arrays;
 // import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 //import com.google.common.primitives.Ints;
 
 //birthLatitude -90..90; birthLongitude -180..180
@@ -176,6 +175,36 @@ public abstract class PersonCls extends ItemCls {
 
     }
 
+    public static BigDecimal getBalance(long personKey, long assetKey, int pos) {
+
+        Set<String> addresses = DCSet.getInstance().getPersonAddressMap().getItems(personKey).keySet();
+
+        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+
+        // тут переключение внутри цикла идет - так же слишком ресурсно
+        BigDecimal sum = addresses.stream()
+                .map((address) -> map.get(address, assetKey))
+                .map((balances) -> {
+                    switch (pos) {
+                        case 1:
+                            return balances.a.b;
+                        case 2:
+                            return balances.b.b;
+                        case 3:
+                            return balances.c.b;
+                        case 4:
+                            return balances.d.b;
+                        case 5:
+                            return balances.e.b;
+                        default:
+                            return BigDecimal.ZERO;
+                    }
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return sum;
+
+    }
 
 
     // DB

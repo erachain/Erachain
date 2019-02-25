@@ -808,6 +808,16 @@ public class BlockChain {
 
     }
 
+    /**
+     * если идет синхронизация то записываем без проверки
+     * @param block
+     */
+    public void setWaitWinBufferUnchecked(Block block) {
+        if (this.waitWinBuffer == null || block.compareWin(waitWinBuffer) > 0) {
+            this.waitWinBuffer = block;
+        }
+    }
+
     public Tuple2<Integer, Long> getHWeightFull(DCSet dcSet) {
         return new Tuple2<Integer, Long>(dcSet.getBlocksHeadsMap().size(),
                 dcSet.getBlocksHeadsMap().getFullWeight());
