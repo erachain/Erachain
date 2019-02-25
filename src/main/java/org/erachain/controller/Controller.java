@@ -24,7 +24,6 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
-import org.erachain.core.item.polls.Poll;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
@@ -408,6 +407,9 @@ public class Controller extends Observable {
 
     public boolean isStatusWaiting() {
         return this.status != STATUS_SYNCHRONIZING;
+    }
+    public boolean isStatusSynchronizing() {
+        return this.status == STATUS_SYNCHRONIZING;
     }
 
     public void checkNeedSyncWallet() {
@@ -1833,6 +1835,12 @@ public class Controller extends Observable {
             this.pingAllPeers(false);
             if (this.isStopping) return;
 
+            // если в момент синхронизации прилетал победный блок
+            // то его вынем и поновой вставим со всеми проверками
+            Block winBlockUnchecked = this.blockChain.popWaitWinBuffer();
+            if (winBlockUnchecked != null)
+                this.blockChain.setWaitWinBuffer(this.dcSet, winBlockUnchecked, null);
+
         }
 
         // send to ALL my HW
@@ -2287,22 +2295,27 @@ public class Controller extends Observable {
 
     }
 
+    @Deprecated
     public List<Name> getNames(Account account) {
         return this.wallet.getNames(account);
     }
 
+    @Deprecated
     public List<Pair<Account, NameSale>> getNameSales() {
         return this.wallet.getNameSales();
     }
 
+    @Deprecated
     public List<NameSale> getNameSales(Account account) {
         return this.wallet.getNameSales(account);
     }
 
+    @Deprecated
     public List<NameSale> getAllNameSales() {
         return this.dcSet.getNameExchangeMap().getNameSales();
     }
 
+    @Deprecated
     public List<Pair<Account, org.erachain.core.voting.Poll>> getPolls() {
         return this.wallet.getPolls();
     }
@@ -2341,11 +2354,11 @@ public class Controller extends Observable {
         return this.wallet.isItemFavorite(item);
     }
 
-    public Collection<org.erachain.core.voting.Poll> getAllPolls() {
-        return this.dcSet.getPollMap().getValuesAll();
+    public Collection<ItemCls> getAllItems(int type) {
+        return getItemMap(type).getValuesAll();
     }
 
-    public Collection<ItemCls> getAllItems(int type) {
+    public Collection<ItemCls> getAllItems(int type, Account account) {
         return getItemMap(type).getValuesAll();
     }
 
@@ -2680,17 +2693,6 @@ public class Controller extends Observable {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
             return this.transactionCreator.createNamePurchase(buyer, nameSale, feePow);
-        }
-    }
-
-    public Transaction issuePoll(PrivateKeyAccount creator, String name, byte[] icon, byte[] image, String description,
-                                 List<String> options, int feePow) {
-        // CREATE ONLY ONE TRANSACTION AT A TIME
-        synchronized (this.transactionCreator) {
-            // CREATE POLL
-            PollCls poll = new Poll(creator, name, icon, image, description, options);
-
-            return this.transactionCreator.createIssuePollRecord(creator, poll, feePow);
         }
     }
 

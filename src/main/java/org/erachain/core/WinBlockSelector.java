@@ -42,6 +42,7 @@ public class WinBlockSelector extends MonitoredThread {
      * @param message
      */
     public boolean offerMessage(Message message) {
+
         boolean result = blockingQueue.offer(message);
         if (!result) {
             this.controller.network.missedWinBlocks.incrementAndGet();
@@ -61,6 +62,12 @@ public class WinBlockSelector extends MonitoredThread {
         // ASK BLOCK FROM BLOCKCHAIN
         Block newBlock = blockWinMessage.getBlock();
 
+        // если мы синхронизируемся - то берем победный блок а потои
+        // его перепроверим при выходе из синхронизации
+        if (this.controller.isStatusSynchronizing()) {
+            blockChain.setWaitWinBufferUnchecked(newBlock);
+            return;
+        }
         String info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
                 + newBlock.toString();
         LOGGER.debug(info);
