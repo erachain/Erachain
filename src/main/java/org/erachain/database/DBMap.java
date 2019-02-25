@@ -2,14 +2,14 @@ package org.erachain.database;
 // upd 09/03
 
 import org.erachain.datachain.DCSet;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.ObserverMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -27,7 +27,10 @@ public abstract class DBMap<T, U> extends Observable {
     static Logger LOGGER = LoggerFactory.getLogger(DBMap.class.getName());
     protected IDB databaseSet;
     protected Map<T, U> map;
-    private Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
+    protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
+
+    public DBMap() {
+    }
 
     public DBMap(IDB databaseSet, DB database) {
         this.databaseSet = databaseSet;
@@ -185,14 +188,16 @@ public abstract class DBMap<T, U> extends Observable {
         return false;
     }
 
-    public void delete(T key) {
+    public U delete(T key) {
 
         this.addUses();
+
+        U value;
 
         try {
             //REMOVE
             if (this.map.containsKey(key)) {
-                U value = this.map.remove(key);
+                value = this.map.remove(key);
 
                 //NOTIFY REMOVE
                 if (this.getObservableData().containsKey(NOTIFY_REMOVE)) {
@@ -205,14 +210,17 @@ public abstract class DBMap<T, U> extends Observable {
                     this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this)); /// SLOW .size()));
                 }
 
-            }
+            } else
+                value = null;
 
         } catch (Exception e) {
+            value = null;
             LOGGER.error(e.getMessage(), e);
         }
 
         this.outUses();
 
+        return value;
     }
 
     public boolean contains(T key) {

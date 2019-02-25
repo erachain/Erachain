@@ -4,20 +4,19 @@ import org.erachain.core.account.Account;
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.ItemSerializer;
-import org.erachain.datachain.DCMap;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.Pair;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 // TODO reference as TIMESTAMP of transaction
-public class WItem_Map extends DCMap<Tuple2<String, String>, ItemCls> {
+public class WItem_Map extends DBMap<Tuple2<String, String>, ItemCls> {
 
     public static final int NAME_INDEX = 1;
     public static final int CREATOR_INDEX = 2;
@@ -41,10 +40,6 @@ public class WItem_Map extends DCMap<Tuple2<String, String>, ItemCls> {
         this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
         this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
         this.observableData.put(DBMap.NOTIFY_LIST, observeList);
-    }
-
-    public WItem_Map(WItem_Map parent) {
-        super(parent, null);
     }
 
     //@SuppressWarnings({ "unchecked", "rawtypes" })

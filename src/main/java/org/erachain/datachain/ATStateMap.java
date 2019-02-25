@@ -98,7 +98,7 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
 
         if (this.parent != null) {
 
-            states.putAll(this.parent.getDCSet().getATStateMap().getStates(blockHeight));
+            states.putAll(this.parent.getDBSet().getATStateMap().getStates(blockHeight));
 
             if (this.deleted != null) {
                 //DELETE DELETED
@@ -129,7 +129,7 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
 
         // in .deleted
         if (false && this.parent != null) {
-            this.parent.getDCSet().getATStateMap().deleteStatesAfter(blockHeight);
+            this.parent.getDBSet().getATStateMap().deleteStatesAfter(blockHeight);
         }
     }
 

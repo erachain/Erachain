@@ -3,23 +3,22 @@ package org.erachain.database.wallet;
 import org.erachain.core.account.Account;
 import org.erachain.core.naming.NameSale;
 import org.erachain.database.DBMap;
-import org.erachain.datachain.DCMap;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
+import org.erachain.utils.ReverseComparator;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
-import org.erachain.utils.ReverseComparator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class NameSaleMap extends DCMap<Tuple2<String, String>, BigDecimal> {
+public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal> {
     public static final int NAME_INDEX = 1;
     public static final int SELLER_INDEX = 2;
     public static final int AMOUNT_INDEX = 3;
@@ -33,10 +32,6 @@ public class NameSaleMap extends DCMap<Tuple2<String, String>, BigDecimal> {
         this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_NAME_SALE_TYPE);
         this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_NAME_SALE_TYPE);
         this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_NAME_SALE_TYPE);
-    }
-
-    public NameSaleMap(NameSaleMap parent) {
-        super(parent, null);
     }
 
     @Override

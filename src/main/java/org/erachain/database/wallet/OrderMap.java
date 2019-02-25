@@ -5,14 +5,13 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.database.DBMap;
 import org.erachain.database.IDB;
 import org.erachain.database.serializer.OrderSerializer;
-import org.erachain.datachain.DCMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.ObserverMessage;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +35,7 @@ Tuple3
 	private BigDecimal fulfilledWant;
 
  */
-public class OrderMap extends DCMap<Tuple2<String, Long>, Order> {
+public class OrderMap extends DBMap<Tuple2<String, Long>, Order> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public OrderMap(IDB databaseSet, DB database) {
@@ -46,11 +45,6 @@ public class OrderMap extends DCMap<Tuple2<String, Long>, Order> {
         this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_ORDER_TYPE);
         this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_ORDER_TYPE);
         this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_ORDER_TYPE);
-    }
-
-    public OrderMap(OrderMap parent) {
-        super(parent, null);
-
     }
 
     @Override

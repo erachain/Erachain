@@ -4,14 +4,14 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.payment.Payment;
-import org.erachain.datachain.SortableList;
+import org.erachain.database.SortableList;
 import org.erachain.gui.BalanceRenderer;
 import org.erachain.gui.models.BalancesComboBoxModel;
 import org.erachain.lang.Lang;
+import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
-import org.erachain.utils.Pair;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -180,7 +180,8 @@ public class PayDividendFrame extends JFrame {
             AssetCls assetToPay = Controller.getInstance().getAsset(assetKey);
 
             //BALANCES
-            SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances = Controller.getInstance().getBalances(this.asset.getKey());
+            SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances
+                    = Controller.getInstance().getBalances(this.asset.getKey());
 
             //GET ACCOUNTS AND THEIR TOTAL BALANCE
             List<Account> accounts = new ArrayList<Account>();

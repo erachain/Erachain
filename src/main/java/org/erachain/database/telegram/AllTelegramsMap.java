@@ -4,7 +4,6 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.TransactionSerializer;
-import org.erachain.datachain.DCMap;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
@@ -12,7 +11,7 @@ import org.mapdb.DB;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AllTelegramsMap extends  DCMap<String , Transaction> {
+public class AllTelegramsMap extends DBMap<String, Transaction> {
     
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
       

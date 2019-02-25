@@ -4,14 +4,16 @@ package org.erachain.core.telegram;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.telegram.TelegramSet;
-import org.erachain.network.Peer;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.settings.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Timer;
 
 
 /**
@@ -77,7 +79,7 @@ public class TelegramStore extends Observable implements Observer {
 
                 if (Settings.getInstance().getTelegramStoreUse() && Settings.getInstance().getTelegramStorePeriod() > 0) {
                     int aliveTime = Settings.getInstance().getTelegramStorePeriod() * 60 * 60 * 24 * 1000;
-                    for (Transaction transaction : database.getTelegramsMap().getValuesAll()) {
+                    for (Transaction transaction : database.getTelegramsMap().getValues()) {
                         if (transaction.getTimestamp() < (System.currentTimeMillis() - aliveTime))
                             database.getTelegramsMap().delete(transaction.viewSignature());
                     }
@@ -97,7 +99,7 @@ public class TelegramStore extends Observable implements Observer {
      public ArrayList<Transaction> getFromCreator(String address) {
 
          ArrayList<Transaction> list = new ArrayList<Transaction>();
-         for (Transaction transaction : this.database.getTelegramsMap().getValuesAll()) {
+         for (Transaction transaction : this.database.getTelegramsMap().getValues()) {
              if (transaction.getCreator().getAddress().equals(address)) list.add(transaction);
          }
          return list;
@@ -110,7 +112,7 @@ public class TelegramStore extends Observable implements Observer {
 	 * @param address
 	 */
 	public void deleteFromCreator(String address){
-	     for ( Transaction transaction:database.getTelegramsMap().getValuesAll()){
+        for (Transaction transaction : database.getTelegramsMap().getValues()) {
              if ( transaction.getCreator().getAddress().equals(address)) 
                  database.getTelegramsMap().delete(transaction.viewSignature());
             }
@@ -124,7 +126,7 @@ public class TelegramStore extends Observable implements Observer {
     public ArrayList<Transaction> getAndDeleteFromCreator(String address) {
 
         ArrayList<Transaction> list = new ArrayList<Transaction>();
-        for (Transaction transaction : this.database.getTelegramsMap().getValuesAll()) {
+        for (Transaction transaction : this.database.getTelegramsMap().getValues()) {
             if (transaction.getCreator().getAddress().equals(address)) {
                 list.add(transaction);
                 database.getTelegramsMap().delete(transaction.viewSignature());

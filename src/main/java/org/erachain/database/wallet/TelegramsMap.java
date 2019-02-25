@@ -1,20 +1,17 @@
 package org.erachain.database.wallet;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.mapdb.BTreeKeySerializer;
-import org.mapdb.DB;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
-import org.erachain.database.serializer.NameSerializer;
 import org.erachain.database.serializer.TransactionSerializer;
-import org.erachain.datachain.DCMap;
-import org.erachain.network.message.TelegramMessage;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.BTreeKeySerializer;
+import org.mapdb.DB;
 
-public class TelegramsMap extends  DCMap<String , Transaction> {
+import java.util.HashMap;
+import java.util.Map;
+
+public class TelegramsMap extends DBMap<String, Transaction> {
     
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
@@ -26,7 +23,6 @@ public class TelegramsMap extends  DCMap<String , Transaction> {
         this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_TELEGRAM_TYPE);
         this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_TELEGRAM_TYPE);
     }
-
    
     @Override
     protected Map<String, Transaction> getMap(DB database) {

@@ -339,6 +339,7 @@ public class DCSet implements Observer, IDB {
 
      * @throws Exception
      */
+
     public static DCSet getInstance(boolean withObserver, boolean dynamicGUI) throws Exception {
         if (instance == null) {
             reCreateDatabase(withObserver, dynamicGUI);

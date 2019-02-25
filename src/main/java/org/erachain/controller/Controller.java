@@ -38,7 +38,11 @@ import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.database.DBSet;
-import org.erachain.datachain.*;
+import org.erachain.database.SortableList;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.Item_Map;
+import org.erachain.datachain.LocalDataMap;
+import org.erachain.datachain.TransactionMap;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
 import org.erachain.gui.library.Issue_Confirm_Dialog;
@@ -2342,11 +2346,11 @@ public class Controller extends Observable {
     }
 
     public Collection<org.erachain.core.voting.Poll> getAllPolls() {
-        return this.dcSet.getPollMap().getValuesAll();
+        return this.dcSet.getPollMap().getValues();
     }
 
     public Collection<ItemCls> getAllItems(int type) {
-        return getItemMap(type).getValuesAll();
+        return getItemMap(type).getValues();
     }
 
 
@@ -2636,7 +2640,7 @@ public class Controller extends Observable {
         if (false) {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_LIST_TRANSACTION_TYPE,
-                    this.dcSet.getTransactionMap().getValuesAll()));
+                    this.dcSet.getTransactionMap().getValues()));
 
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_ADD_TRANSACTION_TYPE, transaction));

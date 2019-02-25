@@ -1,15 +1,15 @@
 package org.erachain.core.web;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.erachain.api.NameStorageResource;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.naming.Name;
 import org.erachain.core.payment.Payment;
 import org.erachain.datachain.DCSet;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.json.simple.JSONObject;
 import org.erachain.utils.*;
+import org.json.simple.JSONObject;
 
 import javax.ws.rs.WebApplicationException;
 import java.util.*;
@@ -81,7 +81,7 @@ public class Profile {
         }
 
         List<Name> results = new ArrayList<>();
-        Collection<Name> values = DCSet.getInstance().getNameMap().getValuesAll();
+        Collection<Name> values = DCSet.getInstance().getNameMap().getValues();
 
         for (Name name : values) {
             Profile profileOpt = Profile.getProfileOpt(name);

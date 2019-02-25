@@ -1,39 +1,24 @@
 package org.erachain.datachain;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableSet;
-import java.util.Set;
-import java.util.TreeSet;
-
-import org.erachain.controller.Controller;
-import org.mapdb.BTreeKeySerializer;
-import org.mapdb.BTreeMap;
-import org.mapdb.Bind;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-import org.mapdb.Fun;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-
-//04/01 +- 
-
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-
+import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.transCalculated.Calculated;
-//import org.erachain.core.transaction.Calculated;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.CalculatedSerializer;
 import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.*;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+
+import java.lang.reflect.Array;
+import java.util.*;
+
+//04/01 +-
+//import org.erachain.core.transaction.Calculated;
 
 //import java.math.BigDecimal;
 
@@ -113,7 +98,7 @@ public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer
         //	Bind.secondaryKey(map, this.block_Key, new Fun.Function2<Integer, Tuple2<Integer, Integer>, Calculated>() {
         //		@Override
         //		public Integer run(Tuple2<Integer, Integer> key, Calculated val) {
-        //			return val.getBlockHeightByParentOrLast(getDCSet());
+        //			return val.getBlockHeightByParentOrLast(getDBSet());
         //		}
         //	});
 
