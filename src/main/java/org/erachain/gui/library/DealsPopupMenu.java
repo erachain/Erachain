@@ -380,31 +380,29 @@ public class DealsPopupMenu extends JPopupMenu {
                 break;
 
             case AssetCls.AS_INSIDE_ACCESS:
-                this.sendAsset.setText(Lang.getInstance().translate("Наделить правами"));
+                this.sendAsset.setText(Lang.getInstance().translate("Grant rights"));
 
-                this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
-                this.holdAsset.setVisible(true);
+                this.holdAsset.setVisible(false);
 
-                this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
+                this.debtAsset.setText(Lang.getInstance().translate("Granting of rights at the time"));
                 this.debtAsset.setVisible(true);
-                this.debtAssetReturn.setText(Lang.getInstance().translate("Return debt"));
+                this.debtAssetReturn.setText(Lang.getInstance().translate("Return access rights"));
                 this.debtAssetReturn.setVisible(true);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("To confiscate a debt"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("To confiscate access rights"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;
 
             case AssetCls.AS_INSIDE_VOTE:
-                this.sendAsset.setText(Lang.getInstance().translate("Наделить голосом"));
+                this.sendAsset.setText(Lang.getInstance().translate("Grant voice"));
 
-                this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
-                this.holdAsset.setVisible(true);
+                this.holdAsset.setVisible(false);
 
-                this.debtAsset.setText(Lang.getInstance().translate("Передать делегату"));
+                this.debtAsset.setText(Lang.getInstance().translate("Delegate voice"));
                 this.debtAsset.setVisible(true);
-                this.debtAssetReturn.setText(Lang.getInstance().translate("Вернуть делегированный голос"));
+                this.debtAssetReturn.setText(Lang.getInstance().translate("Return delegate vote"));
                 this.debtAssetReturn.setVisible(true);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Забрать у делегата"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("To confiscate a delegated vote"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;
