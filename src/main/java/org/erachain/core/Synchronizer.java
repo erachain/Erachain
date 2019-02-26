@@ -398,8 +398,9 @@ public class Synchronizer {
         byte[] lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
 
         // FIND HEADERS for common CHAIN
-        if (Arrays.equals(peer.getAddress().getAddress(), PEER_TEST)) {
-            LOGGER.info("Synchronizing from peer: " + peer.toString() + ":" + peer);
+        if (true || Arrays.equals(peer.getAddress().getAddress(), PEER_TEST)) {
+            LOGGER.info("Synchronizing from peer: " + peer.toString() + ":" + peer
+                    + " my HEIGHT: " + dcSet.getBlocksHeadsMap().size());
         }
 
         Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
@@ -761,6 +762,7 @@ public class Synchronizer {
         return blocks;
     }
 
+    public Block lastPipedBlock;
     // SYNCHRONIZED DO NOT PROCCESS A BLOCK AT THE SAME TIME
     // SYNCHRONIZED MIGHT HAVE BEEN PROCESSING PREVIOUS BLOCK
     public synchronized void pipeProcessOrOrphan(DCSet dcSet, Block block, boolean doOrphan, boolean hardFlush)
@@ -784,6 +786,8 @@ public class Synchronizer {
       //      countObserv_REMOVE = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_REMOVE);
       //      countObserv_COUNT = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_COUNT);
         }
+
+        lastPipedBlock = block;
 
         if (doOrphan) {
 

@@ -343,7 +343,8 @@ public class BlockMap extends DCMap<Integer, Block> {
 
         LOGGER.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE");
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block.blockHead));
+        // NEED in BLOCK!
+        this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block));
 
         LOGGER.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE END");
     }
@@ -356,7 +357,8 @@ public class BlockMap extends DCMap<Integer, Block> {
 
         LOGGER.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE");
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block.blockHead));
+        // NEED in BLOCK!
+        this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block));
 
         LOGGER.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE END");
     }

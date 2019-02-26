@@ -22,6 +22,8 @@ import java.math.BigDecimal;
 import java.util.*;
 
 public class TransactionMap extends DCMap<Tuple2<String, String>, Transaction> {
+
+    static final int KEY_LENGHT = 12;
     public static final int TIMESTAMP_INDEX = 1;
     public static final int ADDRESS_INDEX = 2;
     public static final int AMOUNT_INDEX = 3;
@@ -183,7 +185,7 @@ public class TransactionMap extends DCMap<Tuple2<String, String>, Transaction> {
     }
 
     public void delete(Account account, Transaction transaction) {
-        this.delete(new Tuple2<String, String>(account.getAddress(), new String(transaction.getSignature())));
+        this.delete(new Tuple2<String, String>(account.getAddress(), new String(transaction.getSignature()).substring(KEY_LENGHT)));
     }
 
     public void deleteAll(List<Account> accounts) {
@@ -193,7 +195,7 @@ public class TransactionMap extends DCMap<Tuple2<String, String>, Transaction> {
     }
 
     public boolean add(Account account, Transaction transaction) {
-        return this.set(new Tuple2<String, String>(account.getAddress(), new String(transaction.getSignature())), transaction);
+        return this.set(new Tuple2<String, String>(account.getAddress(), new String(transaction.getSignature()).substring(KEY_LENGHT)), transaction);
     }
 
     public void addAll(Map<Account, List<Transaction>> transactions) {
