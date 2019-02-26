@@ -18,11 +18,8 @@ import org.erachain.core.naming.Name;
 import org.erachain.core.naming.NameSale;
 import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
-import org.erachain.database.wallet.BlocksHeadMap;
 import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.SecureWalletDatabase;
-import org.erachain.database.wallet.TransactionMap;
-import org.erachain.datachain.BlockSignsMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -446,7 +443,7 @@ public class Wallet extends Observable implements Observer {
                     if (Controller.getInstance().isStatusWaiting()) {
 
                         checkNeedSyncWallet(Controller.getInstance().getLastBlockSignature());
-                        if (Controller.getInstance().isNeedSyncWallet() // || checkNeedSyncWallet()
+                        if (Controller.getInstance().isNeedSyncWallet()
                                 && !Controller.getInstance().isProcessingWalletSynchronize()) {
 
                             Controller.getInstance().synchronizeWallet();
@@ -455,7 +452,7 @@ public class Wallet extends Observable implements Observer {
                 }
             };
 
-            this.timerSynchronize.schedule(action, 30000, 30000);
+            this.timerSynchronize.schedule(action, 30000, 600000);
         }
 
     }
@@ -574,10 +571,16 @@ public class Wallet extends Observable implements Observer {
 			this.database.setLastBlockSignature(block.getReference());
 			height = 1;
 
-		}
+        } else {
 
-        byte[] lastSignature = this.database.getLastBlockSignature();
-        block = dcSet.getBlockSignsMap().getBlock(lastSignature);
+            byte[] lastSignature = this.database.getLastBlockSignature();
+            block = dcSet.getBlockSignsMap().getBlock(lastSignature);
+
+            if (block == null) {
+                // выходим и потом пересинхронизируемся с начала
+                return;
+            }
+        }
 
         height = block.getHeight();
 		int steepHeight = dcSet.getBlockMap().size() / 100;
@@ -592,10 +595,10 @@ public class Wallet extends Observable implements Observer {
 				// this.update(this, new
 				// ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE,
 				// block));
-				Block.BlockHead blockHead = dcSet.getBlocksHeadsMap().get(height);
+                block = dcSet.getBlockMap().get(height);
 
 				try {
-					this.processBlock(blockHead);
+                    this.processBlock(block);
 				} catch (java.lang.OutOfMemoryError e) {
 					Controller.getInstance().stopAll(44);
 					return;
@@ -605,7 +608,7 @@ public class Wallet extends Observable implements Observer {
 				if (System.currentTimeMillis() - timePoint > 10000
 						|| steepHeight < height - lastHeight) {
 
-					if (Controller.getInstance().needUpToDate() || !Controller.getInstance().isStatusOK())
+                    if (Controller.getInstance().needUpToDate() || !Controller.getInstance().isStatusWaiting())
 						// если идет синхронизация цепочки - кошелек не синхронизируем
 						break;
 
@@ -668,9 +671,6 @@ public class Wallet extends Observable implements Observer {
             return;
         }
 
-        // break current synchronization if exists
-        synchronizeBodyStop = true;
-
         // here ICREATOR
         Controller.getInstance().setProcessingWalletSynchronize(true);
         Controller.getInstance().setNeedSyncWallet(false);
@@ -726,9 +726,13 @@ public class Wallet extends Observable implements Observer {
         }
 
         Block block;
-        int height;
 
         if (reset) {
+
+            // полная пересборка кошелька
+
+            // break current synchronization if exists
+            synchronizeBodyStop = true;
 
             synchronizeBody(reset);
             return;
@@ -743,45 +747,13 @@ public class Wallet extends Observable implements Observer {
 
             block = dcSet.getBlockSignsMap().getBlock(lastSignature);
             if (block == null) {
-                // TODO подбор последнего блока проверять
-
-                BlocksHeadMap walletHeadsMap = this.database.getBlocksHeadMap();
-                BlockSignsMap chainSignsMap = dcSet.getBlockSignsMap();
-                Block.BlockHead head;
-                while (!chainSignsMap.contains(lastSignature)
-                        && !Controller.getInstance().needUpToDate()
-                        && !Controller.getInstance().isStatusOK()
-                ) {
-                    // если идет синхронизация цепочки - кошелек не синхронизируем
-                    head = walletHeadsMap.getLast();
-                    if (head == null) {
-                        synchronize(true);
-                        return;
-                    }
-
-                    this.orphanBlock(head);
-                    lastSignature = this.database.getLastBlockSignature();
-
-                    if (lastSignature == null) {
-                        synchronize(true);
-                        return;
-                    }
-                }
-
-                block = dcSet.getBlockSignsMap().getBlock(lastSignature);
-
+                synchronize(true);
+                return;
             }
-
-            if (block != null)
-                block = block.getChild(dcSet);
-
-        }
-        if (block == null) {
-            synchronize(true);
-            return;
         }
 
-        synchronize(false);
+        // запустим погоняние
+        synchronizeBody(false);
 
     }
 
@@ -1181,7 +1153,8 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	private long processBlockLogged = 0;
-	private void processBlock(Block.BlockHead blockHead) {
+
+    private void processBlock(Block block) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1190,30 +1163,26 @@ public class Wallet extends Observable implements Observer {
 		long start = System.currentTimeMillis();
 
 		// SET AS LAST BLOCK
-		this.database.setLastBlockSignature(blockHead.signature);
+        this.database.setLastBlockSignature(block.blockHead.signature);
 
-		Account blockGenerator = blockHead.creator;
+        Account blockGenerator = block.blockHead.creator;
 		String blockGeneratorStr = blockGenerator.getAddress();
 
 		DCSet dcSet = DCSet.getInstance();
-		int height = blockHead.heightBlock;
+        int height = block.blockHead.heightBlock;
 
 		// CHECK IF WE ARE GENERATOR
 		if (this.accountExists(blockGeneratorStr)) {
 			// ADD BLOCK
-			this.database.getBlocksHeadMap().add(blockHead);
+            this.database.getBlocksHeadMap().add(block.blockHead);
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
 			// PROCESS FEE
-			feeProcess(dcSet, blockHead.totalFee, blockGenerator, false);
+            feeProcess(dcSet, block.blockHead.totalFee, blockGenerator, false);
 
 		}
 
 		// CHECK TRANSACTIONS
-		Block block = dcSet.getBlockMap().get(blockHead.heightBlock);
-		if (block == null) {
-			return ;
-		}
 		int seqNo = 0;
 		for (Transaction transaction : block.getTransactions()) {
 
@@ -1288,18 +1257,18 @@ public class Wallet extends Observable implements Observer {
 			}
 		}
 
-		if (blockHead.transactionsCount > 0
+        if (block.blockHead.transactionsCount > 0
 				&& start - processBlockLogged > (BlockChain.DEVELOP_USE ? 30000 : 30000)) {
 			long tickets = System.currentTimeMillis() - start;
 			processBlockLogged = start;
-			LOGGER.debug("WALLET [" + blockHead.heightBlock + "] processing time: " + tickets * 0.001
-					+ " TXs = " + blockHead.transactionsCount + " millsec/record:"
-					+ tickets / (blockHead.transactionsCount + 1));
+            LOGGER.debug("WALLET [" + block.blockHead.heightBlock + "] processing time: " + tickets * 0.001
+                    + " TXs = " + block.blockHead.transactionsCount + " millsec/record:"
+                    + tickets / (block.blockHead.transactionsCount + 1));
 		}
 
 	}
 
-	private void orphanBlock(Block.BlockHead blockHead) {
+    private void orphanBlock(Block block) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1312,13 +1281,12 @@ public class Wallet extends Observable implements Observer {
 		DCSet dcSet = DCSet.getInstance();
 
 		// ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
-		Block block = dcSet.getBlockMap().get(blockHead.heightBlock);
 		if (block == null)
 			return;
 
 		List<Transaction> transactions = block.getTransactions();
 		int seqNo;
-		for (int i = blockHead.transactionsCount - 1; i >= 0; i--) {
+        for (int i = block.blockHead.transactionsCount - 1; i >= 0; i--) {
 
 			seqNo = i + 1;
 
@@ -1391,24 +1359,24 @@ public class Wallet extends Observable implements Observer {
 			}
 		}
 
-		Account blockGenerator = blockHead.creator;
+        Account blockGenerator = block.blockHead.creator;
 		String blockGeneratorStr = blockGenerator.getAddress();
 
 		// CHECK IF WE ARE GENERATOR
 		if (this.accountExists(blockGeneratorStr)) {
 			// DELETE BLOCK
-			this.database.getBlocksHeadMap().delete(blockHead);
+            this.database.getBlocksHeadMap().delete(block.blockHead);
 
 			// SET AS LAST BLOCK
 			// this.database.setLastBlockSignature(block.getReference());
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
-			feeProcess(dcSet, blockHead.totalFee, blockGenerator, true);
+            feeProcess(dcSet, block.blockHead.totalFee, blockGenerator, true);
 
 		}
 
 		// SET AS LAST BLOCK
-		this.database.setLastBlockSignature(blockHead.reference); // .reference
+        this.database.setLastBlockSignature(block.blockHead.reference); // .reference
 
 		// long tickets = System.currentTimeMillis() - start;
 		// LOGGER.info("WALLET [" + block.getHeightByParent(DCSet.getInstance())
@@ -1856,13 +1824,17 @@ public class Wallet extends Observable implements Observer {
 			return;
 
 		int type = message.getType();
-		if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE)// .WALLET_ADD_BLOCK_TYPE)
-		{
-			Block.BlockHead block =	(Block.BlockHead) message.getValue();
+        if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
+
+            if (!cnt.isStatusWaiting())
+                // идет синхронизация основной цепочки - не обрабатываем пока кошелек
+                return;
+
+            Block block = (Block) message.getValue();
 
 			// CHECK IF WE NEED TO RESYNC
 			// BY REFERENCE !!!!
-			if (checkNeedSyncWallet(block.reference)) //.getReference()))
+            if (checkNeedSyncWallet(block.getReference())) //.getReference()))
 			{
 				return;
 			}
@@ -1872,11 +1844,11 @@ public class Wallet extends Observable implements Observer {
 
 		} else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
 		{
-			Block.BlockHead block = (Block.BlockHead) message.getValue();
+            Block block = (Block) message.getValue();
 
 			// CHECK IF WE NEED TO RESYNC
 			// BY SIGNATURE !!!!
-			if (checkNeedSyncWallet(block.signature)) //.getSignature()))
+            if (checkNeedSyncWallet(block.getSignature()))
 			{
 				return;
 			}

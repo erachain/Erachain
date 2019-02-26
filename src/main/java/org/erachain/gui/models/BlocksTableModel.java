@@ -188,8 +188,8 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
 
         } else if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
             //CHECK IF LIST UPDATED
-            Block.BlockHead block = (Block.BlockHead) message.getValue();
-            this.blocks.add(0, block);
+            Block block = (Block) message.getValue();
+            this.blocks.add(0, block.blockHead);
             this.fireTableRowsInserted(0, 0);
             boolean needFire = false;
             while(this.blocks.size() > maxSize) {

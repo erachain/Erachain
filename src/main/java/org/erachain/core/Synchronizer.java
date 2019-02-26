@@ -761,6 +761,7 @@ public class Synchronizer {
         return blocks;
     }
 
+    public Block lastPipedBlock;
     // SYNCHRONIZED DO NOT PROCCESS A BLOCK AT THE SAME TIME
     // SYNCHRONIZED MIGHT HAVE BEEN PROCESSING PREVIOUS BLOCK
     public synchronized void pipeProcessOrOrphan(DCSet dcSet, Block block, boolean doOrphan, boolean hardFlush)
@@ -784,6 +785,8 @@ public class Synchronizer {
       //      countObserv_REMOVE = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_REMOVE);
       //      countObserv_COUNT = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_COUNT);
         }
+
+        lastPipedBlock = block;
 
         if (doOrphan) {
 
