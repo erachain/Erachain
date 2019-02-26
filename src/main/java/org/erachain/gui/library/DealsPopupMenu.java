@@ -404,9 +404,9 @@ public class DealsPopupMenu extends JPopupMenu {
                 break;
 
             case AssetCls.AS_INDEX:
-                this.sendAsset.setText(Lang.getInstance().translate("Перевести в собственность индекс"));
+                this.sendAsset.setText(Lang.getInstance().translate("Transfer index to the ownership"));
 
-                this.holdAsset.setText(Lang.getInstance().translate("Учесть прием индекса на баланс"));
+                this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
                 this.holdAsset.setVisible(true);
 
                 //this.debtAsset.setText(Lang.getInstance().translate("Передать в долг"));
