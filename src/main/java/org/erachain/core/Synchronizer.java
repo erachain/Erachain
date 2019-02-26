@@ -398,8 +398,9 @@ public class Synchronizer {
         byte[] lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
 
         // FIND HEADERS for common CHAIN
-        if (Arrays.equals(peer.getAddress().getAddress(), PEER_TEST)) {
-            LOGGER.info("Synchronizing from peer: " + peer.toString() + ":" + peer);
+        if (true || Arrays.equals(peer.getAddress().getAddress(), PEER_TEST)) {
+            LOGGER.info("Synchronizing from peer: " + peer.toString() + ":" + peer
+                    + " my HEIGHT: " + dcSet.getBlocksHeadsMap().size());
         }
 
         Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
