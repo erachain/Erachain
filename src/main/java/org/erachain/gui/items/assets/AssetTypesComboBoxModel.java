@@ -1,14 +1,13 @@
 package org.erachain.gui.items.assets;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
-import javax.swing.DefaultComboBoxModel;
-
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetType;
 import org.erachain.utils.AssetTypeComparator;
+
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
 @SuppressWarnings("serial")
 public class AssetTypesComboBoxModel extends DefaultComboBoxModel<AssetType> {
@@ -52,8 +51,8 @@ public class AssetTypesComboBoxModel extends DefaultComboBoxModel<AssetType> {
             //list.add(new AssetType(AssetCls.AS_INSIDE_UTILITY));
             //list.add(new AssetType(AssetCls.AS_INSIDE_SHARE));
             list.add(new AssetType(AssetCls.AS_INSIDE_BONUS));
-            //list.add(new AssetType(AssetCls.AS_INSIDE_RIGHTS));
-            //list.add(new AssetType(AssetCls.AS_INSIDE_VOTE));
+            list.add(new AssetType(AssetCls.AS_INSIDE_ACCESS));
+            list.add(new AssetType(AssetCls.AS_INSIDE_VOTE));
             list.add(new AssetType(AssetCls.AS_INDEX));
             //list.add(new AssetType(AssetCls.AS_INSIDE_OTHER_CLAIM));
             
