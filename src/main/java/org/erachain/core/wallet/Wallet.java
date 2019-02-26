@@ -1133,57 +1133,12 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
-	private boolean findLastBlockOff(byte[] lastBlockSignature, byte[] signatureORreference) {
-
-		BlockSignsMap blockSignsMap = DCSet.getInstance().getBlockSignsMap();
-
-        TransactionMap txMap = database.getTransactionMap();
-
-		// LOGGER.error("findLastBlockOff for [" +
-		// block.getHeightByParent(DCSet.getInstance()) + "]");
-
-		int height = 0;
-		int currentHeight;
-		while (true) {
-
-            Iterator<Tuple2<String, String>> iterator = txMap.getIterator(1, true);
-            while (iterator.hasNext()) {
-                Transaction transaction = txMap.get(iterator.next());
-                currentHeight = transaction.getBlockHeight();
-                if (currentHeight < height)
-                    break;
-            }
-
-			if (Arrays.equals(lastBlockSignature, reference))
-				return true;
-
-			// LOGGER.error("Wallet orphanBlock for find lastBlockSignature." +
-			// block.getHeightByParent(DCSet.getInstance()));
-
-			/// this.update(this, new
-			/// ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE,
-			/// block));
-			this.orphanBlock(block);
-
-			block = blockSignsMap.getBlock(reference);
-
-			if (block == null) {
-				return false;
-			}
-			reference = block.getReference();
-
-		}
-
-		return false;
-	}
-
 	// TODO: our woier
 	public boolean checkNeedSyncWallet(byte[] signatureORreference) {
 
 		// CHECK IF WE NEED TO RESYNC
 		byte[] lastBlockSignature = this.database.getLastBlockSignature();
 		if (lastBlockSignature == null
-				 || !findLastBlockOff(lastBlockSignature, signatureORreference)
 				|| !Arrays.equals(lastBlockSignature, signatureORreference)) {
 			Controller.getInstance().setNeedSyncWallet(true);
 			return true;
