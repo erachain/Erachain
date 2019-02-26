@@ -17,7 +17,7 @@ function templates(data){
 	{
 		output += '<tr><td><a href="?template=' + key + get_lang()+ '">'+ key + ': ';
 		output += '<b>'+ data.templates[key].name + '</b></a></td>';
-		output += '<td>' + fformat(data.templates[key].description).substr(0, 100) + '</td>';
+		output += '<td>' + data.templates[key].description.substr(0, 100) + '</td>';
 		output += '<td><a href=?addr='+ data.templates[key].owner + get_lang() +'>'+ htmlFilter(data.templates[key].owner) +'</a></td>';
 		output += '</tr>';
 	}
@@ -74,8 +74,9 @@ function template(data)
 	output += '<br><br>';
 	
 	
-	output += '<b>' + data.label_Description + ':</b> ' + wordwrap(data.template.description, 80, '\n', true);
+	output += '<b>' + data.label_Description + ':</b><br>';
 
+	output += fformat(data.template.description); //wordwrap(data.template.description, 80, '\n', true);
 	
 	return output;
 }

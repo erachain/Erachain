@@ -29,7 +29,6 @@ import org.erachain.gui.models.PersonAccountsModel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.*;
-import org.erachain.webserver.API_Person;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -38,7 +37,6 @@ import org.mapdb.Fun.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -368,15 +366,15 @@ public class BlockExplorer {
             output.putAll(jsonQueryStatus(Long.valueOf(info.getQueryParameters().getFirst("status"))));
         }
         // tx from seq-No
-        else if (info.getQueryParameters().containsKey("Seg_No")) {
+        else if (info.getQueryParameters().containsKey("seqNo")) {
             if (info.getQueryParameters().containsKey("statement")) {
                 output.putAll(jsonQueryStatement(info.getQueryParameters().getFirst("statement"),
-                        info.getQueryParameters().getFirst("Seg_No")));
+                        info.getQueryParameters().getFirst("seqNo")));
             } else {
 
                 Transaction transaction = dcSet.getTransactionFinalMap().get(
                         new Integer(info.getQueryParameters().getFirst("block")),
-                        new Integer(info.getQueryParameters().getFirst("Seg_No")));
+                        new Integer(info.getQueryParameters().getFirst("seqNo")));
                 output.put("body", WEB_Transactions_HTML.getInstance().get_HTML(transaction, langObj));
             }
         }
@@ -581,12 +579,12 @@ public class BlockExplorer {
         if (query.indexOf(':') != -1) {
 
             int blockHeight = Integer.valueOf(query.split(":")[0]);
-            int seq = Integer.valueOf(query.split(":")[1]);
+            int seqNo = Integer.valueOf(query.split(":")[1]);
 
             LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = dcSet.getATTransactionMap()
                     .getATTransactions(blockHeight);
 
-            if (atTxs.size() > seq) {
+            if (atTxs.size() > seqNo) {
                 i++;
                 outputItem = new LinkedHashMap();
                 outputItem.put(1, "atTx");
@@ -610,7 +608,7 @@ public class BlockExplorer {
                     outputItem.put(2, Lang.getInstance().translate_from_langObj("Statement", langObj));
                 } else {
                     outputItem.put(1, "block");
-                    outputItem.put(2, Lang.getInstance().translate_from_langObj("Transaction Seq No", langObj));
+                    outputItem.put(2, Lang.getInstance().translate_from_langObj("Transaction SeqNo", langObj));
 
                 }
                 foundList.put(i, outputItem);
@@ -1490,9 +1488,9 @@ public class BlockExplorer {
         return output;
     }
 
-     public Map jsonQueryBlocks(UriInfo info) {
-         int start =-1;
-         try {
+    public Map jsonQueryBlocks(UriInfo info) {
+        int start = -1;
+        try {
             start = Integer.valueOf(info.getQueryParameters().getFirst("start"));
         } catch (NumberFormatException e1) {
             // TODO Auto-generated catch block
@@ -1542,7 +1540,7 @@ public class BlockExplorer {
         output.put("Label_Fee", Lang.getInstance().translate_from_langObj("Fee", langObj));
         output.put("Label_AT_Amount", Lang.getInstance().translate_from_langObj("AT Amount", langObj));
         output.put("Label_Amount", Lang.getInstance().translate_from_langObj("Amount", langObj));
-         output.put("Label_Target", Lang.getInstance().translate_from_langObj("Target", langObj));
+        output.put("Label_Target", Lang.getInstance().translate_from_langObj("Target", langObj));
         output.put("Label_Later", Lang.getInstance().translate_from_langObj("Later", langObj));
         output.put("Label_Previous", Lang.getInstance().translate_from_langObj("Previous", langObj));
 
@@ -2156,7 +2154,7 @@ public class BlockExplorer {
                 : transactions.subList(fromIndex, Math.min(toIndex, transactions.size()));
         for (Transaction trans : transactions2) {
 
-            // SET + HEIGHT + SEQ
+            // SET + HEIGHT + SEQNO
             if (trans.getType() == 100) {
                 trans.setDC(dcSet);
             }
@@ -2209,7 +2207,7 @@ public class BlockExplorer {
 
             transactionJSON.put("block", trans.getBlockHeight());// .getSeqNo(dcSet));
 
-            transactionJSON.put("seq", trans.getSeqNo());
+            transactionJSON.put("seqNo", trans.getSeqNo());
 
             if (trans.getType() == Transaction.CALCULATED_TRANSACTION) {
                 R_Calculated txCalculated = (R_Calculated) trans;
@@ -2239,6 +2237,9 @@ public class BlockExplorer {
                     }
 
                 } else {
+
+                    transactionJSON.put("publickey", Base58.encode(trans.getCreator().getPublicKey()));
+
                     Account atSideAccount;
                     atSideAccount = trans.getCreator();
                     if (account != null) {
@@ -2306,7 +2307,7 @@ public class BlockExplorer {
         output.put("label_confirmations", Lang.getInstance().translate_from_langObj("Confirmations", langObj));
         output.put("label_recipient", Lang.getInstance().translate_from_langObj("Recipient", langObj));
         output.put("label_size", Lang.getInstance().translate_from_langObj("Size", langObj));
-        output.put("label_seq", Lang.getInstance().translate_from_langObj("Seq", langObj));
+        output.put("label_seqNo", Lang.getInstance().translate_from_langObj("SeqNo", langObj));
         output.put("label_signature", Lang.getInstance().translate_from_langObj("Signature", langObj));
         // output.put("label_reference",Lang.getInstance().translate_from_langObj("Reference",langObj));
         output.put("label_amount_key", Lang.getInstance().translate_from_langObj("Amount:Key", langObj));
@@ -2685,7 +2686,7 @@ public class BlockExplorer {
 
         Block block = new GenesisBlock();
         do {
-            int seq = 1;
+            int seqNo = 1;
             for (Transaction transaction : block.getTransactions()) {
                 if ((transaction.getType() == Transaction.REGISTER_NAME_TRANSACTION
                         && ((RegisterNameTransaction) transaction).getName().toString().equals(name))
@@ -2697,10 +2698,10 @@ public class BlockExplorer {
                                 && ((CancelSellNameTransaction) transaction).getName().equals(name))
                         || (transaction.getType() == Transaction.BUY_NAME_TRANSACTION
                                 && ((BuyNameTransaction) transaction).getNameSale().toString().equals(name))) {
-                    all.add(new BlExpUnit(height, seq, transaction));
+                    all.add(new BlExpUnit(height, seqNo, transaction));
                     txsTypeCount[transaction.getType() - 1]++;
                 }
-                seq++;
+                seqNo++;
             }
             block = block.getChild(dcSet);
             height++;
@@ -2906,14 +2907,14 @@ public class BlockExplorer {
             Block block = Controller.getInstance().getBlockByHeight(at.getCreationBlockHeight());
             long aTtimestamp = block.getTimestamp();
             BigDecimal aTbalanceCreation = BigDecimal.ZERO;
-            int seq = 0;
+            int seqNo = 0;
             for (Transaction transaction : block.getTransactions()) {
-                seq++;
+                seqNo++;
                 if (transaction.getType() == Transaction.DEPLOY_AT_TRANSACTION) {
                     Account atAccount = ((DeployATTransaction) transaction).getATaccount(dcSet);
 
                     if (atAccount.getAddress().equals(address)) {
-                        transaction.setBlock(block, dcSet, block.heightBlock, seq);
+                        transaction.setBlock(block, dcSet, block.heightBlock, seqNo);
                         all.add(new BlExpUnit(at.getCreationBlockHeight(), 0, transaction));
                         aTbalanceCreation = ((DeployATTransaction) transaction).getAmount();
                     }
@@ -3593,7 +3594,7 @@ public class BlockExplorer {
             Map out_statement = new LinkedHashMap();
             Transaction statement = model_Statements.get_Statement(row);
             out_statement.put("Block", statement.getBlockHeight());
-            out_statement.put("Seg_No", statement.getSeqNo());
+            out_statement.put("seqNo", statement.getSeqNo());
             out_statement.put("person_key", model_Statements.get_person_key(row));
 
             for (int column = 0; column < column_Count; column++) {
@@ -3776,25 +3777,24 @@ public class BlockExplorer {
         return output;
     }
 
-    private Map jsonQueryStatement(String block, String seg_No) {
+    private Map jsonQueryStatement(String block, String seqNo) {
         // TODO Auto-generated method stub
         Map output = new LinkedHashMap();
 
         R_SignNote trans = (R_SignNote) dcSet.getTransactionFinalMap().get(new Integer(block),
-                new Integer(seg_No));
-        // output.put("Label_title",
-        // Lang.getInstance().translate_from_langObj("Title",langObj));
+                new Integer(seqNo));
+        output.put("Label_type", Lang.getInstance().translate_from_langObj("Type", langObj));
         output.put("Label_statement", Lang.getInstance().translate_from_langObj("Statement", langObj));
         output.put("Label_creator", Lang.getInstance().translate_from_langObj("Creator", langObj));
         output.put("Label_date", Lang.getInstance().translate_from_langObj("Date", langObj));
         output.put("Label_block", Lang.getInstance().translate_from_langObj("Block", langObj));
-        output.put("Label_seg_No", Lang.getInstance().translate_from_langObj("Seg_no", langObj));
+        output.put("Label_seqNo", Lang.getInstance().translate_from_langObj("seqNo", langObj));
         output.put("Label_No", Lang.getInstance().translate_from_langObj("No.", langObj));
 
         output.put("block", block);
-        output.put("Seg_No", seg_No);
+        output.put("seqNo", seqNo);
 
-        TemplateCls statement = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
+        //TemplateCls statement = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
 
         if (!trans.isEncrypted()) {
 
@@ -3810,17 +3810,47 @@ public class BlockExplorer {
                     return null;
                 }
 
-                String str_HTML = "<br>";
-                if (map_Data.b != null)
-                    str_HTML = "<b>" + Lang.getInstance().translate_from_langObj("Title", langObj) + ": </b>"
-                            + map_Data.b + "<br>";
+                if (map_Data.b != null) {
+                    output.put("Label_title", Lang.getInstance().translate_from_langObj("Title", langObj));
+                    output.put("title", map_Data.b);
+                }
 
                 JSONObject jSON = map_Data.c;
                 // parse JSON
                 if (jSON != null) {
 
-                    // V2.0 Template
-                    if (jSON.containsKey("Template")) {
+                    if (jSON.containsKey("TM")) {
+                        // V2.1 Template
+                        Long key = new Long(jSON.get("TM") + "");
+                        TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, key);
+                        if (template != null) {
+                            String description = template.getDescription();
+
+                            // Template Params
+                            if (jSON.containsKey("PR")) {
+                                String str = jSON.get("PR").toString();
+                                JSONObject params = new JSONObject();
+                                ;
+                                try {
+                                    params = (JSONObject) JSONValue.parseWithException(str);
+                                } catch (ParseException e) {
+                                    // TODO Auto-generated catch block
+                                    e.printStackTrace();
+                                }
+                                Set<String> kS = params.keySet();
+                                for (String s : kS) {
+                                    description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
+                                }
+
+                            }
+
+                            output.put("body", description);
+
+                        }
+
+                    } else if (jSON.containsKey("Template")) {
+
+                        // V2.0 Template
                         Long key = new Long(jSON.get("Template") + "");
                         TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, key);
                         if (template != null) {
@@ -3844,77 +3874,28 @@ public class BlockExplorer {
                                 }
 
                             }
-                            str_HTML += description + "<br>";
-                        }
-                    }
-                    // V2.1 Template
-                    if (jSON.containsKey("TM")) {
-                        Long key = new Long(jSON.get("TM") + "");
-                        TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, key);
-                        if (template != null) {
-                            String description = template.getDescription();
 
-                            // Template Params
-                            if (jSON.containsKey("PR")) {
-                                String str = jSON.get("PR").toString();
-                                JSONObject params = new JSONObject();
-                                ;
-                                try {
-                                    params = (JSONObject) JSONValue.parseWithException(str);
-                                } catch (ParseException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
-                                Set<String> kS = params.keySet();
-                                for (String s : kS) {
-                                    description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
-                                }
-
-                            }
-                            // str_HTML+= description + "<br>";
-                            str_HTML += description + "<br>";
+                            output.put("body", description);
 
                         }
 
                     }
-                    // Message v2.0
-                    if (jSON.containsKey("Message"))
-                        str_HTML += "<b>" + Lang.getInstance().translate_from_langObj("Message", langObj) + ": </b><br>"
-                                + jSON.get("Message") + "<br>";
-                    // v 2.1
+
                     if (jSON.containsKey("MS")) {
-                        String mess = (String) jSON.get("MS");
-                        str_HTML += "<b>" + Lang.getInstance().translate_from_langObj("Message", langObj) + ": </b><br>"
-                                + mess + "<br><br>";
+                        // v 2.1
+                        output.put("message", jSON.get("MS"));
+
+                    } else if (jSON.containsKey("Message")) {
+                        // Message v2.0
+                        output.put("message", jSON.get("Message"));
 
                     }
+
                     // Hashes
-                    // v2.0
-                    if (jSON.containsKey("Hashes")) {
-                        str_HTML += "<b>" + Lang.getInstance().translate_from_langObj("Hashes", langObj) + ": </b><br>";
-                        String hasHes = "";
-                        String str = jSON.get("Hashes").toString();
-                        JSONObject params = new JSONObject();
-                        try {
-                            params = (JSONObject) JSONValue.parseWithException(str);
-                        } catch (ParseException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        Set<String> kS = params.keySet();
-
-                        int i = 1;
-                        for (String s : kS) {
-                            hasHes += i + " " + s + " " + params.get(s) + "<br>";
-                        }
-
-                        str_HTML += hasHes + "<br>";
-                    }
-                    // v2.1
                     if (jSON.containsKey("HS")) {
-
-                        str_HTML += "<b>" + Lang.getInstance().translate_from_langObj("Hashes", langObj) + ": <b><br>";
-                        String hasHes = "";
+                        // v2.1
+                        output.put("Label_hashes", Lang.getInstance().translate_from_langObj("Hashes", langObj));
+                        String hashes = "";
                         String str = jSON.get("HS").toString();
                         JSONObject params = new JSONObject();
                         try {
@@ -3927,50 +3908,40 @@ public class BlockExplorer {
 
                         int i = 1;
                         for (String s : kS) {
-                            hasHes += i + " " + s + " " + params.get(s) + "<br>";
+                            hashes += i + " " + s + " " + params.get(s) + "<br>";
                         }
 
-                        str_HTML += hasHes + "<br>";
+                        output.put("hashes", hashes);
 
+                    } else if (jSON.containsKey("Hashes")) {
+                        // v2.0
+                        output.put("Label_hashes", Lang.getInstance().translate_from_langObj("Hashes", langObj));
+                        String hashes = "";
+                        String str = jSON.get("Hashes").toString();
+                        JSONObject params = new JSONObject();
+                        try {
+                            params = (JSONObject) JSONValue.parseWithException(str);
+                        } catch (ParseException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        Set<String> kS = params.keySet();
+
+                        int i = 1;
+                        for (String s : kS) {
+                            hashes += i + " " + s + " " + params.get(s) + "<br>";
+                        }
+
+                        output.put("hashes", hashes);
                     }
 
                 }
-                // parse Ffiles
-                // v2.0
-                if (jSON.containsKey("&*&*%$$%_files_#$@%%%")) {
-                    str_HTML += "<b>" + Lang.getInstance().translate_from_langObj("Files", langObj) + ": </b><br>";
-                    String hasHes = "";
-                    String str = jSON.get("&*&*%$$%_files_#$@%%%").toString();
-                    JSONObject params = new JSONObject();
-                    try {
-                        params = (JSONObject) JSONValue.parseWithException(str);
-                    } catch (ParseException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    Set<String> kS = params.keySet();
 
-                    int i = 1;
-                    JSONObject ss = new JSONObject();
-                    for (String s : kS) {
-
-                        ss = (JSONObject) params.get(s);
-
-                      //  hasHes += i + " " + ss.get("File_Name") + "<br>";
-
-                        hasHes += i + " " + ss.get("File_Name");
-                        hasHes += "<a href = '../apidocuments/getFile?download=false&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("File_Name") + "'> " + Lang.getInstance().translate_from_langObj("View", langObj) + " </a><br>";
-                        hasHes += "<a href = '../apidocuments/getFile?download=true&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("File_Name") + "'> " + Lang.getInstance().translate_from_langObj("Download", langObj) + " </a><br>";
-                    }
-
-                    str_HTML += hasHes + "<br>";
-
-                }
-                // v 2.1
+                // parse files
                 if (jSON.containsKey("F")) {
-
-                    str_HTML += "<b>" + Lang.getInstance().translate_from_langObj("Files", langObj) + ": </b><br>";
-                    String hasHes = "";
+                    // v 2.1
+                    output.put("Label_files", Lang.getInstance().translate_from_langObj("Files", langObj));
+                    String files = "";
                     String str = jSON.get("F").toString();
                     JSONObject params = new JSONObject();
                     try {
@@ -3987,18 +3958,42 @@ public class BlockExplorer {
 
                         ss = (JSONObject) params.get(s);
 
-                    //    hasHes += i + " " + ss.get("FN") + "<br>";
-                        hasHes +=  i + " " + ss.get("FN");
-                        hasHes += "<a href ='../apidocuments/getFile?download=false&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("FN")  + "'> " + Lang.getInstance().translate_from_langObj("View", langObj) + " </a>";
-                        hasHes += "<a href ='../apidocuments/getFile?download=true&block=" + block + "&txt=" + seg_No + "&name=" + ss.get("FN") + "'> " + Lang.getInstance().translate_from_langObj("Download", langObj) + "</a><br>";
+                        files +=  i + " " + ss.get("FN");
+                        files += "<a href ='../apidocuments/getFile?download=false&block=" + block + "&seqNo=" + seqNo + "&name=" + ss.get("FN")  + "'> " + Lang.getInstance().translate_from_langObj("View", langObj) + " </a>";
+                        files += "<a href ='../apidocuments/getFile?download=true&block=" + block + "&seqNo=" + seqNo + "&name=" + ss.get("FN") + "'> " + Lang.getInstance().translate_from_langObj("Download", langObj) + "</a><br>";
                     }
 
-                    str_HTML += hasHes + "<br>";
+                    output.put("files", files);
+
+                } else if (jSON.containsKey("&*&*%$$%_files_#$@%%%")) {
+                    // v2.0
+                    output.put("Label_files", Lang.getInstance().translate_from_langObj("Files", langObj));
+                    String files = "";
+                    String str = jSON.get("&*&*%$$%_files_#$@%%%").toString();
+                    JSONObject params = new JSONObject();
+                    try {
+                        params = (JSONObject) JSONValue.parseWithException(str);
+                    } catch (ParseException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    Set<String> kS = params.keySet();
+
+                    int i = 1;
+                    JSONObject ss = new JSONObject();
+                    for (String s : kS) {
+
+                        ss = (JSONObject) params.get(s);
+
+                        files += i + " " + ss.get("File_Name");
+                        files += "<a href = '../apidocuments/getFile?download=false&block=" + block + "&seqNo=" + seqNo + "&name=" + ss.get("File_Name") + "'> " + Lang.getInstance().translate_from_langObj("View", langObj) + " </a><br>";
+                        files += "<a href = '../apidocuments/getFile?download=true&block=" + block + "&seqNo=" + seqNo + "&name=" + ss.get("File_Name") + "'> " + Lang.getInstance().translate_from_langObj("Download", langObj) + " </a><br>";
+                    }
+
+                    output.put("files", files);
 
                 }
 
-                output.put("statement", str_HTML);
-                // output.put("statement", str_HTML);
             } else {
 
                 // version 1
@@ -4009,34 +4004,40 @@ public class BlockExplorer {
                     String str;
                     JSONObject params = new JSONObject();
                     JSONObject data = new JSONObject();
-                    TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE,
-                            statement.getKey());
+                    TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
                     if (template != null) {
                         description = template.getDescription();
                         data = (JSONObject) JSONValue
                                 .parseWithException(new String(trans.getData(), Charset.forName("UTF-8")));
+
+                        output.put("Label_title", Lang.getInstance().translate_from_langObj("Title", langObj));
+                        output.put("title", data.get("Title"));
+
+                        output.put("message", data.get("Message"));
+
                         str = data.get("Statement_Params").toString();
                         params = (JSONObject) JSONValue.parseWithException(str);
                         kS = params.keySet();
                         for (String s : kS) {
                             description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
                         }
+
+                        output.put("body", description);
+
                     }
-                    String hasHes = "";
+
+                    output.put("Label_hashes", Lang.getInstance().translate_from_langObj("Hashes", langObj));
+
+                    String hashes = "";
                     str = data.get("Hashes").toString();
                     params = (JSONObject) JSONValue.parseWithException(str);
                     kS = params.keySet();
 
                     int i = 1;
                     for (String s : kS) {
-                        hasHes += i + " " + s + " " + params.get(s) + "<br>";
+                        hashes += i + " " + s + " " + params.get(s) + "<br>";
                     }
-
-                    String sT = "<br>" + data.get("Title") + "<br><br>" + description + "<br><br>" + data.get("Message")
-                            + "<br><br>" + hasHes;
-
-                    // output.put("statement", library.to_HTML(sT));
-                    output.put("statement", sT);
+                    output.put("hashes", hashes);
 
                 } catch (ParseException e) {
 
@@ -4047,7 +4048,7 @@ public class BlockExplorer {
 
         } else {
 
-            TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, statement.getKey());
+            TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
             output.put("statement",
                     template.getName() + "<br>" + Lang.getInstance().translate_from_langObj("Encrypted", langObj));
         }
@@ -4085,7 +4086,7 @@ public class BlockExplorer {
                 Map vouchJSON = new LinkedHashMap();
                 vouchJSON.put("date", vouch_Tr.viewTimestamp());
                 vouchJSON.put("block", "" + vouch_Tr.getBlockHeight());
-                vouchJSON.put("Seg_No", "" + vouch_Tr.getSeqNo());
+                vouchJSON.put("seqNo", "" + vouch_Tr.getSeqNo());
                 vouchJSON.put("creator", vouch_Tr.getCreator().getAddress());
 
                 Tuple2<Integer, PersonCls> personInfo = vouch_Tr.getCreator().getPerson();
@@ -4140,10 +4141,11 @@ public class BlockExplorer {
                 output.putAll(jsonQueryStatement(block+"",seqNo+""));
                 output.put("type", "statement");
 
-            }else {
+            } else {
                 output.put("type", "transaction");
                 output.put("body", WEB_Transactions_HTML.getInstance().get_HTML(transaction, langObj));
                 output.put("Label_Transaction", Lang.getInstance().translate_from_langObj("Transaction", langObj));
+                output.put("heightSeqNo", transaction.viewHeightSeq());
             }
             // output.put("Json", transaction.toJson().toString());
 
@@ -4211,9 +4213,9 @@ public class BlockExplorer {
             block = Controller.getInstance().getBlock(Base58.decode(query));
         }
 
-        int seq = 0;
+        int seqNo = 0;
         for (Transaction transaction : block.getTransactions()) {
-            transaction.setBlock(block, dcSet, block.heightBlock, ++seq);
+            transaction.setBlock(block, dcSet, block.heightBlock, ++seqNo);
             all.add(transaction);
             txsTypeCount[transaction.getType() - 1]++;
         }
@@ -4276,9 +4278,9 @@ public class BlockExplorer {
         output.put("countTx", txCountJSON);
 
         BigDecimal totalAmount = BigDecimal.ZERO;
-        //seq = 0;
+        //seqNo = 0;
         for (Transaction transaction : block.getTransactions()) {
-            /// выше уже они инициализированы transaction.setBlock(block, dcSet, block.heightBlock, ++seq);
+            /// выше уже они инициализированы transaction.setBlock(block, dcSet, block.heightBlock, ++seqNo);
             for (Account account : transaction.getInvolvedAccounts()) {
                 BigDecimal amount = transaction.getAmount(account);
                 if (amount.compareTo(BigDecimal.ZERO) > 0) {

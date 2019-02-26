@@ -5,11 +5,13 @@ import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.R_SignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.utils.StrJSonFine;
-import org.erachain.utils.Zip_Bytes;
+
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple4;
+
+import org.erachain.utils.StrJSonFine;
+import org.erachain.utils.Zip_Bytes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -19,6 +21,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,10 +30,7 @@ import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.zip.DataFormatException;
 
@@ -48,8 +48,8 @@ public class API_Documents {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
-        help.put("apidocuments/getFiles?block={block}&txt={transaction}", "get files from transaction");
-        help.put("apidocuments/getFile?download={true/false}block={block}&txt={transaction}&name={name]", "get file (name) from transaction");
+        help.put("apidocuments/getFiles?block={block}&seqNo={seqNo}", "get files from transaction");
+        help.put("apidocuments/getFile?download={true/false}block={block}&seqNo={seqNo}&name={name]", "get file (name) from transaction");
                
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -61,19 +61,23 @@ public class API_Documents {
      * <h3>example request:</h3>
      * apidocuments/getFiles?blockl=1&txt=1
      *
-     * @param blockN is number Block
-     * @param txtN is num Transaction from Block
+     * @param block is number Block
+     * @param seqNo is num Transaction from Block
      * @return JSOM format
      * 
      */
 
     @GET
     @Path("getFiles")
-    public Response getFiles(@QueryParam("block") int blockN, @QueryParam("txt") int txtN ) {
+    public Response getFiles(@QueryParam("block") int block, @QueryParam("seqNo") int seqNo,
+                             @QueryParam("txt") int seqNo_old) {
        JSONObject result = new JSONObject();
         try {
             //READ TXT
-           Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(blockN, txtN);
+            if (seqNo == 0 && seqNo_old > 0) {
+                seqNo = seqNo_old;
+            }
+           Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(block, seqNo);
            if (tx instanceof R_SignNote){
                R_SignNote statement = (R_SignNote)tx; 
                if (statement.getVersion() == 2) {
@@ -127,17 +131,21 @@ public class API_Documents {
                 .entity(result.toJSONString()).build();
     }
 
-   
-
     @GET
     @Path("getFile")
     @Produces("application/zip")
-    public Response getFile(@QueryParam("block") int blockN, @QueryParam("txt") int txtN, @QueryParam("name") String name, @QueryParam("download") String downloadParam ) {
+    public Response getFile(@QueryParam("block") int block, @QueryParam("seqNo") int seqNo,
+                            @QueryParam("txt") int seqNo_old,
+                            @QueryParam("name") String name, @QueryParam("download") String downloadParam ) {
        JSONObject result = new JSONObject();
        byte[] resultByte = null;
         try {
+            if (seqNo == 0 && seqNo_old > 0) {
+                seqNo = seqNo_old;
+            }
+
             //READ TXT
-           Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(blockN, txtN);
+           Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(block, seqNo);
            if (tx instanceof R_SignNote){
                R_SignNote statement = (R_SignNote)tx; 
                if (statement.getVersion() == 2) {
@@ -247,5 +255,5 @@ public class API_Documents {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(result.toJSONString()).build();
     }
-   
+
 }

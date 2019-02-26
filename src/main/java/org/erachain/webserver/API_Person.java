@@ -4,7 +4,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.R_SetStatusToItem;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.KKPersonStatusMap;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;

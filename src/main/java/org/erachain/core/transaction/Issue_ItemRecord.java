@@ -57,6 +57,10 @@ public abstract class Issue_ItemRecord extends Transaction {
         return item.toString();
     }
 
+    public String getItemDescription() {
+        return item.getDescription();
+    }
+
     // RETURN START KEY in tot GEMESIS
     public abstract long getStartKey(int height);
 
