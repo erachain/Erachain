@@ -81,6 +81,7 @@ public class Wallet extends Observable implements Observer {
 
         }
 
+        checkNeedSyncWallet(Controller.getInstance().getLastBlockSignature());
         startProcessForSynchronize();
 
 	}
@@ -442,7 +443,6 @@ public class Wallet extends Observable implements Observer {
 
                     if (Controller.getInstance().isStatusWaiting()) {
 
-                        checkNeedSyncWallet(Controller.getInstance().getLastBlockSignature());
                         if (Controller.getInstance().isNeedSyncWallet()
                                 && !Controller.getInstance().isProcessingWalletSynchronize()) {
 
@@ -452,7 +452,7 @@ public class Wallet extends Observable implements Observer {
                 }
             };
 
-            this.timerSynchronize.schedule(action, 30000, 600000);
+            this.timerSynchronize.schedule(action, 30000, 60000);
         }
 
     }
