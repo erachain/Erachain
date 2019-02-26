@@ -615,11 +615,12 @@ public class Wallet extends Observable implements Observer {
 					timePoint = System.currentTimeMillis();
 					lastHeight = height;
 
-					this.database.commit();
-					this.syncHeight = height;
+                    this.syncHeight = height;
 					Controller.getInstance().walletSyncStatusUpdate(height);
+                    this.database.commit();
+                    System.gc();
 
-				}
+                }
 
 				// LOAD NEXT
 				if (Controller.getInstance().isOnStopping())
@@ -641,6 +642,7 @@ public class Wallet extends Observable implements Observer {
             Controller.getInstance().walletSyncStatusUpdate(height);
 			Controller.getInstance().setProcessingWalletSynchronize(false);
 			this.database.commit();
+            System.gc();
 
 		}
 
