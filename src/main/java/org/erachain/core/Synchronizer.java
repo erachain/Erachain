@@ -319,6 +319,10 @@ public class Synchronizer {
             LOGGER.debug("*** synchronize - orphanedTransactions.size:" + orphanedTransactions.size());
             LOGGER.debug("*** synchronize - orphan block... " + dcSet.getBlockMap().size());
             this.pipeProcessOrOrphan(dcSet, lastBlock, true, false);
+
+            // CLEAR for HEAP
+            lastBlock.clearForHeap();
+
             lastBlock = dcSet.getBlockMap().last();
         }
 
@@ -352,6 +356,10 @@ public class Synchronizer {
                 if (orphanedTransactions.containsKey(key))
                     orphanedTransactions.remove(key);
             }
+
+            // CLEAR for HEAP
+            block.clearForHeap();
+
         }
 
         // CLEAR for DEADs
@@ -501,6 +509,10 @@ public class Synchronizer {
 
                     LOGGER.debug("try pipeProcessOrOrphan");
                     this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false);
+
+                    // CLEAR for HEAP
+                    blockFromPeer.clearForHeap();
+
                     LOGGER.debug("synchronize BLOCK END process");
                     blockBuffer.clearBlock(blockFromPeer.getSignature());
                     LOGGER.debug("synchronize clear from BLOCK BUFFER");
