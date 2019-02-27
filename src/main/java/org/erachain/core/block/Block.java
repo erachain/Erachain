@@ -872,7 +872,7 @@ public class Block {
     }
 
     public void setTransactions(List<Transaction> transactions) {
-        this.setTransactions(transactions, transactions.size());
+        this.setTransactions(transactions, transactions == null ? 0 : transactions.size());
     }
 
     public void setTransactions(List<Transaction> transactions, int count) {

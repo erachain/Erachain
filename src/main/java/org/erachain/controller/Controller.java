@@ -24,7 +24,6 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
-import org.erachain.core.item.polls.Poll;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
@@ -2369,7 +2368,7 @@ public class Controller extends Observable {
     }
 
     public Collection<ItemCls> getAllItems(int type, Account account) {
-        return getItemMap(type).getValuesAll();
+        return getItemMap(type).getValues();
     }
 
 

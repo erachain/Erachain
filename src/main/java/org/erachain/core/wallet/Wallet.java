@@ -599,13 +599,19 @@ public class Wallet extends Observable implements Observer {
 				// block));
                 block = dcSet.getBlockMap().get(height);
 
-				try {
+                if (block == null) {
+                    break;
+                }
+
+                try {
                     this.processBlock(block);
 				} catch (java.lang.OutOfMemoryError e) {
 					Controller.getInstance().stopAll(44);
 					return;
 				}
 
+                // NEED FOR CLEAR HEAP
+                block = null;
 
 				if (System.currentTimeMillis() - timePoint > 10000
 						|| steepHeight < height - lastHeight) {
@@ -629,9 +635,9 @@ public class Wallet extends Observable implements Observer {
 					return;
 
 				height++;
-				block = dcSet.getBlockMap().get(height);
 
-			} while (block != null && !synchronizeBodyStop);
+            } while (!synchronizeBodyStop);
+
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 
@@ -1190,14 +1196,14 @@ public class Wallet extends Observable implements Observer {
 		int seqNo = 0;
 		for (Transaction transaction : block.getTransactions()) {
 
-			if (!this.isWalletDatabaseExisting())
-				return;
+            // TODO нужно сделать при закрытии базы чтобы ожидала окончания проходя всего блока тут
 
 			if (transaction.isWiped()) {
 				continue;
 			}
 
 			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, ++seqNo);
+
 			this.processTransaction(transaction);
 
 			// SKIP PAYMENT TRANSACTIONS
@@ -1270,7 +1276,12 @@ public class Wallet extends Observable implements Observer {
                     + tickets / (block.blockHead.transactionsCount + 1));
 		}
 
-	}
+        // NEED FOR CLEAR HEAP !
+        block.setTransactions(null);
+        block.setTransactionData(0, null);
+        block = null;
+
+    }
 
     private void orphanBlock(Block block) {
 		// CHECK IF WALLET IS OPEN
@@ -1388,7 +1399,12 @@ public class Wallet extends Observable implements Observer {
 		// + " TXs = " + block.getTransactionCount() + " millsec/record:"
 		// + tickets/(block.getTransactionCount()+1) );
 
-	}
+        // NEED FOR CLEAR HEAP !
+        block.setTransactions(null);
+        block.setTransactionData(0, null);
+        block = null;
+
+    }
 
 	private void processNameRegistration(RegisterNameTransaction nameRegistration) {
 		// CHECK IF WALLET IS OPEN
