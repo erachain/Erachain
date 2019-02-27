@@ -559,6 +559,11 @@ public class Block {
         return this.heightBlock;
     }
 
+    public void clearForHeap() {
+        this.transactions = null;
+        this.parentBlockHead = null;
+    }
+
     /*
     public void setHeight(int height) {
         this.heightBlock = height;
@@ -1532,6 +1537,9 @@ public class Block {
                         timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
                 }
 
+                // NEED for CLEAR HEAP
+                transaction.clearBlock();
+
                 transactionsSignatures = Bytes.concat(transactionsSignatures, transactionSignature);
             }
 
@@ -1887,6 +1895,9 @@ public class Block {
 
                 seq++;
 
+                // NEED for CLEAR HEAP
+                transaction.clearBlock();
+
             }
 
             LOGGER.debug("timerProcess: " + timerProcess + "  timerRefsMap_set: " + timerRefsMap_set
@@ -2033,6 +2044,9 @@ public class Block {
                     transFinalMapSinds.delete(itemSignature);
                 }
             }
+
+            // NEED for CLEAR HEAP
+            transaction.clearBlock();
 
         }
 

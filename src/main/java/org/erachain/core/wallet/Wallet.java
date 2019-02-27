@@ -611,7 +611,7 @@ public class Wallet extends Observable implements Observer {
 				}
 
                 // NEED FOR CLEAR HEAP
-                block = null;
+                //block = null;
 
 				if (System.currentTimeMillis() - timePoint > 10000
 						|| steepHeight < height - lastHeight) {
@@ -1202,7 +1202,8 @@ public class Wallet extends Observable implements Observer {
 				continue;
 			}
 
-			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, ++seqNo);
+			if (transaction.noDCSet())
+			    transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, ++seqNo);
 
 			this.processTransaction(transaction);
 
@@ -1265,6 +1266,11 @@ public class Wallet extends Observable implements Observer {
 			else if (transaction instanceof CancelOrderTransaction) {
 				this.processOrderCancel((CancelOrderTransaction) transaction);
 			}
+
+            // NEED FOR CLEAR HEAP !
+			// очистим ссылку чтобы мусор собирался
+			transaction.clearBlock();
+
 		}
 
         if (block.blockHead.transactionsCount > 0
@@ -1277,9 +1283,9 @@ public class Wallet extends Observable implements Observer {
 		}
 
         // NEED FOR CLEAR HEAP !
-        block.setTransactions(null);
-        block.setTransactionData(0, null);
-        block = null;
+        ///block.setTransactions(null);
+        ///block.setTransactionData(0, null);
+        ///block = null;
 
     }
 
@@ -1310,7 +1316,9 @@ public class Wallet extends Observable implements Observer {
 				continue;
 			}
 
-			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, seqNo);
+            if (transaction.noDCSet())
+    			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, seqNo);
+
 			this.orphanTransaction(transaction);
 
 			// CHECK IF PAYMENT
@@ -1372,6 +1380,11 @@ public class Wallet extends Observable implements Observer {
 			else if (transaction instanceof CancelOrderTransaction) {
 				this.orphanOrderCancel((CancelOrderTransaction) transaction);
 			}
+
+            // NEED FOR CLEAR HEAP !
+            // очистим ссылку чтобы мусор собирался
+            transaction.clearBlock();
+
 		}
 
         Account blockGenerator = block.blockHead.creator;
@@ -1400,9 +1413,9 @@ public class Wallet extends Observable implements Observer {
 		// + tickets/(block.getTransactionCount()+1) );
 
         // NEED FOR CLEAR HEAP !
-        block.setTransactions(null);
-        block.setTransactionData(0, null);
-        block = null;
+        //block.setTransactions(null);
+        ///block.setTransactionData(0, null);
+        //block = null;
 
     }
 

@@ -562,6 +562,10 @@ public abstract class Transaction {
             this.calcFee();
     }
 
+    public boolean noDCSet() {
+        return this.dcSet == null;
+    }
+
     public int getType() {
         return Byte.toUnsignedInt(this.typeBytes[0]);
     }
@@ -777,6 +781,13 @@ public abstract class Transaction {
         this.block = db.getBlockMap().get(this.height);
 
         return block;
+    }
+
+    /**
+     * нужно для сборки мусора - убрать ссылку
+     */
+    public void clearBlock() {
+        this.block = null;
     }
 
     public Tuple2<Integer, Integer> getHeightSeqNo() {

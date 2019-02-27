@@ -261,6 +261,8 @@ public class Synchronizer {
 
             } else {
 
+                block.clearForHeap();
+
                 // INVALID BLOCK THROW EXCEPTION
                 String mess = "Dishonest peer by not is Valid block, heigh: " + height;
                 peer.ban(BAN_BLOCK_TIMES, mess);
@@ -481,6 +483,8 @@ public class Synchronizer {
                 }
 
                 if (!blockFromPeer.isValid(dcSet, false)) {
+                    blockFromPeer.clearForHeap();
+
                     errorMess = "invalid BLOCK";
                     banTime = BAN_BLOCK_TIMES;
                     break;
