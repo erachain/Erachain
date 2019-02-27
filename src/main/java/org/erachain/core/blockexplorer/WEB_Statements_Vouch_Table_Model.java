@@ -2,13 +2,13 @@ package org.erachain.core.blockexplorer;
 
 import org.erachain.core.transaction.R_Vouch;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.SortableList;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.lang.Lang;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun.Tuple2;
 
 import javax.swing.table.AbstractTableModel;
 import java.math.BigDecimal;

@@ -1,21 +1,17 @@
 package org.erachain.gui.library;
 
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import org.mapdb.Fun.Tuple2;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.wallet.TransactionMap;
-import org.erachain.datachain.SortableList;
+import org.erachain.database.SortableList;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun.Tuple2;
+
+import javax.swing.*;
+import java.util.Observable;
+import java.util.Observer;
 
 public class SetIntervalPanel extends JPanel implements Observer {
 

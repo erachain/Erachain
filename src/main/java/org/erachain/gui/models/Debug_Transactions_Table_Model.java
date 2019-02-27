@@ -1,29 +1,20 @@
 package org.erachain.gui.models;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.mapdb.Fun.Tuple2;
-
-import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.SortableList;
-import org.erachain.datachain.TransactionMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class Debug_Transactions_Table_Model extends AbstractTableModel implements Observer {
