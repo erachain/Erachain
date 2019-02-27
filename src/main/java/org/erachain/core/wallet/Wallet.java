@@ -612,6 +612,8 @@ public class Wallet extends Observable implements Observer {
 
                 // NEED FOR CLEAR HEAP
                 //block = null;
+                //block.clearForHeap();
+                block = null;
 
 				if (System.currentTimeMillis() - timePoint > 10000
 						|| steepHeight < height - lastHeight) {
@@ -1283,9 +1285,9 @@ public class Wallet extends Observable implements Observer {
 		}
 
         // NEED FOR CLEAR HEAP !
-        ///block.setTransactions(null);
-        ///block.setTransactionData(0, null);
-        ///block = null;
+        block.setTransactions(null);
+        block.setTransactionData(0, null);
+        block = null;
 
     }
 
@@ -1413,9 +1415,9 @@ public class Wallet extends Observable implements Observer {
 		// + tickets/(block.getTransactionCount()+1) );
 
         // NEED FOR CLEAR HEAP !
-        //block.setTransactions(null);
-        ///block.setTransactionData(0, null);
-        //block = null;
+        block.setTransactions(null);
+        block.setTransactionData(0, null);
+        block = null;
 
     }
 
