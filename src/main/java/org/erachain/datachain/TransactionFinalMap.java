@@ -12,11 +12,11 @@ import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.TransactionSerializer;
-import org.mapdb.*;
-import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
+import org.mapdb.*;
+import org.mapdb.Fun.Tuple2;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -112,7 +112,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
                     public String[] run(Long key, Transaction val) {
                         List<String> recps = new ArrayList<String>();
 
-                        val.setDC(getDCSet());
+                        val.setDC(getDBSet());
 
                         for (Account acc : val.getRecipientAccounts()) {
                             // make UNIQUE key??  + val.viewTimestamp()
@@ -220,7 +220,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
             key = (Long)iter.next();
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
-            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
+            item.setDC(this.getDBSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
 
             txs.add(item);
             counter++;
@@ -288,7 +288,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
             key = (Long)iter.next();
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
-            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
+            item.setDC(this.getDBSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
 
             txs.add(item);
             counter++;
@@ -311,7 +311,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
             key = (Long)iter.next();
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
-            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
+            item.setDC(this.getDBSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
 
             txs.add(item);
             counter++;
@@ -367,7 +367,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
             key = (Long)iter.next();
             item = this.map.get(key);
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
+            item.setDC(this.getDBSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
 
             txs.add(item);
         }
@@ -430,7 +430,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
             key = (Long)iter.next();
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
-            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
+            item.setDC(this.getDBSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
             txs.add(item);
         }
         return txs;
@@ -557,7 +557,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
     }
 
     public Transaction get(byte[] signature) {
-        return this.get(getDCSet().getTransactionFinalMapSigns().get(signature));
+        return this.get(getDBSet().getTransactionFinalMapSigns().get(signature));
     }
 
     public Transaction get(Long key) {
@@ -567,7 +567,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
             return null;
 
         Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-        item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
+        item.setDC(this.getDBSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
         return item;
     }
 

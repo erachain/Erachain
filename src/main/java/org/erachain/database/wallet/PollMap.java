@@ -4,21 +4,20 @@ import org.erachain.core.account.Account;
 import org.erachain.core.voting.Poll;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.PollSerializer;
-import org.erachain.datachain.DCMap;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
+import org.erachain.utils.ReverseComparator;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
-import org.erachain.utils.ReverseComparator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class PollMap extends DCMap<Tuple2<String, String>, Poll> {
+public class PollMap extends DBMap<Tuple2<String, String>, Poll> {
     public static final int NAME_INDEX = 1;
     public static final int CREATOR_INDEX = 2;
     static Logger LOGGER = LoggerFactory.getLogger(PollMap.class.getName());
@@ -31,10 +30,6 @@ public class PollMap extends DCMap<Tuple2<String, String>, Poll> {
         this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_POLL_TYPE);
         this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_POLL_TYPE);
         this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_POLL_TYPE);
-    }
-
-    public PollMap(PollMap parent) {
-        super(parent, null);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

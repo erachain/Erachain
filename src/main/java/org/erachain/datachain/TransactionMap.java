@@ -135,7 +135,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                     public String[] run(Long key, Transaction val) {
                         List<String> recps = new ArrayList<String>();
 
-                        val.setDC(getDCSet());
+                        val.setDC(getDBSet());
 
                         for (Account acc : val.getRecipientAccounts()) {
                             // recps.add(acc.getAddress() + val.viewTimestamp()); уникальнось внутри Бинда делается
@@ -155,7 +155,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                         List<Fun.Tuple3<String, Long, Integer>> recps = new ArrayList<Fun.Tuple3<String, Long, Integer>>();
                         Integer type = val.getType();
 
-                        val.setDC(getDCSet());
+                        val.setDC(getDBSet());
 
                         for (Account acc : val.getInvolvedAccounts()) {
                             recps.add(new Fun.Tuple3<String, Long, Integer>(acc.getAddress(), val.getTimestamp(), type));
@@ -233,7 +233,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             }
 
             if (!notSetDCSet)
-                transaction.setDC(this.getDCSet());
+                transaction.setDC(this.getDBSet());
 
             values.add(transaction);
 
@@ -291,7 +291,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         //    return true;
         //}
 
-        //this.getDCSet().updateUncTxCounter(1);
+        //this.getDBSet().updateUncTxCounter(1);
 
         return this.set(key, transaction);
 
@@ -309,7 +309,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         //this.peersBroadcasted.remove(key);
 
         //if (this.contains(key))
-        //    this.getDCSet().updateUncTxCounter(-1);
+        //    this.getDBSet().updateUncTxCounter(-1);
 
         return super.delete(key);
     }
@@ -468,7 +468,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                 ok = false;
 
             if (!ok) {
-                transaction.setDC(this.getDCSet());
+                transaction.setDC(this.getDBSet());
                 HashSet<Account> recipients = transaction.getRecipientAccounts();
 
                 if (recipients == null || recipients.isEmpty() || !recipients.contains(account)) {
@@ -498,7 +498,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                 break;
 
             transaction = this.get(iterator.next());
-            transaction.setDC(this.getDCSet());
+            transaction.setDC(this.getDBSet());
             values.add(transaction);
         }
         iterator = null;
@@ -518,7 +518,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             if (type != 0 && type != transaction.getType())
                 continue;
 
-            transaction.setDC(this.getDCSet());
+            transaction.setDC(this.getDBSet());
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             if (recipients == null || recipients.isEmpty())
                 continue;

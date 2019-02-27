@@ -3,8 +3,8 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
+import org.erachain.database.SortableList;
 import org.erachain.database.wallet.BlocksHeadMap;
-import org.erachain.datachain.SortableList;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Null;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 

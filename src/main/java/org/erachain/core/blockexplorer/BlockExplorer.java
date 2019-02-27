@@ -20,8 +20,8 @@ import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
 import org.erachain.core.voting.PollOption;
+import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.SortableList;
 import org.erachain.datachain.TradeMap;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.gui.models.PeersTableModel;
@@ -920,7 +920,7 @@ public class BlockExplorer {
             asset_g = Long.valueOf(key);
         }
 
-        List<Poll> pools = new ArrayList<Poll>(dcSet.getPollMap().getValuesAll());
+         List<Poll> pools = new ArrayList<Poll>(dcSet.getPollMap().getValues());
 
         if (pools.isEmpty()) {
             output.put("error", "There is no Polls.");
@@ -2054,7 +2054,7 @@ public class BlockExplorer {
 
         //totalNeg = total.add(totalNeg);
 
-        Collection<Order> orders = dcSet.getOrderMap().getValuesAll();
+        Collection<Order> orders = dcSet.getOrderMap().getValues();
 
         for (Order order : orders) {
             if (order.getHave() == key) {
@@ -2786,8 +2786,8 @@ public class BlockExplorer {
             return output;
         }
 
-        SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances = dcSet
-                .getAssetBalanceMap().getBalancesSortableList(new Account(address));
+        SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
+                = dcSet.getAssetBalanceMap().getBalancesSortableList(new Account(address));
 
         for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
             Map assetBalance = new LinkedHashMap();

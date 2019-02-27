@@ -13,12 +13,12 @@ import org.erachain.core.transaction.*;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -204,7 +204,7 @@ public class DatabaseTests {
         }
 
         ItemAssetMap dbMap = dcSet.getItemAssetMap();
-        Collection<ItemCls> assets = dbMap.getValuesAll();
+        Collection<ItemCls> assets = dbMap.getValues();
         for (ItemCls asset : assets) {
             //Asset asset = DBSet.getInstance().getAssetMap().get(key);
             AssetCls aa = (AssetCls) asset;
@@ -238,7 +238,7 @@ public class DatabaseTests {
         long key = asset.getKey(dcSet);
 
         ItemAssetMap assetDB = dcSet.getItemAssetMap();
-        Collection<ItemCls> assets = assetDB.getValuesAll();
+        Collection<ItemCls> assets = assetDB.getValues();
         for (ItemCls asset_2 : assets) {
             AssetCls aa = (AssetCls) asset_2;
             LOGGER.info(aa.toString() + " getQuantity " + aa.getQuantity());

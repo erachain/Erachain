@@ -447,7 +447,7 @@ public class WebResource {
     public Response doDeleteUnconfirmedTxs() {
 
         DCSet dcSet = DCSet.getInstance();
-        Collection<Transaction> values = dcSet.getTransactionMap().getValuesAll();
+        Collection<Transaction> values = dcSet.getTransactionMap().getValues();
 
         List<PrivateKeyAccount> privateKeyAccounts = Controller.getInstance().getPrivateKeyAccounts();
 

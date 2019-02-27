@@ -4,21 +4,20 @@ import org.erachain.core.account.Account;
 import org.erachain.core.naming.Name;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.NameSerializer;
-import org.erachain.datachain.DCMap;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
+import org.erachain.utils.ReverseComparator;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
-import org.erachain.utils.ReverseComparator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class NameMap extends DCMap<Tuple2<String, String>, Name> {
+public class NameMap extends DBMap<Tuple2<String, String>, Name> {
     public static final int NAME_INDEX = 1;
     public static final int OWNER_INDEX = 2;
     static Logger LOGGER = LoggerFactory.getLogger(NameMap.class.getName());
@@ -31,10 +30,6 @@ public class NameMap extends DCMap<Tuple2<String, String>, Name> {
         this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_NAME_TYPE);
         this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_NAME_TYPE);
         this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_NAME_TYPE);
-    }
-
-    public NameMap(NameMap parent) {
-        super(parent, null);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

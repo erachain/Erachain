@@ -2,7 +2,7 @@ package org.erachain.gui.items.imprints;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.imprints.ImprintCls;
-import org.erachain.datachain.SortableList;
+import org.erachain.database.SortableList;
 import org.erachain.gui.models.TableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;

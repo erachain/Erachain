@@ -161,7 +161,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     public byte[] getLastBlockSignature() {
         if (this.lastBlockSignature == null) {
-            this.lastBlockSignature = getDCSet().getBlocksHeadsMap().get(this.size()).signature;
+            this.lastBlockSignature = getDBSet().getBlocksHeadsMap().get(this.size()).signature;
         }
         return this.lastBlockSignature;
     }
@@ -210,14 +210,14 @@ public class BlockMap extends DCMap<Integer, Block> {
         Block block = super.get(height);
         if (block != null) {
             //block.setHeight(height);
-            block.loadHeadMind(this.getDCSet());
+            block.loadHeadMind(this.getDBSet());
         }
         return block;
 
     }
 
     public boolean add(Block block) {
-        DCSet dcSet = getDCSet();
+        DCSet dcSet = getDBSet();
 
 		/*
 		if (init1) {
@@ -292,7 +292,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     // TODO make CHAIN deletes - only for LAST block!
     public Block remove(byte[] signature, byte[] reference, PublicKeyAccount creator) {
-        DCSet dcSet = getDCSet();
+        DCSet dcSet = getDBSet();
 
         int height = this.size();
 

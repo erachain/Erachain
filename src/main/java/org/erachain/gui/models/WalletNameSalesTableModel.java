@@ -3,12 +3,12 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.naming.NameSale;
+import org.erachain.database.SortableList;
 import org.erachain.database.wallet.NameSaleMap;
-import org.erachain.datachain.SortableList;
 import org.erachain.lang.Lang;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
 import java.util.Observable;

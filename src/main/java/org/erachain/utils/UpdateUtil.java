@@ -1,18 +1,18 @@
 package org.erachain.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.erachain.api.BlogPostResource;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.SortableList;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.SortableList;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -26,8 +26,7 @@ public class UpdateUtil {
         DCSet.getInstance().getOrphanNameStorageMap().reset();
         DCSet.getInstance().getHashtagPostMap().reset();
 
-        SortableList<Integer, Block> blocks = DCSet.getInstance().getBlockMap()
-                .getList();
+        SortableList<Integer, Block> blocks = DCSet.getInstance().getBlockMap().getList();
         blocks.sort(BlockMap.HEIGHT_INDEX);
 
         Block b = new GenesisBlock();

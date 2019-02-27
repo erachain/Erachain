@@ -400,7 +400,7 @@ public class TransactionCreator {
 
             // IF has not DUPLICATE in UNCONFIRMED RECORDS
             TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionMap();
-            for (Transaction record : unconfirmedMap.getValuesAll()) {
+            for (Transaction record : unconfirmedMap.getValues()) {
                 if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
                     if (record instanceof IssuePersonRecord) {
                         IssuePersonRecord issuePerson = (IssuePersonRecord) record;
@@ -455,7 +455,7 @@ public class TransactionCreator {
 
         // IF has not DUPLICATE in UNCONFIRMED RECORDS
         TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionMap();
-        for (Transaction record : unconfirmedMap.getValuesAll()) {
+        for (Transaction record : unconfirmedMap.getValues()) {
             if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
                 if (record instanceof IssuePersonRecord) {
                     IssuePersonRecord issuePerson = (IssuePersonRecord) record;
