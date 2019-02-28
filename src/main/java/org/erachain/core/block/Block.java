@@ -780,7 +780,7 @@ public class Block {
 
         BigDecimal bonusFee; // = BlockChain.MIN_FEE_IN_BLOCK;
 
-        if(true || this.heightBlock < BlockChain.VERS_4_12) {
+        if (true) {
             bonusFee = BlockChain.MIN_FEE_IN_BLOCK_4_10;
             if (this.heightBlock < inDay30 << 1)
                 return BigDecimal.valueOf(70000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()

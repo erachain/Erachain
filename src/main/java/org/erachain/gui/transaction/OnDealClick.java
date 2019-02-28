@@ -1,13 +1,12 @@
 package org.erachain.gui.transaction;
 
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.lang.Lang;
+
+import javax.swing.*;
 
 //import javax.swing.JFrame;
 //import javax.swing.JOptionPane;
@@ -273,6 +272,16 @@ public class OnDealClick {
                 break;
             case Transaction.NOT_MOVABLE_ASSET:
                 mess = "Not movable asset";
+                break;
+
+            case Transaction.NOT_DEBTABLE_ASSET:
+                mess = "Not debtable asset";
+                break;
+            case Transaction.NOT_HOLDABLE_ASSET:
+                mess = "Not movable asset";
+                break;
+            case Transaction.NOT_SPENDABLE_ASSET:
+                mess = "Not spendable asset";
                 break;
 
             case Transaction.NOT_DEBT_ASSET:

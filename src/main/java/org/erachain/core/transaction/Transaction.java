@@ -165,8 +165,14 @@ public abstract class Transaction {
     public static final int NAME_KEY_ALREADY_EXISTS = 68;
     public static final int NAME_KEY_NOT_EXISTS = 69;
     public static final int LAST_KEY_IS_DEFAULT_KEY = 70;
-    
-    
+
+    //
+    public static final int NOT_DEBTABLE_ASSET = 71;
+    public static final int NOT_HOLDABLE_ASSET = 72;
+    public static final int NOT_SPENDABLE_ASSET = 73;
+
+
+
     // POLL
     public static final int INVALID_OPTIONS_LENGTH = 80;
     public static final int INVALID_OPTION_LENGTH = 81;

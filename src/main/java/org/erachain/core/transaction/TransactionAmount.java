@@ -545,7 +545,15 @@ public abstract class TransactionAmount extends Transaction {
                     switch (actionType) {
                         // HOLD GOODS, CHECK myself DEBT for CLAIMS
                         case ACTION_HOLD:
-                            
+
+                            if (absKey == FEE_KEY
+                                    || assetType == AssetCls.AS_INDEX
+                                    || assetType == AssetCls.AS_INSIDE_ACCESS
+                                    || assetType == AssetCls.AS_INSIDE_BONUS
+                            ) {
+                                return NOT_HOLDABLE_ASSET;
+                            }
+
                             if (height > BlockChain.HOLD_VALID_START) {
                                 if (!backward) {
                                     // HOLD only must be backward
@@ -588,9 +596,12 @@ public abstract class TransactionAmount extends Transaction {
                             break;
                         
                         case ACTION_DEBT: // DEBT, CREDIT and BORROW
-                            
-                            if (absKey == FEE_KEY) {
-                                return NOT_DEBT_ASSET;
+
+                            if (absKey == FEE_KEY
+                                    || assetType == AssetCls.AS_INDEX
+                                    || assetType == AssetCls.AS_INSIDE_BONUS
+                            ) {
+                                return NOT_DEBTABLE_ASSET;
                             }
                             
                             // CLAIMs DEBT - only for OWNER
@@ -604,6 +615,7 @@ public abstract class TransactionAmount extends Transaction {
                             // 75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12 ->
                             // 7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7
                             if (backward) {
+
                                 // BACKWARD - BORROW - CONFISCATE CREDIT
                                 Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
                                         this.creator.getAddress(), absKey, this.recipient.getAddress());
@@ -808,7 +820,16 @@ public abstract class TransactionAmount extends Transaction {
                             break;
                         
                         case ACTION_SPEND: // PRODUCE - SPEND
-                            
+
+                            if (absKey == FEE_KEY
+                                    || assetType == AssetCls.AS_INDEX
+                                    || assetType == AssetCls.AS_INSIDE_ACCESS
+                                    || assetType == AssetCls.AS_INSIDE_BONUS
+                            ) {
+                                return NOT_SPENDABLE_ASSET;
+                            }
+
+
                             // TRY FEE
                             if (this.creator.getBalance(dcSet, FEE_KEY,  ACTION_SEND).b.compareTo(this.fee) < 0) {
                                 return NOT_ENOUGH_FEE;
