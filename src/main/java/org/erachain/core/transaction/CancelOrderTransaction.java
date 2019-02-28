@@ -282,7 +282,7 @@ public class CancelOrderTransaction extends Transaction {
         }
 
         process_it(this.dcSet, order);
-        this.addCalculated(this.creator, order.getHave(), order.getAmountHave(),
+        this.addCalculated(block, this.creator, order.getHave(), order.getAmountHave(),
                 "cancel order @" + Transaction.viewDBRef(order.getId()));
     }
 
@@ -299,12 +299,12 @@ public class CancelOrderTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
 
         // FIRST GET DB REF from FINAL
 
         // ORPHAN
-        super.orphan(asDeal);
+        super.orphan(block, asDeal);
 
         //REMOVE ORDER DATABASE
         Order order = this.dcSet.getCompletedOrderMap().get(this.orderID);

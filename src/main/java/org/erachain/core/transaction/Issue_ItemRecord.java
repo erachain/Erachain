@@ -191,9 +191,9 @@ public abstract class Issue_ItemRecord extends Transaction {
 
     //@Override
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asDeal);
+        super.orphan(block, asDeal);
 
         //LOGGER.debug("<<<<< org.erachain.core.transaction.Issue_ItemRecord.orphan 1");
         //DELETE FROM DATABASE

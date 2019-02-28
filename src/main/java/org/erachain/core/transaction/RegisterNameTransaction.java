@@ -219,9 +219,9 @@ public class RegisterNameTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
         //UPDATE OWNER
-        super.orphan(asDeal);
+        super.orphan(block, asDeal);
 
         //UPDATE REFERENCE OF OWNER
         //this.creator.setLastReference(this.reference, db);

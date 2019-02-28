@@ -10,10 +10,10 @@ import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.*;
 import org.erachain.datachain.DCSet;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -236,7 +236,7 @@ public class TransactionTests3AssetsAsPack {
         assertEquals(new BigDecimal(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
         assertEquals(issueAssetTransaction.getSignature(), Transaction.FOR_NETWORK);
 
-        issueAssetTransaction.orphan(asPack);
+        issueAssetTransaction.orphan(block, asPack);
 
         //CHECK BALANCE ISSUER
         assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
@@ -460,7 +460,7 @@ public class TransactionTests3AssetsAsPack {
         assetTransfer.sign(maker, asPack);
         assetTransfer.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         assetTransfer.process(gb, asPack);
-        assetTransfer.orphan(asPack);
+        assetTransfer.orphan(block, asPack);
 
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
@@ -693,7 +693,7 @@ public class TransactionTests3AssetsAsPack {
         cancelOrderTransaction.process(gb, asPack);
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(50000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
-        cancelOrderTransaction.orphan(asPack);
+        cancelOrderTransaction.orphan(block, asPack);
 
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(49000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));

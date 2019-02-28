@@ -11,9 +11,9 @@ import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemImprintMap;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -189,7 +189,7 @@ public class TestRecImprint {
         issueImprintTransaction_2.setDC(db,Transaction.FOR_NETWORK, 1, 2);
         issueImprintTransaction_2.process(gb, Transaction.FOR_NETWORK);
         LOGGER.info("imprint_2 KEY: " + imprint_2.getKey(db));
-        issueImprintTransaction_2.orphan(Transaction.FOR_NETWORK);
+        issueImprintTransaction_2.orphan(block, Transaction.FOR_NETWORK);
         ItemImprintMap imprintMap = db.getItemImprintMap();
         int mapSize = imprintMap.size();
         assertEquals(0, mapSize - 1);
@@ -215,7 +215,7 @@ public class TestRecImprint {
         long key = db.getIssueImprintMap().get(issueImprintRecord);
         //		assertEquals(true, Arrays.equals(issueImprintRecord.getSignature(), maker.getLastReference()));
 
-        issueImprintRecord.orphan(Transaction.FOR_NETWORK);
+        issueImprintRecord.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK IMPRINT EXISTS SENDER
         assertEquals(false, db.getItemImprintMap().contains(key));

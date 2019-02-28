@@ -2406,9 +2406,8 @@ public class BlockExplorer {
             transactionDataJSON.put("targetCreator", orderTarget.getCreator());
             transactionDataJSON.put("targetAmount", orderTarget.getAmountHave().toPlainString());
 
-            Block parentBlock = createOrderTarget.getBlock(dcSet);
-            transactionDataJSON.put("height", parentBlock.getHeight());
-            transactionDataJSON.put("confirmations", getHeight() - parentBlock.getHeight() + 1);
+            transactionDataJSON.put("height", createOrderTarget.getBlockHeight());
+            transactionDataJSON.put("confirmations", createOrderTarget.getConfirmations(DCSet.getInstance()));
 
             transactionDataJSON.put("timestamp", trade.getInitiator());
             transactionDataJSON.put("dateTime", "--"); //BlockExplorer.timestampToStr(trade.getTimestamp()));
@@ -2602,9 +2601,7 @@ public class BlockExplorer {
             }
 
             if (transaction.isConfirmed(dcSet)) {
-                Block parent = transaction.getBlock(dcSet);
-                transactionDataJSON.put("block", Base58.encode(parent.getSignature()));
-                transactionDataJSON.put("blockHeight", parent.getHeight());
+                transactionDataJSON.put("blockHeight", transaction.getBlockHeight());
             }
 
             transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(transaction.getTimestamp()));
@@ -2914,7 +2911,7 @@ public class BlockExplorer {
                     Account atAccount = ((DeployATTransaction) transaction).getATaccount(dcSet);
 
                     if (atAccount.getAddress().equals(address)) {
-                        transaction.setBlock(block, dcSet, block.heightBlock, seqNo);
+                        transaction.setDC(dcSet, block.heightBlock, block.heightBlock, seqNo);
                         all.add(new BlExpUnit(at.getCreationBlockHeight(), 0, transaction));
                         aTbalanceCreation = ((DeployATTransaction) transaction).getAmount();
                     }
@@ -4215,7 +4212,7 @@ public class BlockExplorer {
 
         int seqNo = 0;
         for (Transaction transaction : block.getTransactions()) {
-            transaction.setBlock(block, dcSet, block.heightBlock, ++seqNo);
+            transaction.setDC(dcSet, block.heightBlock, block.heightBlock, ++seqNo);
             all.add(transaction);
             txsTypeCount[transaction.getType() - 1]++;
         }

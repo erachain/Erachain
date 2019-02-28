@@ -2021,7 +2021,7 @@ public class Block {
             transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, seqNo);
 
             if (!transaction.isWiped()) {
-                transaction.orphan(Transaction.FOR_NETWORK);
+                transaction.orphan(this, Transaction.FOR_NETWORK);
             } else {
                 // IT IS REFERENCED RECORD?
                 if (transaction.isReferenced()) {

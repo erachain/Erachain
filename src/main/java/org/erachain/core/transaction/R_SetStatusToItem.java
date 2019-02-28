@@ -800,10 +800,10 @@ public class R_SetStatusToItem extends Transaction {
     }
 
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
 
         //UPDATE SENDER
-        super.orphan(asDeal);
+        super.orphan(block, asDeal);
 
 
         // UNDO ALIVE PERSON for DURATION

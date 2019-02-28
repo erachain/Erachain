@@ -10,11 +10,11 @@ import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemStatusMap;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.Corekeys;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.erachain.utils.Corekeys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -191,7 +191,7 @@ public class TestRecStatus {
         issueStatusTransaction_2.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issueStatusTransaction_2.process(gb, Transaction.FOR_NETWORK);
         LOGGER.info("status_2 KEY: " + status_2.getKey(db));
-        issueStatusTransaction_2.orphan(Transaction.FOR_NETWORK);
+        issueStatusTransaction_2.orphan(block, Transaction.FOR_NETWORK);
         assertEquals(mapSize + 1, statusMap.size());
 
         //CHECK STATUS IS CORRECT
@@ -202,7 +202,7 @@ public class TestRecStatus {
 
         ////// ORPHAN ///////
 
-        issueStatusRecord.orphan(Transaction.FOR_NETWORK);
+        issueStatusRecord.orphan(block, Transaction.FOR_NETWORK);
 
         assertEquals(mapSize, statusMap.size());
 

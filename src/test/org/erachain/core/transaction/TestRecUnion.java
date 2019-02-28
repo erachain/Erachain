@@ -12,10 +12,10 @@ import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -311,7 +311,7 @@ public class TestRecUnion {
         assertEquals(issueUnionTransaction.getTimestamp(), certifier.getLastTimestamp(db));
 
         //////// ORPHAN /////////
-        issueUnionTransaction.orphan(Transaction.FOR_NETWORK);
+        issueUnionTransaction.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE ISSUER
         assertEquals(BlockChain.MAJOR_ERA_BALANCE_BD, certifier.getBalanceUSE(ERM_KEY, db));

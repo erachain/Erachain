@@ -7,10 +7,10 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -218,7 +218,7 @@ public class TestRecGenesisAsset {
         //assertEquals(new BigDecimal(asset.getQuantity()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getConfirmedBalance(key, db));
         //assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getSignature(), maker.getLastReference(db)));
 
-        genesisIssueAssetTransaction.orphan(Transaction.FOR_NETWORK);
+        genesisIssueAssetTransaction.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE ISSUER
         assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
@@ -405,7 +405,7 @@ public class TestRecGenesisAsset {
         Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, key, amoSend);
         // assetTransfer.sign(sender); not NEED
         assetTransfer.process(gb, Transaction.FOR_NETWORK);
-        assetTransfer.orphan(Transaction.FOR_NETWORK);
+        assetTransfer.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER - null
         //assertEquals(total, maker.getConfirmedBalance(key, db));
@@ -497,7 +497,7 @@ public class TestRecGenesisAsset {
 
         ///////////////////////////
         ////////////////////////////
-        assetTransfer.orphan(Transaction.FOR_NETWORK);
+        assetTransfer.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER - null
         //assertEquals(total, maker.getConfirmedBalance(key, db));

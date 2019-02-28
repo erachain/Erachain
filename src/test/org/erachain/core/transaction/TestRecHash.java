@@ -1,15 +1,5 @@
 package org.erachain.core.transaction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Stack;
-
-import org.junit.Test;
-import org.mapdb.Fun.Tuple3;
-
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
@@ -18,6 +8,15 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.HashesSignsMap;
 import org.erachain.ntp.NTP;
+import org.junit.Test;
+import org.mapdb.Fun.Tuple3;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Stack;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 //import java.math.BigInteger;
 //import java.util.ArrayList;
@@ -166,7 +165,7 @@ public class TestRecHash {
         assertEquals(result.size(), 1);
 
         ///// ORPHAN
-        hashesRecord.orphan(Transaction.FOR_NETWORK);
+        hashesRecord.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK REFERENCE SENDER
         //assertEquals(hashesRecord.getReference(), maker.getLastReference(db));

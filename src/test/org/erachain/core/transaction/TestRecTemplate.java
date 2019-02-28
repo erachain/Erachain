@@ -10,11 +10,11 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemTemplateMap;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.Corekeys;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.erachain.utils.Corekeys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -211,7 +211,7 @@ public class TestRecTemplate {
         issueTemplateTransaction_2.sign(maker, Transaction.FOR_NETWORK);
         issueTemplateTransaction_2.process(gb, Transaction.FOR_NETWORK);
         LOGGER.info("template_2 KEY: " + template_2.getKey(db));
-        issueTemplateTransaction_2.orphan(Transaction.FOR_NETWORK);
+        issueTemplateTransaction_2.orphan(block, Transaction.FOR_NETWORK);
         assertEquals(mapSize, templateMap.size());
 
         //CHECK PLATE IS CORRECT
@@ -240,7 +240,7 @@ public class TestRecTemplate {
         long key = db.getIssueTemplateMap().get(issueTemplateRecord);
         assertEquals(issueTemplateRecord.getTimestamp(), maker.getLastTimestamp(db));
 
-        issueTemplateRecord.orphan(Transaction.FOR_NETWORK);
+        issueTemplateRecord.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK PLATE EXISTS SENDER
         assertEquals(false, templateMap.contains(key));
@@ -482,7 +482,7 @@ public class TestRecTemplate {
         assertEquals(signNoteRecord.getTimestamp(), maker.getLastTimestamp(db));
 
         ///// ORPHAN
-        signNoteRecord.orphan(Transaction.FOR_NETWORK);
+        signNoteRecord.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK REFERENCE SENDER
         //assertEquals(signNoteRecord.getReference(), maker.getLastReference(db));

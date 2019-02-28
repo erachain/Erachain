@@ -1374,7 +1374,7 @@ public abstract class Transaction {
 
     }
 
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
 
         if (Base58.encode(this.signature)
                 .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {

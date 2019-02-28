@@ -1001,9 +1001,9 @@ public abstract class TransactionAmount extends Transaction {
     }
     
     @Override
-    public void orphan(int asDeal) {
-        
-        super.orphan(asDeal);
+    public void orphan(Block block, int asDeal) {
+
+        super.orphan(block, asDeal);
         
         if (this.amount == null)
             return;

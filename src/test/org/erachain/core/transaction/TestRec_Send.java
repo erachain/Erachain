@@ -15,9 +15,9 @@ import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.payment.Payment;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -542,7 +542,7 @@ public class TestRec_Send {
         assertEquals(messageTransactionV3_2.isSignatureValid(db), true);
 
         //// MESSAGE ONLY
-        r_SendV3.orphan(Transaction.FOR_NETWORK);
+        r_SendV3.orphan(block, Transaction.FOR_NETWORK);
         assertEquals((long) maker.getLastTimestamp(db), gb.getTimestamp());
 
         r_SendV3 = new R_Send(
@@ -591,7 +591,7 @@ public class TestRec_Send {
 
 
         //// AMOUNT ONLY
-        r_SendV3.orphan(Transaction.FOR_NETWORK);
+        r_SendV3.orphan(block, Transaction.FOR_NETWORK);
         assertEquals((long) maker.getLastTimestamp(db), gb.getTimestamp());
 
         r_SendV3 = new R_Send(
@@ -637,7 +637,7 @@ public class TestRec_Send {
         assertEquals(messageTransactionV3_2.isSignatureValid(db), true);
 
         //// EMPTY - NOT AMOUNT and NOT TEXT
-        r_SendV3.orphan(Transaction.FOR_NETWORK);
+        r_SendV3.orphan(block, Transaction.FOR_NETWORK);
 
         r_SendV3 = new R_Send(
                 maker, FEE_POWER,

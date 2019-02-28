@@ -9,13 +9,13 @@ import org.erachain.core.transaction.RegisterNameTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
+import org.erachain.utils.Corekeys;
+import org.erachain.utils.Pair;
+import org.erachain.utils.StorageUtils;
 import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.erachain.utils.Corekeys;
-import org.erachain.utils.Pair;
-import org.erachain.utils.StorageUtils;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -429,7 +429,7 @@ public class NameStorageTest {
                         Corekeys.WEBSITE.toString()));
 
         // ORPHANING FIRST TX!
-        arbitraryTransaction.orphan(Transaction.FOR_NETWORK);
+        arbitraryTransaction.orphan(block, Transaction.FOR_NETWORK);
 
         assertEquals(
                 " second",
@@ -437,7 +437,7 @@ public class NameStorageTest {
                         Corekeys.WEBSITE.toString()));
 
         // ORPHANING second TX!
-        arbitraryTransaction2.orphan(Transaction.FOR_NETWORK);
+        arbitraryTransaction2.orphan(block, Transaction.FOR_NETWORK);
 
         assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
                 Corekeys.WEBSITE.toString()));
@@ -531,7 +531,7 @@ public class NameStorageTest {
         // Website: firstthird
         // random : skerberus
         // asdf : asdf
-        arbitraryTransaction2.orphan(Transaction.FOR_NETWORK);
+        arbitraryTransaction2.orphan(block, Transaction.FOR_NETWORK);
 
         assertEquals(
                 "firstthird",
@@ -636,7 +636,7 @@ public class NameStorageTest {
         // Website: secondthird
         // random : vrontis
         // asdf : asdf
-        arbitraryTransaction.orphan(Transaction.FOR_NETWORK);
+        arbitraryTransaction.orphan(block, Transaction.FOR_NETWORK);
 
         assertEquals(
                 "secondthird",
@@ -656,7 +656,7 @@ public class NameStorageTest {
         // removing new first
         // Website: third
         // asdf : asdf
-        arbitraryTransaction2.orphan(Transaction.FOR_NETWORK);
+        arbitraryTransaction2.orphan(block, Transaction.FOR_NETWORK);
 
         assertEquals(
                 "third",
@@ -758,7 +758,7 @@ public class NameStorageTest {
         // Profenable:yes
         // Website: firstsecond
         // random : skerberus;vrontis
-        arbitraryTransaction3.orphan(Transaction.FOR_NETWORK);
+        arbitraryTransaction3.orphan(block, Transaction.FOR_NETWORK);
 
         assertEquals(
                 "firstsecond",

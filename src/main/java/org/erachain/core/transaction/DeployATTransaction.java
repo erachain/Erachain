@@ -1,23 +1,10 @@
 package org.erachain.core.transaction;
 
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.eclipse.jetty.util.StringUtil;
-import org.json.simple.JSONObject;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-
+import org.eclipse.jetty.util.StringUtil;
 import org.erachain.at.AT;
 import org.erachain.at.AT_Constants;
 import org.erachain.at.AT_Controller;
@@ -30,6 +17,17 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.Converter;
+import org.json.simple.JSONObject;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @deprecated
@@ -442,10 +440,10 @@ public class DeployATTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
 
         //UPDATE ISSUER
-        super.orphan(asDeal);
+        super.orphan(block, asDeal);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).add(this.amount), db);
         this.creator.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.amount, false);
 

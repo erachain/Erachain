@@ -7,11 +7,11 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -209,7 +209,7 @@ public class TestRec_Vouch {
 
 		 */
 
-        vouchRecord.orphan(Transaction.FOR_NETWORK);
+    vouchRecord.orphan(block, Transaction.FOR_NETWORK);
 
         value = db.getVouchRecordMap().get(Transaction.makeDBRef(height, seq));
         assertEquals(value, new Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>(

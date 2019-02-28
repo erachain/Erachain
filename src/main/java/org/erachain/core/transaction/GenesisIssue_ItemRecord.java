@@ -109,7 +109,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record {
 
 
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
 
         //DELETE FROM DATABASE
         this.item.removeFromMap(this.dcSet, 0l);

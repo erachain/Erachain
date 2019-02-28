@@ -1,16 +1,5 @@
 package org.erachain.core.transaction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
-import java.math.BigDecimal;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.junit.Test;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple5;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -21,6 +10,16 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
+import org.junit.Test;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple5;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class TestRec_Send_Movable {
 
@@ -166,7 +165,7 @@ public class TestRec_Send_Movable {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(Transaction.FOR_NETWORK);
+        r_Send.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(500), producer.getBalanceUSE(keyMovable, db));
@@ -234,7 +233,7 @@ public class TestRec_Send_Movable {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(Transaction.FOR_NETWORK);
+        r_Send.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         producerBalance = producer.getBalance(db, assetKey);
@@ -298,7 +297,7 @@ public class TestRec_Send_Movable {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(Transaction.FOR_NETWORK);
+        r_Send.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         producerBalance = producer.getBalance(db, assetKey);
@@ -354,7 +353,7 @@ public class TestRec_Send_Movable {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(Transaction.FOR_NETWORK);
+        r_Send.orphan(block, Transaction.FOR_NETWORK);
 
         spenderBalance = spender.getBalance(db, assetKey);
 

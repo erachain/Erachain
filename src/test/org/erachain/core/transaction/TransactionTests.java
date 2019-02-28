@@ -13,11 +13,10 @@ import org.erachain.core.voting.Poll;
 import org.erachain.core.voting.PollOption;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-//import org.apache.log4j.PropertyConfigurator;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -26,6 +25,8 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
+//import org.apache.log4j.PropertyConfigurator;
 
 //import org.erachain.core.transaction.MultiPaymentTransaction;
 @Ignore
@@ -241,7 +242,7 @@ String  s= "";
         payment.process(gb, Transaction.FOR_NETWORK);
 
         //ORPHAN PAYMENT
-        payment2.orphan(Transaction.FOR_NETWORK);
+        payment2.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(0, amount1.compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
@@ -451,7 +452,7 @@ String  s= "";
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
         nameRegistration.sign(maker, Transaction.FOR_NETWORK);
         nameRegistration.process(gb, Transaction.FOR_NETWORK);
-        nameRegistration.orphan(Transaction.FOR_NETWORK);
+        nameRegistration.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, databaseSet));
@@ -682,7 +683,7 @@ String  s= "";
         Transaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
         nameUpdate.sign(maker, Transaction.FOR_NETWORK);
         nameUpdate.process(gb, Transaction.FOR_NETWORK);
-        nameUpdate.orphan(Transaction.FOR_NETWORK);
+        nameUpdate.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(0, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
@@ -921,7 +922,7 @@ String  s= "";
         Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
         nameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
         nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
-        nameSaleTransaction.orphan(Transaction.FOR_NETWORK);
+        nameSaleTransaction.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         //assertEquals(0, maker.getConfirmedBalance(FEE_KEY, databaseSet));
@@ -1164,7 +1165,7 @@ String  s= "";
         Transaction cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, last_ref);
         cancelNameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
         cancelNameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
-        cancelNameSaleTransaction.orphan(Transaction.FOR_NETWORK);
+        cancelNameSaleTransaction.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(0, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
@@ -1435,7 +1436,7 @@ String  s= "";
         Transaction purchaseNameTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet));
         purchaseNameTransaction.sign(buyer, Transaction.FOR_NETWORK);
         purchaseNameTransaction.process(gb, Transaction.FOR_NETWORK);
-        purchaseNameTransaction.orphan(Transaction.FOR_NETWORK);
+        purchaseNameTransaction.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), buyer.getBalanceUSE(FEE_KEY, databaseSet));
@@ -1668,7 +1669,7 @@ String  s= "";
         Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
         pollCreation.sign(maker, Transaction.FOR_NETWORK);
         pollCreation.process(gb, Transaction.FOR_NETWORK);
-        pollCreation.orphan(Transaction.FOR_NETWORK);
+        pollCreation.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, databaseSet));
@@ -1910,7 +1911,7 @@ String  s= "";
         Transaction pollVote = new VoteOnPollTransaction(maker, poll.getName(), 0, FEE_POWER, timestamp, last_ref);
         pollVote.sign(maker, Transaction.FOR_NETWORK);
         pollVote.process(gb, Transaction.FOR_NETWORK);
-        pollVote.orphan(Transaction.FOR_NETWORK);
+        pollVote.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         //assertEquals(0, maker.getConfirmedBalance(FEE_KEY, databaseSet));
@@ -2076,7 +2077,7 @@ String  s= "";
         ArbitraryTransactionV3 arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, "test".getBytes(), FEE_POWER, timestamp, last_ref);
         arbitraryTransaction.sign(maker, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(gb, Transaction.FOR_NETWORK);
-        arbitraryTransaction.orphan(Transaction.FOR_NETWORK);
+        arbitraryTransaction.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, databaseSet));
@@ -2301,7 +2302,7 @@ String  s= "";
         assertEquals(new BigDecimal(50000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
         assertEquals(issueAssetTransaction.getTimestamp(), maker.getLastTimestamp(db));
 
-        issueAssetTransaction.orphan(Transaction.FOR_NETWORK);
+        issueAssetTransaction.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE ISSUER
         assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));

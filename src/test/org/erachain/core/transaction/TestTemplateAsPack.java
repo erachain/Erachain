@@ -9,10 +9,10 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemTemplateMap;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -173,7 +173,7 @@ public class TestTemplateAsPack {
         issueTemplateTransaction_2.sign(maker, asPack);
         issueTemplateTransaction_2.process(gb, asPack);
         LOGGER.info("template_2 KEY: " + template_2.getKey(db));
-        issueTemplateTransaction_2.orphan(asPack);
+        issueTemplateTransaction_2.orphan(block, asPack);
         ItemTemplateMap templateMap = db.getItemTemplateMap();
         int mapSize = templateMap.size();
         assertEquals(0, mapSize - 4);
@@ -202,7 +202,7 @@ public class TestTemplateAsPack {
         long key = db.getIssueTemplateMap().get(issueTemplateRecord);
         assertEquals((long) makerReference, (long) maker.getLastTimestamp(db));
 
-        issueTemplateRecord.orphan(asPack);
+        issueTemplateRecord.orphan(block, asPack);
 
         //CHECK PLATE EXISTS SENDER
         assertEquals(false, db.getItemTemplateMap().contains(key));

@@ -1268,11 +1268,6 @@ public class Wallet extends Observable implements Observer {
 				this.processOrderCancel((CancelOrderTransaction) transaction);
 			}
 
-            // NEED FOR CLEAR HEAP !
-			// очистим ссылку чтобы мусор собирался
-            // ускоряет сборку мусора и лучше чистит Кучу
-			transaction.clearBlock();
-
 		}
 
         if (block.blockHead.transactionsCount > 0
@@ -1382,11 +1377,6 @@ public class Wallet extends Observable implements Observer {
 			else if (transaction instanceof CancelOrderTransaction) {
 				this.orphanOrderCancel((CancelOrderTransaction) transaction);
 			}
-
-            // NEED FOR CLEAR HEAP !
-            // очистим ссылку чтобы мусор собирался
-            // ускоряет сборку мусора и лучше чистит Кучу
-            transaction.clearBlock();
 
 		}
 

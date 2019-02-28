@@ -15,11 +15,11 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.KKPersonStatusMap;
 import org.erachain.datachain.PersonAddressMap;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple4;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -343,7 +343,7 @@ public class TestRecPerson {
         assertEquals(issuePersonTransaction.getTimestamp(), certifier.getLastTimestamp(db));
 
         //////// ORPHAN /////////
-        issuePersonTransaction.orphan(Transaction.FOR_NETWORK);
+        issuePersonTransaction.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE ISSUER
         assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(ERM_KEY, db));
@@ -645,7 +645,7 @@ public class TestRecPerson {
         assertEquals(true, userAccount3.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
 
         ////////// ORPHAN //////////////////
-        r_SertifyPubKeys.orphan(Transaction.FOR_NETWORK);
+        r_SertifyPubKeys.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(erm_amount, certifier.getBalanceUSE(ERM_KEY, db));
@@ -720,7 +720,7 @@ public class TestRecPerson {
         assertEquals(abs_end_date2, (int) userAccount2.getPersonDuration(db).b);
         assertEquals(false, userAccount2.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
 
-        r_SertifyPubKeys.orphan(Transaction.FOR_NETWORK);
+        r_SertifyPubKeys.orphan(block, Transaction.FOR_NETWORK);
 
         assertEquals(abs_end_date, (int) userAccount2.getPersonDuration(db).b);
         assertEquals(true, userAccount2.isPerson(db, db.getBlockSignsMap().get(db.getBlockMap().getLastBlockSignature())));
@@ -880,7 +880,7 @@ public class TestRecPerson {
 
 
         ////////// ORPHAN //////////////////
-        r_SertifyPubKeys.orphan(Transaction.FOR_NETWORK);
+        r_SertifyPubKeys.orphan(block, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(erm_amount, certifier.getBalanceUSE(ERM_KEY, fork));
