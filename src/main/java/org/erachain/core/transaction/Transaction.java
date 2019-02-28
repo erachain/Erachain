@@ -547,6 +547,7 @@ public abstract class Transaction {
         this.dcSet = dcSet;
         this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);
         this.seqNo = seqNo;
+        this.dbRef = Transaction.makeDBRef(height, seqNo);
         if (asDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0) )
             this.calcFee();
     }

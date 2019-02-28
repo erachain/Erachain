@@ -559,9 +559,14 @@ public class Block {
         return this.heightBlock;
     }
 
+    /**
+     * очищает перекрестные ссылки из тнзакций на блок и позволяет его очистить из Кучи
+     * Так же быстрее чистит байтовые массивы у блока
+     */
     public void clearForHeap() {
         this.transactions = null;
         this.parentBlockHead = null;
+        this.rawTransactions = null;
     }
 
     /*

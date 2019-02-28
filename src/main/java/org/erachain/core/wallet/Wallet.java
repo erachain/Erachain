@@ -611,7 +611,6 @@ public class Wallet extends Observable implements Observer {
 				}
 
                 // NEED FOR CLEAR HEAP
-                //block = null;
                 //block.clearForHeap();
                 block = null;
 
@@ -1271,6 +1270,7 @@ public class Wallet extends Observable implements Observer {
 
             // NEED FOR CLEAR HEAP !
 			// очистим ссылку чтобы мусор собирался
+            // ускоряет сборку мусора и лучше чистит Кучу
 			transaction.clearBlock();
 
 		}
@@ -1285,9 +1285,9 @@ public class Wallet extends Observable implements Observer {
 		}
 
         // NEED FOR CLEAR HEAP !
-        block.setTransactions(null);
-        block.setTransactionData(0, null);
-        block = null;
+        block.clearForHeap();
+
+        //block = null;
 
     }
 
@@ -1385,6 +1385,7 @@ public class Wallet extends Observable implements Observer {
 
             // NEED FOR CLEAR HEAP !
             // очистим ссылку чтобы мусор собирался
+            // ускоряет сборку мусора и лучше чистит Кучу
             transaction.clearBlock();
 
 		}
@@ -1415,9 +1416,7 @@ public class Wallet extends Observable implements Observer {
 		// + tickets/(block.getTransactionCount()+1) );
 
         // NEED FOR CLEAR HEAP !
-        block.setTransactions(null);
-        block.setTransactionData(0, null);
-        block = null;
+        block.clearForHeap();
 
     }
 
