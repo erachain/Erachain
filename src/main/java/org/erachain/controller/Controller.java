@@ -93,7 +93,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.11.10 beta RC";
+    public static String version = "4.11.10 beta RC+heap";
     public static String buildTime = "2019-02-13 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -1373,7 +1373,7 @@ public class Controller extends Observable {
     public void actionAfterConnect() {
 
         if (this.connectTimer == null) {
-            this.connectTimer = new Timer();
+            this.connectTimer = new Timer("Action after connect");
 
             TimerTask action = new TimerTask() {
                 @Override

@@ -437,7 +437,7 @@ public class Wallet extends Observable implements Observer {
     public void startProcessForSynchronize() {
 
         if (this.timerSynchronize == null) {
-            this.timerSynchronize = new Timer();
+            this.timerSynchronize = new Timer("Wallet synchronize check");
 
             TimerTask action = new TimerTask() {
                 @Override
