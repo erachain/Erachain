@@ -311,7 +311,7 @@ public class TestRecUnion {
         assertEquals(issueUnionTransaction.getTimestamp(), certifier.getLastTimestamp(db));
 
         //////// ORPHAN /////////
-        issueUnionTransaction.orphan(block, Transaction.FOR_NETWORK);
+        issueUnionTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE ISSUER
         assertEquals(BlockChain.MAJOR_ERA_BALANCE_BD, certifier.getBalanceUSE(ERM_KEY, db));

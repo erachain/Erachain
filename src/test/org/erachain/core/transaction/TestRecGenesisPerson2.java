@@ -209,7 +209,7 @@ public class TestRecGenesisPerson2 {
 
         /////////////////
         ///// ORPHAN ////
-        genesisIssuePersonTransaction.orphan(block, Transaction.FOR_NETWORK);
+        genesisIssuePersonTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
         assertEquals(false, db.getItemPersonMap().contains(keyPerson));
 

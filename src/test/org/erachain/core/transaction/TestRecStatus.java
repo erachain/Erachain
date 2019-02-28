@@ -191,7 +191,7 @@ public class TestRecStatus {
         issueStatusTransaction_2.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issueStatusTransaction_2.process(gb, Transaction.FOR_NETWORK);
         LOGGER.info("status_2 KEY: " + status_2.getKey(db));
-        issueStatusTransaction_2.orphan(block, Transaction.FOR_NETWORK);
+        issueStatusTransaction_2.orphan(gb, Transaction.FOR_NETWORK);
         assertEquals(mapSize + 1, statusMap.size());
 
         //CHECK STATUS IS CORRECT
@@ -202,7 +202,7 @@ public class TestRecStatus {
 
         ////// ORPHAN ///////
 
-        issueStatusRecord.orphan(block, Transaction.FOR_NETWORK);
+        issueStatusRecord.orphan(gb, Transaction.FOR_NETWORK);
 
         assertEquals(mapSize, statusMap.size());
 

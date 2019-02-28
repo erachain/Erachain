@@ -3,6 +3,7 @@ package org.erachain.core.transaction;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
@@ -57,6 +58,7 @@ public class TransactionTests {
     //CREATE EMPTY MEMORY DATABASE
     private DCSet db;
     private GenesisBlock gb;
+    Block block;
 
     // INIT ASSETS
     private void init() {
@@ -70,6 +72,8 @@ public class TransactionTests {
 
         databaseSet = db = DCSet.createEmptyDatabaseSet();
         gb = new GenesisBlock();
+        block = gb;
+
         try {
             gb.process(db);
         } catch (Exception e) {
@@ -242,7 +246,7 @@ String  s= "";
         payment.process(gb, Transaction.FOR_NETWORK);
 
         //ORPHAN PAYMENT
-        payment2.orphan(block, Transaction.FOR_NETWORK);
+        payment2.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(0, amount1.compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
@@ -452,7 +456,7 @@ String  s= "";
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
         nameRegistration.sign(maker, Transaction.FOR_NETWORK);
         nameRegistration.process(gb, Transaction.FOR_NETWORK);
-        nameRegistration.orphan(block, Transaction.FOR_NETWORK);
+        nameRegistration.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, databaseSet));

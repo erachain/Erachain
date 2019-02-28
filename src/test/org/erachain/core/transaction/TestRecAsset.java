@@ -313,7 +313,7 @@ public class TestRecAsset {
         assertEquals(new BigDecimal(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
         assertEquals((long) issueAssetTransaction.getTimestamp(), (long) maker.getLastTimestamp(db));
 
-        issueAssetTransaction.orphan(block, Transaction.FOR_NETWORK);
+        issueAssetTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE ISSUER
         assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
@@ -543,7 +543,7 @@ public class TestRecAsset {
         assetTransfer.sign(maker, Transaction.FOR_NETWORK);
         assetTransfer.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         assetTransfer.process(gb, Transaction.FOR_NETWORK);
-        assetTransfer.orphan(block, Transaction.FOR_NETWORK);
+        assetTransfer.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
@@ -843,7 +843,7 @@ public class TestRecAsset {
         messageTransaction.sign(maker, Transaction.FOR_NETWORK);
         messageTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         messageTransaction.process(gb, Transaction.FOR_NETWORK);
-        messageTransaction.orphan(block, Transaction.FOR_NETWORK);
+        messageTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));

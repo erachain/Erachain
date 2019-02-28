@@ -241,7 +241,7 @@ public class TestRecSetStatusToItem {
 
 
         ////// ORPHAN 2 ///////
-        setStatusTransaction_2.orphan(block, Transaction.FOR_NETWORK);
+        setStatusTransaction_2.orphan(gb, Transaction.FOR_NETWORK);
 
         statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
         endDate = statusDuration.a;
@@ -251,7 +251,7 @@ public class TestRecSetStatusToItem {
         assertEquals(setStatusTransaction.getTimestamp(), maker.getLastTimestamp(db));
 
         ////// ORPHAN ///////
-        setStatusTransaction.orphan(block, Transaction.FOR_NETWORK);
+        setStatusTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
         statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
         assertEquals(statusDuration, null);

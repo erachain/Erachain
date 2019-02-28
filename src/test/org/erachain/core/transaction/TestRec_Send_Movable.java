@@ -165,7 +165,7 @@ public class TestRec_Send_Movable {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(block, Transaction.FOR_NETWORK);
+        r_Send.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(500), producer.getBalanceUSE(keyMovable, db));
@@ -233,7 +233,7 @@ public class TestRec_Send_Movable {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(block, Transaction.FOR_NETWORK);
+        r_Send.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         producerBalance = producer.getBalance(db, assetKey);
@@ -297,7 +297,7 @@ public class TestRec_Send_Movable {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(block, Transaction.FOR_NETWORK);
+        r_Send.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         producerBalance = producer.getBalance(db, assetKey);
@@ -353,7 +353,7 @@ public class TestRec_Send_Movable {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(block, Transaction.FOR_NETWORK);
+        r_Send.orphan(gb, Transaction.FOR_NETWORK);
 
         spenderBalance = spender.getBalance(db, assetKey);
 

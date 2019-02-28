@@ -209,7 +209,7 @@ public class TestRec_Vouch {
 
 		 */
 
-    vouchRecord.orphan(block, Transaction.FOR_NETWORK);
+    vouchRecord.orphan(gb, Transaction.FOR_NETWORK);
 
         value = db.getVouchRecordMap().get(Transaction.makeDBRef(height, seq));
         assertEquals(value, new Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>(

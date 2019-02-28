@@ -164,7 +164,7 @@ public class TestRec_Send_InSideAsset {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(block, Transaction.FOR_NETWORK);
+        r_Send.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         emitterBalance = emitter.getBalance(db, assetKey);
@@ -241,7 +241,7 @@ public class TestRec_Send_InSideAsset {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(block, Transaction.FOR_NETWORK);
+        r_Send.orphan(gb, Transaction.FOR_NETWORK);
 
         assertEquals(BigDecimal.valueOf(0), db.getCredit_AddressesMap().get(creditKey));
 
@@ -316,7 +316,7 @@ public class TestRec_Send_InSideAsset {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(block, Transaction.FOR_NETWORK);
+        r_Send.orphan(gb, Transaction.FOR_NETWORK);
 
         assertEquals(BigDecimal.valueOf(10), db.getCredit_AddressesMap().get(creditKey));
 

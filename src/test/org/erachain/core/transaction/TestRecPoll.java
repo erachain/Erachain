@@ -313,7 +313,7 @@ public class TestRecPoll {
         assertEquals(issuePollTransaction.getTimestamp(), certifier.getLastTimestamp(db));
 
         //////// ORPHAN /////////
-        issuePollTransaction.orphan(block, Transaction.FOR_NETWORK);
+        issuePollTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE ISSUER
         if (!BlockChain.DEVELOP_USE)

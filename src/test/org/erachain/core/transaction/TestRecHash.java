@@ -165,7 +165,7 @@ public class TestRecHash {
         assertEquals(result.size(), 1);
 
         ///// ORPHAN
-        hashesRecord.orphan(block, Transaction.FOR_NETWORK);
+        hashesRecord.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK REFERENCE SENDER
         //assertEquals(hashesRecord.getReference(), maker.getLastReference(db));

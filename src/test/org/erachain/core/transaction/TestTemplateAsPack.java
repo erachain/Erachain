@@ -173,7 +173,7 @@ public class TestTemplateAsPack {
         issueTemplateTransaction_2.sign(maker, asPack);
         issueTemplateTransaction_2.process(gb, asPack);
         LOGGER.info("template_2 KEY: " + template_2.getKey(db));
-        issueTemplateTransaction_2.orphan(block, asPack);
+        issueTemplateTransaction_2.orphan(gb, asPack);
         ItemTemplateMap templateMap = db.getItemTemplateMap();
         int mapSize = templateMap.size();
         assertEquals(0, mapSize - 4);
@@ -202,7 +202,7 @@ public class TestTemplateAsPack {
         long key = db.getIssueTemplateMap().get(issueTemplateRecord);
         assertEquals((long) makerReference, (long) maker.getLastTimestamp(db));
 
-        issueTemplateRecord.orphan(block, asPack);
+        issueTemplateRecord.orphan(gb, asPack);
 
         //CHECK PLATE EXISTS SENDER
         assertEquals(false, db.getItemTemplateMap().contains(key));

@@ -429,7 +429,7 @@ public class NameStorageTest {
                         Corekeys.WEBSITE.toString()));
 
         // ORPHANING FIRST TX!
-        arbitraryTransaction.orphan(block, Transaction.FOR_NETWORK);
+        arbitraryTransaction.orphan(null, Transaction.FOR_NETWORK);
 
         assertEquals(
                 " second",
@@ -437,7 +437,7 @@ public class NameStorageTest {
                         Corekeys.WEBSITE.toString()));
 
         // ORPHANING second TX!
-        arbitraryTransaction2.orphan(block, Transaction.FOR_NETWORK);
+        arbitraryTransaction2.orphan(null, Transaction.FOR_NETWORK);
 
         assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
                 Corekeys.WEBSITE.toString()));
@@ -531,7 +531,7 @@ public class NameStorageTest {
         // Website: firstthird
         // random : skerberus
         // asdf : asdf
-        arbitraryTransaction2.orphan(block, Transaction.FOR_NETWORK);
+        arbitraryTransaction2.orphan(null, Transaction.FOR_NETWORK);
 
         assertEquals(
                 "firstthird",
@@ -636,7 +636,7 @@ public class NameStorageTest {
         // Website: secondthird
         // random : vrontis
         // asdf : asdf
-        arbitraryTransaction.orphan(block, Transaction.FOR_NETWORK);
+        arbitraryTransaction.orphan(null, Transaction.FOR_NETWORK);
 
         assertEquals(
                 "secondthird",
@@ -656,7 +656,7 @@ public class NameStorageTest {
         // removing new first
         // Website: third
         // asdf : asdf
-        arbitraryTransaction2.orphan(block, Transaction.FOR_NETWORK);
+        arbitraryTransaction2.orphan(null, Transaction.FOR_NETWORK);
 
         assertEquals(
                 "third",
@@ -758,7 +758,7 @@ public class NameStorageTest {
         // Profenable:yes
         // Website: firstsecond
         // random : skerberus;vrontis
-        arbitraryTransaction3.orphan(block, Transaction.FOR_NETWORK);
+        arbitraryTransaction3.orphan(null, Transaction.FOR_NETWORK);
 
         assertEquals(
                 "firstsecond",
