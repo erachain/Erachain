@@ -63,6 +63,11 @@ public class BlockExplorer {
     // format
     private String lang_file;
     private DCSet dcSet;
+    private Map output;
+
+    public Map getOutput() {
+        return output;
+    }
 
     public static BlockExplorer getInstance() {
         if (blockExplorer == null) {
@@ -78,11 +83,11 @@ public class BlockExplorer {
     }
 
     @SuppressWarnings("static-access")
-    public Map jsonQueryMain(UriInfo info) throws UnsupportedEncodingException {
+    public Map jsonQueryMain(UriInfo info) throws UnsupportedEncodingException, WrongSearchException {
         Stopwatch stopwatchAll = new Stopwatch();
 
 
-        Map output = new LinkedHashMap();
+        output = new LinkedHashMap();
         output.put("search", "block");
         // lang
         if (!info.getQueryParameters().containsKey("lang")) {
@@ -833,7 +838,7 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQuerySearchAssets(String search) {
+    public Map jsonQuerySearchAssets(String search) throws WrongSearchException {
         Map output = new LinkedHashMap();
 
         List<ItemCls> listAssets = new ArrayList();
@@ -844,14 +849,13 @@ public class BlockExplorer {
                 listAssets = dcSet.getItemAssetMap().get_By_Name(search, false);
             }
         } catch (Exception e) {
-            logger.info("Неправильно задана строка поиска... Отображение первого словаря");
-            listAssets.add(dcSet.getItemAssetMap().get((long) 1));
+            logger.info("Неправильно задана строка поиска словарей... ");
+            throw new WrongSearchException();
         }
-        if (listAssets == null) {
-            listAssets = new ArrayList();
-        }
-        if (listAssets.size() == 0) {
-            listAssets.add(dcSet.getItemAssetMap().get((long) 1));
+
+        if (listAssets == null || listAssets.size() == 0) {
+            logger.info("Неправильно задана строка поиска словарей... ");
+            throw new WrongSearchException();
         }
 
 
@@ -1802,14 +1806,8 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQuerySearchPersons(String search) {
-        /*
-         * Block block; if(start > 0) { block =
-         * Controller.getInstance().getBlockByHeight(start); } else { block =
-         * getLastBlock(); start = block.getHeight(dcSet); }
-         */
+    public Map jsonQuerySearchPersons(String search) throws WrongSearchException {
         Map output = new LinkedHashMap();
-
         output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
 
         // TODO translate_web(
@@ -1820,21 +1818,6 @@ public class BlockExplorer {
         output.put("Label_Later", Lang.getInstance().translate_from_langObj(">>", langObj));
         output.put("Label_Previous", Lang.getInstance().translate_from_langObj("<<", langObj));
 
-        /*
-         * output.put("Label_Unconfirmed_transactions",
-         * "Unconfirmed transactions"); output.put("Label_Height", "Height");
-         * output.put("Label_Time", "Time"); output.put("Label_Generator",
-         * "Creator"); output.put("Label_Gen_balance", "Gen.Balance");
-         * output.put("Label_TXs", "TXs"); output.put("Label_Fee", "Fee");
-         * output.put("Label_AT_Amount", "AT_Amount");
-         * output.put("Label_Amount", "Amount"); output.put("Label_Later",
-         * "Later"); output.put("Label_Previous", "Previous");
-         *
-         * int counter = start;
-         */
-
-        // if (i <0) i =i + maxRow - start_Web;
-        // k = maxRow - i;
         List<ItemCls> listPerson = new ArrayList();
         try {
             if (search.matches("\\d+") && dcSet.getItemPersonMap().contains(Long.valueOf(search))) {
@@ -1843,84 +1826,30 @@ public class BlockExplorer {
                 listPerson = dcSet.getItemPersonMap().get_By_Name(search, false);
             }
         } catch (Exception e) {
-            logger.info("Неправильно задана строка поиска персоны... Отображение первой персоны");
-            listPerson.add(dcSet.getItemPersonMap().get((long) 1));
+            logger.info("Неправильно задана строка поиска персоны... ");
+            throw new WrongSearchException();
         }
-        if (listPerson == null) {
-            listPerson = new ArrayList();
+        if (listPerson == null||listPerson.size() == 0) {
+            logger.info("Неправильно задана строка поиска персоны... ");
+            throw new WrongSearchException();
         }
-        if (listPerson.size() == 0) {
-            listPerson.add(dcSet.getItemPersonMap().get((long) 1));
-        }
-
-
-        // if (k> dcSet.getItemPersonMap().getSize()) k=
-        // dcSet.getItemPersonMap().getSize();
-
         int i = 0;
-        if (listPerson != null) {
-            for (ItemCls pers : listPerson) {
-
-                PersonCls person = (PersonCls) pers;
-
-                Map blockJSON = new LinkedHashMap();
-                blockJSON.put("key", person.getKey());
-                blockJSON.put("name", person.getName());
-                blockJSON.put("creator", person.getOwner().getAddress());
-                String img = Base64.encodeBase64String(person.getImage());
-                blockJSON.put("img", img);
-
-                /*
-                 * blockJSON.put("generatingBalance",
-                 * block.getGeneratingBalance(dcSet));
-                 * //blockJSON.put("winValue", block.calcWinValue(dcSet));
-                 * blockJSON.put("winValueTargetted",
-                 * block.calcWinValueTargeted(dcSet));
-                 * blockJSON.put("transactionsCount",
-                 * block.getTransactionCount()); blockJSON.put("timestamp",
-                 * block.getTimestamp(dcSet)); blockJSON.put("dateTime",
-                 * BlockExplorer.timestampToStr(block.getTimestamp(dcSet)));
-                 * blockJSON.put("totalFee",
-                 * block.getTotalFee().toPlainString());
-                 *
-                 * BigDecimal totalAmount = BigDecimal.ZERO; for (Transaction
-                 * transaction : block.getTransactions()) { for (Account account
-                 * : transaction.getInvolvedAccounts()) { BigDecimal amount =
-                 * transaction.getAmount(account);
-                 * if(amount.compareTo(BigDecimal.ZERO) > 0) { totalAmount =
-                 * totalAmount.add(amount); } } }
-                 *
-                 * blockJSON.put("totalAmount", totalAmount.toPlainString());
-                 *
-                 * LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction>
-                 * aTtxs =
-                 * dcSet.getATTransactionMap().getATTransactions(counter);
-                 *
-                 * BigDecimal totalATAmount = BigDecimal.ZERO;
-                 *
-                 * for(Map.Entry<Tuple2<Integer, Integer> , AT_Transaction> e :
-                 * aTtxs.entrySet()) { totalATAmount =
-                 * totalATAmount.add(BigDecimal.valueOf(
-                 * e.getValue().getAmount() )); }
-                 *
-                 * blockJSON.put("totalATAmount",
-                 * totalATAmount.toPlainString()); //blockJSON.put("aTfee",
-                 * block.getATfee().toPlainString());
-                 *
-                 * output.put(counter, blockJSON);
-                 *
-                 * counter --; block = block.getParent(dcSet);
-                 */
-                output.put(i, blockJSON);
-                i++;
-
-            }
-
-            output.put("start_row", listPerson.size() - 1);
-            output.put("maxHeight", dcSet.getItemPersonMap().getLastKey());
-            output.put("row", -1);
-            output.put("view_Row", listPerson.size() - 1);
+        for (ItemCls pers : listPerson) {
+            PersonCls person = (PersonCls) pers;
+            Map blockJSON = new LinkedHashMap();
+            blockJSON.put("key", person.getKey());
+            blockJSON.put("name", person.getName());
+            blockJSON.put("creator", person.getOwner().getAddress());
+            String img = Base64.encodeBase64String(person.getImage());
+            blockJSON.put("img", img);
+            output.put(i, blockJSON);
+            i++;
         }
+
+        output.put("start_row", listPerson.size() - 1);
+        output.put("maxHeight", dcSet.getItemPersonMap().getLastKey());
+        output.put("row", -1);
+        output.put("view_Row", listPerson.size() - 1);
 
         return output;
     }
@@ -3711,7 +3640,7 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQuerySearchStatuses(String search) {
+    public Map jsonQuerySearchStatuses(String search) throws WrongSearchException {
 
         List<ItemCls> listStatuses = new ArrayList();
 
@@ -3722,14 +3651,12 @@ public class BlockExplorer {
                 listStatuses = dcSet.getItemStatusMap().get_By_Name(search, false);
             }
         } catch (Exception e) {
-            logger.info("Неправильно задана строка поиска... Отображение первого статуса");
-            listStatuses.add(dcSet.getItemStatusMap().get((long) 1));
+            logger.info("Неправильно задана строка поиска статусов...");
+            throw new WrongSearchException();
         }
-        if (listStatuses == null) {
-            listStatuses = new ArrayList<>();
-        }
-        if (listStatuses.size() == 0) {
-            listStatuses.add(dcSet.getItemStatusMap().get((long) 1));
+        if (listStatuses == null || listStatuses.size() == 0) {
+            logger.info("Неправильно задана строка поиска статусов...");
+            throw new WrongSearchException();
         }
         Map output = new LinkedHashMap();
         Map templatesJSON = new LinkedHashMap();
@@ -4220,7 +4147,7 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryBlock(String query, int transPage) {
+    public Map jsonQueryBlock(String query, int transPage) throws WrongSearchException {
 
         Map output = new LinkedHashMap();
         List<Object> all = new ArrayList<Object>();
@@ -4235,8 +4162,8 @@ public class BlockExplorer {
             try {
                 parseInt = Integer.parseInt(query);
             } catch (NumberFormatException e) {
-                logger.info("Неправильно задан номер... Отображение первого блока");
-                parseInt = 1;
+                logger.info("Неправильно задан номер при поиске...");
+                throw new WrongSearchException();
             }
             block = Controller.getInstance().getBlockByHeight(dcSet, parseInt);
             if (block == null) {
@@ -4248,11 +4175,12 @@ public class BlockExplorer {
             try {
                 block = Controller.getInstance().getBlock(Base58.decode(query));
             } catch (Exception e) {
-                logger.info("Неправильно задана строка поиска... Отображение первого блока");
-                block = Controller.getInstance().getBlockByHeight(dcSet, Integer.parseInt("1"));
+                logger.info("Неправильно задана строка поиска блоков... ");
+                throw new WrongSearchException();
             }
             if (block == null) {
-                block = Controller.getInstance().getBlockByHeight(dcSet, Integer.parseInt("1"));
+                logger.info("Неправильно задана строка поиска блоков... ");
+                throw new WrongSearchException();
             }
         }
 

@@ -14,6 +14,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.blockexplorer.BlockExplorer;
+import org.erachain.core.blockexplorer.WrongSearchException;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
 import org.erachain.core.item.assets.AssetCls;
@@ -64,7 +65,7 @@ import java.util.regex.Pattern;
 @Path("/")
 public class WebResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WebResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(WebResource.class);
     @Context
     HttpServletRequest request;
     String[] imgsArray = {"Erachain.org.png", "logo_header.png", "Erachain.org-user.png",
@@ -213,7 +214,7 @@ public class WebResource {
             return Response.ok(pebbleHelper.evaluate(),
                     "text/html; charset=utf-8").build();
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
     }
@@ -242,31 +243,25 @@ public class WebResource {
     @Path("index/blockexplorer.json")
     @GET
     public Response jsonQueryMain(@Context UriInfo info) {
-        Map output = null;
+        Map output;
         try {
             output = BlockExplorer.getInstance().jsonQueryMain(info);
-        } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            String ss = "";
-            for (StackTraceElement item : e.getStackTrace()) {
-                ss += item.toString() + "<br>";
-            }
-
-            return Response.status(501)
-                    .header("Content-Type", "text/html; charset=utf-8")
-                    .entity(ss + "<br>" + e.getMessage())
+        } catch (WrongSearchException e) {
+            logger.error("Ошибка при неправильном поиске в обозревателе блоков", e);
+            output = BlockExplorer.getInstance().getOutput();
+            output.put("noSearchedElements","true");
+            return Response.status(200)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(StrJSonFine.convert(output))
                     .build();
         } catch (Exception ee) {
-            // TODO Auto-generated catch block
             ee.printStackTrace();
-            String ss = "";
+            StringBuilder ss = new StringBuilder();
             for (StackTraceElement item : ee.getStackTrace()) {
-                ss += item.toString() + "<br>";
+                ss.append(item.toString()).append("<br>");
             }
-
             return Response.status(501)
-                    //.header("Content-Type", "application/json; charset=utf-8")
                     .header("Content-Type", "text/html; charset=utf-8")
                     .entity(ss + "<br>" + ee.getMessage())
                     .build();
@@ -284,7 +279,7 @@ public class WebResource {
     public Response blockexplorer() {
         return blockexplorerhtml();
     }
-    
+
     @GET
     @Path("blockexplorer")
     public Response newBlockExplorerIndex() {
@@ -298,7 +293,7 @@ public class WebResource {
             return Response.status(500).build();
         }
     }
-    
+
     @GET
     @Path("blockexplorer/{address: .+}")
     public Response newBlockExplorer(@PathParam("address") String address) {
@@ -331,7 +326,7 @@ public class WebResource {
 
 
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
 
@@ -346,7 +341,7 @@ public class WebResource {
 
         if (lang != null) {
 
-            LOGGER.error("try lang file: " + lang + ".json for " + request.getRemoteUser() + " " + request.getRequestURL());
+            logger.error("try lang file: " + lang + ".json for " + request.getRemoteUser() + " " + request.getRequestURL());
             langObj = Lang.openLangFile(lang + ".json");
 
      /*   // translate select
@@ -386,7 +381,7 @@ public class WebResource {
                     "text/html; charset=utf-8").build();
 
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
 
@@ -404,7 +399,7 @@ public class WebResource {
 
 
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
 
@@ -419,7 +414,7 @@ public class WebResource {
 
         if (lang != null) {
 
-            LOGGER.error("try lang file: " + lang + ".json");
+            logger.error("try lang file: " + lang + ".json");
             langObj = Lang.openLangFile(lang + ".json");
 
 
@@ -523,7 +518,7 @@ public class WebResource {
                     "text/html; charset=utf-8").build();
 
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
 
@@ -542,7 +537,7 @@ public class WebResource {
             return Response.ok(pebbleHelper.evaluate(),
                     "text/html; charset=utf-8").build();
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
 
@@ -595,7 +590,7 @@ public class WebResource {
             return Response.ok(pebbleHelper.evaluate(),
                     "text/html; charset=utf-8").build();
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
 
@@ -611,7 +606,7 @@ public class WebResource {
             return Response.ok(pebbleHelper.evaluate(),
                     "text/html; charset=utf-8").build();
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
 
@@ -631,7 +626,7 @@ public class WebResource {
             return enhanceAndShowWebsite(website);
 
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
 
@@ -759,7 +754,7 @@ public class WebResource {
                     .entity(json.toJSONString()).build();
 
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
 
         return null;
@@ -850,7 +845,7 @@ public class WebResource {
                 }
 
             } catch (Throwable e) {
-                LOGGER.error(e.getMessage(), e);
+                logger.error(e.getMessage(), e);
             }
 
             if (storageJsonObject == null) {
@@ -971,7 +966,7 @@ public class WebResource {
             }
 
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
 
             json.put("type", "error");
             json.put("error", e.getMessage());
@@ -1016,7 +1011,7 @@ public class WebResource {
             return Response.ok(pebbleHelper.evaluate(),
                     "text/html; charset=utf-8").build();
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
 
@@ -1080,7 +1075,7 @@ public class WebResource {
                     "text/html; charset=utf-8").build();
 
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
 
@@ -1134,7 +1129,7 @@ public class WebResource {
             return Response.ok(pebbleHelper.evaluate(),
                     "text/html; charset=utf-8").build();
         } catch (PebbleException e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return Response.status(404).build();
         }
     }
@@ -1728,7 +1723,7 @@ public class WebResource {
             return Response.ok(pebbleHelper.evaluate(),
                     "text/html; charset=utf-8").build();
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
     }
@@ -1804,7 +1799,7 @@ public class WebResource {
             return Response.ok(pebbleHelper.evaluate(),
                     "text/html; charset=utf-8").build();
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
     }
@@ -1962,7 +1957,7 @@ public class WebResource {
 
             return getBlog(null);
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")
                     .entity("{}").build();
@@ -2063,7 +2058,7 @@ public class WebResource {
                     .entity(jsonanswer.toJSONString()).build();
 
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
 
             jsonanswer.put("type", "deleteError");
             jsonanswer.put("errordetail", e.getMessage());
@@ -2195,7 +2190,7 @@ public class WebResource {
                     .entity(jsonanswer.toJSONString()).build();
 
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
 
             jsonanswer.put("type", "deleteError");
             jsonanswer.put("errordetail", e.getMessage());
@@ -2303,7 +2298,7 @@ public class WebResource {
             }
 
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
 
             json.put("type", "error");
             json.put("error", e.getMessage());
@@ -2436,7 +2431,7 @@ public class WebResource {
             }
 
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
 
             json.put("type", "error");
             json.put("error", e.getMessage());
@@ -2497,7 +2492,7 @@ public class WebResource {
                     "text/html; charset=utf-8").build();
 
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
     }
@@ -2568,7 +2563,7 @@ public class WebResource {
                     "text/html; charset=utf-8").build();
 
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
 
@@ -2620,7 +2615,7 @@ public class WebResource {
                     "text/html; charset=utf-8").build();
 
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
     }
@@ -2730,7 +2725,7 @@ public class WebResource {
             return Response.ok(pebbleHelper.evaluate(),
                     "text/html; charset=utf-8").build();
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
     }
@@ -3357,7 +3352,7 @@ public class WebResource {
                     .header("Content-Type", "text/html; charset=utf-8")
                     .entity(pebbleHelper.evaluate()).build();
         } catch (PebbleException e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return Response.status(404).build();
         }
     }
@@ -3396,7 +3391,7 @@ public class WebResource {
             }
 
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
 
@@ -3407,7 +3402,7 @@ public class WebResource {
             return readFile("web/main.mini.html", StandardCharsets.UTF_8);
 
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return "ERROR";
         }
     }
@@ -3433,7 +3428,7 @@ public class WebResource {
                 try {
                     return error404(request, "This key is empty");
                 } catch (Throwable e) {
-                    LOGGER.error(e.getMessage(), e);
+                    logger.error(e.getMessage(), e);
                     return error404(request, null);
                 }
 
@@ -3441,7 +3436,7 @@ public class WebResource {
 
             return enhanceAndShowWebsite(website);
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
     }
@@ -3467,7 +3462,7 @@ public class WebResource {
                             request,
                             "This name has currently no <a href=\"/index/namestorage.html\">website<a/>!");
                 } catch (Throwable e) {
-                    LOGGER.error(e.getMessage(), e);
+                    logger.error(e.getMessage(), e);
                     return error404(request, null);
                 }
 
@@ -3475,7 +3470,7 @@ public class WebResource {
 
             return enhanceAndShowWebsite(website);
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return error404(request, null);
         }
     }
