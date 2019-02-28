@@ -1442,7 +1442,7 @@ public class Block {
                         return false;
                     }
 
-                    transaction.setBlock(this, validatingDC, Transaction.FOR_NETWORK, seqNo);
+                    transaction.setDC(validatingDC, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                     //CHECK IF VALID
                     if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
@@ -1471,7 +1471,7 @@ public class Block {
 
                 } else {
 
-                    transaction.setBlock(this, validatingDC, Transaction.FOR_NETWORK, seqNo);
+                    transaction.setDC(validatingDC, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                     //UPDATE REFERENCE OF SENDER
                     if (transaction.isReferenced())
@@ -1541,9 +1541,6 @@ public class Block {
                     if (processTimingLocalDiff < 999999999999l)
                         timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
                 }
-
-                // NEED for CLEAR HEAP
-                transaction.clearBlock();
 
                 transactionsSignatures = Bytes.concat(transactionsSignatures, transactionSignature);
             }
@@ -1853,7 +1850,7 @@ public class Block {
                 //LOGGER.debug("[" + seq + "] record is process" );
 
                 // NEED set DC for WIPED too
-                transaction.setBlock(this, dcSet, Transaction.FOR_NETWORK, ++seqNo);
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, this.heightBlock, ++seqNo);
 
                 //PROCESS
                 if (!transaction.isWiped()) {
@@ -1899,9 +1896,6 @@ public class Block {
                 timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
 
                 seq++;
-
-                // NEED for CLEAR HEAP
-                transaction.clearBlock();
 
             }
 
@@ -2024,7 +2018,7 @@ public class Block {
             //LOGGER.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
 
             // (!) seqNo = i + 1
-            transaction.setBlock(this, dcSet, Transaction.FOR_NETWORK, seqNo);
+            transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, seqNo);
 
             if (!transaction.isWiped()) {
                 transaction.orphan(Transaction.FOR_NETWORK);
@@ -2049,9 +2043,6 @@ public class Block {
                     transFinalMapSinds.delete(itemSignature);
                 }
             }
-
-            // NEED for CLEAR HEAP
-            transaction.clearBlock();
 
         }
 

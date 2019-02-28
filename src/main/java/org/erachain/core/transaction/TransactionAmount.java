@@ -13,7 +13,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import java.math.BigDecimal;
@@ -131,14 +130,6 @@ public abstract class TransactionAmount extends Transaction {
     }
     
     // GETTERS/SETTERS
-
-    public void setBlock(Block block, DCSet dcSet, int asDeal, int seqNo) {
-        super.setBlock(block, dcSet, asDeal, seqNo);
-
-        if (this.amount != null) {
-            this.asset = this.dcSet.getItemAssetMap().get(this.getAbsKey());
-        }
-    }
 
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
         super.setDC(dcSet, asDeal, blockHeight, seqNo);

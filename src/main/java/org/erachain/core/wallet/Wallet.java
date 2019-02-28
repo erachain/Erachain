@@ -1204,7 +1204,7 @@ public class Wallet extends Observable implements Observer {
 			}
 
 			if (transaction.noDCSet())
-			    transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, ++seqNo);
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
 
 			this.processTransaction(transaction);
 
@@ -1319,7 +1319,7 @@ public class Wallet extends Observable implements Observer {
 			}
 
             if (transaction.noDCSet())
-    			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, seqNo);
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, block.blockHead.heightBlock, seqNo);
 
 			this.orphanTransaction(transaction);
 

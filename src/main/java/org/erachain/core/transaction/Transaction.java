@@ -363,7 +363,7 @@ public abstract class Transaction {
     protected String TYPE_NAME = "unknown";
     // protected int type;
     protected byte[] typeBytes;
-    protected Block block; // parent block
+
     protected int height;
     protected int seqNo;
     protected Long dbRef; // height + SeqNo
@@ -548,17 +548,6 @@ public abstract class Transaction {
         this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);
         this.seqNo = seqNo;
         this.dbRef = Transaction.makeDBRef(height, seqNo);
-        if (asDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0) )
-            this.calcFee();
-    }
-
-    public void setBlock(Block block, DCSet dcSet, int asDeal, int seqNo) {
-        this.block = block;
-        this.dcSet = dcSet;
-        this.height = block.getHeight();
-        this.seqNo = seqNo;
-        this.dbRef = Transaction.makeDBRef(height, seqNo);
-
         if (asDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0) )
             this.calcFee();
     }
@@ -765,6 +754,7 @@ public abstract class Transaction {
         return BigDecimal.valueOf(fee, BlockChain.AMOUNT_DEDAULT_SCALE);
     }
 
+    /*
     public Block getBlock(DCSet db) {
 
         if (this.block != null)
@@ -783,27 +773,10 @@ public abstract class Transaction {
 
         return block;
     }
-
-    /**
-     * нужно для сборки мусора - убрать ссылку
-     */
-    public void clearBlock() {
-        this.block = null;
-    }
+    */
 
     public Tuple2<Integer, Integer> getHeightSeqNo() {
-        int transactionIndex = -1;
-        int blockIndex;
-        if (block == null) {
-            // blockIndex = db.getBlocksHeadMap().getLastBlock().getHeight(db);
-            blockIndex = -1;
-        } else {
-            blockIndex = block.getHeight();
-            transactionIndex = block.getTransactionSeq(signature);
-        }
-
-        return new Tuple2<Integer, Integer>(blockIndex, transactionIndex);
-
+        return new Tuple2<Integer, Integer>(this.height, this.seqNo);
     }
 
     public int getBlockHeight() {
@@ -811,10 +784,6 @@ public abstract class Transaction {
         if (this.height > 0)
             return this.height;
 
-        if (this.block != null) {
-            this.height = this.block.getHeight();
-            return this.height;
-        }
         return -1;
     }
 
@@ -823,9 +792,6 @@ public abstract class Transaction {
 
         if (this.height > 0)
             return this.height;
-
-        if (block != null)
-            return block.getHeight();
 
         return dc.getBlockMap().size() + 1;
     }
@@ -882,18 +848,11 @@ public abstract class Transaction {
 
     }
 
-    public boolean addCalculated(R_Calculated calculated) {
-        if (this.block != null && this.block.txCalculated != null) {
-            this.block.txCalculated.add(calculated);
-            return true;
-        }
-        return false;
-    }
-
-    public boolean addCalculated(Account creator, long assetKey, BigDecimal amount,
+    public boolean addCalculated(Block block, Account creator, long assetKey, BigDecimal amount,
                                  String message) {
-        if (this.block != null && this.block.txCalculated != null) {
-            this.block.txCalculated.add(new R_Calculated(creator, assetKey, amount,
+
+        if (block != null && block.txCalculated != null) {
+            block.txCalculated.add(new R_Calculated(creator, assetKey, amount,
                     message, this.dbRef));
             return true;
         }
@@ -1379,8 +1338,6 @@ public abstract class Transaction {
             error ++;
         }
 
-        this.block = block;
-
         if (asDeal > Transaction.FOR_PACK) {
             // this.calcFee();
 
@@ -1394,8 +1351,8 @@ public abstract class Transaction {
             long invitedFee = getInvitedFee();
             if (invitedFee > 0)
                 process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
-                        this.block != null && this.block.txCalculated != null?
-                                this.block.txCalculated : null, "@" + this.viewHeightSeq() + " referal");
+                        block != null && block.txCalculated != null ?
+                                block.txCalculated : null, "@" + this.viewHeightSeq() + " referal");
 
             String creatorAddress = this.creator.getAddress();
             AddressTime_SignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();
@@ -1505,34 +1462,8 @@ public abstract class Transaction {
         if (this.height > 0)
             return 1 + db.getBlockMap().size() - this.height;
 
+        return 0;
 
-        /*
-        if (this.getType() != Transaction.CALCULATED_TRANSACTION) {
-            if (db.getTransactionMap().contains(this)) {
-                return -db.getTransactionMap().getBroadcasts(this);
-            }
-        }*/
-
-        Block block = this.getBlock(db);
-
-        if (block == null)
-            return 0;
-
-        // RETURN
-        return 1 + db.getBlockMap().size() - block.heightBlock;
-
-    }
-
-    public int getBlockVersion(DCSet db) {
-        // IF ALREADY IN THE BLOCK. CONFIRMED
-        if (this.isConfirmed(db)) {
-            // return
-            // DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.getSignature()).getVersion();
-            return this.getBlock(db).getVersion();
-        }
-
-        // IF UNCONFIRMED
-        return Controller.getInstance().getLastBlock().getNextBlockVersion(db);
     }
 
     @Override
