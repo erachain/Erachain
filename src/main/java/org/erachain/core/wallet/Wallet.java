@@ -81,7 +81,6 @@ public class Wallet extends Observable implements Observer {
 
         }
 
-        checkNeedSyncWallet(Controller.getInstance().getLastBlockSignature());
         startProcessForSynchronize();
 
 	}

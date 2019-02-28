@@ -564,6 +564,9 @@ public class Synchronizer {
                     + "] for blocks: " + blocks.size());
             List<Transaction> orphanedTransactions = this.synchronize_blocks(dcSet, lastCommonBlock, checkPointHeight,
                     blocks, peer);
+
+            blocks = null;
+
             if (cnt.isOnStopping()) {
                 throw new Exception("on stopping");
             }
