@@ -610,7 +610,6 @@ public class Wallet extends Observable implements Observer {
 				}
 
                 // NEED FOR CLEAR HEAP
-                //block.clearForHeap();
                 block = null;
 
 				if (System.currentTimeMillis() - timePoint > 10000
@@ -626,7 +625,7 @@ public class Wallet extends Observable implements Observer {
                     this.syncHeight = height;
 					Controller.getInstance().walletSyncStatusUpdate(height);
                     this.database.commit();
-                    System.gc();
+                    //System.gc();
 
                 }
 
@@ -1278,11 +1277,6 @@ public class Wallet extends Observable implements Observer {
                     + tickets / (block.blockHead.transactionsCount + 1));
 		}
 
-        // NEED FOR CLEAR HEAP !
-        block.clearForHeap();
-
-        //block = null;
-
     }
 
     private void orphanBlock(Block block) {
@@ -1403,9 +1397,6 @@ public class Wallet extends Observable implements Observer {
 		// + "] orphaning time: " + tickets*0.001
 		// + " TXs = " + block.getTransactionCount() + " millsec/record:"
 		// + tickets/(block.getTransactionCount()+1) );
-
-        // NEED FOR CLEAR HEAP !
-        block.clearForHeap();
 
     }
 

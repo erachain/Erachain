@@ -559,16 +559,6 @@ public class Block {
         return this.heightBlock;
     }
 
-    /**
-     * очищает перекрестные ссылки из тнзакций на блок и позволяет его очистить из Кучи
-     * Так же быстрее чистит байтовые массивы у блока
-     */
-    public void clearForHeap() {
-        this.transactions = null;
-        this.parentBlockHead = null;
-        this.rawTransactions = null;
-    }
-
     /*
     public void setHeight(int height) {
         this.heightBlock = height;
@@ -740,7 +730,6 @@ public class Block {
      * Так обходится неопределенность при откате - если несколько транзакций для одного счета
      * меняли инфо по форжингу
      * @param account
-     * @param amount
      */
     public void addForgingInfoUpdate(Account account) {
         if (this.forgingInfoUpdate == null) {
