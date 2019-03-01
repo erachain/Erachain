@@ -59,7 +59,7 @@ public class Wallet extends Observable implements Observer {
 	PersonsFavorites personsFavorites;
 	private SecureWalletDatabase secureDatabase;
 	private int secondsToUnlock = 100;
-	private Timer lockTimer = new Timer();
+	private Timer lockTimer; // = new Timer();
 	private int syncHeight;
 
 	// CONSTRUCTORS
@@ -814,7 +814,7 @@ public class Wallet extends Observable implements Observer {
 			if (this.lockTimer != null)
 				this.lockTimer.cancel();
 
-			this.lockTimer = new Timer();
+			this.lockTimer = new Timer("Wallet Locker");
 
 			TimerTask action = new TimerTask() {
 				@Override
