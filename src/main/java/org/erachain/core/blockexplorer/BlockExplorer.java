@@ -849,12 +849,12 @@ public class BlockExplorer {
                 listAssets = dcSet.getItemAssetMap().get_By_Name(search, false);
             }
         } catch (Exception e) {
-            logger.info("Неправильно задана строка поиска словарей... ");
+            logger.info("Wrong search while process assets... ");
             throw new WrongSearchException();
         }
 
         if (listAssets == null || listAssets.size() == 0) {
-            logger.info("Неправильно задана строка поиска словарей... ");
+            logger.info("Wrong search while process assets... ");
             throw new WrongSearchException();
         }
 
@@ -1826,11 +1826,11 @@ public class BlockExplorer {
                 listPerson = dcSet.getItemPersonMap().get_By_Name(search, false);
             }
         } catch (Exception e) {
-            logger.info("Неправильно задана строка поиска персоны... ");
+            logger.info("Wrong search while process persons... ");
             throw new WrongSearchException();
         }
         if (listPerson == null||listPerson.size() == 0) {
-            logger.info("Неправильно задана строка поиска персоны... ");
+            logger.info("Wrong search while process persons... ");
             throw new WrongSearchException();
         }
         int i = 0;
@@ -3651,11 +3651,11 @@ public class BlockExplorer {
                 listStatuses = dcSet.getItemStatusMap().get_By_Name(search, false);
             }
         } catch (Exception e) {
-            logger.info("Неправильно задана строка поиска статусов...");
+            logger.info("Wrong search while process statuses... ");
             throw new WrongSearchException();
         }
         if (listStatuses == null || listStatuses.size() == 0) {
-            logger.info("Неправильно задана строка поиска статусов...");
+            logger.info("Wrong search while process statuses... ");
             throw new WrongSearchException();
         }
         Map output = new LinkedHashMap();
@@ -4162,7 +4162,8 @@ public class BlockExplorer {
             try {
                 parseInt = Integer.parseInt(query);
             } catch (NumberFormatException e) {
-                logger.info("Неправильно задан номер при поиске...");
+                logger.info("Wrong search while process blocks... ");
+                logger.info("Wrong search while process blocks... ");
                 throw new WrongSearchException();
             }
             block = Controller.getInstance().getBlockByHeight(dcSet, parseInt);
@@ -4175,11 +4176,11 @@ public class BlockExplorer {
             try {
                 block = Controller.getInstance().getBlock(Base58.decode(query));
             } catch (Exception e) {
-                logger.info("Неправильно задана строка поиска блоков... ");
+                logger.info("Wrong search while process blocks... ");
                 throw new WrongSearchException();
             }
             if (block == null) {
-                logger.info("Неправильно задана строка поиска блоков... ");
+                logger.info("Wrong search while process blocks... ");
                 throw new WrongSearchException();
             }
         }

@@ -205,9 +205,6 @@
             xmlhttp.onreadystatechange = function () {
                 if (xmlhttp.readyState == 4) {
                     if (xmlhttp.status == 200) {
-
-                        console.log("entered")
-                        console.log(xmlhttp.responseText)
                         var data = JSON.parse(xmlhttp.responseText);
                         if (Object.keys(data).length > 0) {
 

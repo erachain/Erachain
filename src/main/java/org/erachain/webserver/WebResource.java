@@ -247,7 +247,7 @@ public class WebResource {
         try {
             output = BlockExplorer.getInstance().jsonQueryMain(info);
         } catch (WrongSearchException e) {
-            logger.error("Ошибка при неправильном поиске в обозревателе блоков", e);
+            logger.info("WrongSearchException");
             output = BlockExplorer.getInstance().getOutput();
             output.put("noSearchedElements","true");
             return Response.status(200)
