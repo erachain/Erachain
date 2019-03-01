@@ -28,7 +28,7 @@ function makePageUri(page){
     return uri;
 }
 
-function transactionsTablePages(data){
+function pagesComponent(data){
 	var output = '';
 	
 	if (data.pageCount > 1){
@@ -47,31 +47,35 @@ function transactionsTablePages(data){
 }
 
 function transactions_Table(data){
-
+	console.log("data=")
+	console.log(data)
 	var output = data.Transactions.label_transactions_table + ':<br>';
-	output += transactionsTablePages(data);
-	output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
+	output += pagesComponent(data);
+	output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
+		' class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
 			
-	output += '<tr bgcolor="f1f1f1"><td><b>'+data.Transactions.label_block+'<td><b>'+ data.Transactions.label_signature+'<td><b>'+data.Transactions.label_type_transaction+'<td><b>'+data.Transactions.label_amount_key+'<td><b>'+ data.Transactions.label_date+'<td><b>'+data.Transactions.label_atside+'<td><b>'+data.Transactions.label_size+'<td><b>'+data.Transactions.label_fee+'<td><b>'+ data.Transactions.label_confirmations+'</tr>';
+	output += '<tr bgcolor="f1f1f1"><td><b>'+data.Transactions.label_block+'<td><b>'+
+		data.Transactions.label_signature+'<td><b>'+data.Transactions.label_type_transaction+'<td><b>'+
+		data.Transactions.label_amount_key+'<td><b>'+ data.Transactions.label_date+'<td><b>'+
+		data.Transactions.label_atside+'<td><b>'+data.Transactions.label_size+'<td><b>'+
+		data.Transactions.label_fee+'<td><b>'+ data.Transactions.label_confirmations+'</tr>';
     for (key in data.Transactions.transactions){
-        //output += '<tr><td><a href ="?tx='+data.Transactions.transactions[key].signature+get_lang()+'">'+ data.Transactions.transactions[key].block +'-'+ data.Transactions.transactions[key].data.Transactions.transactions[key].+'</a><td><a href="?tx='+data.Transactions.transactions[key].signature+get_lang()+'" title = "'+ data.Transactions.transactions[key].signature  +get_lang()+'">'+data.Transactions.transactions[key].signature.slice(0, 11)+'...</a><td><a href="?tx='+data.Transactions.transactions[key].signature+get_lang()+'">'+data.Transactions.transactions[key].type+'</a><td>' + data.Transactions.transactions[key].amount_key + '<td>'+data.Transactions.transactions[key].date;
         output += '<tr><td><a href ="?tx='+data.Transactions.transactions[key].block+'-'
-            +data.Transactions.transactions[key].seqNo+get_lang()+'">'+ data.Transactions.transactions[key].block +'-'+ data.Transactions.transactions[key].seqNo+'</a><td><a href="?tx='+data.Transactions.transactions[key].signature+get_lang()+'" title = "'+ data.Transactions.transactions[key].signature  +get_lang()+'">'+data.Transactions.transactions[key].signature.slice(0, 11)+'...</a><td><a href="?tx='+data.Transactions.transactions[key].signature+get_lang()+'">'+data.Transactions.transactions[key].type+'</a><td>' + data.Transactions.transactions[key].amount_key + '<td>'+data.Transactions.transactions[key].date;
-        output += '<td><a href ="?addr='+data.Transactions.transactions[key].creator_addr+get_lang()+'">'+data.Transactions.transactions[key].creator+'</a>';
-        /*
-        if (data.Transactions.transactions[key].creator_key == '-'){
-            output += '<td>'+data.Transactions.transactions[key].creator+'</a>';
-        }else if (data.Transactions.transactions[key].creator_key == '+'){
-                output += '<td><a href ="?addr='+data.Transactions.transactions[key].creator+get_lang()+'">'+data.Transactions.transactions[key].creator+'</a>';
-            }else{
-                output += '<td><a href ="?person='+data.Transactions.transactions[key].creator_key+get_lang()+'">'+data.Transactions.transactions[key].creator+'</a>';
-            }
-        */
-        output += '<td>'+ data.Transactions.transactions[key].size +'<td>'+ data.Transactions.transactions[key].fee +'<td>'+ data.Transactions.transactions[key].confirmations + '</td></tr>';
+            +data.Transactions.transactions[key].seqNo+get_lang()+'">'+ data.Transactions.transactions[key].block +'-'+
+			data.Transactions.transactions[key].seqNo+'</a><td><a href="?tx='+
+			data.Transactions.transactions[key].signature+get_lang()+'" title = "'+
+			data.Transactions.transactions[key].signature  +get_lang()+'">'+
+			data.Transactions.transactions[key].signature.slice(0, 11)+'...</a><td><a href="?tx='+
+			data.Transactions.transactions[key].signature+get_lang()+'">'+data.Transactions.transactions[key].type+
+			'</a><td>' + data.Transactions.transactions[key].amount_key + '<td>'+data.Transactions.transactions[key].date;
+        output += '<td><a href ="?addr='+data.Transactions.transactions[key].creator_addr+get_lang()+'">'+
+			data.Transactions.transactions[key].creator+'</a>';
+        output += '<td>'+ data.Transactions.transactions[key].size +'<td>'+
+			data.Transactions.transactions[key].fee +'<td>'+ data.Transactions.transactions[key].confirmations + '</td></tr>';
 
     }
 	output +='</table></td></tr></table>';
-	output += transactionsTablePages(data);
+	output += pagesComponent(data);
 
  return output;
 
