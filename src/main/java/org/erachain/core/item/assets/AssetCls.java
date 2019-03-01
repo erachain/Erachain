@@ -572,9 +572,9 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_SHARE:
                 return lang.translate("Digital share. The share of ownership of an external or internal enterpris, the possession of which establishes the right to own the corresponding share of the enterprise without the need to take any external actions");
             case AS_INSIDE_BONUS:
-            return lang.translate("Digital loyalty points, bonuses, awards, discount points (bonus). It has no generally accepted value and can not be exchanged for other types of assets inside the Erachain environment. The exchange for other bonuses and rewards are allowed");
+                return lang.translate("Digital loyalty points, bonuses, awards, discount points (bonus). It has no generally accepted value and can not be exchanged for other types of assets inside the Erachain environment. The exchange for other bonuses and rewards are allowed");
             case AS_INSIDE_ACCESS:
-                return lang.translate("Digital rights of access and control");
+                return lang.translate("Digital rights of access and control, membership, pass");
             case AS_INSIDE_VOTE:
                 return lang.translate("A digital voice for voting");
             case AS_INDEX:

@@ -13,7 +13,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import java.math.BigDecimal;
@@ -554,7 +553,13 @@ public abstract class TransactionAmount extends Transaction {
                     switch (actionType) {
                         // HOLD GOODS, CHECK myself DEBT for CLAIMS
                         case ACTION_HOLD:
-                            
+
+                            if (assetType == AssetCls.AS_INSIDE_ACCESS
+                                    || assetType == AssetCls.AS_INSIDE_VOTE
+                            ) {
+                                return INVALID_HOLD_DIRECTION;
+                            }
+
                             if (height > BlockChain.HOLD_VALID_START) {
                                 if (!backward) {
                                     // HOLD only must be backward
