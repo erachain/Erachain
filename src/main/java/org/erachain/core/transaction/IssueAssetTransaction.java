@@ -274,9 +274,9 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
 
     //@Override
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asDeal);
+        super.orphan(block, asDeal);
 
         //REMOVE ASSETS FROM OWNER
         AssetCls asset = (AssetCls) this.getItem();

@@ -4,17 +4,16 @@ import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.TransactionSerializer;
-import org.erachain.datachain.DCMap;
 import org.erachain.datachain.DCSet;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -24,7 +23,7 @@ import java.util.*;
 // тут надо запминать каким пирам мы уже разослали транзакцию неподтвержденную
 // так что бы при подключении делать автоматически broadcast
 
-public class FavoriteDocument extends DCMap<Tuple2<String, String>, Transaction> implements Observer {
+public class FavoriteDocument extends DBMap<Tuple2<String, String>, Transaction> implements Observer {
 
     static Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class.getName());
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
@@ -37,10 +36,6 @@ public class FavoriteDocument extends DCMap<Tuple2<String, String>, Transaction>
         this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_STATEMENT_FAVORITES_TYPE);
         this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.DELETE_STATEMENT_FAVORITES_TYPE);
         this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_STATEMENT_FAVORITES_TYPE);
-    }
-
-    public FavoriteDocument(TransactionMap parent) {
-        super(parent, null);
     }
 
     @SuppressWarnings({})

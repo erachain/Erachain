@@ -2805,7 +2805,7 @@ public class OrderTestsMy {
         Long orderID_C = createOrderTransaction.makeOrder().getId();
 
         // ORPHAN ORDER THREE
-        createOrderTransaction.orphan(Transaction.FOR_NETWORK);
+        createOrderTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
         // CHECK BALANCES
         Assert.assertEquals(0, accountA.getBalanceUSE(keyA, fork3).compareTo(BigDecimal.valueOf(48000))); // BALANCE
@@ -2847,7 +2847,7 @@ public class OrderTestsMy {
         createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
                 BigDecimal.valueOf(200), (byte) 0, timestamp++, accountA.getLastTimestamp(fork2), new byte[] { 1, 2 });
         createOrderTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
-        createOrderTransaction.orphan(Transaction.FOR_NETWORK);
+        createOrderTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
         // CHECK BALANCES
         Assert.assertEquals(0, accountA.getBalanceUSE(keyA, fork2).compareTo(BigDecimal.valueOf(49000))); // BALANCE
@@ -3062,7 +3062,7 @@ public class OrderTestsMy {
         // CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(assetA.getQuantity()).setScale(assetA.getScale()),
                 accountA.getBalanceUSE(keyA, db));
-        cancelOrderTransaction.orphan(Transaction.FOR_NETWORK);
+        cancelOrderTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
         // CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(assetA.getQuantity()).subtract(orderCreation.makeOrder().getAmountHave()),

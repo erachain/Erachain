@@ -2,11 +2,11 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.naming.Name;
+import org.erachain.database.SortableList;
 import org.erachain.database.wallet.NameMap;
-import org.erachain.datachain.SortableList;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun.Tuple2;
 
 import javax.swing.*;
 import java.util.Observable;

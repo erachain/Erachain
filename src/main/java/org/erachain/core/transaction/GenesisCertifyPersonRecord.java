@@ -164,7 +164,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
     }
 
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
 
         // UNDO ALIVE PERSON for DURATION
         //db.getPersonStatusMap().removeItem(this.key, StatusCls.ALIVE_KEY);

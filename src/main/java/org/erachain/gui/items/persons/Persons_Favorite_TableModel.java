@@ -2,12 +2,12 @@ package org.erachain.gui.items.persons;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.SortableList;
 import org.erachain.gui.models.TableModelCls;
 import org.erachain.lang.Lang;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun.Tuple2;
 
 import javax.validation.constraints.Null;
 import java.util.*;
@@ -33,7 +33,6 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 
         //addObservers();
         //fill((Set<Long>) Controller.getInstance().wallet.database.getPersonFavoritesSet());
-
 
     }
 

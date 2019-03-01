@@ -63,7 +63,6 @@ public class Order implements Comparable<Order> {
     private BigDecimal amountWant;
     private BigDecimal price;
     int status;
-    Block block;
 
     public Order(Long id, Account creator, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant) {
         this.id = id;
@@ -78,12 +77,6 @@ public class Order implements Comparable<Order> {
 
         this.price = calcPrice(amountHave, amountWant, 1);
 
-    }
-
-    public Order(Long id, Account creator, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant, Block block) {
-        this(id, creator, haveKey, wantKey, amountHave, amountWant);
-
-        this.block = block;
     }
 
 
@@ -437,7 +430,7 @@ public class Order implements Comparable<Order> {
 
     }
 
-    public void process(Transaction transaction) {
+    public void process(Block block, Transaction transaction) {
 
         // GET HEIGHT from ID
         int height = (int) (this.id >> 32);
@@ -604,7 +597,7 @@ public class Order implements Comparable<Order> {
                 // REVERT not completed AMOUNT
                 this.creator.changeBalance(this.dcSet, false,
                         this.haveKey, this.getAmountHaveLeft(), false);
-                transaction.addCalculated(this.creator, this.haveKey, this.getAmountHaveLeft(),
+                transaction.addCalculated(block, this.creator, this.haveKey, this.getAmountHaveLeft(),
                         "ended order @" + Transaction.viewDBRef(this.id));
 
                 break;
@@ -726,7 +719,7 @@ public class Order implements Comparable<Order> {
 
                 //TRANSFER FUNDS
                 order.getCreator().changeBalance(this.dcSet, false, order.wantKey, tradeAmountForWant, false);
-                transaction.addCalculated(order.getCreator(), order.getWant(), tradeAmountForWant,
+                transaction.addCalculated(block, order.getCreator(), order.getWant(), tradeAmountForWant,
                         "order @" + Transaction.viewDBRef(order.id));
 
                 // Учтем что у стороны ордера обновилась форжинговая информация
@@ -750,7 +743,7 @@ public class Order implements Comparable<Order> {
                     // REVERT not completed AMOUNT
                     this.creator.changeBalance(this.dcSet, false,
                             this.haveKey, this.getAmountHaveLeft(), false);
-                    transaction.addCalculated(this.creator, this.haveKey, this.getAmountHaveLeft(),
+                    transaction.addCalculated(block, this.creator, this.haveKey, this.getAmountHaveLeft(),
                             "ended order @" + transaction.viewDBRef(this.id));
                     break;
                 }
@@ -771,14 +764,14 @@ public class Order implements Comparable<Order> {
         //TRANSFER FUNDS
         if (processedAmountFulfilledWant.signum() > 0) {
             this.creator.changeBalance(this.dcSet, false, this.wantKey, processedAmountFulfilledWant, false);
-            transaction.addCalculated(this.creator, this.wantKey, processedAmountFulfilledWant,
+            transaction.addCalculated(block, this.creator, this.wantKey, processedAmountFulfilledWant,
                     "order @" + Transaction.viewDBRef(this.id));
         }
 
 
     }
 
-    public void orphan() {
+    public void orphan(Block block) {
 
         CompletedOrderMap completedMap = this.dcSet.getCompletedOrderMap();
         OrderMap ordersMap = this.dcSet.getOrderMap();

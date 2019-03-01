@@ -37,7 +37,11 @@ import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.database.DBSet;
-import org.erachain.datachain.*;
+import org.erachain.database.SortableList;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.Item_Map;
+import org.erachain.datachain.LocalDataMap;
+import org.erachain.datachain.TransactionMap;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
 import org.erachain.gui.library.Issue_Confirm_Dialog;
@@ -89,7 +93,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.11.10 beta RC";
+    public static String version = "4.11.10 beta RC+heap";
     public static String buildTime = "2019-02-13 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -1369,7 +1373,7 @@ public class Controller extends Observable {
     public void actionAfterConnect() {
 
         if (this.connectTimer == null) {
-            this.connectTimer = new Timer();
+            this.connectTimer = new Timer("Action after connect");
 
             TimerTask action = new TimerTask() {
                 @Override
@@ -2355,12 +2359,16 @@ public class Controller extends Observable {
         return this.wallet.isItemFavorite(item);
     }
 
+    public Collection<org.erachain.core.voting.Poll> getAllPolls() {
+        return this.dcSet.getPollMap().getValues();
+    }
+
     public Collection<ItemCls> getAllItems(int type) {
-        return getItemMap(type).getValuesAll();
+        return getItemMap(type).getValues();
     }
 
     public Collection<ItemCls> getAllItems(int type, Account account) {
-        return getItemMap(type).getValuesAll();
+        return getItemMap(type).getValues();
     }
 
 
@@ -2650,7 +2658,7 @@ public class Controller extends Observable {
         if (false) {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_LIST_TRANSACTION_TYPE,
-                    this.dcSet.getTransactionMap().getValuesAll()));
+                    this.dcSet.getTransactionMap().getValues()));
 
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_ADD_TRANSACTION_TYPE, transaction));

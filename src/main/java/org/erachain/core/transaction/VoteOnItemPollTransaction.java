@@ -148,11 +148,6 @@ public class VoteOnItemPollTransaction extends Transaction {
         }
     }
 
-    public void setBlock(Block block, DCSet dcSet, int asDeal, int seqNo) {
-        super.setBlock(block, dcSet, asDeal, seqNo);
-
-        this.poll = (PollCls) this.dcSet.getItemPollMap().get(this.key);
-    }
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
         super.setDC(dcSet, asDeal, blockHeight, seqNo);
 
@@ -264,9 +259,9 @@ public class VoteOnItemPollTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asDeal);
+        super.orphan(block, asDeal);
 
         //DELETE VOTE FROM POLL
         this.dcSet.getVoteOnItemPollMap().removeItem(this.key, this.option, new BigInteger(this.creator.getShortAddressBytes()));

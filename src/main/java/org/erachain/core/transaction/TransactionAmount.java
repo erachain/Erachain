@@ -131,14 +131,6 @@ public abstract class TransactionAmount extends Transaction {
     
     // GETTERS/SETTERS
 
-    public void setBlock(Block block, DCSet dcSet, int asDeal, int seqNo) {
-        super.setBlock(block, dcSet, asDeal, seqNo);
-
-        if (this.amount != null) {
-            this.asset = this.dcSet.getItemAssetMap().get(this.getAbsKey());
-        }
-    }
-
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
         super.setDC(dcSet, asDeal, blockHeight, seqNo);
         
@@ -554,10 +546,12 @@ public abstract class TransactionAmount extends Transaction {
                         // HOLD GOODS, CHECK myself DEBT for CLAIMS
                         case ACTION_HOLD:
 
-                            if (assetType == AssetCls.AS_INSIDE_ACCESS
-                                    || assetType == AssetCls.AS_INSIDE_VOTE
+                            if (absKey == FEE_KEY
+                                    || assetType == AssetCls.AS_INDEX
+                                    || assetType == AssetCls.AS_INSIDE_ACCESS
+                                    || assetType == AssetCls.AS_INSIDE_BONUS
                             ) {
-                                return INVALID_HOLD_DIRECTION;
+                                return NOT_HOLDABLE_ASSET;
                             }
 
                             if (height > BlockChain.HOLD_VALID_START) {
@@ -602,9 +596,12 @@ public abstract class TransactionAmount extends Transaction {
                             break;
                         
                         case ACTION_DEBT: // DEBT, CREDIT and BORROW
-                            
-                            if (absKey == FEE_KEY) {
-                                return NOT_DEBT_ASSET;
+
+                            if (absKey == FEE_KEY
+                                    || assetType == AssetCls.AS_INDEX
+                                    || assetType == AssetCls.AS_INSIDE_BONUS
+                            ) {
+                                return NOT_DEBTABLE_ASSET;
                             }
                             
                             // CLAIMs DEBT - only for OWNER
@@ -618,6 +615,7 @@ public abstract class TransactionAmount extends Transaction {
                             // 75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12 ->
                             // 7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7
                             if (backward) {
+
                                 // BACKWARD - BORROW - CONFISCATE CREDIT
                                 Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
                                         this.creator.getAddress(), absKey, this.recipient.getAddress());
@@ -822,7 +820,16 @@ public abstract class TransactionAmount extends Transaction {
                             break;
                         
                         case ACTION_SPEND: // PRODUCE - SPEND
-                            
+
+                            if (absKey == FEE_KEY
+                                    || assetType == AssetCls.AS_INDEX
+                                    || assetType == AssetCls.AS_INSIDE_ACCESS
+                                    || assetType == AssetCls.AS_INSIDE_BONUS
+                            ) {
+                                return NOT_SPENDABLE_ASSET;
+                            }
+
+
                             // TRY FEE
                             if (this.creator.getBalance(dcSet, FEE_KEY,  ACTION_SEND).b.compareTo(this.fee) < 0) {
                                 return NOT_ENOUGH_FEE;
@@ -1015,9 +1022,9 @@ public abstract class TransactionAmount extends Transaction {
     }
     
     @Override
-    public void orphan(int asDeal) {
-        
-        super.orphan(asDeal);
+    public void orphan(Block block, int asDeal) {
+
+        super.orphan(block, asDeal);
         
         if (this.amount == null)
             return;

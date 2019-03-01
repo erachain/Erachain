@@ -223,9 +223,9 @@ public class CancelSellNameTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
         //UPDATE creator
-        super.orphan(asDeal);
+        super.orphan(block, asDeal);
 
         //ADD TO DATABASE
         BigDecimal amount = this.dcSet.getCancelSellNameMap().get(this);

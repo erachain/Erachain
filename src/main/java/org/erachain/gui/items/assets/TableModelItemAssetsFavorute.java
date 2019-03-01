@@ -2,8 +2,8 @@ package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.SortableList;
 import org.erachain.gui.models.TableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;

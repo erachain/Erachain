@@ -2,10 +2,10 @@ package org.erachain.database.wallet;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.serializer.ItemSerializer;
+import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.ObserverMessage;
 
 import java.util.Map;
 
@@ -24,10 +24,6 @@ public class WItemImprintMap extends WItem_Map {
                 ObserverMessage.WALLET_REMOVE_IMPRINT_TYPE,
                 ObserverMessage.WALLET_LIST_IMPRINT_TYPE
         );
-    }
-
-    public WItemImprintMap(WItemImprintMap parent) {
-        super(parent);
     }
 
     @Override

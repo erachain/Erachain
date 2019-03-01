@@ -599,7 +599,7 @@ public class R_SertifyPubKeys extends Transaction {
 
 
             boolean makeCalculates = false;
-            if (this.block != null && this.block.txCalculated != null) {
+            if (block != null && block.txCalculated != null) {
                 makeCalculates = true;
             }
 
@@ -608,7 +608,7 @@ public class R_SertifyPubKeys extends Transaction {
                     : BONUS_FOR_PERSON_4_11;
             pkAccount.changeBalance(db, false, FEE_KEY, personBonus, false);
             if (makeCalculates) {
-                this.block.txCalculated.add(new R_Calculated(pkAccount, FEE_KEY, personBonus,
+                block.txCalculated.add(new R_Calculated(pkAccount, FEE_KEY, personBonus,
                         "enter bonus", this.dbRef));
             }
             BigDecimal issued_FEE_BD_total = personBonus;
@@ -617,7 +617,7 @@ public class R_SertifyPubKeys extends Transaction {
             issuer.changeBalance(db, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRATOR_4_11,
                     false);
             if (makeCalculates) {
-                this.block.txCalculated.add(new R_Calculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRATOR_4_11,
+                block.txCalculated.add(new R_Calculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRATOR_4_11,
                         "register reward @P:" + this.key, this.dbRef));
             }
             issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRATOR_4_11);
@@ -668,10 +668,10 @@ public class R_SertifyPubKeys extends Transaction {
     }
 
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
 
         //UPDATE SENDER
-        super.orphan(asDeal);
+        super.orphan(block, asDeal);
 
         DCSet db = this.dcSet;
         //UPDATE RECIPIENT

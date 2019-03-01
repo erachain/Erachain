@@ -1,12 +1,10 @@
 package org.erachain.datachain;
 
-import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import com.google.common.primitives.UnsignedBytes;
 import org.erachain.core.block.Block;
-import org.mapdb.*;
+import org.mapdb.DB;
+import org.mapdb.SerializerBase;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -97,7 +95,7 @@ public class BlockSignsMap extends DCMap<Long, Integer> {
         if (value == null)
             return null;
 
-        return this.getDCSet().getBlockMap().get(value);
+        return this.getDBSet().getBlockMap().get(value);
 
     }
 

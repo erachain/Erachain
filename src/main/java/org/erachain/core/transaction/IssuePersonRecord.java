@@ -300,9 +300,9 @@ public class IssuePersonRecord extends Issue_ItemRecord {
     }
 
     //@Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asDeal);
+        super.orphan(block, asDeal);
 
         PersonHuman person = (PersonHuman) this.item;
         PublicKeyAccount maker = person.getOwner();

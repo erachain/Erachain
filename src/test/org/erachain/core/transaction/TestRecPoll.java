@@ -13,11 +13,11 @@ import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -313,7 +313,7 @@ public class TestRecPoll {
         assertEquals(issuePollTransaction.getTimestamp(), certifier.getLastTimestamp(db));
 
         //////// ORPHAN /////////
-        issuePollTransaction.orphan(Transaction.FOR_NETWORK);
+        issuePollTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE ISSUER
         if (!BlockChain.DEVELOP_USE)

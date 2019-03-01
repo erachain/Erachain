@@ -1,14 +1,14 @@
 package org.erachain.gui.items.persons;
 
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemPersonMap;
-import org.erachain.datachain.SortableList;
 import org.erachain.lang.Lang;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;

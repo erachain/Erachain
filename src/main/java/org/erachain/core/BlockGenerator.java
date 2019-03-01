@@ -850,8 +850,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         ctrl.setTransactionMakeTimingAverage(transactionMakeTimingAverage);
                                     }
 
-                                    heapOverflowCount = 0;
-
                                 } catch (java.lang.OutOfMemoryError e) {
                                     ctrl.stopAll(94);
                                     local_status = -1;
@@ -865,8 +863,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         this.local_status = -1;
                                         return;
                                     }
-                                    if (heapOverflowCount > 1)
-                                        ctrl.stopAll(97);
 
                                     LOGGER.error("generateNextBlock is NULL... try wait");
                                     try {
@@ -886,14 +882,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                             this.setMonitorStatus("local_status " + viewStatus());
 
                                             ctrl.broadcastWinBlock(generatedBlock);
-                                            generatedBlock = null;
                                             local_status = 0;
                                             this.setMonitorStatus("local_status " + viewStatus());
 
                                         } else {
-                                            generatedBlock = null;
                                             LOGGER.info("my BLOCK is weak ((...");
                                         }
+                                        generatedBlock = null;
                                     } catch (java.lang.OutOfMemoryError e) {
                                         ctrl.stopAll(94);
                                         local_status = -1;

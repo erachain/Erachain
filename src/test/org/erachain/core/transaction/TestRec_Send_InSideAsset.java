@@ -1,16 +1,5 @@
 package org.erachain.core.transaction;
 
-import static org.junit.Assert.assertEquals;
-
-import java.math.BigDecimal;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.junit.Test;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -20,6 +9,16 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
+import org.junit.Test;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestRec_Send_InSideAsset {
 
@@ -165,7 +164,7 @@ public class TestRec_Send_InSideAsset {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(Transaction.FOR_NETWORK);
+        r_Send.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         emitterBalance = emitter.getBalance(db, assetKey);
@@ -242,7 +241,7 @@ public class TestRec_Send_InSideAsset {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(Transaction.FOR_NETWORK);
+        r_Send.orphan(gb, Transaction.FOR_NETWORK);
 
         assertEquals(BigDecimal.valueOf(0), db.getCredit_AddressesMap().get(creditKey));
 
@@ -317,7 +316,7 @@ public class TestRec_Send_InSideAsset {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(Transaction.FOR_NETWORK);
+        r_Send.orphan(gb, Transaction.FOR_NETWORK);
 
         assertEquals(BigDecimal.valueOf(10), db.getCredit_AddressesMap().get(creditKey));
 

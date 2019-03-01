@@ -146,7 +146,7 @@ public class Synchronizer {
             // LOGGER.debug("*** core.Synchronizer.checkNewBlocks - try orphan:
             // " + lastBlock.getHeight(fork));
             if (cnt.isOnStopping())
-                throw new Exception("on stoping");
+                throw new Exception("on stopping");
 
             int height = lastBlock.getHeight();
             int bbb = fork.getBlockMap().size();
@@ -261,6 +261,8 @@ public class Synchronizer {
 
             } else {
 
+                block.clearForHeap();
+
                 // INVALID BLOCK THROW EXCEPTION
                 String mess = "Dishonest peer by not is Valid block, heigh: " + height;
                 peer.ban(BAN_BLOCK_TIMES, mess);
@@ -305,18 +307,22 @@ public class Synchronizer {
         byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
         while (!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature)) {
             if (cnt.isOnStopping())
-                throw new Exception("on stoping");
+                throw new Exception("on stopping");
 
             // ADD ORPHANED TRANSACTIONS
             // orphanedTransactions.addAll(lastBlock.getTransactions());
             for (Transaction transaction : lastBlock.getTransactions()) {
                 if (cnt.isOnStopping())
-                    throw new Exception("on stoping");
+                    throw new Exception("on stopping");
                 orphanedTransactions.put(new BigInteger(1, transaction.getSignature()).toString(16), transaction);
             }
             LOGGER.debug("*** synchronize - orphanedTransactions.size:" + orphanedTransactions.size());
             LOGGER.debug("*** synchronize - orphan block... " + dcSet.getBlockMap().size());
             this.pipeProcessOrOrphan(dcSet, lastBlock, true, false);
+
+            // CLEAR for HEAP
+            lastBlock.clearForHeap();
+
             lastBlock = dcSet.getBlockMap().last();
         }
 
@@ -328,7 +334,7 @@ public class Synchronizer {
         for (Block block : newBlocks) {
 
             if (cnt.isOnStopping())
-                throw new Exception("on stoping");
+                throw new Exception("on stopping");
 
             if (dcSet.getBlockSignsMap().contains(block.getSignature())) {
                 LOGGER.error("*** add CHAIN - DUPLICATE SIGN! [" + block.getHeight() + "] "
@@ -344,12 +350,16 @@ public class Synchronizer {
             LOGGER.debug("*** begin REMOVE orphanedTransactions");
             for (Transaction transaction : block.getTransactions()) {
                 if (cnt.isOnStopping())
-                    throw new Exception("on stoping");
+                    throw new Exception("on stopping");
 
                 String key = new BigInteger(1, transaction.getSignature()).toString(16);
                 if (orphanedTransactions.containsKey(key))
                     orphanedTransactions.remove(key);
             }
+
+            // CLEAR for HEAP
+            block.clearForHeap();
+
         }
 
         // CLEAR for DEADs
@@ -357,7 +367,7 @@ public class Synchronizer {
         List<Transaction> orphanedTransactionsList = new ArrayList<Transaction>();
         for (Transaction transaction : orphanedTransactions.values()) {
             if (cnt.isOnStopping())
-                throw new Exception("on stoping");
+                throw new Exception("on stopping");
 
             // CHECK IF DEADLINE PASSED
             if (!map.contains(transaction.getSignature())) {
@@ -386,7 +396,7 @@ public class Synchronizer {
         Controller cnt = Controller.getInstance();
 
         if (cnt.isOnStopping())
-            throw new Exception("on stoping");
+            throw new Exception("on stopping");
 
         /*
          * LOGGER.error("Synchronizing from peer: " + peer.toString() + ":" +
@@ -426,7 +436,7 @@ public class Synchronizer {
                 if (cnt.isOnStopping()) {
                     // STOP BLOCKBUFFER
                     blockBuffer.stopThread();
-                    throw new Exception("on stoping");
+                    throw new Exception("on stopping");
                 }
 
                 // GET BLOCK
@@ -446,7 +456,7 @@ public class Synchronizer {
                 if (cnt.isOnStopping()) {
                     // STOP BLOCKBUFFER
                     blockBuffer.stopThread();
-                    throw new Exception("on stoping");
+                    throw new Exception("on stopping");
                 }
 
                 ///blockFromPeer.setCalcGeneratingBalance(dcSet); // NEED SET it
@@ -455,7 +465,7 @@ public class Synchronizer {
                 if (cnt.isOnStopping()) {
                     // STOP BLOCKBUFFER
                     blockBuffer.stopThread();
-                    throw new Exception("on stoping");
+                    throw new Exception("on stopping");
                 }
 
                 if (!blockFromPeer.isSignatureValid()) {
@@ -481,6 +491,8 @@ public class Synchronizer {
                 }
 
                 if (!blockFromPeer.isValid(dcSet, false)) {
+                    blockFromPeer.clearForHeap();
+
                     errorMess = "invalid BLOCK";
                     banTime = BAN_BLOCK_TIMES;
                     break;
@@ -489,7 +501,7 @@ public class Synchronizer {
 
                 if (cnt.isOnStopping()) {
                     blockBuffer.stopThread();
-                    throw new Exception("on stoping");
+                    throw new Exception("on stopping");
                 }
 
                 try {
@@ -497,6 +509,10 @@ public class Synchronizer {
 
                     LOGGER.debug("try pipeProcessOrOrphan");
                     this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false);
+
+                    // CLEAR for HEAP
+                    blockFromPeer.clearForHeap();
+
                     LOGGER.debug("synchronize BLOCK END process");
                     blockBuffer.clearBlock(blockFromPeer.getSignature());
                     LOGGER.debug("synchronize clear from BLOCK BUFFER");
@@ -508,7 +524,7 @@ public class Synchronizer {
                     blockBuffer.stopThread();
 
                     if (cnt.isOnStopping()) {
-                        throw new Exception("on stoping");
+                        throw new Exception("on stopping");
                     } else {
                         throw new Exception(e);
                     }
@@ -526,7 +542,7 @@ public class Synchronizer {
             }
 
             if (cnt.isOnStopping()) {
-                throw new Exception("on stoping");
+                throw new Exception("on stopping");
             }
 
             // RECURSIVE CALL if new block is GENERATED
@@ -538,7 +554,7 @@ public class Synchronizer {
             List<Block> blocks = this.getBlocks(dcSet, signatures, peer);
 
             if (cnt.isOnStopping()) {
-                throw new Exception("on stoping");
+                throw new Exception("on stopping");
             }
 
             Block lastCommonBlock = dcSet.getBlockSignsMap().getBlock(lastCommonBlockSignature);
@@ -548,15 +564,18 @@ public class Synchronizer {
                     + "] for blocks: " + blocks.size());
             List<Transaction> orphanedTransactions = this.synchronize_blocks(dcSet, lastCommonBlock, checkPointHeight,
                     blocks, peer);
+
+            blocks = null;
+
             if (cnt.isOnStopping()) {
-                throw new Exception("on stoping");
+                throw new Exception("on stopping");
             }
 
             // SEND ORPHANED TRANSACTIONS TO PEER
             TransactionMap map = dcSet.getTransactionMap();
             for (Transaction transaction : orphanedTransactions) {
                 if (cnt.isOnStopping()) {
-                    throw new Exception("on stoping");
+                    throw new Exception("on stopping");
                 }
 
                 byte[] sign = transaction.getSignature();
@@ -683,7 +702,7 @@ public class Synchronizer {
         int step = 2;
         do {
             if (cnt.isOnStopping()) {
-                throw new Exception("on stoping");
+                throw new Exception("on stopping");
             }
 
             maxChainHeight -= step;
@@ -739,7 +758,7 @@ public class Synchronizer {
         int bytesGet = 0;
         for (byte[] signature : signatures) {
             if (cnt.isOnStopping()) {
-                throw new Exception("on stoping");
+                throw new Exception("on stopping");
             }
 
             // ADD TO LIST
@@ -762,7 +781,6 @@ public class Synchronizer {
         return blocks;
     }
 
-    public Block lastPipedBlock;
     // SYNCHRONIZED DO NOT PROCCESS A BLOCK AT THE SAME TIME
     // SYNCHRONIZED MIGHT HAVE BEEN PROCESSING PREVIOUS BLOCK
     public synchronized void pipeProcessOrOrphan(DCSet dcSet, Block block, boolean doOrphan, boolean hardFlush)
@@ -771,7 +789,7 @@ public class Synchronizer {
 
         // CHECK IF WE ARE STILL PROCESSING BLOCKS
         if (cnt.isOnStopping()) {
-            throw new Exception("on stoping");
+            throw new Exception("on stopping");
         }
 
         long processTiming = System.nanoTime();
@@ -787,7 +805,6 @@ public class Synchronizer {
       //      countObserv_COUNT = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_COUNT);
         }
 
-        lastPipedBlock = block;
 
         if (doOrphan) {
 
@@ -821,7 +838,7 @@ public class Synchronizer {
                 }
             } finally {
                 if (cnt.isOnStopping()) {
-                    throw new Exception("on stoping");
+                    throw new Exception("on stopping");
                 }
 
                 if (observOn) {
@@ -889,7 +906,7 @@ public class Synchronizer {
                 }
             } finally {
                 if (cnt.isOnStopping()) {
-                    throw new Exception("on stoping");
+                    throw new Exception("on stopping");
                 }
 
                 if (observOn) {

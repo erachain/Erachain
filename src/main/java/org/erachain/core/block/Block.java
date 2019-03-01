@@ -559,6 +559,16 @@ public class Block {
         return this.heightBlock;
     }
 
+    /**
+     * очищает перекрестные ссылки из тнзакций на блок и позволяет его очистить из Кучи
+     * Так же быстрее чистит байтовые массивы у блока
+     */
+    public void clearForHeap() {
+        this.transactions = null;
+        this.parentBlockHead = null;
+        this.rawTransactions = null;
+    }
+
     /*
     public void setHeight(int height) {
         this.heightBlock = height;
@@ -770,7 +780,7 @@ public class Block {
 
         BigDecimal bonusFee; // = BlockChain.MIN_FEE_IN_BLOCK;
 
-        if(true || this.heightBlock < BlockChain.VERS_4_12) {
+        if (true) {
             bonusFee = BlockChain.MIN_FEE_IN_BLOCK_4_10;
             if (this.heightBlock < inDay30 << 1)
                 return BigDecimal.valueOf(70000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
@@ -872,7 +882,7 @@ public class Block {
     }
 
     public void setTransactions(List<Transaction> transactions) {
-        this.setTransactions(transactions, transactions.size());
+        this.setTransactions(transactions, transactions == null ? 0 : transactions.size());
     }
 
     public void setTransactions(List<Transaction> transactions, int count) {
@@ -1432,7 +1442,7 @@ public class Block {
                         return false;
                     }
 
-                    transaction.setBlock(this, validatingDC, Transaction.FOR_NETWORK, seqNo);
+                    transaction.setDC(validatingDC, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                     //CHECK IF VALID
                     if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
@@ -1461,7 +1471,7 @@ public class Block {
 
                 } else {
 
-                    transaction.setBlock(this, validatingDC, Transaction.FOR_NETWORK, seqNo);
+                    transaction.setDC(validatingDC, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                     //UPDATE REFERENCE OF SENDER
                     if (transaction.isReferenced())
@@ -1840,7 +1850,7 @@ public class Block {
                 //LOGGER.debug("[" + seq + "] record is process" );
 
                 // NEED set DC for WIPED too
-                transaction.setBlock(this, dcSet, Transaction.FOR_NETWORK, ++seqNo);
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, this.heightBlock, ++seqNo);
 
                 //PROCESS
                 if (!transaction.isWiped()) {
@@ -2008,10 +2018,10 @@ public class Block {
             //LOGGER.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
 
             // (!) seqNo = i + 1
-            transaction.setBlock(this, dcSet, Transaction.FOR_NETWORK, seqNo);
+            transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, seqNo);
 
             if (!transaction.isWiped()) {
-                transaction.orphan(Transaction.FOR_NETWORK);
+                transaction.orphan(this, Transaction.FOR_NETWORK);
             } else {
                 // IT IS REFERENCED RECORD?
                 if (transaction.isReferenced()) {

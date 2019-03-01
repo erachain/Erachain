@@ -1,23 +1,21 @@
 package org.erachain.core.transaction;
 
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.json.simple.JSONObject;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.naming.Name;
 import org.erachain.core.naming.NameSale;
+import org.json.simple.JSONObject;
+
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 //import java.math.BigInteger;
 
@@ -268,9 +266,9 @@ public class BuyNameTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asDeal);
+        super.orphan(block, asDeal);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).add(this.nameSale.getAmount()), db);
         this.creator.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.nameSale.getAmount(), false);
 

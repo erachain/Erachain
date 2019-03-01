@@ -1,7 +1,8 @@
 package org.erachain.core.transaction;
 
-import org.erachain.api.BlogPostResource;
 import com.google.common.base.Charsets;
+import org.apache.commons.lang3.StringUtils;
+import org.erachain.api.BlogPostResource;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -10,14 +11,13 @@ import org.erachain.core.naming.Name;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.web.blog.BlogEntry;
 import org.erachain.datachain.DCSet;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.BlogUtils;
+import org.erachain.utils.StorageUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.erachain.utils.BlogUtils;
-import org.erachain.utils.StorageUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -220,7 +220,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
 
         // NAME STORAGE UPDATE ORPHAN
         // if (service == 10) {
@@ -231,7 +231,7 @@ public abstract class ArbitraryTransaction extends Transaction {
         // }
 
         // UPDATE CREATOR
-        super.orphan(asDeal);
+        super.orphan(block, asDeal);
 
         // ORPHAN PAYMENTS
         for (Payment payment : this.getPayments()) {

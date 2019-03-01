@@ -14,10 +14,10 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple5;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
@@ -241,7 +241,7 @@ public class TestRecSetStatusToItem {
 
 
         ////// ORPHAN 2 ///////
-        setStatusTransaction_2.orphan(Transaction.FOR_NETWORK);
+        setStatusTransaction_2.orphan(gb, Transaction.FOR_NETWORK);
 
         statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
         endDate = statusDuration.a;
@@ -251,7 +251,7 @@ public class TestRecSetStatusToItem {
         assertEquals(setStatusTransaction.getTimestamp(), maker.getLastTimestamp(db));
 
         ////// ORPHAN ///////
-        setStatusTransaction.orphan(Transaction.FOR_NETWORK);
+        setStatusTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
         statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
         assertEquals(statusDuration, null);

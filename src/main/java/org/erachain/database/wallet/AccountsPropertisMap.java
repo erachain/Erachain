@@ -1,15 +1,14 @@
 package org.erachain.database.wallet;
 
 import org.erachain.database.DBMap;
-import org.erachain.datachain.DCMap;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,7 +16,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 // <Account, Tuple2<Title,JSON_String>>
-public class AccountsPropertisMap extends DCMap<String, Tuple2<String, String>> {
+public class AccountsPropertisMap extends DBMap<String, Tuple2<String, String>> {
     public static final int NAME_INDEX = 1;
     public static final int OWNER_INDEX = 2;
     static Logger LOGGER = LoggerFactory.getLogger(AccountsPropertisMap.class.getName());
@@ -30,10 +29,6 @@ public class AccountsPropertisMap extends DCMap<String, Tuple2<String, String>> 
         this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ACCOUNT_PROPERTIES_ADD);
         this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_ACCOUNT_PROPERTIES_DELETE);
         this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_ACCOUNT_PROPERTIES_LIST);
-    }
-
-    public AccountsPropertisMap(AccountsPropertisMap parent) {
-        super(parent, null);
     }
 
     @Override

@@ -235,13 +235,6 @@ public class CreateOrderTransaction extends Transaction {
     }
     */
 
-    public void setBlock(Block block, DCSet dcSet, int asDeal, int seqNo) {
-        super.setBlock(block, dcSet, asDeal, seqNo);
-
-        this.haveAsset = this.dcSet.getItemAssetMap().get(this.haveKey);
-        this.wantAsset = this.dcSet.getItemAssetMap().get(this.wantKey);
-    }
-
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
         super.setDC(dcSet, asDeal, blockHeight, seqNo);
 
@@ -309,9 +302,7 @@ public class CreateOrderTransaction extends Transaction {
         BigDecimal amountWant = this.amountWant.setScale(this.wantAsset.getScale());
 
         return new Order(Transaction.makeDBRef(this.height, this.seqNo), this.creator, this.haveKey, this.wantKey,
-                amountHave, amountWant, // new SCALE
-                // для отработки форжинговой информации в текущем блоке
-                this.block
+                amountHave, amountWant
         );
     }
 
@@ -584,15 +575,15 @@ public class CreateOrderTransaction extends Transaction {
         //.copy() // тут надо что-то сделать новым - а то значения впамяти по ссылке меняются
         Order order = makeOrder(); //.copy();
         order.setDC(dcSet);
-        order.process(this);
+        order.process(block, this);
 
     }
 
     // @Override
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
         // UPDATE CREATOR
-        super.orphan(asDeal);
+        super.orphan(block, asDeal);
 
         // ORPHAN ORDER
         // изменяемые объекты нужно заново создавать
@@ -601,7 +592,7 @@ public class CreateOrderTransaction extends Transaction {
         // изменяемые объекты нужно заново создавать
         Order order = makeOrder();
         order.setDC(dcSet);
-        order.orphan();
+        order.orphan(block);
 
     }
 

@@ -1,6 +1,6 @@
 package org.erachain.gui.models;
 
-import org.erachain.datachain.SortableList;
+import org.erachain.database.SortableList;
 
 import javax.swing.table.AbstractTableModel;
 

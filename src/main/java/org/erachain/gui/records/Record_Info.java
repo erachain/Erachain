@@ -35,7 +35,7 @@ public class Record_Info extends JTextPane {
         if (!record.isConfirmed(db)) {
             message = Lang.getInstance().translate("Not confirmed");
         } else {
-            message = "Block Height - SeqNo.: " + record.viewHeightSeq() + ", Confs.: " + record.getConfirmations(DCSet.getInstance()) + ", Block Ver.: " + record.getBlockVersion(db);
+            message = "Block Height - SeqNo.: " + record.viewHeightSeq() + ", Confs.: " + record.getConfirmations(DCSet.getInstance());
         }
         message = "<div><b>" + message + "</b>"
                 + ", time: " + record.viewTimestamp() + "</div>";

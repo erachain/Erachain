@@ -7,6 +7,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
@@ -15,9 +16,9 @@ import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.payment.Payment;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ public class TestRec_Send {
     //CREATE EMPTY MEMORY DATABASE
     private DCSet db;
     private GenesisBlock gb;
+    Block block;
 
     // INIT ASSETS
     private void init() {
@@ -64,6 +66,8 @@ public class TestRec_Send {
         db = DCSet.createEmptyDatabaseSet();
         Controller.getInstance().setDCSet(db);
         gb = new GenesisBlock();
+        block = gb;
+
         try {
             gb.process(db);
         } catch (Exception e) {
@@ -162,7 +166,7 @@ public class TestRec_Send {
             r_Send.sign(maker, Transaction.FOR_NETWORK);
             assertEquals(r_Send.isSignatureValid(db), true);
             //r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
-            r_Send.setBlock(this.gb, db, Transaction.FOR_NETWORK, 2);
+            r_Send.setDC(db, Transaction.FOR_NETWORK, this.gb.heightBlock, 2);
             assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
             
             raw_r_Send = r_Send.toBytes(Transaction.FOR_NETWORK, true);
@@ -189,7 +193,7 @@ public class TestRec_Send {
 
             //r_Send_2.sign(maker, false);
             assertEquals(r_Send_2.isSignatureValid(db), true);
-            r_Send_2.setBlock(gb, db, Transaction.FOR_NETWORK, 1);
+            r_Send_2.setDC(db, Transaction.FOR_NETWORK, gb.heightBlock, 1);
             assertEquals(r_Send_2.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
             assertEquals(Arrays.equals(r_Send.getSignature(), r_Send_2.getSignature()), true);
@@ -363,7 +367,7 @@ public class TestRec_Send {
             r_Send.sign(maker, Transaction.FOR_NETWORK);
             assertEquals(r_Send.isSignatureValid(db), true);
             //r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
-            r_Send.setBlock(gb, db, Transaction.FOR_NETWORK, 1);
+            r_Send.setDC(db, Transaction.FOR_NETWORK, gb.heightBlock, 1);
             assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
             
             raw_r_Send = r_Send.toBytes(Transaction.FOR_NETWORK, true);
@@ -390,7 +394,7 @@ public class TestRec_Send {
 
             //r_Send_2.sign(maker, false);
             assertEquals(r_Send_2.isSignatureValid(db), true);
-            r_Send_2.setBlock(gb, db, Transaction.FOR_NETWORK, 1);
+            r_Send_2.setDC(db, Transaction.FOR_NETWORK, gb.heightBlock, 1);
             assertEquals(r_Send_2.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
             assertEquals(Arrays.equals(r_Send.getSignature(), r_Send_2.getSignature()), true);
@@ -542,7 +546,7 @@ public class TestRec_Send {
         assertEquals(messageTransactionV3_2.isSignatureValid(db), true);
 
         //// MESSAGE ONLY
-        r_SendV3.orphan(Transaction.FOR_NETWORK);
+        r_SendV3.orphan(block, Transaction.FOR_NETWORK);
         assertEquals((long) maker.getLastTimestamp(db), gb.getTimestamp());
 
         r_SendV3 = new R_Send(
@@ -591,7 +595,7 @@ public class TestRec_Send {
 
 
         //// AMOUNT ONLY
-        r_SendV3.orphan(Transaction.FOR_NETWORK);
+        r_SendV3.orphan(block, Transaction.FOR_NETWORK);
         assertEquals((long) maker.getLastTimestamp(db), gb.getTimestamp());
 
         r_SendV3 = new R_Send(
@@ -637,7 +641,7 @@ public class TestRec_Send {
         assertEquals(messageTransactionV3_2.isSignatureValid(db), true);
 
         //// EMPTY - NOT AMOUNT and NOT TEXT
-        r_SendV3.orphan(Transaction.FOR_NETWORK);
+        r_SendV3.orphan(block, Transaction.FOR_NETWORK);
 
         r_SendV3 = new R_Send(
                 maker, FEE_POWER,

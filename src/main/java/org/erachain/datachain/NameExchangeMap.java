@@ -3,11 +3,11 @@ package org.erachain.datachain;
 import org.erachain.controller.Controller;
 import org.erachain.core.naming.NameSale;
 import org.erachain.database.DBMap;
+import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.ReverseComparator;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.ReverseComparator;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -96,7 +96,7 @@ public class NameExchangeMap extends DCMap<String, BigDecimal> {
         if (this.parent != null) {
 
             //GET ALL KEYS FOR FORK
-            List<NameSale> forkItems = this.parent.getDCSet().getNameExchangeMap().getNameSales();
+            List<NameSale> forkItems = this.parent.getDBSet().getNameExchangeMap().getNameSales();
 
             nameSales.addAll(forkItems);
 

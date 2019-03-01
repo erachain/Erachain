@@ -3,15 +3,14 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.SortableList;
 import org.erachain.lang.Lang;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun.Tuple2;
 
 import javax.validation.constraints.Null;
-
 import java.util.Collections;
 import java.util.Observable;
 import java.util.Observer;

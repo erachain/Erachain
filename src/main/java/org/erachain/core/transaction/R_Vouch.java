@@ -7,10 +7,10 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -303,9 +303,9 @@ public class R_Vouch extends Transaction {
     }
 
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
 
-        super.orphan(asDeal);
+        super.orphan(block, asDeal);
 
         // make key for vouching record
         Long recordKey = Transaction.makeDBRef(this.vouchHeight, this.vouchSeqNo);

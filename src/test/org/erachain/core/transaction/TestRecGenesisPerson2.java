@@ -9,9 +9,9 @@ import org.erachain.datachain.AddressPersonMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.KKPersonStatusMap;
 import org.erachain.datachain.PersonAddressMap;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
@@ -209,7 +209,7 @@ public class TestRecGenesisPerson2 {
 
         /////////////////
         ///// ORPHAN ////
-        genesisIssuePersonTransaction.orphan(Transaction.FOR_NETWORK);
+        genesisIssuePersonTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
         assertEquals(false, db.getItemPersonMap().contains(keyPerson));
 

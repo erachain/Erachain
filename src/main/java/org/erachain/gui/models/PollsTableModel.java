@@ -3,9 +3,9 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.voting.Poll;
+import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.PollMap;
-import org.erachain.datachain.SortableList;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 

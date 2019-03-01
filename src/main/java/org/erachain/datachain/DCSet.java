@@ -339,6 +339,7 @@ public class DCSet implements Observer, IDB {
 
      * @throws Exception
      */
+
     public static DCSet getInstance(boolean withObserver, boolean dynamicGUI) throws Exception {
         if (instance == null) {
             reCreateDatabase(withObserver, dynamicGUI);
@@ -373,7 +374,7 @@ public class DCSet implements Observer, IDB {
         DB database = DBMaker.newFileDB(dbFile)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 //.cacheSize(CASH_SIZE)
-                //.cacheDisable()
+                .cacheDisable()
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
                 //.snapshotEnable()
@@ -384,7 +385,7 @@ public class DCSet implements Observer, IDB {
                 //.cacheHardRefEnable()
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(3) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
 

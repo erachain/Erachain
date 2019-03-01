@@ -9,10 +9,10 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
+import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.erachain.utils.NumberAsString;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -118,22 +118,6 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
     @Override
     public long getAssetKey() {
         return this.key;
-    }
-
-    public void setBlock(Block block, DCSet dcSet, int asDeal, int seqNo) {
-        super.setBlock(block, dcSet, asDeal, seqNo);
-
-        if (this.amount != null) {
-            long assetKey = this.getAbsKey();
-            AssetCls asset = (AssetCls) this.dcSet.getItemAssetMap().get(assetKey);
-            if (asset == null || assetKey > BlockChain.AMOUNT_SCALE_FROM) {
-                int different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
-                if (different_scale != 0) {
-                    // RESCALE AMOUNT
-                    this.amount = this.amount.scaleByPowerOfTen(different_scale);
-                }
-            }
-        }
     }
 
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
@@ -311,7 +295,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
     }
 
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
         // RISE ERROR
         DCSet err = null;
         err.commit();

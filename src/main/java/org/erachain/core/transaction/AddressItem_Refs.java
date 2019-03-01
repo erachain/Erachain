@@ -144,9 +144,9 @@ public abstract class AddressItem_Refs extends Transaction {
 
     //@Override
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asDeal);
+        super.orphan(block, asDeal);
 
         //DELETE FROM DATABASE
         long key = this.item.removeFromMap(this.dcSet, START_KEY);

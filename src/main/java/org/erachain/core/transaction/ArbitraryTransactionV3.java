@@ -1,20 +1,20 @@
 package org.erachain.core.transaction;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.datachain.DCSet;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 //import java.math.BigInteger;
 
@@ -251,8 +251,9 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
         // REMOVE FEE
         Transaction forkTransaction = this.copy();
         DCSet fork = this.dcSet.fork();
-        forkTransaction.setBlock(this.block, fork, Transaction.FOR_NETWORK, this.seqNo);
-        forkTransaction.process(this.block, Transaction.FOR_NETWORK);
+        forkTransaction.setDC(fork, Transaction.FOR_NETWORK, this.height, this.seqNo);
+        Block block = fork.getBlockMap().get(this.height);
+        forkTransaction.process(block, Transaction.FOR_NETWORK);
         // TODO process && orphan && isValid balances
 
         // CHECK PAYMENTS

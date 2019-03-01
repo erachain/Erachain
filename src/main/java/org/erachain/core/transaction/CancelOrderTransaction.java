@@ -62,14 +62,6 @@ public class CancelOrderTransaction extends Transaction {
 
     //GETTERS/SETTERS
 
-    public void setBlock(Block block, DCSet dcSet, int asDeal, int seqNo) {
-        super.setBlock(block, dcSet, asDeal, seqNo);
-
-        Long createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
-        //Transaction createOrder = this.dcSet.getTransactionMap().get(this.orderSignature);
-        this.orderID = createDBRef;
-    }
-
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
         super.setDC(dcSet, asDeal, blockHeight, seqNo);
 
@@ -290,7 +282,7 @@ public class CancelOrderTransaction extends Transaction {
         }
 
         process_it(this.dcSet, order);
-        this.addCalculated(this.creator, order.getHave(), order.getAmountHave(),
+        this.addCalculated(block, this.creator, order.getHave(), order.getAmountHave(),
                 "cancel order @" + Transaction.viewDBRef(order.getId()));
     }
 
@@ -307,12 +299,12 @@ public class CancelOrderTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(int asDeal) {
+    public void orphan(Block block, int asDeal) {
 
         // FIRST GET DB REF from FINAL
 
         // ORPHAN
-        super.orphan(asDeal);
+        super.orphan(block, asDeal);
 
         //REMOVE ORDER DATABASE
         Order order = this.dcSet.getCompletedOrderMap().get(this.orderID);

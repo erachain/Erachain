@@ -5,9 +5,9 @@ import org.erachain.database.PeerMap.PeerInfo;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun.Tuple2;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
@@ -39,7 +39,7 @@ public class PeersTableModel extends AbstractTableModel implements Observer {
         Controller.getInstance().addActivePeersObserver(this);
 
         if (this.timer == null) {
-            this.timer = new Timer();
+            this.timer = new Timer("Peers Table");
 
             TimerTask action = new TimerTask() {
                 public void run() {
@@ -55,7 +55,7 @@ public class PeersTableModel extends AbstractTableModel implements Observer {
                     // Settings.getInstance().getPingInterval()>>1,
                     5000,
                     // Settings.getInstance().getPingInterval()
-                    5000);
+                    10000);
         }
     }
 

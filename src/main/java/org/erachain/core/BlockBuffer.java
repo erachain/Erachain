@@ -99,7 +99,6 @@ public class BlockBuffer extends Thread {
                         + response.getLength() / 1000 + "kB, "
                         + (System.currentTimeMillis() - timePoint) + "ms"
                 );
-                timePoint = System.currentTimeMillis();
 
             }
         }.start();

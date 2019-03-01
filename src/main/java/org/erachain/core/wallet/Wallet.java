@@ -59,7 +59,7 @@ public class Wallet extends Observable implements Observer {
 	PersonsFavorites personsFavorites;
 	private SecureWalletDatabase secureDatabase;
 	private int secondsToUnlock = 100;
-	private Timer lockTimer = new Timer();
+	private Timer lockTimer; // = new Timer();
 	private int syncHeight;
 
 	// CONSTRUCTORS
@@ -81,7 +81,6 @@ public class Wallet extends Observable implements Observer {
 
         }
 
-        checkNeedSyncWallet(Controller.getInstance().getLastBlockSignature());
         startProcessForSynchronize();
 
 	}
@@ -437,7 +436,7 @@ public class Wallet extends Observable implements Observer {
     public void startProcessForSynchronize() {
 
         if (this.timerSynchronize == null) {
-            this.timerSynchronize = new Timer();
+            this.timerSynchronize = new Timer("Wallet synchronize check");
 
             TimerTask action = new TimerTask() {
                 @Override
@@ -599,13 +598,20 @@ public class Wallet extends Observable implements Observer {
 				// block));
                 block = dcSet.getBlockMap().get(height);
 
-				try {
+                if (block == null) {
+                    break;
+                }
+
+                try {
                     this.processBlock(block);
 				} catch (java.lang.OutOfMemoryError e) {
 					Controller.getInstance().stopAll(44);
 					return;
 				}
 
+                // NEED FOR CLEAR HEAP
+                //block.clearForHeap();
+                block = null;
 
 				if (System.currentTimeMillis() - timePoint > 10000
 						|| steepHeight < height - lastHeight) {
@@ -629,9 +635,9 @@ public class Wallet extends Observable implements Observer {
 					return;
 
 				height++;
-				block = dcSet.getBlockMap().get(height);
 
-			} while (block != null && !synchronizeBodyStop);
+            } while (!synchronizeBodyStop);
+
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 
@@ -808,7 +814,7 @@ public class Wallet extends Observable implements Observer {
 			if (this.lockTimer != null)
 				this.lockTimer.cancel();
 
-			this.lockTimer = new Timer();
+			this.lockTimer = new Timer("Wallet Locker");
 
 			TimerTask action = new TimerTask() {
 				@Override
@@ -1190,14 +1196,15 @@ public class Wallet extends Observable implements Observer {
 		int seqNo = 0;
 		for (Transaction transaction : block.getTransactions()) {
 
-			if (!this.isWalletDatabaseExisting())
-				return;
+            // TODO нужно сделать при закрытии базы чтобы ожидала окончания проходя всего блока тут
 
 			if (transaction.isWiped()) {
 				continue;
 			}
 
-			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, ++seqNo);
+			if (transaction.noDCSet())
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+
 			this.processTransaction(transaction);
 
 			// SKIP PAYMENT TRANSACTIONS
@@ -1259,6 +1266,7 @@ public class Wallet extends Observable implements Observer {
 			else if (transaction instanceof CancelOrderTransaction) {
 				this.processOrderCancel((CancelOrderTransaction) transaction);
 			}
+
 		}
 
         if (block.blockHead.transactionsCount > 0
@@ -1270,7 +1278,12 @@ public class Wallet extends Observable implements Observer {
                     + tickets / (block.blockHead.transactionsCount + 1));
 		}
 
-	}
+        // NEED FOR CLEAR HEAP !
+        block.clearForHeap();
+
+        //block = null;
+
+    }
 
     private void orphanBlock(Block block) {
 		// CHECK IF WALLET IS OPEN
@@ -1299,7 +1312,9 @@ public class Wallet extends Observable implements Observer {
 				continue;
 			}
 
-			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, seqNo);
+            if (transaction.noDCSet())
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, block.blockHead.heightBlock, seqNo);
+
 			this.orphanTransaction(transaction);
 
 			// CHECK IF PAYMENT
@@ -1361,6 +1376,7 @@ public class Wallet extends Observable implements Observer {
 			else if (transaction instanceof CancelOrderTransaction) {
 				this.orphanOrderCancel((CancelOrderTransaction) transaction);
 			}
+
 		}
 
         Account blockGenerator = block.blockHead.creator;
@@ -1388,7 +1404,10 @@ public class Wallet extends Observable implements Observer {
 		// + " TXs = " + block.getTransactionCount() + " millsec/record:"
 		// + tickets/(block.getTransactionCount()+1) );
 
-	}
+        // NEED FOR CLEAR HEAP !
+        block.clearForHeap();
+
+    }
 
 	private void processNameRegistration(RegisterNameTransaction nameRegistration) {
 		// CHECK IF WALLET IS OPEN
