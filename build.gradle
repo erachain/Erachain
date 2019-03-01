@@ -143,6 +143,10 @@ task CopyResourse {
     }
 
     copy {
+        from 'ERA/resources'
+        into 'build/libs/Erachain/resources'
+    }
+    copy {
         from 'ERA/web'
         into 'build/libs/Erachain/web'
     }
