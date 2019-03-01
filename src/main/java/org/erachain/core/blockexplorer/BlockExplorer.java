@@ -4196,8 +4196,6 @@ public class BlockExplorer {
 
         int txsCount = all.size();
 
-            int txsCount = all.size();
-
             LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = dcSet.getATTransactionMap()
                     .getATTransactions(block.getHeight());
 
@@ -4322,7 +4320,7 @@ public class BlockExplorer {
             output.put("label_Child_block", Lang.getInstance().translate_from_langObj("Child block", langObj));
             output.put("label_Including", Lang.getInstance().translate_from_langObj("Including", langObj));
             output.put("label_Signature", Lang.getInstance().translate_from_langObj("Signature", langObj));
-        }
+        
 
 
         return output;
