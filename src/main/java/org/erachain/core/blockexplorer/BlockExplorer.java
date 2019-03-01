@@ -4194,136 +4194,133 @@ public class BlockExplorer {
         output.put("pageCount", (int) Math.ceil((block.getTransactionCount()) / 100d));
         output.put("pageNumber", transPage);
 
+
         int txsCount = all.size();
 
-            int txsCount = all.size();
+        LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = dcSet.getATTransactionMap()
+                .getATTransactions(block.getHeight());
 
-            LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = dcSet.getATTransactionMap()
-                    .getATTransactions(block.getHeight());
+        for (Entry<Tuple2<Integer, Integer>, AT_Transaction> e : atTxs.entrySet()) {
+            all.add(e.getValue());
+            aTTxsCount++;
+        }
+        output.put("type", "block");
 
-            for (Entry<Tuple2<Integer, Integer>, AT_Transaction> e : atTxs.entrySet()) {
-                all.add(e.getValue());
-                aTTxsCount++;
+        output.put("blockSignature", Base58.encode(block.getSignature()));
+        output.put("blockHeight", block.getHeight());
+
+        if (block.getHeight() > 1) {
+            if (block.getParent(dcSet) != null) {
+                output.put("parentBlockSignature", Base58.encode(block.getParent(dcSet).getSignature()));
             }
-            output.put("type", "block");
-
-            output.put("blockSignature", Base58.encode(block.getSignature()));
-            output.put("blockHeight", block.getHeight());
-
-            if (block.getHeight() > 1) {
-                if (block.getParent(dcSet) != null) {
-                    output.put("parentBlockSignature", Base58.encode(block.getParent(dcSet).getSignature()));
-                }
-            } else {
-                output.put("parentBlockSignature", "");
-            }
-
-            if (block.getChild(dcSet) != null) {
-                output.put("childBlockSignature", Base58.encode(block.getChild(dcSet).getSignature()));
-            }
-            int size = all.size();
-
-            Map txCountJSON = new LinkedHashMap();
-
-            if (txsCount > 0) {
-                txCountJSON.put("txsCount", txsCount);
-                Map txTypeCountJSON = new LinkedHashMap();
-                int n = 1;
-                for (int txCount : txsTypeCount) {
-                    if (txCount > 0) {
-                        txTypeCountJSON.put(n, txCount);
-                    }
-                    n++;
-                }
-                txCountJSON.put("txsTypesCount", txTypeCountJSON);
-            }
-
-            if (aTTxsCount > 0) {
-                txCountJSON.put("aTTxsCount", aTTxsCount);
-            }
-
-            txCountJSON.put("allCount", txsCount);
-
-            output.put("countTx", txCountJSON);
-            BigDecimal totalAmount = BigDecimal.ZERO;
-            for (Transaction transaction : block.getTransactions()) {
-                for (Account account : transaction.getInvolvedAccounts()) {
-                    BigDecimal amount = transaction.getAmount(account);
-                    if (amount.compareTo(BigDecimal.ZERO) > 0) {
-                        totalAmount = totalAmount.add(amount);
-                    }
-                }
-            }
-
-            output.put("totalAmount", totalAmount.toPlainString());
-
-            BigDecimal totalATAmount = BigDecimal.ZERO;
-
-            for (Map.Entry<Tuple2<Integer, Integer>, AT_Transaction> e : atTxs.entrySet()) {
-                totalATAmount = totalATAmount.add(BigDecimal.valueOf(e.getValue().getAmount()));
-            }
-
-            output.put("totalATAmount", totalATAmount.toPlainString());
-            output.put("totalFee", block.viewFeeAsBigDecimal());
-            output.put("version", block.getVersion());
-
-            output.put("generatingBalance", block.getForgingValue());
-            output.put("winValue", block.getWinValue());
-            output.put("target", block.getTarget());
-            output.put("winValueTargeted", block.calcWinValueTargeted());
-
-            output.put("start", size + 1);
-            output.put("end", 1);
-
-
-            int counter = 0;
-
-            {
-                Map transactionJSON = new LinkedHashMap();
-                Map transactionDataJSON = new LinkedHashMap();
-
-                transactionDataJSON.put("timestamp", block.getTimestamp());
-                transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
-
-                int height = block.getHeight();
-                transactionDataJSON.put("confirmations", getHeight() - height + 1);
-                transactionDataJSON.put("height", height);
-
-                transactionDataJSON.put("generator", block.getCreator().getAddress());
-                transactionDataJSON.put("signature", Base58.encode(block.getSignature()));
-                transactionDataJSON.put("reference", Base58.encode(block.getReference()));
-                transactionDataJSON.put("generatorSignature", Base58.encode(block.getSignature()));
-                transactionDataJSON.put("version", block.getVersion());
-
-                transactionDataJSON.put("fee", block.viewFeeAsBigDecimal());
-
-                transactionJSON.put("type", "block");
-                transactionJSON.put("block", transactionDataJSON);
-
-                output.put(counter + 1, transactionJSON);
-            }
-            output.put("label_block", Lang.getInstance().translate_from_langObj("Block", langObj));
-            output.put("label_Block_version", Lang.getInstance().translate_from_langObj("Block version", langObj));
-            output.put("label_Transactions_count",
-                    Lang.getInstance().translate_from_langObj("Transactions count", langObj));
-            output.put("label_Total_Amount", Lang.getInstance().translate_from_langObj("Total Amount", langObj));
-            output.put("label_Total_AT_Amount", Lang.getInstance().translate_from_langObj("Total AT Amount", langObj));
-            output.put("label_Total_Fee", Lang.getInstance().translate_from_langObj("Total Fee", langObj));
-
-            output.put("label_Win_Value", Lang.getInstance().translate_from_langObj("Win Value", langObj));
-            output.put("label_Generating_Balance",
-                    Lang.getInstance().translate_from_langObj("Generating Balance", langObj));
-            output.put("label_Target", Lang.getInstance().translate_from_langObj("Target", langObj));
-            output.put("label_Targeted_Win_Value",
-                    Lang.getInstance().translate_from_langObj("Targeted Win Value", langObj));
-
-            output.put("label_Parent_block", Lang.getInstance().translate_from_langObj("Parent block", langObj));
-            output.put("label_Current_block", Lang.getInstance().translate_from_langObj("Current block", langObj));
-            output.put("label_Child_block", Lang.getInstance().translate_from_langObj("Child block", langObj));
-            output.put("label_Including", Lang.getInstance().translate_from_langObj("Including", langObj));
-            output.put("label_Signature", Lang.getInstance().translate_from_langObj("Signature", langObj));
+        } else {
+            output.put("parentBlockSignature", "");
         }
 
+        if (block.getChild(dcSet) != null) {
+            output.put("childBlockSignature", Base58.encode(block.getChild(dcSet).getSignature()));
+        }
+        int size = all.size();
+
+        Map txCountJSON = new LinkedHashMap();
+
+        if (txsCount > 0) {
+            txCountJSON.put("txsCount", txsCount);
+            Map txTypeCountJSON = new LinkedHashMap();
+            int n = 1;
+            for (int txCount : txsTypeCount) {
+                if (txCount > 0) {
+                    txTypeCountJSON.put(n, txCount);
+                }
+                n++;
+            }
+            txCountJSON.put("txsTypesCount", txTypeCountJSON);
+        }
+
+        if (aTTxsCount > 0) {
+            txCountJSON.put("aTTxsCount", aTTxsCount);
+        }
+
+        txCountJSON.put("allCount", txsCount);
+
+        output.put("countTx", txCountJSON);
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        for (Transaction transaction : block.getTransactions()) {
+            for (Account account : transaction.getInvolvedAccounts()) {
+                BigDecimal amount = transaction.getAmount(account);
+                if (amount.compareTo(BigDecimal.ZERO) > 0) {
+                    totalAmount = totalAmount.add(amount);
+                }
+            }
+        }
+
+        output.put("totalAmount", totalAmount.toPlainString());
+
+        BigDecimal totalATAmount = BigDecimal.ZERO;
+
+        for (Map.Entry<Tuple2<Integer, Integer>, AT_Transaction> e : atTxs.entrySet()) {
+            totalATAmount = totalATAmount.add(BigDecimal.valueOf(e.getValue().getAmount()));
+        }
+
+        output.put("totalATAmount", totalATAmount.toPlainString());
+        output.put("totalFee", block.viewFeeAsBigDecimal());
+        output.put("version", block.getVersion());
+
+        output.put("generatingBalance", block.getForgingValue());
+        output.put("winValue", block.getWinValue());
+        output.put("target", block.getTarget());
+        output.put("winValueTargeted", block.calcWinValueTargeted());
+
+        output.put("start", size + 1);
+        output.put("end", 1);
+
+
+        int counter = 0;
+
+        {
+            Map transactionJSON = new LinkedHashMap();
+            Map transactionDataJSON = new LinkedHashMap();
+
+            transactionDataJSON.put("timestamp", block.getTimestamp());
+            transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
+
+            int height = block.getHeight();
+            transactionDataJSON.put("confirmations", getHeight() - height + 1);
+            transactionDataJSON.put("height", height);
+
+            transactionDataJSON.put("generator", block.getCreator().getAddress());
+            transactionDataJSON.put("signature", Base58.encode(block.getSignature()));
+            transactionDataJSON.put("reference", Base58.encode(block.getReference()));
+            transactionDataJSON.put("generatorSignature", Base58.encode(block.getSignature()));
+            transactionDataJSON.put("version", block.getVersion());
+
+            transactionDataJSON.put("fee", block.viewFeeAsBigDecimal());
+
+            transactionJSON.put("type", "block");
+            transactionJSON.put("block", transactionDataJSON);
+
+            output.put(counter + 1, transactionJSON);
+        }
+        output.put("label_block", Lang.getInstance().translate_from_langObj("Block", langObj));
+        output.put("label_Block_version", Lang.getInstance().translate_from_langObj("Block version", langObj));
+        output.put("label_Transactions_count",
+                Lang.getInstance().translate_from_langObj("Transactions count", langObj));
+        output.put("label_Total_Amount", Lang.getInstance().translate_from_langObj("Total Amount", langObj));
+        output.put("label_Total_AT_Amount", Lang.getInstance().translate_from_langObj("Total AT Amount", langObj));
+        output.put("label_Total_Fee", Lang.getInstance().translate_from_langObj("Total Fee", langObj));
+
+        output.put("label_Win_Value", Lang.getInstance().translate_from_langObj("Win Value", langObj));
+        output.put("label_Generating_Balance",
+                Lang.getInstance().translate_from_langObj("Generating Balance", langObj));
+        output.put("label_Target", Lang.getInstance().translate_from_langObj("Target", langObj));
+        output.put("label_Targeted_Win_Value",
+                Lang.getInstance().translate_from_langObj("Targeted Win Value", langObj));
+
+        output.put("label_Parent_block", Lang.getInstance().translate_from_langObj("Parent block", langObj));
+        output.put("label_Current_block", Lang.getInstance().translate_from_langObj("Current block", langObj));
+        output.put("label_Child_block", Lang.getInstance().translate_from_langObj("Child block", langObj));
+        output.put("label_Including", Lang.getInstance().translate_from_langObj("Including", langObj));
+        output.put("label_Signature", Lang.getInstance().translate_from_langObj("Signature", langObj));
 
         return output;
     }

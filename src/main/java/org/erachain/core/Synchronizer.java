@@ -261,8 +261,6 @@ public class Synchronizer {
 
             } else {
 
-                block.clearForHeap();
-
                 // INVALID BLOCK THROW EXCEPTION
                 String mess = "Dishonest peer by not is Valid block, heigh: " + height;
                 peer.ban(BAN_BLOCK_TIMES, mess);
@@ -320,9 +318,6 @@ public class Synchronizer {
             LOGGER.debug("*** synchronize - orphan block... " + dcSet.getBlockMap().size());
             this.pipeProcessOrOrphan(dcSet, lastBlock, true, false);
 
-            // CLEAR for HEAP
-            lastBlock.clearForHeap();
-
             lastBlock = dcSet.getBlockMap().last();
         }
 
@@ -356,9 +351,6 @@ public class Synchronizer {
                 if (orphanedTransactions.containsKey(key))
                     orphanedTransactions.remove(key);
             }
-
-            // CLEAR for HEAP
-            block.clearForHeap();
 
         }
 
@@ -491,7 +483,6 @@ public class Synchronizer {
                 }
 
                 if (!blockFromPeer.isValid(dcSet, false)) {
-                    blockFromPeer.clearForHeap();
 
                     errorMess = "invalid BLOCK";
                     banTime = BAN_BLOCK_TIMES;
@@ -509,9 +500,6 @@ public class Synchronizer {
 
                     LOGGER.debug("try pipeProcessOrOrphan");
                     this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false);
-
-                    // CLEAR for HEAP
-                    blockFromPeer.clearForHeap();
 
                     LOGGER.debug("synchronize BLOCK END process");
                     blockBuffer.clearBlock(blockFromPeer.getSignature());

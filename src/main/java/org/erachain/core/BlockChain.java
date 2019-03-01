@@ -792,7 +792,6 @@ public class BlockChain {
 
         // FULL VALIDATE because before was only HEAD validating
         if (!block.isValid(dcSet, false)) {
-            block.clearForHeap();
 
             LOGGER.info("new winBlock is BAD!");
             if (peer != null)
