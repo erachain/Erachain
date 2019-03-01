@@ -14,6 +14,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.R_Calculated;
+import org.erachain.core.transaction.R_Send;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.DCSet;
@@ -41,6 +42,8 @@ import java.util.*;
 public class Block {
 
     static private HashMap totalCOMPUtest = new HashMap();
+
+    static public boolean TEST_DB_TXS_OFF = true;
 
     public static final int VERSION_LENGTH = 4;
     public static final int TIMESTAMP_LENGTH = 8;
@@ -1487,48 +1490,62 @@ public class Block {
                     if (cnt.isOnStopping())
                         return false;
 
-                    ///LOGGER.debug("[" + seq + "] try finalMap.set" );
-                    processTimingLocal = System.nanoTime();
-                    Long key = Transaction.makeDBRef(this.heightBlock, seq);
-                    finalMap.set(key, transaction);
-                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                    if (processTimingLocalDiff < 999999999999l)
-                        timerFinalMap_set += processTimingLocalDiff / 1000;
+                    if (TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
+                            && ((R_Send)transaction).getAssetKey() != 1) {
+                        ;
+                    } else {
 
-                    processTimingLocal = System.nanoTime();
-                    transFinalMapSinds.set(transactionSignature, key);
-                    List<byte[]> signatures = transaction.getSignatures();
-                    if (signatures != null) {
-                        for (byte[] itemSignature : signatures) {
-                            transFinalMapSinds.set(itemSignature, key);
+                        ///LOGGER.debug("[" + seq + "] try finalMap.set" );
+                        processTimingLocal = System.nanoTime();
+                        Long key = Transaction.makeDBRef(this.heightBlock, seq);
+                        finalMap.set(key, transaction);
+                        processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                        if (processTimingLocalDiff < 999999999999l)
+                            timerFinalMap_set += processTimingLocalDiff / 1000;
+
+                        processTimingLocal = System.nanoTime();
+                        transFinalMapSinds.set(transactionSignature, key);
+                        List<byte[]> signatures = transaction.getSignatures();
+                        if (signatures != null) {
+                            for (byte[] itemSignature : signatures) {
+                                transFinalMapSinds.set(itemSignature, key);
+                            }
                         }
+                        processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                        if (processTimingLocalDiff < 999999999999l)
+                            timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
+
                     }
-                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                    if (processTimingLocalDiff < 999999999999l)
-                        timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
 
                 } else {
-                    // for some TRANSACTIONs need add to FINAM MAP etc.
-                    // R_SertifyPubKeys - in same BLOCK with IssuePersonRecord
 
-                    processTimingLocal = System.nanoTime();
-                    Long key = Transaction.makeDBRef(this.heightBlock, seq);
-                    finalMap.set(key, transaction);
-                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                    if (processTimingLocalDiff < 999999999999l)
-                        timerFinalMap_set += processTimingLocalDiff / 1000;
+                    if (TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
+                            && ((R_Send) transaction).getAssetKey() != 1) {
+                        ;
+                    } else {
 
-                    processTimingLocal = System.nanoTime();
-                    transFinalMapSinds.set(transactionSignature, key);
-                    List<byte[]> signatures = transaction.getSignatures();
-                    if (signatures != null) {
-                        for (byte[] itemSignature : signatures) {
-                            transFinalMapSinds.set(itemSignature, key);
+                        // for some TRANSACTIONs need add to FINAM MAP etc.
+                        // R_SertifyPubKeys - in same BLOCK with IssuePersonRecord
+
+                        processTimingLocal = System.nanoTime();
+                        Long key = Transaction.makeDBRef(this.heightBlock, seq);
+                        finalMap.set(key, transaction);
+                        processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                        if (processTimingLocalDiff < 999999999999l)
+                            timerFinalMap_set += processTimingLocalDiff / 1000;
+
+                        processTimingLocal = System.nanoTime();
+                        transFinalMapSinds.set(transactionSignature, key);
+                        List<byte[]> signatures = transaction.getSignatures();
+                        if (signatures != null) {
+                            for (byte[] itemSignature : signatures) {
+                                transFinalMapSinds.set(itemSignature, key);
+                            }
                         }
+                        processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                        if (processTimingLocalDiff < 999999999999l)
+                            timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
                     }
-                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                    if (processTimingLocalDiff < 999999999999l)
-                        timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
                 }
 
                 transactionsSignatures = Bytes.concat(transactionsSignatures, transactionSignature);
@@ -1864,25 +1881,31 @@ public class Block {
                 unconfirmedMap.delete(transactionSignature);
                 timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
 
-                Long key = Transaction.makeDBRef(this.heightBlock, seq);
+                if (TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
+                        && ((R_Send)transaction).getAssetKey() != 1) {
+                        ;
+                } else {
 
-                if (cnt.isOnStopping())
-                    throw new Exception("on stoping");
+                    Long key = Transaction.makeDBRef(this.heightBlock, seq);
 
-                ///LOGGER.debug("[" + seq + "] try finalMap.set" );
-                timerStart = System.currentTimeMillis();
-                finalMap.set(key, transaction);
-                timerFinalMap_set += System.currentTimeMillis() - timerStart;
-                //LOGGER.debug("[" + seq + "] try transFinalMapSinds.set" );
-                timerStart = System.currentTimeMillis();
-                transFinalMapSinds.set(transactionSignature, key);
-                List<byte[]> signatures = transaction.getSignatures();
-                if (signatures != null) {
-                    for (byte[] itemSignature : signatures) {
-                        transFinalMapSinds.set(itemSignature, key);
+                    if (cnt.isOnStopping())
+                        throw new Exception("on stoping");
+
+                    ///LOGGER.debug("[" + seq + "] try finalMap.set" );
+                    timerStart = System.currentTimeMillis();
+                    finalMap.set(key, transaction);
+                    timerFinalMap_set += System.currentTimeMillis() - timerStart;
+                    //LOGGER.debug("[" + seq + "] try transFinalMapSinds.set" );
+                    timerStart = System.currentTimeMillis();
+                    transFinalMapSinds.set(transactionSignature, key);
+                    List<byte[]> signatures = transaction.getSignatures();
+                    if (signatures != null) {
+                        for (byte[] itemSignature : signatures) {
+                            transFinalMapSinds.set(itemSignature, key);
+                        }
                     }
+                    timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
                 }
-                timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
 
                 seq++;
 
