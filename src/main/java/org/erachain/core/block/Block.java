@@ -43,7 +43,7 @@ public class Block {
 
     static private HashMap totalCOMPUtest = new HashMap();
 
-    static public boolean TEST_DB_TXS_OFF = true;
+    static public boolean TEST_DB_TXS_OFF = false;
 
     public static final int VERSION_LENGTH = 4;
     public static final int TIMESTAMP_LENGTH = 8;
