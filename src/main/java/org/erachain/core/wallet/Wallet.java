@@ -192,6 +192,7 @@ public class Wallet extends Observable implements Observer {
 		return this.secureDatabase.getAccountSeedMap().getPrivateKeyAccount(address);
 	}
 
+	/*
 	public PublicKeyAccount getPublicKeyAccount(String address) {
 		if (this.database == null) {
 			return null;
@@ -199,6 +200,7 @@ public class Wallet extends Observable implements Observer {
 
 		return this.database.getAccountMap().getPublicKeyAccount(address);
 	}
+	*/
 
 	public boolean exists() {
 		if (Controller.getInstance().noUseWallet)
@@ -610,6 +612,7 @@ public class Wallet extends Observable implements Observer {
 				}
 
                 // NEED FOR CLEAR HEAP
+				block.clearForHeap();
                 block = null;
 
 				if (System.currentTimeMillis() - timePoint > 10000
@@ -625,7 +628,7 @@ public class Wallet extends Observable implements Observer {
                     this.syncHeight = height;
 					Controller.getInstance().walletSyncStatusUpdate(height);
                     this.database.commit();
-                    //System.gc();
+                    System.gc();
 
                 }
 

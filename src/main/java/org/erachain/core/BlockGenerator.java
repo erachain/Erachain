@@ -465,7 +465,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     }
 
     public void addObserver() {
-        new Thread() {
+        new Thread("try syncForgingStatus") {
             @Override
             public void run() {
 

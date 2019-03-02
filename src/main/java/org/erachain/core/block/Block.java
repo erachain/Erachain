@@ -884,6 +884,17 @@ public class Block {
         if (this.transactionsHash == null)
             this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), transactions, null);
     }
+
+    public void clearForHeap() {
+        this.transactions = null;
+        this.rawTransactions = null;
+        this.parentBlockHead = null;
+        this.blockHead = null;
+        this.creator = null;
+        this.txCalculated = null;
+        this.forgingInfoUpdate = null;
+    }
+
 	/*
 	public int getTransactionIndex(byte[] signature)
 	{

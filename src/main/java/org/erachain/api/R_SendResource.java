@@ -383,6 +383,7 @@ public class R_SendResource {
         });
 
         threadTest1.start();
+        threadTest1.setName("R_Send.Test1");
 
         out.put("delay", test1Delay);
         LOGGER.info("r_send/test1 STARTED for delay: " + test1Delay);

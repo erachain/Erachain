@@ -47,7 +47,7 @@ public class Wallet_Orphan_Button extends JButton implements Observer {
 
                 // newAccount_Button.setEnabled(false);
                 // creane new thread
-                new Thread() {
+                new Thread("Wallet_Orphan_Button") {
                     @Override
                     public void run() {
 
