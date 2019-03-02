@@ -96,7 +96,7 @@ public class BlockChain {
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
     public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : VERS_4_11;
 
-    public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 : VERS_4_11;
+    public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
 
     public static final int DEVELOP_FORGING_START = 100;
 
@@ -508,7 +508,11 @@ public class BlockChain {
 
         //return targetPrevios - (targetPrevios>>TARGET_COUNT_SHIFT) + (winValue>>TARGET_COUNT_SHIFT);
         // better accuracy
-        return (((targetPrevious << TARGET_COUNT_SHIFT) - targetPrevious) + winValue) >> TARGET_COUNT_SHIFT;
+        long target = (((targetPrevious << TARGET_COUNT_SHIFT) - targetPrevious) + winValue) >> TARGET_COUNT_SHIFT;
+        if (target < 1000 && DEVELOP_USE)
+            target = 1000;
+
+        return target;
     }
 
     // GET MIN TARGET

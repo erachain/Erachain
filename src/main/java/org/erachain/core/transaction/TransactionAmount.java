@@ -551,7 +551,8 @@ public abstract class TransactionAmount extends Transaction {
                                     || assetType == AssetCls.AS_INSIDE_ACCESS
                                     || assetType == AssetCls.AS_INSIDE_BONUS
                             ) {
-                                return NOT_HOLDABLE_ASSET;
+                                if (height > BlockChain.VERS_4_12)
+                                    return NOT_HOLDABLE_ASSET;
                             }
 
                             if (height > BlockChain.HOLD_VALID_START) {
@@ -826,7 +827,8 @@ public abstract class TransactionAmount extends Transaction {
                                     || assetType == AssetCls.AS_INSIDE_ACCESS
                                     || assetType == AssetCls.AS_INSIDE_BONUS
                             ) {
-                                return NOT_SPENDABLE_ASSET;
+                                if (height > BlockChain.HOLD_VALID_START)
+                                    return NOT_SPENDABLE_ASSET;
                             }
 
 

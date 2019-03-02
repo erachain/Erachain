@@ -1279,7 +1279,7 @@ public class Block {
         this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 
         this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
-        if (!cnt.isTestNet() && this.winValue < 1) {
+        if (this.winValue < 1) {
             LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue);
             LOGGER.debug("*** forgingValue: " + this.forgingValue);
             return false;
@@ -1289,7 +1289,7 @@ public class Block {
 
         long currentTarget = this.parentBlockHead.target;
         int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, this.heightBlock, this.winValue, currentTarget);
-        if (!cnt.isTestNet() && targetedWinValue < 1) {
+        if (targetedWinValue < 1) {
             //targetedWinValue = this.calcWinValueTargeted(dcSet);
             LOGGER.debug("*** Block[" + this.heightBlock + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + currentTarget);
             return false;
@@ -1298,6 +1298,7 @@ public class Block {
         if (this.target == 0) {
             BlockChain.calcTarget(this.heightBlock, currentTarget, this.winValue);
             LOGGER.debug("*** Block[" + this.heightBlock + "] TARGET = 0");
+            LOGGER.debug("*** currentTarget: " + currentTarget);
             return false;
         }
 
