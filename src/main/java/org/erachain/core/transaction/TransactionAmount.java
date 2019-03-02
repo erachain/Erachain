@@ -602,7 +602,8 @@ public abstract class TransactionAmount extends Transaction {
                                     || assetType == AssetCls.AS_INDEX
                                     || assetType == AssetCls.AS_INSIDE_BONUS
                             ) {
-                                return NOT_DEBTABLE_ASSET;
+                                if (height > BlockChain.HOLD_VALID_START + 20000)
+                                    return NOT_DEBTABLE_ASSET;
                             }
                             
                             // CLAIMs DEBT - only for OWNER
