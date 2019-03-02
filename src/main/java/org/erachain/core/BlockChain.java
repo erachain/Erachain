@@ -761,6 +761,10 @@ public class BlockChain {
 	 */
 
     public void clearWaitWinBuffer() {
+        if (this.waitWinBuffer != null)
+            // NEED FOR CLEAR HEAP
+            this.waitWinBuffer.clearForHeap();
+
         this.waitWinBuffer = null;
     }
 

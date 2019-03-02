@@ -970,11 +970,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 local_status = -1;
                                 return;
                             }
-                            // if FLUSH out of memory
-                            bchain.clearWaitWinBuffer();
                             LOGGER.error(e.getMessage(), e);
                         }
 
+                        bchain.clearWaitWinBuffer();
 
                         if (needRemoveInvalids != null) {
                             clearInvalids();
@@ -982,7 +981,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             checkForRemove(timePointForGenerate);
                             clearInvalids();
                         }
-
                     }
                 }
 

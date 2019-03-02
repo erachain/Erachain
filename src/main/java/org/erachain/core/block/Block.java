@@ -893,6 +893,10 @@ public class Block {
         this.creator = null;
         this.txCalculated = null;
         this.forgingInfoUpdate = null;
+        this.atBytes = null;
+        this.reference = null;
+        this.signature = null;
+        this.transactionsHash = null;
     }
 
 	/*
