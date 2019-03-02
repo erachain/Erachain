@@ -1281,6 +1281,7 @@ public class Block {
         this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
         if (!cnt.isTestNet() && this.winValue < 1) {
             LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue);
+            LOGGER.debug("*** forgingValue: " + this.forgingValue);
             return false;
         }
 

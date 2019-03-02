@@ -558,8 +558,9 @@ public class BlockChain {
      */
     public static long calcWinValue(DCSet dcSet, Account creator, int height, int forgingBalance) {
 
-        if (forgingBalance < MIN_GENERATING_BALANCE)
-            return 0l;
+        if (forgingBalance < MIN_GENERATING_BALANCE) {
+                return 0l;
+        }
 
         Tuple2<Integer, Integer> previousForgingPoint = creator.getForgingData(dcSet, height);
 
@@ -581,24 +582,17 @@ public class BlockChain {
             forgingBalance = previousForgingPoint.b;
         }
 
-        if (!Controller.getInstance().isTestNet() && forgingBalance < BlockChain.MIN_GENERATING_BALANCE)
-            return 0l;
+        if (forgingBalance < BlockChain.MIN_GENERATING_BALANCE) {
+            if (!Controller.getInstance().isTestNet() && !DEVELOP_USE)
+                return 0l;
+            forgingBalance = BlockChain.MIN_GENERATING_BALANCE;
+        }
 
         int difference = height - previousForgingHeight;
-        if (Controller.getInstance().isTestNet()) {
+        if (Controller.getInstance().isTestNet() || BlockChain.DEVELOP_USE) {
+            if (difference < 10)
+                difference = 10;
             ;
-        } else if (BlockChain.DEVELOP_USE) {
-            if (height < BlockChain.REPEAT_WIN + 2) {
-                if (difference < height - 2)
-                    return difference - height + 2;
-            } else if (height < 20) {
-                if (difference < 4)
-                    return -999l;
-            } else {
-                //difference -= REPEAT_WIN;
-                if (difference < REPEAT_WIN)
-                    return difference - REPEAT_WIN;
-            }
         } else {
 
             int repeatsMin;
@@ -642,8 +636,8 @@ public class BlockChain {
         else
             win_value = forgingBalance;
 
-        if (DEVELOP_USE)
-            return win_value >> 2;
+        if (!Controller.getInstance().isTestNet() || DEVELOP_USE)
+            return win_value;
 
         if (false) {
             if (height < BlockChain.REPEAT_WIN)

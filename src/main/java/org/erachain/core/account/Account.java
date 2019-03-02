@@ -459,7 +459,7 @@ public class Account {
         if (BlockChain.DEVELOP_USE) {
             if (key == 1)
                 return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                        new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.valueOf(1000))),
+                        new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.valueOf(10000))),
                         balance.b, balance.c, balance.d, balance.e);
             else if (key == 2)
                 return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(

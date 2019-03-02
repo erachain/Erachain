@@ -2,10 +2,8 @@ package org.erachain.utils;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import sun.reflect.generics.tree.Tree;
 
 import java.util.*;
-import java.util.concurrent.BlockingQueue;
 
 public class MonitoredThread extends Thread {
     long counter;
