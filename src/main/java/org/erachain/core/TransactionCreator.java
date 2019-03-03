@@ -109,6 +109,8 @@ public class TransactionCreator {
                     //THE TRANSACTION BECAME INVALID LET
                     this.fork.getTransactionMap().delete(transactionAccount);
                 }
+                // CLEAR for HEAP
+                transactionAccount.setDC(null);
             }
         }
     }

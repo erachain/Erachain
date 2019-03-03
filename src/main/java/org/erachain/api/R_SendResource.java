@@ -349,6 +349,9 @@ public class R_SendResource {
                         return;
 
                     Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+                    // CLEAR for HEAP
+                    transaction.setDC(null);
+
 
                     // CHECK VALIDATE MESSAGE
                     if (result != Transaction.VALIDATE_OK) {

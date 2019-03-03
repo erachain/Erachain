@@ -72,21 +72,6 @@ public class Sender extends MonitoredThread {
         return result;
     }
 
-    public boolean offer(Message message, long SOT) {
-        try {
-            return blockingQueue.offer(message, SOT, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            return false;
-        }
-    }
-
-    //public void put(Message message) {
-    //    try {
-    //        blockingQueue.put(message);
-    //    } catch (InterruptedException e) {
-    //    }
-    //}
-
     public void sendGetHWeight(GetHWeightMessage getHWeightMessage) {
         if (true) {
             if (this.blockingQueue.isEmpty()) {
