@@ -527,15 +527,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         long transactionMakeTimingCounter = 0;
         long transactionMakeTimingAverage = 0;
 
-        Peer peer = null;
-        Tuple3<Integer, Long, Peer> maxPeer;
-        SignaturesMessage response;
         long timeToPing = 0;
         long timeTmp;
         long timePoint = 0;
         long timePointForGenerate = 0;
         long flushPoint = 0;
-        Block waitWin = null;
         long timeUpdate = 0;
         int shift_height = 0;
         //byte[] unconfirmedTransactionsHash;
@@ -548,8 +544,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         int targetedWinValue;
         long winned_winValue;
         long previousTarget = bchain.getTarget(dcSet);
-        Block generatedBlock;
-        Block solvingBlock;
 
         int wait_new_block_broadcast;
         long wait_step;
@@ -558,6 +552,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         this.initMonitor();
 
         while (!ctrl.isOnStopping()) {
+
+            Block waitWin = null;
+            Block generatedBlock;
+            Block solvingBlock;
+            Peer peer = null;
+            Tuple3<Integer, Long, Peer> maxPeer;
+            SignaturesMessage response;
 
             try {
                 Thread.sleep(1000);
@@ -982,6 +983,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             clearInvalids();
                         }
                     }
+
+                    continue;
                 }
 
                 ////////////////////////// UPDATE ////////////////////

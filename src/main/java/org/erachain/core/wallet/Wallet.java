@@ -547,7 +547,7 @@ public class Wallet extends Observable implements Observer {
 	public synchronized void synchronizeBody(boolean reset) {
 		DCSet dcSet = DCSet.getInstance();
 
-		Block block;
+		Block blockStart;
 		int height;
         synchronizeBodyStop = false;
 
@@ -570,22 +570,22 @@ public class Wallet extends Observable implements Observer {
 
 
 			// REPROCESS BLOCKS
-			block = new GenesisBlock();
-			this.database.setLastBlockSignature(block.getReference());
+            blockStart = new GenesisBlock();
+			this.database.setLastBlockSignature(blockStart.getReference());
 			height = 1;
 
         } else {
 
             byte[] lastSignature = this.database.getLastBlockSignature();
-            block = dcSet.getBlockSignsMap().getBlock(lastSignature);
+            blockStart = dcSet.getBlockSignsMap().getBlock(lastSignature);
 
-            if (block == null) {
+            if (blockStart == null) {
                 // выходим и потом пересинхронизируемся с начала
                 return;
             }
         }
 
-        height = block.getHeight();
+        height = blockStart.getHeight();
 		int steepHeight = dcSet.getBlockMap().size() / 100;
 		int lastHeight = 0;
 
@@ -598,7 +598,7 @@ public class Wallet extends Observable implements Observer {
 				// this.update(this, new
 				// ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE,
 				// block));
-                block = dcSet.getBlockMap().get(height);
+                Block block = dcSet.getBlockMap().get(height);
 
                 if (block == null) {
                     break;
@@ -628,7 +628,7 @@ public class Wallet extends Observable implements Observer {
                     this.syncHeight = height;
 					Controller.getInstance().walletSyncStatusUpdate(height);
                     this.database.commit();
-                    System.gc();
+                    //System.gc();
 
                 }
 
@@ -1211,7 +1211,7 @@ public class Wallet extends Observable implements Observer {
 
 			// SKIP PAYMENT TRANSACTIONS
 			if (transaction instanceof R_Send) {
-				continue;
+				;
 			}
 
 			// CHECK IF NAME REGISTRATION

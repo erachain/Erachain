@@ -761,7 +761,9 @@ public class BlockChain {
 	 */
 
     public void clearWaitWinBuffer() {
-        if (this.waitWinBuffer != null)
+        // странно но очиста дает ошибки Нуль - при обработке других блоков в разных места
+        // получается что этот блок дальше используется после выноса его из этого буфера
+        if (false && this.waitWinBuffer != null)
             // NEED FOR CLEAR HEAP
             this.waitWinBuffer.clearForHeap();
 
