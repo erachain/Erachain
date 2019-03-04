@@ -25,13 +25,13 @@ import java.util.*;
 
 /**
  * Транзакции занесенные в цепочку
- *
+ * <p>
  * block.id + tx.ID in this block -> transaction
  * * <hr>
- *  Здесь вторичные индексы создаются по несколько для одной записи путем создания массива ключей,
- *  см. typeKey и recipientKey. Они используются для API RPC block explorer.
- *  Нужно огрничивать размер выдаваемого списка чтобы не перегружать ноду.
- *  <br>
+ * Здесь вторичные индексы создаются по несколько для одной записи путем создания массива ключей,
+ * см. typeKey и recipientKey. Они используются для API RPC block explorer.
+ * Нужно огрничивать размер выдаваемого списка чтобы не перегружать ноду.
+ * <br>
  * Вторичные ключи:
  * ++ senderKey
  * ++ recipientKey
@@ -39,7 +39,6 @@ import java.util.*;
  * <hr>
  * (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  * <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
- *
  */
 public class TransactionFinalMap extends DCMap<Long, Transaction> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
@@ -217,7 +216,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         Long key;
         while (iter.hasNext() && (limit == 0 || counter < limit)) {
 
-            key = (Long)iter.next();
+            key = (Long) iter.next();
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
             item.setDC(this.getDBSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
@@ -234,39 +233,21 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Collection<Long> getTransactionsByBlockKeys(Integer forBlock, int offset, int limit) {
-
-        Collection<Long> keys = ((BTreeMap) map)
-                .subMap(Fun.t2(forBlock, null), Fun.t2(forBlock, Fun.HI())).keySet();
-
-        if (offset > 0)
-            keys = (Collection)Iterables.skip(keys, offset);
-
-        if(limit > 0)
-            keys = (Collection)Iterables.limit(keys, limit);
-
-        return keys;
-
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsByBlock(Integer block, int offset, int limit) {
 
-        Collection<Transaction> keys = ((BTreeMap) map)
-                .subMap(Fun.t2(block, null), Fun.t2(block, Fun.HI())).values();
+        Collection<Long> keys = ((BTreeMap) map)
+                .subMap(Transaction.makeDBRef(block, 0), Transaction.makeDBRef(block, Integer.MAX_VALUE)).keySet();
 
         if (offset > 0)
-            keys = (Collection)Iterables.skip(keys, offset);
+            keys = (Collection) Iterables.skip(keys, offset);
 
-        if(limit > 0)
-            keys = (Collection)Iterables.limit(keys, limit);
+        if (limit > 0)
+            keys = (Collection) Iterables.limit(keys, limit);
 
         List<Transaction> txs = new ArrayList<>();
-        for (Long key: getTransactionsByBlockKeys(block, offset, limit)) {
-            txs.add(this.map.get(key));
-            key = null;
+        for (Long key : keys) {
+            txs.add(map.get(key));
         }
-
         return txs;
 
     }
@@ -285,7 +266,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         Transaction item;
         Long key;
         while (iter.hasNext() && (limit == 0 || counter < limit)) {
-            key = (Long)iter.next();
+            key = (Long) iter.next();
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
             item.setDC(this.getDBSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
@@ -308,7 +289,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         Transaction item;
         Long key;
         while (iter.hasNext() && (limit == 0 || counter < limit)) {
-            key = (Long)iter.next();
+            key = (Long) iter.next();
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
             item.setDC(this.getDBSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
@@ -364,7 +345,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         Transaction item;
         Long key;
         while (iter.hasNext()) {
-            key = (Long)iter.next();
+            key = (Long) iter.next();
             item = this.map.get(key);
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item.setDC(this.getDBSet(), Transaction.FOR_NETWORK, pair.a, pair.b);
@@ -427,7 +408,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         Long key;
 
         while (iter.hasNext()) {
-            key = (Long)iter.next();
+            key = (Long) iter.next();
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
             item.setDC(this.getDBSet(), Transaction.FOR_NETWORK, pair.a, pair.b);

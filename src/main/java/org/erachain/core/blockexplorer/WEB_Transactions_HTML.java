@@ -5,7 +5,6 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
@@ -42,7 +41,7 @@ public class WEB_Transactions_HTML {
         this.langObj = langObj;
         List<Transaction> tt = new ArrayList<Transaction>();
         tt.add(transaction);
-        LinkedHashMap json = BlockExplorer.getInstance().Transactions_JSON(null, tt);
+        LinkedHashMap json = BlockExplorer.getInstance().transactionsJSON(null, tt);
         LinkedHashMap tras_json = (LinkedHashMap) ((LinkedHashMap) json.get("transactions")).get(0);
 
         HashMap output = new HashMap();

@@ -84,16 +84,15 @@ public class BlockExplorer {
     public Map jsonQueryMain(UriInfo info) throws UnsupportedEncodingException, WrongSearchException {
         Stopwatch stopwatchAll = new Stopwatch();
         int start = -1;
+        start = checkAndGetIntParam(info, start, "start");
         int txOnPage = 100;
         String filter = "standart";
         boolean allOnOnePage = false;
         String showOnly = "";
         String showWithout = "";
-        int transPage = 1;
+        int pageNumber = 1;
+        pageNumber = checkAndGetIntParam(info, pageNumber, "page");
         output = new LinkedHashMap();
-        if (info.getQueryParameters().containsKey("start")) {
-            start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
-        }
         output.put("search", "block");
         // lang
         if (!info.getQueryParameters().containsKey("lang")) {
@@ -146,27 +145,31 @@ public class BlockExplorer {
 
                 String type = info.getQueryParameters().get("search").get(0);
                 String search = info.getQueryParameters().get("q").get(0);
-                if (type.equals("persons") || type.equals("person")) {
-                    // search persons
-                    output.put("search", type);
-                    output.putAll(jsonQuerySearchPersons(info.getQueryParameters().getFirst("q")));
-
-                } else if (type.equals("assets") || type.equals("asset")) {
-                    // search assets
-                    output.put("search", type);
-                    output.putAll(jsonQuerySearchAssets(info.getQueryParameters().getFirst("q")));
-
-                } else if (type.equals("status") || type.equals("statuses")) {
-                    // search assets
-                    output.put("search", type);
-                    output.putAll(jsonQuerySearchStatuses(info.getQueryParameters().getFirst("q")));
-
-
-                } else if (type.equals("block") || type.equals("blocks")) {
-                    // search assets
-                    output.put("search", "block");
-                    output.putAll(jsonQueryBlock(search, 1));
-
+                switch (type) {
+                    case "persons":
+                    case "person":
+                        // search persons
+                        output.put("search", type);
+                        output.putAll(jsonQuerySearchPersons(info.getQueryParameters().getFirst("q")));
+                        break;
+                    case "assets":
+                    case "asset":
+                        // search assets
+                        output.put("search", type);
+                        output.putAll(jsonQuerySearchAssets(info.getQueryParameters().getFirst("q")));
+                        break;
+                    case "status":
+                    case "statuses":
+                        // search assets
+                        output.put("search", type);
+                        output.putAll(jsonQuerySearchStatuses(info.getQueryParameters().getFirst("q")));
+                        break;
+                    case "block":
+                    case "blocks":
+                        // search assets
+                        output.put("search", "block");
+                        output.putAll(jsonQueryBlock(search, pageNumber));
+                        break;
                 }
 
             }
@@ -215,8 +218,8 @@ public class BlockExplorer {
             }
         } else if (info.getQueryParameters().containsKey("blocks")) {
 
-            output.put("search", "block");
-            output.putAll(jsonQueryBlocks(info, transPage, start, txOnPage, filter,
+//            output.put("search", "block");
+            output.putAll(jsonQueryBlocks(pageNumber, start, txOnPage, filter,
                     allOnOnePage, showOnly, showWithout));
             //peers
         } else if (info.getQueryParameters().containsKey("peers")) {
@@ -227,32 +230,9 @@ public class BlockExplorer {
             // address
         } else if (info.getQueryParameters().containsKey("addr")) {
             if (info.getQueryParameters().containsKey("page")) {
-                transPage = Integer.parseInt(info.getQueryParameters().getFirst("page"));
+                pageNumber = Integer.parseInt(info.getQueryParameters().getFirst("page"));
             }
-            if (info.getQueryParameters().containsKey("txOnPage")) {
-                txOnPage = Integer.valueOf((info.getQueryParameters().getFirst("txOnPage")));
-            }
-
-            if (info.getQueryParameters().containsKey("filter")) {
-                filter = info.getQueryParameters().getFirst("filter");
-            }
-
-            if (info.getQueryParameters().containsKey("allOnOnePage")) {
-                allOnOnePage = true;
-            }
-
-            if (info.getQueryParameters().containsKey("showOnly")) {
-                showOnly = info.getQueryParameters().getFirst("showOnly");
-            }
-
-            if (info.getQueryParameters().containsKey("showWithout")) {
-                showWithout = info.getQueryParameters().getFirst("showWithout");
-            }
-
-
-            output.putAll(jsonQueryAddress(info.getQueryParameters().get("addr"), transPage, start, txOnPage, filter,
-                    allOnOnePage, showOnly, showWithout));
-
+            output.putAll(jsonQueryAddress(info.getQueryParameters().get("addr"), pageNumber));
             // name
         } else if (info.getQueryParameters().containsKey("name")) {
 
@@ -272,10 +252,7 @@ public class BlockExplorer {
             // block
         } else if (info.getQueryParameters().containsKey("block")) {
             output.put("search", "block");
-            if (info.getQueryParameters().containsKey("page")) {
-                transPage = Integer.parseInt(info.getQueryParameters().getFirst("page"));
-            }
-            output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), transPage));
+            output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), pageNumber));
         }
 
         // transaction
@@ -367,6 +344,15 @@ public class BlockExplorer {
 
 
         return output;
+    }
+
+    private int checkAndGetIntParam(UriInfo info, int param, String name) {
+        if (info.getQueryParameters().containsKey(name)
+                && !info.getQueryParameters().getFirst(name).equals("")
+                && !info.getQueryParameters().getFirst(name).equals("undefined")) {
+            param = Integer.valueOf((info.getQueryParameters().getFirst(name)));
+        }
+        return param;
     }
 
     public Map jsonQueryHelp() {
@@ -738,7 +724,6 @@ public class BlockExplorer {
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
             // e.printStackTrace();
-            start = 0;
         }
 
         SortableList<Long, ItemCls> it = dcSet.getItemAssetMap().getList();
@@ -1475,7 +1460,7 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryBlocks(UriInfo info, int transPage, int start, int txOnPage, String filter, boolean allOnOnePage, String showOnly, String showWithout) {
+    public Map jsonQueryBlocks(int transPage, int start, int txOnPage, String filter, boolean allOnOnePage, String showOnly, String showWithout) {
         Block block = null;
         if (start > 0) {
             block = Controller.getInstance().getBlockByHeight(start);
@@ -2031,91 +2016,47 @@ public class BlockExplorer {
         return output;
     }
 
-    public LinkedHashMap Transactions_JSON(Account account, List<Transaction> transactions) {
-        return Transactions_JSON(account, transactions, 0, 0);
+    public LinkedHashMap transactionsJSON(Account account, List<Transaction> transactions) {
+        return transactionsJSON(account, transactions, 0, 0);
     }
 
-    public LinkedHashMap Transactions_JSON(Account account, List<Transaction> transactions, int fromIndex, int toIndex) {
-
+    public LinkedHashMap transactionsJSON(Account account, List<Transaction> transactions, int fromIndex, int toIndex) {
         LinkedHashMap output = new LinkedHashMap();
         // Creator or Recipient if ACCOUNT is SET
         int i1 = 0;
-
         // use negate for amount
-        boolean outcome = false;
+        boolean outcome;
         int type;
-
         int height = Controller.getInstance().getMyHeight();
 
         LinkedHashMap transactionsJSON = new LinkedHashMap();
-        List<Transaction> transactions2 = (toIndex == 0) ? transactions
+        List<Transaction> transactionList = (toIndex == 0) ? transactions
                 : transactions.subList(fromIndex, Math.min(toIndex, transactions.size()));
-        for (Transaction trans : transactions2) {
+        for (Transaction transaction : transactionList) {
 
             // SET + HEIGHT + SEQNO
-            if (trans.getType() == 100) {
-                trans.setDC(dcSet);
+            if (transaction.getType() == 100) {
+                transaction.setDC(dcSet);
             }
-            trans.setDC(dcSet);
+            transaction.setDC(dcSet);
 
             outcome = true;
 
             LinkedHashMap transactionJSON = new LinkedHashMap();
 
-            ///trans.setDC(dcSet, Transaction.FOR_NETWORK);
+            transactionJSON.put("block", transaction.getBlockHeight());// .getSeqNo(dcSet));
 
-            /*
-             * String itemName = "-"; Long itemKey = 0L; if (trans instanceof
-             * TransactionAmount && trans.getAbsKey() >0) { TransactionAmount
-             * transAmo = (TransactionAmount)trans; //recipient =
-             * transAmo.getRecipient(); ItemCls item =
-             * dcSet.getItemAssetMap().get(transAmo.getAbsKey()); if
-             * (item==null){ itemName = "-"; itemKey = 0L;
-             *
-             * } itemName = item.toString(); itemKey = item.getKey(); } else if
-             * ( trans instanceof GenesisTransferAssetTransaction) {
-             * GenesisTransferAssetTransaction transGen =
-             * (GenesisTransferAssetTransaction)trans; //recipient =
-             * transGen.getRecipient(); ItemCls item =
-             * dcSet.getItemAssetMap().get(transGen.getAbsKey()); itemName =
-             * item.toString(); itemKey = item.getKey(); } else if ( trans
-             * instanceof Issue_ItemRecord) { Issue_ItemRecord transIssue =
-             * (Issue_ItemRecord)trans; ItemCls item = transIssue.getItem();
-             * itemName = item.getShort(); itemKey = item.getKey(); } else if (
-             * trans instanceof GenesisIssue_ItemRecord) {
-             * GenesisIssue_ItemRecord transIssue =
-             * (GenesisIssue_ItemRecord)trans; ItemCls item =
-             * transIssue.getItem(); itemName = item.getShort(); itemKey =
-             * item.getKey(); } else if (trans instanceof R_SertifyPubKeys ) {
-             * R_SertifyPubKeys sertifyPK = (R_SertifyPubKeys)trans; //recipient
-             * = transAmo.getRecipient(); ItemCls item =
-             * dcSet.getItemPersonMap().get(sertifyPK.getAbsKey()); if (item ==
-             * null){ itemName = "-"; itemKey = (long) -1;
-             *
-             * } itemName = item.toString(); itemKey = item.getKey(); } else {
-             * itemName = trans.viewItemName(); itemKey = (long) -1; }
-             *
-             * transactionJSON.put("amount",amount);
-             * transactionJSON.put("item_name", itemName);
-             * transactionJSON.put("item_key", itemKey);
-             */
+            transactionJSON.put("seqNo", transaction.getSeqNo());
 
-            //
-
-
-            transactionJSON.put("block", trans.getBlockHeight());// .getSeqNo(dcSet));
-
-            transactionJSON.put("seqNo", trans.getSeqNo());
-
-            if (trans.getType() == Transaction.CALCULATED_TRANSACTION) {
-                R_Calculated txCalculated = (R_Calculated) trans;
+            if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
+                R_Calculated txCalculated = (R_Calculated) transaction;
                 outcome = txCalculated.getAmount().signum() < 0;
 
                 transactionJSON.put("reference", "--");
-                transactionJSON.put("signature", trans.getBlockHeight() + "-" + trans.getSeqNo());
+                transactionJSON.put("signature", transaction.getBlockHeight() + "-" + transaction.getSeqNo());
                 transactionJSON.put("date", txCalculated.getMessage());
 
-                transactionJSON.put("confirmations", trans.getConfirmations(height));
+                transactionJSON.put("confirmations", transaction.getConfirmations(height));
 
                 transactionJSON.put("creator", txCalculated.getRecipient().getPersonAsString());
                 transactionJSON.put("creator_addr", txCalculated.getRecipient().getAddress());
@@ -2124,27 +2065,27 @@ public class BlockExplorer {
                 transactionJSON.put("fee", "--");
 
             } else {
-                transactionJSON.put("signature", Base58.encode(trans.getSignature()));
-                transactionJSON.put("date", DateTimeFormat.timestamptoString(trans.getTimestamp()));
+                transactionJSON.put("signature", Base58.encode(transaction.getSignature()));
+                transactionJSON.put("date", DateTimeFormat.timestamptoString(transaction.getTimestamp()));
 
-                if (trans.getCreator() == null) {
+                if (transaction.getCreator() == null) {
                     transactionJSON.put("creator", GenesisBlock.CREATOR.getAddress());
                     transactionJSON.put("creator_addr", "GENESIS");
-                    if (trans.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
+                    if (transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
                         outcome = false;
                     }
 
                 } else {
 
-                    transactionJSON.put("publickey", Base58.encode(trans.getCreator().getPublicKey()));
+                    transactionJSON.put("publickey", Base58.encode(transaction.getCreator().getPublicKey()));
 
                     Account atSideAccount;
-                    atSideAccount = trans.getCreator();
+                    atSideAccount = transaction.getCreator();
                     if (account != null) {
-                        atSideAccount = trans.getCreator();
-                        type = trans.getType();
+                        atSideAccount = transaction.getCreator();
+                        type = transaction.getType();
                         if (type == Transaction.SEND_ASSET_TRANSACTION) {
-                            R_Send rSend = (R_Send) trans;
+                            R_Send rSend = (R_Send) transaction;
                             if (rSend.getCreator().equals(account)) {
                                 outcome = false;
                                 atSideAccount = rSend.getRecipient();
@@ -2159,24 +2100,20 @@ public class BlockExplorer {
 
                 }
 
-                transactionJSON.put("size", trans.viewSize(Transaction.FOR_NETWORK));
-                transactionJSON.put("fee", trans.getFee());
-                transactionJSON.put("confirmations", trans.getConfirmations(height));
+                transactionJSON.put("size", transaction.viewSize(Transaction.FOR_NETWORK));
+                transactionJSON.put("fee", transaction.getFee());
+                transactionJSON.put("confirmations", transaction.getConfirmations(height));
 
             }
 
-            transactionJSON.put("type", Lang.getInstance().translate_from_langObj(trans.viewFullTypeName(), langObj));
+            transactionJSON.put("type", Lang.getInstance().translate_from_langObj(transaction.viewFullTypeName(), langObj));
 
-            // String amount = "-";
-            // if (trans.getAmount() != null) amount =
-            // trans.getAmount().toString();
-
-            long absKey = trans.getAbsKey();
-            String amount = trans.viewAmount();
+            long absKey = transaction.getAbsKey();
+            String amount = transaction.viewAmount();
             if (absKey > 0) {
                 if (amount.length() > 0) {
                     transactionJSON.put("amount_key",
-                            (outcome ? "-" : "+") + trans.viewAmount() + ":" + absKey);
+                            (outcome ? "-" : "+") + transaction.viewAmount() + ":" + absKey);
                 } else {
                     transactionJSON.put("amount_key", "" + absKey);
                 }
@@ -2184,10 +2121,10 @@ public class BlockExplorer {
                 transactionJSON.put("amount_key", "");
             }
 
-            if (trans.viewRecipient() == null) {
+            if (transaction.viewRecipient() == null) {
                 transactionJSON.put("recipient", "-");
             } else {
-                transactionJSON.put("recipient", trans.viewRecipient());
+                transactionJSON.put("recipient", transaction.viewRecipient());
             }
 
             transactionsJSON.put(i1, transactionJSON);
@@ -2207,7 +2144,6 @@ public class BlockExplorer {
         output.put("label_size", Lang.getInstance().translate_from_langObj("Size", langObj));
         output.put("label_seqNo", Lang.getInstance().translate_from_langObj("SeqNo", langObj));
         output.put("label_signature", Lang.getInstance().translate_from_langObj("Signature", langObj));
-        // output.put("label_reference",Lang.getInstance().translate_from_langObj("Reference",langObj));
         output.put("label_amount_key", Lang.getInstance().translate_from_langObj("Amount:Key", langObj));
         output.put("label_fee", Lang.getInstance().translate_from_langObj("Fee", langObj));
         output.put("label_transactions_table", Lang.getInstance().translate_from_langObj("Transactions", langObj));
@@ -2711,8 +2647,7 @@ public class BlockExplorer {
     }
 
     @SuppressWarnings({"serial", "static-access"})
-    public Map jsonQueryAddress(List<String> addresses, int transPage, int start, int txOnPage, String filter,
-                                boolean allOnOnePage, String showOnly, String showWithout) {
+    public Map jsonQueryAddress(List<String> addresses, int pageNumber) {
 
         List<Transaction> tt = dcSet.getTransactionFinalMap().getTransactionsByAddress(addresses.get(0));
         addresses = new ArrayList<>(new LinkedHashSet<String>(addresses));
@@ -2742,595 +2677,14 @@ public class BlockExplorer {
         // balance assets from
         output.put("Balance", Balance_JSON(new Account(addresses.get(0))));
 
-
         // Transactions view
-        output.put("Transactions", Transactions_JSON(acc, tt, (transPage - 1) * 100, transPage * 100));
+        output.put("Transactions", transactionsJSON(acc, tt, (pageNumber - 1) * 100, pageNumber * 100));
         output.put("pageCount", (int) Math.ceil((tt.size()) / 100d));
-        output.put("pageNumber", transPage);
+        output.put("pageNumber", pageNumber);
 
         output.put("type", "standardAccount");
 
         return output;
-         //todo Закомментировано by Gleb как код, который никогда не выполнялся(такое ощущение что он был оставлен на светлое будущее...)
-//        LinkedHashMap error = new LinkedHashMap();
-//        TreeSet<BlExpUnit> all = new TreeSet<>();
-//        LinkedHashMap transactionsJSON = new LinkedHashMap();
-//        Map<String, Boolean> showOnlyMap = new LinkedHashMap<String, Boolean>();
-//        for (String string : showOnly.split(",")) {
-//            showOnlyMap.put(string, true);
-//        }
-
-//        Map<String, Boolean> showWithoutMap = new LinkedHashMap<String, Boolean>();
-//        for (String string : showWithout.split(",")) {
-//            showWithoutMap.put(string, true);
-//        }
-
-//        for (String address : addresses) {
-//            if (!Crypto.getInstance().isValidAddress(address)) {
-//                error.put(address, "Address is not valid!");
-//            }
-//
-//            if (addresses.size() > 1 && address.startsWith("A")) {
-//                error.put(address, "Multiple addresses with the AT is not supported!");
-//            }
-//        }
-
-//        if (!error.isEmpty()) {
-//            output.put("error", error);
-//            return output;
-//        }
-
-//        if (addresses.size() > 10) {
-//            output.put("error", "Too many addresses!");
-//        }
-
-//        Map<String, Integer> txsCountOfAddr = new LinkedHashMap<>();
-
-//        output.put("addresses", addresses);
-
-//        if (addresses.get(0).startsWith("A")) {
-//            String address = addresses.get(0);
-//
-//            AT at = dcSet.getATMap().getAT(address);
-//            Block block = Controller.getInstance().getBlockByHeight(at.getCreationBlockHeight());
-//            long aTtimestamp = block.getTimestamp();
-//            BigDecimal aTbalanceCreation = BigDecimal.ZERO;
-//            int seqNo = 0;
-//            for (Transaction transaction : block.getTransactions()) {
-//                seqNo++;
-//                if (transaction.getType() == Transaction.DEPLOY_AT_TRANSACTION) {
-//                    Account atAccount = ((DeployATTransaction) transaction).getATaccount(dcSet);
-//
-//                    if (atAccount.getAddress().equals(address)) {
-//                        transaction.setDC(dcSet, block.heightBlock, block.heightBlock, seqNo);
-//                        all.add(new BlExpUnit(at.getCreationBlockHeight(), 0, transaction));
-//                        aTbalanceCreation = ((DeployATTransaction) transaction).getAmount();
-//                    }
-//                }
-//            }
-//
-//            Set<BlExpUnit> atTransactions = dcSet.getATTransactionMap().getBlExpATTransactionsBySender(address);
-//
-//            all.addAll(atTransactions);
-//
-//            output.put("type", "at");
-//
-//            Map atJSON = new LinkedHashMap();
-//            atJSON = at.toJSON();
-//            atJSON.put("balanceCreation", aTbalanceCreation.toPlainString());
-//            atJSON.put("timestamp", aTtimestamp);
-//            atJSON.put("dateTime", BlockExplorer.timestampToStr(aTtimestamp));
-//
-//            output.put("at", atJSON);
-//        } else {
-//            output.put("type", "standardAccount");
-//        }
-
-//        for (String address : addresses) {
-//            if (!address.startsWith("A")) {
-//                // height + win value
-//                Collection<Tuple2<Integer, Integer>> block_heights = dcSet.getAddressForging().getGeneratorBlocks(address);
-//
-//                for (Tuple2<Integer, Integer> item : block_heights) {
-//                    Block block = dcSet.getBlockMap().get(item.a);
-//                    all.add(new BlExpUnit(block.getHeight(), 0, block));
-//                }
-//            }
-//
-//            Set<BlExpUnit> transactions = dcSet.getTransactionFinalMap().getBlExpTransactionsByAddress(address);
-//            txsCountOfAddr.put(address, transactions.size());
-//            all.addAll(transactions);
-//        }
-
-//        for (String address : addresses) {
-//            Map<Tuple2<Long, Long>, Trade> trades
-//                    = new TreeMap<Tuple2<Long, Long>, Trade>();
-//            List<Transaction> orders = dcSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(address,
-//                    Transaction.CREATE_ORDER_TRANSACTION, 0);
-//            TradeMap tradeMap = dcSet.getTradeMap();
-//            for (Transaction transaction : orders) {
-//                Long dbRefTuple = dcSet.getTransactionFinalMapSigns().get(transaction.getSignature());
-//                SortableList<Tuple2<Long, Long>, Trade> tradesBuf
-//                        = tradeMap.getTradesByOrderID(dbRefTuple);
-//                for (Pair<Tuple2<Long, Long>, Trade> pair : tradesBuf) {
-//                    trades.put(pair.getA(), pair.getB());
-//                }
-//            }
-//
-//            for (Map.Entry<Tuple2<Long, Long>, Trade> trade : trades
-//                    .entrySet()) {
-//                Transaction txInitiator = dcSet.getTransactionFinalMap().get(trade.getValue().getInitiator());
-//
-//                Transaction txTarget = dcSet.getTransactionFinalMap().get(trade.getValue().getTarget());
-//
-//                all.add(new BlExpUnit(txInitiator.getBlockHeightByParentOrLast(dcSet),
-//                        txTarget.getBlockHeightByParentOrLast(dcSet), txInitiator.getSeqNo(),
-//                        txTarget.getSeqNo(), trade.getValue()));
-//            }
-//
-//            Set<BlExpUnit> atTransactions = dcSet.getATTransactionMap().getBlExpATTransactionsByRecipient(address);
-//            all.addAll(atTransactions);
-//        }
-
-//        int size = all.size();
-//
-//        if (size == 0) {
-//            output.put("error",
-//                    "No transactions found for this address.<br>It has probably not been used on the network yet.");
-//            return output;
-//        }
-//
-//        int tradesCount = 0;
-//        int aTTxsCount = 0;
-//        int txsCount = 0;
-//        int totalBlocksGeneratedCount = 0;
-//        BigDecimal totalBlocksGeneratedFee = BigDecimal.ZERO;
-//        int[] txsTypeCount = new int[256];
-//        List<Map<String, Map<Long, BigDecimal>>> tXincomes = new ArrayList<>();
-//        List<Map<Long, BigDecimal>> totalBalances = new ArrayList<>();
-//        BigDecimal spentFee = BigDecimal.ZERO;
-//        Map<Long, BigDecimal> receivedCoins = new LinkedHashMap<>();
-//        Map<Long, BigDecimal> sentCoins = new LinkedHashMap<>();
-//        Map<String, BigDecimal> generatedFee = new LinkedHashMap<>();
-//        Map<String, Integer> blocksGeneratedCount = new LinkedHashMap<>();
-//
-//        Map<Long, BigDecimal> zeroAmount = new LinkedHashMap<Long, BigDecimal>() {
-//            {
-//                put(FEE_KEY, BigDecimal.ZERO);
-//            }
-//        };
-//
-//        int i = 1;
-//        for (BlExpUnit unit : all) {
-//
-//            Map<String, Map<Long, BigDecimal>> tXincome = new LinkedHashMap<>();
-//
-//            if (unit.getUnit() instanceof TransactionAmount) {
-//
-//                TransactionAmount tx = (TransactionAmount) unit.getUnit();
-//                //tx.setDC(dcSet, Transaction.FOR_NETWORK);
-//
-//                tXincome = tx.getAssetAmount();
-//
-//                if (tx.getCreator() != null && addresses.contains(tx.getCreator().getAddress())) {
-//                    spentFee = spentFee.add(tx.getFee());
-//                }
-//
-//                txsCount++;
-//                txsTypeCount[((Transaction) unit.getUnit()).getType() - 1]++;
-//
-//            } else if (unit.getUnit() instanceof Block) {
-//
-//                BigDecimal fee = ((Block) unit.getUnit()).getFeeAsBigDecimal();
-//                String generator = ((Block) unit.getUnit()).getCreator().getAddress();
-//
-//                tXincome = Transaction.addAssetAmount(tXincome, generator, FEE_KEY, fee);
-//
-//                generatedFee.put(generator, generatedFee.getOrDefault(generator, BigDecimal.ZERO).add(fee));
-//
-//                totalBlocksGeneratedFee = totalBlocksGeneratedFee.add(fee);
-//
-//                blocksGeneratedCount.put(generator, blocksGeneratedCount.getOrDefault(generator, 0) + 1);
-//
-//                totalBlocksGeneratedCount++;
-//
-//            } else if (unit.getUnit() instanceof Trade) {
-//                Trade trade = (Trade) unit.getUnit();
-//
-//                Order orderInitiator;
-//                if (dcSet.getCompletedOrderMap().contains(trade.getInitiator())) {
-//                    orderInitiator = dcSet.getCompletedOrderMap().get(trade.getInitiator());
-//                } else {
-//                    orderInitiator = dcSet.getOrderMap().get(trade.getInitiator());
-//                }
-//
-//                Order orderTarget;
-//                if (dcSet.getCompletedOrderMap().contains(trade.getTarget())) {
-//                    orderTarget = dcSet.getCompletedOrderMap().get(trade.getTarget());
-//                } else {
-//                    orderTarget = dcSet.getOrderMap().get(trade.getTarget());
-//                }
-//
-//                if (addresses.contains(orderInitiator.getCreator())) {
-//                    tXincome = Transaction.addAssetAmount(tXincome, orderInitiator.getCreator().getAddress(), orderInitiator.getHave(),
-//                            trade.getAmountHave());
-//                }
-//
-//                if (addresses.contains(orderTarget.getCreator())) {
-//
-//                    tXincome = Transaction.addAssetAmount(tXincome, orderTarget.getCreator().getAddress(), orderInitiator.getHave(),
-//                            trade.getAmountWant());
-//
-//                }
-//
-//                tradesCount++;
-//
-//            } else if (unit.getUnit() instanceof AT_Transaction) {
-//                AT_Transaction atTransaction = (AT_Transaction) unit.getUnit();
-//
-//                if (addresses.contains(atTransaction.getSender())) {
-//                    tXincome = Transaction.subAssetAmount(tXincome, atTransaction.getSender(), FEE_KEY,
-//                            BigDecimal.valueOf(atTransaction.getAmount()));
-//                }
-//
-//                if (addresses.contains(atTransaction.getRecipient())) {
-//                    tXincome = Transaction.addAssetAmount(tXincome, atTransaction.getRecipient(), FEE_KEY,
-//                            BigDecimal.valueOf(atTransaction.getAmount()));
-//                }
-//
-//                aTTxsCount++;
-//            }
-//
-//            tXincomes.add(tXincome);
-//
-//            Map<Long, BigDecimal> newTotalBalance;
-//            if (totalBalances.size() > 0) {
-//                newTotalBalance = new LinkedHashMap<>(totalBalances.get(totalBalances.size() - 1));
-//            } else {
-//                newTotalBalance = new LinkedHashMap<>(zeroAmount);
-//            }
-//
-//            for (String address : addresses) {
-//                for (Map.Entry<Long, BigDecimal> assetAmount : tXincome.getOrDefault(address, zeroAmount).entrySet()) {
-//                    if (assetAmount.getValue().compareTo(BigDecimal.ZERO) < 0) {
-//                        sentCoins.put(assetAmount.getKey(), sentCoins
-//                                .getOrDefault(assetAmount.getKey(), BigDecimal.ZERO).subtract(assetAmount.getValue()));
-//                    }
-//
-//                    if (assetAmount.getValue().compareTo(BigDecimal.ZERO) > 0) {
-//                        receivedCoins.put(assetAmount.getKey(), receivedCoins
-//                                .getOrDefault(assetAmount.getKey(), BigDecimal.ZERO).add(assetAmount.getValue()));
-//                    }
-//
-//                    newTotalBalance.put(assetAmount.getKey(), newTotalBalance
-//                            .getOrDefault(assetAmount.getKey(), BigDecimal.ZERO).add(assetAmount.getValue()));
-//                }
-//
-//                if ((newTotalBalance.containsKey(FEE_KEY))
-//                        && newTotalBalance.get(FEE_KEY).compareTo(BigDecimal.ZERO) < 0) {
-//                    logger.info(String.valueOf(i));
-//                }
-//            }
-//
-//            totalBalances.add(newTotalBalance);
-//
-//            i++;
-//        }
-//
-//        Map blockExplorerBalance = new LinkedHashMap();
-//        Map total = new LinkedHashMap();
-//
-//        Map<Long, String> receivedCoinsPrint = new LinkedHashMap();
-//        for (Map.Entry<Long, BigDecimal> e : receivedCoins.entrySet()) {
-//            receivedCoinsPrint.put(e.getKey(), e.getValue().toPlainString());
-//        }
-//        blockExplorerBalance.put("received", receivedCoinsPrint);
-//
-//        Map<Long, String> sentCoinsPrint = new LinkedHashMap();
-//        for (Map.Entry<Long, BigDecimal> e : sentCoins.entrySet()) {
-//            if (e.getKey() == FEE_KEY) {
-//                sentCoinsPrint.put(e.getKey(), e.getValue().subtract(spentFee).toPlainString());
-//            } else {
-//                sentCoinsPrint.put(e.getKey(), e.getValue().toPlainString());
-//            }
-//        }
-//        blockExplorerBalance.put("sent", sentCoinsPrint);
-//
-//        blockExplorerBalance.put("spentFee", spentFee.toPlainString());
-//
-//        for (Map.Entry<Long, BigDecimal> assetAmounts : totalBalances.get(size - 1).entrySet()) {
-//            total.put(assetAmounts.getKey(), assetAmounts.getValue().toPlainString());
-//        }
-//        blockExplorerBalance.put("total", total);
-//
-//        output.put("balance", blockExplorerBalance);
-//
-//        Map generatedBlocks = new LinkedHashMap();
-//        for (Map.Entry<String, Integer> e : blocksGeneratedCount.entrySet()) {
-//            Map generatedInfo = new LinkedHashMap();
-//            generatedInfo.put("count", e.getValue());
-//            generatedInfo.put("fees", generatedFee.get(e.getKey()).toPlainString());
-//            generatedBlocks.put(e.getKey(), generatedInfo);
-//        }
-//
-//        Map generatedInfo = new LinkedHashMap();
-//        generatedInfo.put("count", totalBlocksGeneratedCount);
-//        generatedInfo.put("fees", totalBlocksGeneratedFee.toPlainString());
-//        generatedBlocks.put("total", generatedInfo);
-//
-//        output.put("generatedBlocks", generatedBlocks);
-//
-//        output.put("txsCountOfAddr", txsCountOfAddr);
-//
-//        Map nativeBalance = new LinkedHashMap();
-//
-//        Map<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetAmountTotal = new LinkedHashMap<>();
-//
-//        for (String address : addresses) {
-//
-//            Map<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetAmountOfAddr = assetBalance(
-//                    address);
-//
-//            Map<Long, String> assetAmountOfAddrPrint = new LinkedHashMap<>();
-//
-//            for (Map.Entry<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetAmounts : assetAmountOfAddr
-//                    .entrySet()) {
-//                long assetKey = assetAmounts.getKey();
-//
-//                if (assetAmountTotal.containsKey(assetKey)) {
-//                    Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = assetAmountTotal
-//                            .get(assetKey);
-//                    Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value = assetAmounts
-//                            .getValue();
-//                    balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-//                            new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(value.a.b)),
-//                            new Tuple2<BigDecimal, BigDecimal>(balance.b.a, balance.b.b.add(value.b.b)),
-//                            new Tuple2<BigDecimal, BigDecimal>(balance.c.a, balance.c.b.add(value.c.b)),
-//                            new Tuple2<BigDecimal, BigDecimal>(balance.d.a, balance.d.b.add(value.d.b)),
-//                            new Tuple2<BigDecimal, BigDecimal>(balance.e.a, balance.e.b.add(value.e.b)));
-//
-//                    assetAmountTotal.put(assetKey, balance);
-//                } else {
-//                    assetAmountTotal.put(assetKey, assetAmounts.getValue());
-//                }
-//
-//                assetAmountOfAddrPrint.put(assetKey, assetAmounts.getValue().toString());
-//            }
-//
-//            nativeBalance.put(address, assetAmountOfAddrPrint);
-//        }
-//
-//        Map<Long, String> assetAmountTotalPrint = new LinkedHashMap<>();
-//        for (Map.Entry<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetAmounts : assetAmountTotal
-//                .entrySet()) {
-//            assetAmountTotalPrint.put(assetAmounts.getKey(), assetAmounts.getValue().toString());
-//        }
-//
-//        nativeBalance.put("total", assetAmountTotalPrint);
-//
-//        output.put("nativeBalance", nativeBalance);
-//
-//        Map assetNames = new LinkedHashMap();
-//
-//        for (Map.Entry<Long, BigDecimal> assetAmounts : totalBalances.get(size - 1).entrySet()) {
-//            assetNames.put(assetAmounts.getKey(), Controller.getInstance().getAsset(assetAmounts.getKey()).getName());
-//        }
-//
-//        output.put("assetNames", assetNames);
-//
-//        Map txCountJSON = new LinkedHashMap();
-//
-//        if (!showOnly.equals("")) {
-//            showWithoutMap.clear();
-//            int n = 1;
-//            for (int txCount : txsTypeCount) {
-//                if (txCount > 0) {
-//                    if (!showOnlyMap.containsKey(String.valueOf(n))) {
-//                        showWithoutMap.put(String.valueOf(n), true);
-//                    }
-//                }
-//
-//                n++;
-//            }
-//
-//            if (totalBlocksGeneratedCount > 0) {
-//                if (!showOnlyMap.containsKey("blocks")) {
-//                    showWithoutMap.put("blocks", true);
-//                }
-//            }
-//
-//            if (aTTxsCount > 0) {
-//                if (!showOnlyMap.containsKey("aTTxs")) {
-//                    showWithoutMap.put("aTTxs", true);
-//                }
-//            }
-//
-//            if (tradesCount > 0) {
-//                if (!showOnlyMap.containsKey("trades")) {
-//                    showWithoutMap.put("trades", true);
-//                }
-//            }
-//        }
-//
-//        if (txsCount > 0) {
-//            txCountJSON.put("txsCount", txsCount);
-//            Map txTypeCountJSON = new LinkedHashMap();
-//            int n = 1;
-//            for (int txCount : txsTypeCount) {
-//                if (txCount > 0) {
-//                    txTypeCountJSON.put(n, txCount);
-//                }
-//                n++;
-//            }
-//            txCountJSON.put("txsTypesCount", txTypeCountJSON);
-//        }
-//        if (totalBlocksGeneratedCount > 0) {
-//            txCountJSON.put("blocksCount", totalBlocksGeneratedCount);
-//        }
-//        if (aTTxsCount > 0) {
-//            txCountJSON.put("aTTxsCount", aTTxsCount);
-//        }
-//        if (tradesCount > 0) {
-//            txCountJSON.put("tradesCount", tradesCount);
-//        }
-//
-//        txCountJSON.put("allCount", tradesCount + aTTxsCount + totalBlocksGeneratedCount + txsCount);
-//
-//        output.put("countTx", txCountJSON);
-//
-//        output.put("txOnPage", txOnPage);
-//
-//        output.put("filter", filter);
-//
-//        output.put("allOnOnePage", allOnOnePage);
-//
-//        output.put("showOnly", showOnly);
-//
-//        output.put("showWithout", showWithout);
-//
-//        int end = -1;
-//
-//        int counter = size;
-//
-//        Map<Integer, Map<String, Integer>> pagesStartEnd = new LinkedHashMap();
-//        Map<String, Integer> pageStartEnd = new LinkedHashMap();
-//
-//        int onThisPage = 0;
-//        int pagesCounter = 0;
-//
-//        int onThisPageCurent = 0;
-//        boolean firstPage = false;
-//
-//        Iterator iterator;
-//        iterator = all.descendingIterator();
-//
-//        while (iterator.hasNext()) {
-//
-//            BlExpUnit unit = (BlExpUnit) iterator.next();
-//
-//            onThisPage++;
-//
-//            if (((unit.getUnit() instanceof Block) && (showWithoutMap.containsKey("blocks")))) {
-//                onThisPage--;
-//            }
-//
-//            if (((unit.getUnit() instanceof Trade) && showWithoutMap.containsKey("trades"))) {
-//                onThisPage--;
-//            }
-//
-//            if (((unit.getUnit() instanceof AT_Transaction) && showWithoutMap.containsKey("aTTxs"))) {
-//                onThisPage--;
-//            }
-//
-//            if (((unit.getUnit() instanceof Transaction)
-//                    && showWithoutMap.containsKey(String.valueOf(((Transaction) unit.getUnit()).getType())))) {
-//                onThisPage--;
-//            }
-//
-//            if (!firstPage && onThisPage == 1) {
-//                pageStartEnd.put("start", counter);
-//                firstPage = true;
-//
-//                if (start == -1) {
-//                    start = counter;
-//                }
-//            }
-//
-//            if (onThisPage >= txOnPage) {
-//                pageStartEnd.put("end", counter);
-//
-//                onThisPage = 0;
-//                firstPage = false;
-//            }
-//
-//            if (pageStartEnd.size() == 2) {
-//                pagesCounter++;
-//
-//                pagesStartEnd.put(pagesCounter, new LinkedHashMap(pageStartEnd));
-//
-//                pageStartEnd.clear();
-//            }
-//
-//            if (start != -1 && counter <= start && ((onThisPageCurent < txOnPage) || allOnOnePage)) {
-//                if ((unit.getUnit() instanceof Block) && (showWithoutMap.containsKey("blocks"))) {
-//                    counter--;
-//                    continue;
-//                }
-//
-//                if ((unit.getUnit() instanceof Trade) && showWithoutMap.containsKey("trades")) {
-//                    counter--;
-//                    continue;
-//                }
-//
-//                if ((unit.getUnit() instanceof AT_Transaction) && showWithoutMap.containsKey("aTTxs")) {
-//                    counter--;
-//                    continue;
-//                }
-//
-//                if ((unit.getUnit() instanceof Transaction)
-//                        && showWithoutMap.containsKey(String.valueOf(((Transaction) unit.getUnit()).getType()))) {
-//                    counter--;
-//                    continue;
-//                }
-//
-//                onThisPageCurent++;
-//
-//                Map transactionJSON = new LinkedHashMap();
-//
-//                transactionJSON.putAll(jsonUnitPrint(unit.getUnit())); //, null));
-//
-//                Map tXbalanceChange = new LinkedHashMap();
-//                Map<Long, Boolean> assetIsChange = new LinkedHashMap() {
-//                    {
-//                        put(FEE_KEY, true);
-//                    }
-//                };
-//
-//                for (Map.Entry<String, Map<Long, BigDecimal>> addrsMap : tXincomes.get(counter - 1).entrySet()) {
-//                    if (addresses.contains(addrsMap.getKey())) {
-//                        Map<Long, String> tXaddrBalanceChange = new LinkedHashMap();
-//
-//                        for (Map.Entry<Long, BigDecimal> assetAmount : addrsMap.getValue().entrySet()) {
-//                            tXaddrBalanceChange.put(assetAmount.getKey(), assetAmount.getValue().toPlainString());
-//                            assetIsChange.put(assetAmount.getKey(), true);
-//                        }
-//
-//                        tXbalanceChange.put(addrsMap.getKey(), tXaddrBalanceChange);
-//                    }
-//                }
-//
-//                transactionJSON.put("tXbalanceChange", tXbalanceChange);
-//
-//                Map<Long, String> tXbalance = new LinkedHashMap();
-//
-//                for (Long assetKey : assetIsChange.keySet()) {
-//                    tXbalance.put(assetKey, totalBalances.get(counter - 1).get(assetKey).toPlainString());
-//                }
-//
-//                transactionJSON.put("tXbalance", tXbalance);
-//
-//                output.put(counter, transactionJSON);
-//
-//                end = counter;
-//            }
-//
-//            counter--;
-//        }
-//
-//        if (pageStartEnd.size() == 1) {
-//            pageStartEnd.put("end", 1);
-//
-//            pagesCounter++;
-//
-//            pagesStartEnd.put(pagesCounter, new LinkedHashMap(pageStartEnd));
-//        }
-//
-//        output.put("start", start);
-//        output.put("end", end);
-//
-//        output.put("pages", pagesStartEnd);
-//
-//        return output;
     }
 
     public Map jsonQueryTrade(String query) {
@@ -4089,7 +3443,7 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryBlock(String query, int transPage) throws WrongSearchException {
+    public Map jsonQueryBlock(String query, int pageNumber) throws WrongSearchException {
 
         Map output = new LinkedHashMap();
         List<Object> all = new ArrayList<Object>();
@@ -4135,9 +3489,11 @@ public class BlockExplorer {
         }
 
         // Transactions view
-        output.put("Transactions", Transactions_JSON(null, block.getTransactions(), (transPage - 1) * 100, transPage * 100));
+        List<Transaction> transactions = (List<Transaction>) dcSet.getTransactionFinalMap().getTransactionsByBlock(block.getHeight());
+        output.put("Transactions", transactionsJSON(null, transactions,
+                (pageNumber - 1) * 100, pageNumber * 100));
         output.put("pageCount", (int) Math.ceil((block.getTransactionCount()) / 100d));
-        output.put("pageNumber", transPage);
+        output.put("pageNumber", pageNumber);
 
         int txsCount = all.size();
 

@@ -1256,36 +1256,48 @@
                 output += '<table width="1280" border=0><tr><td align=left>';
                 if (data.person_key != -10) {
 
-                    //output +='<tr><td><br><img src="data:image/gif;base64,' + data.person_Img+ '" width="100"/></td><td style ="padding-left:20px">';
-                    //	<img src="personimage?key=1" style="vertical-align: middle;">;
-                    output += '<tr><td><br><img src="personimage?key=' + data.person_key + '" width="100"/></td><td style ="padding-left:20px">';
-                    output += '<td><font size="+1">' + data.label_account + ': <a href="?addr=' + data.account + get_lang() + '">' + data.account + '</a></font>';
-                    output += '<br><a href ="?person=' + data.person_key + get_lang() + '">' + data.label_person_name + ': ' + data.Person_Name + '</a>';
+                    output += '<tr><td><br><img src="personimage?key=' +
+                        data.person_key +
+                        '" width="100"/></td><td style ="padding-left:20px">';
+                    output += '<td><font size="+1">' +
+                        data.label_account + ': <a href="?addr=' +
+                        data.account + get_lang() + '">' + data.account + '</a></font>';
+                    output += '<br><a href ="?person=' +
+                        data.person_key + get_lang() + '">' +
+                        data.label_person_name + ': ' + data.Person_Name + '</a>';
                     if ('registered' in data) {
-                        output += '<br>' + data.label_registered + ': <b>' + data.registered + '</b>, ' + data.label_certified + ': <b>' + data.certified + '</b>';
+                        output += '<br>' + data.label_registered + ': <b>' +
+                            data.registered + '</b>, ' + data.label_certified +
+                            ': <b>' + data.certified + '</b>';
                     }
                     output += '</tr>';
 
                 } else {
 
                     output += '<br><br>';
-                    output += '<font size="+1">' + data.label_account + ': <a href="?addr=' + data.account + get_lang() + '">' + data.account + '</a></font>';
+                    output += '<font size="+1">' + data.label_account +
+                        ': <a href="?addr=' + data.account + get_lang() +
+                        '">' + data.account + '</a></font>';
                 }
                 output += '</table>';
                 output += '<table width="1280" border=0><tr><td align=left>';
                 output += data.Balance.label_Balance_table + ':<br>';
-                output += '<table id="balance" id=balance BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
-                output += '<tr bgcolor="f1f1f1"><td><b>' + data.Balance.label_asset_key + '<td><b>' + data.Balance.label_asset_name + '<td><b>' + data.Balance.label_Balance_A + '<td><b>' + data.Balance.label_Balance_B + '<td><b>' + data.Balance.label_Balance_C + '</tr>';
+                output += '<table id="balance" id=balance BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
+                    ' class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
+                output += '<tr bgcolor="f1f1f1"><td><b>' + data.Balance.label_asset_key +
+                    '<td><b>' + data.Balance.label_asset_name + '<td><b>' + data.Balance.label_Balance_A +
+                    '<td><b>' + data.Balance.label_Balance_B + '<td><b>' + data.Balance.label_Balance_C + '</tr>';
                 for (key in data.Balance.balances) {
-                    output += '<tr><td><a href ="?asset=' + data.Balance.balances[key].asset_key + get_lang() + '">' + data.Balance.balances[key].asset_key + '</a>';
-                    output += '<td><a href="?asset=' + data.Balance.balances[key].asset_key + get_lang() + '">' + data.Balance.balances[key].asset_name + '</a>';
-                    output += '<td>' + data.Balance.balances[key].balance_A + '<td>' + data.Balance.balances[key].balance_B + '<td>' + data.Balance.balances[key].balance_C;
+                    output += '<tr><td><a href ="?asset=' + data.Balance.balances[key].asset_key +
+                        get_lang() + '">' + data.Balance.balances[key].asset_key + '</a>';
+                    output += '<td><a href="?asset=' + data.Balance.balances[key].asset_key +
+                        get_lang() + '">' + data.Balance.balances[key].asset_name + '</a>';
+                    output += '<td>' + data.Balance.balances[key].balance_A + '<td>' +
+                        data.Balance.balances[key].balance_B + '<td>' + data.Balance.balances[key].balance_C;
 
                 }
-
-
                 output += '</table><br><br>';
-
+                console.log("in standardAccount")
                 output += transactions_Table(data);
             }
 
