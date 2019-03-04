@@ -357,12 +357,20 @@ public class R_SendResource {
 
                     // CHECK VALIDATE MESSAGE
                     if (result != Transaction.VALIDATE_OK) {
+
                         if (result == Transaction.RECEIVER_NOT_PERSONALIZED
                                 || result == Transaction.CREATOR_NOT_PERSONALIZED
                                 || result == Transaction.NO_BALANCE
                                 || result == Transaction.NOT_ENOUGH_FEE
-                                || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT)
+                                || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT) {
+
+                            try {
+                                Thread.sleep(10);
+                            } catch (InterruptedException e) {
+                            }
+
                             continue;
+                        }
 
                         // not work in Threads - LOGGER.info("TEST1: " + OnDealClick.resultMess(result));
                         try {
