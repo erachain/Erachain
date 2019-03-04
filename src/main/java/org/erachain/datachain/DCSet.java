@@ -373,17 +373,18 @@ public class DCSet implements Observer, IDB {
         //CREATE DATABASE
         DB database = DBMaker.newFileDB(dbFile)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
-                //.cacheSize(CASH_SIZE)
 
                 //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
                 ///// добавил dcSet.clearCash(); --
-                ////.cacheDisable()
+                ///.cacheDisable()
 
+                ////// ТУТ вряд ли нужно КЭШИРОВАТь при чтении что-либо
+                //////
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
                 // у другого типа КЭША происходит утечка памяти
                 .cacheHardRefEnable()
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
-                .cacheSize(10000)
+                .cacheSize(10)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
