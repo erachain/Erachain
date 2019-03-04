@@ -293,8 +293,14 @@ public class R_SendResource {
 
         if (threadTest1 != null) {
             JSONObject out = new JSONObject();
-            out.put("delay", delay);
-            LOGGER.info("r_send/test1 DELAY UPDATE:" + delay);
+            if (delay <= 0) {
+                threadTest1 = null;
+                out.put("status", "STOP");
+                LOGGER.info("r_send/test1 STOP");
+            } else {
+                out.put("delay", delay);
+                LOGGER.info("r_send/test1 DELAY UPDATE:" + delay);
+            }
             return out.toJSONString();
         }
 
@@ -322,11 +328,7 @@ public class R_SendResource {
                 try {
 
                     if (this.test1Delay <= 0) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                        }
-                        continue;
+                        return;
                     }
 
                     if (cnt.isOnStopping())

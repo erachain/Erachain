@@ -672,8 +672,14 @@ public class TelegramsResource {
 
         if (threadTest1 != null) {
             JSONObject out = new JSONObject();
-            out.put("delay", delay);
-            LOGGER.info("telegrams/test1 DELAY UPDATE:" + delay);
+            if (delay <= 0) {
+                threadTest1 = null;
+                out.put("status", "STOP");
+                LOGGER.info("telegrams/test1 STOP");
+            } else {
+                out.put("delay", delay);
+                LOGGER.info("telegrams/test1 DELAY UPDATE:" + delay);
+            }
             return out.toJSONString();
         }
 
@@ -701,12 +707,7 @@ public class TelegramsResource {
                 try {
 
                     if (this.test1Delay <= 0) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            return;
-                        }
-                        continue;
+                        return;
                     }
 
                     if (cnt.isOnStopping())
