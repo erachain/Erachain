@@ -886,6 +886,11 @@ public class Block {
     }
 
     public void clearForHeap() {
+        if (this.transactions != null) {
+            for (Transaction transaction: this.transactions) {
+                transaction.setDC(null);
+            }
+        }
         this.transactions = null;
         this.rawTransactions = null;
         this.parentBlockHead = null;
