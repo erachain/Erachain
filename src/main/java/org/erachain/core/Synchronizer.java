@@ -391,6 +391,9 @@ public class Synchronizer {
          * peer);
          */
 
+        // освободим HEAP и память - нам не нужна она все равно
+        dcSet.clearCash();
+
         fromPeer = peer;
 
         byte[] lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();

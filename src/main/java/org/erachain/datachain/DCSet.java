@@ -374,7 +374,11 @@ public class DCSet implements Observer, IDB {
         DB database = DBMaker.newFileDB(dbFile)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 //.cacheSize(CASH_SIZE)
-                //.cacheDisable()
+
+                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
+                ///// добавил dcSet.clearCash(); --
+                ////.cacheDisable()
+
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
                 //.snapshotEnable()
@@ -1394,6 +1398,10 @@ public class DCSet implements Observer, IDB {
         }
     }
 
+    public void clearCash() {
+        this.database.getEngine().clearCache();
+    }
+
     @Override
     public void commit() {
         this.actions += 100;
@@ -1412,6 +1420,8 @@ public class DCSet implements Observer, IDB {
             return;
 
         this.addUses();
+
+        this.database.getEngine().clearCache();
 
         this.actions += size;
         if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT) {

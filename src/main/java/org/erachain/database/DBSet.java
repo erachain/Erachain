@@ -43,7 +43,11 @@ public class DBSet implements IDB {
         DATA_FILE.getParentFile().mkdirs();
 
         database = DBMaker.newFileDB(DATA_FILE)
-                //.cacheDisable()
+
+                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
+                ///// добавил dcSet.clearCash(); --
+                ///.cacheDisable()
+
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++
                 /// ICREATOR

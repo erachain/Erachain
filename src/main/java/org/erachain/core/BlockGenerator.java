@@ -587,6 +587,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     this.setMonitorStatusBefore("orphan to " + orphanto);
                     local_status = 9;
                     ctrl.setForgingStatus(ForgingStatus.FORGING_ENABLED);
+
+                    // обязательно нужно чтобы память освобождать
+                    // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
+                    // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
+                    dcSet.clearCash();
+
                     try {
                         while (bchain.getHeight(dcSet) >= this.orphanto
                             //    && bchain.getHeight(dcSet) > 157044

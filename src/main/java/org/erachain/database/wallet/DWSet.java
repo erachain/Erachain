@@ -68,7 +68,11 @@ public class DWSet implements IDB {
         this.database = DBMaker.newFileDB(WALLET_FILE)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 //.cacheSize(2048)
-                //.cacheDisable()
+
+                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
+                ///// добавил dcSet.clearCash(); --
+                ////.cacheDisable()
+
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++
                 /// ICREATOR
@@ -360,9 +364,14 @@ public class DWSet implements IDB {
 
     }
 
+    public void clearCash() {
+        this.database.getEngine().clearCache();
+    }
+
     @Override
     public void commit() {
         this.uses++;
+        this.database.getEngine().clearCache();
         this.database.commit();
         this.uses--;
 
