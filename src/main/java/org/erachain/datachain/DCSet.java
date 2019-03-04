@@ -379,6 +379,11 @@ public class DCSet implements Observer, IDB {
                 ///// добавил dcSet.clearCash(); --
                 ////.cacheDisable()
 
+                // это чистит сама память если соталось 25% от кучи - так что она безопасная
+                .cacheHardRefEnable()
+                // количество точек в таблице которые хранятся в HashMap как в КЭШе
+                .cacheSize(10000)
+
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
                 //.snapshotEnable()

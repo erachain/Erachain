@@ -885,25 +885,6 @@ public class Block {
             this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), transactions, null);
     }
 
-    public void clearForHeap() {
-        if (this.transactions != null) {
-            for (Transaction transaction: this.transactions) {
-                transaction.setDC(null);
-            }
-        }
-        this.transactions = null;
-        this.rawTransactions = null;
-        this.parentBlockHead = null;
-        this.blockHead = null;
-        this.creator = null;
-        this.txCalculated = null;
-        this.forgingInfoUpdate = null;
-        this.atBytes = null;
-        this.reference = null;
-        this.signature = null;
-        this.transactionsHash = null;
-    }
-
 	/*
 	public int getTransactionIndex(byte[] signature)
 	{
