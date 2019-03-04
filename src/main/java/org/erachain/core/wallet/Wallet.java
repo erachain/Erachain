@@ -610,7 +610,7 @@ public class Wallet extends Observable implements Observer {
 				}
 
                 // NEED FOR CLEAR HEAP
-				//block.clearForHeap(); - не нужно теперь если мы чистим КЭШ
+				//block.clearForHeap(); - не нужно теперь если мы чистим КЭШ в dcSet.clearCash();
                 //block = null;
 
                 if (Controller.getInstance().needUpToDate() || !Controller.getInstance().isStatusWaiting())
