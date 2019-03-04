@@ -380,6 +380,7 @@ public class DCSet implements Observer, IDB {
                 ////.cacheDisable()
 
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
+                // у другого типа КЭША происходит утечка памяти
                 .cacheHardRefEnable()
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 .cacheSize(10000)
