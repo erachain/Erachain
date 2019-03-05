@@ -118,7 +118,7 @@ jar {
 sourceSets {
     main {
         java {
-            srcDir 'src/main/'
+            srcDir 'src/main/java'
         }
     }
 
