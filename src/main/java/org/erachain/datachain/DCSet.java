@@ -30,9 +30,6 @@ public class DCSet implements Observer, IDB {
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_BYTE << 3;
     private static final int CASH_SIZE = BlockChain.HARD_WORK ? 1024 << 2 : 1024;
 
-    private static final String TX_COUNTER = "tx_counter";
-    private static final String UNC_TX_COUNTER = "unc_tx_counter";
-
     private static boolean isStoped = false;
     private static DCSet instance;
     private DCSet parent;
@@ -383,8 +380,12 @@ public class DCSet implements Observer, IDB {
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
                 // у другого типа КЭША происходит утечка памяти
                 .cacheHardRefEnable()
+                //.cacheSoftRefEnable()
+                ///.cacheLRUEnable()
+                ///.cacheWeakRefEnable()
+
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
-                .cacheSize(10)
+                .cacheSize(100)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
@@ -417,12 +418,6 @@ public class DCSet implements Observer, IDB {
         if (instance.actions < 0) {
             dbFile.delete();
             throw new Exception("error in DATACHAIN:" + instance.actions);
-        }
-
-        // INIT COUNTERS
-        if (instance.database.getAtomicLong(TX_COUNTER) == null) {
-            instance.database.getAtomicLong(TX_COUNTER).set(0);
-            instance.database.getAtomicLong(UNC_TX_COUNTER).set(0);
         }
 
     }
@@ -506,58 +501,6 @@ public class DCSet implements Observer, IDB {
     @Override
     public void openDBSet() {
 
-    }
-
-    /**
-     * сколько всего транзакций в цепочке
-     * TODO: это лишнее сейчас так как счетчик встроен ФиналМап
-     *
-     * @param offset
-     */
-    public void updateTxCounter(long offset) {
-        if (parent == null && offset != 0l) {
-            this.uses++;
-            this.database.getAtomicLong(TX_COUNTER).set(this.database.getAtomicLong(TX_COUNTER).get() + offset);
-            this.uses--;
-        }
-    }
-
-    public long getTxCounter() {
-        if (true) {
-            return this.transactionFinalMap.size();
-
-        } else {
-            long u = this.database.getAtomicLong(TX_COUNTER).longValue();
-            return u;
-        }
-    }
-
-
-    /**
-     * сколько всего транзакций в ожидании
-     * TODO: это лишнее сейчас так как счетчик встроен ФиналМап
-     *
-     * @param offset
-     */
-    public void updateUncTxCounter(int offset) {
-        if (parent == null && offset != 0) {
-            this.uses++;
-            this.database.getAtomicLong(UNC_TX_COUNTER).set(this.database.getAtomicLong(UNC_TX_COUNTER).get() + offset);
-            this.uses--;
-        }
-    }
-
-    public long getUncTxCounter() {
-        long u = this.database.getAtomicLong(UNC_TX_COUNTER).longValue();
-        return u;
-    }
-
-    public void setUncTxCounter(int value) {
-        if (parent == null) {
-            this.uses++;
-            this.database.getAtomicLong(UNC_TX_COUNTER).set(value);
-            this.uses--;
-        }
     }
 
     /**
