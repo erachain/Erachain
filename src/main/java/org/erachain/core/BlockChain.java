@@ -640,7 +640,7 @@ public class BlockChain {
         else
             win_value = forgingBalance;
 
-        if (!Controller.getInstance().isTestNet() || DEVELOP_USE)
+        if (Controller.getInstance().isTestNet() || DEVELOP_USE)
             return win_value;
 
         if (false) {
