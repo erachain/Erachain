@@ -477,7 +477,7 @@ public class CreateOrderTransaction extends Transaction {
         // VALID if want to BY COMPU by ERA
         else if (wantKey == FEE_KEY && haveKey == RIGHTS_KEY
                 && amountHave.compareTo(BigDecimal.ONE) >= 0 // минимально меняем 1 ЭРА
-                && this.creator.getBalance(this.dcSet, RIGHTS_KEY).a.b.compareTo(amountHave) >= 0 // ЭРА есть на счету
+                && (height < 222047 || this.creator.getBalance(this.dcSet, RIGHTS_KEY).a.b.compareTo(amountHave) >= 0) // ЭРА есть на счету
                 && this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.FEE_MIN_1) > 0) { // на балансе компушки не минус
             flags = flags | NOT_VALIDATE_FLAG_FEE;
         } else {
