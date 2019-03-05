@@ -32,6 +32,12 @@ public class TelegramSet implements IDB {
         this.database = DBMaker.newFileDB(dbFile)
                 // .cacheSize(2048)
                 // .cacheDisable()
+
+                // это чистит сама память если соталось 25% от кучи - так что она безопасная
+                .cacheHardRefEnable()
+                // количество точек в таблице которые хранятся в HashMap как в КЭШе
+                .cacheSize(1000)
+
                 .checksumEnable()
                 .mmapFileEnableIfSupported()
 

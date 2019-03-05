@@ -293,8 +293,14 @@ public class R_SendResource {
 
         if (threadTest1 != null) {
             JSONObject out = new JSONObject();
-            out.put("delay", delay);
-            LOGGER.info("r_send/test1 DELAY UPDATE:" + delay);
+            if (delay <= 0) {
+                threadTest1 = null;
+                out.put("status", "STOP");
+                LOGGER.info("r_send/test1 STOP");
+            } else {
+                out.put("delay", delay);
+                LOGGER.info("r_send/test1 DELAY UPDATE:" + delay);
+            }
             return out.toJSONString();
         }
 
@@ -322,11 +328,7 @@ public class R_SendResource {
                 try {
 
                     if (this.test1Delay <= 0) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                        }
-                        continue;
+                        return;
                     }
 
                     if (cnt.isOnStopping())
@@ -349,15 +351,26 @@ public class R_SendResource {
                         return;
 
                     Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+                    // CLEAR for HEAP
+                    transaction.setDC(null);
+
 
                     // CHECK VALIDATE MESSAGE
                     if (result != Transaction.VALIDATE_OK) {
+
                         if (result == Transaction.RECEIVER_NOT_PERSONALIZED
                                 || result == Transaction.CREATOR_NOT_PERSONALIZED
                                 || result == Transaction.NO_BALANCE
                                 || result == Transaction.NOT_ENOUGH_FEE
-                                || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT)
+                                || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT) {
+
+                            try {
+                                Thread.sleep(10);
+                            } catch (InterruptedException e) {
+                            }
+
                             continue;
+                        }
 
                         // not work in Threads - LOGGER.info("TEST1: " + OnDealClick.resultMess(result));
                         try {
@@ -383,6 +396,7 @@ public class R_SendResource {
         });
 
         threadTest1.start();
+        threadTest1.setName("R_Send.Test1");
 
         out.put("delay", test1Delay);
         LOGGER.info("r_send/test1 STARTED for delay: " + test1Delay);

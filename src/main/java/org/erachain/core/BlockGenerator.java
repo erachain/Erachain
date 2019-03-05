@@ -465,7 +465,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     }
 
     public void addObserver() {
-        new Thread() {
+        new Thread("try syncForgingStatus") {
             @Override
             public void run() {
 
@@ -527,15 +527,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         long transactionMakeTimingCounter = 0;
         long transactionMakeTimingAverage = 0;
 
-        Peer peer = null;
-        Tuple3<Integer, Long, Peer> maxPeer;
-        SignaturesMessage response;
         long timeToPing = 0;
         long timeTmp;
         long timePoint = 0;
         long timePointForGenerate = 0;
         long flushPoint = 0;
-        Block waitWin = null;
         long timeUpdate = 0;
         int shift_height = 0;
         //byte[] unconfirmedTransactionsHash;
@@ -548,8 +544,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         int targetedWinValue;
         long winned_winValue;
         long previousTarget = bchain.getTarget(dcSet);
-        Block generatedBlock;
-        Block solvingBlock;
 
         int wait_new_block_broadcast;
         long wait_step;
@@ -558,6 +552,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         this.initMonitor();
 
         while (!ctrl.isOnStopping()) {
+
+            Block waitWin = null;
+            Block generatedBlock;
+            Block solvingBlock;
+            Peer peer = null;
+            Tuple3<Integer, Long, Peer> maxPeer;
+            SignaturesMessage response;
 
             try {
                 Thread.sleep(1000);
@@ -586,6 +587,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     this.setMonitorStatusBefore("orphan to " + orphanto);
                     local_status = 9;
                     ctrl.setForgingStatus(ForgingStatus.FORGING_ENABLED);
+
+                    // обязательно нужно чтобы память освобождать
+                    // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
+                    // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
+                    dcSet.clearCash();
+
                     try {
                         while (bchain.getHeight(dcSet) >= this.orphanto
                             //    && bchain.getHeight(dcSet) > 157044
@@ -970,11 +977,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 local_status = -1;
                                 return;
                             }
-                            // if FLUSH out of memory
-                            bchain.clearWaitWinBuffer();
                             LOGGER.error(e.getMessage(), e);
                         }
 
+                        bchain.clearWaitWinBuffer();
 
                         if (needRemoveInvalids != null) {
                             clearInvalids();
@@ -982,8 +988,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             checkForRemove(timePointForGenerate);
                             clearInvalids();
                         }
-
                     }
+
+                    continue;
                 }
 
                 ////////////////////////// UPDATE ////////////////////

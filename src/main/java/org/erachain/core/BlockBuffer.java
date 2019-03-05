@@ -65,7 +65,7 @@ public class BlockBuffer extends Thread {
         this.blocks.put(signature, blockingQueue);
 
         //LOAD BLOCK IN THREAD
-        new Thread() {
+        new Thread("loadBlock") {
             public void run() {
                 //CREATE MESSAGE
                 Message message = MessageFactory.getInstance().createGetBlockMessage(signature);

@@ -43,7 +43,19 @@ public class DBSet implements IDB {
         DATA_FILE.getParentFile().mkdirs();
 
         database = DBMaker.newFileDB(DATA_FILE)
-                //.cacheDisable()
+
+                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
+                ///// добавил dcSet.clearCash(); --
+                ///.cacheDisable()
+
+                // это чистит сама память если соталось 25% от кучи - так что она безопасная
+                ///.cacheHardRefEnable()
+                .cacheSoftRefEnable()
+                ///.cacheLRUEnable()
+                ///.cacheWeakRefEnable()
+                // количество точек в таблице которые хранятся в HashMap как в КЭШе
+                .cacheSize(1000)
+
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++
                 /// ICREATOR

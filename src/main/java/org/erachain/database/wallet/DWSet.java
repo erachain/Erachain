@@ -29,6 +29,9 @@ public class DWSet implements IDB {
     private DB database;
     private int uses;
 
+    private Var<Long> licenseKeyVar;
+    private Long licenseKey;
+
     private AccountMap accountMap;
     private AccountsPropertisMap accountsPropertisMap;
     private TransactionMap transactionMap;
@@ -68,20 +71,38 @@ public class DWSet implements IDB {
         this.database = DBMaker.newFileDB(WALLET_FILE)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 //.cacheSize(2048)
-                //.cacheDisable()
+
+                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
+                ///// добавил dcSet.clearCash(); --
+                ///.cacheDisable()
+
+                // это чистит сама память если соталось 25% от кучи - так что она безопасная
+                // у другого типа КЭША происходит утечка памяти
+                ///.cacheHardRefEnable()
+                .cacheSoftRefEnable()
+                ///.cacheLRUEnable()
+                ///.cacheWeakRefEnable()
+                // количество точек в таблице которые хранятся в HashMap как в КЭШе
+                .cacheSize(1000)
+
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++
                 /// ICREATOR
                 .commitFileSyncDisable() // ++
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(3) // не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
 
                 .make();
 
         uses = 0;
+
+        // LICENCE SIGNED
+        this.licenseKeyVar = database.getAtomicVar("licenseKey");
+        this.licenseKey = this.licenseKeyVar.get();
+
 
         this.accountMap = new AccountMap(this, this.database);
         this.accountsPropertisMap = new AccountsPropertisMap(this, this.database);
@@ -119,6 +140,17 @@ public class DWSet implements IDB {
         int u = this.database.getAtomicInteger(VERSION).intValue();
         this.uses--;
         return u;
+    }
+
+    public Long getLicenseKey() {
+        return this.licenseKey;
+    }
+
+    public void setLicenseKey(Long key) {
+
+        this.licenseKey = key;
+        this.licenseKeyVar.set(this.licenseKey);
+
     }
 
     public void setVersion(int version) {
@@ -360,9 +392,14 @@ public class DWSet implements IDB {
 
     }
 
+    public void clearCash() {
+        this.database.getEngine().clearCache();
+    }
+
     @Override
     public void commit() {
         this.uses++;
+        this.database.getEngine().clearCache();
         this.database.commit();
         this.uses--;
 

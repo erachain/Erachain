@@ -20,6 +20,7 @@ import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
 import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.SecureWalletDatabase;
+import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -192,6 +193,7 @@ public class Wallet extends Observable implements Observer {
 		return this.secureDatabase.getAccountSeedMap().getPrivateKeyAccount(address);
 	}
 
+	/*
 	public PublicKeyAccount getPublicKeyAccount(String address) {
 		if (this.database == null) {
 			return null;
@@ -199,6 +201,7 @@ public class Wallet extends Observable implements Observer {
 
 		return this.database.getAccountMap().getPublicKeyAccount(address);
 	}
+	*/
 
 	public boolean exists() {
 		if (Controller.getInstance().noUseWallet)
@@ -545,7 +548,7 @@ public class Wallet extends Observable implements Observer {
 	public synchronized void synchronizeBody(boolean reset) {
 		DCSet dcSet = DCSet.getInstance();
 
-		Block block;
+		Block blockStart;
 		int height;
         synchronizeBodyStop = false;
 
@@ -568,64 +571,71 @@ public class Wallet extends Observable implements Observer {
 
 
 			// REPROCESS BLOCKS
-			block = new GenesisBlock();
-			this.database.setLastBlockSignature(block.getReference());
+            blockStart = new GenesisBlock();
+			this.database.setLastBlockSignature(blockStart.getReference());
 			height = 1;
 
         } else {
 
             byte[] lastSignature = this.database.getLastBlockSignature();
-            block = dcSet.getBlockSignsMap().getBlock(lastSignature);
+            blockStart = dcSet.getBlockSignsMap().getBlock(lastSignature);
 
-            if (block == null) {
+            if (blockStart == null) {
                 // выходим и потом пересинхронизируемся с начала
                 return;
             }
         }
 
-        height = block.getHeight();
+        height = blockStart.getHeight();
 		int steepHeight = dcSet.getBlockMap().size() / 100;
 		int lastHeight = 0;
 
 		long timePoint = System.currentTimeMillis();
+		BlockMap blockMap = dcSet.getBlockMap();
 
 		try {
 			do {
 
-				// UPDATE
-				// this.update(this, new
-				// ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE,
-				// block));
-                block = dcSet.getBlockMap().get(height);
+                Block block = blockMap.get(height);
 
                 if (block == null) {
                     break;
                 }
 
                 try {
-                    this.processBlock(block);
+                    this.processBlock(dcSet, block);
 				} catch (java.lang.OutOfMemoryError e) {
 					Controller.getInstance().stopAll(44);
 					return;
 				}
 
                 // NEED FOR CLEAR HEAP
-                block = null;
+				//block.clearForHeap(); - не нужно теперь если мы чистим КЭШ в dcSet.clearCash();
+                //block = null;
 
-				if (System.currentTimeMillis() - timePoint > 10000
+                if (Controller.getInstance().needUpToDate() || !Controller.getInstance().isStatusWaiting())
+                    // если идет синхронизация цепочки - кошелек не синхронизируем
+                    break;
+
+                if (System.currentTimeMillis() - timePoint > 10000
 						|| steepHeight < height - lastHeight) {
-
-                    if (Controller.getInstance().needUpToDate() || !Controller.getInstance().isStatusWaiting())
-						// если идет синхронизация цепочки - кошелек не синхронизируем
-						break;
 
 					timePoint = System.currentTimeMillis();
 					lastHeight = height;
 
                     this.syncHeight = height;
 					Controller.getInstance().walletSyncStatusUpdate(height);
+
                     this.database.commit();
-                    //System.gc();
+
+                    // обязательно нужно чтобы память освобождать
+                    // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
+                    // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
+                    // БЕЗ очистки КЭША HEAP забивается под завязку
+					dcSet.clearCash();
+
+					// не нужно - Ява сама норм делает вызов очистки
+					//System.gc();
 
                 }
 
@@ -648,7 +658,15 @@ public class Wallet extends Observable implements Observer {
             this.syncHeight = height;
             Controller.getInstance().walletSyncStatusUpdate(height);
 			Controller.getInstance().setProcessingWalletSynchronize(false);
+
+			// обязательно нужно чтобы память освобождать
+			// и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
+			// при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызывают
+            // вдобавое отчищает полностью память - много свободной памяти получаем
+			dcSet.clearCash();
+
 			this.database.commit();
+
             System.gc();
 
 		}
@@ -1163,7 +1181,7 @@ public class Wallet extends Observable implements Observer {
 
 	private long processBlockLogged = 0;
 
-    private void processBlock(Block block) {
+    private void processBlock(DCSet dcSet, Block block) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1177,7 +1195,6 @@ public class Wallet extends Observable implements Observer {
         Account blockGenerator = block.blockHead.creator;
 		String blockGeneratorStr = blockGenerator.getAddress();
 
-		DCSet dcSet = DCSet.getInstance();
         int height = block.blockHead.heightBlock;
 
 		// CHECK IF WE ARE GENERATOR
@@ -1208,7 +1225,7 @@ public class Wallet extends Observable implements Observer {
 
 			// SKIP PAYMENT TRANSACTIONS
 			if (transaction instanceof R_Send) {
-				continue;
+				;
 			}
 
 			// CHECK IF NAME REGISTRATION
@@ -1854,7 +1871,7 @@ public class Wallet extends Observable implements Observer {
 			}
 
 			// CHECK BLOCK
-			this.processBlock(block);
+			this.processBlock(DCSet.getInstance(), block);
 
 		} else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
 		{
@@ -2013,15 +2030,15 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	public long getLicenseKey() {
-		if (this.database == null || this.database.getAccountMap().getLicenseKey() == null) {
+		if (this.database == null || this.database.getLicenseKey() == null) {
 			return 2l;
 		}
 
-		return this.database.getAccountMap().getLicenseKey();
+		return this.database.getLicenseKey();
 	}
 
 	public void setLicenseKey(long key) {
-		this.database.getAccountMap().setLicenseKey(key);
+		this.database.setLicenseKey(key);
 	}
 
 	public Integer loadFromDir() {

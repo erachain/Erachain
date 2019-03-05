@@ -27,8 +27,6 @@ public class AccountMap extends Observable {
     private Map<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalanceMap;
     private Set<byte[]> publickKeys;
 
-    private Var<Long> licenseKeyVar;
-    private Long licenseKey;
     // nom account from create. if <0 - not show
     private Map<String, Integer> acountsNoMap;
 
@@ -46,10 +44,6 @@ public class AccountMap extends Observable {
 
         this.assetsBalanceMap = database.getTreeMap(ADDRESS_ASSETS);
         this.acountsNoMap = database.getTreeMap(ADDRESSES_NO);
-
-        // LICENCE SIGNED
-        this.licenseKeyVar = database.getAtomicVar("licenseKey");
-        this.licenseKey = this.licenseKeyVar.get();
 
     }
 
@@ -73,17 +67,6 @@ public class AccountMap extends Observable {
 		}
 	}
 	 */
-
-    public Long getLicenseKey() {
-        return this.licenseKey;
-    }
-
-    public void setLicenseKey(Long key) {
-
-        this.licenseKey = key;
-        this.licenseKeyVar.set(this.licenseKey);
-
-    }
 
     public List<Account> getAccounts() {
 
