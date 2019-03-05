@@ -219,8 +219,7 @@ public class BlockExplorer {
         } else if (info.getQueryParameters().containsKey("blocks")) {
 
 //            output.put("search", "block");
-            output.putAll(jsonQueryBlocks(pageNumber, start, txOnPage, filter,
-                    allOnOnePage, showOnly, showWithout));
+            output.putAll(jsonQueryBlocks(pageNumber));
             //peers
         } else if (info.getQueryParameters().containsKey("peers")) {
             output.putAll(jsonQueryPeers(info));
@@ -1460,20 +1459,11 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryBlocks(int transPage, int start, int txOnPage, String filter, boolean allOnOnePage, String showOnly, String showWithout) {
-        Block block = null;
-        if (start > 0) {
-            block = Controller.getInstance().getBlockByHeight(start);
-        }
-
-        if (block == null) {
-            block = getLastBlock();
-            start = block.getHeight();
-        }
+    public Map jsonQueryBlocks(int pageNumber) {
 
         Map output = new LinkedHashMap();
 
-        output.put("maxHeight", block.getHeight());
+        output.put("maxHeight", getLastBlock().getHeight());
 
         output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
         output.put("totaltransactions", dcSet.getTransactionFinalMap().size());
@@ -1495,14 +1485,44 @@ public class BlockExplorer {
         output.put("Label_Previous", Lang.getInstance().translate_from_langObj("Previous", langObj));
 
 
-        putLastCountBlocksInOutput(start, block, output, 300);
 
-        output.put("pageCount", (int) Math.ceil((dcSet.getBlockMap().size()) / 100d));
-        output.put("pageNumber", transPage);
+
+        List<Block> blocks = new ArrayList<>(dcSet.getBlockMap().getValues());
+
+
+        int numberOfRepresentsItemsOnPage = 20;
+        blocksJSON(blocks, output, (pageNumber - 1) * numberOfRepresentsItemsOnPage, pageNumber * numberOfRepresentsItemsOnPage);
+
+//        putLastCountBlocksInOutput(start, block, output, 300);
+
+        output.put("pageCount", (int) Math.ceil((blocks.size()) / 100d));
+        output.put("pageNumber", pageNumber);
 
 
         return output;
     }
+
+    public void blocksJSON(List<Block> blocks, Map output, int fromIndex, int toIndex) {
+        List<Block> blocksList = (toIndex == 0) ? blocks
+                : blocks.subList(fromIndex, Math.min(toIndex, blocks.size()));
+        for (Block block : blocksList) {
+            Map blockJSON = new LinkedHashMap();
+            blockJSON.put("height", block.getHeight());
+            blockJSON.put("signature", Base58.encode(block.getSignature()));
+            blockJSON.put("generator", block.getCreator().getAddress());
+            blockJSON.put("generatingBalance", block.getForgingValue());
+            blockJSON.put("target", block.getTarget());
+            blockJSON.put("winValue", block.getWinValue());
+            blockJSON.put("winValueTargetted", block.calcWinValueTargeted() - 100000);
+            blockJSON.put("transactionsCount", block.getTransactionCount());
+            blockJSON.put("timestamp", block.getTimestamp());
+            blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
+//            blockJSON.put("totalFee", block.viewFeeAsBigDecimal());
+            blockJSON.put("totalFee", "1");
+            output.put(block.getHeight(), blockJSON);
+        }
+    }
+
 
     private void putLastCountBlocksInOutput(int lastNumber, Block initialBlock, Map output, int count) {
         int i = lastNumber;
@@ -3489,8 +3509,7 @@ public class BlockExplorer {
         }
 
         // Transactions view
-        List<Transaction> transactions = (List<Transaction>) dcSet.getTransactionFinalMap().getTransactionsByBlock(block.getHeight());
-        output.put("Transactions", transactionsJSON(null, transactions,
+        output.put("Transactions", transactionsJSON(null, block.getTransactions(),
                 (pageNumber - 1) * 100, pageNumber * 100));
         output.put("pageCount", (int) Math.ceil((block.getTransactionCount()) / 100d));
         output.put("pageNumber", pageNumber);

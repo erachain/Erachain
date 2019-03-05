@@ -17,6 +17,7 @@
     <script src="/index/libs/js/third-party/qrcode.min.js"></script>
     <link href="/index/libs/css/sidebar.css" rel="stylesheet">
     <script src="/index/libs/js/Base58.js" charset="utf-8"></script>
+    
     <style type="text/css">
         body {
             padding-top: 50px;
@@ -194,7 +195,8 @@
         function asyncAjax(url, type) {
             var xmlhttp = getXmlHttp()
             xmlhttp.open('GET', url, true);
-
+            console.log("url=")
+            console.log(url)
             loading = true;
             setTimeout(function () {
                 if (loading) {
@@ -299,6 +301,7 @@
                                     document.getElementById('main').innerHTML = status(data);
                                 }
                                 if (type == 'block') {
+                                    console.log("in search if before block")
                                     document.getElementById('main').innerHTML = block(data);
                                 }
                             }
@@ -448,25 +451,39 @@
 
         function blocks(data) {
             var output = '';
-
+            console.log("blocks data = ")
+            console.log(data)
             if (data.hasOwnProperty('error')) {
                 return '<h2>' + data.error + '</h2>';
             }
+            output += pagesComponentBeauty(data);
 
             output += lastBlock(data.lastBlock);
 
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
             output += '<tr><td align=left>';
-            output += '<table id=blocks_Transactions BORDER=0 cellpadding=15 cellspacing=0 width="1180" ><tr><td><a href=?unconfirmed' + get_lang() + '>' + data.Label_Unconfirmed_transactions + ': ' + data.unconfirmedTxs + '</a>';
+            output += '<table id=blocks_Transactions BORDER=0 cellpadding=15 cellspacing=0 width="1180" >' +
+                '<tr><td><a href=?unconfirmed' + get_lang() + '>' + data.Label_Unconfirmed_transactions
+                + ': ' + data.unconfirmedTxs + '</a>';
             output += '<td align="right">' + data.Label_total_transactions + ': ' + data.totaltransactions + "</table>";
-            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
-            output += '<tr><td><b>' + data.Label_Height + ' <td><b>' + data.Label_Time + '<td><b>' + data.Label_Generator + '<td><b>' + data.Label_TXs + '<td><b>' + data.Label_Fee + '<td><b>' + data.Label_Target + '<td><b>' + data.Label_Gen_balance + '<td><b>WV dtWV';
+            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  ' +
+                'class="table table-striped" style="border: 1px solid #ddd;">';
+            output += '<tr><td><b>' + data.Label_Height + ' <td><b>' + data.Label_Time
+                + '<td><b>' + data.Label_Generator + '<td><b>' + data.Label_TXs + '<td><b>'
+                + data.Label_Fee + '<td><b>' + data.Label_Target + '<td><b>' + data.Label_Gen_balance + '<td><b>WV dtWV';
 
             minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
             for (var i = data.maxHeight; i >= minHeight; i--) {
                 output += '<tr>';
-                output += '<td><a href=?block=' + i + get_lang() + '>' + i + '</a><td>' + data[i].dateTime + '<td>' + '<a href=?addr=' + data[i].generator + get_lang() + '>' + data[i].generator;
-                output += '<td>' + data[i].transactionsCount + '<td>' + addCommas(data[i].totalFee) + '<td>' + addCommas(data[i].target);
+                console.log("i=")
+                console.log(i)
+                console.log("dateTime")
+                console.log(data[i].dateTime)
+                output += '<td><a href=?block=' + i + get_lang() + '>' + i + '</a><td>'
+                    + data[i].dateTime + '<td>' + '<a href=?addr=' + data[i].generator
+                    + get_lang() + '>' + data[i].generator;
+                output += '<td>' + data[i].transactionsCount + '<td>' +
+                    addCommas(data[i].totalFee) + '<td>' + addCommas(data[i].target);
                 output += '<td>' + addCommas(data[i].generatingBalance)
                     + '<td>' + addCommas(data[i].winValue) + ' ' + addCommas(data[i].winValueTargetted);
             }
@@ -485,7 +502,7 @@
             if (minHeight > 1) {
                 output += '<a href=?startBlock=' + (data.maxHeight - 21) + get_lang() + '>' + data.Label_Previous;
             }
-
+            output += pagesComponentBeauty(data);
             return output;
         }
 
@@ -1202,7 +1219,7 @@
         }
 
         function mainQuery(data) {
-
+            console.log("mainQuery in")
             var output = '';
             var transactionTypes = ["", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Asset Issue", "Asset Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message",
                 "", ""];
@@ -1302,6 +1319,7 @@
             }
 
             if (data.type == 'block') {
+                console.log("in if before in block")
                 return output + block(data);
             }
 
@@ -2811,6 +2829,7 @@
         }
 
         function block(data) {
+            console.log("in block")
             var output = '';
             url = '?block=' + data.blockHeight;
             urlstart = url;
@@ -2875,7 +2894,7 @@
                 output += '<br><br>';
             }
             output += transactions_Table(data);
-
+            console.log("output=")
             return output;
         }
 
@@ -3335,6 +3354,17 @@
             document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value) + get_lang() + '&search=' + par;
         }
 
+        function receiveNumberPage() {
+            var page;
+            if (params.hasOwnProperty('page') && isFinite(params['page'])) {
+                page = params['page'];
+            }
+            else {
+                page = 1;
+            }
+            return page;
+        }
+
         function start() {
 
             params = parseUrlQuery();
@@ -3367,6 +3397,7 @@
 
 
             var title = 'Erachain BlockExplorer';
+            var page = receiveNumberPage();
 
 
             if (params.hasOwnProperty('aTs')) {
@@ -3442,13 +3473,13 @@
             }
 
             if (params.hasOwnProperty('addr')) {
-                var page;
-                if (params.hasOwnProperty('page') && isFinite(params['page'])) {
-                    page = params['page'];
-                }
-                else {
-                    page = 1;
-                }
+                // var page;
+                // if (params.hasOwnProperty('page') && isFinite(params['page'])) {
+                //     page = params['page'];
+                // }
+                // else {
+                //     page = 1;
+                // }
 
                 if (params.hasOwnProperty('start') && isFinite(params['start'])) {
                     start = params['start'];
@@ -3617,14 +3648,9 @@
 
 
             if (params.hasOwnProperty('block')) {
-                var page;
-                if (params.hasOwnProperty('page') && isFinite(params['page'])) {
-                    page = params['page'];
-                }
-                else {
-                    page = 1;
-                }
-
+                console.log("page=")
+                console.log(page)
+                console.log("before receiving json")
                 asyncAjax('blockexplorer.json?block=' + params['block'] + '&lang=' + params['lang'] + '&page=' + page, 'mainQuery');
 
                 document.title = title + ' - Block - ' + params['block'];
@@ -3656,8 +3682,11 @@
                 if (params['search'] == 'asset' || params['search'] == 'assets') ss = 'assets';
                 if (params['search'] == 'status' || params['search'] == 'statuses') ss = 'statuses';
                 if (params['search'] == 'block' || params['search'] == 'blocks') ss = 'block';
-
-                asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] + '&search=' + params['search'], ss);
+                console.log("I find all problems!!!")
+                console.log("page=")
+                console.log(page)
+                asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
+                    '&search=' + params['search'] + '&page=' + page, ss);
 
                 document.title = title + ' - Search - ' + decodeURIComponent(params['q']);
                 document.getElementById('q').value = decodeURIComponent(params['q']);
@@ -3717,7 +3746,7 @@
                 return;
             }
 
-            asyncAjax('blockexplorer.json?blocks' + '&lang=' + params['lang'], 'blocks');
+            asyncAjax('blockexplorer.json?blocks' + '&lang=' + params['lang'] + '&page=' + page, 'blocks');
 
             document.title = title;
 
