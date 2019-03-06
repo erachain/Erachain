@@ -32,7 +32,7 @@ public class TelegramManager extends Thread {
     /**
      * time to live telegram
      */
-    private static final int KEEP_TIME = 60000 * 60 * (BlockChain.HARD_WORK ? 2 : 8);
+    private static final int KEEP_TIME = 60000 * 60 * (BlockChain.HARD_WORK ? 2 : 24);
     static Logger LOGGER = LoggerFactory.getLogger(TelegramManager.class.getName());
     private Network network;
     private boolean run;
