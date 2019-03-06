@@ -535,17 +535,18 @@ public class Wallet extends Observable implements Observer {
 	public void update_account_assets() {
 		List<Tuple2<Account, Long>> accounts_assets = this.getAccountsAssets();
 
-		synchronized (accounts_assets) {
-			for (Tuple2<Account, Long> account_asset : accounts_assets) {
-				this.database.getAccountMap().changeBalance(account_asset.a.getAddress(), false, account_asset.b,
-						BigDecimal.ZERO);
-			}
-		}
+        for (Tuple2<Account, Long> account_asset : accounts_assets) {
+            this.database.getAccountMap().changeBalance(account_asset.a.getAddress(), false, account_asset.b,
+                    BigDecimal.ZERO);
+        }
 
 	}
 
 	boolean synchronizeBodyStop;
-	public synchronized void synchronizeBody(boolean reset) {
+	public void synchronizeBody(boolean reset) {
+	    if (!synchronizeBodyStop)
+	        return;
+
 		DCSet dcSet = DCSet.getInstance();
 
 		Block blockStart;

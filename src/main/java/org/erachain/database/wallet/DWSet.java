@@ -78,9 +78,9 @@ public class DWSet implements IDB {
 
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
                 // у другого типа КЭША происходит утечка памяти
-                ///.cacheHardRefEnable()
-                .cacheSoftRefEnable()
-                ///.cacheLRUEnable()
+                //.cacheHardRefEnable()
+                //.cacheSoftRefEnable()
+                .cacheLRUEnable()
                 ///.cacheWeakRefEnable()
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 .cacheSize(1000)

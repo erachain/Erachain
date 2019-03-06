@@ -49,9 +49,8 @@ public class DBSet implements IDB {
                 ///.cacheDisable()
 
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
-                ///.cacheHardRefEnable()
-                .cacheSoftRefEnable()
-                ///.cacheLRUEnable()
+                ///.cacheSoftRefEnable()
+                .cacheLRUEnable()
                 ///.cacheWeakRefEnable()
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 .cacheSize(1000)
