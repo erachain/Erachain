@@ -379,7 +379,7 @@ public class DCSet implements Observer, IDB {
                 //////
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
                 // у другого типа КЭША происходит утечка памяти
-                //.cacheHardRefEnable()
+                .cacheHardRefEnable()
                 //.cacheSoftRefEnable()
                 //.cacheLRUEnable()
                 ///.cacheWeakRefEnable()
