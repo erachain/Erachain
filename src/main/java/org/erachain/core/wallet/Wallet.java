@@ -556,8 +556,8 @@ public class Wallet extends Observable implements Observer {
 			LOGGER.info("   >>>>  Resetted maps");
 
             // SAVE transactions file
-            this.database.commit();
             this.database.clearCash();
+            this.database.commit();
 
             // RESET MAPS
 			this.database.getTransactionMap().reset();
@@ -591,8 +591,8 @@ public class Wallet extends Observable implements Observer {
         }
 
         // SAVE transactions file
-        this.database.commit();
         this.database.clearCash();
+        this.database.commit();
 
         height = blockStart.getHeight();
 		int steepHeight = dcSet.getBlockMap().size() / 100;
@@ -636,8 +636,8 @@ public class Wallet extends Observable implements Observer {
                     this.syncHeight = height;
 					Controller.getInstance().walletSyncStatusUpdate(height);
 
-                    this.database.commit();
                     this.database.clearCash();
+                    this.database.commit();
 
                     // обязательно нужно чтобы память освобождать
                     // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
@@ -676,8 +676,8 @@ public class Wallet extends Observable implements Observer {
             // вдобавое отчищает полностью память - много свободной памяти получаем
 			dcSet.clearCash();
 
-			this.database.commit();
             this.database.clearCash();
+			this.database.commit();
 
             System.gc();
 
