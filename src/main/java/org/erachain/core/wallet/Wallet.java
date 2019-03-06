@@ -1225,7 +1225,7 @@ public class Wallet extends Observable implements Observer {
 
 			// SKIP PAYMENT TRANSACTIONS
 			if (transaction instanceof R_Send) {
-				;
+				continue;
 			}
 
 			// CHECK IF NAME REGISTRATION
@@ -1284,6 +1284,9 @@ public class Wallet extends Observable implements Observer {
 			}
 
 		}
+
+		// SAVE transactions file
+		this.database.commit();
 
         if (block.blockHead.transactionsCount > 0
 				&& start - processBlockLogged > (BlockChain.DEVELOP_USE ? 30000 : 30000)) {
@@ -1409,7 +1412,10 @@ public class Wallet extends Observable implements Observer {
 		// SET AS LAST BLOCK
         this.database.setLastBlockSignature(block.blockHead.reference); // .reference
 
-		// long tickets = System.currentTimeMillis() - start;
+        // SAVE transactions file
+        this.database.commit();
+
+        // long tickets = System.currentTimeMillis() - start;
 		// LOGGER.info("WALLET [" + block.getHeightByParent(DCSet.getInstance())
 		// + "] orphaning time: " + tickets*0.001
 		// + " TXs = " + block.getTransactionCount() + " millsec/record:"
