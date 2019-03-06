@@ -304,6 +304,7 @@ public class Menu_Deals extends JMenu {
 		        
 		        */
         
+/*
         JMenuItem FindHashFromDir = new JMenuItem(Lang.getInstance().translate("Find Hash from DIR"));
         FindHashFromDir.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Find Hash from DIR"));
         FindHashFromDir.addActionListener(new ActionListener() {
@@ -314,6 +315,7 @@ public class Menu_Deals extends JMenu {
             }
         });
         add(FindHashFromDir);
+*/
 
     }
 

@@ -27,7 +27,7 @@ ext {
 }
 
 //String versionEra = "4.11.08-${git.head().abbreviatedId}"
-String versionEra = "4.11.10"
+String versionEra = "4.11.10 beta"
 archivesBaseName = 'Erachain'
 group 'org.erachain'
 //version versionEra
@@ -118,7 +118,7 @@ jar {
 sourceSets {
     main {
         java {
-            srcDir 'src/main/'
+            srcDir 'src/main/java'
         }
     }
 
