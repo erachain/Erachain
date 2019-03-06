@@ -1,4 +1,4 @@
-function makePageUri(page) {
+function makePageUri(page, flag) {
     // parse url
     var urlParams;
     var match,
@@ -13,7 +13,11 @@ function makePageUri(page) {
     while (match = search.exec(query))
         urlParams[decode(match[1])] = decode(match[2]);
 
-    urlParams['page'] = page;
+    if (flag) {
+        urlParams['page'] = page;
+    } else {
+        urlParams['startBlock'] = page;
+    }
     var uri = '';
 
     for (var paramKey in urlParams) {
@@ -40,7 +44,7 @@ function pagesComponent(data) {
                 output += '<b>' + page + '</b>&nbsp;';
             }
             else {
-                output += '<a href="' + makePageUri(page) + '">' + page + '</a>&nbsp;';
+                output += '<a href="' + makePageUri(page, true) + '">' + page + '</a>&nbsp;';
             }
         }
     }
@@ -48,20 +52,19 @@ function pagesComponent(data) {
     return output;
 }
 
-function pagesComponentBeauty(data) {
+function pagesBlocksComponentBeauty(data) {
     var output = '';
-    var delta = 5;
-
-    if (data.pageCount > 1) {
-        output += 'Pages: ';
-
-        for (var page = 1; page <= data.pageCount; page++) {
-            if (page == data.pageNumber) {
-                output += '<b>' + page + '</b>&nbsp;';
-            }
-            else if (page > data.pageNumber - delta && page < data.pageNumber + delta
-            ) {
-                output += '<a href="' + makePageUri(page) + '">' + page + '</a>&nbsp;';
+    var delta = 9;
+    var step = 100;
+    if (data.startBlock >= 1) {
+        output += 'Blocks: ';
+        for (var page = data.startBlock - step * delta; page < data.startBlock + step * delta + 1; page += step) {
+            if (page >= 1 && page <= data.lastBlock.height) {
+                if (page == data.startBlock) {
+                    output += '<b>' + page + '</b>&nbsp;';
+                    continue;
+                }
+                output += '<a href="' + makePageUri(page, false) + '">' + page + '</a>&nbsp;';
             }
         }
     }

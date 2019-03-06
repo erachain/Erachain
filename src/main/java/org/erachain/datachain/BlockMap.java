@@ -210,7 +210,7 @@ public class BlockMap extends DCMap<Integer, Block> {
         Block block = super.get(height);
         if (block != null) {
             //block.setHeight(height);
-            block.loadHeadMind(this.getDBSet());
+            block.loadHeadMind(getDBSet());
         }
         return block;
 

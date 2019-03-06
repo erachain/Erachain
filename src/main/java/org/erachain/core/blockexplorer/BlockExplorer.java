@@ -218,8 +218,7 @@ public class BlockExplorer {
             }
         } else if (info.getQueryParameters().containsKey("blocks")) {
 
-//            output.put("search", "block");
-            output.putAll(jsonQueryBlocks(pageNumber));
+            output.putAll(jsonQueryBlocks(start));
             //peers
         } else if (info.getQueryParameters().containsKey("peers")) {
             output.putAll(jsonQueryPeers(info));
@@ -1459,11 +1458,9 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryBlocks(int pageNumber) {
+    public Map jsonQueryBlocks(int startBlock) {
 
         Map output = new LinkedHashMap();
-
-        output.put("maxHeight", getLastBlock().getHeight());
 
         output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
         output.put("totaltransactions", dcSet.getTransactionFinalMap().size());
@@ -1484,28 +1481,34 @@ public class BlockExplorer {
         output.put("Label_Later", Lang.getInstance().translate_from_langObj("Later", langObj));
         output.put("Label_Previous", Lang.getInstance().translate_from_langObj("Previous", langObj));
 
+        //Параметр показывающий сколько элементов располагать на странице
+        int numberOfRepresentsItemsOnPage = 100;
+        //Получение списка блоков из бд
+        List<Block> blocks = new ArrayList<>();
+
+        if (startBlock == -1) {
+            startBlock = dcSet.getBlockMap().size() - numberOfRepresentsItemsOnPage;
+        }
 
 
+        for (int i = startBlock; i <= startBlock + numberOfRepresentsItemsOnPage; i++) {
+            Block block = dcSet.getBlockMap().get(i);
+            if (block != null) {
+                blocks.add(block);
+            }
+        }
 
-        List<Block> blocks = new ArrayList<>(dcSet.getBlockMap().getValues());
-
-
-        int numberOfRepresentsItemsOnPage = 20;
-        blocksJSON(blocks, output, (pageNumber - 1) * numberOfRepresentsItemsOnPage, pageNumber * numberOfRepresentsItemsOnPage);
-
-//        putLastCountBlocksInOutput(start, block, output, 300);
-
-        output.put("pageCount", (int) Math.ceil((blocks.size()) / 100d));
-        output.put("pageNumber", pageNumber);
-
-
+        //Выделение map со списком блоков в соответствии с запрошенной страницей
+        Map blocksJSON = blocksJSON(blocks);
+        output.put("Blocks", blocksJSON);
+        output.put("startBlock", startBlock);
         return output;
     }
 
-    public void blocksJSON(List<Block> blocks, Map output, int fromIndex, int toIndex) {
-        List<Block> blocksList = (toIndex == 0) ? blocks
-                : blocks.subList(fromIndex, Math.min(toIndex, blocks.size()));
-        for (Block block : blocksList) {
+    public Map blocksJSON(List<Block> blocks) {
+
+        Map blocksJSON = new LinkedHashMap();
+        for (Block block : blocks) {
             Map blockJSON = new LinkedHashMap();
             blockJSON.put("height", block.getHeight());
             blockJSON.put("signature", Base58.encode(block.getSignature()));
@@ -1517,10 +1520,11 @@ public class BlockExplorer {
             blockJSON.put("transactionsCount", block.getTransactionCount());
             blockJSON.put("timestamp", block.getTimestamp());
             blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
-//            blockJSON.put("totalFee", block.viewFeeAsBigDecimal());
-            blockJSON.put("totalFee", "1");
-            output.put(block.getHeight(), blockJSON);
+            block.loadHeadMind(dcSet);
+            blockJSON.put("totalFee", block.viewFeeAsBigDecimal());
+            blocksJSON.put(block.getHeight(), blockJSON);
         }
+        return blocksJSON;
     }
 
 
