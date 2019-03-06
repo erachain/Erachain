@@ -206,8 +206,8 @@ public class SettingLangFrame extends JDialog {
             String langFileName = listLang.getSelectedValue().getFileName();
 
             if (listLang.getSelectedIndex() > 0) {
-                String url = Lang.translationsUrl + langFileName;
-                FileUtils.copyURLToFile(new URL(url), new File(Settings.getInstance().getLangDir(), langFileName));
+//                String url = Lang.translationsUrl + langFileName;
+//                FileUtils.copyURLToFile(new URL(url), new File(Settings.getInstance().getLangDir(), langFileName));
             }
             JSONObject settingsLangJSON = Settings.getInstance().Dump();
             settingsLangJSON.put("lang", langFileName);

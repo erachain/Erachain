@@ -27,7 +27,7 @@ ext {
 }
 
 //String versionEra = "4.11.08-${git.head().abbreviatedId}"
-String versionEra = "4.11.10 beta RC"
+String versionEra = "4.11.10 beta"
 archivesBaseName = 'Erachain'
 group 'org.erachain'
 //version versionEra
@@ -178,7 +178,6 @@ task CreateZip(type: Zip) {
     archiveName 'Erachain' + '.zip'
     destinationDir(file('build/libs/'))
 }
-
 
 //task copyToLib(type: Copy){
 //    into "build/libs/Erachain/libs"
