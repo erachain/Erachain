@@ -385,6 +385,7 @@ public class DCSet implements Observer, IDB {
                 //.cacheWeakRefEnable()
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
+                // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
                 .cacheSize(10)
 
                 .checksumEnable()
