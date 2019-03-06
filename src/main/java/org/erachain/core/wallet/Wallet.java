@@ -555,7 +555,10 @@ public class Wallet extends Observable implements Observer {
 		if (reset) {
 			LOGGER.info("   >>>>  Resetted maps");
 
-			// RESET MAPS
+            // SAVE transactions file
+            this.database.commit();
+
+            // RESET MAPS
 			this.database.getTransactionMap().reset();
 			this.database.getBlocksHeadMap().reset();
 			this.database.getNameMap().reset();
@@ -585,6 +588,9 @@ public class Wallet extends Observable implements Observer {
                 return;
             }
         }
+
+        // SAVE transactions file
+        this.database.commit();
 
         height = blockStart.getHeight();
 		int steepHeight = dcSet.getBlockMap().size() / 100;
@@ -760,7 +766,11 @@ public class Wallet extends Observable implements Observer {
 
             // break current synchronization if exists
             synchronizeBodyStop = true;
-
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                return;
+            }
             synchronizeBody(reset);
             return;
 
@@ -779,7 +789,14 @@ public class Wallet extends Observable implements Observer {
             }
         }
 
-        // запустим погоняние
+        // break current synchronization if exists
+        synchronizeBodyStop = true;
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            return;
+        }
+        // запустим догоняние
         synchronizeBody(false);
 
     }
