@@ -555,7 +555,9 @@ public class Wallet extends Observable implements Observer {
 		if (reset) {
 			LOGGER.info("   >>>>  Resetted maps");
 
-			// RESET MAPS
+            this.database.clearCash();
+
+            // RESET MAPS
 			this.database.getTransactionMap().reset();
 			this.database.getBlocksHeadMap().reset();
 			this.database.getNameMap().reset();
@@ -593,7 +595,9 @@ public class Wallet extends Observable implements Observer {
 		long timePoint = System.currentTimeMillis();
 		BlockMap blockMap = dcSet.getBlockMap();
 
-		try {
+        this.database.clearCash();
+
+        try {
 			do {
 
                 Block block = blockMap.get(height);
