@@ -601,7 +601,9 @@ public class Wallet extends Observable implements Observer {
 		long timePoint = System.currentTimeMillis();
 		BlockMap blockMap = dcSet.getBlockMap();
 
-		try {
+        this.database.clearCash();
+
+        try {
 			do {
 
                 Block block = blockMap.get(height);
