@@ -553,7 +553,7 @@ public class Wallet extends Observable implements Observer {
         synchronizeBodyStop = false;
 
 		if (reset) {
-			LOGGER.info("   >>>>  Resetted maps");
+			LOGGER.info("   >>>>  try to Reset maps");
 
             // SAVE transactions file
             this.database.clearCash();
@@ -573,6 +573,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.getUnionMap().reset();
 			this.database.getOrderMap().reset();
 
+            LOGGER.info("   >>>>  Maps was Resetted");
 
 			// REPROCESS BLOCKS
             blockStart = new GenesisBlock();
