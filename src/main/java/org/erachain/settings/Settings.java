@@ -353,19 +353,21 @@ public class Settings {
             List<Peer> knownPeers = new ArrayList<>();
             JSONArray peersArray = new JSONArray();
 
-            try {
-                JSONArray peersArraySettings = (JSONArray) this.settingsJSON.get("knownpeers");
+            if (!BlockChain.DEVELOP_USE) {
+                try {
+                    JSONArray peersArraySettings = (JSONArray) this.settingsJSON.get("knownpeers");
 
-                if (peersArraySettings != null) {
-                    for (Object peer : peersArraySettings) {
-                        if (!peersArray.contains(peer)) {
-                            peersArray.add(peer);
+                    if (peersArraySettings != null) {
+                        for (Object peer : peersArraySettings) {
+                            if (!peersArray.contains(peer)) {
+                                peersArray.add(peer);
+                            }
                         }
                     }
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
+                    LOGGER.info("Error with loading knownpeers from settings.json.");
                 }
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
-                LOGGER.info("Error with loading knownpeers from settings.json.");
             }
 
             try {

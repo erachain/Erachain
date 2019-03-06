@@ -14,6 +14,7 @@ public class FavoriteItemTemplate extends FavoriteItem {
         super(dWSet, database, ObserverMessage.LIST_TEMPLATE_FAVORITES_TYPE, "template", TemplateCls.INITIAL_FAVORITES);
     }
 
+    /*
     public void replace(List<Long> keys) {
         this.itemsSet.clear();
         this.itemsSet.addAll(keys);
@@ -56,5 +57,6 @@ public class FavoriteItemTemplate extends FavoriteItem {
         this.notifyObservers(new ObserverMessage(this.observer_favorites, this.itemsSet));
     }
 
+    */
 
 }

@@ -399,7 +399,6 @@ public class DWSet implements IDB {
     @Override
     public void commit() {
         this.uses++;
-        this.database.getEngine().clearCache();
         this.database.commit();
         this.uses--;
 
