@@ -3,6 +3,7 @@ package org.erachain.datachain;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
+import org.erachain.api.TransactionsResource;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -14,6 +15,8 @@ import org.erachain.utils.ReverseComparator;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple2Comparator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -37,6 +40,8 @@ import java.util.*;
  */
 public class TransactionMap extends DCMap<Long, Transaction> implements Observer {
     public static final int TIMESTAMP_INDEX = 1;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class);
 
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
@@ -487,10 +492,13 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         return values;
     }
 
-    public List<Transaction> getTransactions(int from, int count, boolean descending) {
+    public List<Transaction> getTransactions(int indexID, int count, boolean descending) {
 
         ArrayList<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = this.getIterator(from, descending);
+
+        LOGGER.debug("get ITERATOR");
+        Iterator<Long> iterator = this.getIterator(indexID, descending);
+        LOGGER.debug("get ITERATOR - DONE");
 
         Transaction transaction;
         for (int i = 0; i < count; i++) {

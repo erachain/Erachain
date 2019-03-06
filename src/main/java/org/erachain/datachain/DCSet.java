@@ -381,11 +381,11 @@ public class DCSet implements Observer, IDB {
                 // у другого типа КЭША происходит утечка памяти
                 //.cacheHardRefEnable()
                 //.cacheSoftRefEnable()
-                .cacheLRUEnable()
+                //.cacheLRUEnable()
                 ///.cacheWeakRefEnable()
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
-                .cacheSize(100)
+                .cacheSize(2)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
@@ -397,7 +397,7 @@ public class DCSet implements Observer, IDB {
                 //.cacheHardRefEnable()
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(3) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
 

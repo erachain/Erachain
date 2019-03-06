@@ -1897,8 +1897,8 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK BLOCK
 			this.processBlock(DCSet.getInstance(), block);
-            this.database.clearCash();
-            this.database.commit();
+            //this.database.clearCash();
+            //this.database.commit();
 
 		} else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
 		{
@@ -1913,8 +1913,8 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK BLOCK
 			this.orphanBlock(block);
-            this.database.clearCash();
-            this.database.commit();
+            //this.database.clearCash();
+            //this.database.commit();
 
 		} else if (false && type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
 			;
