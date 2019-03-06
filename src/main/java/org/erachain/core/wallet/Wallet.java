@@ -557,6 +557,7 @@ public class Wallet extends Observable implements Observer {
 
             // SAVE transactions file
             this.database.commit();
+            this.database.clearCash();
 
             // RESET MAPS
 			this.database.getTransactionMap().reset();
@@ -591,6 +592,7 @@ public class Wallet extends Observable implements Observer {
 
         // SAVE transactions file
         this.database.commit();
+        this.database.clearCash();
 
         height = blockStart.getHeight();
 		int steepHeight = dcSet.getBlockMap().size() / 100;
@@ -633,6 +635,7 @@ public class Wallet extends Observable implements Observer {
 					Controller.getInstance().walletSyncStatusUpdate(height);
 
                     this.database.commit();
+                    this.database.clearCash();
 
                     // обязательно нужно чтобы память освобождать
                     // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
@@ -672,6 +675,7 @@ public class Wallet extends Observable implements Observer {
 			dcSet.clearCash();
 
 			this.database.commit();
+            this.database.clearCash();
 
             System.gc();
 
@@ -1302,9 +1306,6 @@ public class Wallet extends Observable implements Observer {
 
 		}
 
-		// SAVE transactions file
-		this.database.commit();
-
         if (block.blockHead.transactionsCount > 0
 				&& start - processBlockLogged > (BlockChain.DEVELOP_USE ? 30000 : 30000)) {
 			long tickets = System.currentTimeMillis() - start;
@@ -1428,9 +1429,6 @@ public class Wallet extends Observable implements Observer {
 
 		// SET AS LAST BLOCK
         this.database.setLastBlockSignature(block.blockHead.reference); // .reference
-
-        // SAVE transactions file
-        this.database.commit();
 
         // long tickets = System.currentTimeMillis() - start;
 		// LOGGER.info("WALLET [" + block.getHeightByParent(DCSet.getInstance())
@@ -1895,6 +1893,8 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK BLOCK
 			this.processBlock(DCSet.getInstance(), block);
+            this.database.clearCash();
+            this.database.commit();
 
 		} else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
 		{
@@ -1909,6 +1909,8 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK BLOCK
 			this.orphanBlock(block);
+            this.database.clearCash();
+            this.database.commit();
 
 		} else if (false && type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
 			;
