@@ -51,15 +51,19 @@ public class DBSet implements IDB {
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
                 //.cacheHardRefEnable()
                 ///.cacheSoftRefEnable()
-                .cacheLRUEnable()
+                //.cacheLRUEnable()
                 ///.cacheWeakRefEnable()
+
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
-                .cacheSize(100)
+                .cacheSize(1000)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++
                 /// ICREATOR
                 .commitFileSyncDisable() // ++
+
+                // если при записи на диск блока процессор сильно нагружается - то уменьшить это
+                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
 

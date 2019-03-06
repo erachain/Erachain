@@ -80,10 +80,11 @@ public class DWSet implements IDB {
                 // у другого типа КЭША происходит утечка памяти
                 //.cacheHardRefEnable()
                 //.cacheSoftRefEnable()
-                .cacheLRUEnable()
+                //.cacheLRUEnable()
                 ///.cacheWeakRefEnable()
+
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
-                .cacheSize(100)
+                .cacheSize(1000)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++

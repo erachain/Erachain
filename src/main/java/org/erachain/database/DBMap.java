@@ -270,7 +270,6 @@ public abstract class DBMap<T, U> extends Observable {
     public Iterator<T> getIterator(int index, boolean descending) {
         this.addUses();
 
-
         if (this.indexes.containsKey(index)) {
             // IT IS INDEX ID in this.indexes
 
