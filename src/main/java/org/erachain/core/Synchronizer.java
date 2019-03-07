@@ -813,6 +813,8 @@ public class Synchronizer {
                     return;
 
             } catch (IOException e) {
+                dcSet.rollback();
+                LOGGER.error(e.getMessage(), e);
                 cnt.stopAll(22);
 
             } catch (Exception e) {
@@ -881,6 +883,9 @@ public class Synchronizer {
                 // NOTIFY to WALLET
 
             } catch (IOException e) {
+                dcSet.rollback();
+                LOGGER.error(e.getMessage(), e);
+
                 cnt.stopAll(22);
 
             } catch (Exception e) {

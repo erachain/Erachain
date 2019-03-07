@@ -52,7 +52,7 @@ public class DBSet implements IDB {
                 //.cacheHardRefEnable()
                 //.cacheLRUEnable()
                 ///.cacheSoftRefEnable()
-                .cacheWeakRefEnable()
+                //.cacheWeakRefEnable()
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 .cacheSize(1000)
