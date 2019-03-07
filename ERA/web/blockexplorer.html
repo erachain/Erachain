@@ -458,7 +458,6 @@
                 return '<h2>' + data.error + '</h2>';
             }
             output += lastBlock(data.lastBlock);
-            output += '<br>'
             output += pagesBlocksComponentBeauty(data);
 
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
@@ -473,13 +472,12 @@
                 + '<td><b>' + data.Label_Generator + '<td><b>' + data.Label_TXs + '<td><b>'
                 + data.Label_Fee + '<td><b>' + data.Label_Target + '<td><b>' + data.Label_Gen_balance + '<td><b>WV dtWV';
 
-            for (key in data.Blocks) {
+
+            // for (var key = lengthObj(data.Blocks)-1; key >= 0; key--) {
+            var length = Object.keys(data.Blocks).length;
+            for (var key = length-1; key >= 0; key--) {
                 output += '<tr>';
-                console.log("i=")
-                console.log(key)
-                console.log("dateTime")
-                console.log(data.Blocks[key].dateTime)
-                output += '<td><a href=?block=' + key + get_lang() + '>' + key + '</a><td>'
+                output += '<td><a href=?block=' + data.Blocks[key].height + get_lang() + '>' + data.Blocks[key].height + '</a><td>'
                     + data.Blocks[key].dateTime + '<td>' + '<a href=?addr=' + data.Blocks[key].generator
                     + get_lang() + '>' + data.Blocks[key].generator;
                 output += '<td>' + data.Blocks[key].transactionsCount + '<td>' +
@@ -487,13 +485,26 @@
                 output += '<td>' + addCommas(data.Blocks[key].generatingBalance)
                     + '<td>' + addCommas(data.Blocks[key].winValue) + ' ' + addCommas(data.Blocks[key].winValueTargetted);
             }
+            
+            var numberShiftDelta = 100
+
+
+            output += '<tr><td colspan=4>';
+            if (data.Blocks[0].height != 1) {
+                output += '<a href=?startBlock=' + (data.Blocks[length-1].height - numberShiftDelta) + get_lang() + '>' + data.Label_Previous;
+            }
+
+            output += '<td colspan=4 align=right>';
+            if (data.lastBlock.height > data.Blocks[0].height + numberShiftDelta) {
+                output += '<a href=?startBlock=' + (data.Blocks[length-1].height + numberShiftDelta) + get_lang() + '>' + data.Label_Later;
+            }
+
             output += '</table></td></tr></table>';
 
             output += pagesBlocksComponentBeauty(data);
 
             return output;
         }
-
 
         function peers(data) {
             var output = '';
@@ -3119,7 +3130,7 @@
             var output = '';
             output += lastBlock.label_Last_processed_block + ': <a href=?block=' + lastBlock.height + get_lang() + '>' + lastBlock.height + '</a>';
             output += ' (' + lastBlock.dateTime + ', ' + secToFine(new Date().getTime() - lastBlock.timestamp, lastBlock) + '  ' + lastBlock.label_ago + ') ';
-            output += '<br><br>';
+            output += '<br>';
 
             return output;
         }
@@ -3735,7 +3746,7 @@
                 return;
             }
 
-            asyncAjax('blockexplorer.json?blocks'+'&lang='+params['lang'], 'blocks');
+            asyncAjax('blockexplorer.json?blocks' + '&lang=' + params['lang'], 'blocks');
 
             document.title = title;
 

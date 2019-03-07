@@ -88,8 +88,6 @@ public class BlockExplorer {
         int txOnPage = 100;
         String filter = "standart";
         boolean allOnOnePage = false;
-        String showOnly = "";
-        String showWithout = "";
         int pageNumber = 1;
         pageNumber = checkAndGetIntParam(info, pageNumber, "page");
         output = new LinkedHashMap();
@@ -98,7 +96,6 @@ public class BlockExplorer {
         if (!info.getQueryParameters().containsKey("lang")) {
             lang_file = LANG_DEFAULT + ".json";
         } else {
-
             lang_file = info.getQueryParameters().getFirst("lang") + ".json";
         }
 
@@ -109,17 +106,14 @@ public class BlockExplorer {
         List<Tuple2<String, String>> langs = Lang.getInstance().getLangListToWeb();
 
         Map lang_list = new LinkedHashMap();
-        int i = 0;
-        for (Tuple2<String, String> lang : langs) {
+        for (int i = 0; i < langs.size(); i++) {
             Map lang_par = new LinkedHashMap();
-            lang_par.put("ISO", lang.a);
-            lang_par.put("name", lang.b);
+            lang_par.put("ISO", langs.get(i).a);
+            lang_par.put("name", langs.get(i).b);
             lang_list.put(i, lang_par);
-            i++;
-
         }
         output.put("Lang", lang_list);
-        // main menu
+        // Основное меню. заголовки и их перевод на выбранный язык
         output.put("id_home2", Lang.getInstance().translate_from_langObj("Blocks", langObj));
         output.put("id_menu_top_100", Lang.getInstance().translate_from_langObj("Top 100 Richest", langObj));
         output.put("id_menu_percons", Lang.getInstance().translate_from_langObj("Persons", langObj));
@@ -128,11 +122,11 @@ public class BlockExplorer {
         output.put("id_menu_aTs", Lang.getInstance().translate_from_langObj("ATs", langObj));
         output.put("id_menu_documents", Lang.getInstance().translate_from_langObj("Documents", langObj));
 
-        // servece info
+        // информация о последнем блоке
         output.put("lastBlock", jsonQueryLastBlock());
 
-        if (info.getQueryParameters().containsKey("balance")) {
 
+        if (info.getQueryParameters().containsKey("balance")) {
             for (String address : info.getQueryParameters().get("balance")) {
                 output.put(address, jsonQueryBalance(address));
             }
@@ -1475,11 +1469,12 @@ public class BlockExplorer {
         output.put("Label_Gen_balance", Lang.getInstance().translate_from_langObj("Gen.Balance", langObj));
         output.put("Label_TXs", Lang.getInstance().translate_from_langObj("TXs", langObj));
         output.put("Label_Fee", Lang.getInstance().translate_from_langObj("Fee", langObj));
-        output.put("Label_AT_Amount", Lang.getInstance().translate_from_langObj("AT Amount", langObj));
-        output.put("Label_Amount", Lang.getInstance().translate_from_langObj("Amount", langObj));
+//        output.put("Label_AT_Amount", Lang.getInstance().translate_from_langObj("AT Amount", langObj));
+//        output.put("Label_Amount", Lang.getInstance().translate_from_langObj("Amount", langObj));
         output.put("Label_Target", Lang.getInstance().translate_from_langObj("Target", langObj));
         output.put("Label_Later", Lang.getInstance().translate_from_langObj("Later", langObj));
         output.put("Label_Previous", Lang.getInstance().translate_from_langObj("Previous", langObj));
+        output.put("Label_Blocks", Lang.getInstance().translate_from_langObj("Blocks", langObj));
 
         //Параметр показывающий сколько элементов располагать на странице
         int numberOfRepresentsItemsOnPage = 100;
@@ -1487,11 +1482,11 @@ public class BlockExplorer {
         List<Block> blocks = new ArrayList<>();
 
         if (startBlock == -1) {
-            startBlock = dcSet.getBlockMap().size() - numberOfRepresentsItemsOnPage;
+            startBlock = dcSet.getBlockMap().size();
         }
 
 
-        for (int i = startBlock; i <= startBlock + numberOfRepresentsItemsOnPage; i++) {
+        for (int i = startBlock - numberOfRepresentsItemsOnPage+1; i <=startBlock ; i++) {
             Block block = dcSet.getBlockMap().get(i);
             if (block != null) {
                 blocks.add(block);
@@ -1505,11 +1500,11 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map blocksJSON(List<Block> blocks) {
-
+    private Map blocksJSON(List<Block> blocks) {
         Map blocksJSON = new LinkedHashMap();
-        for (Block block : blocks) {
+        for (int i = 0; i < blocks.size(); i++) {
             Map blockJSON = new LinkedHashMap();
+            Block block = blocks.get(i);
             blockJSON.put("height", block.getHeight());
             blockJSON.put("signature", Base58.encode(block.getSignature()));
             blockJSON.put("generator", block.getCreator().getAddress());
@@ -1522,31 +1517,9 @@ public class BlockExplorer {
             blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
             block.loadHeadMind(dcSet);
             blockJSON.put("totalFee", block.viewFeeAsBigDecimal());
-            blocksJSON.put(block.getHeight(), blockJSON);
+            blocksJSON.put(i, blockJSON);
         }
         return blocksJSON;
-    }
-
-
-    private void putLastCountBlocksInOutput(int lastNumber, Block initialBlock, Map output, int count) {
-        int i = lastNumber;
-        do {
-            Map blockJSON = new LinkedHashMap();
-            blockJSON.put("height", i);
-            blockJSON.put("signature", Base58.encode(initialBlock.getSignature()));
-            blockJSON.put("generator", initialBlock.getCreator().getAddress());
-            blockJSON.put("generatingBalance", initialBlock.getForgingValue());
-            blockJSON.put("target", initialBlock.getTarget());
-            blockJSON.put("winValue", initialBlock.getWinValue());
-            blockJSON.put("winValueTargetted", initialBlock.calcWinValueTargeted() - 100000);
-            blockJSON.put("transactionsCount", initialBlock.getTransactionCount());
-            blockJSON.put("timestamp", initialBlock.getTimestamp());
-            blockJSON.put("dateTime", BlockExplorer.timestampToStr(initialBlock.getTimestamp()));
-            blockJSON.put("totalFee", initialBlock.viewFeeAsBigDecimal());
-            output.put(i, blockJSON);
-            i--;
-            initialBlock = initialBlock.getParent(dcSet);
-        } while (initialBlock != null && i >= lastNumber - count);
     }
 
     // new Long(personKey)

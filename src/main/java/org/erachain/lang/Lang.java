@@ -88,7 +88,7 @@ public class Lang {
     public String[] translate(String[] Messages) {
         String[] translateMessages = Messages.clone();
         for (int i = 0; i < translateMessages.length; i++) {
-            translateMessages[i] = this.translate(translateMessages[i]);
+            translateMessages[i] = translate(translateMessages[i]);
         }
         return translateMessages;
     }

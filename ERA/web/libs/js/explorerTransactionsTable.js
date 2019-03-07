@@ -54,12 +54,17 @@ function pagesComponent(data) {
 
 function pagesBlocksComponentBeauty(data) {
     var output = '';
-    var delta = 9;
+    var delta = 7;
     var step = 100;
+    var numberPages = 3;
     if (data.startBlock >= 1) {
-        output += 'Blocks: ';
-        for (var page = data.startBlock - step * delta; page < data.startBlock + step * delta + 1; page += step) {
-            if (page >= 1 && page <= data.lastBlock.height) {
+        output += data.Label_Blocks + ':';
+        var from = data.lastBlock.height
+        var to = data.lastBlock.height - (numberPages - 2) * step + 1;
+        var restriction = data.lastBlock.height;
+
+        for (var page = from; page > to; page -= step) {
+            if (page >= 1 && page <= restriction) {
                 if (page == data.startBlock) {
                     output += '<b>' + page + '</b>&nbsp;';
                     continue;
@@ -67,6 +72,39 @@ function pagesBlocksComponentBeauty(data) {
                 output += '<a href="' + makePageUri(page, false) + '">' + page + '</a>&nbsp;';
             }
         }
+
+        output += '...';
+
+
+        from = data.startBlock + step * delta;
+        to = (data.startBlock - step * delta);
+        restriction = data.lastBlock.height - 1;
+        for (var page = from; page > to; page -= step) {
+            if (page >= 1 && page <= restriction) {
+                if (page == data.startBlock) {
+                    output += '<b>' + page + '</b>&nbsp;';
+                    continue;
+                }
+                output += '<a href="' + makePageUri(page, false) + '">' + page + '</a>&nbsp;';
+            }
+        }
+        output += '...';
+
+
+        from = numberPages * step;
+        to = 1;
+        restriction = data.lastBlock.height;
+
+        for (var page = from; page > to; page -= step) {
+            if (page >= 1 && page <= restriction) {
+                if (page == data.startBlock) {
+                    output += '<b>' + page + '</b>&nbsp;';
+                    continue;
+                }
+                output += '<a href="' + makePageUri(page, false) + '">' + page + '</a>&nbsp;';
+            }
+        }
+
     }
 
     return output;
