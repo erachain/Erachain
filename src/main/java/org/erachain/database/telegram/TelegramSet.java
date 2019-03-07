@@ -36,10 +36,11 @@ public class TelegramSet implements IDB {
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
                 ///.cacheHardRefEnable()
                 //.cacheLRUEnable()
+                .cacheSoftRefEnable()
                 ///.cacheWeakRefEnable()
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
-                .cacheSize(1000)
+                .cacheSize(10000)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported()
