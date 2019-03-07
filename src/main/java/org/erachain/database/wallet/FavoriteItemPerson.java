@@ -13,6 +13,7 @@ public class FavoriteItemPerson extends FavoriteItem {
         super(dWSet, database, ObserverMessage.LIST_PERSON_FAVORITES_TYPE, "person", 0);
     }
 
+    /*
     public void replace(List<Long> keys) {
         this.itemsSet.clear();
         this.itemsSet.addAll(keys);
@@ -56,4 +57,5 @@ public class FavoriteItemPerson extends FavoriteItem {
         this.notifyObservers(new ObserverMessage(this.observer_favorites, this.itemsSet));
     }
 
+    */
 }

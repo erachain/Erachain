@@ -553,9 +553,13 @@ public class Wallet extends Observable implements Observer {
         synchronizeBodyStop = false;
 
 		if (reset) {
-			LOGGER.info("   >>>>  Resetted maps");
+			LOGGER.info("   >>>>  try to Reset maps");
 
-			// RESET MAPS
+            // SAVE transactions file
+            this.database.clearCash();
+            this.database.commit();
+
+            // RESET MAPS
 			this.database.getTransactionMap().reset();
 			this.database.getBlocksHeadMap().reset();
 			this.database.getNameMap().reset();
@@ -569,6 +573,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.getUnionMap().reset();
 			this.database.getOrderMap().reset();
 
+            LOGGER.info("   >>>>  Maps was Resetted");
 
 			// REPROCESS BLOCKS
             blockStart = new GenesisBlock();
@@ -586,6 +591,10 @@ public class Wallet extends Observable implements Observer {
             }
         }
 
+        // SAVE transactions file
+        this.database.clearCash();
+        this.database.commit();
+
         height = blockStart.getHeight();
 		int steepHeight = dcSet.getBlockMap().size() / 100;
 		int lastHeight = 0;
@@ -593,7 +602,9 @@ public class Wallet extends Observable implements Observer {
 		long timePoint = System.currentTimeMillis();
 		BlockMap blockMap = dcSet.getBlockMap();
 
-		try {
+        this.database.clearCash();
+
+        try {
 			do {
 
                 Block block = blockMap.get(height);
@@ -626,6 +637,7 @@ public class Wallet extends Observable implements Observer {
                     this.syncHeight = height;
 					Controller.getInstance().walletSyncStatusUpdate(height);
 
+                    this.database.clearCash();
                     this.database.commit();
 
                     // обязательно нужно чтобы память освобождать
@@ -665,6 +677,7 @@ public class Wallet extends Observable implements Observer {
             // вдобавое отчищает полностью память - много свободной памяти получаем
 			dcSet.clearCash();
 
+            this.database.clearCash();
 			this.database.commit();
 
             System.gc();
@@ -760,7 +773,11 @@ public class Wallet extends Observable implements Observer {
 
             // break current synchronization if exists
             synchronizeBodyStop = true;
-
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                return;
+            }
             synchronizeBody(reset);
             return;
 
@@ -779,7 +796,14 @@ public class Wallet extends Observable implements Observer {
             }
         }
 
-        // запустим погоняние
+        // break current synchronization if exists
+        synchronizeBodyStop = true;
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            return;
+        }
+        // запустим догоняние
         synchronizeBody(false);
 
     }
@@ -1225,7 +1249,7 @@ public class Wallet extends Observable implements Observer {
 
 			// SKIP PAYMENT TRANSACTIONS
 			if (transaction instanceof R_Send) {
-				;
+				continue;
 			}
 
 			// CHECK IF NAME REGISTRATION
@@ -1409,7 +1433,7 @@ public class Wallet extends Observable implements Observer {
 		// SET AS LAST BLOCK
         this.database.setLastBlockSignature(block.blockHead.reference); // .reference
 
-		// long tickets = System.currentTimeMillis() - start;
+        // long tickets = System.currentTimeMillis() - start;
 		// LOGGER.info("WALLET [" + block.getHeightByParent(DCSet.getInstance())
 		// + "] orphaning time: " + tickets*0.001
 		// + " TXs = " + block.getTransactionCount() + " millsec/record:"
@@ -1872,6 +1896,8 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK BLOCK
 			this.processBlock(DCSet.getInstance(), block);
+            this.database.clearCash();
+            this.database.commit();
 
 		} else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
 		{
@@ -1886,6 +1912,8 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK BLOCK
 			this.orphanBlock(block);
+            this.database.clearCash();
+            this.database.commit();
 
 		} else if (false && type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
 			;

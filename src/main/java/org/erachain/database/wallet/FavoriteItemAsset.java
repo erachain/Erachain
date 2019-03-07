@@ -17,6 +17,7 @@ public class FavoriteItemAsset extends FavoriteItem {
 
     }
 
+    /*
     public void replace(List<Long> keys) {
         this.itemsSet.clear();
         this.itemsSet.addAll(keys);
@@ -58,5 +59,6 @@ public class FavoriteItemAsset extends FavoriteItem {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(this.observer_favorites, this.itemsSet));
     }
+    */
 
 }

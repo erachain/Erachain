@@ -283,8 +283,9 @@ public class R_SendResource {
     @Path("test1/{delay}")
     public String test1(@PathParam("delay") long delay, @QueryParam("password") String password) {
 
-        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
-                && !BlockChain.DEVELOP_USE)
+        if (!BlockChain.DEVELOP_USE
+                && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
+                )
             return "not LOCAL && not DEVELOP";
 
         APIUtils.askAPICallAllowed(password, "GET test1\n ", request, true);
@@ -395,8 +396,8 @@ public class R_SendResource {
             } while (true);
         });
 
-        threadTest1.start();
         threadTest1.setName("R_Send.Test1");
+        threadTest1.start();
 
         out.put("delay", test1Delay);
         LOGGER.info("r_send/test1 STARTED for delay: " + test1Delay);
