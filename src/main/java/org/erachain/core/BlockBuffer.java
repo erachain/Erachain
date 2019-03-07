@@ -1,6 +1,7 @@
 package org.erachain.core;
 
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Base58;
 import org.erachain.network.Peer;
 import org.erachain.network.message.BlockMessage;
 import org.erachain.network.message.Message;
@@ -33,7 +34,7 @@ public class BlockBuffer extends Thread {
         this.peer = peer;
         this.counter = 0;
         this.error = false;
-        this.setName("Thread BlockBuffer - " + this.getId());
+        this.setName("Thread BlockBuffer - " + this.getId() + " for " + peer);
         this.blocks = new HashMap<byte[], BlockingQueue<Block>>(BUFFER_SIZE << 1, 1);
         this.start();
     }
@@ -55,6 +56,7 @@ public class BlockBuffer extends Thread {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 //ERROR SLEEPING
+                break;
             }
         }
     }
@@ -65,7 +67,7 @@ public class BlockBuffer extends Thread {
         this.blocks.put(signature, blockingQueue);
 
         //LOAD BLOCK IN THREAD
-        new Thread("loadBlock") {
+        new Thread("loadBlock " + Base58.encode(signature)) {
             public void run() {
                 //CREATE MESSAGE
                 Message message = MessageFactory.getInstance().createGetBlockMessage(signature);

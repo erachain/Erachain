@@ -94,9 +94,9 @@ public class BlockChain {
     public static final int VERS_4_11 = DEVELOP_USE ? 230000 : 194400;
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : VERS_4_11;
 
     public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : DEVELOP_USE? 325555 : VERS_4_11;
 
     public static final int DEVELOP_FORGING_START = 100;
 
