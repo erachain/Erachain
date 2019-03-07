@@ -212,6 +212,17 @@ public class BlockMap extends DCMap<Integer, Block> {
             //block.setHeight(height);
             block.loadHeadMind(this.getDBSet());
         }
+
+        // проверим занятую память и очистим если что
+        if (this.parent == null && block.getTransactionCount() > 33) {
+            if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+                if (Runtime.getRuntime().freeMemory() < 250000000l) {
+                    this.getDBSet().clearCash();
+                }
+            }
+
+        }
+
         return block;
 
     }
