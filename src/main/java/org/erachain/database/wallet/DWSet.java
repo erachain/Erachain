@@ -81,7 +81,7 @@ public class DWSet implements IDB {
                 //.cacheHardRefEnable()
                 //.cacheSoftRefEnable()
                 //.cacheLRUEnable()
-                ///.cacheWeakRefEnable()
+                .cacheWeakRefEnable()
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 .cacheSize(1000)
