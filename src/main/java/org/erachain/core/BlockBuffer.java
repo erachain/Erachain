@@ -154,14 +154,14 @@ public class BlockBuffer extends Thread {
     }
 
     public void stopThread() {
-        try {
+        //try {
             this.run = false;
 
-            this.join();
+            //this.join();
 
-        } catch (InterruptedException e) {
+        //} catch (InterruptedException e) {
             //INTERRUPTED
-        }
+        //}
     }
 
 }
