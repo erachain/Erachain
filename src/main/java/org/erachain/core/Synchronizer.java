@@ -434,7 +434,12 @@ public class Synchronizer {
                 LOGGER.debug("try get BLOCK from BUFFER");
 
                 long time1 = System.currentTimeMillis();
-                blockFromPeer = blockBuffer.getBlock(signature);
+                try {
+                    blockFromPeer = blockBuffer.getBlock(signature);
+                } catch (Exception e) {
+                    blockBuffer.stopThread();
+                    throw new Exception(e);
+                }
 
                 if (blockFromPeer == null) {
 
