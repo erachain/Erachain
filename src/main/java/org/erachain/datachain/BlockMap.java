@@ -208,10 +208,11 @@ public class BlockMap extends DCMap<Integer, Block> {
     public Block get(Integer height) {
 
         Block block = super.get(height);
-        if (block != null) {
-            //block.setHeight(height);
-            block.loadHeadMind(this.getDBSet());
-        }
+        if (block == null)
+            return null;
+
+        // LOAD HEAD
+        block.loadHeadMind(this.getDBSet());
 
         // проверим занятую память и очистим если что
         if (this.parent == null && block.getTransactionCount() > 33) {
