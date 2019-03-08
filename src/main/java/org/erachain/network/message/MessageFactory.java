@@ -195,8 +195,8 @@ public class MessageFactory {
             case Message.WIN_BLOCK_TYPE:
 
                 // может быть это повтор?
-                if (!Controller.getInstance().isStatusOK()
-                        || !sender.network.checkHandledWinBlockMessages(data, sender, false)
+                if (//!Controller.getInstance().isStatusOK() ||
+                        !sender.network.checkHandledWinBlockMessages(data, sender, false)
                 ) {
                     LOGGER.debug(sender + " <-- Win Block REPEATED...");
                     return null;
