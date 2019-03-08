@@ -182,6 +182,9 @@ public class MessageFactory {
             case Message.TRANSACTION_TYPE:
 
                 // может быть это повтор?
+                // TODO сделаь тут проверку - если идет синхронизация и конец ее скоро (меньше 333) блока
+                // то разрешить парсинг прилетающего блока, иначе не заморачиваться даже
+                // так чтобы не было постоянной синхронизации форжинга
                 if (!sender.network.checkHandledTransactionMessages(data, sender, false)) {
                     //LOGGER.debug(sender + " <-- Transaction REPEATED...");
                     return null;
