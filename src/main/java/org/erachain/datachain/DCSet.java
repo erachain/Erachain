@@ -372,7 +372,7 @@ public class DCSet implements Observer, IDB {
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
 
                 //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
-                ///// добавил dcSet.clearCash(); --
+                ///// добавил dcSet.clearCache(); --
                 ///.cacheDisable()
 
                 ////// ТУТ вряд ли нужно КЭШИРОВАТь при чтении что-либо
@@ -1349,7 +1349,7 @@ public class DCSet implements Observer, IDB {
         }
     }
 
-    public void clearCash() {
+    public void clearCache() {
         this.database.getEngine().clearCache();
     }
 

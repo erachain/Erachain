@@ -45,7 +45,7 @@ public class DBSet implements IDB {
         database = DBMaker.newFileDB(DATA_FILE)
 
                 //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
-                ///// добавил dcSet.clearCash(); --
+                ///// добавил dcSet.clearCache(); --
                 ///.cacheDisable()
 
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
@@ -76,6 +76,10 @@ public class DBSet implements IDB {
         instance = new DBSet();
 
 
+    }
+
+    public void clearCache() {
+        this.database.getEngine().clearCache();
     }
 
     public PeerMap getPeerMap() {

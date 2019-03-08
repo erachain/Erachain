@@ -215,9 +215,10 @@ public class BlockMap extends DCMap<Integer, Block> {
 
         // проверим занятую память и очистим если что
         if (this.parent == null && block.getTransactionCount() > 33) {
+            // это не Форк базы и большой блок взяли - наверно надо чистить КЭШ
             if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
                 if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 1)) {
-                    this.getDBSet().clearCash();
+                    this.getDBSet().clearCache();
                 }
             }
 

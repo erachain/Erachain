@@ -392,7 +392,7 @@ public class Synchronizer {
          */
 
         // освободим HEAP и память - нам не нужна она все равно
-        dcSet.clearCash();
+        dcSet.clearCache();
 
         fromPeer = peer;
 
