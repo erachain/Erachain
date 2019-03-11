@@ -641,14 +641,22 @@ public class Peer extends MonitoredThread {
         return Controller.getInstance().getDBSet().getPeerMap().getBanMinutes(this);
     }
 
-    public synchronized void ban(int banForMinutes, String message) {
+    /**
+     * Ban for PEER. <br>
+     * (Tip: deadlock if set synchronized - Sender + Pinger + ban + setName)
+     * @param banForMinutes
+     * @param message
+     */
+    public /* synchronized */ void ban(int banForMinutes, String message) {
 
         if (!runed) {
             if (banForMinutes > this.getBanMinutes())
                 this.network.afterDisconnect(this, banForMinutes, message);
+
             return;
         }
 
+        /// этот метод блокирует доступ к пиру - и его нельзя делать внутри synchronized методов
         this.setName(this.getName()
                 + " banned for " + banForMinutes + " " + message);
 
@@ -660,7 +668,9 @@ public class Peer extends MonitoredThread {
     }
 
     public void ban(String message) {
-        ban(network.banForActivePeersCounter(), message);
+        if (this.isUsed()) {
+            ban(network.banForActivePeersCounter(), message);
+        }
     }
 
 

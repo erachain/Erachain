@@ -535,17 +535,18 @@ public class Wallet extends Observable implements Observer {
 	public void update_account_assets() {
 		List<Tuple2<Account, Long>> accounts_assets = this.getAccountsAssets();
 
-		synchronized (accounts_assets) {
-			for (Tuple2<Account, Long> account_asset : accounts_assets) {
-				this.database.getAccountMap().changeBalance(account_asset.a.getAddress(), false, account_asset.b,
-						BigDecimal.ZERO);
-			}
-		}
+        for (Tuple2<Account, Long> account_asset : accounts_assets) {
+            this.database.getAccountMap().changeBalance(account_asset.a.getAddress(), false, account_asset.b,
+                    BigDecimal.ZERO);
+        }
 
 	}
 
 	boolean synchronizeBodyStop;
-	public synchronized void synchronizeBody(boolean reset) {
+	public void synchronizeBody(boolean reset) {
+	    if (!synchronizeBodyStop)
+	        return;
+
 		DCSet dcSet = DCSet.getInstance();
 
 		Block blockStart;
@@ -556,7 +557,7 @@ public class Wallet extends Observable implements Observer {
 			LOGGER.info("   >>>>  try to Reset maps");
 
             // SAVE transactions file
-            this.database.clearCash();
+            this.database.clearCache();
             this.database.commit();
 
             // RESET MAPS
@@ -592,7 +593,7 @@ public class Wallet extends Observable implements Observer {
         }
 
         // SAVE transactions file
-        this.database.clearCash();
+        this.database.clearCache();
         this.database.commit();
 
         height = blockStart.getHeight();
@@ -602,7 +603,7 @@ public class Wallet extends Observable implements Observer {
 		long timePoint = System.currentTimeMillis();
 		BlockMap blockMap = dcSet.getBlockMap();
 
-        this.database.clearCash();
+        this.database.clearCache();
 
         try {
 			do {
@@ -621,7 +622,7 @@ public class Wallet extends Observable implements Observer {
 				}
 
                 // NEED FOR CLEAR HEAP
-				//block.clearForHeap(); - не нужно теперь если мы чистим КЭШ в dcSet.clearCash();
+				//block.clearForHeap(); - не нужно теперь если мы чистим КЭШ в dcSet.clearCache();
                 //block = null;
 
                 if (Controller.getInstance().needUpToDate() || !Controller.getInstance().isStatusWaiting())
@@ -637,14 +638,14 @@ public class Wallet extends Observable implements Observer {
                     this.syncHeight = height;
 					Controller.getInstance().walletSyncStatusUpdate(height);
 
-                    this.database.clearCash();
+                    this.database.clearCache();
                     this.database.commit();
 
                     // обязательно нужно чтобы память освобождать
                     // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
                     // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
                     // БЕЗ очистки КЭША HEAP забивается под завязку
-					dcSet.clearCash();
+					dcSet.clearCache();
 
 					// не нужно - Ява сама норм делает вызов очистки
 					//System.gc();
@@ -675,9 +676,9 @@ public class Wallet extends Observable implements Observer {
 			// и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
 			// при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызывают
             // вдобавое отчищает полностью память - много свободной памяти получаем
-			dcSet.clearCash();
+			dcSet.clearCache();
 
-            this.database.clearCash();
+            this.database.clearCache();
 			this.database.commit();
 
             System.gc();
@@ -1896,8 +1897,8 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK BLOCK
 			this.processBlock(DCSet.getInstance(), block);
-            this.database.clearCash();
-            this.database.commit();
+            //this.database.clearCache();
+            //this.database.commit();
 
 		} else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
 		{
@@ -1912,8 +1913,8 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK BLOCK
 			this.orphanBlock(block);
-            this.database.clearCash();
-            this.database.commit();
+            //this.database.clearCache();
+            //this.database.commit();
 
 		} else if (false && type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
 			;

@@ -73,17 +73,18 @@ public class DWSet implements IDB {
                 //.cacheSize(2048)
 
                 //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
-                ///// добавил dcSet.clearCash(); --
+                ///// добавил dcSet.clearCache(); --
                 ///.cacheDisable()
 
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
                 // у другого типа КЭША происходит утечка памяти
-                ///.cacheHardRefEnable()
-                .cacheSoftRefEnable()
-                ///.cacheLRUEnable()
-                ///.cacheWeakRefEnable()
+                //.cacheHardRefEnable()
+                //.cacheLRUEnable()
+                ///.cacheSoftRefEnable()
+                .cacheWeakRefEnable()
+
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
-                .cacheSize(1000)
+                .cacheSize(10000)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++
@@ -91,7 +92,7 @@ public class DWSet implements IDB {
                 .commitFileSyncDisable() // ++
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(3) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
 
@@ -392,7 +393,7 @@ public class DWSet implements IDB {
 
     }
 
-    public void clearCash() {
+    public void clearCache() {
         this.database.getEngine().clearCache();
     }
 

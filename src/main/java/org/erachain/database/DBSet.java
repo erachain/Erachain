@@ -45,14 +45,15 @@ public class DBSet implements IDB {
         database = DBMaker.newFileDB(DATA_FILE)
 
                 //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
-                ///// добавил dcSet.clearCash(); --
+                ///// добавил dcSet.clearCache(); --
                 ///.cacheDisable()
 
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
-                ///.cacheHardRefEnable()
-                .cacheSoftRefEnable()
-                ///.cacheLRUEnable()
-                ///.cacheWeakRefEnable()
+                //.cacheHardRefEnable()
+                //.cacheLRUEnable()
+                ///.cacheSoftRefEnable()
+                //.cacheWeakRefEnable()
+
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 .cacheSize(1000)
 
@@ -60,6 +61,9 @@ public class DBSet implements IDB {
                 .mmapFileEnableIfSupported() // ++
                 /// ICREATOR
                 .commitFileSyncDisable() // ++
+
+                // если при записи на диск блока процессор сильно нагружается - то уменьшить это
+                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
 
@@ -72,6 +76,10 @@ public class DBSet implements IDB {
         instance = new DBSet();
 
 
+    }
+
+    public void clearCache() {
+        this.database.getEngine().clearCache();
     }
 
     public PeerMap getPeerMap() {

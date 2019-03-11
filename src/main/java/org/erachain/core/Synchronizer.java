@@ -392,7 +392,7 @@ public class Synchronizer {
          */
 
         // освободим HEAP и память - нам не нужна она все равно
-        dcSet.clearCash();
+        dcSet.clearCache();
 
         fromPeer = peer;
 
@@ -434,7 +434,12 @@ public class Synchronizer {
                 LOGGER.debug("try get BLOCK from BUFFER");
 
                 long time1 = System.currentTimeMillis();
-                blockFromPeer = blockBuffer.getBlock(signature);
+                try {
+                    blockFromPeer = blockBuffer.getBlock(signature);
+                } catch (Exception e) {
+                    blockBuffer.stopThread();
+                    throw new Exception(e);
+                }
 
                 if (blockFromPeer == null) {
 
@@ -792,6 +797,7 @@ public class Synchronizer {
       //      countObserv_COUNT = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_COUNT);
         }
 
+        Exception error = null;
 
         if (doOrphan) {
 
@@ -813,19 +819,31 @@ public class Synchronizer {
                     return;
 
             } catch (IOException e) {
-                cnt.stopAll(22);
+                error = new Exception(e);
 
             } catch (Exception e) {
 
                 if (cnt.isOnStopping()) {
                     return;
                 } else {
-                    dcSet.rollback();
-                    throw new Exception(e);
+                    error = new Exception(e);
                 }
             } finally {
                 if (cnt.isOnStopping()) {
                     throw new Exception("on stopping");
+                }
+
+                if (error != null) {
+                    dcSet.rollback();
+                    LOGGER.error(error.getMessage(), error);
+
+                    if (error instanceof IOException) {
+                        cnt.stopAll(22);
+                        return;
+                    }
+
+                    throw new Exception(error);
+
                 }
 
                 if (observOn) {
@@ -881,19 +899,31 @@ public class Synchronizer {
                 // NOTIFY to WALLET
 
             } catch (IOException e) {
-                cnt.stopAll(22);
+                error = new Exception(e);
 
             } catch (Exception e) {
 
                 if (cnt.isOnStopping()) {
                     return;
                 } else {
-                    dcSet.rollback();
-                    throw new Exception(e);
+                    error = new Exception(e);
                 }
             } finally {
                 if (cnt.isOnStopping()) {
                     throw new Exception("on stopping");
+                }
+
+                if (error != null) {
+                    dcSet.rollback();
+                    LOGGER.error(error.getMessage(), error);
+
+                    if (error instanceof IOException) {
+                        cnt.stopAll(22);
+                        return;
+                    }
+
+                    throw new Exception(error);
+
                 }
 
                 if (observOn) {

@@ -283,6 +283,10 @@ public class PeersTableModel extends AbstractTableModel implements Observer {
 
     public void deleteObserver() {
         Controller.getInstance().removeActivePeersObserver(this);
+        if (this.timer != null){
+            this.timer.cancel();
+            this.timer = null;
+        }
 
     }
 
