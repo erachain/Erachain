@@ -372,7 +372,7 @@ public class DCSet implements Observer, IDB {
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
 
                 //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
-                ///// добавил dcSet.clearCash(); --
+                ///// добавил dcSet.clearCache(); --
                 ///.cacheDisable()
 
                 ////// ТУТ вряд ли нужно КЭШИРОВАТь при чтении что-либо
@@ -380,12 +380,13 @@ public class DCSet implements Observer, IDB {
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
                 // у другого типа КЭША происходит утечка памяти
                 .cacheHardRefEnable()
-                //.cacheSoftRefEnable()
-                ///.cacheLRUEnable()
+                //.cacheLRUEnable()
+                ///.cacheSoftRefEnable()
                 ///.cacheWeakRefEnable()
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
-                .cacheSize(100)
+                // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
+                .cacheSize(10000)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
@@ -397,7 +398,7 @@ public class DCSet implements Observer, IDB {
                 //.cacheHardRefEnable()
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(3) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
 
@@ -1348,7 +1349,7 @@ public class DCSet implements Observer, IDB {
         }
     }
 
-    public void clearCash() {
+    public void clearCache() {
         this.database.getEngine().clearCache();
     }
 

@@ -591,7 +591,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     // обязательно нужно чтобы память освобождать
                     // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
                     // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
-                    dcSet.clearCash();
+                    dcSet.clearCache();
 
                     try {
                         while (bchain.getHeight(dcSet) >= this.orphanto

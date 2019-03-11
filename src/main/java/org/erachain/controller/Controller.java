@@ -2473,6 +2473,12 @@ public class Controller extends Observable {
             return false;
         }
 
+        if (newBlock.blockHead == null || newBlock.blockHead.winValue == 0l
+                || newBlock.getWinValue() == 0l )
+            // это может случиться при добавлении оего сгнерированного блока т.к. он не роверился
+            // когда надо было?
+            return false;
+
         LOGGER.debug("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
 
         try {

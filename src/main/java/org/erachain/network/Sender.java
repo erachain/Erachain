@@ -110,7 +110,7 @@ public class Sender extends MonitoredThread {
      * @param needFlush
      * @return
      */
-    private synchronized boolean writeAndFlush(byte[] bytes, boolean needFlush) {
+    private boolean writeAndFlush(byte[] bytes, boolean needFlush) {
         // пока есть входы по sendMessage (org.erachain.network.Peer.directSendMessage) - нужно ждать синхрон
         if (this.out == null)
             return false;
@@ -167,7 +167,9 @@ public class Sender extends MonitoredThread {
         }
 
         if (error != null) {
-            peer.ban(error);
+            if (peer.isUsed()) {
+                peer.ban(error);
+            }
             return false;
         }
 
