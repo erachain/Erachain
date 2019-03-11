@@ -1,4 +1,4 @@
-function makePageUri(page, flag) {
+function makePageUri(page, linkName) {
     // parse url
     var urlParams;
     var match,
@@ -13,11 +13,7 @@ function makePageUri(page, flag) {
     while (match = search.exec(query))
         urlParams[decode(match[1])] = decode(match[2]);
 
-    if (flag) {
-        urlParams['page'] = page;
-    } else {
-        urlParams['startBlock'] = page;
-    }
+    urlParams[linkName] = page;
     var uri = '';
 
     for (var paramKey in urlParams) {
@@ -44,7 +40,7 @@ function pagesComponent(data) {
                 output += '<b>' + page + '</b>&nbsp;';
             }
             else {
-                output += '<a href="' + makePageUri(page, true) + '">' + page + '</a>&nbsp;';
+                output += '<a href="' + makePageUri(page, 'page') + '">' + page + '</a>&nbsp;';
             }
         }
     }
@@ -52,61 +48,32 @@ function pagesComponent(data) {
     return output;
 }
 
-function pagesBlocksComponentBeauty(data) {
+function pageCreation(from, to, step, restriction, start, linkName) {
     var output = '';
-    var delta = 7;
-    var step = 100;
-    var numberPages = 3;
-    if (data.startBlock >= 1) {
-        output += data.Label_Blocks + ':';
-        var from = data.lastBlock.height
-        var to = data.lastBlock.height - (numberPages - 2) * step + 1;
-        var restriction = data.lastBlock.height;
-
-        for (var page = from; page > to; page -= step) {
-            if (page >= 1 && page <= restriction) {
-                if (page == data.startBlock) {
-                    output += '<b>' + page + '</b>&nbsp;';
-                    continue;
-                }
-                output += '<a href="' + makePageUri(page, false) + '">' + page + '</a>&nbsp;';
+    for (var page = from; page > to; page -= step) {
+        if (page >= 1 && page <= restriction) {
+            if (page == start) {
+                output += '<b>' + page + '</b>&nbsp;';
+                continue;
             }
+            output += '<a href="' + makePageUri(page, linkName) + '">' + page + '</a>&nbsp;';
         }
-
-        output += '...';
-
-
-        from = data.startBlock + step * delta;
-        to = (data.startBlock - step * delta);
-        restriction = data.lastBlock.height - 1;
-        for (var page = from; page > to; page -= step) {
-            if (page >= 1 && page <= restriction) {
-                if (page == data.startBlock) {
-                    output += '<b>' + page + '</b>&nbsp;';
-                    continue;
-                }
-                output += '<a href="' + makePageUri(page, false) + '">' + page + '</a>&nbsp;';
-            }
-        }
-        output += '...';
-
-
-        from = numberPages * step;
-        to = 1;
-        restriction = data.lastBlock.height;
-
-        for (var page = from; page > to; page -= step) {
-            if (page >= 1 && page <= restriction) {
-                if (page == data.startBlock) {
-                    output += '<b>' + page + '</b>&nbsp;';
-                    continue;
-                }
-                output += '<a href="' + makePageUri(page, false) + '">' + page + '</a>&nbsp;';
-            }
-        }
-
     }
+    return output;
+}
 
+function pagesComponentBeauty(start, label, numberLast, step, linkName) {
+    var output = '';
+    var delta = 5;
+    var numberPages = 3;
+    if (start >= 1) {
+        output += label + ':';
+        output += pageCreation(numberLast, numberLast - (numberPages - 2) * step + 1, step, numberLast, start,  linkName);
+        output += '...';
+        output +=pageCreation(start + step * delta, (start - step * delta), step, numberLast - 1, start, linkName);
+        output += '...';
+        output +=pageCreation(numberPages * step, 1, step, numberLast, start, linkName);
+    }
     return output;
 }
 

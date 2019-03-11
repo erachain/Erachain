@@ -450,16 +450,18 @@
         }
 
         function blocks(data) {
-            console.log('data=')
-            console.log(data)
 
             var output = '';
             if (data.hasOwnProperty('error')) {
                 return '<h2>' + data.error + '</h2>';
             }
+            var numberShiftDelta = data.numberOfRepresentsItemsOnPage;
+            //Отображение последнего блока
             output += lastBlock(data.lastBlock);
-            output += pagesBlocksComponentBeauty(data);
+            //Отображение компонента страниц(вверху)
+            output += pagesComponentBeauty(data.startBlock, data.Label_Blocks, data.lastBlock.height, numberShiftDelta, 'startBlock');
 
+            //Отображение шапки таблицы
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
             output += '<tr><td align=left>';
             output += '<table id=blocks_Transactions BORDER=0 cellpadding=15 cellspacing=0 width="1180" >' +
@@ -472,10 +474,9 @@
                 + '<td><b>' + data.Label_Generator + '<td><b>' + data.Label_TXs + '<td><b>'
                 + data.Label_Fee + '<td><b>' + data.Label_Target + '<td><b>' + data.Label_Gen_balance + '<td><b>WV dtWV';
 
-
-            // for (var key = lengthObj(data.Blocks)-1; key >= 0; key--) {
+            //Отображение таблицы элементов блоков
             var length = Object.keys(data.Blocks).length;
-            for (var key = length-1; key >= 0; key--) {
+            for (var key = length - 1; key >= 0; key--) {
                 output += '<tr>';
                 output += '<td><a href=?block=' + data.Blocks[key].height + get_lang() + '>' + data.Blocks[key].height + '</a><td>'
                     + data.Blocks[key].dateTime + '<td>' + '<a href=?addr=' + data.Blocks[key].generator
@@ -485,23 +486,21 @@
                 output += '<td>' + addCommas(data.Blocks[key].generatingBalance)
                     + '<td>' + addCommas(data.Blocks[key].winValue) + ' ' + addCommas(data.Blocks[key].winValueTargetted);
             }
-            
-            var numberShiftDelta = 100
 
-
+            //Отображение ссылки предыдущая
             output += '<tr><td colspan=4>';
-            if (data.Blocks[0].height != 1) {
-                output += '<a href=?startBlock=' + (data.Blocks[length-1].height - numberShiftDelta) + get_lang() + '>' + data.Label_Previous;
+            if (data.startBlock >= 1) {
+                output += '<a href=?startBlock=' + (data.startBlock - numberShiftDelta) + get_lang() + '>' + data.Label_Previous;
             }
-
+            //Отображение ссылки следующая
             output += '<td colspan=4 align=right>';
-            if (data.lastBlock.height > data.Blocks[0].height + numberShiftDelta) {
-                output += '<a href=?startBlock=' + (data.Blocks[length-1].height + numberShiftDelta) + get_lang() + '>' + data.Label_Later;
+            if (data.lastBlock.height > data.startBlock) {
+                output += '<a href=?startBlock=' + (data.startBlock + numberShiftDelta) + get_lang() + '>' + data.Label_Later;
             }
 
             output += '</table></td></tr></table>';
-
-            output += pagesBlocksComponentBeauty(data);
+            //Отображение компонента страниц(снизу)
+            output += pagesComponentBeauty(data.startBlock, data.Label_Blocks, data.lastBlock.height, numberShiftDelta, 'startBlock');
 
             return output;
         }
@@ -3267,57 +3266,49 @@
 
 
         function persons(data) {
-
             var output = '';
-
             if (data.hasOwnProperty('error')) {
                 return '<h2>' + data.error + '</h2>';
             }
-
+            var numberShiftDelta = data.numberOfRepresentsItemsOnPage;
+            //Отображение последнего блока
             output += lastBlock(data.lastBlock);
-
+            //Отображение компонента страниц(вверху)
+            output += pagesComponentBeauty(data.startPerson, data.Label_Persons, data.numberLastPerson, numberShiftDelta, 'startPerson');
+            //Отображение шапки таблицы
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
             output += '<tr><td align=left>';
-            output += '<a href=?unconfirmed' + get_lang() + '>' + data.Label_Unconfirmed_transactions + ': ' + data.unconfirmedTxs + '</a>.';
-
-            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
-            output += '<tr><td><td><b>' + data.Label_key + ' <td><b>' + data.Label_name + '<td><b>' + data.Label_creator; // +'<td><b>'+data.Label_Gen_balance+'<td><b>'+data.Label_TXs+'<td><b>'+data.Label_Fee+'<td><b>'+data.Label_AT_Amount+'<td><b>'+data.Label_Amount;
-
-
-            row = data.row;
-            for (var i = data.start_row; i > row; i--) {
+            output += '<a href=?unconfirmed' + get_lang() + '>' +
+                data.Label_Unconfirmed_transactions + ': ' + data.unconfirmedTxs + '</a>.';
+            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  ' +
+                'class="table table-striped" style="border: 1px solid #ddd;">';
+            output += '<tr><td><td><b>' + data.Label_key + ' <td><b>' +
+                data.Label_name + '<td><b>' + data.Label_creator;
+            //Отображение таблицы элементов персон
+            var length = Object.keys(data.Persons).length;
+            for (var i = length - 1; i >= 0; i--) {
                 output += '<tr>';
-                //	output += '<td><a href=?block='+i+'>'+i+'</a><td>'+data[i].dateTime+'<td>'+'<a href=?addr='+data[i].generator+'>'+data[i].generator;
-                //	output += '<td>'+addCommas(data[i].generatingBalance)+'<td>'+data[i].transactionCount;
-                //	output += '<td>'+addCommas(data[i].totalFee)+'<td>'+addCommas(data[i].totalATAmount)+'<td>'+addCommas(data[i].totalAmount);
-                //output += '<td><img src="data:image/gif;base64,' + data[i].img+ '" width="100" /></td>';
-                output += ' <td><img src="personimage?key=' + data[i].key + '" width="100"/></td>';
-                output += '<td>' + addCommas(data[i].key) + '<td><a href=?person=' + data[i].key + get_lang() + '>' + data[i].name + '</a>';
-                //output += '<td><a href ="?person='+ 1 +'"><b> ' + data[i].creator + '</b></a><br>';
-                output += '<td><a href=?addr=' + data[i].creator + get_lang() + '>' + data[i].creator + '</a>';
+                output += ' <td><img src="personimage?key=' + data.Persons[i].key + '" width="100"/></td>';
+                output += '<td>' + addCommas(data.Persons[i].key) + '<td><a href=?person=' +
+                    data.Persons[i].key + get_lang() + '>' + data.Persons[i].name + '</a>';
+                output += '<td><a href=?addr=' + data.Persons[i].creator + get_lang() + '>' + data.Persons[i].creator + '</a>';
             }
-
+            //Отображение ссылки предыдущая
             output += '<tr><td colspan=4>';
-//	if(data.maxHeight != data.lastBlock.height)
-//	{
-            if (data.row > 0) {
-                output += '<a href=?persons&startPerson=' + data.row + get_lang() + '>' + data.Label_Previous;
+            if (data.startPerson > 1) {
+                output += '<a href=?persons&startPerson=' +
+                    (data.startPerson - numberShiftDelta) + get_lang() + '>' + data.Label_Previous;
             }
-            //else
-            //{
-            //	output += '<a href=?startPerson='+(data.maxHeight+21)+'>'+data.Label_Later;
-            //}
-//	}
-
+            //Отображение ссылки следующая
             output += '<td colspan=4 align=right>';
-            if (data.start_row < data.maxHeight) {
-                output += '<a href=?persons&startPerson=' + (data.start_row + data.view_Row) + get_lang() + '>' + data.Label_Later;
+            if (data.numberLastPerson > data.startPerson) {
+                output += '<a href=?persons&startPerson=' +
+                    (data.startPerson + numberShiftDelta) + get_lang() + '>' + data.Label_Later;
             }
-
-
+            output += '</table></td></tr></table>';
+            //Отображение компонента страниц(снизу)
+            output += pagesComponentBeauty(data.startPerson, data.Label_Persons, data.numberLastPerson, numberShiftDelta, 'startPerson');
             return output;
-
-
         }
 
         function get_lang() {
@@ -3473,14 +3464,6 @@
             }
 
             if (params.hasOwnProperty('addr')) {
-                // var page;
-                // if (params.hasOwnProperty('page') && isFinite(params['page'])) {
-                //     page = params['page'];
-                // }
-                // else {
-                //     page = 1;
-                // }
-
                 if (params.hasOwnProperty('start') && isFinite(params['start'])) {
                     start = params['start'];
                 }
@@ -3695,7 +3678,7 @@
             }
 
             if (params.hasOwnProperty('persons')) {
-                asyncAjax('blockexplorer.json?persons' + '&lang=' + params['lang'] + '&startPerson=' + params['startPerson'], 'persons');
+                asyncAjax('blockexplorer.json?persons' + '&lang=' + params['lang'] + '&start=' + params['startPerson'], 'persons');
                 document.title = title + ' - Search - ' + decodeURIComponent(params['persons']);
                 return;
             }

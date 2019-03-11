@@ -211,7 +211,6 @@ public class BlockExplorer {
                 }
             }
         } else if (info.getQueryParameters().containsKey("blocks")) {
-
             output.putAll(jsonQueryBlocks(start));
             //peers
         } else if (info.getQueryParameters().containsKey("peers")) {
@@ -270,12 +269,8 @@ public class BlockExplorer {
         }
         // persons list
         else if (info.getQueryParameters().containsKey("persons")) {
-            String startPerson = null;
             output.put("search", "person");
-            if (info.getQueryParameters().containsKey("startPerson")) {
-                startPerson = info.getQueryParameters().getFirst("startPerson");
-            }
-            output.putAll(jsonQueryPersons(startPerson));
+            output.putAll(jsonQueryPersons(start));
         }
         // person
         else if (info.getQueryParameters().containsKey("person")) {
@@ -1469,8 +1464,6 @@ public class BlockExplorer {
         output.put("Label_Gen_balance", Lang.getInstance().translate_from_langObj("Gen.Balance", langObj));
         output.put("Label_TXs", Lang.getInstance().translate_from_langObj("TXs", langObj));
         output.put("Label_Fee", Lang.getInstance().translate_from_langObj("Fee", langObj));
-//        output.put("Label_AT_Amount", Lang.getInstance().translate_from_langObj("AT Amount", langObj));
-//        output.put("Label_Amount", Lang.getInstance().translate_from_langObj("Amount", langObj));
         output.put("Label_Target", Lang.getInstance().translate_from_langObj("Target", langObj));
         output.put("Label_Later", Lang.getInstance().translate_from_langObj("Later", langObj));
         output.put("Label_Previous", Lang.getInstance().translate_from_langObj("Previous", langObj));
@@ -1478,15 +1471,14 @@ public class BlockExplorer {
 
         //Параметр показывающий сколько элементов располагать на странице
         int numberOfRepresentsItemsOnPage = 100;
-        //Получение списка блоков из бд
-        List<Block> blocks = new ArrayList<>();
-
+        output.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
         if (startBlock == -1) {
             startBlock = dcSet.getBlockMap().size();
         }
 
-
-        for (int i = startBlock - numberOfRepresentsItemsOnPage+1; i <=startBlock ; i++) {
+        List<Block> blocks = new ArrayList<>();
+        //Получение списка блоков из бд
+        for (int i = startBlock - numberOfRepresentsItemsOnPage + 1; i <= startBlock; i++) {
             Block block = dcSet.getBlockMap().get(i);
             if (block != null) {
                 blocks.add(block);
@@ -1501,7 +1493,7 @@ public class BlockExplorer {
     }
 
     private Map blocksJSON(List<Block> blocks) {
-        Map blocksJSON = new LinkedHashMap();
+        Map result = new LinkedHashMap();
         for (int i = 0; i < blocks.size(); i++) {
             Map blockJSON = new LinkedHashMap();
             Block block = blocks.get(i);
@@ -1517,9 +1509,9 @@ public class BlockExplorer {
             blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
             block.loadHeadMind(dcSet);
             blockJSON.put("totalFee", block.viewFeeAsBigDecimal());
-            blocksJSON.put(i, blockJSON);
+            result.put(i, blockJSON);
         }
-        return blocksJSON;
+        return result;
     }
 
     // new Long(personKey)
@@ -1787,95 +1779,58 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryPersons(String start_Web) {
-        /*
-         * Block block; if(start > 0) { block =
-         * Controller.getInstance().getBlockByHeight(start); } else { block =
-         * getLastBlock(); start = block.getHeight(dcSet); }
-         */
+    public Map jsonQueryPersons(int startPerson) {
         Map output = new LinkedHashMap();
 
         output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
 
-        // TODO translate_web(
-
+        output.put("Label_Unconfirmed_transactions",
+                Lang.getInstance().translate_from_langObj("Unconfirmed transactions", langObj));
         output.put("Label_key", Lang.getInstance().translate_from_langObj("Key", langObj));
         output.put("Label_name", Lang.getInstance().translate_from_langObj("Name", langObj));
         output.put("Label_creator", Lang.getInstance().translate_from_langObj("Creator", langObj));
-        output.put("Label_Later", Lang.getInstance().translate_from_langObj(">>", langObj));
-        output.put("Label_Previous", Lang.getInstance().translate_from_langObj("<<", langObj));
+        output.put("Label_Later", Lang.getInstance().translate_from_langObj("Later", langObj));
+        output.put("Label_Previous", Lang.getInstance().translate_from_langObj("Previous", langObj));
+        output.put("Label_Persons", Lang.getInstance().translate_from_langObj("Persons", langObj));
 
-        /*
-         * output.put("Label_Unconfirmed_transactions",
-         * "Unconfirmed transactions"); output.put("Label_Height", "Height");
-         * output.put("Label_Time", "Time"); output.put("Label_Generator",
-         * "Creator"); output.put("Label_Gen_balance", "Gen.Balance");
-         * output.put("Label_TXs", "TXs"); output.put("Label_Fee", "Fee");
-         * output.put("Label_AT_Amount", "AT_Amount");
-         * output.put("Label_Amount", "Amount"); output.put("Label_Later",
-         * "Later"); output.put("Label_Previous", "Previous");
-         *
-         * int counter = start;
-         */
+        //Параметр показывающий сколько элементов располагать на странице
+        int numberOfRepresentsItemsOnPage = 20;
+        output.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
 
-        long maxRow = dcSet.getItemPersonMap().getLastKey();
-        long view_Row = 21;
-        Long startRow;
-        try {
-            startRow = Long.valueOf(start_Web);
-            if (startRow > maxRow)
-                startRow = maxRow;
-
-        } catch (NumberFormatException e) {
-            // TODO Auto-generated catch block
-
-            startRow = maxRow;
+        if (startPerson == -1) {
+            startPerson = dcSet.getItemPersonMap().size();
         }
 
-        if (startRow < 1)
-            startRow = view_Row;
+        List<PersonCls> persons = new ArrayList<>();
 
-        long i = startRow;
-        long k = i - view_Row;
-        if (startRow - view_Row < 0)
-            k = 0;
-        // if (i <0) i =i + maxRow - start_Web;
-        // k = maxRow - i;
-
-        // if (k> dcSet.getItemPersonMap().getSize()) k=
-        // dcSet.getItemPersonMap().getSize();
-        output.put("start_row", i);
-        do {
-
-            PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(i);
-            Map blockJSON = new LinkedHashMap();
+        for (int i = startPerson - numberOfRepresentsItemsOnPage + 1; i <= startPerson; i++) {
+            PersonCls person = (PersonCls) dcSet.getItemPersonMap().get((long) i);
             if (person != null) {
-                blockJSON.put("key", person.getKey());
-                blockJSON.put("name", person.getName());
-                blockJSON.put("creator", person.getOwner().getAddress());
-                String img = Base64.encodeBase64String(person.getImage());
-                blockJSON.put("img", img);
-                String ico = Base64.encodeBase64String(person.getIcon());
-                blockJSON.put("ico", ico);
-            } else {
-                blockJSON.put("key", i);
-                blockJSON.put("name", "-");
-                blockJSON.put("creator", "-");
-                //String img = Base64.encodeBase64String(person.getImage());
-                blockJSON.put("img", "");
-                //String ico = Base64.encodeBase64String(person.getIcon());
-                blockJSON.put("ico", "");
+                persons.add(person);
             }
-            output.put(i, blockJSON);
-            i--;
+        }
 
-        } while (i > k);
-
-        output.put("maxHeight", dcSet.getItemPersonMap().getLastKey());
-        output.put("row", i);
-        output.put("view_Row", view_Row);
-
+        Map personsJSON = personsJSON(persons);
+        output.put("Persons", personsJSON);
+        output.put("startPerson", startPerson);
+        output.put("numberLastPerson", dcSet.getItemPersonMap().getLastKey());
         return output;
+    }
+
+
+    private Map personsJSON(List<PersonCls> persons) {
+        Map result = new LinkedHashMap();
+        for (int i = 0; i < persons.size(); i++) {
+            Map personJSON = new LinkedHashMap();
+            PersonCls person = persons.get(i);
+            personJSON.put("key", person.getKey());
+            personJSON.put("name", person.getName());
+            personJSON.put("creator", person.getOwner().getAddress());
+            personJSON.put("img", Base64.encodeBase64String(person.getImage()));
+            personJSON.put("ico", Base64.encodeBase64String(person.getIcon()));
+            result.put(i, personJSON);
+        }
+        return result;
     }
 
     public Map jsonQueryLastBlock() {
@@ -1986,7 +1941,6 @@ public class BlockExplorer {
         output.put("Label_minus", Lang.getInstance().translate_from_langObj("minus", langObj));
         output.put("Label_in_order", Lang.getInstance().translate_from_langObj("in order", langObj));
 
-        output.put("Label_Top", Lang.getInstance().translate_from_langObj("Top", langObj));
         output.put("Label_Top", Lang.getInstance().translate_from_langObj("Top", langObj));
 
         output.put("all", all.toPlainString());
