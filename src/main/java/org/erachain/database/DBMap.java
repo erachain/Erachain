@@ -292,10 +292,10 @@ public abstract class DBMap<T, U> extends Observable {
     }
 
     public SortableList<T, U> getList() {
-        this.addUses();
-        SortableList<T, U> u = new SortableList<T, U>(this);
-        this.outUses();
-        return u;
+        addUses();
+        SortableList<T, U> result = new SortableList<T, U>(this);
+        outUses();
+        return result;
     }
 
     public void reset() {

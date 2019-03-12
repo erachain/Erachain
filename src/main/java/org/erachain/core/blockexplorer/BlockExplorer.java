@@ -59,7 +59,7 @@ public class BlockExplorer {
     private DateFormat df = DateFormat.getDateInstance(DateFormat.DATE_FIELD, local); // for
     // date
     // format
-    private String lang_file;
+    private String langFile;
     private DCSet dcSet;
     private Map output;
 
@@ -85,23 +85,26 @@ public class BlockExplorer {
         Stopwatch stopwatchAll = new Stopwatch();
         int start = -1;
         start = checkAndGetIntParam(info, start, "start");
+        int pageNumber = 1;
+        pageNumber = checkAndGetIntParam(info, pageNumber, "page");
+
         int txOnPage = 100;
         String filter = "standart";
         boolean allOnOnePage = false;
-        int pageNumber = 1;
-        pageNumber = checkAndGetIntParam(info, pageNumber, "page");
+
         output = new LinkedHashMap();
         output.put("search", "block");
-        // lang
+
+        //lang
         if (!info.getQueryParameters().containsKey("lang")) {
-            lang_file = LANG_DEFAULT + ".json";
+            langFile = LANG_DEFAULT + ".json";
         } else {
-            lang_file = info.getQueryParameters().getFirst("lang") + ".json";
+            langFile = info.getQueryParameters().getFirst("lang") + ".json";
         }
 
-        logger.error("try lang file: " + lang_file);
+        logger.info("try lang file: " + langFile);
 
-        langObj = Lang.getInstance().openLangFile(lang_file);
+        langObj = Lang.getInstance().openLangFile(langFile);
 
         List<Tuple2<String, String>> langs = Lang.getInstance().getLangListToWeb();
 
@@ -113,7 +116,7 @@ public class BlockExplorer {
             lang_list.put(i, lang_par);
         }
         output.put("Lang", lang_list);
-        // Основное меню. заголовки и их перевод на выбранный язык
+        //Основное меню. заголовки и их перевод на выбранный язык
         output.put("id_home2", Lang.getInstance().translate_from_langObj("Blocks", langObj));
         output.put("id_menu_top_100", Lang.getInstance().translate_from_langObj("Top 100 Richest", langObj));
         output.put("id_menu_percons", Lang.getInstance().translate_from_langObj("Persons", langObj));
@@ -122,45 +125,47 @@ public class BlockExplorer {
         output.put("id_menu_aTs", Lang.getInstance().translate_from_langObj("ATs", langObj));
         output.put("id_menu_documents", Lang.getInstance().translate_from_langObj("Documents", langObj));
 
-        // информация о последнем блоке
+        //информация о последнем блоке
         output.put("lastBlock", jsonQueryLastBlock());
 
-
-        if (info.getQueryParameters().containsKey("balance")) {
-            for (String address : info.getQueryParameters().get("balance")) {
-                output.put(address, jsonQueryBalance(address));
-            }
-
-        }
+        //todo Gleb непонятно зачем - выпиливаю
+//        if (info.getQueryParameters().containsKey("balance")) {
+//            for (String address : info.getQueryParameters().get("balance")) {
+//                output.put(address, jsonQueryBalance(address));
+//            }
+//
+//        }
 
         if (info.getQueryParameters().containsKey("q")) {
 
             if (info.getQueryParameters().containsKey("search")) {
 
-                String type = info.getQueryParameters().get("search").get(0);
-                String search = info.getQueryParameters().get("q").get(0);
+                String type = info.getQueryParameters().getFirst("search");
+                logger.info("type=" + type);
+                String search = info.getQueryParameters().getFirst("q");
                 switch (type) {
                     case "persons":
                     case "person":
-                        // search persons
+                        //search persons
                         output.put("search", type);
-                        output.putAll(jsonQuerySearchPersons(info.getQueryParameters().getFirst("q")));
+                        output.putAll(jsonQuerySearchPersons(search, start));
+
                         break;
                     case "assets":
                     case "asset":
-                        // search assets
+                        //search assets
                         output.put("search", type);
-                        output.putAll(jsonQuerySearchAssets(info.getQueryParameters().getFirst("q")));
+                        output.putAll(jsonQuerySearchAssets(search));
                         break;
-                    case "status":
                     case "statuses":
-                        // search assets
+                    case "status":
+                        //search statuses
                         output.put("search", type);
-                        output.putAll(jsonQuerySearchStatuses(info.getQueryParameters().getFirst("q")));
+                        output.putAll(jsonQuerySearchStatuses(search));
                         break;
-                    case "block":
                     case "blocks":
-                        // search assets
+                    case "block":
+                        //search block
                         output.put("search", "block");
                         output.putAll(jsonQueryBlock(search, pageNumber));
                         break;
@@ -182,7 +187,6 @@ public class BlockExplorer {
             output.putAll(jsonQueryPools(info));
             // asset
         } else if (info.getQueryParameters().containsKey("asset")) {
-
             // person asset balance
             if (info.getQueryParameters().containsKey("person")) {
                 output.put("search", "person");
@@ -275,10 +279,9 @@ public class BlockExplorer {
         // person
         else if (info.getQueryParameters().containsKey("person")) {
             output.put("search", "person");
-
             // person asset balance
             if (info.getQueryParameters().containsKey("asset")) {
-                output.put("search", "person");
+//                output.put("search", "person");
                 output.putAll(jsonQueryPersonBalance(new Long(info.getQueryParameters().getFirst("person")),
                         new Long(info.getQueryParameters().getFirst("asset")),
                         new Integer(info.getQueryParameters().getFirst("position"))
@@ -287,7 +290,6 @@ public class BlockExplorer {
                 output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
             }
         }
-
         // templates list
         else if (info.getQueryParameters().containsKey("templates")) {
             output.put("search", "template");
@@ -1556,12 +1558,75 @@ public class BlockExplorer {
         return output;
     }
 
+
+    private Map jsonQuerySearchPersons(String search, int startPerson) throws WrongSearchException {
+        Map output = new LinkedHashMap();
+        output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
+        output.put("Label_Unconfirmed_transactions",
+                Lang.getInstance().translate_from_langObj("Unconfirmed transactions", langObj));
+        output.put("Label_key", Lang.getInstance().translate_from_langObj("Key", langObj));
+        output.put("Label_name", Lang.getInstance().translate_from_langObj("Name", langObj));
+        output.put("Label_creator", Lang.getInstance().translate_from_langObj("Creator", langObj));
+        output.put("Label_Later", Lang.getInstance().translate_from_langObj("Later", langObj));
+        output.put("Label_Previous", Lang.getInstance().translate_from_langObj("Previous", langObj));
+        output.put("Label_Persons", Lang.getInstance().translate_from_langObj("Persons", langObj));
+
+        List<ItemCls> listPersons = new ArrayList();
+        try {
+            if (search.matches("\\d+") && dcSet.getItemPersonMap().contains(Long.valueOf(search))) {
+                listPersons.add(dcSet.getItemPersonMap().get(Long.valueOf(search)));
+            } else {
+                listPersons = dcSet.getItemPersonMap().get_By_Name(search, false);
+            }
+        } catch (Exception e) {
+            logger.info("Wrong search while process persons... ");
+            throw new WrongSearchException();
+        }
+        if (listPersons == null || listPersons.size() == 0) {
+            logger.info("Wrong search while process persons... ");
+            throw new WrongSearchException();
+        }
+
+        int numberOfRepresentsItemsOnPage = 10;
+        List<PersonCls> persons = new ArrayList<>();
+        int min = Math.min(numberOfRepresentsItemsOnPage, listPersons.size());
+        for (int i = listPersons.size() - min; i < listPersons.size() ; i++) {
+            PersonCls person = (PersonCls) listPersons.get(i);
+            if (startPerson != -1) {
+                if (person.getKey() <= startPerson) {
+                    persons.add(person);
+                }
+            } else {
+                persons.add(person);
+            }
+
+        }
+        output.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
+
+        Map personsJSON = personsJSON(persons);
+        output.put("Persons", personsJSON);
+        if (persons.size()==0) {
+            throw new WrongSearchException();
+        }
+        long key = persons.get(persons.size() - 1).getKey();
+
+
+        if (startPerson == -1) {
+            startPerson = (int) key;
+        }
+
+        output.put("startPerson", startPerson);
+        output.put("numberLastPerson", key);
+
+        return output;
+    }
+
     private Map jsonQueryPerson(String first) {
-        // TODO Auto-generated method stub
         Map output = new LinkedHashMap();
         PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(new Long(first));
-        if (person == null)
+        if (person == null) {
             return null;
+        }
 
         byte[] b = person.getImage();
         String a = Base64.encodeBase64String(b);
@@ -1586,10 +1651,8 @@ public class BlockExplorer {
         }
 
         output.put("name", person.getName());
-        //////// output.put("birthday", df.format(new
-        //////// Date(person.getBirthday())).toString());
         output.put("birthday", person.getBirthdayStr());
-        if (!person.isAlive(0l)) { //NTP.getTime())) {
+        if (!person.isAlive(0l)) {
             output.put("deathday", person.getDeathdayStr());
             output.put("Label_dead", Lang.getInstance().translate_from_langObj("Deathday", langObj));
 
@@ -1597,8 +1660,9 @@ public class BlockExplorer {
         output.put("description", person.getDescription());
 
         String gender = Lang.getInstance().translate_from_langObj("Man", langObj);
-        if (person.getGender() != 0)
+        if (person.getGender() != 0) {
             gender = Lang.getInstance().translate_from_langObj("Woman", langObj);
+        }
         output.put("gender", gender);
 
         // statuses
@@ -1613,9 +1677,9 @@ public class BlockExplorer {
         if (rowCount > 0) {
             for (int i = 0; i < rowCount; i++) {
                 Map statusJSON = new LinkedHashMap();
-                statusJSON.put("status_name", statusModel.getValueAt(i, statusModel.COLUMN_STATUS_NAME));
-                statusJSON.put("status_period", statusModel.getValueAt(i, statusModel.COLUMN_PERIOD));
-                Account creator = (Account) statusModel.getValueAt(i, statusModel.COLUMN_MAKER_ACCOUNT);
+                statusJSON.put("status_name", statusModel.getValueAt(i, WEB_PersonStatusesModel.COLUMN_STATUS_NAME));
+                statusJSON.put("status_period", statusModel.getValueAt(i, WEB_PersonStatusesModel.COLUMN_PERIOD));
+                Account creator = (Account) statusModel.getValueAt(i, WEB_PersonStatusesModel.COLUMN_MAKER_ACCOUNT);
 
                 if (creator != null) {
                     statusJSON.put("status_creator_address", creator.getAddress());
@@ -1658,10 +1722,10 @@ public class BlockExplorer {
 
             for (int i = 0; i < rowCount; i++) {
                 Map accountJSON = new LinkedHashMap();
-                accountJSON.put("address", personModel.getValueAt(i, personModel.COLUMN_ADDRESS));
-                accountJSON.put("to_date", personModel.getValueAt(i, personModel.COLUMN_TO_DATE));
-                accountJSON.put("creator", personModel.getValueAt(i, personModel.COLUMN_CREATOR));
-                accountJSON.put("creator_address", personModel.getValueAt(i, personModel.COLUMN_CREATOR_ADDRESS));
+                accountJSON.put("address", personModel.getValueAt(i, PersonAccountsModel.COLUMN_ADDRESS));
+                accountJSON.put("to_date", personModel.getValueAt(i, PersonAccountsModel.COLUMN_TO_DATE));
+                accountJSON.put("creator", personModel.getValueAt(i, PersonAccountsModel.COLUMN_CREATOR));
+                accountJSON.put("creator_address", personModel.getValueAt(i, PersonAccountsModel.COLUMN_CREATOR_ADDRESS));
 
 
                 accountsJSON.put(i, accountJSON);
@@ -1670,9 +1734,6 @@ public class BlockExplorer {
 
                 my_Issue_Persons.addAll(dcSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(acc,
                         Transaction.ISSUE_PERSON_TRANSACTION, 0));
-
-                //WEB_Balance_from_Adress_TableModel balanceTableModel = new WEB_Balance_from_Adress_TableModel(
-                //        new Account(acc));
 
                 Account account = new Account(acc);
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
@@ -1718,10 +1779,7 @@ public class BlockExplorer {
             my_Person_JSON.put("key", item.getKey());
             my_Person_JSON.put("name", item.getName());
 
-            my_Person_JSON.put("date", df.format(new Date(my_Issue_Person.getTimestamp())).toString());// new
-            // Date(my_Issue_Person.getTimestamp().toString()));
-            /// my_Person_JSON.put("date",
-            /// utils.DateTimeFormat.timestamptoString(my_Issue_Person.getTimestamp()));
+            my_Person_JSON.put("date", df.format(new Date(my_Issue_Person.getTimestamp())));
             my_Persons_JSON.put(i, my_Person_JSON);
             i++;
         }
@@ -1731,55 +1789,8 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQuerySearchPersons(String search) throws WrongSearchException {
-        Map output = new LinkedHashMap();
-        output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
 
-        // TODO translate_web(
-
-        output.put("Label_key", Lang.getInstance().translate_from_langObj("Key", langObj));
-        output.put("Label_name", Lang.getInstance().translate_from_langObj("Name", langObj));
-        output.put("Label_creator", Lang.getInstance().translate_from_langObj("Creator", langObj));
-        output.put("Label_Later", Lang.getInstance().translate_from_langObj(">>", langObj));
-        output.put("Label_Previous", Lang.getInstance().translate_from_langObj("<<", langObj));
-
-        List<ItemCls> listPerson = new ArrayList();
-        try {
-            if (search.matches("\\d+") && dcSet.getItemPersonMap().contains(Long.valueOf(search))) {
-                listPerson.add(dcSet.getItemPersonMap().get(Long.valueOf(search)));
-            } else {
-                listPerson = dcSet.getItemPersonMap().get_By_Name(search, false);
-            }
-        } catch (Exception e) {
-            logger.info("Wrong search while process persons... ");
-            throw new WrongSearchException();
-        }
-        if (listPerson == null || listPerson.size() == 0) {
-            logger.info("Wrong search while process persons... ");
-            throw new WrongSearchException();
-        }
-        int i = 0;
-        for (ItemCls pers : listPerson) {
-            PersonCls person = (PersonCls) pers;
-            Map blockJSON = new LinkedHashMap();
-            blockJSON.put("key", person.getKey());
-            blockJSON.put("name", person.getName());
-            blockJSON.put("creator", person.getOwner().getAddress());
-            String img = Base64.encodeBase64String(person.getImage());
-            blockJSON.put("img", img);
-            output.put(i, blockJSON);
-            i++;
-        }
-
-        output.put("start_row", listPerson.size() - 1);
-        output.put("maxHeight", dcSet.getItemPersonMap().getLastKey());
-        output.put("row", -1);
-        output.put("view_Row", listPerson.size() - 1);
-
-        return output;
-    }
-
-    public Map jsonQueryPersons(int startPerson) {
+    private Map jsonQueryPersons(int startPerson) {
         Map output = new LinkedHashMap();
 
         output.put("unconfirmedTxs", dcSet.getTransactionMap().size());

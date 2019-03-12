@@ -455,6 +455,8 @@
             if (data.hasOwnProperty('error')) {
                 return '<h2>' + data.error + '</h2>';
             }
+            console.log('data=')
+            console.log(data)
             var numberShiftDelta = data.numberOfRepresentsItemsOnPage;
             //Отображение последнего блока
             output += lastBlock(data.lastBlock);
@@ -3184,8 +3186,7 @@
         }
 
         function person(data) {
-            var output = '';
-            output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+            var output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
             output += '<tr><td align=left>';
             output += '<table><tr><td>';
 
@@ -3270,6 +3271,8 @@
             if (data.hasOwnProperty('error')) {
                 return '<h2>' + data.error + '</h2>';
             }
+            console.log('data=')
+            console.log(data)
             var numberShiftDelta = data.numberOfRepresentsItemsOnPage;
             //Отображение последнего блока
             output += lastBlock(data.lastBlock);
@@ -3660,16 +3663,22 @@
             }
 
             if (params.hasOwnProperty('q')) {
-                var ss = 'search';
-                if (params['search'] == 'person' || params['search'] == 'persons') ss = 'persons';
-                if (params['search'] == 'asset' || params['search'] == 'assets') ss = 'assets';
-                if (params['search'] == 'status' || params['search'] == 'statuses') ss = 'statuses';
-                if (params['search'] == 'block' || params['search'] == 'blocks') ss = 'block';
+                if (params['search'] == 'person' || params['search'] == 'persons') {
+                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
+                        '&search=' + params['search'] + '&start=' + params['startPerson'], 'persons');
+                } else if (params['search'] == 'asset' || params['search'] == 'assets') {
+                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
+                        '&search=' + params['search'], 'assets');
+                } else if (params['search'] == 'status' || params['search'] == 'statuses') {
+                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
+                        '&search=' + params['search'], 'statuses');
+                } else if (params['search'] == 'block' || params['search'] == 'blocks') {
+                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
+                        '&search=' + params['search'] + '&page=' + page, 'block');
+                }
                 console.log("I find all problems!!!")
                 console.log("page=")
                 console.log(page)
-                asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                    '&search=' + params['search'] + '&page=' + page, ss);
 
                 document.title = title + ' - Search - ' + decodeURIComponent(params['q']);
                 document.getElementById('q').value = decodeURIComponent(params['q']);
