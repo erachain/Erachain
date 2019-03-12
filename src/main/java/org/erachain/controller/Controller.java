@@ -2475,9 +2475,11 @@ public class Controller extends Observable {
 
         if (newBlock.blockHead == null || newBlock.blockHead.winValue == 0l
                 || newBlock.getWinValue() == 0l )
-            // это может случиться при добавлении оего сгнерированного блока т.к. он не роверился
-            // когда надо было?
-            return false;
+            // это может случиться при добавлении в момент синхронизации - тогда до расчета Победы не доходит
+            // или прри добавлении моего сгнерированного блока т.к. он не проверился?
+            if (!newBlock.isValidHead(dcSet))
+                // тогда проверим заново полностью
+                return false;
 
         LOGGER.debug("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
 
