@@ -2480,7 +2480,7 @@ public class Controller extends Observable {
                 // тогда проверим заново полностью
                 return false;
 
-        LOGGER.debug("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
+        LOGGER.info("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
 
         try {
             this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true);
@@ -2495,7 +2495,7 @@ public class Controller extends Observable {
             }
         }
 
-        LOGGER.debug("+++ flushNewBlockGenerated OK");
+        LOGGER.info("+++ flushNewBlockGenerated OK");
 
         /// LOGGER.info("and broadcast it");
 

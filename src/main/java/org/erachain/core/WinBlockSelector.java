@@ -70,12 +70,12 @@ public class WinBlockSelector extends MonitoredThread {
         }
         String info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
                 + newBlock.toString();
-        LOGGER.debug(info);
+        LOGGER.info(info);
 
         if (!newBlock.isValidHead(dcSet)) {
             // то проверим заголовок
             info = "Block[" + newBlock.toString() + "] HEAD is Invalid - ignore";
-            LOGGER.debug(info);
+            LOGGER.info(info);
             return;
         }
 
