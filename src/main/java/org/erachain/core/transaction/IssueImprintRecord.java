@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 // reference - as item.name
 // TODO - reference NOT NEED - because it is unique record! - make it as new version protocol
-public class IssueImprintRecord extends Issue_ItemRecord {
+public class IssueImprintRecord extends IssueItemRecord {
     //protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK;
 
     protected static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK - REFERENCE_LENGTH;

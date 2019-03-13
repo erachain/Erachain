@@ -203,7 +203,7 @@ public class Lang {
         return lngFileList;
     }
 
-    public String translate_from_langObj(String message, JSONObject langObj1) {
+    public String translateFromLangObj(String message, JSONObject langObj1) {
         //COMMENT AFTER # FOR TRANSLATE THAT WOULD BE THE SAME TEXT IN DIFFERENT WAYS TO TRANSLATE
         String messageWithoutComment = message.replaceFirst("(?<!\\\\)#.*$", "");
         messageWithoutComment = messageWithoutComment.replace("\\#", "#");

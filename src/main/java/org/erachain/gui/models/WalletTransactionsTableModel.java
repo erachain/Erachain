@@ -165,8 +165,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
             itemName = item.toString();
             creator_address = transGen.getRecipient().getAddress();
-        } else if (transaction instanceof Issue_ItemRecord) {
-            Issue_ItemRecord transIssue = (Issue_ItemRecord) transaction;
+        } else if (transaction instanceof IssueItemRecord) {
+            IssueItemRecord transIssue = (IssueItemRecord) transaction;
             ItemCls item = transIssue.getItem();
             if (item == null)
                 return null;

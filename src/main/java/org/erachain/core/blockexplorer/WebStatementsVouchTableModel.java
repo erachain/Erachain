@@ -16,7 +16,7 @@ import java.util.*;
 
 //import org.erachain.core.transaction.R_SignStatement_old;
 
-public class WEB_Statements_Vouch_Table_Model extends AbstractTableModel implements Observer {
+public class WebStatementsVouchTableModel extends AbstractTableModel implements Observer {
 
     public static final int COLUMN_TIMESTAMP = 0;
     // public static final int COLUMN_TYPE = 1;
@@ -43,7 +43,7 @@ public class WEB_Statements_Vouch_Table_Model extends AbstractTableModel impleme
 
     private String sss;
 
-    public WEB_Statements_Vouch_Table_Model(Transaction transaction) {
+    public WebStatementsVouchTableModel(Transaction transaction) {
         table = DCSet.getInstance().getTransactionFinalMap();
         blockNo = transaction.getBlockHeight();
         recNo = transaction.getSeqNo();

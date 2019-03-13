@@ -12,7 +12,7 @@ import java.util.Arrays;
 //import java.util.Map;
 // import org.slf4j.LoggerFactory;
 
-public class IssueUnionRecord extends Issue_ItemRecord {
+public class IssueUnionRecord extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_UNION_TRANSACTION;
     private static final String NAME_ID = "Issue Union";
 
