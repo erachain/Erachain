@@ -384,7 +384,7 @@ public class Peer extends MonitoredThread {
                 } catch (EOFException e) {
                     if (this.runed)
                         // на ТОМ конце произошло отключение - делаем тоже дисконект
-                        ban(network.banForActivePeersCounter(), "read-0 peer is shutdownInput");
+                        ban(0, "peer is shutdownInput");
 
                     break;
                 } catch (java.net.SocketException e) {

@@ -93,7 +93,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.11.10 beta";
+    public static String version = "4.11.10a beta";
     public static String buildTime = "2019-02-13 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -2473,13 +2473,14 @@ public class Controller extends Observable {
             return false;
         }
 
-        if (newBlock.blockHead == null || newBlock.blockHead.winValue == 0l
-                || newBlock.getWinValue() == 0l )
-            // это может случиться при добавлении оего сгнерированного блока т.к. он не роверился
-            // когда надо было?
-            return false;
+        if (!newBlock.isValidated())
+            // это может случиться при добавлении в момент синхронизации - тогда до расчета Победы не доходит
+            // или прри добавлении моего сгнерированного блока т.к. он не проверился?
+            if (!newBlock.isValid(dcSet, false))
+                // тогда проверим заново полностью
+                return false;
 
-        LOGGER.debug("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
+        LOGGER.info("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
 
         try {
             this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true);
@@ -2494,7 +2495,7 @@ public class Controller extends Observable {
             }
         }
 
-        LOGGER.debug("+++ flushNewBlockGenerated OK");
+        LOGGER.info("+++ flushNewBlockGenerated OK");
 
         /// LOGGER.info("and broadcast it");
 
