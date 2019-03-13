@@ -100,6 +100,9 @@ public class Block {
     // при обработке трнзакций используем для запоминания что данные менялись
     protected List<Account> forgingInfoUpdate;
 
+    // was validated
+    protected boolean wasValidated;
+
     /////////////////////////////////////// BLOCK HEAD //////////////////////////////
     public static class BlockHead {
 
@@ -461,7 +464,7 @@ public class Block {
         }
 
         //CHECK IF WE HAVE MINIMUM BLOCK LENGTH
-        if (data.length < (useHeight <= 0? BASE_LENGTH + HEIGHT_LENGTH: BASE_LENGTH)
+        if (data.length < (useHeight <= 0 ? BASE_LENGTH + HEIGHT_LENGTH : BASE_LENGTH)
         ) {
             throw new Exception("Data is less then minimum block length - " + data.length + " useHeight:" + useHeight);
         }
@@ -535,7 +538,7 @@ public class Block {
         //READ TRANSACTIONS COUNT
         byte[] transactionCountBytes = Arrays.copyOfRange(data, position, position + TRANSACTIONS_COUNT_LENGTH);
         int transactionCount = Ints.fromByteArray(transactionCountBytes);
-        if (transactionCount <0 || transactionCount > 20000) {
+        if (transactionCount < 0 || transactionCount > 20000) {
             throw new Exception("Block parse - transactionCount error for useHeight[" + useHeight + "] with height:" + height);
         }
         position += TRANSACTIONS_COUNT_LENGTH;
@@ -607,6 +610,11 @@ public class Block {
     public Block.BlockHead getParentHead() {
         return this.parentBlockHead;
     }
+
+    public boolean isValidated() {
+        return this.wasValidated;
+    }
+
 
     public Block getParent(DCSet dcSet) {
         try {
@@ -1608,6 +1616,7 @@ public class Block {
 
         }
 
+        this.wasValidated = true;
         return true;
     }
 

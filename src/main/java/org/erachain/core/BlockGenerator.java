@@ -871,7 +871,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         return;
                                     }
 
-                                    LOGGER.error("generateNextBlock is NULL... try wait");
+                                    LOGGER.info("generateNextBlock is NULL... try wait");
                                     try {
                                         Thread.sleep(10000);
                                     } catch (InterruptedException e) {
@@ -939,7 +939,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             continue;
 
                         // FLUSH WINER to DB MAP
-                        LOGGER.debug("TRY to FLUSH WINER to DB MAP");
+                        LOGGER.info("TRY to FLUSH WINER to DB MAP");
 
                         try {
                             if (flushPoint + BlockChain.FLUSH_TIMEPOINT < NTP.getTime()) {
@@ -955,7 +955,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             try {
                                 if (!ctrl.flushNewBlockGenerated()) {
                                     // NEW BLOCK not FLUSHED
-                                    LOGGER.error("NEW BLOCK not FLUSHED");
+                                    LOGGER.info("NEW BLOCK not FLUSHED");
                                 } else {
                                     if (forgingStatus == ForgingStatus.FORGING_WAIT)
                                         setForgingStatus(ForgingStatus.FORGING);
