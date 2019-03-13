@@ -133,13 +133,16 @@ public class MonitoredThread extends Thread {
         info.put("counter", counter);
         info.put("periodAvg [ns]", periodAvg);
 
-        JSONArray statusJson = new JSONArray();
-        statusJson.add(0, this.status[0]);
-        statusJson.add(1, this.status[1]);
-        info.put("status", statusJson);
+        if (status != null) {
+            JSONArray statusJson = new JSONArray();
+            statusJson.add(0, this.status[0]);
+            statusJson.add(1, this.status[1]);
+            info.put("status", statusJson);
+        }
 
         if (withLog) {
             JSONArray statusLogJson = new JSONArray();
+
             for (Object[] item : this.statusLog) {
                 JSONArray statusItemLogJson = new JSONArray();
                 statusItemLogJson.add(0, item[0]);
