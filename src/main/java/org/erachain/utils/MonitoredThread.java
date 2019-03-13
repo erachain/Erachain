@@ -32,6 +32,10 @@ public class MonitoredThread extends Thread {
 
     }
 
+    public MonitoredThread() {
+        this(20);
+    }
+
     /**
      * перед запуском цикла ставим
      */
