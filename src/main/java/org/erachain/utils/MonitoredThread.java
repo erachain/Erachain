@@ -12,6 +12,7 @@ public class MonitoredThread extends Thread {
     long frequencyHour;
 
     long point;
+    private int size;
 
     /**
      * среднее значение срока оборота
@@ -24,8 +25,9 @@ public class MonitoredThread extends Thread {
     private Set<Long> logKeys;
     private long logKey;
 
-    public MonitoredThread() {
+    public MonitoredThread(int size) {
         super();
+        this.size = size;
         this.logKeys = Collections.synchronizedSet(new TreeSet<Long>());
 
     }
@@ -68,9 +70,9 @@ public class MonitoredThread extends Thread {
     public synchronized void setMonitorStatus(String status) {
         this.status = new Object[]{status, System.currentTimeMillis()};
 
-        if (this.statusLog.size() > 100) {
+        while (this.statusLog.size() > this.size) {
             try {
-                this.statusLog.remove(100);
+                this.statusLog.remove(this.size);
             } catch (Exception e) {
             }
         }
@@ -80,12 +82,14 @@ public class MonitoredThread extends Thread {
 
     private long statusPoint;
     public synchronized long setMonitorStatusBefore(String status) {
-        //long key = upKey();
-        //this.logKeys.add(key);
 
         this.status = new Object[]{status, System.currentTimeMillis()};
-        if (this.statusLog.size() > 100)
-            this.statusLog.remove(100);
+        while (this.statusLog.size() > this.size) {
+            try {
+                this.statusLog.remove(this.size);
+            } catch (Exception e) {
+            }
+        }
 
         this.statusLog.add(this.status);
 
@@ -108,6 +112,12 @@ public class MonitoredThread extends Thread {
         }
 
         this.status = new Object[]{this.status[0], this.status[1], period};
+        while (this.statusLog.size() > this.size) {
+            try {
+                this.statusLog.remove(this.size);
+            } catch (Exception e) {
+            }
+        }
 
         this.statusLog.add(this.statusLog.size(), this.status);
 
