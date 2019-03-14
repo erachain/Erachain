@@ -45,14 +45,14 @@ public class PeerManager extends MonitoredThread {
 
                 // TODO понять почему произошла ошибка https://lab.erachain.org/erachain/Erachain/issues/669
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().getDBSet().close();
-
+                LOGGER.error("try delete error peer");
                 try {
                     Controller.getInstance().getDBSet().getPeerMap().delete(peer.getAddress().getAddress());
                 } catch (Exception eIO) {
                     LOGGER.error(eIO.getMessage(), eIO);
                     LOGGER.error("try reCreate");
                     try {
+                        Controller.getInstance().getDBSet().close();
                         Controller.getInstance().reCreateDB();
                     } catch (Exception eIO2) {
                         LOGGER.error(eIO.getMessage(), eIO2);
