@@ -3403,7 +3403,6 @@ public class Controller extends Observable {
                 if (Gui.isGuiStarted()) {
                     JOptionPane.showMessageDialog(null, e.getMessage(), Lang.getInstance().translate("Startup Error"), JOptionPane.ERROR_MESSAGE);
 
-
                 }
 
 
