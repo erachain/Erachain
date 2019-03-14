@@ -139,7 +139,7 @@ public class BlockBuffer extends Thread {
         block = this.blocks.get(signature).poll(BlockChain.HARD_WORK?30000 : (Synchronizer.GET_BLOCK_TIMEOUT >> 1),
                 TimeUnit.MILLISECONDS);
         if (block == null) {
-            throw new Exception("Block buffer error 3");
+            throw new Exception("Block buffer error 3 =null");
         }
 
         return block;
