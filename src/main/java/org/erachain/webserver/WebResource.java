@@ -341,7 +341,7 @@ public class WebResource {
 
         if (lang != null) {
 
-            logger.error("try lang file: " + lang + ".json for " + request.getRemoteUser() + " " + request.getRequestURL());
+            logger.info("try lang file: " + lang + ".json for " + request.getRemoteUser() + " " + request.getRequestURL());
             langObj = Lang.openLangFile(lang + ".json");
 
      /*   // translate select

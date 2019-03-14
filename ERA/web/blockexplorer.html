@@ -3157,57 +3157,61 @@
 
             console.log('dataAssets=')
             console.log(data)
+            var notDisplayPages = data.notDisplayPages;
             var numberShiftDelta = data.numberOfRepresentsItemsOnPage;
             output += lastBlock(data.lastBlock);
-
+            var startAsset = data.startAsset;
+            if (!notDisplayPages) {
+                output += pagesComponentBeauty(startAsset, data.label_Assets, data.numberLastPerson, numberShiftDelta, 'start');
+            }
             output += '<table width="1280" border=0><tr><td align=left><br>';
             output += '<a href="?assets"' + get_lang() + '><h3 style="display:inline;">' + data.label_Title + '</h3></a>';
             output += '<br><br>';
 
-            var table = '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 ' +
+            output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 ' +
                 'class="table table-striped" style="border: 1px solid #ddd;"><tr>';
-            // table += '<td><b>' + data.label_table_key + ': <b>' + data.label_table_asset_name +
-            //     '<td><b>Operations<td><b>' + data.label_table_asset_description + '<td><b>' + data.label_table_asset_creator;
-            table += '<td><b>' + data.label_table_key + ': <b>' + data.label_table_asset_name +
-                '<td><b>Operations<td><b>' + data.label_table_asset_creator;
-            table += '<td><b>' + data.label_table_asset_movable + '<td><b>' +
+            output += '<td><b>' + data.label_table_key + ': <b>' + data.label_table_asset_name +
+                '<td><b>'+data.label_operations+'<td><b>' + data.label_table_asset_creator;
+            output += '<td><b>' + data.label_table_asset_movable + '<td><b>' +
                 data.label_table_asset_amount + '<td><b>' + data.label_table_asset_divisible;
 
             //Отображение таблицы элементов активов
             var length = Object.keys(data.Assets).length;
+            console.log('length=')
+            console.log(length)
             for (var i = length - 1; i >= 0; i--) {
-                table += '<tr>';
-                table += '<td> <a href=?asset=' + encodeURIComponent(data.Assets[i].key) + get_lang() + '>';
-                table += '<b>' + data.Assets[i].key+ '</b>: ' + htmlFilter(data.Assets[i].name);
+                output += '<tr>';
+                output += '<td> <a href=?asset=' + encodeURIComponent(data.Assets[i].key) + get_lang() + '>';
+                output += '<b>' + data.Assets[i].key+ '</b>: ' + htmlFilter(data.Assets[i].name);
                 if (data.Assets[i].icon.length > 0)
-                    table += '<img src="data:image/gif;base64,' + data.Assets[i].icon + '" width="100" /> <br>';
-                table += '</a>';
-                table += '<td>' + data.Assets[i].operations;
+                    output += '<img src="data:image/gif;base64,' + data.Assets[i].icon + '" width="100" /> <br>';
+                output += '</a>';
+                output += '<td>' + data.Assets[i].operations;
                 //Здесь возникает html injection - решено убрать это поле
                 // table += '<td>' + data.assets[key].description.substr(0, 80);
-                table += '<td><a href =?addr=' + data.Assets[i].owner + get_lang()
+                output += '<td><a href =?addr=' + data.Assets[i].owner + get_lang()
                     + '> ' + htmlFilter(data.Assets[i].owner) + '</a>';
-                table += '<td>' + htmlFilter(data.Assets[i].assetType);
-                table += '<td>' + data.Assets[i].quantity;
-                table += '<td>' + data.Assets[i].scale;
+                output += '<td>' + htmlFilter(data.Assets[i].assetType);
+                output += '<td>' + data.Assets[i].quantity;
+                output += '<td>' + data.Assets[i].scale;
             }
-            table += '<tr><td colspan=4>';
-            var startAsset = data.startAsset;
-            if (startAsset > 1) {
-                table += '<a href=?assets&start='
-                    + (startAsset - numberShiftDelta) + get_lang() + '>' + data.Label_Previous;
+            if (!notDisplayPages) {
+                output += '<tr><td colspan=4>';
+                if (startAsset > 1) {
+                    output += '<a href=?assets&start='
+                        + (startAsset - numberShiftDelta) + get_lang() + '>' + data.Label_Previous;
+                }
+                output += '<td colspan=4 align=right>';
+                if (data.numberLastPerson > startAsset) {
+                    output += '<a href=?assets&start='
+                        + (startAsset + numberShiftDelta) + get_lang() + '>' + data.Label_Later;
+                }
+
+
+                output += '</table></td></tr></table>';
+
+                output += pagesComponentBeauty(startAsset, data.label_Assets, data.numberLastPerson, numberShiftDelta, 'start');
             }
-            table += '<td colspan=4 align=right>';
-            if (data.numberLastPerson > startAsset) {
-                table += '<a href=?assets&start='
-                    + (startAsset + numberShiftDelta) + get_lang() + '>' + data.Label_Later;
-            }
-
-
-            table += '</table>';
-
-            output += table;
-
             return output;
         }
 
@@ -3837,12 +3841,12 @@
                         <div class="input-group">
                             <select id="selectID" class="form-control" role="tablist">
                                 <option value=block id=home2_op translate="true">Blocks</option>
-                                <option value=asset id=menu_assets_op translate="true">Asset</option>
-                                <option value=person id=menu_percons_op translate="true">Person</option>
-                                <option value=transaction translate="true">Transaction</option>
-                                <option value=status id=menu_statuses_op translate="true">Status</option>
-                                <option value=template id=menu_templates_op translate="true">Templates</option>
-                                <option value=template id=menu_documents_op translate="true">Documents</option>
+                                <option value=asset id=menu_assets_op translate="true">Assets</option>
+                                <option value=person id=menu_percons_op translate="true">Persons</option>
+                                <!--<option value=transaction translate="true">Transaction</option>-->
+                                <option value=status id=menu_statuses_op translate="true">Statuses</option>
+                                <!--<option value=template id=menu_templates_op translate="true">Templates</option>-->
+                                <!--<option value=template id=menu_documents_op translate="true">Documents</option>-->
 
                             </select>
                         </div>

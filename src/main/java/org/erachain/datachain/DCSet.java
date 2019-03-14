@@ -34,7 +34,7 @@ public class DCSet implements Observer, IDB {
     private static final String UNC_TX_COUNTER = "unc_tx_counter";
 
     private static boolean isStoped = false;
-    private static DCSet instance;
+    private volatile static DCSet instance;
     private DCSet parent;
     private int uses;
 
