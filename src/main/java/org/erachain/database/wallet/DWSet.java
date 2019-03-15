@@ -10,8 +10,10 @@ import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
+import org.erachain.database.DBASet;
 import org.erachain.database.IDB;
 import org.erachain.settings.Settings;
+import org.jcp.xml.dsig.internal.dom.DOMBase64Transform;
 import org.mapdb.Atomic.Var;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -20,14 +22,9 @@ import java.io.File;
 
 //import org.mapdb.Serializer;
 
-public class DWSet implements IDB {
-    private final File WALLET_FILE;
+public class DWSet extends DBASet {
 
-    private static final String VERSION = "version";
     private static final String LAST_BLOCK = "lastBlock";
-
-    private DB database;
-    private int uses;
 
     private Var<Long> licenseKeyVar;
     private Long licenseKey;
@@ -61,14 +58,14 @@ public class DWSet implements IDB {
 
     public DWSet() {
         //OPEN WALLET
-        WALLET_FILE = new File(Settings.getInstance().getDataWalletDir(), "wallet.dat");
-        WALLET_FILE.getParentFile().mkdirs();
+        DATA_FILE = new File(Settings.getInstance().getDataWalletDir(), "wallet.dat");
+        DATA_FILE.getParentFile().mkdirs();
 
         //DELETE TRANSACTIONS
         //File transactionFile = new File(Settings.getInstance().getWalletDir(), "wallet.dat.t");
         //transactionFile.delete();
 
-        this.database = DBMaker.newFileDB(WALLET_FILE)
+        this.database = DBMaker.newFileDB(DATA_FILE)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 //.cacheSize(2048)
 
@@ -132,17 +129,6 @@ public class DWSet implements IDB {
 
     }
 
-    public boolean exists() {
-        return WALLET_FILE.exists();
-    }
-
-    public int getVersion() {
-        this.uses++;
-        int u = this.database.getAtomicInteger(VERSION).intValue();
-        this.uses--;
-        return u;
-    }
-
     public Long getLicenseKey() {
         return this.licenseKey;
     }
@@ -151,34 +137,6 @@ public class DWSet implements IDB {
 
         this.licenseKey = key;
         this.licenseKeyVar.set(this.licenseKey);
-
-    }
-
-    public void setVersion(int version) {
-        this.uses++;
-        this.database.getAtomicInteger(VERSION).set(version);
-        this.uses--;
-    }
-
-    public void addUses() {
-        this.uses++;
-
-    }
-
-    public void outUses() {
-        this.uses--;
-    }
-
-    public boolean isBusy() {
-        if (this.uses > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public void openDBSet() {
 
     }
 
@@ -393,36 +351,4 @@ public class DWSet implements IDB {
 
     }
 
-    public void clearCache() {
-        this.database.getEngine().clearCache();
-    }
-
-    @Override
-    public void commit() {
-        this.uses++;
-        this.database.commit();
-        this.uses--;
-
-    }
-
-    public void rollback() {
-        this.uses++;
-        this.database.rollback();
-        this.uses--;
-
-    }
-
-    @Override
-    public void close() {
-        if (this.database != null) {
-            if (!this.database.isClosed()) {
-                this.uses++;
-                //this.database.rollback();
-                this.database.commit();
-                this.database.close();
-                this.uses--;
-
-            }
-        }
-    }
 }

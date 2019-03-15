@@ -16,6 +16,7 @@ public class AllTelegramsMap extends DBMap<String, Transaction> {
     public AllTelegramsMap(TelegramSet dWSet, DB database) {
         super(dWSet, database);
 
+        this.observableData = new HashMap<Integer, Integer>(8, 1);
         this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.ALL_TELEGRAM_RESET_TYPE);
         this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ALL_TELEGRAMT_ADD_TYPE);
         this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.ALL_TELEGRAMT_REMOVE_TYPE);
@@ -28,10 +29,10 @@ public class AllTelegramsMap extends DBMap<String, Transaction> {
     protected Map<String, Transaction> getMap(DB database) {
       //OPEN MAP
        return database.createTreeMap("telegrams")
-              .keySerializer(BTreeKeySerializer.BASIC)
+               .keySerializer(BTreeKeySerializer.BASIC)
                .valueSerializer(new TransactionSerializer())
-              .counterEnable()
-              .makeOrGet();
+               .counterEnable()
+               .makeOrGet();
     }
 
     @Override

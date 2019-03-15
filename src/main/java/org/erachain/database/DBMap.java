@@ -43,6 +43,11 @@ public abstract class DBMap<T, U> extends Observable {
         //CREATE INDEXES
         this.indexes = new HashMap<Integer, NavigableSet<Tuple2<?, T>>>();
         this.createIndexes(database);
+
+        if (databaseSet.isWithObserver()) {
+            observableData = new HashMap<Integer, Integer>(8, 1);
+        }
+
     }
 
 
@@ -169,15 +174,19 @@ public abstract class DBMap<T, U> extends Observable {
             // TODO
             this.databaseSet.commit();
 
-            //NOTIFY ADD
-            if (this.getObservableData().containsKey(NOTIFY_ADD)) {
-                this.setChanged();
-                this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_ADD), value));
-            }
+            //NOTIFY
+            if (this.observableData != null) {
 
-            if (this.getObservableData().containsKey(NOTIFY_COUNT)) {
-                this.setChanged();
-                this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this)); /// SLOW .size()));
+                //NOTIFY ADD
+                if (this.observableData.containsKey(NOTIFY_ADD)) {
+                    this.setChanged();
+                    this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_ADD), value));
+                }
+
+                if (this.observableData.containsKey(NOTIFY_COUNT)) {
+                    this.setChanged();
+                    this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_COUNT), this)); /// SLOW .size()));
+                }
             }
 
             this.outUses();
@@ -206,15 +215,17 @@ public abstract class DBMap<T, U> extends Observable {
                 // NOTYFIES
                 if (observers != null) {
 
-                    //NOTIFY REMOVE
-                    if (observers.containsKey(NOTIFY_REMOVE)) {
-                        this.setChanged();
-                        this.notifyObservers(new ObserverMessage(observers.get(NOTIFY_REMOVE), value));
-                    }
+                    if (this.observableData != null) {
+                        //NOTIFY REMOVE
+                        if (observers.containsKey(NOTIFY_REMOVE)) {
+                            this.setChanged();
+                            this.notifyObservers(new ObserverMessage(observers.get(NOTIFY_REMOVE), value));
+                        }
 
-                    if (observers.containsKey(NOTIFY_COUNT)) {
-                        this.setChanged();
-                        this.notifyObservers(new ObserverMessage(observers.get(NOTIFY_COUNT), this));
+                        if (observers.containsKey(NOTIFY_COUNT)) {
+                            this.setChanged();
+                            this.notifyObservers(new ObserverMessage(observers.get(NOTIFY_COUNT), this));
+                        }
                     }
                 }
 
