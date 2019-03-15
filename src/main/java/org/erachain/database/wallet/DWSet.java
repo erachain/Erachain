@@ -11,16 +11,11 @@ import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.database.DBASet;
-import org.erachain.database.IDB;
 import org.erachain.settings.Settings;
-import org.jcp.xml.dsig.internal.dom.DOMBase64Transform;
 import org.mapdb.Atomic.Var;
-import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
 import java.io.File;
-
-//import org.mapdb.Serializer;
 
 public class DWSet extends DBASet {
 
