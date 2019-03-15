@@ -49,8 +49,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     private String[] columnNames = Lang.getInstance().translate(new String[]{
             "Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
-    private int start =0;
-    private int step =100;
+    private int start = 0;
+    private int step = 100;
     private List<Pair<Tuple2<String, String>, Transaction>> pairTransactions;
 
     public WalletTransactionsTableModel() {
@@ -69,7 +69,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
 
     }
-
 
     public Object getItem(int row) {
         return this.transactions.get(row).getB();
