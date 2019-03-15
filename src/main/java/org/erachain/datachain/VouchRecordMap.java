@@ -81,9 +81,4 @@ public class VouchRecordMap extends DCMap<Long, Tuple2<BigDecimal, List<Long>>> 
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
 }

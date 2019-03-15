@@ -129,11 +129,6 @@ public class _BalanceMap extends DCMap<Tuple2<Long, Long>,
                 );
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
 	/*
 	public void set(String assence, BigDecimal value)
 	{

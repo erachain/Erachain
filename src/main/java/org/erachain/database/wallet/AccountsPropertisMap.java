@@ -51,11 +51,6 @@ public class AccountsPropertisMap extends DBMap<String, Tuple2<String, String>> 
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Map<String, Tuple2<String, String>> get_By_Name(String str, boolean caseCharacter) {

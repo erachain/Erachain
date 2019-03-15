@@ -78,11 +78,6 @@ public class KKN_Map extends DCMap<
         return new TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>>();
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     @SuppressWarnings("unchecked")
     public void addItem(Long key, String nameKey, Tuple3<Long, Integer, byte[]> item) {
 

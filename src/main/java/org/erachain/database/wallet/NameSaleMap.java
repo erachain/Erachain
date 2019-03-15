@@ -104,11 +104,6 @@ public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal> {
         return BigDecimal.ZERO;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<NameSale> get(Account account) {
         List<NameSale> nameSales = new ArrayList<NameSale>();

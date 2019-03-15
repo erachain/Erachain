@@ -217,11 +217,6 @@ public class ATMap extends DCMap<String, AT> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public boolean add(AT at) {
         //TODO CHECK PROPER at.getCreator() ENCODING
         return add(at, at.getCreationBlockHeight());

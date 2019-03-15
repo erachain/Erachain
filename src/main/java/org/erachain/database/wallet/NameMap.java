@@ -86,11 +86,6 @@ public class NameMap extends DBMap<Tuple2<String, String>, Name> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Name> get(Account account) {
         List<Name> names = new ArrayList<Name>();

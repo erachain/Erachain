@@ -61,11 +61,6 @@ public class AddressPersonMap extends DCMap<String, Stack<Tuple4<
         return new Stack<Tuple4<Long, Integer, Integer, Integer>>();
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     ///////////////////////////////
     @SuppressWarnings("unchecked")
     public void addItem(String address, Tuple4<Long, Integer, Integer, Integer> item) {

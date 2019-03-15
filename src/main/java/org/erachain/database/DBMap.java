@@ -62,7 +62,9 @@ public abstract class DBMap<T, U> extends Observable {
 
     protected abstract U getDefaultValue();
 
-    protected abstract Map<Integer, Integer> getObservableData();
+    protected Map<Integer, Integer> getObservableData() {
+        return this.observableData;
+    }
 
     protected abstract void createIndexes(DB database);
 

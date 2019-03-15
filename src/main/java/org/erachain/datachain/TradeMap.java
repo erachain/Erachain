@@ -186,11 +186,6 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public void add(Trade trade) {
         this.set(new Tuple2<Long, Long>(trade.getInitiator(), trade.getTarget()), trade);
     }

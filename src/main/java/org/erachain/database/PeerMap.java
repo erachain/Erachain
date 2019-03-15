@@ -48,11 +48,6 @@ public class PeerMap extends DBMap<byte[], byte[]> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public List<Peer> getAllPeers(int amount) {
         try {
             //GET ITERATOR

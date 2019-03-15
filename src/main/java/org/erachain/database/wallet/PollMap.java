@@ -86,11 +86,6 @@ public class PollMap extends DBMap<Tuple2<String, String>, Poll> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Poll> get(Account account) {
         List<Poll> polls = new ArrayList<Poll>();

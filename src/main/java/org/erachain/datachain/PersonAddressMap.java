@@ -77,11 +77,6 @@ public class PersonAddressMap extends DCMap<
         return new TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>();
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     ///////////////////////////////
     @SuppressWarnings("unchecked")
     public void addItem(Long person, String address, Tuple3<Integer, Integer, Integer> item) {

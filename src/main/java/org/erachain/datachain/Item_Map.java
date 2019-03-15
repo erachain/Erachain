@@ -82,11 +82,6 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public ItemCls get(Long key) {
         ItemCls item = super.get(key);
         if (item == null)

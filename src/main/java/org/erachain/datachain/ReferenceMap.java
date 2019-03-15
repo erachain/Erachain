@@ -58,11 +58,6 @@ public class ReferenceMap extends DCMap<byte[], Long> {
         return 0l;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public Long get(String address, Long timestamp) {
         byte[] key = Bytes.concat(Base58.decode(address), Longs.toByteArray(timestamp));
         return this.get(key);

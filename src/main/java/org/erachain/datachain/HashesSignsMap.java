@@ -61,11 +61,6 @@ public class HashesSignsMap extends DCMap<byte[], Stack<Tuple3<
         return new Stack<Tuple3<Long, Integer, Integer>>();
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     ///////////////////////////////
     @SuppressWarnings("unchecked")
     public void addItem(byte[] hash, Tuple3<Long, Integer, Integer> item) {

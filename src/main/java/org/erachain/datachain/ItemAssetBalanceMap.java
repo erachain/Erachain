@@ -152,11 +152,6 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple5<
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO));
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
 	/*
 	public void set(String address, BigDecimal value)
 	{

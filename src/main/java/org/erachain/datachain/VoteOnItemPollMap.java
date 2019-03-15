@@ -65,11 +65,6 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, 
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public NavigableSet<Tuple3> getVotes(Long pollKey) {
         BTreeMap map = (BTreeMap) this.map;

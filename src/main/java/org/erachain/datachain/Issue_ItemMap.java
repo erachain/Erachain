@@ -42,11 +42,6 @@ public abstract class Issue_ItemMap extends DCMap<byte[], Long> {
         return 0l;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public Long get(Transaction transaction) {
         return this.get(transaction.getSignature());
     }

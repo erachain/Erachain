@@ -80,11 +80,6 @@ public class OrderMap extends DBMap<Tuple2<String, Long>, Order> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public void add(Order order) {
 
         this.set(new Tuple2<String, Long>(order.getCreator().getAddress(), order.getId()), order);

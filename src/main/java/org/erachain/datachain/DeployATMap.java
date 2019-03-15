@@ -41,11 +41,6 @@ public class DeployATMap extends DCMap<byte[], Long> {
         return -1l;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public Long get(Transaction transaction) {
         return this.get(transaction.getSignature());
     }

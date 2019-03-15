@@ -43,9 +43,4 @@ public class HashesMap extends DCMap<byte[], byte[]> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
 }

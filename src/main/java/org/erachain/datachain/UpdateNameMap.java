@@ -45,11 +45,6 @@ public class UpdateNameMap extends DCMap<byte[], Name> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public Name get(Transaction transaction) {
         return this.get(transaction.getSignature());
     }

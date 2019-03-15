@@ -55,11 +55,6 @@ public class Credit_AddressesMap extends DCMap<Tuple3<String, Long, String>, Big
         return BigDecimal.ZERO;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public BigDecimal add(Tuple3<String, Long, String> key, BigDecimal amount) {
         BigDecimal summ = this.get(key).add(amount);
         this.set(key, summ);

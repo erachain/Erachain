@@ -79,11 +79,6 @@ public class NameExchangeMap extends DCMap<String, BigDecimal> {
         return BigDecimal.ZERO;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public List<NameSale> getNameSales() {
         List<NameSale> nameSales = new ArrayList<NameSale>();
 

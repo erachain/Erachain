@@ -148,11 +148,6 @@ public class BlockMap extends DCMap<Integer, Block> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public Block last() {
         // return this.get(this.getLastBlockSignature());
         return this.get(this.size());

@@ -80,11 +80,6 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public Long getFullWeight() {
         return this.fullWeight;
     }

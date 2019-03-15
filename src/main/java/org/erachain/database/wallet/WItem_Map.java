@@ -96,11 +96,6 @@ public class WItem_Map extends DBMap<Tuple2<String, String>, ItemCls> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<ItemCls> get(Account account) {
         List<ItemCls> items = new ArrayList<ItemCls>();

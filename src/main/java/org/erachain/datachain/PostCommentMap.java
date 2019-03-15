@@ -82,11 +82,6 @@ public class PostCommentMap extends DCMap<byte[], List<byte[]>> {
     }
 
     @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
-    @Override
     protected void createIndexes(DB database) {
     }
 

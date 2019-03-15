@@ -67,11 +67,6 @@ public class AddressItem_Refs extends DCMap<Tuple2<byte[], Long>, byte[]> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public byte[] get(String address, Long key) {
         return this.get(new Tuple2<byte[], Long>(Base58.decode(address), key));
     }

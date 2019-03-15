@@ -53,11 +53,6 @@ public class CancelSellNameMap extends DCMap<byte[], BigDecimal> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public void delete(CancelSellNameTransaction transaction) {
         this.delete(transaction.getSignature());
     }

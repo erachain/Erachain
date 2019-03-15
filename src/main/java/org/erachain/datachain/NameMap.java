@@ -40,11 +40,6 @@ public class NameMap extends DCMap<String, Name> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public boolean contains(Name name) {
         return this.contains(name.getName());
     }

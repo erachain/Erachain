@@ -77,11 +77,6 @@ public class CompletedOrderMap extends DCMap<Long, Order> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public void add(Order order) {
         // this order is NOT executable
         ////order = datachain.OrderMap.setExecutable(order, false);

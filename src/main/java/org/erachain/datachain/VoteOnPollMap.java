@@ -42,11 +42,6 @@ public class VoteOnPollMap extends DCMap<byte[], Integer> {
         return -1;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public Integer get(Transaction transaction) {
         return this.get(transaction.getSignature());
     }

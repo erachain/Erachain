@@ -136,10 +136,4 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
-
 }

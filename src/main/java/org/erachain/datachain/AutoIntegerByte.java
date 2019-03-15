@@ -80,11 +80,6 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public long add(byte[] item) {
         // INCREMENT ATOMIC KEY IF EXISTS
         if (this.atomicKey != null) {

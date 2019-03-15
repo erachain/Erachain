@@ -99,11 +99,6 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public boolean add(Integer blockHeight, int seq, AT_Transaction atTx) {
         atTx.setBlockHeight(blockHeight);
         atTx.setSeq(seq);

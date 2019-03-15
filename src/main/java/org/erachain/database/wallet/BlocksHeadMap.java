@@ -151,11 +151,6 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public Block.BlockHead getLast() {
 
         List<Pair<Account, Block.BlockHead>> blocks = new ArrayList<Pair<Account, Block.BlockHead>>();

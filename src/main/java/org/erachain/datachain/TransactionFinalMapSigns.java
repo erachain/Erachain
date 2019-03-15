@@ -59,11 +59,6 @@ public class TransactionFinalMapSigns extends DCMap<UUID, Long> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public boolean contains(byte[] signature) {
 
         // make 12 bytes KEY

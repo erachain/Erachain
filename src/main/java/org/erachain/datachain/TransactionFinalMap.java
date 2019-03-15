@@ -168,11 +168,6 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void delete(Integer height) {
         BTreeMap map = (BTreeMap) this.map;

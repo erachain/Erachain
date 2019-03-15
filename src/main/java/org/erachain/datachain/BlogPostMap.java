@@ -34,11 +34,6 @@ public class BlogPostMap extends DCMap<String, List<byte[]>> {
     }
 
     @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
-    @Override
     protected void createIndexes(DB database) {
     }
 

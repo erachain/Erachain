@@ -112,11 +112,6 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> get(Account account, int limit) {
         List<Transaction> transactions = new ArrayList<Transaction>();

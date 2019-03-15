@@ -190,11 +190,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public Iterator<Long> getTimestampIterator() {
 
         Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);

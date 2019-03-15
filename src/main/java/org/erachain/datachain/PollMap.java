@@ -82,11 +82,6 @@ public class PollMap extends DCMap<String, Poll> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public boolean contains(Poll poll) {
         return this.contains(poll.getName());
     }

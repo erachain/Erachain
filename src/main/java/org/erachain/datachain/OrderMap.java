@@ -146,11 +146,6 @@ public class OrderMap extends DCMap<Long, Order> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     // GET KEYs with FORKED rules
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected List<Long> getSubKeysWithParent(long have, long want) {

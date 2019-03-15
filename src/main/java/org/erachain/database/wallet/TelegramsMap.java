@@ -45,12 +45,6 @@ public class TelegramsMap extends DBMap<String, Transaction> {
     }
 
     @Override
-    protected Map<Integer, Integer> getObservableData() {
-        // TODO Auto-generated method stub
-        return this.observableData;
-    }
-
-    @Override
     protected void createIndexes(DB database) {
         // TODO Auto-generated method stub
         
