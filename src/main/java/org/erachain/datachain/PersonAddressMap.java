@@ -6,6 +6,7 @@ import org.mapdb.DB;
 import org.mapdb.Fun.Tuple3;
 import org.erachain.utils.ObserverMessage;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -36,7 +37,6 @@ public class PersonAddressMap extends DCMap<
                         Integer, // block.getHeight
                         Integer // transaction index
                         >>>> {
-    private Map<Integer, Integer> observableData = new TreeMap<Integer, Integer>(); // hashMap ?
 
     public PersonAddressMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

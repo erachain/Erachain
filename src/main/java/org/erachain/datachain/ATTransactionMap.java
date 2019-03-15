@@ -14,7 +14,6 @@ import java.util.*;
 
 public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transaction> {
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
     @SuppressWarnings("rawtypes")

@@ -27,7 +27,6 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
     public static final int ADDRESS_INDEX = 2;
     public static final int AMOUNT_INDEX = 3;
     static Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class.getName());
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public TransactionMap(DWSet dWSet, DB database) {
         super(dWSet, database);

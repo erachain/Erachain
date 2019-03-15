@@ -11,9 +11,6 @@ import java.util.Map;
 
 public class HashtagPostMap extends DCMap<String, List<byte[]>> {
 
-
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     public HashtagPostMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }

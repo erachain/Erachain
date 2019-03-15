@@ -23,7 +23,6 @@ public class WItem_Map extends DBMap<Tuple2<String, String>, ItemCls> {
     static Logger LOGGER = LoggerFactory.getLogger(WItem_Map.class.getName());
     protected int type;
     protected String name;
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public WItem_Map(DWSet dWSet, DB database, int type, String name,
                      int observeReset,

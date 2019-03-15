@@ -17,7 +17,6 @@ import java.util.TreeMap;
  * занчение: номер блока (высота, height)<br>
  */
 public class BlockSignsMap extends DCMap<Long, Integer> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public BlockSignsMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

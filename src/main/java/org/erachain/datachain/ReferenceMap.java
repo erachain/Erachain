@@ -22,7 +22,6 @@ import java.util.TreeMap;
  *
  */
 public class ReferenceMap extends DCMap<byte[], Long> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public ReferenceMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

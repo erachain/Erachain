@@ -24,7 +24,6 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
 
     static final String NAME = "blocks_heads";
     static Logger LOGGER = LoggerFactory.getLogger(BlocksHeadsMap.class.getName());
-    protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
     // for saving in DB
     private Atomic.Long fullWeightVar;
     private Long fullWeight = 0L;

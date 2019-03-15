@@ -11,8 +11,6 @@ import java.util.*;
 //Integer -> blockHeight (f.e 0 -> 1000 -> 2000 if we keep state every 1000s blocks), byte[] -> atId , byte[] stateBytes
 public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     @SuppressWarnings("rawtypes")
     private NavigableSet allATStates;
 

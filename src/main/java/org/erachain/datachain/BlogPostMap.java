@@ -12,7 +12,6 @@ import java.util.Map;
 public class BlogPostMap extends DCMap<String, List<byte[]>> {
 
     public final static String MAINBLOG = "Erachain.org";
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public BlogPostMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

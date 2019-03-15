@@ -26,7 +26,6 @@ import java.util.Map;
  */
 
 public class AddressTime_SignatureMap extends DCMap<Tuple2<String, Long>, byte[]> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public AddressTime_SignatureMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

@@ -25,7 +25,6 @@ import java.util.Map;
  * Значение: заказ<br>
  */
 public class CompletedOrderMap extends DCMap<Long, Order> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public CompletedOrderMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

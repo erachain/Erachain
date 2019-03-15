@@ -35,7 +35,6 @@ import java.util.*;
  * ++ address_type_txs
  */
 public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer, Long>, Calculated> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;

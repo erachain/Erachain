@@ -21,8 +21,6 @@ import java.util.*;
  */
 
 public class Credit_AddressesMap extends DCMap<Tuple3<String, Long, String>, BigDecimal> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
 
     public Credit_AddressesMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

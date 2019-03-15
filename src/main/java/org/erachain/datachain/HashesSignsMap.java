@@ -5,6 +5,7 @@ import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple3;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -29,7 +30,6 @@ public class HashesSignsMap extends DCMap<byte[], Stack<Tuple3<
         Integer, // block height
         Integer>>> // transaction index
 {
-    private Map<Integer, Integer> observableData = new TreeMap<Integer, Integer>(); // icreator -HashMap
 
     public HashesSignsMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

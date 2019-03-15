@@ -36,7 +36,6 @@ Tuple3
 
  */
 public class OrderMap extends DBMap<Tuple2<String, Long>, Order> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public OrderMap(IDB databaseSet, DB database) {
         super(databaseSet, database);

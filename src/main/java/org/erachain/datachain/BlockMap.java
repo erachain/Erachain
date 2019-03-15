@@ -42,7 +42,6 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     public static final int HEIGHT_INDEX = 1; // for GUI
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
     private byte[] lastBlockSignature;
     private Atomic.Boolean processingVar;
     private Boolean processing;

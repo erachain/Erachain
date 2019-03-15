@@ -21,7 +21,6 @@ public class AccountsPropertisMap extends DBMap<String, Tuple2<String, String>> 
     public static final int OWNER_INDEX = 2;
     static Logger LOGGER = LoggerFactory.getLogger(AccountsPropertisMap.class.getName());
     BTreeMap<String, String> titleIndex;
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public AccountsPropertisMap(DWSet dWSet, DB database) {
         super(dWSet, database);

@@ -28,7 +28,6 @@ import java.util.Map;
  */
 
 public class VouchRecordMap extends DCMap<Long, Tuple2<BigDecimal, List<Long>>> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public VouchRecordMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

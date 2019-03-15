@@ -19,8 +19,6 @@ import java.util.Map;
  * Значение: Актив<br>
  */
 public class ItemAssetMap extends Item_Map {
-    // private Map<Integer, Integer> observableData = new HashMap<Integer,
-    // Integer>();
 
     // private Atomic.Long atomicKey;
     // private long key;

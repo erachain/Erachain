@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class DeployATMap extends DCMap<byte[], Long> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public DeployATMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

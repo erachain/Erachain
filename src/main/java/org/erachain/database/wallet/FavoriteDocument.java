@@ -26,7 +26,6 @@ import java.util.*;
 public class FavoriteDocument extends DBMap<Tuple2<String, String>, Transaction> implements Observer {
 
     static Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class.getName());
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public FavoriteDocument(DWSet dWSet, DB database) {
         super(dWSet, database);

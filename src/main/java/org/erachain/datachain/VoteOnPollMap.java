@@ -11,7 +11,6 @@ import java.util.TreeMap;
 
 @Deprecated
 public class VoteOnPollMap extends DCMap<byte[], Integer> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public VoteOnPollMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

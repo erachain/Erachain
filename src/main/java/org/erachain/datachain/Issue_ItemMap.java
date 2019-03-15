@@ -20,7 +20,6 @@ import java.util.TreeMap;
  *
  */
 public abstract class Issue_ItemMap extends DCMap<byte[], Long> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public Issue_ItemMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

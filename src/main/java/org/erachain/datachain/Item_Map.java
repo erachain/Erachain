@@ -21,7 +21,6 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
     static Logger LOGGER = LoggerFactory.getLogger(Item_Map.class.getName());
 
     // protected int type;
-    protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
     protected Atomic.Long atomicKey;
     protected long key;
 

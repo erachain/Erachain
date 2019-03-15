@@ -42,7 +42,6 @@ import java.util.*;
  *
  */
 public class TransactionFinalMap extends DCMap<Long, Transaction> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;

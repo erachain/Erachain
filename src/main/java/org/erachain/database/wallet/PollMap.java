@@ -21,7 +21,6 @@ public class PollMap extends DBMap<Tuple2<String, String>, Poll> {
     public static final int NAME_INDEX = 1;
     public static final int CREATOR_INDEX = 2;
     static Logger LOGGER = LoggerFactory.getLogger(PollMap.class.getName());
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public PollMap(DWSet dWSet, DB database) {
         super(dWSet, database);

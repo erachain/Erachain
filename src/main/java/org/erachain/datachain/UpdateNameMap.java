@@ -13,7 +13,6 @@ import java.util.TreeMap;
 
 @Deprecated
 public class UpdateNameMap extends DCMap<byte[], Name> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public UpdateNameMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

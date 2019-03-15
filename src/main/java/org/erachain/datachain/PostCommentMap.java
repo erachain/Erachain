@@ -16,9 +16,6 @@ import java.util.Map;
  */
 public class PostCommentMap extends DCMap<byte[], List<byte[]>> {
 
-
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     public PostCommentMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }

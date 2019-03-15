@@ -20,7 +20,6 @@ import java.util.TreeMap;
  */
 public class AddressItem_Refs extends DCMap<Tuple2<byte[], Long>, byte[]> {
     protected String name;
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public AddressItem_Refs(DCSet databaseSet, DB database, String name,
                             int observeReset, int observeAdd, int observeRemove, int observeList

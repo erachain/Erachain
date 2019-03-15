@@ -37,8 +37,6 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple5<
         Tuple2<BigDecimal, BigDecimal>  // on HOLD
         >> {
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     @SuppressWarnings("rawtypes")
     private BTreeMap assetKeyMap;
 

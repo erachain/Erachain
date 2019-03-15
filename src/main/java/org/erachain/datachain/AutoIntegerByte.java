@@ -19,7 +19,6 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
     static Logger LOGGER = LoggerFactory.getLogger(AutoIntegerByte.class.getName());
 
     // protected int type;
-    protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
     protected Atomic.Integer atomicKey;
     protected int key;
 

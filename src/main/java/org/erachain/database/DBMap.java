@@ -29,6 +29,8 @@ public abstract class DBMap<T, U> extends Observable {
     protected Map<T, U> map;
     protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
 
+    protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>(8, 1);
+
     public DBMap() {
     }
 
@@ -199,15 +201,21 @@ public abstract class DBMap<T, U> extends Observable {
             if (this.map.containsKey(key)) {
                 value = this.map.remove(key);
 
-                //NOTIFY REMOVE
-                if (this.getObservableData().containsKey(NOTIFY_REMOVE)) {
-                    this.setChanged();
-                    this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_REMOVE), value));
-                }
+                Map<Integer, Integer> observers = this.getObservableData();
 
-                if (this.getObservableData().containsKey(NOTIFY_COUNT)) {
-                    this.setChanged();
-                    this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this)); /// SLOW .size()));
+                // NOTYFIES
+                if (observers != null) {
+
+                    //NOTIFY REMOVE
+                    if (observers.containsKey(NOTIFY_REMOVE)) {
+                        this.setChanged();
+                        this.notifyObservers(new ObserverMessage(observers.get(NOTIFY_REMOVE), value));
+                    }
+
+                    if (observers.containsKey(NOTIFY_COUNT)) {
+                        this.setChanged();
+                        this.notifyObservers(new ObserverMessage(observers.get(NOTIFY_COUNT), this));
+                    }
                 }
 
             } else

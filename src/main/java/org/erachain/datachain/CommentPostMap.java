@@ -13,8 +13,6 @@ import java.util.Map;
  */
 public class CommentPostMap extends DCMap<byte[], byte[]> {
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     public CommentPostMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }

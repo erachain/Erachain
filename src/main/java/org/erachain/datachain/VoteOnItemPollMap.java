@@ -24,7 +24,6 @@ import java.util.*;
  * TODO: передлать короткий Счет на байты
  */
 public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public VoteOnItemPollMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

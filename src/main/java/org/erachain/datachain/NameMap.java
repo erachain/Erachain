@@ -10,7 +10,6 @@ import java.util.Map;
 //import org.erachain.database.DBSet;
 
 public class NameMap extends DCMap<String, Name> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public NameMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

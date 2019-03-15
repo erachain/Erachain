@@ -21,7 +21,6 @@ Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @SuppressWarnings("rawtypes")
 public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     private BTreeMap pairKeyMap;
     private BTreeMap wantKeyMap;

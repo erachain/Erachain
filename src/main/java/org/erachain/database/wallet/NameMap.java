@@ -21,7 +21,6 @@ public class NameMap extends DBMap<Tuple2<String, String>, Name> {
     public static final int NAME_INDEX = 1;
     public static final int OWNER_INDEX = 2;
     static Logger LOGGER = LoggerFactory.getLogger(NameMap.class.getName());
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public NameMap(DWSet dWSet, DB database) {
         super(dWSet, database);

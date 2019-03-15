@@ -27,7 +27,6 @@ public class KKN_Map extends DCMap<
                         byte[] // transaction.getReference
                         >>>> {
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
     private String name;
 
     public KKN_Map(DCSet databaseSet, DB database,

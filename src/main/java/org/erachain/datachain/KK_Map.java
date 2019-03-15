@@ -38,7 +38,6 @@ public class KK_Map extends DCMap<
                         Integer // block.get(transaction.getSignature()) -> block.get(index)
                         >>>> {
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
     private String name;
 
     public KK_Map(DCSet databaseSet, DB database,

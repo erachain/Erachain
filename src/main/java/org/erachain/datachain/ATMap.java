@@ -19,7 +19,6 @@ import java.util.*;
 
 @SuppressWarnings("rawtypes")
 public class ATMap extends DCMap<String, AT> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     private NavigableSet typeATs;
     private NavigableSet creatorATs;

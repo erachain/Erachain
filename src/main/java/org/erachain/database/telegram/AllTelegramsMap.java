@@ -12,9 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AllTelegramsMap extends DBMap<String, Transaction> {
-    
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-      
 
     public AllTelegramsMap(TelegramSet dWSet, DB database) {
         super(dWSet, database);

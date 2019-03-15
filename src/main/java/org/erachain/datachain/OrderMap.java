@@ -22,7 +22,6 @@ import java.util.*;
  * @return
  */
 public class OrderMap extends DCMap<Long, Order> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     private static boolean  useWantHaveKeys = true;
     @SuppressWarnings("rawtypes")

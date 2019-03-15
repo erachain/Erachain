@@ -19,8 +19,6 @@ import java.util.Map.Entry;
 public class NameExchangeMap extends DCMap<String, BigDecimal> {
     public static final int AMOUNT_INDEX = 1;
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     public NameExchangeMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 

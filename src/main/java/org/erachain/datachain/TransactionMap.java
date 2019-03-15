@@ -43,8 +43,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class);
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
     @SuppressWarnings("rawtypes")

@@ -35,7 +35,6 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
     public static final int TRANSACTIONS_INDEX = 4;
     public static final int FEE_INDEX = 5;
     static Logger LOGGER = LoggerFactory.getLogger(BlocksHeadMap.class.getName());
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public BlocksHeadMap(DWSet dWSet, DB database) {
         super(dWSet, database);

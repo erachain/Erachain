@@ -11,7 +11,6 @@ import java.util.Map;
 
 @Deprecated
 public class PollMap extends DCMap<String, Poll> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public PollMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

@@ -13,8 +13,6 @@ public class LocalDataMap extends DCMap<String, String> {
 
     public static final String LOCAL_DATA_VERSION_KEY = "dataversion";
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     public LocalDataMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }

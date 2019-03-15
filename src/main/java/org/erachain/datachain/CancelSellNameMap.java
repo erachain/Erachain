@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class CancelSellNameMap extends DCMap<byte[], BigDecimal> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public CancelSellNameMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

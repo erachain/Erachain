@@ -23,7 +23,6 @@ public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal> {
     public static final int SELLER_INDEX = 2;
     public static final int AMOUNT_INDEX = 3;
     static Logger LOGGER = LoggerFactory.getLogger(NameSaleMap.class.getName());
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public NameSaleMap(DWSet dWSet, DB database) {
         super(dWSet, database);
