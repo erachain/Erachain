@@ -283,8 +283,9 @@ public class R_SendResource {
     @Path("test1/{delay}")
     public String test1(@PathParam("delay") long delay, @QueryParam("password") String password) {
 
-        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
-                && !BlockChain.DEVELOP_USE)
+        if (!BlockChain.DEVELOP_USE
+                && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
+                )
             return "not LOCAL && not DEVELOP";
 
         APIUtils.askAPICallAllowed(password, "GET test1\n ", request, true);
@@ -293,8 +294,14 @@ public class R_SendResource {
 
         if (threadTest1 != null) {
             JSONObject out = new JSONObject();
-            out.put("delay", delay);
-            LOGGER.info("r_send/test1 DELAY UPDATE:" + delay);
+            if (delay <= 0) {
+                threadTest1 = null;
+                out.put("status", "STOP");
+                LOGGER.info("r_send/test1 STOP");
+            } else {
+                out.put("delay", delay);
+                LOGGER.info("r_send/test1 DELAY UPDATE:" + delay);
+            }
             return out.toJSONString();
         }
 
@@ -322,11 +329,7 @@ public class R_SendResource {
                 try {
 
                     if (this.test1Delay <= 0) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                        }
-                        continue;
+                        return;
                     }
 
                     if (cnt.isOnStopping())
@@ -349,15 +352,26 @@ public class R_SendResource {
                         return;
 
                     Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+                    // CLEAR for HEAP
+                    transaction.setDC(null);
+
 
                     // CHECK VALIDATE MESSAGE
                     if (result != Transaction.VALIDATE_OK) {
+
                         if (result == Transaction.RECEIVER_NOT_PERSONALIZED
                                 || result == Transaction.CREATOR_NOT_PERSONALIZED
                                 || result == Transaction.NO_BALANCE
                                 || result == Transaction.NOT_ENOUGH_FEE
-                                || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT)
+                                || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT) {
+
+                            try {
+                                Thread.sleep(10);
+                            } catch (InterruptedException e) {
+                            }
+
                             continue;
+                        }
 
                         // not work in Threads - LOGGER.info("TEST1: " + OnDealClick.resultMess(result));
                         try {
@@ -382,6 +396,7 @@ public class R_SendResource {
             } while (true);
         });
 
+        threadTest1.setName("R_Send.Test1");
         threadTest1.start();
 
         out.put("delay", test1Delay);

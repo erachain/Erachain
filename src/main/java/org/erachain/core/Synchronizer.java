@@ -221,53 +221,47 @@ public class Synchronizer {
             LOGGER.debug("*** checkNewBlocks - VALIDATE [" + height + "]");
 
             // CHECK IF VALID
-            if (block.isSignatureValid()) {
-                try {
-                    block.getTransactions();
-                } catch (Exception e) {
-                    LOGGER.debug(e.getMessage(), e);
-                    String mess = "Dishonest peer error PARSE: " + height;
-                    peer.ban(BAN_BLOCK_TIMES << 2, mess);
-                    throw new Exception(mess);
-                }
-
-                if (block.isValid(fork, true)) {
-
-                    int height2 = block.getHeight();
-                    int bbb2 = fork.getBlockMap().size();
-                    int hhh2 = fork.getBlocksHeadsMap().size();
-                    int sss2 = fork.getBlockSignsMap().size();
-                    assert (height2 == hhh2);
-                    assert (bbb2 == hhh2);
-                    assert (sss2 == hhh2);
-
-                    // PROCESS TO VALIDATE NEXT BLOCKS
-                    // runedBlock = block;
-                    /// already in Validate block.process(fork);
-                    if (checkFullWeight && testHeight == height) {
-                        if (myWeight >= fork.getBlocksHeadsMap().getFullWeight()) {
-                            // суть в том что тут цепоска на этой высоте слабже моей,
-                            // поэтому мы ее пока забаним чтобы с ней постоянно не синхронизироваться
-                            // - может мы лучше цепочку собрем еще
-
-                            // INVALID BLOCK THROW EXCEPTION
-                            String mess = "Dishonest peer by weak FullWeight, heigh: " + height;
-                            peer.ban(BAN_BLOCK_TIMES >> 3, mess);
-
-                            throw new Exception(mess);
-                        }
-                    }
-                }
-
-            } else {
-
-                block.clearForHeap();
-
+            if (!block.isSignatureValid()) {
                 // INVALID BLOCK THROW EXCEPTION
                 String mess = "Dishonest peer by not is Valid block, heigh: " + height;
                 peer.ban(BAN_BLOCK_TIMES, mess);
                 throw new Exception(mess);
             }
+
+            try {
+                block.getTransactions();
+            } catch (Exception e) {
+                LOGGER.debug(e.getMessage(), e);
+                String mess = "Dishonest peer error block.getTransactions PARSE: " + height;
+                peer.ban(BAN_BLOCK_TIMES << 2, mess);
+                throw new Exception(mess);
+            }
+
+            if (!block.isValid(fork, true)) {
+                // INVALID BLOCK THROW EXCEPTION
+                String mess = "Dishonest peer by not is Valid block, heigh: " + height;
+                peer.ban(BAN_BLOCK_TIMES, mess);
+                throw new Exception(mess);
+            }
+
+            // PROCESS TO VALIDATE NEXT BLOCKS
+            // runedBlock = block;
+            /// already in Validate block.process(fork);
+            if (checkFullWeight && testHeight == height) {
+                if (myWeight >= fork.getBlocksHeadsMap().getFullWeight()) {
+                    // суть в том что тут цепоска на этой высоте слабже моей,
+                    // поэтому мы ее пока забаним чтобы с ней постоянно не синхронизироваться
+                    // - может мы лучше цепочку собрем еще
+
+                    // INVALID BLOCK THROW EXCEPTION
+                    String mess = "Dishonest peer by weak FullWeight, heigh: " + height;
+                    peer.ban(BAN_BLOCK_TIMES >> 3, mess);
+                    throw new Exception(mess);
+
+                }
+
+            }
+
         }
 
         LOGGER.debug("*** core.Synchronizer.checkNewBlocks - END");
@@ -320,9 +314,6 @@ public class Synchronizer {
             LOGGER.debug("*** synchronize - orphan block... " + dcSet.getBlockMap().size());
             this.pipeProcessOrOrphan(dcSet, lastBlock, true, false);
 
-            // CLEAR for HEAP
-            lastBlock.clearForHeap();
-
             lastBlock = dcSet.getBlockMap().last();
         }
 
@@ -356,9 +347,6 @@ public class Synchronizer {
                 if (orphanedTransactions.containsKey(key))
                     orphanedTransactions.remove(key);
             }
-
-            // CLEAR for HEAP
-            block.clearForHeap();
 
         }
 
@@ -403,6 +391,9 @@ public class Synchronizer {
          * peer);
          */
 
+        // освободим HEAP и память - нам не нужна она все равно
+        dcSet.clearCache();
+
         fromPeer = peer;
 
         byte[] lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
@@ -443,7 +434,12 @@ public class Synchronizer {
                 LOGGER.debug("try get BLOCK from BUFFER");
 
                 long time1 = System.currentTimeMillis();
-                blockFromPeer = blockBuffer.getBlock(signature);
+                try {
+                    blockFromPeer = blockBuffer.getBlock(signature);
+                } catch (Exception e) {
+                    blockBuffer.stopThread();
+                    throw new Exception(e);
+                }
 
                 if (blockFromPeer == null) {
 
@@ -491,7 +487,6 @@ public class Synchronizer {
                 }
 
                 if (!blockFromPeer.isValid(dcSet, false)) {
-                    blockFromPeer.clearForHeap();
 
                     errorMess = "invalid BLOCK";
                     banTime = BAN_BLOCK_TIMES;
@@ -509,9 +504,6 @@ public class Synchronizer {
 
                     LOGGER.debug("try pipeProcessOrOrphan");
                     this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false);
-
-                    // CLEAR for HEAP
-                    blockFromPeer.clearForHeap();
 
                     LOGGER.debug("synchronize BLOCK END process");
                     blockBuffer.clearBlock(blockFromPeer.getSignature());
@@ -805,6 +797,7 @@ public class Synchronizer {
       //      countObserv_COUNT = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_COUNT);
         }
 
+        Exception error = null;
 
         if (doOrphan) {
 
@@ -826,19 +819,31 @@ public class Synchronizer {
                     return;
 
             } catch (IOException e) {
-                cnt.stopAll(22);
+                error = new Exception(e);
 
             } catch (Exception e) {
 
                 if (cnt.isOnStopping()) {
                     return;
                 } else {
-                    dcSet.rollback();
-                    throw new Exception(e);
+                    error = new Exception(e);
                 }
             } finally {
                 if (cnt.isOnStopping()) {
                     throw new Exception("on stopping");
+                }
+
+                if (error != null) {
+                    dcSet.rollback();
+                    LOGGER.error(error.getMessage(), error);
+
+                    if (error instanceof IOException) {
+                        cnt.stopAll(22);
+                        return;
+                    }
+
+                    throw new Exception(error);
+
                 }
 
                 if (observOn) {
@@ -894,19 +899,31 @@ public class Synchronizer {
                 // NOTIFY to WALLET
 
             } catch (IOException e) {
-                cnt.stopAll(22);
+                error = new Exception(e);
 
             } catch (Exception e) {
 
                 if (cnt.isOnStopping()) {
                     return;
                 } else {
-                    dcSet.rollback();
-                    throw new Exception(e);
+                    error = new Exception(e);
                 }
             } finally {
                 if (cnt.isOnStopping()) {
                     throw new Exception("on stopping");
+                }
+
+                if (error != null) {
+                    dcSet.rollback();
+                    LOGGER.error(error.getMessage(), error);
+
+                    if (error instanceof IOException) {
+                        cnt.stopAll(22);
+                        return;
+                    }
+
+                    throw new Exception(error);
+
                 }
 
                 if (observOn) {

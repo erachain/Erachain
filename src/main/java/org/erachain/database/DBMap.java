@@ -274,7 +274,19 @@ public abstract class DBMap<T, U> extends Observable {
     public Iterator<T> getIterator(int index, boolean descending) {
         this.addUses();
 
-        if (index == DEFAULT_INDEX) {
+        // 0 - это главный индекс - он не в списке indexes
+        if (index > 0 && this.indexes != null && this.indexes.containsKey(index)) {
+            // IT IS INDEX ID in this.indexes
+
+            if (descending) {
+                index += 10000;
+            }
+
+            IndexIterator<T> u = new IndexIterator<T>(this.indexes.get(index));
+            this.outUses();
+            return u;
+
+        } else {
             if (descending) {
                 Iterator<T> u = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
                 this.outUses();
@@ -284,14 +296,7 @@ public abstract class DBMap<T, U> extends Observable {
             Iterator<T> u = ((NavigableMap<T, U>) this.map).keySet().iterator();
             this.outUses();
             return u;
-        } else {
-            if (descending) {
-                index += 10000;
-            }
 
-            IndexIterator<T> u = new IndexIterator<T>(this.indexes.get(index));
-            this.outUses();
-            return u;
         }
     }
 

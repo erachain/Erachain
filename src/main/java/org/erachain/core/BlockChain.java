@@ -33,7 +33,7 @@ public class BlockChain {
 
     //public static final int START_LEVEL = 1;
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = true;
+    public static final boolean DEVELOP_USE = false;
     public static final boolean HARD_WORK = false;
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
@@ -94,9 +94,9 @@ public class BlockChain {
     public static final int VERS_4_11 = DEVELOP_USE ? 230000 : 194400;
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : VERS_4_11;
 
-    public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 : VERS_4_11;
+    public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : DEVELOP_USE? 325555 : VERS_4_11;
 
     public static final int DEVELOP_FORGING_START = 100;
 
@@ -508,7 +508,11 @@ public class BlockChain {
 
         //return targetPrevios - (targetPrevios>>TARGET_COUNT_SHIFT) + (winValue>>TARGET_COUNT_SHIFT);
         // better accuracy
-        return (((targetPrevious << TARGET_COUNT_SHIFT) - targetPrevious) + winValue) >> TARGET_COUNT_SHIFT;
+        long target = (((targetPrevious << TARGET_COUNT_SHIFT) - targetPrevious) + winValue) >> TARGET_COUNT_SHIFT;
+        if (target < 1000 && DEVELOP_USE)
+            target = 1000;
+
+        return target;
     }
 
     // GET MIN TARGET
@@ -558,8 +562,9 @@ public class BlockChain {
      */
     public static long calcWinValue(DCSet dcSet, Account creator, int height, int forgingBalance) {
 
-        if (forgingBalance < MIN_GENERATING_BALANCE)
-            return 0l;
+        if (forgingBalance < MIN_GENERATING_BALANCE) {
+                return 0l;
+        }
 
         Tuple2<Integer, Integer> previousForgingPoint = creator.getForgingData(dcSet, height);
 
@@ -581,24 +586,17 @@ public class BlockChain {
             forgingBalance = previousForgingPoint.b;
         }
 
-        if (!Controller.getInstance().isTestNet() && forgingBalance < BlockChain.MIN_GENERATING_BALANCE)
-            return 0l;
+        if (forgingBalance < BlockChain.MIN_GENERATING_BALANCE) {
+            if (!Controller.getInstance().isTestNet() && !DEVELOP_USE)
+                return 0l;
+            forgingBalance = BlockChain.MIN_GENERATING_BALANCE;
+        }
 
         int difference = height - previousForgingHeight;
-        if (Controller.getInstance().isTestNet()) {
+        if (Controller.getInstance().isTestNet() || BlockChain.DEVELOP_USE) {
+            if (difference < 10)
+                difference = 10;
             ;
-        } else if (BlockChain.DEVELOP_USE) {
-            if (height < BlockChain.REPEAT_WIN + 2) {
-                if (difference < height - 2)
-                    return difference - height + 2;
-            } else if (height < 20) {
-                if (difference < 4)
-                    return -999l;
-            } else {
-                //difference -= REPEAT_WIN;
-                if (difference < REPEAT_WIN)
-                    return difference - REPEAT_WIN;
-            }
         } else {
 
             int repeatsMin;
@@ -642,8 +640,8 @@ public class BlockChain {
         else
             win_value = forgingBalance;
 
-        if (DEVELOP_USE)
-            return win_value >> 2;
+        if (Controller.getInstance().isTestNet() || DEVELOP_USE)
+            return win_value;
 
         if (false) {
             if (height < BlockChain.REPEAT_WIN)
@@ -792,7 +790,6 @@ public class BlockChain {
 
         // FULL VALIDATE because before was only HEAD validating
         if (!block.isValid(dcSet, false)) {
-            block.clearForHeap();
 
             LOGGER.info("new winBlock is BAD!");
             if (peer != null)

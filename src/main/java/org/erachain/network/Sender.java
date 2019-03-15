@@ -72,21 +72,6 @@ public class Sender extends MonitoredThread {
         return result;
     }
 
-    public boolean offer(Message message, long SOT) {
-        try {
-            return blockingQueue.offer(message, SOT, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            return false;
-        }
-    }
-
-    //public void put(Message message) {
-    //    try {
-    //        blockingQueue.put(message);
-    //    } catch (InterruptedException e) {
-    //    }
-    //}
-
     public void sendGetHWeight(GetHWeightMessage getHWeightMessage) {
         if (true) {
             if (this.blockingQueue.isEmpty()) {
@@ -125,7 +110,7 @@ public class Sender extends MonitoredThread {
      * @param needFlush
      * @return
      */
-    private synchronized boolean writeAndFlush(byte[] bytes, boolean needFlush) {
+    private boolean writeAndFlush(byte[] bytes, boolean needFlush) {
         // пока есть входы по sendMessage (org.erachain.network.Peer.directSendMessage) - нужно ждать синхрон
         if (this.out == null)
             return false;
@@ -182,7 +167,9 @@ public class Sender extends MonitoredThread {
         }
 
         if (error != null) {
-            peer.ban(error);
+            if (peer.isUsed()) {
+                peer.ban(error);
+            }
             return false;
         }
 

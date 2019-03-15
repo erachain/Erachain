@@ -30,9 +30,6 @@ public class DCSet implements Observer, IDB {
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_BYTE << 3;
     private static final int CASH_SIZE = BlockChain.HARD_WORK ? 1024 << 2 : 1024;
 
-    private static final String TX_COUNTER = "tx_counter";
-    private static final String UNC_TX_COUNTER = "unc_tx_counter";
-
     private static boolean isStoped = false;
     private volatile static DCSet instance;
     private DCSet parent;
@@ -373,8 +370,24 @@ public class DCSet implements Observer, IDB {
         //CREATE DATABASE
         DB database = DBMaker.newFileDB(dbFile)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
-                //.cacheSize(CASH_SIZE)
-                .cacheDisable()
+
+                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
+                ///// добавил dcSet.clearCache(); --
+                ///.cacheDisable()
+
+                ////// ТУТ вряд ли нужно КЭШИРОВАТь при чтении что-либо
+                //////
+                // это чистит сама память если соталось 25% от кучи - так что она безопасная
+                // у другого типа КЭША происходит утечка памяти
+                .cacheHardRefEnable()
+                //.cacheLRUEnable()
+                ///.cacheSoftRefEnable()
+                ///.cacheWeakRefEnable()
+
+                // количество точек в таблице которые хранятся в HashMap как в КЭШе
+                // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
+                .cacheSize(10000)
+
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
                 //.snapshotEnable()
@@ -406,12 +419,6 @@ public class DCSet implements Observer, IDB {
         if (instance.actions < 0) {
             dbFile.delete();
             throw new Exception("error in DATACHAIN:" + instance.actions);
-        }
-
-        // INIT COUNTERS
-        if (instance.database.getAtomicLong(TX_COUNTER) == null) {
-            instance.database.getAtomicLong(TX_COUNTER).set(0);
-            instance.database.getAtomicLong(UNC_TX_COUNTER).set(0);
         }
 
     }
@@ -495,58 +502,6 @@ public class DCSet implements Observer, IDB {
     @Override
     public void openDBSet() {
 
-    }
-
-    /**
-     * сколько всего транзакций в цепочке
-     * TODO: это лишнее сейчас так как счетчик встроен ФиналМап
-     *
-     * @param offset
-     */
-    public void updateTxCounter(long offset) {
-        if (parent == null && offset != 0l) {
-            this.uses++;
-            this.database.getAtomicLong(TX_COUNTER).set(this.database.getAtomicLong(TX_COUNTER).get() + offset);
-            this.uses--;
-        }
-    }
-
-    public long getTxCounter() {
-        if (true) {
-            return this.transactionFinalMap.size();
-
-        } else {
-            long u = this.database.getAtomicLong(TX_COUNTER).longValue();
-            return u;
-        }
-    }
-
-
-    /**
-     * сколько всего транзакций в ожидании
-     * TODO: это лишнее сейчас так как счетчик встроен ФиналМап
-     *
-     * @param offset
-     */
-    public void updateUncTxCounter(int offset) {
-        if (parent == null && offset != 0) {
-            this.uses++;
-            this.database.getAtomicLong(UNC_TX_COUNTER).set(this.database.getAtomicLong(UNC_TX_COUNTER).get() + offset);
-            this.uses--;
-        }
-    }
-
-    public long getUncTxCounter() {
-        long u = this.database.getAtomicLong(UNC_TX_COUNTER).longValue();
-        return u;
-    }
-
-    public void setUncTxCounter(int value) {
-        if (parent == null) {
-            this.uses++;
-            this.database.getAtomicLong(UNC_TX_COUNTER).set(value);
-            this.uses--;
-        }
     }
 
     /**
@@ -1394,6 +1349,10 @@ public class DCSet implements Observer, IDB {
         }
     }
 
+    public void clearCache() {
+        this.database.getEngine().clearCache();
+    }
+
     @Override
     public void commit() {
         this.actions += 100;
@@ -1412,6 +1371,8 @@ public class DCSet implements Observer, IDB {
             return;
 
         this.addUses();
+
+        this.database.getEngine().clearCache();
 
         this.actions += size;
         if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT) {

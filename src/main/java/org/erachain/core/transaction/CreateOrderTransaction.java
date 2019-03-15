@@ -472,17 +472,20 @@ public class CreateOrderTransaction extends Transaction {
             if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(amountHave.add(this.fee)) == -1) {
                 return NO_BALANCE;
             }
-            // VALID if want to BY COMPU by ERA
-        } else if (wantKey == FEE_KEY && haveKey == RIGHTS_KEY
-                && amountHave.compareTo(BigDecimal.ONE) >= 0
-                && this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.FEE_MIN_1) > 0) {
+        }
+
+        // VALID if want to BY COMPU by ERA
+        else if (wantKey == FEE_KEY && haveKey == RIGHTS_KEY
+                && amountHave.compareTo(BigDecimal.ONE) >= 0 // минимально меняем 1 ЭРА
+                && (height < 222047 || this.creator.getBalance(this.dcSet, RIGHTS_KEY).a.b.compareTo(amountHave) >= 0) // ЭРА есть на счету
+                && this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.FEE_MIN_1) > 0) { // на балансе компушки не минус
             flags = flags | NOT_VALIDATE_FLAG_FEE;
         } else {
 
-            // CHECK IF SENDER HAS ENOUGH FEE BALANCE
-            if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.fee) == -1) {
-                return NOT_ENOUGH_FEE;
-            }
+            ///// CHECK IF SENDER HAS ENOUGH FEE BALANCE
+            ///if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.fee) == -1) {
+            ///    return NOT_ENOUGH_FEE;
+            ///}
 
             // if asset is unlimited and me is creator of this asset
             boolean unLimited = haveAsset.getQuantity().equals(0l)

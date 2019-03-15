@@ -20,6 +20,7 @@ import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
 import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.SecureWalletDatabase;
+import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -192,6 +193,7 @@ public class Wallet extends Observable implements Observer {
 		return this.secureDatabase.getAccountSeedMap().getPrivateKeyAccount(address);
 	}
 
+	/*
 	public PublicKeyAccount getPublicKeyAccount(String address) {
 		if (this.database == null) {
 			return null;
@@ -199,6 +201,7 @@ public class Wallet extends Observable implements Observer {
 
 		return this.database.getAccountMap().getPublicKeyAccount(address);
 	}
+	*/
 
 	public boolean exists() {
 		if (Controller.getInstance().noUseWallet)
@@ -532,27 +535,32 @@ public class Wallet extends Observable implements Observer {
 	public void update_account_assets() {
 		List<Tuple2<Account, Long>> accounts_assets = this.getAccountsAssets();
 
-		synchronized (accounts_assets) {
-			for (Tuple2<Account, Long> account_asset : accounts_assets) {
-				this.database.getAccountMap().changeBalance(account_asset.a.getAddress(), false, account_asset.b,
-						BigDecimal.ZERO);
-			}
-		}
+        for (Tuple2<Account, Long> account_asset : accounts_assets) {
+            this.database.getAccountMap().changeBalance(account_asset.a.getAddress(), false, account_asset.b,
+                    BigDecimal.ZERO);
+        }
 
 	}
 
 	boolean synchronizeBodyStop;
-	public synchronized void synchronizeBody(boolean reset) {
+	public void synchronizeBody(boolean reset) {
+	    if (!synchronizeBodyStop)
+	        return;
+
 		DCSet dcSet = DCSet.getInstance();
 
-		Block block;
+		Block blockStart;
 		int height;
         synchronizeBodyStop = false;
 
 		if (reset) {
-			LOGGER.info("   >>>>  Resetted maps");
+			LOGGER.info("   >>>>  try to Reset maps");
 
-			// RESET MAPS
+            // SAVE transactions file
+            this.database.clearCache();
+            this.database.commit();
+
+            // RESET MAPS
 			this.database.getTransactionMap().reset();
 			this.database.getBlocksHeadMap().reset();
 			this.database.getNameMap().reset();
@@ -566,67 +574,81 @@ public class Wallet extends Observable implements Observer {
 			this.database.getUnionMap().reset();
 			this.database.getOrderMap().reset();
 
+            LOGGER.info("   >>>>  Maps was Resetted");
 
 			// REPROCESS BLOCKS
-			block = new GenesisBlock();
-			this.database.setLastBlockSignature(block.getReference());
+            blockStart = new GenesisBlock();
+			this.database.setLastBlockSignature(blockStart.getReference());
 			height = 1;
 
         } else {
 
             byte[] lastSignature = this.database.getLastBlockSignature();
-            block = dcSet.getBlockSignsMap().getBlock(lastSignature);
+            blockStart = dcSet.getBlockSignsMap().getBlock(lastSignature);
 
-            if (block == null) {
+            if (blockStart == null) {
                 // выходим и потом пересинхронизируемся с начала
                 return;
             }
         }
 
-        height = block.getHeight();
+        // SAVE transactions file
+        this.database.clearCache();
+        this.database.commit();
+
+        height = blockStart.getHeight();
 		int steepHeight = dcSet.getBlockMap().size() / 100;
 		int lastHeight = 0;
 
 		long timePoint = System.currentTimeMillis();
+		BlockMap blockMap = dcSet.getBlockMap();
 
-		try {
+        this.database.clearCache();
+
+        try {
 			do {
 
-				// UPDATE
-				// this.update(this, new
-				// ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE,
-				// block));
-                block = dcSet.getBlockMap().get(height);
+                Block block = blockMap.get(height);
 
                 if (block == null) {
                     break;
                 }
 
                 try {
-                    this.processBlock(block);
+                    this.processBlock(dcSet, block);
 				} catch (java.lang.OutOfMemoryError e) {
 					Controller.getInstance().stopAll(44);
 					return;
 				}
 
                 // NEED FOR CLEAR HEAP
-                //block.clearForHeap();
-                block = null;
+				//block.clearForHeap(); - не нужно теперь если мы чистим КЭШ в dcSet.clearCache();
+                //block = null;
 
-				if (System.currentTimeMillis() - timePoint > 10000
+                if (Controller.getInstance().needUpToDate() || !Controller.getInstance().isStatusWaiting())
+                    // если идет синхронизация цепочки - кошелек не синхронизируем
+                    break;
+
+                if (System.currentTimeMillis() - timePoint > 10000
 						|| steepHeight < height - lastHeight) {
-
-                    if (Controller.getInstance().needUpToDate() || !Controller.getInstance().isStatusWaiting())
-						// если идет синхронизация цепочки - кошелек не синхронизируем
-						break;
 
 					timePoint = System.currentTimeMillis();
 					lastHeight = height;
 
                     this.syncHeight = height;
 					Controller.getInstance().walletSyncStatusUpdate(height);
+
+                    this.database.clearCache();
                     this.database.commit();
-                    System.gc();
+
+                    // обязательно нужно чтобы память освобождать
+                    // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
+                    // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
+                    // БЕЗ очистки КЭША HEAP забивается под завязку
+					dcSet.clearCache();
+
+					// не нужно - Ява сама норм делает вызов очистки
+					//System.gc();
 
                 }
 
@@ -649,7 +671,16 @@ public class Wallet extends Observable implements Observer {
             this.syncHeight = height;
             Controller.getInstance().walletSyncStatusUpdate(height);
 			Controller.getInstance().setProcessingWalletSynchronize(false);
+
+			// обязательно нужно чтобы память освобождать
+			// и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
+			// при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызывают
+            // вдобавое отчищает полностью память - много свободной памяти получаем
+			dcSet.clearCache();
+
+            this.database.clearCache();
 			this.database.commit();
+
             System.gc();
 
 		}
@@ -743,7 +774,11 @@ public class Wallet extends Observable implements Observer {
 
             // break current synchronization if exists
             synchronizeBodyStop = true;
-
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                return;
+            }
             synchronizeBody(reset);
             return;
 
@@ -762,7 +797,14 @@ public class Wallet extends Observable implements Observer {
             }
         }
 
-        // запустим погоняние
+        // break current synchronization if exists
+        synchronizeBodyStop = true;
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            return;
+        }
+        // запустим догоняние
         synchronizeBody(false);
 
     }
@@ -1164,7 +1206,7 @@ public class Wallet extends Observable implements Observer {
 
 	private long processBlockLogged = 0;
 
-    private void processBlock(Block block) {
+    private void processBlock(DCSet dcSet, Block block) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1178,7 +1220,6 @@ public class Wallet extends Observable implements Observer {
         Account blockGenerator = block.blockHead.creator;
 		String blockGeneratorStr = blockGenerator.getAddress();
 
-		DCSet dcSet = DCSet.getInstance();
         int height = block.blockHead.heightBlock;
 
 		// CHECK IF WE ARE GENERATOR
@@ -1277,11 +1318,6 @@ public class Wallet extends Observable implements Observer {
                     + " TXs = " + block.blockHead.transactionsCount + " millsec/record:"
                     + tickets / (block.blockHead.transactionsCount + 1));
 		}
-
-        // NEED FOR CLEAR HEAP !
-        block.clearForHeap();
-
-        //block = null;
 
     }
 
@@ -1398,14 +1434,11 @@ public class Wallet extends Observable implements Observer {
 		// SET AS LAST BLOCK
         this.database.setLastBlockSignature(block.blockHead.reference); // .reference
 
-		// long tickets = System.currentTimeMillis() - start;
+        // long tickets = System.currentTimeMillis() - start;
 		// LOGGER.info("WALLET [" + block.getHeightByParent(DCSet.getInstance())
 		// + "] orphaning time: " + tickets*0.001
 		// + " TXs = " + block.getTransactionCount() + " millsec/record:"
 		// + tickets/(block.getTransactionCount()+1) );
-
-        // NEED FOR CLEAR HEAP !
-        block.clearForHeap();
 
     }
 
@@ -1863,7 +1896,9 @@ public class Wallet extends Observable implements Observer {
 			}
 
 			// CHECK BLOCK
-			this.processBlock(block);
+			this.processBlock(DCSet.getInstance(), block);
+            //this.database.clearCache();
+            //this.database.commit();
 
 		} else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
 		{
@@ -1878,6 +1913,8 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK BLOCK
 			this.orphanBlock(block);
+            //this.database.clearCache();
+            //this.database.commit();
 
 		} else if (false && type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
 			;
@@ -2022,15 +2059,15 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	public long getLicenseKey() {
-		if (this.database == null || this.database.getAccountMap().getLicenseKey() == null) {
+		if (this.database == null || this.database.getLicenseKey() == null) {
 			return 2l;
 		}
 
-		return this.database.getAccountMap().getLicenseKey();
+		return this.database.getLicenseKey();
 	}
 
 	public void setLicenseKey(long key) {
-		this.database.getAccountMap().setLicenseKey(key);
+		this.database.setLicenseKey(key);
 	}
 
 	public Integer loadFromDir() {

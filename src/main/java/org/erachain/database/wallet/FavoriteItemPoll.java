@@ -14,6 +14,7 @@ public class FavoriteItemPoll extends FavoriteItem {
         super(dWSet, database, ObserverMessage.WALLET_LIST_POLL_FAVORITES_TYPE, "poll", PollCls.INITIAL_FAVORITES);
     }
 
+    /*
     public void replace(List<Long> keys) {
         this.itemsSet.clear();
         this.itemsSet.addAll(keys);
@@ -56,5 +57,6 @@ public class FavoriteItemPoll extends FavoriteItem {
         this.notifyObservers(new ObserverMessage(this.observer_favorites, this.itemsSet));
     }
 
+*/
 
 }

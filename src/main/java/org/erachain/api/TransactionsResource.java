@@ -159,9 +159,11 @@ public class TransactionsResource {
     @GET
     @Path("/network")
     public String getNetworkTransactions() {
+        LOGGER.debug("try get");
         List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 100, true);
         JSONArray array = new JSONArray();
 
+        LOGGER.debug("get: " + transactions.size());
         for (Transaction transaction : transactions) {
             // JSONArray peersList = new JSONArray<List<byte[]>>(transaction.a);
             array.add(transaction.toJson());
