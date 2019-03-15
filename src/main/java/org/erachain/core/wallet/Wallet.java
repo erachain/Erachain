@@ -65,20 +65,22 @@ public class Wallet extends Observable implements Observer {
 
 	// CONSTRUCTORS
 
-	public Wallet() {
+	public Wallet(boolean withObserver, boolean dynamicGUI) {
 
 		//this.syncHeight = ;
 
 		// CHECK IF EXISTS
 		if (this.exists()) {
 			// OPEN WALLET
-			this.database = new DWSet();
+			this.database = new DWSet(withObserver, dynamicGUI);
 
-			// ADD OBSERVER
-			// Controller.getInstance().addObserver(this);
-			DCSet.getInstance().getTransactionMap().addObserver(this);
-			DCSet.getInstance().getBlockMap().addObserver(this);
-			// DCSet.getInstance().getCompletedOrderMap().addObserver(this);
+			if (withObserver) {
+				// ADD OBSERVER
+				// Controller.getInstance().addObserver(this);
+				DCSet.getInstance().getTransactionMap().addObserver(this);
+				DCSet.getInstance().getBlockMap().addObserver(this);
+				// DCSet.getInstance().getCompletedOrderMap().addObserver(this);
+			}
 
         }
 
@@ -346,12 +348,13 @@ public class Wallet extends Observable implements Observer {
 		return this.database.isItemFavorite(item);
 	}
 
-	public boolean create(byte[] seed, String password, int depth, boolean synchronize, String path) {
+	public boolean create(byte[] seed, String password, int depth, boolean synchronize, String path,
+						  boolean withObserver, boolean dynamicGUI) {
 		String oldPath = Settings.getInstance().getWalletDir();
 		// set wallet dir
 		Settings.getInstance().setWalletDir(path);
 		// OPEN WALLET
-		DWSet database = new DWSet();
+		DWSet database = new DWSet(withObserver, dynamicGUI);
 
 		if (this.secureDatabase != null) {
 			// CLOSE secured WALLET
@@ -2070,7 +2073,7 @@ public class Wallet extends Observable implements Observer {
 		this.database.setLicenseKey(key);
 	}
 
-	public Integer loadFromDir() {
+	public Integer loadFromDir(boolean withObserver, boolean dynamicGUI) {
 		// return 1 - is ok
 		// if > 1 - error
 		String pathOld = Settings.getInstance().getWalletDir();
@@ -2088,7 +2091,7 @@ public class Wallet extends Observable implements Observer {
 			// set wallet dir
 			Settings.getInstance().setWalletDir(dir);
 			// open wallet
-			Controller.getInstance().wallet = new Wallet();
+			Controller.getInstance().wallet = new Wallet(withObserver, dynamicGUI);
 			// not wallet return 0;
 			if (!Controller.getInstance().wallet.exists()) return 2;
 			// accounts

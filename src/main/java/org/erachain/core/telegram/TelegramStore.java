@@ -27,16 +27,19 @@ public class TelegramStore extends Observable implements Observer {
 
     Timer timer;
 
+    public static TelegramStore getInstanse(boolean withObserver, boolean dynamicGUI) {
+        if (th == null) th = new TelegramStore(withObserver, dynamicGUI);
+        return th;
+    }
     public static TelegramStore getInstanse() {
-        if (th == null) th = new TelegramStore();
         return th;
     }
 
 	// CONSTRUCTORS
 
-    private TelegramStore() {
+    private TelegramStore(boolean withObserver, boolean dynamicGUI) {
         // OPEN db
-        this.database = new TelegramSet();
+        this.database = new TelegramSet(withObserver, dynamicGUI);
         // start clear olf telegram
         clearOldTelegtams();
     }

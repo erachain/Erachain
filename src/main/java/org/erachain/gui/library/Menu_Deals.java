@@ -122,7 +122,7 @@ public class Menu_Deals extends JMenu {
                 //
                 //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
                 // new Account_Repay_Debt_Dialog(null, null);
-                Integer res = Controller.getInstance().wallet.loadFromDir();
+                int res = Controller.getInstance().loadWalletFromDir();
                 if (res == 0) {
                     JOptionPane.showMessageDialog(
                             new JFrame(), Lang.getInstance().translate("wallet does not exist") + "!",

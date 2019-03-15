@@ -26,12 +26,14 @@ abstract public class DBASet implements IDB {
     public DBASet() {
     }
 
-    public DBASet(DB database, boolean withObserver, boolean dynamicGUI) {
+    public DBASet(boolean withObserver, boolean dynamicGUI) {
         this.withObserver = withObserver;
         this.dynamicGUI = dynamicGUI;
-        this.database = database;
+    }
 
-        uses = 1;
+    public DBASet(DB database, boolean withObserver, boolean dynamicGUI) {
+        this(withObserver, dynamicGUI);
+        this.database = database;
     }
 
     public int getVersion() {

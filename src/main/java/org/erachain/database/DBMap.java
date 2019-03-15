@@ -24,7 +24,9 @@ public abstract class DBMap<T, U> extends Observable {
     public static final int NOTIFY_COUNT = 5;
 
     public static final int DEFAULT_INDEX = 0;
-    static Logger LOGGER = LoggerFactory.getLogger(DBMap.class.getName());
+
+    protected static Logger LOGGER;
+
     protected IDB databaseSet;
     protected Map<T, U> map;
     protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
@@ -62,9 +64,9 @@ public abstract class DBMap<T, U> extends Observable {
 
     protected abstract U getDefaultValue();
 
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
+    //protected Map<Integer, Integer> getObservableData() {
+    //    return this.observableData;
+    //}
 
     protected abstract void createIndexes(DB database);
 
@@ -212,22 +214,17 @@ public abstract class DBMap<T, U> extends Observable {
             if (this.map.containsKey(key)) {
                 value = this.map.remove(key);
 
-                Map<Integer, Integer> observers = this.getObservableData();
-
                 // NOTYFIES
-                if (observers != null) {
+                if (this.observableData != null) {
+                    //NOTIFY REMOVE
+                    if (this.observableData.containsKey(NOTIFY_REMOVE)) {
+                        this.setChanged();
+                        this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_REMOVE), value));
+                    }
 
-                    if (this.observableData != null) {
-                        //NOTIFY REMOVE
-                        if (observers.containsKey(NOTIFY_REMOVE)) {
-                            this.setChanged();
-                            this.notifyObservers(new ObserverMessage(observers.get(NOTIFY_REMOVE), value));
-                        }
-
-                        if (observers.containsKey(NOTIFY_COUNT)) {
-                            this.setChanged();
-                            this.notifyObservers(new ObserverMessage(observers.get(NOTIFY_COUNT), this));
-                        }
+                    if (this.observableData.containsKey(NOTIFY_COUNT)) {
+                        this.setChanged();
+                        this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_COUNT), this));
                     }
                 }
 
@@ -265,18 +262,21 @@ public abstract class DBMap<T, U> extends Observable {
         //ADD OBSERVER
         super.addObserver(o);
 
-        //NOTIFY LIST if this not FORK
-        if (this.getObservableData().containsKey(NOTIFY_LIST)) {
-            //CREATE LIST
-            SortableList<T, U> list = new SortableList<T, U>(this);
+        // NOTYFIES
+        if (this.observableData != null) {
+            //NOTIFY LIST if this not FORK
+            if (this.observableData.containsKey(NOTIFY_LIST)) {
+                //CREATE LIST
+                SortableList<T, U> list = new SortableList<T, U>(this);
 
-            //UPDATE
-            o.update(null, new ObserverMessage(this.getObservableData().get(NOTIFY_LIST), list));
-        }
+                //UPDATE
+                o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), list));
+            }
 
-        if (this.getObservableData().containsKey(NOTIFY_COUNT)) {
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this)); /// SLOW .size()));
+            if (this.observableData.containsKey(NOTIFY_COUNT)) {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_COUNT), this)); /// SLOW .size()));
+            }
         }
 
         this.outUses();
@@ -335,19 +335,22 @@ public abstract class DBMap<T, U> extends Observable {
             set.clear();
         }
 
-        //NOTIFY LIST
-        if (this.getObservableData().containsKey(NOTIFY_RESET)) {
-            //CREATE LIST
-            /////SortableList<T, U> list = new SortableList<T, U>(this);
+        // NOTYFIES
+        if (this.observableData != null) {
+            //NOTIFY LIST
+            if (this.observableData.containsKey(NOTIFY_RESET)) {
+                //CREATE LIST
+                /////SortableList<T, U> list = new SortableList<T, U>(this);
 
-            //UPDATE
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_RESET), null));
-        }
+                //UPDATE
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_RESET), null));
+            }
 
-        if (this.getObservableData().containsKey(NOTIFY_COUNT)) {
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this));
+            if (this.observableData.containsKey(NOTIFY_COUNT)) {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_COUNT), this));
+            }
         }
 
         this.outUses();

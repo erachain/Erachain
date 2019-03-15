@@ -16,7 +16,8 @@ public class TelegramSet extends DBASet {
 
     private AllTelegramsMap telegramsMap;
 
-    public TelegramSet() {
+    public TelegramSet(boolean withObserver, boolean dynamicGUI) {
+        super(withObserver, dynamicGUI);
 
         DATA_FILE = new File(Settings.getInstance().getTelegramDir(), "telegram.dat");
         DATA_FILE.getParentFile().mkdirs();

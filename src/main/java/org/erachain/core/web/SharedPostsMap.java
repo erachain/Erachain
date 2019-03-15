@@ -66,11 +66,6 @@ public class SharedPostsMap extends DCMap<byte[], List<String>> {
     }
 
     @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
-    @Override
     protected void createIndexes(DB database) {
     }
 

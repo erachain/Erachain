@@ -37,11 +37,6 @@ public class NameStorageMap extends DCMap<String, Map<String, String>> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     protected void createIndexes(DB database) {
     }
 

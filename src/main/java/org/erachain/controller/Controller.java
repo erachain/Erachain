@@ -44,6 +44,8 @@ import org.erachain.datachain.LocalDataMap;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
+import org.erachain.gui.create.CreateWalletFrame;
+import org.erachain.gui.create.RecoverWalletFrame;
 import org.erachain.gui.library.Issue_Confirm_Dialog;
 import org.erachain.lang.Lang;
 import org.erachain.network.Network;
@@ -687,7 +689,7 @@ public class Controller extends Observable {
         // CREATE WALLET
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open Wallet")));
-        this.wallet = new Wallet();
+        this.wallet = new Wallet(this.dcSetWithObserver, this.dynamicGUI);
 
         if (this.seedCommand != null && this.seedCommand.length > 1) {
             /// 0 - Accounts number, 1 - seed, 2 - password, [3 - path]
@@ -744,7 +746,7 @@ public class Controller extends Observable {
 
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open Telegram")));
-        this.telegramStore = TelegramStore.getInstanse();
+        this.telegramStore = TelegramStore.getInstanse(this.dcSetWithObserver, this.dynamicGUI);
 
 
         this.setChanged();
@@ -793,6 +795,10 @@ public class Controller extends Observable {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    public int loadWalletFromDir() {
+        return this.wallet.loadFromDir(this.dcSetWithObserver, this.dynamicGUI);
     }
 
     public void replaseFavoriteItems(int type) {
@@ -1942,7 +1948,8 @@ public class Controller extends Observable {
             return true;
 
         // IF NEW WALLET CREADED
-        if (this.wallet.create(seed, password, amount, false, path)) {
+        if (this.wallet.create(seed, password, amount, false, path,
+                this.dcSetWithObserver, this.dynamicGUI)) {
             this.setWalletLicense(licenseKey);
             return true;
         } else
@@ -1954,7 +1961,9 @@ public class Controller extends Observable {
         if (noUseWallet)
             return true;
 
-        if (this.wallet.create(seed, password, amount, false, path)) {
+        if (this.wallet.create(seed, password, amount, false, path,
+                this.dcSetWithObserver, this.dynamicGUI)) {
+
             LOGGER.info("Wallet needs to synchronize!");
             this.setNeedSyncWallet(true);
 

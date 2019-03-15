@@ -139,7 +139,11 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
     public void update(Observable o, Object object) {
 
         ObserverMessage message = (ObserverMessage) object;
-        if (message.getType() == this.db.getObservableData().get(DBMap.NOTIFY_ADD) || message.getType() == this.db.getObservableData().get(DBMap.NOTIFY_REMOVE)) {
+        if (this.db.observableData == null)
+            return;
+
+        if (message.getType() == this.db.observableData.get(DBMap.NOTIFY_ADD)
+                || message.getType() == this.db.observableData.get(DBMap.NOTIFY_REMOVE)) {
             //RESET DATA
             this.sort(this.index, this.descending);
         }

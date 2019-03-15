@@ -56,7 +56,9 @@ public class DWSet extends DBASet {
 
     private FavoriteDocument statementFavoritesSet;
 
-    public DWSet() {
+    public DWSet(boolean withObserver, boolean dynamicGUI) {
+        super(withObserver,  dynamicGUI);
+
         //OPEN WALLET
         DATA_FILE = new File(Settings.getInstance().getDataWalletDir(), "wallet.dat");
         DATA_FILE.getParentFile().mkdirs();
