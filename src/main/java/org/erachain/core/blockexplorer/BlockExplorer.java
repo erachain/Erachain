@@ -2920,7 +2920,7 @@ public class BlockExplorer {
         Map result = new LinkedHashMap();
         //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
         //В зависимости от выбранного языка(ru,en)
-        addHeadInfoCapBlocks(result);
+        AdderHeadInfo.addHeadInfoCapBlocks(result,dcSet, langObj);
         //Если номер с какого элемента отображать не задан - берем последний
         if (start == -1) {
             start = dcSet.getBlockMap().size();
@@ -2929,7 +2929,7 @@ public class BlockExplorer {
         int numberOfRepresentsItemsOnPage = 40;
         List<Block> blocks = receiveListElements(Block.class, start, result, numberOfRepresentsItemsOnPage);
         //Выделение map со списком блоков в соответствии с запрошенной страницей
-        Map blocksJSON = blocksJSON(blocks);
+        Map blocksJSON = ConverterListInMap.blocksJSON(blocks,dcSet);
         result.put("Blocks", blocksJSON);
         result.put("start", start);
         return result;
@@ -2940,7 +2940,7 @@ public class BlockExplorer {
         Map result = new LinkedHashMap();
         //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
         //В зависимости от выбранного языка(ru,en)
-        addHeadInfoCapPersons(result);
+        AdderHeadInfo.addHeadInfoCapPersons(result,dcSet, langObj);
         //Если номер с какого элемента отображать не задан - берем последний
         if (start == -1) {
             start = dcSet.getItemPersonMap().size();
@@ -2949,7 +2949,7 @@ public class BlockExplorer {
         int numberOfRepresentsItemsOnPage = 20;
         List<PersonCls> persons = receiveListElements(PersonCls.class, start, result, numberOfRepresentsItemsOnPage);
         //Преобразование данных из списка(list) в словарь(map)
-        Map personsJSON = personsJSON(persons);
+        Map personsJSON = ConverterListInMap.personsJSON(persons);
         //Добавление полученного словаря(map) в данные для отправки
         result.put("Persons", personsJSON);
         //Элемент, с которого идет отсчет страниц в обозревателе блоков(block explorer)
@@ -2963,7 +2963,7 @@ public class BlockExplorer {
         Map result = new LinkedHashMap();
         //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
         //В зависимости от выбранного языка(ru,en)
-        addHeadInfoCapAssets(result);
+        AdderHeadInfo.addHeadInfoCapAssets(result,langObj);
         //Если номер с какого элемента отображать не задан - берем последний
         if (start == -1) {
             start = dcSet.getItemAssetMap().getLastKey();
@@ -2972,7 +2972,7 @@ public class BlockExplorer {
         int numberOfRepresentsItemsOnPage = 20;
         //Получение списка активов из бд
         List<AssetCls> assets = receiveListElements(AssetCls.class, start, result, numberOfRepresentsItemsOnPage);
-        Map assetsJSON = assetsJSON(assets);
+        Map assetsJSON = ConverterListInMap.assetsJSON(assets, dcSet, langObj);
         result.put("Assets", assetsJSON);
         result.put("start", start);
         result.put("numberLastPerson", dcSet.getItemAssetMap().getLastKey());
@@ -2984,7 +2984,7 @@ public class BlockExplorer {
         Map result = new LinkedHashMap();
         //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
         //В зависимости от выбранного языка(ru,en)
-        addHeadInfoCapStatusesTemplates(result);
+        AdderHeadInfo.addHeadInfoCapStatusesTemplates(result,langObj);
         //Если номер с какого элемента отображать не задан - берем последний
         if (start == -1) {
             start = dcSet.getItemStatusMap().getLastKey();
@@ -2993,7 +2993,7 @@ public class BlockExplorer {
         int numberOfRepresentsItemsOnPage = 20;
         //Получение списка статусов из бд
         List<StatusCls> statuses = receiveListElements(StatusCls.class, start, result, numberOfRepresentsItemsOnPage);
-        Map statusesJSON = statusTemplateJSON(StatusCls.class, statuses);
+        Map statusesJSON = ConverterListInMap.statusTemplateJSON(StatusCls.class, statuses);
         result.put("Statuses", statusesJSON);
         result.put("start", start);
         result.put("numberLastPerson", dcSet.getItemStatusMap().getLastKey());
@@ -3003,7 +3003,7 @@ public class BlockExplorer {
     private Map jsonQueryTemplates(long start) throws Exception {
         //Результирующий сортированный в порядке добавления словарь(map)
         Map result = new LinkedHashMap();
-        addHeadInfoCapStatusesTemplates(result);
+        AdderHeadInfo.addHeadInfoCapStatusesTemplates(result,langObj);
         //Если номер с какого элемента отображать не задан - берем последний
         if (start == -1) {
             start = dcSet.getItemTemplateMap().getLastKey();
@@ -3012,7 +3012,7 @@ public class BlockExplorer {
         int numberOfRepresentsItemsOnPage = 20;
         //Получение списка шаблонов из бд
         List<TemplateCls> templates = receiveListElements(TemplateCls.class, start, result, numberOfRepresentsItemsOnPage);
-        Map templateJSON = statusTemplateJSON(TemplateCls.class, templates);
+        Map templateJSON = ConverterListInMap.statusTemplateJSON(TemplateCls.class, templates);
         result.put("Templates", templateJSON);
         result.put("start", start);
         result.put("numberLastPerson", dcSet.getItemTemplateMap().getLastKey());
@@ -3072,7 +3072,7 @@ public class BlockExplorer {
         List<ItemCls> listPersons = new ArrayList();
         //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
         //В зависимости от выбранного языка(ru,en)
-        addHeadInfoCapPersons(result);
+        AdderHeadInfo.addHeadInfoCapPersons(result,dcSet, langObj);
         try {
             //Если в строке ввели число
             if (search.matches("\\d+")) {
@@ -3108,7 +3108,7 @@ public class BlockExplorer {
         int numberOfRepresentsItemsOnPage = 10;
         receiverMapForBlockExplorer.setNumberOfRepresentsItemsOnPage(numberOfRepresentsItemsOnPage);
         //Преобразовать соответствующие данные
-        receiverMapForBlockExplorer.process(PersonCls.class);
+        receiverMapForBlockExplorer.process(PersonCls.class,dcSet, langObj);
         //Добавляем количество элементов для отображения на странице для отправки
         result.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
         result.put("Persons", receiverMapForBlockExplorer.getMap());
@@ -3123,7 +3123,7 @@ public class BlockExplorer {
         Map result = new LinkedHashMap();
         //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
         //В зависимости от выбранного языка(ru,en)
-        addHeadInfoCapAssets(result);
+        AdderHeadInfo.addHeadInfoCapAssets(result, langObj);
         List<ItemCls> listAssets = new ArrayList();
         try {
             //Если в строке ввели число
@@ -3158,7 +3158,7 @@ public class BlockExplorer {
         int numberOfRepresentsItemsOnPage = 10;
         receiverMapForBlockExplorer.setNumberOfRepresentsItemsOnPage(numberOfRepresentsItemsOnPage);
         //Преобразовать соответствующие данные
-        receiverMapForBlockExplorer.process(AssetCls.class);
+        receiverMapForBlockExplorer.process(AssetCls.class,dcSet, langObj);
         //Добавляем количество элементов для отображения на странице для отправки
         result.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
         result.put("Assets", receiverMapForBlockExplorer.getMap());
@@ -3173,7 +3173,7 @@ public class BlockExplorer {
         Map result = new LinkedHashMap();
         //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
         //В зависимости от выбранного языка(ru,en)
-        addHeadInfoCapStatusesTemplates(result);
+        AdderHeadInfo.addHeadInfoCapStatusesTemplates(result, langObj);
 
         List<ItemCls> listStatuses = new ArrayList();
 
@@ -3210,7 +3210,7 @@ public class BlockExplorer {
         int numberOfRepresentsItemsOnPage = 20;
         receiverMapForBlockExplorer.setNumberOfRepresentsItemsOnPage(numberOfRepresentsItemsOnPage);
         //Преобразовать соответствующие данные
-        receiverMapForBlockExplorer.process(StatusCls.class);
+        receiverMapForBlockExplorer.process(StatusCls.class, dcSet, langObj);
         //Добавляем количество элементов для отображения на странице для отправки
         result.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
         result.put("Statuses", receiverMapForBlockExplorer.getMap());
@@ -3220,285 +3220,7 @@ public class BlockExplorer {
         return result;
     }
 
-    /**
-     * Перегоняет информацию из списка блоков в словарь
-     *
-     * @param blocks список блоков
-     * @return словарь с добавленной информацией из списка блоков
-     * с ключами соответствующими номерам элементов в исходном списке
-     */
-    private Map blocksJSON(List<Block> blocks) {
-        //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
-        for (int i = 0; i < blocks.size(); i++) {
-            Map blockJSON = new LinkedHashMap();
-            Block block = blocks.get(i);
-            blockJSON.put("height", block.getHeight());
-            blockJSON.put("signature", Base58.encode(block.getSignature()));
-            blockJSON.put("generator", block.getCreator().getAddress());
-            blockJSON.put("generatingBalance", block.getForgingValue());
-            blockJSON.put("target", block.getTarget());
-            blockJSON.put("winValue", block.getWinValue());
-            blockJSON.put("winValueTargetted", block.calcWinValueTargeted() - 100000);
-            blockJSON.put("transactionsCount", block.getTransactionCount());
-            blockJSON.put("timestamp", block.getTimestamp());
-            blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
-            block.loadHeadMind(dcSet);
-            blockJSON.put("totalFee", block.viewFeeAsBigDecimal());
-            result.put(i, blockJSON);
-        }
-        return result;
-    }
 
-    /**
-     * Перегоняет информацию из списка песрон в словарь
-     *
-     * @param persons список персон
-     * @return словарь с добавленной информацией из списка персон
-     * с ключами соответствующими номерам элементов в исходном списке
-     */
-    private Map personsJSON(List<PersonCls> persons) {
-        //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
-        for (int i = 0; i < persons.size(); i++) {
-            Map personJSON = new LinkedHashMap();
-            PersonCls person = persons.get(i);
-            personJSON.put("key", person.getKey());
-            personJSON.put("name", person.getName());
-            personJSON.put("creator", person.getOwner().getAddress());
-            personJSON.put("img", Base64.encodeBase64String(person.getImage()));
-            personJSON.put("ico", Base64.encodeBase64String(person.getIcon()));
-            result.put(i, personJSON);
-        }
-        return result;
-    }
-
-    /**
-     * Перегоняет информацию из списка активов в словарь
-     *
-     * @param assets список активов
-     * @return словарь с добавленной информацией из списка активов
-     * с ключами соответствующими номерам элементов в исходном списке
-     */
-    private Map assetsJSON(List<AssetCls> assets) {
-        //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
-        for (int i = 0; i < assets.size(); i++) {
-            Map assetJSON = new LinkedHashMap();
-            AssetCls asset = assets.get(i);
-            assetJSON.put("key", asset.getKey());
-            assetJSON.put("name", asset.getName());
-            assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
-            assetJSON.put("owner", asset.getOwner().getAddress());
-            assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
-            assetJSON.put("scale", asset.getScale());
-            assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
-            assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
-            assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
-            List<Order> orders = dcSet
-                    .getOrderMap().getOrders(asset.getKey());
-            List<Trade> trades = dcSet.getTradeMap()
-                    .getTrades(asset.getKey());
-            assetJSON.put("operations", orders.size() + trades.size());
-            result.put(i, assetJSON);
-        }
-        return result;
-    }
-    /**
-     * Перегоняет информацию из списка шаблонов или статусов в словарь
-     *
-     * @param type TemplateCls.class - шаблон, StatusCls.class - статус соответственно
-     * @param list список шаблонов или статусов
-     * @param <T>  тип элементов - {@link TemplateCls} или {@link StatusCls}
-     * @return словарь с добавленной информацией из списка активов
-     * с ключами соответствующими номерам элементов в исходном списке
-     * @throws Exception передан неподдерживаемый type
-     */
-    private <T> Map statusTemplateJSON(Class<T> type, List<T> list) throws Exception {
-        //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
-        for (int i = 0; i < list.size(); i++) {
-            Map map = new LinkedHashMap();
-            ItemCls element;
-            if (type == TemplateCls.class) {
-                element = (TemplateCls) list.get(i);
-            } else if (type == StatusCls.class) {
-                element = (StatusCls) list.get(i);
-            } else {
-                logger.error("incorrect type of element list while converting in JSON Map");
-                throw new Exception();
-            }
-            map.put("key", element.getKey());
-            map.put("name", element.getName());
-            map.put("description", element.getDescription());
-            map.put("owner", element.getOwner().getAddress());
-            result.put(i, map);
-        }
-        return result;
-    }
-
-    /**
-     * Добавляет переведенные на соответствующий язык информацию(бирки) для блоков
-     *
-     * @param output словарь, в который добавляется информация
-     */
-    private void addHeadInfoCapBlocks(Map output) {
-        output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
-        output.put("totaltransactions", dcSet.getTransactionFinalMap().size());
-        output.put("Label_Unconfirmed_transactions",
-                Lang.getInstance().translateFromLangObj("Unconfirmed transactions", langObj));
-        output.put("Label_total_transactions",
-                Lang.getInstance().translateFromLangObj("Total Transactions", langObj));
-        output.put("Label_Height", Lang.getInstance().translateFromLangObj("Height", langObj));
-        output.put("Label_Time", Lang.getInstance().translateFromLangObj("Time", langObj));
-        output.put("Label_Generator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("Label_Gen_balance", Lang.getInstance().translateFromLangObj("Gen.Balance", langObj));
-        output.put("Label_TXs", Lang.getInstance().translateFromLangObj("TXs", langObj));
-        output.put("Label_Fee", Lang.getInstance().translateFromLangObj("Fee", langObj));
-        output.put("Label_Target", Lang.getInstance().translateFromLangObj("Target", langObj));
-        addLaterPrevious(output);
-        output.put("Label_Blocks", Lang.getInstance().translateFromLangObj("Blocks", langObj));
-    }
-
-    /**
-     * Добавляет переведенные на соответствующий язык информацию(бирки) для личностей(персон)
-     *
-     * @param output словарь, в который добавляется информация
-     */
-    private void addHeadInfoCapPersons(Map output) {
-        output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
-        output.put("Label_Unconfirmed_transactions",
-                Lang.getInstance().translateFromLangObj("Unconfirmed transactions", langObj));
-        output.put("Label_key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("Label_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-        output.put("Label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("Label_Persons", Lang.getInstance().translateFromLangObj("Persons", langObj));
-        addLaterPrevious(output);
-    }
-
-    /**
-     * Добавляет переведенные на соответствующий язык информацию(бирки) для актовов
-     *
-     * @param output словарь, в который добавляется информация
-     */
-    private void addHeadInfoCapAssets(Map output) {
-        output.put("label_Title", Lang.getInstance().translateFromLangObj("Assets", langObj));
-        output.put("label_table_key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("label_table_asset_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-        output.put("label_table_asset_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_table_asset_movable", Lang.getInstance().translateFromLangObj("Movable", langObj));
-        output.put("label_table_asset_description", Lang.getInstance().translateFromLangObj("Description", langObj));
-        output.put("label_table_asset_divisible", Lang.getInstance().translateFromLangObj("Divisible", langObj));
-        output.put("label_table_asset_amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
-        output.put("label_Assets", Lang.getInstance().translateFromLangObj("Assets", langObj));
-        output.put("label_operations", Lang.getInstance().translateFromLangObj("Operations", langObj));
-        addLaterPrevious(output);
-    }
-
-    /**
-     * Добавляет переведенные на соответствующий язык информацию(бирки) для или статусов или шаблонов
-     *
-     * @param output словарь, в который добавляется информация
-     */
-    private void addHeadInfoCapStatusesTemplates(Map output) {
-        output.put("label_table_key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("label_table_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-        output.put("label_table_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_table_description", Lang.getInstance().translateFromLangObj("Description", langObj));
-        output.put("Label_Statuses", Lang.getInstance().translateFromLangObj("Statuses", langObj));
-        output.put("Label_Templates", Lang.getInstance().translateFromLangObj("Templates", langObj));
-        addLaterPrevious(output);
-    }
-
-    /**
-     * Добавляет переведенные на соответствующий язык информацию(бирки) о предыдущем и следующем элементе
-     *
-     * @param output словарь, в который добавляется информация
-     */
-    private void addLaterPrevious(Map output) {
-        output.put("Label_Later", Lang.getInstance().translateFromLangObj("Later", langObj));
-        output.put("Label_Previous", Lang.getInstance().translateFromLangObj("Previous", langObj));
-    }
-
-    private class ReceiverMapForBlockExplorer {
-        private int start;
-        private List<ItemCls> listItems;
-        private int size;
-        private int numberOfRepresentsItemsOnPage;
-        private Map map;
-        private long key;
-
-        ReceiverMapForBlockExplorer(int startPerson, List<ItemCls> listPersons, int size) {
-            this.start = startPerson;
-            this.listItems = listPersons;
-            this.size = size;
-        }
-
-        Map getMap() {
-            return map;
-        }
-
-        public long getKey() {
-            return key;
-        }
-
-        void setNumberOfRepresentsItemsOnPage(int numberOfRepresentsItemsOnPage) {
-            this.numberOfRepresentsItemsOnPage = numberOfRepresentsItemsOnPage;
-        }
-
-        <T> void process(Class<T> type) throws Exception {
-            //Если начальный номер элемента не задан - берем последний
-            if (start == -1) {
-                start = (int) listItems.get(size - 1).getKey();
-            }
-            int number = 0;
-            //Подсчитать количество элементов, ключи которых меньше или равны переданному параметру из url
-            while (size > number && start >= listItems.get(number).getKey()) {
-                number++;
-            }
-            //Данные для отправки
-            List<T> list = new ArrayList<>();
-            //Если количество найденных элементов меньше количества элементов для отображения на странице,
-            //то передаем все элементы
-            int max = Math.max(0, number - numberOfRepresentsItemsOnPage);
-            for (int i = max; i >= 0 && i < number; i++) {
-                //Получаем элемент из списка найденных личностей(person)
-                T element = (T) listItems.get(i);
-                //Если элемент не null - то добавляем его
-                if (element != null) {
-                    list.add(element);
-                }
-            }
-            //Преобразование данных из списка(list) в словарь(map)
-            if (type == PersonCls.class) {
-                map = personsJSON((List<PersonCls>) list);
-                if (list.size() != 0) {
-                    //Берем последний ключ в найденном списке
-                    key = ((List<PersonCls>) (list)).get(list.size() - 1).getKey();
-                }
-            } else if (type == AssetCls.class) {
-                map = assetsJSON((List<AssetCls>) list);
-                if (list.size() != 0) {
-                    //Берем последний ключ в найденном списке
-                    key = ((List<AssetCls>) (list)).get(list.size() - 1).getKey();
-                }
-            } else if (type == StatusCls.class) {
-                map = statusTemplateJSON(StatusCls.class, (List<StatusCls>) list);
-                if (list.size() != 0) {
-                    //Берем последний ключ в найденном списке
-                    key = ((List<StatusCls>) (list)).get(list.size() - 1).getKey();
-                }
-            } else {
-                logger.error("Incorrect generic type in receiver JSON");
-            }
-            //Добавление полученного словаря(map) в данные для отправки
-            //Элемент, с которого идет отсчет страниц в обозревателе блоков(block explorer)
-            if (list.size() == 0) {
-                //Если элементов в списке найденных элементов нет - берем, который пришел
-                key = start;
-            }
-        }
-    }
 
 //  todo Gleb -----------------------------------------------------------------------------------------------------------
 
