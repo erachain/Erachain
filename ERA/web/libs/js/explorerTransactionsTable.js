@@ -51,12 +51,15 @@ function pagesComponent(data) {
 function pageCreation(from, to, step, restriction, start, linkName) {
     var output = '';
     for (var page = from; page > to; page -= step) {
-        if (page >= 1 && page <= restriction) {
-            if (page == start) {
-                output += '<b>' + page + '</b>&nbsp;';
-                continue;
+        if (page >= step) {
+            if (page >= 1 && page <= restriction) {
+                if (page === start) {
+                    output += '<b>' + page + '</b>&nbsp;';
+                    continue;
+                }
+                output += '<a href="' + makePageUri(page, linkName) + '">' + page + '</a>&nbsp;';
+
             }
-            output += '<a href="' + makePageUri(page, linkName) + '">' + page + '</a>&nbsp;';
         }
     }
     return output;
@@ -68,11 +71,11 @@ function pagesComponentBeauty(start, label, numberLast, step, linkName) {
     var numberPages = 3;
     if (start >= 1) {
         output += label + ':';
-        output += pageCreation(numberLast, numberLast - (numberPages - 2) * step + 1, step, numberLast, start,  linkName);
+        output += pageCreation(numberLast, numberLast - (numberPages - 2) * step + 1, step, numberLast, start, linkName);
         output += '...';
-        output +=pageCreation(start + step * delta, (start - step * delta), step, numberLast - 1, start, linkName);
+        output += pageCreation(start + step * delta, (start - step * delta), step, numberLast - 1, start, linkName);
         output += '...';
-        output +=pageCreation(numberPages * step, 1, step, numberLast, start, linkName);
+        output += pageCreation(numberPages * step, 1, step, numberLast, start, linkName);
     }
     return output;
 }

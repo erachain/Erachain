@@ -78,7 +78,7 @@ public class BlockExplorer {
     }
 
     @SuppressWarnings("static-access")
-    public Map jsonQueryMain(UriInfo info) throws WrongSearchException {
+    public Map jsonQueryMain(UriInfo info) throws WrongSearchException, Exception {
         Stopwatch stopwatchAll = new Stopwatch();
         int start = -1;
         start = checkAndGetIntParam(info, start, "start");
@@ -158,7 +158,7 @@ public class BlockExplorer {
                     case "status":
                         //search statuses
                         output.put("search", type);
-                        output.putAll(jsonQuerySearchStatuses(search));
+                        output.putAll(jsonQuerySearchStatuses(search, start));
                         break;
                     case "blocks":
                     case "block":
@@ -1072,139 +1072,14 @@ public class BlockExplorer {
         return output;
     }
 
-    private Map jsonQueryBlocks(int startBlock) {
+    //todo Gleb for future убрать duplicateCodeAssets. Проблема в ключе.  заменит на assetsJSON
+    public Map jsonQueryAssets() {
         Map output = new LinkedHashMap();
-
-        output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
-        output.put("totaltransactions", dcSet.getTransactionFinalMap().size());
-
-        output.put("Label_Unconfirmed_transactions",
-                Lang.getInstance().translateFromLangObj("Unconfirmed transactions", langObj));
-        output.put("Label_total_transactions",
-                Lang.getInstance().translateFromLangObj("Total Transactions", langObj));
-        output.put("Label_Height", Lang.getInstance().translateFromLangObj("Height", langObj));
-        output.put("Label_Time", Lang.getInstance().translateFromLangObj("Time", langObj));
-        output.put("Label_Generator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("Label_Gen_balance", Lang.getInstance().translateFromLangObj("Gen.Balance", langObj));
-        output.put("Label_TXs", Lang.getInstance().translateFromLangObj("TXs", langObj));
-        output.put("Label_Fee", Lang.getInstance().translateFromLangObj("Fee", langObj));
-        output.put("Label_Target", Lang.getInstance().translateFromLangObj("Target", langObj));
-        addLaterPrevious(output);
-        output.put("Label_Blocks", Lang.getInstance().translateFromLangObj("Blocks", langObj));
-
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 100;
-        output.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
-        //Если номер с какого элемента отображать не задан - берем последний
-        if (startBlock == -1) {
-            startBlock = dcSet.getBlockMap().size();
+        Collection<ItemCls> items = Controller.getInstance().getAllItems(ItemCls.ASSET_TYPE);
+        for (ItemCls item : items) {
+            duplicateCodeAssets(output, (AssetCls) item);
         }
-
-        List<Block> blocks = new ArrayList<>();
-        //Получение списка блоков из бд
-        for (int i = startBlock - numberOfRepresentsItemsOnPage + 1; i <= startBlock; i++) {
-            Block block = dcSet.getBlockMap().get(i);
-            if (block != null) {
-                blocks.add(block);
-            }
-        }
-
-        //Выделение map со списком блоков в соответствии с запрошенной страницей
-        Map blocksJSON = blocksJSON(blocks);
-        output.put("Blocks", blocksJSON);
-        output.put("startBlock", startBlock);
         return output;
-    }
-
-    private Map blocksJSON(List<Block> blocks) {
-        Map result = new LinkedHashMap();
-        for (int i = 0; i < blocks.size(); i++) {
-            Map blockJSON = new LinkedHashMap();
-            Block block = blocks.get(i);
-            blockJSON.put("height", block.getHeight());
-            blockJSON.put("signature", Base58.encode(block.getSignature()));
-            blockJSON.put("generator", block.getCreator().getAddress());
-            blockJSON.put("generatingBalance", block.getForgingValue());
-            blockJSON.put("target", block.getTarget());
-            blockJSON.put("winValue", block.getWinValue());
-            blockJSON.put("winValueTargetted", block.calcWinValueTargeted() - 100000);
-            blockJSON.put("transactionsCount", block.getTransactionCount());
-            blockJSON.put("timestamp", block.getTimestamp());
-            blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
-            block.loadHeadMind(dcSet);
-            blockJSON.put("totalFee", block.viewFeeAsBigDecimal());
-            result.put(i, blockJSON);
-        }
-        return result;
-    }
-
-
-    private Map jsonQueryAssets(long startAsset) {
-        Map output = new LinkedHashMap();
-        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
-        //В зависимости от выбранного языка(ru,en)
-        addHeadInfoCapAssets(output);
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 20;
-        output.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
-        AssetCls assetCls = dcSet.getItemAssetMap().get(1L);
-
-        //Если номер с какого элемента отображать не задан - берем последний
-        if (startAsset == -1) {
-            startAsset = dcSet.getItemAssetMap().getLastKey();
-        }
-
-        List<AssetCls> assets = new ArrayList<>();
-        //Получение списка активов из бд
-        for (long i = startAsset - numberOfRepresentsItemsOnPage + 1; i <= startAsset; i++) {
-            AssetCls asset = dcSet.getItemAssetMap().get(i);
-            if (asset != null) {
-                assets.add(asset);
-            }
-        }
-        Map assetsJSON = assetsJSON(assets);
-        output.put("Assets", assetsJSON);
-        output.put("startAsset", startAsset);
-        output.put("numberLastPerson", dcSet.getItemAssetMap().getLastKey());
-        return output;
-    }
-
-    private void addHeadInfoCapAssets(Map output) {
-        output.put("label_Title", Lang.getInstance().translateFromLangObj("Assets", langObj));
-        output.put("label_table_key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("label_table_asset_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-        output.put("label_table_asset_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_table_asset_movable", Lang.getInstance().translateFromLangObj("Movable", langObj));
-        output.put("label_table_asset_description", Lang.getInstance().translateFromLangObj("Description", langObj));
-        output.put("label_table_asset_divisible", Lang.getInstance().translateFromLangObj("Divisible", langObj));
-        output.put("label_table_asset_amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
-        output.put("label_Assets", Lang.getInstance().translateFromLangObj("Assets", langObj));
-        output.put("label_operations", Lang.getInstance().translateFromLangObj("Operations", langObj));
-        addLaterPrevious(output);
-    }
-
-    private Map assetsJSON(List<AssetCls> assets) {
-        Map result = new LinkedHashMap();
-        for (int i = 0; i < assets.size(); i++) {
-            Map assetJSON = new LinkedHashMap();
-            AssetCls asset = assets.get(i);
-            assetJSON.put("key", asset.getKey());
-            assetJSON.put("name", asset.getName());
-            assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
-            assetJSON.put("owner", asset.getOwner().getAddress());
-            assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
-            assetJSON.put("scale", asset.getScale());
-            assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
-            assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
-            assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
-            List<Order> orders = dcSet
-                    .getOrderMap().getOrders(asset.getKey());
-            List<Trade> trades = dcSet.getTradeMap()
-                    .getTrades(asset.getKey());
-            assetJSON.put("operations", orders.size() + trades.size());
-            result.put(i, assetJSON);
-        }
-        return result;
     }
 
     private void duplicateCodeAssets(Map assetsJSON, AssetCls asset) {
@@ -1226,177 +1101,6 @@ public class BlockExplorer {
         assetJSON.put("operations", orders.size() + trades.size());
         assetsJSON.put(asset.getKey(), assetJSON);
     }
-
-    private Map jsonQuerySearchPersons(String search, int startPerson) throws WrongSearchException {
-        Map output = new LinkedHashMap();
-        List<ItemCls> listPersons = new ArrayList();
-        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
-        //В зависимости от выбранного языка(ru,en)
-        addHeadInfoCapPersons(output);
-        try {
-            //Если в строке ввели число
-            if (search.matches("\\d+")) {
-                if (dcSet.getItemPersonMap().contains(Long.valueOf(search))) {
-                    //Элемент найден - добавляем его
-                    listPersons.add(dcSet.getItemPersonMap().get(Long.valueOf(search)));
-                    //Не отображать для одного элемента навигацию и пагинацию
-                    output.put("notDisplayPages", "true");
-                }
-            } else {
-                //Поиск элементов по имени
-                listPersons = dcSet.getItemPersonMap().get_By_Name(search, false);
-            }
-        } catch (Exception e) {
-            //Ошибка при поиске - пробрасываем WrongSearchException для отображения пустого списка элементов
-            logger.info("Wrong search while process persons... ");
-            throw new WrongSearchException();
-        }
-        //Количество найденных элементов
-        int size = listPersons.size();
-        //Не найден ни один элемент - пробрасываем WrongSearchException для отображения пустого списка элементов
-        if (size == 0) {
-            logger.info("Wrong search while process persons... ");
-            throw new WrongSearchException();
-        }
-        //Вспомогательный объект
-        ReceiverMapForBlockExplorer receiverMapForBlockExplorer = new ReceiverMapForBlockExplorer(startPerson, listPersons, size);
-        //Параметр показывающий сколько элементов располагать на странице
-        int NumberOfRepresentsItemsOnPage = 10;
-        receiverMapForBlockExplorer.setNumberOfRepresentsItemsOnPage(NumberOfRepresentsItemsOnPage);
-        //Преобразовать соответствующие данные
-        receiverMapForBlockExplorer.process(PersonCls.class);
-        //Добавляем количество элементов для отображения на странице для отправки
-        output.put("numberOfRepresentsItemsOnPage", NumberOfRepresentsItemsOnPage);
-        output.put("Persons", receiverMapForBlockExplorer.getMap());
-        //Добавляем ключ в JSON для отправки
-        output.put("startPerson", receiverMapForBlockExplorer.getKey());
-        output.put("numberLastPerson", listPersons.get(listPersons.size() - 1).getKey());
-        return output;
-    }
-
-    private Map jsonQuerySearchAssets(String search, int startAssets) throws WrongSearchException {
-        Map output = new LinkedHashMap();
-        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
-        //В зависимости от выбранного языка(ru,en)
-        addHeadInfoCapAssets(output);
-        List<ItemCls> listAssets = new ArrayList();
-        try {
-            //Если в строке ввели число
-            if (search.matches("\\d+")) {
-                if (dcSet.getItemAssetMap().contains(Long.valueOf(search))) {
-                    //Элемент найден - добавляем его
-                    listAssets.add(dcSet.getItemAssetMap().get(Long.valueOf(search)));
-                    //Не отображать для одного элемента навигацию и пагинацию
-                    output.put("notDisplayPages", "true");
-                }
-            } else {
-                //Поиск элементов по имени
-                listAssets = dcSet.getItemAssetMap().get_By_Name(search, false);
-            }
-        } catch (Exception e) {
-            logger.info("Wrong search while process assets... ");
-            throw new WrongSearchException();
-        }
-        //Количество найденных элементов
-        int size = listAssets.size();
-
-        if (size == 0) {
-            logger.info("Wrong search while process assets... ");
-            throw new WrongSearchException();
-        }
-        //Вспомогательный объект
-        ReceiverMapForBlockExplorer receiverMapForBlockExplorer = new ReceiverMapForBlockExplorer(startAssets, listAssets, size);
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 10;
-        receiverMapForBlockExplorer.setNumberOfRepresentsItemsOnPage(numberOfRepresentsItemsOnPage);
-        //Преобразовать соответствующие данные
-        receiverMapForBlockExplorer.process(AssetCls.class);
-        //Добавляем количество элементов для отображения на странице для отправки
-        output.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
-        output.put("Assets", receiverMapForBlockExplorer.getMap());
-        //Добавляем ключ в JSON для отправки
-        output.put("startPerson", receiverMapForBlockExplorer.getKey());
-        output.put("numberLastPerson", listAssets.get(listAssets.size() - 1).getKey());
-        return output;
-    }
-    //todo Gleb for future убрать duplicateCodeAssets. Проблема в ключе.  заменит на assetsJSON
-
-    public Map jsonQueryAssets() {
-        Map output = new LinkedHashMap();
-        Collection<ItemCls> items = Controller.getInstance().getAllItems(ItemCls.ASSET_TYPE);
-        for (ItemCls item : items) {
-            duplicateCodeAssets(output, (AssetCls) item);
-        }
-        return output;
-    }
-
-
-    private Map jsonQueryPersons(int startPerson) {
-        Map output = new LinkedHashMap();
-        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
-        //В зависимости от выбранного языка(ru,en)
-        addHeadInfoCapPersons(output);
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 20;
-        //Добавляем количество элементов для отображения для отправки
-        output.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
-        //Если номер с какого элемента отображать не задан - берем последний
-        if (startPerson == -1) {
-            startPerson = dcSet.getItemPersonMap().size();
-        }
-
-        List<PersonCls> persons = new ArrayList<>();
-
-        for (int i = startPerson - numberOfRepresentsItemsOnPage + 1; i <= startPerson; i++) {
-            //Получаем элемент из списка найденных личностей(person)
-            PersonCls person = (PersonCls) dcSet.getItemPersonMap().get((long) i);
-            //Если элемент не null - то добавляем его
-            if (person != null) {
-                persons.add(person);
-            }
-        }
-        //Преобразование данных из списка(list) в словарь(map)
-        Map personsJSON = personsJSON(persons);
-        //Добавление полученного словаря(map) в данные для отправки
-        output.put("Persons", personsJSON);
-        //Элемент, с которого идет отсчет страниц в обозревателе блоков(block explorer)
-        output.put("startPerson", startPerson);
-        output.put("numberLastPerson", dcSet.getItemPersonMap().getLastKey());
-        return output;
-    }
-
-
-    private void addHeadInfoCapPersons(Map output) {
-        output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
-        output.put("Label_Unconfirmed_transactions",
-                Lang.getInstance().translateFromLangObj("Unconfirmed transactions", langObj));
-        output.put("Label_key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("Label_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-        output.put("Label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("Label_Persons", Lang.getInstance().translateFromLangObj("Persons", langObj));
-        addLaterPrevious(output);
-    }
-
-    private Map personsJSON(List<PersonCls> persons) {
-        Map result = new LinkedHashMap();
-        for (int i = 0; i < persons.size(); i++) {
-            Map personJSON = new LinkedHashMap();
-            PersonCls person = persons.get(i);
-            personJSON.put("key", person.getKey());
-            personJSON.put("name", person.getName());
-            personJSON.put("creator", person.getOwner().getAddress());
-            personJSON.put("img", Base64.encodeBase64String(person.getImage()));
-            personJSON.put("ico", Base64.encodeBase64String(person.getIcon()));
-            result.put(i, personJSON);
-        }
-        return result;
-    }
-
-    private void addLaterPrevious(Map output) {
-        output.put("Label_Later", Lang.getInstance().translateFromLangObj("Later", langObj));
-        output.put("Label_Previous", Lang.getInstance().translateFromLangObj("Previous", langObj));
-    }
-
     private Map jsonQueryPerson(String first) {
         Map output = new LinkedHashMap();
         PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(new Long(first));
@@ -1566,7 +1270,7 @@ public class BlockExplorer {
     }
 
 
-    public Map jsonQueryLastBlock() {
+    private Map jsonQueryLastBlock() {
         Map output = new LinkedHashMap();
 
         Block lastBlock = getLastBlock();
@@ -2544,133 +2248,6 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryTemplates(int start) {
-        Map output = new LinkedHashMap();
-
-        SortableList<Long, ItemCls> it = dcSet.getItemTemplateMap().getList();
-
-        int view_Row = 21;
-        int end = start + view_Row;
-        if (end > it.size())
-            end = it.size();
-
-        output.put("start_row", start);
-        int i;
-        Map templatesJSON = new LinkedHashMap();
-        for (i = start; i < end; i++) {
-
-            TemplateCls template = (TemplateCls) it.get(i).getB();
-
-            Map templateJSON = new LinkedHashMap();
-
-            templateJSON.put("key", template.getKey());
-            templateJSON.put("name", template.getName());
-            templateJSON.put("description", template.getDescription());
-            templateJSON.put("owner", template.getOwner().getAddress());
-
-            templatesJSON.put(template.getKey(), templateJSON);
-        }
-        output.put("view_Row", view_Row);
-        output.put("hasLess", start > view_Row);
-        output.put("hasMore", end < it.size());
-        output.put("templates", templatesJSON);
-        output.put("label_table_key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("label_table_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-        output.put("label_table_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_table_description", Lang.getInstance().translateFromLangObj("Description", langObj));
-        output.put("Label_Later", Lang.getInstance().translateFromLangObj(">>", langObj));
-        output.put("Label_Previous", Lang.getInstance().translateFromLangObj("<<", langObj));
-
-        return output;
-    }
-
-    public Map jsonQueryStatuses(int start) {
-        Map output = new LinkedHashMap();
-
-        SortableList<Long, ItemCls> it = dcSet.getItemStatusMap().getList();
-
-        int view_Row = 21;
-        int end = start + view_Row;
-        if (end > it.size())
-            end = it.size();
-
-        output.put("start_row", start);
-        int i;
-        Map templatesJSON = new LinkedHashMap();
-        for (i = start; i < end; i++) {
-
-            StatusCls template = (StatusCls) it.get(i).getB();
-
-            Map templateJSON = new LinkedHashMap();
-
-            templateJSON.put("key", template.getKey());
-            templateJSON.put("name", template.getName());
-            templateJSON.put("description", template.getDescription());
-            templateJSON.put("owner", template.getOwner().getAddress());
-
-            templatesJSON.put(template.getKey(), templateJSON);
-        }
-        output.put("view_Row", view_Row);
-        output.put("hasLess", start > view_Row);
-        output.put("hasMore", end < it.size());
-        output.put("templates", templatesJSON);
-        output.put("label_table_key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("label_table_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-        output.put("label_table_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_table_description", Lang.getInstance().translateFromLangObj("Description", langObj));
-        output.put("Label_Later", Lang.getInstance().translateFromLangObj(">>", langObj));
-        output.put("Label_Previous", Lang.getInstance().translateFromLangObj("<<", langObj));
-
-        return output;
-    }
-
-    public Map jsonQuerySearchStatuses(String search) throws WrongSearchException {
-
-        List<ItemCls> listStatuses = new ArrayList();
-
-        try {
-            if (search.matches("\\d+") && dcSet.getItemStatusMap().contains(Long.valueOf(search))) {
-                listStatuses.add(dcSet.getItemStatusMap().get(Long.valueOf(search)));
-            } else {
-                listStatuses = dcSet.getItemStatusMap().get_By_Name(search, false);
-            }
-        } catch (Exception e) {
-            logger.info("Wrong search while process statuses... ");
-            throw new WrongSearchException();
-        }
-        if (listStatuses == null || listStatuses.size() == 0) {
-            logger.info("Wrong search while process statuses... ");
-            throw new WrongSearchException();
-        }
-        Map output = new LinkedHashMap();
-        Map templatesJSON = new LinkedHashMap();
-        if (listStatuses != null) {
-            for (ItemCls pers : listStatuses) {
-
-                StatusCls template = (StatusCls) pers;
-
-                Map templateJSON = new LinkedHashMap();
-
-                templateJSON.put("key", template.getKey());
-                templateJSON.put("name", template.getName());
-                templateJSON.put("description", template.getDescription());
-                templateJSON.put("owner", template.getOwner().getAddress());
-
-                templatesJSON.put(template.getKey(), templateJSON);
-            }
-            output.put("view_Row", listStatuses.size() - 1);
-            output.put("hasLess", false);
-            output.put("hasMore", true);
-            output.put("templates", templatesJSON);
-            output.put("label_table_key", Lang.getInstance().translateFromLangObj("Key", langObj));
-            output.put("label_table_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-            output.put("label_table_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-            output.put("label_table_description", Lang.getInstance().translateFromLangObj("Description", langObj));
-            output.put("Label_Later", Lang.getInstance().translateFromLangObj(">>", langObj));
-            output.put("Label_Previous", Lang.getInstance().translateFromLangObj("<<", langObj));
-        }
-        return output;
-    }
 
     public Map jsonQueryTemplate(Long key) {
         Map output = new LinkedHashMap();
@@ -3084,47 +2661,6 @@ public class BlockExplorer {
                 output.put("Label_Transaction", Lang.getInstance().translateFromLangObj("Transaction", langObj));
                 output.put("heightSeqNo", transaction.viewHeightSeq());
             }
-            // output.put("Json", transaction.toJson().toString());
-
-            // output.put("",transaction);
-
-            /*
-             * all.add( new BlExpUnit(
-             * transaction.getBlock(dcSet).getHeight(dcSet),
-             * transaction.getSeqNo(dcSet), transaction));
-             *
-             * if(transaction instanceof CreateOrderTransaction) {
-             * Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-             * Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>
-             * order = ((CreateOrderTransaction)transaction).getOrder();
-             *
-             * SortableList<Tuple2<byte[], byte[]>, Trade> tradesBuf =
-             * Controller.getInstance().getTrades(order); for
-             * (Pair<Tuple2<byte[], byte[]>, Trade> pair : tradesBuf) {
-             * trades.put(pair.getA(), pair.getB()); } } }
-             *
-             * for(Map.Entry<Tuple2<byte[], byte[]>, Trade> trade :
-             * trades.entrySet()) { Transaction txInitiator =
-             * Controller.getInstance().get(trade.getValue().
-             * getInitiator().toByteArray());
-             *
-             * Transaction txTarget =
-             * Controller.getInstance().get(trade.getValue().
-             * getTarget().toByteArray());
-             *
-             * all.add( new
-             * BlExpUnit(txInitiator.getBlock(dcSet).getHeight(dcSet),
-             * txTarget.getBlock(dcSet).getHeight(dcSet),
-             * txInitiator.getSeqNo(dcSet), txTarget.getSeqNo(dcSet),
-             * trade.getValue() ) ); }
-             *
-             * int size = all.size();
-             *
-             * output.put("start", size); output.put("end", 1);
-             *
-             * int counter = 0; for (BlExpUnit unit : all) { output.put(size -
-             * counter, jsonUnitPrint(unit.getUnit(), assetNames)); counter ++;
-             */
         }
 
 
@@ -3377,6 +2913,513 @@ public class BlockExplorer {
 
     }
 
+    //  todo Gleb -----------------------------------------------------------------------------------------------------------------
+
+    private Map jsonQueryBlocks(int start) {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
+        //В зависимости от выбранного языка(ru,en)
+        addHeadInfoCapBlocks(result);
+        //Если номер с какого элемента отображать не задан - берем последний
+        if (start == -1) {
+            start = dcSet.getBlockMap().size();
+        }
+        //Параметр показывающий сколько элементов располагать на странице
+        int numberOfRepresentsItemsOnPage = 40;
+        List<Block> blocks = receiveListElements(Block.class, start, result, numberOfRepresentsItemsOnPage);
+        //Выделение map со списком блоков в соответствии с запрошенной страницей
+        Map blocksJSON = blocksJSON(blocks);
+        result.put("Blocks", blocksJSON);
+        result.put("start", start);
+        return result;
+    }
+
+    private Map jsonQueryPersons(int start) {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
+        //В зависимости от выбранного языка(ru,en)
+        addHeadInfoCapPersons(result);
+        //Если номер с какого элемента отображать не задан - берем последний
+        if (start == -1) {
+            start = dcSet.getItemPersonMap().size();
+        }
+        //Параметр показывающий сколько элементов располагать на странице
+        int numberOfRepresentsItemsOnPage = 20;
+        List<PersonCls> persons = receiveListElements(PersonCls.class, start, result, numberOfRepresentsItemsOnPage);
+        //Преобразование данных из списка(list) в словарь(map)
+        Map personsJSON = personsJSON(persons);
+        //Добавление полученного словаря(map) в данные для отправки
+        result.put("Persons", personsJSON);
+        //Элемент, с которого идет отсчет страниц в обозревателе блоков(block explorer)
+        result.put("start", start);
+        result.put("numberLastPerson", dcSet.getItemPersonMap().getLastKey());
+        return result;
+    }
+
+    private Map jsonQueryAssets(long start) {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
+        //В зависимости от выбранного языка(ru,en)
+        addHeadInfoCapAssets(result);
+        //Если номер с какого элемента отображать не задан - берем последний
+        if (start == -1) {
+            start = dcSet.getItemAssetMap().getLastKey();
+        }
+        //Параметр показывающий сколько элементов располагать на странице
+        int numberOfRepresentsItemsOnPage = 20;
+        //Получение списка активов из бд
+        List<AssetCls> assets = receiveListElements(AssetCls.class, start, result, numberOfRepresentsItemsOnPage);
+        Map assetsJSON = assetsJSON(assets);
+        result.put("Assets", assetsJSON);
+        result.put("start", start);
+        result.put("numberLastPerson", dcSet.getItemAssetMap().getLastKey());
+        return result;
+    }
+
+    private Map jsonQueryStatuses(long start) throws Exception {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
+        //В зависимости от выбранного языка(ru,en)
+        addHeadInfoCapStatusesTemplates(result);
+        //Если номер с какого элемента отображать не задан - берем последний
+        if (start == -1) {
+            start = dcSet.getItemStatusMap().getLastKey();
+        }
+        //Параметр показывающий сколько элементов располагать на странице
+        int numberOfRepresentsItemsOnPage = 20;
+        //Получение списка статусов из бд
+        List<StatusCls> statuses = receiveListElements(StatusCls.class, start, result, numberOfRepresentsItemsOnPage);
+        Map statusesJSON = statusTemplateJSON(StatusCls.class, statuses);
+        result.put("Statuses", statusesJSON);
+        result.put("start", start);
+        result.put("numberLastPerson", dcSet.getItemStatusMap().getLastKey());
+        return result;
+    }
+
+    private Map jsonQueryTemplates(long start) throws Exception {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        addHeadInfoCapStatusesTemplates(result);
+        //Если номер с какого элемента отображать не задан - берем последний
+        if (start == -1) {
+            start = dcSet.getItemTemplateMap().getLastKey();
+        }
+        //Параметр показывающий сколько элементов располагать на странице
+        int numberOfRepresentsItemsOnPage = 20;
+        //Получение списка шаблонов из бд
+        List<TemplateCls> templates = receiveListElements(TemplateCls.class, start, result, numberOfRepresentsItemsOnPage);
+        Map templateJSON = statusTemplateJSON(TemplateCls.class, templates);
+        result.put("Templates", templateJSON);
+        result.put("start", start);
+        result.put("numberLastPerson", dcSet.getItemTemplateMap().getLastKey());
+        return result;
+    }
+
+    private <T> List<T> receiveListElements(Class<T> type, long start, Map output, int numberOfRepresentsItemsOnPage) {
+        //Параметр показывающий сколько элементов располагать на странице
+        output.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
+        List<T> list = new ArrayList<>();
+        //Получение списка блоков из бд
+        for (long i = start - numberOfRepresentsItemsOnPage + 1; i <= start; i++) {
+            //Если тип блок, то добавляем блок в список
+            if (type == Block.class) {
+                Block block = dcSet.getBlockMap().get((int) i);
+                if (block != null) {
+                    list.add((T) block);
+                }
+            }//Если тип первона, то добавляем персону в список
+            else if (type == PersonCls.class) {
+                //Получаем элемент из списка найденных личностей(person)
+                PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(i);
+                //Если элемент не null - то добавляем его
+                if (person != null) {
+                    list.add((T) person);
+                }
+            }//Если тип актив, то добавляем актив в список
+            else if (type == AssetCls.class) {
+                AssetCls asset = dcSet.getItemAssetMap().get(i);
+                if (asset != null) {
+                    list.add((T) asset);
+                }
+            }//Если тип статус, то добавляем статус в список
+            else if (type == StatusCls.class) {
+                StatusCls status = (StatusCls) dcSet.getItemStatusMap().get(i);
+                if (status != null) {
+                    list.add((T) status);
+                }
+            }//Если тип шаблон, то добавляем шаблон в список
+            else if (type == TemplateCls.class) {
+                TemplateCls template = (TemplateCls) dcSet.getItemTemplateMap().get(i);
+                if (template != null) {
+                    list.add((T) template);
+                }
+            } else {
+                logger.error("Incorrect type generic while converting list in Map");
+            }
+        }
+        //Возвращаем список элементов типа T
+        return list;
+    }
+
+
+    private Map jsonQuerySearchPersons(String search, int startPerson) throws WrongSearchException, Exception {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        List<ItemCls> listPersons = new ArrayList();
+        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
+        //В зависимости от выбранного языка(ru,en)
+        addHeadInfoCapPersons(result);
+        try {
+            //Если в строке ввели число
+            if (search.matches("\\d+")) {
+                if (dcSet.getItemPersonMap().contains(Long.valueOf(search))) {
+                    //Элемент найден - добавляем его
+                    listPersons.add(dcSet.getItemPersonMap().get(Long.valueOf(search)));
+                    //Не отображать для одного элемента навигацию и пагинацию
+                    result.put("notDisplayPages", "true");
+                }
+            } else {
+                //Поиск элементов по имени
+                listPersons = dcSet.getItemPersonMap().get_By_Name(search, false);
+            }
+        } catch (Exception e) {
+            //Ошибка при поиске - пробрасываем WrongSearchException для отображения пустого списка элементов
+            logger.info("Wrong search while process persons... ");
+            throw new WrongSearchException();
+        }
+        if (listPersons == null) {
+            logger.info("Wrong search while process assets... ");
+            throw new WrongSearchException();
+        }
+        //Количество найденных элементов
+        int size = listPersons.size();
+        //Не найден ни один элемент - пробрасываем WrongSearchException для отображения пустого списка элементов
+        if (size == 0) {
+            logger.info("Wrong search while process persons... ");
+            throw new WrongSearchException();
+        }
+        //Вспомогательный объект
+        ReceiverMapForBlockExplorer receiverMapForBlockExplorer = new ReceiverMapForBlockExplorer(startPerson, listPersons, size);
+        //Параметр показывающий сколько элементов располагать на странице
+        int numberOfRepresentsItemsOnPage = 10;
+        receiverMapForBlockExplorer.setNumberOfRepresentsItemsOnPage(numberOfRepresentsItemsOnPage);
+        //Преобразовать соответствующие данные
+        receiverMapForBlockExplorer.process(PersonCls.class);
+        //Добавляем количество элементов для отображения на странице для отправки
+        result.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
+        result.put("Persons", receiverMapForBlockExplorer.getMap());
+        //Добавляем ключ в JSON для отправки
+        result.put("start", receiverMapForBlockExplorer.getKey());
+        result.put("numberLastPerson", listPersons.get(listPersons.size() - 1).getKey());
+        return result;
+    }
+
+    private Map jsonQuerySearchAssets(String search, int startAssets) throws WrongSearchException, Exception {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
+        //В зависимости от выбранного языка(ru,en)
+        addHeadInfoCapAssets(result);
+        List<ItemCls> listAssets = new ArrayList();
+        try {
+            //Если в строке ввели число
+            if (search.matches("\\d+")) {
+                if (dcSet.getItemAssetMap().contains(Long.valueOf(search))) {
+                    //Элемент найден - добавляем его
+                    listAssets.add(dcSet.getItemAssetMap().get(Long.valueOf(search)));
+                    //Не отображать для одного элемента навигацию и пагинацию
+                    result.put("notDisplayPages", "true");
+                }
+            } else {
+                //Поиск элементов по имени
+                listAssets = dcSet.getItemAssetMap().get_By_Name(search, false);
+            }
+        } catch (Exception e) {
+            logger.info("Wrong search while process assets... ");
+            throw new WrongSearchException();
+        }
+        if (listAssets == null) {
+            logger.info("Wrong search while process assets... ");
+            throw new WrongSearchException();
+        }
+        //Количество найденных элементов
+        int size = listAssets.size();
+        if (size == 0) {
+            logger.info("Wrong search while process assets... ");
+            throw new WrongSearchException();
+        }
+        //Вспомогательный объект
+        ReceiverMapForBlockExplorer receiverMapForBlockExplorer = new ReceiverMapForBlockExplorer(startAssets, listAssets, size);
+        //Параметр показывающий сколько элементов располагать на странице
+        int numberOfRepresentsItemsOnPage = 10;
+        receiverMapForBlockExplorer.setNumberOfRepresentsItemsOnPage(numberOfRepresentsItemsOnPage);
+        //Преобразовать соответствующие данные
+        receiverMapForBlockExplorer.process(AssetCls.class);
+        //Добавляем количество элементов для отображения на странице для отправки
+        result.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
+        result.put("Assets", receiverMapForBlockExplorer.getMap());
+        //Добавляем ключ в JSON для отправки
+        result.put("start", receiverMapForBlockExplorer.getKey());
+        result.put("numberLastPerson", listAssets.get(listAssets.size() - 1).getKey());
+        return result;
+    }
+
+    private Map jsonQuerySearchStatuses(String search, int startStatuses) throws WrongSearchException, Exception {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
+        //В зависимости от выбранного языка(ru,en)
+        addHeadInfoCapStatusesTemplates(result);
+
+        List<ItemCls> listStatuses = new ArrayList();
+
+        try {
+            //Если в строке ввели число
+            if (search.matches("\\d+")) {
+                if (dcSet.getItemStatusMap().contains(Long.valueOf(search))) {
+                    //Элемент найден - добавляем его
+                    listStatuses.add(dcSet.getItemStatusMap().get(Long.valueOf(search)));
+                    //Не отображать для одного элемента навигацию и пагинацию
+                    result.put("notDisplayPages", "true");
+                }
+            } else {
+                //Поиск элементов по имени
+                listStatuses = dcSet.getItemStatusMap().get_By_Name(search, false);
+            }
+        } catch (Exception e) {
+            logger.info("Wrong search while process statuses... ");
+            throw new WrongSearchException();
+        }
+        if (listStatuses == null) {
+            logger.info("Wrong search while process assets... ");
+            throw new WrongSearchException();
+        }
+        //Количество найденных элементов
+        int size = listStatuses.size();
+        if (size == 0) {
+            logger.info("Wrong search while process assets... ");
+            throw new WrongSearchException();
+        }
+        //Вспомогательный объект
+        ReceiverMapForBlockExplorer receiverMapForBlockExplorer = new ReceiverMapForBlockExplorer(startStatuses, listStatuses, size);
+        //Параметр показывающий сколько элементов располагать на странице
+        int numberOfRepresentsItemsOnPage = 20;
+        receiverMapForBlockExplorer.setNumberOfRepresentsItemsOnPage(numberOfRepresentsItemsOnPage);
+        //Преобразовать соответствующие данные
+        receiverMapForBlockExplorer.process(StatusCls.class);
+        //Добавляем количество элементов для отображения на странице для отправки
+        result.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
+        result.put("Statuses", receiverMapForBlockExplorer.getMap());
+        //Добавляем ключ в JSON для отправки
+        result.put("start", receiverMapForBlockExplorer.getKey());
+        result.put("numberLastPerson", listStatuses.get(listStatuses.size() - 1).getKey());
+        return result;
+    }
+
+    /**
+     * Перегоняет информацию из списка блоков в словарь
+     *
+     * @param blocks список блоков
+     * @return словарь с добавленной информацией из списка блоков
+     * с ключами соответствующими номерам элементов в исходном списке
+     */
+    private Map blocksJSON(List<Block> blocks) {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        for (int i = 0; i < blocks.size(); i++) {
+            Map blockJSON = new LinkedHashMap();
+            Block block = blocks.get(i);
+            blockJSON.put("height", block.getHeight());
+            blockJSON.put("signature", Base58.encode(block.getSignature()));
+            blockJSON.put("generator", block.getCreator().getAddress());
+            blockJSON.put("generatingBalance", block.getForgingValue());
+            blockJSON.put("target", block.getTarget());
+            blockJSON.put("winValue", block.getWinValue());
+            blockJSON.put("winValueTargetted", block.calcWinValueTargeted() - 100000);
+            blockJSON.put("transactionsCount", block.getTransactionCount());
+            blockJSON.put("timestamp", block.getTimestamp());
+            blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
+            block.loadHeadMind(dcSet);
+            blockJSON.put("totalFee", block.viewFeeAsBigDecimal());
+            result.put(i, blockJSON);
+        }
+        return result;
+    }
+
+    /**
+     * Перегоняет информацию из списка песрон в словарь
+     *
+     * @param persons список персон
+     * @return словарь с добавленной информацией из списка персон
+     * с ключами соответствующими номерам элементов в исходном списке
+     */
+    private Map personsJSON(List<PersonCls> persons) {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        for (int i = 0; i < persons.size(); i++) {
+            Map personJSON = new LinkedHashMap();
+            PersonCls person = persons.get(i);
+            personJSON.put("key", person.getKey());
+            personJSON.put("name", person.getName());
+            personJSON.put("creator", person.getOwner().getAddress());
+            personJSON.put("img", Base64.encodeBase64String(person.getImage()));
+            personJSON.put("ico", Base64.encodeBase64String(person.getIcon()));
+            result.put(i, personJSON);
+        }
+        return result;
+    }
+
+    /**
+     * Перегоняет информацию из списка активов в словарь
+     *
+     * @param assets список активов
+     * @return словарь с добавленной информацией из списка активов
+     * с ключами соответствующими номерам элементов в исходном списке
+     */
+    private Map assetsJSON(List<AssetCls> assets) {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        for (int i = 0; i < assets.size(); i++) {
+            Map assetJSON = new LinkedHashMap();
+            AssetCls asset = assets.get(i);
+            assetJSON.put("key", asset.getKey());
+            assetJSON.put("name", asset.getName());
+            assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+            assetJSON.put("owner", asset.getOwner().getAddress());
+            assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
+            assetJSON.put("scale", asset.getScale());
+            assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
+            assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
+            assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
+            List<Order> orders = dcSet
+                    .getOrderMap().getOrders(asset.getKey());
+            List<Trade> trades = dcSet.getTradeMap()
+                    .getTrades(asset.getKey());
+            assetJSON.put("operations", orders.size() + trades.size());
+            result.put(i, assetJSON);
+        }
+        return result;
+    }
+    /**
+     * Перегоняет информацию из списка шаблонов или статусов в словарь
+     *
+     * @param type TemplateCls.class - шаблон, StatusCls.class - статус соответственно
+     * @param list список шаблонов или статусов
+     * @param <T>  тип элементов - {@link TemplateCls} или {@link StatusCls}
+     * @return словарь с добавленной информацией из списка активов
+     * с ключами соответствующими номерам элементов в исходном списке
+     * @throws Exception передан неподдерживаемый type
+     */
+    private <T> Map statusTemplateJSON(Class<T> type, List<T> list) throws Exception {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        for (int i = 0; i < list.size(); i++) {
+            Map map = new LinkedHashMap();
+            ItemCls element;
+            if (type == TemplateCls.class) {
+                element = (TemplateCls) list.get(i);
+            } else if (type == StatusCls.class) {
+                element = (StatusCls) list.get(i);
+            } else {
+                logger.error("incorrect type of element list while converting in JSON Map");
+                throw new Exception();
+            }
+            map.put("key", element.getKey());
+            map.put("name", element.getName());
+            map.put("description", element.getDescription());
+            map.put("owner", element.getOwner().getAddress());
+            result.put(i, map);
+        }
+        return result;
+    }
+
+    /**
+     * Добавляет переведенные на соответствующий язык информацию(бирки) для блоков
+     *
+     * @param output словарь, в который добавляется информация
+     */
+    private void addHeadInfoCapBlocks(Map output) {
+        output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
+        output.put("totaltransactions", dcSet.getTransactionFinalMap().size());
+        output.put("Label_Unconfirmed_transactions",
+                Lang.getInstance().translateFromLangObj("Unconfirmed transactions", langObj));
+        output.put("Label_total_transactions",
+                Lang.getInstance().translateFromLangObj("Total Transactions", langObj));
+        output.put("Label_Height", Lang.getInstance().translateFromLangObj("Height", langObj));
+        output.put("Label_Time", Lang.getInstance().translateFromLangObj("Time", langObj));
+        output.put("Label_Generator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        output.put("Label_Gen_balance", Lang.getInstance().translateFromLangObj("Gen.Balance", langObj));
+        output.put("Label_TXs", Lang.getInstance().translateFromLangObj("TXs", langObj));
+        output.put("Label_Fee", Lang.getInstance().translateFromLangObj("Fee", langObj));
+        output.put("Label_Target", Lang.getInstance().translateFromLangObj("Target", langObj));
+        addLaterPrevious(output);
+        output.put("Label_Blocks", Lang.getInstance().translateFromLangObj("Blocks", langObj));
+    }
+
+    /**
+     * Добавляет переведенные на соответствующий язык информацию(бирки) для личностей(персон)
+     *
+     * @param output словарь, в который добавляется информация
+     */
+    private void addHeadInfoCapPersons(Map output) {
+        output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
+        output.put("Label_Unconfirmed_transactions",
+                Lang.getInstance().translateFromLangObj("Unconfirmed transactions", langObj));
+        output.put("Label_key", Lang.getInstance().translateFromLangObj("Key", langObj));
+        output.put("Label_name", Lang.getInstance().translateFromLangObj("Name", langObj));
+        output.put("Label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        output.put("Label_Persons", Lang.getInstance().translateFromLangObj("Persons", langObj));
+        addLaterPrevious(output);
+    }
+
+    /**
+     * Добавляет переведенные на соответствующий язык информацию(бирки) для актовов
+     *
+     * @param output словарь, в который добавляется информация
+     */
+    private void addHeadInfoCapAssets(Map output) {
+        output.put("label_Title", Lang.getInstance().translateFromLangObj("Assets", langObj));
+        output.put("label_table_key", Lang.getInstance().translateFromLangObj("Key", langObj));
+        output.put("label_table_asset_name", Lang.getInstance().translateFromLangObj("Name", langObj));
+        output.put("label_table_asset_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        output.put("label_table_asset_movable", Lang.getInstance().translateFromLangObj("Movable", langObj));
+        output.put("label_table_asset_description", Lang.getInstance().translateFromLangObj("Description", langObj));
+        output.put("label_table_asset_divisible", Lang.getInstance().translateFromLangObj("Divisible", langObj));
+        output.put("label_table_asset_amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
+        output.put("label_Assets", Lang.getInstance().translateFromLangObj("Assets", langObj));
+        output.put("label_operations", Lang.getInstance().translateFromLangObj("Operations", langObj));
+        addLaterPrevious(output);
+    }
+
+    /**
+     * Добавляет переведенные на соответствующий язык информацию(бирки) для или статусов или шаблонов
+     *
+     * @param output словарь, в который добавляется информация
+     */
+    private void addHeadInfoCapStatusesTemplates(Map output) {
+        output.put("label_table_key", Lang.getInstance().translateFromLangObj("Key", langObj));
+        output.put("label_table_name", Lang.getInstance().translateFromLangObj("Name", langObj));
+        output.put("label_table_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        output.put("label_table_description", Lang.getInstance().translateFromLangObj("Description", langObj));
+        output.put("Label_Statuses", Lang.getInstance().translateFromLangObj("Statuses", langObj));
+        output.put("Label_Templates", Lang.getInstance().translateFromLangObj("Templates", langObj));
+        addLaterPrevious(output);
+    }
+
+    /**
+     * Добавляет переведенные на соответствующий язык информацию(бирки) о предыдущем и следующем элементе
+     *
+     * @param output словарь, в который добавляется информация
+     */
+    private void addLaterPrevious(Map output) {
+        output.put("Label_Later", Lang.getInstance().translateFromLangObj("Later", langObj));
+        output.put("Label_Previous", Lang.getInstance().translateFromLangObj("Previous", langObj));
+    }
+
     private class ReceiverMapForBlockExplorer {
         private int start;
         private List<ItemCls> listItems;
@@ -3391,10 +3434,6 @@ public class BlockExplorer {
             this.size = size;
         }
 
-        int getNumberOfRepresentsItemsOnPage() {
-            return numberOfRepresentsItemsOnPage;
-        }
-
         Map getMap() {
             return map;
         }
@@ -3407,7 +3446,7 @@ public class BlockExplorer {
             this.numberOfRepresentsItemsOnPage = numberOfRepresentsItemsOnPage;
         }
 
-        <T> void process(Class<T> type) {
+        <T> void process(Class<T> type) throws Exception {
             //Если начальный номер элемента не задан - берем последний
             if (start == -1) {
                 start = (int) listItems.get(size - 1).getKey();
@@ -3443,6 +3482,12 @@ public class BlockExplorer {
                     //Берем последний ключ в найденном списке
                     key = ((List<AssetCls>) (list)).get(list.size() - 1).getKey();
                 }
+            } else if (type == StatusCls.class) {
+                map = statusTemplateJSON(StatusCls.class, (List<StatusCls>) list);
+                if (list.size() != 0) {
+                    //Берем последний ключ в найденном списке
+                    key = ((List<StatusCls>) (list)).get(list.size() - 1).getKey();
+                }
             } else {
                 logger.error("Incorrect generic type in receiver JSON");
             }
@@ -3455,324 +3500,6 @@ public class BlockExplorer {
         }
     }
 
-
-    //todo Gleb не используется нигде unused
-    // LOCAL MAP of ASSETS
-//    class AssetNames_old {
-//        private Map<Long, String> assetNames;
-//
-//        public AssetNames_old() {
-//            assetNames = new TreeMap<Long, String>();
-//        }
-//
-//        public void setKey(long key) {
-//            if (key <= 0l)
-//                return;
-//
-//            if (!assetNames.containsKey(key)) {
-//                assetNames.put(key, Controller.getInstance().getAsset(key).getName());
-//            }
-//        }
-//
-//        public Map<Long, String> getMap() {
-//            return assetNames;
-//        }
-//    }
-
-
-    //todo Gleb не используется нигде unused
-//    class Balance {
-//        private Map<Long, BigDecimal> totalBalance;
-//        private Map<Long, BigDecimal> transactionBalance;
-//
-//        public Balance() {
-//            totalBalance = new TreeMap<Long, BigDecimal>();
-//            transactionBalance = new TreeMap<Long, BigDecimal>();
-//        }
-//
-//        public void setTotalBalance(long key, BigDecimal amount) {
-//            totalBalance.put(key, amount);
-//        }
-//
-//        public void addTotalBalance(long key, BigDecimal amount) {
-//            if (totalBalance.containsKey(key)) {
-//                totalBalance.put(key, totalBalance.get(key).add(amount));
-//            } else {
-//                totalBalance.put(key, amount);
-//            }
-//        }
-//
-//        public void setTransactionBalance(long key, BigDecimal amount) {
-//            transactionBalance.put(key, amount);
-//        }
-//
-//        public void addTransactionBalance(long key, BigDecimal amount) {
-//            if (transactionBalance.containsKey(key)) {
-//                transactionBalance.put(key, transactionBalance.get(key).add(amount));
-//            } else {
-//                transactionBalance.put(key, amount);
-//            }
-//        }
-//
-//        public BigDecimal getTransactionBalance(long key) {
-//            if (transactionBalance.containsKey(key)) {
-//                return transactionBalance.get(key);
-//            } else {
-//                return BigDecimal.ZERO;
-//            }
-//        }
-//
-//        public BigDecimal getTotalBalance(long key) {
-//            if (totalBalance.containsKey(key)) {
-//                return totalBalance.get(key);
-//            } else {
-//                return BigDecimal.ZERO;
-//            }
-//        }
-//
-//        public Map<Long, BigDecimal> getTotalBalance() {
-//            return totalBalance;
-//        }
-//
-//        public Map<Long, BigDecimal> getTransactionBalance() {
-//            return transactionBalance;
-//        }
-//
-//        public void setFromTransactionToTotalBalance() {
-//            for (Map.Entry<Long, BigDecimal> e : transactionBalance.entrySet()) {
-//                if (totalBalance.containsKey(e.getKey())) {
-//                    totalBalance.put(e.getKey(), totalBalance.get(e.getKey()).add(e.getValue()));
-//                } else {
-//                    totalBalance.put(e.getKey(), e.getValue());
-//                }
-//            }
-//        }
-//
-//        public void copyTotalBalanceFrom(Map<Long, BigDecimal> fromTotalBalance) {
-//            for (Map.Entry<Long, BigDecimal> e : fromTotalBalance.entrySet()) {
-//                totalBalance.put(e.getKey(), e.getValue());
-//            }
-//        }
-//    }
-//
-
-    //todo Gleb не используется нигде unused
-//    public class BigDecimalComparator implements Comparator<Tuple2<String, BigDecimal>> {
-//
-//        @Override
-//        public int compare(Tuple2<String, BigDecimal> a, Tuple2<String, BigDecimal> b) {
-//            try {
-//                return a.b.compareTo(b.b);
-//            } catch (Exception e) {
-//                return 0;
-//            }
-//        }
-//
-//    }
-
-
-    //todo Gleb не используется нигде unused
-//    public Map jsonQuerySearch(String query) {
-//        Map output = new LinkedHashMap();
-//        Map outputItem = new LinkedHashMap();
-//        Map foundList = new LinkedHashMap();
-//
-//        output.put("query", query);
-//
-//        int i = 0;
-//
-//        byte[] signatureBytes = null;
-//
-//        try {
-//            signatureBytes = Base58.decode(query);
-//        } catch (Exception e) {
-//
-//        }
-//
-//        if (Crypto.getInstance().isValidAddress(query)) {
-//            if (query.startsWith("7")) {
-//                i++;
-//                outputItem = new LinkedHashMap();
-//                outputItem.put(1, "standardAccount");
-//                outputItem.put(2, Lang.getInstance().translateFromLangObj("Standard Account", langObj));
-//                foundList.put(i, outputItem);
-//            }
-//
-//            if (query.startsWith("A")) {
-//                i++;
-//                outputItem = new LinkedHashMap();
-//                outputItem.put(1, "atAccount");
-//                outputItem.put(2, Lang.getInstance().translateFromLangObj("At Account", langObj));
-//                foundList.put(i, outputItem);
-//            }
-//
-//            output.put("foundCount", i);
-//            output.put("foundList", foundList);
-//
-//            return output;
-//        }
-//
-//        if (query.indexOf(',') != -1) {
-//            String[] strings = query.split(",");
-//
-//            boolean isAddresses = strings.length > 0;
-//
-//            for (String string : strings) {
-//                if (!string.startsWith("7")) {
-//                    isAddresses = false;
-//                    break;
-//                }
-//
-//                if (!Crypto.getInstance().isValidAddress(string)) {
-//                    isAddresses = false;
-//                    break;
-//                }
-//            }
-//
-//            if (isAddresses) {
-//                i++;
-//                outputItem = new LinkedHashMap();
-//                outputItem.put(1, "multiAccount");
-//                outputItem.put(2, Lang.getInstance().translateFromLangObj("Multi Account", langObj));
-//                foundList.put(i, outputItem);
-//
-//                output.put("foundCount", i);
-//                output.put("foundList", foundList);
-//
-//                return output;
-//
-//            }
-//        }
-//
-//        if (signatureBytes != null && dcSet.getBlockSignsMap().contains(signatureBytes)) {
-//            i++;
-//            outputItem = new LinkedHashMap();
-//            outputItem.put(1, "blockSignature");
-//            outputItem.put(2, Lang.getInstance().translateFromLangObj("Block Signature", langObj));
-//            foundList.put(i, outputItem);
-//        } else if (query.matches("\\d+") && Integer.valueOf(query) > 0 && Integer.valueOf(query) <= getHeight()) {
-//            i++;
-//            outputItem = new LinkedHashMap();
-//            outputItem.put(1, "blockHeight");
-//            outputItem.put(2, Lang.getInstance().translateFromLangObj("Block", langObj));
-//            foundList.put(i, outputItem);
-//        } else if (query.equals("last")) {
-//            i++;
-//            outputItem = new LinkedHashMap();
-//            outputItem.put(1, "blockLast");
-//            outputItem.put(2, Lang.getInstance().translateFromLangObj("Block Last", langObj));
-//            foundList.put(i, outputItem);
-//        } else {
-//            if (!(signatureBytes == null) && (dcSet.getTransactionFinalMapSigns().contains(signatureBytes))) {
-//                i++;
-//                outputItem = new LinkedHashMap();
-//                outputItem.put(1, "transactionSignature");
-//                outputItem.put(2, Lang.getInstance().translateFromLangObj("Transaction Signature", langObj));
-//                foundList.put(i, outputItem);
-//
-//            }
-//        }
-//
-//        if (dcSet.getNameMap().contains(query)) {
-//            i++;
-//            outputItem = new LinkedHashMap();
-//            outputItem.put(1, "name");
-//            outputItem.put(2, Lang.getInstance().translateFromLangObj("Name", langObj));
-//            foundList.put(i, outputItem);
-//        }
-//
-//        if (query.matches("\\d+") && dcSet.getItemAssetMap().contains(Long.valueOf(query))) {
-//            i++;
-//            outputItem = new LinkedHashMap();
-//            outputItem.put(1, "asset");
-//            outputItem.put(2, Lang.getInstance().translateFromLangObj("Asset", langObj));
-//            foundList.put(i, outputItem);
-//        }
-//
-//        if (query.matches("\\d+") && dcSet.getItemPersonMap().contains(Long.valueOf(query))) {
-//            i++;
-//            outputItem = new LinkedHashMap();
-//            outputItem.put(1, "person");
-//            outputItem.put(2, Lang.getInstance().translateFromLangObj("Person", langObj));
-//            foundList.put(i, outputItem);
-//        }
-//
-//        if (dcSet.getPollMap().contains(query)) {
-//            i++;
-//            outputItem = new LinkedHashMap();
-//            outputItem.put(1, "pool");
-//            outputItem.put(2, Lang.getInstance().translateFromLangObj("pool", langObj));
-//
-//            foundList.put(i, outputItem);
-//        }
-//
-//        if (query.indexOf('/') != -1) {
-//            String[] signatures = query.split("/");
-//
-//            try {
-//                if (dcSet.getTransactionFinalMapSigns().contains(Base58.decode(signatures[0]))
-//                        || dcSet.getTransactionFinalMapSigns().contains(Base58.decode(signatures[1]))) {
-//                    i++;
-//                    outputItem = new LinkedHashMap();
-//                    outputItem.put(1, "trade");
-//                    outputItem.put(2, Lang.getInstance().translateFromLangObj("Trade", langObj));
-//                    foundList.put(i, outputItem);
-//                }
-//            } catch (Exception e) {
-//                logger.error(e.getMessage(), e);
-//            }
-//        }
-//
-//        if (query.indexOf(':') != -1) {
-//
-//            int blockHeight = Integer.valueOf(query.split(":")[0]);
-//            int seqNo = Integer.valueOf(query.split(":")[1]);
-//
-//            LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = dcSet.getATTransactionMap()
-//                    .getATTransactions(blockHeight);
-//
-//            if (atTxs.size() > seqNo) {
-//                i++;
-//                outputItem = new LinkedHashMap();
-//                outputItem.put(1, "atTx");
-//                outputItem.put(2, Lang.getInstance().translateFromLangObj("atTx", langObj));
-//                foundList.put(i, outputItem);
-//            }
-//        }
-//
-//        Pattern statementPattern = Pattern.compile("^(\\d*)-(\\d*)$");
-//        Matcher matcher = statementPattern.matcher(query);
-//        if (matcher.matches()) {
-//            Integer blockNo = Integer.valueOf(matcher.group(1));
-//            Integer seqNo = Integer.valueOf(matcher.group(2));
-//
-//            if (dcSet.getTransactionFinalMap().contains(Transaction.makeDBRef(blockNo, seqNo))) {
-//                i++;
-//                outputItem = new LinkedHashMap();
-//                Transaction transaction = dcSet.getTransactionFinalMap().get(Transaction.makeDBRef(blockNo, seqNo));
-//                if (transaction instanceof R_SignNote) {
-//                    outputItem.put(1, "statement");
-//                    outputItem.put(2, Lang.getInstance().translateFromLangObj("Statement", langObj));
-//                } else {
-//                    outputItem.put(1, "block");
-//                    outputItem.put(2, Lang.getInstance().translateFromLangObj("Transaction SeqNo", langObj));
-//
-//                }
-//                foundList.put(i, outputItem);
-//            }
-//        }
-//
-//        output.put("foundCount", i);
-//        output.put("foundList", foundList);
-//
-//        if (i < 1) {
-//            output.put("title", Lang.getInstance().translateFromLangObj("Search no results", langObj));
-//        } else {
-//            output.put("title", Lang.getInstance().translateFromLangObj("Search results", langObj));
-//        }
-//        ;
-//        return output;
-//    }
-
+//  todo Gleb -----------------------------------------------------------------------------------------------------------
 
 }
