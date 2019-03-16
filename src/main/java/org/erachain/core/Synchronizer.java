@@ -62,7 +62,7 @@ public class Synchronizer {
             } else {
                 // ERROR
                 String mess = "*** Peer timed out";
-                peer.ban(0, mess);
+                peer.ban(mess);
                 throw new Exception(mess);
             }
         }
@@ -70,7 +70,7 @@ public class Synchronizer {
         Block block = response.getBlock();
         if (block == null) {
             String mess = "*** Dishonest peer - Block is NULL";
-            peer.ban(0, mess);
+            peer.ban(mess);
             throw new Exception(mess);
         }
 
