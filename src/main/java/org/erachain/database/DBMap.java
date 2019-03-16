@@ -1,5 +1,4 @@
 package org.erachain.database;
-// upd 09/03
 
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
@@ -9,11 +8,8 @@ import org.mapdb.DB;
 import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
-
-//import org.erachain.database.wallet.DWSet;
 
 public abstract class DBMap<T, U> extends Observable {
 
@@ -31,7 +27,7 @@ public abstract class DBMap<T, U> extends Observable {
     protected Map<T, U> map;
     protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
 
-    protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>(8, 1);
+    protected Map<Integer, Integer> observableData;
 
     public DBMap() {
     }
@@ -168,6 +164,12 @@ public abstract class DBMap<T, U> extends Observable {
         return u;
     }
 
+    /**
+     * уведомляет только счетчик если он разрешен, иначе Добавить
+     * @param key
+     * @param value
+     * @return
+     */
     public boolean set(T key, U value) {
         this.addUses();
         try {
@@ -181,15 +183,12 @@ public abstract class DBMap<T, U> extends Observable {
             //NOTIFY
             if (this.observableData != null) {
 
-                //NOTIFY ADD
-                if (this.observableData.containsKey(NOTIFY_ADD)) {
-                    this.setChanged();
-                    this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_ADD), value));
-                }
-
                 if (this.observableData.containsKey(NOTIFY_COUNT)) {
                     this.setChanged();
                     this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_COUNT), this)); /// SLOW .size()));
+                } else if (this.observableData.containsKey(NOTIFY_ADD)) {
+                    this.setChanged();
+                    this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_ADD), value));
                 }
             }
 
@@ -203,6 +202,11 @@ public abstract class DBMap<T, U> extends Observable {
         return false;
     }
 
+    /**
+     * уведомляет только счетчик если он разрешен, иначе Удалить
+     * @param key
+     * @return
+     */
     public U delete(T key) {
 
         this.addUses();
@@ -214,17 +218,14 @@ public abstract class DBMap<T, U> extends Observable {
             if (this.map.containsKey(key)) {
                 value = this.map.remove(key);
 
-                // NOTYFIES
+                //NOTIFY
                 if (this.observableData != null) {
-                    //NOTIFY REMOVE
-                    if (this.observableData.containsKey(NOTIFY_REMOVE)) {
-                        this.setChanged();
-                        this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_REMOVE), value));
-                    }
-
                     if (this.observableData.containsKey(NOTIFY_COUNT)) {
                         this.setChanged();
                         this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_COUNT), this));
+                    } else if (this.observableData.containsKey(NOTIFY_REMOVE)) {
+                        this.setChanged();
+                        this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_REMOVE), value));
                     }
                 }
 
@@ -254,6 +255,10 @@ public abstract class DBMap<T, U> extends Observable {
         return false;
     }
 
+    /**
+     * уведомляет только счетчик если он разрешен, иначе Список
+     * @param o
+     */
     @Override
     public void addObserver(Observer o) {
 
@@ -262,20 +267,17 @@ public abstract class DBMap<T, U> extends Observable {
         //ADD OBSERVER
         super.addObserver(o);
 
-        // NOTYFIES
+        //NOTIFY
         if (this.observableData != null) {
-            //NOTIFY LIST if this not FORK
-            if (this.observableData.containsKey(NOTIFY_LIST)) {
+            if (this.observableData.containsKey(NOTIFY_COUNT)) {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_COUNT), this)); /// SLOW .size()));
+            } else if (this.observableData.containsKey(NOTIFY_LIST)) {
                 //CREATE LIST
                 SortableList<T, U> list = new SortableList<T, U>(this);
 
                 //UPDATE
                 o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), list));
-            }
-
-            if (this.observableData.containsKey(NOTIFY_COUNT)) {
-                this.setChanged();
-                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_COUNT), this)); /// SLOW .size()));
             }
         }
 
@@ -324,6 +326,9 @@ public abstract class DBMap<T, U> extends Observable {
         return u;
     }
 
+    /**
+     * уведомляет только счетчик если он разрешен, иначе Сбросить
+     */
     public void reset() {
         this.addUses();
 
@@ -338,19 +343,14 @@ public abstract class DBMap<T, U> extends Observable {
         // NOTYFIES
         if (this.observableData != null) {
             //NOTIFY LIST
-            if (this.observableData.containsKey(NOTIFY_RESET)) {
-                //CREATE LIST
-                /////SortableList<T, U> list = new SortableList<T, U>(this);
-
-                //UPDATE
+            if (this.observableData.containsKey(NOTIFY_COUNT)) {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_COUNT), this));
+            } else if (this.observableData.containsKey(NOTIFY_RESET)) {
                 this.setChanged();
                 this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_RESET), null));
             }
 
-            if (this.observableData.containsKey(NOTIFY_COUNT)) {
-                this.setChanged();
-                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_COUNT), this));
-            }
         }
 
         this.outUses();

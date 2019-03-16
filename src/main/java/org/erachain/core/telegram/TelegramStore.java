@@ -1,5 +1,5 @@
 package org.erachain.core.telegram;
-// 09/03
+
 
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
