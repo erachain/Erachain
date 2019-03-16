@@ -3,7 +3,7 @@ package org.erachain.core.telegram;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.telegram.TelegramSet;
+import org.erachain.database.telegram.DGSet;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.settings.Settings;
@@ -22,7 +22,7 @@ import java.util.Timer;
 public class TelegramStore extends Observable implements Observer {
 
     static Logger LOGGER = LoggerFactory.getLogger(TelegramStore.class.getName());
-	public TelegramSet database;
+	public DGSet database;
     private static TelegramStore th;
 
     Timer timer;
@@ -39,7 +39,7 @@ public class TelegramStore extends Observable implements Observer {
 
     private TelegramStore(boolean withObserver, boolean dynamicGUI) {
         // OPEN db
-        this.database = new TelegramSet(withObserver, dynamicGUI);
+        this.database = DGSet.reCreateDB(withObserver, dynamicGUI);
         // start clear olf telegram
         clearOldTelegtams();
     }

@@ -51,8 +51,8 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 
     public void setBlockNumber(String string) {
 
-        // byte[] block_key = DBSet.getInstance().getBlockHeightsMap().get(Long.parseLong(string));
-        // Block block = DBSet.getInstance().getBlocksHeadMap().get(block_key);
+        // byte[] block_key = DLSet.getInstance().getBlockHeightsMap().get(Long.parseLong(string));
+        // Block block = DLSet.getInstance().getBlocksHeadMap().get(block_key);
         // transactions = block.getTransactions();
 
         try {

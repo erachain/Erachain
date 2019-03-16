@@ -3,7 +3,6 @@ package org.erachain.database.telegram;
 
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.database.DBASet;
-import org.erachain.database.IDB;
 import org.erachain.settings.Settings;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -12,22 +11,23 @@ import java.io.File;
 
 //import org.mapdb.Serializer;
 
-public class TelegramSet extends DBASet {
+public class DGSet extends DBASet {
 
     private AllTelegramsMap telegramsMap;
 
-    public TelegramSet(boolean withObserver, boolean dynamicGUI) {
-        super(withObserver, dynamicGUI);
+    public DGSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI) {
+        super(dbFile, database, withObserver, dynamicGUI);
 
-        DATA_FILE = new File(Settings.getInstance().getTelegramDir(), "telegram.dat");
-        DATA_FILE.getParentFile().mkdirs();
+        this.telegramsMap = new AllTelegramsMap(this, this.database);
 
-        // DELETE TRANSACTIONS
-        // File transactionFile = new
-        // File(Settings.getInstance().getWalletDir(), "wallet.dat.t");
-        // transactionFile.delete();
+    }
 
-        this.database = DBMaker.newFileDB(DATA_FILE)
+    public static DGSet reCreateDB(boolean withObserver, boolean dynamicGUI) {
+
+        File dbFile = new File(Settings.getInstance().getTelegramDir(), "telegram.dat");
+        dbFile.getParentFile().mkdirs();
+
+        DB database = DBMaker.newFileDB(dbFile)
                 // .cacheSize(2048)
                 // .cacheDisable()
 
@@ -51,9 +51,7 @@ public class TelegramSet extends DBASet {
                 .transactionDisable() // DISABLE TRANSACTIONS
                 .make();
 
-        uses = 0;
-
-        this.telegramsMap = new AllTelegramsMap(this, this.database);
+        return new DGSet(dbFile, database, withObserver, dynamicGUI);
 
     }
 

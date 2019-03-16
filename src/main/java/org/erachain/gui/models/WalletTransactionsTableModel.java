@@ -56,7 +56,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     public WalletTransactionsTableModel() {
         addObservers();
 
-        //dbItemAssetMap = DBSet.getInstance().getItemAssetMap();
+        //dbItemAssetMap = DLSet.getInstance().getItemAssetMap();
 
     }
 

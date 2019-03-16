@@ -54,7 +54,7 @@ public class Person_Info extends JTextPane {
 
 		/*
 		// GET CERTIFIED ACCOUNTS
-		TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+		TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses= DLSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 		if ( addresses.isEmpty()){
 			message += "<p>" +  Lang.getInstance().translate("Not personalized")+ "</p";
 		} else {

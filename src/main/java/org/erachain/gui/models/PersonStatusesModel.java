@@ -31,7 +31,7 @@ public class PersonStatusesModel extends AbstractTableModel implements Observer 
     List<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>> statusesRows;
 
     SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
-    //TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+    //TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DLSet.getInstance().getPersonAddressMap().getItems(person.getKey());
     String from_date_str;
     String to_date_str;
 

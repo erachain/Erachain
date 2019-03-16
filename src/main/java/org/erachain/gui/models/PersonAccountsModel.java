@@ -31,7 +31,7 @@ public class PersonAccountsModel extends AbstractTableModel implements Observer 
     private static final HashSet<Account> Account = null;
 
     long key_person_table;
-    TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+    TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DLSet.getInstance().getPersonAddressMap().getItems(person.getKey());
     SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Name", "Date", "Verifier"}); //, "Data"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, true};

@@ -60,7 +60,7 @@ public class PersonsFavorites implements Observer {
 			
 			/* balancec = nil
 			for (Account account : Controller.getInstance().getAccounts()) {
-				SortableList<Tuple2<String, Long>, BigDecimal> balancesList = DBSet.getInstance().getBalanceMap().getBalancesSortableList(account);
+				SortableList<Tuple2<String, Long>, BigDecimal> balancesList = DLSet.getInstance().getBalanceMap().getBalancesSortableList(account);
 				
 				for (Pair<Tuple2<String, Long>, BigDecimal> balance : balancesList) {
 					if(balance.getB().compareTo(BigDecimal.ZERO) > 0) {

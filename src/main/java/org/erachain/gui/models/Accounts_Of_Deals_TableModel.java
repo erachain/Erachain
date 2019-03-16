@@ -66,7 +66,7 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 
         }
 
-        //	balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
+        //	balance = account.getBalance(this.asset.getKey(DLSet.getInstance()));
 
         return NumberAsString.formatAsString(ss);
     }
@@ -83,7 +83,7 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 
         }
 
-        //	balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
+        //	balance = account.getBalance(this.asset.getKey(DLSet.getInstance()));
 
         return NumberAsString.formatAsString(ss.subtract(sW).stripTrailingZeros());
     }

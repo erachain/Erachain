@@ -3485,8 +3485,8 @@ public class WebResource {
                 tmpFile.getAbsolutePath(), request);
         pebbleHelper.getContextMap().put("namestoragemap",
                 NameStorageWebResource.getInstance());
-        // pebbleHelper.getContextMap().put("atmap",DBSet.getInstance().getATMap());
-        // pebbleHelper.getContextMap().put("attxsmap",DBSet.getInstance().getATTransactionMap());
+        // pebbleHelper.getContextMap().put("atmap",DLSet.getInstance().getATMap());
+        // pebbleHelper.getContextMap().put("attxsmap",DLSet.getInstance().getATTransactionMap());
         pebbleHelper.getContextMap().put("ats", ATWebResource.getInstance());
         pebbleHelper.getContextMap().put("controller",
                 ControllerWebResource.getInstance());

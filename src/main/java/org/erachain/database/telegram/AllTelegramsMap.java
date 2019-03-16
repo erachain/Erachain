@@ -8,12 +8,11 @@ import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class AllTelegramsMap extends DBMap<String, Transaction> {
 
-    public AllTelegramsMap(TelegramSet dWSet, DB database) {
+    public AllTelegramsMap(DGSet dWSet, DB database) {
         super(dWSet, database);
 
         this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.ALL_TELEGRAM_RESET_TYPE);

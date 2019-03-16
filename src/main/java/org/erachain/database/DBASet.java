@@ -13,12 +13,11 @@ import java.util.Observer;
 
 abstract public class DBASet implements IDB {
 
-    protected static File DATA_FILE;
     private static final String VERSION = "version";
 
-    protected static DB database;
-    protected static int uses;
-    protected static DBSet instance;
+    protected File DATA_FILE;
+    protected DB database;
+    protected int uses;
 
     private boolean withObserver;// observe
     private boolean dynamicGUI;// observe
@@ -26,13 +25,14 @@ abstract public class DBASet implements IDB {
     public DBASet() {
     }
 
-    public DBASet(boolean withObserver, boolean dynamicGUI) {
+    public DBASet(File DATA_FILE, boolean withObserver, boolean dynamicGUI) {
+        this.DATA_FILE = DATA_FILE;
         this.withObserver = withObserver;
         this.dynamicGUI = dynamicGUI;
     }
 
-    public DBASet(DB database, boolean withObserver, boolean dynamicGUI) {
-        this(withObserver, dynamicGUI);
+    public DBASet(File DATA_FILE, DB database, boolean withObserver, boolean dynamicGUI) {
+        this(DATA_FILE, withObserver, dynamicGUI);
         this.database = database;
     }
 
@@ -57,7 +57,7 @@ abstract public class DBASet implements IDB {
         return this.dynamicGUI;
     }
 
-    public static boolean exists() {
+    public boolean exists() {
         return DATA_FILE.exists();
     }
 

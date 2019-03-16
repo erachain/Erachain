@@ -36,7 +36,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
-import org.erachain.database.DBSet;
+import org.erachain.database.DLSet;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.Item_Map;
@@ -44,8 +44,6 @@ import org.erachain.datachain.LocalDataMap;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
-import org.erachain.gui.create.CreateWalletFrame;
-import org.erachain.gui.create.RecoverWalletFrame;
 import org.erachain.gui.library.Issue_Confirm_Dialog;
 import org.erachain.lang.Lang;
 import org.erachain.network.Network;
@@ -158,8 +156,8 @@ public class Controller extends Observable {
     private long toOfflineTime;
     private ConcurrentHashMap<Peer, Tuple2<Integer, Long>> peerHWeight;
     private ConcurrentHashMap<Peer, Pair<String, Long>> peersVersions;
-    private DBSet dbSet; // = DBSet.getInstance();
-    private DCSet dcSet; // = DBSet.getInstance();
+    private DLSet dlSet; // = DLSet.getInstance();
+    private DCSet dcSet; // = DLSet.getInstance();
 
     // private JSONObject Setting_Json;
 
@@ -262,8 +260,8 @@ public class Controller extends Observable {
         this.dcSet = db;
     }
 
-    public DBSet getDBSet() {
-        return this.dbSet;
+    public DLSet getDBSet() {
+        return this.dlSet;
     }
 
     public int getNetworkPort() {
@@ -451,8 +449,8 @@ public class Controller extends Observable {
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open") + " " + name));
 
             //// должен быть метод
-            ///// dbSet.open();
-            /// this.dbSet = DBSet.getinstanse();
+            ///// DLSet.open();
+            /// this.DLSet = DLSet.getinstanse();
 
             LOGGER.info(name + " OK");
             this.setChanged();
@@ -468,7 +466,7 @@ public class Controller extends Observable {
                 // пытаемся восстановисть
 
                 /// у объекта должен быть этот метод восстанорвления
-                // dbSet.restoreBuckUp();
+                // DLSet.restoreBuckUp();
 
             } catch (Throwable e1) {
 
@@ -478,7 +476,7 @@ public class Controller extends Observable {
                 try {
                     // пытаемся пересоздать
                     //// у объекта должен быть такой метод пересоздания
-                    // dbSet.reCreateDB();
+                    // DLSet.reCreateDB();
 
                 } catch (Throwable e2) {
 
@@ -501,13 +499,13 @@ public class Controller extends Observable {
                     this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("BackUp datachain")));
                     // delete & copy files in BackUp dir
 
-                    //// у объекта должен быть этот метод сохранения dbSet.createDataCheckpoint();
+                    //// у объекта должен быть этот метод сохранения DLSet.createDataCheckpoint();
                 }
             } else {
                 this.setChanged();
                 this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("BackUp datachain")));
                 // delete & copy files in BackUp dir
-                //// у объекта должен быть этот метод сохранения dbSet.createDataCheckpoint();
+                //// у объекта должен быть этот метод сохранения DLSet.createDataCheckpoint();
             }
         }
 
@@ -560,7 +558,7 @@ public class Controller extends Observable {
         try {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open DataLocale")));
-            this.dbSet = DBSet.getinstanse();
+            this.dlSet = DLSet.reCreateDB();
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataLocale OK")));
             LOGGER.info("DataLocale OK");
@@ -650,7 +648,7 @@ public class Controller extends Observable {
          * this.dcSet.getLocalDataMap().set("txfinalmap", "2");
          * this.dcSet.getLocalDataMap().set("blogpostmap", "2"); } } catch
          * (Exception e12) { createDataCheckpoint(); //
-         * Setting_Json.put("DB_OPEN", "Open BAD - try reCreate"); }
+         * Setting_Json.put("DB_OPEN", "Open BAD - try reCreateDB"); }
          */
 
         // CREATE SYNCHRONIZOR
@@ -774,7 +772,7 @@ public class Controller extends Observable {
             this.status = STATUS_OK;
 
         // REGISTER DATABASE OBSERVER
-        // this.addObserver(this.dbSet.getPeerMap());
+        // this.addObserver(this.DLSet.getPeerMap());
         this.addObserver(this.dcSet);
 
         // start memory viewer
@@ -829,13 +827,13 @@ public class Controller extends Observable {
 
         }
 
-        DCSet.reCreateDatabase(this.dcSetWithObserver, this.dynamicGUI);
+        DCSet.reCreateDB(this.dcSetWithObserver, this.dynamicGUI);
         this.dcSet = DCSet.getInstance();
         return this.dcSet;
     }
 
     // recreate DB locate
-    public DBSet reCreateDB() throws IOException, Exception {
+    public DLSet reCreateDB() throws IOException, Exception {
 
         File dataLocal = new File(Settings.getInstance().getLocalDir());
 
@@ -848,9 +846,8 @@ public class Controller extends Observable {
             }
         }
 
-        DBSet.reCreateDatabase();
-        this.dbSet = DBSet.getinstanse();
-        return this.dbSet;
+        this.dlSet = DLSet.reCreateDB();
+        return this.dlSet;
     }
 
     private void createDataCheckpoint() {
@@ -906,7 +903,7 @@ public class Controller extends Observable {
                 // delete data folder
                 java.nio.file.Files.walkFileTree(dataBak.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
             }
-            DCSet.reCreateDatabase(this.dcSetWithObserver, this.dynamicGUI);
+            DCSet.reCreateDB(this.dcSetWithObserver, this.dynamicGUI);
 
             this.dcSet.getLocalDataMap().set(LocalDataMap.LOCAL_DATA_VERSION_KEY, Controller.releaseVersion);
 
@@ -1122,7 +1119,7 @@ public class Controller extends Observable {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing Local database")));
         LOGGER.info("Closing Local database");
-        this.dbSet.close();
+        this.dlSet.close();
 
         // CLOSE telegram
         this.setChanged();
@@ -1776,7 +1773,7 @@ public class Controller extends Observable {
 
         /// this.status = STATUS_SYNCHRONIZING;
 
-        // DBSet dcSet = DBSet.getInstance();
+        // DLSet dcSet = DLSet.getInstance();
 
         Peer peer = null;
         // Block lastBlock = getLastBlock();
@@ -2476,7 +2473,7 @@ public class Controller extends Observable {
         if (newBlock == null)
             return false;
 
-        // if last block is changed by core.Synchronizer.process(DBSet, Block)
+        // if last block is changed by core.Synchronizer.process(DLSet, Block)
         // clear this win block
         if (!Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getReference())) {
             return false;

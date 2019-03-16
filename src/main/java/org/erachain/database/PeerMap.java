@@ -22,7 +22,7 @@ public class PeerMap extends DBMap<byte[], byte[]> {
     private static final byte[] BYTE_NOTFOUND = new byte[]{2, 2};
     static Logger LOGGER = LoggerFactory.getLogger(PeerMap.class.getName());
 
-    public PeerMap(DBSet databaseSet, DB database) {
+    public PeerMap(DLSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 

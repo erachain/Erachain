@@ -34,7 +34,7 @@ public abstract class Issue_ItemRecord extends Transaction {
         this(typeBytes, NAME_ID, creator, item, feePow, timestamp, reference);
         this.signature = signature;
         if (item.getReference() == null) item.setReference(signature); // set reference
-        //item.resolveKey(DBSet.getInstance());
+        //item.resolveKey(DLSet.getInstance());
         //if (timestamp > 1000 ) this.calcFee(); // not asPaack
     }
 
@@ -42,7 +42,7 @@ public abstract class Issue_ItemRecord extends Transaction {
         this(typeBytes, NAME_ID, creator, item, (byte) 0, 0l, null);
         this.signature = signature;
         if (this.item.getReference() == null) this.item.setReference(signature);
-        //item.resolveKey(DBSet.getInstance());
+        //item.resolveKey(DLSet.getInstance());
     }
 
     //GETTERS/SETTERS

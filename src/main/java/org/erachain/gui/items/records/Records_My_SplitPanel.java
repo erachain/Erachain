@@ -140,7 +140,7 @@ public class Records_My_SplitPanel extends Split_Panel {
                 // code Rebroadcast
 
                 if (trans == null) return;
-                // DBSet db = DBSet.getInstance();
+                // DLSet db = DLSet.getInstance();
                 Controller.getInstance().broadcastTransaction(trans);
 
             }

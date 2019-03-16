@@ -43,7 +43,7 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
         ttt = new ArrayList<Tuple3<String,String,Transaction>>();
         addObservers();
 
-        // dbItemAssetMap = DBSet.getInstance().getItemAssetMap();
+        // dbItemAssetMap = DLSet.getInstance().getItemAssetMap();
 
     }
 

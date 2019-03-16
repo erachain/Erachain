@@ -13,6 +13,7 @@ import org.erachain.core.item.unions.UnionCls;
 import org.erachain.database.DBASet;
 import org.erachain.settings.Settings;
 import org.mapdb.Atomic.Var;
+import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
 import java.io.File;
@@ -51,18 +52,51 @@ public class DWSet extends DBASet {
 
     private FavoriteDocument statementFavoritesSet;
 
-    public DWSet(boolean withObserver, boolean dynamicGUI) {
-        super(withObserver,  dynamicGUI);
+    public DWSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI) {
+        super(dbFile, database, withObserver,  dynamicGUI);
+
+        // LICENCE SIGNED
+        this.licenseKeyVar = database.getAtomicVar("licenseKey");
+        this.licenseKey = this.licenseKeyVar.get();
+
+        this.accountMap = new AccountMap(this, this.database);
+        this.accountsPropertisMap = new AccountsPropertisMap(this, this.database);
+        this.transactionMap = new TransactionMap(this, this.database);
+        this.blocksHeadMap = new BlocksHeadMap(this, this.database);
+        this.nameMap = new NameMap(this, this.database);
+        this.nameSaleMap = new NameSaleMap(this, this.database);
+        this.pollMap_old = new PollMap(this, this.database);
+        this.assetMap = new WItemAssetMap(this, this.database);
+        this.imprintMap = new WItemImprintMap(this, this.database);
+        this.TemplateMap = new WItemTemplateMap(this, this.database);
+        this.personMap = new WItemPersonMap(this, this.database);
+        this.statusMap = new WItemStatusMap(this, this.database);
+        this.unionMap = new WItemUnionMap(this, this.database);
+        this.pollMap = new WItemPollMap(this, this.database);
+        this.orderMap = new OrderMap(this, this.database);
+        this.assetFavoritesSet = new FavoriteItemAsset(this, this.database);
+        this.templateFavoritesSet = new FavoriteItemTemplate(this, this.database);
+        this.imprintFavoritesSet = new FavoriteItemImprint(this, this.database);
+        this.pollFavoriteSet = new FavoriteItemPoll(this, this.database);
+        this.personFavoritesSet = new FavoriteItemPerson(this, this.database);
+        this.statusFavoritesSet = new FavoriteItemStatus(this, this.database);
+        this.unionFavoritesSet = new FavoriteItemUnion(this, this.database);
+        this.statementFavoritesSet = new FavoriteDocument(this, this.database);
+        this.telegramsMap = new TelegramsMap(this,this.database);
+
+    }
+
+    public static DWSet reCreateDB(boolean withObserver, boolean dynamicGUI) {
 
         //OPEN WALLET
-        DATA_FILE = new File(Settings.getInstance().getDataWalletDir(), "wallet.dat");
-        DATA_FILE.getParentFile().mkdirs();
+        File dbFile = new File(Settings.getInstance().getDataWalletDir(), "wallet.dat");
+        dbFile.getParentFile().mkdirs();
 
         //DELETE TRANSACTIONS
         //File transactionFile = new File(Settings.getInstance().getWalletDir(), "wallet.dat.t");
         //transactionFile.delete();
 
-        this.database = DBMaker.newFileDB(DATA_FILE)
+        DB database = DBMaker.newFileDB(dbFile)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 //.cacheSize(2048)
 
@@ -92,37 +126,7 @@ public class DWSet extends DBASet {
 
                 .make();
 
-        uses = 0;
-
-        // LICENCE SIGNED
-        this.licenseKeyVar = database.getAtomicVar("licenseKey");
-        this.licenseKey = this.licenseKeyVar.get();
-
-
-        this.accountMap = new AccountMap(this, this.database);
-        this.accountsPropertisMap = new AccountsPropertisMap(this, this.database);
-        this.transactionMap = new TransactionMap(this, this.database);
-        this.blocksHeadMap = new BlocksHeadMap(this, this.database);
-        this.nameMap = new NameMap(this, this.database);
-        this.nameSaleMap = new NameSaleMap(this, this.database);
-        this.pollMap_old = new PollMap(this, this.database);
-        this.assetMap = new WItemAssetMap(this, this.database);
-        this.imprintMap = new WItemImprintMap(this, this.database);
-        this.TemplateMap = new WItemTemplateMap(this, this.database);
-        this.personMap = new WItemPersonMap(this, this.database);
-        this.statusMap = new WItemStatusMap(this, this.database);
-        this.unionMap = new WItemUnionMap(this, this.database);
-        this.pollMap = new WItemPollMap(this, this.database);
-        this.orderMap = new OrderMap(this, this.database);
-        this.assetFavoritesSet = new FavoriteItemAsset(this, this.database);
-        this.templateFavoritesSet = new FavoriteItemTemplate(this, this.database);
-        this.imprintFavoritesSet = new FavoriteItemImprint(this, this.database);
-        this.pollFavoriteSet = new FavoriteItemPoll(this, this.database);
-        this.personFavoritesSet = new FavoriteItemPerson(this, this.database);
-        this.statusFavoritesSet = new FavoriteItemStatus(this, this.database);
-        this.unionFavoritesSet = new FavoriteItemUnion(this, this.database);
-        this.statementFavoritesSet = new FavoriteDocument(this, this.database);
-        this.telegramsMap = new TelegramsMap(this,this.database);
+        return new DWSet(dbFile, database, withObserver, dynamicGUI);
 
     }
 

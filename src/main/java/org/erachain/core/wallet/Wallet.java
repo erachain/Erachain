@@ -72,7 +72,7 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF EXISTS
 		if (this.exists()) {
 			// OPEN WALLET
-			this.database = new DWSet(withObserver, dynamicGUI);
+			this.database = DWSet.reCreateDB(withObserver, dynamicGUI);
 
 			if (withObserver) {
 				// ADD OBSERVER
@@ -354,7 +354,7 @@ public class Wallet extends Observable implements Observer {
 		// set wallet dir
 		Settings.getInstance().setWalletDir(path);
 		// OPEN WALLET
-		DWSet database = new DWSet(withObserver, dynamicGUI);
+		DWSet database = DWSet.reCreateDB(withObserver, dynamicGUI);
 
 		if (this.secureDatabase != null) {
 			// CLOSE secured WALLET
@@ -1648,7 +1648,7 @@ public class Wallet extends Observable implements Observer {
 
 		// CHECK IF WE ARE OWNER
 		ItemCls item = issueItem.getItem();
-		// item.resolveKey(DBSet.getInstance());
+		// item.resolveKey(DLSet.getInstance());
 		Account creator = item.getOwner();
 		if (creator == null)
 			return;

@@ -9,7 +9,6 @@ import org.erachain.core.web.OrphanNameStorageHelperMap;
 import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.DBASet;
-import org.erachain.database.IDB;
 import org.erachain.settings.Settings;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -112,8 +111,8 @@ public class DCSet extends DBASet implements Observer {
     private DB database;
     private long actions = (long) (Math.random() * (ACTIONS_BEFORE_COMMIT >> 1));
 
-    public DCSet(DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory) {
-        super(database, withObserver, dynamicGUI);
+    public DCSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory) {
+        super(dbFile, database, withObserver, dynamicGUI);
 
         this.inMemory = inMemory;
 
@@ -335,7 +334,7 @@ public class DCSet extends DBASet implements Observer {
 
     public static DCSet getInstance(boolean withObserver, boolean dynamicGUI) throws Exception {
         if (instance == null) {
-            reCreateDatabase(withObserver, dynamicGUI);
+            reCreateDB(withObserver, dynamicGUI);
         }
 
         return instance;
@@ -356,7 +355,7 @@ public class DCSet extends DBASet implements Observer {
      * @param dynamicGUI [true] - for switch on GUI observers fir dynamic interface
      * @throws Exception
      */
-    public static void reCreateDatabase(boolean withObserver, boolean dynamicGUI) throws Exception {
+    public static void reCreateDB(boolean withObserver, boolean dynamicGUI) throws Exception {
 
         //OPEN DB
         File dbFile = new File(Settings.getInstance().getDataDir(), "chain.dat");
@@ -411,7 +410,7 @@ public class DCSet extends DBASet implements Observer {
                 .make();
 
         //CREATE INSTANCE
-        instance = new DCSet(database, withObserver, dynamicGUI, false);
+        instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false);
         if (instance.actions < 0) {
             dbFile.delete();
             throw new Exception("error in DATACHAIN:" + instance.actions);
@@ -430,7 +429,7 @@ public class DCSet extends DBASet implements Observer {
                 //.newMemoryDirectDB()
                 .make();
 
-        instance = new DCSet(database, false, false, true);
+        instance = new DCSet(null, database, false, false, true);
         return instance;
     }
 

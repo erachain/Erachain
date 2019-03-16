@@ -7,34 +7,23 @@ import org.mapdb.DBMaker;
 
 import java.io.File;
 
-public class DBSet extends DBASet {
+public class DLSet extends DBASet {
 
     private PeerMap peerMap;
 
-    private DBSet() {
+    public DLSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI) {
+        super(dbFile, database, withObserver, dynamicGUI);
         this.peerMap = new PeerMap(this, this.database);
     }
 
-
-    public static DBSet getinstanse() {
-        if (instance == null) {
-
-            DATA_FILE = new File(Settings.getInstance().getLocalDir(), "data.dat");
-
-            reCreateDatabase();
-        }
-
-        return instance;
-
-    }
-
-    public static void reCreateDatabase() {
+    public static DLSet reCreateDB() {
 
         //OPEN DB
         //OPEN WALLET
-        DATA_FILE.getParentFile().mkdirs();
+        File dbFile = new File(Settings.getInstance().getLocalDir(), "data.dat");
+        dbFile.getParentFile().mkdirs();
 
-        database = DBMaker.newFileDB(DATA_FILE)
+        DB database = DBMaker.newFileDB(dbFile)
 
                 //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
                 ///// добавил dcSet.clearCache(); --
@@ -62,11 +51,7 @@ public class DBSet extends DBASet {
                 .transactionDisable()
                 .make();
 
-        uses = 0;
-
-        //CREATE INSTANCE
-        instance = new DBSet();
-
+        return new DLSet(dbFile, database, true, true);
 
     }
 

@@ -12,7 +12,7 @@ import java.util.Stack;
 import java.util.TreeMap;
 
 //import java.util.HashMap;
-//import org.erachain.database.DBSet;
+//import org.erachain.database.DLSet;
 
 /**
  * Хранит Удостоверенные публичные ключи для персон.

@@ -48,7 +48,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
 
         addObservers();
 
-        //dbItemAssetMap = DBSet.getInstance().getItemAssetMap();
+        //dbItemAssetMap = DLSet.getInstance().getItemAssetMap();
 
     }
 

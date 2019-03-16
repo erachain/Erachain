@@ -7,7 +7,7 @@ import org.mapdb.DB;
 import java.util.HashMap;
 import java.util.Map;
 
-//import org.erachain.database.DBSet;
+//import org.erachain.database.DLSet;
 
 public class NameMap extends DCMap<String, Name> {
 

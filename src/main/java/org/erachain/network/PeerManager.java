@@ -50,7 +50,7 @@ public class PeerManager extends MonitoredThread {
                     Controller.getInstance().getDBSet().getPeerMap().delete(peer.getAddress().getAddress());
                 } catch (Exception eIO) {
                     LOGGER.error(eIO.getMessage(), eIO);
-                    LOGGER.error("try reCreate");
+                    LOGGER.error("try reCreateDB");
                     try {
                         Controller.getInstance().getDBSet().close();
                         Controller.getInstance().reCreateDB();

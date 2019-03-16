@@ -57,7 +57,7 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
          * transactions.add(transaction); } }
          *
          * for (Account account : Controller.getInstance().getAccounts()) {
-         * transactions.addAll(DBSet.getInstance().getTransactionFinalMap().
+         * transactions.addAll(DLSet.getInstance().getTransactionFinalMap().
          * getTransactionsByTypeAndAddress(account.getAddress(),
          * Transaction.SIGN_NOTE_TRANSACTION,0));//.SEND_ASSET_TRANSACTION, 0));
          * }
@@ -75,7 +75,7 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
 
         // blockChain.getBlock(0)
 
-        // private DBSet dcSet;
+        // private DLSet dcSet;
 
         // CREATE GENESIS BLOCK
         // genesisBlock = new GenesisBlock();
@@ -84,7 +84,7 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
         Controller.getInstance().addObserver(this);
         ///transactions = read_Statement();
         /*
-         * // база данных DBSet dcSet = DBSet.getInstance(); // читаем все блоки
+         * // база данных DLSet dcSet = DLSet.getInstance(); // читаем все блоки
          * SortableList<byte[], Block> lists = dcSet.getBlocksHeadMap().getList(); //
          * проходим по блокам for(Pair<byte[], Block> list: lists) {
          *
@@ -116,7 +116,7 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
          * transactions.add(transaction); } }
          *
          * for (Account account : Controller.getInstance().getAccounts()) {
-         * transactions.addAll(DBSet.getInstance().getTransactionFinalMap().
+         * transactions.addAll(DLSet.getInstance().getTransactionFinalMap().
          * getTransactionsByTypeAndAddress(null,
          * Transaction.SIGN_NOTE_TRANSACTION,0));//.SEND_ASSET_TRANSACTION, 0));
          * }

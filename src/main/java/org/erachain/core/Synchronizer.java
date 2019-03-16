@@ -55,6 +55,8 @@ public class Synchronizer {
         // SEND MESSAGE TO PEER
         BlockMessage response = (BlockMessage) peer.getResponse(message, check ? GET_BLOCK_TIMEOUT << 1 : GET_BLOCK_TIMEOUT);
 
+        // если ошибка то банить нужно в любом случае - чтобы не зацикливаться на этом пире
+
         // CHECK IF WE GOT RESPONSE
         if (response == null) {
             if (check) {
@@ -974,6 +976,6 @@ public class Synchronizer {
         // if (runedBlock != null)
         // runedBlock.stop();
 
-        // this.pipeProcessOrOrphan(DBSet.getInstance(), null, false);
+        // this.pipeProcessOrOrphan(DLSet.getInstance(), null, false);
     }
 }
