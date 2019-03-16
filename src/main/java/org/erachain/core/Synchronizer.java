@@ -61,7 +61,7 @@ public class Synchronizer {
                 return null;
             } else {
                 // ERROR
-                String mess = "*** Peer timed out";
+                String mess = "*** getBlock: Peer timed out";
                 peer.ban(mess);
                 throw new Exception(mess);
             }
@@ -69,7 +69,7 @@ public class Synchronizer {
 
         Block block = response.getBlock();
         if (block == null) {
-            String mess = "*** Dishonest peer - Block is NULL";
+            String mess = "*** getBlock: Block is NULL";
             peer.ban(mess);
             throw new Exception(mess);
         }
@@ -77,7 +77,7 @@ public class Synchronizer {
         // CHECK BLOCK SIGNATURE
         if (!block.isSignatureValid()) {
             int banTime = BAN_BLOCK_TIMES;
-            String mess = "*** Dishonest peer - Invalid block --signature. Ban for " + banTime;
+            String mess = "*** getBlock: Dishonest peer - Invalid block --signature. Ban for " + banTime;
             peer.ban(banTime, mess);
             throw new Exception(mess);
         }
@@ -87,7 +87,7 @@ public class Synchronizer {
             block.getTransactions();
         } catch (Exception e) {
             int banTime = BAN_BLOCK_TIMES << 1;
-            String mess = "*** Dishonest peer - Invalid block --зфкыу Екфтыфсешщты. Ban for " + banTime;
+            String mess = "*** getBlock: Dishonest peer - Invalid block on parse transactions. Ban for " + banTime;
             peer.ban(banTime, mess);
             throw new Exception(mess);
         }
