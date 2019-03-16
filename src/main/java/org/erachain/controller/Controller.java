@@ -95,8 +95,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.11.10a beta";
-    public static String buildTime = "2019-02-13 13:33:33 UTC";
+    public static String version = "4.11.10 beta";
+    public static String buildTime = "2019-03-13 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -3411,7 +3411,6 @@ public class Controller extends Observable {
 
                 if (Gui.isGuiStarted()) {
                     JOptionPane.showMessageDialog(null, e.getMessage(), Lang.getInstance().translate("Startup Error"), JOptionPane.ERROR_MESSAGE);
-
 
                 }
 
