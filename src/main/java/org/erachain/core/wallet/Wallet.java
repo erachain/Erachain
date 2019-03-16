@@ -1919,82 +1919,14 @@ public class Wallet extends Observable implements Observer {
             //this.database.clearCache();
             //this.database.commit();
 
-		} else if (false && type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
+		} else if (type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
 			;
-		} else if (type == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE)
-		{
-			Pair<byte[], Transaction> value = (Pair<byte[], Transaction>) message.getValue();
-			Transaction transaction = value.getB();
-
-			transaction.setDC(DCSet.getInstance());
-			this.processTransaction(transaction);
-
-			// CHECK IF PAYMENT
-			if (transaction instanceof R_Send) {
-				return;
-			}
-
-			// CHECK IF NAME REGISTRATION
-			else if (transaction instanceof RegisterNameTransaction) {
-				this.processNameRegistration((RegisterNameTransaction) transaction);
-			}
-
-			// CHECK IF POLL CREATION
-			else if (transaction instanceof CreatePollTransaction) {
-				this.processPollCreation((CreatePollTransaction) transaction);
-			}
-
-			// CHECK IF ITEM ISSUE
-			else if (transaction instanceof Issue_ItemRecord) {
-				this.processItemIssue((Issue_ItemRecord) transaction);
-			}
-
-			// CHECK IF SERTIFY PErSON
-			else if (transaction instanceof R_SertifyPubKeys) {
-				this.processSertifyPerson((R_SertifyPubKeys) transaction);
-			}
-
-			// CHECK IF ORDER CREATION
-			else if (transaction instanceof CreateOrderTransaction) {
-				this.processOrderCreation((CreateOrderTransaction) transaction);
-			}
-		} else if (false && type == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
+		} else if (type == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
+            ;
+		} else if (type == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
 			;
-		} else if (type == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE)
-		{
-			Transaction transaction = (Transaction) message.getValue();
-
-			transaction.setDC(DCSet.getInstance());
-			this.orphanTransaction(transaction);
-
-			// CHECK IF PAYMENT
-			if (transaction instanceof R_Send) {
-				return;
-			}
-			// CHECK IF NAME REGISTRATION
-			else if (transaction instanceof RegisterNameTransaction) {
-				this.orphanNameRegistration((RegisterNameTransaction) transaction);
-			}
-
-			// CHECK IF POLL CREATION
-			else if (transaction instanceof CreatePollTransaction) {
-				this.orphanPollCreation((CreatePollTransaction) transaction);
-			}
-
-			// CHECK IF ITEM ISSUE
-			else if (transaction instanceof Issue_ItemRecord) {
-				this.orphanItemIssue((Issue_ItemRecord) transaction);
-			}
-
-			// CHECK IF SERTIFY PErSON
-			else if (transaction instanceof R_SertifyPubKeys) {
-				this.orphanSertifyPerson((R_SertifyPubKeys) transaction);
-			}
-
-			// CHECK IF ORDER CREATION
-			else if (transaction instanceof CreateOrderTransaction) {
-				this.orphanOrderCreation((CreateOrderTransaction) transaction);
-			}
+		} else if (type == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
+            ;
 		} else if (type == ObserverMessage.ADD_ORDER_TYPE
 				|| type == ObserverMessage.ADD_COMPL_ORDER_TYPE) {
 			// UPDATE FULFILLED

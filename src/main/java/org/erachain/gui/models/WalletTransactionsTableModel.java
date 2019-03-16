@@ -443,6 +443,11 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         this.step = step;
        // pp.c.clear();
         int end = start+step;
+        if (transactions == null) {
+            transactions = new SortableList<Tuple2<String, String>, Transaction>(
+                    Controller.getInstance().getWallet().database.getTransactionMap());
+        }
+
         if (end > transactions.size()) end = transactions.size();
         pairTransactions = this.transactions.subList(start, end);
         

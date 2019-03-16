@@ -142,6 +142,7 @@ public class SetIntervalPanel extends JPanel implements Observer {
 
             } else if (message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE) {
                 // CHECK IF LIST UPDATED
+                if (this.transactions != null)
                 this.orders.remove(0);
                 jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + this.orders.size());
 
@@ -158,7 +159,8 @@ public class SetIntervalPanel extends JPanel implements Observer {
             }
             if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE
                     || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + this.transactions.size());
+                if (this.transactions != null)
+                    jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + this.transactions.size());
             }
 
         }
@@ -166,8 +168,8 @@ public class SetIntervalPanel extends JPanel implements Observer {
     }
 
     public void removeObservers() {
-        if (type == Transaction.CREATE_ORDER_TRANSACTION) this.orders.removeObserver();
-        if (type  == Transaction.EXTENDED)  this.transactions.removeObserver();
+        if (type == Transaction.CREATE_ORDER_TRANSACTION && this.orders != null) this.orders.removeObserver();
+        if (type  == Transaction.EXTENDED && this.transactions != null) this.transactions.removeObserver();
         Controller.getInstance().deleteWalletObserver(this);
     }
 

@@ -139,19 +139,20 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
     @Override
     public void update(Observable o, Object object) {
 
-        // ограничим частоту отображения
-        if (System.currentTimeMillis() - timePoint < 1000)
+        if (this.db == null || this.db.observableData == null)
+            return;
+
+        // ограничим частоту сортировки
+        if (System.currentTimeMillis() - timePoint < 2000)
             return;
 
         timePoint = System.currentTimeMillis();
 
         ObserverMessage message = (ObserverMessage) object;
-        if (this.db.observableData == null)
-            return;
 
-        if (message.getType() == this.db.observableData.get(DBMap.NOTIFY_ADD)
-                || message.getType() == this.db.observableData.get(DBMap.NOTIFY_REMOVE)) {
-            //RESET DATA
+        if (this.db.observableData.containsKey(DBMap.NOTIFY_ADD) && message.getType() == this.db.observableData.get(DBMap.NOTIFY_ADD)
+                || this.db.observableData.containsKey(DBMap.NOTIFY_REMOVE) && message.getType() == this.db.observableData.get(DBMap.NOTIFY_REMOVE)) {
+            //RESORT DATA
             this.sort(this.index, this.descending);
         }
 
