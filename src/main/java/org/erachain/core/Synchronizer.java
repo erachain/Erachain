@@ -61,14 +61,16 @@ public class Synchronizer {
                 return null;
             } else {
                 // ERROR
-                throw new Exception("Peer timed out");
+                String mess = "*** Peer timed out";
+                peer.ban(0, mess);
+                throw new Exception(mess);
             }
         }
 
         Block block = response.getBlock();
         if (block == null) {
             String mess = "*** Dishonest peer - Block is NULL";
-            peer.ban(mess);
+            peer.ban(0, mess);
             throw new Exception(mess);
         }
 
