@@ -61,7 +61,9 @@ public class Synchronizer {
                 return null;
             } else {
                 // ERROR
-                throw new Exception("Peer timed out");
+                String mess = "*** Peer timed out";
+                peer.ban(mess);
+                throw new Exception(mess);
             }
         }
 
