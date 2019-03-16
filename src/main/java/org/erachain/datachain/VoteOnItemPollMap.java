@@ -30,11 +30,11 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, 
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_VOTEPOLL_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_VOTEPOLL_TYPE);
             if (databaseSet.isDynamicGUI()) {
                 this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_VOTEPOLL_TYPE);
                 this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_VOTEPOLL_TYPE);
             }
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_VOTEPOLL_TYPE);
         }
 
     }

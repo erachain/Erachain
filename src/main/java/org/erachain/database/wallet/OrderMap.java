@@ -40,10 +40,14 @@ public class OrderMap extends DBMap<Tuple2<String, Long>, Order> {
     public OrderMap(IDB databaseSet, DB database) {
         super(databaseSet, database);
 
-        this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_ORDER_TYPE);
-        this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_ORDER_TYPE);
-        this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_ORDER_TYPE);
-        this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_ORDER_TYPE);
+        if (databaseSet.isWithObserver()) {
+            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_ORDER_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_ORDER_TYPE);
+            if (databaseSet.isDynamicGUI()) {
+                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_ORDER_TYPE);
+                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_ORDER_TYPE);
+            }
+        }
     }
 
     @Override

@@ -24,11 +24,11 @@ public class NameExchangeMap extends DCMap<String, BigDecimal> {
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_NAME_SALE_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_NAME_SALE_TYPE);
             if (databaseSet.isDynamicGUI()) {
                 this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_NAME_SALE_TYPE);
                 this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_NAME_SALE_TYPE);
             }
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_NAME_SALE_TYPE);
         }
     }
 

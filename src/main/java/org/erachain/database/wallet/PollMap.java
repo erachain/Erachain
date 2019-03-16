@@ -25,10 +25,14 @@ public class PollMap extends DBMap<Tuple2<String, String>, Poll> {
     public PollMap(DWSet dWSet, DB database) {
         super(dWSet, database);
 
-        this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_POLL_TYPE);
-        this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_POLL_TYPE);
-        this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_POLL_TYPE);
-        this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_POLL_TYPE);
+        if (databaseSet.isWithObserver()) {
+            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_POLL_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_POLL_TYPE);
+            if (databaseSet.isDynamicGUI()) {
+                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_POLL_TYPE);
+                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_POLL_TYPE);
+            }
+        }
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

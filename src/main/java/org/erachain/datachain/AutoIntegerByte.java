@@ -37,14 +37,14 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
         if (databaseSet.isWithObserver()) {
             if (observeReset > 0)
                 this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
+            if (observeList > 0)
+                this.observableData.put(DBMap.NOTIFY_LIST, observeList);
             if (databaseSet.isDynamicGUI()) {
                 if (observeAdd > 0)
                     this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
                 if (observeRemove > 0)
                     this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
             }
-            if (observeList > 0)
-                this.observableData.put(DBMap.NOTIFY_LIST, observeList);
         }
     }
 

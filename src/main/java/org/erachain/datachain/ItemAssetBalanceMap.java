@@ -45,11 +45,11 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple5<
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_BALANCE_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_BALANCE_TYPE);
             if (databaseSet.isDynamicGUI()) {
                 this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_BALANCE_TYPE);
                 this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_BALANCE_TYPE);
             }
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_BALANCE_TYPE);
         }
     }
 

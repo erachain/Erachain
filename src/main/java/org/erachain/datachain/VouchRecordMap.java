@@ -34,11 +34,11 @@ public class VouchRecordMap extends DCMap<Long, Tuple2<BigDecimal, List<Long>>> 
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_VOUCH_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_VOUCH_TYPE);
             if (databaseSet.isDynamicGUI()) {
                 this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_VOUCH_TYPE);
                 this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_VOUCH_TYPE);
             }
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_VOUCH_TYPE);
         }
     }
 
