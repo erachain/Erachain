@@ -30,7 +30,6 @@ public class FavoriteDocument extends DBMap<Tuple2<String, String>, Transaction>
     public FavoriteDocument(DWSet dWSet, DB database) {
         super(dWSet, database);
 
-        //	DCSet.getInstance().getTransactionFinalMap().addObserver(this);
         this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_STATEMENT_FAVORITES_TYPE);
         this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_STATEMENT_FAVORITES_TYPE);
         this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.DELETE_STATEMENT_FAVORITES_TYPE);

@@ -135,8 +135,15 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
 	*/
 
 
+	private long timePoint;
     @Override
     public void update(Observable o, Object object) {
+
+        // ограничим частоту отображения
+        if (System.currentTimeMillis() - timePoint < 1000)
+            return;
+
+        timePoint = System.currentTimeMillis();
 
         ObserverMessage message = (ObserverMessage) object;
         if (this.db.observableData == null)

@@ -29,11 +29,11 @@ public class AddressItem_Refs extends DCMap<Tuple2<byte[], Long>, byte[]> {
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
+            this.observableData.put(DBMap.NOTIFY_LIST, observeList);
             if (databaseSet.isDynamicGUI()) {
                 this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
                 this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
             }
-            this.observableData.put(DBMap.NOTIFY_LIST, observeList);
         }
 
     }

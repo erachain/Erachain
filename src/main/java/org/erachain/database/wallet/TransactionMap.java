@@ -30,6 +30,7 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
 
     public TransactionMap(DWSet dWSet, DB database) {
         super(dWSet, database);
+
         if (DCSet.getInstance().isDynamicGUI()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_TRANSACTION_TYPE);
             this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_TRANSACTION_TYPE);
