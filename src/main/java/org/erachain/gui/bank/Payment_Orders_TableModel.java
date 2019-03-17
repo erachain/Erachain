@@ -40,15 +40,12 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
     private SortableList<Tuple2<String, String>, Transaction> transactions;
     //ItemAssetMap dbItemAssetMap;
     private ArrayList<R_Send> trans;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{
-            "Confirmation", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
 
     public Payment_Orders_TableModel() {
-
-        addObservers();
-
-        //dbItemAssetMap = DLSet.getInstance().getItemAssetMap();
+        super("Payment_Orders_TableModel", 1000,
+                new String[]{
+                        "Confirmation", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
 
     }
 
@@ -73,16 +70,6 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
             return null;
         }
         return data.getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return columnNames[index];
     }
 
     @Override
@@ -279,13 +266,13 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
         }
     }
 
-    public void addObservers() {
+    public void addObserversThis() {
 
         Controller.getInstance().addWalletListener(this);
     }
 
 
-    public void removeObservers() {
+    public void removeObserversThis() {
 
         Controller.getInstance().deleteObserver(this);
     }

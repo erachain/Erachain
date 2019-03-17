@@ -24,11 +24,11 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 
     private SortableList<Tuple2<String, String>, AssetCls> assets;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Confirmed", "Favorite"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false, false, false, false};
 
     public WalletItemAssetsTableModel() {
-        addObservers();
+        super("WalletItemAssetsTableModel", 1000,
+                new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Confirmed", "Favorite"});
 
     }
 
@@ -56,16 +56,6 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 
     public AssetCls getAsset(int row) {
         return this.assets.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -150,13 +140,13 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
         }
     }
 
-    public void addObservers() {
+    public void addObserversThis() {
 
         Controller.getInstance().addWalletListener(this);
     }
 
 
-    public void removeObservers() {
+    public void removeObserversThis() {
 
         Controller.getInstance().deleteObserver(this);
     }

@@ -33,7 +33,7 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
     //public static final int COLUMN_GENERATING_BALANCE = 3;
     //	public static final int COLUMN_FEE_BALANCE = 3;
     List<Tuple2<Tuple3<String, Long, String>, BigDecimal>> cred;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Amount", "Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
+    //private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Amount", "Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
     private Boolean[] column_AutuHeight = new Boolean[]{true, false, false, false};
     private List<PublicKeyAccount> publicKeyAccounts;
     private Account account;
@@ -45,13 +45,12 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
 
     @SuppressWarnings("unchecked")
     public Model_Account_Transactions() {
+        super("Accounts Table", 1000, new String[]{"Account", "Amount", "Type"});
         this.transactions_Asset = new ArrayList<Transaction>();
         this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
         cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
         account = new Account("");
 
-        Controller.getInstance().addWalletListener(this);
-        //	Controller.getInstance().addObserver(this);
 
     }
 
@@ -112,16 +111,6 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
 
 
         this.fireTableDataChanged();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return columnNames[index];
     }
 
     @Override
@@ -274,6 +263,14 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
         }
 
         return totalBalance;
+    }
+
+    protected void addObserversThis() {
+        Controller.getInstance().addWalletListener(this);
+        //	Controller.getInstance().addObserver(this);
+    }
+
+    public void removeObserversThis() {
     }
 
     @Override

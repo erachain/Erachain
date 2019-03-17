@@ -21,13 +21,12 @@ public abstract class WalletItem_TableModel extends TableModelCls<Tuple2<String,
     static Logger LOGGER = LoggerFactory.getLogger(WalletItem_TableModel.class.getName());
     protected SortableList<Tuple2<String, String>, ItemCls> items;
 
-    protected String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed"});
-
     protected int observer_add;
     protected int observer_remove;
     protected int observer_list;
 
-    public WalletItem_TableModel(int observer_add, int observer_remove, int observer_list) {
+    public WalletItem_TableModel(String name, int observer_add, int observer_remove, int observer_list) {
+        super(name, 1000, new String[]{"Key", "Name", "Owner", "Confirmed"});
         Controller.getInstance().addWalletListener(this);
         this.observer_add = observer_add;
         this.observer_remove = observer_remove;
@@ -42,16 +41,6 @@ public abstract class WalletItem_TableModel extends TableModelCls<Tuple2<String,
 
     public ItemCls getItem(int row) {
         return this.items.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -100,30 +89,5 @@ public abstract class WalletItem_TableModel extends TableModelCls<Tuple2<String,
 
     //@SuppressWarnings("unchecked")
     public abstract void syncUpdate(Observable o, Object arg);
-	/*
-	@SuppressWarnings("unchecked")
-	public synchronized void syncUpdate(Observable o, Object arg)
-	{
-		ObserverMessage message = (ObserverMessage) arg;
-		
-		//CHECK IF NEW LIST
-		if(message.getType() == this.observer_list)
-		{
-			if(this.items == null)
-			{
-				this.items = (SortableList<Tuple2<String, String>, ItemCls>) message.getValue();
-				this.items.registerObserver();
-				//this.items.sort(PollMap.NAME_INDEX);
-			}
-			
-			this.fireTableDataChanged();
-		}
-		
-		//CHECK IF LIST UPDATED
-		if(message.getType() == this.observer_add || message.getType() == this.observer_remove)
-		{
-			this.fireTableDataChanged();
-		}	
-	}
-	*/
+
 }

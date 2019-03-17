@@ -21,15 +21,12 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
     private static final int COLUMN_CREATOR = 1;
     private AssetCls asset;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Name", "Creator", "Total Votes"});
     private SortableList<String, Poll> polls;
     private PollMap db;
 
     public PollsTableModel() {
-        this.asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
-        //Controller.getInstance().addObserver(this);
-        db = DCSet.getInstance().getPollMap();
-        polls = db.getList();
+        super("PollsTableModel", 2000,
+                new String[]{"Name", "Creator", "Total Votes"});
     }
 
     public void setAsset(AssetCls asset) {
@@ -49,16 +46,6 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
 
     public Poll getPoll(int row) {
         return this.polls.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -133,7 +120,14 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
         }
     }
 
-    public void removeObservers() {
+    public void addObserversThis() {
+        this.asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
+        //Controller.getInstance().addObserver(this);
+        db = DCSet.getInstance().getPollMap();
+        polls = db.getList();
+    }
+
+    public void removeObserversThis() {
         //if(this.polls!=null)this.polls.removeObserver();
         //DCSet.getInstance().getPollMap().deleteObserver(this);
     }

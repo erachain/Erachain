@@ -54,10 +54,9 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     private List<Pair<Tuple2<String, String>, Transaction>> pairTransactions;
 
     public WalletTransactionsTableModel() {
-        addObservers();
-
-        //dbItemAssetMap = DLSet.getInstance().getItemAssetMap();
-
+        super("WalletTransactionsTableModel", 1000,
+                new String[]{
+                        "Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
     }
 
     @Override
@@ -423,7 +422,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         }
     }
 
-    public void addObservers() {
+    public void addObserversThis() {
 
         if (!Controller.getInstance().doesWalletDatabaseExists())
             return;
@@ -438,7 +437,10 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     }
 
 
-    public void removeObservers() {
+    public void removeObserversThis() {
+        addObservers();
+
+        //dbItemAssetMap = DLSet.getInstance().getItemAssetMap();
 
         if (Controller.getInstance().doesWalletDatabaseExists())
             return;

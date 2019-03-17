@@ -3486,8 +3486,8 @@ public class BlockExplorer {
 
         for (int column = 0; column < column_Count; column++) {
 
-            output.put("Label_" + model_Peers.getColumnNameNO_Translate(column).replace(' ', '_'),
-                    Lang.getInstance().translate_from_langObj(model_Peers.getColumnNameNO_Translate(column), langObj));
+            output.put("Label_" + model_Peers.getColumnNameOrigin(column).replace(' ', '_'),
+                    Lang.getInstance().translate_from_langObj(model_Peers.getColumnNameOrigin(column), langObj));
         }
 
         Map out_peers = new LinkedHashMap();
@@ -3503,7 +3503,7 @@ public class BlockExplorer {
             Map out_peer = new LinkedHashMap();
 
             for (int column = 0; column < column_Count; column++) {
-                out_peer.put(model_Peers.getColumnNameNO_Translate(column).replace(' ', '_'),
+                out_peer.put(model_Peers.getColumnNameOrigin(column).replace(' ', '_'),
                         model_Peers.getValueAt(row, column).toString());
 
             }
