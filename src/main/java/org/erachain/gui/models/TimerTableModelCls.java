@@ -18,6 +18,10 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
     private Timer timer;
     boolean needUpdate;
 
+    private int start = 0;
+    private int step = 50;
+    private int size = 0;
+
     public int COLUMN_FAVORITE = 1000;
 
     public TimerTableModelCls(String[] columnNames) {
@@ -40,6 +44,7 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
                 public void run() {
                     try {
                         if (needUpdate) {
+                            getInterval();
                             fireTableDataChanged();
                             needUpdate = false;
                         }
@@ -80,6 +85,29 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
 
     public void update(Observable o, Object arg) {
         this.syncUpdate(o, arg);
+    }
+
+    //public abstract void getIntervalThis(int startBack, int endBack);
+    public void getIntervalThis(int startBack, int endBack) {
+    }
+
+    //public abstract int getMapSize();
+    public int getMapSize() {
+        return 0;
+    }
+
+    public void getInterval() {
+
+        int startBack = -getMapSize() + start;
+        getIntervalThis( startBack, startBack + step);
+
+    }
+
+    public void setInterval(int start, int step) {
+        this.start = start;
+        this.step = step;
+
+        getInterval();
     }
 
     protected abstract void addObserversThis();

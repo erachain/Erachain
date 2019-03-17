@@ -313,35 +313,40 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         } else if (message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
             // INCOME
 
-            long period = System.currentTimeMillis() - this.timeUpdate;
-            if (period < 2000) //Gui.PERIOD_UPDATE)
+            if (true) {
+                needUpdate = true;
                 return;
-            this.timeUpdate = System.currentTimeMillis();
-            needUpdate = false;
+            } else {
 
-            this.fireTableDataChanged();
-            if (true)
-                return;
+                long period = System.currentTimeMillis() - this.timeUpdate;
+                if (period < 2000) //Gui.PERIOD_UPDATE)
+                    return;
+                this.timeUpdate = System.currentTimeMillis();
+                needUpdate = false;
 
-            Pair<byte[], Transaction> pair = (Pair<byte[], Transaction>) message.getValue();
-            Transaction record = pair.getB();
+                this.fireTableDataChanged();
+                if (true)
+                    return;
 
-            if (!Controller.getInstance().wallet.accountExists(record.getCreator().getAddress())) {
-                return;
-            }
+                Pair<byte[], Transaction> pair = (Pair<byte[], Transaction>) message.getValue();
+                Transaction record = pair.getB();
 
-            if (false) {
-                //*****this.transactions.contains(pair);
-                // ОЧЕНЬ сильно тормозит так как внутри перебор обычный
-                Pair<Tuple2<String, String>, Transaction> pairRecord = new Pair<Tuple2<String, String>, Transaction>(
-                        new Tuple2<String, String>(record.getCreator().getAddress(),
-                                new String(record.getSignature())), record);
-                boolean found = this.transactions.contains(pairRecord);
-
-                if (found) {
+                if (!Controller.getInstance().wallet.accountExists(record.getCreator().getAddress())) {
                     return;
                 }
-            }
+
+                if (false) {
+                    //*****this.transactions.contains(pair);
+                    // ОЧЕНЬ сильно тормозит так как внутри перебор обычный
+                    Pair<Tuple2<String, String>, Transaction> pairRecord = new Pair<Tuple2<String, String>, Transaction>(
+                            new Tuple2<String, String>(record.getCreator().getAddress(),
+                                    new String(record.getSignature())), record);
+                    boolean found = this.transactions.contains(pairRecord);
+
+                    if (found) {
+                        return;
+                    }
+                }
 
             /*
             Ошибка - это статичный массив - в него нельзя не добавлять ни удалять
@@ -351,40 +356,46 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             this.transactions.add(0, pairRecord);
             */
 
-            if (DCSet.getInstance().getTransactionMap().contains(record.getSignature())) {
-                if (record.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                    library.notifySysTrayRecord(record);
-                } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-                    PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
+                if (DCSet.getInstance().getTransactionMap().contains(record.getSignature())) {
+                    if (record.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                        library.notifySysTrayRecord(record);
+                    } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
+                        PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
+                    }
                 }
-            }
 
-            this.fireTableRowsInserted(0,0);
+                this.fireTableRowsInserted(0, 0);
 
-            if (!needUpdate) {
-                needUpdate = true;
+                if (!needUpdate) {
+                    needUpdate = true;
+                }
+                return;
             }
-            return;
 
         } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
 
-            Transaction record = (Transaction) message.getValue();
-            byte[] signKey = record.getSignature();
-            for (int i = 0; i < this.transactions.size() - 1; i++) {
-                Transaction item = this.transactions.get(i).getB();
-                if (item == null)
-                    return;
-                if (Arrays.equals(signKey, item.getSignature())) {
-                    this.fireTableRowsDeleted(i, i);
-                    return;
-                }
-            }
-
-            if (needUpdate) {
-                return;
-            } else {
+            if (true) {
                 needUpdate = true;
                 return;
+            } else {
+                Transaction record = (Transaction) message.getValue();
+                byte[] signKey = record.getSignature();
+                for (int i = 0; i < this.transactions.size() - 1; i++) {
+                    Transaction item = this.transactions.get(i).getB();
+                    if (item == null)
+                        return;
+                    if (Arrays.equals(signKey, item.getSignature())) {
+                        this.fireTableRowsDeleted(i, i);
+                        return;
+                    }
+                }
+
+                if (needUpdate) {
+                    return;
+                } else {
+                    needUpdate = true;
+                    return;
+                }
             }
         }
     }
