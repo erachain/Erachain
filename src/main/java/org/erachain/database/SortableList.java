@@ -102,6 +102,14 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
         return this.size;
     }
 
+    @Override
+    public boolean contains(Object key) {
+        if (this.db.contains((T)key))
+            return true;
+
+        return false;
+    }
+
     public void sort(int index) {
         this.sort(index, false);
     }
