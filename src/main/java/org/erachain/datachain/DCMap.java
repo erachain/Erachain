@@ -158,7 +158,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
             } else {
 
                 // NOTIFY if not FORKED
-                if (this.observableData != null) {
+                if (this.observableData != null && (old == null || !old.equals(value))) {
                     if (this.observableData.containsKey(DBMap.NOTIFY_COUNT)) {
                         this.setChanged();
                         this.notifyObservers(

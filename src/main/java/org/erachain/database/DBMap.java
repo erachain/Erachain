@@ -177,12 +177,11 @@ public abstract class DBMap<T, U> extends Observable {
             U old = this.map.put(key, value);
 
             //COMMIT and NOTIFY if not FORKED
-            // TODO
-            this.databaseSet.commit();
+            // TODO - удалить тут этот ак как у нас везде управляемый внешний коммит
+            if (false) this.databaseSet.commit();
 
             //NOTIFY
-            if (this.observableData != null) {
-
+            if (this.observableData != null && (old == null || !old.equals(value))) {
                 if (this.observableData.containsKey(NOTIFY_COUNT)) {
                     this.setChanged();
                     this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_COUNT), this)); /// SLOW .size()));
