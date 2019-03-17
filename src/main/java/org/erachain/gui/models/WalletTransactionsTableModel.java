@@ -311,15 +311,21 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
             Transaction record = (Transaction) message.getValue();
 
-            Account creator = record.getCreator();
+            if (false) {
+                //*****this.transactions.contains(pair);
+                // ОЧЕНЬ сильно тормозит так как внутри перебор обычный
 
-            Pair<Tuple2<String, String>, Transaction> pair = new Pair<Tuple2<String, String>, Transaction>(
-                    new Tuple2<String, String>(creator == null? "GENESIS" : creator.getAddress(),
-                            new String(record.getSignature())), record);
-            boolean found = this.transactions.contains(pair);
+                Account creator = record.getCreator();
 
-            if (found) {
-                return;
+                Pair<Tuple2<String, String>, Transaction> pair = new Pair<Tuple2<String, String>, Transaction>(
+                        new Tuple2<String, String>(creator == null ? "GENESIS" : creator.getAddress(),
+                                new String(record.getSignature())), record);
+
+                boolean found = this.transactions.contains(pair);
+
+                if (found) {
+                    return;
+                }
             }
 
             /*
@@ -358,13 +364,17 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
                 return;
             }
 
-            Pair<Tuple2<String, String>, Transaction> pairRecord = new Pair<Tuple2<String, String>, Transaction>(
-                    new Tuple2<String, String>(record.getCreator().getAddress(),
-                            new String(record.getSignature())), record);
-            boolean found = this.transactions.contains(pairRecord);
+            if (false) {
+                //*****this.transactions.contains(pair);
+                // ОЧЕНЬ сильно тормозит так как внутри перебор обычный
+                Pair<Tuple2<String, String>, Transaction> pairRecord = new Pair<Tuple2<String, String>, Transaction>(
+                        new Tuple2<String, String>(record.getCreator().getAddress(),
+                                new String(record.getSignature())), record);
+                boolean found = this.transactions.contains(pairRecord);
 
-            if (found) {
-                return;
+                if (found) {
+                    return;
+                }
             }
 
             /*
