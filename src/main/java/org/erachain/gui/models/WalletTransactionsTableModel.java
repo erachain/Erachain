@@ -47,9 +47,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     //ItemAssetMap dbItemAssetMap;
     private SortableList<Tuple2<String, String>, Transaction> transactions;
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
-    private int start = 0;
-    private int step = 100;
-    private List<Pair<Tuple2<String, String>, Transaction>> pairTransactions;
+
+    //private List<Pair<Tuple2<String, String>, Transaction>> pairTransactions;
 
     public WalletTransactionsTableModel() {
         super("WalletTransactionsTableModel", 1000,
@@ -62,18 +61,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         return this.transactions;
     }
 
-    public void setAsset(AssetCls asset) {
-
-
-    }
-
     public Object getItem(int row) {
-        return this.transactions.get(row).getB();
-    }
-
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
+        return getTransaction(row);
     }
 
     // читаем колонки которые изменяем высоту
@@ -97,22 +86,22 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
     @Override
     public int getRowCount() {
-        if (this.pairTransactions == null) {
+        if (this.transactions == null) {
             return 0;
         }
 
-        return this.pairTransactions.size();
+        return this.transactions.size();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
         //try
         //{
-        if (this.pairTransactions == null || this.pairTransactions.size() - 1 < row) {
+        if (this.transactions == null || this.transactions.size() - 1 < row) {
             return null;
         }
 
-        Pair<Tuple2<String, String>, Transaction> data = this.pairTransactions.get(row);
+        Pair<Tuple2<String, String>, Transaction> data = this.transactions.get(row);
 
         if (data == null || data.getB() == null) {
             return null;
@@ -266,11 +255,11 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             if (!needUpdate)
                 return;
 
-            long period = NTP.getTime() - this.timeUpdate;
+            long period = System.currentTimeMillis() - this.timeUpdate;
             if (period < 2000) //Gui.PERIOD_UPDATE)
                 return;
 
-            this.timeUpdate = NTP.getTime();
+            this.timeUpdate = System.currentTimeMillis();
             needUpdate = false;
             this.fireTableDataChanged();
 
@@ -279,7 +268,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             if (!needUpdate)
                 return;
 
-            this.timeUpdate = NTP.getTime();
+            this.timeUpdate = System.currentTimeMillis();
             needUpdate = false;
             this.fireTableDataChanged();
 
@@ -324,10 +313,10 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         } else if (message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
             // INCOME
 
-            long period = NTP.getTime() - this.timeUpdate;
+            long period = System.currentTimeMillis() - this.timeUpdate;
             if (period < 2000) //Gui.PERIOD_UPDATE)
                 return;
-            this.timeUpdate = NTP.getTime();
+            this.timeUpdate = System.currentTimeMillis();
             needUpdate = false;
 
             this.fireTableDataChanged();
@@ -429,25 +418,17 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         DCSet.getInstance().getTransactionMap().addObserver(this);
         /// ??? Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);
     }
-    
-    public void getInterval() {
-        int end = start + step;
 
-        if (transactions == null) {
-            transactions = new SortableList<Tuple2<String, String>, Transaction>(
-                    Controller.getInstance().getWallet().database.getTransactionMap(),
-                    Controller.getInstance().getWallet().database.getTransactionMap().getFromToKeys(start, end));
-        }
-
-        if (end > transactions.size()) end = transactions.size();
-        pairTransactions = this.transactions.subList(start, end);
-        
+    @Override
+    public int getMapSize() {
+        return Controller.getInstance().getWallet().database.getTransactionMap().size();
     }
 
-    public void setInterval(int start, int step) {
-        this.start = start;
-        this.step = step;
+        @Override
+    public void getIntervalThis(int startBack, int endBack) {
+        transactions = new SortableList<Tuple2<String, String>, Transaction>(
+                Controller.getInstance().getWallet().database.getTransactionMap(),
+                Controller.getInstance().getWallet().database.getTransactionMap().getFromToKeys(startBack, endBack));
 
-        getInterval();
     }
 }

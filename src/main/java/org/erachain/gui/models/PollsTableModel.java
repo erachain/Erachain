@@ -8,6 +8,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.PollMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun;
 
 import javax.validation.constraints.Null;
 import java.math.BigDecimal;
@@ -91,15 +92,6 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -137,4 +129,8 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
         // TODO Auto-generated method stub
         return this.polls.get(k).getB();
     }
+
+    public void getIntervalThis(int startBack, int endBack) {
+    }
+
 }

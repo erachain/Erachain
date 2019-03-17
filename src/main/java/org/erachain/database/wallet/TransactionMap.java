@@ -117,7 +117,7 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
         Bind.secondaryKey(map, this.AUTOKEY_INDEX, new Fun.Function2<Integer, Tuple2<String, String>, Transaction>() {
             @Override
             public Integer run(Tuple2<String, String> key, Transaction value) {
-                return Controller.getInstance().wallet.database.getTransactionMap().size() + 1;
+                return -Controller.getInstance().wallet.database.getTransactionMap().size();
             }
         });
 
@@ -188,11 +188,6 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
 
     @SuppressWarnings("unchecked")
     public Collection<Tuple2<String, String>> getFromToKeys(Integer fromKey, Integer toKey) {
-
-        ConcurrentNavigableMap<Integer, Tuple2<String, String>> subset = AUTOKEY_INDEX.subMap(fromKey, toKey);
-
-        Collection<Tuple2<String, String>> keys = subset.values();
-
         return AUTOKEY_INDEX.subMap(fromKey, toKey).values();
     }
 

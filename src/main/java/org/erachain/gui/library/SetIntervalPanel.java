@@ -161,7 +161,9 @@ public class SetIntervalPanel extends JPanel implements Observer {
                 if (this.transactions == null) {
                     this.transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
                     this.transactions.registerObserver();
-                    jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + this.transactions.size());
+                    ///jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + this.transactions.size());
+                    jLabelTotal.setText(Lang.getInstance().translate("Total") + ":"
+                            + Controller.getInstance().wallet.database.getTransactionMap().size());
                 }
             }
 
