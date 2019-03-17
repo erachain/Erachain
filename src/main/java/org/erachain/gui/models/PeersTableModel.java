@@ -36,7 +36,7 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
     private Boolean[] column_AutuHeight = new Boolean[] { false, false, false, false, false, false, false, false };
 
     public PeersTableModel() {
-        super("Peers Table", 10000,
+        super("PeersTableModel", 10000,
                 new String[] { "IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago",
                 "Online Time", "Version" });
 
@@ -195,15 +195,6 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
         }
 
         return null;
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            // GUI ERROR
-        }
     }
 
     @SuppressWarnings("unchecked")

@@ -1,9 +1,12 @@
 package org.erachain.database.wallet;
 //09/03
 
+import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
+import org.erachain.database.SortableList;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
@@ -17,8 +20,10 @@ import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.List;
 
 public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
 
@@ -26,6 +31,7 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
     public static final int TIMESTAMP_INDEX = 1;
     public static final int ADDRESS_INDEX = 2;
     public static final int AMOUNT_INDEX = 3;
+    public static final int AUTOKEY_INDEX = 4;
     static Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class.getName());
 
     public TransactionMap(DWSet dWSet, DB database) {
@@ -93,6 +99,24 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
                 return value.getAmount(account);
             }
         });
+
+        //AUTOINCREMENT INDEX
+        NavigableSet<Tuple2<Integer, Tuple2<String, String>>> autoKeyIndex = database.createTreeSet("transactions_index_key")
+                .comparator(Fun.COMPARATOR)
+                .makeOrGet();
+
+        NavigableSet<Tuple2<Integer, Tuple2<String, String>>> descendingAutoKeyIndex = database.createTreeSet("transactions_index_key_descending")
+                .comparator(new ReverseComparator(Fun.COMPARATOR))
+                .makeOrGet();
+
+        createIndex(AUTOKEY_INDEX, autoKeyIndex, descendingAutoKeyIndex, new Fun.Function2<Integer, Tuple2<String, String>, Transaction>() {
+            @Override
+            public Integer run(Tuple2<String, String> key, Transaction value) {
+                return Controller.getInstance().wallet.database.getTransactionMap().size() + 1;
+            }
+        });
+
+
     }
 
     @Override
@@ -165,6 +189,12 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
         }
 
         return transactions;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Collection<Tuple2<String, String>> getFromToKeys(Integer fromKey, Integer toKey) {
+        return ((BTreeMap<Integer, Tuple2<String, String>>)
+                this.indexes.get(AUTOKEY_INDEX)).subMap(fromKey, toKey).values();
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

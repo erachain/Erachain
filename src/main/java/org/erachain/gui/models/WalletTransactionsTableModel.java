@@ -46,8 +46,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     static Logger LOGGER = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
     //ItemAssetMap dbItemAssetMap;
     private SortableList<Tuple2<String, String>, Transaction> transactions;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{
-            "Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
     private int start = 0;
     private int step = 100;
@@ -95,16 +93,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             return null;
         }
         return data.getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return columnNames[index];
     }
 
     @Override
@@ -253,16 +241,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         //	return null;
         //}
 
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-            String mess = e.getMessage();
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -427,6 +405,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         if (!Controller.getInstance().doesWalletDatabaseExists())
             return;
 
+        getInterval();
+
         //REGISTER ON WALLET TRANSACTIONS
         Controller.getInstance().getWallet().database.getTransactionMap().addObserver(this);
         // for UNCONFIRMEDs
@@ -450,21 +430,24 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         /// ??? Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);
     }
     
-    public void getInterval(int start,int step){
-        this.start = start;
-        this.step = step;
-       // pp.c.clear();
-        int end = start+step;
+    public void getInterval() {
+        int end = start + step;
+
         if (transactions == null) {
             transactions = new SortableList<Tuple2<String, String>, Transaction>(
-                    Controller.getInstance().getWallet().database.getTransactionMap());
+                    Controller.getInstance().getWallet().database.getTransactionMap(),
+                    Controller.getInstance().getWallet().database.getTransactionMap().getFromToKeys(start, end));
         }
 
         if (end > transactions.size()) end = transactions.size();
         pairTransactions = this.transactions.subList(start, end);
         
     }
-    public void setInterval(int start, int step){
-        getInterval(start,step);
+
+    public void setInterval(int start, int step) {
+        this.start = start;
+        this.step = step;
+
+        getInterval();
     }
 }

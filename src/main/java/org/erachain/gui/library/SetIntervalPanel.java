@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
+import org.erachain.database.wallet.DWSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -150,17 +151,18 @@ public class SetIntervalPanel extends JPanel implements Observer {
             // all transactions
         } else if (type  == Transaction.EXTENDED) {
 
-            if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
+            if (message.getType() == ObserverMessage.WALLET_COUNT_TRANSACTION_TYPE
+                    || message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE
+                    || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
+                    jLabelTotal.setText(Lang.getInstance().translate("Total") + ":"
+                            + Controller.getInstance().wallet.database.getTransactionMap().size());
+
+            } else if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
                 if (this.transactions == null) {
                     this.transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
                     this.transactions.registerObserver();
                     jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + this.transactions.size());
                 }
-            }
-            if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE
-                    || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-                if (this.transactions != null)
-                    jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + this.transactions.size());
             }
 
         }

@@ -558,6 +558,7 @@ public class Controller extends Observable {
         try {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open DataLocale")));
+            LOGGER.info("Try Open DataLocal");
             this.dlSet = DLSet.reCreateDB();
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataLocale OK")));
@@ -572,7 +573,8 @@ public class Controller extends Observable {
         // OPENING DATABASES
         try {
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open DataChain")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Try Open DataChain")));
+            LOGGER.info("Try Open DataChain");
             this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI);
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataChain OK")));
