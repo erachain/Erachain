@@ -20,7 +20,6 @@ public class TableModelItemStatuses extends TableModelItems {
 
     //private SortableList<Long, StatusCls> statuses;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Unique", "Favorite"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false};
     private ItemStatusMap db;
     private ArrayList<ItemCls> list;
@@ -28,6 +27,9 @@ public class TableModelItemStatuses extends TableModelItems {
     private String filter_Name;
 
     public TableModelItemStatuses() {
+        super("TableModelItemStatuses", 0,
+                new String[]{"Key", "Name", "Creator", "Unique", "Favorite"});
+
         //	Controller.getInstance().addObserver(this);
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
         db = DCSet.getInstance().getItemStatusMap();
@@ -57,17 +59,6 @@ public class TableModelItemStatuses extends TableModelItems {
     @Override
     public ItemCls getItem(int row) {
         return this.list.get(row);
-    }
-
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override

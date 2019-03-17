@@ -12,23 +12,11 @@ public class TableModelUnions extends TableModelItems {
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_FAVORITE = 3;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Favorite"});
-
     public TableModelUnions() {
+        super("TableModelUnions", 0, new String[]{"Key", "Name", "Creator", "Favorite"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
         db = DCSet.getInstance().getItemUnionMap();
     }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
-    }
-
 
     @Override
     public Object getValueAt(int row, int column) {

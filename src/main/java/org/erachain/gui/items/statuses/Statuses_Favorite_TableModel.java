@@ -23,19 +23,12 @@ public class Statuses_Favorite_TableModel extends TableModelCls<Tuple2<String, S
 
     private List<StatusCls> statuses;
 
-
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
 
     public Statuses_Favorite_TableModel() {
+        super("Statuses_Favorite_TableModel", 1000,
+                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
-        addObservers();
-
-
-        //addObservers();
-        //fill((Set<Long>) Controller.getInstance().wallet.database.getPersonFavoritesSet());
-
-
     }
 
     @Override
@@ -62,16 +55,6 @@ public class Statuses_Favorite_TableModel extends TableModelCls<Tuple2<String, S
     public StatusCls getItem(int row) {
         return this.statuses.get(row);
 
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -166,16 +149,16 @@ public class Statuses_Favorite_TableModel extends TableModelCls<Tuple2<String, S
 
     }
 
+    public void addObserversThis() {
+        //fill((Set<Long>) Controller.getInstance().wallet.database.getPersonFavoritesSet());
 
-    public void removeObservers() {
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            Controller.getInstance().wallet.database.getStatusFavoritesSet().deleteObserver(this);
-    }
-
-    public void addObservers() {
         if (Controller.getInstance().doesWalletDatabaseExists())
             Controller.getInstance().wallet.database.getStatusFavoritesSet().addObserver(this);
     }
 
+    public void removeObserversThis() {
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getStatusFavoritesSet().deleteObserver(this);
+    }
 
 }

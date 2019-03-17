@@ -7,6 +7,7 @@ import org.erachain.gui.models.TableModelCls;
 
 import javax.validation.constraints.Null;
 import java.util.ArrayList;
+import java.util.Observable;
 
 @SuppressWarnings("serial")
 public abstract class TableModelItems extends TableModelCls<Long, ItemCls> {
@@ -51,6 +52,9 @@ public abstract class TableModelItems extends TableModelCls<Long, ItemCls> {
     }
 
     @Override
+    public void syncUpdate(Observable o, Object arg) { }
+
+    @Override
     public SortableList<Long, ItemCls> getSortableList() {
         return null;
     }
@@ -62,6 +66,14 @@ public abstract class TableModelItems extends TableModelCls<Long, ItemCls> {
     @Override
     public int getRowCount() {
         return (this.list == null) ? 0 : this.list.size();
+    }
+
+    @Override
+    public void addObserversThis() {
+    }
+
+    @Override
+    public void removeObserversThis() {
     }
 
 }

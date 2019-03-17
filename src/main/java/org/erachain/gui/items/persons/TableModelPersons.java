@@ -22,9 +22,6 @@ public class TableModelPersons extends TableModelItems {
     public static final int COLUMN_PUBLISHER = 3;
     public static final int COLUMN_FAVORITE = 4;
     static Logger LOGGER = LoggerFactory.getLogger(TableModelPersons.class.getName());
-    private String[] columnNames = Lang.getInstance()
-            .translate(new String[]{"Key", "Name", "Birthday", "Publisher", "Favorite"});// ,
-    // "Favorite"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false};
     private ItemPersonMap db;
     private List<ItemCls> list;
@@ -32,6 +29,8 @@ public class TableModelPersons extends TableModelItems {
     private long key_filter = 0;
 
     public TableModelPersons() {
+        super("TableModelPersons", 1000,
+                new String[]{"Key", "Name", "Birthday", "Publisher", "Favorite"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
         db = DCSet.getInstance().getItemPersonMap();
     }
@@ -72,16 +71,6 @@ public class TableModelPersons extends TableModelItems {
     @Override
     public ItemCls getItem(int row) {
         return this.list.get(row);
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override

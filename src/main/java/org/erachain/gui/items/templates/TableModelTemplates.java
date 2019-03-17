@@ -16,7 +16,6 @@ public class TableModelTemplates extends TableModelItems {
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_FAVORITE = 3;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Favorite"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false};
     private Long key_filter;
     private ArrayList<ItemCls> list;
@@ -24,6 +23,8 @@ public class TableModelTemplates extends TableModelItems {
     private ItemTemplateMap db;
 
     public TableModelTemplates() {
+        super("TableModelTemplates", 0,
+                new String[]{"Key", "Name", "Creator", "Favorite"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
         db = DCSet.getInstance().getItemTemplateMap();
     }
@@ -51,16 +52,6 @@ public class TableModelTemplates extends TableModelItems {
 
     public TemplateCls getTemplate(int row) {
         return (TemplateCls) list.get(row);
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override

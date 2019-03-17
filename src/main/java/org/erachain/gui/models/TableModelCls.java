@@ -9,8 +9,6 @@ import java.util.TimerTask;
 @SuppressWarnings("serial")
 public abstract class TableModelCls<T, U> extends TimerTableModelCls {
 
-    public int COLUMN_FAVORITE = 1000;
-
     public abstract SortableList<T, U> getSortableList();
 
     public TableModelCls(String name, long timeout, String[] columnNames) {

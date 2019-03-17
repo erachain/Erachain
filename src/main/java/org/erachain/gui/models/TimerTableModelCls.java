@@ -5,6 +5,7 @@ import org.erachain.lang.Lang;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
+import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -16,7 +17,6 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
     private String[] columnNames;
     private Timer timer;
     boolean needUpdate;
-
 
     public int COLUMN_FAVORITE = 1000;
 
@@ -69,6 +69,12 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
     public Class<? extends Object> getColumnClass(int c) {
         Object o = getValueAt(0, c);
         return o == null ? Null.class : o.getClass();
+    }
+
+    public abstract void syncUpdate(Observable o, Object arg);
+
+    public void update(Observable o, Object arg) {
+        this.syncUpdate(o, arg);
     }
 
     protected abstract void addObserversThis();

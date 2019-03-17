@@ -23,13 +23,12 @@ public class Templates_Favorite_TableModel extends TableModelCls<Tuple2<String, 
 
     private List<TemplateCls> templates;
 
-
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
 
     public Templates_Favorite_TableModel() {
+        super("Templates_Favorite_TableModel", 1000,
+                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
-        addObservers();
     }
 
     @Override
@@ -56,16 +55,6 @@ public class Templates_Favorite_TableModel extends TableModelCls<Tuple2<String, 
     public TemplateCls getItem(int row) {
         return this.templates.get(row);
 
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -149,15 +138,14 @@ public class Templates_Favorite_TableModel extends TableModelCls<Tuple2<String, 
         }
     }
 
-    public void removeObservers() {
-        if (Controller.getInstance().doesWalletDatabaseExists())
-        Controller.getInstance().wallet.database.getTemplateFavoritesSet().deleteObserver(this);
-    }
-
-    public void addObservers() {
+    public void addObserversThis() {
         if (Controller.getInstance().doesWalletDatabaseExists())
             Controller.getInstance().wallet.database.getTemplateFavoritesSet().addObserver(this);
     }
 
+    public void removeObserversThis() {
+        if (Controller.getInstance().doesWalletDatabaseExists())
+        Controller.getInstance().wallet.database.getTemplateFavoritesSet().deleteObserver(this);
+    }
 
 }
