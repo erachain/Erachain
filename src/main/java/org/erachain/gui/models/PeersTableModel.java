@@ -87,6 +87,11 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
     // view ==1 all
     public void setView(int view) {
         this.view = view;
+
+        if (peersView == null) {
+            peersView = new ArrayList<Peer>();
+        }
+
         peersView.clear();
         if (view != 0) {
             peersView.addAll(peers);
@@ -210,6 +215,7 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
 
             this.peers = (List<Peer>) message.getValue();
             setView(view);
+            needUpdate = true;
             this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.UPDATE_PEER_TYPE) {
@@ -223,14 +229,17 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
                 n++;
             }
             setView(view);
+            needUpdate = true;
             this.fireTableRowsUpdated(n, n);
 
         } else if (message.getType() == ObserverMessage.ADD_PEER_TYPE) {
             setView(view);
+            needUpdate = true;
             this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.REMOVE_PEER_TYPE) {
             setView(view);
+            needUpdate = true;
             this.fireTableDataChanged();
         }
     }

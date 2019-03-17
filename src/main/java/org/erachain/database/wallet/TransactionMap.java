@@ -12,10 +12,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.erachain.utils.ReverseComparator;
-import org.mapdb.BTreeKeySerializer;
-import org.mapdb.BTreeMap;
-import org.mapdb.DB;
-import org.mapdb.Fun;
+import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +21,7 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentNavigableMap;
 
 public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
 
@@ -31,7 +29,7 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
     public static final int TIMESTAMP_INDEX = 1;
     public static final int ADDRESS_INDEX = 2;
     public static final int AMOUNT_INDEX = 3;
-    public static final int AUTOKEY_INDEX = 4;
+    BTreeMap AUTOKEY_INDEX;
     static Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class.getName());
 
     public TransactionMap(DWSet dWSet, DB database) {
@@ -100,33 +98,30 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
             }
         });
 
-        //AUTOINCREMENT INDEX
-        NavigableSet<Tuple2<Integer, Tuple2<String, String>>> autoKeyIndex = database.createTreeSet("transactions_index_key")
+    }
+
+    @Override
+    protected Map<Tuple2<String, String>, Transaction> getMap(DB database) {
+        //OPEN MAP
+        BTreeMap map = database.createTreeMap("transactions")
+                .keySerializer(BTreeKeySerializer.TUPLE2)
+                .valueSerializer(new TransactionSerializer())
+                .counterEnable()
+                .makeOrGet();
+
+        this.AUTOKEY_INDEX = database.createTreeMap("AUTOKEY_INDEX")
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
-        NavigableSet<Tuple2<Integer, Tuple2<String, String>>> descendingAutoKeyIndex = database.createTreeSet("transactions_index_key_descending")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
-                .makeOrGet();
-
-        createIndex(AUTOKEY_INDEX, autoKeyIndex, descendingAutoKeyIndex, new Fun.Function2<Integer, Tuple2<String, String>, Transaction>() {
+        //BIND
+        Bind.secondaryKey(map, this.AUTOKEY_INDEX, new Fun.Function2<Integer, Tuple2<String, String>, Transaction>() {
             @Override
             public Integer run(Tuple2<String, String> key, Transaction value) {
                 return Controller.getInstance().wallet.database.getTransactionMap().size() + 1;
             }
         });
 
-
-    }
-
-    @Override
-    protected Map<Tuple2<String, String>, Transaction> getMap(DB database) {
-        //OPEN MAP
-        return database.createTreeMap("transactions")
-                .keySerializer(BTreeKeySerializer.TUPLE2)
-                .valueSerializer(new TransactionSerializer())
-                .counterEnable()
-                .makeOrGet();
+        return map;
     }
 
     @Override
@@ -193,8 +188,12 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
 
     @SuppressWarnings("unchecked")
     public Collection<Tuple2<String, String>> getFromToKeys(Integer fromKey, Integer toKey) {
-        return ((BTreeMap<Integer, Tuple2<String, String>>)
-                this.indexes.get(AUTOKEY_INDEX)).subMap(fromKey, toKey).values();
+
+        ConcurrentNavigableMap<Integer, Tuple2<String, String>> subset = AUTOKEY_INDEX.subMap(fromKey, toKey);
+
+        Collection<Tuple2<String, String>> keys = subset.values();
+
+        return AUTOKEY_INDEX.subMap(fromKey, toKey).values();
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
