@@ -4,14 +4,12 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemTemplateMap;
-import org.erachain.gui.items.TableModelItems;
-import org.erachain.lang.Lang;
+import org.erachain.gui.items.TableModelItemsSearch;
 
-import javax.validation.constraints.Null;
 import java.util.ArrayList;
 
 @SuppressWarnings("serial")
-public class TableModelTemplates extends TableModelItems {
+public class TableModelTemplates extends TableModelItemsSearch {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -23,15 +21,9 @@ public class TableModelTemplates extends TableModelItems {
     private ItemTemplateMap db;
 
     public TableModelTemplates() {
-        super("TableModelTemplates", 0,
-                new String[]{"Key", "Name", "Creator", "Favorite"});
+        super(new String[]{"Key", "Name", "Creator", "Favorite"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
         db = DCSet.getInstance().getItemTemplateMap();
-    }
-
-    public Class<? extends Object> getColumnClass(int c) { // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
     }
 
     // читаем колонки которые изменяем высоту
@@ -43,20 +35,6 @@ public class TableModelTemplates extends TableModelItems {
     // устанавливаем колонки которым изменить высоту
     public void set_get_Column_AutoHeight(Boolean[] arg0) {
         this.column_AutuHeight = arg0;
-    }
-
-    @Override
-    public ItemCls getItem(int row) {
-        return this.list.get(row);
-    }
-
-    public TemplateCls getTemplate(int row) {
-        return (TemplateCls) list.get(row);
-    }
-
-    @Override
-    public int getRowCount() {
-        return (list == null) ? 0 : list.size();
     }
 
     @Override
@@ -89,33 +67,4 @@ public class TableModelTemplates extends TableModelItems {
         return null;
     }
 
-    public void Find_item_from_key(String text) {
-        // TODO Auto-generated method stub
-        if (text.equals("") || text == null)
-            return;
-        if (!text.matches("[0-9]*"))
-            return;
-        key_filter = new Long(text);
-        list = new ArrayList<ItemCls>();
-        TemplateCls template = (TemplateCls) db.get(key_filter);
-        if (template == null)
-            return;
-        list.add(template);
-
-        this.fireTableDataChanged();
-
-    }
-
-    public void clear() {
-        list = new ArrayList<ItemCls>();
-        this.fireTableDataChanged();
-
-    }
-
-    public void set_Filter_By_Name(String str) {
-        filter_Name = str;
-        list = (ArrayList<ItemCls>) db.get_By_Name(filter_Name, false);
-        this.fireTableDataChanged();
-
-    }
 }

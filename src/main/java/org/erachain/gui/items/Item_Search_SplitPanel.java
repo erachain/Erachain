@@ -14,7 +14,7 @@ import java.awt.event.ActionListener;
 public class Item_Search_SplitPanel extends Item_SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
-    protected TableModelItems search_Table_Model;
+    protected TableModelItemsSearch search_Table_Model;
     private M_DecimalFormatedTextField key_Item;
 //	protected JMenuItem favorite_menu_items;
 //	protected JPopupMenu menu_Table;
@@ -22,7 +22,7 @@ public class Item_Search_SplitPanel extends Item_SplitPanel {
 //	protected ItemCls item_Table_Selected = null;
 
     @SuppressWarnings("rawtypes")
-    public Item_Search_SplitPanel(TableModelItems search_Table_Model1, String gui_Name, String search_Label_Text) {
+    public Item_Search_SplitPanel(TableModelItemsSearch search_Table_Model1, String gui_Name, String search_Label_Text) {
 
         super(search_Table_Model1, gui_Name);
         this.search_Table_Model = search_Table_Model1;
@@ -60,7 +60,7 @@ public class Item_Search_SplitPanel extends Item_SplitPanel {
                 new Thread() {
                     @Override
                     public void run() {
-                        search_Table_Model.Find_item_from_key(key_Item.getText());
+                        search_Table_Model.findByKey(key_Item.getText());
                         if (search_Table_Model.getRowCount() > 0) {
                             jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
                             jTable_jScrollPanel_LeftPanel. getSelectionModel().addSelectionInterval(0, 0);
@@ -103,7 +103,7 @@ public class Item_Search_SplitPanel extends Item_SplitPanel {
                 new Thread() {
                     @Override
                     public void run() {
-                        search_Table_Model.set_Filter_By_Name(search);
+                        search_Table_Model.findByName(search);
                         if (search_Table_Model.getRowCount() < 1) {
                             Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found"));
                             jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);

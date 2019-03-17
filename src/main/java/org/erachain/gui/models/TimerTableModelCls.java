@@ -20,6 +20,11 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
 
     public int COLUMN_FAVORITE = 1000;
 
+    public TimerTableModelCls(String[] columnNames) {
+        this.columnNames = columnNames;
+        addObservers();
+    }
+
     public TimerTableModelCls(String name, long timeout, String[] columnNames) {
         this.columnNames = columnNames;
         this.name = name;
@@ -28,7 +33,7 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
     }
 
     public void initTimer() {
-        if (this.timer == null) {
+        if (this.timer == null && name != null) {
             this.timer = new Timer(name);
 
             TimerTask action = new TimerTask() {
