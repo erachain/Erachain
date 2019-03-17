@@ -24,7 +24,6 @@ public class TableModelItemAssets extends TableModelItems {
 
     //private SortableList<Long, AssetCls> assets;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false, false, false, false};
     private List<ItemCls> list;
     private String filter_Name = "";
@@ -32,7 +31,8 @@ public class TableModelItemAssets extends TableModelItems {
     private ItemAssetMap db;
 
     public TableModelItemAssets() {
-        //Controller.getInstance().addObserver(this);
+        super("TableModelItemAssets", 1000,
+                new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
         db = DCSet.getInstance().getItemAssetMap();
     }
@@ -77,16 +77,6 @@ public class TableModelItemAssets extends TableModelItems {
     @Override
     public ItemCls getItem(int row) {
         return this.list.get(row);
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -154,6 +144,13 @@ public class TableModelItemAssets extends TableModelItems {
         list.add(pers);
         this.fireTableDataChanged();
 
-
     }
+
+    public void addObserversThis() {
+        //Controller.getInstance().addObserver(this);
+    }
+
+    public void removeObserversThis() {
+    }
+
 }

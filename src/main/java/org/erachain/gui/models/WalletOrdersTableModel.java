@@ -34,11 +34,10 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
 
     private SortableList<Tuple2<String, Long>, Order> orders;
     List<Pair<Tuple2<String, Long>, Order>> pp = new ArrayList<Pair<Tuple2<String, Long>, Order>>();
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", " ", "Amount", "Have", "Price", "Want", "Total", "Left", "Creator", "Status"});
 
     public WalletOrdersTableModel() {
-        columnNames[COLUMN_BLOCK] = Lang.getInstance().translate("Block - transaction");
-        Controller.getInstance().addWalletListener(this);
+        super("WalletOrdersTableModel", 1000,
+                new String[]{"Timestamp", "Block - transaction", "Amount", "Have", "Price", "Want", "Total", "Left", "Creator", "Status"});
     }
 
     @Override
@@ -61,16 +60,6 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
             return null;
 
         return item.getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -202,14 +191,16 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
 
     }
 
-    public void addObservers() {
+    public void addObserversThis() {
+        Controller.getInstance().addWalletListener(this);
+
         if (Controller.getInstance().doesWalletDatabaseExists()) {
             this.orders.registerObserver();
             Controller.getInstance().addWalletListener(this);
         }
     }
 
-    public void removeObservers() {
+    public void removeObserversThis() {
         if (Controller.getInstance().doesWalletDatabaseExists()) {
             this.orders.removeObserver();
             Controller.getInstance().deleteWalletObserver(this);

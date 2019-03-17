@@ -26,7 +26,7 @@ public class WalletNameSalesTableModel extends TableModelCls<Tuple2<String, Stri
     private SortableList<Tuple2<String, String>, BigDecimal> nameSales;
 
     public WalletNameSalesTableModel() {
-        Controller.getInstance().addWalletListener(this);
+        super("WalletNameSalesTableModel", 1000, new String[]{"Name", "Seller", "Price"});
     }
 
     @Override
@@ -117,7 +117,11 @@ public class WalletNameSalesTableModel extends TableModelCls<Tuple2<String, Stri
         }
     }
 
-    public void removeObservers() {
+    public void addObserversThis() {
+        Controller.getInstance().addWalletListener(this);
+    }
+
+    public void removeObserversThis() {
         Controller.getInstance().deleteWalletObserver(this);
     }
 

@@ -23,11 +23,9 @@ public class WalletVotesTableModel extends TableModelCls<Tuple2<String, String>,
 
     private SortableList<Tuple2<String, String>, Poll> polls;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Name", "Creator", "Total Votes", "Confirmed"});
-
     public WalletVotesTableModel() {
-
-        addObservers();
+        super("WalletVotesTableModel", 1000,
+                new String[]{"Name", "Creator", "Total Votes", "Confirmed"});
     }
 
     public Class<? extends Object> getColumnClass(int c) {     // set column type
@@ -42,16 +40,6 @@ public class WalletVotesTableModel extends TableModelCls<Tuple2<String, String>,
 
     public Poll getPoll(int row) {
         return polls.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -129,14 +117,13 @@ public class WalletVotesTableModel extends TableModelCls<Tuple2<String, String>,
         }
     }
 
-    public void removeObservers() {
 
-        Controller.getInstance().deleteObserver(this);
-
+    public void addObserversThis() {
+        Controller.getInstance().addWalletListener(this);
     }
 
-    public void addObservers() {
-        Controller.getInstance().addWalletListener(this);
+    public void removeObserversThis() {
+        Controller.getInstance().deleteObserver(this);
     }
 
     @Override
