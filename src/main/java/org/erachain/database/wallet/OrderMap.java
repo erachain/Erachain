@@ -46,6 +46,8 @@ public class OrderMap extends DBMap<Tuple2<String, Long>, Order> {
             if (databaseSet.isDynamicGUI()) {
                 this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_ORDER_TYPE);
                 this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_ORDER_TYPE);
+            } else {
+                this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.WALLET_COUNT_TRANSACTION_TYPE);
             }
         }
     }

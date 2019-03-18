@@ -405,8 +405,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         if (!Controller.getInstance().doesWalletDatabaseExists())
             return;
 
-        getInterval();
-
         //REGISTER ON WALLET TRANSACTIONS
         Controller.getInstance().getWallet().database.getTransactionMap().addObserver(this);
         // for UNCONFIRMEDs
@@ -414,11 +412,12 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         // for ??
         ///Controller.getInstance().wallet.database.getPersonMap().addObserver(transactions);
 
+        getInterval();
+
     }
 
 
     public void removeObserversThis() {
-        addObservers();
 
         //dbItemAssetMap = DLSet.getInstance().getItemAssetMap();
 
@@ -426,7 +425,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             return;
 
         Controller.getInstance().getWallet().database.getTransactionMap().deleteObserver(this);
-        DCSet.getInstance().getTransactionMap().addObserver(this);
+        DCSet.getInstance().getTransactionMap().deleteObserver(this);
         /// ??? Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);
     }
 

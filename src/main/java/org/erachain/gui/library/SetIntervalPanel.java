@@ -11,6 +11,7 @@ import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
 import javax.swing.*;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -20,6 +21,8 @@ public class SetIntervalPanel extends JPanel implements Observer {
      * 
      */
     private static final long serialVersionUID = 1L;
+    Map map;
+    private long size;
 
     /**
      * Creates new form SetInterval
@@ -27,7 +30,7 @@ public class SetIntervalPanel extends JPanel implements Observer {
     public SetIntervalPanel(int type) {
         this.type=type;
         jLabelTotal = new JLabel();
-        Controller.getInstance().addWalletListener(this);
+        addObservers();
         initComponents();
     }
 
@@ -102,9 +105,9 @@ public class SetIntervalPanel extends JPanel implements Observer {
     public javax.swing.JTextField jTextFieldStart;
     public javax.swing.JButton jButtonSetInterval;
     JLabel jLabelTotal;
-    private SortableList<Tuple2<String, Long>, Order> orders;
-    private SortableList<Tuple2<String, String>, Transaction> transactions;
-    public int type =0;
+    //private SortableList<Tuple2<String, Long>, Order> orders;
+    //private SortableList<Tuple2<String, String>, Transaction> transactions;
+    public int type;
 
     // End of variables declaration
     @Override
@@ -123,57 +126,52 @@ public class SetIntervalPanel extends JPanel implements Observer {
         ObserverMessage message = (ObserverMessage) arg;
 
         // CHECK IF NEW LIST
+
         // order transactions
         if (type == Transaction.CREATE_ORDER_TRANSACTION) {
             if (message.getType() == ObserverMessage.WALLET_RESET_ORDER_TYPE
                     || message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
-                if (this.orders == null) {
-                    this.orders = (SortableList<Tuple2<String, Long>, Order>) message.getValue();
-                    this.orders.registerObserver();
-                    int ff = this.orders.size();
-                    jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + this.orders.size());
 
-                }
+                map = (Map) message.getValue();
+                size = map.size();
+                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
+
+            } else if (message.getType() == ObserverMessage.WALLET_COUNT_ORDER_TYPE) {
+                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + map.size());
 
             } else if (message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE) {
-                // CHECK IF LIST UPDATED
-                Pair<Tuple2<String, Long>, Order> item = (Pair<Tuple2<String, Long>, Order>) message.getValue();
-                this.orders.add(0, item);
-                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + this.orders.size());
+                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + ++size);
 
             } else if (message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE) {
-                // CHECK IF LIST UPDATED
-                if (this.transactions != null)
-                this.orders.remove(0);
-                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + this.orders.size());
+                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + --size);
 
             }
-            // all transactions
+        // all transactions
         } else if (type  == Transaction.EXTENDED) {
 
-            if (message.getType() == ObserverMessage.WALLET_COUNT_TRANSACTION_TYPE
-                    || message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE
-                    || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-                    jLabelTotal.setText(Lang.getInstance().translate("Total") + ":"
-                            + Controller.getInstance().wallet.database.getTransactionMap().size());
+            if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
+                map = (Map) message.getValue();
+                size = map.size();
+                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
 
-            } else if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-                if (this.transactions == null) {
-                    this.transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
-                    this.transactions.registerObserver();
-                    ///jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + this.transactions.size());
-                    jLabelTotal.setText(Lang.getInstance().translate("Total") + ":"
-                            + Controller.getInstance().wallet.database.getTransactionMap().size());
-                }
+            } else if (message.getType() == ObserverMessage.WALLET_COUNT_TRANSACTION_TYPE) {
+                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + map.size());
+
+            } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
+                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + ++size);
+            } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
+                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + --size);
+
             }
 
         }
 
     }
 
+    public void addObservers() {
+        Controller.getInstance().addWalletListener(this);
+    }
     public void removeObservers() {
-        if (type == Transaction.CREATE_ORDER_TRANSACTION && this.orders != null) this.orders.removeObserver();
-        if (type  == Transaction.EXTENDED && this.transactions != null) this.transactions.removeObserver();
         Controller.getInstance().deleteWalletObserver(this);
     }
 

@@ -235,6 +235,7 @@ public class ObserverMessage {
     public static final int WALLET_ADD_ORDER_TYPE = 10022;
     public static final int WALLET_REMOVE_ORDER_TYPE = 10023;
     public static final int WALLET_LIST_ORDER_TYPE = 10024;
+    public static final int WALLET_COUNT_ORDER_TYPE = 10025;
 
     public static final int WALLET_RESET_NAME_TYPE = 10031;
     public static final int WALLET_ADD_NAME_TYPE = 10032;
