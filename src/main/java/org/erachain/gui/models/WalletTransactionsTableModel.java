@@ -31,9 +31,6 @@ import java.util.Observer;
 // in list of org.erachain.records in wallet
 public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer {
 
-    private boolean needUpdate = false;
-    private long timeUpdate = 0;
-
     public static final int COLUMN_CONFIRMATIONS = 0;
     public static final int COLUMN_TIMESTAMP = 1;
     public static final int COLUMN_TYPE = 2;
@@ -43,9 +40,11 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     public static final int COLUMN_RECIPIENT = 6;
     public static final int COLUMN_FEE = 7;
     public static final int COLUMN_SIZE = 8;
+
     static Logger LOGGER = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
-    //ItemAssetMap dbItemAssetMap;
+
     private SortableList<Tuple2<String, String>, Transaction> transactions;
+
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
 
     //private List<Pair<Tuple2<String, String>, Transaction>> pairTransactions;
@@ -252,42 +251,34 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
                     || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
             // если прилетел блок или откатился и нужно обновить - то обновляем
-            if (!needUpdate)
-                return;
 
-            long period = System.currentTimeMillis() - this.timeUpdate;
-            if (period < 2000) //Gui.PERIOD_UPDATE)
-                return;
-
-            this.timeUpdate = System.currentTimeMillis();
-            needUpdate = false;
-            this.fireTableDataChanged();
+            needUpdate = true;
+            //this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
                             || message.getType() == ObserverMessage.WALLET_SYNC_STATUS) {
-            if (!needUpdate)
-                return;
 
-            this.timeUpdate = System.currentTimeMillis();
-            needUpdate = false;
-            this.fireTableDataChanged();
+            needUpdate = true;
+            //this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
             // INCOME
 
-            Transaction record = (Transaction) message.getValue();
+            needUpdate = true;
+            if (true)
+                return;
+
+            Transaction transaction = (Transaction) message.getValue();
+            Account creator = transaction.getCreator();
+            Pair<Tuple2<String, String>, Transaction> item = new Pair<Tuple2<String, String>, Transaction>(
+                    new Tuple2<String, String>(creator == null ? "GENESIS" : creator.getAddress(),
+                            new String(transaction.getSignature())), transaction);
 
             if (false) {
                 //*****this.transactions.contains(pair);
                 // ОЧЕНЬ сильно тормозит так как внутри перебор обычный
 
-                Account creator = record.getCreator();
-
-                Pair<Tuple2<String, String>, Transaction> pair = new Pair<Tuple2<String, String>, Transaction>(
-                        new Tuple2<String, String>(creator == null ? "GENESIS" : creator.getAddress(),
-                                new String(record.getSignature())), record);
-
-                boolean found = this.transactions.contains(pair);
+                boolean found = this.transactions.contains(item);
 
                 if (found) {
                     return;
@@ -302,101 +293,106 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             this.transactions.add(0, pair);
             */
 
-            if (DCSet.getInstance().getTransactionMap().contains(record.getSignature())) {
-                if (record.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                    library.notifySysTrayRecord(record);
+            if (DCSet.getInstance().getTransactionMap().contains(transaction.getSignature())) {
+                if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                    library.notifySysTrayRecord(transaction);
                 } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-                    PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
+                    PlaySound.getInstance().playSound("newtransaction.wav", transaction.getSignature());
                 }
             }
+
+            this.transactions.add(item);
+            this.fireTableRowsInserted(0, 0);
+
+            boolean needFire = false;
+            while(this.transactions.size() > step) {
+                this.transactions.remove(step);
+                needFire = true;
+            }
+
+            if (needFire) this.fireTableRowsDeleted(step, step);
+
 
         } else if (message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
             // INCOME
 
-            if (true) {
-                needUpdate = true;
+            needUpdate = true;
+            if (true)
                 return;
-            } else {
 
-                long period = System.currentTimeMillis() - this.timeUpdate;
-                if (period < 2000) //Gui.PERIOD_UPDATE)
-                    return;
-                this.timeUpdate = System.currentTimeMillis();
-                needUpdate = false;
+            Pair<byte[], Transaction> item = (Pair<byte[], Transaction>) message.getValue();
+            Transaction transaction = item.getB();
 
-                this.fireTableDataChanged();
-                if (true)
-                    return;
+            Account creator = transaction.getCreator();
 
-                Pair<byte[], Transaction> pair = (Pair<byte[], Transaction>) message.getValue();
-                Transaction record = pair.getB();
+            if (!Controller.getInstance().wallet.accountExists(creator.getAddress())) {
+                return;
+            }
 
-                if (!Controller.getInstance().wallet.accountExists(record.getCreator().getAddress())) {
+            Pair<Tuple2<String, String>, Transaction> itemThis = new Pair<Tuple2<String, String>, Transaction>(
+                    new Tuple2<String, String>(creator == null ? "GENESIS" : creator.getAddress(),
+                            new String(transaction.getSignature())), transaction);
+
+            if (false) {
+                //*****this.transactions.contains(pair);
+                // ОЧЕНЬ сильно тормозит так как внутри перебор обычный
+
+                boolean found = this.transactions.contains(item);
+
+                if (found) {
                     return;
                 }
-
-                if (false) {
-                    //*****this.transactions.contains(pair);
-                    // ОЧЕНЬ сильно тормозит так как внутри перебор обычный
-                    Pair<Tuple2<String, String>, Transaction> pairRecord = new Pair<Tuple2<String, String>, Transaction>(
-                            new Tuple2<String, String>(record.getCreator().getAddress(),
-                                    new String(record.getSignature())), record);
-                    boolean found = this.transactions.contains(pairRecord);
-
-                    if (found) {
-                        return;
-                    }
-                }
+            }
 
             /*
             Ошибка - это статичный массив - в него нельзя не добавлять ни удалять
             if (this.transactions.size()> 1000)
                 this.transactions.remove(this.transactions.size() - 1);
 
-            this.transactions.add(0, pairRecord);
+            this.transactions.add(0, pair);
             */
 
-                if (DCSet.getInstance().getTransactionMap().contains(record.getSignature())) {
-                    if (record.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                        library.notifySysTrayRecord(record);
-                    } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-                        PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
-                    }
+            if (DCSet.getInstance().getTransactionMap().contains(transaction.getSignature())) {
+                if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                    library.notifySysTrayRecord(transaction);
+                } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
+                    PlaySound.getInstance().playSound("newtransaction.wav", transaction.getSignature());
                 }
-
-                this.fireTableRowsInserted(0, 0);
-
-                if (!needUpdate) {
-                    needUpdate = true;
-                }
-                return;
             }
 
-        } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
+            this.transactions.add(0, itemThis);
+            this.fireTableRowsInserted(0, 0);
 
-            if (true) {
-                needUpdate = true;
+            boolean needFire = false;
+            while(this.transactions.size() > step) {
+                this.transactions.remove(step);
+                needFire = true;
+            }
+
+            if (needFire)
+                this.fireTableRowsDeleted(step, step);
+
+        } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE
+                || message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
+
+            needUpdate = true;
+            if (true)
                 return;
+
+            try {
+                this.transactions.remove(0);
+            } catch (Exception e) {
+                getInterval();
+                this.fireTableDataChanged();
+                return;
+            }
+            if (this.transactions.size() > 1) {
+                this.fireTableRowsDeleted(0, 0);
             } else {
-                Transaction record = (Transaction) message.getValue();
-                byte[] signKey = record.getSignature();
-                for (int i = 0; i < this.transactions.size() - 1; i++) {
-                    Transaction item = this.transactions.get(i).getB();
-                    if (item == null)
-                        return;
-                    if (Arrays.equals(signKey, item.getSignature())) {
-                        this.fireTableRowsDeleted(i, i);
-                        return;
-                    }
-                }
-
-                if (needUpdate) {
-                    return;
-                } else {
-                    needUpdate = true;
-                    return;
-                }
+                getInterval();
+                this.fireTableDataChanged();
             }
+
         }
     }
 

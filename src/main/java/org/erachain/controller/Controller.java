@@ -2379,15 +2379,6 @@ public class Controller extends Observable {
         return getItemMap(type).getValues();
     }
 
-
-    public void onDatabaseCommit() {
-        this.wallet.commit();
-    }
-
-    public void startBlockGenerator() {
-        this.blockGenerator.start();
-    }
-
     public BlockGenerator getBlockGenerator() {
         return this.blockGenerator;
     }

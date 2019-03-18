@@ -18,9 +18,9 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
     private Timer timer;
     boolean needUpdate;
 
-    private int start = 0;
-    private int step = 50;
-    private int size = 0;
+    protected int start = 0;
+    protected int step = 50;
+    protected int size = 0;
 
     public int COLUMN_FAVORITE = 1000;
 
@@ -49,7 +49,8 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
                             needUpdate = false;
                         }
                     } catch (Exception e) {
-                        // LOGGER.error(e.getMessage(),e);
+                        //LOGGER.error(e.getMessage(),e);
+                        String err = e.getMessage();
                     }
                 }
             };

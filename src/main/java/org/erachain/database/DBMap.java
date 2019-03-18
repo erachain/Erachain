@@ -1,5 +1,6 @@
 package org.erachain.database;
 
+import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
@@ -8,6 +9,7 @@ import org.mapdb.DB;
 import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -21,7 +23,7 @@ public abstract class DBMap<T, U> extends Observable {
 
     public static final int DEFAULT_INDEX = 0;
 
-    protected static Logger LOGGER;
+    static Logger LOGGER = LoggerFactory.getLogger(DBMap.class.getName());
 
     protected IDB databaseSet;
     protected Map<T, U> map;

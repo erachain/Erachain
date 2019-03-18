@@ -352,4 +352,40 @@ public class DWSet extends DBASet {
 
     }
 
+    long commitPoint;
+
+    @Override
+    public void commit() {
+        if (this.uses != 0 || System.currentTimeMillis() - commitPoint < 50000)
+            return;
+
+        this.uses++;
+        //this.database.commit();
+        this.uses--;
+
+        commitPoint = System.currentTimeMillis();
+
+    }
+
+    @Override
+    public void close() {
+
+        if (this.database == null || this.database.isClosed())
+            return;
+
+        int step = 0;
+        while (uses > 0 && ++step < 100) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+
+        }
+
+        this.uses++;
+        this.database.close();
+        this.uses--;
+
+    }
+
 }

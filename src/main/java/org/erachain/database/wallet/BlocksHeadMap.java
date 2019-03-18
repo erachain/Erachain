@@ -224,13 +224,11 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
         //DELETE TRANSACTIONS
         for (Tuple2<String, String> key : accountBlocks.keySet()) {
             this.delete(key);
-            this.databaseSet.commit();
         }
     }
 
     public void delete(Block.BlockHead block) {
         this.delete(new Tuple2<String, String>(block.creator.getAddress(), new String(block.signature)));
-        this.databaseSet.commit();
     }
 
     public void deleteAll(List<Account> accounts) {
@@ -242,7 +240,6 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
     public boolean add(Block.BlockHead block) {
         boolean result = this.set(new Tuple2<String, String>(block.creator.getAddress(),
                 new String(block.signature)), block);
-        this.databaseSet.commit();
         return result;
     }
 

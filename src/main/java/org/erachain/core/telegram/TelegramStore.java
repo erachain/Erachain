@@ -140,6 +140,7 @@ public class TelegramStore extends Observable implements Observer {
      
     public void close() {
         if (this.database != null) {
+            this.database.commit();
             this.database.close();
         }
     }

@@ -496,8 +496,7 @@ public class Wallet extends Observable implements Observer {
 					Lang.getInstance().translate("My Account") + " " + (nonce + 1), StrJSonFine.convert(ob)));
 			LOGGER.info("Added account #" + nonce);
 
-			this.secureDatabase.commit();
-			this.database.commit();
+			this.commit();
 
 			// NOTIFY
 			this.setChanged();
@@ -521,8 +520,7 @@ public class Wallet extends Observable implements Observer {
 		this.secureDatabase.delete(account);
 
 		// SAVE TO DISK
-		this.database.commit();
-		this.secureDatabase.commit();
+		this.commit();
 
 		// NOTIFY
 		this.setChanged();
@@ -682,6 +680,8 @@ public class Wallet extends Observable implements Observer {
 			dcSet.clearCache();
 
             this.database.clearCache();
+            // тут возможно цепочка синхронизировалась или начала синхронизироваться и КОММИТ вызовет ошибку
+            //  java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
 			this.database.commit();
 
             System.gc();
@@ -924,8 +924,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.getAccountMap().add(account, -1);
 
 			// SAVE TO DISK
-			this.secureDatabase.commit();
-			this.database.commit();
+			this.commit();
 
 			// SYNCHRONIZE
 			this.synchronize(true);
