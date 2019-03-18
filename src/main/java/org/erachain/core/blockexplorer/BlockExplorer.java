@@ -2181,7 +2181,7 @@ public class BlockExplorer {
         for (int column = 0; column < column_Count; column++) {
 
             output.put("Label_" + model_Peers.getColumnNameOrigin(column).replace(' ', '_'),
-                    Lang.getInstance().translateFromLangObj(model_Peers.getColumnNameNO_Translate(column), langObj));
+                    Lang.getInstance().translateFromLangObj(model_Peers.getColumnNameOrigin(column), langObj));
         }
 
         Map out_peers = new LinkedHashMap();
