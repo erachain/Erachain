@@ -120,7 +120,7 @@ public class DWSet extends DBASet {
                 .commitFileSyncDisable() // ++
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(3) // не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
 
@@ -360,7 +360,7 @@ public class DWSet extends DBASet {
             return;
 
         this.uses++;
-        //this.database.commit();
+        this.database.commit();
         this.uses--;
 
         commitPoint = System.currentTimeMillis();
