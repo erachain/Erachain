@@ -1101,6 +1101,7 @@ public class BlockExplorer {
         assetJSON.put("operations", orders.size() + trades.size());
         assetsJSON.put(asset.getKey(), assetJSON);
     }
+
     private Map jsonQueryPerson(String first) {
         Map output = new LinkedHashMap();
         PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(new Long(first));
@@ -2920,7 +2921,7 @@ public class BlockExplorer {
         Map result = new LinkedHashMap();
         //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
         //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCapBlocks(result,dcSet, langObj);
+        AdderHeadInfo.addHeadInfoCapBlocks(result, dcSet, langObj);
         //Если номер с какого элемента отображать не задан - берем последний
         if (start == -1) {
             start = dcSet.getBlockMap().size();
@@ -2929,7 +2930,7 @@ public class BlockExplorer {
         int numberOfRepresentsItemsOnPage = 40;
         List<Block> blocks = receiveListElements(Block.class, start, result, numberOfRepresentsItemsOnPage);
         //Выделение map со списком блоков в соответствии с запрошенной страницей
-        Map blocksJSON = ConverterListInMap.blocksJSON(blocks,dcSet);
+        Map blocksJSON = ConverterListInMap.blocksJSON(blocks, dcSet);
         result.put("Blocks", blocksJSON);
         result.put("start", start);
         return result;
@@ -2940,7 +2941,7 @@ public class BlockExplorer {
         Map result = new LinkedHashMap();
         //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
         //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCapPersons(result,dcSet, langObj);
+        AdderHeadInfo.addHeadInfoCapPersons(result, dcSet, langObj);
         //Если номер с какого элемента отображать не задан - берем последний
         if (start == -1) {
             start = dcSet.getItemPersonMap().size();
@@ -2963,7 +2964,7 @@ public class BlockExplorer {
         Map result = new LinkedHashMap();
         //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
         //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCapAssets(result,langObj);
+        AdderHeadInfo.addHeadInfoCapAssets(result, langObj);
         //Если номер с какого элемента отображать не задан - берем последний
         if (start == -1) {
             start = dcSet.getItemAssetMap().getLastKey();
@@ -2984,7 +2985,7 @@ public class BlockExplorer {
         Map result = new LinkedHashMap();
         //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
         //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCapStatusesTemplates(result,langObj);
+        AdderHeadInfo.addHeadInfoCapStatusesTemplates(result, langObj);
         //Если номер с какого элемента отображать не задан - берем последний
         if (start == -1) {
             start = dcSet.getItemStatusMap().getLastKey();
@@ -3003,7 +3004,7 @@ public class BlockExplorer {
     private Map jsonQueryTemplates(long start) throws Exception {
         //Результирующий сортированный в порядке добавления словарь(map)
         Map result = new LinkedHashMap();
-        AdderHeadInfo.addHeadInfoCapStatusesTemplates(result,langObj);
+        AdderHeadInfo.addHeadInfoCapStatusesTemplates(result, langObj);
         //Если номер с какого элемента отображать не задан - берем последний
         if (start == -1) {
             start = dcSet.getItemTemplateMap().getLastKey();
@@ -3072,7 +3073,7 @@ public class BlockExplorer {
         List<ItemCls> listPersons = new ArrayList();
         //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
         //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCapPersons(result,dcSet, langObj);
+        AdderHeadInfo.addHeadInfoCapPersons(result, dcSet, langObj);
         try {
             //Если в строке ввели число
             if (search.matches("\\d+")) {
@@ -3108,7 +3109,7 @@ public class BlockExplorer {
         int numberOfRepresentsItemsOnPage = 10;
         receiverMapForBlockExplorer.setNumberOfRepresentsItemsOnPage(numberOfRepresentsItemsOnPage);
         //Преобразовать соответствующие данные
-        receiverMapForBlockExplorer.process(PersonCls.class,dcSet, langObj);
+        receiverMapForBlockExplorer.process(PersonCls.class, dcSet, langObj);
         //Добавляем количество элементов для отображения на странице для отправки
         result.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
         result.put("Persons", receiverMapForBlockExplorer.getMap());
@@ -3121,10 +3122,10 @@ public class BlockExplorer {
     private Map jsonQuerySearchAssets(String search, int startAssets) throws WrongSearchException, Exception {
         //Результирующий сортированный в порядке добавления словарь(map)
         Map result = new LinkedHashMap();
+        List<ItemCls> listAssets = new ArrayList();
         //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
         //В зависимости от выбранного языка(ru,en)
         AdderHeadInfo.addHeadInfoCapAssets(result, langObj);
-        List<ItemCls> listAssets = new ArrayList();
         try {
             //Если в строке ввели число
             if (search.matches("\\d+")) {
@@ -3158,7 +3159,7 @@ public class BlockExplorer {
         int numberOfRepresentsItemsOnPage = 10;
         receiverMapForBlockExplorer.setNumberOfRepresentsItemsOnPage(numberOfRepresentsItemsOnPage);
         //Преобразовать соответствующие данные
-        receiverMapForBlockExplorer.process(AssetCls.class,dcSet, langObj);
+        receiverMapForBlockExplorer.process(AssetCls.class, dcSet, langObj);
         //Добавляем количество элементов для отображения на странице для отправки
         result.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
         result.put("Assets", receiverMapForBlockExplorer.getMap());
@@ -3219,7 +3220,6 @@ public class BlockExplorer {
         result.put("numberLastPerson", listStatuses.get(listStatuses.size() - 1).getKey());
         return result;
     }
-
 
 
 //  todo Gleb -----------------------------------------------------------------------------------------------------------

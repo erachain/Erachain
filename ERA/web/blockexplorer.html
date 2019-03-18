@@ -3262,6 +3262,8 @@
 
 
         function assets(data) {
+            console.log('dataAssets=')
+            console.log(data)
             var output = '';
             var notDisplayPages = data.notDisplayPages;
             var numberShiftDelta = data.numberOfRepresentsItemsOnPage;
@@ -3675,10 +3677,10 @@
                         '&search=' + params['search'] + '&start=' + params['startPerson'], 'persons');
                 } else if (params['search'] == 'asset' || params['search'] == 'assets') {
                     asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'], 'assets');
+                        '&search=' + params['search'] + '&start=' + params['start'], 'assets');
                 } else if (params['search'] == 'status' || params['search'] == 'statuses') {
                     asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'], 'statuses');
+                        '&search=' + params['search'] + '&start=' + params['start'], 'statuses');
                 } else if (params['search'] == 'block' || params['search'] == 'blocks') {
                     asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
                         '&search=' + params['search'] + '&page=' + page, 'block');
