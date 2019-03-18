@@ -937,8 +937,8 @@ public class TransactionCreator {
                 transaction.process(null, asDeal);
 
                 // if it ISSUE - reset key
-                if (transaction instanceof Issue_ItemRecord) {
-                    Issue_ItemRecord issueItem = (Issue_ItemRecord) transaction;
+                if (transaction instanceof IssueItemRecord) {
+                    IssueItemRecord issueItem = (IssueItemRecord) transaction;
                     issueItem.getItem().resetKey();
                 }
 

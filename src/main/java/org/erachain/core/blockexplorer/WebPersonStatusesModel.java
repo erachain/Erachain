@@ -21,7 +21,7 @@ import java.util.*;
 ////////
 
 @SuppressWarnings("serial")
-public class WEB_PersonStatusesModel extends AbstractTableModel implements Observer {
+public class WebPersonStatusesModel extends AbstractTableModel implements Observer {
     public static final int COLUMN_MAKE_DATE = 0;
     public static final int COLUMN_STATUS_NAME = 1;
     public static final int COLUMN_PERIOD = 2;
@@ -48,7 +48,7 @@ public class WEB_PersonStatusesModel extends AbstractTableModel implements Obser
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Maked", "Status", "Period", "Creator", "RecNo"}); //, "Data"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, false};
 
-    public WEB_PersonStatusesModel(long person_Key) {
+    public WebPersonStatusesModel(long person_Key) {
 
         itemKey = person_Key;
         Controller.getInstance().addWalletListener(this);

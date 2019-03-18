@@ -628,12 +628,12 @@ public class Block {
     }
 
     public void loadHeadMind(DCSet dcSet) {
-        this.blockHead = dcSet.getBlocksHeadsMap().get(this.heightBlock);
-        this.forgingValue = blockHead.forgingValue;
-        this.winValue = blockHead.winValue;
-        this.target = blockHead.target;
-        this.totalFee = blockHead.totalFee;
-        this.emittedFee = blockHead.emittedFee;
+        blockHead = dcSet.getBlocksHeadsMap().get(heightBlock);
+        forgingValue = blockHead.forgingValue;
+        winValue = blockHead.winValue;
+        target = blockHead.target;
+        totalFee = blockHead.totalFee;
+        emittedFee = blockHead.emittedFee;
         //this.transactionCount = blockHead.transactionsCount;
         //this.version = blockHead.version;
     }
@@ -962,7 +962,7 @@ public class Block {
 
     public String viewFeeAsBigDecimal() {
 
-        return NumberAsString.formatAsString(BigDecimal.valueOf(this.blockHead.totalFee, BlockChain.FEE_SCALE));
+        return NumberAsString.formatAsString(BigDecimal.valueOf(blockHead.totalFee, BlockChain.FEE_SCALE));
     }
 
     //PARSE/CONVERT

@@ -4,7 +4,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.naming.Name;
 import org.erachain.database.DBMap;
 import org.erachain.datachain.NameMap;
-import org.erachain.datachain.SortableList;
+import org.erachain.database.SortableList;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

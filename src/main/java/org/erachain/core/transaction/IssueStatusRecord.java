@@ -11,9 +11,9 @@ import java.util.Arrays;
 
 //import java.util.Map;
 // import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
-public class IssueStatusRecord extends Issue_ItemRecord {
+
+public class IssueStatusRecord extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_STATUS_TRANSACTION;
     private static final String NAME_ID = "Issue Status";
 

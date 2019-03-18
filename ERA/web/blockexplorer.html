@@ -17,6 +17,7 @@
     <script src="/index/libs/js/third-party/qrcode.min.js"></script>
     <link href="/index/libs/css/sidebar.css" rel="stylesheet">
     <script src="/index/libs/js/Base58.js" charset="utf-8"></script>
+
     <style type="text/css">
         body {
             padding-top: 50px;
@@ -194,7 +195,8 @@
         function asyncAjax(url, type) {
             var xmlhttp = getXmlHttp()
             xmlhttp.open('GET', url, true);
-
+            console.log("url=")
+            console.log(url)
             loading = true;
             setTimeout(function () {
                 if (loading) {
@@ -299,6 +301,7 @@
                                     document.getElementById('main').innerHTML = status(data);
                                 }
                                 if (type == 'block') {
+                                    console.log("in search if before block")
                                     document.getElementById('main').innerHTML = block(data);
                                 }
                             }
@@ -446,49 +449,6 @@
             return output;
         }
 
-        function blocks(data) {
-            var output = '';
-
-            if (data.hasOwnProperty('error')) {
-                return '<h2>' + data.error + '</h2>';
-            }
-
-            output += lastBlock(data.lastBlock);
-
-            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
-            output += '<tr><td align=left>';
-            output += '<table id=blocks_Transactions BORDER=0 cellpadding=15 cellspacing=0 width="1180" ><tr><td><a href=?unconfirmed' + get_lang() + '>' + data.Label_Unconfirmed_transactions + ': ' + data.unconfirmedTxs + '</a>';
-            output += '<td align="right">' + data.Label_total_transactions + ': ' + data.totaltransactions + "</table>";
-            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
-            output += '<tr><td><b>' + data.Label_Height + ' <td><b>' + data.Label_Time + '<td><b>' + data.Label_Generator + '<td><b>' + data.Label_TXs + '<td><b>' + data.Label_Fee + '<td><b>' + data.Label_Target + '<td><b>' + data.Label_Gen_balance + '<td><b>WV dtWV';
-
-            minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
-            for (var i = data.maxHeight; i >= minHeight; i--) {
-                output += '<tr>';
-                output += '<td><a href=?block=' + i + get_lang() + '>' + i + '</a><td>' + data[i].dateTime + '<td>' + '<a href=?addr=' + data[i].generator + get_lang() + '>' + data[i].generator;
-                output += '<td>' + data[i].transactionsCount + '<td>' + addCommas(data[i].totalFee) + '<td>' + addCommas(data[i].target);
-                output += '<td>' + addCommas(data[i].generatingBalance)
-                    + '<td>' + addCommas(data[i].winValue) + ' ' + addCommas(data[i].winValueTargetted);
-            }
-
-            output += '<tr><td colspan=4>';
-            if (data.maxHeight != data.lastBlock.height) {
-                if (data.lastBlock.height < data.maxHeight + 21) {
-                    output += '<a href=?startBlock=' + (data.lastBlock.height) + get_lang() + '>' + data.Label_Later;
-                }
-                else {
-                    output += '<a href=?startBlock=' + (data.maxHeight + 21) + get_lang() + '>' + data.Label_Later;
-                }
-            }
-
-            output += '<td colspan=4 align=right>';
-            if (minHeight > 1) {
-                output += '<a href=?startBlock=' + (data.maxHeight - 21) + get_lang() + '>' + data.Label_Previous;
-            }
-
-            return output;
-        }
-
 
         function peers(data) {
             var output = '';
@@ -501,7 +461,6 @@
 
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
             output += '<tr><td align=left>';
-//	output += '<a href=?unconfirmed'+get_lang()+'>' + data.Label_Unconfirmed_transactions+': '+data.unconfirmedTxs+'</a>.';
 
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
             output += '<tr><td><b>' + data.Label_No + '<td><b>' + data.Label_IP + ' <td><b>' + data.Label_Height + '<td><b>' + data.Label_Ping_mc + '<td><b>' + data.Label_Reliable + '<td><b>' + data.Label_Initiator + '<td><b>' + data.Label_Finding_ago + '<td><b>' + data.Label_Online_Time + '<td><b>' + data.Label_Version;
@@ -750,62 +709,6 @@
             return output;
         }
 
-        function assets(data) {
-            var output = "";
-
-            output += lastBlock(data.lastBlock);
-
-            output += '<table width="1280" border=0><tr><td align=left><br>';
-
-            output += '<a href="?assets"' + get_lang() + '><h3 style="display:inline;">' + data.label_Title + '</h3></a>';
-
-            output += '<br><br>';
-
-            // style="background: #f4f4f4;"
-
-            var table = '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd;"><tr>';
-            table += '<td><b>' + data.label_table_key + ': <b>' + data.label_table_asset_name + '<td><b>Operations<td><b>' + data.label_table_asset_description + '<td><b>' + data.label_table_asset_creator;
-            table += '<td><b>' + data.label_table_asset_movable + '<td><b>' + data.label_table_asset_amount + '<td><b>' + data.label_table_asset_divisible;
-
-            for (key in data.assets) {
-                table += '<tr>';
-                table += '<td> <a href=?asset=' + encodeURIComponent(key) + get_lang() + '>';
-                table += '<b>' + key + '</b>: ' + htmlFilter(data.assets[key].name);
-                if (data.assets[key].icon.length > 0) table += '<img src="data:image/gif;base64,' + data.assets[key].icon + '" width="100" /> <br>';
-                table += '</a>';
-
-                table += '<td>' + data.assets[key].operations;
-
-                table += '<td>' + data.assets[key].description.substr(0, 80);
-                table += '<td><a href =?addr=' + data.assets[key].owner + get_lang() + '> ' + htmlFilter(data.assets[key].owner) + '</a>';
-                table += '<td>' + htmlFilter(data.assets[key].assetType);
-                table += '<td>' + data.assets[key].quantity;
-                table += '<td>' + data.assets[key].scale;
-            }
-            table += '<tr><td colspan=4>';
-//	if(data.maxHeight != data.lastBlock.height)
-//	{
-            if (data.start_row > 0) {
-                table += '<a href=?assets&start=' + (data.start_row - data.view_Row) + get_lang() + '>' + data.Label_Previous;
-            }
-            //else
-            //{
-            //	output += '<a href=?startPerson='+(data.maxHeight+21)+'>'+data.Label_Later;
-            //}
-//	}
-
-            table += '<td colspan=4 align=right>';
-            if (data.row != data.maxHeight) {
-                table += '<a href=?assets&start=' + data.row + get_lang() + '>' + data.Label_Later;
-            }
-
-
-            table += '</table>';
-
-            output += table;
-
-            return output;
-        }
 
         function asset(data) {
             var output = "";
@@ -1202,7 +1105,7 @@
         }
 
         function mainQuery(data) {
-
+            console.log("mainQuery in")
             var output = '';
             var transactionTypes = ["", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Asset Issue", "Asset Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message",
                 "", ""];
@@ -1256,40 +1159,53 @@
                 output += '<table width="1280" border=0><tr><td align=left>';
                 if (data.person_key != -10) {
 
-                    //output +='<tr><td><br><img src="data:image/gif;base64,' + data.person_Img+ '" width="100"/></td><td style ="padding-left:20px">';
-                    //	<img src="personimage?key=1" style="vertical-align: middle;">;
-                    output += '<tr><td><br><img src="personimage?key=' + data.person_key + '" width="100"/></td><td style ="padding-left:20px">';
-                    output += '<td><font size="+1">' + data.label_account + ': <a href="?addr=' + data.account + get_lang() + '">' + data.account + '</a></font>';
-                    output += '<br><a href ="?person=' + data.person_key + get_lang() + '">' + data.label_person_name + ': ' + data.Person_Name + '</a>';
+                    output += '<tr><td><br><img src="personimage?key=' +
+                        data.person_key +
+                        '" width="100"/></td><td style ="padding-left:20px">';
+                    output += '<td><font size="+1">' +
+                        data.label_account + ': <a href="?addr=' +
+                        data.account + get_lang() + '">' + data.account + '</a></font>';
+                    output += '<br><a href ="?person=' +
+                        data.person_key + get_lang() + '">' +
+                        data.label_person_name + ': ' + data.Person_Name + '</a>';
                     if ('registered' in data) {
-                        output += '<br>' + data.label_registered + ': <b>' + data.registered + '</b>, ' + data.label_certified + ': <b>' + data.certified + '</b>';
+                        output += '<br>' + data.label_registered + ': <b>' +
+                            data.registered + '</b>, ' + data.label_certified +
+                            ': <b>' + data.certified + '</b>';
                     }
                     output += '</tr>';
 
                 } else {
 
                     output += '<br><br>';
-                    output += '<font size="+1">' + data.label_account + ': <a href="?addr=' + data.account + get_lang() + '">' + data.account + '</a></font>';
+                    output += '<font size="+1">' + data.label_account +
+                        ': <a href="?addr=' + data.account + get_lang() +
+                        '">' + data.account + '</a></font>';
                 }
                 output += '</table>';
                 output += '<table width="1280" border=0><tr><td align=left>';
                 output += data.Balance.label_Balance_table + ':<br>';
-                output += '<table id="balance" id=balance BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
-                output += '<tr bgcolor="f1f1f1"><td><b>' + data.Balance.label_asset_key + '<td><b>' + data.Balance.label_asset_name + '<td><b>' + data.Balance.label_Balance_A + '<td><b>' + data.Balance.label_Balance_B + '<td><b>' + data.Balance.label_Balance_C + '</tr>';
+                output += '<table id="balance" id=balance BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
+                    ' class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
+                output += '<tr bgcolor="f1f1f1"><td><b>' + data.Balance.label_asset_key +
+                    '<td><b>' + data.Balance.label_asset_name + '<td><b>' + data.Balance.label_Balance_A +
+                    '<td><b>' + data.Balance.label_Balance_B + '<td><b>' + data.Balance.label_Balance_C + '</tr>';
                 for (key in data.Balance.balances) {
-                    output += '<tr><td><a href ="?asset=' + data.Balance.balances[key].asset_key + get_lang() + '">' + data.Balance.balances[key].asset_key + '</a>';
-                    output += '<td><a href="?asset=' + data.Balance.balances[key].asset_key + get_lang() + '">' + data.Balance.balances[key].asset_name + '</a>';
-                    output += '<td>' + data.Balance.balances[key].balance_A + '<td>' + data.Balance.balances[key].balance_B + '<td>' + data.Balance.balances[key].balance_C;
+                    output += '<tr><td><a href ="?asset=' + data.Balance.balances[key].asset_key +
+                        get_lang() + '">' + data.Balance.balances[key].asset_key + '</a>';
+                    output += '<td><a href="?asset=' + data.Balance.balances[key].asset_key +
+                        get_lang() + '">' + data.Balance.balances[key].asset_name + '</a>';
+                    output += '<td>' + data.Balance.balances[key].balance_A + '<td>' +
+                        data.Balance.balances[key].balance_B + '<td>' + data.Balance.balances[key].balance_C;
 
                 }
-
-
                 output += '</table><br><br>';
-
+                console.log("in standardAccount")
                 output += transactions_Table(data);
             }
 
             if (data.type == 'block') {
+                console.log("in if before in block")
                 return output + block(data);
             }
 
@@ -2799,6 +2715,7 @@
         }
 
         function block(data) {
+            console.log("in block")
             var output = '';
             url = '?block=' + data.blockHeight;
             urlstart = url;
@@ -2863,7 +2780,7 @@
                 output += '<br><br>';
             }
             output += transactions_Table(data);
-
+            console.log("output=")
             return output;
         }
 
@@ -3101,7 +3018,7 @@
             var output = '';
             output += lastBlock.label_Last_processed_block + ': <a href=?block=' + lastBlock.height + get_lang() + '>' + lastBlock.height + '</a>';
             output += ' (' + lastBlock.dateTime + ', ' + secToFine(new Date().getTime() - lastBlock.timestamp, lastBlock) + '  ' + lastBlock.label_ago + ') ';
-            output += '<br><br>';
+            output += '<br>';
 
             return output;
         }
@@ -3156,8 +3073,7 @@
         }
 
         function person(data) {
-            var output = '';
-            output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+            var output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
             output += '<tr><td align=left>';
             output += '<table><tr><td>';
 
@@ -3236,59 +3152,173 @@
             return output;
         }
 
-
-        function persons(data) {
-
+        function blocks(data) {
             var output = '';
-
             if (data.hasOwnProperty('error')) {
                 return '<h2>' + data.error + '</h2>';
             }
-
+            var numberShiftDelta = data.numberOfRepresentsItemsOnPage;
+            //Отображение последнего блока
             output += lastBlock(data.lastBlock);
+            //Отображение компонента страниц(вверху)
+            var start = data.start;
+            output += pagesComponentBeauty(start, data.Label_Blocks, data.lastBlock.height, numberShiftDelta, 'startBlock');
 
+            //Отображение шапки таблицы
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
             output += '<tr><td align=left>';
-            output += '<a href=?unconfirmed' + get_lang() + '>' + data.Label_Unconfirmed_transactions + ': ' + data.unconfirmedTxs + '</a>.';
+            output += '<table id=blocks_Transactions BORDER=0 cellpadding=15 cellspacing=0 width="1180" >' +
+                '<tr><td><a href=?unconfirmed' + get_lang() + '>' + data.Label_Unconfirmed_transactions
+                + ': ' + data.unconfirmedTxs + '</a>';
+            output += '<td align="right">' + data.Label_total_transactions + ': ' + data.totaltransactions + "</table>";
+            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  ' +
+                'class="table table-striped" style="border: 1px solid #ddd;">';
+            output += '<tr><td><b>' + data.Label_Height + ' <td><b>' + data.Label_Time
+                + '<td><b>' + data.Label_Generator + '<td><b>' + data.Label_TXs + '<td><b>'
+                + data.Label_Fee + '<td><b>' + data.Label_Target + '<td><b>' + data.Label_Gen_balance + '<td><b>WV dtWV';
 
-            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
-            output += '<tr><td><td><b>' + data.Label_key + ' <td><b>' + data.Label_name + '<td><b>' + data.Label_creator; // +'<td><b>'+data.Label_Gen_balance+'<td><b>'+data.Label_TXs+'<td><b>'+data.Label_Fee+'<td><b>'+data.Label_AT_Amount+'<td><b>'+data.Label_Amount;
-
-
-            row = data.row;
-            for (var i = data.start_row; i > row; i--) {
+            //Отображение таблицы элементов блоков
+            var length = Object.keys(data.Blocks).length;
+            for (var key = length - 1; key >= 0; key--) {
                 output += '<tr>';
-                //	output += '<td><a href=?block='+i+'>'+i+'</a><td>'+data[i].dateTime+'<td>'+'<a href=?addr='+data[i].generator+'>'+data[i].generator;
-                //	output += '<td>'+addCommas(data[i].generatingBalance)+'<td>'+data[i].transactionCount;
-                //	output += '<td>'+addCommas(data[i].totalFee)+'<td>'+addCommas(data[i].totalATAmount)+'<td>'+addCommas(data[i].totalAmount);
-                //output += '<td><img src="data:image/gif;base64,' + data[i].img+ '" width="100" /></td>';
-                output += ' <td><img src="personimage?key=' + data[i].key + '" width="100"/></td>';
-                output += '<td>' + addCommas(data[i].key) + '<td><a href=?person=' + data[i].key + get_lang() + '>' + data[i].name + '</a>';
-                //output += '<td><a href ="?person='+ 1 +'"><b> ' + data[i].creator + '</b></a><br>';
-                output += '<td><a href=?addr=' + data[i].creator + get_lang() + '>' + data[i].creator + '</a>';
+                output += '<td><a href=?block=' + data.Blocks[key].height + get_lang() + '>' + data.Blocks[key].height + '</a><td>'
+                    + data.Blocks[key].dateTime + '<td>' + '<a href=?addr=' + data.Blocks[key].generator
+                    + get_lang() + '>' + data.Blocks[key].generator;
+                output += '<td>' + data.Blocks[key].transactionsCount + '<td>' +
+                    addCommas(data.Blocks[key].totalFee) + '<td>' + addCommas(data.Blocks[key].target);
+                output += '<td>' + addCommas(data.Blocks[key].generatingBalance)
+                    + '<td>' + addCommas(data.Blocks[key].winValue) + ' ' + addCommas(data.Blocks[key].winValueTargetted);
             }
 
+            //Отображение ссылки предыдущая
             output += '<tr><td colspan=4>';
-//	if(data.maxHeight != data.lastBlock.height)
-//	{
-            if (data.row > 0) {
-                output += '<a href=?persons&startPerson=' + data.row + get_lang() + '>' + data.Label_Previous;
+            if (start >= 1) {
+                output += '<a href=?startBlock=' + (start - numberShiftDelta) + get_lang() + '>' + data.Label_Previous;
             }
-            //else
-            //{
-            //	output += '<a href=?startPerson='+(data.maxHeight+21)+'>'+data.Label_Later;
-            //}
-//	}
-
+            //Отображение ссылки следующая
             output += '<td colspan=4 align=right>';
-            if (data.start_row < data.maxHeight) {
-                output += '<a href=?persons&startPerson=' + (data.start_row + data.view_Row) + get_lang() + '>' + data.Label_Later;
+            if (data.lastBlock.height > start) {
+                output += '<a href=?startBlock=' + (start + numberShiftDelta) + get_lang() + '>' + data.Label_Later;
             }
 
+            output += '</table></td></tr></table>';
+            //Отображение компонента страниц(снизу)
+            output += pagesComponentBeauty(start, data.Label_Blocks, data.lastBlock.height, numberShiftDelta, 'startBlock');
 
             return output;
+        }
+
+        function persons(data) {
+            var output = '';
+            if (data.hasOwnProperty('error')) {
+                return '<h2>' + data.error + '</h2>';
+            }
+            var notDisplayPages = data.notDisplayPages;
+            var numberShiftDelta = data.numberOfRepresentsItemsOnPage;
+            //Отображение последнего блока
+            output += lastBlock(data.lastBlock);
+            var start = data.start;
+            if (!notDisplayPages) {
+                //Отображение компонента страниц(вверху)
+                output += pagesComponentBeauty(start, data.Label_Persons, data.numberLastPerson, numberShiftDelta, 'startPerson');
+            }
+            //Отображение шапки таблицы
+            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
+            output += '<tr><td align=left>';
+            output += '<a href=?unconfirmed' + get_lang() + '>' +
+                data.Label_Unconfirmed_transactions + ': ' + data.unconfirmedTxs + '</a>.';
+            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  ' +
+                'class="table table-striped" style="border: 1px solid #ddd;">';
+            output += '<tr><td><td><b>' + data.Label_key + ' <td><b>' +
+                data.Label_name + '<td><b>' + data.Label_creator;
+            //Отображение таблицы элементов персон
+            var length = Object.keys(data.Persons).length;
+            for (var i = length - 1; i >= 0; i--) {
+                output += '<tr>';
+                output += ' <td><img src="personimage?key=' + data.Persons[i].key + '" width="100"/></td>';
+                output += '<td>' + addCommas(data.Persons[i].key) + '<td><a href=?person=' +
+                    data.Persons[i].key + get_lang() + '>' + data.Persons[i].name + '</a>';
+                output += '<td><a href=?addr=' + data.Persons[i].creator + get_lang() + '>' + data.Persons[i].creator + '</a>';
+            }
+            if (!notDisplayPages) {
+                //Отображение ссылки предыдущая
+                output += '<tr><td colspan=4>';
+                if (start > 1) {
+                    output += '<a href=?persons&startPerson=' +
+                        (start - numberShiftDelta) + get_lang() + '>' + data.Label_Previous;
+                }
+                //Отображение ссылки следующая
+                output += '<td colspan=4 align=right>';
+                if (data.numberLastPerson > start) {
+                    output += '<a href=?persons&startPerson=' +
+                        (start + numberShiftDelta) + get_lang() + '>' + data.Label_Later;
+                }
+                output += '</table></td></tr></table>';
+                //Отображение компонента страниц(снизу)
+                output += pagesComponentBeauty(start, data.Label_Persons, data.numberLastPerson, numberShiftDelta, 'startPerson');
+            }
+            return output;
+        }
 
 
+        function assets(data) {
+            var output = '';
+            var notDisplayPages = data.notDisplayPages;
+            var numberShiftDelta = data.numberOfRepresentsItemsOnPage;
+            output += lastBlock(data.lastBlock);
+            var start = data.start;
+            if (!notDisplayPages) {
+                output += pagesComponentBeauty(start, data.label_Assets, data.numberLastPerson, numberShiftDelta, 'start');
+            }
+            output += '<table width="1280" border=0><tr><td align=left><br>';
+            output += '<a href="?assets"' + get_lang() + '><h3 style="display:inline;">' + data.label_Title + '</h3></a>';
+            output += '<br><br>';
+
+            output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 ' +
+                'class="table table-striped" style="border: 1px solid #ddd;"><tr>';
+            output += '<td><b>' + data.label_table_key + ': <b>' + data.label_table_asset_name +
+                '<td><b>'+data.label_operations+'<td><b>' + data.label_table_asset_creator;
+            output += '<td><b>' + data.label_table_asset_movable + '<td><b>' +
+                data.label_table_asset_amount + '<td><b>' + data.label_table_asset_divisible;
+
+            //Отображение таблицы элементов активов
+            var length = Object.keys(data.Assets).length;
+            console.log('length=')
+            console.log(length)
+            for (var i = length - 1; i >= 0; i--) {
+                output += '<tr>';
+                output += '<td> <a href=?asset=' + encodeURIComponent(data.Assets[i].key) + get_lang() + '>';
+                output += '<b>' + data.Assets[i].key+ '</b>: ' + htmlFilter(data.Assets[i].name);
+                if (data.Assets[i].icon.length > 0)
+                    output += '<img src="data:image/gif;base64,' + data.Assets[i].icon + '" width="100" /> <br>';
+                output += '</a>';
+                output += '<td>' + data.Assets[i].operations;
+                //Здесь возникает html injection - решено убрать это поле
+                // table += '<td>' + data.assets[key].description.substr(0, 80);
+                output += '<td><a href =?addr=' + data.Assets[i].owner + get_lang()
+                    + '> ' + htmlFilter(data.Assets[i].owner) + '</a>';
+                output += '<td>' + htmlFilter(data.Assets[i].assetType);
+                output += '<td>' + data.Assets[i].quantity;
+                output += '<td>' + data.Assets[i].scale;
+            }
+            if (!notDisplayPages) {
+                output += '<tr><td colspan=4>';
+                if (start > 1) {
+                    output += '<a href=?assets&start='
+                        + (start - numberShiftDelta) + get_lang() + '>' + data.Label_Previous;
+                }
+                output += '<td colspan=4 align=right>';
+                if (data.numberLastPerson > start) {
+                    output += '<a href=?assets&start='
+                        + (start + numberShiftDelta) + get_lang() + '>' + data.Label_Later;
+                }
+
+
+                output += '</table></td></tr></table>';
+
+                output += pagesComponentBeauty(start, data.label_Assets, data.numberLastPerson, numberShiftDelta, 'start');
+            }
+            return output;
         }
 
         function get_lang() {
@@ -3323,6 +3353,19 @@
             document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value) + get_lang() + '&search=' + par;
         }
 
+        function receiveNumberPage() {
+            var page;
+            if (params.hasOwnProperty('page') && isFinite(params['page'])) {
+                page = params['page'];
+                console.log('if')
+            }
+            else {
+                page = 1;
+                console.log('else')
+            }
+            return page;
+        }
+
         function start() {
 
             params = parseUrlQuery();
@@ -3355,6 +3398,7 @@
 
 
             var title = 'Erachain BlockExplorer';
+            var page = receiveNumberPage();
 
 
             if (params.hasOwnProperty('aTs')) {
@@ -3430,14 +3474,6 @@
             }
 
             if (params.hasOwnProperty('addr')) {
-                var page;
-                if (params.hasOwnProperty('page') && isFinite(params['page'])) {
-                    page = params['page'];
-                }
-                else {
-                    page = 1;
-                }
-
                 if (params.hasOwnProperty('start') && isFinite(params['start'])) {
                     start = params['start'];
                 }
@@ -3605,14 +3641,9 @@
 
 
             if (params.hasOwnProperty('block')) {
-                var page;
-                if (params.hasOwnProperty('page') && isFinite(params['page'])) {
-                    page = params['page'];
-                }
-                else {
-                    page = 1;
-                }
-
+                console.log("page=")
+                console.log(page)
+                console.log("before receiving json")
                 asyncAjax('blockexplorer.json?block=' + params['block'] + '&lang=' + params['lang'] + '&page=' + page, 'mainQuery');
 
                 document.title = title + ' - Block - ' + params['block'];
@@ -3639,14 +3670,19 @@
             }
 
             if (params.hasOwnProperty('q')) {
-                var ss = 'search';
-                if (params['search'] == 'person' || params['search'] == 'persons') ss = 'persons';
-                if (params['search'] == 'asset' || params['search'] == 'assets') ss = 'assets';
-                if (params['search'] == 'status' || params['search'] == 'statuses') ss = 'statuses';
-                if (params['search'] == 'block' || params['search'] == 'blocks') ss = 'block';
-
-                asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] + '&search=' + params['search'], ss);
-
+                if (params['search'] == 'person' || params['search'] == 'persons') {
+                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
+                        '&search=' + params['search'] + '&start=' + params['startPerson'], 'persons');
+                } else if (params['search'] == 'asset' || params['search'] == 'assets') {
+                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
+                        '&search=' + params['search'], 'assets');
+                } else if (params['search'] == 'status' || params['search'] == 'statuses') {
+                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
+                        '&search=' + params['search'], 'statuses');
+                } else if (params['search'] == 'block' || params['search'] == 'blocks') {
+                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
+                        '&search=' + params['search'] + '&page=' + page, 'block');
+                }
                 document.title = title + ' - Search - ' + decodeURIComponent(params['q']);
                 document.getElementById('q').value = decodeURIComponent(params['q']);
 
@@ -3654,7 +3690,7 @@
             }
 
             if (params.hasOwnProperty('persons')) {
-                asyncAjax('blockexplorer.json?persons' + '&lang=' + params['lang'] + '&startPerson=' + params['startPerson'], 'persons');
+                asyncAjax('blockexplorer.json?persons' + '&lang=' + params['lang'] + '&start=' + params['startPerson'], 'persons');
                 document.title = title + ' - Search - ' + decodeURIComponent(params['persons']);
                 return;
             }
@@ -3688,7 +3724,7 @@
                 return;
             }
             if (params.hasOwnProperty('templates')) {
-                asyncAjax('blockexplorer.json?templates&lang=' + params['lang'], 'templates');
+                asyncAjax('blockexplorer.json?templates&lang=' + params['lang'] + '&start=' + params['start'], 'templates');
                 document.title = title;
                 return;
             }
@@ -3798,12 +3834,12 @@
                         <div class="input-group">
                             <select id="selectID" class="form-control" role="tablist">
                                 <option value=block id=home2_op translate="true">Blocks</option>
-                                <option value=asset id=menu_assets_op translate="true">Asset</option>
-                                <option value=person id=menu_percons_op translate="true">Person</option>
-                                <option value=transaction translate="true">Transaction</option>
-                                <option value=status id=menu_statuses_op translate="true">Status</option>
-                                <option value=template id=menu_templates_op translate="true">Templates</option>
-                                <option value=template id=menu_documents_op translate="true">Documents</option>
+                                <option value=asset id=menu_assets_op translate="true">Assets</option>
+                                <option value=person id=menu_percons_op translate="true">Persons</option>
+                                <!--<option value=transaction translate="true">Transaction</option>-->
+                                <option value=status id=menu_statuses_op translate="true">Statuses</option>
+                                <!--<option value=template id=menu_templates_op translate="true">Templates</option>-->
+                                <!--<option value=template id=menu_documents_op translate="true">Documents</option>-->
 
                             </select>
                         </div>
