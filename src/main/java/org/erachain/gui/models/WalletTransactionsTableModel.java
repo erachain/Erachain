@@ -262,22 +262,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             needUpdate = true;
 
             Transaction transaction = (Transaction) message.getValue();
-            if (false) {
-
-                Account creator = transaction.getCreator();
-                Pair<Tuple2<String, String>, Transaction> item = new Pair<Tuple2<String, String>, Transaction>(
-                        new Tuple2<String, String>(creator == null ? "GENESIS" : creator.getAddress(),
-                                new String(transaction.getSignature())), transaction);
-
-                //*****this.transactions.contains(pair);
-                // ОЧЕНЬ сильно тормозит так как внутри перебор обычный
-
-                boolean found = this.transactions.contains(item);
-
-                if (found) {
-                    return;
-                }
-            }
 
             if (DCSet.getInstance().getTransactionMap().contains(transaction.getSignature())) {
                 if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
@@ -295,39 +279,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
             Pair<byte[], Transaction> item = (Pair<byte[], Transaction>) message.getValue();
             Transaction transaction = item.getB();
-
-            if (false) {
-
-
-                Account creator = transaction.getCreator();
-
-                if (!Controller.getInstance().wallet.accountExists(creator.getAddress())) {
-                    return;
-                }
-
-                Pair<Tuple2<String, String>, Transaction> itemThis = new Pair<Tuple2<String, String>, Transaction>(
-                        new Tuple2<String, String>(creator == null ? "GENESIS" : creator.getAddress(),
-                                new String(transaction.getSignature())), transaction);
-
-                if (false) {
-                    //*****this.transactions.contains(pair);
-                    // ОЧЕНЬ сильно тормозит так как внутри перебор обычный
-
-                    boolean found = this.transactions.contains(item);
-
-                    if (found) {
-                        return;
-                    }
-                }
-
-            /*
-            Ошибка - это статичный массив - в него нельзя не добавлять ни удалять
-            if (this.transactions.size()> 1000)
-                this.transactions.remove(this.transactions.size() - 1);
-
-            this.transactions.add(0, pair);
-            */
-            }
 
             if (DCSet.getInstance().getTransactionMap().contains(transaction.getSignature())) {
                 if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {

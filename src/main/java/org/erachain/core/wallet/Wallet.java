@@ -1869,19 +1869,29 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
-	public void update(Observable o, Object arg) {
+    @Override
+    public void update(Observable o, Object arg) {
+        try {
+            this.syncUpdate(o, arg);
+        } catch (Exception e) {
+            //GUI ERROR
+        }
+    }
 
-		if (this.database == null)
+    @SuppressWarnings("unchecked")
+    // synchronized нужно чтобы не было конкуренции при this.database.commit();
+    public synchronized void syncUpdate(Observable o, Object arg) {
+
+        if (this.database == null)
 			return;
-
-		ObserverMessage message = (ObserverMessage) arg;
 
 		Controller cnt = Controller.getInstance();
 		if (cnt.isProcessingWalletSynchronize() || cnt.isNeedSyncWallet())
 			return;
 
-		int type = message.getType();
+        ObserverMessage message = (ObserverMessage) arg;
+        int type = message.getType();
+
         if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
 
             if (!cnt.isStatusWaiting())

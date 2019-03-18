@@ -2665,16 +2665,6 @@ public class Controller extends Observable {
         // ADD TO UNCONFIRMED TRANSACTIONS
         this.dcSet.getTransactionMap().add(transaction);
 
-        // NOTIFY OBSERVERS - AUTO in database.wallet.TransactionMap
-        if (false) {
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_LIST_TRANSACTION_TYPE,
-                    this.dcSet.getTransactionMap().getValues()));
-
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_ADD_TRANSACTION_TYPE, transaction));
-        }
-
         // BROADCAST
         this.broadcastTransaction(transaction);
     }
