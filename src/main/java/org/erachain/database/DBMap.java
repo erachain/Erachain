@@ -22,9 +22,7 @@ public abstract class DBMap<T, U> extends Observable {
     public static final int NOTIFY_COUNT = 5;
 
     public static final int DEFAULT_INDEX = 0;
-
-    static Logger LOGGER = LoggerFactory.getLogger(DBMap.class.getName());
-
+    static Logger logger = LoggerFactory.getLogger(DBMap.class.getName());
     protected IDB databaseSet;
     protected Map<T, U> map;
     protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
@@ -38,7 +36,7 @@ public abstract class DBMap<T, U> extends Observable {
         this.databaseSet = databaseSet;
 
         //OPEN MAP
-        this.map = this.getMap(database);
+        map = getMap(database);
 
         //CREATE INDEXES
         this.indexes = new HashMap<Integer, NavigableSet<Tuple2<?, T>>>();
@@ -48,6 +46,10 @@ public abstract class DBMap<T, U> extends Observable {
             observableData = new HashMap<Integer, Integer>(8, 1);
         }
 
+    }
+
+    public Map<T, U> getMap() {
+        return map;
     }
 
 
@@ -144,7 +146,7 @@ public abstract class DBMap<T, U> extends Observable {
         } catch (Exception e)
         //else
         {
-            //LOGGER.error(e.getMessage(), e);
+            //logger.error(e.getMessage(), e);
 
             U u = this.getDefaultValue();
             this.outUses();
@@ -196,7 +198,7 @@ public abstract class DBMap<T, U> extends Observable {
             this.outUses();
             return old != null;
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
 
         this.outUses();
@@ -235,7 +237,7 @@ public abstract class DBMap<T, U> extends Observable {
 
         } catch (Exception e) {
             value = null;
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
 
         this.outUses();
@@ -321,10 +323,10 @@ public abstract class DBMap<T, U> extends Observable {
     }
 
     public SortableList<T, U> getList() {
-        this.addUses();
-        SortableList<T, U> u = new SortableList<T, U>(this);
-        this.outUses();
-        return u;
+        addUses();
+        SortableList<T, U> result = new SortableList<T, U>(this);
+        outUses();
+        return result;
     }
 
     /**

@@ -1291,8 +1291,8 @@ public class Wallet extends Observable implements Observer {
 			}
 
 			// CHECK IF ITEM ISSUE
-			else if (transaction instanceof Issue_ItemRecord) {
-				this.processItemIssue((Issue_ItemRecord) transaction);
+			else if (transaction instanceof IssueItemRecord) {
+				this.processItemIssue((IssueItemRecord) transaction);
 			}
 
 			// CHECK IF SERTIFY PErSON
@@ -1396,8 +1396,8 @@ public class Wallet extends Observable implements Observer {
 			}
 
 			// CHECK IF ITEM ISSUE
-			else if (transaction instanceof Issue_ItemRecord) {
-				this.orphanItemIssue((Issue_ItemRecord) transaction);
+			else if (transaction instanceof IssueItemRecord) {
+				this.orphanItemIssue((IssueItemRecord) transaction);
 			}
 
 			// CHECK IF SERTIFY PErSON
@@ -1639,7 +1639,7 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
-	private void processItemIssue(Issue_ItemRecord issueItem) {
+	private void processItemIssue(IssueItemRecord issueItem) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1661,7 +1661,7 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
-	private void orphanItemIssue(Issue_ItemRecord issueItem) {
+	private void orphanItemIssue(IssueItemRecord issueItem) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;

@@ -131,38 +131,6 @@ public class BlockExplorerTest {
         addrs.add("QdrhixdevE7ZJqSHAfV19yVYrYsys8VLgz");
         addrs.add("QPVknSmwDryB98Hh8xB7E6U75dGFYwNkJ4");
 
-		/*
-		Cancel Order:
-		Payment:
-		Name Registration:
-		Name Update:
-		Name Sale:
-		Cancel Name	Sale:
-		Name Purchase:
-		Poll Creation:
-		Arbitrary Transaction:
-		Asset Transfer:
-		Poll Vote:
-		Asset Issue:
-		Order Creation:
-		Multi Payment:
-		Message:
-		Deploy AT:
-		Genesis:
-		//+Trades:
-		//Generated blocks:
-		//AT Transactions:
-
-		17 tx type
-		 */
-
-        int start = -1;
-        int txOnPage = 10;
-        String filter = "standart";
-        boolean allOnOnePage = false;
-        String showOnly = "";
-        String showWithout = "";
-
         DCSet.getInstance();
 
         for (int i = 0; i < addrs.size(); i++) {
@@ -171,7 +139,7 @@ public class BlockExplorerTest {
             List<String> listaddr = new ArrayList<>();
             listaddr.add(addr);
 
-            Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(listaddr, 1, start, txOnPage, filter, allOnOnePage, showOnly, showWithout);
+            Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(listaddr, 1);
 
             Map<Long, String> totalBalance = (Map<Long, String>) output.get("balance").get("total");
 

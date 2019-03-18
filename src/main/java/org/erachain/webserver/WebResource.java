@@ -341,18 +341,18 @@ public class WebResource {
 
         if (lang != null) {
 
-            logger.error("try lang file: " + lang + ".json for " + request.getRemoteUser() + " " + request.getRequestURL());
+            logger.info("try lang file: " + lang + ".json for " + request.getRemoteUser() + " " + request.getRequestURL());
             langObj = Lang.openLangFile(lang + ".json");
 
      /*   // translate select
             Elements el = doc.getElementsByTag("option");//.select("translate");
             for (Element e : el) {
-                e.text(Lang.getInstance().translate_from_langObj(e.text(), langObj));
+                e.text(Lang.getInstance().translateFromLangObj(e.text(), langObj));
           }
       */        // translate links
             Elements el = doc.getElementsByAttributeValueContaining("translate", "true");//.select("translate");
             for (Element e : el) {
-                e.text(Lang.getInstance().translate_from_langObj(e.text(), langObj));
+                e.text(Lang.getInstance().translateFromLangObj(e.text(), langObj));
             }
         }
 
@@ -420,7 +420,7 @@ public class WebResource {
 
             Elements el = doc.select("translate");
             for (Element e : el) {
-                e.text(Lang.getInstance().translate_from_langObj(e.text(), langObj));
+                e.text(Lang.getInstance().translateFromLangObj(e.text(), langObj));
             }
         }
 

@@ -15,9 +15,9 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 
-public abstract class Issue_ItemRecord extends Transaction {
+public abstract class IssueItemRecord extends Transaction {
 
-    static Logger LOGGER = LoggerFactory.getLogger(Issue_ItemRecord.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(IssueItemRecord.class.getName());
 
     //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
@@ -25,12 +25,12 @@ public abstract class Issue_ItemRecord extends Transaction {
 
     protected ItemCls item;
 
-    public Issue_ItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference) {
+    public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
         this.item = item;
     }
 
-    public Issue_ItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature) {
+    public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature) {
         this(typeBytes, NAME_ID, creator, item, feePow, timestamp, reference);
         this.signature = signature;
         if (item.getReference() == null) item.setReference(signature); // set reference
@@ -38,7 +38,7 @@ public abstract class Issue_ItemRecord extends Transaction {
         //if (timestamp > 1000 ) this.calcFee(); // not asPaack
     }
 
-    public Issue_ItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature) {
+    public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature) {
         this(typeBytes, NAME_ID, creator, item, (byte) 0, 0l, null);
         this.signature = signature;
         if (this.item.getReference() == null) this.item.setReference(signature);
@@ -195,10 +195,10 @@ public abstract class Issue_ItemRecord extends Transaction {
         //UPDATE CREATOR
         super.orphan(block, asDeal);
 
-        //LOGGER.debug("<<<<< org.erachain.core.transaction.Issue_ItemRecord.orphan 1");
+        //LOGGER.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 1");
         //DELETE FROM DATABASE
         long key = this.item.removeFromMap(this.dcSet, START_KEY);
-        //LOGGER.debug("<<<<< org.erachain.core.transaction.Issue_ItemRecord.orphan 2");
+        //LOGGER.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 2");
     }
 
     @Override

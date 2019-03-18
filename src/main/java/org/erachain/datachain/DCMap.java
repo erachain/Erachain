@@ -282,9 +282,9 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
 
     @Override
     public String toString() {
-        if (this.parent == null)
-            return "DCmain";
-
-        return this.parent.toString() + ".parent";
+        if (parent == null)  {
+            return getClass().getName();
+        }
+        return parent.getClass().getName() + ".parent";
     }
 }
