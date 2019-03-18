@@ -23,9 +23,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.util.TimeZone;
 
 public class InsertPersonPanel extends IssuePersonPanel {
@@ -131,6 +131,8 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtHeight.setEditable(false);
         issueButton.setVisible(false);
 
+
+
         txt_public_key.setEditable(false);
 
         label_Sign.setText(Lang.getInstance().translate("Signature") + ":");
@@ -219,6 +221,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         gridBagConstraints.weightx = 0.05;
         jPanel1.add(iconLabel, gridBagConstraints);
 
+
         pasteButton = new MButton(Lang.getInstance().translate("Paste Person from clipboard"), 2);
         pasteButton.addActionListener(new ActionListener() {
 
@@ -291,6 +294,9 @@ public class InsertPersonPanel extends IssuePersonPanel {
                     txtSNILS.setText(person.getRace());
                 txtBirthLatitude.setText("" + person.getBirthLatitude() + ", " + person.getBirthLongitude());
                 // txtBirthLongitude.setText("" + person.getBirthLongitude());
+
+
+
                 if (person.getSkinColor() != null)
                     txtSkinColor.setText(person.getSkinColor());
                 if (person.getEyeColor() != null)
@@ -305,6 +311,11 @@ public class InsertPersonPanel extends IssuePersonPanel {
                 txt_public_key.setText(Base58.encode(person.getOwner().getPublicKey()));
 
             }
+
+
+
+
+
 
         });
 
@@ -439,6 +450,10 @@ public class InsertPersonPanel extends IssuePersonPanel {
         gridBagConstraints1.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints1.insets = new java.awt.Insets(20, 0, 0, 16);
         mainPanel.add(trans_Button, gridBagConstraints1);
+
+
+
+
 
     }
 

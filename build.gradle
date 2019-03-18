@@ -85,6 +85,9 @@ dependencies {
 
     //compile "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
     //compile "org.springframework.boot:spring-boot:${springbootVersion}"
+
+    //compileOnly 'org.projectlombok:lombok:1.18.6'
+    //annotationProcessor 'org.projectlombok:lombok:1.18.6'
 }
 
 jar {
