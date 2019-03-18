@@ -8,6 +8,10 @@ import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * только запускает событи - "обновиться"
+ * Используется в gui.library.SetIntervalPanel#syncUpdate(java.util.Observable, java.lang.Object) и других
+ */
 public class GuiTimer extends Observable {
 
     public GuiTimer() {

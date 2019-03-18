@@ -34,7 +34,9 @@ public class SetIntervalPanel extends JPanel implements Observer {
     static Logger LOGGER = LoggerFactory.getLogger(SetIntervalPanel.class.getName());
 
     /**
-     * Creates new form SetInterval
+     * В динамическом режиме перерисовывается при каждом прилете записи.<br>
+     * Без динамического режима перерисовывается по внешнему таймеру из
+     * gui.GuiTimer - только если было обновление
      */
     public SetIntervalPanel(int type) {
         this.type=type;

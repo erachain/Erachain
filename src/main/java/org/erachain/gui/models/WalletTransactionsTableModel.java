@@ -28,7 +28,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-// in list of org.erachain.records in wallet
 public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer {
 
     public static final int COLUMN_CONFIRMATIONS = 0;
@@ -48,6 +47,12 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
     //private List<Pair<Tuple2<String, String>, Transaction>> pairTransactions;
 
+    /**
+     * В динамическом режиме перерисовывается автоматически по таймеру встроенному от TimerTableModelCls
+     * - перерисовка стрницы целой, поэтому не так тормозит основные процессы.<br>
+     * Без динамического режима перерисовывается только принудительно - по нажатию кнопки тут
+     * gui.items.assets.My_Order_Tab
+     */
     public WalletTransactionsTableModel() {
         super("WalletTransactionsTableModel", 1000,
                 new String[]{
@@ -93,8 +98,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
     @Override
     public Object getValueAt(int row, int column) {
-        //try
-        //{
+
         if (this.transactions == null || this.transactions.size() - 1 < row) {
             return null;
         }
@@ -222,12 +226,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
         return null;
 
-        //} catch (Exception e) {
-        //GUI ERROR
-        //	LOGGER.error(e.getMessage(),e);
-        //	return null;
-        //}
-
     }
 
     @SuppressWarnings("unchecked")
@@ -249,31 +247,28 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
         } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
                     || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
-            // если прилетел блок или откатился и нужно обновить - то обновляем
 
+            // если прилетел блок или откатился и нужно обновить - то обновляем
             needUpdate = true;
-            //this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
                             || message.getType() == ObserverMessage.WALLET_SYNC_STATUS) {
 
             needUpdate = true;
-            //this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
             // INCOME
 
             needUpdate = true;
-            if (true)
-                return;
 
             Transaction transaction = (Transaction) message.getValue();
-            Account creator = transaction.getCreator();
-            Pair<Tuple2<String, String>, Transaction> item = new Pair<Tuple2<String, String>, Transaction>(
-                    new Tuple2<String, String>(creator == null ? "GENESIS" : creator.getAddress(),
-                            new String(transaction.getSignature())), transaction);
-
             if (false) {
+
+                Account creator = transaction.getCreator();
+                Pair<Tuple2<String, String>, Transaction> item = new Pair<Tuple2<String, String>, Transaction>(
+                        new Tuple2<String, String>(creator == null ? "GENESIS" : creator.getAddress(),
+                                new String(transaction.getSignature())), transaction);
+
                 //*****this.transactions.contains(pair);
                 // ОЧЕНЬ сильно тормозит так как внутри перебор обычный
 
@@ -284,14 +279,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
                 }
             }
 
-            /*
-            Ошибка - это статичный массив - в него нельзя не добавлять ни удалять
-            if (this.transactions.size()> 1000)
-                this.transactions.remove(this.transactions.size() - 1);
-
-            this.transactions.add(0, pair);
-            */
-
             if (DCSet.getInstance().getTransactionMap().contains(transaction.getSignature())) {
                 if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
                     library.notifySysTrayRecord(transaction);
@@ -299,49 +286,39 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
                     PlaySound.getInstance().playSound("newtransaction.wav", transaction.getSignature());
                 }
             }
-
-            this.transactions.add(item);
-            this.fireTableRowsInserted(0, 0);
-
-            boolean needFire = false;
-            while(this.transactions.size() > step) {
-                this.transactions.remove(step);
-                needFire = true;
-            }
-
-            if (needFire) this.fireTableRowsDeleted(step, step);
 
 
         } else if (message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
             // INCOME
 
             needUpdate = true;
-            if (true)
-                return;
 
             Pair<byte[], Transaction> item = (Pair<byte[], Transaction>) message.getValue();
             Transaction transaction = item.getB();
 
-            Account creator = transaction.getCreator();
-
-            if (!Controller.getInstance().wallet.accountExists(creator.getAddress())) {
-                return;
-            }
-
-            Pair<Tuple2<String, String>, Transaction> itemThis = new Pair<Tuple2<String, String>, Transaction>(
-                    new Tuple2<String, String>(creator == null ? "GENESIS" : creator.getAddress(),
-                            new String(transaction.getSignature())), transaction);
-
             if (false) {
-                //*****this.transactions.contains(pair);
-                // ОЧЕНЬ сильно тормозит так как внутри перебор обычный
 
-                boolean found = this.transactions.contains(item);
 
-                if (found) {
+                Account creator = transaction.getCreator();
+
+                if (!Controller.getInstance().wallet.accountExists(creator.getAddress())) {
                     return;
                 }
-            }
+
+                Pair<Tuple2<String, String>, Transaction> itemThis = new Pair<Tuple2<String, String>, Transaction>(
+                        new Tuple2<String, String>(creator == null ? "GENESIS" : creator.getAddress(),
+                                new String(transaction.getSignature())), transaction);
+
+                if (false) {
+                    //*****this.transactions.contains(pair);
+                    // ОЧЕНЬ сильно тормозит так как внутри перебор обычный
+
+                    boolean found = this.transactions.contains(item);
+
+                    if (found) {
+                        return;
+                    }
+                }
 
             /*
             Ошибка - это статичный массив - в него нельзя не добавлять ни удалять
@@ -350,6 +327,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
             this.transactions.add(0, pair);
             */
+            }
 
             if (DCSet.getInstance().getTransactionMap().contains(transaction.getSignature())) {
                 if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
@@ -359,38 +337,10 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
                 }
             }
 
-            this.transactions.add(0, itemThis);
-            this.fireTableRowsInserted(0, 0);
-
-            boolean needFire = false;
-            while(this.transactions.size() > step) {
-                this.transactions.remove(step);
-                needFire = true;
-            }
-
-            if (needFire)
-                this.fireTableRowsDeleted(step, step);
-
         } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE
                 || message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
 
             needUpdate = true;
-            if (true)
-                return;
-
-            try {
-                this.transactions.remove(0);
-            } catch (Exception e) {
-                getInterval();
-                this.fireTableDataChanged();
-                return;
-            }
-            if (this.transactions.size() > 1) {
-                this.fireTableRowsDeleted(0, 0);
-            } else {
-                getInterval();
-                this.fireTableDataChanged();
-            }
 
         }
     }
