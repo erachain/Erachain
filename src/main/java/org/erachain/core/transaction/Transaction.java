@@ -65,7 +65,7 @@ public abstract class Transaction {
             Base58.decode("9UBPJ4XJzRkw7kQAdFvXbEZuroUszFPomH25UAmMkYyTFPfnbyo9qKKTMZffoSjoMHzMssszaTPiFVhxaxEwBrY"),
             Base58.decode("4Vo6hmojFGgAJhfjyiN8PNYktpgrdHGF8Bqe12Pk3PvcvcH8tuJTcTnnCqyGChriHTuZX1u5Qwho8BuBPT4FJ53W")
     };
-    
+
     /*
      *  SEE in concrete TRANSACTIONS
      * public static final byte[][] VALID_RECORDS = new byte[][]{
@@ -118,7 +118,7 @@ public abstract class Transaction {
 
     // ASSETS
     public static final int INVALID_QUANTITY = 30;
-    
+
     // public static final int ASSET_DOES_NOT_EXIST = 31;
     public static final int INVALID_AMOUNT_IS_NULL = 31;
     public static final int NEGATIVE_AMOUNT = 32;
@@ -138,7 +138,7 @@ public abstract class Transaction {
     public static final int INVALID_ACCOUNTING_PAIR = 46;
     public static final int INVALID_HOLD_DIRECTION = 47;
     public static final int INVALID_ECXHANGE_PAIR = 48;
-    
+
     public static final int NO_INCLAIM_BALANCE = 49;
 
     public static final int INVALID_NAME_LENGTH = 50;
@@ -170,7 +170,6 @@ public abstract class Transaction {
     public static final int NOT_DEBTABLE_ASSET = 71;
     public static final int NOT_HOLDABLE_ASSET = 72;
     public static final int NOT_SPENDABLE_ASSET = 73;
-
 
 
     // POLL
@@ -554,7 +553,7 @@ public abstract class Transaction {
         this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);
         this.seqNo = seqNo;
         this.dbRef = Transaction.makeDBRef(height, seqNo);
-        if (asDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0) )
+        if (asDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0))
             this.calcFee();
     }
 
@@ -742,7 +741,7 @@ public abstract class Transaction {
 
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
         if (personDuration == null
-                || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY ) {
+                || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY) {
             // ANONYMOUS or ME
             return 0l;
         }
@@ -750,8 +749,8 @@ public abstract class Transaction {
         long fee = this.fee.unscaledValue().longValue();
 
         // Если слишком большая комиссия, то и награду чуток увеличим
-        if (fee > BlockChain.BONUS_REFERAL<<3)
-            return BlockChain.BONUS_REFERAL<<1;
+        if (fee > BlockChain.BONUS_REFERAL << 3)
+            return BlockChain.BONUS_REFERAL << 1;
 
         return BlockChain.BONUS_REFERAL;
     }
@@ -810,7 +809,7 @@ public abstract class Transaction {
         return this.dbRef;
     }
 
-        // reference in Map - or as signatire or as BlockHeight + seqNo
+    // reference in Map - or as signatire or as BlockHeight + seqNo
     public byte[] getDBRef(DCSet db) {
         if (this.getConfirmations(db) < BlockChain.MAX_ORPHAN) {
             // soft or hard confirmations
@@ -1206,7 +1205,7 @@ public abstract class Transaction {
             return NOT_ENOUGH_FEE;
         }
 
-        if ( (flags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0l
+        if ((flags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0l
                 && this.hasPublicText()
                 && (!BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
                 || BlockChain.NOVA_ASSETS.get(this.creator.getAddress()) == null)
@@ -1238,7 +1237,7 @@ public abstract class Transaction {
 
     public void process_gifts_turn(int level, long fee_gift, Account invitedAccount,
                                    long invitedPersonKey, boolean asOrphan,
-                              List<R_Calculated> txCalculated, String message) {
+                                   List<R_Calculated> txCalculated, String message) {
 
         if (fee_gift <= 0l)
             return;
@@ -1281,7 +1280,7 @@ public abstract class Transaction {
             return;
         }
 
-        if (level > 1 ) {
+        if (level > 1) {
 
             long fee_gift_next = fee_gift >> BlockChain.FEE_INVITED_SHIFT_IN_LEVEL;
             long fee_gift_get = fee_gift - fee_gift_next;
@@ -1321,7 +1320,7 @@ public abstract class Transaction {
 
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
         if (personDuration == null
-                || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY ) {
+                || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY) {
 
             // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
             GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, FEE_KEY,
@@ -1341,7 +1340,7 @@ public abstract class Transaction {
         if (this.signature != null && Base58.encode(this.signature)
                 .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
             int error = 0;
-            error ++;
+            error++;
         }
 
         if (asDeal > Transaction.FOR_PACK) {
@@ -1385,7 +1384,7 @@ public abstract class Transaction {
         if (Base58.encode(this.signature)
                 .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
             int error = 0;
-            error ++;
+            error++;
         }
 
         if (asDeal > Transaction.FOR_PACK) {
@@ -1474,7 +1473,10 @@ public abstract class Transaction {
 
     @Override
     public String toString() {
-        return Base58.encode(this.signature);
+        if (signature == null) {
+            return getClass().getName() + ":" + viewFullTypeName();
+        }
+        return Base58.encode(signature);
     }
 
 }

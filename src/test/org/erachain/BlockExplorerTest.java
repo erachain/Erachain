@@ -139,7 +139,7 @@ public class BlockExplorerTest {
             List<String> listaddr = new ArrayList<>();
             listaddr.add(addr);
 
-            Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(listaddr, 1);
+            Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(listaddr.get(0), 1);
 
             Map<Long, String> totalBalance = (Map<Long, String>) output.get("balance").get("total");
 

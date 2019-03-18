@@ -17,45 +17,39 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class Balance_from_Adress_TableModel extends AbstractTableModel implements Observer {
-    // private static final int COLUMN_ADDRESS = 0;
-    public static final int COLUMN_D = 5;
+public class BalanceFromAddressTableModel extends AbstractTableModel implements Observer {
     public static final int COLUMN_C = 4;
     public static final int COLUMN_B = 3;
     public static final int COLUMN_A = 2;
     public static final int COLUMN_ASSET_NAME = 1;
     public static final int COLUMN_ASSET_KEY = 0;
-    List<Account> accounts;
     Account account;
     Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance;
-    Object tab_Balances;
     Tuple2<Long, String> asset;
-    private long key;
     private String[] columnNames = Lang.getInstance()
             .translate(new String[]{"key Asset", "Asset", "Balance A", "Balance B", "Balance C"});
     // balances;
     private SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
-    private ArrayList<Pair<Account, Pair<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> table_balance;
-    private ArrayList<Pair<Account, Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> table_balance1;
+    private ArrayList<Pair<Account, Pair<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> tableBalance;
+    private ArrayList<Pair<Account, Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> tableBalance1;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Balance_from_Adress_TableModel() {
-
-        // this.key = key;
+    public BalanceFromAddressTableModel() {
         Controller.getInstance().addObserver(this);
         List<Account> accounts = Controller.getInstance().getAccounts();
-        // table_balance = new List();
-        table_balance = new ArrayList<>();// Pair();
-        table_balance1 = new ArrayList<>();
+        tableBalance = new ArrayList<>();// Pair();
+        tableBalance1 = new ArrayList<>();
         HashSet<Long> item;
         item = new HashSet();
 
-        for (int ia = 0; accounts.size() > ia; ia++) {
-            account = accounts.get(ia);
-            this.balances = Controller.getInstance().getBalances(account); // .getBalances(key);
-            for (int ib = 0; this.balances.size() > ib; ib++) {
-                balance = this.balances.get(ib);
-                table_balance1.add(new Pair(account, new Pair(balance.getA(), balance.getB())));
+        for (Account account1 : accounts) {
+            account = account1;
+            balances = Controller.getInstance().getBalances(account);
+            for (Pair<Tuple2<String, Long>,
+                    Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance1 : this.balances) {
+                balance = balance1;
+                tableBalance1.add(new Pair(account, new Pair(balance.getA(), balance.getB())));
                 item.add(balance.getA().b);
             }
         }
@@ -71,8 +65,8 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
             BigDecimal sumCB = new BigDecimal(0);
             BigDecimal sumDB = new BigDecimal(0);
             BigDecimal sumEB = new BigDecimal(0);
-            for (Pair<Account, Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> k : this.table_balance1) {
-                if (k.getB().getA().b == i) {
+            for (Pair<Account, Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> k : this.tableBalance1) {
+                if (k.getB().getA().b.equals(i)) {
 
                     sumAA = sumAA.add(k.getB().getB().a.a);
                     sumBA = sumBA.add(k.getB().getB().b.a);
@@ -89,28 +83,26 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
                 }
 
             }
-            table_balance.add(new Pair(account, new Pair(i, new Tuple5(
+            tableBalance.add(new Pair(account, new Pair(i, new Tuple5(
                     new Tuple2(sumAA, sumAB), new Tuple2(sumBA, sumBB), new Tuple2(sumCA, sumCB),
                     new Tuple2(sumDA, sumDB), new Tuple2(sumEA, sumEB)))));
 
         }
 
-        ((SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>) this.balances)
-                .registerObserver();
+        balances.registerObserver();
     }
 
-    public Class<? extends Object> getColumnClass(int c) { // set column type
+    public Class<?> getColumnClass(int c) { // set column type
         Object o = getValueAt(0, c);
         return o == null ? Null.class : o.getClass();
     }
 
     public AssetCls getAsset(int row) {
-        return Controller.getInstance().getAsset(table_balance.get(row).getB().getA());
+        return Controller.getInstance().getAsset(tableBalance.get(row).getB().getA());
     }
 
     public String getAccount(int row) {
-        // TODO Auto-generated method stub
-        return table_balance.get(row).getA().getAddress();
+        return tableBalance.get(row).getA().getAddress();
     }
 
     @Override
@@ -126,47 +118,30 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
     @Override
     public int getRowCount() {
 
-        return table_balance.size();
+        return tableBalance.size();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
 
-        if (table_balance == null || row > table_balance.size() - 1) {
+        if (tableBalance == null || row > tableBalance.size() - 1) {
             return null;
         }
 
-        AssetCls asset = Controller.getInstance().getAsset(table_balance.get(row).getB().getA());
-
-        // Pair<Tuple2<String, Long>, BigDecimal> sa;
+        AssetCls asset = Controller.getInstance().getAsset(tableBalance.get(row).getB().getA());
 
         switch (column) {
             case COLUMN_ASSET_KEY:
-
                 return asset.getKey();
-
             case COLUMN_A:
-
-                return NumberAsString.formatAsString(table_balance.get(row).getB().getB().a.b);
-
+                return NumberAsString.formatAsString(tableBalance.get(row).getB().getB().a.b);
             case COLUMN_B:
-
-                return NumberAsString.formatAsString(table_balance.get(row).getB().getB().b.b);
-
+                return NumberAsString.formatAsString(tableBalance.get(row).getB().getB().b.b);
             case COLUMN_C:
-
-                return NumberAsString.formatAsString(table_balance.get(row).getB().getB().c.b);
-
-            //case COLUMN_D:
-
-            //return NumberAsString.formatAsString(table_balance.get(row).getB().getB().d.b);
-
+                return NumberAsString.formatAsString(tableBalance.get(row).getB().getB().c.b);
             case COLUMN_ASSET_NAME:
-
                 return asset.viewName();
-
         }
-
         return null;
     }
 
@@ -174,8 +149,7 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
     public void update(Observable o, Object arg) {
         try {
             this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            // GUI ERROR
+        } catch (Exception ignored) {
         }
     }
 

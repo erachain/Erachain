@@ -4,7 +4,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
 import org.erachain.gui.Split_Panel;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.models.Balance_from_Adress_TableModel;
+import org.erachain.gui.models.BalanceFromAddressTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 import org.mapdb.Fun.Tuple2;
@@ -30,7 +30,7 @@ public class My_Balance_Tab extends Split_Panel {
     private static final long serialVersionUID = 1L;
     final MTable table;
     protected int row;
-    Balance_from_Adress_TableModel BalancesModel;
+    BalanceFromAddressTableModel BalancesModel;
     private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
     private My_Balance_Tab th;
 
@@ -48,7 +48,7 @@ public class My_Balance_Tab extends Split_Panel {
 
         //TABLE
 
-        BalancesModel = new Balance_from_Adress_TableModel();
+        BalancesModel = new BalanceFromAddressTableModel();
         table = new MTable(BalancesModel);
 
 
@@ -74,7 +74,7 @@ public class My_Balance_Tab extends Split_Panel {
 
 
 // column #1
-        TableColumn column1 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_ASSET_KEY);//.COLUMN_CONFIRMED);
+        TableColumn column1 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_ASSET_KEY);//.COLUMN_CONFIRMED);
         column1.setMinWidth(1);
         column1.setMaxWidth(1000);
         column1.setPreferredWidth(20);
@@ -82,33 +82,33 @@ public class My_Balance_Tab extends Split_Panel {
 
 
         // column #1
-        TableColumn column2 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_A);//.COLUMN_CONFIRMED);
+        TableColumn column2 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_A);//.COLUMN_CONFIRMED);
         column2.setMinWidth(50);
         column2.setMaxWidth(1000);
         column2.setPreferredWidth(50);
 
 
         // column #1
-        TableColumn column3 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_B);//.COLUMN_CONFIRMED);
+        TableColumn column3 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_B);//.COLUMN_CONFIRMED);
         column3.setMinWidth(50);
         column3.setMaxWidth(1000);
         column3.setPreferredWidth(50);
 
         // column #1
-        TableColumn column4 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_C);//.COLUMN_CONFIRMED);
+        TableColumn column4 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_C);//.COLUMN_CONFIRMED);
         column4.setMinWidth(50);
         column4.setMaxWidth(1000);
         column4.setPreferredWidth(50);
 
 
         // column #1
-        TableColumn column5 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_ASSET_NAME);//.COLUMN_CONFIRMED);
+        TableColumn column5 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_ASSET_NAME);//.COLUMN_CONFIRMED);
         column5.setMinWidth(50);
         column5.setMaxWidth(1000);
         column5.setPreferredWidth(150);
 	
 /*		// column #1
-		TableColumn column4 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_ACCOUNT);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
+		TableColumn column4 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_ACCOUNT);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
 		column4.setMinWidth(50);
 		column4.setMaxWidth(1000);
 		column4.setPreferredWidth(50);
