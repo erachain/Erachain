@@ -3,14 +3,20 @@ package org.erachain.gui.library;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.wallet.Wallet;
+import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.DWSet;
+import org.erachain.gui.Gui;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
@@ -21,8 +27,11 @@ public class SetIntervalPanel extends JPanel implements Observer {
      * 
      */
     private static final long serialVersionUID = 1L;
-    Map map;
+    DBMap map;
     private long size;
+    private boolean needUpdate;
+
+    static Logger LOGGER = LoggerFactory.getLogger(SetIntervalPanel.class.getName());
 
     /**
      * Creates new form SetInterval
@@ -117,6 +126,7 @@ public class SetIntervalPanel extends JPanel implements Observer {
             this.syncUpdate(arg0, arg1);
         } catch (Exception e) {
             // GUI ERROR
+            LOGGER.error(e.getMessage(), e);
         }
 
     }
@@ -129,15 +139,36 @@ public class SetIntervalPanel extends JPanel implements Observer {
 
         // order transactions
         if (type == Transaction.CREATE_ORDER_TRANSACTION) {
-            if (message.getType() == ObserverMessage.WALLET_RESET_ORDER_TYPE
-                    || message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
 
-                map = (Map) message.getValue();
-                size = map.size();
+            if (message.getType() == ObserverMessage.GUI_REPAINT) {
+                // это режим нединамического отображения - раз в 2 сек делаем
+
+                if (!needUpdate)
+                    return;
+
+                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
+                needUpdate = true;
+
+            } else if (message.getType() == ObserverMessage.WALLET_RESET_ORDER_TYPE) {
+
+                size = 0;
+
+                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
+
+            } else if (message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
+
+                Collection list = (Collection) message.getValue();
+                size = list.size();
+
                 jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
 
             } else if (message.getType() == ObserverMessage.WALLET_COUNT_ORDER_TYPE) {
-                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + map.size());
+
+                if (map == null)
+                    map = (DBMap) message.getValue();
+
+                size = map.size();
+                needUpdate = true;
 
             } else if (message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE) {
                 jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + ++size);
@@ -149,13 +180,30 @@ public class SetIntervalPanel extends JPanel implements Observer {
         // all transactions
         } else if (type  == Transaction.EXTENDED) {
 
-            if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-                map = (Map) message.getValue();
-                size = map.size();
+            if (message.getType() == ObserverMessage.GUI_REPAINT) {
+                // это режим нединамического отображения - раз в 2 сек делаем
+                if (!needUpdate)
+                    return;
+
+                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
+                needUpdate = true;
+
+            } else if (message.getType() == ObserverMessage.WALLET_RESET_TRANSACTION_TYPE) {
+                size = 0;
+                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
+
+            } else if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
+                Collection list = (Collection) message.getValue();
+                size = list.size();
                 jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
 
             } else if (message.getType() == ObserverMessage.WALLET_COUNT_TRANSACTION_TYPE) {
-                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + map.size());
+
+                if (map == null)
+                    map = (DBMap) message.getValue();
+
+                size = map.size();
+                needUpdate = true;
 
             } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
                 jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + ++size);
@@ -170,9 +218,12 @@ public class SetIntervalPanel extends JPanel implements Observer {
 
     public void addObservers() {
         Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().guiTimer.addTimerObserver(this); // нужно для перерисовки раз в 2 сек
+
     }
     public void removeObservers() {
         Controller.getInstance().deleteWalletObserver(this);
+        Controller.getInstance().guiTimer.removeTimerObserver(this); // нужно для перерисовки раз в 2 сек
     }
 
 }

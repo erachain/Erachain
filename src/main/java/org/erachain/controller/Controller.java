@@ -44,6 +44,7 @@ import org.erachain.datachain.LocalDataMap;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
+import org.erachain.gui.GuiTimer;
 import org.erachain.gui.library.Issue_Confirm_Dialog;
 import org.erachain.lang.Lang;
 import org.erachain.network.Network;
@@ -158,6 +159,8 @@ public class Controller extends Observable {
     private ConcurrentHashMap<Peer, Pair<String, Long>> peersVersions;
     private DLSet dlSet; // = DLSet.getInstance();
     private DCSet dcSet; // = DLSet.getInstance();
+    public Gui gui;
+    public GuiTimer guiTimer;
 
     // private JSONObject Setting_Json;
 
@@ -1011,6 +1014,8 @@ public class Controller extends Observable {
     }
 
     public void deleteWalletObserver(Observer o) {
+        //this.deleteObserver(o);
+        super.deleteObserver(o); // нужно для перерисовки раз в 2 сек
         this.wallet.deleteObserver(o);
     }
 
@@ -2169,7 +2174,7 @@ public class Controller extends Observable {
                 }
             };
 
-            Gui gui = Gui.getInstance();
+            //gui = Gui.getInstance();
             gui.bringtoFront();
 
             result = JOptionPane.showOptionDialog(gui, jsp, Lang.getInstance().translate("INCOMING API CALL"),
@@ -3358,11 +3363,13 @@ public class Controller extends Observable {
 
                         //START GUI
 
-                        if (Gui.getInstance() != null && Settings.getInstance().isSysTrayEnabled()) {
+                        guiTimer = new GuiTimer();
+                        gui = Gui.getInstance();
+
+                        if (gui != null && Settings.getInstance().isSysTrayEnabled()) {
 
                             SysTray.getInstance().createTrayIcon();
                             about_frame.setVisible(false);
-                   //         about_frame.getInstance().dispose();
                         }
                     } catch (Exception e1) {
                         if (about_frame!=null) {

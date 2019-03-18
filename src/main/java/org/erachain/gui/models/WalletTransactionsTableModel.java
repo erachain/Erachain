@@ -44,7 +44,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     static Logger LOGGER = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
 
     private SortableList<Tuple2<String, String>, Transaction> transactions;
-
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
 
     //private List<Pair<Tuple2<String, String>, Transaction>> pairTransactions;
