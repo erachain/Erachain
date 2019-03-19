@@ -33,24 +33,38 @@ import org.jvnet.substance.skin.SubstanceNebulaBrickWallLookAndFeel;
 public class library {
 
     // PLAY SOUND
-    public static void notifySysTrayRecord(Transaction record) {
+    public static void notifySysTrayRecord(Transaction transaction) {
 
-        R_Send r_Send = (R_Send) record;
-        Account account = Controller.getInstance().getAccountByAddress(r_Send.getRecipient().getAddress());
-        if (account != null) {
-            if (Settings.getInstance().isSoundReceiveMessageEnabled()) {
-                PlaySound.getInstance().playSound("receivemessage.wav", record.getSignature());
-            }
+        switch ( transaction.getType()) {
+            case Transaction.SEND_ASSET_TRANSACTION:
+                R_Send r_Send = (R_Send) transaction;
+                Account account = Controller.getInstance().getAccountByAddress(r_Send.getCreator().getAddress());
 
-            SysTray.getInstance().sendMessage("Payment received",
-                    "From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + account.getPersonAsString() + "\n"
-                            + "Asset Key" + ": " + r_Send.getAbsKey() + ", " + "Amount" + ": "
-                            + r_Send.getAmount().toPlainString(),
-                    MessageType.INFO);
-        } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-            PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
+                if (account != null) {
+                    PlaySound.getInstance().playSound("newtransaction.wav", transaction.getSignature());
+                    return;
+                }
+
+                account = Controller.getInstance().getAccountByAddress(r_Send.getRecipient().getAddress());
+                if (account != null) {
+                    if (Settings.getInstance().isSoundReceiveMessageEnabled()) {
+                        PlaySound.getInstance().playSound("receivemessage.wav", transaction.getSignature());
+                    }
+
+                    SysTray.getInstance().sendMessage("Payment received",
+                            "From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + account.getPersonAsString() + "\n"
+                                    + "Asset Key" + ": " + r_Send.getAbsKey() + ", " + "Amount" + ": "
+                                    + r_Send.getAmount().toPlainString(),
+                            MessageType.INFO);
+                } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
+                    PlaySound.getInstance().playSound("newtransaction.wav", transaction.getSignature());
+                }
+                return;
+            default:
+                if (Settings.getInstance().isSoundNewTransactionEnabled()) {
+                    PlaySound.getInstance().playSound("newtransaction.wav", transaction.getSignature());
+                }
         }
-
     }
 
     public static void Set_GUI_Look_And_Feel(String text) {

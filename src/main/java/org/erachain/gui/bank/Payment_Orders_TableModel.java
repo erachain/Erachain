@@ -7,6 +7,7 @@ import org.erachain.core.transaction.*;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.library.library;
 import org.erachain.gui.models.TableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -215,32 +216,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
             //CHECK IF LIST UPDATED
             read_trans();
             this.fireTableDataChanged();
-
-        } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE
-                || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-            if (Controller.getInstance().getStatus() == Controller.STATUS_OK
-                    && (DCSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature()))) {
-                int type = ((Transaction) message.getValue()).getType();
-                if (type == Transaction.SEND_ASSET_TRANSACTION) {
-                    R_Send r_Send = (R_Send) message.getValue();
-                    Account account = Controller.getInstance().getAccountByAddress(((R_Send) message.getValue()).getRecipient().getAddress());
-                    if (account != null) {
-                        if (Settings.getInstance().isSoundReceiveMessageEnabled()) {
-                            PlaySound.getInstance().playSound("receivemessage.wav", ((Transaction) message.getValue()).getSignature());
-                        }
-
-                        SysTray.getInstance().sendMessage("Payment received", "From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + account.getPersonAsString()
-                                + "\n" + "Asset Key" + ": " + r_Send.getAbsKey()
-                                + ", " + "Amount" + ": " + r_Send.getAmount().toPlainString(), MessageType.INFO);
-                    } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-                        PlaySound.getInstance().playSound("newtransaction.wav", ((Transaction) message.getValue()).getSignature());
-                    }
-                } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-                    PlaySound.getInstance().playSound("newtransaction.wav", ((Transaction) message.getValue()).getSignature());
-                }
-            }
         }
-
         if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
                 || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
                 || message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE
