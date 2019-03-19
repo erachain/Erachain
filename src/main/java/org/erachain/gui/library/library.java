@@ -35,6 +35,9 @@ public class library {
     // PLAY SOUND
     public static void notifySysTrayRecord(Transaction transaction) {
 
+        if (transaction.noDCSet())
+            transaction.setDC_HeightSeq(DCSet.getInstance());
+
         switch ( transaction.getType()) {
             case Transaction.SEND_ASSET_TRANSACTION:
                 R_Send r_Send = (R_Send) transaction;
