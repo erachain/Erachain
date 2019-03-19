@@ -277,7 +277,20 @@ public abstract class DBMap<T, U> extends Observable {
                 this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_COUNT), this)); /// SLOW .size()));
             } else if (this.observableData.containsKey(NOTIFY_LIST)) {
                 //CREATE LIST
-                SortableList<T, U> list = new SortableList<T, U>(this);
+                SortableList<T, U> list;
+                if (this.size() < 1000) {
+                    list = new SortableList<T, U>(this);
+                } else {
+                    // обрезаем полный список в базе до 1000
+                    Iterator iterator = this.getIterator(DEFAULT_INDEX, false);
+                    List<T> keys = new ArrayList<T>();
+                    int i = 0;
+                    while (iterator.hasNext() && ++i < 1000) {
+                        keys.add((T)iterator.next());
+                    }
+
+                    list = new SortableList<T, U>(this, keys);
+                }
 
                 //UPDATE
                 o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), list));

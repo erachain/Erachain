@@ -1,5 +1,6 @@
 package org.erachain.gui.items.assets;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Split_Panel;
@@ -47,7 +48,7 @@ public class My_Order_Tab extends Split_Panel {
         jButton2_jToolBar_RightPanel.setVisible(false);
 
         // set interval panel
-        setIntervalPanel = new SetIntervalPanel(Transaction.CREATE_ORDER_TRANSACTION);
+        setIntervalPanel = new SetIntervalPanel(Controller.getInstance().wallet.database.getOrderMap(), Transaction.CREATE_ORDER_TRANSACTION);
         GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;

@@ -1907,15 +1907,18 @@ public class Wallet extends Observable implements Observer {
 
         if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
 
-            if (!cnt.isStatusWaiting())
+            if (!cnt.isStatusWaiting()
+				|| this.synchronizeStatus)
                 // идет синхронизация основной цепочки - не обрабатываем пока кошелек
                 return;
 
             Block block = (Block) message.getValue();
 
+			// TODO сделать фактори которая синхронно по оереди с синхронизацией это будет разруливать
+
 			// CHECK IF WE NEED TO RESYNC
 			// BY REFERENCE !!!!
-            if (checkNeedSyncWallet(block.getReference())) //.getReference()))
+            if (checkNeedSyncWallet(block.getReference()))
 			{
 				return;
 			}
@@ -1924,13 +1927,19 @@ public class Wallet extends Observable implements Observer {
 			this.processBlock(DCSet.getInstance(), block);
 
             //this.database.clearCache();
-            //if (!synchronizeStatusCheck())
-            //    this.database.commit();
+            if (!synchronizeStatusCheck())
+                this.database.commit();
 
 		} else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
 		{
+			// тут при откате основной цепочки нужно тоже откатывать блоки
+			// - иначе потом окнцов не найдем и нужно полная синхронизация
+			if (this.synchronizeStatus)
+				return;
+
             Block block = (Block) message.getValue();
 
+            // TODO сделать фактори которая синхронно по оереди с синхронизацией это будет разруливать
 			// CHECK IF WE NEED TO RESYNC
 			// BY SIGNATURE !!!!
             if (checkNeedSyncWallet(block.getSignature()))

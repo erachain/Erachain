@@ -238,7 +238,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.transactions == null) {
-                this.transactions = (SortableList<Tuple2<String, String>, Transaction>)message.getValue();
+                getInterval();
                 this.transactions.registerObserver();
                 this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
             }
@@ -316,11 +316,17 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         return Controller.getInstance().getWallet().database.getTransactionMap().size();
     }
 
-        @Override
+    @Override
     public void getIntervalThis(int startBack, int endBack) {
         transactions = new SortableList<Tuple2<String, String>, Transaction>(
                 Controller.getInstance().getWallet().database.getTransactionMap(),
                 Controller.getInstance().getWallet().database.getTransactionMap().getFromToKeys(startBack, endBack));
+
+        DCSet dcSet = DCSet.getInstance();
+        for (Pair<Tuple2<String, String>, Transaction> item: transactions) {
+            item.getB().setDC_HeightSeq(dcSet);
+            item.getB().calcFee();
+        }
 
     }
 }

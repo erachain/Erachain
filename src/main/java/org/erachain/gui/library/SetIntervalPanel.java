@@ -7,6 +7,7 @@ import org.erachain.core.wallet.Wallet;
 import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.DWSet;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
@@ -38,9 +39,10 @@ public class SetIntervalPanel extends JPanel implements Observer {
      * Без динамического режима перерисовывается по внешнему таймеру из
      * gui.GuiTimer - только если было обновление
      */
-    public SetIntervalPanel(int type) {
+    public SetIntervalPanel(DBMap map, int type) {
         this.type=type;
         jLabelTotal = new JLabel();
+        this.map = map;
         addObservers();
         initComponents();
     }
@@ -159,15 +161,11 @@ public class SetIntervalPanel extends JPanel implements Observer {
 
             } else if (message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
 
-                Collection list = (Collection) message.getValue();
-                size = list.size();
+                size = map.size();
 
                 jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
 
             } else if (message.getType() == ObserverMessage.WALLET_COUNT_ORDER_TYPE) {
-
-                if (map == null)
-                    map = (DBMap) message.getValue();
 
                 size = map.size();
                 needUpdate = true;
@@ -195,8 +193,9 @@ public class SetIntervalPanel extends JPanel implements Observer {
                 jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
 
             } else if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-                Collection list = (Collection) message.getValue();
-                size = list.size();
+
+                size = map.size();
+
                 jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
 
             } else if (message.getType() == ObserverMessage.WALLET_COUNT_TRANSACTION_TYPE) {
