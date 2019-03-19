@@ -611,7 +611,10 @@ public class Wallet extends Observable implements Observer {
         this.database.clearCache();
         this.database.commit();
 
-        height = blockStart.getHeight();
+		if (Controller.getInstance().isOnStopping())
+			return;
+
+		height = blockStart.getHeight();
 		int steepHeight = dcSet.getBlockMap().size() / 100;
 		int lastHeight = 0;
 

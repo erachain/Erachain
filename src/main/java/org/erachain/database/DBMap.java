@@ -337,9 +337,16 @@ public abstract class DBMap<T, U> extends Observable {
 
     public SortableList<T, U> getList() {
         addUses();
-        SortableList<T, U> result = new SortableList<T, U>(this);
+        SortableList<T, U> list;
+        if (this.size() < 1000) {
+            list = new SortableList<T, U>(this);
+        } else {
+            // обрезаем полный список в базе до 1000
+            list = SortableList.makeSortableList(this, false, 1000);
+        }
+
         outUses();
-        return result;
+        return list;
     }
 
     /**

@@ -55,28 +55,6 @@ public class AccountsPropertisMap extends DBMap<String, Tuple2<String, String>> 
         return null;
     }
 
-    // get list items in name substring str
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public Map<String, Tuple2<String, String>> get_By_Name(String str, boolean caseCharacter) {
-        Map<String, Tuple2<String, String>> txs = new TreeMap<String, Tuple2<String, String>>();
-        // if (str == null || str.length() < 3)
-        // return null;
-
-        Iterator<Pair<String, Tuple2<String, String>>> it = this.getList().iterator();
-        while (it.hasNext()) {
-            Pair<String, Tuple2<String, String>> a = it.next();
-            String s1 = a.getB().a;
-            if (!caseCharacter) {
-                s1 = s1.toLowerCase();
-                str = str.toLowerCase();
-            }
-            if (s1.contains(str))
-                txs.put(a.getA(), a.getB());
-        }
-
-        return txs;
-    }
-
     @Override
     protected void createIndexes(DB database) {
         // TODO Auto-generated method stub

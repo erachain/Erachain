@@ -313,32 +313,4 @@ public class WebStatementsTableModelSearch extends AbstractTableModel implements
         }
     }
 
-    private List<Transaction> read_Statement_old() {
-        List<Transaction> tran;
-        ArrayList<Transaction> db_transactions;
-        db_transactions = new ArrayList<Transaction>();
-        tran = new ArrayList<Transaction>();
-        // база данных
-        DCSet dcSet = DCSet.getInstance();
-        // читаем все блоки
-        SortableList<Integer, Block> lists = dcSet.getBlockMap().getList();
-        // проходим по блокам
-        for (Pair<Integer, Block> list : lists) {
-
-            // читаем транзакции из блока
-            db_transactions = (ArrayList<Transaction>) list.getB().getTransactions();
-            // проходим по транзакциям
-            for (Transaction transaction : db_transactions) {
-                transaction.setDC(dcSet);
-                // если ноте то пишем в transactions
-                if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION)
-                    tran.add(transaction);
-
-            }
-
-        }
-        return tran;
-
-    }
-
 }

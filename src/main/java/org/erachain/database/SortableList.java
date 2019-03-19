@@ -50,6 +50,22 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
         additionalFilterFields = new ArrayList<String>();
     }
 
+    public static SortableList makeSortableList(DBMap map, boolean descending, int limit) {
+
+        // обрезаем полный список в базе до 1000
+        Iterator iterator = map.getIterator(map.DEFAULT_INDEX, descending);
+
+        List keys = new ArrayList<Object>();
+
+        int i = 0;
+        while (iterator.hasNext() && i++ < limit) {
+            keys.add(iterator.next());
+        }
+
+        return new SortableList(map, keys);
+
+    }
+
     public void registerObserver() {
         this.db.addObserver(this);
     }

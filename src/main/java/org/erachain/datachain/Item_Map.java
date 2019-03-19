@@ -129,19 +129,33 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
     // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<ItemCls> get_By_Name(String str, boolean caseCharacter) {
-        List<ItemCls> result = new ArrayList<>();
+
+        // TODO сделать поиск по ограничению  не перебором
+
         if (str == null || str.length() < 3){
             return null;
         }
-        for (Pair<Long, ItemCls> a : getList()) {
-            String s1 = a.getB().getName();
+
+        if (!caseCharacter) {
+            str = str.toLowerCase();
+        }
+
+        List<ItemCls> result = new ArrayList<>();
+
+        Iterator<Long> iterator = this.getIterator(DEFAULT_INDEX, false);
+
+        while (iterator.hasNext()) {
+
+            ItemCls item = get(iterator.next());
+            String s1 = item.getName();
             if (!caseCharacter) {
                 s1 = s1.toLowerCase();
-                str = str.toLowerCase();
             }
+
             if (s1.contains(str))
-                result.add(a.getB());
+                result.add(item);
         }
+
         return result;
     }
 }
