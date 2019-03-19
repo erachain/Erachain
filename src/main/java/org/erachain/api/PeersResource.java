@@ -20,10 +20,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Path("peers")
 @Produces(MediaType.APPLICATION_JSON)
@@ -87,22 +85,57 @@ public class PeersResource {
         return array.toJSONString();
     }
 
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @GET
     @Path("detail")
     public String getDetail() {
         List<Peer> activePeers = Controller.getInstance().getActivePeers();
-        Map output = new LinkedHashMap();
+        Map output = getMapPeers(activePeers);
+        return JSONValue.toJSONString(output);
+    }
 
-        for (int i = 0; i < activePeers.size(); i++) {
-            Peer peer = activePeers.get(i);
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @GET
+    @Path("detail/knownpeers")
+    public String getDetailKnownPeers() {
+        List<Peer> knownPeers = Controller.getInstance().network.getKnownPeers();
+        Map output = getMapPeers(knownPeers);
+        return JSONValue.toJSONString(output);
+    }
+
+
+    /**
+     *
+     * @param peers
+     * @return
+     */
+    private Map getMapPeers(List<Peer> peers) {
+
+        return peers.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(
+                        peer -> peer.getAddress().getHostAddress(),
+                        this::getDetail,
+                        (u, v) -> {
+                            throw new IllegalStateException(String.format("Duplicate key %s", u));
+                        },
+                        LinkedHashMap::new)
+                );
+
+        /*
+        Map map = new LinkedHashMap();
+
+        for (int i = 0; i < peers.size(); i++) {
+            Peer peer = peers.get(i);
 
             if (peer != null) {
-                output.put(peer.getAddress().getHostAddress(), this.getDetail(peer));
+                map.put(peer.getAddress().getHostAddress(), this.getDetail(peer));
             }
         }
-
-        return JSONValue.toJSONString(output);
+        return map;
+        */
     }
 
     @GET
