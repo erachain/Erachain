@@ -10,5 +10,8 @@ copy AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy
 
 
 test SEED - many transactions
+G4CYuoNtie1keHAhEzj9CiQq92vW5KxeEH3SRwBcoukk
+era-61 CNToKWgxZ9VD3Z8MgQodGJz8ZPexQg4iyAkyq1veDG7R
 42KstyCe8GGyjnyjS279PifuhCDVtvL9oAb5jvKTkkdV
 8Rkm3AdRVqkR3FKC76QPBb9fW9K9nzxugtCB3ZzS2yGt
+

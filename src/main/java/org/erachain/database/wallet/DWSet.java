@@ -1,6 +1,7 @@
 package org.erachain.database.wallet;
 // 30/03 ++
 
+import org.erachain.controller.Controller;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -109,18 +110,22 @@ public class DWSet extends DBASet {
                 //.cacheHardRefEnable()
                 //.cacheLRUEnable()
                 ///.cacheSoftRefEnable()
-                .cacheWeakRefEnable()
+                //.cacheWeakRefEnable()
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 .cacheSize(10000)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++
-                /// ICREATOR
-                .commitFileSyncDisable() // ++
+
+                // вызывает java.io.IOError: java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
+                // на ситема с Виндой в момент синхронизации кошелька когда там многот транзакций для этого кошелька
+                //.commitFileSyncDisable() // ++
+
+                .asyncWriteFlushDelay(30000)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(3) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
 
@@ -377,6 +382,14 @@ public class DWSet extends DBASet {
 
         if (this.database == null || this.database.isClosed())
             return;
+
+        while (Controller.getInstance().wallet.synchronizeStatus) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+
+        }
 
         int step = 0;
         while (uses > 0 && ++step < 100) {

@@ -544,7 +544,7 @@ public class Wallet extends Observable implements Observer {
 	}
 
 
-    private static boolean synchronizeStatus;
+    public static boolean synchronizeStatus;
 
     /**
      * нужно для запрета вызова уже работающего процесса синхронизации
@@ -636,14 +636,6 @@ public class Wallet extends Observable implements Observer {
 					return;
 				}
 
-                if (Controller.getInstance().isOnStopping()
-                        || Controller.getInstance().needUpToDate()
-                        || !Controller.getInstance().isStatusWaiting()
-                        || !Controller.getInstance().isStatusWaiting()
-                )
-                    // если идет синхронизация цепочки - кошелек не синхронизируем
-                    break;
-
                 if (System.currentTimeMillis() - timePoint > 10000
 						|| steepHeight < height - lastHeight) {
 
@@ -652,8 +644,7 @@ public class Wallet extends Observable implements Observer {
 
                     this.syncHeight = height;
 
-                    this.database.clearCache();
-                    LOGGER.info("try Commit");
+                    //LOGGER.debug("try Commit");
                     this.database.commit();
 
                     // обязательно нужно чтобы память освобождать
@@ -661,6 +652,7 @@ public class Wallet extends Observable implements Observer {
                     // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
                     // БЕЗ очистки КЭША HEAP забивается под завязку
 					dcSet.clearCache();
+					this.database.clearCache();
 
 					// не нужно - Ява сама норм делает вызов очистки
 					//System.gc();
@@ -669,13 +661,13 @@ public class Wallet extends Observable implements Observer {
 
                 }
 
-				// LOAD NEXT
-				if (Controller.getInstance().isOnStopping())
-					return;
-
 				height++;
 
-            } while (!synchronizeBodyStop);
+            } while (!synchronizeBodyStop
+					&& !Controller.getInstance().isOnStopping()
+					&& !Controller.getInstance().needUpToDate()
+					&& Controller.getInstance().isStatusWaiting()
+					&& Controller.getInstance().isStatusWaiting());
 
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
