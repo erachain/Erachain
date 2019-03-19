@@ -91,7 +91,7 @@ public class Credit_AddressesMap extends DCMap<Tuple3<String, Long, String>, Big
         }
 
         if (this.parent != null)
-            result.addAll(this.parent.getDBSet().getCredit_AddressesMap().getList(creditorAddress, key));
+            result.addAll(((DCSet)this.parent.getDBSet()).getCredit_AddressesMap().getList(creditorAddress, key));
 
         return result;
     }

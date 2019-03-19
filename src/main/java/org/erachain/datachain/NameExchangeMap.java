@@ -89,7 +89,7 @@ public class NameExchangeMap extends DCMap<String, BigDecimal> {
         if (this.parent != null) {
 
             //GET ALL KEYS FOR FORK
-            List<NameSale> forkItems = this.parent.getDBSet().getNameExchangeMap().getNameSales();
+            List<NameSale> forkItems = ((DCSet)this.parent.getDBSet()).getNameExchangeMap().getNameSales();
 
             nameSales.addAll(forkItems);
 

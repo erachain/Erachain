@@ -155,7 +155,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     public byte[] getLastBlockSignature() {
         if (this.lastBlockSignature == null) {
-            this.lastBlockSignature = getDBSet().getBlocksHeadsMap().get(this.size()).signature;
+            this.lastBlockSignature = ((DCSet)databaseSet).getBlocksHeadsMap().get(this.size()).signature;
         }
         return this.lastBlockSignature;
     }
@@ -206,14 +206,14 @@ public class BlockMap extends DCMap<Integer, Block> {
             return null;
 
         // LOAD HEAD
-        block.loadHeadMind(this.getDBSet());
+        block.loadHeadMind((DCSet)databaseSet);
 
         // проверим занятую память и очистим если что
         if (this.parent == null && block.getTransactionCount() > 33) {
             // это не Форк базы и большой блок взяли - наверно надо чистить КЭШ
             if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
                 if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 1)) {
-                    this.getDBSet().clearCache();
+                    ((DCSet)databaseSet).clearCache();
                 }
             }
 
@@ -224,7 +224,7 @@ public class BlockMap extends DCMap<Integer, Block> {
     }
 
     public boolean add(Block block) {
-        DCSet dcSet = getDBSet();
+        DCSet dcSet = (DCSet)databaseSet;
 
 		/*
 		if (init1) {
@@ -299,7 +299,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     // TODO make CHAIN deletes - only for LAST block!
     public Block remove(byte[] signature, byte[] reference, PublicKeyAccount creator) {
-        DCSet dcSet = getDBSet();
+        DCSet dcSet = (DCSet)databaseSet;
 
         int height = this.size();
 

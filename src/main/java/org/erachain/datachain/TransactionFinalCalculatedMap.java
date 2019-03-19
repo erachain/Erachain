@@ -97,7 +97,7 @@ public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer
         //	Bind.secondaryKey(map, this.block_Key, new Fun.Function2<Integer, Tuple2<Integer, Integer>, Calculated>() {
         //		@Override
         //		public Integer run(Tuple2<Integer, Integer> key, Calculated val) {
-        //			return val.getBlockHeightByParentOrLast(getDBSet());
+        //			return val.getBlockHeightByParentOrLast((DCSet)databaseSet);
         //		}
         //	});
 

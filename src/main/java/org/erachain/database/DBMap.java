@@ -53,8 +53,8 @@ public abstract class DBMap<T, U> extends Observable {
     }
 
 
-    public DCSet getDBSet() {
-        return (DCSet) this.databaseSet;
+    public IDB getDBSet() {
+        return this.databaseSet;
     }
 
 

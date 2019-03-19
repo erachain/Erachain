@@ -89,7 +89,7 @@ public class BlockSignsMap extends DCMap<Long, Integer> {
         if (value == null)
             return null;
 
-        return this.getDBSet().getBlockMap().get(value);
+        return ((DCSet)this.databaseSet).getBlockMap().get(value);
 
     }
 

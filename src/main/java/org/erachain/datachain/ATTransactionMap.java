@@ -125,7 +125,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         }
 
         if (this.parent != null)
-            this.parent.getDBSet().getATTransactionMap().delete(height);
+            ((DCSet)this.parent.getDBSet()).getATTransactionMap().delete(height);
 
     }
 
@@ -144,7 +144,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         }
 
         if (this.parent != null)
-            this.parent.getDBSet().getATTransactionMap().deleteAllAfterHeight(height);
+            ((DCSet)this.parent.getDBSet()).getATTransactionMap().deleteAllAfterHeight(height);
 
     }
 
@@ -165,7 +165,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         }
 
         if (this.parent != null)
-            txs.putAll(this.parent.getDBSet().getATTransactionMap().getATTransactions(height));
+            txs.putAll(((DCSet)this.parent.getDBSet()).getATTransactionMap().getATTransactions(height));
 
         return txs;
 
@@ -182,7 +182,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         }
 
         if (this.parent != null)
-            ats.addAll(this.parent.getDBSet().getATTransactionMap().getATTransactionsBySender(sender));
+            ats.addAll(((DCSet)this.parent.getDBSet()).getATTransactionMap().getATTransactionsBySender(sender));
 
         return ats;
     }
@@ -199,7 +199,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         }
 
         if (this.parent != null)
-            ats.addAll(this.parent.getDBSet().getATTransactionMap().getBlExpATTransactionsBySender(sender));
+            ats.addAll(((DCSet)this.parent.getDBSet()).getATTransactionMap().getBlExpATTransactionsBySender(sender));
 
         return ats;
     }
@@ -215,7 +215,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         }
 
         if (this.parent != null)
-            ats.addAll(this.parent.getDBSet().getATTransactionMap().getATTransactionsByRecipient(recipient));
+            ats.addAll(((DCSet)this.parent.getDBSet()).getATTransactionMap().getATTransactionsByRecipient(recipient));
 
         return ats;
     }
@@ -232,7 +232,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         }
 
         if (this.parent != null)
-            ats.addAll(this.parent.getDBSet().getATTransactionMap().getBlExpATTransactionsByRecipient(recipient));
+            ats.addAll(((DCSet)this.parent.getDBSet()).getATTransactionMap().getBlExpATTransactionsByRecipient(recipient));
 
         return ats;
     }
