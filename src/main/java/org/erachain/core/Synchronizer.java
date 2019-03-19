@@ -61,7 +61,9 @@ public class Synchronizer {
                 return null;
             } else {
                 // ERROR
-                throw new Exception("Peer timed out");
+                String mess = "*** Peer timed out";
+                peer.ban(mess);
+                throw new Exception(mess);
             }
         }
 
@@ -438,6 +440,7 @@ public class Synchronizer {
                     blockFromPeer = blockBuffer.getBlock(signature);
                 } catch (Exception e) {
                     blockBuffer.stopThread();
+                    peer.ban(0, "get block BUFFER - " + e.getMessage());
                     throw new Exception(e);
                 }
 

@@ -557,6 +557,18 @@ public class Block {
         return version;
     }
 
+    @Override
+    public int hashCode() {
+        return Ints.fromByteArray(signature);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Block)
+            return Arrays.equals(this.signature, ((Block) obj).signature);
+        return false;
+    }
+
     public byte[] getSignature() {
         return this.signature;
     }
@@ -2072,17 +2084,6 @@ public class Block {
 
         // DELETE ALL CALCULATED
         finalMap.delete(height);
-    }
-
-    @Override
-    public boolean equals(Object otherObject) {
-        if (otherObject instanceof Block) {
-            Block otherBlock = (Block) otherObject;
-
-            return Arrays.equals(this.getSignature(), otherBlock.getSignature());
-        }
-
-        return false;
     }
 
     @Override
