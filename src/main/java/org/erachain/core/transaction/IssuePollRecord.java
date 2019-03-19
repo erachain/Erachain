@@ -9,7 +9,7 @@ import org.erachain.core.item.polls.PollFactory;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
-public class IssuePollRecord extends Issue_ItemRecord {
+public class IssuePollRecord extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_POLL_TRANSACTION;
     private static final String NAME_ID = "Issue Poll";
 

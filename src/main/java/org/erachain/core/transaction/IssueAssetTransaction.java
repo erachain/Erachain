@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class IssueAssetTransaction extends Issue_ItemRecord {
+public class IssueAssetTransaction extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
     private static final String NAME_ID = "Issue Asset";
 

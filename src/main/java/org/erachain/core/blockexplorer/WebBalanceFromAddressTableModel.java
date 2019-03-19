@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class WEB_Balance_from_Adress_TableModel extends AbstractTableModel implements Observer {
+public class WebBalanceFromAddressTableModel extends AbstractTableModel implements Observer {
     //private static final int COLUMN_ADDRESS = 0;
     public static final int COLUMN_C = 4;
     public static final int COLUMN_B = 3;
@@ -37,7 +37,7 @@ public class WEB_Balance_from_Adress_TableModel extends AbstractTableModel imple
     private ArrayList<Pair<Account, Pair<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> table_balance1;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public WEB_Balance_from_Adress_TableModel(Account account) {
+    public WebBalanceFromAddressTableModel(Account account) {
 
 
         //this.key = key;

@@ -14,7 +14,7 @@ import java.util.TreeMap;
  * Ключ: подпись создавшей класс записи - поидее надо поменять на ссылку
  * Значение - номер сущности
  *
- * Используется в org.erachain.core.transaction.Issue_ItemRecord#orphan(int)
+ * Используется в org.erachain.core.transaction.IssueItemRecord#orphan(int)
  * TODO: поменять ссылку на запись с подписи на ссылку по номерам - и в таблицах ключ тоже на Лонг поменять
  * https://lab.erachain.org/erachain/Erachain/issues/465
  *

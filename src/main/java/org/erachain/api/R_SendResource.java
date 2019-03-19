@@ -38,6 +38,8 @@ public class R_SendResource {
         Map<String, String> help = new LinkedHashMap<String, String>();
         help.put("GET r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&encoding={encoding}&encrypt=true&password={password}",
                 "make and broadcast SEND asset amount and mail");
+        help.put("POST r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&encoding={encoding}&encrypt=true&password={password} (message)",
+                "make and broadcast SEND asset amount and mail in body");
         help.put("GET r_send/raw/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&encoding={encoding}&encrypt=true&password={password}",
                 "make RAW for SEND asset amount and mail");
         help.put("POST r_send {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"encoding\": <encoding>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
@@ -81,6 +83,46 @@ public class R_SendResource {
                           @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
                           @QueryParam("amount") BigDecimal amount, @QueryParam("title") String title,
                           @QueryParam("message") String message,
+                          @QueryParam("encoding") int encoding,
+                          @QueryParam("encrypt") boolean encrypt, @QueryParam("password") String password) {
+
+        APIUtils.askAPICallAllowed(password, "GET send\n ", request, true);
+
+        JSONObject out = new JSONObject();
+        Controller cntr = Controller.getInstance();
+
+        boolean needAmount = false;
+        Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr,
+                assetKey, true,
+                amount, needAmount,
+                title, message, encoding, encrypt);
+
+        Transaction transaction = result.getB();
+        if (transaction == null) {
+            out.put("error", result.getA());
+            out.put("error_message", OnDealClick.resultMess(result.getA()));
+            return out.toJSONString();
+        }
+
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+        if (validate == Transaction.VALIDATE_OK)
+            return transaction.toJson().toJSONString();
+        else {
+            out.put("error", validate);
+            out.put("error_message", OnDealClick.resultMess(validate));
+            return out.toJSONString();
+        }
+
+    }
+
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Path("{creator}/{recipient}")
+    public String sendPost(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
+                          @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
+                          @QueryParam("amount") BigDecimal amount, @QueryParam("title") String title,
+                          String message,
                           @QueryParam("encoding") int encoding,
                           @QueryParam("encrypt") boolean encrypt, @QueryParam("password") String password) {
 

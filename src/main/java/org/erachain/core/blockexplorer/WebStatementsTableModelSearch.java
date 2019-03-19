@@ -25,7 +25,7 @@ import java.util.Observer;
 
 //import org.erachain.core.transaction.R_SignStatement_old;
 
-public class WEB_Statements_Table_Model_Search extends AbstractTableModel implements Observer {
+public class WebStatementsTableModelSearch extends AbstractTableModel implements Observer {
 
     public static final int COLUMN_TIMESTAMP = 0;
     // public static final int COLUMN_TYPE = 1;
@@ -47,7 +47,7 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, false};
     // private Map<byte[], BlockingQueue<Block>> blocks;
 
-    public WEB_Statements_Table_Model_Search() {
+    public WebStatementsTableModelSearch() {
         // transactions = new ArrayList<Transaction>();
 
         /*

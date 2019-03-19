@@ -31,7 +31,7 @@ public class DCSet implements Observer, IDB {
     private static final int CASH_SIZE = BlockChain.HARD_WORK ? 1024 << 2 : 1024;
 
     private static boolean isStoped = false;
-    private static DCSet instance;
+    private volatile static DCSet instance;
     private DCSet parent;
     private int uses;
 
@@ -1402,5 +1402,6 @@ public class DCSet implements Observer, IDB {
     public String toString() {
         return this.isFork()? "forked" : "main" + " "  + super.toString();
     }
+
 
 }

@@ -12,7 +12,7 @@ import java.util.Arrays;
 //import java.util.Map;
 // import org.slf4j.LoggerFactory;
 
-public class IssueTemplateRecord extends Issue_ItemRecord {
+public class IssueTemplateRecord extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_TEMPLATE_TRANSACTION;
     private static final String NAME_ID = "Issue Template";
 
