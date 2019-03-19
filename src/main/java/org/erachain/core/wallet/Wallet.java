@@ -543,9 +543,23 @@ public class Wallet extends Observable implements Observer {
 
 	}
 
-	boolean synchronizeBodyStop;
+
+    private static boolean synchronizeStatus;
+
+    /**
+     * нужно для запрета вызова уже работающего процесса синхронизации
+     * @return
+     */
+    public synchronized boolean synchronizeStatusCheck() {
+        if (synchronizeStatus)
+            return true;
+        synchronizeStatus = true;
+        return false;
+    }
+
+    boolean synchronizeBodyStop;
 	public void synchronizeBody(boolean reset) {
-	    if (!synchronizeBodyStop)
+	    if (!synchronizeBodyStop || synchronizeStatusCheck())
 	        return;
 
 		DCSet dcSet = DCSet.getInstance();
@@ -622,11 +636,11 @@ public class Wallet extends Observable implements Observer {
 					return;
 				}
 
-                // NEED FOR CLEAR HEAP
-				//block.clearForHeap(); - не нужно теперь если мы чистим КЭШ в dcSet.clearCache();
-                //block = null;
-
-                if (Controller.getInstance().needUpToDate() || !Controller.getInstance().isStatusWaiting())
+                if (Controller.getInstance().isOnStopping()
+                        || Controller.getInstance().needUpToDate()
+                        || !Controller.getInstance().isStatusWaiting()
+                        || !Controller.getInstance().isStatusWaiting()
+                )
                     // если идет синхронизация цепочки - кошелек не синхронизируем
                     break;
 
@@ -637,9 +651,9 @@ public class Wallet extends Observable implements Observer {
 					lastHeight = height;
 
                     this.syncHeight = height;
-					Controller.getInstance().walletSyncStatusUpdate(height);
 
                     this.database.clearCache();
+                    LOGGER.info("try Commit");
                     this.database.commit();
 
                     // обязательно нужно чтобы память освобождать
@@ -650,6 +664,8 @@ public class Wallet extends Observable implements Observer {
 
 					// не нужно - Ява сама норм делает вызов очистки
 					//System.gc();
+
+                    Controller.getInstance().walletSyncStatusUpdate(height);
 
                 }
 
@@ -670,8 +686,6 @@ public class Wallet extends Observable implements Observer {
 				return;
 
             this.syncHeight = height;
-            Controller.getInstance().walletSyncStatusUpdate(height);
-			Controller.getInstance().setProcessingWalletSynchronize(false);
 
 			// обязательно нужно чтобы память освобождать
 			// и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
@@ -679,14 +693,20 @@ public class Wallet extends Observable implements Observer {
             // вдобавое отчищает полностью память - много свободной памяти получаем
 			dcSet.clearCache();
 
-            this.database.clearCache();
             // тут возможно цепочка синхронизировалась или начала синхронизироваться и КОММИТ вызовет ошибку
             //  java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
 			this.database.commit();
 
+            this.database.clearCache();
+
             System.gc();
 
-		}
+            synchronizeStatus = false;
+
+            Controller.getInstance().walletSyncStatusUpdate(height);
+            Controller.getInstance().setProcessingWalletSynchronize(false);
+
+        }
 
 		// RESET UNCONFIRMED BALANCE for accounts + assets
 		LOGGER.info("Resetted balances");
@@ -1240,6 +1260,7 @@ public class Wallet extends Observable implements Observer {
 		for (Transaction transaction : block.getTransactions()) {
 
             // TODO нужно сделать при закрытии базы чтобы ожидала окончания проходя всего блока тут
+
 
 			if (transaction.isWiped()) {
 				continue;
@@ -1909,8 +1930,10 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK BLOCK
 			this.processBlock(DCSet.getInstance(), block);
+
             //this.database.clearCache();
-            //this.database.commit();
+            //if (!synchronizeStatusCheck())
+            //    this.database.commit();
 
 		} else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
 		{
@@ -1925,6 +1948,7 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK BLOCK
 			this.orphanBlock(block);
+
             //this.database.clearCache();
             //this.database.commit();
 

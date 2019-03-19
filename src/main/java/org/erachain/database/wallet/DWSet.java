@@ -355,8 +355,10 @@ public class DWSet extends DBASet {
     long commitPoint;
 
     @Override
-    public void commit() {
-        if (this.uses != 0 || System.currentTimeMillis() - commitPoint < 50000)
+    public synchronized void commit() {
+        if (this.uses != 0
+                //|| System.currentTimeMillis() - commitPoint < 50000
+        )
             return;
 
         this.uses++;
@@ -367,6 +369,9 @@ public class DWSet extends DBASet {
 
     }
 
+    /**
+     * закрываем без коммита! - чтобы при запуске продолжитть?
+     */
     @Override
     public void close() {
 
