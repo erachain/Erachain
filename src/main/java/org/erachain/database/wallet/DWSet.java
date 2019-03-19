@@ -110,7 +110,7 @@ public class DWSet extends DBASet {
                 //.cacheHardRefEnable()
                 //.cacheLRUEnable()
                 ///.cacheSoftRefEnable()
-                //.cacheWeakRefEnable()
+                .cacheWeakRefEnable()
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 .cacheSize(10000)
@@ -120,13 +120,14 @@ public class DWSet extends DBASet {
 
                 // вызывает java.io.IOError: java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
                 // на ситема с Виндой в момент синхронизации кошелька когда там многот транзакций для этого кошелька
-                //.commitFileSyncDisable() // ++
+                .commitFileSyncDisable() // ++
 
-                .asyncWriteFlushDelay(30000)
+                //.asyncWriteFlushDelay(30000)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
                 .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
 
+                .mmapFileEnablePartial()
                 //.compressionEnable()
 
                 .make();
@@ -360,7 +361,7 @@ public class DWSet extends DBASet {
     long commitPoint;
 
     @Override
-    public synchronized void commit() {
+    public void commit() {
         if (this.uses != 0
                 //|| System.currentTimeMillis() - commitPoint < 50000
         )
@@ -383,15 +384,21 @@ public class DWSet extends DBASet {
         if (this.database == null || this.database.isClosed())
             return;
 
-        while (Controller.getInstance().wallet.synchronizeStatus) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-            }
+        int step = 0;
+        if (Controller.getInstance().wallet.synchronizeStatus) {
+            // STOP syncronize Wallet
+            Controller.getInstance().wallet.synchronizeBodyStop = true;
 
+            while (Controller.getInstance().wallet.synchronizeStatus && ++step < 500) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                }
+
+            }
         }
 
-        int step = 0;
+        step = 0;
         while (uses > 0 && ++step < 100) {
             try {
                 Thread.sleep(100);

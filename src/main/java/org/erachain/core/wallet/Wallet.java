@@ -557,9 +557,10 @@ public class Wallet extends Observable implements Observer {
         return false;
     }
 
-    boolean synchronizeBodyStop;
+    public boolean synchronizeBodyStop;
 	public void synchronizeBody(boolean reset) {
-	    if (!synchronizeBodyStop || synchronizeStatusCheck())
+	    if (!synchronizeBodyStop || synchronizeStatusCheck()
+				|| getAccounts() == null || getAccounts().isEmpty())
 	        return;
 
 		DCSet dcSet = DCSet.getInstance();
@@ -666,7 +667,6 @@ public class Wallet extends Observable implements Observer {
             } while (!synchronizeBodyStop
 					&& !Controller.getInstance().isOnStopping()
 					&& !Controller.getInstance().needUpToDate()
-					&& Controller.getInstance().isStatusWaiting()
 					&& Controller.getInstance().isStatusWaiting());
 
 		} catch (Exception e) {

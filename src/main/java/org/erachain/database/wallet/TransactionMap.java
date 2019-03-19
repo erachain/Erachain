@@ -117,12 +117,7 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
         Bind.secondaryKey(map, this.AUTOKEY_INDEX, new Fun.Function2<Integer, Tuple2<String, String>, Transaction>() {
             @Override
             public Integer run(Tuple2<String, String> key, Transaction value) {
-                if (true || Controller.getInstance().wallet == null || Controller.getInstance().wallet.database == null)
-                    return map.size();
-                else {
-                    //return -Controller.getInstance().wallet.database.getTransactionMap().size();
-                    return -((DWSet) databaseSet).getTransactionMap().size();
-                }
+                return -map.size();
             }
         });
 

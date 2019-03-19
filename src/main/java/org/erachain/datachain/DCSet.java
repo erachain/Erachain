@@ -385,15 +385,15 @@ public class DCSet extends DBASet implements Observer {
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
-                //.snapshotEnable()
-                /// ICREATOR
                 .commitFileSyncDisable() // ++
+
+                //.snapshotEnable()
                 //.asyncWriteEnable()
                 //.asyncWriteFlushDelay(100)
                 //.cacheHardRefEnable()
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(3) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
 
