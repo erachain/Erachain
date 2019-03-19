@@ -1815,6 +1815,7 @@ public class Controller extends Observable {
                             ;
                         } else {
                             LOGGER.error(e.getMessage(), e);
+                            peer.ban(e.getMessage());
                             return;
                         }
                     }
