@@ -118,7 +118,7 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
             @Override
             public Integer run(Tuple2<String, String> key, Transaction value) {
                 if (Controller.getInstance().wallet == null || Controller.getInstance().wallet.database == null)
-                    return getDBSet().getTransactionMap().size();
+                    return map.size();
 
                 return -Controller.getInstance().wallet.database.getTransactionMap().size();
             }
