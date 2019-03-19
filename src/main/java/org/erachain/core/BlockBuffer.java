@@ -1,5 +1,6 @@
 package org.erachain.core;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.network.Peer;
@@ -42,6 +43,12 @@ public class BlockBuffer extends Thread {
     public void run() {
         while (this.run) {
             for (int i = 0; i < this.signatures.size() && i < this.counter + BUFFER_SIZE; i++) {
+
+                if (Controller.getInstance().isOnStopping()) {
+                    stopThread();
+                    break;
+                }
+
                 byte[] signature = this.signatures.get(i);
 
                 //CHECK IF WE HAVE ALREADY LOADED THIS BLOCK
