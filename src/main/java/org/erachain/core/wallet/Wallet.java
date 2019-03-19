@@ -559,8 +559,7 @@ public class Wallet extends Observable implements Observer {
 
     public boolean synchronizeBodyStop;
 	public void synchronizeBody(boolean reset) {
-	    if (!synchronizeBodyStop || synchronizeStatusCheck()
-				|| getAccounts() == null || getAccounts().isEmpty())
+	    if (!synchronizeBodyStop || synchronizeStatusCheck())
 	        return;
 
 		DCSet dcSet = DCSet.getInstance();
@@ -622,53 +621,54 @@ public class Wallet extends Observable implements Observer {
         this.database.clearCache();
 
         try {
-			do {
+        	if (getAccounts() != null && !getAccounts().isEmpty()) {
+				do {
 
-                Block block = blockMap.get(height);
+					Block block = blockMap.get(height);
 
-                if (block == null) {
-                    break;
-                }
+					if (block == null) {
+						break;
+					}
 
-                try {
-                    this.processBlock(dcSet, block);
-				} catch (java.lang.OutOfMemoryError e) {
-					Controller.getInstance().stopAll(44);
-					return;
-				}
+					try {
+						this.processBlock(dcSet, block);
+					} catch (java.lang.OutOfMemoryError e) {
+						Controller.getInstance().stopAll(44);
+						return;
+					}
 
-                if (System.currentTimeMillis() - timePoint > 10000
-						|| steepHeight < height - lastHeight) {
+					if (System.currentTimeMillis() - timePoint > 10000
+							|| steepHeight < height - lastHeight) {
 
-					timePoint = System.currentTimeMillis();
-					lastHeight = height;
+						timePoint = System.currentTimeMillis();
+						lastHeight = height;
 
-                    this.syncHeight = height;
+						this.syncHeight = height;
 
-                    //LOGGER.debug("try Commit");
-                    this.database.commit();
+						//LOGGER.debug("try Commit");
+						this.database.commit();
 
-                    // обязательно нужно чтобы память освобождать
-                    // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
-                    // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
-                    // БЕЗ очистки КЭША HEAP забивается под завязку
-					dcSet.clearCache();
-					this.database.clearCache();
+						// обязательно нужно чтобы память освобождать
+						// и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
+						// при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
+						// БЕЗ очистки КЭША HEAP забивается под завязку
+						dcSet.clearCache();
+						this.database.clearCache();
 
-					// не нужно - Ява сама норм делает вызов очистки
-					//System.gc();
+						// не нужно - Ява сама норм делает вызов очистки
+						//System.gc();
 
-                    Controller.getInstance().walletSyncStatusUpdate(height);
+						Controller.getInstance().walletSyncStatusUpdate(height);
 
-                }
+					}
 
-				height++;
+					height++;
 
-            } while (!synchronizeBodyStop
-					&& !Controller.getInstance().isOnStopping()
-					&& !Controller.getInstance().needUpToDate()
-					&& Controller.getInstance().isStatusWaiting());
-
+				} while (!synchronizeBodyStop
+						&& !Controller.getInstance().isOnStopping()
+						&& !Controller.getInstance().needUpToDate()
+						&& Controller.getInstance().isStatusWaiting());
+			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 
