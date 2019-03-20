@@ -274,7 +274,7 @@ public class Mails_Transactions_Table extends JTable implements Observer {
             }
         });
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         Controller.getInstance().addObserver(this);
     }
 

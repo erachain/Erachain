@@ -118,7 +118,7 @@ public class WalletNameSalesTableModel extends TableModelCls<Tuple2<String, Stri
     }
 
     public void addObserversThis() {
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
     }
 
     public void removeObserversThis() {

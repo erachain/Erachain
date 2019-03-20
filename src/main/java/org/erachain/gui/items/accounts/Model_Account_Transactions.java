@@ -266,7 +266,7 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
     }
 
     protected void addObserversThis() {
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         //	Controller.getInstance().addObserver(this);
     }
 

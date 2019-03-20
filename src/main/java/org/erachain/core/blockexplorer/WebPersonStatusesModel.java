@@ -51,7 +51,7 @@ public class WebPersonStatusesModel extends AbstractTableModel implements Observ
     public WebPersonStatusesModel(long person_Key) {
 
         itemKey = person_Key;
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         statuses = dcSet.getPersonStatusMap().get(itemKey);
         statusesMap = dcSet.getItemStatusMap();
         setRows();

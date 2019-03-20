@@ -274,7 +274,7 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
             cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
         }
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         //		Controller.getInstance().addObserver(this);
         //		int a = 1;
 

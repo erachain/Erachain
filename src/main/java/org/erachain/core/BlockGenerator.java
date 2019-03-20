@@ -478,7 +478,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     }
                 }
 
-                ctrl.addWalletListener(BlockGenerator.this);
+                ctrl.addWalletObserver(BlockGenerator.this);
                 syncForgingStatus();
             }
         }.start();

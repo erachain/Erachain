@@ -156,7 +156,7 @@ public class Pinger extends Thread {
             }
         }
 
-        LOGGER.info(this + " - halted");
+        //LOGGER.debug(this + " - halted");
 
     }
 

@@ -5,7 +5,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
@@ -137,7 +136,7 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
     }
 
     public void addObserversThis() {
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
     }
 
     public void removeObserversThis() {

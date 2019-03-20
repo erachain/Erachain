@@ -4,7 +4,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.voting.Poll;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.PollMap;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
@@ -119,7 +118,7 @@ public class WalletVotesTableModel extends TableModelCls<Tuple2<String, String>,
 
 
     public void addObserversThis() {
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
     }
 
     public void removeObserversThis() {

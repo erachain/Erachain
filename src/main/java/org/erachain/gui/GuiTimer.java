@@ -1,7 +1,10 @@
 package org.erachain.gui;
 
 import org.erachain.controller.Controller;
+import org.erachain.database.DBMap;
 import org.erachain.utils.ObserverMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -12,35 +15,34 @@ import java.util.TimerTask;
  * только запускает событи - "обновиться"
  * Используется в gui.library.SetIntervalPanel#syncUpdate(java.util.Observable, java.lang.Object) и других
  */
-public class GuiTimer extends Observable {
+public class GuiTimer extends Thread {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GuiTimer.class);
 
     public GuiTimer() {
-        Timer timer = new Timer("GuiTimer");
+    }
 
-        TimerTask action = new TimerTask() {
-            public void run() {
-                try {
-                    onRepaint();
-                } catch (Exception e) {
-                }
+    public void run() {
+
+        Controller cnt = Controller.getInstance();
+
+        while (!cnt.isOnStopping()) {
+            try {
+                cnt.repaintGUI();
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(56);
+                return;
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
             }
-        };
 
-        timer.schedule(action, 1000, 2000);
+            try {
+                Thread.sleep(cnt.isDynamicGUI()? 500 : 2500);
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
 
-    }
-
-    public void onRepaint() {
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_REPAINT, this));
-    }
-
-    // for REPAINT timer
-    public void addTimerObserver(Observer o) {
-        this.addObserver(o);
-    }
-    public void removeTimerObserver(Observer o) {
-        this.deleteObserver(o);
     }
 
 }

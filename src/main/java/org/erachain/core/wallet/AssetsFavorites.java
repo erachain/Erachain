@@ -25,7 +25,7 @@ public class AssetsFavorites implements Observer {
     public AssetsFavorites() {
         this.favorites = new ArrayList<Long>();
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         Controller.getInstance().addObserver(this);
         ///this.reload();
         //this.getAssets();

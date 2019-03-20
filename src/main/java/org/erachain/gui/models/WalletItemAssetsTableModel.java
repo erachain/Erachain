@@ -142,7 +142,7 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 
     public void addObserversThis() {
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
     }
 
 

@@ -7,7 +7,6 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemStatusMap;
 import org.erachain.lang.Lang;
-import org.erachain.utils.DateTimeFormat;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 import org.erachain.utils.ObserverMessage;
@@ -274,7 +273,7 @@ public class PersonStatusesModel extends AbstractTableModel implements Observer 
 
     public void addObservers() {
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
 
     }
 

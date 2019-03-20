@@ -27,7 +27,7 @@ public abstract class WalletItem_TableModel extends TableModelCls<Tuple2<String,
 
     public WalletItem_TableModel(String name, int observer_add, int observer_remove, int observer_list) {
         super(name, 1000, new String[]{"Key", "Name", "Owner", "Confirmed"});
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         this.observer_add = observer_add;
         this.observer_remove = observer_remove;
         this.observer_list = observer_list;

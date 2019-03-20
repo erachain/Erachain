@@ -1,24 +1,14 @@
 package org.erachain.gui.library;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.wallet.Wallet;
 import org.erachain.database.DBMap;
-import org.erachain.database.SortableList;
-import org.erachain.database.wallet.DWSet;
-import org.erachain.datachain.DCSet;
-import org.erachain.gui.Gui;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
-import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import java.util.Collection;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -171,10 +161,14 @@ public class SetIntervalPanel extends JPanel implements Observer {
                 needUpdate = true;
 
             } else if (message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE) {
-                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + ++size);
+                //jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + ++size);
+                ++size;
+                needUpdate = true;
 
             } else if (message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE) {
-                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + --size);
+                //jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + --size);
+                --size;
+                needUpdate = true;
 
             }
         // all transactions
@@ -207,9 +201,14 @@ public class SetIntervalPanel extends JPanel implements Observer {
                 needUpdate = true;
 
             } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
-                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + ++size);
+                //jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + ++size);
+                ++size;
+                needUpdate = true;
+
             } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + --size);
+                //jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + --size);
+                --size;
+                needUpdate = true;
 
             }
 
@@ -218,13 +217,11 @@ public class SetIntervalPanel extends JPanel implements Observer {
     }
 
     public void addObservers() {
-        Controller.getInstance().addWalletListener(this);
-        Controller.getInstance().guiTimer.addTimerObserver(this); // нужно для перерисовки раз в 2 сек
+        Controller.getInstance().addWalletObserver(this);
 
     }
     public void removeObservers() {
         Controller.getInstance().deleteWalletObserver(this);
-        Controller.getInstance().guiTimer.removeTimerObserver(this); // нужно для перерисовки раз в 2 сек
     }
 
 }

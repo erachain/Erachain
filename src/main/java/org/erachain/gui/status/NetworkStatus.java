@@ -60,7 +60,7 @@ public class NetworkStatus extends JLabel implements Observer {
         });
         //LISTEN ON STATUS
         Controller.getInstance().addObserver(this);
-        //Controller.getInstance().addWalletListener(this);
+        //Controller.getInstance().addWalletObserver(this);
 
     }
 
