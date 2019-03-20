@@ -651,6 +651,9 @@ public class Wallet extends Observable implements Observer {
 						//LOGGER.debug("try Commit");
 						this.database.commit();
 
+                        if (Controller.getInstance().isOnStopping())
+                            return;
+
 						// обязательно нужно чтобы память освобождать
 						// и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
 						// при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю

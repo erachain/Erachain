@@ -66,6 +66,13 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
 
     }
 
+    /**
+     * Присоединяет к этому списку таблицу от котрой ловит события Добавить и Удалить.
+     * По котрым запускает свой sort - что может очень тормозить все. <br>
+     * Поэтому использовать с сотрожностью. Хотя я вставил в Update 2 секундную защелку
+     * на обработку событий - если прошло меньше времени то ничего не делать
+     *
+     */
     public void registerObserver() {
         this.db.addObserver(this);
     }
@@ -126,14 +133,7 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
         return false;
     }
 
-    public void sort(int index) {
-        this.sort(index, false);
-    }
-
-    public void sort(int index, boolean descending) {
-        this.index = index;
-        this.descending = descending;
-
+    public void sort() {
         if (this.keys != null) {
             this.size = this.keys.size();
             this.iterator = this.keys.iterator();
@@ -144,6 +144,21 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
 
         this.position = 0;
         this.lastValue = null;
+    }
+
+    public void sort(int index, boolean descending) {
+        this.index = index;
+        this.descending = descending;
+
+        this.sort();
+
+    }
+
+    public void sort(int index) {
+        this.index = index;
+        this.descending = false;
+
+        this.sort();
     }
 
 	/*
@@ -174,10 +189,12 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
 
         ObserverMessage message = (ObserverMessage) object;
 
-        if (this.db.observableData.containsKey(DBMap.NOTIFY_ADD) && message.getType() == this.db.observableData.get(DBMap.NOTIFY_ADD)
-                || this.db.observableData.containsKey(DBMap.NOTIFY_REMOVE) && message.getType() == this.db.observableData.get(DBMap.NOTIFY_REMOVE)) {
+        if (this.db.observableData.containsKey(DBMap.NOTIFY_ADD)
+                && message.getType() == this.db.observableData.get(DBMap.NOTIFY_ADD)
+            || this.db.observableData.containsKey(DBMap.NOTIFY_REMOVE)
+                && message.getType() == this.db.observableData.get(DBMap.NOTIFY_REMOVE)) {
             //RESORT DATA
-            this.sort(this.index, this.descending);
+            this.sort();
         }
 
     }
@@ -229,7 +246,7 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
 
     public void setFilter(String filter) {
         this.pattern = Pattern.compile(".*" + filter + ".*");
-        this.sort(this.index, this.descending);
+        this.sort();
     }
 
     /**
