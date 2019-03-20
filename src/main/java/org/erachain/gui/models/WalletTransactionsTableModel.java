@@ -241,10 +241,16 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.transactions == null) {
                 getInterval();
-                this.transactions.registerObserver();
-                this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
+
+                ///this.transactions.registerObserver();
+                ///this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
             }
 
+            this.fireTableDataChanged();
+
+        } else if (message.getType() == ObserverMessage.WALLET_RESET_TRANSACTION_TYPE) {
+
+            getInterval();
             this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
@@ -269,7 +275,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         } else if (message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
             // INCOME
 
-            needUpdate = true;
+            //needUpdate = true;
 
             Pair<byte[], Transaction> item = (Pair<byte[], Transaction>) message.getValue();
             Transaction transaction = item.getB();
@@ -277,7 +283,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             library.notifySysTrayRecord(transaction);
 
         } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE
-                || message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
+                //|| message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE
+                ) {
 
             needUpdate = true;
 
@@ -309,6 +316,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
 
         getInterval();
+        fireTableDataChanged();
 
     }
 

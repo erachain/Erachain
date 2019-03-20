@@ -359,7 +359,7 @@ public abstract class DBMap<T, U> extends Observable {
             //NOTIFY LIST
             if (this.observableData.containsKey(NOTIFY_RESET)) {
                 this.setChanged();
-                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_RESET), null));
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_RESET), this));
             }
 
         }
