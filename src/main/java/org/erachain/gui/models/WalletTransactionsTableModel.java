@@ -273,8 +273,11 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             needUpdate = true;
 
         } else if (message.getType() == ObserverMessage.GUI_REPAINT
-                && needUpdate
-                && ++count > 4) {
+                && Controller.getInstance().isDynamicGUI()
+                && needUpdate) {
+
+            if (count++ < 4)
+                return;
 
             count = 0;
             needUpdate = false;
