@@ -40,8 +40,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     public static final int COLUMN_FEE = 7;
     public static final int COLUMN_SIZE = 8;
 
-    static Logger LOGGER = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
-
     private SortableList<Tuple2<String, String>, Transaction> transactions;
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
 
@@ -57,6 +55,9 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         super("WalletTransactionsTableModel", 999000,
                 new String[]{
                         "Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
+
+        LOGGER = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
+
     }
 
     @Override
@@ -335,6 +336,9 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
         DCSet dcSet = DCSet.getInstance();
         for (Pair<Tuple2<String, String>, Transaction> item: transactions) {
+            if (item.getB() == null)
+                continue;
+
             item.getB().setDC_HeightSeq(dcSet);
             item.getB().calcFee();
         }

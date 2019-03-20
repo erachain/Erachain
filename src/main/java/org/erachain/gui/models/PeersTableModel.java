@@ -9,6 +9,8 @@ import org.erachain.network.Peer;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
@@ -39,6 +41,8 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
         super("PeersTableModel", 10000,
                 new String[] { "IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago",
                 "Online Time", "Version" });
+
+        LOGGER = LoggerFactory.getLogger(PeersTableModel.class.getName());
 
     }
 

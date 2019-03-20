@@ -15,6 +15,8 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Null;
 import java.math.BigDecimal;
@@ -46,11 +48,13 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
     @SuppressWarnings("unchecked")
     public Model_Account_Transactions() {
         super("Accounts Table", 1000, new String[]{"Account", "Amount", "Type"});
+
+        LOGGER = LoggerFactory.getLogger(Model_Account_Transactions.class.getName());
+
         this.transactions_Asset = new ArrayList<Transaction>();
         this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
         cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
         account = new Account("");
-
 
     }
 
