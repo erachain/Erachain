@@ -12,60 +12,61 @@ import java.util.*;
 
 /**
  * Хранение сущностей
- *
+ * <p>
  * ключ: номер, с самоувеличением
  * Значение: Сущность
  */
-public abstract class Item_Map extends DCMap<Long, ItemCls> {
+public abstract class ItemMap extends DCMap<Long, ItemCls> {
 
-    static Logger LOGGER = LoggerFactory.getLogger(Item_Map.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(ItemMap.class.getName());
 
     // protected int type;
     protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
     protected Atomic.Long atomicKey;
     protected long key;
 
-    public Item_Map(DCSet databaseSet, DB database, String name) {
+    public ItemMap(DCSet databaseSet, DB database, String name) {
         super(databaseSet, database);
 
-        this.atomicKey = database.getAtomicLong(name + "_key");
-        this.key = this.atomicKey.get();
+        atomicKey = database.getAtomicLong(name + "_key");
+        key = atomicKey.get();
     }
 
-    public Item_Map(DCSet databaseSet, DB database,
-                    // int type,
-                    String name, int observeReset, int observeAdd, int observeRemove, int observeList) {
-
+    public ItemMap(DCSet databaseSet, DB database,
+                   // int type,
+                   String name, int observeReset, int observeAdd, int observeRemove, int observeList) {
         this(databaseSet, database, name);
-
         if (databaseSet.isWithObserver()) {
-            if (observeReset > 0)
-                this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
-            if (databaseSet.isDynamicGUI()) {
-                if (observeAdd > 0)
-                    this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
-                if (observeRemove > 0)
-                    this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+            if (observeReset > 0) {
+                observableData.put(DBMap.NOTIFY_RESET, observeReset);
             }
-            if (observeList > 0)
-                this.observableData.put(DBMap.NOTIFY_LIST, observeList);
+            if (databaseSet.isDynamicGUI()) {
+                if (observeAdd > 0) {
+                    observableData.put(DBMap.NOTIFY_ADD, observeAdd);
+                }
+                if (observeRemove > 0) {
+                    observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+                }
+            }
+            if (observeList > 0) {
+                observableData.put(DBMap.NOTIFY_LIST, observeList);
+            }
         }
     }
 
-    public Item_Map(Item_Map parent) {
+    public ItemMap(ItemMap parent) {
         super(parent, null);
-
-        this.key = parent.getLastKey();
+        key = parent.getLastKey();
     }
 
     public long getLastKey() {
-        return this.key;
+        return key;
     }
 
     public void setLastKey(long key) {
         // INCREMENT ATOMIC KEY IF EXISTS
-        if (this.atomicKey != null) {
-            this.atomicKey.set(key);
+        if (atomicKey != null) {
+            atomicKey.set(key);
         }
         this.key = key;
     }
@@ -75,7 +76,7 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
 
     @Override
     protected Map<Long, ItemCls> getMemoryMap() {
-        return new HashMap<Long, ItemCls>();
+        return new HashMap<>();
     }
 
     @Override
@@ -85,13 +86,14 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
 
     @Override
     protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
+        return observableData;
     }
 
     public ItemCls get(Long key) {
         ItemCls item = super.get(key);
-        if (item == null)
+        if (item == null) {
             return null;
+        }
 
         item.setKey(key);
         return item;
@@ -99,32 +101,32 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
 
     public long add(ItemCls item) {
         // INCREMENT ATOMIC KEY IF EXISTS
-        if (this.atomicKey != null) {
-            this.atomicKey.incrementAndGet();
+        if (atomicKey != null) {
+            atomicKey.incrementAndGet();
         }
 
         // INCREMENT KEY
-        this.key++;
+        key++;
         item.setKey(key);
 
         // INSERT WITH NEW KEY
-        this.set(this.key, item);
+        set(key, item);
 
         // RETURN KEY
-        return this.key;
+        return key;
     }
 
     public void remove(long key) {
         super.delete(key);
 
-        if (this.key != key)
+        if (this.key != key) {
             // it is not top of STACK (for UNIQUE items with short NUM)
             return;
-
+        }
         // delete on top STACK
 
-        if (this.atomicKey != null) {
-            this.atomicKey.decrementAndGet();
+        if (atomicKey != null) {
+            atomicKey.decrementAndGet();
         }
 
         // DECREMENT KEY
@@ -136,7 +138,7 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<ItemCls> get_By_Name(String str, boolean caseCharacter) {
         List<ItemCls> result = new ArrayList<>();
-        if (str == null || str.length() < 3){
+        if (str == null || str.length() < 3) {
             return null;
         }
         for (Pair<Long, ItemCls> a : getList()) {

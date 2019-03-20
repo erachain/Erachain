@@ -8,8 +8,8 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.Issue_ItemMap;
-import org.erachain.datachain.Item_Map;
+import org.erachain.datachain.IssueItemMap;
+import org.erachain.datachain.ItemMap;
 import org.json.simple.JSONObject;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
@@ -60,11 +60,11 @@ public abstract class UnionCls extends ItemCls {
     }
 
     // DB
-    public Item_Map getDBMap(DCSet db) {
+    public ItemMap getDBMap(DCSet db) {
         return db.getItemUnionMap();
     }
 
-    public Issue_ItemMap getDBIssueMap(DCSet db) {
+    public IssueItemMap getDBIssueMap(DCSet db) {
         return db.getIssueUnionMap();
     }
 

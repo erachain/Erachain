@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class WItemPersonMap extends WItem_Map {
 
-    //static Logger LOGGER = LoggerFactory.getLogger(WItemPersonMap.class.getName());
+    //static Logger logger = LoggerFactory.getLogger(WItemPersonMap.class.getName());
     static final String NAME = "person";
     static final int TYPE = ItemCls.PERSON_TYPE;
 
@@ -96,7 +96,7 @@ public class WItemPersonMap extends WItem_Map {
 		catch(Exception e)
 		{
 			//ERROR
-			LOGGER.error(e.getMessage(),e);
+			logger.error(e.getMessage(),e);
 		}
 		
 		return persons;
@@ -124,7 +124,7 @@ public class WItemPersonMap extends WItem_Map {
 		catch(Exception e)
 		{
 			//ERROR
-			LOGGER.error(e.getMessage(),e);
+			logger.error(e.getMessage(),e);
 		}
 		
 		return persons;

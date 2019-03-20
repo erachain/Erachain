@@ -4,7 +4,7 @@ import org.mapdb.DB;
 import org.erachain.utils.ObserverMessage;
 
 /**
- * Назначает объединение для объединения. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+ * Назначает объединение для объединения. Использует схему карты Ключ + Ключ - Значение: KKMap,
  * в котрой по ключу ищем значение там карта по ключу еще и
  * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
  *
@@ -12,7 +12,7 @@ import org.erachain.utils.ObserverMessage;
  // TODO - insert in DBSet
  * @return dcMap
  */
-public class KKUnionUnionMap extends KK_Map {
+public class KKUnionUnionMap extends KKMap {
 
     public KKUnionUnionMap(DCSet databaseSet, DB database) {
         super(databaseSet, database, "union_union",

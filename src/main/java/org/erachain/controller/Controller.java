@@ -39,7 +39,7 @@ import org.erachain.core.wallet.Wallet;
 import org.erachain.database.DBSet;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.Item_Map;
+import org.erachain.datachain.ItemMap;
 import org.erachain.datachain.LocalDataMap;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.gui.AboutFrame;
@@ -2337,7 +2337,7 @@ public class Controller extends Observable {
         this.wallet.addItemFavorite(item);
     }
 
-    public Item_Map getItemMap(int type) {
+    public ItemMap getItemMap(int type) {
         switch (type) {
             case ItemCls.ASSET_TYPE:
                 return this.dcSet.getItemAssetMap();

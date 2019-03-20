@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class WItemImprintMap extends WItem_Map {
 
-    //static Logger LOGGER = LoggerFactory.getLogger(WItemImprintMap.class.getName());
+    //static Logger logger = LoggerFactory.getLogger(WItemImprintMap.class.getName());
     static final String NAME = "imprint";
     static final int TYPE = ItemCls.IMPRINT_TYPE;
 
@@ -96,7 +96,7 @@ public class WItemImprintMap extends WItem_Map {
 		catch(Exception e)
 		{
 			//ERROR
-			LOGGER.error(e.getMessage(),e);
+			logger.error(e.getMessage(),e);
 		}
 		
 		return imprints;
@@ -124,7 +124,7 @@ public class WItemImprintMap extends WItem_Map {
 		catch(Exception e)
 		{
 			//ERROR
-			LOGGER.error(e.getMessage(),e);
+			logger.error(e.getMessage(),e);
 		}
 		
 		return imprints;

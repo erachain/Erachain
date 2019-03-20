@@ -10,7 +10,7 @@ import org.mapdb.Fun.Tuple2;
 import java.util.Map;
 
 public class WItemAssetMap extends WItem_Map {
-    //static Logger LOGGER = LoggerFactory.getLogger(WItemAssetMap.class.getName());
+    //static Logger logger = LoggerFactory.getLogger(WItemAssetMap.class.getName());
 
     static final String NAME = "asset";
     static final int TYPE = ItemCls.ASSET_TYPE;
@@ -94,7 +94,7 @@ public class WItemAssetMap extends WItem_Map {
 		catch(Exception e)
 		{
 			//ERROR
-			LOGGER.error(e.getMessage(),e);
+			logger.error(e.getMessage(),e);
 		}
 		
 		return assets;
@@ -122,7 +122,7 @@ public class WItemAssetMap extends WItem_Map {
 		catch(Exception e)
 		{
 			//ERROR
-			LOGGER.error(e.getMessage(),e);
+			logger.error(e.getMessage(),e);
 		}
 		
 		return assets;

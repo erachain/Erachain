@@ -2,7 +2,7 @@ package org.erachain.gui.items;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.SortableList;
-import org.erachain.datachain.Item_Map;
+import org.erachain.datachain.ItemMap;
 import org.erachain.gui.models.TableModelCls;
 
 import javax.validation.constraints.Null;
@@ -17,7 +17,7 @@ public class TableModelItems extends TableModelCls<Long, ItemCls> {
     //public static final int COLUMN_ASSET_TYPE = 4;
 
     protected ArrayList<ItemCls> list;
-    protected Item_Map db;
+    protected ItemMap db;
 
 
     public TableModelItems() {

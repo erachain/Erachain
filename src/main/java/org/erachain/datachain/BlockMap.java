@@ -38,7 +38,7 @@ import java.util.TreeMap;
  */
 public class BlockMap extends DCMap<Integer, Block> {
 
-    static Logger LOGGER = LoggerFactory.getLogger(BlockMap.class.getName());
+    static Logger logger = LoggerFactory.getLogger(BlockMap.class.getName());
 
     public static final int HEIGHT_INDEX = 1; // for GUI
 
@@ -50,14 +50,6 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     public BlockMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
-
-
-        if (databaseSet.isWithObserver()) {
-            if (databaseSet.isDynamicGUI()) {
-            }
-        }
-
-
         // PROCESSING
         this.processingVar = database.getAtomicBoolean("processingBlock");
         this.processing = this.processingVar.get();
@@ -74,52 +66,7 @@ public class BlockMap extends DCMap<Integer, Block> {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes(DB database) {
-
-
         generatorMap = database.createTreeMap("generators_index").makeOrGet();
-
-        /*
-        Bind.secondaryKey((BTreeMap) this.map, generatorMap, new Fun.Function2<Tuple2<String, String>, Integer, Block>() {
-            @Override
-            public Tuple2<String, String> run(Integer b, Block block) {
-                return new Tuple2<String, String>(block.getCreator().getAddress(), Converter.toHex(block.getSignature()));
-            }
-        });
-        */
-
-        /*
-         * secondary value map. Key - byte[], value Tuple2<Integer, Integer>
-         * HTreeMap<byte[], Tuple2<Integer,Integer>> blockSignsMap =
-         * database.createHashMap("block_signs_map_Value").makeOrGet();
-         * Bind.secondaryValue((BTreeMap)this.map, blockSignsMap, new
-         * Fun.Function2<Tuple2<Integer,Integer>, byte[], Block>() {
-         *
-         * @Override public Tuple2<Integer, Integer> run(byte[] a, Block b) { //
-         * b.getSignature(); } });
-         */
-        /*
-         * // multi key NavigableSet<Tuple2<Integer, byte[]>> Set1 =
-         * database.createTreeSet("Set1").makeOrGet();
-         * Bind.secondaryKeys((BTreeMap)this.map, Set1, new
-         * Fun.Function2<Integer[], byte[], Block>() {
-         *
-         * @Override public Integer[] run(byte[] b, Block block) { return new
-         * Integer[]{1};
-         *
-         * } });
-         */
-        /*
-         * NavigableSet<Tuple2< byte[], Integer>> Set2 =
-         * database.createTreeSet("Set2").makeOrGet();
-         * Bind.secondaryValues((BTreeMap)this.map, Set2, new
-         * Fun.Function2<Integer[],byte[], Block>(){
-         *
-         * @Override public Integer[] run(byte[] b, Block block) { return new
-         * Integer[]{1};
-         *
-         * } });
-         */
-
     }
 
     @Override
@@ -127,7 +74,6 @@ public class BlockMap extends DCMap<Integer, Block> {
         // OPEN MAP
         return database.createTreeMap("blocks")
                 .keySerializer(BTreeKeySerializer.BASIC)
-                // .comparator(UnsignedBytes.lexicographicalComparator())
                 .valueSerializer(new BlockSerializer())
                 .valuesOutsideNodesEnable()
                 .counterEnable() // - auto increment atomicKey
@@ -136,13 +82,8 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     @Override
     protected Map<Integer, Block> getMemoryMap() {
-        // return new TreeMap<byte[],
-        // Block>(UnsignedBytes.lexicographicalComparator());
-        return new TreeMap<Integer, Block>();
+        return new TreeMap<>();
     }
-    // public Var<byte[]> getLastBlockVar() {
-    // return this.lastBlockVar;
-    // }
 
     @Override
     protected Block getDefaultValue() {
@@ -151,62 +92,48 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     @Override
     protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
+        return observableData;
     }
 
     public Block last() {
-        // return this.get(this.getLastBlockSignature());
-        return this.get(this.size());
+        return get(size());
     }
 
     public byte[] getLastBlockSignature() {
-        if (this.lastBlockSignature == null) {
-            this.lastBlockSignature = getDBSet().getBlocksHeadsMap().get(this.size()).signature;
+        if (lastBlockSignature == null) {
+            lastBlockSignature = getDBSet().getBlocksHeadsMap().get(size()).signature;
         }
-        return this.lastBlockSignature;
+        return lastBlockSignature;
     }
 
     private void setLastBlockSignature(byte[] signature) {
-
-        this.lastBlockSignature = signature;
-        // if(this.lastBlockVar != null)
-        // {
-        // this.lastBlockVar.set(this.lastBlockSignature);
-        // }
-
+        lastBlockSignature = signature;
     }
 
     public boolean isProcessing() {
-        if (this.processing != null) {
-            return this.processing.booleanValue();
+        if (processing != null) {
+            return processing;
         }
 
         return false;
     }
 
     public void setProcessing(boolean processing) {
-        if (this.processingVar != null) {
+        if (processingVar != null) {
             if (DCSet.isStoped()) {
                 return;
             }
-            this.processingVar.set(processing);
+            processingVar.set(processing);
         }
-
         this.processing = processing;
     }
 
     public Block getWithMind(int height) {
-
-        Block block = this.get(height);
-        if (block == null)
-            return null;
-
-        return block;
+        return get(height);
 
     }
 
     public Block get(Integer height) {
-
         Block block = super.get(height);
         if (block == null)
             return null;
@@ -215,48 +142,27 @@ public class BlockMap extends DCMap<Integer, Block> {
         block.loadHeadMind(this.getDBSet());
 
         // проверим занятую память и очистим если что
-        if (this.parent == null && block.getTransactionCount() > 33) {
+        if (parent == null && block.getTransactionCount() > 33) {
             // это не Форк базы и большой блок взяли - наверно надо чистить КЭШ
             if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
                 if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 1)) {
-                    this.getDBSet().clearCache();
+                    getDBSet().clearCache();
                 }
             }
 
         }
-
         return block;
 
     }
 
     public boolean add(Block block) {
         DCSet dcSet = getDBSet();
-
-		/*
-		if (init1) {
-			init1 = false;
-			Iterator<Integer> iterator = this.getIterator(0, true);
-			while (iterator.hasNext()) {
-				Integer key = iterator.next();
-				Block itemBlock = this.get(key);
-				byte[] pkb = itemBlock.getCreator().getPublicKey();
-				PublicKeyAccount pk = new PublicKeyAccount(pkb);
-				if (((Account)pk).equals("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")) {
-					LOGGER.error(key + " - 7DedW8f87pSDiRnDArq381DNn1FsTBa68Y : " + Base58.encode(pkb));
-				}
-
-			}
-		}
-		 */
-
         byte[] signature = block.getSignature();
         if (dcSet.getBlockSignsMap().contains(signature)) {
-            LOGGER.error("already EXIST : " + this.size()
+            logger.error("already EXIST : " + this.size()
                     + " SIGN: " + Base58.encode(signature));
             return true;
         }
-
-        //int height = this.size() + 1;
         int height = block.getHeight();
 
         if (block.getVersion() == 0) {
@@ -273,7 +179,7 @@ public class BlockMap extends DCMap<Integer, Block> {
         }
         creator.setForgingData(dcSet, height, block.getForgingValue());
 
-        // LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1200: " +
+        // logger.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1200: " +
         // (System.currentTimeMillis() - start)*0.001);
 
         dcSet.getBlockSignsMap().set(signature, height);
@@ -285,13 +191,13 @@ public class BlockMap extends DCMap<Integer, Block> {
         dcSet.getBlocksHeadsMap().set(block.blockHead);
         this.setLastBlockSignature(signature);
 
-        // LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1500: " +
+        // logger.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1500: " +
         // (System.currentTimeMillis() - start)*0.001);
 
         // TODO feePool
         // this.setFeePool(_feePool);
         boolean sss = super.set(height, block);
-        // LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1600: " +
+        // logger.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1600: " +
         // (System.currentTimeMillis() - start)*0.001);
         return sss;
 
@@ -354,12 +260,12 @@ public class BlockMap extends DCMap<Integer, Block> {
             return;
         }
 
-        LOGGER.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE");
+        logger.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE");
         this.setChanged();
         // NEED in BLOCK!
         this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block));
 
-        LOGGER.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE END");
+        logger.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE END");
     }
 
     public void notifyOrphanChain(Block block) {
@@ -368,12 +274,12 @@ public class BlockMap extends DCMap<Integer, Block> {
             return;
         }
 
-        LOGGER.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE");
+        logger.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE");
         this.setChanged();
         // NEED in BLOCK!
         this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block));
 
-        LOGGER.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE END");
+        logger.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE END");
     }
 
 }

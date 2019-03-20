@@ -4,8 +4,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.database.serializer.ItemSerializer;
-import org.mapdb.BTreeMap;
-import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
@@ -21,13 +19,12 @@ import java.util.NavigableSet;
  * Значение: Персона<br>
  */
 
-public class ItemPersonMap extends Item_Map {
+public class ItemPersonMap extends ItemMap {
 
-    public static final int PERSON_NAME_INDEX = 1;
+    private static final int PERSON_NAME_INDEX = 1;
     static final String NAME = "item_persons";
     static final int TYPE = ItemCls.PERSON_TYPE;
     private NavigableSet person_Name_Index;
-    //private BTreeMap<Long, ItemCls> person_Map;
     private NavigableSet<Tuple2<String, Long>> name_Index;
     private NavigableSet<Tuple2<String, Long>> name_descending_Index;
 
@@ -42,53 +39,35 @@ public class ItemPersonMap extends Item_Map {
         );
     }
 
-    public ItemPersonMap(Item_Map parent) {
+    public ItemPersonMap(ItemMap parent) {
         super(parent);
     }
 
     // type+name not initialized yet! - it call as Super in New
     @SuppressWarnings("unchecked")
     protected Map<Long, ItemCls> getMap(DB database) {
-
         //OPEN MAP
         map = database.createTreeMap(NAME)
                 .valueSerializer(new ItemSerializer(TYPE))
-                //.valueSerializer(new PersonSerializer())
                 .makeOrGet();
-
-        if (Controller.getInstance().onlyProtocolIndexing)
+        if (Controller.getInstance().onlyProtocolIndexing) {
             // NOT USE SECONDARY INDEXES
             return map;
-
+        }
         // open name index
-        this.person_Name_Index = database.createTreeSet("person_name_index")
+        person_Name_Index = database.createTreeSet("person_name_index")
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
-
-        /*
-        // create index
-        Bind.secondaryKey(map, this.person_Name_Index, new Fun.Function2<String, Long, ItemCls>() {
-            @Override
-            public String run(Long a, ItemCls b) {
-                // TODO Auto-generated method stub
-                PersonCls person = (PersonCls) b;
-                return person.getName();
-            }
-        });
-        */
-
-
         return map;
     }
 
 
     @SuppressWarnings("unchecked")
     protected void createIndexes(DB database) {
-
-        if (Controller.getInstance().onlyProtocolIndexing)
+        if (Controller.getInstance().onlyProtocolIndexing){
             // NOT USE SECONDARY INDEXES
             return;
-
+        }
         //NAME INDEX
         name_Index = database.createTreeSet("pp")
                 .comparator(Fun.COMPARATOR)
@@ -98,27 +77,18 @@ public class ItemPersonMap extends Item_Map {
                 .comparator(new ReverseComparator(Fun.COMPARATOR))
                 .makeOrGet();
 
-        createIndex(PERSON_NAME_INDEX, name_Index, name_descending_Index, new Fun.Function2<String, Long, ItemCls>() {
-            @Override
-            public String run(Long a, ItemCls b) {
-                // TODO Auto-generated method stub
-                PersonCls person = (PersonCls) b;
-                return person.getName();
-            }
+        createIndex(PERSON_NAME_INDEX, name_Index, name_descending_Index, (a, b) -> {
+            PersonCls person = (PersonCls) b;
+            return person.getName();
         });
 
     }
 
-    public NavigableSet<Tuple2<String, Long>> get_Name_Index() {
-
+    public NavigableSet<Tuple2<String, Long>> getNameIndex() {
         return name_Index;
-
     }
 
-    public NavigableSet<Tuple2<String, Long>> name_descending_Index() {
-
+    public NavigableSet<Tuple2<String, Long>> nameDescendingIndex() {
         return name_descending_Index;
     }
-
-
 }
