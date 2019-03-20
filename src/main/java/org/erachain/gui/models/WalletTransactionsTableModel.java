@@ -239,14 +239,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-            if (this.transactions == null) {
-                getInterval();
 
-                ///this.transactions.registerObserver();
-                ///this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
-            }
-
-            this.fireTableDataChanged();
+            needUpdate = true;
 
         } else if (message.getType() == ObserverMessage.WALLET_RESET_TRANSACTION_TYPE) {
 
