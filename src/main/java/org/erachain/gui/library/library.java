@@ -35,6 +35,9 @@ public class library {
     // PLAY SOUND
     public static void notifySysTrayRecord(Transaction transaction) {
 
+        if (transaction.getCreator() == null)
+            return;
+
         if (transaction.noDCSet())
             transaction.setDC_HeightSeq(DCSet.getInstance());
 
