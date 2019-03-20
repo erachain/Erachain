@@ -162,7 +162,7 @@ public class Records_My_SplitPanel extends Split_Panel {
             }
         });
 
-        menu.add(item_Delete);
+        //menu.add(item_Delete);
         
         item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
         item_Save.addActionListener(new ActionListener() {
