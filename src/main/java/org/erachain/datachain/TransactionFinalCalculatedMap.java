@@ -54,12 +54,8 @@ public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_CLACULATED_TYPE);
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_CLACULATED_TYPE);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_CLACULATED_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_CLACULATED_TYPE);
-            } else {
-                this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.COUNT_CLACULATED_TYPE);
-            }
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_CLACULATED_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_CLACULATED_TYPE);
         }
     }
 

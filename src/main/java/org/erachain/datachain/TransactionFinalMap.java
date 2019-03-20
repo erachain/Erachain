@@ -62,7 +62,6 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_TRANSACTION_TYPE);
             this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_TRANSACTION_TYPE);
             this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_TRANSACTION_TYPE);
-            this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.COUNT_TRANSACTION_TYPE);
         }
     }
 

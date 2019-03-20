@@ -159,11 +159,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
 
                 // NOTIFY if not FORKED
                 if (this.observableData != null && (old == null || !old.equals(value))) {
-                    if (this.observableData.containsKey(DBMap.NOTIFY_COUNT)) {
-                        this.setChanged();
-                        this.notifyObservers(
-                                new ObserverMessage(this.observableData.get(DBMap.NOTIFY_COUNT), this)); /// SLOW .size()));
-                    } else if (this.observableData.containsKey(DBMap.NOTIFY_ADD) && !DCSet.isStoped()) {
+                    if (this.observableData.containsKey(DBMap.NOTIFY_ADD) && !DCSet.isStoped()) {
                         this.setChanged();
                         Integer observeItem = this.observableData.get(DBMap.NOTIFY_ADD);
                         if (
@@ -219,11 +215,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
 
             // NOTIFY
             if (this.observableData != null) {
-                if (this.observableData.containsKey(DBMap.NOTIFY_COUNT)) {
-                    this.setChanged();
-                    this.notifyObservers(
-                            new ObserverMessage(this.observableData.get(DBMap.NOTIFY_COUNT), this)); /// SLOW .size()));
-                } else if (this.observableData.containsKey(DBMap.NOTIFY_REMOVE)) {
+                if (this.observableData.containsKey(DBMap.NOTIFY_REMOVE)) {
                     this.setChanged();
                     Integer observItem = this.observableData.get(DBMap.NOTIFY_REMOVE);
                     if (

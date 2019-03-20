@@ -151,11 +151,6 @@ public class SetIntervalPanel extends JPanel implements Observer {
                 size = map.size();
                 jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
 
-            } else if (message.getType() == ObserverMessage.WALLET_COUNT_ORDER_TYPE) {
-
-                size = map.size();
-                needUpdate = true;
-
             } else if (message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE) {
 
                 ++size;
@@ -188,11 +183,6 @@ public class SetIntervalPanel extends JPanel implements Observer {
                 needUpdate = false;
                 size = map.size();
                 jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
-
-            } else if (message.getType() == ObserverMessage.WALLET_COUNT_TRANSACTION_TYPE) {
-
-                size = map.size();
-                needUpdate = true;
 
             } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
 
