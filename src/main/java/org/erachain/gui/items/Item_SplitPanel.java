@@ -182,7 +182,7 @@ public class Item_SplitPanel extends Split_Panel {
     }
 
     @Override
-    public void delay_on_close() {
+    public void onClose() {
         jTable_jScrollPanel_LeftPanel = null;
         table_Model = null;
         favorite_menu_items = null;

@@ -68,7 +68,7 @@ public class Polls_My_SplitPanel extends Split_Panel {
     }
 
     @Override
-    public void delay_on_close() {
+    public void onClose() {
         // delete observer left panel
         my_Poll_Model.removeObservers();
         // get component from right panel

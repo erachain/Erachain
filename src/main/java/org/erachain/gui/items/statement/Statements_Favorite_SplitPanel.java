@@ -145,7 +145,7 @@ public class Statements_Favorite_SplitPanel extends Split_Panel {
     }
 
     @Override
-    public void delay_on_close() {
+    public void onClose() {
         // delete observer left panel
         search_Table_Model.removeObservers();
         // get component from right panel

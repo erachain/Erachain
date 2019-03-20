@@ -249,14 +249,14 @@ public class Records_My_SplitPanel extends Split_Panel {
     }
 
     //@Override
-    public void delay_on_close() {
+    public void onClose() {
         // delete observer left panel
         this.records_model.removeObservers();
         this.setIntervalPanel.removeObservers();
         // get component from right panel
         //	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
         // if Person_Info 002 delay on close
-        //	  if (c1.getClass() == this.records_Info_Panel.getClass()) voush_Library_Panel.delay_on_close();
+        //	  if (c1.getClass() == this.records_Info_Panel.getClass()) voush_Library_Panel.onClose();
 
     }
 

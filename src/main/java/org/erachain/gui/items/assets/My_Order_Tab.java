@@ -302,7 +302,7 @@ public class My_Order_Tab extends Split_Panel {
     }
     
     @Override
-    public void delay_on_close() {
+    public void onClose() {
         ordersModel.removeObservers();
         setIntervalPanel.removeObservers();
         

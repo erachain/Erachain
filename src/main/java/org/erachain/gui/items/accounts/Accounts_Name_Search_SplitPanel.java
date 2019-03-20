@@ -444,7 +444,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
     }
 
     @Override
-    public void delay_on_close() {
+    public void onClose() {
         // delete observer left panel
         tableModelImprints.deleteObserver();
         // get component from right panel
