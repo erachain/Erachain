@@ -23,6 +23,8 @@ public class GuiTimer extends Thread {
 
     public GuiTimer() {
         observer = new GuiObserver();
+        this.setName("GuiTimer");
+        this.start();
     }
 
     public void run() {
@@ -39,8 +41,9 @@ public class GuiTimer extends Thread {
                 LOGGER.error(e.getMessage(), e);
             }
 
+            long timer = cnt.useGui? (cnt.isDynamicGUI()? 500 : 2500) : 60000;
             try {
-                Thread.sleep(cnt.useGui? (cnt.isDynamicGUI()? 500 : 2500) : 10000);
+                Thread.sleep(timer);
             } catch (InterruptedException e) {
                 break;
             }

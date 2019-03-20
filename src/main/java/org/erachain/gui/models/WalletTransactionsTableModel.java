@@ -54,7 +54,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
      * gui.items.assets.My_Order_Tab
      */
     public WalletTransactionsTableModel() {
-        super("WalletTransactionsTableModel", 1000,
+        super("WalletTransactionsTableModel", 999000,
                 new String[]{
                         "Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
     }
@@ -228,6 +228,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
     }
 
+    private int count;
+
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         if (Controller.getInstance().wallet.database == null)
@@ -279,6 +281,16 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
             needUpdate = true;
 
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT
+                && needUpdate
+                && ++count > 4) {
+
+            count = 0;
+            needUpdate = false;
+
+            getInterval();
+            fireTableDataChanged();
+
         }
     }
 
@@ -294,12 +306,16 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         // for ??
         ///Controller.getInstance().wallet.database.getPersonMap().addObserver(transactions);
 
+        Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
+
         getInterval();
 
     }
 
 
     public void removeObserversThis() {
+
+        Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
 
         //dbItemAssetMap = DLSet.getInstance().getItemAssetMap();
 

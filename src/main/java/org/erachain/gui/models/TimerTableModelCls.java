@@ -26,6 +26,7 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
 
     public TimerTableModelCls(String[] columnNames) {
         this.columnNames = columnNames;
+        //this.initComponents();
         addObservers();
     }
 
@@ -33,6 +34,7 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
         this.columnNames = columnNames;
         this.name = name;
         this.timeout = timeout;
+        //this.initComponents();
         addObservers();
     }
 
@@ -59,6 +61,8 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
         }
 
     }
+
+    //public abstract void initComponents();
 
     @Override
     public int getColumnCount() {

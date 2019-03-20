@@ -60,12 +60,9 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_TRANSACTION_TYPE);
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_TRANSACTION_TYPE);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_TRANSACTION_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_TRANSACTION_TYPE);
-            } else {
-                this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.COUNT_TRANSACTION_TYPE);
-            }
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_TRANSACTION_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_TRANSACTION_TYPE);
+            this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.COUNT_TRANSACTION_TYPE);
         }
     }
 

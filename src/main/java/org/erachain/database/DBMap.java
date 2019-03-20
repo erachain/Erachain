@@ -186,7 +186,7 @@ public abstract class DBMap<T, U> extends Observable {
 
             //NOTIFY
             if (this.observableData != null && (old == null || !old.equals(value))) {
-                if (this.observableData.containsKey(NOTIFY_COUNT)) {
+                if (false && this.observableData.containsKey(NOTIFY_COUNT)) {
                     this.setChanged();
                     this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_COUNT), this)); /// SLOW .size()));
                 } else if (this.observableData.containsKey(NOTIFY_ADD)) {
@@ -223,7 +223,7 @@ public abstract class DBMap<T, U> extends Observable {
 
                 //NOTIFY
                 if (this.observableData != null) {
-                    if (this.observableData.containsKey(NOTIFY_COUNT)) {
+                    if (false && this.observableData.containsKey(NOTIFY_COUNT)) {
                         this.setChanged();
                         this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_COUNT), this));
                     } else if (this.observableData.containsKey(NOTIFY_REMOVE)) {
@@ -272,7 +272,7 @@ public abstract class DBMap<T, U> extends Observable {
 
         //NOTIFY
         if (this.observableData != null) {
-            if (this.observableData.containsKey(NOTIFY_COUNT)) {
+            if (false && this.observableData.containsKey(NOTIFY_COUNT)) {
                 this.setChanged();
                 this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_COUNT), this)); /// SLOW .size()));
             } else if (this.observableData.containsKey(NOTIFY_LIST)) {
@@ -366,7 +366,7 @@ public abstract class DBMap<T, U> extends Observable {
         // NOTYFIES
         if (this.observableData != null) {
             //NOTIFY LIST
-            if (this.observableData.containsKey(NOTIFY_COUNT)) {
+            if (false && this.observableData.containsKey(NOTIFY_COUNT)) {
                 this.setChanged();
                 this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_COUNT), this));
             } else if (this.observableData.containsKey(NOTIFY_RESET)) {
