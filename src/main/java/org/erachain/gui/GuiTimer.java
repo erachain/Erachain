@@ -19,7 +19,10 @@ public class GuiTimer extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GuiTimer.class);
 
+    private GuiObserver observer;
+
     public GuiTimer() {
+        observer = new GuiObserver();
     }
 
     public void run() {
@@ -28,7 +31,7 @@ public class GuiTimer extends Thread {
 
         while (!cnt.isOnStopping()) {
             try {
-                cnt.repaintGUI();
+                observer.repaintGUI();
             } catch (java.lang.OutOfMemoryError e) {
                 Controller.getInstance().stopAll(56);
                 return;
@@ -37,12 +40,20 @@ public class GuiTimer extends Thread {
             }
 
             try {
-                Thread.sleep(cnt.isDynamicGUI()? 500 : 2500);
+                Thread.sleep(cnt.useGui? (cnt.isDynamicGUI()? 500 : 2500) : 10000);
             } catch (InterruptedException e) {
                 break;
             }
         }
 
+    }
+
+    public void addObserver(Observer o) {
+        observer.addObserver(o);
+    }
+
+    public void deleteObserver(Observer o) {
+        observer.deleteObserver(o);
     }
 
 }

@@ -738,6 +738,8 @@ public class Controller extends Observable {
 
         }
 
+        guiTimer = new GuiTimer();
+
         if (this.wallet.isWalletDatabaseExisting()) {
             this.wallet.initiateItemsFavorites();
         }
@@ -3202,16 +3204,11 @@ public class Controller extends Observable {
 
     public void addWalletObserver(Observer o) {
         this.wallet.addObserver(o);
-        super.addObserver(o); // обработка repaintGUI
+        this.guiTimer.addObserver(o); // обработка repaintGUI
     }
     public void deleteWalletObserver(Observer o) {
-        super.deleteObserver(o); // нужно для перерисовки раз в 2 сек
+        this.guiTimer.deleteObserver(o); // нужно для перерисовки раз в 2 сек
         this.wallet.deleteObserver(o);
-    }
-
-    public void repaintGUI() {
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_REPAINT, null));
     }
 
     public void startApplication(String args[]){
@@ -3365,7 +3362,6 @@ public class Controller extends Observable {
 
                         //START GUI
 
-                        guiTimer = new GuiTimer();
                         gui = Gui.getInstance();
 
                         if (gui != null && Settings.getInstance().isSysTrayEnabled()) {
