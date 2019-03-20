@@ -306,7 +306,7 @@ public class  Split_Panel extends javax.swing.JPanel {
 
     }
 
-    public void delay_on_close() {
-    }
+    //public void delay_on_close() {
+    //}
     // End of variables declaration                   
 }

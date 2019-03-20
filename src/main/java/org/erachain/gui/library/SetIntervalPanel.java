@@ -202,8 +202,8 @@ public class SetIntervalPanel extends JPanel implements Observer {
 
     public void addObservers() {
         Controller.getInstance().addWalletObserver(this);
-
     }
+
     public void removeObservers() {
         Controller.getInstance().deleteWalletObserver(this);
     }

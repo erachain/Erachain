@@ -224,7 +224,12 @@ public class Records_My_SplitPanel extends Split_Panel {
 
         if (instance == null) {
             instance = new Records_My_SplitPanel();
+        } else {
+            // восстановим наблюдения
+            instance.records_model.addObservers();
+            instance.setIntervalPanel.addObservers();
         }
+
 
         return instance;
 
@@ -243,7 +248,7 @@ public class Records_My_SplitPanel extends Split_Panel {
         }
     }
 
-    @Override
+    //@Override
     public void delay_on_close() {
         // delete observer left panel
         this.records_model.removeObservers();
