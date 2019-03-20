@@ -266,16 +266,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             Transaction transaction = (Transaction) message.getValue();
             library.notifySysTrayRecord(transaction);
 
-        } else if (message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
-            // INCOME
-
-            //needUpdate = true;
-
-            Pair<byte[], Transaction> item = (Pair<byte[], Transaction>) message.getValue();
-            Transaction transaction = item.getB();
-
-            library.notifySysTrayRecord(transaction);
-
         } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE
                 //|| message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE
                 ) {
