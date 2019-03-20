@@ -2,6 +2,7 @@ package org.erachain.utils;
 // 30/03
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
@@ -39,6 +40,8 @@ public class SysTray implements Observer {
     private static SysTray systray = null;
     private TrayIcon icon = null;
     private PopupMenu createPopupMenu;
+
+    public boolean stopMessages = BlockChain.DEVELOP_USE;
 
     private long timePoint;
 
@@ -89,7 +92,7 @@ public class SysTray implements Observer {
     }
 
     public void sendMessage(String caption, String text, TrayIcon.MessageType messagetype) {
-        if (icon != null) {
+        if (icon != null && ! stopMessages) {
             icon.displayMessage(caption, text,
                     messagetype);
         }
