@@ -4,10 +4,9 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
-import org.erachain.gui.items.records.Records_UnConfirmed_Panel;
+import org.erachain.gui.items.records.UnconfirmedTransactionsPanel;
 import org.erachain.gui2.Main_Panel;
 import org.erachain.lang.Lang;
-import org.erachain.ntp.NTP;
 import org.erachain.utils.ObserverMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +76,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
                 // Lang.getInstance().translate("My Records"),
                 // Records_My_SplitPanel.getInstance());
                 Main_Panel.getInstance().insertTab(Lang.getInstance().translate("Unconfirmed Records"),
-                        Records_UnConfirmed_Panel.getInstance());
+                        UnconfirmedTransactionsPanel.getInstance());
             }
 
         });

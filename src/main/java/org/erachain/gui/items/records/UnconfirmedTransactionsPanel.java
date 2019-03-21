@@ -24,7 +24,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.Split_Panel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.library;
-import org.erachain.gui.models.Debug_Transactions_Table_Model;
+import org.erachain.gui.models.UnconfirmedTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -33,16 +33,16 @@ import org.erachain.utils.TableMenuPopupUtil;
 //import java.awt.la
 
 @SuppressWarnings("serial")
-public class Records_UnConfirmed_Panel extends JPanel // JPanel
+public class UnconfirmedTransactionsPanel extends JPanel // JPanel
 
 {
 
-    private static Records_UnConfirmed_Panel instance;
-    private Debug_Transactions_Table_Model transactionsModel;
+    private static UnconfirmedTransactionsPanel instance;
+    private UnconfirmedTransactionsTableModel transactionsModel;
     private MTable transactionsTable;
-    private Records_UnConfirmed_Panel th;
+    private UnconfirmedTransactionsPanel th;
 
-    public Records_UnConfirmed_Panel() {
+    public UnconfirmedTransactionsPanel() {
         th = this;
         setName(Lang.getInstance().translate("Unconfirmed Records"));
         // this.parent = parent;
@@ -70,7 +70,7 @@ public class Records_UnConfirmed_Panel extends JPanel // JPanel
         tableGBC.gridy = 1;
 
         // TRANSACTIONS
-        this.transactionsModel = new Debug_Transactions_Table_Model();
+        this.transactionsModel = new UnconfirmedTransactionsTableModel();
         this.transactionsTable = new MTable(this.transactionsModel);
         /*
          * //TRANSACTIONS SORTER Map<Integer, Integer> indexes = new
@@ -297,10 +297,10 @@ public class Records_UnConfirmed_Panel extends JPanel // JPanel
 
     }
 
-    public static Records_UnConfirmed_Panel getInstance() {
+    public static UnconfirmedTransactionsPanel getInstance() {
 
         if (instance == null) {
-            instance = new Records_UnConfirmed_Panel();
+            instance = new UnconfirmedTransactionsPanel();
         }
 
         return instance;

@@ -21,7 +21,7 @@ import java.util.Observer;
 
 @SuppressWarnings("serial")
 // IN gui.DebugTabPane used
-public class TransactionsTableModel extends TableModelCls<byte[], Transaction> implements Observer {
+public class SearchTransactionsTableModel extends TableModelCls<byte[], Transaction> implements Observer {
 
     //public static final int COLUMN_NO = 0;
     public static final int COLUMN_TIMESTAMP = 0;
@@ -30,7 +30,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
     public static final int COLUMN_TYPE = 3;
     public static final int COLUMN_AMOUNT = 4;
     public static final int COLUMN_FEE = 5;
-    static Logger LOGGER = LoggerFactory.getLogger(TransactionsTableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(SearchTransactionsTableModel.class.getName());
     Long block_Height;
     Integer block_No;
     List<Transaction> transactions;
@@ -39,8 +39,8 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
     //private String[] columnNames = Lang.getInstance().translate();
     private String ac;
 
-    public TransactionsTableModel() {
-        super("TransactionsTableModel", 1000,
+    public SearchTransactionsTableModel() {
+        super("SearchTransactionsTableModel", 1000,
                 new String[]{"Timestamp", "Block", "Seq_no", "Type", "Amount", AssetCls.FEE_NAME});
     }
 

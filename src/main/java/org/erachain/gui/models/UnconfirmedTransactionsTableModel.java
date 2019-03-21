@@ -17,13 +17,13 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class Debug_Transactions_Table_Model extends AbstractTableModel implements Observer {
+public class UnconfirmedTransactionsTableModel extends AbstractTableModel implements Observer {
 
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TYPE = 1;
     public static final int COLUMN_FEE = 2;
     private static final int MAX_ROWS = 1000;
-    private static final Logger LOGGER = LoggerFactory.getLogger(Debug_Transactions_Table_Model.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnconfirmedTransactionsTableModel.class);
 
     long timePoint;
 
@@ -31,7 +31,7 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
     SortableList<Long, Transaction> list;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Fee"});
 
-    public Debug_Transactions_Table_Model() {
+    public UnconfirmedTransactionsTableModel() {
         DCSet.getInstance().getTransactionMap().addObserver(this);
     }
 
@@ -131,7 +131,7 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
 
         if (type == ObserverMessage.LIST_UNC_TRANSACTION_TYPE) {
             //CHECK IF NEW LIST
-            //        LOGGER.error("gui.models.Debug_Transactions_Table_Model.syncUpdate - LIST_UNC_TRANSACTION_TYPE");
+            //        LOGGER.error("gui.models.UnconfirmedTransactionsTableModel.syncUpdate - LIST_UNC_TRANSACTION_TYPE");
             if (this.list == null) {
                 this.list = (SortableList<Long, Transaction>) message.getValue();
                 this.list.registerObserver();

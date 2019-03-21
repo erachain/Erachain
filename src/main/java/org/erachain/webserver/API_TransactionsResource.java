@@ -8,7 +8,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.library.library;
-import org.erachain.gui.models.TransactionsTableModel;
+import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.TransactionTimestampComparator;
@@ -300,7 +300,7 @@ public class API_TransactionsResource {
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(ff.toJSONString()).build();
         }
-        // TransactionsTableModel a = new TransactionsTableModel();
+        // SearchTransactionsTableModel a = new SearchTransactionsTableModel();
         // a.Find_Transactions_from_Address(address);
         // result =a.getTransactions();
         Integer type;
@@ -397,7 +397,7 @@ public class API_TransactionsResource {
         JSONObject ff = new JSONObject();
         List<Transaction> result;
 
-        TransactionsTableModel transactionsTableModel = new TransactionsTableModel();
+        SearchTransactionsTableModel transactionsTableModel = new SearchTransactionsTableModel();
         transactionsTableModel.setBlockNumber(block);
         result = transactionsTableModel.getTransactions();
         if (result == null || result.isEmpty()) {
