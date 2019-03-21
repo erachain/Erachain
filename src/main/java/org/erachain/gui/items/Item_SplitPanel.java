@@ -6,6 +6,7 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.Split_Panel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -21,7 +22,7 @@ import java.awt.event.*;
 public class Item_SplitPanel extends Split_Panel {
 
     private static final long serialVersionUID = 2717571093561259483L;
-    protected TableModelCls table_Model;
+    protected TimerTableModelCls table_Model;
     protected JMenuItem favorite_menu_items;
     protected JPopupMenu menu_Table;
     protected ItemCls item_Menu;
@@ -29,7 +30,7 @@ public class Item_SplitPanel extends Split_Panel {
     protected TableColumnModel tableColumnMode;
 
     @SuppressWarnings("rawtypes")
-    public Item_SplitPanel(TableModelCls table_Model1, String gui_Name) {
+    public Item_SplitPanel(TimerTableModelCls table_Model1, String gui_Name) {
 
         super(gui_Name);
         this.table_Model = table_Model1;

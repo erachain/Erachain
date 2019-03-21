@@ -4,6 +4,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemImprintMap;
+import org.erachain.datachain.Item_Map;
 import org.erachain.gui.items.TableModelItemsSearch;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -20,60 +21,12 @@ public class TableModelImprintsSearch extends TableModelItemsSearch {
     public static final int COLUMN_BORN = 2;
     public static final int COLUMN_PUBLISHER = 3;
     public static final int COLUMN_FAVORITE = 4;
-    static Logger LOGGER = LoggerFactory.getLogger(TableModelImprintsSearch.class.getName());
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false};
-    private ItemImprintMap db;
-    private List<ItemCls> list;
-    private String filter_Name = "";
-    private long key_filter = 0;
 
     public TableModelImprintsSearch() {
-        super(new String[]{"Key", "Name", "Birthday", "Publisher", "Favorite"});
+        super(DCSet.getInstance().getItemImprintMap(), new String[]{"Key", "Name", "Birthday", "Publisher", "Favorite"},
+                new Boolean[]{false, true, true, false});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
-        db = DCSet.getInstance().getItemImprintMap();
-    }
-
-    public void findByName(String str) {
-        filter_Name = str;
-        list = db.get_By_Name(filter_Name, false);
-        this.fireTableDataChanged();
-
-    }
-
-    public void clear() {
-        list = new ArrayList<ItemCls>();
-        this.fireTableDataChanged();
-
-    }
-
-    public Class<? extends Object> getColumnClass(int c) { // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] getColumnAutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void setColumnAutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
-    }
-
-    @Override
-    public ItemCls getItem(int row) {
-        return this.list.get(row);
-    }
-
-    @Override
-    public int getRowCount() {
-        if (this.list == null)
-            return 0;
-        ;
-        return this.list.size();
-
+        LOGGER = LoggerFactory.getLogger(TableModelImprintsSearch.class.getName());
     }
 
     @Override
@@ -82,61 +35,29 @@ public class TableModelImprintsSearch extends TableModelItemsSearch {
             return null;
         }
 
-        ImprintCls person = (ImprintCls) list.get(row);
+        ImprintCls item = (ImprintCls) list.get(row);
 
         switch (column) {
             case COLUMN_KEY:
 
-                return person.getKey();
+                return item.getKey();
 
             case COLUMN_NAME:
 
-                return person.getName();
+                return item.getName();
 
             case COLUMN_PUBLISHER:
 
-                return person.getOwner().getPersonAsString();
+                return item.getOwner().getPersonAsString();
 
             case COLUMN_FAVORITE:
 
-                return person.isFavorite();
+                return item.isFavorite();
 
-            //	case COLUMN_BORN:
-
-            // DateFormat f = new DateFormat("DD-MM-YYYY");
-            // SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY");
-            // return dateFormat.format( new Date(person.getBirthday()));
-            //		return person.getBirthdayStr();
 
         }
 
         return null;
-    }
-
-
-    public void findByKey(String text) {
-        // TODO Auto-generated method stub
-        if (text.equals("") || text == null) return;
-        if (!text.matches("[0-9]*")) return;
-        key_filter = new Long(text);
-        list = new ArrayList<ItemCls>();
-        ImprintCls pers = (ImprintCls) db.get(key_filter);
-        if (pers == null) return;
-        list.add(pers);
-        try {
-            this.fireTableDataChanged();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            LOGGER.info("fireTableDataChanged ?");
-        }
-
-    }
-
-    public void addObserversThis() {
-    }
-
-    public void removeObserversThis() {
     }
 
 }

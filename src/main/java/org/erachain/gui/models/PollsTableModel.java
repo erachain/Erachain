@@ -123,7 +123,7 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
     }
 
     @Override
-    public Object getItem(int k) {
+    public Poll getItem(int k) {
         // TODO Auto-generated method stub
         return this.polls.get(k).getB();
     }

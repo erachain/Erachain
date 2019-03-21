@@ -16,30 +16,10 @@ public class TableModelItemStatuses extends TableModelItemsSearch {
     public static final int COLUMN_UNIQUE = 3;
     public static final int COLUMN_FAVORITE = 4;
 
-    //private SortableList<Long, StatusCls> statuses;
-
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false};
-    private ItemStatusMap db;
-    private ArrayList<ItemCls> list;
-    private Long key_filter;
-    private String filter_Name;
-
     public TableModelItemStatuses() {
-        super(new String[]{"Key", "Name", "Creator", "Unique", "Favorite"});
-
+        super(DCSet.getInstance().getItemStatusMap(), new String[]{"Key", "Name", "Creator", "Unique", "Favorite"},
+                new Boolean[]{false, true, true, false});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
-        db = DCSet.getInstance().getItemStatusMap();
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] getColumnAutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void setColumnAutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
     }
 
     @Override

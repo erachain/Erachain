@@ -263,7 +263,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>, Trade> i
     }
 
     @Override
-    public Object getItem(int k) {
+    public Trade getItem(int k) {
         // TODO Auto-generated method stub
         Pair<Tuple2<Long, Long>, Trade> rec = this.trades.get(k);
         if (rec == null)

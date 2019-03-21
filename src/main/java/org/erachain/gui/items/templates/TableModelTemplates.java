@@ -14,27 +14,11 @@ public class TableModelTemplates extends TableModelItemsSearch {
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_FAVORITE = 3;
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false};
-    private Long key_filter;
-    private ArrayList<ItemCls> list;
-    private String filter_Name;
-    private ItemTemplateMap db;
 
     public TableModelTemplates() {
-        super(new String[]{"Key", "Name", "Creator", "Favorite"});
+        super(DCSet.getInstance().getItemTemplateMap(), new String[]{"Key", "Name", "Creator", "Favorite"},
+                new Boolean[]{false, true, true, false});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
-        db = DCSet.getInstance().getItemTemplateMap();
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] getColumnAutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void setColumnAutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
     }
 
     @Override

@@ -288,8 +288,8 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
     }
 
     @Override
-    public Object getItem(int k) {
+    public Transaction getItem(int k) {
         // TODO Auto-generated method stub
-        return transactions_Asset.get(k);
+        return transactions_Asset.get(k).b;
     }
 }

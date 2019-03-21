@@ -12,9 +12,8 @@ public class TableModelUnions extends TableModelItemsSearch {
     public static final int COLUMN_FAVORITE = 3;
 
     public TableModelUnions() {
-        super(new String[]{"Key", "Name", "Creator", "Favorite"});
+        super(DCSet.getInstance().getItemUnionMap(), new String[]{"Key", "Name", "Creator", "Favorite"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
-        db = DCSet.getInstance().getItemUnionMap();
     }
 
     @Override

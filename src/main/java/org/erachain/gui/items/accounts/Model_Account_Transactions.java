@@ -277,7 +277,7 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
     }
 
     @Override
-    public Object getItem(int k) {
+    public Transaction getItem(int k) {
         // TODO Auto-generated method stub
         return transactions_Asset.get(k);
     }

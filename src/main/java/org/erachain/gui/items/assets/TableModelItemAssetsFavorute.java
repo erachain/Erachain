@@ -149,7 +149,7 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
     }
 
     @Override
-    public Object getItem(int k) {
+    public AssetCls getItem(int k) {
         // TODO Auto-generated method stub
         return this.assets.get(k);
     }

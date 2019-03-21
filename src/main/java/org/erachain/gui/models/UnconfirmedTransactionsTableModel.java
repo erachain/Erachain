@@ -38,7 +38,7 @@ public class UnconfirmedTransactionsTableModel extends TableModelCls<Long, Trans
         return this.list;
     }
 
-    public Object getItem(int row) {
+    public Transaction getItem(int row) {
         return getTransaction(row);
     }
 

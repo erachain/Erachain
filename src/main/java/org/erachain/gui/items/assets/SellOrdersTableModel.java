@@ -217,7 +217,7 @@ public class SellOrdersTableModel extends TableModelCls<Long, Order> implements 
     }
 
     @Override
-    public Object getItem(int k) {
+    public Order getItem(int k) {
         // TODO Auto-generated method stub
         return this.orders.get(k).getB();
     }

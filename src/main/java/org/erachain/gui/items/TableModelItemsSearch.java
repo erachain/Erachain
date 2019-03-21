@@ -1,25 +1,29 @@
 package org.erachain.gui.items;
 
 import org.erachain.core.item.ItemCls;
+import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.Item_Map;
 import org.erachain.gui.models.TableModelCls;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 
 @SuppressWarnings("serial")
 public abstract class TableModelItemsSearch extends TableModelCls<Long, ItemCls> {
 
-    protected ArrayList<ItemCls> list;
-    protected Item_Map db;
+    protected List<ItemCls> list;
 
-    public TableModelItemsSearch(String[] columnNames) {
-        super(columnNames);
+    public TableModelItemsSearch(DBMap itemsMap, String[] columnNames) {
+        super(itemsMap, columnNames);
+    }
+    public TableModelItemsSearch(DBMap itemsMap, String[] columnNames, Boolean[] column_AutoHeight) {
+        super(itemsMap, columnNames, column_AutoHeight);
     }
 
     public void findByName(String filter) {
-        list = (ArrayList<ItemCls>) db.get_By_Name(filter, false);
+        list = ((Item_Map) map).get_By_Name(filter, false);
         this.fireTableDataChanged();
     }
 
@@ -31,7 +35,7 @@ public abstract class TableModelItemsSearch extends TableModelCls<Long, ItemCls>
         Long key_filter = new Long(text);
         list = new ArrayList<ItemCls>();
 
-        ItemCls itemCls = db.get(key_filter);
+        ItemCls itemCls = (ItemCls) map.get(key_filter);
 
         if (itemCls != null)
             list.add(itemCls);

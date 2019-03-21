@@ -5,12 +5,9 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemPersonMap;
 import org.erachain.gui.items.TableModelItemsSearch;
-import org.erachain.lang.Lang;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-import javax.validation.constraints.Null;
-import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("serial")
@@ -21,28 +18,14 @@ public class TableModelPersons extends TableModelItemsSearch {
     public static final int COLUMN_BORN = 2;
     public static final int COLUMN_PUBLISHER = 3;
     public static final int COLUMN_FAVORITE = 4;
-    static Logger LOGGER = LoggerFactory.getLogger(TableModelPersons.class.getName());
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false};
-    private ItemPersonMap db;
+
     private List<ItemCls> list;
-    private String filter_Name = "";
-    private long key_filter = 0;
 
     public TableModelPersons() {
-        super(new String[]{"Key", "Name", "Birthday", "Publisher", "Favorite"});
+        super(DCSet.getInstance().getItemPersonMap(), new String[]{"Key", "Name", "Birthday", "Publisher", "Favorite"},
+                new Boolean[]{false, true, true, false});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
-        db = DCSet.getInstance().getItemPersonMap();
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] getColumnAutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void setColumnAutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
+        LOGGER = LoggerFactory.getLogger(TableModelPersons.class.getName());
     }
 
     @Override

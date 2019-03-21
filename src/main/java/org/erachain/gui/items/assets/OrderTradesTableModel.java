@@ -133,7 +133,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tra
     }
 
     @Override
-    public Object getItem(int k) {
+    public Trade getItem(int k) {
         // TODO Auto-generated method stub
         return this.trades.get(k).getB();
     }

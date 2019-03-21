@@ -103,7 +103,7 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
     }
 
     @Override
-    public Object getItem(int k) {
+    public ImprintCls getItem(int k) {
         // TODO Auto-generated method stub
         return this.imprints.get(k).getB();
     }

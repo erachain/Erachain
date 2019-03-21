@@ -52,7 +52,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
     }
 
 
-    public Object getItem(int row) {
+    public Transaction getItem(int row) {
         return this.transactions.get(row).getB();
     }
 
