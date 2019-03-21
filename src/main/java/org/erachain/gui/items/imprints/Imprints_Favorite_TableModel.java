@@ -21,12 +21,12 @@ public class Imprints_Favorite_TableModel extends TableModelCls<Tuple2<String, S
     public static final int COLUMN_CONFIRMED = 3;
     public static final int COLUMN_FAVORITE = 4;
     private List<ImprintCls> persons;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
 
     public Imprints_Favorite_TableModel() {
+        super("Imprints_Favorite_TableModel", 1000,
+                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
-        addObservers();
     }
 
     @Override
@@ -53,16 +53,6 @@ public class Imprints_Favorite_TableModel extends TableModelCls<Tuple2<String, S
     public ImprintCls getItem(int row) {
         return this.persons.get(row);
 
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -142,12 +132,12 @@ public class Imprints_Favorite_TableModel extends TableModelCls<Tuple2<String, S
         }
     }
 
-    public void removeObservers() {
+    public void addObserversThis() {
+        Controller.getInstance().wallet.database.getImprintFavoritesSet().addObserver(this);
+    }
+
+    public void removeObserversThis() {
         Controller.getInstance().wallet.database.getImprintFavoritesSet().deleteObserver(this);
     }
 
-    public void addObservers() {
-
-        Controller.getInstance().wallet.database.getImprintFavoritesSet().addObserver(this);
-    }
 }

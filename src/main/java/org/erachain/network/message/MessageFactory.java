@@ -201,7 +201,7 @@ public class MessageFactory {
                 if (//!Controller.getInstance().isStatusOK() ||
                         !sender.network.checkHandledWinBlockMessages(data, sender, false)
                 ) {
-                    LOGGER.debug(sender + " <-- Win Block REPEATED...");
+                    //LOGGER.debug(sender + " <-- Win Block REPEATED...");
                     return null;
                 }
 

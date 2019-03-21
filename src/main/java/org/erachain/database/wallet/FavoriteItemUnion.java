@@ -9,5 +9,4 @@ public class FavoriteItemUnion extends FavoriteItem {
     public FavoriteItemUnion(DWSet dWSet, DB database) {
         super(dWSet, database, ObserverMessage.LIST_UNION_FAVORITES_TYPE, "union", 10);
     }
-
 }

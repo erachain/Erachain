@@ -21,14 +21,17 @@ public class AccountsPropertisMap extends DBMap<String, Tuple2<String, String>> 
     public static final int OWNER_INDEX = 2;
     static Logger LOGGER = LoggerFactory.getLogger(AccountsPropertisMap.class.getName());
     BTreeMap<String, String> titleIndex;
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public AccountsPropertisMap(DWSet dWSet, DB database) {
         super(dWSet, database);
 
-        this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ACCOUNT_PROPERTIES_ADD);
-        this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_ACCOUNT_PROPERTIES_DELETE);
-        this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_ACCOUNT_PROPERTIES_LIST);
+        if (databaseSet.isWithObserver()) {
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_ACCOUNT_PROPERTIES_LIST);
+            if (databaseSet.isDynamicGUI()) {
+                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ACCOUNT_PROPERTIES_ADD);
+                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_ACCOUNT_PROPERTIES_DELETE);
+            }
+        }
     }
 
     @Override
@@ -50,33 +53,6 @@ public class AccountsPropertisMap extends DBMap<String, Tuple2<String, String>> 
     @Override
     protected Tuple2<String, String> getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
-    // get list items in name substring str
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public Map<String, Tuple2<String, String>> get_By_Name(String str, boolean caseCharacter) {
-        Map<String, Tuple2<String, String>> txs = new TreeMap<String, Tuple2<String, String>>();
-        // if (str == null || str.length() < 3)
-        // return null;
-
-        Iterator<Pair<String, Tuple2<String, String>>> it = this.getList().iterator();
-        while (it.hasNext()) {
-            Pair<String, Tuple2<String, String>> a = it.next();
-            String s1 = a.getB().a;
-            if (!caseCharacter) {
-                s1 = s1.toLowerCase();
-                str = str.toLowerCase();
-            }
-            if (s1.contains(str))
-                txs.put(a.getA(), a.getB());
-        }
-
-        return txs;
     }
 
     @Override

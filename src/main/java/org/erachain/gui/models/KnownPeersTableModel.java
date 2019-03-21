@@ -236,9 +236,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
             Peer peer1 = (Peer) message.getValue();
             int n = 0;
             for (Peer peer2 : this.peers) {
-                if (Arrays.equals(peer1.getAddress().getAddress(),
-                        peer2.getAddress().getAddress())) {
-                    ///this.peersStatus.set(n, true);
+                if (peer2.equals(peer1)) {
                     break;
                 }
                 n++;

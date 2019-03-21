@@ -1,6 +1,7 @@
 package org.erachain.database.wallet;
 // 30/03 ++
 
+import org.erachain.controller.Controller;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -10,7 +11,7 @@ import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
-import org.erachain.database.IDB;
+import org.erachain.database.DBASet;
 import org.erachain.settings.Settings;
 import org.mapdb.Atomic.Var;
 import org.mapdb.DB;
@@ -18,16 +19,9 @@ import org.mapdb.DBMaker;
 
 import java.io.File;
 
-//import org.mapdb.Serializer;
+public class DWSet extends DBASet {
 
-public class DWSet implements IDB {
-    private final File WALLET_FILE;
-
-    private static final String VERSION = "version";
     private static final String LAST_BLOCK = "lastBlock";
-
-    private DB database;
-    private int uses;
 
     private Var<Long> licenseKeyVar;
     private Long licenseKey;
@@ -59,51 +53,12 @@ public class DWSet implements IDB {
 
     private FavoriteDocument statementFavoritesSet;
 
-    public DWSet() {
-        //OPEN WALLET
-        WALLET_FILE = new File(Settings.getInstance().getDataWalletDir(), "wallet.dat");
-        WALLET_FILE.getParentFile().mkdirs();
-
-        //DELETE TRANSACTIONS
-        //File transactionFile = new File(Settings.getInstance().getWalletDir(), "wallet.dat.t");
-        //transactionFile.delete();
-
-        this.database = DBMaker.newFileDB(WALLET_FILE)
-                // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
-                //.cacheSize(2048)
-
-                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
-                ///// добавил dcSet.clearCache(); --
-                ///.cacheDisable()
-
-                // это чистит сама память если соталось 25% от кучи - так что она безопасная
-                // у другого типа КЭША происходит утечка памяти
-                //.cacheHardRefEnable()
-                //.cacheLRUEnable()
-                ///.cacheSoftRefEnable()
-                .cacheWeakRefEnable()
-
-                // количество точек в таблице которые хранятся в HashMap как в КЭШе
-                .cacheSize(10000)
-
-                .checksumEnable()
-                .mmapFileEnableIfSupported() // ++
-                /// ICREATOR
-                .commitFileSyncDisable() // ++
-
-                // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
-
-                //.compressionEnable()
-
-                .make();
-
-        uses = 0;
+    public DWSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI) {
+        super(dbFile, database, withObserver,  dynamicGUI);
 
         // LICENCE SIGNED
         this.licenseKeyVar = database.getAtomicVar("licenseKey");
         this.licenseKey = this.licenseKeyVar.get();
-
 
         this.accountMap = new AccountMap(this, this.database);
         this.accountsPropertisMap = new AccountsPropertisMap(this, this.database);
@@ -132,15 +87,53 @@ public class DWSet implements IDB {
 
     }
 
-    public boolean exists() {
-        return WALLET_FILE.exists();
-    }
+    public static DWSet reCreateDB(boolean withObserver, boolean dynamicGUI) {
 
-    public int getVersion() {
-        this.uses++;
-        int u = this.database.getAtomicInteger(VERSION).intValue();
-        this.uses--;
-        return u;
+        //OPEN WALLET
+        File dbFile = new File(Settings.getInstance().getDataWalletDir(), "wallet.dat");
+        dbFile.getParentFile().mkdirs();
+
+        //DELETE TRANSACTIONS
+        //File transactionFile = new File(Settings.getInstance().getWalletDir(), "wallet.dat.t");
+        //transactionFile.delete();
+
+        DB database = DBMaker.newFileDB(dbFile)
+                // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
+                //.cacheSize(2048)
+
+                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
+                ///// добавил dcSet.clearCache(); --
+                ///.cacheDisable()
+
+                // это чистит сама память если соталось 25% от кучи - так что она безопасная
+                // у другого типа КЭША происходит утечка памяти
+                //.cacheHardRefEnable()
+                //.cacheLRUEnable()
+                ///.cacheSoftRefEnable()
+                .cacheWeakRefEnable()
+
+                // количество точек в таблице которые хранятся в HashMap как в КЭШе
+                .cacheSize(10000)
+
+                .checksumEnable()
+                .mmapFileEnableIfSupported() // ++
+
+                // вызывает java.io.IOError: java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
+                // на ситема с Виндой в момент синхронизации кошелька когда там многот транзакций для этого кошелька
+                .commitFileSyncDisable() // ++
+
+                //.asyncWriteFlushDelay(30000)
+
+                // если при записи на диск блока процессор сильно нагружается - то уменьшить это
+                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
+
+                //.mmapFileEnablePartial()
+                //.compressionEnable()
+
+                .make();
+
+        return new DWSet(dbFile, database, withObserver, dynamicGUI);
+
     }
 
     public Long getLicenseKey() {
@@ -151,34 +144,6 @@ public class DWSet implements IDB {
 
         this.licenseKey = key;
         this.licenseKeyVar.set(this.licenseKey);
-
-    }
-
-    public void setVersion(int version) {
-        this.uses++;
-        this.database.getAtomicInteger(VERSION).set(version);
-        this.uses--;
-    }
-
-    public void addUses() {
-        this.uses++;
-
-    }
-
-    public void outUses() {
-        this.uses--;
-    }
-
-    public boolean isBusy() {
-        if (this.uses > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public void openDBSet() {
 
     }
 
@@ -393,36 +358,60 @@ public class DWSet implements IDB {
 
     }
 
-    public void clearCache() {
-        this.database.getEngine().clearCache();
-    }
+    long commitPoint;
 
     @Override
     public void commit() {
+        if (this.uses != 0
+                //|| System.currentTimeMillis() - commitPoint < 50000
+        )
+            return;
+
         this.uses++;
         this.database.commit();
         this.uses--;
 
+        commitPoint = System.currentTimeMillis();
+
     }
 
-    public void rollback() {
+    /**
+     * закрываем без коммита! - чтобы при запуске продолжитть?
+     */
+    @Override
+    public void close() {
+
+        if (this.database == null || this.database.isClosed())
+            return;
+
+        int step = 0;
+        if (Controller.getInstance().wallet.synchronizeStatus) {
+            // STOP syncronize Wallet
+            Controller.getInstance().wallet.synchronizeBodyStop = true;
+
+            while (Controller.getInstance().wallet.synchronizeStatus && ++step < 500) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                }
+
+            }
+        }
+
+        step = 0;
+        while (uses > 0 && ++step < 100) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+
+        }
+
         this.uses++;
         this.database.rollback();
+        this.database.close();
         this.uses--;
 
     }
 
-    @Override
-    public void close() {
-        if (this.database != null) {
-            if (!this.database.isClosed()) {
-                this.uses++;
-                //this.database.rollback();
-                this.database.commit();
-                this.database.close();
-                this.uses--;
-
-            }
-        }
-    }
 }

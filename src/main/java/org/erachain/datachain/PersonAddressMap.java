@@ -6,12 +6,13 @@ import org.mapdb.DB;
 import org.mapdb.Fun.Tuple3;
 import org.erachain.utils.ObserverMessage;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
 //import java.util.HashMap;
-//import org.erachain.database.DBSet;
+//import org.erachain.database.DLSet;
 
 /**
  * Хранит Удостоверенные публичные ключи для персон.
@@ -36,18 +37,17 @@ public class PersonAddressMap extends DCMap<
                         Integer, // block.getHeight
                         Integer // transaction index
                         >>>> {
-    private Map<Integer, Integer> observableData = new TreeMap<Integer, Integer>(); // hashMap ?
 
     public PersonAddressMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_ALL_ACCOUNT_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_ALL_ACCOUNT_TYPE);
             if (databaseSet.isDynamicGUI()) {
                 this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_ALL_ACCOUNT_TYPE);
                 this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_ALL_ACCOUNT_TYPE);
             }
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_ALL_ACCOUNT_TYPE);
         }
     }
 
@@ -75,11 +75,6 @@ public class PersonAddressMap extends DCMap<
     @Override
     protected TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> getDefaultValue() {
         return new TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>();
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     ///////////////////////////////

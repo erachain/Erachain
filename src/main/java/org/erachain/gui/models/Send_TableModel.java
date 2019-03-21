@@ -257,7 +257,7 @@ public class Send_TableModel extends JTable implements Observer {
             }
         });
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         Controller.getInstance().addObserver(this);
     }
 

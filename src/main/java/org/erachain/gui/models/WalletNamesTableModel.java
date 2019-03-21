@@ -5,7 +5,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.naming.Name;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.NameMap;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
@@ -21,10 +20,9 @@ public class WalletNamesTableModel extends TableModelCls<Tuple2<String, String>,
 
     private SortableList<Tuple2<String, String>, Name> names;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Name", "Owner", "Confirmed"});
-
     public WalletNamesTableModel() {
-        Controller.getInstance().addWalletListener(this);
+        super("WalletNamesTableModel", 1000,
+                new String[]{"Name", "Owner", "Confirmed"});
     }
 
     @Override
@@ -40,16 +38,6 @@ public class WalletNamesTableModel extends TableModelCls<Tuple2<String, String>,
             return name;
         }
         return this.names.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -123,5 +111,15 @@ public class WalletNamesTableModel extends TableModelCls<Tuple2<String, String>,
             return name;
         }
         return this.names.get(k).getB();
+
+    }
+
+    public void addObserversThis() {
+        Controller.getInstance().addWalletObserver(this);
+    }
+
+    public void removeObserversThis() {
+        Controller.getInstance().deleteObserver(this);
+
     }
 }

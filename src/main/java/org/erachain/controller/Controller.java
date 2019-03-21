@@ -36,7 +36,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
-import org.erachain.database.DBSet;
+import org.erachain.database.DLSet;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.Item_Map;
@@ -44,6 +44,7 @@ import org.erachain.datachain.LocalDataMap;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
+import org.erachain.gui.GuiTimer;
 import org.erachain.gui.library.Issue_Confirm_Dialog;
 import org.erachain.lang.Lang;
 import org.erachain.network.Network;
@@ -156,8 +157,10 @@ public class Controller extends Observable {
     private long toOfflineTime;
     private ConcurrentHashMap<Peer, Tuple2<Integer, Long>> peerHWeight;
     private ConcurrentHashMap<Peer, Pair<String, Long>> peersVersions;
-    private DBSet dbSet; // = DBSet.getInstance();
-    private DCSet dcSet; // = DBSet.getInstance();
+    private DLSet dlSet; // = DLSet.getInstance();
+    private DCSet dcSet; // = DLSet.getInstance();
+    public Gui gui;
+    public GuiTimer guiTimer;
 
     // private JSONObject Setting_Json;
 
@@ -255,13 +258,16 @@ public class Controller extends Observable {
     public void setDynamicGUI(boolean dynamicGUI) {
         this.dynamicGUI = dynamicGUI;
     }
+    public boolean isDynamicGUI() {
+        return this.dynamicGUI;
+    }
 
     public void setDCSet(DCSet db) {
         this.dcSet = db;
     }
 
-    public DBSet getDBSet() {
-        return this.dbSet;
+    public DLSet getDBSet() {
+        return this.dlSet;
     }
 
     public int getNetworkPort() {
@@ -449,8 +455,8 @@ public class Controller extends Observable {
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open") + " " + name));
 
             //// должен быть метод
-            ///// dbSet.open();
-            /// this.dbSet = DBSet.getinstanse();
+            ///// DLSet.open();
+            /// this.DLSet = DLSet.getinstanse();
 
             LOGGER.info(name + " OK");
             this.setChanged();
@@ -466,7 +472,7 @@ public class Controller extends Observable {
                 // пытаемся восстановисть
 
                 /// у объекта должен быть этот метод восстанорвления
-                // dbSet.restoreBuckUp();
+                // DLSet.restoreBuckUp();
 
             } catch (Throwable e1) {
 
@@ -476,7 +482,7 @@ public class Controller extends Observable {
                 try {
                     // пытаемся пересоздать
                     //// у объекта должен быть такой метод пересоздания
-                    // dbSet.reCreateDB();
+                    // DLSet.reCreateDB();
 
                 } catch (Throwable e2) {
 
@@ -499,13 +505,13 @@ public class Controller extends Observable {
                     this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("BackUp datachain")));
                     // delete & copy files in BackUp dir
 
-                    //// у объекта должен быть этот метод сохранения dbSet.createDataCheckpoint();
+                    //// у объекта должен быть этот метод сохранения DLSet.createDataCheckpoint();
                 }
             } else {
                 this.setChanged();
                 this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("BackUp datachain")));
                 // delete & copy files in BackUp dir
-                //// у объекта должен быть этот метод сохранения dbSet.createDataCheckpoint();
+                //// у объекта должен быть этот метод сохранения DLSet.createDataCheckpoint();
             }
         }
 
@@ -558,7 +564,8 @@ public class Controller extends Observable {
         try {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open DataLocale")));
-            this.dbSet = DBSet.getinstanse();
+            LOGGER.info("Try Open DataLocal");
+            this.dlSet = DLSet.reCreateDB();
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataLocale OK")));
             LOGGER.info("DataLocale OK");
@@ -572,7 +579,8 @@ public class Controller extends Observable {
         // OPENING DATABASES
         try {
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open DataChain")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Try Open DataChain")));
+            LOGGER.info("Try Open DataChain");
             this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI);
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataChain OK")));
@@ -648,7 +656,7 @@ public class Controller extends Observable {
          * this.dcSet.getLocalDataMap().set("txfinalmap", "2");
          * this.dcSet.getLocalDataMap().set("blogpostmap", "2"); } } catch
          * (Exception e12) { createDataCheckpoint(); //
-         * Setting_Json.put("DB_OPEN", "Open BAD - try reCreate"); }
+         * Setting_Json.put("DB_OPEN", "Open BAD - try reCreateDB"); }
          */
 
         // CREATE SYNCHRONIZOR
@@ -687,7 +695,7 @@ public class Controller extends Observable {
         // CREATE WALLET
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open Wallet")));
-        this.wallet = new Wallet();
+        this.wallet = new Wallet(this.dcSetWithObserver, this.dynamicGUI);
 
         if (this.seedCommand != null && this.seedCommand.length > 1) {
             /// 0 - Accounts number, 1 - seed, 2 - password, [3 - path]
@@ -730,6 +738,8 @@ public class Controller extends Observable {
 
         }
 
+        guiTimer = new GuiTimer();
+
         if (this.wallet.isWalletDatabaseExisting()) {
             this.wallet.initiateItemsFavorites();
         }
@@ -744,7 +754,7 @@ public class Controller extends Observable {
 
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open Telegram")));
-        this.telegramStore = TelegramStore.getInstanse();
+        this.telegramStore = TelegramStore.getInstanse(this.dcSetWithObserver, this.dynamicGUI);
 
 
         this.setChanged();
@@ -772,7 +782,7 @@ public class Controller extends Observable {
             this.status = STATUS_OK;
 
         // REGISTER DATABASE OBSERVER
-        // this.addObserver(this.dbSet.getPeerMap());
+        // this.addObserver(this.DLSet.getPeerMap());
         this.addObserver(this.dcSet);
 
         // start memory viewer
@@ -793,6 +803,10 @@ public class Controller extends Observable {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    public int loadWalletFromDir() {
+        return this.wallet.loadFromDir(this.dcSetWithObserver, this.dynamicGUI);
     }
 
     public void replaseFavoriteItems(int type) {
@@ -823,13 +837,13 @@ public class Controller extends Observable {
 
         }
 
-        DCSet.reCreateDatabase(this.dcSetWithObserver, this.dynamicGUI);
+        DCSet.reCreateDB(this.dcSetWithObserver, this.dynamicGUI);
         this.dcSet = DCSet.getInstance();
         return this.dcSet;
     }
 
     // recreate DB locate
-    public DBSet reCreateDB() throws IOException, Exception {
+    public DLSet reCreateDB() throws IOException, Exception {
 
         File dataLocal = new File(Settings.getInstance().getLocalDir());
 
@@ -842,9 +856,8 @@ public class Controller extends Observable {
             }
         }
 
-        DBSet.reCreateDatabase();
-        this.dbSet = DBSet.getinstanse();
-        return this.dbSet;
+        this.dlSet = DLSet.reCreateDB();
+        return this.dlSet;
     }
 
     private void createDataCheckpoint() {
@@ -900,7 +913,7 @@ public class Controller extends Observable {
                 // delete data folder
                 java.nio.file.Files.walkFileTree(dataBak.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
             }
-            DCSet.reCreateDatabase(this.dcSetWithObserver, this.dynamicGUI);
+            DCSet.reCreateDB(this.dcSetWithObserver, this.dynamicGUI);
 
             this.dcSet.getLocalDataMap().set(LocalDataMap.LOCAL_DATA_VERSION_KEY, Controller.releaseVersion);
 
@@ -937,76 +950,6 @@ public class Controller extends Observable {
             this.webService = new WebService();
             this.webService.start();
         }
-    }
-
-    @Override
-    public void addObserver(Observer o) {
-
-        this.dcSet.getBlockMap().addObserver(o);
-        this.dcSet.getTransactionMap().addObserver(o);
-        // this.dcSet.getTransactionFinalMap().addObserver(o);
-
-        if (this.dcSetWithObserver) {
-            // ADD OBSERVER TO SYNCHRONIZER
-            // this.synchronizer.addObserver(o);
-
-            // ADD OBSERVER TO BLOCKGENERATOR
-            // this.blockGenerator.addObserver(o);
-
-            // ADD OBSERVER TO NAMESALES
-            this.dcSet.getNameExchangeMap().addObserver(o);
-
-            // ADD OBSERVER TO POLLS
-            //this.dcSet.getPollMap().addObserver(o);
-
-            // ADD OBSERVER TO ASSETS
-            this.dcSet.getItemAssetMap().addObserver(o);
-
-            // ADD OBSERVER TO IMPRINTS
-            this.dcSet.getItemImprintMap().addObserver(o);
-
-            // ADD OBSERVER TO TEMPLATES
-            this.dcSet.getItemTemplateMap().addObserver(o);
-
-            // ADD OBSERVER TO PERSONS
-            this.dcSet.getItemPersonMap().addObserver(o);
-
-            // ADD OBSERVER TO STATUSES
-            this.dcSet.getItemStatusMap().addObserver(o);
-
-            // ADD OBSERVER TO UNIONS
-            this.dcSet.getItemUnionMap().addObserver(o);
-
-            // ADD OBSERVER TO ORDERS
-            this.dcSet.getOrderMap().addObserver(o);
-
-            // ADD OBSERVER TO TRADES
-            this.dcSet.getTradeMap().addObserver(o);
-
-            // ADD OBSERVER TO BALANCES
-            this.dcSet.getAssetBalanceMap().addObserver(o);
-
-            // ADD OBSERVER TO ATMAP
-            this.dcSet.getATMap().addObserver(o);
-
-            // ADD OBSERVER TO ATTRANSACTION MAP
-            this.dcSet.getATTransactionMap().addObserver(o);
-        }
-
-        // ADD OBSERVER TO CONTROLLER
-        super.addObserver(o);
-        o.update(this, new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
-    }
-
-    @Override
-    public void deleteObserver(Observer o) {
-        this.dcSet.getBlockMap().deleteObserver(o);
-
-        super.deleteObserver(o);
-    }
-
-    public void deleteWalletObserver(Observer o) {
-        this.wallet.deleteObserver(o);
     }
 
     public boolean isOnStopping() {
@@ -1116,7 +1059,7 @@ public class Controller extends Observable {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing Local database")));
         LOGGER.info("Closing Local database");
-        this.dbSet.close();
+        this.dlSet.close();
 
         // CLOSE telegram
         this.setChanged();
@@ -1770,7 +1713,7 @@ public class Controller extends Observable {
 
         /// this.status = STATUS_SYNCHRONIZING;
 
-        // DBSet dcSet = DBSet.getInstance();
+        // DLSet dcSet = DLSet.getInstance();
 
         Peer peer = null;
         // Block lastBlock = getLastBlock();
@@ -1943,7 +1886,8 @@ public class Controller extends Observable {
             return true;
 
         // IF NEW WALLET CREADED
-        if (this.wallet.create(seed, password, amount, false, path)) {
+        if (this.wallet.create(seed, password, amount, false, path,
+                this.dcSetWithObserver, this.dynamicGUI)) {
             this.setWalletLicense(licenseKey);
             return true;
         } else
@@ -1955,7 +1899,9 @@ public class Controller extends Observable {
         if (noUseWallet)
             return true;
 
-        if (this.wallet.create(seed, password, amount, false, path)) {
+        if (this.wallet.create(seed, password, amount, false, path,
+                this.dcSetWithObserver, this.dynamicGUI)) {
+
             LOGGER.info("Wallet needs to synchronize!");
             this.setNeedSyncWallet(true);
 
@@ -2079,10 +2025,6 @@ public class Controller extends Observable {
         return this.wallet.getUnconfirmedBalance(account, key);
     }
 
-    public void addWalletListener(Observer o) {
-        this.wallet.addObserver(o);
-    }
-
     public String importAccountSeed(byte[] accountSeed) {
         return this.wallet.importAccountSeed(accountSeed);
     }
@@ -2162,7 +2104,7 @@ public class Controller extends Observable {
                 }
             };
 
-            Gui gui = Gui.getInstance();
+            //gui = Gui.getInstance();
             gui.bringtoFront();
 
             result = JOptionPane.showOptionDialog(gui, jsp, Lang.getInstance().translate("INCOMING API CALL"),
@@ -2372,15 +2314,6 @@ public class Controller extends Observable {
         return getItemMap(type).getValues();
     }
 
-
-    public void onDatabaseCommit() {
-        this.wallet.commit();
-    }
-
-    public void startBlockGenerator() {
-        this.blockGenerator.start();
-    }
-
     public BlockGenerator getBlockGenerator() {
         return this.blockGenerator;
     }
@@ -2468,7 +2401,7 @@ public class Controller extends Observable {
         if (newBlock == null)
             return false;
 
-        // if last block is changed by core.Synchronizer.process(DBSet, Block)
+        // if last block is changed by core.Synchronizer.process(DLSet, Block)
         // clear this win block
         if (!Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getReference())) {
             return false;
@@ -2661,16 +2594,6 @@ public class Controller extends Observable {
     public void onTransactionCreate(Transaction transaction) {
         // ADD TO UNCONFIRMED TRANSACTIONS
         this.dcSet.getTransactionMap().add(transaction);
-
-        // NOTIFY OBSERVERS - AUTO in database.wallet.TransactionMap
-        if (false) {
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_LIST_TRANSACTION_TYPE,
-                    this.dcSet.getTransactionMap().getValues()));
-
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_ADD_TRANSACTION_TYPE, transaction));
-        }
 
         // BROADCAST
         this.broadcastTransaction(transaction);
@@ -3205,8 +3128,88 @@ public class Controller extends Observable {
 
         return null;
     }
+
+    @Override
+    public void addObserver(Observer o) {
+
+        this.dcSet.getBlockMap().addObserver(o);
+        this.dcSet.getTransactionMap().addObserver(o);
+        // this.dcSet.getTransactionFinalMap().addObserver(o);
+
+        if (this.dcSetWithObserver) {
+            // ADD OBSERVER TO SYNCHRONIZER
+            // this.synchronizer.addObserver(o);
+
+            // ADD OBSERVER TO BLOCKGENERATOR
+            // this.blockGenerator.addObserver(o);
+
+            // ADD OBSERVER TO NAMESALES
+            this.dcSet.getNameExchangeMap().addObserver(o);
+
+            // ADD OBSERVER TO POLLS
+            //this.dcSet.getPollMap().addObserver(o);
+
+            // ADD OBSERVER TO ASSETS
+            this.dcSet.getItemAssetMap().addObserver(o);
+
+            // ADD OBSERVER TO IMPRINTS
+            this.dcSet.getItemImprintMap().addObserver(o);
+
+            // ADD OBSERVER TO TEMPLATES
+            this.dcSet.getItemTemplateMap().addObserver(o);
+
+            // ADD OBSERVER TO PERSONS
+            this.dcSet.getItemPersonMap().addObserver(o);
+
+            // ADD OBSERVER TO STATUSES
+            this.dcSet.getItemStatusMap().addObserver(o);
+
+            // ADD OBSERVER TO UNIONS
+            this.dcSet.getItemUnionMap().addObserver(o);
+
+            // ADD OBSERVER TO ORDERS
+            this.dcSet.getOrderMap().addObserver(o);
+
+            // ADD OBSERVER TO TRADES
+            this.dcSet.getTradeMap().addObserver(o);
+
+            // ADD OBSERVER TO BALANCES
+            this.dcSet.getAssetBalanceMap().addObserver(o);
+
+            // ADD OBSERVER TO ATMAP
+            this.dcSet.getATMap().addObserver(o);
+
+            // ADD OBSERVER TO ATTRANSACTION MAP
+            this.dcSet.getATTransactionMap().addObserver(o);
+        }
+
+        // ADD OBSERVER TO CONTROLLER
+        super.addObserver(o);
+        o.update(this, new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
+    }
+
+    @Override
+    public void deleteObserver(Observer o) {
+        this.dcSet.getBlockMap().deleteObserver(o);
+
+        super.deleteObserver(o);
+    }
+
     public void addSingleObserver(Observer o){
        super.addObserver(o);
+    }
+
+    public void deleteSingleObserver(Observer o){
+        super.deleteObserver(o);
+    }
+
+    public void addWalletObserver(Observer o) {
+        this.wallet.addObserver(o);
+        this.guiTimer.addObserver(o); // обработка repaintGUI
+    }
+    public void deleteWalletObserver(Observer o) {
+        this.guiTimer.deleteObserver(o); // нужно для перерисовки раз в 2 сек
+        this.wallet.deleteObserver(o);
     }
 
     public void startApplication(String args[]){
@@ -3360,11 +3363,12 @@ public class Controller extends Observable {
 
                         //START GUI
 
-                        if (Gui.getInstance() != null && Settings.getInstance().isSysTrayEnabled()) {
+                        gui = Gui.getInstance();
+
+                        if (gui != null && Settings.getInstance().isSysTrayEnabled()) {
 
                             SysTray.getInstance().createTrayIcon();
                             about_frame.setVisible(false);
-                   //         about_frame.getInstance().dispose();
                         }
                     } catch (Exception e1) {
                         if (about_frame!=null) {

@@ -211,7 +211,7 @@ public class RIPPersonFrame extends JInternalFrame {
             // IF PERSON DEAD
             // TODO by PERSON
 			/*
-			Tuple5<Long, Long, byte[], Integer, Integer> aliveStatus = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY);
+			Tuple5<Long, Long, byte[], Integer, Integer> aliveStatus = DLSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY);
 			if (aliveStatus == null) {}
 			else if (aliveStatus != null && aliveStatus.c[0] == (byte)2)
 			{

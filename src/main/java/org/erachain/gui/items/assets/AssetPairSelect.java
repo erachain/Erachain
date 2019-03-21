@@ -186,7 +186,7 @@ public class AssetPairSelect extends JDialog {
                 pair_Panel.jScrollPanel_LeftPanel.setViewportView(pair_Panel.search_Info_Panel);
 
 
-                //	search_Table_Model.set_Filter_By_Name(search);
+                //	search_Table_Model.findByName(search);
 
                 new Thread() {
                     @Override

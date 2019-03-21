@@ -21,7 +21,6 @@ Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @SuppressWarnings("rawtypes")
 public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     private BTreeMap pairKeyMap;
     private BTreeMap wantKeyMap;
@@ -33,11 +32,11 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_TRADE_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_ORDER_TYPE);
             if (databaseSet.isDynamicGUI()) {
                 this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_TRADE_TYPE);
                 this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_TRADE_TYPE);
             }
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_ORDER_TYPE);
         }
     }
 
@@ -185,11 +184,6 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
     @Override
     protected Trade getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     public void add(Trade trade) {

@@ -29,19 +29,17 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
     public static final int COLUMN_FEE = 5;
     static Logger LOGGER = LoggerFactory.getLogger(WalletBlocksTableModel.class.getName());
     private SortableList<Tuple2<String, String>, Block.BlockHead> blocks;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator",
-            "GB dtWV", //"Generating Balance",
-            "Transactions", "Fee"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, true, false};
 
     public WalletBlocksTableModel() {
+        super("WalletBlocksTableModel", 1000,
+                new String[]{"Height", "Timestamp", "Generator",
+                        "GB dtWV", //"Generating Balance",
+                        "Transactions", "Fee"});
         if (!Controller.getInstance().doesWalletDatabaseExists()) {
             this.blocks = null;
         } else {
-            Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this);
-            Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.blocks);
-            this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
-            this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            addObservers();
         }
     }
 
@@ -64,17 +62,6 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
     // устанавливаем колонки которым изменить высоту
     public void set_get_Column_AutoHeight(Boolean[] arg0) {
         this.column_AutuHeight = arg0;
-    }
-
-
-    @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return columnNames[index];
     }
 
     @Override
@@ -184,14 +171,20 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
         }
     }
 
-    public void deleteObserver() {
+    protected void addObserversThis() {
+        Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this);
+        Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.blocks);
+        this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
+        this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+    }
+
+    protected void removeObserversThis() {
         Controller.getInstance().wallet.database.getBlocksHeadMap().deleteObserver(this);
         Controller.getInstance().wallet.database.getBlocksHeadMap().deleteObserver(this.blocks);
     }
 
     @Override
-    public Object getItem(int k) {
-        // TODO Auto-generated method stub
-        return this.blocks.get(k);
+    public Block.BlockHead getItem(int k) {
+        return this.blocks.get(k).getB();
     }
 }

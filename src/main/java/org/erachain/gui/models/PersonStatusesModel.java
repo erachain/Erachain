@@ -7,7 +7,6 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemStatusMap;
 import org.erachain.lang.Lang;
-import org.erachain.utils.DateTimeFormat;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 import org.erachain.utils.ObserverMessage;
@@ -31,7 +30,7 @@ public class PersonStatusesModel extends AbstractTableModel implements Observer 
     List<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>> statusesRows;
 
     SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
-    //TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+    //TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DLSet.getInstance().getPersonAddressMap().getItems(person.getKey());
     String from_date_str;
     String to_date_str;
 
@@ -274,7 +273,7 @@ public class PersonStatusesModel extends AbstractTableModel implements Observer 
 
     public void addObservers() {
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
 
     }
 

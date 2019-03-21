@@ -1347,7 +1347,7 @@ public abstract class Transaction {
 
     // REST
 
-    // public abstract void process(DBSet db);
+    // public abstract void process(DLSet db);
     public void process(Block block, int asDeal) {
 
         if (this.signature != null && Base58.encode(this.signature)
@@ -1437,7 +1437,7 @@ public abstract class Transaction {
 
     /*
      * public boolean isConfirmed() { return
-     * this.isConfirmed(DBSet.getInstance()); }
+     * this.isConfirmed(DLSet.getInstance()); }
      */
 
     public abstract HashSet<Account> getRecipientAccounts();

@@ -39,16 +39,9 @@ public class OrphanNameStorageMap extends DCMap<byte[], Map<String, String>> {
         return null;
     }
 
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     @Override
     protected void createIndexes(DB database) {
     }
-
 
     public void add(byte[] txAndName, String key, String value) {
         Map<String, String> keyValueMap = this.get(txAndName);

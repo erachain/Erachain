@@ -5,7 +5,6 @@ import org.erachain.core.item.polls.PollCls;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.PollMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
@@ -24,11 +23,9 @@ public class WalletItemPollsTableModel extends TableModelCls<Tuple2<String, Stri
 
     private SortableList<Tuple2<String, String>, PollCls> polls;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Name", "Creator", "Total Votes", "Confirmed"});
-
     public WalletItemPollsTableModel() {
-
-        addObservers();
+        super("WalletItemPollsTableModel", 1000,
+                new String[]{"Name", "Creator", "Total Votes", "Confirmed"});
     }
 
     public Class<? extends Object> getColumnClass(int c) {     // set column type
@@ -43,16 +40,6 @@ public class WalletItemPollsTableModel extends TableModelCls<Tuple2<String, Stri
 
     public PollCls getPoll(int row) {
         return polls.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -130,14 +117,12 @@ public class WalletItemPollsTableModel extends TableModelCls<Tuple2<String, Stri
         }
     }
 
-    public void removeObservers() {
-
-        Controller.getInstance().deleteObserver(this);
-
+    public void addObserversThis() {
+        Controller.getInstance().addWalletObserver(this);
     }
 
-    public void addObservers() {
-        Controller.getInstance().addWalletListener(this);
+    public void removeObserversThis() {
+        Controller.getInstance().deleteObserver(this);
     }
 
     @Override

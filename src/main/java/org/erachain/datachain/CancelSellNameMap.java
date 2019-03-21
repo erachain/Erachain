@@ -13,18 +13,17 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class CancelSellNameMap extends DCMap<byte[], BigDecimal> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public CancelSellNameMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_NAME_SALE_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_NAME_SALE_TYPE);
             if (databaseSet.isDynamicGUI()) {
                 this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_NAME_SALE_TYPE);
                 this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_NAME_SALE_TYPE);
             }
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_NAME_SALE_TYPE);
         }
     }
 
@@ -52,11 +51,6 @@ public class CancelSellNameMap extends DCMap<byte[], BigDecimal> {
     @Override
     protected BigDecimal getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     public void delete(CancelSellNameTransaction transaction) {

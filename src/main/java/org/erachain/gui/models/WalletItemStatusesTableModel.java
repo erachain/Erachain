@@ -5,7 +5,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
@@ -25,11 +24,11 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
 
     private SortableList<Tuple2<String, String>, StatusCls> statuses;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Unique", "Confirmed", "Favorite"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
 
     public WalletItemStatusesTableModel() {
-        Controller.getInstance().addWalletListener(this);
+        super("WalletItemStatusesTableModel", 1000,
+                new String[]{"Key", "Name", "Creator", "Unique", "Confirmed", "Favorite"});
     }
 
     @Override
@@ -55,16 +54,6 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
     // устанавливаем колонки которым изменить высоту
     public void set_get_Column_AutoHeight(Boolean[] arg0) {
         this.column_AutuHeight = arg0;
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -146,7 +135,11 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
         }
     }
 
-    public void removeObservers() {
+    public void addObserversThis() {
+        Controller.getInstance().addWalletObserver(this);
+    }
+
+    public void removeObserversThis() {
         if (this.statuses != null) this.statuses.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }

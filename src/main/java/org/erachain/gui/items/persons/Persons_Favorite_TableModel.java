@@ -22,18 +22,12 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 
     private List<PersonCls> persons;
 
-
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
 
     public Persons_Favorite_TableModel() {
+        super("Persons_Favorite_TableModel", 1000,
+                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
-        addObservers();
-
-
-        //addObservers();
-        //fill((Set<Long>) Controller.getInstance().wallet.database.getPersonFavoritesSet());
-
     }
 
     @Override
@@ -52,30 +46,16 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
         this.column_AutuHeight = arg0;
     }
 
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
-    public PersonCls getItem(int row) {
-        return this.persons.get(row);
-
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
-    }
-
     @Override
     public int getRowCount() {
         if (persons == null) return 0;
         return this.persons.size();
+    }
+
+    @Override
+    public PersonCls getItem(int row) {
+        if (persons == null) return null;
+        return this.persons.get(row);
     }
 
     @Override
@@ -113,18 +93,6 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
         }
 
         return null;
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        //	try
-        //	{
-        this.syncUpdate(o, arg);
-        //	}
-        //	catch(Exception e)
-        //	{
-        //GUI ERROR
-        //	}
     }
 
     @SuppressWarnings("unchecked")
@@ -168,19 +136,18 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 
     }
 
-
-    public void removeObservers() {
-
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            Controller.getInstance().wallet.database.getPersonFavoritesSet().deleteObserver(this);
-
-    }
-
-    public void addObservers() {
+    public void addObserversThis() {
+        //fill((Set<Long>) Controller.getInstance().wallet.database.getPersonFavoritesSet());
 
         if (Controller.getInstance().doesWalletDatabaseExists())
             Controller.getInstance().wallet.database.getPersonFavoritesSet().addObserver(this);
     }
 
+    public void removeObserversThis() {
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getPersonFavoritesSet().deleteObserver(this);
+
+    }
 
 }

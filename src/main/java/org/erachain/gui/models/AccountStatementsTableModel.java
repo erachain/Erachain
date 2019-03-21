@@ -26,7 +26,7 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
 
     public AccountStatementsTableModel() {
         this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         Controller.getInstance().addObserver(this);
     }
 

@@ -21,7 +21,7 @@ public class Accounts_ComboBox_Model extends DefaultComboBoxModel implements Obs
         //INSERT ALL ACCOUNTS
 //		List<Account> accounts = Controller.getInstance().getAccounts();
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         key_person_table = person_Key;
         addresses = DCSet.getInstance().getPersonAddressMap().getItems(key_person_table);
 
@@ -30,7 +30,7 @@ public class Accounts_ComboBox_Model extends DefaultComboBoxModel implements Obs
             sortAndAdd();
         }
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         Controller.getInstance().addObserver(this);
     }
 

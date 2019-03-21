@@ -23,13 +23,12 @@ public class Polls_Favorite_TableModel extends TableModelCls<Tuple2<String, Stri
 
     private List<PollCls> templates;
 
-
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
 
     public Polls_Favorite_TableModel() {
+        super("Polls_Favorite_TableModel", 1000,
+                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
-        addObservers();
     }
 
     @Override
@@ -56,16 +55,6 @@ public class Polls_Favorite_TableModel extends TableModelCls<Tuple2<String, Stri
     public PollCls getItem(int row) {
         return this.templates.get(row);
 
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -149,14 +138,12 @@ public class Polls_Favorite_TableModel extends TableModelCls<Tuple2<String, Stri
         }
     }
 
-    public void removeObservers() {
-        Controller.getInstance().wallet.database.getPollFavoritesSet().deleteObserver(this);
-    }
-
-    public void addObservers() {
-
+    public void addObserversThis() {
         Controller.getInstance().wallet.database.getPollFavoritesSet().addObserver(this);
     }
 
+    public void removeObserversThis() {
+        Controller.getInstance().wallet.database.getPollFavoritesSet().deleteObserver(this);
+    }
 
 }

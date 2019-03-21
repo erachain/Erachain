@@ -99,7 +99,7 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
              *
              * return " "; } //view version 1
              *
-             * return ItemCls.getItem(DBSet.getInstance(), ItemCls.TEMPLATE_TYPE,
+             * return ItemCls.getItem(DLSet.getInstance(), ItemCls.TEMPLATE_TYPE,
              * record.getKey()).toString();
              */
 

@@ -55,13 +55,15 @@ public class Synchronizer {
         // SEND MESSAGE TO PEER
         BlockMessage response = (BlockMessage) peer.getResponse(message, check ? GET_BLOCK_TIMEOUT << 1 : GET_BLOCK_TIMEOUT);
 
+        // если ошибка то банить нужно в любом случае - чтобы не зацикливаться на этом пире
+
         // CHECK IF WE GOT RESPONSE
         if (response == null) {
             if (check) {
                 return null;
             } else {
                 // ERROR
-                String mess = "*** Peer timed out";
+                String mess = "*** getBlock: Peer timed out";
                 peer.ban(mess);
                 throw new Exception(mess);
             }
@@ -69,7 +71,7 @@ public class Synchronizer {
 
         Block block = response.getBlock();
         if (block == null) {
-            String mess = "*** Dishonest peer - Block is NULL";
+            String mess = "*** getBlock: Block is NULL";
             peer.ban(mess);
             throw new Exception(mess);
         }
@@ -77,7 +79,7 @@ public class Synchronizer {
         // CHECK BLOCK SIGNATURE
         if (!block.isSignatureValid()) {
             int banTime = BAN_BLOCK_TIMES;
-            String mess = "*** Dishonest peer - Invalid block --signature. Ban for " + banTime;
+            String mess = "*** getBlock: Dishonest peer - Invalid block --signature. Ban for " + banTime;
             peer.ban(banTime, mess);
             throw new Exception(mess);
         }
@@ -87,7 +89,7 @@ public class Synchronizer {
             block.getTransactions();
         } catch (Exception e) {
             int banTime = BAN_BLOCK_TIMES << 1;
-            String mess = "*** Dishonest peer - Invalid block --зфкыу Екфтыфсешщты. Ban for " + banTime;
+            String mess = "*** getBlock: Dishonest peer - Invalid block on parse transactions. Ban for " + banTime;
             peer.ban(banTime, mess);
             throw new Exception(mess);
         }
@@ -857,12 +859,6 @@ public class Synchronizer {
                             } catch (Exception e) {
                                 LOGGER.error(e.getMessage(), e);
                             }
-                        } else if (countObserv_COUNT != null) {
-                            try {
-                                dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_COUNT, countObserv_COUNT);
-                            } catch (Exception e) {
-                                LOGGER.error(e.getMessage(), e);
-                            }
                         }
 
                     try {
@@ -937,12 +933,6 @@ public class Synchronizer {
                         } catch (Exception e) {
                             LOGGER.error(e.getMessage(), e);
                         }
-                    } else if (countObserv_COUNT != null) {
-                        try {
-                            dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_COUNT, countObserv_COUNT);
-                        } catch (Exception e) {
-                            LOGGER.error(e.getMessage(), e);
-                        }
                     }
 
                     try {
@@ -974,6 +964,6 @@ public class Synchronizer {
         // if (runedBlock != null)
         // runedBlock.stop();
 
-        // this.pipeProcessOrOrphan(DBSet.getInstance(), null, false);
+        // this.pipeProcessOrOrphan(DLSet.getInstance(), null, false);
     }
 }

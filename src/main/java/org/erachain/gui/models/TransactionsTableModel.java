@@ -36,12 +36,12 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
     List<Transaction> transactions;
     //private SortableList<byte[], Transaction> transactions;
     private Integer blockNo = null;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Block", "Seq_no", "Type", "Amount", AssetCls.FEE_NAME});
+    //private String[] columnNames = Lang.getInstance().translate();
     private String ac;
 
     public TransactionsTableModel() {
-        Controller.getInstance().addObserver(this);
-
+        super("TransactionsTableModel", 1000,
+                new String[]{"Timestamp", "Block", "Seq_no", "Type", "Amount", AssetCls.FEE_NAME});
     }
 
     public Class<? extends Object> getColumnClass(int c) {     // set column type
@@ -51,8 +51,8 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 
     public void setBlockNumber(String string) {
 
-        // byte[] block_key = DBSet.getInstance().getBlockHeightsMap().get(Long.parseLong(string));
-        // Block block = DBSet.getInstance().getBlocksHeadMap().get(block_key);
+        // byte[] block_key = DLSet.getInstance().getBlockHeightsMap().get(Long.parseLong(string));
+        // Block block = DLSet.getInstance().getBlocksHeadMap().get(block_key);
         // transactions = block.getTransactions();
 
         try {
@@ -124,7 +124,6 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 
     }
 
-
     public Transaction getTransaction(int row) {
         Transaction data = transactions.get(row);
         if (data == null) {
@@ -135,17 +134,6 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 
     public List<Transaction> getTransactions() {
         return transactions;
-    }
-
-
-    @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return columnNames[index];
     }
 
     @Override
@@ -241,7 +229,11 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 		*/
     }
 
-    public void removeObservers() {
+    public void addObserversThis() {
+        Controller.getInstance().addObserver(this);
+    }
+
+    public void removeObserversThis() {
         //	this.transactions.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }

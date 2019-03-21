@@ -57,7 +57,7 @@ public class WebStatementsTableModelSearch extends AbstractTableModel implements
          * transactions.add(transaction); } }
          *
          * for (Account account : Controller.getInstance().getAccounts()) {
-         * transactions.addAll(DBSet.getInstance().getTransactionFinalMap().
+         * transactions.addAll(DLSet.getInstance().getTransactionFinalMap().
          * getTransactionsByTypeAndAddress(account.getAddress(),
          * Transaction.SIGN_NOTE_TRANSACTION,0));//.SEND_ASSET_TRANSACTION, 0));
          * }
@@ -75,7 +75,7 @@ public class WebStatementsTableModelSearch extends AbstractTableModel implements
 
         // blockChain.getBlock(0)
 
-        // private DBSet dcSet;
+        // private DLSet dcSet;
 
         // CREATE GENESIS BLOCK
         // genesisBlock = new GenesisBlock();
@@ -84,7 +84,7 @@ public class WebStatementsTableModelSearch extends AbstractTableModel implements
         Controller.getInstance().addObserver(this);
         ///transactions = read_Statement();
         /*
-         * // база данных DBSet dcSet = DBSet.getInstance(); // читаем все блоки
+         * // база данных DLSet dcSet = DLSet.getInstance(); // читаем все блоки
          * SortableList<byte[], Block> lists = dcSet.getBlocksHeadMap().getList(); //
          * проходим по блокам for(Pair<byte[], Block> list: lists) {
          *
@@ -116,7 +116,7 @@ public class WebStatementsTableModelSearch extends AbstractTableModel implements
          * transactions.add(transaction); } }
          *
          * for (Account account : Controller.getInstance().getAccounts()) {
-         * transactions.addAll(DBSet.getInstance().getTransactionFinalMap().
+         * transactions.addAll(DLSet.getInstance().getTransactionFinalMap().
          * getTransactionsByTypeAndAddress(null,
          * Transaction.SIGN_NOTE_TRANSACTION,0));//.SEND_ASSET_TRANSACTION, 0));
          * }
@@ -311,34 +311,6 @@ public class WebStatementsTableModelSearch extends AbstractTableModel implements
             }
 
         }
-    }
-
-    private List<Transaction> read_Statement_old() {
-        List<Transaction> tran;
-        ArrayList<Transaction> db_transactions;
-        db_transactions = new ArrayList<Transaction>();
-        tran = new ArrayList<Transaction>();
-        // база данных
-        DCSet dcSet = DCSet.getInstance();
-        // читаем все блоки
-        SortableList<Integer, Block> lists = dcSet.getBlockMap().getList();
-        // проходим по блокам
-        for (Pair<Integer, Block> list : lists) {
-
-            // читаем транзакции из блока
-            db_transactions = (ArrayList<Transaction>) list.getB().getTransactions();
-            // проходим по транзакциям
-            for (Transaction transaction : db_transactions) {
-                transaction.setDC(dcSet);
-                // если ноте то пишем в transactions
-                if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION)
-                    tran.add(transaction);
-
-            }
-
-        }
-        return tran;
-
     }
 
 }

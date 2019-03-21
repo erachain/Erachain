@@ -32,6 +32,7 @@ public class BlockChain {
     // 1824 - 7635471
 
     //public static final int START_LEVEL = 1;
+
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
     public static final boolean DEVELOP_USE = true;
     public static final boolean HARD_WORK = false;
@@ -262,7 +263,7 @@ public class BlockChain {
     public long transactionProcessTimingAverage;
     public long transactionProcessTimingCounter;
 
-    //private DBSet dcSet;
+    //private DLSet dcSet;
 
     // dcSet_in = db() - for test
     public BlockChain(DCSet dcSet_in) throws Exception {
@@ -426,7 +427,7 @@ public class BlockChain {
         // process genesis block
         {
             if (dcSet_in == null && dcSet.getBlockMap().getLastBlockSignature() != null) {
-                LOGGER.info("reCreate Database...");
+                LOGGER.info("reCreateDB Database...");
 
                 try {
                     dcSet.close();
@@ -517,7 +518,7 @@ public class BlockChain {
 
     // GET MIN TARGET
     // TODO GENESIS_CHAIN
-    // SEE core.block.Block.calcWinValue(DBSet, Account, int, int)
+    // SEE core.block.Block.calcWinValue(DLSet, Account, int, int)
     public static int getTargetedMin(int height) {
         int base;
         if (height < BlockChain.REPEAT_WIN)
