@@ -137,11 +137,6 @@ public class Synchronizer {
                 peer.ban(BAN_BLOCK_TIMES, mess);
                 throw new Exception(mess);
 
-            } else if (countTransactionToOrphan > MAX_ORPHAN_TRANSACTIONS) {
-                String mess = "Dishonest peer by on lastCommonBlock[" + lastCommonBlock.getHeight()
-                        + "] - reached MAX_ORPHAN_TRANSACTIONS: " + MAX_ORPHAN_TRANSACTIONS;
-                peer.ban(BAN_BLOCK_TIMES >> 2, mess);
-                throw new Exception(mess);
             }
             // LOGGER.debug("*** core.Synchronizer.checkNewBlocks - try orphan:
             // " + lastBlock.getHeight(fork));
@@ -149,6 +144,18 @@ public class Synchronizer {
                 throw new Exception("on stopping");
 
             int height = lastBlock.getHeight();
+
+            fork.getTransactionMap().clearByDeadTimeAndLimit(
+                    cnt.getBlockChain().getTimestamp(height), false);
+
+            // проверим на переполнение откаченных трнзакций
+            if (countTransactionToOrphan > MAX_ORPHAN_TRANSACTIONS) {
+                String mess = "Dishonest peer by on lastCommonBlock[" + lastCommonBlock.getHeight()
+                        + "] - reached MAX_ORPHAN_TRANSACTIONS: " + MAX_ORPHAN_TRANSACTIONS;
+                peer.ban(BAN_BLOCK_TIMES >> 2, mess);
+                throw new Exception(mess);
+            }
+
             int bbb = fork.getBlockMap().size();
             int hhh = fork.getBlocksHeadsMap().size();
             int sss = fork.getBlockSignsMap().size();
