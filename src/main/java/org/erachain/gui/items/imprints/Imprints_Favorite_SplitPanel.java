@@ -15,7 +15,7 @@ import java.awt.event.ActionListener;
 
 public class Imprints_Favorite_SplitPanel extends Item_SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private static Imprints_Favorite_TableModel table_Model = new Imprints_Favorite_TableModel();
+    private static FavoriteImprintsTableModel table_Model = new FavoriteImprintsTableModel();
     private Imprints_Favorite_SplitPanel th;
 
     public Imprints_Favorite_SplitPanel() {

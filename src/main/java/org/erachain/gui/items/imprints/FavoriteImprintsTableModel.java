@@ -1,10 +1,14 @@
 package org.erachain.gui.items.imprints;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.gui.models.TableModelCls;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.ObserverMessage;
@@ -14,73 +18,52 @@ import javax.validation.constraints.Null;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class Imprints_Favorite_TableModel extends TimerTableModelCls<Tuple2<String, String>, ImprintCls> implements Observer {
+public class FavoriteImprintsTableModel extends FavoriteItemModelTable<Long, ImprintCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_CONFIRMED = 3;
     public static final int COLUMN_FAVORITE = 4;
-    private List<ImprintCls> persons;
 
-    public Imprints_Favorite_TableModel() {
-        super(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"}, new Boolean[]{false, true, true, false, false});
+    public FavoriteImprintsTableModel() {
+        super(ItemCls.IMPRINT_TYPE, new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"}, new Boolean[]{false, true, true, false, false});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
-    }
-
-    public ImprintCls getItem(int row) {
-        return this.persons.get(row);
-
-    }
-
-    @Override
-    public int getRowCount() {
-        if (persons == null) return 0;
-        return this.persons.size();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.persons == null || row > this.persons.size() - 1) {
+        if (this.list == null || row > this.list.size() - 1) {
             return null;
         }
 
-        ImprintCls person = this.persons.get(row);
-        if (person == null)
+        ImprintCls item = (ImprintCls) this.list.get(row);
+        if (item == null)
             return null;
 
         switch (column) {
             case COLUMN_KEY:
 
-                return person.getKey(DCSet.getInstance());
+                return item.getKey(DCSet.getInstance());
 
             case COLUMN_NAME:
 
-                return person.viewName();
+                return item.viewName();
 
             case COLUMN_ADDRESS:
 
-                return person.getOwner().getPersonAsString();
+                return item.getOwner().getPersonAsString();
 
             case COLUMN_CONFIRMED:
 
-                return person.isConfirmed();
+                return item.isConfirmed();
 
             case COLUMN_FAVORITE:
 
-                return person.isFavorite();
+                return item.isFavorite();
 
         }
 
         return null;
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -88,24 +71,18 @@ public class Imprints_Favorite_TableModel extends TimerTableModelCls<Tuple2<Stri
         ObserverMessage message = (ObserverMessage) arg;
 
         //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.LIST_IMPRINT_FAVORITES_TYPE && persons == null) {
-            persons = new ArrayList<ImprintCls>();
+        if (message.getType() == ObserverMessage.LIST_IMPRINT_FAVORITES_TYPE && list == null) {
+            list = new ArrayList<ItemCls>();
             fill((Set<Long>) message.getValue());
             fireTableDataChanged();
         }
         if (message.getType() == ObserverMessage.ADD_IMPRINT_TYPE_FAVORITES_TYPE) {
-            persons.add(Controller.getInstance().getImprint((long) message.getValue()));
+            list.add(Controller.getInstance().getImprint((long) message.getValue()));
             fireTableDataChanged();
         }
         if (message.getType() == ObserverMessage.DELETE_IMPRINT_FAVORITES_TYPE) {
-            persons.remove(Controller.getInstance().getImprint((long) message.getValue()));
+            list.remove(Controller.getInstance().getImprint((long) message.getValue()));
             fireTableDataChanged();
-        }
-    }
-
-    public void fill(Set<Long> set) {
-        for (Long s : set) {
-            persons.add(Controller.getInstance().getImprint(s));
         }
     }
 
