@@ -19,8 +19,6 @@ public class TableModelPersons extends TableModelItemsSearch {
     public static final int COLUMN_PUBLISHER = 3;
     public static final int COLUMN_FAVORITE = 4;
 
-    private List<ItemCls> list;
-
     public TableModelPersons() {
         super(DCSet.getInstance().getItemPersonMap(), new String[]{"Key", "Name", "Birthday", "Publisher", "Favorite"},
                 new Boolean[]{false, true, true, false});

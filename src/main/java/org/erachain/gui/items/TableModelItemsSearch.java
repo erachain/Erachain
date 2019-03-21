@@ -28,12 +28,14 @@ public abstract class TableModelItemsSearch extends TableModelCls<Long, ItemCls>
     }
 
     public void findByKey(String text) {
-        if (text.equals("") || text == null)
-            return;
-        if (!text.matches("[0-9]*"))
-            return;
-        Long key_filter = new Long(text);
         list = new ArrayList<ItemCls>();
+
+        if (text.equals("") || text == null || !text.matches("[0-9]*")) {
+            this.fireTableDataChanged();
+            return;
+        }
+
+        Long key_filter = new Long(text);
 
         ItemCls itemCls = (ItemCls) map.get(key_filter);
 

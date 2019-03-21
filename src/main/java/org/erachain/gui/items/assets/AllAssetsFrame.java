@@ -135,7 +135,7 @@ public class AllAssetsFrame extends JFrame {
                 int row = assetsTable.getSelectedRow();
                 row = assetsTable.convertRowIndexToModel(row);
 
-                AssetCls asset = tableModelItemAssets.getAsset(row);
+                AssetCls asset = (AssetCls) tableModelItemAssets.getItem(row);
                 new AssetFrame(asset);
             }
         });
@@ -153,7 +153,7 @@ public class AllAssetsFrame extends JFrame {
 
                 if (e.getClickCount() == 2) {
                     row = assetsTable.convertRowIndexToModel(row);
-                    AssetCls asset = tableModelItemAssets.getAsset(row);
+                    AssetCls asset = (AssetCls) tableModelItemAssets.getItem(row);
                     new AssetFrame(asset);
                 }
             }
