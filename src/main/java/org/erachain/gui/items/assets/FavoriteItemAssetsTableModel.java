@@ -1,6 +1,7 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
@@ -11,7 +12,7 @@ import org.erachain.utils.ObserverMessage;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class TableModelItemAssetsFavorite extends FavoriteItemModelTable<Long, AssetCls> {
+public class FavoriteItemAssetsTableModel extends FavoriteItemModelTable<Long, AssetCls> {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -21,40 +22,21 @@ public class TableModelItemAssetsFavorite extends FavoriteItemModelTable<Long, A
     public static final int COLUMN_I_OWNER = 6;
 
 
-    public TableModelItemAssetsFavorite() {
-        super(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"},
+    public FavoriteItemAssetsTableModel() {
+        super(ItemCls.ASSET_TYPE, new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"},
                 new Boolean[]{false, true, true, false, false, false, false, false});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
     }
 
-
-    @Override
-    public SortableList<Long, AssetCls> getSortableList() {
-        return this.assetsSorted;
-    }
-
-
-    public AssetCls getAsset(int row) {
-        return this.assets.get(row);
-    }
-
-    @Override
-    public int getRowCount() {
-        if (this.assets == null)
-            return 0;
-
-        return this.assets.size();
-
-    }
-
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.assets == null || row > this.assets.size() - 1) {
+        if (this.list == null || row > this.list.size() - 1) {
             return null;
         }
 
-        AssetCls asset = this.assets.get(row);
-        if (asset == null) return null;
+        AssetCls asset = (AssetCls) this.list.get(row);
+        if (asset == null)
+            return null;
 
         switch (column) {
             case COLUMN_KEY:
@@ -97,15 +79,15 @@ public class TableModelItemAssetsFavorite extends FavoriteItemModelTable<Long, A
 
         //CHECK IF NEW LIST
         int type = message.getType();
-        if (type == ObserverMessage.LIST_ASSET_FAVORITES_TYPE && assets == null) {
-            assets = new ArrayList<AssetCls>();
+        if (type == ObserverMessage.LIST_ASSET_FAVORITES_TYPE && list == null) {
+            list = new ArrayList<ItemCls>();
             fill((Set<Long>) message.getValue());
             this.fireTableDataChanged();
         } else if (type == ObserverMessage.ADD_ASSET_FAVORITES_TYPE) {
-            assets.add(Controller.getInstance().getAsset((long) message.getValue()));
+            list.add(Controller.getInstance().getAsset((long) message.getValue()));
             this.fireTableDataChanged();
         } else if (type == ObserverMessage.DELETE_ASSET_FAVORITES_TYPE) {
-            assets.remove(Controller.getInstance().getAsset((long) message.getValue()));
+            list.remove(Controller.getInstance().getAsset((long) message.getValue()));
             this.fireTableDataChanged();
         }
     }
@@ -120,13 +102,13 @@ public class TableModelItemAssetsFavorite extends FavoriteItemModelTable<Long, A
             if (asset == null)
                 continue;
 
-            assets.add(asset);
+            list.add(asset);
         }
     }
 
     public void addObserversThis() {
         if (Controller.getInstance().doesWalletDatabaseExists()) {
-            .addObserver(this);
+            Controller.getInstance().wallet.database.getAssetFavoritesSet().addObserver(this);
         }
     }
 
@@ -135,9 +117,4 @@ public class TableModelItemAssetsFavorite extends FavoriteItemModelTable<Long, A
             Controller.getInstance().wallet.database.getAssetFavoritesSet().deleteObserver(this);
     }
 
-    @Override
-    public AssetCls getItem(int k) {
-        // TODO Auto-generated method stub
-        return this.assets.get(k);
-    }
 }

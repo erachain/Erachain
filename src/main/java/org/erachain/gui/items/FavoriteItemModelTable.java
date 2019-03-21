@@ -13,11 +13,11 @@ import org.erachain.utils.ObserverMessage;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class FavoriteItemModelTable<T, U> extends TableModelCls<T, U> implements Observer {
+public abstract class FavoriteItemModelTable<T, U> extends TableModelCls<Long, ItemCls> implements Observer {
 
     protected int itemType;
-    protected List<U> list;
-    protected SortableList<T, U> listSorted;
+    protected List<ItemCls> list;
+    protected SortableList<Long, ItemCls> listSorted;
 
     public int COLUMN_FAVORITE = 1000;
 
@@ -27,7 +27,7 @@ public class FavoriteItemModelTable<T, U> extends TableModelCls<T, U> implements
     }
 
     @Override
-    public SortableList<T, U> getSortableList() {
+    public SortableList<Long, ItemCls> getSortableList() {
         return this.listSorted;
     }
 
@@ -41,17 +41,23 @@ public class FavoriteItemModelTable<T, U> extends TableModelCls<T, U> implements
     }
 
     public void fill(Set<Long> set) {
-        AssetCls asset;
+        ItemCls item;
         for (Long s : set) {
             if (s < 1)
                 continue;
 
-            asset = Controller.getInstance().getItem(itemType, s);
-            if (asset == null)
+            item = Controller.getInstance().getItem(itemType, s);
+            if (item == null)
                 continue;
 
-            assets.add(asset);
+            list.add(item);
         }
+    }
+
+    @Override
+    public ItemCls getItem(int k) {
+        // TODO Auto-generated method stub
+        return this.list.get(k);
     }
 
 }
