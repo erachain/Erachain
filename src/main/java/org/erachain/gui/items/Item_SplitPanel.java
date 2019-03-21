@@ -6,6 +6,7 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.Split_Panel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.WalletItemPersonsTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 

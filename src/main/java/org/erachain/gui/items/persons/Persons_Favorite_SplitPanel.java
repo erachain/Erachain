@@ -4,6 +4,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.gui.items.Item_SplitPanel;
 import org.erachain.gui.items.accounts.Account_Send_Dialog;
 import org.erachain.gui.items.mails.Mail_Send_Dialog;
@@ -17,7 +18,7 @@ import java.awt.event.ActionListener;
 
 public class Persons_Favorite_SplitPanel extends Item_SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private static FavoritePersonsTableModel table_Model = new FavoritePersonsTableModel();
+    private static FavoriteItemModelTable table_Model = new FavoritePersonsTableModel();
     private Persons_Favorite_SplitPanel th;
 
     public Persons_Favorite_SplitPanel() {

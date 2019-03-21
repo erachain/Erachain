@@ -19,8 +19,6 @@ public abstract class FavoriteItemModelTable<T, U> extends TableModelCls<Long, I
     protected List<ItemCls> list;
     protected SortableList<Long, ItemCls> listSorted;
 
-    public int COLUMN_FAVORITE = 1000;
-
     public FavoriteItemModelTable(int itemType, String[] columnNames, Boolean[] columnAutoHeight) {
         super(columnNames, columnAutoHeight);
         this.itemType = itemType;

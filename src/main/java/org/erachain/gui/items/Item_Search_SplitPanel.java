@@ -1,5 +1,7 @@
 package org.erachain.gui.items;
 
+import org.erachain.gui.models.SearchTransactionsTableModel;
+import org.erachain.gui.models.TableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 

@@ -6,6 +6,8 @@ import org.erachain.database.SortableList;
 @SuppressWarnings("serial")
 public abstract class TableModelCls<T, U> extends TimerTableModelCls<T, U> {
 
+    public int COLUMN_FAVORITE = 1000;
+
     public abstract SortableList<T, U> getSortableList();
 
     public TableModelCls(String[] columnNames) {
