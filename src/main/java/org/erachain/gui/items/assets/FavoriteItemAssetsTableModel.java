@@ -23,8 +23,13 @@ public class FavoriteItemAssetsTableModel extends FavoriteItemModelTable<Long, A
 
 
     public FavoriteItemAssetsTableModel() {
-        super(ItemCls.ASSET_TYPE, new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"},
-                new Boolean[]{false, true, true, false, false, false, false, false});
+        super(DCSet.getInstance().getItemAssetMap(),
+                new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"},
+                new Boolean[]{false, true, true, false, false, false, false, false},
+                ObserverMessage.RESET_ASSET_FAVORITES_TYPE,
+                ObserverMessage.ADD_ASSET_FAVORITES_TYPE,
+                ObserverMessage.DELETE_ASSET_FAVORITES_TYPE,
+                ObserverMessage.LIST_ASSET_FAVORITES_TYPE);
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
     }
 
@@ -71,39 +76,6 @@ public class FavoriteItemAssetsTableModel extends FavoriteItemModelTable<Long, A
         }
 
         return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        //CHECK IF NEW LIST
-        int type = message.getType();
-        if (type == ObserverMessage.LIST_ASSET_FAVORITES_TYPE && list == null) {
-            list = new ArrayList<ItemCls>();
-            fill((Set<Long>) message.getValue());
-            this.fireTableDataChanged();
-        } else if (type == ObserverMessage.ADD_ASSET_FAVORITES_TYPE) {
-            list.add(Controller.getInstance().getAsset((long) message.getValue()));
-            this.fireTableDataChanged();
-        } else if (type == ObserverMessage.DELETE_ASSET_FAVORITES_TYPE) {
-            list.remove(Controller.getInstance().getAsset((long) message.getValue()));
-            this.fireTableDataChanged();
-        }
-    }
-
-    public void fill(Set<Long> set) {
-        AssetCls asset;
-        for (Long s : set) {
-            if (s < 1)
-                continue;
-
-            asset = Controller.getInstance().getAsset(s);
-            if (asset == null)
-                continue;
-
-            list.add(asset);
-        }
     }
 
     public void addObserversThis() {

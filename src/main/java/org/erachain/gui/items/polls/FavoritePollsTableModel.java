@@ -23,8 +23,13 @@ public class FavoritePollsTableModel extends FavoriteItemModelTable<Long, PollCl
     public static final int COLUMN_FAVORITE = 4;
 
     public FavoritePollsTableModel() {
-        super(ItemCls.POLL_TYPE, new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false});
+        super(DCSet.getInstance().getItemAssetMap(),
+                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
+                new Boolean[]{false, true, true, false, false},
+                ObserverMessage.WALLET_RESET_POLL_FAVORITES_TYPE,
+                ObserverMessage.WALLET_ADD_POLL_FAVORITES_TYPE,
+                ObserverMessage.WALLET_DELETE_POLL_FAVORITES_TYPE,
+                ObserverMessage.WALLET_LIST_POLL_FAVORITES_TYPE);
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
     }
 
@@ -65,32 +70,14 @@ public class FavoritePollsTableModel extends FavoriteItemModelTable<Long, PollCl
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.WALLET_LIST_POLL_FAVORITES_TYPE && list == null) {
-            list = new ArrayList<ItemCls>();
-            fill((Set<Long>) message.getValue());
-            fireTableDataChanged();
-        }
-        if (message.getType() == ObserverMessage.WALLET_ADD_POLL_FAVORITES_TYPE) {
-            list.add(Controller.getInstance().getPoll((long) message.getValue()));
-            fireTableDataChanged();
-        }
-        if (message.getType() == ObserverMessage.WALLET_DELETE_POLL_FAVORITE_TYPE) {
-            list.remove(Controller.getInstance().getPoll((long) message.getValue()));
-            fireTableDataChanged();
-        }
-    }
-
     public void addObserversThis() {
-        Controller.getInstance().wallet.database.getPollFavoritesSet().addObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getPollFavoritesSet().addObserver(this);
     }
 
     public void removeObserversThis() {
-        Controller.getInstance().wallet.database.getPollFavoritesSet().deleteObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getPollFavoritesSet().deleteObserver(this);
     }
 
 }

@@ -13,49 +13,62 @@ import org.erachain.utils.ObserverMessage;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public abstract class FavoriteItemModelTable<T, U> extends TableModelCls<Long, ItemCls> implements Observer {
+public abstract class FavoriteItemModelTable<T, U> extends SearchItemsTableModel<Long, ItemCls> implements Observer {
 
-    protected int itemType;
-    protected List<ItemCls> list;
-    protected SortableList<Long, ItemCls> listSorted;
+    public final int RESET_EVENT;
+    public final int ADD_EVENT;
+    public final int DELETE_EVENT;
+    public final int LIST_EVENT;
 
-    public FavoriteItemModelTable(int itemType, String[] columnNames, Boolean[] columnAutoHeight) {
-        super(columnNames, columnAutoHeight);
-        this.itemType = itemType;
+    public FavoriteItemModelTable(DBMap map, String[] columnNames, Boolean[] columnAutoHeight,
+              int resetObserver, int addObserver, int deleteObserver, int listObserver) {
+        super(map, columnNames, columnAutoHeight);
+
+        this.RESET_EVENT = resetObserver;
+        this.ADD_EVENT = addObserver;
+        this.DELETE_EVENT = deleteObserver;
+        this.LIST_EVENT = listObserver;
     }
 
-    @Override
-    public SortableList<Long, ItemCls> getSortableList() {
-        return this.listSorted;
-    }
-
-    @Override
-    public int getRowCount() {
-        if (this.list == null)
-            return 0;
-
-        return this.list.size();
-
-    }
-
-    public void fill(Set<Long> set) {
+    public void fill(Set<Long> keys) {
         ItemCls item;
-        for (Long s : set) {
-            if (s < 1)
+        list = new ArrayList<ItemCls>();
+
+        for (Long itemKey : keys) {
+            if (itemKey == null || itemKey < 1)
                 continue;
 
-            item = Controller.getInstance().getItem(itemType, s);
+            item = Controller.getInstance().getItem(itemType, itemKey);
             if (item == null)
                 continue;
 
             list.add(item);
         }
+
+        this.listSorted = new SortableList<Long, ItemCls>(this.map, keys);
     }
 
-    @Override
-    public ItemCls getItem(int k) {
-        // TODO Auto-generated method stub
-        return this.list.get(k);
+    @SuppressWarnings("unchecked")
+    public synchronized void syncUpdate(Observable o, Object arg) {
+        ObserverMessage message = (ObserverMessage) arg;
+
+        //CHECK IF NEW LIST
+        int type = message.getType();
+        if (type == LIST_EVENT && list == null) {
+            this.fireTableDataChanged();
+
+        } else if (type == ADD_EVENT) {
+            list.add(Controller.getInstance().getAsset((long) message.getValue()));
+            this.fireTableDataChanged();
+
+        } else if (type == DELETE_EVENT) {
+            list.remove(Controller.getInstance().getAsset((long) message.getValue()));
+            this.fireTableDataChanged();
+
+        } else if (type == RESET_EVENT) {
+            list = new ArrayList<ItemCls>();
+            this.fireTableDataChanged();
+        }
     }
 
 }

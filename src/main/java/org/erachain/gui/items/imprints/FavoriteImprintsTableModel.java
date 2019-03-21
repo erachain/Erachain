@@ -26,7 +26,13 @@ public class FavoriteImprintsTableModel extends FavoriteItemModelTable<Long, Imp
     public static final int COLUMN_FAVORITE = 4;
 
     public FavoriteImprintsTableModel() {
-        super(ItemCls.IMPRINT_TYPE, new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"}, new Boolean[]{false, true, true, false, false});
+        super(DCSet.getInstance().getItemAssetMap(),
+                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
+                new Boolean[]{false, true, true, false, false},
+                ObserverMessage.RESET_IMPRINT_FAVORITES_TYPE,
+                ObserverMessage.ADD_IMPRINT_FAVORITES_TYPE,
+                ObserverMessage.REMOVE_IMPRINT_FAVORITES_TYPE,
+                ObserverMessage.LIST_IMPRINT_FAVORITES_TYPE);
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
     }
 
@@ -66,32 +72,14 @@ public class FavoriteImprintsTableModel extends FavoriteItemModelTable<Long, Imp
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.LIST_IMPRINT_FAVORITES_TYPE && list == null) {
-            list = new ArrayList<ItemCls>();
-            fill((Set<Long>) message.getValue());
-            fireTableDataChanged();
-        }
-        if (message.getType() == ObserverMessage.ADD_IMPRINT_TYPE_FAVORITES_TYPE) {
-            list.add(Controller.getInstance().getImprint((long) message.getValue()));
-            fireTableDataChanged();
-        }
-        if (message.getType() == ObserverMessage.DELETE_IMPRINT_FAVORITES_TYPE) {
-            list.remove(Controller.getInstance().getImprint((long) message.getValue()));
-            fireTableDataChanged();
-        }
-    }
-
     public void addObserversThis() {
-        Controller.getInstance().wallet.database.getImprintFavoritesSet().addObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getImprintFavoritesSet().addObserver(this);
     }
 
     public void removeObserversThis() {
-        Controller.getInstance().wallet.database.getImprintFavoritesSet().deleteObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getImprintFavoritesSet().deleteObserver(this);
     }
 
 }
