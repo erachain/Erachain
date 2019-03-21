@@ -43,10 +43,6 @@ public abstract class DBMap<T, U> extends Observable {
         this.createIndexes(database);
     }
 
-    public Map<T, U> getMap() {
-        return map;
-    }
-
 
     public DCSet getDBSet() {
         return (DCSet) this.databaseSet;

@@ -45,7 +45,6 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
         super(parent, dcSet);
 
     }
-
     @Override
     protected void createIndexes(DB database) {
     }
