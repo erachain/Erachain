@@ -17,7 +17,7 @@ import java.awt.event.ActionListener;
 
 public class Persons_Favorite_SplitPanel extends Item_SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private static Persons_Favorite_TableModel table_Model = new Persons_Favorite_TableModel();
+    private static FavoritePersonsTableModel table_Model = new FavoritePersonsTableModel();
     private Persons_Favorite_SplitPanel th;
 
     public Persons_Favorite_SplitPanel() {
