@@ -5,11 +5,9 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.TableModelCls;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.util.*;
 
 @SuppressWarnings("serial")
@@ -25,8 +23,7 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
 
     public Persons_Favorite_TableModel() {
-        super("Persons_Favorite_TableModel", 1000,
-                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
+        super(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
     }
 
@@ -36,13 +33,13 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
     }
 
     // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
+    public Boolean[] getColumnAutoHeight() {
 
         return this.column_AutuHeight;
     }
 
     // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
+    public void setColumnAutoHeight(Boolean[] arg0) {
         this.column_AutuHeight = arg0;
     }
 

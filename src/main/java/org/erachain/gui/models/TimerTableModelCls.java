@@ -1,9 +1,8 @@
 package org.erachain.gui.models;
 
-import org.erachain.database.SortableList;
+import org.erachain.database.DBMap;
 import org.erachain.lang.Lang;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
@@ -20,14 +19,15 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
     private Timer timer;
     boolean needUpdate;
 
+    protected Boolean[] columnAutoHeight; // = new Boolean[]{true, true, true, true, true, true, true, false, false};
     protected int start = 0;
     protected int step = 50;
     protected int size = 0;
 
     public int COLUMN_FAVORITE = 1000;
 
+    protected DBMap map;
     protected Logger LOGGER;
-
 
     public TimerTableModelCls(String[] columnNames) {
         this.columnNames = columnNames;
@@ -35,10 +35,34 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
         addObservers();
     }
 
-    public TimerTableModelCls(String name, long timeout, String[] columnNames) {
+    public TimerTableModelCls(DBMap map, String[] columnNames) {
+        this.map = map;
+        this.columnNames = columnNames;
+        //this.initComponents();
+        addObservers();
+    }
+
+    public TimerTableModelCls(String[] columnNames, Boolean[] columnAutoHeight) {
+        this.columnNames = columnNames;
+        this.columnAutoHeight = columnAutoHeight;
+        //this.initComponents();
+        addObservers();
+    }
+
+    public TimerTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight) {
+        this.map = map;
+        this.columnNames = columnNames;
+        this.columnAutoHeight = columnAutoHeight;
+        //this.initComponents();
+        addObservers();
+    }
+
+    public TimerTableModelCls(DBMap map, String name, long timeout, String[] columnNames, Boolean[] columnAutoHeight) {
+        this.map = map;
         this.columnNames = columnNames;
         this.name = name;
         this.timeout = timeout;
+        this.columnAutoHeight = columnAutoHeight;
         //this.initComponents();
         addObservers();
     }
@@ -68,6 +92,17 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
     }
 
     //public abstract void initComponents();
+
+    public Boolean[] getColumnAutoHeight() {
+
+        return this.columnAutoHeight;
+    }
+
+
+    // устанавливаем колонки которым изменить высоту
+    public void setColumnAutoHeight(Boolean[] arg0) {
+        this.columnAutoHeight = arg0;
+    }
 
     @Override
     public int getColumnCount() {

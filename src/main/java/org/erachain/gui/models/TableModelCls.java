@@ -1,16 +1,10 @@
 package org.erachain.gui.models;
 
-import org.erachain.controller.Controller;
-import org.erachain.core.transaction.Transaction;
+import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
-import org.mapdb.Fun;
-
-import javax.swing.table.AbstractTableModel;
-import java.util.Timer;
-import java.util.TimerTask;
 
 @SuppressWarnings("serial")
-public abstract class TableModelCls<T, U> extends TimerTableModelCls {
+public abstract class TableModelCls<T, U> extends TimerTableModelCls<T, U> {
 
     public abstract SortableList<T, U> getSortableList();
 
@@ -18,8 +12,20 @@ public abstract class TableModelCls<T, U> extends TimerTableModelCls {
         super(columnNames);
     }
 
-    public TableModelCls(String name, long timeout, String[] columnNames) {
-        super(name, timeout, columnNames);
+    public TableModelCls(DBMap map, String[] columnNames) {
+        super(map, columnNames);
+    }
+
+    public TableModelCls(String[] columnNames, Boolean[] column_AutoHeight) {
+        super(columnNames, column_AutoHeight);
+    }
+
+    public TableModelCls(DBMap map, String[] columnNames, Boolean[] column_AutoHeight) {
+        super(map, columnNames, column_AutoHeight);
+    }
+
+    public TableModelCls(DBMap map, String name, long timeout, String[] columnNames, Boolean[] column_AutoHeight) {
+        super(map, name, timeout, columnNames, column_AutoHeight);
     }
 
 }

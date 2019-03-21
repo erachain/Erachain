@@ -36,19 +36,12 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
     List<Pair<Tuple2<String, Long>, Order>> pp = new ArrayList<Pair<Tuple2<String, Long>, Order>>();
 
     public WalletOrdersTableModel() {
-        super("WalletOrdersTableModel", 1000,
-                new String[]{"Timestamp", "Block - transaction", "Amount", "Have", "Price", "Want", "Total", "Left", "Creator", "Status"});
+        super(new String[]{"Timestamp", "Block - transaction", "Amount", "Have", "Price", "Want", "Total", "Left", "Creator", "Status"});
     }
 
     @Override
     public SortableList<Tuple2<String, Long>, Order> getSortableList() {
         return this.orders;
-    }
-
-    @Override
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
     }
 
     public Order getOrder(int row) {
@@ -147,16 +140,6 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-            String msg = e.getMessage();
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -208,7 +191,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
     }
 
     @Override
-    public Object getItem(int k) {
+    public Order getItem(int k) {
         if (this.orders == null)
             return null;
 

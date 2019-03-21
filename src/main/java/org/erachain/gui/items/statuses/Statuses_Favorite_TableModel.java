@@ -6,7 +6,6 @@ import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.TableModelCls;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 
@@ -14,7 +13,7 @@ import javax.validation.constraints.Null;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class Statuses_Favorite_TableModel extends TableModelCls<Tuple2<String, String>, PersonCls> implements Observer {
+public class Statuses_Favorite_TableModel extends TableModelCls<Tuple2<String, String>, StatusCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -23,33 +22,15 @@ public class Statuses_Favorite_TableModel extends TableModelCls<Tuple2<String, S
 
     private List<StatusCls> statuses;
 
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
-
     public Statuses_Favorite_TableModel() {
-        super("Statuses_Favorite_TableModel", 1000,
-                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
+        super(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
+                new Boolean[]{false, true, true, false, false});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
     }
 
     @Override
-    public SortableList<Tuple2<String, String>, PersonCls> getSortableList() {
+    public SortableList<Tuple2<String, String>, StatusCls> getSortableList() {
         return null;
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
-    }
-
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
     }
 
     public StatusCls getItem(int row) {
@@ -98,18 +79,6 @@ public class Statuses_Favorite_TableModel extends TableModelCls<Tuple2<String, S
         }
 
         return null;
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        //	try
-        //	{
-        this.syncUpdate(o, arg);
-        //	}
-        //	catch(Exception e)
-        //	{
-        //GUI ERROR
-        //	}
     }
 
     @SuppressWarnings("unchecked")

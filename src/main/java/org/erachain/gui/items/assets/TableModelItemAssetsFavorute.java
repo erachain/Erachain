@@ -23,36 +23,20 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
 
     private SortableList<Long, AssetCls> assetsSorted;
 
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false, false, false, false};
     private List<AssetCls> assets;
 
     public TableModelItemAssetsFavorute() {
-        super("TableModelItemAssetsFavorute", 1000,
-                new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"});
+        super(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"},
+                new Boolean[]{false, true, true, false, false, false, false, false});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
     }
 
-    // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
-    }
 
     @Override
     public SortableList<Long, AssetCls> getSortableList() {
         return this.assetsSorted;
     }
 
-    @Override
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
 
     public AssetCls getAsset(int row) {
         return this.assets.get(row);

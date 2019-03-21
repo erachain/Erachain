@@ -27,13 +27,13 @@ public class TableModelTemplates extends TableModelItemsSearch {
     }
 
     // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
+    public Boolean[] getColumnAutoHeight() {
 
         return this.column_AutuHeight;
     }
 
     // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
+    public void setColumnAutoHeight(Boolean[] arg0) {
         this.column_AutuHeight = arg0;
     }
 

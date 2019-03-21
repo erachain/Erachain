@@ -36,8 +36,7 @@ public class BuyOrdersTableModel extends TableModelCls<Long, Order> implements O
     private long wantKey;
 
     public BuyOrdersTableModel(AssetCls have, AssetCls want) {
-        super("BuyOrdersTableModel", 1000,
-                new String[]{"Want", "Price", "Have"});
+        super(new String[]{"Want", "Price", "Have"});
 
         this.have = have;
         this.want = want;

@@ -50,6 +50,8 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     @SuppressWarnings("rawtypes")
     private NavigableSet typeKey;
 
+    BTreeMap AUTOKEY_INDEX;
+
     public TransactionMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
@@ -170,6 +172,18 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                         return ret;
                     }
                 });
+
+        this.AUTOKEY_INDEX = database.createTreeMap("AUTOKEY_INDEX")
+                .comparator(Fun.COMPARATOR)
+                .makeOrGet();
+
+        //BIND
+        Bind.secondaryKey(map, this.AUTOKEY_INDEX, new Fun.Function2<Integer, Long, Transaction>() {
+            @Override
+            public Integer run(Long key, Transaction value) {
+                return -map.size();
+            }
+        });
 
         return map;
     }
@@ -308,6 +322,11 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     public Transaction get(byte[] signature) {
         return this.get(Longs.fromByteArray(signature));
+    }
+
+    @SuppressWarnings("unchecked")
+    public Collection<Long> getFromToKeys(Integer fromKey, Integer toKey) {
+        return AUTOKEY_INDEX.subMap(fromKey, toKey).values();
     }
 
     /**

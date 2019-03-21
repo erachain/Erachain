@@ -43,7 +43,7 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
 
     @SuppressWarnings("unchecked")
     public CreditsTableModel() {
-        super("CreditsTableModel", 1000,
+        super(DCSet.getInstance().getCredit_AddressesMap(),
                 new String[]{"Account", "Amount", "Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
 
         LOGGER = LoggerFactory.getLogger(CreditsTableModel.class.getName());
@@ -62,13 +62,13 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
     }
 
     // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
+    public Boolean[] getColumnAutoHeight() {
 
         return this.column_AutuHeight;
     }
 
     // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
+    public void setColumnAutoHeight(Boolean[] arg0) {
         this.column_AutuHeight = arg0;
     }
 
