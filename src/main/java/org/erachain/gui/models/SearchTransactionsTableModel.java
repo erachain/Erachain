@@ -20,7 +20,9 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-// IN gui.DebugTabPane used
+/**
+ * не перерисовыется по событиям - статичная таблица при поиске
+ */
 public class SearchTransactionsTableModel extends TimerTableModelCls<byte[], Transaction> implements Observer {
 
     public static final int COLUMN_TIMESTAMP = 0;
@@ -39,10 +41,6 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<byte[], Tra
 
     public void setBlockNumber(String string) {
 
-        // byte[] block_key = DLSet.getInstance().getBlockHeightsMap().get(Long.parseLong(string));
-        // Block block = DLSet.getInstance().getBlocksHeadMap().get(block_key);
-        // transactions = block.getTransactions();
-
         try {
             block_No = Integer.parseInt(string);
         } catch (NumberFormatException e) {
@@ -57,28 +55,15 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<byte[], Tra
         }
 
         transactions = (List<Transaction>) DCSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(block_No);
-        //for (Transaction transaction: transactions) {
-            //transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
-        //}
         this.fireTableDataChanged();
 
     }
 
     public void Find_Transactions_from_Address(String address) {
-        String sender;
-        String recipient;
-        int minHeight;
-        int maxHeight;
-        int type;
-        int service;
-        boolean desc;
-        int offset;
-        int limit;
 
         if (address == null || address.equals("")) return;
         Tuple2<Account, String> accountResult = Account.tryMakeAccount(address);
         Account account = accountResult.a;
-
 
         if (account != null) {
 
@@ -86,29 +71,8 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<byte[], Tra
             transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress()));//.findTransactions(address, sender=address, recipient=address, minHeight=0, maxHeight=0, type=0, service=0, desc=false, offset=0, limit=0);//.getTransactionsByBlock(block_No);
 
             this.fireTableDataChanged();
-        } else {
-            ;
+
         }
-
-
-    }
-
-
-    public void view_Transactioms_From_Adress(String str) {
-
-        transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(str);
-        //for (Transaction transaction: transactions) {
-        //    transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
-        //}
-        this.fireTableDataChanged();
-
-
-    }
-
-    public void view_Clear() {
-        transactions.clear();
-        this.fireTableDataChanged();
-
 
     }
 
@@ -185,21 +149,8 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<byte[], Tra
         }
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-        }
     }
 
     public void addObserversThis() {

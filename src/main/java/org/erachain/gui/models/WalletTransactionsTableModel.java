@@ -36,10 +36,10 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     //private List<Pair<Tuple2<String, String>, Transaction>> pairTransactions;
 
     /**
-     * В динамическом режиме перерисовывается автоматически по таймеру встроенному от TimerTableModelCls
-     * - перерисовка стрницы целой, поэтому не так тормозит основные процессы.<br>
+     * В динамическом режиме перерисовывается автоматически по событию GUI_REPAINT
+     * - перерисовка страницы целой, поэтому не так тормозит основные процессы.<br>
      * Без динамического режима перерисовывается только принудительно - по нажатию кнопки тут
-     * gui.items.assets.My_Order_Tab
+     * org.erachain.gui.items.records.MyTransactionsSplitPanel#setIntervalPanel
      */
     public WalletTransactionsTableModel() {
         super(new String[]{
