@@ -7,7 +7,7 @@ import org.erachain.gui.items.SearchItemsTableModel;
 import org.erachain.lang.Lang;
 
 @SuppressWarnings("serial")
-public class TableModelItemAssetsItemsTableModel extends SearchItemsTableModel {
+public class ItemAssetsTableModel extends SearchItemsTableModel {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -16,10 +16,10 @@ public class TableModelItemAssetsItemsTableModel extends SearchItemsTableModel {
     public static final int COLUMN_FAVORITE = 5;
     public static final int COLUMN_I_OWNER = 6;
 
-    public TableModelItemAssetsItemsTableModel() {
+    public ItemAssetsTableModel() {
         super(DCSet.getInstance().getItemAssetMap(), new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"},
-                new Boolean[]{false, true, true, false, false, false, false, false});
-        super.COLUMN_FAVORITE = COLUMN_FAVORITE;
+                new Boolean[]{false, true, true, false, false, false, false, false},
+                COLUMN_FAVORITE);
     }
 
     @Override

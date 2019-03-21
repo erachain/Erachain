@@ -18,7 +18,7 @@ public class Search_Assets_Tab extends Item_Search_SplitPanel {
      *
      */
     private static final long serialVersionUID = 1L;
-    private static TableModelItemAssetsItemsTableModel tableModelItemAssets = new TableModelItemAssetsItemsTableModel();
+    private static ItemAssetsTableModel tableModelItemAssets = new ItemAssetsTableModel();
     private Search_Assets_Tab th;
 
 

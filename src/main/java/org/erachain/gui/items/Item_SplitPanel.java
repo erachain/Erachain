@@ -40,7 +40,6 @@ public class Item_SplitPanel extends Split_Panel {
         button1_ToolBar_LeftPanel.setVisible(false);
         button2_ToolBar_LeftPanel.setVisible(false);
 
-
         // not show My filter
         searth_My_JCheckBox_LeftPanel.setVisible(false);
         searth_Favorite_JCheckBox_LeftPanel.setVisible(false);
@@ -79,9 +78,9 @@ public class Item_SplitPanel extends Split_Panel {
                 int row;
                 try {
                     row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-               
-                item_Table_Selected = (ItemCls) table_Model.getItem(jTable_jScrollPanel_LeftPanel
-                        .convertRowIndexToModel(row));
+
+                    item_Table_Selected = (ItemCls) table_Model.getItem(jTable_jScrollPanel_LeftPanel
+                            .convertRowIndexToModel(row));
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     return;
@@ -201,9 +200,9 @@ public class Item_SplitPanel extends Split_Panel {
 
         // CHECK IF FAVORITES
         if (Controller.getInstance().isItemFavorite(itemCls)) {
-           int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") +"?", Lang.getInstance().translate("Delete from favorite") , JOptionPane.OK_CANCEL_OPTION);
-           
-           if (dd ==0) Controller.getInstance().removeItemFavorite(itemCls);
+            int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+
+            if (dd == 0) Controller.getInstance().removeItemFavorite(itemCls);
         } else {
 
             Controller.getInstance().addItemFavorite(itemCls);
@@ -220,7 +219,5 @@ public class Item_SplitPanel extends Split_Panel {
     protected void table_mouse_2_Click(ItemCls item) {
 
     }
-
-    ;
 
 }

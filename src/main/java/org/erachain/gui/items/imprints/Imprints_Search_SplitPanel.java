@@ -10,7 +10,7 @@ public class Imprints_Search_SplitPanel extends Item_Search_SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
 
-    private static TableModelImprintsSearchItemsTableModel search_Table_Model = new TableModelImprintsSearchItemsTableModel();
+    private static ImprintsSearchTableModel search_Table_Model = new ImprintsSearchTableModel();
 
     public Imprints_Search_SplitPanel() {
         super(search_Table_Model, "Persons_Search_SplitPanel", "Persons_Search_SplitPanel");

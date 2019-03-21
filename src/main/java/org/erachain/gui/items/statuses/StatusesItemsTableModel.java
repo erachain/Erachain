@@ -5,17 +5,17 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemsTableModel;
 
 @SuppressWarnings("serial")
-public class TableModelItemStatusesItemsTableModel extends SearchItemsTableModel {
+public class StatusesItemsTableModel extends SearchItemsTableModel {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_UNIQUE = 3;
     public static final int COLUMN_FAVORITE = 4;
 
-    public TableModelItemStatusesItemsTableModel() {
+    public StatusesItemsTableModel() {
         super(DCSet.getInstance().getItemStatusMap(), new String[]{"Key", "Name", "Creator", "Unique", "Favorite"},
-                new Boolean[]{false, true, true, false});
-        super.COLUMN_FAVORITE = COLUMN_FAVORITE;
+                new Boolean[]{false, true, true, false},
+                COLUMN_FAVORITE);
     }
 
     @Override

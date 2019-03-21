@@ -29,8 +29,8 @@ public class FavoritePollsTableModel extends FavoriteItemModelTable<Long, PollCl
                 ObserverMessage.WALLET_RESET_POLL_FAVORITES_TYPE,
                 ObserverMessage.WALLET_ADD_POLL_FAVORITES_TYPE,
                 ObserverMessage.WALLET_DELETE_POLL_FAVORITES_TYPE,
-                ObserverMessage.WALLET_LIST_POLL_FAVORITES_TYPE);
-        super.COLUMN_FAVORITE = COLUMN_FAVORITE;
+                ObserverMessage.WALLET_LIST_POLL_FAVORITES_TYPE,
+                COLUMN_FAVORITE);
     }
 
     @Override

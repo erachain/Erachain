@@ -29,8 +29,8 @@ public class FavoriteItemAssetsTableModel extends FavoriteItemModelTable<Long, A
                 ObserverMessage.RESET_ASSET_FAVORITES_TYPE,
                 ObserverMessage.ADD_ASSET_FAVORITES_TYPE,
                 ObserverMessage.DELETE_ASSET_FAVORITES_TYPE,
-                ObserverMessage.LIST_ASSET_FAVORITES_TYPE);
-        super.COLUMN_FAVORITE = COLUMN_FAVORITE;
+                ObserverMessage.LIST_ASSET_FAVORITES_TYPE,
+                COLUMN_FAVORITE);
     }
 
     @Override

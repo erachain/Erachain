@@ -12,7 +12,7 @@ public class Search_Statuses_Tab extends Item_Search_SplitPanel {
      *
      */
     private static final long serialVersionUID = 1L;
-    private static TableModelItemStatusesItemsTableModel tableModelUnions = new TableModelItemStatusesItemsTableModel();
+    private static StatusesItemsTableModel tableModelUnions = new StatusesItemsTableModel();
 
     public Search_Statuses_Tab() {
         super(tableModelUnions, "Search Statuses", "Search Statuses");

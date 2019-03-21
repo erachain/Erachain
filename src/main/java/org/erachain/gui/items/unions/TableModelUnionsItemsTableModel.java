@@ -12,8 +12,9 @@ public class TableModelUnionsItemsTableModel extends SearchItemsTableModel {
     public static final int COLUMN_FAVORITE = 3;
 
     public TableModelUnionsItemsTableModel() {
-        super(DCSet.getInstance().getItemUnionMap(), new String[]{"Key", "Name", "Creator", "Favorite"});
-        super.COLUMN_FAVORITE = COLUMN_FAVORITE;
+        super(DCSet.getInstance().getItemUnionMap(), new String[]{"Key", "Name", "Creator", "Favorite"},
+                null,
+                COLUMN_FAVORITE);
     }
 
     @Override

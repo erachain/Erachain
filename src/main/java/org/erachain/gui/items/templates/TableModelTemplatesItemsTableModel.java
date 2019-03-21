@@ -13,8 +13,7 @@ public class TableModelTemplatesItemsTableModel extends SearchItemsTableModel {
 
     public TableModelTemplatesItemsTableModel() {
         super(DCSet.getInstance().getItemTemplateMap(), new String[]{"Key", "Name", "Creator", "Favorite"},
-                new Boolean[]{false, true, true, false});
-        super.COLUMN_FAVORITE = COLUMN_FAVORITE;
+                new Boolean[]{false, true, true, false}, COLUMN_FAVORITE);
     }
 
     @Override

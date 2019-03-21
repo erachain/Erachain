@@ -21,13 +21,14 @@ public abstract class FavoriteItemModelTable<T, U> extends SearchItemsTableModel
     public final int LIST_EVENT;
 
     public FavoriteItemModelTable(DBMap map, String[] columnNames, Boolean[] columnAutoHeight,
-              int resetObserver, int addObserver, int deleteObserver, int listObserver) {
-        super(map, columnNames, columnAutoHeight);
+              int resetObserver, int addObserver, int deleteObserver, int listObserver, int favorite) {
+        super(map, columnNames, columnAutoHeight, favorite);
 
         this.RESET_EVENT = resetObserver;
         this.ADD_EVENT = addObserver;
         this.DELETE_EVENT = deleteObserver;
         this.LIST_EVENT = listObserver;
+
     }
 
     public void fill(Set<Long> keys) {

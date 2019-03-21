@@ -16,14 +16,11 @@ public abstract class SearchItemsTableModel<T, U> extends TableModelCls<Long, It
     protected int itemType;
     protected List<ItemCls> list;
     protected SortableList<Long, ItemCls> listSorted;
-    public int COLUMN_FAVORITE = 1000;
 
-
-    public SearchItemsTableModel(DBMap itemsMap, String[] columnNames) {
-        super(itemsMap, columnNames);
-    }
-    public SearchItemsTableModel(DBMap itemsMap, String[] columnNames, Boolean[] column_AutoHeight) {
+    public SearchItemsTableModel(DBMap itemsMap, String[] columnNames, Boolean[] column_AutoHeight, int favorite) {
         super(itemsMap, columnNames, column_AutoHeight);
+        this.COLUMN_FAVORITE = favorite;
+
     }
 
     public void findByName(String filter) {

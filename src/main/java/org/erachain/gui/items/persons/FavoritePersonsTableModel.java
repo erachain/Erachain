@@ -22,9 +22,14 @@ public class FavoritePersonsTableModel extends FavoriteItemModelTable<Long, Pers
     public static final int COLUMN_FAVORITE = 4;
 
     public FavoritePersonsTableModel() {
-        super(ItemCls.PERSON_TYPE, new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false});
-        super.COLUMN_FAVORITE = COLUMN_FAVORITE;
+        super(DCSet.getInstance().getItemPersonMap(),
+                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
+                new Boolean[]{false, true, true, false, false},
+                ObserverMessage.RESET_PERSON_FAVORITES_TYPE,
+                ObserverMessage.ADD_PERSON_FAVORITES_TYPE,
+                ObserverMessage.DELETE_PERSON_FAVORITES_TYPE,
+                ObserverMessage.LIST_PERSON_FAVORITES_TYPE,
+                COLUMN_FAVORITE);
     }
 
     @Override
@@ -62,26 +67,6 @@ public class FavoritePersonsTableModel extends FavoriteItemModelTable<Long, Pers
         }
 
         return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        int type = message.getType();
-        //CHECK IF NEW LIST
-        if (type == ObserverMessage.LIST_PERSON_FAVORITES_TYPE && list == null) {
-            list = new ArrayList<ItemCls>();
-            fill((Set<Long>) message.getValue());
-            fireTableDataChanged();
-        } else if (type == ObserverMessage.ADD_PERSON_FAVORITES_TYPE) {
-            list.add(Controller.getInstance().getPerson((long) message.getValue()));
-            fireTableDataChanged();
-        } else if (type == ObserverMessage.DELETE_PERSON_FAVORITES_TYPE) {
-            list.remove(Controller.getInstance().getPerson((long) message.getValue()));
-            fireTableDataChanged();
-        }
-
     }
 
     public void addObserversThis() {

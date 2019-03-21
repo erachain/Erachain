@@ -12,8 +12,8 @@ public class TableModelPollsItemsTableModel extends SearchItemsTableModel {
     public static final int COLUMN_FAVORITE = 3;
 
     public TableModelPollsItemsTableModel() {
-        super(DCSet.getInstance().getItemPollMap(), new String[]{"Key", "Name", "Creator", "Favorite"});
-        super.COLUMN_FAVORITE = COLUMN_FAVORITE;
+        super(DCSet.getInstance().getItemPollMap(), new String[]{"Key", "Name", "Creator", "Favorite"},
+            null, COLUMN_FAVORITE);
     }
 
     @Override

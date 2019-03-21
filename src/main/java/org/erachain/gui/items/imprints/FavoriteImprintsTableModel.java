@@ -26,14 +26,14 @@ public class FavoriteImprintsTableModel extends FavoriteItemModelTable<Long, Imp
     public static final int COLUMN_FAVORITE = 4;
 
     public FavoriteImprintsTableModel() {
-        super(DCSet.getInstance().getItemAssetMap(),
+        super(DCSet.getInstance().getItemImprintMap(),
                 new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false, false},
                 ObserverMessage.RESET_IMPRINT_FAVORITES_TYPE,
                 ObserverMessage.ADD_IMPRINT_FAVORITES_TYPE,
                 ObserverMessage.REMOVE_IMPRINT_FAVORITES_TYPE,
-                ObserverMessage.LIST_IMPRINT_FAVORITES_TYPE);
-        super.COLUMN_FAVORITE = COLUMN_FAVORITE;
+                ObserverMessage.LIST_IMPRINT_FAVORITES_TYPE,
+                COLUMN_FAVORITE);
     }
 
     @Override
