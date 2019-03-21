@@ -35,7 +35,7 @@ public class WalletTests {
     // INIT NOTES
     private void init() {
 
-        database = new DWSet(false, false);
+        database = DWSet.reCreateDB(false, false);
         secureDatabase = new SecureWalletDatabase(password);
 
         wallet = new Wallet(false, false);

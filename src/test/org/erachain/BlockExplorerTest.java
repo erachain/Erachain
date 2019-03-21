@@ -51,7 +51,7 @@ public class BlockExplorerTest {
                 .make();
 
         //CREATE INSTANCE
-        return new DCSet(database, false, false, false);
+        return new DCSet(dbFile, database, false, false, false);
     }
 
     public void maxBalance() {
