@@ -1,20 +1,13 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetMap;
-import org.erachain.datachain.Item_Map;
-import org.erachain.gui.items.TableModelItemsSearch;
+import org.erachain.gui.items.SearchItemsTableModel;
 import org.erachain.lang.Lang;
 
-import javax.validation.constraints.Null;
-import java.util.ArrayList;
-import java.util.List;
-
 @SuppressWarnings("serial")
-public class TableModelItemAssets extends TableModelItemsSearch {
+public class TableModelItemAssetsItemsTableModel extends SearchItemsTableModel {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -23,7 +16,7 @@ public class TableModelItemAssets extends TableModelItemsSearch {
     public static final int COLUMN_FAVORITE = 5;
     public static final int COLUMN_I_OWNER = 6;
 
-    public TableModelItemAssets() {
+    public TableModelItemAssetsItemsTableModel() {
         super(DCSet.getInstance().getItemAssetMap(), new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"},
                 new Boolean[]{false, true, true, false, false, false, false, false});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;

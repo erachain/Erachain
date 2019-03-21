@@ -2,16 +2,16 @@ package org.erachain.gui.items.polls;
 
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.items.TableModelItemsSearch;
+import org.erachain.gui.items.SearchItemsTableModel;
 
 @SuppressWarnings("serial")
-public class TableModelPolls extends TableModelItemsSearch {
+public class TableModelPollsItemsTableModel extends SearchItemsTableModel {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_FAVORITE = 3;
 
-    public TableModelPolls() {
+    public TableModelPollsItemsTableModel() {
         super(DCSet.getInstance().getItemPollMap(), new String[]{"Key", "Name", "Creator", "Favorite"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
     }

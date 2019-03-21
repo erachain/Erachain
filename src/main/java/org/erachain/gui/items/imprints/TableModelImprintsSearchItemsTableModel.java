@@ -1,20 +1,12 @@
 package org.erachain.gui.items.imprints;
 
-import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemImprintMap;
-import org.erachain.datachain.Item_Map;
-import org.erachain.gui.items.TableModelItemsSearch;
+import org.erachain.gui.items.SearchItemsTableModel;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
-import javax.validation.constraints.Null;
-import java.util.ArrayList;
-import java.util.List;
 
 @SuppressWarnings("serial")
-public class TableModelImprintsSearch extends TableModelItemsSearch {
+public class TableModelImprintsSearchItemsTableModel extends SearchItemsTableModel {
 
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
@@ -22,11 +14,11 @@ public class TableModelImprintsSearch extends TableModelItemsSearch {
     public static final int COLUMN_PUBLISHER = 3;
     public static final int COLUMN_FAVORITE = 4;
 
-    public TableModelImprintsSearch() {
+    public TableModelImprintsSearchItemsTableModel() {
         super(DCSet.getInstance().getItemImprintMap(), new String[]{"Key", "Name", "Birthday", "Publisher", "Favorite"},
                 new Boolean[]{false, true, true, false});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
-        LOGGER = LoggerFactory.getLogger(TableModelImprintsSearch.class.getName());
+        LOGGER = LoggerFactory.getLogger(TableModelImprintsSearchItemsTableModel.class.getName());
     }
 
     @Override

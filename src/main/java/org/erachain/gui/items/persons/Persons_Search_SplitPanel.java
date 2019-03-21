@@ -19,7 +19,7 @@ public class Persons_Search_SplitPanel extends Item_Search_SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
 
-    private static TableModelPersons search_Table_Model = new TableModelPersons();
+    private static TableModelPersonsItemsTableModel search_Table_Model = new TableModelPersonsItemsTableModel();
 
     private Persons_Search_SplitPanel th;
 

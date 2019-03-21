@@ -2,16 +2,16 @@ package org.erachain.gui.items.unions;
 
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.items.TableModelItemsSearch;
+import org.erachain.gui.items.SearchItemsTableModel;
 
 @SuppressWarnings("serial")
-public class TableModelUnions extends TableModelItemsSearch {
+public class TableModelUnionsItemsTableModel extends SearchItemsTableModel {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_FAVORITE = 3;
 
-    public TableModelUnions() {
+    public TableModelUnionsItemsTableModel() {
         super(DCSet.getInstance().getItemUnionMap(), new String[]{"Key", "Name", "Creator", "Favorite"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
     }

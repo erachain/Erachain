@@ -1,21 +1,17 @@
 package org.erachain.gui.items.templates;
 
-import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemTemplateMap;
-import org.erachain.gui.items.TableModelItemsSearch;
-
-import java.util.ArrayList;
+import org.erachain.gui.items.SearchItemsTableModel;
 
 @SuppressWarnings("serial")
-public class TableModelTemplates extends TableModelItemsSearch {
+public class TableModelTemplatesItemsTableModel extends SearchItemsTableModel {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_FAVORITE = 3;
 
-    public TableModelTemplates() {
+    public TableModelTemplatesItemsTableModel() {
         super(DCSet.getInstance().getItemTemplateMap(), new String[]{"Key", "Name", "Creator", "Favorite"},
                 new Boolean[]{false, true, true, false});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;

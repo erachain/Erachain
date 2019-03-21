@@ -22,7 +22,7 @@ import java.awt.event.*;
 public class Item_SplitPanel extends Split_Panel {
 
     private static final long serialVersionUID = 2717571093561259483L;
-    protected FavoriteItemModelTable table_Model;
+    protected TableModelCls table_Model;
     protected JMenuItem favorite_menu_items;
     protected JPopupMenu menu_Table;
     protected ItemCls item_Menu;
@@ -33,7 +33,7 @@ public class Item_SplitPanel extends Split_Panel {
     public Item_SplitPanel(TableModelCls table_Model1, String gui_Name) {
 
         super(gui_Name);
-        this.table_Model = (FavoriteItemModelTable)table_Model1;
+        this.table_Model = table_Model1;
         // not show buttons
         jToolBar_RightPanel.setVisible(false);
         toolBar_LeftPanel.setVisible(true);

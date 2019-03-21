@@ -17,7 +17,7 @@ public class Polls_Search_SplitPanel extends Item_Search_SplitPanel {
      *
      */
     private static final long serialVersionUID = 1L;
-    private static TableModelPolls tableModelPolls = new TableModelPolls();
+    private static TableModelPollsItemsTableModel tableModelPolls = new TableModelPollsItemsTableModel();
     private Polls_Search_SplitPanel th;
 
     public Polls_Search_SplitPanel() {

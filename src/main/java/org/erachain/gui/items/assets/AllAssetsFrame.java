@@ -24,7 +24,7 @@ import java.util.TreeMap;
 @SuppressWarnings("serial")
 public class AllAssetsFrame extends JFrame {
 
-    private TableModelItemAssets tableModelItemAssets;
+    private TableModelItemAssetsItemsTableModel tableModelItemAssets;
 
     public AllAssetsFrame() {
 
@@ -79,15 +79,15 @@ public class AllAssetsFrame extends JFrame {
         tableGBC.gridy = 1;
 
         //CREATE TABLE
-        this.tableModelItemAssets = new TableModelItemAssets();
+        this.tableModelItemAssets = new TableModelItemAssetsItemsTableModel();
         final MTable assetsTable = new MTable(this.tableModelItemAssets);
 
         //CHECKBOX FOR ASSET TYPE
-        TableColumn divisibleColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_ASSET_TYPE);
+        TableColumn divisibleColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssetsItemsTableModel.COLUMN_ASSET_TYPE);
         divisibleColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
 
         //CHECKBOX FOR FAVORITE
-        TableColumn favoriteColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_FAVORITE);
+        TableColumn favoriteColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssetsItemsTableModel.COLUMN_FAVORITE);
         favoriteColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
 
         //ASSETS SORTER

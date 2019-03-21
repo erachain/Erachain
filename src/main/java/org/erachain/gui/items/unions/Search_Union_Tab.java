@@ -15,7 +15,7 @@ public class Search_Union_Tab extends Item_Search_SplitPanel {
      *
      */
     private static final long serialVersionUID = 1L;
-    private static TableModelUnions tableModelUnions = new TableModelUnions();
+    private static TableModelUnionsItemsTableModel tableModelUnions = new TableModelUnionsItemsTableModel();
     private Search_Union_Tab th;
 
     public Search_Union_Tab() {

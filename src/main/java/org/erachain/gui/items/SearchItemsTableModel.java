@@ -11,16 +11,16 @@ import java.util.List;
 import java.util.Observable;
 
 @SuppressWarnings("serial")
-public abstract class TableModelItemsSearch extends TableModelCls<Long, ItemCls> {
+public abstract class SearchItemsTableModel extends TableModelCls<Long, ItemCls> {
 
     protected List<ItemCls> list;
-    public int COLUMN_FAVORITE = 1000;
+    //public int COLUMN_FAVORITE = 1000;
 
 
-    public TableModelItemsSearch(DBMap itemsMap, String[] columnNames) {
+    public SearchItemsTableModel(DBMap itemsMap, String[] columnNames) {
         super(itemsMap, columnNames);
     }
-    public TableModelItemsSearch(DBMap itemsMap, String[] columnNames, Boolean[] column_AutoHeight) {
+    public SearchItemsTableModel(DBMap itemsMap, String[] columnNames, Boolean[] column_AutoHeight) {
         super(itemsMap, columnNames, column_AutoHeight);
     }
 
