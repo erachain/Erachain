@@ -25,11 +25,11 @@ import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class Records_My_SplitPanel extends Split_Panel {
+public class MyTransactionsSplitPanel extends Split_Panel {
 
     private static final long serialVersionUID = 2717571093561259483L;
 
-    private static Records_My_SplitPanel instance;
+    private static MyTransactionsSplitPanel instance;
     public Voush_Library_Panel voush_Library_Panel;
     protected Transaction trans;
     private JPanel records_Info_Panel;
@@ -43,8 +43,8 @@ public class Records_My_SplitPanel extends Split_Panel {
 
   
 
-    private Records_My_SplitPanel() {
-        super("Records_My_SplitPanel");
+    private MyTransactionsSplitPanel() {
+        super("MyTransactionsSplitPanel");
         this.leftPanel.setVisible(true);
        
 
@@ -220,10 +220,10 @@ public class Records_My_SplitPanel extends Split_Panel {
 
     }
 
-    public static Records_My_SplitPanel getInstance() {
+    public static MyTransactionsSplitPanel getInstance() {
 
         if (instance == null) {
-            instance = new Records_My_SplitPanel();
+            instance = new MyTransactionsSplitPanel();
         } else {
             // восстановим наблюдения
             instance.records_model.addObservers();

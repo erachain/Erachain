@@ -41,7 +41,7 @@ import org.erachain.gui.items.polls.IssuePollPanel;
 import org.erachain.gui.items.polls.Polls_Favorite_SplitPanel;
 import org.erachain.gui.items.polls.Polls_My_SplitPanel;
 import org.erachain.gui.items.polls.Polls_Search_SplitPanel;
-import org.erachain.gui.items.records.Records_My_SplitPanel;
+import org.erachain.gui.items.records.MyTransactionsSplitPanel;
 import org.erachain.gui.items.records.SearchTransactionsSplitPanel;
 import org.erachain.gui.items.records.UnconfirmedTransactionsPanel;
 import org.erachain.gui.items.statement.Issue_Document_Panel;
@@ -466,8 +466,8 @@ public class Main_Panel extends javax.swing.JPanel {
         }
 
 
-        if (str.equals(Lang.getInstance().translate("My Records")) || str.equals("Records_My_SplitPanel")) {
-            insertTab(Lang.getInstance().translate("My Records"), Records_My_SplitPanel.getInstance());
+        if (str.equals(Lang.getInstance().translate("My Records")) || str.equals("MyTransactionsSplitPanel")) {
+            insertTab(Lang.getInstance().translate("My Records"), MyTransactionsSplitPanel.getInstance());
             return;
         }
         if (str.equals(Lang.getInstance().translate("Search Records")) || str.equals("SearchTransactionsSplitPanel")) {
