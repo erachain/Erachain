@@ -1,6 +1,5 @@
 package org.erachain.api;
 
-import com.google.gson.JsonObject;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.lang.Lang;
