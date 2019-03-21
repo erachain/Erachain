@@ -1,5 +1,6 @@
 package org.erachain.api;
 
+import com.google.gson.JsonObject;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.lang.Lang;
@@ -131,42 +132,27 @@ public class CoreResource {
     @GET
     @Path("/info/speed")
     public String getSpeedInfo() {
-
-        JSONObject jsonObject = new JSONObject();
-
+        JSONObject jsonObj = new JSONObject();
         Controller cnt = Controller.getInstance();
 
         if (BlockChain.DEVELOP_USE) {
-
-            jsonObject.put("missedTelegrams", cnt.getInstance().network.missedTelegrams.get());
-
-            jsonObject.put("missedTransactions", cnt.getInstance().network.missedTransactions.get());
-
-            jsonObject.put("activePeersCounter", cnt.getInstance().network.getKnownPeers());
-
-            jsonObject.put("missedWinBlocks", cnt.getInstance().network.missedWinBlocks.get());
-
-            jsonObject.put("missedMessages", cnt.getInstance().network.missedMessages.get());
-
-            jsonObject.put("missedSendes", cnt.getInstance().network.missedSendes.get());
-
-            jsonObject.put("msgTimingAvrg", cnt.getInstance().network.telegramer.messageTimingAverage);
-
-            jsonObject.put("unconfMsgTimingAvrg", cnt.getInstance().getUnconfigmedMessageTimingAverage());
-
-            jsonObject.put("transactionWinnedTimingAvrg", cnt.getInstance().getBlockChain().transactionWinnedTimingAverage);
-
-            jsonObject.put("transactionMakeTimingAvrg", cnt.getInstance().getTransactionMakeTimingAverage());
-
-            jsonObject.put("transactionValidateTimingAvrg", cnt.getInstance().getBlockChain().transactionValidateTimingAverage);
-
-            jsonObject.put("transactionProcessTimingAvrg", cnt.getInstance().getBlockChain().transactionProcessTimingAverage);
+            jsonObj.put("missedTelegrams", cnt.getInstance().network.missedTelegrams.get());
+            jsonObj.put("missedTransactions", cnt.getInstance().network.missedTransactions.get());
+            jsonObj.put("activePeersCounter", cnt.getInstance().network.getKnownPeers());
+            jsonObj.put("missedWinBlocks", cnt.getInstance().network.missedWinBlocks.get());
+            jsonObj.put("missedMessages", cnt.getInstance().network.missedMessages.get());
+            jsonObj.put("missedSendes", cnt.getInstance().network.missedSendes.get());
+            jsonObj.put("msgTimingAvrg", cnt.getInstance().network.telegramer.messageTimingAverage);
+            jsonObj.put("unconfMsgTimingAvrg", cnt.getInstance().getUnconfigmedMessageTimingAverage());
+            jsonObj.put("transactionWinnedTimingAvrg", cnt.getInstance().getBlockChain().transactionWinnedTimingAverage);
+            jsonObj.put("transactionMakeTimingAvrg", cnt.getInstance().getTransactionMakeTimingAverage());
+            jsonObj.put("transactionValidateTimingAvrg", cnt.getInstance().getBlockChain().transactionValidateTimingAverage);
+            jsonObj.put("transactionProcessTimingAvrg", cnt.getInstance().getBlockChain().transactionProcessTimingAverage);
         }
         else {
-            jsonObject.put("null", "null");
+            jsonObj.put("null", "null");
         }
-
-        return jsonObject.toJSONString();
+        return jsonObj.toJSONString();
     }
 
 }

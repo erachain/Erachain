@@ -17,11 +17,11 @@ import java.awt.event.ActionListener;
 
 public class Persons_Favorite_SplitPanel extends Item_SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private static Persons_Favorite_TableModel table_Model = new Persons_Favorite_TableModel();
+    private static Persons_Favorite_TableModel table_Model;
     private Persons_Favorite_SplitPanel th;
 
     public Persons_Favorite_SplitPanel() {
-        super(table_Model, "Persons_Favorite_SplitPanel");
+        super(table_Model = new Persons_Favorite_TableModel(), "Persons_Favorite_SplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Persons"));
         th = this;
         JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
