@@ -17,7 +17,7 @@ import java.awt.event.ActionListener;
 
 public class Polls_Favorite_SplitPanel extends Item_SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private static Polls_Favorite_TableModel table_Model = new Polls_Favorite_TableModel();
+    private static FavoritePollsTableModel table_Model = new FavoritePollsTableModel();
     private Polls_Favorite_SplitPanel th;
 
     public Polls_Favorite_SplitPanel() {

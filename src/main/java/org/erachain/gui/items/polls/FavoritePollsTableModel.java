@@ -1,10 +1,12 @@
 package org.erachain.gui.items.polls;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.gui.models.TableModelCls;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
@@ -13,43 +15,26 @@ import javax.validation.constraints.Null;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class Polls_Favorite_TableModel extends TableModelCls<Tuple2<String, String>, PollCls> implements Observer {
+public class FavoritePollsTableModel extends FavoriteItemModelTable<Long, PollCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_CONFIRMED = 3;
     public static final int COLUMN_FAVORITE = 4;
 
-    private List<PollCls> templates;
-
-    public Polls_Favorite_TableModel() {
-        super(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"}, new Boolean[]{false, true, true, false, false});
+    public FavoritePollsTableModel() {
+        super(ItemCls.POLL_TYPE, new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
+                new Boolean[]{false, true, true, false, false});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
     }
 
     @Override
-    public SortableList<Tuple2<String, String>, PollCls> getSortableList() {
-        return null;
-    }
-
-    public PollCls getItem(int row) {
-        return this.templates.get(row);
-
-    }
-
-    @Override
-    public int getRowCount() {
-        if (templates == null) return 0;
-        return this.templates.size();
-    }
-
-    @Override
     public Object getValueAt(int row, int column) {
-        if (this.templates == null || row > this.templates.size() - 1) {
+        if (this.list == null || row > this.list.size() - 1) {
             return null;
         }
 
-        PollCls status = this.templates.get(row);
+        PollCls status = (PollCls) this.list.get(row);
         if (status == null)
             return null;
 
@@ -85,24 +70,18 @@ public class Polls_Favorite_TableModel extends TableModelCls<Tuple2<String, Stri
         ObserverMessage message = (ObserverMessage) arg;
 
         //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.WALLET_LIST_POLL_FAVORITES_TYPE && templates == null) {
-            templates = new ArrayList<PollCls>();
+        if (message.getType() == ObserverMessage.WALLET_LIST_POLL_FAVORITES_TYPE && list == null) {
+            list = new ArrayList<ItemCls>();
             fill((Set<Long>) message.getValue());
             fireTableDataChanged();
         }
         if (message.getType() == ObserverMessage.WALLET_ADD_POLL_FAVORITES_TYPE) {
-            templates.add(Controller.getInstance().getPoll((long) message.getValue()));
+            list.add(Controller.getInstance().getPoll((long) message.getValue()));
             fireTableDataChanged();
         }
         if (message.getType() == ObserverMessage.WALLET_DELETE_POLL_FAVORITE_TYPE) {
-            templates.remove(Controller.getInstance().getPoll((long) message.getValue()));
+            list.remove(Controller.getInstance().getPoll((long) message.getValue()));
             fireTableDataChanged();
-        }
-    }
-
-    public void fill(Set<Long> set) {
-        for (Long s : set) {
-            templates.add(Controller.getInstance().getPoll(s));
         }
     }
 
