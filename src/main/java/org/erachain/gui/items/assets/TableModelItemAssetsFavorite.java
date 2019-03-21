@@ -4,15 +4,14 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 
-import javax.validation.constraints.Null;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> implements Observer {
+public class TableModelItemAssetsFavorite extends FavoriteItemModelTable<Long, AssetCls> {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -21,11 +20,8 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
     public static final int COLUMN_FAVORITE = 5;
     public static final int COLUMN_I_OWNER = 6;
 
-    private SortableList<Long, AssetCls> assetsSorted;
 
-    private List<AssetCls> assets;
-
-    public TableModelItemAssetsFavorute() {
+    public TableModelItemAssetsFavorite() {
         super(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"},
                 new Boolean[]{false, true, true, false, false, false, false, false});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
@@ -95,15 +91,6 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -139,7 +126,7 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
 
     public void addObserversThis() {
         if (Controller.getInstance().doesWalletDatabaseExists()) {
-            Controller.getInstance().wallet.database.getAssetFavoritesSet().addObserver(this);
+            .addObserver(this);
         }
     }
 

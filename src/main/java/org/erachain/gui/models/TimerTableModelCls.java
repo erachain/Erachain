@@ -24,8 +24,6 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
     protected int step = 50;
     protected int size = 0;
 
-    public int COLUMN_FAVORITE = 1000;
-
     protected DBMap map;
     protected Logger LOGGER;
 

@@ -14,6 +14,8 @@ import java.util.Observable;
 public abstract class TableModelItemsSearch extends TableModelCls<Long, ItemCls> {
 
     protected List<ItemCls> list;
+    public int COLUMN_FAVORITE = 1000;
+
 
     public TableModelItemsSearch(DBMap itemsMap, String[] columnNames) {
         super(itemsMap, columnNames);
