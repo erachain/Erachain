@@ -18,7 +18,7 @@ public class TemplatesFavorites implements Observer {
     public TemplatesFavorites() {
         this.favorites = new ArrayList<Long>();
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         Controller.getInstance().addObserver(this);
     }
 

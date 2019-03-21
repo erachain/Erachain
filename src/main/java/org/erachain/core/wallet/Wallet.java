@@ -22,6 +22,7 @@ import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.SecureWalletDatabase;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.library.library;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
@@ -1960,7 +1961,14 @@ public class Wallet extends Observable implements Observer {
             //this.database.commit();
 
 		} else if (type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
-			;
+
+        	if (Controller.getInstance().useGui) {
+				Pair<byte[], Transaction> item = (Pair<byte[], Transaction>) message.getValue();
+				Transaction transaction = item.getB();
+
+				library.notifySysTrayRecord(transaction);
+			}
+
 		} else if (type == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
             ;
 		} else if (type == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {

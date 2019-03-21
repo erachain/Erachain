@@ -5,7 +5,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.naming.Name;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.NameMap;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
@@ -116,7 +115,7 @@ public class WalletNamesTableModel extends TableModelCls<Tuple2<String, String>,
     }
 
     public void addObserversThis() {
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
     }
 
     public void removeObserversThis() {

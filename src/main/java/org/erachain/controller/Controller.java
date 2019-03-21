@@ -258,6 +258,9 @@ public class Controller extends Observable {
     public void setDynamicGUI(boolean dynamicGUI) {
         this.dynamicGUI = dynamicGUI;
     }
+    public boolean isDynamicGUI() {
+        return this.dynamicGUI;
+    }
 
     public void setDCSet(DCSet db) {
         this.dcSet = db;
@@ -735,6 +738,8 @@ public class Controller extends Observable {
 
         }
 
+        guiTimer = new GuiTimer();
+
         if (this.wallet.isWalletDatabaseExisting()) {
             this.wallet.initiateItemsFavorites();
         }
@@ -945,78 +950,6 @@ public class Controller extends Observable {
             this.webService = new WebService();
             this.webService.start();
         }
-    }
-
-    @Override
-    public void addObserver(Observer o) {
-
-        this.dcSet.getBlockMap().addObserver(o);
-        this.dcSet.getTransactionMap().addObserver(o);
-        // this.dcSet.getTransactionFinalMap().addObserver(o);
-
-        if (this.dcSetWithObserver) {
-            // ADD OBSERVER TO SYNCHRONIZER
-            // this.synchronizer.addObserver(o);
-
-            // ADD OBSERVER TO BLOCKGENERATOR
-            // this.blockGenerator.addObserver(o);
-
-            // ADD OBSERVER TO NAMESALES
-            this.dcSet.getNameExchangeMap().addObserver(o);
-
-            // ADD OBSERVER TO POLLS
-            //this.dcSet.getPollMap().addObserver(o);
-
-            // ADD OBSERVER TO ASSETS
-            this.dcSet.getItemAssetMap().addObserver(o);
-
-            // ADD OBSERVER TO IMPRINTS
-            this.dcSet.getItemImprintMap().addObserver(o);
-
-            // ADD OBSERVER TO TEMPLATES
-            this.dcSet.getItemTemplateMap().addObserver(o);
-
-            // ADD OBSERVER TO PERSONS
-            this.dcSet.getItemPersonMap().addObserver(o);
-
-            // ADD OBSERVER TO STATUSES
-            this.dcSet.getItemStatusMap().addObserver(o);
-
-            // ADD OBSERVER TO UNIONS
-            this.dcSet.getItemUnionMap().addObserver(o);
-
-            // ADD OBSERVER TO ORDERS
-            this.dcSet.getOrderMap().addObserver(o);
-
-            // ADD OBSERVER TO TRADES
-            this.dcSet.getTradeMap().addObserver(o);
-
-            // ADD OBSERVER TO BALANCES
-            this.dcSet.getAssetBalanceMap().addObserver(o);
-
-            // ADD OBSERVER TO ATMAP
-            this.dcSet.getATMap().addObserver(o);
-
-            // ADD OBSERVER TO ATTRANSACTION MAP
-            this.dcSet.getATTransactionMap().addObserver(o);
-        }
-
-        // ADD OBSERVER TO CONTROLLER
-        super.addObserver(o);
-        o.update(this, new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
-    }
-
-    @Override
-    public void deleteObserver(Observer o) {
-        this.dcSet.getBlockMap().deleteObserver(o);
-
-        super.deleteObserver(o);
-    }
-
-    public void deleteWalletObserver(Observer o) {
-        //this.deleteObserver(o);
-        super.deleteObserver(o); // нужно для перерисовки раз в 2 сек
-        this.wallet.deleteObserver(o);
     }
 
     public boolean isOnStopping() {
@@ -2089,10 +2022,6 @@ public class Controller extends Observable {
     // }
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance(Account account, long key) {
         return this.wallet.getUnconfirmedBalance(account, key);
-    }
-
-    public void addWalletListener(Observer o) {
-        this.wallet.addObserver(o);
     }
 
     public String importAccountSeed(byte[] accountSeed) {
@@ -3198,8 +3127,88 @@ public class Controller extends Observable {
 
         return null;
     }
+
+    @Override
+    public void addObserver(Observer o) {
+
+        this.dcSet.getBlockMap().addObserver(o);
+        this.dcSet.getTransactionMap().addObserver(o);
+        // this.dcSet.getTransactionFinalMap().addObserver(o);
+
+        if (this.dcSetWithObserver) {
+            // ADD OBSERVER TO SYNCHRONIZER
+            // this.synchronizer.addObserver(o);
+
+            // ADD OBSERVER TO BLOCKGENERATOR
+            // this.blockGenerator.addObserver(o);
+
+            // ADD OBSERVER TO NAMESALES
+            this.dcSet.getNameExchangeMap().addObserver(o);
+
+            // ADD OBSERVER TO POLLS
+            //this.dcSet.getPollMap().addObserver(o);
+
+            // ADD OBSERVER TO ASSETS
+            this.dcSet.getItemAssetMap().addObserver(o);
+
+            // ADD OBSERVER TO IMPRINTS
+            this.dcSet.getItemImprintMap().addObserver(o);
+
+            // ADD OBSERVER TO TEMPLATES
+            this.dcSet.getItemTemplateMap().addObserver(o);
+
+            // ADD OBSERVER TO PERSONS
+            this.dcSet.getItemPersonMap().addObserver(o);
+
+            // ADD OBSERVER TO STATUSES
+            this.dcSet.getItemStatusMap().addObserver(o);
+
+            // ADD OBSERVER TO UNIONS
+            this.dcSet.getItemUnionMap().addObserver(o);
+
+            // ADD OBSERVER TO ORDERS
+            this.dcSet.getOrderMap().addObserver(o);
+
+            // ADD OBSERVER TO TRADES
+            this.dcSet.getTradeMap().addObserver(o);
+
+            // ADD OBSERVER TO BALANCES
+            this.dcSet.getAssetBalanceMap().addObserver(o);
+
+            // ADD OBSERVER TO ATMAP
+            this.dcSet.getATMap().addObserver(o);
+
+            // ADD OBSERVER TO ATTRANSACTION MAP
+            this.dcSet.getATTransactionMap().addObserver(o);
+        }
+
+        // ADD OBSERVER TO CONTROLLER
+        super.addObserver(o);
+        o.update(this, new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
+    }
+
+    @Override
+    public void deleteObserver(Observer o) {
+        this.dcSet.getBlockMap().deleteObserver(o);
+
+        super.deleteObserver(o);
+    }
+
     public void addSingleObserver(Observer o){
        super.addObserver(o);
+    }
+
+    public void deleteSingleObserver(Observer o){
+        super.deleteObserver(o);
+    }
+
+    public void addWalletObserver(Observer o) {
+        this.wallet.addObserver(o);
+        this.guiTimer.addObserver(o); // обработка repaintGUI
+    }
+    public void deleteWalletObserver(Observer o) {
+        this.guiTimer.deleteObserver(o); // нужно для перерисовки раз в 2 сек
+        this.wallet.deleteObserver(o);
     }
 
     public void startApplication(String args[]){
@@ -3353,7 +3362,6 @@ public class Controller extends Observable {
 
                         //START GUI
 
-                        guiTimer = new GuiTimer();
                         gui = Gui.getInstance();
 
                         if (gui != null && Settings.getInstance().isSysTrayEnabled()) {

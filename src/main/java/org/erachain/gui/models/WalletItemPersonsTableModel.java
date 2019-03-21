@@ -140,7 +140,7 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
     }
 
     public void addObserversThis() {
-        //Controller.getInstance().addWalletListener(this);
+        //Controller.getInstance().addWalletObserver(this);
         if (Controller.getInstance().doesWalletDatabaseExists())
             Controller.getInstance().wallet.database.getPersonMap().addObserver(this);
 

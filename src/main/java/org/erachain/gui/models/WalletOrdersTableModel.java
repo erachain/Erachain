@@ -192,11 +192,11 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
     }
 
     public void addObserversThis() {
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
 
         if (Controller.getInstance().doesWalletDatabaseExists()) {
             this.orders.registerObserver();
-            Controller.getInstance().addWalletListener(this);
+            Controller.getInstance().addWalletObserver(this);
         }
     }
 

@@ -39,7 +39,7 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 
     public Accounts_Of_Deals_TableModel(int deal) {
         this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         Controller.getInstance().addObserver(this);
         this.deal = deal;
     }

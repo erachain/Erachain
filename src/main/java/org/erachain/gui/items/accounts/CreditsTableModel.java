@@ -14,6 +14,7 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Null;
 import java.math.BigDecimal;
@@ -44,6 +45,8 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
     public CreditsTableModel() {
         super("CreditsTableModel", 1000,
                 new String[]{"Account", "Amount", "Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
+
+        LOGGER = LoggerFactory.getLogger(CreditsTableModel.class.getName());
 
     }
 
@@ -274,7 +277,7 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
             cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
         }
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         //		Controller.getInstance().addObserver(this);
         //		int a = 1;
 

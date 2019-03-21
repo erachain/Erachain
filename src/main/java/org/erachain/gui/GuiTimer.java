@@ -1,7 +1,10 @@
 package org.erachain.gui;
 
 import org.erachain.controller.Controller;
+import org.erachain.database.DBMap;
 import org.erachain.utils.ObserverMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -12,35 +15,48 @@ import java.util.TimerTask;
  * только запускает событи - "обновиться"
  * Используется в gui.library.SetIntervalPanel#syncUpdate(java.util.Observable, java.lang.Object) и других
  */
-public class GuiTimer extends Observable {
+public class GuiTimer extends Thread {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GuiTimer.class);
+
+    private GuiObserver observer;
 
     public GuiTimer() {
-        Timer timer = new Timer("GuiTimer");
+        observer = new GuiObserver();
+        this.setName("GuiTimer");
+        this.start();
+    }
 
-        TimerTask action = new TimerTask() {
-            public void run() {
-                try {
-                    onRepaint();
-                } catch (Exception e) {
-                }
+    public void run() {
+
+        Controller cnt = Controller.getInstance();
+
+        while (!cnt.isOnStopping()) {
+            try {
+                observer.repaintGUI();
+            } catch (java.lang.OutOfMemoryError e) {
+                Controller.getInstance().stopAll(56);
+                return;
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
             }
-        };
 
-        timer.schedule(action, 1000, 2000);
+            long timer = cnt.useGui? (cnt.isDynamicGUI()? 500 : 2500) : 60000;
+            try {
+                Thread.sleep(timer);
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
 
     }
 
-    public void onRepaint() {
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_REPAINT, this));
+    public void addObserver(Observer o) {
+        observer.addObserver(o);
     }
 
-    // for REPAINT timer
-    public void addTimerObserver(Observer o) {
-        this.addObserver(o);
-    }
-    public void removeTimerObserver(Observer o) {
-        this.deleteObserver(o);
+    public void deleteObserver(Observer o) {
+        observer.deleteObserver(o);
     }
 
 }

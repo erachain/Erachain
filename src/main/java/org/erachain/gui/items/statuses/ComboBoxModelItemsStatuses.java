@@ -14,7 +14,7 @@ public class ComboBoxModelItemsStatuses extends DefaultComboBoxModel<StatusCls> 
     Lock lock = new ReentrantLock();
 
     public ComboBoxModelItemsStatuses() {
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
     }
 
     @Override

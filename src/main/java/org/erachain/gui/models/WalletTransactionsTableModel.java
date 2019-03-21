@@ -40,8 +40,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     public static final int COLUMN_FEE = 7;
     public static final int COLUMN_SIZE = 8;
 
-    static Logger LOGGER = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
-
     private SortableList<Tuple2<String, String>, Transaction> transactions;
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
 
@@ -54,9 +52,12 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
      * gui.items.assets.My_Order_Tab
      */
     public WalletTransactionsTableModel() {
-        super("WalletTransactionsTableModel", 1000,
+        super("WalletTransactionsTableModel", 999000,
                 new String[]{
                         "Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
+
+        LOGGER = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
+
     }
 
     @Override
@@ -228,6 +229,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
     }
 
+    private int count;
+
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         if (Controller.getInstance().wallet.database == null)
@@ -237,12 +240,12 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-            if (this.transactions == null) {
-                getInterval();
-                this.transactions.registerObserver();
-                this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
-            }
 
+            needUpdate = true;
+
+        } else if (message.getType() == ObserverMessage.WALLET_RESET_TRANSACTION_TYPE) {
+
+            getInterval();
             this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
@@ -264,20 +267,24 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             Transaction transaction = (Transaction) message.getValue();
             library.notifySysTrayRecord(transaction);
 
-        } else if (message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
-            // INCOME
-
-            needUpdate = true;
-
-            Pair<byte[], Transaction> item = (Pair<byte[], Transaction>) message.getValue();
-            Transaction transaction = item.getB();
-
-            library.notifySysTrayRecord(transaction);
-
         } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE
-                || message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
+                //|| message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE
+                ) {
 
             needUpdate = true;
+
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT
+                && Controller.getInstance().isDynamicGUI()
+                && needUpdate) {
+
+            if (count++ < 4)
+                return;
+
+            count = 0;
+            needUpdate = false;
+
+            getInterval();
+            fireTableDataChanged();
 
         }
     }
@@ -294,12 +301,17 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         // for ??
         ///Controller.getInstance().wallet.database.getPersonMap().addObserver(transactions);
 
+        Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
+
         getInterval();
+        fireTableDataChanged();
 
     }
 
 
     public void removeObserversThis() {
+
+        Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
 
         //dbItemAssetMap = DLSet.getInstance().getItemAssetMap();
 
@@ -324,6 +336,9 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
         DCSet dcSet = DCSet.getInstance();
         for (Pair<Tuple2<String, String>, Transaction> item: transactions) {
+            if (item.getB() == null)
+                continue;
+
             item.getB().setDC_HeightSeq(dcSet);
             item.getB().calcFee();
         }

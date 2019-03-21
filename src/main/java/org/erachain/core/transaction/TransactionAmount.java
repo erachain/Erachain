@@ -199,7 +199,11 @@ public abstract class TransactionAmount extends Transaction {
         String address = account.getAddress();
         return getAmount(address);
     }
-    
+
+    public boolean hasAmount() {
+        return amount != null && amount.signum() != 0;
+    }
+
     public static int getActionType(long assetKey, BigDecimal amount, boolean isBackward) {
         int type = Account.actionType(assetKey, amount);
         return type * (isBackward ? -1 : 1);

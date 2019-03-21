@@ -1,7 +1,6 @@
 package org.erachain.gui.bank;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.*;
 import org.erachain.database.SortableList;
@@ -10,14 +9,12 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.TableModelCls;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.*;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Null;
-import java.awt.TrayIcon.MessageType;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -251,7 +248,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
 
     public void addObserversThis() {
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
     }
 
 

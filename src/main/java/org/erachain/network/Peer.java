@@ -513,7 +513,7 @@ public class Peer extends MonitoredThread {
         }
 
         if (USE_MONITOR) this.setMonitorStatus("halted");
-        LOGGER.info(this + " - halted");
+        //LOGGER.debug(this + " - halted");
 
     }
 

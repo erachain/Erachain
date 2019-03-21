@@ -5,7 +5,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 
@@ -107,7 +106,7 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
     }
 
     public void addObserversThis() {
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
     }
 
     public void removeObserversThis() {

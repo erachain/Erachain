@@ -859,12 +859,6 @@ public class Synchronizer {
                             } catch (Exception e) {
                                 LOGGER.error(e.getMessage(), e);
                             }
-                        } else if (countObserv_COUNT != null) {
-                            try {
-                                dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_COUNT, countObserv_COUNT);
-                            } catch (Exception e) {
-                                LOGGER.error(e.getMessage(), e);
-                            }
                         }
 
                     try {
@@ -936,12 +930,6 @@ public class Synchronizer {
                     if (countObserv_REMOVE != null) {
                         try {
                             dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_REMOVE, countObserv_REMOVE);
-                        } catch (Exception e) {
-                            LOGGER.error(e.getMessage(), e);
-                        }
-                    } else if (countObserv_COUNT != null) {
-                        try {
-                            dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_COUNT, countObserv_COUNT);
                         } catch (Exception e) {
                             LOGGER.error(e.getMessage(), e);
                         }

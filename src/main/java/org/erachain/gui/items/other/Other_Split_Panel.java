@@ -301,7 +301,7 @@ public class Other_Split_Panel extends Split_Panel {
     }
     
     @Override
-    public void delay_on_close() {
+    public void onClose() {
         
         blocksModel.removeObservers();
         peersTableModel.removeObservers();

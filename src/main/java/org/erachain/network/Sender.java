@@ -312,7 +312,7 @@ public class Sender extends MonitoredThread {
 
         }
 
-        LOGGER.info(this + " - halted");
+        //LOGGER.debug(this + " - halted");
     }
 
     public void close() {
