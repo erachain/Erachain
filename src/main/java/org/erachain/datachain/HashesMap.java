@@ -11,7 +11,6 @@ import java.util.TreeMap;
 // found by hash -> record signature
 // TODO: переделать ссылку на транзакцию на Long
 public class HashesMap extends DCMap<byte[], byte[]> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public HashesMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -42,11 +41,6 @@ public class HashesMap extends DCMap<byte[], byte[]> {
     @Override
     protected byte[] getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
 }

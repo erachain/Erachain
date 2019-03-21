@@ -17,7 +17,6 @@ import java.util.UUID;
  * signature (as UUID bytes16) -> <BlockHeoght, Record No> (as Long)
  */
 public class TransactionFinalMapSigns extends DCMap<UUID, Long> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public TransactionFinalMapSigns(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -58,11 +57,6 @@ public class TransactionFinalMapSigns extends DCMap<UUID, Long> {
     @Override
     protected Long getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     public boolean contains(byte[] signature) {

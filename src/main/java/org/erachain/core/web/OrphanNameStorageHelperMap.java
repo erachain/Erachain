@@ -38,14 +38,8 @@ public class OrphanNameStorageHelperMap extends DCMap<String, List<byte[]>> {
     }
 
     @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
-    @Override
     protected void createIndexes(DB database) {
     }
-
 
     public void add(String name, byte[] signatureOfTx) {
         List<byte[]> list = this.get(name);

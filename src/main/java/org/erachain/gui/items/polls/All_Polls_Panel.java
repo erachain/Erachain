@@ -128,7 +128,7 @@ public class All_Polls_Panel extends JPanel {
 
                 if (e.getClickCount() == 2) {
                     row = pollsTable.convertRowIndexToModel(row);
-                    PollCls poll = pollsTableModel.getPoll(row);
+                    PollCls poll = (PollCls) pollsTableModel.getItem(row);
                     AssetCls item = (AssetCls) cbxAssets.getSelectedItem();
                     //				new PollFrame(poll, item);
                 }

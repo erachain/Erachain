@@ -21,8 +21,6 @@ import java.util.*;
  */
 
 public class Credit_AddressesMap extends DCMap<Tuple3<String, Long, String>, BigDecimal> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
 
     public Credit_AddressesMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -55,11 +53,6 @@ public class Credit_AddressesMap extends DCMap<Tuple3<String, Long, String>, Big
     @Override
     protected BigDecimal getDefaultValue() {
         return BigDecimal.ZERO;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     public BigDecimal add(Tuple3<String, Long, String> key, BigDecimal amount) {
@@ -98,7 +91,7 @@ public class Credit_AddressesMap extends DCMap<Tuple3<String, Long, String>, Big
         }
 
         if (this.parent != null)
-            result.addAll(this.parent.getDBSet().getCredit_AddressesMap().getList(creditorAddress, key));
+            result.addAll(((DCSet)this.parent.getDBSet()).getCredit_AddressesMap().getList(creditorAddress, key));
 
         return result;
     }

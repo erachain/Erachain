@@ -1287,7 +1287,7 @@ String  s= "";
         //CHECK IF NAME UPDATE IS INVALID
         assertEquals(Transaction.NO_BALANCE, namePurchaseTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
-        // setConfirmedBalance(long key, BigDecimal amount, DBSet db)
+        // setConfirmedBalance(long key, BigDecimal amount, DLSet db)
         buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(2000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
         //CREATE NAME UPDATE INVALID REFERENCE
@@ -2095,7 +2095,7 @@ String  s= "";
 	{
 
 		//CREATE EMPTY MEMORY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
+		DLSet databaseSet = DLSet.createEmptyDatabaseSet();
 
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());

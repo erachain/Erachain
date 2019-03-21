@@ -27,7 +27,17 @@ public class PlaySound {
         return instance;
     }
 
+    private long timePoint;
     public void playSound(final String url, byte[] signature) {
+
+        if (System.currentTimeMillis() - timePoint > 10000) {
+            return;
+        }
+
+        timePoint = System.currentTimeMillis();
+        if (transactionsAlreadyPlayed.size() > 100) {
+            transactionsAlreadyPlayed.clear();
+        }
 
         boolean is = false;
 

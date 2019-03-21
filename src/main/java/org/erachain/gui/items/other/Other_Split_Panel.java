@@ -70,7 +70,7 @@ public class Other_Split_Panel extends Split_Panel {
                 // TODO Auto-generated method stub
                 int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
                 int rowRow = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-                item_Peer_Menu = peersTableModel.get_Peers(rowRow);
+                item_Peer_Menu = peersTableModel.getItem(rowRow);
                 
             }
             
@@ -301,10 +301,10 @@ public class Other_Split_Panel extends Split_Panel {
     }
     
     @Override
-    public void delay_on_close() {
+    public void onClose() {
         
-        blocksModel.deleteObserver();
-        peersTableModel.deleteObserver();
+        blocksModel.removeObservers();
+        peersTableModel.removeObservers();
         All_Blocks_TableModel.removeObservers();
         Controller.getInstance().addObserver(sync_Button);
         

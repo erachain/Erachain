@@ -5,7 +5,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 
@@ -23,12 +22,11 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
 
     private SortableList<Tuple2<String, String>, UnionCls> unions;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
 
     public WalletItemUnionsTableModel() {
-
-        addObservers();
+        super("WalletItemUnionsTableModel", 1000,
+                new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"});
 
     }
 
@@ -55,16 +53,6 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
 
     public UnionCls getItem(int row) {
         return this.unions.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -137,14 +125,12 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
         }
     }
 
-    public void removeObservers() {
-
-        Controller.getInstance().deleteObserver(this);
-
+    public void addObserversThis() {
+        Controller.getInstance().addWalletObserver(this);
     }
 
-    public void addObservers() {
-        Controller.getInstance().addWalletListener(this);
+    public void removeObserversThis() {
+        Controller.getInstance().deleteObserver(this);
     }
 
 }

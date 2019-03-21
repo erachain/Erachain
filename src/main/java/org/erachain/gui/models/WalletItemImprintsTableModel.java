@@ -23,11 +23,11 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
 
     private SortableList<Tuple2<String, String>, ImprintCls> imprints;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false};
 
     public WalletItemImprintsTableModel() {
-        addObservers();
+        super("WalletItemImprintsTableModel", 1000,
+                new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"});
     }
 
     // читаем колонки которые изменяем высоту
@@ -53,16 +53,6 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
 
     public ImprintCls getItem(int row) {
         return this.imprints.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -133,14 +123,12 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
         }
     }
 
-    public void addObservers() {
+    public void addObserversThis() {
         Controller.getInstance().wallet.database.getImprintMap().addObserver(this);
-
 
     }
 
-
-    public void removeObservers() {
+    public void removeObserversThis() {
         //this.persons.removeObserver();
         //Controller.getInstance().deleteWalletObserver(this);
         Controller.getInstance().wallet.database.getImprintMap().deleteObserver(this);

@@ -19,18 +19,16 @@ import java.util.Map.Entry;
 public class NameExchangeMap extends DCMap<String, BigDecimal> {
     public static final int AMOUNT_INDEX = 1;
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     public NameExchangeMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_NAME_SALE_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_NAME_SALE_TYPE);
             if (databaseSet.isDynamicGUI()) {
                 this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_NAME_SALE_TYPE);
                 this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_NAME_SALE_TYPE);
             }
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_NAME_SALE_TYPE);
         }
     }
 
@@ -81,11 +79,6 @@ public class NameExchangeMap extends DCMap<String, BigDecimal> {
         return BigDecimal.ZERO;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public List<NameSale> getNameSales() {
         List<NameSale> nameSales = new ArrayList<NameSale>();
 
@@ -96,7 +89,7 @@ public class NameExchangeMap extends DCMap<String, BigDecimal> {
         if (this.parent != null) {
 
             //GET ALL KEYS FOR FORK
-            List<NameSale> forkItems = this.parent.getDBSet().getNameExchangeMap().getNameSales();
+            List<NameSale> forkItems = ((DCSet)this.parent.getDBSet()).getNameExchangeMap().getNameSales();
 
             nameSales.addAll(forkItems);
 

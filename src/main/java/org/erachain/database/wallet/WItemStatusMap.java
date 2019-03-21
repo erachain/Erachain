@@ -67,12 +67,6 @@ public class WItemStatusMap extends WItem_Map {
 	{
 		return null;
 	}
-	
-	@Override
-	protected Map<Integer, Integer> getObservableData() 
-	{
-		return this.observableData;
-	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<StatusCls> get(Account account)

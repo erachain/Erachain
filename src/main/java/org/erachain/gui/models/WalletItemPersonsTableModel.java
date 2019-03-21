@@ -25,12 +25,11 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 
     private SortableList<Tuple2<String, String>, PersonCls> persons;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
 
     public WalletItemPersonsTableModel() {
-        //Controller.getInstance().addWalletListener(this);
-        addObservers();
+        super("WalletItemPersonsTableModel", 1000,
+                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
     }
 
     @Override
@@ -60,16 +59,6 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
             return null;
 
         return personRes.getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -150,14 +139,14 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
         }
     }
 
-    public void addObservers() {
+    public void addObserversThis() {
+        //Controller.getInstance().addWalletObserver(this);
         if (Controller.getInstance().doesWalletDatabaseExists())
             Controller.getInstance().wallet.database.getPersonMap().addObserver(this);
 
     }
 
-
-    public void removeObservers() {
+    public void removeObserversThis() {
         if (!Controller.getInstance().doesWalletDatabaseExists())
             return;
 

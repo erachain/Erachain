@@ -38,7 +38,7 @@ public class FavoriteItem extends Observable {
     public void replace(List<Long> keys) {
         this.itemsSet.clear();
         this.itemsSet.addAll(keys);
-        this.dWSet.commit();
+        //this.dWSet.commit();
 
         //NOTIFY
         this.notifyFavorites();
@@ -46,7 +46,7 @@ public class FavoriteItem extends Observable {
 
     public void add(Long key) {
         this.itemsSet.add(key);
-        this.dWSet.commit();
+        //this.dWSet.commit();
 
         //NOTIFY
         this.notifyFavorites();
@@ -54,7 +54,7 @@ public class FavoriteItem extends Observable {
 
     public void delete(Long key) {
         this.itemsSet.remove(key);
-        this.dWSet.commit();
+        //this.dWSet.commit();
 
         //NOTIFY
         this.notifyFavorites();

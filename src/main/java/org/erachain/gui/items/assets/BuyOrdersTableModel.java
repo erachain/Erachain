@@ -16,9 +16,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class BuyOrdersTableModel extends
-        TableModelCls<Long, Order>
-        implements Observer {
+public class BuyOrdersTableModel extends TableModelCls<Long, Order> implements Observer {
     //public static final int COLUMN_BUYING_PRICE = -1;
     public static final int COLUMN_AMOUNT_WANT = 0;
     public static final int COLUMN_PRICE = 1;
@@ -32,13 +30,15 @@ public class BuyOrdersTableModel extends
     BigDecimal sumAmountHave;
     // private String[] columnNames = Lang.getInstance().translate(new
     // String[]{"Buying Price", "Buying Amount", "Price", "Amount"});
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Want", "Price", "Have"});
     private AssetCls have;
     private AssetCls want;
     private long haveKey;
     private long wantKey;
 
     public BuyOrdersTableModel(AssetCls have, AssetCls want) {
+        super("BuyOrdersTableModel", 1000,
+                new String[]{"Want", "Price", "Have"});
+
         this.have = have;
         this.want = want;
 
@@ -48,14 +48,13 @@ public class BuyOrdersTableModel extends
         this.orders = Controller.getInstance().getOrders(have, want, false);
 
         // columnNames[COLUMN_BUYING_PRICE] += " " + have.getShort();
-        columnNames[COLUMN_PRICE] += " " + have.getShort();
-        columnNames[COLUMN_AMOUNT_WANT] += " " + want.getShort();
-        columnNames[COLUMN_AMOUNT_HAVE] += " " + have.getShort();
+        ///columnNames[COLUMN_PRICE] += " " + have.getShort();
+        ///columnNames[COLUMN_AMOUNT_WANT] += " " + want.getShort();
+        ///columnNames[COLUMN_AMOUNT_HAVE] += " " + have.getShort();
 
         totalCalc();
 
-        Controller.getInstance().addObserver(this);
-        //this.orders.registerObserver();
+        addObservers();
 
     }
 
@@ -83,16 +82,6 @@ public class BuyOrdersTableModel extends
             return null;
 
         return this.orders.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -244,7 +233,13 @@ public class BuyOrdersTableModel extends
         }
     }
 
-    public void removeObservers() {
+    public void addObserversThis() {
+        Controller.getInstance().addObserver(this);
+        //this.orders.registerObserver();
+
+    }
+
+    public void removeObserversThis() {
         this.orders.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }

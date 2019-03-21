@@ -43,8 +43,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class);
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
     @SuppressWarnings("rawtypes")
@@ -56,14 +54,10 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_UNC_TRANSACTION_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
-                this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_UNC_TRANSACTION_TYPE);
-            } else {
-                this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.COUNT_UNC_TRANSACTION_TYPE);
-            }
+            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_UNC_TRANSACTION_TYPE);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_UNC_TRANSACTION_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
         }
 
     }
@@ -140,7 +134,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                     public String[] run(Long key, Transaction val) {
                         List<String> recps = new ArrayList<String>();
 
-                        val.setDC(getDBSet());
+                        val.setDC((DCSet)databaseSet);
 
                         for (Account acc : val.getRecipientAccounts()) {
                             // recps.add(acc.getAddress() + val.viewTimestamp()); уникальнось внутри Бинда делается
@@ -160,7 +154,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                         List<Fun.Tuple3<String, Long, Integer>> recps = new ArrayList<Fun.Tuple3<String, Long, Integer>>();
                         Integer type = val.getType();
 
-                        val.setDC(getDBSet());
+                        val.setDC((DCSet)databaseSet);
 
                         for (Account acc : val.getInvolvedAccounts()) {
                             recps.add(new Fun.Tuple3<String, Long, Integer>(acc.getAddress(), val.getTimestamp(), type));
@@ -190,11 +184,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     @Override
     protected Transaction getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     public Iterator<Long> getTimestampIterator() {
@@ -238,7 +227,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             }
 
             if (!notSetDCSet)
-                transaction.setDC(this.getDBSet());
+                transaction.setDC((DCSet)databaseSet);
 
             values.add(transaction);
 
@@ -292,12 +281,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         Long key = Longs.fromByteArray(signature);
 
-        //if (this.map.containsKey(key)) {
-        //    return true;
-        //}
-
-        //this.getDBSet().updateUncTxCounter(1);
-
         return this.set(key, transaction);
 
     }
@@ -307,18 +290,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         return this.set(transaction.getSignature(), transaction);
 
     }
-
-    public Transaction delete(Long key) {
-
-        // delete BROADCASTS
-        //this.peersBroadcasted.remove(key);
-
-        //if (this.contains(key))
-        //    this.getDBSet().updateUncTxCounter(-1);
-
-        return super.delete(key);
-    }
-
 
     public void delete(Transaction transaction) {
         this.delete(transaction.getSignature());
@@ -473,7 +444,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                 ok = false;
 
             if (!ok) {
-                transaction.setDC(this.getDBSet());
+                transaction.setDC((DCSet)databaseSet);
                 HashSet<Account> recipients = transaction.getRecipientAccounts();
 
                 if (recipients == null || recipients.isEmpty() || !recipients.contains(account)) {
@@ -506,7 +477,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                 break;
 
             transaction = this.get(iterator.next());
-            transaction.setDC(this.getDBSet());
+            transaction.setDC((DCSet)databaseSet);
             values.add(transaction);
         }
         iterator = null;
@@ -526,7 +497,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             if (type != 0 && type != transaction.getType())
                 continue;
 
-            transaction.setDC(this.getDBSet());
+            transaction.setDC((DCSet)databaseSet);
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             if (recipients == null || recipients.isEmpty())
                 continue;

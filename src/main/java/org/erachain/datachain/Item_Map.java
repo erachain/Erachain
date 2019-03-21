@@ -21,7 +21,6 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
     static Logger LOGGER = LoggerFactory.getLogger(Item_Map.class.getName());
 
     // protected int type;
-    protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
     protected Atomic.Long atomicKey;
     protected long key;
 
@@ -41,14 +40,14 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
         if (databaseSet.isWithObserver()) {
             if (observeReset > 0)
                 this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
+            if (observeList > 0)
+                this.observableData.put(DBMap.NOTIFY_LIST, observeList);
             if (databaseSet.isDynamicGUI()) {
                 if (observeAdd > 0)
                     this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
                 if (observeRemove > 0)
                     this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
             }
-            if (observeList > 0)
-                this.observableData.put(DBMap.NOTIFY_LIST, observeList);
         }
     }
 
@@ -81,11 +80,6 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
     @Override
     protected ItemCls getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     public ItemCls get(Long key) {
@@ -135,19 +129,33 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
     // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<ItemCls> get_By_Name(String str, boolean caseCharacter) {
-        List<ItemCls> result = new ArrayList<>();
+
+        // TODO сделать поиск по ограничению  не перебором
+
         if (str == null || str.length() < 3){
             return null;
         }
-        for (Pair<Long, ItemCls> a : getList()) {
-            String s1 = a.getB().getName();
+
+        if (!caseCharacter) {
+            str = str.toLowerCase();
+        }
+
+        List<ItemCls> result = new ArrayList<>();
+
+        Iterator<Long> iterator = this.getIterator(DEFAULT_INDEX, false);
+
+        while (iterator.hasNext()) {
+
+            ItemCls item = get(iterator.next());
+            String s1 = item.getName();
             if (!caseCharacter) {
                 s1 = s1.toLowerCase();
-                str = str.toLowerCase();
             }
+
             if (s1.contains(str))
-                result.add(a.getB());
+                result.add(item);
         }
+
         return result;
     }
 }

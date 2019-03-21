@@ -126,7 +126,7 @@ public class My_Order_Pauments_SplitPanel extends Split_Panel {
     }
 
     @Override
-    public void delay_on_close() {
+    public void onClose() {
         // delete observer left panel
         payment_Orders_model.removeObservers();
         // get component from right panel

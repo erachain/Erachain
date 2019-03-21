@@ -139,7 +139,7 @@ public class NameUtils {
 	}
 
 	public static List<Transaction> getOwnUnconfirmedTX() {
-		List<Tuple2<List<byte[]>, Transaction>> transactions = DBSet.getInstance()
+		List<Tuple2<List<byte[]>, Transaction>> transactions = DLSet.getInstance()
 				.getTransactionMap().getTransactions();
 		List<Transaction> accountTransactions = new ArrayList<Transaction>();
 

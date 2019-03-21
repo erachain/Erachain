@@ -33,7 +33,6 @@ package org.erachain.gui2;
 
 
 import org.erachain.gui.*;
-import org.erachain.gui.*;
 import org.erachain.gui.items.other.Other_Split_Panel;
 import org.json.simple.JSONObject;
 import org.erachain.settings.Settings;
@@ -143,9 +142,8 @@ public class ButtonTabComponent extends JPanel {
                 HashMap outTabbedDiv = new HashMap();
                 if (p_Comp instanceof Other_Split_Panel) {
                     Other_Split_Panel sP = ((Other_Split_Panel) p_Comp);
-                    sP.delay_on_close();
-                }
-                if (p_Comp instanceof Split_Panel) {
+                    sP.onClose();
+                } else if (p_Comp instanceof Split_Panel) {
                     Split_Panel sP = ((Split_Panel) p_Comp);
                     outTabbedDiv.put("Div_Orientation", sP.jSplitPanel.getOrientation() + "");
 
@@ -171,7 +169,7 @@ public class ButtonTabComponent extends JPanel {
                                         + Settings.getInstance().getSettingsPath() + "\nProbably there is no access.", "Error!",
                                 JOptionPane.ERROR_MESSAGE);
                     }
-                    sP.delay_on_close();
+                    sP.onClose();
                     sP = null;
 
                 }

@@ -11,7 +11,6 @@ import java.util.TreeMap;
 
 @Deprecated
 public class VoteOnPollMap extends DCMap<byte[], Integer> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public VoteOnPollMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -41,11 +40,6 @@ public class VoteOnPollMap extends DCMap<byte[], Integer> {
     @Override
     protected Integer getDefaultValue() {
         return -1;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     public Integer get(Transaction transaction) {

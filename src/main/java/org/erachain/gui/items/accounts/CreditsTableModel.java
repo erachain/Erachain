@@ -14,6 +14,7 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Null;
 import java.math.BigDecimal;
@@ -34,7 +35,6 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
     //	private AssetCls asset = core.block.GenesisBlock.makeAsset(asset_Key);
     //private Account account;
     List<Tuple2<Tuple3<String, Long, String>, BigDecimal>> cred;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Amount", "Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
     private Boolean[] column_AutuHeight = new Boolean[]{true, false, false, false};
     private List<PublicKeyAccount> publicKeyAccounts;
     private long asset_Key = 1l;
@@ -43,18 +43,10 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
 
     @SuppressWarnings("unchecked")
     public CreditsTableModel() {
-        this.transactions_Asset = new ArrayList<Tuple2<Tuple2<String, String>, Transaction>>();
-        this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+        super("CreditsTableModel", 1000,
+                new String[]{"Account", "Amount", "Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
 
-        cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
-        for (PublicKeyAccount account : this.publicKeyAccounts) {
-            //cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
-            cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
-        }
-
-        Controller.getInstance().addWalletListener(this);
-        //		Controller.getInstance().addObserver(this);
-        //		int a = 1;
+        LOGGER = LoggerFactory.getLogger(CreditsTableModel.class.getName());
 
     }
 
@@ -94,7 +86,7 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
         cred.clear();
         for (PublicKeyAccount account : this.publicKeyAccounts) {
             List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress());
-            //cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
+            //cred.addAll(DLSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
             cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
         }
 		/*		for (Pair<Tuple2<String, String>, Transaction> trans:this.transactions){
@@ -122,16 +114,6 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
         }
 
         this.fireTableDataChanged();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return columnNames[index];
     }
 
     @Override
@@ -167,13 +149,13 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
 			/*
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
-			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
+			balance = account.getBalance(this.asset.getKey(DLSet.getInstance()));
 			str = NumberAsString.getInstance().numberAsString(balance.a) + "/" + balance.b.toPlainString() + "/" + balance.c.toPlainString();
 			return str;
 		case COLUMN_WAINTING_BALANCE:
 			if (this.asset == null) return "-";
-			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
-			unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DBSet.getInstance()));
+			balance = account.getBalance(this.asset.getKey(DLSet.getInstance()));
+			unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DLSet.getInstance()));
 			str = NumberAsString.getInstance().numberAsString(unconfBalance.a.subtract(balance.a))
 					+ "/" + unconfBalance.b.subtract(balance.b).toPlainString()
 					+ "/" + unconfBalance.c.subtract(balance.c).toPlainString();
@@ -254,7 +236,7 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
             cred.clear();
             for (PublicKeyAccount account : this.publicKeyAccounts) {
                 cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
-                //cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
+                //cred.addAll(DLSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
             }
 
 
@@ -282,6 +264,27 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
         }
 
         return totalBalance;
+    }
+
+    public void addObserversThis() {
+
+        this.transactions_Asset = new ArrayList<Tuple2<Tuple2<String, String>, Transaction>>();
+        this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+
+        cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
+        for (PublicKeyAccount account : this.publicKeyAccounts) {
+            //cred.addAll(DLSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
+            cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
+        }
+
+        Controller.getInstance().addWalletObserver(this);
+        //		Controller.getInstance().addObserver(this);
+        //		int a = 1;
+
+    }
+
+
+    public void removeObserversThis() {
     }
 
     @Override

@@ -23,7 +23,6 @@ public class WItem_Map extends DBMap<Tuple2<String, String>, ItemCls> {
     static Logger LOGGER = LoggerFactory.getLogger(WItem_Map.class.getName());
     protected int type;
     protected String name;
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public WItem_Map(DWSet dWSet, DB database, int type, String name,
                      int observeReset,
@@ -36,10 +35,14 @@ public class WItem_Map extends DBMap<Tuple2<String, String>, ItemCls> {
         this.type = type;
         this.name = name;
 
-        this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
-        this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
-        this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
-        this.observableData.put(DBMap.NOTIFY_LIST, observeList);
+        if (databaseSet.isWithObserver()) {
+            this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
+            this.observableData.put(DBMap.NOTIFY_LIST, observeList);
+            if (databaseSet.isDynamicGUI()) {
+                this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
+                this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+            }
+        }
     }
 
     //@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -95,11 +98,6 @@ public class WItem_Map extends DBMap<Tuple2<String, String>, ItemCls> {
     @Override
     protected ItemCls getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

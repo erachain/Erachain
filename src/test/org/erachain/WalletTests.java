@@ -35,10 +35,10 @@ public class WalletTests {
     // INIT NOTES
     private void init() {
 
-        database = new DWSet();
+        database = new DWSet(false, false);
         secureDatabase = new SecureWalletDatabase(password);
 
-        wallet = new Wallet();
+        wallet = new Wallet(false, false);
         create = wallet.create(database, secureDatabase, Crypto.getInstance()
                 .digest(password.getBytes()), 10, false);
     }

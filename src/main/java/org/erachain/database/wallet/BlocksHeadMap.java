@@ -35,15 +35,18 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
     public static final int TRANSACTIONS_INDEX = 4;
     public static final int FEE_INDEX = 5;
     static Logger LOGGER = LoggerFactory.getLogger(BlocksHeadMap.class.getName());
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public BlocksHeadMap(DWSet dWSet, DB database) {
         super(dWSet, database);
 
-        this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_BLOCK_TYPE);
-        this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_BLOCK_TYPE);
-        this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_BLOCK_TYPE);
-        this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_BLOCK_TYPE);
+        if (databaseSet.isWithObserver()) {
+            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_BLOCK_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_BLOCK_TYPE);
+            if (databaseSet.isDynamicGUI()) {
+                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_BLOCK_TYPE);
+                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_BLOCK_TYPE);
+            }
+        }
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -152,11 +155,6 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public Block.BlockHead getLast() {
 
         List<Pair<Account, Block.BlockHead>> blocks = new ArrayList<Pair<Account, Block.BlockHead>>();
@@ -226,13 +224,11 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
         //DELETE TRANSACTIONS
         for (Tuple2<String, String> key : accountBlocks.keySet()) {
             this.delete(key);
-            this.databaseSet.commit();
         }
     }
 
     public void delete(Block.BlockHead block) {
         this.delete(new Tuple2<String, String>(block.creator.getAddress(), new String(block.signature)));
-        this.databaseSet.commit();
     }
 
     public void deleteAll(List<Account> accounts) {
@@ -244,7 +240,6 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
     public boolean add(Block.BlockHead block) {
         boolean result = this.set(new Tuple2<String, String>(block.creator.getAddress(),
                 new String(block.signature)), block);
-        this.databaseSet.commit();
         return result;
     }
 

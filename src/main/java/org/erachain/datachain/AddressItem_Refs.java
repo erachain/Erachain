@@ -20,7 +20,6 @@ import java.util.TreeMap;
  */
 public class AddressItem_Refs extends DCMap<Tuple2<byte[], Long>, byte[]> {
     protected String name;
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public AddressItem_Refs(DCSet databaseSet, DB database, String name,
                             int observeReset, int observeAdd, int observeRemove, int observeList
@@ -30,11 +29,11 @@ public class AddressItem_Refs extends DCMap<Tuple2<byte[], Long>, byte[]> {
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
+            this.observableData.put(DBMap.NOTIFY_LIST, observeList);
             if (databaseSet.isDynamicGUI()) {
                 this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
                 this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
             }
-            this.observableData.put(DBMap.NOTIFY_LIST, observeList);
         }
 
     }
@@ -66,11 +65,6 @@ public class AddressItem_Refs extends DCMap<Tuple2<byte[], Long>, byte[]> {
     @Override
     protected byte[] getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     public byte[] get(String address, Long key) {

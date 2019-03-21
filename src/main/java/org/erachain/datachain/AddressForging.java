@@ -35,7 +35,6 @@ import java.util.Map;
 
 // TODO укротить до 20 байт адрес
 public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Integer, Integer>> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
 
     public AddressForging(DCSet databaseSet, DB database) {
@@ -65,11 +64,6 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
     @Override
     protected Tuple2<Integer, Integer> getDefaultValue() {
         return null; //new Tuple2<Integer, Integer>(-1, 0);
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     public Tuple2<Integer, Integer> get(String address, int height) {

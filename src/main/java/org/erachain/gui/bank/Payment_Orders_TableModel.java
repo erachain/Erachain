@@ -1,22 +1,20 @@
 package org.erachain.gui.bank;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.*;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.library.library;
 import org.erachain.gui.models.TableModelCls;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.*;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Null;
-import java.awt.TrayIcon.MessageType;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -40,15 +38,12 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
     private SortableList<Tuple2<String, String>, Transaction> transactions;
     //ItemAssetMap dbItemAssetMap;
     private ArrayList<R_Send> trans;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{
-            "Confirmation", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
 
     public Payment_Orders_TableModel() {
-
-        addObservers();
-
-        //dbItemAssetMap = DBSet.getInstance().getItemAssetMap();
+        super("Payment_Orders_TableModel", 1000,
+                new String[]{
+                        "Confirmation", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
 
     }
 
@@ -73,16 +68,6 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
             return null;
         }
         return data.getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return columnNames[index];
     }
 
     @Override
@@ -230,28 +215,10 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
             this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE
-                || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-            if (Controller.getInstance().getStatus() == Controller.STATUS_OK
-                    && (DCSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature()))) {
-                int type = ((Transaction) message.getValue()).getType();
-                if (type == Transaction.SEND_ASSET_TRANSACTION) {
-                    R_Send r_Send = (R_Send) message.getValue();
-                    Account account = Controller.getInstance().getAccountByAddress(((R_Send) message.getValue()).getRecipient().getAddress());
-                    if (account != null) {
-                        if (Settings.getInstance().isSoundReceiveMessageEnabled()) {
-                            PlaySound.getInstance().playSound("receivemessage.wav", ((Transaction) message.getValue()).getSignature());
-                        }
-
-                        SysTray.getInstance().sendMessage("Payment received", "From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + account.getPersonAsString()
-                                + "\n" + "Asset Key" + ": " + r_Send.getAbsKey()
-                                + ", " + "Amount" + ": " + r_Send.getAmount().toPlainString(), MessageType.INFO);
-                    } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-                        PlaySound.getInstance().playSound("newtransaction.wav", ((Transaction) message.getValue()).getSignature());
-                    }
-                } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-                    PlaySound.getInstance().playSound("newtransaction.wav", ((Transaction) message.getValue()).getSignature());
-                }
-            }
+                //|| message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE
+                ) {
+            Transaction transaction = (Transaction) message.getValue();
+            library.notifySysTrayRecord(transaction);
         }
 
         if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
@@ -279,13 +246,13 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
         }
     }
 
-    public void addObservers() {
+    public void addObserversThis() {
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
     }
 
 
-    public void removeObservers() {
+    public void removeObserversThis() {
 
         Controller.getInstance().deleteObserver(this);
     }

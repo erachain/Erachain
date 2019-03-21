@@ -565,7 +565,7 @@ public class R_SignNote extends Transaction {
     //PROCESS/ORPHAN
 
 	/*
-	public void process(DBSet db, boolean asPack) {
+	public void process(DLSet db, boolean asPack) {
 
 		//UPDATE SENDER
 		super.process(db, asPack);
@@ -575,7 +575,7 @@ public class R_SignNote extends Transaction {
 
 	}
 
-	public void orphan(DBSet db, boolean asPack) {
+	public void orphan(DLSet db, boolean asPack) {
 
 		//UPDATE SENDER
 		super.orphan(db, asPack);

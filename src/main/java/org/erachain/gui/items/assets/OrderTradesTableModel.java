@@ -26,12 +26,12 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tra
     private SortableList<Tuple2<Long, Long>, Trade> trades;
     private Order order;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Amount", "Price", "Total"});
-
     public OrderTradesTableModel(Order order) {
+        super("OrderTradesTableModel", 1000,
+                new String[]{"Timestamp", "Type", "Amount", "Price", "Total"});
+
         this.order = order;
         this.trades = DCSet.getInstance().getTradeMap().getTrades(order.getId());
-        this.trades.registerObserver();
     }
 
     @Override
@@ -41,16 +41,6 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tra
 
     public Trade getTrade(int row) {
         return this.trades.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -134,7 +124,11 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tra
         }
     }
 
-    public void removeObservers() {
+    public void addObserversThis() {
+        this.trades.registerObserver();
+    }
+
+    public void removeObserversThis() {
         this.trades.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }

@@ -17,7 +17,7 @@ public class ComboBoxModelItems extends DefaultComboBoxModel<ItemCls> implements
     private int itemType;
 
     public ComboBoxModelItems(int observerMessageType, int itemType) {
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         this.observerMessageType = observerMessageType;
         this.itemType = itemType;
     }

@@ -126,7 +126,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
 
                 case COLUMN_TIMESTAMP:
 
-                    return DateTimeFormat.timestamptoString(block.getTimestamp());// + " " + block.getTimestamp(DBSet.getInstance())/ 1000;
+                    return DateTimeFormat.timestamptoString(block.getTimestamp());// + " " + block.getTimestamp(DLSet.getInstance())/ 1000;
 
                 case COLUMN_GENERATOR:
 

@@ -23,13 +23,13 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
 
     private SortableList<Long, AssetCls> assetsSorted;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false, false, false, false};
     private List<AssetCls> assets;
 
     public TableModelItemAssetsFavorute() {
+        super("TableModelItemAssetsFavorute", 1000,
+                new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
-        addObservers();
     }
 
     // читаем колонки которые изменяем высоту
@@ -56,16 +56,6 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
 
     public AssetCls getAsset(int row) {
         return this.assets.get(row);
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -163,15 +153,15 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
         }
     }
 
-    public void removeObservers() {
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            Controller.getInstance().wallet.database.getAssetFavoritesSet().deleteObserver(this);
-    }
-
-    public void addObservers() {
+    public void addObserversThis() {
         if (Controller.getInstance().doesWalletDatabaseExists()) {
             Controller.getInstance().wallet.database.getAssetFavoritesSet().addObserver(this);
         }
+    }
+
+    public void removeObserversThis() {
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getAssetFavoritesSet().deleteObserver(this);
     }
 
     @Override

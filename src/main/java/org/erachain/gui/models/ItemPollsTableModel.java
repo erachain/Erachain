@@ -22,15 +22,12 @@ public class ItemPollsTableModel extends TableModelCls<Long, ItemCls> implements
     private static final int COLUMN_CREATOR = 1;
     private AssetCls asset;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Name", "Creator", "Total Votes"});
     private SortableList<Long, ItemCls> polls;
     private ItemPollMap map;
 
     public ItemPollsTableModel() {
-        this.asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
-        //Controller.getInstance().addObserver(this);
-        map = DCSet.getInstance().getItemPollMap();
-        polls = map.getList();
+        super("ItemPollsTableModel", 1000,
+                new String[]{"Name", "Creator", "Total Votes"});
     }
 
     public void setAsset(AssetCls asset) {
@@ -46,20 +43,6 @@ public class ItemPollsTableModel extends TableModelCls<Long, ItemCls> implements
     @Override
     public SortableList<Long, ItemCls> getSortableList() {
         return this.polls;
-    }
-
-    public PollCls getPoll(int row) {
-        return (PollCls) this.polls.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -134,14 +117,20 @@ public class ItemPollsTableModel extends TableModelCls<Long, ItemCls> implements
         }
     }
 
-    public void removeObservers() {
+    public void addObserversThis() {
+        this.asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
+        //Controller.getInstance().addObserver(this);
+        map = DCSet.getInstance().getItemPollMap();
+        polls = map.getList();
+    }
+
+    public void removeObserversThis() {
         //if(this.polls!=null)this.polls.removeObserver();
         //DCSet.getInstance().getPollMap().deleteObserver(this);
     }
 
     @Override
     public Object getItem(int k) {
-        // TODO Auto-generated method stub
         return this.polls.get(k).getB();
     }
 }
