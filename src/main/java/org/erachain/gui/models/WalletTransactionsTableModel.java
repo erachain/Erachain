@@ -1,29 +1,19 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.*;
 import org.erachain.database.SortableList;
-import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.library.library;
 import org.erachain.lang.Lang;
-import org.erachain.ntp.NTP;
-import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
-import org.erachain.utils.PlaySound;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.Null;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -41,7 +31,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     public static final int COLUMN_SIZE = 8;
 
     private SortableList<Tuple2<String, String>, Transaction> transactions;
-    private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
+    private Boolean[] column_AutoHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
 
     //private List<Pair<Tuple2<String, String>, Transaction>> pairTransactions;
 
@@ -52,8 +42,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
      * gui.items.assets.My_Order_Tab
      */
     public WalletTransactionsTableModel() {
-        super("WalletTransactionsTableModel", 999000,
-                new String[]{
+        super(new String[]{
                         "Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
 
         LOGGER = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
@@ -72,12 +61,12 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     // читаем колонки которые изменяем высоту
     public Boolean[] get_Column_AutoHeight() {
 
-        return this.column_AutuHeight;
+        return this.column_AutoHeight;
     }
 
     // устанавливаем колонки которым изменить высоту
     public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
+        this.column_AutoHeight = arg0;
     }
 
     public Transaction getTransaction(int row) {

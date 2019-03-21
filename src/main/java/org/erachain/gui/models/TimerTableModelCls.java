@@ -129,7 +129,7 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
 
     public void addObservers() {
         addObserversThis();
-        initTimer();
+        if (timeout > 0) initTimer();
     }
 
     protected abstract void removeObserversThis();

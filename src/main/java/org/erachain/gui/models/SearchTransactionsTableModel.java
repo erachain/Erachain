@@ -21,9 +21,8 @@ import java.util.Observer;
 
 @SuppressWarnings("serial")
 // IN gui.DebugTabPane used
-public class SearchTransactionsTableModel extends TableModelCls<byte[], Transaction> implements Observer {
+public class SearchTransactionsTableModel extends TimerTableModelCls<byte[], Transaction> implements Observer {
 
-    //public static final int COLUMN_NO = 0;
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_BLOCK = 1;
     public static final int COLUMN_SEQ_NO = 2;
@@ -31,22 +30,11 @@ public class SearchTransactionsTableModel extends TableModelCls<byte[], Transact
     public static final int COLUMN_AMOUNT = 4;
     public static final int COLUMN_FEE = 5;
     static Logger LOGGER = LoggerFactory.getLogger(SearchTransactionsTableModel.class.getName());
-    Long block_Height;
     Integer block_No;
     List<Transaction> transactions;
-    //private SortableList<byte[], Transaction> transactions;
-    private Integer blockNo = null;
-    //private String[] columnNames = Lang.getInstance().translate();
-    private String ac;
 
     public SearchTransactionsTableModel() {
-        super("SearchTransactionsTableModel", 1000,
-                new String[]{"Timestamp", "Block", "Seq_no", "Type", "Amount", AssetCls.FEE_NAME});
-    }
-
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
+        super(new String[]{"Timestamp", "Block", "Seq_no", "Type", "Amount", AssetCls.FEE_NAME});
     }
 
     public void setBlockNumber(String string) {
@@ -210,47 +198,20 @@ public class SearchTransactionsTableModel extends TableModelCls<byte[], Transact
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
-        //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-            if (this.transactions == null) {
-                //	this.transactions = (SortableList<byte[], Transaction>) message.getValue();
-                //	this.transactions.registerObserver();
-                //	this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
-            }
-
-            this.fireTableDataChanged();
         }
-		/*
-		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE)
-		{
-			this.fireTableDataChanged();
-		}
-		*/
     }
 
     public void addObserversThis() {
-        Controller.getInstance().addObserver(this);
     }
 
     public void removeObserversThis() {
-        //	this.transactions.removeObserver();
-        Controller.getInstance().deleteObserver(this);
     }
 
     @Override
-    public SortableList<byte[], Transaction> getSortableList() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Object getItem(int k) {
+    public Transaction getItem(int k) {
         // TODO Auto-generated method stub
         Transaction data = transactions.get(k);
-        if (data == null) {
-            return null;
-        }
         return data;
     }
 }
