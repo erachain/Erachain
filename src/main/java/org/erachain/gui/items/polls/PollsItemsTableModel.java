@@ -1,19 +1,19 @@
-package org.erachain.gui.items.templates;
+package org.erachain.gui.items.polls;
 
-import org.erachain.core.item.templates.TemplateCls;
+import org.erachain.core.item.polls.PollCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemsTableModel;
 
 @SuppressWarnings("serial")
-public class TableModelTemplatesItemsTableModel extends SearchItemsTableModel {
+public class PollsItemsTableModel extends SearchItemsTableModel {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_FAVORITE = 3;
 
-    public TableModelTemplatesItemsTableModel() {
-        super(DCSet.getInstance().getItemTemplateMap(), new String[]{"Key", "Name", "Creator", "Favorite"},
-                new Boolean[]{false, true, true, false}, COLUMN_FAVORITE);
+    public PollsItemsTableModel() {
+        super(DCSet.getInstance().getItemPollMap(), new String[]{"Key", "Name", "Creator", "Favorite"},
+            null, COLUMN_FAVORITE);
     }
 
     @Override
@@ -22,24 +22,24 @@ public class TableModelTemplatesItemsTableModel extends SearchItemsTableModel {
             return null;
         }
 
-        TemplateCls template = (TemplateCls) list.get(row);
+        PollCls poll = (PollCls) this.list.get(row);
 
         switch (column) {
             case COLUMN_KEY:
 
-                return template.getKey();
+                return poll.getKey();
 
             case COLUMN_NAME:
 
-                return template.viewName();
+                return poll.viewName();
 
             case COLUMN_ADDRESS:
 
-                return template.getOwner().getPersonAsString();
+                return poll.getOwner().getPersonAsString();
 
             case COLUMN_FAVORITE:
 
-                return template.isFavorite();
+                return poll.isFavorite();
 
         }
 
