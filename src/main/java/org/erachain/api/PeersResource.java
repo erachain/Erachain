@@ -20,8 +20,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Path("peers")
 @Produces(MediaType.APPLICATION_JSON)
@@ -112,19 +114,6 @@ public class PeersResource {
      * @return
      */
     private Map getMapPeers(List<Peer> peers) {
-
-        return peers.stream()
-                .filter(Objects::nonNull)
-                .collect(Collectors.toMap(
-                        peer -> peer.getAddress().getHostAddress(),
-                        this::getDetail,
-                        (u, v) -> {
-                            throw new IllegalStateException(String.format("Duplicate key %s", u));
-                        },
-                        LinkedHashMap::new)
-                );
-
-        /*
         Map map = new LinkedHashMap();
 
         for (int i = 0; i < peers.size(); i++) {
@@ -135,7 +124,6 @@ public class PeersResource {
             }
         }
         return map;
-        */
     }
 
     @GET
