@@ -18,12 +18,12 @@ public class Search_Assets_SplitPanel extends Search_Item_SplitPanel {
      *
      */
     private static final long serialVersionUID = 1L;
-    private static ItemAssetsTableModel tableModelItemAssets = new ItemAssetsTableModel();
+    //private static ItemAssetsTableModel tableModelItemAssets = ;
     private Search_Assets_SplitPanel th;
 
 
     public Search_Assets_SplitPanel(boolean search_and_exchange) {
-        super(tableModelItemAssets, "Search_Assets_SplitPanel", "Search_Assets_SplitPanel");
+        super(new ItemAssetsTableModel(), "Search_Assets_SplitPanel", "Search_Assets_SplitPanel");
         th = this;
         setName(Lang.getInstance().translate("Search Assets"));
 

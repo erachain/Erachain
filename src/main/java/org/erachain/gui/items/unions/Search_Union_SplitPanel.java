@@ -10,16 +10,16 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Search_Union_Tab extends Search_Item_SplitPanel {
+public class Search_Union_SplitPanel extends Search_Item_SplitPanel {
     /**
      *
      */
     private static final long serialVersionUID = 1L;
     private static TableModelUnionsItemsTableModel tableModelUnions = new TableModelUnionsItemsTableModel();
-    private Search_Union_Tab th;
+    private Search_Union_SplitPanel th;
 
-    public Search_Union_Tab() {
-        super(tableModelUnions, "Search_Union_Tab", "Search_Union_Tab");
+    public Search_Union_SplitPanel() {
+        super(tableModelUnions, "Search_Union_SplitPanel", "Search_Union_SplitPanel");
         th = this;
 
         // ADD MENU ITEMS

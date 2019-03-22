@@ -15,12 +15,12 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 
-public class Search_Imprints_Tab extends Split_Panel {
+public class Search_Imprints_SplitPanel extends Split_Panel {
 
     private TableModelImprints tableModelImprints;
 
-    public Search_Imprints_Tab() {
-        super("Search_Imprints_Tab");
+    public Search_Imprints_SplitPanel() {
+        super("Search_Imprints_SplitPanel");
 
         setName(Lang.getInstance().translate("Search Imprints"));
         searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");

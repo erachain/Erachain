@@ -56,7 +56,7 @@ import org.erachain.gui.items.templates.Search_Templates_SplitPanel;
 import org.erachain.gui.items.templates.Templates_Favorite_SplitPanel;
 import org.erachain.gui.items.unions.IssueUnionPanel;
 import org.erachain.gui.items.unions.My_Unions_Tab;
-import org.erachain.gui.items.unions.Search_Union_Tab;
+import org.erachain.gui.items.unions.Search_Union_SplitPanel;
 import org.erachain.gui.library.MSplitPane;
 import org.erachain.gui.telegrams.ALLTelegramPanel;
 import org.erachain.gui.telegrams.TelegramSplitPanel;
@@ -437,8 +437,8 @@ public class Main_Panel extends javax.swing.JPanel {
                 insertTab(Lang.getInstance().translate("My Unions"), new My_Unions_Tab());
                 return;
             }
-            if (str.equals(Lang.getInstance().translate("Search Unions")) || str.equals("Search_Union_Tab")) {
-                insertTab(Lang.getInstance().translate("Search Unions"), new Search_Union_Tab());
+            if (str.equals(Lang.getInstance().translate("Search Unions")) || str.equals("Search_Union_SplitPanel")) {
+                insertTab(Lang.getInstance().translate("Search Unions"), new Search_Union_SplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Issue Union")) || str.equals("IssueUnionPanel")) {
