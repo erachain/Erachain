@@ -18,7 +18,7 @@ import javax.validation.constraints.Null;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class FavoriteImprintsTableModel extends FavoriteItemModelTable<Long, ImprintCls> implements Observer {
+public class FavoriteImprintsTableModel extends FavoriteItemModelTable implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;

@@ -14,7 +14,7 @@ import org.mapdb.Fun.Tuple2;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class FavoritePersonsTableModel extends FavoriteItemModelTable<Long, PersonCls> implements Observer {
+public class FavoritePersonsTableModel extends FavoriteItemModelTable implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;

@@ -16,7 +16,7 @@ import javax.validation.constraints.Null;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class FavoriteTemplatesTableModel extends FavoriteItemModelTable<Long, TemplateCls> implements Observer {
+public class FavoriteTemplatesTableModel extends FavoriteItemModelTable implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;

@@ -5,14 +5,13 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.Item_Map;
 import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 
-import java.util.*;
-
 @SuppressWarnings("serial")
-public class FavoriteItemAssetsTableModel extends FavoriteItemModelTable<Long, AssetCls> {
+public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -21,8 +20,7 @@ public class FavoriteItemAssetsTableModel extends FavoriteItemModelTable<Long, A
     public static final int COLUMN_FAVORITE = 5;
     public static final int COLUMN_I_OWNER = 6;
 
-
-    public FavoriteItemAssetsTableModel() {
+    public FavoriteAssetsTableModel() {
         super(DCSet.getInstance().getItemAssetMap(),
                 new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"},
                 new Boolean[]{false, true, true, false, false, false, false, false},
@@ -87,6 +85,17 @@ public class FavoriteItemAssetsTableModel extends FavoriteItemModelTable<Long, A
     public void removeObserversThis() {
         if (Controller.getInstance().doesWalletDatabaseExists())
             Controller.getInstance().wallet.database.getAssetFavoritesSet().deleteObserver(this);
+    }
+
+    public int getMapSize() {
+        return map.size();
+    }
+
+    @Override
+    public void getIntervalThis(long startBack, long endBack) {
+        this.listSorted = new SortableList<Long, ItemCls>(
+                map, ((Item_Map)map).getFromToKeys(startBack, endBack));
+
     }
 
 }

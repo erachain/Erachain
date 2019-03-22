@@ -17,7 +17,7 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
     private long timeout;
     private String[] columnNames;
     private Timer timer;
-    boolean needUpdate;
+    protected boolean needUpdate;
 
     protected Boolean[] columnAutoHeight; // = new Boolean[]{true, true, true, true, true, true, true, false, false};
     protected int start = 0;
@@ -119,6 +119,8 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
 
     public abstract U getItem(int row);
 
+    public abstract Object getValueAt(int row, int column);
+
     public Class<? extends Object> getColumnClass(int c) {
         Object o = getValueAt(0, c);
         return o == null ? Null.class : o.getClass();
@@ -136,7 +138,7 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
     }
 
     //public abstract void getIntervalThis(int startBack, int endBack);
-    public void getIntervalThis(int startBack, int endBack) {
+    public void getIntervalThis(long startBack, long endBack) {
     }
 
     //public abstract int getMapSize();

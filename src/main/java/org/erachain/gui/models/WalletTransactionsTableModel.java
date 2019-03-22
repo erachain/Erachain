@@ -305,7 +305,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     }
 
     @Override
-    public void getIntervalThis(int startBack, int endBack) {
+    public void getIntervalThis(long startBack, long endBack) {
         transactions = new SortableList<Tuple2<String, String>, Transaction>(
                 Controller.getInstance().getWallet().database.getTransactionMap(),
                 Controller.getInstance().getWallet().database.getTransactionMap().getFromToKeys(startBack, endBack));

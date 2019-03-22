@@ -9,18 +9,32 @@ import org.erachain.gui.models.TableModelCls;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
+import java.util.Set;
 
 @SuppressWarnings("serial")
 public abstract class SearchItemsTableModel<T, U> extends TableModelCls<Long, ItemCls> {
 
-    protected int itemType;
-    protected List<ItemCls> list;
-    protected SortableList<Long, ItemCls> listSorted;
-
     public SearchItemsTableModel(DBMap itemsMap, String[] columnNames, Boolean[] column_AutoHeight, int favorite) {
-        super(itemsMap, columnNames, column_AutoHeight);
-        this.COLUMN_FAVORITE = favorite;
+        super(itemsMap, columnNames, column_AutoHeight, favorite);
 
+    }
+
+    public void fill(Set<Long> keys) {
+        ItemCls item;
+        list = new ArrayList<ItemCls>();
+
+        for (Long itemKey : keys) {
+            if (itemKey == null || itemKey < 1)
+                continue;
+
+            item = (ItemCls) map.get(itemKey);
+            if (item == null)
+                continue;
+
+            list.add(item);
+        }
+
+        this.listSorted = new SortableList<Long, ItemCls>(this.map, keys);
     }
 
     public void findByName(String filter) {

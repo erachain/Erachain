@@ -149,7 +149,7 @@ public class UnconfirmedTransactionsTableModel extends TableModelCls<Long, Trans
     }
 
     @Override
-    public void getIntervalThis(int startBack, int endBack) {
+    public void getIntervalThis(long startBack, long endBack) {
         list = new SortableList<Long, Transaction>(map, ((TransactionMap)map).getFromToKeys(startBack, endBack));
 
         DCSet dcSet = DCSet.getInstance();

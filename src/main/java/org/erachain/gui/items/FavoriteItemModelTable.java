@@ -13,12 +13,12 @@ import org.erachain.utils.ObserverMessage;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public abstract class FavoriteItemModelTable<T, U> extends SearchItemsTableModel<Long, ItemCls> implements Observer {
+public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls> implements Observer {
 
-    public final int RESET_EVENT;
-    public final int ADD_EVENT;
-    public final int DELETE_EVENT;
-    public final int LIST_EVENT;
+    private final int RESET_EVENT;
+    private final int ADD_EVENT;
+    private final int DELETE_EVENT;
+    private final int LIST_EVENT;
 
     public FavoriteItemModelTable(DBMap map, String[] columnNames, Boolean[] columnAutoHeight,
               int resetObserver, int addObserver, int deleteObserver, int listObserver, int favorite) {
@@ -31,24 +31,6 @@ public abstract class FavoriteItemModelTable<T, U> extends SearchItemsTableModel
 
     }
 
-    public void fill(Set<Long> keys) {
-        ItemCls item;
-        list = new ArrayList<ItemCls>();
-
-        for (Long itemKey : keys) {
-            if (itemKey == null || itemKey < 1)
-                continue;
-
-            item = Controller.getInstance().getItem(itemType, itemKey);
-            if (item == null)
-                continue;
-
-            list.add(item);
-        }
-
-        this.listSorted = new SortableList<Long, ItemCls>(this.map, keys);
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -56,19 +38,22 @@ public abstract class FavoriteItemModelTable<T, U> extends SearchItemsTableModel
         //CHECK IF NEW LIST
         int type = message.getType();
         if (type == LIST_EVENT && list == null) {
+            getInterval();
             this.fireTableDataChanged();
+            needUpdate = false;
 
         } else if (type == ADD_EVENT) {
             list.add(Controller.getInstance().getAsset((long) message.getValue()));
-            this.fireTableDataChanged();
+            needUpdate = true;
 
         } else if (type == DELETE_EVENT) {
             list.remove(Controller.getInstance().getAsset((long) message.getValue()));
-            this.fireTableDataChanged();
+            needUpdate = true;
 
         } else if (type == RESET_EVENT) {
-            list = new ArrayList<ItemCls>();
+            getInterval();
             this.fireTableDataChanged();
+            needUpdate = false;
         }
     }
 

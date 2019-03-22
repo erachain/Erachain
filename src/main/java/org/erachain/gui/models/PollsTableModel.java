@@ -128,7 +128,7 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
         return this.polls.get(k).getB();
     }
 
-    public void getIntervalThis(int startBack, int endBack) {
+    public void getIntervalThis(long startBack, long endBack) {
     }
 
 }

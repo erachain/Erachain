@@ -51,6 +51,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     private NavigableSet typeKey;
 
     BTreeMap AUTOKEY_INDEX;
+    protected Atomic.Long atomicKey;
 
     public TransactionMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -61,6 +62,8 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_UNC_TRANSACTION_TYPE);
             this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
         }
+
+        this.atomicKey = database.getAtomicLong("dc_transactions" + "_atomicKey");
 
     }
 
@@ -178,10 +181,10 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                 .makeOrGet();
 
         //BIND
-        Bind.secondaryKey(map, this.AUTOKEY_INDEX, new Fun.Function2<Integer, Long, Transaction>() {
+        Bind.secondaryKey(map, this.AUTOKEY_INDEX, new Fun.Function2<Long, Long, Transaction>() {
             @Override
-            public Integer run(Long key, Transaction value) {
-                return -map.size();
+            public Long run(Long key, Transaction value) {
+                return -atomicKey.get();
             }
         });
 
@@ -293,6 +296,10 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     public boolean set(byte[] signature, Transaction transaction) {
 
+        if (this.atomicKey != null) {
+            this.atomicKey.incrementAndGet();
+        }
+
         Long key = Longs.fromByteArray(signature);
 
         return this.set(key, transaction);
@@ -310,8 +317,14 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     }
 
     public Transaction delete(byte[] signature) {
+
+        if (this.atomicKey != null) {
+            this.atomicKey.decrementAndGet();
+        }
+
         return this.delete(Longs.fromByteArray(signature));
     }
+
     public boolean contains(byte[] signature) {
         return this.contains(Longs.fromByteArray(signature));
     }
@@ -325,7 +338,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<Long> getFromToKeys(Integer fromKey, Integer toKey) {
+    public Collection<Long> getFromToKeys(long fromKey, long toKey) {
         return AUTOKEY_INDEX.subMap(fromKey, toKey).values();
     }
 
