@@ -81,15 +81,17 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
 
     }
 
-
     @Override
     public void getIntervalThis(long startBack, long endBack) {
         this.listSorted = new SortableList<Long, ItemCls>((Item_Map)map, favoriteMap.getFromToKeys(startBack, endBack));
-        this.list = new ArrayList<Long, ItemCls>();
-        this.list.addAll(this.listSorted);
+        this.listSorted.sort();
 
+        this.list = new ArrayList<ItemCls>();
         for (Pair<Long, ItemCls> key: listSorted) {
-            ItemCls item = (ItemCls)map.get(key.getA());
+            if (key.getB() == null)
+                continue;
+
+            this.list.add((ItemCls)map.get(key.getA()));
         }
 
     }

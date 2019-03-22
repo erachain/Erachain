@@ -9,7 +9,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 public abstract class TableModelCls<T, U> extends TimerTableModelCls<T, U> {
 
-    protected List<T> list;
+    protected List<U> list;
     protected SortableList<T, U> listSorted;
 
     public int COLUMN_FAVORITE = 1000;
