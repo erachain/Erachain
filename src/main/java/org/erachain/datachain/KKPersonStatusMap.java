@@ -5,7 +5,7 @@ import org.mapdb.DB;
 import org.erachain.utils.ObserverMessage;
 
 /**
- * Назначает статус для персоны. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+ * Назначает статус для персоны. Использует схему карты Ключ + Ключ - Значение: KKMap,
  * в котрой по ключу ищем значение там карта по ключу еще и
  * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись.<br>
  *     <br>
@@ -26,7 +26,7 @@ import org.erachain.utils.ObserverMessage;
      * @return dcMap
      */
 
-public class KKPersonStatusMap extends KK_Map {
+public class KKPersonStatusMap extends KKMap {
 
     public KKPersonStatusMap(DCSet databaseSet, DB database) {
         super(databaseSet, database, "person_status",

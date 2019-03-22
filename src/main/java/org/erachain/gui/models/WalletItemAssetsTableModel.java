@@ -24,34 +24,15 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 
     private SortableList<Tuple2<String, String>, AssetCls> assets;
 
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false, false, false, false};
-
     public WalletItemAssetsTableModel() {
-        super("WalletItemAssetsTableModel", 1000,
-                new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Confirmed", "Favorite"});
+        super(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Confirmed", "Favorite"},
+                new Boolean[]{false, true, true, false, false, false, false, false});
 
     }
 
     @Override
     public SortableList<Tuple2<String, String>, AssetCls> getSortableList() {
         return this.assets;
-    }
-
-    @Override
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
     }
 
     public AssetCls getAsset(int row) {
@@ -109,15 +90,6 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -152,7 +124,7 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
     }
 
     @Override
-    public Object getItem(int k) {
+    public AssetCls getItem(int k) {
         // TODO Auto-generated method stub
         return this.assets.get(k).getB();
     }

@@ -15,7 +15,6 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Null;
@@ -47,7 +46,7 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
 
     @SuppressWarnings("unchecked")
     public Model_Account_Transactions() {
-        super("Accounts Table", 1000, new String[]{"Account", "Amount", "Type"});
+        super(new String[]{"Account", "Amount", "Type"});
 
         LOGGER = LoggerFactory.getLogger(Model_Account_Transactions.class.getName());
 
@@ -70,13 +69,13 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
     }
 
     // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
+    public Boolean[] getColumnAutoHeight() {
 
         return this.column_AutuHeight;
     }
 
     // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
+    public void setColumnAutoHeight(Boolean[] arg0) {
         this.column_AutuHeight = arg0;
     }
 
@@ -278,7 +277,7 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
     }
 
     @Override
-    public Object getItem(int k) {
+    public Transaction getItem(int k) {
         // TODO Auto-generated method stub
         return transactions_Asset.get(k);
     }

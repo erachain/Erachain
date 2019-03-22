@@ -1,52 +1,46 @@
 package org.erachain.gui.models;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
-import org.slf4j.Logger;
+import org.erachain.utils.Pair;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class UnconfirmedTransactionsTableModel extends AbstractTableModel implements Observer {
+public class UnconfirmedTransactionsTableModel extends TableModelCls<Long, Transaction> implements Observer {
 
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TYPE = 1;
     public static final int COLUMN_FEE = 2;
-    private static final int MAX_ROWS = 1000;
-    private static final Logger LOGGER = LoggerFactory.getLogger(UnconfirmedTransactionsTableModel.class);
 
-    long timePoint;
-
-    private List<Transaction> transactions;
     SortableList<Long, Transaction> list;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Fee"});
 
-    public UnconfirmedTransactionsTableModel() {
-        DCSet.getInstance().getTransactionMap().addObserver(this);
+    public UnconfirmedTransactionsTableModel()
+    {
+        super(DCSet.getInstance().getTransactionMap(),
+                new String[]{"Timestamp", "Type", "Fee"},
+                new Boolean[]{true, false, false});
+
+        LOGGER = LoggerFactory.getLogger(UnconfirmedTransactionsTableModel.class);
     }
 
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
+    @Override
+    public SortableList<Long, Transaction> getSortableList() {
+        return this.list;
     }
-	
-	/*
-	@Override
-	public SortableList<byte[], Transaction> getSortableList() 
-	{
-		return this.transactions;
-	}
-	*/
+
+    public Transaction getItem(int row) {
+        return getTransaction(row);
+    }
 
     public Transaction getTransaction(int row) {
         if (list == null
@@ -54,16 +48,6 @@ public class UnconfirmedTransactionsTableModel extends AbstractTableModel implem
             return null;
 
         return list.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return columnNames[index];
     }
 
     @Override
@@ -108,46 +92,75 @@ public class UnconfirmedTransactionsTableModel extends AbstractTableModel implem
         }
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-            LOGGER.error(e.getMessage(), e);
-        }
-    }
+    private int count;
 
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
-
-        if (System.currentTimeMillis() - timePoint < 2000)
-            return;
-
-        timePoint = System.currentTimeMillis();
 
         ObserverMessage message = (ObserverMessage) arg;
         int type = message.getType();
 
         if (type == ObserverMessage.LIST_UNC_TRANSACTION_TYPE) {
-            //CHECK IF NEW LIST
-            //        LOGGER.error("gui.models.UnconfirmedTransactionsTableModel.syncUpdate - LIST_UNC_TRANSACTION_TYPE");
-            if (this.list == null) {
-                this.list = (SortableList<Long, Transaction>) message.getValue();
-                this.list.registerObserver();
-            }
+            needUpdate = true;
+
+        } else if (type == ObserverMessage.RESET_UNC_TRANSACTION_TYPE) {
+            needUpdate = false;
+            getInterval();
             this.fireTableDataChanged();
+
         } else if (type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
-            this.fireTableDataChanged();
+            needUpdate = true;
         } else if (type == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
-            this.fireTableDataChanged();
+            needUpdate = true;
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT
+                && Controller.getInstance().isDynamicGUI()
+                && needUpdate) {
+
+            if (count++ < 4)
+                return;
+
+            count = 0;
+            needUpdate = false;
+
+            getInterval();
+            fireTableDataChanged();
         }
 
     }
 
-    public void removeObservers() {
-        //this.transactions.removeObserver();
-        DCSet.getInstance().getTransactionMap().deleteObserver(this);
-        this.list.removeObserver();
+    public void addObserversThis() {
+
+        map.addObserver(this);
+
+        Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
+
+        getInterval();
+        fireTableDataChanged();
+
     }
+
+    public void removeObserversThis() {
+        map.deleteObserver(this);
+    }
+
+    @Override
+    public long getMapSize() {
+        return map.size();
+    }
+
+    @Override
+    public void getIntervalThis(long startBack, long endBack) {
+        list = new SortableList<Long, Transaction>(map, ((TransactionMap)map).getFromToKeys(startBack, endBack));
+
+        DCSet dcSet = DCSet.getInstance();
+        for (Pair<Long, Transaction> item: list) {
+            if (item.getB() == null)
+                continue;
+
+            item.getB().setDC_HeightSeq(dcSet);
+            item.getB().calcFee();
+        }
+
+    }
+
 }

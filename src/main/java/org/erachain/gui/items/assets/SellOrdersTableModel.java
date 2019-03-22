@@ -33,8 +33,7 @@ public class SellOrdersTableModel extends TableModelCls<Long, Order> implements 
     private long wantKey;
 
     public SellOrdersTableModel(AssetCls have, AssetCls want) {
-        super("SellOrdersTableModel", 1000,
-                new String[]{"Have", "Price", "Want"});
+        super(new String[]{"Have", "Price", "Want"});
 
         this.have = have;
         this.want = want;
@@ -218,7 +217,7 @@ public class SellOrdersTableModel extends TableModelCls<Long, Order> implements 
     }
 
     @Override
-    public Object getItem(int k) {
+    public Order getItem(int k) {
         // TODO Auto-generated method stub
         return this.orders.get(k).getB();
     }

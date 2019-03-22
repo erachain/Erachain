@@ -22,8 +22,7 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
     private SortableList<Tuple2<String, String>, TemplateCls> templates;
 
     public WalletItemTemplatesTableModel() {
-        super("WalletItemTemplatesTableModel", 1000,
-                new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"});
+        super(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"});
     }
 
     @Override
@@ -72,15 +71,6 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
         }
 
         return null;
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
     }
 
     @SuppressWarnings("unchecked")

@@ -40,23 +40,23 @@ import org.erachain.gui.items.persons.*;
 import org.erachain.gui.items.polls.IssuePollPanel;
 import org.erachain.gui.items.polls.Polls_Favorite_SplitPanel;
 import org.erachain.gui.items.polls.Polls_My_SplitPanel;
-import org.erachain.gui.items.polls.Polls_Search_SplitPanel;
+import org.erachain.gui.items.polls.Search_Polls_SplitPanel;
 import org.erachain.gui.items.records.MyTransactionsSplitPanel;
 import org.erachain.gui.items.records.SearchTransactionsSplitPanel;
 import org.erachain.gui.items.records.UnconfirmedTransactionsPanel;
+import org.erachain.gui.items.statement.Favorite_Statements_SplitPanel;
 import org.erachain.gui.items.statement.Issue_Document_Panel;
-import org.erachain.gui.items.statement.Statements_Favorite_SplitPanel;
+import org.erachain.gui.items.statement.Search_Statements_SplitPanel;
 import org.erachain.gui.items.statement.Statements_My_SplitPanel;
-import org.erachain.gui.items.statement.Statements_Search_SplitPanel;
 import org.erachain.gui.items.statuses.IssueStatusPanel;
-import org.erachain.gui.items.statuses.Search_Statuses_Tab;
+import org.erachain.gui.items.statuses.Search_Statuses_SplitPanel;
 import org.erachain.gui.items.statuses.Statuses_Favorite_SplitPanel;
 import org.erachain.gui.items.templates.IssueTemplatePanel;
-import org.erachain.gui.items.templates.Search_Templates_Tab;
+import org.erachain.gui.items.templates.Search_Templates_SplitPanel;
 import org.erachain.gui.items.templates.Templates_Favorite_SplitPanel;
 import org.erachain.gui.items.unions.IssueUnionPanel;
 import org.erachain.gui.items.unions.My_Unions_Tab;
-import org.erachain.gui.items.unions.Search_Union_Tab;
+import org.erachain.gui.items.unions.Search_Union_SplitPanel;
 import org.erachain.gui.library.MSplitPane;
 import org.erachain.gui.telegrams.ALLTelegramPanel;
 import org.erachain.gui.telegrams.TelegramSplitPanel;
@@ -308,8 +308,8 @@ public class Main_Panel extends javax.swing.JPanel {
             insertTab(Lang.getInstance().translate("My Persons"), new Persons_My_SplitPanel());
             return;
         }
-        if (str.equals(Lang.getInstance().translate("Search Persons")) || str.equals("Persons_Search_SplitPanel")) {
-            insertTab(Lang.getInstance().translate("Search Persons"), new Persons_Search_SplitPanel());
+        if (str.equals(Lang.getInstance().translate("Search Persons")) || str.equals("Search_Persons_SplitPanel")) {
+            insertTab(Lang.getInstance().translate("Search Persons"), new Search_Persons_SplitPanel());
             return;
         }
         if (str.equals(Lang.getInstance().translate("Issue Person")) || str.equals("IssuePersonPanel")) {
@@ -344,8 +344,8 @@ public class Main_Panel extends javax.swing.JPanel {
         }
 
         if (str.equals(Lang.getInstance().translate("Favorite Documents"))
-                || str.equals("Statements_Favorite_SplitPanel")) {
-            insertTab(Lang.getInstance().translate("Favorite Documents"), new Statements_Favorite_SplitPanel());
+                || str.equals("Favorite_Statements_SplitPanel")) {
+            insertTab(Lang.getInstance().translate("Favorite Documents"), new Favorite_Statements_SplitPanel());
             return;
         }
         if (str.equals(Lang.getInstance().translate("My Documents")) || str.equals("Statements_My_SplitPanel")) {
@@ -354,8 +354,8 @@ public class Main_Panel extends javax.swing.JPanel {
 
         }
         if (str.equals(Lang.getInstance().translate("Search Documents"))
-                || str.equals("Statements_Search_SplitPanel")) {
-            insertTab(Lang.getInstance().translate("Search Documents"), new Statements_Search_SplitPanel());
+                || str.equals("Search_Statements_SplitPanel")) {
+            insertTab(Lang.getInstance().translate("Search Documents"), new Search_Statements_SplitPanel());
             return;
 
         }
@@ -386,8 +386,8 @@ public class Main_Panel extends javax.swing.JPanel {
             insertTab(Lang.getInstance().translate("My Assets"), new My_Assets_Tab());
             return;
         }
-        if (str.equals(Lang.getInstance().translate("Search Assets")) || str.equals("Search_Assets_Tab")) {
-            insertTab(Lang.getInstance().translate("Search Assets"), new Search_Assets_Tab(true));
+        if (str.equals(Lang.getInstance().translate("Search Assets")) || str.equals("Search_Assets_SplitPanel")) {
+            insertTab(Lang.getInstance().translate("Search Assets"), new Search_Assets_SplitPanel(true));
             return;
         }
         if (str.equals(Lang.getInstance().translate("My Balance")) || str.equals("My_Balance_Tab")) {
@@ -406,8 +406,8 @@ public class Main_Panel extends javax.swing.JPanel {
             insertTab(Lang.getInstance().translate("Exchange"), new Exchange_Panel(null, null, null, null));
             return;
         }
-        if (str.equals(Lang.getInstance().translate("Search Templates")) || str.equals("Search_Templates_Tab")) {
-            insertTab(Lang.getInstance().translate("Search Templates"), new Search_Templates_Tab());
+        if (str.equals(Lang.getInstance().translate("Search Templates")) || str.equals("Search_Templates_SplitPanel")) {
+            insertTab(Lang.getInstance().translate("Search Templates"), new Search_Templates_SplitPanel());
             return;
         }
         if (str.equals(Lang.getInstance().translate("Favorite Templates"))
@@ -428,8 +428,8 @@ public class Main_Panel extends javax.swing.JPanel {
             insertTab(Lang.getInstance().translate("Favorite Statuses"), new Statuses_Favorite_SplitPanel());
             return;
         }
-        if (str.equals(Lang.getInstance().translate("Search Statuses")) || str.equals("Search_Statuses_Tab")) {
-            insertTab(Lang.getInstance().translate("Search Statuses"), new Search_Statuses_Tab());
+        if (str.equals(Lang.getInstance().translate("Search Statuses")) || str.equals("Search_Statuses_SplitPanel")) {
+            insertTab(Lang.getInstance().translate("Search Statuses"), new Search_Statuses_SplitPanel());
             return;
         }
         if (BlockChain.DEVELOP_USE) {
@@ -437,8 +437,8 @@ public class Main_Panel extends javax.swing.JPanel {
                 insertTab(Lang.getInstance().translate("My Unions"), new My_Unions_Tab());
                 return;
             }
-            if (str.equals(Lang.getInstance().translate("Search Unions")) || str.equals("Search_Union_Tab")) {
-                insertTab(Lang.getInstance().translate("Search Unions"), new Search_Union_Tab());
+            if (str.equals(Lang.getInstance().translate("Search Unions")) || str.equals("Search_Union_SplitPanel")) {
+                insertTab(Lang.getInstance().translate("Search Unions"), new Search_Union_SplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Issue Union")) || str.equals("IssueUnionPanel")) {
@@ -452,8 +452,8 @@ public class Main_Panel extends javax.swing.JPanel {
             insertTab(Lang.getInstance().translate("My Polls"), new Polls_My_SplitPanel());
             return;
         }
-        if (str.equals(Lang.getInstance().translate("Search Polls")) || str.equals("Polls_Search_SplitPanel")) {
-            insertTab(Lang.getInstance().translate("Search Polls"), new Polls_Search_SplitPanel());
+        if (str.equals(Lang.getInstance().translate("Search Polls")) || str.equals("Search_Polls_SplitPanel")) {
+            insertTab(Lang.getInstance().translate("Search Polls"), new Search_Polls_SplitPanel());
             return;
         }
         if (str.equals(Lang.getInstance().translate("Issue Poll")) || str.equals("IssuePollPanel")) {

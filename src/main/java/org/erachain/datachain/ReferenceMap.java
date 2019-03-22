@@ -11,9 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-//import org.mapdb.Fun.Tuple2;
-//import org.erachain.core.account.Account;
-//import org.erachain.core.block.Block;
 
 /**
  * TODO: Надо подумать может она лишняя??
@@ -31,14 +28,12 @@ public class ReferenceMap extends DCMap<byte[], Long> {
         super(parent, null);
     }
 
-
     @Override
     protected Map<byte[], Long> getMap(DB database) {
         //OPEN MAP
         return database.createTreeMap("references")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
-                //.valueSerializer(new BlockSerializer())
                 .valuesOutsideNodesEnable()
                 .counterEnable()
                 .makeOrGet();
@@ -46,7 +41,7 @@ public class ReferenceMap extends DCMap<byte[], Long> {
 
     @Override
     protected Map<byte[], Long> getMemoryMap() {
-        return new TreeMap<byte[], Long>(UnsignedBytes.lexicographicalComparator());
+        return new TreeMap<>(UnsignedBytes.lexicographicalComparator());
     }
 
     protected void createIndexes(DB database) {
@@ -55,27 +50,23 @@ public class ReferenceMap extends DCMap<byte[], Long> {
     @Override
     protected Long getDefaultValue() {
         // NEED for toByte for not referenced accounts
-        return 0l;
+        return 0L;
     }
 
     public Long get(String address, Long timestamp) {
-        byte[] key = Bytes.concat(Base58.decode(address), Longs.toByteArray(timestamp));
-        return this.get(key);
+        return get(Bytes.concat(Base58.decode(address), Longs.toByteArray(timestamp)));
     }
 
     public void set(String address, Long timestamp, Long reference) {
-        byte[] key = Bytes.concat(Base58.decode(address), Longs.toByteArray(timestamp));
-        this.set(key, reference);
+        set(Bytes.concat(Base58.decode(address), Longs.toByteArray(timestamp)), reference);
     }
 
     public void delete(String address, Long timestamp) {
-        byte[] key = Bytes.concat(Base58.decode(address), Longs.toByteArray(timestamp));
-        this.delete(key);
+        delete(Bytes.concat(Base58.decode(address), Longs.toByteArray(timestamp)));
     }
 
     public Long getLast(String address) {
-        byte[] key = Base58.decode(address);
-        return this.get(key);
+        return get(Base58.decode(address));
     }
 
 }

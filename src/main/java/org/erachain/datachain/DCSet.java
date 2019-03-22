@@ -39,9 +39,9 @@ public class DCSet extends DBASet implements Observer {
     private BlockChain bchain;
 
     private AddressForging addressForging;
-    private Credit_AddressesMap credit_AddressesMap;
+    private CreditAddressesMap credit_AddressesMap;
     private ItemAssetBalanceMap assetBalanceMap;
-    private AddressStatement_Refs addressStatement_Refs;
+    private AddressStatementRefs addressStatement_Refs;
     private ItemAssetBalanceMap assetBalanceAccountingMap;
     private KKAssetStatusMap kKAssetStatusMap;
     private KKPersonStatusMap kKPersonStatusMap;
@@ -53,12 +53,12 @@ public class DCSet extends DBASet implements Observer {
     private KKStatusUnionMap kKStatusUnionMap;
     private AddressPersonMap addressPersonMap;
     private PersonAddressMap personAddressMap;
-    private KK_KPersonStatusUnionMap kK_KPersonStatusUnionMap;
+    private KKKMapPersonStatusUnion kK_KPersonStatusUnionMapPersonStatusUnionTable;
     private VouchRecordMap vouchRecordMap;
     private HashesMap hashesMap;
     private HashesSignsMap hashesSignsMap;
 
-    private AddressTime_SignatureMap addressTime_SignatureMap;
+    private AddressTimeSignatureMap addressTime_SignatureMap;
     private BlockMap blockMap;
     //private BlockCreatorMap blockCreatorMap;
     private BlockSignsMap blockSignsMap;
@@ -126,9 +126,9 @@ public class DCSet extends DBASet implements Observer {
             this.blocksHeadsMap = new BlocksHeadsMap(this, database);
             this.referenceMap = new ReferenceMap(this, database);
             this.addressForging = new AddressForging(this, database);
-            this.credit_AddressesMap = new Credit_AddressesMap(this, database);
+            this.credit_AddressesMap = new CreditAddressesMap(this, database);
             this.assetBalanceMap = new ItemAssetBalanceMap(this, database);
-            this.addressStatement_Refs = new AddressStatement_Refs(this, database);
+            this.addressStatement_Refs = new AddressStatementRefs(this, database);
             this.assetBalanceAccountingMap = new ItemAssetBalanceMap(this, database);
 
             this.kKAssetStatusMap = new KKAssetStatusMap(this, database);
@@ -141,7 +141,7 @@ public class DCSet extends DBASet implements Observer {
             this.kKStatusUnionMap = new KKStatusUnionMap(this, database);
             this.addressPersonMap = new AddressPersonMap(this, database);
             this.personAddressMap = new PersonAddressMap(this, database);
-            this.kK_KPersonStatusUnionMap = new KK_KPersonStatusUnionMap(this, database);
+            this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(this, database);
             this.transactionFinalMap = new TransactionFinalMap(this, database);
             this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(this, database);
 
@@ -150,7 +150,7 @@ public class DCSet extends DBASet implements Observer {
             this.vouchRecordMap = new VouchRecordMap(this, database);
             this.hashesMap = new HashesMap(this, database);
             this.hashesSignsMap = new HashesSignsMap(this, database);
-            this.addressTime_SignatureMap = new AddressTime_SignatureMap(this, database);
+            this.addressTime_SignatureMap = new AddressTimeSignatureMap(this, database);
             this.nameMap = new NameMap(this, database);
             this.nameStorageMap = new NameStorageMap(this, database);
             this.orphanNameStorageMap = new OrphanNameStorageMap(this, database);
@@ -237,9 +237,9 @@ public class DCSet extends DBASet implements Observer {
         this.bchain = parent.bchain;
 
         this.addressForging = new AddressForging(parent.addressForging);
-        this.credit_AddressesMap = new Credit_AddressesMap(parent.credit_AddressesMap);
+        this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap);
         this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap);
-        this.addressStatement_Refs = new AddressStatement_Refs(parent.addressStatement_Refs);
+        this.addressStatement_Refs = new AddressStatementRefs(parent.addressStatement_Refs);
         this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap);
         this.kKAssetStatusMap = new KKAssetStatusMap(parent.kKAssetStatusMap);
         this.kKPersonStatusMap = new KKPersonStatusMap(parent.kKPersonStatusMap);
@@ -252,7 +252,7 @@ public class DCSet extends DBASet implements Observer {
         this.kKStatusUnionMap = new KKStatusUnionMap(parent.kKStatusUnionMap);
         this.addressPersonMap = new AddressPersonMap(parent.addressPersonMap);
         this.personAddressMap = new PersonAddressMap(parent.personAddressMap);
-        this.kK_KPersonStatusUnionMap = new KK_KPersonStatusUnionMap(parent.kK_KPersonStatusUnionMap);
+        this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(parent.kK_KPersonStatusUnionMapPersonStatusUnionTable);
         this.transactionFinalMap = new TransactionFinalMap(parent.transactionFinalMap, this);
         this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(parent.transactionFinalCalculatedMap, this);
         this.transactionFinalMapSigns = new TransactionFinalMapSigns(parent.transactionFinalMapSigns);
@@ -261,7 +261,7 @@ public class DCSet extends DBASet implements Observer {
         this.hashesMap = new HashesMap(parent.hashesMap);
         this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap);
 
-        this.addressTime_SignatureMap = new AddressTime_SignatureMap(parent.addressTime_SignatureMap);
+        this.addressTime_SignatureMap = new AddressTimeSignatureMap(parent.addressTime_SignatureMap);
         this.blockMap = new BlockMap(parent.blockMap, this);
         //this.blockCreatorMap = new BlockCreatorMap(parent.blockCreatorMap);
         this.blockSignsMap = new BlockSignsMap(parent.blockSignsMap, this);
@@ -499,8 +499,7 @@ public class DCSet extends DBASet implements Observer {
         this.kKStatusUnionMap.reset();
         this.addressPersonMap.reset();
         this.personAddressMap.reset();
-        ;
-        this.kK_KPersonStatusUnionMap.reset();
+        this.kK_KPersonStatusUnionMapPersonStatusUnionTable.reset();
         this.vouchRecordMap.reset();
         this.hashesMap.reset();
         this.hashesSignsMap.reset();
@@ -614,7 +613,7 @@ public class DCSet extends DBASet implements Observer {
      * <b>Значение:</b> сумма средств
      *
      */
-    public Credit_AddressesMap getCredit_AddressesMap() {
+    public CreditAddressesMap getCredit_AddressesMap() {
         return this.credit_AddressesMap;
     }
 
@@ -636,7 +635,7 @@ public class DCSet extends DBASet implements Observer {
      * Хранит для этого адреса и времени создания ссылки на транзакции типа Statement, см. супер класс
      * @return
      */
-    public AddressStatement_Refs getAddressStatement_Refs() {
+    public AddressStatementRefs getAddressStatement_Refs() {
         return this.addressStatement_Refs;
     }
 
@@ -694,7 +693,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * Назначает статус для актива. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * Назначает статус для актива. Использует схему карты Ключ + Ключ - Значение: KKMap,
      * в котрой по ключу ищем значение там карта по ключу еще и
      * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
 
@@ -705,7 +704,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * Назначает статус для персоны. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * Назначает статус для персоны. Использует схему карты Ключ + Ключ - Значение: KKMap,
      * в котрой по ключу ищем значение там карта по ключу еще и
      * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись.<br>
      *     <br>
@@ -730,7 +729,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * Назначает статус для актива. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * Назначает статус для актива. Использует схему карты Ключ + Ключ - Значение: KKMap,
      * в котрой по ключу ищем значение там карта по ключу еще и
      * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
 
@@ -741,7 +740,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * Назначает актив для объединения. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * Назначает актив для объединения. Использует схему карты Ключ + Ключ - Значение: KKMap,
      * в котрой по ключу ищем значение там карта по ключу еще и
      * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
 
@@ -752,7 +751,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * Назначает персон для объединения. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * Назначает персон для объединения. Использует схему карты Ключ + Ключ - Значение: KKMap,
      * в котрой по ключу ищем значение там карта по ключу еще и
      * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
 
@@ -763,7 +762,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * Назначает голосования для объединения. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * Назначает голосования для объединения. Использует схему карты Ключ + Ключ - Значение: KKMap,
      * в котрой по ключу ищем значение там карта по ключу еще и
      * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
 
@@ -774,7 +773,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * Назначает статус для объединения. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * Назначает статус для объединения. Использует схему карты Ключ + Ключ - Значение: KKMap,
      * в котрой по ключу ищем значение там карта по ключу еще и
      * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
 
@@ -791,8 +790,8 @@ public class DCSet extends DBASet implements Observer {
 
      * @return dcMap
      */
-    public KK_KPersonStatusUnionMap getPersonStatusUnionMap() {
-        return this.kK_KPersonStatusUnionMap;
+    public KKKMapPersonStatusUnion getPersonStatusUnionMap() {
+        return this.kK_KPersonStatusUnionMapPersonStatusUnionTable;
     }
 
     /**
@@ -896,7 +895,7 @@ public class DCSet extends DBASet implements Observer {
      *
      * @return
      */
-    public AddressTime_SignatureMap getAddressTime_SignatureMap() {
+    public AddressTimeSignatureMap getAddressTime_SignatureMap() {
         return this.addressTime_SignatureMap;
     }
 
@@ -1056,7 +1055,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * see datachain.Issue_ItemMap
+     * see datachain.IssueItemMap
      *
      * @return
      */
@@ -1100,7 +1099,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
 /**
- * see datachain.Issue_ItemMap
+ * see datachain.IssueItemMap
  *
  * @return
  */
@@ -1118,7 +1117,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * see datachain.Issue_ItemMap
+     * see datachain.IssueItemMap
      *
      * @return
      */
@@ -1131,7 +1130,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * see datachain.Issue_ItemMap
+     * see datachain.IssueItemMap
      *
      * @return
      */
@@ -1140,7 +1139,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * see datachain.Item_Map
+     * see datachain.ItemMap
      *
      * @return
      */
@@ -1149,7 +1148,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * see datachain.Issue_ItemMap
+     * see datachain.IssueItemMap
      *
      * @return
      */
@@ -1158,7 +1157,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * see datachain.Item_Map
+     * see datachain.ItemMap
      *
      * @return
      */
@@ -1167,7 +1166,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * see datachain.Issue_ItemMap
+     * see datachain.IssueItemMap
      *
      * @return
      */
@@ -1176,7 +1175,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * see datachain.Item_Map
+     * see datachain.ItemMap
      *
      * @return
      */
@@ -1185,7 +1184,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * see datachain.Issue_ItemMap
+     * see datachain.IssueItemMap
      *
      * @return
      */
@@ -1194,7 +1193,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * see datachain.Item_Map
+     * see datachain.ItemMap
      *
      * @return
      */
@@ -1203,7 +1202,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     * see datachain.Issue_ItemMap
+     * see datachain.IssueItemMap
      *
      * @return
      */
@@ -1216,7 +1215,7 @@ public class DCSet extends DBASet implements Observer {
      * @param type тип Сущности
      * @return
      */
-    public Item_Map getItem_Map(int type) {
+    public ItemMap getItem_Map(int type) {
 
         switch (type) {
             case ItemCls.ASSET_TYPE: {

@@ -7,7 +7,6 @@ import org.erachain.core.item.polls.PollCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemPollMap;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 
 import javax.validation.constraints.Null;
@@ -23,21 +22,15 @@ public class ItemPollsTableModel extends TableModelCls<Long, ItemCls> implements
     private AssetCls asset;
 
     private SortableList<Long, ItemCls> polls;
-    private ItemPollMap map;
 
     public ItemPollsTableModel() {
-        super("ItemPollsTableModel", 1000,
+        super(DCSet.getInstance().getItemPollMap(),
                 new String[]{"Name", "Creator", "Total Votes"});
     }
 
     public void setAsset(AssetCls asset) {
         this.asset = asset;
         this.fireTableDataChanged();
-    }
-
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
     }
 
     @Override
@@ -88,15 +81,6 @@ public class ItemPollsTableModel extends TableModelCls<Long, ItemCls> implements
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -120,7 +104,6 @@ public class ItemPollsTableModel extends TableModelCls<Long, ItemCls> implements
     public void addObserversThis() {
         this.asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
         //Controller.getInstance().addObserver(this);
-        map = DCSet.getInstance().getItemPollMap();
         polls = map.getList();
     }
 
@@ -130,7 +113,7 @@ public class ItemPollsTableModel extends TableModelCls<Long, ItemCls> implements
     }
 
     @Override
-    public Object getItem(int k) {
+    public ItemCls getItem(int k) {
         return this.polls.get(k).getB();
     }
 }

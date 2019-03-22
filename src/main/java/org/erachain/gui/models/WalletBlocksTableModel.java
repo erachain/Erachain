@@ -5,7 +5,6 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.BlocksHeadMap;
-import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -27,41 +26,24 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
     public static final int COLUMN_BASETARGET = 3;
     public static final int COLUMN_TRANSACTIONS = 4;
     public static final int COLUMN_FEE = 5;
-    static Logger LOGGER = LoggerFactory.getLogger(WalletBlocksTableModel.class.getName());
     private SortableList<Tuple2<String, String>, Block.BlockHead> blocks;
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, true, false};
 
     public WalletBlocksTableModel() {
-        super("WalletBlocksTableModel", 1000,
+        super(Controller.getInstance().wallet.database.getBlocksHeadMap(), "WalletBlocksTableModel", 1000,
                 new String[]{"Height", "Timestamp", "Generator",
                         "GB dtWV", //"Generating Balance",
-                        "Transactions", "Fee"});
+                        "Transactions", "Fee"}, new Boolean[]{false, true, true, false, true, false});
         if (!Controller.getInstance().doesWalletDatabaseExists()) {
             this.blocks = null;
         } else {
             addObservers();
         }
+        LOGGER = LoggerFactory.getLogger(WalletBlocksTableModel.class.getName());
     }
 
     @Override
     public SortableList<Tuple2<String, String>, Block.BlockHead> getSortableList() {
         return this.blocks;
-    }
-
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
     }
 
     @Override
@@ -126,18 +108,6 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
         }
 
         return null;
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        //try
-        //{
-        this.syncUpdate(o, arg);
-        //}
-        //catch(Exception e)
-        //	{
-        //GUI ERROR
-        //	}
     }
 
     @SuppressWarnings("unchecked")

@@ -8,12 +8,10 @@ import org.mapdb.DB;
 import com.google.common.primitives.UnsignedBytes;
 
 /**
- * see datachain.Issue_ItemMap
- *
- * @return
+ * see datachain.IssueItemMap
  */
 
-public class IssueStatementMap extends Issue_ItemMap {
+public class IssueStatementMap extends IssueItemMap {
 
     public IssueStatementMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

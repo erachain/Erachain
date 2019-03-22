@@ -28,13 +28,14 @@ import java.util.*;
  */
 
 public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead> {
-// нужно сделать так: public class BlocksHeadMap extends DCMap<Integer, Block.BlockHead> {
+    // нужно сделать так: public class BlocksHeadMap extends DCMap<Integer, Block.BlockHead> {
     public static final int TIMESTAMP_INDEX = 1;
     public static final int GENERATOR_INDEX = 2;
     public static final int BALANCE_INDEX = 3;
     public static final int TRANSACTIONS_INDEX = 4;
     public static final int FEE_INDEX = 5;
-    static Logger LOGGER = LoggerFactory.getLogger(BlocksHeadMap.class.getName());
+    static Logger logger = LoggerFactory.getLogger(BlocksHeadMap.class.getName());
+    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public BlocksHeadMap(DWSet dWSet, DB database) {
         super(dWSet, database);
@@ -186,7 +187,7 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
             }
         } catch (Exception e) {
             //ERROR
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
 
         return blocks;
@@ -199,7 +200,6 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
             //FOR EACH ACCOUNTS
             synchronized (accounts) {
                 for (Account account : accounts) {
-
                     List<Block.BlockHead> accountBlocks = get(account, limit);
                     for (Block.BlockHead block : accountBlocks) {
                         blocks.add(new Pair<Account, Block.BlockHead>(account, block));
@@ -207,8 +207,7 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
                 }
             }
         } catch (Exception e) {
-            //ERROR
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
 
         return blocks;
@@ -223,17 +222,17 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
 
         //DELETE TRANSACTIONS
         for (Tuple2<String, String> key : accountBlocks.keySet()) {
-            this.delete(key);
+            delete(key);
         }
     }
 
     public void delete(Block.BlockHead block) {
-        this.delete(new Tuple2<String, String>(block.creator.getAddress(), new String(block.signature)));
+        delete(new Tuple2<String, String>(block.creator.getAddress(), new String(block.signature)));
     }
 
     public void deleteAll(List<Account> accounts) {
         for (Account account : accounts) {
-            this.delete(account);
+            delete(account);
         }
     }
 
@@ -248,7 +247,7 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
         for (Account account : blocks.keySet()) {
             //FOR EACH TRANSACTION
             for (Block.BlockHead block : blocks.get(account)) {
-                this.add(block);
+                add(block);
             }
         }
     }

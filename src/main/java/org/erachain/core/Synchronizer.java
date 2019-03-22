@@ -37,7 +37,7 @@ public class Synchronizer {
     private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class);
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
     public static int BAN_BLOCK_TIMES = 8 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60;
-    private static int MAX_ORPHAN_TRANSACTIONS = 100000;
+    private static int MAX_ORPHAN_TRANSACTIONS = BlockChain.DEVELOP_USE? 200000: 50000;
     // private boolean run = true;
     // private Block runedBlock;
     private Peer fromPeer;
@@ -141,11 +141,6 @@ public class Synchronizer {
                 peer.ban(BAN_BLOCK_TIMES, mess);
                 throw new Exception(mess);
 
-            } else if (countTransactionToOrphan > MAX_ORPHAN_TRANSACTIONS) {
-                String mess = "Dishonest peer by on lastCommonBlock[" + lastCommonBlock.getHeight()
-                        + "] - reached MAX_ORPHAN_TRANSACTIONS: " + MAX_ORPHAN_TRANSACTIONS;
-                peer.ban(BAN_BLOCK_TIMES >> 2, mess);
-                throw new Exception(mess);
             }
             // LOGGER.debug("*** core.Synchronizer.checkNewBlocks - try orphan:
             // " + lastBlock.getHeight(fork));
@@ -153,6 +148,18 @@ public class Synchronizer {
                 throw new Exception("on stopping");
 
             int height = lastBlock.getHeight();
+
+            fork.getTransactionMap().clearByDeadTimeAndLimit(
+                    cnt.getBlockChain().getTimestamp(height), false);
+
+            // проверим на переполнение откаченных трнзакций
+            if (countTransactionToOrphan > MAX_ORPHAN_TRANSACTIONS) {
+                String mess = "Dishonest peer by on lastCommonBlock[" + lastCommonBlock.getHeight()
+                        + "] - reached MAX_ORPHAN_TRANSACTIONS: " + MAX_ORPHAN_TRANSACTIONS;
+                peer.ban(BAN_BLOCK_TIMES >> 2, mess);
+                throw new Exception(mess);
+            }
+
             int bbb = fork.getBlockMap().size();
             int hhh = fork.getBlocksHeadsMap().size();
             int sss = fork.getBlockSignsMap().size();

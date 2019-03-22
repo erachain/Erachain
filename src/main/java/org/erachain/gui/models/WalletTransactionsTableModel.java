@@ -31,9 +31,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     public static final int COLUMN_SIZE = 8;
 
     private SortableList<Tuple2<String, String>, Transaction> transactions;
-    private Boolean[] column_AutoHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
-
-    //private List<Pair<Tuple2<String, String>, Transaction>> pairTransactions;
 
     /**
      * В динамическом режиме перерисовывается автоматически по событию GUI_REPAINT
@@ -42,8 +39,9 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
      * org.erachain.gui.items.records.MyTransactionsSplitPanel#setIntervalPanel
      */
     public WalletTransactionsTableModel() {
-        super(new String[]{
-                        "Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
+        super(Controller.getInstance().getWallet().database.getTransactionMap(),
+                new String[]{"Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"},
+                new Boolean[]{true, true, true, true, true, true, true, false, false});
 
         LOGGER = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
 
@@ -54,19 +52,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         return this.transactions;
     }
 
-    public Object getItem(int row) {
+    public Transaction getItem(int row) {
         return getTransaction(row);
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutoHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutoHeight = arg0;
     }
 
     public Transaction getTransaction(int row) {
@@ -234,6 +221,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
         } else if (message.getType() == ObserverMessage.WALLET_RESET_TRANSACTION_TYPE) {
 
+            needUpdate = false;
             getInterval();
             this.fireTableDataChanged();
 
@@ -297,7 +285,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
     }
 
-
     public void removeObserversThis() {
 
         Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
@@ -313,12 +300,12 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     }
 
     @Override
-    public int getMapSize() {
+    public long getMapSize() {
         return Controller.getInstance().getWallet().database.getTransactionMap().size();
     }
 
     @Override
-    public void getIntervalThis(int startBack, int endBack) {
+    public void getIntervalThis(long startBack, long endBack) {
         transactions = new SortableList<Tuple2<String, String>, Transaction>(
                 Controller.getInstance().getWallet().database.getTransactionMap(),
                 Controller.getInstance().getWallet().database.getTransactionMap().getFromToKeys(startBack, endBack));
