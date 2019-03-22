@@ -183,14 +183,7 @@ public class Item_SplitPanel extends Split_Panel {
 
     @Override
     public void onClose() {
-        jTable_jScrollPanel_LeftPanel = null;
-        table_Model = null;
-        favorite_menu_items = null;
-        menu_Table = null;
-        item_Menu = null;
-        item_Table_Selected = null;
         table_Model.deleteObservers();
-
     }
 
     public void favorite_set(ItemCls itemCls) {
