@@ -143,8 +143,8 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 
     protected void addObserversThis() {
         Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this);
-        Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.blocks);
         this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
+        Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.blocks);
         this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
     }
 
