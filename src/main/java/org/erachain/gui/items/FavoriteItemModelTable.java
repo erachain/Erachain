@@ -48,7 +48,7 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
 
         //CHECK IF NEW LIST
         int type = message.getType();
-        if (type == LIST_EVENT && list == null) {
+        if (type == LIST_EVENT) {
             getInterval();
             this.fireTableDataChanged();
             needUpdate = false;
