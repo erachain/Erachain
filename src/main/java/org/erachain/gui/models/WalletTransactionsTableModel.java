@@ -41,7 +41,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     public WalletTransactionsTableModel() {
         super(Controller.getInstance().getWallet().database.getTransactionMap(),
                 new String[]{"Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"},
-                new Boolean[]{true, true, true, true, true, true, true, false, false});
+                new Boolean[]{true, true, true, true, true, true, true, false, false}, true);
 
         LOGGER = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
 
@@ -266,7 +266,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
 
         if (!Controller.getInstance().doesWalletDatabaseExists())
             return;
@@ -285,7 +285,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
 
         Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
 

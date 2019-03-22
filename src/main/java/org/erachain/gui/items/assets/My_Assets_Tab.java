@@ -401,7 +401,7 @@ public class My_Assets_Tab extends Split_Panel {
     @Override
     public void onClose() {
         // delete observer left panel
-        assetsModel.removeObservers();
+        assetsModel.deleteObservers();
         // get component from right panel
         Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
         // if Person_Info 002 delay on close

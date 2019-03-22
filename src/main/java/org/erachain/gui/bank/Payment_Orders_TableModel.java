@@ -41,8 +41,8 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
 
     public Payment_Orders_TableModel() {
-        super(new String[]{
-                        "Confirmation", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
+        super(new String[]{"Confirmation", "Timestamp", "Type", "Creator", "Item",
+                "Amount", "Recipient", "Fee", "Size"}, true);
 
     }
 
@@ -245,13 +245,13 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
 
         Controller.getInstance().addWalletObserver(this);
     }
 
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
 
         Controller.getInstance().deleteObserver(this);
     }

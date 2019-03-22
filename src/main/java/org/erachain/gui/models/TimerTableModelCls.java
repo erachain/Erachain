@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
+import java.util.List;
 import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -18,8 +19,12 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
     private String[] columnNames;
     private Timer timer;
     protected boolean needUpdate;
+    protected boolean descending;
+
+    protected List<U> list;
 
     protected Boolean[] columnAutoHeight; // = new Boolean[]{true, true, true, true, true, true, true, false, false};
+
     protected long start = 0;
     protected int step = 50;
     protected long size = 0;
@@ -27,57 +32,37 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
     protected DBMap map;
     protected Logger LOGGER;
 
-    public TimerTableModelCls(String[] columnNames) {
+    public TimerTableModelCls(String[] columnNames, boolean descending) {
         this.columnNames = columnNames;
-
-        if (map != null) {
-            //this.initComponents();
-            addObservers();
-        }
+        this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMap map, String[] columnNames) {
+    public TimerTableModelCls(DBMap map, String[] columnNames, boolean descending) {
         this.map = map;
         this.columnNames = columnNames;
-
-        if (map != null) {
-            //this.initComponents();
-            addObservers();
-        }
+        this.descending = descending;
     }
 
-    public TimerTableModelCls(String[] columnNames, Boolean[] columnAutoHeight) {
+    public TimerTableModelCls(String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
-
-        if (map != null) {
-            //this.initComponents();
-            addObservers();
-        }
+        this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight) {
+    public TimerTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
         this.map = map;
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
-
-        if (map != null) {
-            //this.initComponents();
-            addObservers();
-        }
+        this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMap map, String name, long timeout, String[] columnNames, Boolean[] columnAutoHeight) {
+    public TimerTableModelCls(DBMap map, String name, long timeout, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
         this.map = map;
         this.columnNames = columnNames;
         this.name = name;
         this.timeout = timeout;
         this.columnAutoHeight = columnAutoHeight;
-
-        if (map != null) {
-            //this.initComponents();
-            addObservers();
-        }
+        this.descending = descending;
     }
 
     public void initTimer() {
@@ -99,18 +84,14 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
                 }
             };
 
-            this.timer.schedule(action, 500, timeout);
+            this.timer.schedule(action, 100, timeout);
         }
 
     }
 
-    //public abstract void initComponents();
-
     public Boolean[] getColumnAutoHeight() {
-
         return this.columnAutoHeight;
     }
-
 
     // устанавливаем колонки которым изменить высоту
     public void setColumnAutoHeight(Boolean[] arg0) {
@@ -132,7 +113,16 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
         return columnNames[index];
     }
 
-    public abstract U getItem(int row);
+    public U getItem(int row) {
+        if (list == null)
+            return null;
+
+        return this.list.get(row);
+    }
+
+    public int getRowCount() {
+        return (this.list == null) ? 0 : this.list.size();
+    }
 
     public abstract Object getValueAt(int row, int column);
 
@@ -153,7 +143,7 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
     }
 
     //public abstract void getIntervalThis(int startBack, int endBack);
-    public void getIntervalThis(long startBack, long endBack) {
+    public void getIntervalThis(long start, long end) {
     }
 
     //public abstract int getMapSize();
@@ -161,10 +151,19 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
         return 0;
     }
 
+    /**
+     * если descending установлен, то ключ отрицательный значит и его вычисляем обратно.
+     * То есть 10-я запись имеет ключ -9 (отричательный). Тогда отсчет start=0 будет идти от последней записи
+     * с отступом step
+     */
     public void getInterval() {
 
-        long startBack = -getMapSize() + start;
-        getIntervalThis( startBack, startBack + step);
+        if (descending) {
+            long startBack = -getMapSize() + start;
+            getIntervalThis(startBack, startBack + step);
+        } else {
+            getIntervalThis(start, start + step);
+        }
 
     }
 
@@ -175,19 +174,13 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
         getInterval();
     }
 
-    protected abstract void addObserversThis();
-
     public void addObservers() {
-        addObserversThis();
         if (timeout > 0)
             initTimer();
     }
 
-    protected abstract void removeObserversThis();
-
-    public void removeObservers() {
+    public void deleteObservers() {
         stopTimer();
-        removeObserversThis();
     }
 
     public void stopTimer() {

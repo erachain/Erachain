@@ -10,7 +10,6 @@ import org.erachain.gui.models.PeersTableModel;
 import org.erachain.gui.models.WalletBlocksTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
-import org.erachain.network.PeerManager;
 import org.erachain.utils.TableMenuPopupUtil;
 
 import javax.swing.*;
@@ -303,10 +302,10 @@ public class Other_Split_Panel extends Split_Panel {
     @Override
     public void onClose() {
         
-        blocksModel.removeObservers();
-        peersTableModel.removeObservers();
+        blocksModel.deleteObservers();
+        peersTableModel.deleteObservers();
         All_Blocks_TableModel.removeObservers();
-        Controller.getInstance().addObserver(sync_Button);
+        Controller.getInstance().deleteObserver(sync_Button);
         
     }
     

@@ -189,7 +189,7 @@ public class All_Polls_Panel extends JPanel {
             public void windowClosing(WindowEvent e)
             {
             	//REMOVE OBSERVERS/HANLDERS
-            	pollsTableModel.removeObservers();
+            	pollsTableModel.deleteObservers();
                 
                 //DISPOSE
                 setVisible(false);

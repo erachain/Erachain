@@ -15,7 +15,7 @@ import java.util.Set;
 public abstract class SearchItemsTableModel<T, U> extends TableModelCls<Long, ItemCls> {
 
     public SearchItemsTableModel(DBMap itemsMap, String[] columnNames, Boolean[] column_AutoHeight, int favorite) {
-        super(itemsMap, columnNames, column_AutoHeight, favorite);
+        super(itemsMap, columnNames, column_AutoHeight, favorite, false);
     }
     protected List<ItemCls> list;
     protected ItemMap db;
@@ -85,11 +85,11 @@ public abstract class SearchItemsTableModel<T, U> extends TableModelCls<Long, It
     }
 
     @Override
-    public void addObserversThis() {
+    public void addObservers() {
     }
 
     @Override
-    public void removeObserversThis() {
+    public void deleteObservers() {
     }
 
 }

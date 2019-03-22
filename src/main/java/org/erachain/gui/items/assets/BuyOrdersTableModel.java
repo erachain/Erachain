@@ -36,7 +36,7 @@ public class BuyOrdersTableModel extends TableModelCls<Long, Order> implements O
     private long wantKey;
 
     public BuyOrdersTableModel(AssetCls have, AssetCls want) {
-        super(new String[]{"Want", "Price", "Have"});
+        super(new String[]{"Want", "Price", "Have"}, true);
 
         this.have = have;
         this.want = want;
@@ -232,13 +232,13 @@ public class BuyOrdersTableModel extends TableModelCls<Long, Order> implements O
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         Controller.getInstance().addObserver(this);
         //this.orders.registerObserver();
 
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         this.orders.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }

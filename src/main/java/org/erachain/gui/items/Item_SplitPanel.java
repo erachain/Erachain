@@ -54,8 +54,8 @@ public class Item_SplitPanel extends Split_Panel {
             public void mouseMoved(MouseEvent e) {
 
                 if (jTable_jScrollPanel_LeftPanel.columnAtPoint(e.getPoint()) == table_Model.COLUMN_FAVORITE) {
-
                     jTable_jScrollPanel_LeftPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
                 } else {
                     jTable_jScrollPanel_LeftPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 }

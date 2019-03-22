@@ -293,13 +293,16 @@ public class PersonAccountsModel extends AbstractTableModel implements Observer 
 
     public void addObservers() {
 
-        Controller.getInstance().addWalletObserver(this);
+        //// зацикливает обсерверы при первой иницализации
+        ////Controller.getInstance().addWalletObserver(this);
+
+
 
     }
 
 
     public void removeObservers() {
 
-        Controller.getInstance().deleteObserver(this);
+        ////Controller.getInstance().deleteObserver(this);
     }
 }

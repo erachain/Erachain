@@ -9,7 +9,6 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -26,7 +25,7 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
 
     public WalletItemStatusesTableModel() {
         super(new String[]{"Key", "Name", "Creator", "Unique", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false});
+                new Boolean[]{false, true, true, false, false}, false);
     }
 
     @Override
@@ -107,11 +106,11 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         Controller.getInstance().addWalletObserver(this);
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         if (this.statuses != null) this.statuses.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }

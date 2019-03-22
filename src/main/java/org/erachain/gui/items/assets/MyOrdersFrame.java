@@ -6,20 +6,13 @@ import org.erachain.gui.models.WalletOrdersTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -149,6 +142,6 @@ public class MyOrdersFrame extends JFrame {
     }
 
     public void removeObservers() {
-        this.ordersTableModel.removeObservers();
+        this.ordersTableModel.deleteObservers();
     }
 }

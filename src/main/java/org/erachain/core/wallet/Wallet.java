@@ -1029,6 +1029,24 @@ public class Wallet extends Observable implements Observer {
 			// REGISTER ON ORDERS
 			this.database.getOrderMap().addObserver(o);
 
+		}
+
+		// SEND STATUS
+		int status = STATUS_LOCKED;
+		if (this.isUnlocked()) {
+			status = STATUS_UNLOCKED;
+		}
+
+		o.update(this, new ObserverMessage(ObserverMessage.WALLET_STATUS, status));
+	}
+
+	public void addFavoritesObserver(Observer o) {
+
+		super.addObserver(o);
+
+		if (Controller.getInstance().doesWalletDatabaseExists()) {
+
+
 			// REGISTER ON ASSET FAVORITES
 			this.database.getAssetFavoritesSet().addObserver(o);
 
@@ -1045,14 +1063,6 @@ public class Wallet extends Observable implements Observer {
 			this.database.getUnionFavoritesSet().addObserver(o);
 
 		}
-
-		// SEND STATUS
-		int status = STATUS_LOCKED;
-		if (this.isUnlocked()) {
-			status = STATUS_UNLOCKED;
-		}
-
-		o.update(this, new ObserverMessage(ObserverMessage.WALLET_STATUS, status));
 	}
 
 	private void deal_transaction(Account account, Transaction transaction, boolean asOrphan) {

@@ -117,9 +117,9 @@ public class DebugTabPane extends JTabbedPane {
 
     public void close() {
         //REMOVE OBSERVERS/HANLDERS
-        this.peersTableModel.removeObservers();
+        this.peersTableModel.deleteObservers();
 
-        this.transactionsTableModel.removeObservers();
+        this.transactionsTableModel.deleteObservers();
 
         this.blocksTableModel.removeObservers();
 

@@ -273,14 +273,15 @@ public class PersonStatusesModel extends AbstractTableModel implements Observer 
 
     public void addObservers() {
 
-        Controller.getInstance().addWalletObserver(this);
+        DCSet.getInstance().getPersonStatusMap().addObserver(this);
+        //Controller.getInstance().addWalletObserver(this);
 
     }
 
-
     public void removeObservers() {
 
-        Controller.getInstance().deleteObserver(this);
+        DCSet.getInstance().getPersonStatusMap().deleteObserver(this);
+        //Controller.getInstance().deleteObserver(this);
     }
 
 }

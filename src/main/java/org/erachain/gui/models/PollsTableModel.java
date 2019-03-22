@@ -25,7 +25,7 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
 
     public PollsTableModel() {
         super(DCSet.getInstance().getPollMap(), "PollsTableModel", 2000,
-                new String[]{"Name", "Creator", "Total Votes"}, null);
+                new String[]{"Name", "Creator", "Total Votes"}, null, false);
     }
 
     public void setAsset(AssetCls asset) {
@@ -110,14 +110,14 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         this.asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
         //Controller.getInstance().addObserver(this);
         db = DCSet.getInstance().getPollMap();
         polls = db.getList();
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         //if(this.polls!=null)this.polls.removeObserver();
         //DCSet.getInstance().getPollMap().deleteObserver(this);
     }

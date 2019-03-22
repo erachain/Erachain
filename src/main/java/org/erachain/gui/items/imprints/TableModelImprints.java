@@ -6,7 +6,6 @@ import org.erachain.database.SortableList;
 import org.erachain.gui.models.TableModelCls;
 import org.erachain.utils.ObserverMessage;
 
-import javax.validation.constraints.Null;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -18,7 +17,7 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
     private SortableList<Long, ImprintCls> imprints;
 
     public TableModelImprints() {
-        super(new String[]{"Key", "Name", "Owner"}, new Boolean[]{false, true, true});
+        super(new String[]{"Key", "Name", "Owner"}, new Boolean[]{false, true, true}, false);
     }
 
     @Override
@@ -93,11 +92,11 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         Controller.getInstance().addObserver(this);
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         this.imprints.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }

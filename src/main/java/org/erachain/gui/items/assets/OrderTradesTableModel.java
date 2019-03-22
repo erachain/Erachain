@@ -27,7 +27,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tra
     private Order order;
 
     public OrderTradesTableModel(Order order) {
-        super(new String[]{"Timestamp", "Type", "Amount", "Price", "Total"});
+        super(new String[]{"Timestamp", "Type", "Amount", "Price", "Total"}, true);
 
         this.order = order;
         this.trades = DCSet.getInstance().getTradeMap().getTrades(order.getId());
@@ -123,11 +123,11 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tra
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         this.trades.registerObserver();
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         this.trades.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }

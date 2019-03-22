@@ -252,7 +252,7 @@ public class My_Statuses_Tab extends Split_Panel {
     @Override
     public void onClose() {
         // delete observer left panel
-        statusesModel.removeObservers();
+        statusesModel.deleteObservers();
         // get component from right panel
         Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
         // if Person_Info 002 delay on close

@@ -46,7 +46,7 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
 
     @SuppressWarnings("unchecked")
     public Model_Account_Transactions() {
-        super(new String[]{"Account", "Amount", "Type"});
+        super(new String[]{"Account", "Amount", "Type"}, true);
 
         LOGGER = LoggerFactory.getLogger(Model_Account_Transactions.class.getName());
 
@@ -268,12 +268,26 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
         return totalBalance;
     }
 
-    protected void addObserversThis() {
-        Controller.getInstance().addWalletObserver(this);
-        //	Controller.getInstance().addObserver(this);
+    public void addObservers() {
+        super.addObservers();
+        //Controller.getInstance().addWalletObserver(this);
+
+        // REGISTER ON ACCOUNTS
+        Controller.getInstance().wallet.database.getAccountMap().addObserver(this);
+
+        // REGISTER ON TRANSACTIONS
+        Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
+
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
+        // REGISTER ON ACCOUNTS
+        Controller.getInstance().wallet.database.getAccountMap().deleteObserver(this);
+
+        // REGISTER ON TRANSACTIONS
+        Controller.getInstance().wallet.database.getTransactionMap().deleteObserver(this);
+
+        super.deleteObservers();
     }
 
     @Override

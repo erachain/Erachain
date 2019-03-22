@@ -6,10 +6,8 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemPollMap;
 import org.erachain.utils.ObserverMessage;
 
-import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.util.Observable;
 import java.util.Observer;
@@ -25,7 +23,7 @@ public class ItemPollsTableModel extends TableModelCls<Long, ItemCls> implements
 
     public ItemPollsTableModel() {
         super(DCSet.getInstance().getItemPollMap(),
-                new String[]{"Name", "Creator", "Total Votes"});
+                new String[]{"Name", "Creator", "Total Votes"}, true);
     }
 
     public void setAsset(AssetCls asset) {
@@ -101,13 +99,13 @@ public class ItemPollsTableModel extends TableModelCls<Long, ItemCls> implements
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         this.asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
         //Controller.getInstance().addObserver(this);
         polls = map.getList();
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         //if(this.polls!=null)this.polls.removeObserver();
         //DCSet.getInstance().getPollMap().deleteObserver(this);
     }

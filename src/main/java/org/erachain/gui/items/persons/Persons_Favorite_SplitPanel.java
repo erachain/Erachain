@@ -18,13 +18,14 @@ import java.awt.event.ActionListener;
 
 public class Persons_Favorite_SplitPanel extends Item_SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private static FavoriteItemModelTable table_Model = new FavoritePersonsTableModel();
     private Persons_Favorite_SplitPanel th;
 
     public Persons_Favorite_SplitPanel() {
-        super(table_Model, "Persons_Favorite_SplitPanel");
+        super(new FavoritePersonsTableModel(), "Persons_Favorite_SplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Persons"));
+
         th = this;
+
         JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
 
         vsend_Coins_Item.addActionListener(new ActionListener() {
@@ -34,7 +35,7 @@ public class Persons_Favorite_SplitPanel extends Item_SplitPanel {
             }
         });
 
-       // th.menu_Table.add(vsend_Coins_Item);
+        // th.menu_Table.add(vsend_Coins_Item);
         JMenuItem send_Mail_Item = new JMenuItem(Lang.getInstance().translate("Send mail"));
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
@@ -43,52 +44,51 @@ public class Persons_Favorite_SplitPanel extends Item_SplitPanel {
             }
         });
 
-     //   th.menu_Table.add(send_Mail_Item);
+        //   th.menu_Table.add(send_Mail_Item);
 //      add items in menu
 
 
         JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set status to person"));
-      
-       set_Status_Item.addActionListener(new ActionListener() {
-           @Override
-           public void actionPerformed(ActionEvent e) {
 
-               @SuppressWarnings("unused")
-               PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) th.item_Menu);
-               
-           }
-       });
-       this.menu_Table.add(set_Status_Item);
+        set_Status_Item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                @SuppressWarnings("unused")
+                PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) th.item_Menu);
+
+            }
+        });
+        this.menu_Table.add(set_Status_Item);
 
         JMenuItem attestPubKey_Item = new JMenuItem(Lang.getInstance().translate("Attest public key for person"));
-      
-       attestPubKey_Item.addActionListener(new ActionListener() {
-           @Override
-           public void actionPerformed(ActionEvent e) {
 
+        attestPubKey_Item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
-               @SuppressWarnings("unused")
-               PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) th.item_Menu, th.item_Menu.getOwner());
-              
-           }
-       });
-       this.menu_Table.add(attestPubKey_Item);
+                @SuppressWarnings("unused")
+                PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) th.item_Menu, th.item_Menu.getOwner());
+
+            }
+        });
+        this.menu_Table.add(attestPubKey_Item);
 
         JMenuItem vouchPerson_Item = new JMenuItem(Lang.getInstance().translate("Vouch the person info"));
-       vouchPerson_Item.addActionListener(new ActionListener() {
-           @Override
-           public void actionPerformed(ActionEvent e) {
+        vouchPerson_Item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
-               PersonCls per = (PersonCls) th.item_Menu;
-               byte[] ref = per.getReference();
-               Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
-               int blockNo = transaction.getBlockHeight();
-               int recNo = transaction.getSeqNo();
-               new VouchRecordDialog(blockNo, recNo);
-              
-           }
-       });
-       this.menu_Table.add(vouchPerson_Item);
+                PersonCls per = (PersonCls) th.item_Menu;
+                byte[] ref = per.getReference();
+                Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
+                int blockNo = transaction.getBlockHeight();
+                int recNo = transaction.getSeqNo();
+                new VouchRecordDialog(blockNo, recNo);
+
+            }
+        });
+        this.menu_Table.add(vouchPerson_Item);
 
     }
 
@@ -100,7 +100,7 @@ public class Persons_Favorite_SplitPanel extends Item_SplitPanel {
 
     @Override
     protected void splitClose() {
-        table_Model.removeObservers();
+        table_Model.deleteObservers();
 
     }
 }

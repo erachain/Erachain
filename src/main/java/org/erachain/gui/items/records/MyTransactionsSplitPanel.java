@@ -251,7 +251,7 @@ public class MyTransactionsSplitPanel extends Split_Panel {
     //@Override
     public void onClose() {
         // delete observer left panel
-        this.records_model.removeObservers();
+        this.records_model.deleteObservers();
         this.setIntervalPanel.removeObservers();
         // get component from right panel
         //	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();

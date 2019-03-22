@@ -8,7 +8,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -25,7 +24,7 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
     public WalletItemImprintsTableModel() {
         super(Controller.getInstance().wallet.database.getImprintMap(), "WalletItemImprintsTableModel", 1000,
                 new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false});
+                new Boolean[]{false, true, true, false}, false);
     }
 
     @Override
@@ -96,12 +95,12 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         Controller.getInstance().wallet.database.getImprintMap().addObserver(this);
 
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         //this.persons.removeObserver();
         //Controller.getInstance().deleteWalletObserver(this);
         Controller.getInstance().wallet.database.getImprintMap().deleteObserver(this);

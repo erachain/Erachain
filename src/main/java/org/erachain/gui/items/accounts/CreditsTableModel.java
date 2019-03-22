@@ -44,7 +44,7 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
     @SuppressWarnings("unchecked")
     public CreditsTableModel() {
         super(DCSet.getInstance().getCredit_AddressesMap(),
-                new String[]{"Account", "Amount", "Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
+                new String[]{"Account", "Amount", "Type"}, false);
 
         LOGGER = LoggerFactory.getLogger(CreditsTableModel.class.getName());
 
@@ -266,7 +266,7 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
         return totalBalance;
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
 
         this.transactions_Asset = new ArrayList<Tuple2<Tuple2<String, String>, Transaction>>();
         this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
@@ -284,7 +284,7 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
     }
 
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
     }
 
     @Override

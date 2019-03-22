@@ -28,7 +28,7 @@ public class UnconfirmedTransactionsTableModel extends TableModelCls<Long, Trans
     {
         super(DCSet.getInstance().getTransactionMap(),
                 new String[]{"Timestamp", "Type", "Fee"},
-                new Boolean[]{true, false, false});
+                new Boolean[]{true, false, false}, true);
 
         LOGGER = LoggerFactory.getLogger(UnconfirmedTransactionsTableModel.class);
     }
@@ -128,7 +128,7 @@ public class UnconfirmedTransactionsTableModel extends TableModelCls<Long, Trans
 
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
 
         map.addObserver(this);
 
@@ -139,7 +139,7 @@ public class UnconfirmedTransactionsTableModel extends TableModelCls<Long, Trans
 
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         map.deleteObserver(this);
     }
 

@@ -22,7 +22,7 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
     private SortableList<Tuple2<String, String>, TemplateCls> templates;
 
     public WalletItemTemplatesTableModel() {
-        super(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"});
+        super(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"}, false);
     }
 
     @Override
@@ -95,11 +95,11 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
 
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         Controller.getInstance().addWalletObserver(this);
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
     }
 
 }

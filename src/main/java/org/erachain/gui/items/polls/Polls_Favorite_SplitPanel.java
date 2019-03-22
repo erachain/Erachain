@@ -59,7 +59,7 @@ public class Polls_Favorite_SplitPanel extends Item_SplitPanel {
 
     @Override
     protected void splitClose() {
-        table_Model.removeObservers();
+        table_Model.deleteObservers();
 
     }
 }

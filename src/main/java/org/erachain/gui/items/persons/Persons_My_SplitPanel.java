@@ -83,7 +83,7 @@ public class Persons_My_SplitPanel extends Item_SplitPanel {
 
     @Override
     protected void splitClose() {
-        table_Model.removeObservers();
+        table_Model.deleteObservers();
 
     }
 

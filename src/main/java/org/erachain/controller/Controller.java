@@ -3212,6 +3212,15 @@ public class Controller extends Observable {
         this.wallet.deleteObserver(o);
     }
 
+    public void addWalletFavoritesObserver(Observer o) {
+        this.wallet.addFavoritesObserver(o);
+        this.guiTimer.addObserver(o); // обработка repaintGUI
+    }
+    public void deleteWalletFavoritesObserver(Observer o) {
+        this.guiTimer.deleteObserver(o); // нужно для перерисовки раз в 2 сек
+        this.wallet.deleteObserver(o);
+    }
+
     public void startApplication(String args[]){
         boolean cli = false;
 

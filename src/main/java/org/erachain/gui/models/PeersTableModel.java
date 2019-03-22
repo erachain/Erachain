@@ -32,7 +32,7 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
     public PeersTableModel() {
         super(new String[] { "IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago",
                 "Online Time", "Version" },
-                new Boolean[] { false, false, false, false, false, false, false, false });
+                new Boolean[] { false, false, false, false, false, false, false, false }, false);
 
         LOGGER = LoggerFactory.getLogger(PeersTableModel.class.getName());
 
@@ -123,7 +123,7 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
         }
 
         if (Controller.getInstance().isOnStopping()) {
-            this.removeObservers();
+            this.deleteObservers();
             return null;
         }
 
@@ -194,7 +194,7 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
         ObserverMessage message = (ObserverMessage) arg;
 
         if (Controller.getInstance().isOnStopping()) {
-            this.removeObservers();
+            this.deleteObservers();
             return;
         }
 
@@ -231,12 +231,14 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
         }
     }
 
-    protected void addObserversThis() {
+    public void addObservers() {
+        super.addObservers();
         Controller.getInstance().addActivePeersObserver(this);
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         Controller.getInstance().removeActivePeersObserver(this);
+        super.deleteObservers();
     }
 
 }

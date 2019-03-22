@@ -6,25 +6,17 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Split_Panel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.SetIntervalPanel;
-import org.erachain.gui.models.WalletItemAssetsTableModel;
 import org.erachain.gui.models.WalletOrdersTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
-
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 public class My_Order_Tab extends Split_Panel {
 
@@ -303,7 +295,7 @@ public class My_Order_Tab extends Split_Panel {
     
     @Override
     public void onClose() {
-        ordersModel.removeObservers();
+        ordersModel.deleteObservers();
         setIntervalPanel.removeObservers();
         
     }

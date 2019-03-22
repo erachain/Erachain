@@ -1,6 +1,5 @@
 package org.erachain.gui.items;
 
-import com.sun.xml.internal.bind.v2.util.CollisionCheckStack;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.SortableList;
@@ -11,7 +10,6 @@ import org.erachain.gui.models.TableModelCls;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 
-import javax.ws.rs.PathParam;
 import java.util.*;
 
 @SuppressWarnings("serial")
@@ -26,7 +24,7 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
 
     public FavoriteItemModelTable(DCMap map, FavoriteItemMap favoriteMap, String[] columnNames, Boolean[] columnAutoHeight,
                                   int resetObserver, int addObserver, int deleteObserver, int listObserver, int favorite) {
-        super(columnNames, columnAutoHeight);
+        super(columnNames, columnAutoHeight, false);
 
         // в головной гласс нельзя таблицу передавать - чтобы там лишний раз не запускалась иницализация наблюдения
         // оно еще ен готово так как таблица вторая не присвоена - ниже привяжемся к наблюдениям
@@ -45,7 +43,7 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
         needUpdate = false;
 
         // переиницализация после установуи таблиц
-        addObserversThis();
+        this.addObservers();
 
     }
 
@@ -103,13 +101,13 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
 
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         if (Controller.getInstance().doesWalletDatabaseExists()
             && favoriteMap != null)
             favoriteMap.addObserver(this);
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         if (Controller.getInstance().doesWalletDatabaseExists()
                 && favoriteMap != null)
             favoriteMap.deleteObserver(this);

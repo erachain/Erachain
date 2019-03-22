@@ -8,7 +8,6 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.util.Observable;
 import java.util.Observer;
@@ -23,7 +22,7 @@ public class WalletVotesTableModel extends TableModelCls<Tuple2<String, String>,
     private SortableList<Tuple2<String, String>, Poll> polls;
 
     public WalletVotesTableModel() {
-        super(new String[]{"Name", "Creator", "Total Votes", "Confirmed"});
+        super(new String[]{"Name", "Creator", "Total Votes", "Confirmed"}, true);
     }
 
     @Override
@@ -102,11 +101,11 @@ public class WalletVotesTableModel extends TableModelCls<Tuple2<String, String>,
     }
 
 
-    public void addObserversThis() {
+    public void addObservers() {
         Controller.getInstance().addWalletObserver(this);
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         Controller.getInstance().deleteObserver(this);
     }
 

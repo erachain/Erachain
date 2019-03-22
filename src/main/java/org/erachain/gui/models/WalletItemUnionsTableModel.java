@@ -8,7 +8,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -23,7 +22,8 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
     private SortableList<Tuple2<String, String>, UnionCls> unions;
 
     public WalletItemUnionsTableModel() {
-        super(new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"}, new Boolean[]{false, true, true, false, false});
+        super(new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"},
+                new Boolean[]{false, true, true, false, false}, true);
 
     }
 
@@ -106,11 +106,11 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         Controller.getInstance().addWalletObserver(this);
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         Controller.getInstance().deleteObserver(this);
     }
 

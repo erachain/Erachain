@@ -20,10 +20,11 @@ public class Assets_Favorite_SplitPanel extends Item_SplitPanel {
 
     public Assets_Favorite_SplitPanel() {
         super(new FavoriteAssetsTableModel(), "Assets_Favorite_SplitPanel");
-        this.setName(Lang.getInstance().translate("Favorite Persons"));
+        this.setName(Lang.getInstance().translate("Favorite Assets"));
 
         th = this;
         JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
+
         sell.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new ExchangeFrame((AssetCls) th.item_Menu, null, "To sell", "");
@@ -71,7 +72,7 @@ public class Assets_Favorite_SplitPanel extends Item_SplitPanel {
 
     @Override
     protected void splitClose() {
-        //table_Model.removeObservers();
+        table_Model.deleteObservers();
     }
 
 }

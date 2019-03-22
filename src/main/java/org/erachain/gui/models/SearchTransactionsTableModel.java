@@ -32,7 +32,7 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<byte[], Tra
     List<Transaction> transactions;
 
     public SearchTransactionsTableModel() {
-        super(new String[]{"Timestamp", "Block", "Seq_no", "Type", "Amount", AssetCls.FEE_NAME});
+        super(new String[]{"Timestamp", "Block", "Seq_no", "Type", "Amount", AssetCls.FEE_NAME}, false);
     }
 
     public void setBlockNumber(String string) {
@@ -149,10 +149,10 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<byte[], Tra
     public synchronized void syncUpdate(Observable o, Object arg) {
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
     }
 
     @Override

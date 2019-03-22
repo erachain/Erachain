@@ -9,10 +9,8 @@ import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.util.Observable;
 import java.util.Observer;
@@ -32,7 +30,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
         super(Controller.getInstance().wallet.database.getBlocksHeadMap(), "WalletBlocksTableModel", 1000,
                 new String[]{"Height", "Timestamp", "Generator",
                         "GB dtWV", //"Generating Balance",
-                        "Transactions", "Fee"}, new Boolean[]{false, true, true, false, true, false});
+                        "Transactions", "Fee"}, new Boolean[]{false, true, true, false, true, false}, true);
         if (!Controller.getInstance().doesWalletDatabaseExists()) {
             this.blocks = null;
         } else {
@@ -141,14 +139,14 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
         }
     }
 
-    protected void addObserversThis() {
+    public void addObservers() {
         Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this);
         this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
         Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.blocks);
         this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
     }
 
-    protected void removeObserversThis() {
+    public void deleteObservers() {
         Controller.getInstance().wallet.database.getBlocksHeadMap().deleteObserver(this);
         Controller.getInstance().wallet.database.getBlocksHeadMap().deleteObserver(this.blocks);
     }

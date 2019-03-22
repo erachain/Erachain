@@ -12,7 +12,6 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -36,7 +35,8 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
     List<Pair<Tuple2<String, Long>, Order>> pp = new ArrayList<Pair<Tuple2<String, Long>, Order>>();
 
     public WalletOrdersTableModel() {
-        super(new String[]{"Timestamp", "Block - transaction", "Amount", "Have", "Price", "Want", "Total", "Left", "Creator", "Status"});
+        super(new String[]{"Timestamp", "Block - transaction", "Amount", "Have", "Price",
+                "Want", "Total", "Left", "Creator", "Status"}, true);
     }
 
     @Override
@@ -174,7 +174,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
 
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         Controller.getInstance().addWalletObserver(this);
 
         if (Controller.getInstance().doesWalletDatabaseExists()) {
@@ -183,7 +183,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
         }
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         if (Controller.getInstance().doesWalletDatabaseExists()) {
             this.orders.removeObserver();
             Controller.getInstance().deleteWalletObserver(this);

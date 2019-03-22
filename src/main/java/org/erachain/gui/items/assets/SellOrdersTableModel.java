@@ -33,7 +33,7 @@ public class SellOrdersTableModel extends TableModelCls<Long, Order> implements 
     private long wantKey;
 
     public SellOrdersTableModel(AssetCls have, AssetCls want) {
-        super(new String[]{"Have", "Price", "Want"});
+        super(new String[]{"Have", "Price", "Want"}, true);
 
         this.have = have;
         this.want = want;
@@ -207,11 +207,11 @@ public class SellOrdersTableModel extends TableModelCls<Long, Order> implements 
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         Controller.getInstance().addObserver(this);
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         this.orders.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }

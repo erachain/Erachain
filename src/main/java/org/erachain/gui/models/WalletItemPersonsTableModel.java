@@ -9,7 +9,6 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.util.Collections;
 import java.util.Observable;
 import java.util.Observer;
@@ -27,7 +26,7 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
     public WalletItemPersonsTableModel() {
         super(Controller.getInstance().wallet.database.getPersonMap(), "WalletItemPersonsTableModel", 1000,
                 new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false});
+                new Boolean[]{false, true, true, false, false}, true);
     }
 
     @Override
@@ -112,14 +111,14 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         //Controller.getInstance().addWalletObserver(this);
         if (Controller.getInstance().doesWalletDatabaseExists())
             Controller.getInstance().wallet.database.getPersonMap().addObserver(this);
 
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         if (!Controller.getInstance().doesWalletDatabaseExists())
             return;
 

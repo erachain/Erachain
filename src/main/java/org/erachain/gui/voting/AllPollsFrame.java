@@ -7,7 +7,6 @@ import org.erachain.database.DBMap;
 import org.erachain.gui.CoreRowSorter;
 import org.erachain.gui.items.ComboBoxModelItemsAll;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.*;
 import org.erachain.gui.models.PollsTableModel;
 import org.erachain.lang.Lang;
 
@@ -184,7 +183,7 @@ public class AllPollsFrame extends JFrame {
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 //REMOVE OBSERVERS/HANLDERS
-                pollsTableModel.removeObservers();
+                pollsTableModel.deleteObservers();
 
                 //DISPOSE
                 setVisible(false);
