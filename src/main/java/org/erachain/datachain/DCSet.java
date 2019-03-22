@@ -42,7 +42,7 @@ public class DCSet implements Observer, IDB {
     private AddressForging addressForging;
     private CreditAddressesMap credit_AddressesMap;
     private ItemAssetBalanceMap assetBalanceMap;
-    private AddressStatement_Refs addressStatement_Refs;
+    private AddressStatementRefs addressStatement_Refs;
     private ItemAssetBalanceMap assetBalanceAccountingMap;
     private KKAssetStatusMap kKAssetStatusMap;
     private KKPersonStatusMap kKPersonStatusMap;
@@ -59,7 +59,7 @@ public class DCSet implements Observer, IDB {
     private HashesMap hashesMap;
     private HashesSignsMap hashesSignsMap;
 
-    private AddressTime_SignatureMap addressTime_SignatureMap;
+    private AddressTimeSignatureMap addressTime_SignatureMap;
     private BlockMap blockMap;
     //private BlockCreatorMap blockCreatorMap;
     private BlockSignsMap blockSignsMap;
@@ -132,7 +132,7 @@ public class DCSet implements Observer, IDB {
             this.addressForging = new AddressForging(this, database);
             this.credit_AddressesMap = new CreditAddressesMap(this, database);
             this.assetBalanceMap = new ItemAssetBalanceMap(this, database);
-            this.addressStatement_Refs = new AddressStatement_Refs(this, database);
+            this.addressStatement_Refs = new AddressStatementRefs(this, database);
             this.assetBalanceAccountingMap = new ItemAssetBalanceMap(this, database);
 
             this.kKAssetStatusMap = new KKAssetStatusMap(this, database);
@@ -154,7 +154,7 @@ public class DCSet implements Observer, IDB {
             this.vouchRecordMap = new VouchRecordMap(this, database);
             this.hashesMap = new HashesMap(this, database);
             this.hashesSignsMap = new HashesSignsMap(this, database);
-            this.addressTime_SignatureMap = new AddressTime_SignatureMap(this, database);
+            this.addressTime_SignatureMap = new AddressTimeSignatureMap(this, database);
             this.nameMap = new NameMap(this, database);
             this.nameStorageMap = new NameStorageMap(this, database);
             this.orphanNameStorageMap = new OrphanNameStorageMap(this, database);
@@ -244,7 +244,7 @@ public class DCSet implements Observer, IDB {
         this.addressForging = new AddressForging(parent.addressForging);
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap);
         this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap);
-        this.addressStatement_Refs = new AddressStatement_Refs(parent.addressStatement_Refs);
+        this.addressStatement_Refs = new AddressStatementRefs(parent.addressStatement_Refs);
         this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap);
         this.kKAssetStatusMap = new KKAssetStatusMap(parent.kKAssetStatusMap);
         this.kKPersonStatusMap = new KKPersonStatusMap(parent.kKPersonStatusMap);
@@ -266,7 +266,7 @@ public class DCSet implements Observer, IDB {
         this.hashesMap = new HashesMap(parent.hashesMap);
         this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap);
 
-        this.addressTime_SignatureMap = new AddressTime_SignatureMap(parent.addressTime_SignatureMap);
+        this.addressTime_SignatureMap = new AddressTimeSignatureMap(parent.addressTime_SignatureMap);
         this.blockMap = new BlockMap(parent.blockMap, this);
         //this.blockCreatorMap = new BlockCreatorMap(parent.blockCreatorMap);
         this.blockSignsMap = new BlockSignsMap(parent.blockSignsMap, this);
@@ -663,7 +663,7 @@ public class DCSet implements Observer, IDB {
      * Хранит для этого адреса и времени создания ссылки на транзакции типа Statement, см. супер класс
      * @return
      */
-    public AddressStatement_Refs getAddressStatement_Refs() {
+    public AddressStatementRefs getAddressStatement_Refs() {
         return this.addressStatement_Refs;
     }
 
@@ -923,7 +923,7 @@ public class DCSet implements Observer, IDB {
      *
      * @return
      */
-    public AddressTime_SignatureMap getAddressTime_SignatureMap() {
+    public AddressTimeSignatureMap getAddressTime_SignatureMap() {
         return this.addressTime_SignatureMap;
     }
 

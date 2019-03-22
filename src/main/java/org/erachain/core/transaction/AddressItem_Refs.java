@@ -24,7 +24,7 @@ public abstract class AddressItem_Refs extends Transaction {
     }
 
     /*
-    public AddressItem_Refs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature)
+    public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature)
     {
         this(typeBytes, NAME_ID, creator, item, feePow, timestamp, reference);
         this.signature = signature;

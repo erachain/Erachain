@@ -15,7 +15,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.datachain.AddressTime_SignatureMap;
+import org.erachain.datachain.AddressTimeSignatureMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
@@ -1360,7 +1360,7 @@ public abstract class Transaction {
                                 block.txCalculated : null, "@" + this.viewHeightSeq() + " referal");
 
             String creatorAddress = this.creator.getAddress();
-            AddressTime_SignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();
+            AddressTimeSignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();
             if (!dbASmap.contains(creatorAddress)) {
                 // for quick search public keys by address - use PUB_KEY from Person DATA owner
                 // used in - controller.Controller.getPublicKeyByAddress

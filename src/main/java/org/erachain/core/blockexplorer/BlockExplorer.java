@@ -1399,147 +1399,6 @@ public class BlockExplorer {
         return transactionsJSON(account, transactions, 0, 0);
     }
 
-    public LinkedHashMap transactionsJSON(Account account, List<Transaction> transactions, int fromIndex, int toIndex) {
-        LinkedHashMap output = new LinkedHashMap();
-        // Creator or Recipient if ACCOUNT is SET
-        int i = 0;
-        // use negate for amount
-        boolean outcome;
-        int type;
-        int height = Controller.getInstance().getMyHeight();
-
-        LinkedHashMap transactionsJSON = new LinkedHashMap();
-        List<Transaction> transactionList = (toIndex == 0) ? transactions
-                : transactions.subList(fromIndex, Math.min(toIndex, transactions.size()));
-        for (Transaction transaction : transactionList) {
-
-            transaction.setDC(dcSet);
-
-            outcome = true;
-
-            LinkedHashMap out = new LinkedHashMap();
-
-            out.put("block", transaction.getBlockHeight());// .getSeqNo(dcSet));
-
-            out.put("seqNo", transaction.getSeqNo());
-
-            if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
-                R_Calculated txCalculated = (R_Calculated) transaction;
-                outcome = txCalculated.getAmount().signum() < 0;
-
-                out.put("reference", "--");
-                out.put("signature", transaction.getBlockHeight() + "-" + transaction.getSeqNo());
-
-
-                String message = txCalculated.getMessage();
-                if (message.equals("forging")) {
-                    out.put("date", DateTimeFormat.timestamptoString(dcSet.getBlockMap().get(transaction.getBlockHeight()).getTimestamp()));
-                } else {
-                    out.put("date", message);
-                }
-
-                String typeName = transaction.viewFullTypeName();
-                if (typeName.equals("_protocol_")) {
-                    out.put("type", message);
-                } else {
-                    out.put("type", typeName);
-                }
-                
-                out.put("confirmations", transaction.getConfirmations(height));
-
-                out.put("creator", txCalculated.getRecipient().getPersonAsString());
-                out.put("creator_addr", txCalculated.getRecipient().getAddress());
-
-                out.put("size", "--");
-                out.put("fee", "--");
-
-            } else {
-                out.put("signature", Base58.encode(transaction.getSignature()));
-                out.put("date", DateTimeFormat.timestamptoString(transaction.getTimestamp()));
-
-                if (transaction.getCreator() == null) {
-                    out.put("creator", GenesisBlock.CREATOR.getAddress());
-                    out.put("creator_addr", "GENESIS");
-                    if (transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
-                        outcome = false;
-                    }
-
-                } else {
-
-                    out.put("publickey", Base58.encode(transaction.getCreator().getPublicKey()));
-
-                    Account atSideAccount;
-                    atSideAccount = transaction.getCreator();
-                    if (account != null) {
-                        atSideAccount = transaction.getCreator();
-                        type = transaction.getType();
-                        if (type == Transaction.SEND_ASSET_TRANSACTION) {
-                            R_Send rSend = (R_Send) transaction;
-                            if (rSend.getCreator().equals(account)) {
-                                outcome = false;
-                                atSideAccount = rSend.getRecipient();
-                            }
-                            // возврат и взять на харенение обратный
-                            outcome = outcome ^ !rSend.isBackward() ^ (rSend.getActionType() == TransactionAmount.ACTION_HOLD);
-                        }
-                    }
-
-                    out.put("creator", atSideAccount.getPersonAsString());
-                    out.put("creator_addr", atSideAccount.getAddress());
-
-                }
-
-                out.put("size", transaction.viewSize(Transaction.FOR_NETWORK));
-                out.put("fee", transaction.getFee());
-                out.put("confirmations", transaction.getConfirmations(height));
-
-            }
-
-
-
-            long absKey = transaction.getAbsKey();
-            String amount = transaction.viewAmount();
-            if (absKey > 0) {
-                if (amount.length() > 0) {
-                    out.put("amount_key",
-                            (outcome ? "-" : "+") + transaction.viewAmount() + ":" + absKey);
-                } else {
-                    out.put("amount_key", "" + absKey);
-                }
-            } else {
-                out.put("amount_key", "");
-            }
-
-            if (transaction.viewRecipient() == null) {
-                out.put("recipient", "-");
-            } else {
-                out.put("recipient", transaction.viewRecipient());
-            }
-
-            transactionsJSON.put(i, out);
-            i++;
-        }
-
-        output.put("transactions", transactionsJSON);
-        output.put("label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
-        output.put("label_date", Lang.getInstance().translateFromLangObj("Date", langObj));
-        output.put("label_type_transaction", Lang.getInstance().translateFromLangObj("Type", langObj));
-        output.put("label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_atside", Lang.getInstance().translateFromLangObj("Side", langObj));
-        output.put("label_asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
-        output.put("label_amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
-        output.put("label_confirmations", Lang.getInstance().translateFromLangObj("Confirmations", langObj));
-        output.put("label_recipient", Lang.getInstance().translateFromLangObj("Recipient", langObj));
-        output.put("label_size", Lang.getInstance().translateFromLangObj("Size", langObj));
-        output.put("label_seqNo", Lang.getInstance().translateFromLangObj("SeqNo", langObj));
-        output.put("label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
-        output.put("label_amount_key", Lang.getInstance().translateFromLangObj("Amount:Key", langObj));
-        output.put("label_fee", Lang.getInstance().translateFromLangObj("Fee", langObj));
-        output.put("label_transactions_table", Lang.getInstance().translateFromLangObj("Transactions", langObj));
-
-        return output;
-
-    }
 
     @SuppressWarnings("static-access")
     private LinkedHashMap balanceJSON(Account account) {
@@ -3222,5 +3081,151 @@ public class BlockExplorer {
 
 
 //  todo Gleb -----------------------------------------------------------------------------------------------------------
+
+    private LinkedHashMap transactionsJSON(Account account, List<Transaction> transactions, int fromIndex, int toIndex) {
+        LinkedHashMap output = new LinkedHashMap();
+        int i = 0;
+        boolean outcome;
+        int type;
+        int height = Controller.getInstance().getMyHeight();
+
+        LinkedHashMap transactionsJSON = new LinkedHashMap();
+        List<Transaction> transactionList = (toIndex == 0) ? transactions
+                : transactions.subList(fromIndex, Math.min(toIndex, transactions.size()));
+        for (Transaction transaction : transactionList) {
+
+            transaction.setDC(dcSet);
+
+            outcome = true;
+
+            LinkedHashMap out = new LinkedHashMap();
+
+            out.put("block", transaction.getBlockHeight());// .getSeqNo(dcSet));
+
+            out.put("seqNo", transaction.getSeqNo());
+
+            if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
+                R_Calculated txCalculated = (R_Calculated) transaction;
+                outcome = txCalculated.getAmount().signum() < 0;
+
+                out.put("reference", "--");
+                out.put("signature", transaction.getBlockHeight() + "-" + transaction.getSeqNo());
+
+
+                String message = txCalculated.getMessage();
+                if (message.equals("forging")) {
+                    out.put("date", DateTimeFormat.timestamptoString(dcSet.getBlockMap().get(transaction.getBlockHeight()).getTimestamp()));
+                } else {
+                    out.put("date", message);
+                }
+
+                String typeName = transaction.viewFullTypeName();
+                if (typeName.equals("_protocol_")) {
+                    out.put("type", message);
+                } else {
+                    out.put("type", typeName);
+                }
+
+                out.put("confirmations", transaction.getConfirmations(height));
+
+                out.put("creator", txCalculated.getRecipient().getPersonAsString());
+                out.put("creator_addr", txCalculated.getRecipient().getAddress());
+
+                out.put("size", "--");
+                out.put("fee", "--");
+
+            } else {
+                out.put("signature", Base58.encode(transaction.getSignature()));
+                out.put("date", DateTimeFormat.timestamptoString(transaction.getTimestamp()));
+
+                if (transaction.getCreator() == null) {
+                    out.put("creator", GenesisBlock.CREATOR.getAddress());
+                    out.put("creator_addr", "GENESIS");
+                    if (transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
+                        outcome = false;
+                    }
+
+                } else {
+
+                    out.put("publickey", Base58.encode(transaction.getCreator().getPublicKey()));
+
+                    Account atSideAccount;
+                    atSideAccount = transaction.getCreator();
+                    if (account != null) {
+                        atSideAccount = transaction.getCreator();
+                        type = transaction.getType();
+                        if (type == Transaction.SEND_ASSET_TRANSACTION) {
+                            R_Send rSend = (R_Send) transaction;
+                            if (rSend.getCreator().equals(account)) {
+                                outcome = false;
+                                atSideAccount = rSend.getRecipient();
+                            }
+                            // возврат и взять на харенение обратный
+                            outcome = outcome ^ !rSend.isBackward() ^ (rSend.getActionType() == TransactionAmount.ACTION_HOLD);
+                        }
+                    }
+
+                    out.put("creator", atSideAccount.getPersonAsString());
+                    out.put("creator_addr", atSideAccount.getAddress());
+
+                }
+
+                out.put("size", transaction.viewSize(Transaction.FOR_NETWORK));
+                out.put("fee", transaction.getFee());
+                out.put("confirmations", transaction.getConfirmations(height));
+
+            }
+
+
+
+            long absKey = transaction.getAbsKey();
+            String amount = transaction.viewAmount();
+            if (absKey > 0) {
+                if (amount.length() > 0) {
+                    out.put("amount_key",
+                            (outcome ? "-" : "+") + transaction.viewAmount() + ":" + absKey);
+                } else {
+                    out.put("amount_key", "" + absKey);
+                }
+            } else {
+                out.put("amount_key", "");
+            }
+
+            if (transaction.viewRecipient() == null) {
+                out.put("recipient", "-");
+            } else {
+                out.put("recipient", transaction.viewRecipient());
+            }
+
+            transactionsJSON.put(i, out);
+            i++;
+        }
+
+        output.put("transactions", transactionsJSON);
+        output.put("label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
+        output.put("label_date", Lang.getInstance().translateFromLangObj("Date", langObj));
+        output.put("label_type_transaction", Lang.getInstance().translateFromLangObj("Type", langObj));
+        output.put("label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        output.put("label_atside", Lang.getInstance().translateFromLangObj("Side", langObj));
+        output.put("label_asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
+        output.put("label_amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
+        output.put("label_confirmations", Lang.getInstance().translateFromLangObj("Confirmations", langObj));
+        output.put("label_recipient", Lang.getInstance().translateFromLangObj("Recipient", langObj));
+        output.put("label_size", Lang.getInstance().translateFromLangObj("Size", langObj));
+        output.put("label_seqNo", Lang.getInstance().translateFromLangObj("SeqNo", langObj));
+        output.put("label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
+        output.put("label_amount_key", Lang.getInstance().translateFromLangObj("Amount:Key", langObj));
+        output.put("label_fee", Lang.getInstance().translateFromLangObj("Fee", langObj));
+        output.put("label_transactions_table", Lang.getInstance().translateFromLangObj("Transactions", langObj));
+
+        return output;
+
+    }
+
+
+
+
+
+
 
 }

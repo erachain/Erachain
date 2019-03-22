@@ -9,10 +9,10 @@ import org.erachain.utils.ObserverMessage;
  * @return
  */
 
-public class AddressStatement_Refs extends AddressItem_Refs {
+public class AddressStatementRefs extends AddressItemRefs {
     static final String NAME = "statement";
 
-    public AddressStatement_Refs(DCSet databaseSet, DB database) {
+    public AddressStatementRefs(DCSet databaseSet, DB database) {
         super(databaseSet, database,
                 NAME,
                 ObserverMessage.RESET_STATEMENT_TYPE,
@@ -22,7 +22,7 @@ public class AddressStatement_Refs extends AddressItem_Refs {
         );
     }
 
-    public AddressStatement_Refs(AddressStatement_Refs parent) {
+    public AddressStatementRefs(AddressStatementRefs parent) {
         super(parent);
     }
 
