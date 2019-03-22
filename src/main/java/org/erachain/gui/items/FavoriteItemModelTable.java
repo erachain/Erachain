@@ -1,6 +1,5 @@
 package org.erachain.gui.items;
 
-import com.sun.xml.internal.bind.v2.util.CollisionCheckStack;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.SortableList;
