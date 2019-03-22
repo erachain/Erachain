@@ -12,6 +12,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+/**
+ * TODO тут нужно применить SortableList для сортировки по полям?
+ * Или тут более изящно сортировка сделана?
+ */
 @SuppressWarnings("serial")
 public class PeersTableModel extends TimerTableModelCls<Peer> implements Observer {
 
@@ -24,6 +28,9 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
     private static final int COLUMN_ONLINE_TIME = 6;
     private static final int COLUMN_VERSION = 7;
 
+    /**
+     * для сортировки по полям в особом виде
+     */
     List<Peer> peersView = new ArrayList<Peer>();
     int view = 1;
 
@@ -200,17 +207,19 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                 n++;
             }
             setView(view);
-            needUpdate = true;
             this.fireTableRowsUpdated(n, n);
 
         } else if (message.getType() == ObserverMessage.ADD_PEER_TYPE) {
             setView(view);
             needUpdate = true;
-            this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.REMOVE_PEER_TYPE) {
             setView(view);
             needUpdate = true;
+
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT
+                && needUpdate) {
+            needUpdate = false;
             this.fireTableDataChanged();
         }
     }
