@@ -27,8 +27,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tra
     private Order order;
 
     public OrderTradesTableModel(Order order) {
-        super("OrderTradesTableModel", 1000,
-                new String[]{"Timestamp", "Type", "Amount", "Price", "Total"});
+        super(new String[]{"Timestamp", "Type", "Amount", "Price", "Total"});
 
         this.order = order;
         this.trades = DCSet.getInstance().getTradeMap().getTrades(order.getId());
@@ -134,7 +133,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tra
     }
 
     @Override
-    public Object getItem(int k) {
+    public Trade getItem(int k) {
         // TODO Auto-generated method stub
         return this.trades.get(k).getB();
     }

@@ -15,12 +15,13 @@ import java.awt.event.ActionListener;
 
 public class Assets_Favorite_SplitPanel extends Item_SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private static TableModelItemAssetsFavorute table_Model = new TableModelItemAssetsFavorute();
+    //private static FavoriteAssetsTableModel table_Model = ;
     private Assets_Favorite_SplitPanel th;
 
     public Assets_Favorite_SplitPanel() {
-        super(table_Model, "Assets_Favorite_SplitPanel");
+        super(new FavoriteAssetsTableModel(), "Assets_Favorite_SplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Persons"));
+
         th = this;
         JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
         sell.addActionListener(new ActionListener() {
@@ -70,8 +71,7 @@ public class Assets_Favorite_SplitPanel extends Item_SplitPanel {
 
     @Override
     protected void splitClose() {
-        table_Model.removeObservers();
-
+        //table_Model.removeObservers();
     }
 
 }

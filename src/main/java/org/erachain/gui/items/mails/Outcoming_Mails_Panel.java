@@ -80,7 +80,7 @@ public class Outcoming_Mails_Panel extends JPanel // implements ItemListener
         // renderer
         // table.setDefaultRenderer(String.class, new
         // Renderer_Left(table.getFontMetrics(table.getFont()),
-        // tableModel.get_Column_AutoHeight())); // set renderer
+        // tableModel.getColumnAutoHeight())); // set renderer
 
         /*
          *

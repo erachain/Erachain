@@ -1,29 +1,19 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.*;
 import org.erachain.database.SortableList;
-import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.library.library;
 import org.erachain.lang.Lang;
-import org.erachain.ntp.NTP;
-import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
-import org.erachain.utils.PlaySound;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.Null;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -41,20 +31,17 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     public static final int COLUMN_SIZE = 8;
 
     private SortableList<Tuple2<String, String>, Transaction> transactions;
-    private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
-
-    //private List<Pair<Tuple2<String, String>, Transaction>> pairTransactions;
 
     /**
-     * В динамическом режиме перерисовывается автоматически по таймеру встроенному от TimerTableModelCls
-     * - перерисовка стрницы целой, поэтому не так тормозит основные процессы.<br>
+     * В динамическом режиме перерисовывается автоматически по событию GUI_REPAINT
+     * - перерисовка страницы целой, поэтому не так тормозит основные процессы.<br>
      * Без динамического режима перерисовывается только принудительно - по нажатию кнопки тут
-     * gui.items.assets.My_Order_Tab
+     * org.erachain.gui.items.records.MyTransactionsSplitPanel#setIntervalPanel
      */
     public WalletTransactionsTableModel() {
-        super("WalletTransactionsTableModel", 999000,
-                new String[]{
-                        "Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
+        super(Controller.getInstance().getWallet().database.getTransactionMap(),
+                new String[]{"Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"},
+                new Boolean[]{true, true, true, true, true, true, true, false, false});
 
         LOGGER = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
 
@@ -65,19 +52,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         return this.transactions;
     }
 
-    public Object getItem(int row) {
+    public Transaction getItem(int row) {
         return getTransaction(row);
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
     }
 
     public Transaction getTransaction(int row) {
@@ -245,6 +221,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
         } else if (message.getType() == ObserverMessage.WALLET_RESET_TRANSACTION_TYPE) {
 
+            needUpdate = false;
             getInterval();
             this.fireTableDataChanged();
 
@@ -308,7 +285,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
     }
 
-
     public void removeObserversThis() {
 
         Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
@@ -324,12 +300,12 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     }
 
     @Override
-    public int getMapSize() {
+    public long getMapSize() {
         return Controller.getInstance().getWallet().database.getTransactionMap().size();
     }
 
     @Override
-    public void getIntervalThis(int startBack, int endBack) {
+    public void getIntervalThis(long startBack, long endBack) {
         transactions = new SortableList<Tuple2<String, String>, Transaction>(
                 Controller.getInstance().getWallet().database.getTransactionMap(),
                 Controller.getInstance().getWallet().database.getTransactionMap().getFromToKeys(startBack, endBack));

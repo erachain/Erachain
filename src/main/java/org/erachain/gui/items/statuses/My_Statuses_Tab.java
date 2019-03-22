@@ -27,7 +27,7 @@ public class My_Statuses_Tab extends Split_Panel {
     private MTable table;
     private TableColumn favoriteColumn;
     private My_Statuses_Tab tSP;
-    //	private  TableModelItemStatuses tableModelItemStatuses;
+    //	private  StatusesItemsTableModel tableModelItemStatuses;
     private Status_Info info1;
     // My statuses
     public My_Statuses_Tab() {

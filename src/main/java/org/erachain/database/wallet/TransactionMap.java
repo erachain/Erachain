@@ -25,15 +25,20 @@ import java.util.concurrent.ConcurrentNavigableMap;
 
 public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
 
+    BTreeMap AUTOKEY_INDEX;
+    private Atomic.Long atomicKey;
+
     static final int KEY_LENGHT = 12;
     public static final int TIMESTAMP_INDEX = 1;
     public static final int ADDRESS_INDEX = 2;
     public static final int AMOUNT_INDEX = 3;
-    BTreeMap AUTOKEY_INDEX;
+
     static Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class.getName());
 
     public TransactionMap(DWSet dWSet, DB database) {
         super(dWSet, database);
+
+        this.atomicKey = database.getAtomicLong("TransactionMap_atomicKey");
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_TRANSACTION_TYPE);
@@ -105,15 +110,15 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
                 .counterEnable()
                 .makeOrGet();
 
-        this.AUTOKEY_INDEX = database.createTreeMap("AUTOKEY_INDEX")
+        this.AUTOKEY_INDEX = database.createTreeMap("dw_transactions_AUTOKEY_INDEX")
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
         //BIND
-        Bind.secondaryKey(map, this.AUTOKEY_INDEX, new Fun.Function2<Integer, Tuple2<String, String>, Transaction>() {
+        Bind.secondaryKey(map, this.AUTOKEY_INDEX, new Fun.Function2<Long, Tuple2<String, String>, Transaction>() {
             @Override
-            public Integer run(Tuple2<String, String> key, Transaction value) {
-                return -map.size();
+            public Long run(Tuple2<String, String> key, Transaction value) {
+                return -atomicKey.get();
             }
         });
 
@@ -183,8 +188,15 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<Tuple2<String, String>> getFromToKeys(Integer fromKey, Integer toKey) {
+    public Collection<Tuple2<String, String>> getFromToKeys(long fromKey, long toKey) {
         return AUTOKEY_INDEX.subMap(fromKey, toKey).values();
+    }
+
+    public Transaction delete(Tuple2<String, String> key) {
+        if (this.atomicKey != null) {
+            this.atomicKey.decrementAndGet();
+        }
+        return super.delete(key);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -208,6 +220,13 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
         for (Account account : accounts) {
             this.delete(account);
         }
+    }
+
+    public boolean set(Tuple2<String, String> key, Transaction transaction) {
+        if (this.atomicKey != null) {
+            this.atomicKey.incrementAndGet();
+        }
+        return super.set(key, transaction);
     }
 
     public boolean add(Account account, Transaction transaction) {
