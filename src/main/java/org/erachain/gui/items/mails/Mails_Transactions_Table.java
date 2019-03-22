@@ -274,7 +274,7 @@ public class Mails_Transactions_Table extends JTable implements Observer {
             }
         });
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         Controller.getInstance().addObserver(this);
     }
 
@@ -789,7 +789,7 @@ public class Mails_Transactions_Table extends JTable implements Observer {
                 amountStr = /*"<font" + fontSize + ">" +send_type + " "
 						//+ Lang.getInstance().translate("Amount") + ": "
 						+  */ NumberAsString.formatAsString(this.amount) /*+ "</font>"
-						+ "\n " + Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort(DBSet.getInstance())*/;
+						+ "\n " + Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort(DLSet.getInstance())*/;
             }
 
             if (!incoming) {
@@ -813,7 +813,7 @@ public class Mails_Transactions_Table extends JTable implements Observer {
                         + "<td bgcolor='" + colorHeader + "' width='" + (width / 2 - 1) + "'><font color=black>" + DateTimeFormat.timestamptoString(this.timestamp)
                         + "<td bgcolor='" + colorHeader + "' width='" + (width / 2 - 1) + "'><font color=black>" + Lang.getInstance().translate("Sent")
                         //			+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=red><b> " + amountStr
-                        //			+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).viewName()//.getShort(DBSet.getInstance())
+                        //			+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).viewName()//.getShort(DLSet.getInstance())
                         //			+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  +   this.recipient.asPerson()
                         + "<td bgcolor='" + colorHeader + "' width='" + (width / 2 - 1) + "'><font color=black>" + Lang.getInstance().translate("Sender") + ": " + this.sender.getPersonAsString()
                         + "<td bgcolor='" + colorHeader + "' width='" + (width / 2 - 1) + "'><font color=black>" + Lang.getInstance().translate("Recipient") + ": " + this.recipient.getPersonAsString()

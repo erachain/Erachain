@@ -414,10 +414,22 @@ public abstract class Transaction {
         return Byte.toUnsignedInt(typeBytes[1]);
     }
 
+
     public static Transaction findByHeightSeqNo(DCSet db, int height, int seq) {
         return db.getTransactionFinalMap().get(height, seq);
     }
 
+    @Override
+    public int hashCode() {
+        return Ints.fromByteArray(signature);
+    }
+
+    @Override
+    public boolean equals(Object transaction) {
+        if (transaction instanceof Transaction)
+            return Arrays.equals(this.signature, ((Transaction) transaction).signature);
+        return false;
+    }
 
     // reference in Map - or as signatire or as BlockHeight + seqNo
     public static Transaction findByDBRef(DCSet db, byte[] dbRef) {
@@ -1334,7 +1346,7 @@ public abstract class Transaction {
 
     // REST
 
-    // public abstract void process(DBSet db);
+    // public abstract void process(DLSet db);
     public void process(Block block, int asDeal) {
 
         if (this.signature != null && Base58.encode(this.signature)
@@ -1424,23 +1436,12 @@ public abstract class Transaction {
 
     /*
      * public boolean isConfirmed() { return
-     * this.isConfirmed(DBSet.getInstance()); }
+     * this.isConfirmed(DLSet.getInstance()); }
      */
 
     public abstract HashSet<Account> getRecipientAccounts();
 
     public abstract boolean isInvolved(Account account);
-
-    @Override
-    public boolean equals(Object object) {
-        if (object instanceof Transaction) {
-            Transaction transaction = (Transaction) object;
-
-            return Arrays.equals(this.getSignature(), transaction.getSignature());
-        }
-
-        return false;
-    }
 
     public boolean isConfirmed(DCSet db) {
         if (this.getType() == Transaction.CALCULATED_TRANSACTION) {

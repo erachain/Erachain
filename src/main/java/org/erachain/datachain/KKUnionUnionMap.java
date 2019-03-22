@@ -9,7 +9,7 @@ import org.erachain.utils.ObserverMessage;
  * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
  *
  // Union parent has unions
- // TODO - insert in DBSet
+ // TODO - insert in DLSet
  * @return dcMap
  */
 public class KKUnionUnionMap extends KKMap {

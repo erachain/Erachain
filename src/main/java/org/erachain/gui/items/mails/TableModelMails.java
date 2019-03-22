@@ -92,7 +92,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
             //	case COLUMN_CONFIRM:
 
-            //		return tran.isConfirmed(DBSet.getInstance());
+            //		return tran.isConfirmed(DLSet.getInstance());
 
             case COLUMN_SENDER:
 

@@ -56,12 +56,7 @@ public class AddressTimeSignatureMap extends DCMap<Tuple2<String, Long>, byte[]>
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
-    public byte[] get(Account account, Long timestamp) {
+      public byte[] get(Account account, Long timestamp) {
         return this.get(account.getAddress(), timestamp);
     }
 

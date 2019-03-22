@@ -28,11 +28,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-// in list of org.erachain.records in wallet
 public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer {
-
-    private boolean needUpdate = false;
-    private long timeUpdate = 0;
 
     public static final int COLUMN_CONFIRMATIONS = 0;
     public static final int COLUMN_TIMESTAMP = 1;
@@ -43,20 +39,24 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     public static final int COLUMN_RECIPIENT = 6;
     public static final int COLUMN_FEE = 7;
     public static final int COLUMN_SIZE = 8;
-    static Logger LOGGER = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
-    //ItemAssetMap dbItemAssetMap;
+
     private SortableList<Tuple2<String, String>, Transaction> transactions;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{
-            "Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
-    private int start =0;
-    private int step =100;
-    private List<Pair<Tuple2<String, String>, Transaction>> pairTransactions;
 
+    //private List<Pair<Tuple2<String, String>, Transaction>> pairTransactions;
+
+    /**
+     * В динамическом режиме перерисовывается автоматически по таймеру встроенному от TimerTableModelCls
+     * - перерисовка стрницы целой, поэтому не так тормозит основные процессы.<br>
+     * Без динамического режима перерисовывается только принудительно - по нажатию кнопки тут
+     * gui.items.assets.My_Order_Tab
+     */
     public WalletTransactionsTableModel() {
-        addObservers();
+        super("WalletTransactionsTableModel", 999000,
+                new String[]{
+                        "Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
 
-        //dbItemAssetMap = DBSet.getInstance().getItemAssetMap();
+        LOGGER = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
 
     }
 
@@ -65,19 +65,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         return this.transactions;
     }
 
-    public void setAsset(AssetCls asset) {
-
-
-    }
-
-
     public Object getItem(int row) {
-        return this.transactions.get(row).getB();
-    }
-
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
+        return getTransaction(row);
     }
 
     // читаем колонки которые изменяем высоту
@@ -100,33 +89,22 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     }
 
     @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return columnNames[index];
-    }
-
-    @Override
     public int getRowCount() {
-        if (this.pairTransactions == null) {
+        if (this.transactions == null) {
             return 0;
         }
 
-        return this.pairTransactions.size();
+        return this.transactions.size();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-        //try
-        //{
-        if (this.pairTransactions == null || this.pairTransactions.size() - 1 < row) {
+
+        if (this.transactions == null || this.transactions.size() - 1 < row) {
             return null;
         }
 
-        Pair<Tuple2<String, String>, Transaction> data = this.pairTransactions.get(row);
+        Pair<Tuple2<String, String>, Transaction> data = this.transactions.get(row);
 
         if (data == null || data.getB() == null) {
             return null;
@@ -249,23 +227,9 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
         return null;
 
-        //} catch (Exception e) {
-        //GUI ERROR
-        //	LOGGER.error(e.getMessage(),e);
-        //	return null;
-        //}
-
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-            String mess = e.getMessage();
-        }
-    }
+    private int count;
 
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
@@ -276,145 +240,56 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-            if (this.transactions == null) {
-                this.transactions = (SortableList<Tuple2<String, String>, Transaction>)message.getValue();
-                this.transactions.registerObserver();
-                this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
-            }
 
+            needUpdate = true;
+
+        } else if (message.getType() == ObserverMessage.WALLET_RESET_TRANSACTION_TYPE) {
+
+            getInterval();
             this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
                     || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
+
             // если прилетел блок или откатился и нужно обновить - то обновляем
-            if (!needUpdate)
-                return;
-
-            long period = NTP.getTime() - this.timeUpdate;
-            if (period < 2000) //Gui.PERIOD_UPDATE)
-                return;
-
-            this.timeUpdate = NTP.getTime();
-            needUpdate = false;
-            this.fireTableDataChanged();
+            needUpdate = true;
 
         } else if (message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
                             || message.getType() == ObserverMessage.WALLET_SYNC_STATUS) {
-            if (!needUpdate)
-                return;
 
-            this.timeUpdate = NTP.getTime();
-            needUpdate = false;
-            this.fireTableDataChanged();
+            needUpdate = true;
 
         } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
             // INCOME
 
-            Transaction record = (Transaction) message.getValue();
+            needUpdate = true;
 
-            Account creator = record.getCreator();
+            Transaction transaction = (Transaction) message.getValue();
+            library.notifySysTrayRecord(transaction);
 
-            Pair<Tuple2<String, String>, Transaction> pair = new Pair<Tuple2<String, String>, Transaction>(
-                    new Tuple2<String, String>(creator == null? "GENESIS" : creator.getAddress(),
-                            new String(record.getSignature())), record);
-            boolean found = this.transactions.contains(pair);
+        } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE
+                //|| message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE
+                ) {
 
-            if (found) {
+            needUpdate = true;
+
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT
+                && Controller.getInstance().isDynamicGUI()
+                && needUpdate) {
+
+            if (count++ < 4)
                 return;
-            }
 
-            /*
-            Ошибка - это статичный массив - в него нельзя не добавлять ни удалять
-            if (this.transactions.size()> 1000)
-                this.transactions.remove(this.transactions.size() - 1);
-
-            this.transactions.add(0, pair);
-            */
-
-            if (DCSet.getInstance().getTransactionMap().contains(record.getSignature())) {
-                if (record.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                    library.notifySysTrayRecord(record);
-                } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-                    PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
-                }
-            }
-
-        } else if (message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
-            // INCOME
-
-            long period = NTP.getTime() - this.timeUpdate;
-            if (period < 2000) //Gui.PERIOD_UPDATE)
-                return;
-            this.timeUpdate = NTP.getTime();
+            count = 0;
             needUpdate = false;
 
-            this.fireTableDataChanged();
-            if (true)
-                return;
+            getInterval();
+            fireTableDataChanged();
 
-            Pair<byte[], Transaction> pair = (Pair<byte[], Transaction>) message.getValue();
-            Transaction record = pair.getB();
-
-            if (!Controller.getInstance().wallet.accountExists(record.getCreator().getAddress())) {
-                return;
-            }
-
-            Pair<Tuple2<String, String>, Transaction> pairRecord = new Pair<Tuple2<String, String>, Transaction>(
-                    new Tuple2<String, String>(record.getCreator().getAddress(),
-                            new String(record.getSignature())), record);
-            boolean found = this.transactions.contains(pairRecord);
-
-            if (found) {
-                return;
-            }
-
-            /*
-            Ошибка - это статичный массив - в него нельзя не добавлять ни удалять
-            if (this.transactions.size()> 1000)
-                this.transactions.remove(this.transactions.size() - 1);
-
-            this.transactions.add(0, pairRecord);
-            */
-
-            if (DCSet.getInstance().getTransactionMap().contains(record.getSignature())) {
-                if (record.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                    library.notifySysTrayRecord(record);
-                } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-                    PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
-                }
-            }
-
-            this.fireTableRowsInserted(0,0);
-
-            if (!needUpdate) {
-                needUpdate = true;
-            }
-            return;
-
-        } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-
-            Transaction record = (Transaction) message.getValue();
-            byte[] signKey = record.getSignature();
-            for (int i = 0; i < this.transactions.size() - 1; i++) {
-                Transaction item = this.transactions.get(i).getB();
-                if (item == null)
-                    return;
-                if (Arrays.equals(signKey, item.getSignature())) {
-                    this.fireTableRowsDeleted(i, i);
-                    return;
-                }
-            }
-
-            if (needUpdate) {
-                return;
-            } else {
-                needUpdate = true;
-                return;
-            }
         }
     }
 
-    public void addObservers() {
+    public void addObserversThis() {
 
         if (!Controller.getInstance().doesWalletDatabaseExists())
             return;
@@ -426,29 +301,47 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         // for ??
         ///Controller.getInstance().wallet.database.getPersonMap().addObserver(transactions);
 
+        Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
+
+        getInterval();
+        fireTableDataChanged();
+
     }
 
 
-    public void removeObservers() {
+    public void removeObserversThis() {
+
+        Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
+
+        //dbItemAssetMap = DLSet.getInstance().getItemAssetMap();
 
         if (Controller.getInstance().doesWalletDatabaseExists())
             return;
 
         Controller.getInstance().getWallet().database.getTransactionMap().deleteObserver(this);
-        DCSet.getInstance().getTransactionMap().addObserver(this);
+        DCSet.getInstance().getTransactionMap().deleteObserver(this);
         /// ??? Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);
     }
-    
-    public void getInterval(int start,int step){
-        this.start = start;
-        this.step = step;
-       // pp.c.clear();
-        int end = start+step;
-        if (end > transactions.size()) end = transactions.size();
-        pairTransactions = this.transactions.subList(start, end);
-        
+
+    @Override
+    public int getMapSize() {
+        return Controller.getInstance().getWallet().database.getTransactionMap().size();
     }
-    public void setInterval(int start, int step){
-        getInterval(start,step);
+
+    @Override
+    public void getIntervalThis(int startBack, int endBack) {
+        transactions = new SortableList<Tuple2<String, String>, Transaction>(
+                Controller.getInstance().getWallet().database.getTransactionMap(),
+                Controller.getInstance().getWallet().database.getTransactionMap().getFromToKeys(startBack, endBack));
+
+        DCSet dcSet = DCSet.getInstance();
+        for (Pair<Tuple2<String, String>, Transaction> item: transactions) {
+            if (item.getB() == null)
+                continue;
+
+            item.getB().setDC_HeightSeq(dcSet);
+            item.getB().calcFee();
+        }
+
     }
 }

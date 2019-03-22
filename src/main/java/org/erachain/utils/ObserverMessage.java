@@ -11,13 +11,11 @@ public class ObserverMessage {
     public static final int ADD_TRANSACTION_TYPE = 7;
     public static final int REMOVE_TRANSACTION_TYPE = 8;
     public static final int LIST_TRANSACTION_TYPE = 9;
-    public static final int COUNT_TRANSACTION_TYPE = 10;
 
     public static final int RESET_UNC_TRANSACTION_TYPE = 11;
     public static final int ADD_UNC_TRANSACTION_TYPE = 12;
     public static final int REMOVE_UNC_TRANSACTION_TYPE = 13;
     public static final int LIST_UNC_TRANSACTION_TYPE = 14;
-    public static final int COUNT_UNC_TRANSACTION_TYPE = 15;
 
     public static final int RESET_PEER_TYPE = 16;
     public static final int ADD_PEER_TYPE = 17;
@@ -129,7 +127,6 @@ public class ObserverMessage {
     public static final int ADD_CLACULATED_TYPE = 167;
     public static final int REMOVE_CLACULATED_TYPE = 168;
     public static final int LIST_CLACULATED_TYPE = 169;
-    public static final int COUNT_CLACULATED_TYPE = 170;
 
     public static final int RESET_COMPL_ORDER_TYPE = 201;
     public static final int ADD_COMPL_ORDER_TYPE = 202;
@@ -229,7 +226,6 @@ public class ObserverMessage {
     public static final int WALLET_ADD_TRANSACTION_TYPE = 10012;
     public static final int WALLET_REMOVE_TRANSACTION_TYPE = 10013;
     public static final int WALLET_LIST_TRANSACTION_TYPE = 10014;
-    public static final int WALLET_COUNT_TRANSACTION_TYPE = 10015;
 
     public static final int WALLET_RESET_ORDER_TYPE = 10021;
     public static final int WALLET_ADD_ORDER_TYPE = 10022;
@@ -317,6 +313,7 @@ public class ObserverMessage {
     public static final int  RPC_WORK_TYPE = 20000;
 
     public static final int  GUI_ABOUT_TYPE = 1000000001;
+    public static final int  GUI_REPAINT = 1100000001;
 
 
     private int type;

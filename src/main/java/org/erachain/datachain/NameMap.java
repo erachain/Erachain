@@ -7,10 +7,9 @@ import org.mapdb.DB;
 import java.util.HashMap;
 import java.util.Map;
 
-//import org.erachain.database.DBSet;
+//import org.erachain.database.DLSet;
 
 public class NameMap extends DCMap<String, Name> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public NameMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -39,11 +38,6 @@ public class NameMap extends DCMap<String, Name> {
     @Override
     protected Name getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     public boolean contains(Name name) {

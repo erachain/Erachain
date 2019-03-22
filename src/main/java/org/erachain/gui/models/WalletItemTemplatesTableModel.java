@@ -5,7 +5,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 
@@ -22,10 +21,9 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
 
     private SortableList<Tuple2<String, String>, TemplateCls> templates;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"});
-
     public WalletItemTemplatesTableModel() {
-        Controller.getInstance().addWalletListener(this);
+        super("WalletItemTemplatesTableModel", 1000,
+                new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"});
     }
 
     @Override
@@ -35,16 +33,6 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
 
     public TemplateCls getItem(int row) {
         return this.templates.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -114,5 +102,14 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
         if (message.getType() == ObserverMessage.ADD_TEMPLATE_TYPE || message.getType() == ObserverMessage.REMOVE_TEMPLATE_TYPE) {
             this.fireTableDataChanged();
         }
+
     }
+
+    public void addObserversThis() {
+        Controller.getInstance().addWalletObserver(this);
+    }
+
+    public void removeObserversThis() {
+    }
+
 }

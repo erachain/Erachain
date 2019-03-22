@@ -25,18 +25,17 @@ import java.util.Map;
  * Значение: заказ<br>
  */
 public class CompletedOrderMap extends DCMap<Long, Order> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public CompletedOrderMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_COMPL_ORDER_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_COMPL_ORDER_TYPE);
             if (databaseSet.isDynamicGUI()) {
                 this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_COMPL_ORDER_TYPE);
                 this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_COMPL_ORDER_TYPE);
             }
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_COMPL_ORDER_TYPE);
         }
     }
 
@@ -76,11 +75,6 @@ public class CompletedOrderMap extends DCMap<Long, Order> {
     @Override
     protected Order getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     public void add(Order order) {

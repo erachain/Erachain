@@ -8,7 +8,7 @@ import org.erachain.core.web.NameStorageMap;
 import org.erachain.core.web.OrphanNameStorageHelperMap;
 import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
-import org.erachain.database.IDB;
+import org.erachain.database.DBASet;
 import org.erachain.settings.Settings;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -24,7 +24,7 @@ import java.util.Observer;
  * Но почемуто парент хранится в каждой таблице - хотя там сразу ссылка на форкнутую таблицу есть
  * а в ней уже хранится объект набора DCSet
  */
-public class DCSet implements Observer, IDB {
+public class DCSet extends DBASet implements Observer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_BYTE << 3;
@@ -33,7 +33,6 @@ public class DCSet implements Observer, IDB {
     private static boolean isStoped = false;
     private volatile static DCSet instance;
     private DCSet parent;
-    private int uses;
 
     private boolean inMemory = false;
 
@@ -111,14 +110,11 @@ public class DCSet implements Observer, IDB {
 
     private DB database;
     private long actions = (long) (Math.random() * (ACTIONS_BEFORE_COMMIT >> 1));
-    private boolean withObserver;// observe
-    private boolean dynamicGUI;// observe
 
-    public DCSet(DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory) {
+    public DCSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory) {
+        super(dbFile, database, withObserver, dynamicGUI);
+
         this.inMemory = inMemory;
-        uses = 1;
-        this.withObserver = withObserver;
-        this.dynamicGUI = dynamicGUI;
 
         try {
             this.database = database;
@@ -239,7 +235,6 @@ public class DCSet implements Observer, IDB {
         this.parent = parent;
         ///this.database = parent.database.snapshot();
         this.bchain = parent.bchain;
-        this.withObserver = false;
 
         this.addressForging = new AddressForging(parent.addressForging);
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap);
@@ -339,7 +334,7 @@ public class DCSet implements Observer, IDB {
 
     public static DCSet getInstance(boolean withObserver, boolean dynamicGUI) throws Exception {
         if (instance == null) {
-            reCreateDatabase(withObserver, dynamicGUI);
+            reCreateDB(withObserver, dynamicGUI);
         }
 
         return instance;
@@ -360,7 +355,7 @@ public class DCSet implements Observer, IDB {
      * @param dynamicGUI [true] - for switch on GUI observers fir dynamic interface
      * @throws Exception
      */
-    public static void reCreateDatabase(boolean withObserver, boolean dynamicGUI) throws Exception {
+    public static void reCreateDB(boolean withObserver, boolean dynamicGUI) throws Exception {
 
         //OPEN DB
         File dbFile = new File(Settings.getInstance().getDataDir(), "chain.dat");
@@ -390,9 +385,9 @@ public class DCSet implements Observer, IDB {
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
-                //.snapshotEnable()
-                /// ICREATOR
                 .commitFileSyncDisable() // ++
+
+                //.snapshotEnable()
                 //.asyncWriteEnable()
                 //.asyncWriteFlushDelay(100)
                 //.cacheHardRefEnable()
@@ -415,7 +410,7 @@ public class DCSet implements Observer, IDB {
                 .make();
 
         //CREATE INSTANCE
-        instance = new DCSet(database, withObserver, dynamicGUI, false);
+        instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false);
         if (instance.actions < 0) {
             dbFile.delete();
             throw new Exception("error in DATACHAIN:" + instance.actions);
@@ -434,7 +429,7 @@ public class DCSet implements Observer, IDB {
                 //.newMemoryDirectDB()
                 .make();
 
-        instance = new DCSet(database, false, false, true);
+        instance = new DCSet(null, database, false, false, true);
         return instance;
     }
 
@@ -462,14 +457,6 @@ public class DCSet implements Observer, IDB {
         return isStoped;
     }
 
-    public boolean isWithObserver() {
-        return this.withObserver;
-    }
-
-    public boolean isDynamicGUI() {
-        return dynamicGUI;
-    }
-
     public boolean inMemory() {
         return this.inMemory || this.parent != null;
     }
@@ -488,20 +475,6 @@ public class DCSet implements Observer, IDB {
             return;
         }
         this.uses--;
-    }
-
-    @Override
-    public boolean isBusy() {
-        if (this.uses > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public void openDBSet() {
-
     }
 
     /**
@@ -526,7 +499,7 @@ public class DCSet implements Observer, IDB {
         this.kKStatusUnionMap.reset();
         this.addressPersonMap.reset();
         this.personAddressMap.reset();
-        ;
+        this.kK_KPersonStatusUnionMap.reset();
         this.kK_KPersonStatusUnionMapPersonStatusUnionTable.reset();
         this.vouchRecordMap.reset();
         this.hashesMap.reset();
@@ -1349,10 +1322,6 @@ public class DCSet implements Observer, IDB {
         }
     }
 
-    public void clearCache() {
-        this.database.getEngine().clearCache();
-    }
-
     @Override
     public void commit() {
         this.actions += 100;
@@ -1400,7 +1369,7 @@ public class DCSet implements Observer, IDB {
     }
     
     public String toString() {
-        return this.isFork()? "forked" : "main" + " "  + super.toString();
+        return (this.isFork()? "forked " : "")  + super.toString();
     }
 
 

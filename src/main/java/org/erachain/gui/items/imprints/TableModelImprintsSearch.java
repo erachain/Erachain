@@ -4,8 +4,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemImprintMap;
-import org.erachain.gui.items.TableModelItems;
-import org.erachain.lang.Lang;
+import org.erachain.gui.items.TableModelItemsSearch;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -14,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("serial")
-public class TableModelImprintsSearch extends TableModelItems {
+public class TableModelImprintsSearch extends TableModelItemsSearch {
 
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
@@ -22,9 +21,6 @@ public class TableModelImprintsSearch extends TableModelItems {
     public static final int COLUMN_PUBLISHER = 3;
     public static final int COLUMN_FAVORITE = 4;
     static Logger LOGGER = LoggerFactory.getLogger(TableModelImprintsSearch.class.getName());
-    private String[] columnNames = Lang.getInstance()
-            .translate(new String[]{"Key", "Name", "Birthday", "Publisher", "Favorite"});// ,
-    // "Favorite"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false};
     private ItemImprintMap db;
     private List<ItemCls> list;
@@ -32,11 +28,12 @@ public class TableModelImprintsSearch extends TableModelItems {
     private long key_filter = 0;
 
     public TableModelImprintsSearch() {
+        super(new String[]{"Key", "Name", "Birthday", "Publisher", "Favorite"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
         db = DCSet.getInstance().getItemImprintMap();
     }
 
-    public void set_Filter_By_Name(String str) {
+    public void findByName(String str) {
         filter_Name = str;
         list = db.get_By_Name(filter_Name, false);
         this.fireTableDataChanged();
@@ -68,16 +65,6 @@ public class TableModelImprintsSearch extends TableModelItems {
     @Override
     public ItemCls getItem(int row) {
         return this.list.get(row);
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -127,7 +114,7 @@ public class TableModelImprintsSearch extends TableModelItems {
     }
 
 
-    public void Find_item_from_key(String text) {
+    public void findByKey(String text) {
         // TODO Auto-generated method stub
         if (text.equals("") || text == null) return;
         if (!text.matches("[0-9]*")) return;
@@ -144,6 +131,12 @@ public class TableModelImprintsSearch extends TableModelItems {
             LOGGER.info("fireTableDataChanged ?");
         }
 
-
     }
+
+    public void addObserversThis() {
+    }
+
+    public void removeObserversThis() {
+    }
+
 }

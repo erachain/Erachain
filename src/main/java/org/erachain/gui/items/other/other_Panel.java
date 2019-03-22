@@ -30,8 +30,8 @@ public class other_Panel extends javax.swing.JPanel {
     //private JTable peersTable;
     private BlocksTableModel All_Blocks_TableModel;
     private WalletBlocksTableModel blocksModel;
-    private WalletTransactionsTableModel transactionsModel;
-    private RecordsPanel record_Panel;
+    //private WalletTransactionsTableModel transactionsModel;
+    //private RecordsPanel record_Panel;
     // Variables declaration - do not modify
     private javax.swing.JLabel jLabel_All_Block;
     private javax.swing.JLabel jLabel_My_Block_Title;
@@ -78,7 +78,7 @@ public class other_Panel extends javax.swing.JPanel {
         // my block
         Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 
-        CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
+        //CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
 
         //TRANSACTIONS
         this.blocksModel = new WalletBlocksTableModel();
@@ -92,8 +92,8 @@ public class other_Panel extends javax.swing.JPanel {
         indexes.put(WalletBlocksTableModel.COLUMN_BASETARGET, BlocksHeadMap.BALANCE_INDEX);
         indexes.put(WalletBlocksTableModel.COLUMN_TRANSACTIONS, BlocksHeadMap.TRANSACTIONS_INDEX);
         indexes.put(WalletBlocksTableModel.COLUMN_FEE, BlocksHeadMap.FEE_INDEX);
-        sorter = new CoreRowSorter(blocksModel, indexes);
-        jTable_My_Block.setRowSorter(sorter);
+        //sorter = new CoreRowSorter(blocksModel, indexes);
+        //jTable_My_Block.setRowSorter(sorter);
         this.jTable_My_Block.setEnabled(false);
 
 
@@ -102,7 +102,7 @@ public class other_Panel extends javax.swing.JPanel {
 
         // panel org.erachain.records
 
-        this.record_Panel = new RecordsPanel();
+        //this.record_Panel = new RecordsPanel();
         initComponents();
 
         this.jLabel_All_Block.setText(Lang.getInstance().translate("Last 100 blocks"));
@@ -304,7 +304,7 @@ public class other_Panel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(6, 11, 12, 11);
-        jPanel6.add(record_Panel, gridBagConstraints);
+        //jPanel6.add(record_Panel, gridBagConstraints);
 
         jSplitPane3.setTopComponent(jPanel6);
         jSplitPane3.setMinimumSize(new Dimension(0, 0));

@@ -25,14 +25,20 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 
     private TransactionMap map;
     private int counter;
+    private boolean needUpdate;
+
 
     public UnconfirmTransactionStatus() {
         super("| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0 0/usec");
 
         map = DCSet.getInstance().getTransactionMap();
-        map.addObserver(this);
-        DCSet.getInstance().getBlockMap().addObserver(this);
         counter = map.size();
+
+        map.addObserver(this);
+
+        DCSet.getInstance().getBlockMap().addObserver(this);
+        Controller.getInstance().guiTimer.addObserver(this);
+
         refresh();
 
         this.addMouseListener(new MouseListener() {
@@ -77,49 +83,41 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
         });
     }
 
-    private static long lastUpdate;
     @Override
     public void update(Observable arg0, Object arg1) {
-
-        // TODO Auto-generated method stub
-        // if (Controller.getInstance().needUpToDate())
-        // return;
 
         ObserverMessage message = (ObserverMessage) arg1;
 
         switch (message.getType()) {
             case ObserverMessage.ADD_UNC_TRANSACTION_TYPE:
                 counter++;
-                if (NTP.getTime() - lastUpdate > 2000) {
-                    refresh();
-                }
+                needUpdate = true;
                 return;
             case ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE:
                 counter--;
-                if (NTP.getTime() - lastUpdate > 2000) {
-                    refresh();
-                }
+                needUpdate = true;
                 return;
             case ObserverMessage.CHAIN_ADD_BLOCK_TYPE:
-                if (NTP.getTime() - lastUpdate > 2000) {
-                    counter = map.size();
-                    refresh();
-                }
+                needUpdate = true;
                 return;
             case ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE:
-                if (NTP.getTime() - lastUpdate > 2000) {
-                    counter = map.size();
+                needUpdate = true;
+                return;
+            case ObserverMessage.CHAIN_RESET_BLOCK_TYPE:
+                counter = 0;
+                needUpdate = false;
+                refresh();
+                return;
+            case ObserverMessage.GUI_REPAINT:
+                if (needUpdate) {
+                    needUpdate = false;
                     refresh();
                 }
                 return;
-
         }
     }
 
-    long missedMessages = 0l;
     private void refresh() {
-
-        lastUpdate = NTP.getTime();
 
         String mess;
         if (counter > 0) {

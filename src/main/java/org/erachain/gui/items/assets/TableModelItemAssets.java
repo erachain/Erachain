@@ -5,7 +5,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
-import org.erachain.gui.items.TableModelItems;
+import org.erachain.gui.items.TableModelItemsSearch;
 import org.erachain.lang.Lang;
 
 import javax.validation.constraints.Null;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("serial")
-public class TableModelItemAssets extends TableModelItems {
+public class TableModelItemAssets extends TableModelItemsSearch {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -22,9 +22,6 @@ public class TableModelItemAssets extends TableModelItems {
     public static final int COLUMN_FAVORITE = 5;
     public static final int COLUMN_I_OWNER = 6;
 
-    //private SortableList<Long, AssetCls> assets;
-
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false, false, false, false};
     private List<ItemCls> list;
     private String filter_Name = "";
@@ -32,13 +29,13 @@ public class TableModelItemAssets extends TableModelItems {
     private ItemAssetMap db;
 
     public TableModelItemAssets() {
-        //Controller.getInstance().addObserver(this);
+        super(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"});
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
         db = DCSet.getInstance().getItemAssetMap();
     }
 
     @Override
-    public void set_Filter_By_Name(String str) {
+    public void findByName(String str) {
         filter_Name = str;
         list = db.get_By_Name(filter_Name, false);
         this.fireTableDataChanged();
@@ -77,16 +74,6 @@ public class TableModelItemAssets extends TableModelItems {
     @Override
     public ItemCls getItem(int row) {
         return this.list.get(row);
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -143,7 +130,7 @@ public class TableModelItemAssets extends TableModelItems {
 
 
     @Override
-    public void Find_item_from_key(String text) {
+    public void findByKey(String text) {
         // TODO Auto-generated method stub
         if (text.equals("") || text == null) return;
         if (!text.matches("[0-9]*")) return;
@@ -154,6 +141,12 @@ public class TableModelItemAssets extends TableModelItems {
         list.add(pers);
         this.fireTableDataChanged();
 
-
     }
+
+    public void addObserversThis() {
+    }
+
+    public void removeObserversThis() {
+    }
+
 }

@@ -557,6 +557,18 @@ public class Block {
         return version;
     }
 
+    @Override
+    public int hashCode() {
+        return Ints.fromByteArray(signature);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Block)
+            return Arrays.equals(this.signature, ((Block) obj).signature);
+        return false;
+    }
+
     public byte[] getSignature() {
         return this.signature;
     }
@@ -1136,7 +1148,7 @@ public class Block {
     }
 
 	/*
-	public static int getPreviousForgingHeightForIncomes(DBSet dcSet, Account creator, int height) {
+	public static int getPreviousForgingHeightForIncomes(DLSet dcSet, Account creator, int height) {
 
 		// IF BLOCK in the MAP
 		int previousForgingHeight = creator.getForgingData(dcSet, height);
@@ -1398,7 +1410,7 @@ public class Block {
             long processTimingLocal;
             long processTimingLocalDiff;
 
-            //DBSet dbSet = Controller.getInstance().getDBSet();
+            //DLSet dbSet = Controller.getInstance().getDBSet();
             TransactionMap unconfirmedMap = validatingDC.getTransactionMap();
             TransactionFinalMap finalMap = validatingDC.getTransactionFinalMap();
             TransactionFinalMapSigns transFinalMapSinds = validatingDC.getTransactionFinalMapSigns();
@@ -1672,7 +1684,7 @@ public class Block {
                     new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true);
         }
 
-        //LOGGER.debug("<<< core.block.Block.orphan(DBSet) #3");
+        //LOGGER.debug("<<< core.block.Block.orphan(DLSet) #3");
 
     }
 
@@ -1767,7 +1779,7 @@ public class Block {
 		/*
 		if (!dcSet.isFork()) {
 			int lastHeight = dcSet.getBlocksHeadMap().getLastBlock().getHeight(dcSet);
-			LOGGER.error("*** core.block.Block.process(DBSet)[" + (this.getParentHeight(dcSet) + 1)
+			LOGGER.error("*** core.block.Block.process(DLSet)[" + (this.getParentHeight(dcSet) + 1)
 					+ "] SET new last Height: " + lastHeight
 					+ " getHeightMap().getHeight: " + this.height_process);
 		}
@@ -1848,7 +1860,7 @@ public class Block {
                 this.txCalculated = new ArrayList<R_Calculated>();
             }
 
-            //DBSet dbSet = Controller.getInstance().getDBSet();
+            //DLSet dbSet = Controller.getInstance().getDBSet();
             TransactionMap unconfirmedMap = dcSet.getTransactionMap();
             TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
             TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
@@ -1947,7 +1959,7 @@ public class Block {
         if (cnt.isOnStopping())
             throw new Exception("on stoping");
 
-        //LOGGER.debug("<<< core.block.Block.orphan(DBSet) #0");
+        //LOGGER.debug("<<< core.block.Block.orphan(DLSet) #0");
         if (this.heightBlock == 1) {
             // GENESIS BLOCK cannot be orphanED
             return;
@@ -1968,10 +1980,10 @@ public class Block {
         this.forgingInfoUpdate = null;
 
         //ORPHAN TRANSACTIONS
-        //LOGGER.debug("<<< core.block.Block.orphan(DBSet) #2 ORPHAN TRANSACTIONS");
+        //LOGGER.debug("<<< core.block.Block.orphan(DLSet) #2 ORPHAN TRANSACTIONS");
         this.orphanTransactions(dcSet, heightBlock);
 
-        //LOGGER.debug("<<< core.block.Block.orphan(DBSet) #2f FEE");
+        //LOGGER.debug("<<< core.block.Block.orphan(DLSet) #2f FEE");
 
         //REMOVE FEE
         feeProcess(dcSet, true);
@@ -1998,7 +2010,7 @@ public class Block {
             //DELETE BLOCK FROM DB
         dcSet.getBlockMap().remove(this.signature, this.reference, this.creator);
 
-        //LOGGER.debug("<<< core.block.Block.orphan(DBSet) #4");
+        //LOGGER.debug("<<< core.block.Block.orphan(DLSet) #4");
 
         long tickets = System.currentTimeMillis() - start;
         LOGGER.debug("[" + this.heightBlock + "] orphaning time: " + (System.currentTimeMillis() - start) * 0.001
@@ -2024,7 +2036,7 @@ public class Block {
     private void orphanTransactions(DCSet dcSet, int height) throws Exception {
 
         Controller cnt = Controller.getInstance();
-        //DBSet dbSet = Controller.getInstance().getDBSet();
+        //DLSet dbSet = Controller.getInstance().getDBSet();
 
         TransactionMap unconfirmedMap = dcSet.getTransactionMap();
         TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
@@ -2072,17 +2084,6 @@ public class Block {
 
         // DELETE ALL CALCULATED
         finalMap.delete(height);
-    }
-
-    @Override
-    public boolean equals(Object otherObject) {
-        if (otherObject instanceof Block) {
-            Block otherBlock = (Block) otherObject;
-
-            return Arrays.equals(this.getSignature(), otherBlock.getSignature());
-        }
-
-        return false;
     }
 
     @Override

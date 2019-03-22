@@ -1,6 +1,7 @@
 package org.erachain.core.blockexplorer;
 
 import org.apache.commons.net.util.Base64;
+import org.erachain.at.AT;
 import org.erachain.at.AT_Transaction;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
@@ -21,6 +22,7 @@ import org.erachain.core.voting.Poll;
 import org.erachain.core.voting.PollOption;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TradeMap;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.gui.models.PersonAccountsModel;
@@ -2036,8 +2038,8 @@ public class BlockExplorer {
 
         for (int column = 0; column < column_Count; column++) {
 
-            output.put("Label_" + model_Peers.getColumnNameNO_Translate(column).replace(' ', '_'),
-                    Lang.getInstance().translateFromLangObj(model_Peers.getColumnNameNO_Translate(column), langObj));
+            output.put("Label_" + model_Peers.getColumnNameOrigin(column).replace(' ', '_'),
+                    Lang.getInstance().translateFromLangObj(model_Peers.getColumnNameOrigin(column), langObj));
         }
 
         Map out_peers = new LinkedHashMap();
@@ -2053,7 +2055,7 @@ public class BlockExplorer {
             Map out_peer = new LinkedHashMap();
 
             for (int column = 0; column < column_Count; column++) {
-                out_peer.put(model_Peers.getColumnNameNO_Translate(column).replace(' ', '_'),
+                out_peer.put(model_Peers.getColumnNameOrigin(column).replace(' ', '_'),
                         model_Peers.getValueAt(row, column).toString());
 
             }

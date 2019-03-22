@@ -19,7 +19,6 @@ import java.util.TreeMap;
  *
  */
 public class ReferenceMap extends DCMap<byte[], Long> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public ReferenceMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -52,11 +51,6 @@ public class ReferenceMap extends DCMap<byte[], Long> {
     protected Long getDefaultValue() {
         // NEED for toByte for not referenced accounts
         return 0L;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return observableData;
     }
 
     public Long get(String address, Long timestamp) {

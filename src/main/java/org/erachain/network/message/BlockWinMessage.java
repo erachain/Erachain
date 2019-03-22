@@ -12,6 +12,9 @@ import java.util.Arrays;
 public class BlockWinMessage extends Message {
 
     private static final int HEIGHT_LENGTH = Block.HEIGHT_LENGTH;
+    private static final int HASH_POSITION = Block.HEIGHT_LENGTH + Block.VERSION_LENGTH + Block.REFERENCE_LENGTH
+            + Block.CREATOR_LENGTH + Block.HEIGHT_LENGTH + Block.TRANSACTIONS_COUNT_LENGTH + Block.TRANSACTIONS_HASH_LENGTH
+            + 10;
 
     private Block block;
     private int height;
@@ -25,7 +28,7 @@ public class BlockWinMessage extends Message {
 
     @Override
     public Long getHash() {
-        return Longs.fromByteArray(this.block.getCreator().getShortAddressBytes());
+        return Longs.fromByteArray(this.block.getSignature());
     }
 
     @Override
@@ -34,16 +37,7 @@ public class BlockWinMessage extends Message {
     // берем создателя с транзакции и трансформируем в Целое
     public static Integer getHandledID(byte[] data) {
 
-        // KEY BY CREATOR
-        int position = Block.HEIGHT_LENGTH
-                + Block.VERSION_LENGTH
-                + Block.REFERENCE_LENGTH
-                //+ Block.CREATOR_LENGTH
-                //+ Block.HEIGHT_LENGTH
-                //+ Block.TRANSACTIONS_HASH_LENGTH
-                ;
-
-        return Ints.fromBytes(data[position + 1], data[position + 2], data[position + 3], data[position + 4]);
+        return Ints.fromBytes(data[HASH_POSITION + 1], data[HASH_POSITION + 2], data[HASH_POSITION + 3], data[HASH_POSITION + 4]);
 
     }
 

@@ -21,10 +21,9 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true};
     private SortableList<Long, ImprintCls> imprints;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner"});//, "Quantity"});//, "Divisible"});
-
     public TableModelImprints() {
-        Controller.getInstance().addObserver(this);
+        super("TableModelImprints", 1000,
+                new String[]{"Key", "Name", "Owner"});
     }
 
     @Override
@@ -51,16 +50,6 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
 
     public ImprintCls getImprint(int row) {
         return this.imprints.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -126,7 +115,11 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
         }
     }
 
-    public void removeObservers() {
+    public void addObserversThis() {
+        Controller.getInstance().addObserver(this);
+    }
+
+    public void removeObserversThis() {
         this.imprints.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }

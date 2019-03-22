@@ -4,14 +4,12 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemStatusMap;
-import org.erachain.gui.items.TableModelItems;
-import org.erachain.lang.Lang;
+import org.erachain.gui.items.TableModelItemsSearch;
 
-import javax.validation.constraints.Null;
 import java.util.ArrayList;
 
 @SuppressWarnings("serial")
-public class TableModelItemStatuses extends TableModelItems {
+public class TableModelItemStatuses extends TableModelItemsSearch {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -20,7 +18,6 @@ public class TableModelItemStatuses extends TableModelItems {
 
     //private SortableList<Long, StatusCls> statuses;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Unique", "Favorite"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false};
     private ItemStatusMap db;
     private ArrayList<ItemCls> list;
@@ -28,15 +25,10 @@ public class TableModelItemStatuses extends TableModelItems {
     private String filter_Name;
 
     public TableModelItemStatuses() {
-        //	Controller.getInstance().addObserver(this);
+        super(new String[]{"Key", "Name", "Creator", "Unique", "Favorite"});
+
         super.COLUMN_FAVORITE = COLUMN_FAVORITE;
         db = DCSet.getInstance().getItemStatusMap();
-    }
-
-
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
     }
 
     // читаем колонки которые изменяем высоту
@@ -48,33 +40,6 @@ public class TableModelItemStatuses extends TableModelItems {
     // устанавливаем колонки которым изменить высоту
     public void set_get_Column_AutoHeight(Boolean[] arg0) {
         this.column_AutuHeight = arg0;
-    }
-
-    public StatusCls getStatus(int row) {
-        return (StatusCls) db.get((long) row);
-    }
-
-    @Override
-    public ItemCls getItem(int row) {
-        return this.list.get(row);
-    }
-
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
-    }
-
-    @Override
-    public int getRowCount() {
-
-        return (list == null) ? 0 : list.size();
-
     }
 
     @Override
@@ -111,32 +76,4 @@ public class TableModelItemStatuses extends TableModelItems {
         return null;
     }
 
-
-    public void Find_item_from_key(String text) {
-        // TODO Auto-generated method stub
-        if (text.equals("") || text == null) return;
-        if (!text.matches("[0-9]*")) return;
-        key_filter = new Long(text);
-        list = new ArrayList<ItemCls>();
-        StatusCls status = (StatusCls) db.get(key_filter);
-        if (status == null) return;
-        list.add(status);
-
-        this.fireTableDataChanged();
-
-
-    }
-
-    public void clear() {
-        list = new ArrayList<ItemCls>();
-        this.fireTableDataChanged();
-
-    }
-
-    public void set_Filter_By_Name(String str) {
-        filter_Name = str;
-        list = (ArrayList<ItemCls>) db.get_By_Name(filter_Name, false);
-        this.fireTableDataChanged();
-
-    }
 }

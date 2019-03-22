@@ -16,49 +16,4 @@ public class FavoriteItemAsset extends FavoriteItem {
         );
 
     }
-
-    /*
-    public void replace(List<Long> keys) {
-        this.itemsSet.clear();
-        this.itemsSet.addAll(keys);
-        this.dWSet.commit();
-
-        //NOTIFY
-        this.notifyFavorites();
-    }
-
-    public void add(Long key) {
-        this.itemsSet.add(key);
-        this.dWSet.commit();
-
-        //NOTIFY
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ASSET_FAVORITES_TYPE, key));
-    }
-
-    public void delete(Long key) {
-        this.itemsSet.remove(key);
-        this.dWSet.commit();
-
-        //NOTIFY
-        //this.notifyFavorites();
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.DELETE_ASSET_FAVORITES_TYPE, key));
-    }
-
-    @Override
-    public void addObserver(Observer o) {
-        //ADD OBSERVER
-        super.addObserver(o);
-
-        //NOTIFY LIST
-        this.notifyFavorites();
-    }
-
-    protected void notifyFavorites() {
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(this.observer_favorites, this.itemsSet));
-    }
-    */
-
 }

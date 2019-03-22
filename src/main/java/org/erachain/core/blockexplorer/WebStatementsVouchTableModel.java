@@ -193,11 +193,11 @@ public class WebStatementsVouchTableModel extends AbstractTableModel implements 
         // db_transactions = new ArrayList<Transaction>();
         // tran = new ArrayList<Transaction>();
         // база данных
-        // DBSet dcSet = DBSet.getInstance();
+        // DLSet dcSet = DLSet.getInstance();
 
         /*
          * Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs =
-         * DBSet.getInstance().getVouchRecordMap().get(blockNo, recNo);
+         * DLSet.getInstance().getVouchRecordMap().get(blockNo, recNo);
          *
          *
          * if (signs == null) return null; for(Tuple2<Integer, Integer> seq:

@@ -18,7 +18,7 @@ public class NameComboBoxModel extends DefaultComboBoxModel<Name> implements Obs
     private SortableList<Tuple2<String, String>, Name> names;
 
     public NameComboBoxModel() {
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
     }
 
     @Override

@@ -15,6 +15,8 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Null;
 import java.math.BigDecimal;
@@ -33,7 +35,7 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
     //public static final int COLUMN_GENERATING_BALANCE = 3;
     //	public static final int COLUMN_FEE_BALANCE = 3;
     List<Tuple2<Tuple3<String, Long, String>, BigDecimal>> cred;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Amount", "Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
+    //private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Amount", "Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
     private Boolean[] column_AutuHeight = new Boolean[]{true, false, false, false};
     private List<PublicKeyAccount> publicKeyAccounts;
     private Account account;
@@ -45,13 +47,14 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
 
     @SuppressWarnings("unchecked")
     public Model_Account_Transactions() {
+        super("Accounts Table", 1000, new String[]{"Account", "Amount", "Type"});
+
+        LOGGER = LoggerFactory.getLogger(Model_Account_Transactions.class.getName());
+
         this.transactions_Asset = new ArrayList<Transaction>();
         this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
         cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
         account = new Account("");
-
-        Controller.getInstance().addWalletListener(this);
-        //	Controller.getInstance().addObserver(this);
 
     }
 
@@ -115,16 +118,6 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
     }
 
     @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return columnNames[index];
-    }
-
-    @Override
     public int getRowCount() {
 
         return transactions_Asset.size();
@@ -157,13 +150,13 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
 			/*
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
-			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
+			balance = account.getBalance(this.asset.getKey(DLSet.getInstance()));
 			str = NumberAsString.getInstance().numberAsString(balance.a) + "/" + balance.b.toPlainString() + "/" + balance.c.toPlainString();
 			return str;
 		case COLUMN_WAINTING_BALANCE:
 			if (this.asset == null) return "-";
-			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
-			unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DBSet.getInstance()));
+			balance = account.getBalance(this.asset.getKey(DLSet.getInstance()));
+			unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DLSet.getInstance()));
 			str = NumberAsString.getInstance().numberAsString(unconfBalance.a.subtract(balance.a))
 					+ "/" + unconfBalance.b.subtract(balance.b).toPlainString()
 					+ "/" + unconfBalance.c.subtract(balance.c).toPlainString();
@@ -242,7 +235,7 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
             cred.clear();
             for (PublicKeyAccount account : this.publicKeyAccounts) {
                 cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
-                //cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
+                //cred.addAll(DLSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
             }
 
 
@@ -274,6 +267,14 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
         }
 
         return totalBalance;
+    }
+
+    protected void addObserversThis() {
+        Controller.getInstance().addWalletObserver(this);
+        //	Controller.getInstance().addObserver(this);
+    }
+
+    public void removeObserversThis() {
     }
 
     @Override

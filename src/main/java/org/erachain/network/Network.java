@@ -192,8 +192,8 @@ public class Network extends Observable {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.REMOVE_PEER_TYPE, peer));
 
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
+        //this.setChanged();
+        //this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
     }
 
     public boolean isKnownAddress(InetAddress address, boolean andUsed) {

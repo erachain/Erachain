@@ -1,24 +1,27 @@
 package org.erachain.database.wallet;
 //09/03
 
+import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
+import org.erachain.database.SortableList;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.erachain.utils.ReverseComparator;
-import org.mapdb.BTreeKeySerializer;
-import org.mapdb.BTreeMap;
-import org.mapdb.DB;
-import org.mapdb.Fun;
+import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.List;
+import java.util.concurrent.ConcurrentNavigableMap;
 
 public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
 
@@ -26,18 +29,17 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
     public static final int TIMESTAMP_INDEX = 1;
     public static final int ADDRESS_INDEX = 2;
     public static final int AMOUNT_INDEX = 3;
+    BTreeMap AUTOKEY_INDEX;
     static Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class.getName());
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public TransactionMap(DWSet dWSet, DB database) {
         super(dWSet, database);
-        if (DCSet.getInstance().isDynamicGUI()) {
+
+        if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_TRANSACTION_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_TRANSACTION_TYPE);
             this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_TRANSACTION_TYPE);
             this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_TRANSACTION_TYPE);
-        } else {
-            this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.WALLET_COUNT_TRANSACTION_TYPE);
         }
     }
 
@@ -91,16 +93,31 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
                 return value.getAmount(account);
             }
         });
+
     }
 
     @Override
     protected Map<Tuple2<String, String>, Transaction> getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("transactions")
+        BTreeMap map = database.createTreeMap("transactions")
                 .keySerializer(BTreeKeySerializer.TUPLE2)
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
+
+        this.AUTOKEY_INDEX = database.createTreeMap("AUTOKEY_INDEX")
+                .comparator(Fun.COMPARATOR)
+                .makeOrGet();
+
+        //BIND
+        Bind.secondaryKey(map, this.AUTOKEY_INDEX, new Fun.Function2<Integer, Tuple2<String, String>, Transaction>() {
+            @Override
+            public Integer run(Tuple2<String, String> key, Transaction value) {
+                return -map.size();
+            }
+        });
+
+        return map;
     }
 
     @Override
@@ -111,11 +128,6 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
     @Override
     protected Transaction getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -168,6 +180,11 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
         }
 
         return transactions;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Collection<Tuple2<String, String>> getFromToKeys(Integer fromKey, Integer toKey) {
+        return AUTOKEY_INDEX.subMap(fromKey, toKey).values();
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

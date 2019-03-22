@@ -1,7 +1,5 @@
 package org.erachain.datachain;
 
-// upd 09/03
-
 import org.erachain.controller.Controller;
 import org.erachain.database.DBMap;
 import org.erachain.database.IDB;
@@ -158,35 +156,23 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
                         ++this.shiftSize;
                 }
             } else {
-                // COMMIT and NOTIFY if not FORKED
 
-                // IT IS NOT FORK
-                if (false && !(this.databaseSet instanceof DWSet
-                        && Controller.getInstance().isProcessingWalletSynchronize())) {
-                    // TODO
-                    ///// this.databaseSet.commit();
-                }
-
-                // NOTIFY ADD
-                if (this.getObservableData().containsKey(DBMap.NOTIFY_ADD) && !DCSet.isStoped()) {
-                    this.setChanged();
-                    if (
-                            this.getObservableData().get(DBMap.NOTIFY_ADD).equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
-                                    || this.getObservableData().get(DBMap.NOTIFY_ADD).equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
-                                    || this.getObservableData().get(DBMap.NOTIFY_ADD).equals(ObserverMessage.ADD_AT_TX_TYPE)
-                    ) {
-                        this.notifyObservers(new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_ADD),
-                                new Pair<T, U>(key, value)));
-                    } else {
-                        this.notifyObservers(
-                                new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_ADD), value));
+                // NOTIFY if not FORKED
+                if (this.observableData != null && (old == null || !old.equals(value))) {
+                    if (this.observableData.containsKey(DBMap.NOTIFY_ADD) && !DCSet.isStoped()) {
+                        this.setChanged();
+                        Integer observeItem = this.observableData.get(DBMap.NOTIFY_ADD);
+                        if (
+                                observeItem.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
+                                        || observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
+                                        || observeItem.equals(ObserverMessage.ADD_AT_TX_TYPE)
+                        ) {
+                            this.notifyObservers(new ObserverMessage(observeItem, new Pair<T, U>(key, value)));
+                        } else {
+                            this.notifyObservers(
+                                    new ObserverMessage(observeItem, value));
+                        }
                     }
-                }
-
-                if (this.getObservableData().containsKey(DBMap.NOTIFY_COUNT)) {
-                    this.setChanged();
-                    this.notifyObservers(
-                            new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_COUNT), this)); /// SLOW .size()));
                 }
             }
 
@@ -227,28 +213,24 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
 
         } else if (this.parent == null) {
 
-            // NOTIFY REMOVE
-            if (this.getObservableData().containsKey(DBMap.NOTIFY_REMOVE)) {
-                this.setChanged();
-                if (
-                        this.getObservableData().get(DBMap.NOTIFY_REMOVE).equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
-                                || this.getObservableData().get(DBMap.NOTIFY_REMOVE).equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
-                                || this.getObservableData().get(DBMap.NOTIFY_REMOVE).equals(ObserverMessage.REMOVE_AT_TX)
-                ) {
-                    this.notifyObservers(new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_REMOVE),
-                            new Pair<T, U>(key, value)));
-                } else {
-                    this.notifyObservers(new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_REMOVE), value));
+            // NOTIFY
+            if (this.observableData != null) {
+                if (this.observableData.containsKey(DBMap.NOTIFY_REMOVE)) {
+                    this.setChanged();
+                    Integer observItem = this.observableData.get(DBMap.NOTIFY_REMOVE);
+                    if (
+                            observItem.equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
+                                    || observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
+                                    || observItem.equals(ObserverMessage.REMOVE_AT_TX)
+                    ) {
+                        this.notifyObservers(new ObserverMessage(observItem, new Pair<T, U>(key, value)));
+                    } else {
+                        this.notifyObservers(new ObserverMessage(observItem, value));
+                    }
                 }
             }
-
-            if (this.getObservableData().containsKey(DBMap.NOTIFY_COUNT)) {
-                this.setChanged();
-                this.notifyObservers(
-                        new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_COUNT), this)); /// SLOW .size()));
-            }
-
         }
+
         this.outUses();
         return value;
 

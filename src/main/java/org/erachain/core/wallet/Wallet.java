@@ -22,6 +22,7 @@ import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.SecureWalletDatabase;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.library.library;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
@@ -65,20 +66,22 @@ public class Wallet extends Observable implements Observer {
 
 	// CONSTRUCTORS
 
-	public Wallet() {
+	public Wallet(boolean withObserver, boolean dynamicGUI) {
 
 		//this.syncHeight = ;
 
 		// CHECK IF EXISTS
 		if (this.exists()) {
 			// OPEN WALLET
-			this.database = new DWSet();
+			this.database = DWSet.reCreateDB(withObserver, dynamicGUI);
 
-			// ADD OBSERVER
-			// Controller.getInstance().addObserver(this);
-			DCSet.getInstance().getTransactionMap().addObserver(this);
-			DCSet.getInstance().getBlockMap().addObserver(this);
-			// DCSet.getInstance().getCompletedOrderMap().addObserver(this);
+			if (withObserver) {
+				// ADD OBSERVER
+				// Controller.getInstance().addObserver(this);
+				DCSet.getInstance().getTransactionMap().addObserver(this);
+				DCSet.getInstance().getBlockMap().addObserver(this);
+				// DCSet.getInstance().getCompletedOrderMap().addObserver(this);
+			}
 
         }
 
@@ -346,12 +349,13 @@ public class Wallet extends Observable implements Observer {
 		return this.database.isItemFavorite(item);
 	}
 
-	public boolean create(byte[] seed, String password, int depth, boolean synchronize, String path) {
+	public boolean create(byte[] seed, String password, int depth, boolean synchronize, String path,
+						  boolean withObserver, boolean dynamicGUI) {
 		String oldPath = Settings.getInstance().getWalletDir();
 		// set wallet dir
 		Settings.getInstance().setWalletDir(path);
 		// OPEN WALLET
-		DWSet database = new DWSet();
+		DWSet database = DWSet.reCreateDB(withObserver, dynamicGUI);
 
 		if (this.secureDatabase != null) {
 			// CLOSE secured WALLET
@@ -493,8 +497,7 @@ public class Wallet extends Observable implements Observer {
 					Lang.getInstance().translate("My Account") + " " + (nonce + 1), StrJSonFine.convert(ob)));
 			LOGGER.info("Added account #" + nonce);
 
-			this.secureDatabase.commit();
-			this.database.commit();
+			this.commit();
 
 			// NOTIFY
 			this.setChanged();
@@ -518,8 +521,7 @@ public class Wallet extends Observable implements Observer {
 		this.secureDatabase.delete(account);
 
 		// SAVE TO DISK
-		this.database.commit();
-		this.secureDatabase.commit();
+		this.commit();
 
 		// NOTIFY
 		this.setChanged();
@@ -542,9 +544,23 @@ public class Wallet extends Observable implements Observer {
 
 	}
 
-	boolean synchronizeBodyStop;
+
+    public static boolean synchronizeStatus;
+
+    /**
+     * нужно для запрета вызова уже работающего процесса синхронизации
+     * @return
+     */
+    public synchronized boolean synchronizeStatusCheck() {
+        if (synchronizeStatus)
+            return true;
+        synchronizeStatus = true;
+        return false;
+    }
+
+    public boolean synchronizeBodyStop;
 	public void synchronizeBody(boolean reset) {
-	    if (!synchronizeBodyStop)
+	    if (!synchronizeBodyStop || synchronizeStatusCheck())
 	        return;
 
 		DCSet dcSet = DCSet.getInstance();
@@ -596,7 +612,10 @@ public class Wallet extends Observable implements Observer {
         this.database.clearCache();
         this.database.commit();
 
-        height = blockStart.getHeight();
+		if (Controller.getInstance().isOnStopping())
+			return;
+
+		height = blockStart.getHeight();
 		int steepHeight = dcSet.getBlockMap().size() / 100;
 		int lastHeight = 0;
 
@@ -606,60 +625,57 @@ public class Wallet extends Observable implements Observer {
         this.database.clearCache();
 
         try {
-			do {
+        	if (getAccounts() != null && !getAccounts().isEmpty()) {
+				do {
 
-                Block block = blockMap.get(height);
+					Block block = blockMap.get(height);
 
-                if (block == null) {
-                    break;
-                }
+					if (block == null) {
+						break;
+					}
 
-                try {
-                    this.processBlock(dcSet, block);
-				} catch (java.lang.OutOfMemoryError e) {
-					Controller.getInstance().stopAll(44);
-					return;
-				}
+					try {
+						this.processBlock(dcSet, block);
+					} catch (java.lang.OutOfMemoryError e) {
+						Controller.getInstance().stopAll(44);
+						return;
+					}
 
-                // NEED FOR CLEAR HEAP
-				//block.clearForHeap(); - не нужно теперь если мы чистим КЭШ в dcSet.clearCache();
-                //block = null;
+					if (System.currentTimeMillis() - timePoint > 10000
+							|| steepHeight < height - lastHeight) {
 
-                if (Controller.getInstance().needUpToDate() || !Controller.getInstance().isStatusWaiting())
-                    // если идет синхронизация цепочки - кошелек не синхронизируем
-                    break;
+						timePoint = System.currentTimeMillis();
+						lastHeight = height;
 
-                if (System.currentTimeMillis() - timePoint > 10000
-						|| steepHeight < height - lastHeight) {
+						this.syncHeight = height;
 
-					timePoint = System.currentTimeMillis();
-					lastHeight = height;
+						//LOGGER.debug("try Commit");
+						this.database.commit();
 
-                    this.syncHeight = height;
-					Controller.getInstance().walletSyncStatusUpdate(height);
+                        if (Controller.getInstance().isOnStopping())
+                            return;
 
-                    this.database.clearCache();
-                    this.database.commit();
+						// обязательно нужно чтобы память освобождать
+						// и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
+						// при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
+						// БЕЗ очистки КЭША HEAP забивается под завязку
+						dcSet.clearCache();
+						this.database.clearCache();
 
-                    // обязательно нужно чтобы память освобождать
-                    // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
-                    // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
-                    // БЕЗ очистки КЭША HEAP забивается под завязку
-					dcSet.clearCache();
+						// не нужно - Ява сама норм делает вызов очистки
+						//System.gc();
 
-					// не нужно - Ява сама норм делает вызов очистки
-					//System.gc();
+						Controller.getInstance().walletSyncStatusUpdate(height);
 
-                }
+					}
 
-				// LOAD NEXT
-				if (Controller.getInstance().isOnStopping())
-					return;
+					height++;
 
-				height++;
-
-            } while (!synchronizeBodyStop);
-
+				} while (!synchronizeBodyStop
+						&& !Controller.getInstance().isOnStopping()
+						&& !Controller.getInstance().needUpToDate()
+						&& Controller.getInstance().isStatusWaiting());
+			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 
@@ -669,8 +685,6 @@ public class Wallet extends Observable implements Observer {
 				return;
 
             this.syncHeight = height;
-            Controller.getInstance().walletSyncStatusUpdate(height);
-			Controller.getInstance().setProcessingWalletSynchronize(false);
 
 			// обязательно нужно чтобы память освобождать
 			// и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
@@ -678,12 +692,20 @@ public class Wallet extends Observable implements Observer {
             // вдобавое отчищает полностью память - много свободной памяти получаем
 			dcSet.clearCache();
 
-            this.database.clearCache();
+            // тут возможно цепочка синхронизировалась или начала синхронизироваться и КОММИТ вызовет ошибку
+            //  java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
 			this.database.commit();
+
+            this.database.clearCache();
 
             System.gc();
 
-		}
+            synchronizeStatus = false;
+
+            Controller.getInstance().walletSyncStatusUpdate(height);
+            Controller.getInstance().setProcessingWalletSynchronize(false);
+
+        }
 
 		// RESET UNCONFIRMED BALANCE for accounts + assets
 		LOGGER.info("Resetted balances");
@@ -921,8 +943,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.getAccountMap().add(account, -1);
 
 			// SAVE TO DISK
-			this.secureDatabase.commit();
-			this.database.commit();
+			this.commit();
 
 			// SYNCHRONIZE
 			this.synchronize(true);
@@ -1238,6 +1259,7 @@ public class Wallet extends Observable implements Observer {
 		for (Transaction transaction : block.getTransactions()) {
 
             // TODO нужно сделать при закрытии базы чтобы ожидала окончания проходя всего блока тут
+
 
 			if (transaction.isWiped()) {
 				continue;
@@ -1645,7 +1667,7 @@ public class Wallet extends Observable implements Observer {
 
 		// CHECK IF WE ARE OWNER
 		ItemCls item = issueItem.getItem();
-		// item.resolveKey(DBSet.getInstance());
+		// item.resolveKey(DLSet.getInstance());
 		Account creator = item.getOwner();
 		if (creator == null)
 			return;
@@ -1867,43 +1889,64 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
-	public void update(Observable o, Object arg) {
+    @Override
+    public void update(Observable o, Object arg) {
+        try {
+            this.syncUpdate(o, arg);
+        } catch (Exception e) {
+            //GUI ERROR
+        }
+    }
 
-		if (this.database == null)
+    @SuppressWarnings("unchecked")
+    // synchronized нужно чтобы не было конкуренции при this.database.commit();
+    public synchronized void syncUpdate(Observable o, Object arg) {
+
+        if (this.database == null)
 			return;
-
-		ObserverMessage message = (ObserverMessage) arg;
 
 		Controller cnt = Controller.getInstance();
 		if (cnt.isProcessingWalletSynchronize() || cnt.isNeedSyncWallet())
 			return;
 
-		int type = message.getType();
+        ObserverMessage message = (ObserverMessage) arg;
+        int type = message.getType();
+
         if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
 
-            if (!cnt.isStatusWaiting())
+            if (!cnt.isStatusWaiting()
+				|| this.synchronizeStatus)
                 // идет синхронизация основной цепочки - не обрабатываем пока кошелек
                 return;
 
             Block block = (Block) message.getValue();
 
+			// TODO сделать фактори которая синхронно по оереди с синхронизацией это будет разруливать
+
 			// CHECK IF WE NEED TO RESYNC
 			// BY REFERENCE !!!!
-            if (checkNeedSyncWallet(block.getReference())) //.getReference()))
+            if (checkNeedSyncWallet(block.getReference()))
 			{
 				return;
 			}
 
 			// CHECK BLOCK
 			this.processBlock(DCSet.getInstance(), block);
+
             //this.database.clearCache();
-            //this.database.commit();
+            if (!synchronizeStatusCheck())
+                this.database.commit();
 
 		} else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
 		{
+			// тут при откате основной цепочки нужно тоже откатывать блоки
+			// - иначе потом окнцов не найдем и нужно полная синхронизация
+			if (this.synchronizeStatus)
+				return;
+
             Block block = (Block) message.getValue();
 
+            // TODO сделать фактори которая синхронно по оереди с синхронизацией это будет разруливать
 			// CHECK IF WE NEED TO RESYNC
 			// BY SIGNATURE !!!!
             if (checkNeedSyncWallet(block.getSignature()))
@@ -1913,85 +1956,25 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK BLOCK
 			this.orphanBlock(block);
+
             //this.database.clearCache();
             //this.database.commit();
 
-		} else if (false && type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
+		} else if (type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
+
+        	if (Controller.getInstance().useGui) {
+				Pair<byte[], Transaction> item = (Pair<byte[], Transaction>) message.getValue();
+				Transaction transaction = item.getB();
+
+				library.notifySysTrayRecord(transaction);
+			}
+
+		} else if (type == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
+            ;
+		} else if (type == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
 			;
-		} else if (type == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE)
-		{
-			Pair<byte[], Transaction> value = (Pair<byte[], Transaction>) message.getValue();
-			Transaction transaction = value.getB();
-
-			transaction.setDC(DCSet.getInstance());
-			this.processTransaction(transaction);
-
-			// CHECK IF PAYMENT
-			if (transaction instanceof R_Send) {
-				return;
-			}
-
-			// CHECK IF NAME REGISTRATION
-			else if (transaction instanceof RegisterNameTransaction) {
-				this.processNameRegistration((RegisterNameTransaction) transaction);
-			}
-
-			// CHECK IF POLL CREATION
-			else if (transaction instanceof CreatePollTransaction) {
-				this.processPollCreation((CreatePollTransaction) transaction);
-			}
-
-			// CHECK IF ITEM ISSUE
-			else if (transaction instanceof IssueItemRecord) {
-				this.processItemIssue((IssueItemRecord) transaction);
-			}
-
-			// CHECK IF SERTIFY PErSON
-			else if (transaction instanceof R_SertifyPubKeys) {
-				this.processSertifyPerson((R_SertifyPubKeys) transaction);
-			}
-
-			// CHECK IF ORDER CREATION
-			else if (transaction instanceof CreateOrderTransaction) {
-				this.processOrderCreation((CreateOrderTransaction) transaction);
-			}
-		} else if (false && type == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
-			;
-		} else if (type == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE)
-		{
-			Transaction transaction = (Transaction) message.getValue();
-
-			transaction.setDC(DCSet.getInstance());
-			this.orphanTransaction(transaction);
-
-			// CHECK IF PAYMENT
-			if (transaction instanceof R_Send) {
-				return;
-			}
-			// CHECK IF NAME REGISTRATION
-			else if (transaction instanceof RegisterNameTransaction) {
-				this.orphanNameRegistration((RegisterNameTransaction) transaction);
-			}
-
-			// CHECK IF POLL CREATION
-			else if (transaction instanceof CreatePollTransaction) {
-				this.orphanPollCreation((CreatePollTransaction) transaction);
-			}
-
-			// CHECK IF ITEM ISSUE
-			else if (transaction instanceof IssueItemRecord) {
-				this.orphanItemIssue((IssueItemRecord) transaction);
-			}
-
-			// CHECK IF SERTIFY PErSON
-			else if (transaction instanceof R_SertifyPubKeys) {
-				this.orphanSertifyPerson((R_SertifyPubKeys) transaction);
-			}
-
-			// CHECK IF ORDER CREATION
-			else if (transaction instanceof CreateOrderTransaction) {
-				this.orphanOrderCreation((CreateOrderTransaction) transaction);
-			}
+		} else if (type == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
+            ;
 		} else if (type == ObserverMessage.ADD_ORDER_TYPE
 				|| type == ObserverMessage.ADD_COMPL_ORDER_TYPE) {
 			// UPDATE FULFILLED
@@ -2070,7 +2053,7 @@ public class Wallet extends Observable implements Observer {
 		this.database.setLicenseKey(key);
 	}
 
-	public Integer loadFromDir() {
+	public Integer loadFromDir(boolean withObserver, boolean dynamicGUI) {
 		// return 1 - is ok
 		// if > 1 - error
 		String pathOld = Settings.getInstance().getWalletDir();
@@ -2088,7 +2071,7 @@ public class Wallet extends Observable implements Observer {
 			// set wallet dir
 			Settings.getInstance().setWalletDir(dir);
 			// open wallet
-			Controller.getInstance().wallet = new Wallet();
+			Controller.getInstance().wallet = new Wallet(withObserver, dynamicGUI);
 			// not wallet return 0;
 			if (!Controller.getInstance().wallet.exists()) return 2;
 			// accounts

@@ -38,7 +38,6 @@ public class KKMap extends DCMap<
                         Integer // block.get(transaction.getSignature()) -> block.get(index)
                         >>>> {
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
     private String name;
 
     public KKMap(DCSet databaseSet, DB database,
@@ -51,11 +50,11 @@ public class KKMap extends DCMap<
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, observerMessage_reset);
+            this.observableData.put(DBMap.NOTIFY_LIST, observerMessage_list);
             if (databaseSet.isDynamicGUI()) {
                 this.observableData.put(DBMap.NOTIFY_ADD, observerMessage_add);
                 this.observableData.put(DBMap.NOTIFY_REMOVE, observerMessage_remove);
             }
-            this.observableData.put(DBMap.NOTIFY_LIST, observerMessage_list);
         }
 
     }
@@ -89,11 +88,6 @@ public class KKMap extends DCMap<
     @Override
     protected TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> getDefaultValue() {
         return new TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>();
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     @SuppressWarnings("unchecked")

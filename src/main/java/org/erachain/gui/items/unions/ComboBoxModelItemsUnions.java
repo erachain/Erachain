@@ -15,7 +15,7 @@ public class ComboBoxModelItemsUnions extends DefaultComboBoxModel<UnionCls> imp
     Lock lock = new ReentrantLock();
 
     public ComboBoxModelItemsUnions() {
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
     }
 
     @Override

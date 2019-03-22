@@ -27,7 +27,6 @@ public class BalanceMap extends DCMap<Tuple2<Long, Long>,
         Tuple4<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> {
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
     private String name;
 
     @SuppressWarnings("rawtypes")
@@ -128,11 +127,6 @@ public class BalanceMap extends DCMap<Tuple2<Long, Long>,
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO)
                 );
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
 	/*

@@ -110,7 +110,7 @@ public class VouchRecordDialog extends JDialog {
 
         Transaction record = null;
         if (text.length() < 40) {
-            //record = R_Vouch.getVouchingRecord(DBSet.getInstance(), jTextField_recordID.getText());
+            //record = R_Vouch.getVouchingRecord(DLSet.getInstance(), jTextField_recordID.getText());
             record = DCSet.getInstance().getTransactionFinalMap().getRecord(text);
         } else {
             record = Transaction.findByDBRef(DCSet.getInstance(), Base58.decode(text));

@@ -42,7 +42,6 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     public static final int HEIGHT_INDEX = 1; // for GUI
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
     private byte[] lastBlockSignature;
     private Atomic.Boolean processingVar;
     private Boolean processing;
@@ -50,6 +49,14 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     public BlockMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
+
+
+        if (databaseSet.isWithObserver()) {
+            if (databaseSet.isDynamicGUI()) {
+            }
+        }
+
+
         // PROCESSING
         this.processingVar = database.getAtomicBoolean("processingBlock");
         this.processing = this.processingVar.get();
@@ -90,18 +97,13 @@ public class BlockMap extends DCMap<Integer, Block> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return observableData;
-    }
-
     public Block last() {
         return get(size());
     }
 
     public byte[] getLastBlockSignature() {
         if (lastBlockSignature == null) {
-            lastBlockSignature = getDBSet().getBlocksHeadsMap().get(size()).signature;
+            lastBlockSignature = ((DCSet)databaseSet).getBlocksHeadsMap().get(this.size()).signature;
         }
         return lastBlockSignature;
     }
@@ -139,14 +141,14 @@ public class BlockMap extends DCMap<Integer, Block> {
             return null;
 
         // LOAD HEAD
-        block.loadHeadMind(this.getDBSet());
+        block.loadHeadMind((DCSet)databaseSet);
 
         // проверим занятую память и очистим если что
         if (parent == null && block.getTransactionCount() > 33) {
             // это не Форк базы и большой блок взяли - наверно надо чистить КЭШ
             if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
                 if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 1)) {
-                    getDBSet().clearCache();
+                    ((DCSet)databaseSet).clearCache();
                 }
             }
 
@@ -156,7 +158,7 @@ public class BlockMap extends DCMap<Integer, Block> {
     }
 
     public boolean add(Block block) {
-        DCSet dcSet = getDBSet();
+        DCSet dcSet = (DCSet)databaseSet;
         byte[] signature = block.getSignature();
         if (dcSet.getBlockSignsMap().contains(signature)) {
             logger.error("already EXIST : " + this.size()
@@ -211,7 +213,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     // TODO make CHAIN deletes - only for LAST block!
     public Block remove(byte[] signature, byte[] reference, PublicKeyAccount creator) {
-        DCSet dcSet = getDBSet();
+        DCSet dcSet = (DCSet)databaseSet;
 
         int height = this.size();
 

@@ -238,6 +238,7 @@ public class SettingsFrame extends JDialog {
 
         if (Settings.getInstance().isGuiDynamic() != settingsTabPane.settingsBasicPanel.chckbxGuiDynamic.isSelected()) {
             settingsJSONbuf.put("guidynamic", settingsTabPane.settingsBasicPanel.chckbxGuiDynamic.isSelected());
+            Controller.getInstance().setDynamicGUI(settingsTabPane.settingsBasicPanel.chckbxGuiDynamic.isSelected());
         }
         if (Settings.getInstance().isRpcEnabled() != settingsTabPane.settingsBasicPanel.chckbxRpcEnabled.isSelected()) {
             settingsJSONbuf.put("rpcenabled", settingsTabPane.settingsBasicPanel.chckbxRpcEnabled.isSelected());

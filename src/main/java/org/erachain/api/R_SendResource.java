@@ -38,6 +38,8 @@ public class R_SendResource {
         Map<String, String> help = new LinkedHashMap<String, String>();
         help.put("GET r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&encoding={encoding}&encrypt=true&password={password}",
                 "make and broadcast SEND asset amount and mail");
+        help.put("POST r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&encoding={encoding}&encrypt=true&password={password} (message)",
+                "make and broadcast SEND asset amount and mail in body");
         help.put("GET r_send/raw/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&encoding={encoding}&encrypt=true&password={password}",
                 "make RAW for SEND asset amount and mail");
         help.put("POST r_send {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"encoding\": <encoding>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
@@ -111,6 +113,20 @@ public class R_SendResource {
             out.put("error_message", OnDealClick.resultMess(validate));
             return out.toJSONString();
         }
+
+    }
+
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Path("{creator}/{recipient}")
+    public String sendPost(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
+                          @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
+                          @QueryParam("amount") BigDecimal amount, @QueryParam("title") String title,
+                          String message,
+                          @QueryParam("encoding") int encoding,
+                          @QueryParam("encrypt") boolean encrypt, @QueryParam("password") String password) {
+
+        return sendGet(creatorStr, recipientStr, feePowStr, assetKey, amount, title, message,encoding,encrypt, password);
 
     }
 

@@ -259,7 +259,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
     }
 
     @Override
-    public void delay_on_close() {
+    public void onClose() {
         // delete observer left panel
         // get component from right panel
         Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();

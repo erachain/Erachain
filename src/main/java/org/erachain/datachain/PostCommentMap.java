@@ -16,9 +16,6 @@ import java.util.Map;
  */
 public class PostCommentMap extends DCMap<byte[], List<byte[]>> {
 
-
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     public PostCommentMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
@@ -82,11 +79,6 @@ public class PostCommentMap extends DCMap<byte[], List<byte[]>> {
     @Override
     protected List<byte[]> getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     @Override

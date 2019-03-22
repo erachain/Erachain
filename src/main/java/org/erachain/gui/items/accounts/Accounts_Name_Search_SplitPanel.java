@@ -336,6 +336,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
                         // buffer
                         JSONObject output = new JSONObject();
 
+                        // TODO переделать с  db.getList() на перебор по ключу
                         SortableList<String, Tuple2<String, String>> lists = db.getList();
 
                         for (Pair<String, Tuple2<String, String>> list : lists) {
@@ -443,7 +444,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
     }
 
     @Override
-    public void delay_on_close() {
+    public void onClose() {
         // delete observer left panel
         tableModelImprints.deleteObserver();
         // get component from right panel

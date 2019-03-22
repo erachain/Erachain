@@ -8,7 +8,7 @@ import org.erachain.utils.NumberAsString;
 
 import java.util.Arrays;
 
-// core.block.Block.isValid(DBSet) - check as false it
+// core.block.Block.isValid(DLSet) - check as false it
 public class GenesisIssueAssetTransaction extends GenesisIssue_ItemRecord {
 
     private static final byte TYPE_ID = (byte) GENESIS_ISSUE_ASSET_TRANSACTION;

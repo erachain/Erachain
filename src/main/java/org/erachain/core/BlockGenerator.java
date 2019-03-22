@@ -478,7 +478,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     }
                 }
 
-                ctrl.addWalletListener(BlockGenerator.this);
+                ctrl.addWalletObserver(BlockGenerator.this);
                 syncForgingStatus();
             }
         }.start();
@@ -954,9 +954,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                             try {
                                 if (!ctrl.flushNewBlockGenerated()) {
+                                    this.setMonitorStatusAfter();
                                     // NEW BLOCK not FLUSHED
                                     LOGGER.info("NEW BLOCK not FLUSHED");
                                 } else {
+                                    this.setMonitorStatusAfter();
                                     if (forgingStatus == ForgingStatus.FORGING_WAIT)
                                         setForgingStatus(ForgingStatus.FORGING);
                                 }
