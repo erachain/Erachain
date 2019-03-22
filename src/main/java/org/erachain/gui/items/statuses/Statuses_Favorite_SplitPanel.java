@@ -15,11 +15,10 @@ import java.awt.event.ActionListener;
 
 public class Statuses_Favorite_SplitPanel extends Item_SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private static FavoriteStatusesTableModel table_Model = new FavoriteStatusesTableModel();
     private Statuses_Favorite_SplitPanel th;
 
     public Statuses_Favorite_SplitPanel() {
-        super(table_Model, "Statuses_Favorite_SplitPanel");
+        super(new FavoriteStatusesTableModel(), "Statuses_Favorite_SplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Statuses"));
         th = this;
         JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
@@ -42,9 +41,4 @@ public class Statuses_Favorite_SplitPanel extends Item_SplitPanel {
         return info;
     }
 
-    @Override
-    protected void splitClose() {
-        table_Model.deleteObservers();
-
-    }
 }

@@ -17,11 +17,10 @@ import java.awt.event.ActionListener;
 
 public class Polls_Favorite_SplitPanel extends Item_SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private static FavoritePollsTableModel table_Model = new FavoritePollsTableModel();
     private Polls_Favorite_SplitPanel th;
 
     public Polls_Favorite_SplitPanel() {
-        super(table_Model, "Polls_Favorite_SplitPanel");
+        super(new FavoritePollsTableModel(), "Polls_Favorite_SplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Polls"));
         th = this;
         JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
@@ -50,16 +49,10 @@ public class Polls_Favorite_SplitPanel extends Item_SplitPanel {
     // show details
     @Override
     public Component get_show(ItemCls item) {
-        //return  null;//new Info_Templates((TemplateCls) item);
         AssetCls AssetCls = DCSet.getInstance().getItemAssetMap().get((long) (1));
         PollsDetailPanel pollInfo = new PollsDetailPanel((PollCls) item, AssetCls);
 
         return pollInfo;
     }
 
-    @Override
-    protected void splitClose() {
-        table_Model.deleteObservers();
-
-    }
 }

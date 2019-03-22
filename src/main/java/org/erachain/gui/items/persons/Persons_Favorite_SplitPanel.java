@@ -98,9 +98,4 @@ public class Persons_Favorite_SplitPanel extends Item_SplitPanel {
         return new Person_Info_002((PersonCls) item, true);
     }
 
-    @Override
-    protected void splitClose() {
-        table_Model.deleteObservers();
-
-    }
 }

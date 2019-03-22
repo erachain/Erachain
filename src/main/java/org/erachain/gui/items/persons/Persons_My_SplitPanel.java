@@ -19,10 +19,9 @@ public class Persons_My_SplitPanel extends Item_SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
       
     private Persons_My_SplitPanel th;
-    private static WalletItemPersonsTableModel table_Model = new WalletItemPersonsTableModel();
 
     public Persons_My_SplitPanel() {
-        super(table_Model, "Persons_My_SplitPanel");
+        super(new WalletItemPersonsTableModel(), "Persons_My_SplitPanel");
 
         this.setName(Lang.getInstance().translate("My Persons"));
         th = this;
@@ -81,16 +80,4 @@ public class Persons_My_SplitPanel extends Item_SplitPanel {
         return new Person_Info_002((PersonCls) item, true);
     }
 
-    @Override
-    protected void splitClose() {
-        table_Model.deleteObservers();
-
-    }
-
-   
-
 }
-
-
-
-
