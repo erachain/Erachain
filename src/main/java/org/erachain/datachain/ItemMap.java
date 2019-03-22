@@ -14,58 +14,57 @@ import java.util.*;
 
 /**
  * Хранение сущностей
- *
+ * <p>
  * ключ: номер, с самоувеличением
  * Значение: Сущность
  */
-public abstract class Item_Map extends DCMap<Long, ItemCls> {
+public abstract class ItemMap extends DCMap<Long, ItemCls> {
 
-    static Logger LOGGER = LoggerFactory.getLogger(Item_Map.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(ItemMap.class.getName());
 
     protected Atomic.Long atomicKey;
     protected long key;
 
-    public Item_Map(DCSet databaseSet, DB database, String name) {
+    public ItemMap(DCSet databaseSet, DB database, String name) {
         super(databaseSet, database);
 
-        this.atomicKey = database.getAtomicLong(name + "_key");
-        this.key = this.atomicKey.get();
+        atomicKey = database.getAtomicLong(name + "_key");
+        key = atomicKey.get();
     }
 
-    public Item_Map(DCSet databaseSet, DB database,
-                    // int type,
-                    String name, int observeReset, int observeAdd, int observeRemove, int observeList) {
-
+    public ItemMap(DCSet databaseSet, DB database,
+                   // int type,
+                   String name, int observeReset, int observeAdd, int observeRemove, int observeList) {
         this(databaseSet, database, name);
-
         if (databaseSet.isWithObserver()) {
             if (observeReset > 0)
                 this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
             if (observeList > 0)
                 this.observableData.put(DBMap.NOTIFY_LIST, observeList);
             if (databaseSet.isDynamicGUI()) {
-                if (observeAdd > 0)
-                    this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
-                if (observeRemove > 0)
-                    this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+                if (observeAdd > 0) {
+                    observableData.put(DBMap.NOTIFY_ADD, observeAdd);
+                }
+                if (observeRemove > 0) {
+                    observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+                }
             }
         }
     }
 
-    public Item_Map(Item_Map parent) {
+    public ItemMap(ItemMap parent) {
         super(parent, null);
-
-        this.key = parent.getLastKey();
+        key = parent.getLastKey();
     }
 
     public long getLastKey() {
-        return this.key;
+        return key;
     }
 
     public void setLastKey(long key) {
         // INCREMENT ATOMIC KEY IF EXISTS
-        if (this.atomicKey != null) {
-            this.atomicKey.set(key);
+        if (atomicKey != null) {
+            atomicKey.set(key);
         }
         this.key = key;
     }
@@ -85,8 +84,9 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
 
     public ItemCls get(Long key) {
         ItemCls item = super.get(key);
-        if (item == null)
+        if (item == null) {
             return null;
+        }
 
         item.setKey(key);
         return item;
@@ -94,32 +94,32 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
 
     public long add(ItemCls item) {
         // INCREMENT ATOMIC KEY IF EXISTS
-        if (this.atomicKey != null) {
-            this.atomicKey.incrementAndGet();
+        if (atomicKey != null) {
+            atomicKey.incrementAndGet();
         }
 
         // INCREMENT KEY
-        this.key++;
+        key++;
         item.setKey(key);
 
         // INSERT WITH NEW KEY
-        this.set(this.key, item);
+        set(key, item);
 
         // RETURN KEY
-        return this.key;
+        return key;
     }
 
     public void remove(long key) {
         super.delete(key);
 
-        if (this.key != key)
+        if (this.key != key) {
             // it is not top of STACK (for UNIQUE items with short NUM)
             return;
-
+        }
         // delete on top STACK
 
-        if (this.atomicKey != null) {
-            this.atomicKey.decrementAndGet();
+        if (atomicKey != null) {
+            atomicKey.decrementAndGet();
         }
 
         // DECREMENT KEY

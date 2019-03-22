@@ -22,7 +22,7 @@ import java.util.TreeMap;
  *
  * TODO: передлать подпись на Long
  */
-public class KK_K_Map extends DCMap<
+public class KKKMap extends DCMap<
         Tuple2<Long, Long>, // item1 Key + item2 Key
         TreeMap<Long, // item3 Key
                 Stack<Tuple3<
@@ -33,9 +33,9 @@ public class KK_K_Map extends DCMap<
 
     private String name;
 
-    public KK_K_Map(DCSet databaseSet, DB database,
-                    String name,
-                    int observerMessage_reset, int observerMessage_add, int observerMessage_remove, int observerMessage_list
+    public KKKMap(DCSet databaseSet, DB database,
+                  String name,
+                  int observerMessage_reset, int observerMessage_add, int observerMessage_remove, int observerMessage_list
     ) {
         super(databaseSet, database);
 
@@ -52,7 +52,7 @@ public class KK_K_Map extends DCMap<
 
     }
 
-    public KK_K_Map(KK_K_Map parent) {
+    public KKKMap(KKKMap parent) {
         super(parent, null);
     }
 

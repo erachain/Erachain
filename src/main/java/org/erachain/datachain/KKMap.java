@@ -25,7 +25,7 @@ import java.util.TreeMap;
  * TODO: переделать ссылку на запись на Лонг
  *
  */
-public class KK_Map extends DCMap<
+public class KKMap extends DCMap<
         Long, // item1 Key
         TreeMap<Long, // item2 Key
                 Stack<Tuple5<
@@ -40,9 +40,9 @@ public class KK_Map extends DCMap<
 
     private String name;
 
-    public KK_Map(DCSet databaseSet, DB database,
-                  String name,
-                  int observerMessage_reset, int observerMessage_add, int observerMessage_remove, int observerMessage_list
+    public KKMap(DCSet databaseSet, DB database,
+                 String name,
+                 int observerMessage_reset, int observerMessage_add, int observerMessage_remove, int observerMessage_list
     ) {
         super(databaseSet, database);
 
@@ -59,7 +59,7 @@ public class KK_Map extends DCMap<
 
     }
 
-    public KK_Map(KK_Map parent) {
+    public KKMap(KKMap parent) {
         super(parent, null);
     }
 

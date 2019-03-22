@@ -12,14 +12,13 @@ import java.util.Map;
  * Ключ: номер (автоинкремент)<br>
  * Значение: Представление<br>
  */
-public class ItemStatementMap extends Item_Map {
+public class ItemStatementMap extends ItemMap {
 
     static final String NAME = "item_statements";
-    static final int TYPE = ItemCls.STATEMENT_TYPE;
+    private static final int TYPE = ItemCls.STATEMENT_TYPE;
 
     public ItemStatementMap(DCSet databaseSet, DB database) {
         super(databaseSet, database,
-                //TYPE,
                 NAME,
                 ObserverMessage.RESET_STATEMENT_TYPE,
                 ObserverMessage.ADD_STATEMENT_TYPE,
@@ -34,11 +33,9 @@ public class ItemStatementMap extends Item_Map {
 
     // type+name not initialized yet! - it call as Super in New
     protected Map<Long, ItemCls> getMap(DB database) {
-
         //OPEN MAP
         return database.createTreeMap(NAME)
                 .valueSerializer(new ItemSerializer(TYPE))
-                //.valueSerializer(new StatusSerializer())
                 .makeOrGet();
     }
 

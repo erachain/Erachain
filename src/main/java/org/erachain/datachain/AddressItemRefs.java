@@ -16,13 +16,13 @@ import java.util.TreeMap;
  * Если ключ создан без времени, то хранит ссылку на последнюютранзакцию с этого счета
  * Ключ - счет (20 байт) + время (Long)
  * Значение  - массив байтов
- * Используется как супер класс для AddressStatement_Refs (которая сейчас не используется?) - видимо для быстрого поиска записей данного вида для данного счета
+ * Используется как супер класс для AddressStatementRefs (которая сейчас не используется?) - видимо для быстрого поиска записей данного вида для данного счета
  */
-public class AddressItem_Refs extends DCMap<Tuple2<byte[], Long>, byte[]> {
+public class AddressItemRefs extends DCMap<Tuple2<byte[], Long>, byte[]> {
     protected String name;
 
-    public AddressItem_Refs(DCSet databaseSet, DB database, String name,
-                            int observeReset, int observeAdd, int observeRemove, int observeList
+    public AddressItemRefs(DCSet databaseSet, DB database, String name,
+                           int observeReset, int observeAdd, int observeRemove, int observeList
     ) {
         super(databaseSet, database);
         this.name = name;
@@ -39,7 +39,7 @@ public class AddressItem_Refs extends DCMap<Tuple2<byte[], Long>, byte[]> {
     }
 
 
-    public AddressItem_Refs(AddressItem_Refs parent) {
+    public AddressItemRefs(AddressItemRefs parent) {
         super(parent, null);
     }
 

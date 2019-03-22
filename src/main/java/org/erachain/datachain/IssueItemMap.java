@@ -11,7 +11,7 @@ import java.util.TreeMap;
 /**
  * Super Class for Issue Items
  *
- * Ключ: подпись создавшей класс записи - поидее надо поменять на ссылку
+ * Ключ: подпись создавшей класс записи - по идее надо поменять на ссылку
  * Значение - номер сущности
  *
  * Используется в org.erachain.core.transaction.IssueItemRecord#orphan(int)
@@ -19,13 +19,13 @@ import java.util.TreeMap;
  * https://lab.erachain.org/erachain/Erachain/issues/465
  *
  */
-public abstract class Issue_ItemMap extends DCMap<byte[], Long> {
+public abstract class IssueItemMap extends DCMap<byte[], Long> {
 
-    public Issue_ItemMap(DCSet databaseSet, DB database) {
+    public IssueItemMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public Issue_ItemMap(Issue_ItemMap parent) {
+    public IssueItemMap(IssueItemMap parent) {
         super(parent, null);
     }
 
@@ -34,23 +34,23 @@ public abstract class Issue_ItemMap extends DCMap<byte[], Long> {
 
     @Override
     protected Map<byte[], Long> getMemoryMap() {
-        return new TreeMap<byte[], Long>(UnsignedBytes.lexicographicalComparator());
+        return new TreeMap<>(UnsignedBytes.lexicographicalComparator());
     }
 
     @Override
     protected Long getDefaultValue() {
-        return 0l;
+        return 0L;
     }
 
     public Long get(Transaction transaction) {
-        return this.get(transaction.getSignature());
+        return get(transaction.getSignature());
     }
 
     public void set(Transaction transaction, Long key) {
-        this.set(transaction.getSignature(), key);
+        set(transaction.getSignature(), key);
     }
 
     public void delete(Transaction transaction) {
-        this.delete(transaction.getSignature());
+        delete(transaction.getSignature());
     }
 }

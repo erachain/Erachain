@@ -18,7 +18,9 @@ import java.util.Map;
  * Ключ: номер (автоинкремент)<br>
  * Значение: Актив<br>
  */
-public class ItemAssetMap extends Item_Map {
+public class ItemAssetMap extends ItemMap {
+    // private Map<Integer, Integer> observableData = new HashMap<Integer,
+    // Integer>();
 
     // private Atomic.Long atomicKey;
     // private long key;

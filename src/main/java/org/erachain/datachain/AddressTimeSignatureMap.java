@@ -25,13 +25,14 @@ import java.util.Map;
  * @return
  */
 
-public class AddressTime_SignatureMap extends DCMap<Tuple2<String, Long>, byte[]> {
+public class AddressTimeSignatureMap extends DCMap<Tuple2<String, Long>, byte[]> {
+    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-    public AddressTime_SignatureMap(DCSet databaseSet, DB database) {
+    public AddressTimeSignatureMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public AddressTime_SignatureMap(AddressTime_SignatureMap parent) {
+    public AddressTimeSignatureMap(AddressTimeSignatureMap parent) {
         super(parent, null);
     }
 
@@ -55,7 +56,7 @@ public class AddressTime_SignatureMap extends DCMap<Tuple2<String, Long>, byte[]
         return null;
     }
 
-    public byte[] get(Account account, Long timestamp) {
+      public byte[] get(Account account, Long timestamp) {
         return this.get(account.getAddress(), timestamp);
     }
 

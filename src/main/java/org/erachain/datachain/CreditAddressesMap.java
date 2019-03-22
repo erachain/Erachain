@@ -20,13 +20,14 @@ import java.util.*;
  *
  */
 
-public class Credit_AddressesMap extends DCMap<Tuple3<String, Long, String>, BigDecimal> {
+public class CreditAddressesMap extends DCMap<Tuple3<String, Long, String>, BigDecimal> {
 
-    public Credit_AddressesMap(DCSet databaseSet, DB database) {
+
+    public CreditAddressesMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public Credit_AddressesMap(Credit_AddressesMap parent) {
+    public CreditAddressesMap(CreditAddressesMap parent) {
         super(parent, null);
     }
 

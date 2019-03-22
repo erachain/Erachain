@@ -12,13 +12,12 @@ import java.util.Map;
  * Ключ: номер (автоинкремент)<br>
  * Значение: Шаблон<br>
  */
-public class ItemTemplateMap extends Item_Map {
+public class ItemTemplateMap extends ItemMap {
     static final String NAME = "item_templates";
-    static final int TYPE = ItemCls.TEMPLATE_TYPE;
+    private static final int TYPE = ItemCls.TEMPLATE_TYPE;
 
     public ItemTemplateMap(DCSet databaseSet, DB database) {
         super(databaseSet, database,
-                //TYPE,
                 "item_templates",
                 ObserverMessage.RESET_TEMPLATE_TYPE,
                 ObserverMessage.ADD_TEMPLATE_TYPE,
@@ -33,7 +32,6 @@ public class ItemTemplateMap extends Item_Map {
 
     // type+name not initialized yet! - it call as Super in New
     protected Map<Long, ItemCls> getMap(DB database) {
-
         //OPEN MAP
         return database.createTreeMap(NAME)
                 .valueSerializer(new ItemSerializer(TYPE))

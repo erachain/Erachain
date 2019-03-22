@@ -3,8 +3,8 @@ package org.erachain.core.item.statements;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.Issue_ItemMap;
-import org.erachain.datachain.Item_Map;
+import org.erachain.datachain.IssueItemMap;
+import org.erachain.datachain.ItemMap;
 
 public abstract class StatementCls extends ItemCls {
 
@@ -18,7 +18,7 @@ public abstract class StatementCls extends ItemCls {
 
     public StatementCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
         this(new byte[TYPE_LENGTH], owner, name, icon, image, description);
-        this.typeBytes[0] = (byte) type;
+        typeBytes[0] = (byte) type;
 
     }
 
@@ -32,11 +32,11 @@ public abstract class StatementCls extends ItemCls {
     }
 
     // DB
-    public Item_Map getDBMap(DCSet db) {
+    public ItemMap getDBMap(DCSet db) {
         return db.getItemStatementMap();
     }
 
-    public Issue_ItemMap getDBIssueMap(DCSet db) {
+    public IssueItemMap getDBIssueMap(DCSet db) {
         return db.getIssueStatementMap();
     }
 

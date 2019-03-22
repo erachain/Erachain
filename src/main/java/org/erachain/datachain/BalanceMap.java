@@ -23,7 +23,7 @@ import java.util.TreeMap;
  *   b - balance
  *   outcome = b - a
  */
-public class _BalanceMap extends DCMap<Tuple2<Long, Long>,
+public class BalanceMap extends DCMap<Tuple2<Long, Long>,
         Tuple4<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> {
 
@@ -32,8 +32,8 @@ public class _BalanceMap extends DCMap<Tuple2<Long, Long>,
     @SuppressWarnings("rawtypes")
     private BTreeMap assetKeyMap;
 
-    public _BalanceMap(DCSet databaseSet, DB database,
-                       String name, int reset_BALANCE_TYPE, int add_BALANCE_TYPE, int remove_BALANCE_TYPE, int list_BALANCE_TYPE
+    public BalanceMap(DCSet databaseSet, DB database,
+                      String name, int reset_BALANCE_TYPE, int add_BALANCE_TYPE, int remove_BALANCE_TYPE, int list_BALANCE_TYPE
     ) {
         super(databaseSet, database);
 
@@ -49,7 +49,7 @@ public class _BalanceMap extends DCMap<Tuple2<Long, Long>,
         }
     }
 
-    public _BalanceMap(_BalanceMap parent) {
+    public BalanceMap(BalanceMap parent) {
         super(parent, null);
     }
 

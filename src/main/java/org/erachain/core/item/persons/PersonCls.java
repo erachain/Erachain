@@ -5,9 +5,9 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.Issue_ItemMap;
+import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemAssetBalanceMap;
-import org.erachain.datachain.Item_Map;
+import org.erachain.datachain.ItemMap;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ByteArrayUtils;
 import org.erachain.utils.DateTimeFormat;
@@ -208,11 +208,11 @@ public abstract class PersonCls extends ItemCls {
 
 
     // DB
-    public Item_Map getDBMap(DCSet db) {
+    public ItemMap getDBMap(DCSet db) {
         return db.getItemPersonMap();
     }
 
-    public Issue_ItemMap getDBIssueMap(DCSet db) {
+    public IssueItemMap getDBIssueMap(DCSet db) {
         return db.getIssuePersonMap();
     }
 

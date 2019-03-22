@@ -23,7 +23,7 @@ public class Lang {
     public static final String translationsUrl = "https://raw.githubusercontent.com/erachain/erachain-public/master/languages/";
 
     private static final Logger logger = LoggerFactory.getLogger(Lang.class);
-    private static Lang instance;
+    private volatile static Lang instance;
     private Map<String, String> noTranslateMap;
 
     private JSONObject langObj;
@@ -36,7 +36,6 @@ public class Lang {
         if (instance == null) {
             instance = new Lang();
         }
-
         return instance;
     }
 

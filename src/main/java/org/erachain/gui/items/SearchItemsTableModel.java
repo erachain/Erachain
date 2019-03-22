@@ -3,7 +3,7 @@ package org.erachain.gui.items;
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
-import org.erachain.datachain.Item_Map;
+import org.erachain.datachain.ItemMap;
 import org.erachain.gui.models.TableModelCls;
 
 import java.util.ArrayList;
@@ -16,9 +16,9 @@ public abstract class SearchItemsTableModel<T, U> extends TableModelCls<Long, It
 
     public SearchItemsTableModel(DBMap itemsMap, String[] columnNames, Boolean[] column_AutoHeight, int favorite) {
         super(itemsMap, columnNames, column_AutoHeight, favorite);
-
     }
-
+    protected List<ItemCls> list;
+    protected ItemMap db;
     public void fill(Set<Long> keys) {
         ItemCls item;
         list = new ArrayList<ItemCls>();
@@ -38,7 +38,7 @@ public abstract class SearchItemsTableModel<T, U> extends TableModelCls<Long, It
     }
 
     public void findByName(String filter) {
-        list = ((Item_Map) map).get_By_Name(filter, false);
+        list = ((ItemMap) map).get_By_Name(filter, false);
         //this.listSorted = new SortableList<Long, ItemCls>(this.map, keys);
         this.fireTableDataChanged();
     }

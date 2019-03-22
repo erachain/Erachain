@@ -99,8 +99,11 @@ function transactions_Table(data) {
             data.Transactions.transactions[key].seqNo + '</a><td><a href="?tx=' +
             data.Transactions.transactions[key].signature + get_lang() + '" title = "' +
             data.Transactions.transactions[key].signature + get_lang() + '">' +
-            data.Transactions.transactions[key].signature.slice(0, 11) + '...</a><td><a href="?tx=' +
-            data.Transactions.transactions[key].signature + get_lang() + '">' + data.Transactions.transactions[key].type +
+            data.Transactions.transactions[key].signature.slice(0, 11) + '...</a><td>'
+        if (data.Transactions.transactions[key].type !== 'forging') {
+            output += '<a href="?tx=' + data.Transactions.transactions[key].signature + get_lang() + '">'
+        }
+        output += data.Transactions.transactions[key].type +
             '</a><td>' + data.Transactions.transactions[key].amount_key + '<td>' + data.Transactions.transactions[key].date;
         output += '<td><a href ="?addr=' + data.Transactions.transactions[key].creator_addr + get_lang() + '">' +
             data.Transactions.transactions[key].creator + '</a>';
