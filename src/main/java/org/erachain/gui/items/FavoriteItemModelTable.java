@@ -26,9 +26,13 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
 
     public FavoriteItemModelTable(DCMap map, FavoriteItemMap favoriteMap, String[] columnNames, Boolean[] columnAutoHeight,
                                   int resetObserver, int addObserver, int deleteObserver, int listObserver, int favorite) {
-        super(map, columnNames, columnAutoHeight, favorite);
+        super(columnNames, columnAutoHeight);
 
+        // в головной гласс нельзя таблицу передавать - чтобы там лишний раз не запускалась иницализация наблюдения
+        // оно еще ен готово так как таблица вторая не присвоена - ниже привяжемся к наблюдениям
+        this.map = map;
         this.favoriteMap = favoriteMap;
+        this.COLUMN_FAVORITE = favorite;
 
         this.RESET_EVENT = resetObserver;
         this.ADD_EVENT = addObserver;
@@ -39,6 +43,9 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
         getInterval();
         this.fireTableDataChanged();
         needUpdate = false;
+
+        // переиницализация после установуи таблиц
+        addObserversThis();
 
     }
 
@@ -83,7 +90,7 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
 
     @Override
     public void getIntervalThis(long startBack, long endBack) {
-        this.listSorted = new SortableList<Long, ItemCls>((Item_Map)map, favoriteMap.getFromToKeys(startBack, endBack));
+        this.listSorted = new SortableList<Long, ItemCls>((Item_Map)map, favoriteMap.getFromToKeys(0, 999999999));
         this.listSorted.sort();
 
         this.list = new ArrayList<ItemCls>();
