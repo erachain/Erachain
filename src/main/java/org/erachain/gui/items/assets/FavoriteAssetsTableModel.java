@@ -21,7 +21,8 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
     public static final int COLUMN_I_OWNER = 6;
 
     public FavoriteAssetsTableModel() {
-        super(Controller.getInstance().wallet.database.getAssetFavoritesSet(),
+        super(DCSet.getInstance().getItemAssetMap(),
+                Controller.getInstance().wallet.database.getAssetFavoritesSet(),
                 new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"},
                 new Boolean[]{false, true, true, false, false, false, false, false},
                 ObserverMessage.RESET_ASSET_FAVORITES_TYPE,
@@ -74,14 +75,6 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
         }
 
         return null;
-    }
-
-    @Override
-    public void getIntervalThis(long startBack, long endBack) {
-        this.listSorted = new SortableList<Long, ItemCls>(
-                DCSet.getInstance().getItemAssetMap(),
-                Controller.getInstance().wallet.database.getAssetFavoritesSet().getFromToKeys(startBack, endBack));
-
     }
 
 }

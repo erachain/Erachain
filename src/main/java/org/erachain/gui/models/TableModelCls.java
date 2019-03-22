@@ -9,7 +9,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 public abstract class TableModelCls<T, U> extends TimerTableModelCls<T, U> {
 
-    protected List<U> list;
+    protected List<T> list;
     protected SortableList<T, U> listSorted;
 
     public int COLUMN_FAVORITE = 1000;
@@ -45,7 +45,7 @@ public abstract class TableModelCls<T, U> extends TimerTableModelCls<T, U> {
     }
 
     public U getItem(int row) {
-        return this.list.get(row);
+        return this.listSorted.get(row).getB();
     }
 
     public int getRowCount() {

@@ -22,7 +22,8 @@ public class FavoritePersonsTableModel extends FavoriteItemModelTable implements
     public static final int COLUMN_FAVORITE = 4;
 
     public FavoritePersonsTableModel() {
-        super(Controller.getInstance().wallet.database.getPersonFavoritesSet(),
+        super(DCSet.getInstance().getItemPersonMap(),
+                Controller.getInstance().wallet.database.getPersonFavoritesSet(),
                 new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false, false},
                 ObserverMessage.RESET_PERSON_FAVORITES_TYPE,

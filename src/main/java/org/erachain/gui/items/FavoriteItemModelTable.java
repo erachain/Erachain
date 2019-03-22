@@ -1,11 +1,17 @@
 package org.erachain.gui.items;
 
+import com.sun.xml.internal.bind.v2.util.CollisionCheckStack;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
+import org.erachain.database.SortableList;
 import org.erachain.database.wallet.FavoriteItemMap;
+import org.erachain.datachain.DCMap;
+import org.erachain.datachain.Item_Map;
 import org.erachain.gui.models.TableModelCls;
 import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 
+import javax.ws.rs.PathParam;
 import java.util.*;
 
 @SuppressWarnings("serial")
@@ -18,9 +24,9 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
 
     protected FavoriteItemMap favoriteMap;
 
-    public FavoriteItemModelTable(FavoriteItemMap favoriteMap, String[] columnNames, Boolean[] columnAutoHeight,
+    public FavoriteItemModelTable(DCMap map, FavoriteItemMap favoriteMap, String[] columnNames, Boolean[] columnAutoHeight,
                                   int resetObserver, int addObserver, int deleteObserver, int listObserver, int favorite) {
-        super(null, columnNames, columnAutoHeight, favorite);
+        super(map, columnNames, columnAutoHeight, favorite);
 
         this.favoriteMap = favoriteMap;
 
@@ -63,17 +69,40 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
     }
 
     //public abstract int getMapSize();
+    @Override
     public long getMapSize() {
         return favoriteMap.size();
     }
 
+    @Override
+    public void getInterval() {
+
+        getIntervalThis( start, step);
+
+    }
+
+
+    @Override
+    public void getIntervalThis(long startBack, long endBack) {
+        this.listSorted = new SortableList<Long, ItemCls>((Item_Map)map, favoriteMap.getFromToKeys(startBack, endBack));
+        this.list = new ArrayList<Long, ItemCls>();
+        this.list.addAll(this.listSorted);
+
+        for (Pair<Long, ItemCls> key: listSorted) {
+            ItemCls item = (ItemCls)map.get(key.getA());
+        }
+
+    }
+
     public void addObserversThis() {
-        if (Controller.getInstance().doesWalletDatabaseExists())
+        if (Controller.getInstance().doesWalletDatabaseExists()
+            && favoriteMap != null)
             favoriteMap.addObserver(this);
     }
 
     public void removeObserversThis() {
-        if (Controller.getInstance().doesWalletDatabaseExists())
+        if (Controller.getInstance().doesWalletDatabaseExists()
+                && favoriteMap != null)
             favoriteMap.deleteObserver(this);
     }
 

@@ -24,7 +24,8 @@ public class FavoriteTemplatesTableModel extends FavoriteItemModelTable implemen
     public static final int COLUMN_FAVORITE = 4;
 
     public FavoriteTemplatesTableModel() {
-        super(Controller.getInstance().wallet.database.getTemplateFavoritesSet(),
+        super(DCSet.getInstance().getItemTemplateMap(),
+                Controller.getInstance().wallet.database.getTemplateFavoritesSet(),
                 new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false, false},
                 ObserverMessage.RESET_TEMPLATE_FAVORITES_TYPE,
@@ -70,5 +71,5 @@ public class FavoriteTemplatesTableModel extends FavoriteItemModelTable implemen
 
         return null;
     }
-    
+
 }

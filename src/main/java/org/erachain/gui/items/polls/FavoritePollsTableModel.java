@@ -23,7 +23,8 @@ public class FavoritePollsTableModel extends FavoriteItemModelTable implements O
     public static final int COLUMN_FAVORITE = 4;
 
     public FavoritePollsTableModel() {
-        super(Controller.getInstance().wallet.database.getPollFavoritesSet(),
+        super(DCSet.getInstance().getItemPollMap(),
+                Controller.getInstance().wallet.database.getPollFavoritesSet(),
                 new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false, false},
                 ObserverMessage.WALLET_RESET_POLL_FAVORITES_TYPE,
