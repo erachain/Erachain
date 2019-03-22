@@ -428,8 +428,6 @@ public class Wallet extends Observable implements Observer {
 		Controller.getInstance().addObserver(this);
 		DCSet.getInstance().getCompletedOrderMap().addObserver(this);
 
-		this.initiateItemsFavorites();
-
 		// SOME
 		// Account initAccount = this.getAccounts().get(0);
 		// initAccount.setConfirmedBalance(Transaction.AssetCls.DILE_KEY,

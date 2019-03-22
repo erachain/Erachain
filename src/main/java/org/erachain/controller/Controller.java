@@ -3379,6 +3379,10 @@ public class Controller extends Observable {
                     }
                 }
 
+                if (Controller.getInstance().doesWalletExists()) {
+                    Controller.getInstance().wallet.initiateItemsFavorites();
+                }
+
 
             } catch (Exception e) {
 
