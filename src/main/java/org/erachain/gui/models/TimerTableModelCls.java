@@ -20,9 +20,9 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
     protected boolean needUpdate;
 
     protected Boolean[] columnAutoHeight; // = new Boolean[]{true, true, true, true, true, true, true, false, false};
-    protected int start = 0;
+    protected long start = 0;
     protected int step = 50;
-    protected int size = 0;
+    protected long size = 0;
 
     protected DBMap map;
     protected Logger LOGGER;
@@ -142,13 +142,13 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
     }
 
     //public abstract int getMapSize();
-    public int getMapSize() {
+    public long getMapSize() {
         return 0;
     }
 
     public void getInterval() {
 
-        int startBack = -getMapSize() + start;
+        long startBack = -getMapSize() + start;
         getIntervalThis( startBack, startBack + step);
 
     }
@@ -164,7 +164,8 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
 
     public void addObservers() {
         addObserversThis();
-        if (timeout > 0) initTimer();
+        if (timeout > 0)
+            initTimer();
     }
 
     protected abstract void removeObserversThis();

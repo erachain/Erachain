@@ -4,16 +4,13 @@ import org.erachain.core.item.assets.AssetCls;
 import org.mapdb.DB;
 import org.erachain.utils.ObserverMessage;
 
-import java.util.List;
-import java.util.Observer;
-
-public class FavoriteItemAsset extends FavoriteItem {
-
+public class FavoriteItemMapAsset extends FavoriteItemMap {
 
     // favorites init SET
-    public FavoriteItemAsset(DWSet dWSet, DB database) {
+    public FavoriteItemMapAsset(DWSet dWSet, DB database) {
         super(dWSet, database, ObserverMessage.LIST_ASSET_FAVORITES_TYPE, "asset", AssetCls.INITIAL_FAVORITES //, dWSet.getAssetMap()
         );
 
     }
+
 }

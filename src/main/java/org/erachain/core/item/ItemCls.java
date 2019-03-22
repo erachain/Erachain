@@ -126,7 +126,7 @@ public abstract class ItemCls {
     public abstract int getItemTypeInt();
 
     public abstract String getItemTypeStr();
-    //public abstract FavoriteItem getDBFavoriteMap();
+    //public abstract FavoriteItemMap getDBFavoriteMap();
 
     public abstract String getItemSubType();
 

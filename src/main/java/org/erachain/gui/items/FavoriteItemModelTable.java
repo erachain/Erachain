@@ -2,12 +2,8 @@ package org.erachain.gui.items;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.assets.AssetCls;
-import org.erachain.database.DBMap;
-import org.erachain.database.SortableList;
-import org.erachain.datachain.DCSet;
+import org.erachain.database.wallet.FavoriteItemMap;
 import org.erachain.gui.models.TableModelCls;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 
 import java.util.*;
@@ -20,14 +16,23 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
     private final int DELETE_EVENT;
     private final int LIST_EVENT;
 
-    public FavoriteItemModelTable(DBMap map, String[] columnNames, Boolean[] columnAutoHeight,
-              int resetObserver, int addObserver, int deleteObserver, int listObserver, int favorite) {
-        super(map, columnNames, columnAutoHeight, favorite);
+    protected FavoriteItemMap favoriteMap;
+
+    public FavoriteItemModelTable(FavoriteItemMap favoriteMap, String[] columnNames, Boolean[] columnAutoHeight,
+                                  int resetObserver, int addObserver, int deleteObserver, int listObserver, int favorite) {
+        super(null, columnNames, columnAutoHeight, favorite);
+
+        this.favoriteMap = favoriteMap;
 
         this.RESET_EVENT = resetObserver;
         this.ADD_EVENT = addObserver;
         this.DELETE_EVENT = deleteObserver;
         this.LIST_EVENT = listObserver;
+
+        // теперь нужно опять послать событие чтобы загрузить
+        getInterval();
+        this.fireTableDataChanged();
+        needUpdate = false;
 
     }
 

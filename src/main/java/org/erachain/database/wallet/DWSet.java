@@ -41,15 +41,15 @@ public class DWSet extends DBASet {
     private WItemUnionMap unionMap;
     private WItemPollMap pollMap;
     private OrderMap orderMap;
-    private FavoriteItemAsset assetFavoritesSet;
-    private FavoriteItemTemplate templateFavoritesSet;
-    private FavoriteItemImprint imprintFavoritesSet;
-    private FavoriteItemPoll pollFavoriteSet;
+    private FavoriteItemMapAsset assetFavoritesSet;
+    private FavoriteItemMapTemplate templateFavoritesSet;
+    private FavoriteItemMapImprint imprintFavoritesSet;
+    private FavoriteItemMapPoll pollFavoriteSet;
     private TelegramsMap telegramsMap;
 
-    private FavoriteItemPerson personFavoritesSet;
-    private FavoriteItemStatus statusFavoritesSet;
-    private FavoriteItemUnion unionFavoritesSet;
+    private FavoriteItemMapPerson personFavoritesSet;
+    private FavoriteItemMapStatus statusFavoritesSet;
+    private FavoriteItemMapUnion unionFavoritesSet;
 
     private FavoriteDocument statementFavoritesSet;
 
@@ -75,13 +75,13 @@ public class DWSet extends DBASet {
         this.unionMap = new WItemUnionMap(this, this.database);
         this.pollMap = new WItemPollMap(this, this.database);
         this.orderMap = new OrderMap(this, this.database);
-        this.assetFavoritesSet = new FavoriteItemAsset(this, this.database);
-        this.templateFavoritesSet = new FavoriteItemTemplate(this, this.database);
-        this.imprintFavoritesSet = new FavoriteItemImprint(this, this.database);
-        this.pollFavoriteSet = new FavoriteItemPoll(this, this.database);
-        this.personFavoritesSet = new FavoriteItemPerson(this, this.database);
-        this.statusFavoritesSet = new FavoriteItemStatus(this, this.database);
-        this.unionFavoritesSet = new FavoriteItemUnion(this, this.database);
+        this.assetFavoritesSet = new FavoriteItemMapAsset(this, this.database);
+        this.templateFavoritesSet = new FavoriteItemMapTemplate(this, this.database);
+        this.imprintFavoritesSet = new FavoriteItemMapImprint(this, this.database);
+        this.pollFavoriteSet = new FavoriteItemMapPoll(this, this.database);
+        this.personFavoritesSet = new FavoriteItemMapPerson(this, this.database);
+        this.statusFavoritesSet = new FavoriteItemMapStatus(this, this.database);
+        this.unionFavoritesSet = new FavoriteItemMapUnion(this, this.database);
         this.statementFavoritesSet = new FavoriteDocument(this, this.database);
         this.telegramsMap = new TelegramsMap(this,this.database);
 
@@ -276,24 +276,24 @@ public class DWSet extends DBASet {
         return this.orderMap;
     }
 
-    public FavoriteItemAsset getAssetFavoritesSet() {
+    public FavoriteItemMapAsset getAssetFavoritesSet() {
         return this.assetFavoritesSet;
     }
 
-    public FavoriteItemTemplate getTemplateFavoritesSet() {
+    public FavoriteItemMapTemplate getTemplateFavoritesSet() {
         return this.templateFavoritesSet;
     }
 
-    public FavoriteItemImprint getImprintFavoritesSet() {
+    public FavoriteItemMapImprint getImprintFavoritesSet() {
         return this.imprintFavoritesSet;
     }
 
-    public FavoriteItemPoll getPollFavoritesSet() {
+    public FavoriteItemMapPoll getPollFavoritesSet() {
         return this.pollFavoriteSet;
     }
 
 
-    public FavoriteItemPerson getPersonFavoritesSet() {
+    public FavoriteItemMapPerson getPersonFavoritesSet() {
         return this.personFavoritesSet;
     }
 
@@ -301,15 +301,15 @@ public class DWSet extends DBASet {
         return this.statementFavoritesSet;
     }
 
-    public FavoriteItemStatus getStatusFavoritesSet() {
+    public FavoriteItemMapStatus getStatusFavoritesSet() {
         return this.statusFavoritesSet;
     }
 
-    public FavoriteItemUnion getUnionFavoritesSet() {
+    public FavoriteItemMapUnion getUnionFavoritesSet() {
         return this.unionFavoritesSet;
     }
 
-    public FavoriteItem getItemFavoritesSet(ItemCls item) {
+    public FavoriteItemMap getItemFavoritesSet(ItemCls item) {
         if (item instanceof AssetCls) {
             return this.assetFavoritesSet;
         } else if (item instanceof ImprintCls) {
