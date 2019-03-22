@@ -2,7 +2,7 @@ package org.erachain.gui.items;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.SortableList;
-import org.erachain.datachain.Item_Map;
+import org.erachain.datachain.ItemMap;
 import org.erachain.gui.models.TableModelCls;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.Observable;
 public abstract class TableModelItemsSearch extends TableModelCls<Long, ItemCls> {
 
     protected ArrayList<ItemCls> list;
-    protected Item_Map db;
+    protected ItemMap db;
 
     public TableModelItemsSearch(String[] columnNames) {
         super(columnNames);

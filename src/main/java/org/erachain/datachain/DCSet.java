@@ -499,7 +499,6 @@ public class DCSet extends DBASet implements Observer {
         this.kKStatusUnionMap.reset();
         this.addressPersonMap.reset();
         this.personAddressMap.reset();
-        this.kK_KPersonStatusUnionMap.reset();
         this.kK_KPersonStatusUnionMapPersonStatusUnionTable.reset();
         this.vouchRecordMap.reset();
         this.hashesMap.reset();
