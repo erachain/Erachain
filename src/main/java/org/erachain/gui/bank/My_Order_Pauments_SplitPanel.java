@@ -104,7 +104,7 @@ public class My_Order_Pauments_SplitPanel extends Split_Panel {
 
                 if (e.getClickCount() == 1 & e.getButton() == e.BUTTON1) {
 
-                    //	if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == PersonsItemsTableModel.COLUMN_FAVORITE){
+                    //	if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == ItemsPersonsTableModel.COLUMN_FAVORITE){
                     //		row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
                     //	 PersonCls asset = my_PersonsModel.getItem(row);
                     //	favorite_set( jTable_jScrollPanel_LeftPanel);

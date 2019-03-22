@@ -6,7 +6,7 @@ import org.erachain.gui.items.SearchItemsTableModel;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
-public class PersonsItemsTableModel extends SearchItemsTableModel {
+public class ItemsPersonsTableModel extends SearchItemsTableModel {
 
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
@@ -14,11 +14,11 @@ public class PersonsItemsTableModel extends SearchItemsTableModel {
     public static final int COLUMN_PUBLISHER = 3;
     public static final int COLUMN_FAVORITE = 4;
 
-    public PersonsItemsTableModel() {
+    public ItemsPersonsTableModel() {
         super(DCSet.getInstance().getItemPersonMap(), new String[]{"Key", "Name", "Birthday", "Publisher", "Favorite"},
                 new Boolean[]{false, true, true, false},
                 COLUMN_FAVORITE);
-        LOGGER = LoggerFactory.getLogger(PersonsItemsTableModel.class.getName());
+        LOGGER = LoggerFactory.getLogger(ItemsPersonsTableModel.class.getName());
     }
 
     @Override

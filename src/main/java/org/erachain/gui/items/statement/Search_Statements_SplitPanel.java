@@ -4,7 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.transaction.R_SignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Split_Panel;
-import org.erachain.gui.items.persons.PersonsItemsTableModel;
+import org.erachain.gui.items.persons.ItemsPersonsTableModel;
 import org.erachain.gui.library.Issue_Confirm_Dialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
@@ -22,7 +22,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-public class Statements_Search_SplitPanel extends Split_Panel {
+public class Search_Statements_SplitPanel extends Split_Panel {
 
     private static final long serialVersionUID = 2717571093561259483L;
     protected Issue_Confirm_Dialog ddd;
@@ -31,12 +31,12 @@ public class Statements_Search_SplitPanel extends Split_Panel {
     int alpha_int;
     private Statements_Table_Model_Search search_Table_Model;
     // private MTable search_Table;
-    private RowSorter<PersonsItemsTableModel> search_Sorter;
+    private RowSorter<ItemsPersonsTableModel> search_Sorter;
     private int selected_Item;
     private JTextField key_Item;
 
-    public Statements_Search_SplitPanel() {
-        super("Statements_Search_SplitPanel");
+    public Search_Statements_SplitPanel() {
+        super("Search_Statements_SplitPanel");
         setName(Lang.getInstance().translate("Search Statements"));
         searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         this.searchToolBar_LeftPanel.setVisible(true);
@@ -114,7 +114,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 
         // Sorter
         // search_Sorter = new
-        // TableRowSorter<PersonsItemsTableModel>(this.search_Table_Model);
+        // TableRowSorter<ItemsPersonsTableModel>(this.search_Table_Model);
         // search_Table.setRowSorter(search_Sorter);
 
         // UPDATE FILTER ON TEXT CHANGE

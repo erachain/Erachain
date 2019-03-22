@@ -4,7 +4,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.items.Item_Search_SplitPanel;
+import org.erachain.gui.items.Search_Item_SplitPanel;
 import org.erachain.gui.items.accounts.Account_Send_Dialog;
 import org.erachain.gui.items.mails.Mail_Send_Dialog;
 import org.erachain.gui.records.VouchRecordDialog;
@@ -15,16 +15,14 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Persons_Search_SplitPanel extends Item_Search_SplitPanel {
+public class Search_Persons_SplitPanel extends Search_Item_SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
 
-    private static PersonsItemsTableModel search_Table_Model = new PersonsItemsTableModel();
+    private Search_Persons_SplitPanel th;
 
-    private Persons_Search_SplitPanel th;
-
-    public Persons_Search_SplitPanel() {
-        super(search_Table_Model, "Persons_Search_SplitPanel", "Persons_Search_SplitPanel");
+    public Search_Persons_SplitPanel() {
+        super(new ItemsPersonsTableModel(), "Search_Persons_SplitPanel", "Search_Persons_SplitPanel");
 
         this.th = this;
         JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));

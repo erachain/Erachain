@@ -9,7 +9,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.*;
 import org.erachain.gui.items.accounts.Account_Send_Panel;
 import org.erachain.gui.items.accounts.My_Accounts_SplitPanel;
-import org.erachain.gui.items.assets.Search_Assets_Tab;
+import org.erachain.gui.items.assets.Search_Assets_SplitPanel;
 import org.erachain.gui.models.WalletTransactionsTableModel;
 import org.erachain.gui.settings.SettingsFrame;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
@@ -248,7 +248,7 @@ public class SysTray implements Observer {
                 frame.setIconImage(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
                 frame.setSize(800, 600);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                Search_Assets_Tab ap = new Search_Assets_Tab(true);
+                Search_Assets_SplitPanel ap = new Search_Assets_SplitPanel(true);
                 frame.getContentPane().add(ap);
                 frame.pack();
                 frame.setLocationRelativeTo(null);

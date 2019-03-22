@@ -4,7 +4,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.items.Item_Search_SplitPanel;
+import org.erachain.gui.items.Search_Item_SplitPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -12,15 +12,15 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Polls_Search_SplitPanel extends Item_Search_SplitPanel {
+public class Search_Polls_SplitPanel extends Search_Item_SplitPanel {
     /**
      *
      */
     private static final long serialVersionUID = 1L;
     private static PollsItemsTableModel tableModelPolls = new PollsItemsTableModel();
-    private Polls_Search_SplitPanel th;
+    private Search_Polls_SplitPanel th;
 
-    public Polls_Search_SplitPanel() {
+    public Search_Polls_SplitPanel() {
         super(tableModelPolls, "Search_Popll_Tab", "Search_Poll_Tab");
         th = this;
 

@@ -2,7 +2,7 @@ package org.erachain.gui.items.unions;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.unions.UnionCls;
-import org.erachain.gui.items.Item_Search_SplitPanel;
+import org.erachain.gui.items.Search_Item_SplitPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -10,7 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Search_Union_Tab extends Item_Search_SplitPanel {
+public class Search_Union_Tab extends Search_Item_SplitPanel {
     /**
      *
      */

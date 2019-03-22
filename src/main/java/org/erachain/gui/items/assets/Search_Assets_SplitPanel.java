@@ -4,7 +4,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.items.Item_Search_SplitPanel;
+import org.erachain.gui.items.Search_Item_SplitPanel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
 
@@ -13,17 +13,17 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Search_Assets_Tab extends Item_Search_SplitPanel {
+public class Search_Assets_SplitPanel extends Search_Item_SplitPanel {
     /**
      *
      */
     private static final long serialVersionUID = 1L;
     private static ItemAssetsTableModel tableModelItemAssets = new ItemAssetsTableModel();
-    private Search_Assets_Tab th;
+    private Search_Assets_SplitPanel th;
 
 
-    public Search_Assets_Tab(boolean search_and_exchange) {
-        super(tableModelItemAssets, "Search_Assets_Tab", "Search_Assets_Tab");
+    public Search_Assets_SplitPanel(boolean search_and_exchange) {
+        super(tableModelItemAssets, "Search_Assets_SplitPanel", "Search_Assets_SplitPanel");
         th = this;
         setName(Lang.getInstance().translate("Search Assets"));
 

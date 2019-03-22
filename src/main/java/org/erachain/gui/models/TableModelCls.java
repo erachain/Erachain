@@ -45,7 +45,8 @@ public abstract class TableModelCls<T, U> extends TimerTableModelCls<T, U> {
     }
 
     public U getItem(int row) {
-        return this.listSorted.get(row).getB();
+        //return this.listSorted.get(row).getB();
+        return this.list.get(row);
     }
 
     public int getRowCount() {

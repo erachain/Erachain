@@ -47,7 +47,7 @@ public class FavoritePersonsTableModel extends FavoriteItemModelTable implements
         switch (column) {
             case COLUMN_KEY:
 
-                return person.getKey(DCSet.getInstance());
+                return person.getKey();
 
             case COLUMN_NAME:
 

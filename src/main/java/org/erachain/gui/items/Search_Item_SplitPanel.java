@@ -11,7 +11,7 @@ import org.erachain.gui.library.M_DecimalFormatedTextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Item_Search_SplitPanel extends Item_SplitPanel {
+public class Search_Item_SplitPanel extends Item_SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
     protected SearchItemsTableModel search_Table_Model;
@@ -22,7 +22,7 @@ public class Item_Search_SplitPanel extends Item_SplitPanel {
 //	protected ItemCls item_Table_Selected = null;
 
     @SuppressWarnings("rawtypes")
-    public Item_Search_SplitPanel(SearchItemsTableModel search_Table_Model1, String gui_Name, String search_Label_Text) {
+    public Search_Item_SplitPanel(SearchItemsTableModel search_Table_Model1, String gui_Name, String search_Label_Text) {
 
         super(search_Table_Model1, gui_Name);
         this.search_Table_Model = search_Table_Model1;

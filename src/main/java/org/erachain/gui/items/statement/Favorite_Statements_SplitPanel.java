@@ -4,7 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.transaction.R_SignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Split_Panel;
-import org.erachain.gui.items.persons.PersonsItemsTableModel;
+import org.erachain.gui.items.persons.ItemsPersonsTableModel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
@@ -25,7 +25,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 
-public class Statements_Favorite_SplitPanel extends Split_Panel {
+public class Favorite_Statements_SplitPanel extends Split_Panel {
 
     private static final long serialVersionUID = 2717571093561259483L;
     // для прозрачности
@@ -33,10 +33,10 @@ public class Statements_Favorite_SplitPanel extends Split_Panel {
     int alpha_int;
     private Statements_Table_Model_Favorite search_Table_Model;
     //	private MTable search_Table;
-    private RowSorter<PersonsItemsTableModel> search_Sorter;
+    private RowSorter<ItemsPersonsTableModel> search_Sorter;
 
-    public Statements_Favorite_SplitPanel() {
-        super("Statements_Favorite_SplitPanel");
+    public Favorite_Statements_SplitPanel() {
+        super("Favorite_Statements_SplitPanel");
         setName(Lang.getInstance().translate("Favorite Documents"));
         searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 
@@ -59,14 +59,14 @@ public class Statements_Favorite_SplitPanel extends Split_Panel {
 		
 	/*		
 		//CHECKBOX FOR FAVORITE
-				TableColumn favoriteColumn = search_Table.getColumnModel().getColumn(PersonsItemsTableModel.COLUMN_FAVORITE);
+				TableColumn favoriteColumn = search_Table.getColumnModel().getColumn(ItemsPersonsTableModel.COLUMN_FAVORITE);
 				favoriteColumn.setCellRenderer(new Renderer_Boolean()); 
 				favoriteColumn.setMinWidth(50);
 				favoriteColumn.setMaxWidth(50);
 				favoriteColumn.setPreferredWidth(50);
 	*/
         //Sorter
-        //			 search_Sorter = new TableRowSorter<PersonsItemsTableModel>(this.search_Table_Model);
+        //			 search_Sorter = new TableRowSorter<ItemsPersonsTableModel>(this.search_Table_Model);
         //			search_Table.setRowSorter(search_Sorter);
 
         // UPDATE FILTER ON TEXT CHANGE

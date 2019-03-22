@@ -4,7 +4,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.items.Item_Search_SplitPanel;
+import org.erachain.gui.items.Search_Item_SplitPanel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
 
@@ -14,13 +14,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 @SuppressWarnings("serial")
-public class Search_Templates_Tab extends Item_Search_SplitPanel {
+public class Search_Templates_SplitPanel extends Search_Item_SplitPanel {
     private static TemplatesItemsTableModel tableModelTemplates = new TemplatesItemsTableModel();
-    private Search_Templates_Tab th;
+    private Search_Templates_SplitPanel th;
 
 
-    public Search_Templates_Tab() {
-        super(tableModelTemplates, "Search_Templates_Tab", "Search_Templates_Tab");
+    public Search_Templates_SplitPanel() {
+        super(tableModelTemplates, "Search_Templates_SplitPanel", "Search_Templates_SplitPanel");
         this.th = this;
         setName(Lang.getInstance().translate("Search Templates"));
         JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
