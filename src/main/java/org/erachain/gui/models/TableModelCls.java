@@ -1,25 +1,56 @@
 package org.erachain.gui.models;
 
-import org.erachain.controller.Controller;
-import org.erachain.core.transaction.Transaction;
+import org.erachain.core.item.ItemCls;
+import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
-import org.mapdb.Fun;
 
-import javax.swing.table.AbstractTableModel;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.List;
 
 @SuppressWarnings("serial")
-public abstract class TableModelCls<T, U> extends TimerTableModelCls {
+public abstract class TableModelCls<T, U> extends TimerTableModelCls<T, U> {
 
-    public abstract SortableList<T, U> getSortableList();
+    protected List<U> list;
+    protected SortableList<T, U> listSorted;
+
+    public int COLUMN_FAVORITE = 1000;
 
     public TableModelCls(String[] columnNames) {
         super(columnNames);
     }
 
-    public TableModelCls(String name, long timeout, String[] columnNames) {
-        super(name, timeout, columnNames);
+    public TableModelCls(DBMap map, String[] columnNames) {
+        super(map, columnNames);
     }
+
+    public TableModelCls(String[] columnNames, Boolean[] column_AutoHeight) {
+        super(columnNames, column_AutoHeight);
+    }
+
+    public TableModelCls(DBMap map, String[] columnNames, Boolean[] column_AutoHeight) {
+        super(map, columnNames, column_AutoHeight);
+    }
+
+    public TableModelCls(DBMap map, String[] columnNames, Boolean[] column_AutoHeight, int favoriteColumn) {
+        super(map, columnNames, column_AutoHeight);
+        this.COLUMN_FAVORITE = favoriteColumn;
+
+    }
+
+    public TableModelCls(DBMap map, String name, long timeout, String[] columnNames, Boolean[] column_AutoHeight) {
+        super(map, name, timeout, columnNames, column_AutoHeight);
+    }
+
+    public SortableList<T, U> getSortableList() {
+        return listSorted;
+    }
+
+    public U getItem(int row) {
+        return this.listSorted.get(row).getB();
+    }
+
+    public int getRowCount() {
+        return (this.list == null) ? 0 : this.list.size();
+    }
+
 
 }

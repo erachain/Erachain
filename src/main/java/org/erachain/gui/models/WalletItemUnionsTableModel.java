@@ -22,33 +22,14 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
 
     private SortableList<Tuple2<String, String>, UnionCls> unions;
 
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
-
     public WalletItemUnionsTableModel() {
-        super("WalletItemUnionsTableModel", 1000,
-                new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"});
+        super(new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"}, new Boolean[]{false, true, true, false, false});
 
     }
 
     @Override
     public SortableList<Tuple2<String, String>, UnionCls> getSortableList() {
         return this.unions;
-    }
-
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
     }
 
     public UnionCls getItem(int row) {

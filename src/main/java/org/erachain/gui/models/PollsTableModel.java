@@ -6,9 +6,7 @@ import org.erachain.core.voting.Poll;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.PollMap;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
-import org.mapdb.Fun;
 
 import javax.validation.constraints.Null;
 import java.math.BigDecimal;
@@ -26,8 +24,8 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
     private PollMap db;
 
     public PollsTableModel() {
-        super("PollsTableModel", 2000,
-                new String[]{"Name", "Creator", "Total Votes"});
+        super(DCSet.getInstance().getPollMap(), "PollsTableModel", 2000,
+                new String[]{"Name", "Creator", "Total Votes"}, null);
     }
 
     public void setAsset(AssetCls asset) {
@@ -125,12 +123,12 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
     }
 
     @Override
-    public Object getItem(int k) {
+    public Poll getItem(int k) {
         // TODO Auto-generated method stub
         return this.polls.get(k).getB();
     }
 
-    public void getIntervalThis(int startBack, int endBack) {
+    public void getIntervalThis(long startBack, long endBack) {
     }
 
 }

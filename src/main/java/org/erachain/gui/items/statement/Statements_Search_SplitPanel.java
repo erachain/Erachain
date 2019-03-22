@@ -4,7 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.transaction.R_SignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Split_Panel;
-import org.erachain.gui.items.persons.TableModelPersons;
+import org.erachain.gui.items.persons.PersonsItemsTableModel;
 import org.erachain.gui.library.Issue_Confirm_Dialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
@@ -31,7 +31,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
     int alpha_int;
     private Statements_Table_Model_Search search_Table_Model;
     // private MTable search_Table;
-    private RowSorter<TableModelPersons> search_Sorter;
+    private RowSorter<PersonsItemsTableModel> search_Sorter;
     private int selected_Item;
     private JTextField key_Item;
 
@@ -114,7 +114,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 
         // Sorter
         // search_Sorter = new
-        // TableRowSorter<TableModelPersons>(this.search_Table_Model);
+        // TableRowSorter<PersonsItemsTableModel>(this.search_Table_Model);
         // search_Table.setRowSorter(search_Sorter);
 
         // UPDATE FILTER ON TEXT CHANGE

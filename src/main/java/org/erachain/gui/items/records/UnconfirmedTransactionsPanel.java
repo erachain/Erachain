@@ -24,26 +24,23 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.Split_Panel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.library;
-import org.erachain.gui.models.Debug_Transactions_Table_Model;
+import org.erachain.gui.models.UnconfirmedTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
-//import java.awt.ScrollPaneLayout;
-//import java.awt.la
 
 @SuppressWarnings("serial")
-public class Records_UnConfirmed_Panel extends JPanel // JPanel
+public class UnconfirmedTransactionsPanel extends JPanel
 
 {
 
-    private static Records_UnConfirmed_Panel instance;
-    private Debug_Transactions_Table_Model transactionsModel;
+    private static UnconfirmedTransactionsPanel instance;
+    private UnconfirmedTransactionsTableModel transactionsModel;
     private MTable transactionsTable;
-    private Records_UnConfirmed_Panel th;
 
-    public Records_UnConfirmed_Panel() {
-        th = this;
+
+    public UnconfirmedTransactionsPanel() {
         setName(Lang.getInstance().translate("Unconfirmed Records"));
         // this.parent = parent;
         this.setLayout(new GridBagLayout());
@@ -70,63 +67,8 @@ public class Records_UnConfirmed_Panel extends JPanel // JPanel
         tableGBC.gridy = 1;
 
         // TRANSACTIONS
-        this.transactionsModel = new Debug_Transactions_Table_Model();
+        this.transactionsModel = new UnconfirmedTransactionsTableModel();
         this.transactionsTable = new MTable(this.transactionsModel);
-        /*
-         * //TRANSACTIONS SORTER Map<Integer, Integer> indexes = new
-         * TreeMap<Integer, Integer>();
-         * indexes.put(WalletTransactionsTableModel.COLUMN_CONFIRMATIONS,
-         * TransactionMap.TIMESTAMP_INDEX);
-         * indexes.put(WalletTransactionsTableModel.COLUMN_TIMESTAMP,
-         * TransactionMap.TIMESTAMP_INDEX);
-         * indexes.put(WalletTransactionsTableModel.COLUMN_CREATOR,
-         * TransactionMap.ADDRESS_INDEX);
-         * indexes.put(WalletTransactionsTableModel.COLUMN_AMOUNT,
-         * TransactionMap.AMOUNT_INDEX); CoreRowSorter sorter = new
-         * CoreRowSorter(transactionsModel, indexes);
-         * transactionsTable.setRowSorter(sorter);
-         *
-         * //Custom renderer for the String column; //RenderingHints.
-         * this.transactionsTable.setDefaultRenderer(Long.class, new
-         * Renderer_Right()); // set renderer //
-         * this.transactionsTable.setDefaultRenderer(String.class, new
-         * Renderer_Left(this.transactionsTable.getFontMetrics(this.
-         * transactionsTable.getFont()),transactionsModel.get_Column_AutoHeight(
-         * ))); // set renderer
-         * this.transactionsTable.setDefaultRenderer(Boolean.class, new
-         * Renderer_Boolean()); // set renderer
-         * this.transactionsTable.setDefaultRenderer(Double.class, new
-         * Renderer_Right()); // set renderer
-         * this.transactionsTable.setDefaultRenderer(Integer.class, new
-         * Renderer_Right()); // set renderer
-         *
-         * this.transactionsTable.setSelectionMode(ListSelectionModel.
-         * SINGLE_SELECTION );
-         *
-         * TableColumn column_Size =
-         * this.transactionsTable.getColumnModel().getColumn(
-         * WalletTransactionsTableModel.COLUMN_SIZE);
-         * column_Size.setMinWidth(50); column_Size.setMaxWidth(1000);
-         * column_Size.setPreferredWidth(70);
-         *
-         * TableColumn column_Confirm =
-         * this.transactionsTable.getColumnModel().getColumn(
-         * WalletTransactionsTableModel.COLUMN_CONFIRMATIONS);//.COLUMN_SIZE);
-         * column_Confirm.setMinWidth(50); column_Confirm.setMaxWidth(1000);
-         * column_Confirm.setPreferredWidth(70);
-         *
-         * TableColumn column_Fee =
-         * this.transactionsTable.getColumnModel().getColumn(
-         * WalletTransactionsTableModel.COLUMN_FEE);//.COLUMN_SIZE);
-         * column_Fee.setMinWidth(80); column_Fee.setMaxWidth(1000);
-         * column_Fee.setPreferredWidth(80);
-         *
-         * TableColumn column_Date =
-         * this.transactionsTable.getColumnModel().getColumn(
-         * WalletTransactionsTableModel.COLUMN_TIMESTAMP);//.COLUMN_FEE);//.
-         * COLUMN_SIZE); column_Date.setMinWidth(120);
-         * column_Date.setMaxWidth(1000); column_Date.setPreferredWidth(120);
-         */
         // TRANSACTION DETAILS
         this.transactionsTable.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
@@ -290,17 +232,17 @@ public class Records_UnConfirmed_Panel extends JPanel // JPanel
             @Override
             public void tableChanged(TableModelEvent arg0) {
                 // TODO Auto-generated method stub
-                th.setName(Lang.getInstance().translate("Unconfirmed Records:" + transactionsModel.getRowCount()));
+                setName(Lang.getInstance().translate("Unconfirmed Records:" + transactionsModel.getRowCount()));
             }
 
         });
 
     }
 
-    public static Records_UnConfirmed_Panel getInstance() {
+    public static UnconfirmedTransactionsPanel getInstance() {
 
         if (instance == null) {
-            instance = new Records_UnConfirmed_Panel();
+            instance = new UnconfirmedTransactionsPanel();
         }
 
         return instance;

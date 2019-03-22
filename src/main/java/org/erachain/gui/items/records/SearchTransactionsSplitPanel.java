@@ -7,7 +7,7 @@ import org.erachain.gui.Split_Panel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.Voush_Library_Panel;
 import org.erachain.gui.library.library;
-import org.erachain.gui.models.TransactionsTableModel;
+import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
@@ -27,17 +27,19 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-
-public class Records_Search_SplitPanel extends Split_Panel {
+/**
+ * search transactions
+ */
+public class SearchTransactionsSplitPanel extends Split_Panel {
 
     public JPanel info_Panel;
     public Voush_Library_Panel voush_Library_Panel;
-    TransactionsTableModel transactionsTableModel;
+    SearchTransactionsTableModel transactionsTableModel;
     JScrollPane jScrollPane4;
     private JTextField sender_address;
 
-    public Records_Search_SplitPanel() {
-        super("Records_Search_SplitPanel");
+    public SearchTransactionsSplitPanel() {
+        super("SearchTransactionsSplitPanel");
 
         this.searchToolBar_LeftPanel.setVisible(true);
         jScrollPane4 = new JScrollPane();
@@ -94,7 +96,7 @@ public class Records_Search_SplitPanel extends Split_Panel {
         });
 
         //TRANSACTIONS TABLE MODEL
-        this.transactionsTableModel = new TransactionsTableModel();
+        this.transactionsTableModel = new SearchTransactionsTableModel();
         this.jTable_jScrollPanel_LeftPanel = new MTable(this.transactionsTableModel);
 
         this.jTable_jScrollPanel_LeftPanel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -144,7 +146,7 @@ public class Records_Search_SplitPanel extends Split_Panel {
 
         //TRANSACTIONS SORTER
         //		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-        //		indexes.put(TransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
+        //		indexes.put(SearchTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
         //		CoreRowSorter sorter = new CoreRowSorter(transactionsTableModel, indexes);
         //		this.jTable_jScrollPanel_LeftPanel.setRowSorter(sorter);
 

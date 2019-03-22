@@ -24,13 +24,7 @@ public class WalletItemPollsTableModel extends TableModelCls<Tuple2<String, Stri
     private SortableList<Tuple2<String, String>, PollCls> polls;
 
     public WalletItemPollsTableModel() {
-        super("WalletItemPollsTableModel", 1000,
-                new String[]{"Name", "Creator", "Total Votes", "Confirmed"});
-    }
-
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
+        super(new String[]{"Name", "Creator", "Total Votes", "Confirmed"});
     }
 
     @Override
@@ -87,15 +81,6 @@ public class WalletItemPollsTableModel extends TableModelCls<Tuple2<String, Stri
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -126,7 +111,7 @@ public class WalletItemPollsTableModel extends TableModelCls<Tuple2<String, Stri
     }
 
     @Override
-    public Object getItem(int k) {
+    public PollCls getItem(int k) {
         // TODO Auto-generated method stub
         return polls.get(k).getB();
     }

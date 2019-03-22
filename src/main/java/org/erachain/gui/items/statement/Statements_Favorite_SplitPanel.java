@@ -4,7 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.transaction.R_SignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Split_Panel;
-import org.erachain.gui.items.persons.TableModelPersons;
+import org.erachain.gui.items.persons.PersonsItemsTableModel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
@@ -33,7 +33,7 @@ public class Statements_Favorite_SplitPanel extends Split_Panel {
     int alpha_int;
     private Statements_Table_Model_Favorite search_Table_Model;
     //	private MTable search_Table;
-    private RowSorter<TableModelPersons> search_Sorter;
+    private RowSorter<PersonsItemsTableModel> search_Sorter;
 
     public Statements_Favorite_SplitPanel() {
         super("Statements_Favorite_SplitPanel");
@@ -59,14 +59,14 @@ public class Statements_Favorite_SplitPanel extends Split_Panel {
 		
 	/*		
 		//CHECKBOX FOR FAVORITE
-				TableColumn favoriteColumn = search_Table.getColumnModel().getColumn(TableModelPersons.COLUMN_FAVORITE);	
+				TableColumn favoriteColumn = search_Table.getColumnModel().getColumn(PersonsItemsTableModel.COLUMN_FAVORITE);
 				favoriteColumn.setCellRenderer(new Renderer_Boolean()); 
 				favoriteColumn.setMinWidth(50);
 				favoriteColumn.setMaxWidth(50);
 				favoriteColumn.setPreferredWidth(50);
 	*/
         //Sorter
-        //			 search_Sorter = new TableRowSorter<TableModelPersons>(this.search_Table_Model);
+        //			 search_Sorter = new TableRowSorter<PersonsItemsTableModel>(this.search_Table_Model);
         //			search_Table.setRowSorter(search_Sorter);
 
         // UPDATE FILTER ON TEXT CHANGE

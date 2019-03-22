@@ -14,7 +14,7 @@ import java.awt.event.ActionListener;
 public class Item_Search_SplitPanel extends Item_SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
-    protected TableModelItemsSearch search_Table_Model;
+    protected SearchItemsTableModel search_Table_Model;
     private M_DecimalFormatedTextField key_Item;
 //	protected JMenuItem favorite_menu_items;
 //	protected JPopupMenu menu_Table;
@@ -22,7 +22,7 @@ public class Item_Search_SplitPanel extends Item_SplitPanel {
 //	protected ItemCls item_Table_Selected = null;
 
     @SuppressWarnings("rawtypes")
-    public Item_Search_SplitPanel(TableModelItemsSearch search_Table_Model1, String gui_Name, String search_Label_Text) {
+    public Item_Search_SplitPanel(SearchItemsTableModel search_Table_Model1, String gui_Name, String search_Label_Text) {
 
         super(search_Table_Model1, gui_Name);
         this.search_Table_Model = search_Table_Model1;

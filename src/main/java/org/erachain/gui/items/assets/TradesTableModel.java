@@ -42,8 +42,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>, Trade> i
 
     public TradesTableModel(AssetCls have, AssetCls want) {
 
-        super("TradesTableModel", 1000,
-                new String[]{"Timestamp", "Type", "Check 1", "Price", "Check 2"});
+        super(new String[]{"Timestamp", "Type", "Check 1", "Price", "Check 2"});
 
         this.have = have;
         this.want = want;
@@ -264,7 +263,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>, Trade> i
     }
 
     @Override
-    public Object getItem(int k) {
+    public Trade getItem(int k) {
         // TODO Auto-generated method stub
         Pair<Tuple2<Long, Long>, Trade> rec = this.trades.get(k);
         if (rec == null)

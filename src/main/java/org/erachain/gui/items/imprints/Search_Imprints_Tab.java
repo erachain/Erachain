@@ -36,7 +36,7 @@ public class Search_Imprints_Tab extends Split_Panel {
         final MTable imprintsTable = new MTable(this.tableModelImprints);
 
 //CHECKBOX FOR FAVORITE
-//	TableColumn favoriteColumn = imprintsTable.getColumnModel().getColumn(TableModelUnions.COLUMN_FAVORITE);
+//	TableColumn favoriteColumn = imprintsTable.getColumnModel().getColumn(TableModelUnionsItemsTableModel.COLUMN_FAVORITE);
 //	favoriteColumn.setCellRenderer(new Renderer_Boolean()); //unionsTable.getDefaultRenderer(Boolean.class));
 //	favoriteColumn.setMinWidth(50);
 //	favoriteColumn.setMaxWidth(50);

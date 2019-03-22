@@ -2,18 +2,14 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.database.PeerMap.PeerInfo;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
 import java.util.*;
 
 @SuppressWarnings("serial")
@@ -32,15 +28,11 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
 
     List<Peer> peersView = new ArrayList<Peer>();
     int view = 1;
-    // String[] columnNames = Lang.getInstance().translate(new String[]{"IP",
-    // "Height", "Ping mc", "Reliable", "Initiator", "Finding ago", "Online
-    // Time", "Version"});
-    private Boolean[] column_AutuHeight = new Boolean[] { false, false, false, false, false, false, false, false };
 
     public PeersTableModel() {
-        super("PeersTableModel", 10000,
-                new String[] { "IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago",
-                "Online Time", "Version" });
+        super(new String[] { "IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago",
+                "Online Time", "Version" },
+                new Boolean[] { false, false, false, false, false, false, false, false });
 
         LOGGER = LoggerFactory.getLogger(PeersTableModel.class.getName());
 
@@ -108,15 +100,6 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
             }
         }
       
-    }
-
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
     }
 
     @Override

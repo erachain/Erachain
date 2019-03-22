@@ -1,37 +1,59 @@
 package org.erachain.gui.items;
 
 import org.erachain.core.item.ItemCls;
+import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.ItemMap;
 import org.erachain.gui.models.TableModelCls;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
+import java.util.Set;
 
 @SuppressWarnings("serial")
-public abstract class TableModelItemsSearch extends TableModelCls<Long, ItemCls> {
+public abstract class SearchItemsTableModel<T, U> extends TableModelCls<Long, ItemCls> {
 
+    public SearchItemsTableModel(DBMap itemsMap, String[] columnNames, Boolean[] column_AutoHeight, int favorite) {
+        super(itemsMap, columnNames, column_AutoHeight, favorite);
+    }
     protected ArrayList<ItemCls> list;
     protected ItemMap db;
+    public void fill(Set<Long> keys) {
+        ItemCls item;
+        list = new ArrayList<ItemCls>();
 
-    public TableModelItemsSearch(String[] columnNames) {
-        super(columnNames);
+        for (Long itemKey : keys) {
+            if (itemKey == null || itemKey < 1)
+                continue;
+
+            item = (ItemCls) map.get(itemKey);
+            if (item == null)
+                continue;
+
+            list.add(item);
+        }
+
+        this.listSorted = new SortableList<Long, ItemCls>(this.map, keys);
     }
 
     public void findByName(String filter) {
-        list = (ArrayList<ItemCls>) db.get_By_Name(filter, false);
+        list = ((ItemMap) map).get_By_Name(filter, false);
+        //this.listSorted = new SortableList<Long, ItemCls>(this.map, keys);
         this.fireTableDataChanged();
     }
 
     public void findByKey(String text) {
-        if (text.equals("") || text == null)
-            return;
-        if (!text.matches("[0-9]*"))
-            return;
-        Long key_filter = new Long(text);
         list = new ArrayList<ItemCls>();
 
-        ItemCls itemCls = db.get(key_filter);
+        if (text.equals("") || text == null || !text.matches("[0-9]*")) {
+            this.fireTableDataChanged();
+            return;
+        }
+
+        Long key_filter = new Long(text);
+
+        ItemCls itemCls = (ItemCls) map.get(key_filter);
 
         if (itemCls != null)
             list.add(itemCls);
@@ -50,7 +72,7 @@ public abstract class TableModelItemsSearch extends TableModelCls<Long, ItemCls>
 
     @Override
     public SortableList<Long, ItemCls> getSortableList() {
-        return null;
+        return listSorted;
     }
 
     public ItemCls getItem(int row) {

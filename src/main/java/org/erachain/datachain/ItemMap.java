@@ -2,6 +2,8 @@ package org.erachain.datachain;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.DBMap;
+import org.mapdb.BTreeMap;
+import org.mapdb.Fun;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.mapdb.Atomic;
@@ -20,7 +22,6 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
 
     private static Logger logger = LoggerFactory.getLogger(ItemMap.class.getName());
 
-    // protected int type;
     protected Atomic.Long atomicKey;
     protected long key;
 
@@ -73,7 +74,7 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
 
     @Override
     protected Map<Long, ItemCls> getMemoryMap() {
-        return new HashMap<>();
+        return new TreeMap<Long, ItemCls>();
     }
 
     @Override
@@ -158,4 +159,8 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
 
         return result;
     }
+    public Collection<Long> getFromToKeys(long fromKey, long toKey) {
+        return ((BTreeMap)map).subMap(fromKey, toKey).values();
+    }
+
 }

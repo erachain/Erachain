@@ -4,13 +4,10 @@ import org.erachain.core.item.polls.PollCls;
 import org.mapdb.DB;
 import org.erachain.utils.ObserverMessage;
 
-import java.util.List;
-import java.util.Observer;
-
-public class FavoriteItemPoll extends FavoriteItem {
+public class FavoriteItemMapPoll extends FavoriteItemMap {
 
     // favorites init SET
-    public FavoriteItemPoll(DWSet dWSet, DB database) {
+    public FavoriteItemMapPoll(DWSet dWSet, DB database) {
         super(dWSet, database, ObserverMessage.WALLET_LIST_POLL_FAVORITES_TYPE, "poll", PollCls.INITIAL_FAVORITES);
     }
 }

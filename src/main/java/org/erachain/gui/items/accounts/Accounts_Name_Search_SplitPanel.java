@@ -88,7 +88,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
 
         // CHECKBOX FOR FAVORITE
         // TableColumn favoriteColumn =
-        // imprintsTable.getColumnModel().getColumn(TableModelUnions.COLUMN_FAVORITE);
+        // imprintsTable.getColumnModel().getColumn(TableModelUnionsItemsTableModel.COLUMN_FAVORITE);
         // favoriteColumn.setCellRenderer(new Renderer_Boolean());
         // //unionsTable.getDefaultRenderer(Boolean.class));
         // favoriteColumn.setMinWidth(50);

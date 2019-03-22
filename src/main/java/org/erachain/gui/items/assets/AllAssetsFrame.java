@@ -24,7 +24,7 @@ import java.util.TreeMap;
 @SuppressWarnings("serial")
 public class AllAssetsFrame extends JFrame {
 
-    private TableModelItemAssets tableModelItemAssets;
+    private ItemAssetsTableModel tableModelItemAssets;
 
     public AllAssetsFrame() {
 
@@ -79,15 +79,15 @@ public class AllAssetsFrame extends JFrame {
         tableGBC.gridy = 1;
 
         //CREATE TABLE
-        this.tableModelItemAssets = new TableModelItemAssets();
+        this.tableModelItemAssets = new ItemAssetsTableModel();
         final MTable assetsTable = new MTable(this.tableModelItemAssets);
 
         //CHECKBOX FOR ASSET TYPE
-        TableColumn divisibleColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_ASSET_TYPE);
+        TableColumn divisibleColumn = assetsTable.getColumnModel().getColumn(ItemAssetsTableModel.COLUMN_ASSET_TYPE);
         divisibleColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
 
         //CHECKBOX FOR FAVORITE
-        TableColumn favoriteColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_FAVORITE);
+        TableColumn favoriteColumn = assetsTable.getColumnModel().getColumn(ItemAssetsTableModel.COLUMN_FAVORITE);
         favoriteColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
 
         //ASSETS SORTER
@@ -135,7 +135,7 @@ public class AllAssetsFrame extends JFrame {
                 int row = assetsTable.getSelectedRow();
                 row = assetsTable.convertRowIndexToModel(row);
 
-                AssetCls asset = tableModelItemAssets.getAsset(row);
+                AssetCls asset = (AssetCls) tableModelItemAssets.getItem(row);
                 new AssetFrame(asset);
             }
         });
@@ -153,7 +153,7 @@ public class AllAssetsFrame extends JFrame {
 
                 if (e.getClickCount() == 2) {
                     row = assetsTable.convertRowIndexToModel(row);
-                    AssetCls asset = tableModelItemAssets.getAsset(row);
+                    AssetCls asset = (AssetCls) tableModelItemAssets.getItem(row);
                     new AssetFrame(asset);
                 }
             }

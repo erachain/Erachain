@@ -15,7 +15,7 @@ import java.awt.event.ActionListener;
 
 @SuppressWarnings("serial")
 public class Search_Templates_Tab extends Item_Search_SplitPanel {
-    private static TableModelTemplates tableModelTemplates = new TableModelTemplates();
+    private static TemplatesItemsTableModel tableModelTemplates = new TemplatesItemsTableModel();
     private Search_Templates_Tab th;
 
 
