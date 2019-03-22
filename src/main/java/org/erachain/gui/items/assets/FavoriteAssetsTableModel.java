@@ -21,8 +21,7 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
     public static final int COLUMN_I_OWNER = 6;
 
     public FavoriteAssetsTableModel() {
-        super( //DCSet.getInstance().getItemAssetMap(),
-                null,
+        super(Controller.getInstance().wallet.database.getAssetFavoritesSet(),
                 new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"},
                 new Boolean[]{false, true, true, false, false, false, false, false},
                 ObserverMessage.RESET_ASSET_FAVORITES_TYPE,
@@ -75,24 +74,6 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
         }
 
         return null;
-    }
-
-    public void addObserversThis() {
-        if (Controller.getInstance().doesWalletDatabaseExists()) {
-            Controller.getInstance().wallet.database.getAssetFavoritesSet().addObserver(this);
-        }
-    }
-
-
-    public void removeObserversThis() {
-        FavoriteItemMapAsset rrr = Controller.getInstance().wallet.database.getAssetFavoritesSet();
-
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            Controller.getInstance().wallet.database.getAssetFavoritesSet().deleteObserver(this);
-    }
-
-    public long getMapSize() {
-        return favoriteMap.size();
     }
 
     @Override

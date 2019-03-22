@@ -62,4 +62,19 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
         }
     }
 
+    //public abstract int getMapSize();
+    public long getMapSize() {
+        return favoriteMap.size();
+    }
+
+    public void addObserversThis() {
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            favoriteMap.addObserver(this);
+    }
+
+    public void removeObserversThis() {
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            favoriteMap.deleteObserver(this);
+    }
+
 }

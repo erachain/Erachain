@@ -29,30 +29,42 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
 
     public TimerTableModelCls(String[] columnNames) {
         this.columnNames = columnNames;
-        //this.initComponents();
-        addObservers();
+
+        if (map != null) {
+            //this.initComponents();
+            addObservers();
+        }
     }
 
     public TimerTableModelCls(DBMap map, String[] columnNames) {
         this.map = map;
         this.columnNames = columnNames;
-        //this.initComponents();
-        addObservers();
+
+        if (map != null) {
+            //this.initComponents();
+            addObservers();
+        }
     }
 
     public TimerTableModelCls(String[] columnNames, Boolean[] columnAutoHeight) {
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
-        //this.initComponents();
-        addObservers();
+
+        if (map != null) {
+            //this.initComponents();
+            addObservers();
+        }
     }
 
     public TimerTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight) {
         this.map = map;
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
-        //this.initComponents();
-        addObservers();
+
+        if (map != null) {
+            //this.initComponents();
+            addObservers();
+        }
     }
 
     public TimerTableModelCls(DBMap map, String name, long timeout, String[] columnNames, Boolean[] columnAutoHeight) {
@@ -61,8 +73,11 @@ public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
         this.name = name;
         this.timeout = timeout;
         this.columnAutoHeight = columnAutoHeight;
-        //this.initComponents();
-        addObservers();
+
+        if (map != null) {
+            //this.initComponents();
+            addObservers();
+        }
     }
 
     public void initTimer() {

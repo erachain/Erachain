@@ -144,7 +144,7 @@ public class UnconfirmedTransactionsTableModel extends TableModelCls<Long, Trans
     }
 
     @Override
-    public int getMapSize() {
+    public long getMapSize() {
         return map.size();
     }
 

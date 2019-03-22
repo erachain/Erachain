@@ -23,7 +23,7 @@ public class FavoritePollsTableModel extends FavoriteItemModelTable implements O
     public static final int COLUMN_FAVORITE = 4;
 
     public FavoritePollsTableModel() {
-        super(DCSet.getInstance().getItemAssetMap(),
+        super(Controller.getInstance().wallet.database.getPollFavoritesSet(),
                 new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false, false},
                 ObserverMessage.WALLET_RESET_POLL_FAVORITES_TYPE,
@@ -68,16 +68,6 @@ public class FavoritePollsTableModel extends FavoriteItemModelTable implements O
         }
 
         return null;
-    }
-
-    public void addObserversThis() {
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            Controller.getInstance().wallet.database.getPollFavoritesSet().addObserver(this);
-    }
-
-    public void removeObserversThis() {
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            Controller.getInstance().wallet.database.getPollFavoritesSet().deleteObserver(this);
     }
 
 }

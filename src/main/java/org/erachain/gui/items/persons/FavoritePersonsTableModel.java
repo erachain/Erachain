@@ -22,7 +22,7 @@ public class FavoritePersonsTableModel extends FavoriteItemModelTable implements
     public static final int COLUMN_FAVORITE = 4;
 
     public FavoritePersonsTableModel() {
-        super(DCSet.getInstance().getItemPersonMap(),
+        super(Controller.getInstance().wallet.database.getPersonFavoritesSet(),
                 new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false, false},
                 ObserverMessage.RESET_PERSON_FAVORITES_TYPE,
@@ -67,17 +67,6 @@ public class FavoritePersonsTableModel extends FavoriteItemModelTable implements
         }
 
         return null;
-    }
-
-    public void addObserversThis() {
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            Controller.getInstance().wallet.database.getPersonFavoritesSet().addObserver(this);
-    }
-
-    public void removeObserversThis() {
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            Controller.getInstance().wallet.database.getPersonFavoritesSet().deleteObserver(this);
-
     }
 
 }

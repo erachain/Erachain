@@ -26,7 +26,7 @@ public class FavoriteImprintsTableModel extends FavoriteItemModelTable implement
     public static final int COLUMN_FAVORITE = 4;
 
     public FavoriteImprintsTableModel() {
-        super(DCSet.getInstance().getItemImprintMap(),
+        super(Controller.getInstance().wallet.database.getImprintFavoritesSet(),
                 new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false, false},
                 ObserverMessage.RESET_IMPRINT_FAVORITES_TYPE,
@@ -70,16 +70,6 @@ public class FavoriteImprintsTableModel extends FavoriteItemModelTable implement
         }
 
         return null;
-    }
-
-    public void addObserversThis() {
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            Controller.getInstance().wallet.database.getImprintFavoritesSet().addObserver(this);
-    }
-
-    public void removeObserversThis() {
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            Controller.getInstance().wallet.database.getImprintFavoritesSet().deleteObserver(this);
     }
 
 }

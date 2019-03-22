@@ -300,7 +300,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     }
 
     @Override
-    public int getMapSize() {
+    public long getMapSize() {
         return Controller.getInstance().getWallet().database.getTransactionMap().size();
     }
 
