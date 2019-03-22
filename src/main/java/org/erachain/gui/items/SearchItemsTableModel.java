@@ -17,7 +17,7 @@ public abstract class SearchItemsTableModel<T, U> extends TableModelCls<Long, It
     public SearchItemsTableModel(DBMap itemsMap, String[] columnNames, Boolean[] column_AutoHeight, int favorite) {
         super(itemsMap, columnNames, column_AutoHeight, favorite);
     }
-    protected ArrayList<ItemCls> list;
+    protected List<ItemCls> list;
     protected ItemMap db;
     public void fill(Set<Long> keys) {
         ItemCls item;

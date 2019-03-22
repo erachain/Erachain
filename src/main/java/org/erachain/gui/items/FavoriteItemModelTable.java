@@ -6,7 +6,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.FavoriteItemMap;
 import org.erachain.datachain.DCMap;
-import org.erachain.datachain.Item_Map;
+import org.erachain.datachain.ItemMap;
 import org.erachain.gui.models.TableModelCls;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -90,7 +90,7 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
 
     @Override
     public void getIntervalThis(long startBack, long endBack) {
-        this.listSorted = new SortableList<Long, ItemCls>((Item_Map)map, favoriteMap.getFromToKeys(0, 999999999));
+        this.listSorted = new SortableList<Long, ItemCls>((ItemMap)map, favoriteMap.getFromToKeys(0, 999999999));
         this.listSorted.sort();
 
         this.list = new ArrayList<ItemCls>();
