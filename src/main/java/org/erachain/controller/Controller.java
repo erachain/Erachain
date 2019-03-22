@@ -1492,9 +1492,11 @@ public class Controller extends Observable {
 
     public void addActivePeersObserver(Observer o) {
         this.network.addObserver(o);
+        this.guiTimer.addObserver(o);
     }
 
     public void removeActivePeersObserver(Observer o) {
+        this.guiTimer.deleteObserver(o);
         this.network.deleteObserver(o);
     }
 

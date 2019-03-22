@@ -189,10 +189,7 @@ public class Item_SplitPanel extends Split_Panel {
         menu_Table = null;
         item_Menu = null;
         item_Table_Selected = null;
-        splitClose();
-    }
-
-    protected void splitClose() {
+        table_Model.deleteObservers();
 
     }
 

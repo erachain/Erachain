@@ -12,7 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @SuppressWarnings("serial")
-public abstract class TimerTableModelCls<T, U> extends AbstractTableModel {
+public abstract class TimerTableModelCls<U> extends AbstractTableModel {
 
     private String name;
     private long timeout;

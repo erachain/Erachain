@@ -110,7 +110,7 @@ public class SearchTransactionsSplitPanel extends Split_Panel {
 
                 int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
                 row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-                Transaction trans = transactionsTableModel.getTransaction(row);
+                Transaction trans = transactionsTableModel.getItem(row);
                 DCSet db = DCSet.getInstance();
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
 
@@ -127,7 +127,7 @@ public class SearchTransactionsSplitPanel extends Split_Panel {
 
                 int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
                 row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-                Transaction trans = transactionsTableModel.getTransaction(row);
+                Transaction trans = transactionsTableModel.getItem(row);
                 if (trans == null) return;
                 // save
                 library.saveTransactionJSONtoFileSystem(getParent(), trans);
@@ -159,7 +159,7 @@ public class SearchTransactionsSplitPanel extends Split_Panel {
                     row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
 
                     //GET TRANSACTION
-                    Transaction transaction = transactionsTableModel.getTransaction(row);
+                    Transaction transaction = transactionsTableModel.getItem(row);
 
                     //SHOW DETAIL SCREEN OF TRANSACTION
                     TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
@@ -199,7 +199,8 @@ public class SearchTransactionsSplitPanel extends Split_Panel {
             UnionCls union;
             Transaction voting = null;
             if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0) {
-                voting = (Transaction) transactionsTableModel.getTransaction(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+                voting = (Transaction) transactionsTableModel.getItem(jTable_jScrollPanel_LeftPanel
+                        .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 
                 //	Person_info_panel_001 info_panel = new Person_info_panel_001(voting, false);
 

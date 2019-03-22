@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class PeersTableModel extends TimerTableModelCls implements Observer {
+public class PeersTableModel extends TimerTableModelCls<Peer> implements Observer {
 
     private static final int COLUMN_ADDRESS = 0;
     private static final int COLUMN_HEIGHT = 1;
@@ -24,8 +24,6 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
     private static final int COLUMN_ONLINE_TIME = 6;
     private static final int COLUMN_VERSION = 7;
 
-    private List<Peer> peers;
-
     List<Peer> peersView = new ArrayList<Peer>();
     int view = 1;
 
@@ -35,6 +33,7 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
                 new Boolean[] { false, false, false, false, false, false, false, false }, false);
 
         LOGGER = LoggerFactory.getLogger(PeersTableModel.class.getName());
+        addObservers();
 
     }
 
@@ -90,9 +89,9 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
 
         peersView.clear();
         if (view != 0) {
-            peersView.addAll(peers);
+            peersView.addAll(list);
         } else {
-            for (Peer peer : peers) {
+            for (Peer peer : list) {
                 if (view == 0) {
                     if (peer.isUsed())
                         peersView.add(peer);
@@ -100,20 +99,6 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
             }
         }
       
-    }
-
-    @Override
-    public Peer getItem(int k) {
-        return this.peers.get(k);
-    }
-
-    @Override
-    public int getRowCount() {
-        if (peersView == null) {
-            return 0;
-        }
-
-        return peersView.size();
     }
 
     @Override
@@ -200,15 +185,14 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
 
         if (message.getType() == ObserverMessage.LIST_PEER_TYPE) {
 
-            this.peers = (List<Peer>) message.getValue();
+            this.list = (List<Peer>) message.getValue();
             setView(view);
             needUpdate = true;
-            this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.UPDATE_PEER_TYPE) {
             Peer peer1 = (Peer) message.getValue();
             int n = 0;
-            for (Peer peer2 : this.peers) {
+            for (Peer peer2 : this.list) {
                 if (Arrays.equals(peer1.getAddress().getAddress(), peer2.getAddress().getAddress())) {
                     /// this.peersStatus.set(n, true);
                     break;

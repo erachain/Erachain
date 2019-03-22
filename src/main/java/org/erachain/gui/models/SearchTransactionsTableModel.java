@@ -5,7 +5,9 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
+import org.erachain.network.Peer;
 import org.erachain.utils.DateTimeFormat;
+import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,7 @@ import java.util.Observer;
 /**
  * не перерисовыется по событиям - статичная таблица при поиске
  */
-public class SearchTransactionsTableModel extends TimerTableModelCls<byte[], Transaction> implements Observer {
+public class SearchTransactionsTableModel extends TimerTableModelCls<Transaction> implements Observer {
 
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_BLOCK = 1;
@@ -27,12 +29,12 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<byte[], Tra
     public static final int COLUMN_TYPE = 3;
     public static final int COLUMN_AMOUNT = 4;
     public static final int COLUMN_FEE = 5;
-    static Logger LOGGER = LoggerFactory.getLogger(SearchTransactionsTableModel.class.getName());
+
     Integer block_No;
-    List<Transaction> transactions;
 
     public SearchTransactionsTableModel() {
         super(new String[]{"Timestamp", "Block", "Seq_no", "Type", "Amount", AssetCls.FEE_NAME}, false);
+        LOGGER = LoggerFactory.getLogger(SearchTransactionsTableModel.class.getName());
     }
 
     public void setBlockNumber(String string) {
@@ -40,18 +42,18 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<byte[], Tra
         try {
             block_No = Integer.parseInt(string);
         } catch (NumberFormatException e) {
-            transactions = new ArrayList<>();
+            list = new ArrayList<>();
             Transaction transaction = DCSet.getInstance().getTransactionFinalMap().getRecord(string);
             if (transaction != null) {
                 transaction.setDC(DCSet.getInstance());
-                transactions.add(transaction);
+                list.add(transaction);
             }
-            this.fireTableDataChanged();
+            needUpdate = true;
             return;
         }
 
-        transactions = (List<Transaction>) DCSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(block_No);
-        this.fireTableDataChanged();
+        list = (List<Transaction>) DCSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(block_No);
+        needUpdate = true;
 
     }
 
@@ -63,44 +65,23 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<byte[], Tra
 
         if (account != null) {
 
-            transactions = new ArrayList();
-            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress()));//.findTransactions(address, sender=address, recipient=address, minHeight=0, maxHeight=0, type=0, service=0, desc=false, offset=0, limit=0);//.getTransactionsByBlock(block_No);
+            list = new ArrayList();
+            list.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress()));//.findTransactions(address, sender=address, recipient=address, minHeight=0, maxHeight=0, type=0, service=0, desc=false, offset=0, limit=0);//.getTransactionsByBlock(block_No);
 
-            this.fireTableDataChanged();
+            needUpdate = true;
 
         }
 
-    }
-
-    public Transaction getTransaction(int row) {
-        Transaction data = transactions.get(row);
-        if (data == null) {
-            return null;
-        }
-        return data;
-    }
-
-    public List<Transaction> getTransactions() {
-        return transactions;
-    }
-
-    @Override
-    public int getRowCount() {
-        if (this.transactions == null) {
-            return 0;
-        }
-
-        return this.transactions.size();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
         try {
-            if (this.transactions == null || this.transactions.size() - 1 < row) {
+            if (this.list == null || this.list.size() - 1 < row) {
                 return null;
             }
 
-            Transaction transaction = transactions.get(row);
+            Transaction transaction = list.get(row);
             if (transaction == null) {
                 return null;
             }
@@ -147,18 +128,13 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<byte[], Tra
 
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
+
+        ObserverMessage message = (ObserverMessage) arg;
+
+        if (message.getType() == ObserverMessage.GUI_REPAINT) {
+            needUpdate = false;
+            this.fireTableDataChanged();
+        }
     }
 
-    public void addObservers() {
-    }
-
-    public void deleteObservers() {
-    }
-
-    @Override
-    public Transaction getItem(int k) {
-        // TODO Auto-generated method stub
-        Transaction data = transactions.get(k);
-        return data;
-    }
 }

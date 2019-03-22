@@ -4,7 +4,7 @@ import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
 
 @SuppressWarnings("serial")
-public abstract class TableModelCls<T, U> extends TimerTableModelCls<T, U> {
+public abstract class TableModelCls<T, U> extends TimerTableModelCls<U> {
 
     protected SortableList<T, U> listSorted;
 

@@ -70,9 +70,4 @@ public class Assets_Favorite_SplitPanel extends Item_SplitPanel {
         return new Asset_Info((AssetCls) item);
     }
 
-    @Override
-    protected void splitClose() {
-        table_Model.deleteObservers();
-    }
-
 }

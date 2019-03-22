@@ -393,16 +393,21 @@ public class API_TransactionsResource {
     @SuppressWarnings("unchecked")
     @GET
     @Path("getbyblock")
-    public Response getByBlock(@QueryParam("block") String block) {
+    public Response getByBlock(@QueryParam("block") int blockNo) {
         JSONObject ff = new JSONObject();
-        List<Transaction> result;
 
-        SearchTransactionsTableModel transactionsTableModel = new SearchTransactionsTableModel();
-        transactionsTableModel.setBlockNumber(block);
-        result = transactionsTableModel.getTransactions();
-        if (result == null || result.isEmpty()) {
+        Block block = DCSet.getInstance().getBlockMap().get(blockNo);
+        if (block == null) {
+            ff.put("error", "block not found");
+            return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(ff.toJSONString()).build();
+        }
 
-            ff.put("message", "null");
+        List<Transaction> result = block.getTransactions();
+        if (result == null) {
+
+            ff.put("error", "null");
             return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(ff.toJSONString()).build();
@@ -410,10 +415,9 @@ public class API_TransactionsResource {
 
         JSONArray array = new JSONArray();
         for (Transaction trans : result) {
-
             array.add(trans.toJson());
         }
-        // json.put("transactions", array);
+
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(array.toJSONString()).build();
