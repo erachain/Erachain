@@ -367,6 +367,10 @@ public class AccountMap extends Observable {
             this.acountsNoMap.clear();
             this.assetsBalanceMap.clear();
         }
+
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.RESET_ALL_ACCOUNT_TYPE, this));
+
     }
 
 }
