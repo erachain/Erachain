@@ -203,7 +203,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
         if (false && messageType == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.transactions == null) {
                 transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
-                transactions.registerObserver();
+                //transactions.registerObserver();
                 transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
                 read_trans();
                 this.fireTableDataChanged();

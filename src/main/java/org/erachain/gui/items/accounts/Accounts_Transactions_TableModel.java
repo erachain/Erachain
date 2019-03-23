@@ -307,7 +307,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
                 
                 sortableItems = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
                 //sortableItems.registerObserver();
-                Controller.getInstance().wallet.database.getTransactionMap().addObserver(sortableItems);
+                //Controller.getInstance().wallet.database.getTransactionMap().addObserver(sortableItems);
                 sortableItems.sort(TransactionMap.ADDRESS_INDEX, true);
                 // this.r_Trans.sort(NameMap.NAME_INDEX);
                 get_R_Send();

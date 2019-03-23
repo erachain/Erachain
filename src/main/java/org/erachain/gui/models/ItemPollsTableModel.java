@@ -87,7 +87,7 @@ public class ItemPollsTableModel extends TableModelCls<Long, ItemCls> implements
         if (message.getType() == ObserverMessage.LIST_POLL_TYPE) {
             if (this.polls == null) {
                 this.polls = (SortableList<Long, ItemCls>) message.getValue();
-                this.polls.registerObserver();
+                ///this.polls.registerObserver();
             }
 
             this.fireTableDataChanged();

@@ -89,7 +89,7 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
 
         }
 
-        balances.registerObserver();
+        //balances.registerObserver();
     }
 
     public Class<?> getColumnClass(int c) { // set column type
@@ -166,7 +166,7 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
     }
 
     public void removeObservers() {
-        this.balances.removeObserver();
+        //this.balances.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 

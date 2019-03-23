@@ -179,7 +179,7 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
         if (message.getType() == ObserverMessage.LIST_STATEMENT_FAVORITES_TYPE) {
             if (this.transactions == null) {
                 transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
-                transactions.registerObserver();
+                //transactions.registerObserver();
                 SortableList<Tuple2<String, String>, Transaction> sss = Controller.getInstance().wallet.database.getDocumentFavoritesSet().getList();
                 this.fireTableDataChanged();
             }
@@ -208,7 +208,7 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
 
         if (Controller.getInstance().doesWalletDatabaseExists()) {
             Controller.getInstance().wallet.database.getDocumentFavoritesSet().deleteObserver(this);
-            transactions.removeObserver();
+            //transactions.removeObserver();
         }
     }
 

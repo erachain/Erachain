@@ -93,7 +93,7 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
         if (message.getType() == ObserverMessage.LIST_STATUS_TYPE) {
             if (this.statuses == null) {
                 this.statuses = (SortableList<Tuple2<String, String>, StatusCls>) message.getValue();
-                this.statuses.registerObserver();
+                //this.statuses.registerObserver();
                 //this.statuses.sort(PollMap.NAME_INDEX);
             }
 
@@ -111,7 +111,7 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
     }
 
     public void deleteObservers() {
-        if (this.statuses != null) this.statuses.removeObserver();
+        //if (this.statuses != null) this.statuses.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 }

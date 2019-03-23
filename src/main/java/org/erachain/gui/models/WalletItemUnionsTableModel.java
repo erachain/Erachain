@@ -93,7 +93,7 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
         if (message.getType() == ObserverMessage.LIST_UNION_TYPE) {
             if (this.unions == null) {
                 this.unions = (SortableList<Tuple2<String, String>, UnionCls>) message.getValue();
-                this.unions.registerObserver();
+                //this.unions.registerObserver();
                 //this.unions.sort(PollMap.NAME_INDEX);
             }
 

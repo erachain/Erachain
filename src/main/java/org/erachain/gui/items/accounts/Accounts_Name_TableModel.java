@@ -182,7 +182,7 @@ public class Accounts_Name_TableModel extends AbstractTableModel implements Obse
 
 
             this.accounts = (SortableList<String, Tuple2<String, String>>) message.getValue();
-            this.accounts.registerObserver();
+            //this.accounts.registerObserver();
             this.fireTableDataChanged();
         }
 
@@ -205,7 +205,7 @@ public class Accounts_Name_TableModel extends AbstractTableModel implements Obse
 
         if (dbAccounts != null) {
             dbAccounts.deleteObserver(this);
-            this.accounts.removeObserver();
+            //this.accounts.removeObserver();
         }
 
     }

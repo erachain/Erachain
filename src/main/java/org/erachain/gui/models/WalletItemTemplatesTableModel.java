@@ -81,7 +81,7 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
         if (message.getType() == ObserverMessage.LIST_TEMPLATE_TYPE) {
             if (this.templates == null) {
                 this.templates = (SortableList<Tuple2<String, String>, TemplateCls>) message.getValue();
-                this.templates.registerObserver();
+                //this.templates.registerObserver();
                 //this.templates.sort(PollMap.NAME_INDEX);
             }
 

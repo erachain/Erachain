@@ -152,7 +152,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
             if (this.orders == null) {
                 this.orders = (SortableList<Tuple2<String, Long>, Order>) message.getValue();
                 this.orders.sort(0, true);
-                this.orders.registerObserver();
+                //this.orders.registerObserver();
             }
             getInterval(start, step);
             this.fireTableDataChanged();
@@ -178,14 +178,14 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
         Controller.getInstance().addWalletObserver(this);
 
         if (Controller.getInstance().doesWalletDatabaseExists()) {
-            this.orders.registerObserver();
+            //this.orders.registerObserver();
             Controller.getInstance().addWalletObserver(this);
         }
     }
 
     public void deleteObservers() {
         if (Controller.getInstance().doesWalletDatabaseExists()) {
-            this.orders.removeObserver();
+            //this.orders.removeObserver();
             Controller.getInstance().deleteWalletObserver(this);
         }
     }

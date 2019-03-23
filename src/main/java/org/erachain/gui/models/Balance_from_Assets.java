@@ -58,7 +58,7 @@ public class Balance_from_Assets extends AbstractTableModel implements Observer 
         }
 
 
-        ((SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>) this.balances).registerObserver();
+        //((SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>) this.balances).registerObserver();
     }
 
 
@@ -146,7 +146,7 @@ public class Balance_from_Assets extends AbstractTableModel implements Observer 
     }
 
     public void removeObservers() {
-        this.balances.removeObserver();
+        //this.balances.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 

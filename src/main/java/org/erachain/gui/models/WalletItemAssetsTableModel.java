@@ -92,7 +92,7 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
         if (message.getType() == ObserverMessage.LIST_ASSET_TYPE || message.getType() == ObserverMessage.WALLET_LIST_ASSET_TYPE) {
             if (this.assets == null) {
                 this.assets = (SortableList<Tuple2<String, String>, AssetCls>) message.getValue();
-                this.assets.registerObserver();
+                //this.assets.registerObserver();
                 //this.assets.sort(PollMap.NAME_INDEX);
             }
 

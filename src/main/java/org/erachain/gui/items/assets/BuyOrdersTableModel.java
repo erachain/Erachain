@@ -239,7 +239,7 @@ public class BuyOrdersTableModel extends TableModelCls<Long, Order> implements O
     }
 
     public void deleteObservers() {
-        this.orders.removeObserver();
+        //this.orders.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 

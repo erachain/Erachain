@@ -88,7 +88,7 @@ public class WalletItemPollsTableModel extends TableModelCls<Tuple2<String, Stri
         if (message.getType() == ObserverMessage.LIST_POLL_TYPE) {
             if (this.polls == null) {
                 this.polls = (SortableList<Tuple2<String, String>, PollCls>) message.getValue();
-                this.polls.registerObserver();
+                //this.polls.registerObserver();
                 this.polls.sort(PollMap.NAME_INDEX);
             }
 

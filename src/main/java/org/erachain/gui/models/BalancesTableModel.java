@@ -38,7 +38,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer {
         this.scale = asset.getScale();
         Controller.getInstance().addObserver(this);
         this.balances = Controller.getInstance().getBalances(key);
-        this.balances.registerObserver();
+        //this.balances.registerObserver();
     }
     
     public Class<? extends Object> getColumnClass(int c) { // set column type
@@ -156,7 +156,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer {
     }
     
     public void removeObservers() {
-        this.balances.removeObserver();
+        //this.balances.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 }

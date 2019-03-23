@@ -81,7 +81,7 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
         if (message.getType() == ObserverMessage.LIST_IMPRINT_TYPE || message.getType() == ObserverMessage.WALLET_LIST_IMPRINT_TYPE) {
             if (this.imprints == null) {
                 this.imprints = (SortableList<Tuple2<String, String>, ImprintCls>) message.getValue();
-                this.imprints.registerObserver();
+                //this.imprints.registerObserver();
                 //this.imprints.sort(PollMap.NAME_INDEX);
             }
 
@@ -105,6 +105,6 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
         //Controller.getInstance().deleteWalletObserver(this);
         Controller.getInstance().wallet.database.getImprintMap().deleteObserver(this);
         //Controller.getInstance().wallet.database.getImprintMap().deleteObserver(imprints);
-        imprints.removeObserver();
+        //imprints.removeObserver();
     }
 }

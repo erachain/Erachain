@@ -80,7 +80,7 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
             if (this.imprints == null) {
                 this.imprints = (SortableList<Long, ImprintCls>) message.getValue();
                 this.imprints.addFilterField("name");
-                this.imprints.registerObserver();
+                //this.imprints.registerObserver();
             }
 
             this.fireTableDataChanged();
@@ -97,7 +97,7 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
     }
 
     public void deleteObservers() {
-        this.imprints.removeObserver();
+        //this.imprints.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 

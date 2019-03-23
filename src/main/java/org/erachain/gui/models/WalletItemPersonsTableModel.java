@@ -94,7 +94,7 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
         if (message.getType() == ObserverMessage.LIST_PERSON_TYPE || message.getType() == ObserverMessage.WALLET_LIST_PERSON_TYPE) {
             if (this.persons == null) {
                 this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
-                this.persons.registerObserver();
+                //this.persons.registerObserver();
                 // sort from comparator
                 Collections.sort(this.persons, (a, b) -> a.getB().getName().compareToIgnoreCase(b.getB().getName()));
             }

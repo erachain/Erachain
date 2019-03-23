@@ -51,7 +51,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>, Trade> i
         this.wantKey = this.want.getKey();
 
         this.trades = Controller.getInstance().getTrades(have, want);
-        this.trades.registerObserver();
+        //this.trades.registerObserver();
 
         //this.columnNames[2] = have.getShort();
         //this.columnNames[4] = want.getShort();
@@ -258,7 +258,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>, Trade> i
     }
 
     public void deleteObservers() {
-        this.trades.removeObserver();
+        //this.trades.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 

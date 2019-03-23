@@ -148,7 +148,7 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
         if (message.getType() == ObserverMessage.WALLET_LIST_TELEGRAM_TYPE) {
             if (this.transactions == null) {
                 this.transactions = (SortableList<String, Transaction>) message.getValue();
-                this.transactions.registerObserver();
+                //this.transactions.registerObserver();
 
             }
             filter();

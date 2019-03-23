@@ -124,11 +124,11 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tra
     }
 
     public void addObservers() {
-        this.trades.registerObserver();
+        //this.trades.registerObserver();
     }
 
     public void deleteObservers() {
-        this.trades.removeObserver();
+        //this.trades.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 

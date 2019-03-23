@@ -98,7 +98,7 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
         if (message.getType() == ObserverMessage.LIST_POLL_TYPE) {
             if (this.polls == null) {
                 this.polls = (SortableList<String, Poll>) message.getValue();
-                this.polls.registerObserver();
+                //this.polls.registerObserver();
             }
 
             this.fireTableDataChanged();

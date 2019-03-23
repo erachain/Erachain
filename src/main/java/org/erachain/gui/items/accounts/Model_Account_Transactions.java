@@ -202,7 +202,7 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.transactions == null) {
                 this.transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
-                this.transactions.registerObserver();
+                //this.transactions.registerObserver();
                 this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
 
                 this.transactions_Asset.clear();

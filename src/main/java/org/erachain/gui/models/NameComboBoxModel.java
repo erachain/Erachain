@@ -38,7 +38,7 @@ public class NameComboBoxModel extends DefaultComboBoxModel<Name> implements Obs
         if (message.getType() == ObserverMessage.LIST_NAME_TYPE) {
             if (this.names == null) {
                 this.names = (SortableList<Tuple2<String, String>, Name>) message.getValue();
-                this.names.registerObserver();
+                //this.names.registerObserver();
                 this.names.sort(NameMap.NAME_INDEX);
             }
 
