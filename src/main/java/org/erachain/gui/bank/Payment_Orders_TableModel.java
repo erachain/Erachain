@@ -7,7 +7,7 @@ import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.library.library;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.*;
 import org.mapdb.Fun.Tuple2;
@@ -23,7 +23,7 @@ import java.util.Observer;
 
 @SuppressWarnings("serial")
 // in list of org.erachain.records in wallet
-public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer {
+public class Payment_Orders_TableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> implements Observer {
 
     public static final int COLUMN_CONFIRMATIONS = 0;
     public static final int COLUMN_TIMESTAMP = 1;

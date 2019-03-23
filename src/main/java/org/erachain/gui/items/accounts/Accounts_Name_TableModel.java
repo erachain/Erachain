@@ -2,13 +2,8 @@ package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.core.item.ItemCls;
 import org.erachain.database.SortableList;
-import org.erachain.database.wallet.AccountsPropertisMap;
-import org.erachain.datachain.ItemMap;
 import org.erachain.gui.models.SortedListTableModelCls;
-import org.erachain.gui.models.TableModelCls;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
@@ -17,10 +12,7 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -53,11 +45,11 @@ public class Accounts_Name_TableModel extends SortedListTableModelCls<String, Tu
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.list == null || row > this.list.size() - 1) {
+        if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
 
-        account = this.list.get(row);
+        account = this.listSorted.get(row);
         if (account == null) {
             return null;
         }
@@ -148,8 +140,8 @@ public class Accounts_Name_TableModel extends SortedListTableModelCls<String, Tu
 
     @Override
     public void getInterval() {
-        this.list = new SortableList<String, Tuple2<String, String>>(map, map.getKeys());
-        this.list.sort();
+        this.listSorted = new SortableList<String, Tuple2<String, String>>(map, map.getKeys());
+        this.listSorted.sort();
     }
 
     public void addObservers() {

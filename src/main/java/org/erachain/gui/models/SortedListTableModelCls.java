@@ -7,7 +7,7 @@ import org.erachain.utils.Pair;
 @SuppressWarnings("serial")
 public abstract class SortedListTableModelCls<T, U> extends TimerTableModelCls<U> {
 
-    protected SortableList<T, U> list;
+    protected SortableList<T, U> listSorted;
 
     public int COLUMN_FAVORITE = 1000;
 
@@ -39,25 +39,26 @@ public abstract class SortedListTableModelCls<T, U> extends TimerTableModelCls<U
 
     @Override
     public U getItem(int k) {
-        return this.list.get(k).getB();
+        return this.listSorted.get(k).getB();
     }
 
     public Pair<T, U> getPairItem(int k) {
-        return this.list.get(k);
+        return this.listSorted.get(k);
     }
 
     public SortableList<T, U> getSortableList() {
-        return list;
+        return listSorted;
     }
 
-    // необходимо переопределить так у супер класса по размеру простого списка
+    // необходимо переопределить так у супер класса по размеру его списка постает
+    // а там НОЛЬ
     @Override
     public int getRowCount() {
-        if (list == null) {
+        if (listSorted == null) {
             return 0;
         }
 
-        return list.size();
+        return listSorted.size();
     }
 
 

@@ -13,7 +13,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class ItemPollsTableModel extends TableModelCls<Long, ItemCls> implements Observer {
+public class ItemPollsTableModel extends SortedListTableModelCls<Long, ItemCls> implements Observer {
     public static final int COLUMN_NAME = 0;
     public static final int COLUMN_VOTES = 2;
     private static final int COLUMN_CREATOR = 1;

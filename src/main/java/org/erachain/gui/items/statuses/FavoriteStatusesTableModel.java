@@ -1,17 +1,11 @@
 package org.erachain.gui.items.statuses;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.statuses.StatusCls;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.FavoriteItemModelTable;
-import org.erachain.gui.models.TableModelCls;
 import org.erachain.utils.ObserverMessage;
-import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.util.*;
 
 @SuppressWarnings("serial")

@@ -38,10 +38,10 @@ public class WalletOrdersTableModel extends SortedListTableModelCls<Tuple2<Strin
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.list == null || row >= this.list.size()) {
+        if (this.listSorted == null || row >= this.listSorted.size()) {
             return null;
         }
-        Pair<Tuple2<String, Long>, Order> item = this.list.get(row);
+        Pair<Tuple2<String, Long>, Order> item = this.listSorted.get(row);
         if (item == null)
             return null;
 
@@ -120,7 +120,7 @@ public class WalletOrdersTableModel extends SortedListTableModelCls<Tuple2<Strin
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_RESET_ORDER_TYPE) {
-            this.list.clear();
+            this.listSorted.clear();
             this.fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
             needUpdate = false;
@@ -139,9 +139,9 @@ public class WalletOrdersTableModel extends SortedListTableModelCls<Tuple2<Strin
 
         Set<Tuple2<String, Long>> keys = ((OrderMap) map).getKeys();
 
-        if (end > list.size()) end = list.size();
+        if (end > listSorted.size()) end = listSorted.size();
 
-        list = SortableList.makeSortableList(map, true,  (int)(end - start));
+        listSorted = SortableList.makeSortableList(map, true,  (int)(end - start));
 
     }
 

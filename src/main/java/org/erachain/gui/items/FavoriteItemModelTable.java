@@ -6,14 +6,14 @@ import org.erachain.database.SortableList;
 import org.erachain.database.wallet.FavoriteItemMap;
 import org.erachain.datachain.DCMap;
 import org.erachain.datachain.ItemMap;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 
 import java.util.*;
 
 @SuppressWarnings("serial")
-public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls> implements Observer {
+public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Long, ItemCls> implements Observer {
 
     private final int RESET_EVENT;
     private final int ADD_EVENT;

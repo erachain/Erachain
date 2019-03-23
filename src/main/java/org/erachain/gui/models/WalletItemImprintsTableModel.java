@@ -3,13 +3,9 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.imprints.ImprintCls;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
-import org.erachain.database.wallet.TransactionMap;
-import org.erachain.database.wallet.WItemImprintMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.Observable;
@@ -31,11 +27,11 @@ public class WalletItemImprintsTableModel extends SortedListTableModelCls<Tuple2
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.list == null || row > this.list.size() - 1) {
+        if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
 
-        ImprintCls imprint = this.list.get(row).getB();
+        ImprintCls imprint = this.listSorted.get(row).getB();
 
         switch (column) {
             case COLUMN_KEY:
@@ -83,7 +79,7 @@ public class WalletItemImprintsTableModel extends SortedListTableModelCls<Tuple2
 
     @Override
     public void getInterval() {
-        list = new SortableList<Tuple2<String, String>, ImprintCls>(
+        listSorted = new SortableList<Tuple2<String, String>, ImprintCls>(
                 map, map.getKeys());
     }
 

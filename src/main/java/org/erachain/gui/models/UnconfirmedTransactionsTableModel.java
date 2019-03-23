@@ -16,7 +16,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class UnconfirmedTransactionsTableModel extends TableModelCls<Long, Transaction> implements Observer {
+public class UnconfirmedTransactionsTableModel extends SortedListTableModelCls<Long, Transaction> implements Observer {
 
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TYPE = 1;

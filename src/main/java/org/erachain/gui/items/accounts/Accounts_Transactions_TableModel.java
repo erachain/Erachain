@@ -18,7 +18,6 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -67,8 +66,8 @@ public class Accounts_Transactions_TableModel extends SortedListTableModelCls<Tu
     public void set_Account(Account sender) {
 
         this.sender = sender;
-        if (list != null)
-            list.setFilter(this.sender.getAddress());
+        if (listSorted != null)
+            listSorted.setFilter(this.sender.getAddress());
 
     }
 
@@ -225,10 +224,10 @@ public class Accounts_Transactions_TableModel extends SortedListTableModelCls<Tu
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.trans_List == null) {
                 
-                list = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
+                listSorted = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
                 //sortableItems.registerObserver();
                 //Controller.getInstance().wallet.database.getTransactionMap().addObserver(sortableItems);
-                list.sort(TransactionMap.ADDRESS_INDEX, true);
+                listSorted.sort(TransactionMap.ADDRESS_INDEX, true);
                 // this.r_Trans.sort(NameMap.NAME_INDEX);
                 get_R_Send();
                
@@ -261,12 +260,12 @@ public class Accounts_Transactions_TableModel extends SortedListTableModelCls<Tu
 
     public void get_R_Send() {
 
-        if (this.sender == null || this.asset == null || list == null)
+        if (this.sender == null || this.asset == null || listSorted == null)
             return;
 
         trans_Hash_Map = new HashMap<String, Trans>();
         trans_List = null;
-        Iterator<Pair<Tuple2<String, String>, Transaction>> s_it = list.iterator();
+        Iterator<Pair<Tuple2<String, String>, Transaction>> s_it = listSorted.iterator();
         while (s_it.hasNext()) {
             Pair<Tuple2<String, String>, Transaction> tt = s_it.next();
             Transaction ttt = tt.getB();

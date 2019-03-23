@@ -3,14 +3,14 @@ package org.erachain.gui.items.imprints;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.database.SortableList;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.utils.ObserverMessage;
 
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class TableModelImprints extends TableModelCls<Long, ImprintCls> implements Observer {
+public class TableModelImprints extends SortedListTableModelCls<Long, ImprintCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;

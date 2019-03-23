@@ -8,7 +8,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -24,7 +24,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer {
+public class CreditsTableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> implements Observer {
     public static final int COLUMN_AMOUNT = 1;
     public static final int COLUMN_TRANSACTION = 2;
     private static final int COLUMN_ADDRESS = 0;

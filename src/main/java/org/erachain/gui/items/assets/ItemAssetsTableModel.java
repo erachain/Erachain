@@ -24,11 +24,11 @@ public class ItemAssetsTableModel extends SearchItemsTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.list == null || row > this.list.size() - 1) {
+        if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
 
-        AssetCls asset = (AssetCls) this.list.get(row);
+        AssetCls asset = (AssetCls) this.getItem(row);
 
         switch (column) {
             case COLUMN_KEY:

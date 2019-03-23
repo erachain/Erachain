@@ -14,7 +14,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class PollsTableModel extends TableModelCls<String, Poll> implements Observer {
+public class PollsTableModel extends SortedListTableModelCls<String, Poll> implements Observer {
     public static final int COLUMN_NAME = 0;
     public static final int COLUMN_VOTES = 2;
     private static final int COLUMN_CREATOR = 1;

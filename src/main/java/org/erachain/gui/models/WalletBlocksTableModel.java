@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.Observable;
-import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class WalletBlocksTableModel extends SortedListTableModelCls<Tuple2<String, String>, Block.BlockHead> {
@@ -42,11 +41,11 @@ public class WalletBlocksTableModel extends SortedListTableModelCls<Tuple2<Strin
     @Override
     public Object getValueAt(int row, int column) {
         try {
-            if (this.list == null || this.list.size() - 1 < row) {
+            if (this.listSorted == null || this.listSorted.size() - 1 < row) {
                 return null;
             }
 
-            Pair<Tuple2<String, String>, Block.BlockHead> data = this.list.get(row);
+            Pair<Tuple2<String, String>, Block.BlockHead> data = this.listSorted.get(row);
 
             if (data == null) {
                 return null;
@@ -101,8 +100,8 @@ public class WalletBlocksTableModel extends SortedListTableModelCls<Tuple2<Strin
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE) {
             //this.list = map.getList();
-            this.list = SortableList.makeSortableList(map, true, 50);
-            this.list.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            this.listSorted = SortableList.makeSortableList(map, true, 50);
+            this.listSorted.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
             //this.list.sort();
 
             this.fireTableDataChanged();
@@ -110,17 +109,17 @@ public class WalletBlocksTableModel extends SortedListTableModelCls<Tuple2<Strin
         } else if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
                 || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
                 ) {
-            this.list = SortableList.makeSortableList(map, true, 50);
+            this.listSorted = SortableList.makeSortableList(map, true, 50);
             //this.list.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
-            this.list.sort();
+            this.listSorted.sort();
 
             this.fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE
                 ) {
             //CHECK IF LIST UPDATED
-            this.list = SortableList.makeSortableList(map, true, 50);
+            this.listSorted = SortableList.makeSortableList(map, true, 50);
             //this.list.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
-            this.list.sort();
+            this.listSorted.sort();
 
             this.fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.GUI_REPAINT
@@ -132,8 +131,8 @@ public class WalletBlocksTableModel extends SortedListTableModelCls<Tuple2<Strin
             count = 0;
 
             //this.list = map.getList();
-            this.list = SortableList.makeSortableList(map, true, 50);
-            this.list.sort();
+            this.listSorted = SortableList.makeSortableList(map, true, 50);
+            this.listSorted.sort();
             this.fireTableDataChanged();
         }
     }

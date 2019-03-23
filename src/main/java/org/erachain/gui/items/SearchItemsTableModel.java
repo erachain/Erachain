@@ -4,21 +4,20 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.ItemMap;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Observable;
 import java.util.Set;
 
 @SuppressWarnings("serial")
-public abstract class SearchItemsTableModel<T, U> extends TableModelCls<Long, ItemCls> {
+public abstract class SearchItemsTableModel extends SortedListTableModelCls<Long, ItemCls> {
 
     public SearchItemsTableModel(DBMap itemsMap, String[] columnNames, Boolean[] column_AutoHeight, int favorite) {
         super(itemsMap, columnNames, column_AutoHeight, favorite, false);
     }
-    protected List<ItemCls> list;
-    protected ItemMap db;
+
+    //protected ItemMap db;
     public void fill(Set<Long> keys) {
         ItemCls item;
         list = new ArrayList<ItemCls>();
@@ -71,17 +70,8 @@ public abstract class SearchItemsTableModel<T, U> extends TableModelCls<Long, It
     public void syncUpdate(Observable o, Object arg) { }
 
     @Override
-    public SortableList<Long, ItemCls> getSortableList() {
-        return listSorted;
-    }
-
     public ItemCls getItem(int row) {
         return this.list.get(row);
-    }
-
-    @Override
-    public int getRowCount() {
-        return (this.list == null) ? 0 : this.list.size();
     }
 
     @Override

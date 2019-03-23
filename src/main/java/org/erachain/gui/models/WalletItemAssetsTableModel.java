@@ -12,7 +12,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, String>, AssetCls> implements Observer {
+public class WalletItemAssetsTableModel extends SortedListTableModelCls<Tuple2<String, String>, AssetCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;

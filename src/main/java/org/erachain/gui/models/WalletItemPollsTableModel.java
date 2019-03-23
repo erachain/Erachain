@@ -14,7 +14,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemPollsTableModel extends TableModelCls<Tuple2<String, String>, PollCls> implements Observer {
+public class WalletItemPollsTableModel extends SortedListTableModelCls<Tuple2<String, String>, PollCls> implements Observer {
     public static final int COLUMN_NAME = 0;
     public static final int COLUMN_ADDRESS = 1;
     public static final int COLUMN_TOTAL_VOTES = 2;
