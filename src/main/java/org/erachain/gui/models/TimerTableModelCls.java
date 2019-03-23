@@ -1,5 +1,6 @@
 package org.erachain.gui.models;
 
+import org.erachain.controller.Controller;
 import org.erachain.database.DBMap;
 import org.erachain.lang.Lang;
 import org.slf4j.Logger;
@@ -177,6 +178,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel {
     public void addObservers() {
         if (timeout > 0)
             initTimer();
+
     }
 
     public void deleteObservers() {

@@ -225,13 +225,11 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
     }
 
     public void addObservers() {
-        super.addObservers();
         Controller.getInstance().addActivePeersObserver(this);
     }
 
     public void deleteObservers() {
         Controller.getInstance().removeActivePeersObserver(this);
-        super.deleteObservers();
     }
 
 }

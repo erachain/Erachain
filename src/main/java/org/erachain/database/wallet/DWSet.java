@@ -127,7 +127,7 @@ public class DWSet extends DBASet {
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
                 .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
 
-                //.mmapFileEnablePartial()
+                .mmapFileEnablePartial()
                 //.compressionEnable()
 
                 .make();
@@ -363,7 +363,7 @@ public class DWSet extends DBASet {
     @Override
     public synchronized void commit() {
         if (this.uses != 0
-                || System.currentTimeMillis() - commitPoint < 50000
+                || System.currentTimeMillis() - commitPoint < 10000
         )
             return;
 
