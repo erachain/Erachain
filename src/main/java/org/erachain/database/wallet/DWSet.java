@@ -363,7 +363,7 @@ public class DWSet extends DBASet {
     @Override
     public synchronized void commit() {
         if (this.uses != 0
-                //|| System.currentTimeMillis() - commitPoint < 50000
+                || System.currentTimeMillis() - commitPoint < 50000
         )
             return;
 
