@@ -302,7 +302,7 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
 
     @Override
     public long getMapSize() {
-        return map.size();
+        return listSorted.size();
     }
 
     @Override

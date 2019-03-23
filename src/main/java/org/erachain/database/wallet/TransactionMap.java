@@ -187,7 +187,6 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
         return transactions;
     }
 
-    @SuppressWarnings("unchecked")
     public Collection<Tuple2<String, String>> getFromToKeys(long fromKey, long toKey) {
         return AUTOKEY_INDEX.subMap(fromKey, toKey).values();
     }

@@ -1,5 +1,6 @@
 package org.erachain.gui.models;
 
+import com.sun.org.apache.xpath.internal.operations.Or;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
@@ -135,13 +136,9 @@ public class WalletOrdersTableModel extends SortedListTableModelCls<Tuple2<Strin
     }
 
     @Override
-    public void getIntervalThis(long start, long end) {
-
-        Set<Tuple2<String, Long>> keys = ((OrderMap) map).getKeys();
-
-        if (end > map.size()) end = map.size();
-
-        listSorted = SortableList.makeSortableList(map, true,  (int)(end - start));
+    public void getIntervalThis(long startBack, long endBack) {
+        listSorted = new SortableList<Tuple2<String, Long>, Order>(
+                map, ((OrderMap)map).getFromToKeys(startBack, endBack));
 
     }
 
