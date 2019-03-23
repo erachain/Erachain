@@ -21,7 +21,7 @@ public abstract class DBMap<T, U> extends Observable {
     public static final int NOTIFY_LIST = 4;
     //public static final int NOTIFY_COUNT = 5;
 
-    public static final int DEFAULT_INDEX = 0;
+    public int DEFAULT_INDEX = 0;
     private static Logger logger = LoggerFactory.getLogger(DBMap.class.getName());
     protected IDB databaseSet;
     protected Map<T, U> map;

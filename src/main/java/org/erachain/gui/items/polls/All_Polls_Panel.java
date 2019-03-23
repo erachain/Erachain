@@ -106,7 +106,7 @@ public class All_Polls_Panel extends JPanel {
 
         //NAMESALES SORTER
         Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-        indexes.put(PollsTableModel.COLUMN_NAME, DBMap.DEFAULT_INDEX);
+        indexes.put(PollsTableModel.COLUMN_NAME, this.pollsTableModel.getMapDefaultIndex());
         CoreRowSorter sorter = new CoreRowSorter(this.pollsTableModel, indexes);
         pollsTable.setRowSorter(sorter);
 

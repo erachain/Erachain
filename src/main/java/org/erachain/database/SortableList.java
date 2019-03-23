@@ -29,10 +29,10 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
         this.db = db;
 
         //LOAD DEFAULT ITERATOR
-        this.index = DBMap.DEFAULT_INDEX;
+        this.index = db.DEFAULT_INDEX;
         this.size = db.size();
         this.descending = false;
-        this.iterator = this.filter(db.getIterator(DBMap.DEFAULT_INDEX, this.descending));
+        this.iterator = this.filter(db.getIterator(db.DEFAULT_INDEX, this.descending));
         this.position = 0;
         additionalFilterFields = new ArrayList<String>();
     }
@@ -42,7 +42,7 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
         this.keys = keys;
 
         //LOAD DEFAULT ITERATOR
-        this.index = DBMap.DEFAULT_INDEX;
+        this.index = db.DEFAULT_INDEX;
         this.size = keys.size();
         this.descending = false;
         this.iterator = keys.iterator();

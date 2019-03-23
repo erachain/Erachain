@@ -46,10 +46,9 @@ public class WalletBlocksTableModel extends SortedListTableModelCls<Tuple2<Strin
                 return null;
             }
 
-            //
             Pair<Tuple2<String, String>, Block.BlockHead> data = this.list.get(row);
 
-            if (data == null || data.getB() == null) {
+            if (data == null) {
                 return null;
             }
 
@@ -104,6 +103,7 @@ public class WalletBlocksTableModel extends SortedListTableModelCls<Tuple2<Strin
             //this.list = map.getList();
             this.list = SortableList.makeSortableList(map, true, 50);
             this.list.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            //this.list.sort();
 
             this.fireTableDataChanged();
 
@@ -111,15 +111,16 @@ public class WalletBlocksTableModel extends SortedListTableModelCls<Tuple2<Strin
                 || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
                 ) {
             this.list = SortableList.makeSortableList(map, true, 50);
-            this.list.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            //this.list.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            this.list.sort();
 
             this.fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE
                 ) {
             //CHECK IF LIST UPDATED
-            //this.list = map.getList();
             this.list = SortableList.makeSortableList(map, true, 50);
-            this.list.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            //this.list.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            this.list.sort();
 
             this.fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.GUI_REPAINT

@@ -147,6 +147,13 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel {
     public void getIntervalThis(long start, long end) {
     }
 
+    public int getMapDefaultIndex() {
+        if (map == null)
+            return 0;
+
+        return map.DEFAULT_INDEX;
+    }
+
     //public abstract int getMapSize();
     public long getMapSize() {
         return 0;

@@ -102,7 +102,7 @@ public class AllPollsFrame extends JFrame {
 
         //NAMESALES SORTER
         Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-        indexes.put(PollsTableModel.COLUMN_NAME, DBMap.DEFAULT_INDEX);
+        indexes.put(PollsTableModel.COLUMN_NAME, pollsTableModel.getMapDefaultIndex());
         CoreRowSorter sorter = new CoreRowSorter(this.pollsTableModel, indexes);
         pollsTable.setRowSorter(sorter);
 
