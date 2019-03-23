@@ -245,7 +245,10 @@ public abstract class DBMap<T, U> extends Observable {
     }
 
     /**
-     * уведомляет только счетчик если он разрешен, иначе Список
+     * Соединяется прямо к списку SortableList для отображения в ГУИ
+     * Нужен только для сортировки<br>
+     * TODO надо его убрать отсюла нафиг чтобы не тормозило и только
+     * по месту работало окнкретно как надо
      * @param o
      */
     @Override
@@ -259,24 +262,31 @@ public abstract class DBMap<T, U> extends Observable {
         //NOTIFY
         if (this.observableData != null) {
             if (this.observableData.containsKey(NOTIFY_LIST)) {
-                //CREATE LIST
-                SortableList<T, U> list;
-                if (this.size() < 1000) {
-                    list = new SortableList<T, U>(this);
-                } else {
-                    // обрезаем полный список в базе до 1000
-                    Iterator iterator = this.getIterator(DEFAULT_INDEX, false);
-                    List<T> keys = new ArrayList<T>();
-                    int i = 0;
-                    while (iterator.hasNext() && ++i < 1000) {
-                        keys.add((T)iterator.next());
+                if (false) {
+                    //CREATE LIST
+                    SortableList<T, U> list;
+                    if (this.size() < 1000) {
+                        list = new SortableList<T, U>(this);
+                    } else {
+                        // обрезаем полный список в базе до 1000
+                        Iterator iterator = this.getIterator(DEFAULT_INDEX, false);
+                        List<T> keys = new ArrayList<T>();
+                        int i = 0;
+                        while (iterator.hasNext() && ++i < 1000) {
+                            keys.add((T) iterator.next());
+                        }
+
+                        list = new SortableList<T, U>(this, keys);
                     }
 
-                    list = new SortableList<T, U>(this, keys);
-                }
+                    //UPDATE
+                    o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), list));
+                } else {
 
-                //UPDATE
-                o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), list));
+                    //UPDATE
+                    o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), this));
+
+                }
             }
         }
 
