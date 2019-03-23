@@ -16,7 +16,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>, Block.BlockHead> implements Observer {
+public class WalletBlocksTableModel extends SortedListTableModelCls<Tuple2<String, String>, Block.BlockHead> implements Observer {
 
     public static final int COLUMN_HEIGHT = 0;
     public static final int COLUMN_TIMESTAMP = 1;
@@ -24,44 +24,30 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
     public static final int COLUMN_BASETARGET = 3;
     public static final int COLUMN_TRANSACTIONS = 4;
     public static final int COLUMN_FEE = 5;
-    private SortableList<Tuple2<String, String>, Block.BlockHead> blocks;
 
     public WalletBlocksTableModel() {
         super(Controller.getInstance().wallet.database.getBlocksHeadMap(), "WalletBlocksTableModel", 1000,
                 new String[]{"Height", "Timestamp", "Generator",
                         "GB dtWV", //"Generating Balance",
                         "Transactions", "Fee"}, new Boolean[]{false, true, true, false, true, false}, true);
-        if (!Controller.getInstance().doesWalletDatabaseExists()) {
-            this.blocks = null;
-        } else {
+
+        // сначала ЛОГЕР задаем
+        LOGGER = LoggerFactory.getLogger(WalletBlocksTableModel.class.getName());
+
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
             addObservers();
         }
-        LOGGER = LoggerFactory.getLogger(WalletBlocksTableModel.class.getName());
-    }
-
-    @Override
-    public SortableList<Tuple2<String, String>, Block.BlockHead> getSortableList() {
-        return this.blocks;
-    }
-
-    @Override
-    public int getRowCount() {
-        if (blocks == null) {
-            return 0;
-        }
-
-        return blocks.size();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
         try {
-            if (this.blocks == null || this.blocks.size() - 1 < row) {
+            if (this.list == null || this.list.size() - 1 < row) {
                 return null;
             }
 
             //
-            Pair<Tuple2<String, String>, Block.BlockHead> data = this.blocks.get(row);
+            Pair<Tuple2<String, String>, Block.BlockHead> data = this.list.get(row);
 
             if (data == null || data.getB() == null) {
                 return null;
@@ -69,7 +55,6 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 
             Block.BlockHead block = data.getB();
             if (block == null) {
-                //this.fireTableDataChanged();
                 return null;
             }
 
@@ -116,19 +101,26 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE) {
-            this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
-            this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            //this.list = map.getList();
+            this.list = SortableList.makeSortableList(map, true, 50);
+            this.list.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+
             this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
                 || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
                 ) {
-            this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            this.list = SortableList.makeSortableList(map, true, 50);
+            this.list.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+
             this.fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE
                 ) {
             //CHECK IF LIST UPDATED
-            this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
+            //this.list = map.getList();
+            this.list = SortableList.makeSortableList(map, true, 50);
+            this.list.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+
             this.fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.GUI_REPAINT
         ) {
@@ -138,24 +130,21 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 
             count = 0;
 
-            this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
-            this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            //this.list = map.getList();
+            this.list = SortableList.makeSortableList(map, true, 50);
+            this.list.sort();
             this.fireTableDataChanged();
         }
     }
 
     public void addObservers() {
-        Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this);
+        map.addObserver(this);
         Controller.getInstance().guiTimer.addObserver(this);
     }
 
     public void deleteObservers() {
         Controller.getInstance().guiTimer.deleteObserver(this);
-        Controller.getInstance().wallet.database.getBlocksHeadMap().deleteObserver(this);
+        map.deleteObserver(this);
     }
 
-    @Override
-    public Block.BlockHead getItem(int k) {
-        return this.blocks.get(k).getB();
-    }
 }

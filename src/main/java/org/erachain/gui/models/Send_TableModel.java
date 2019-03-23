@@ -58,7 +58,7 @@ import org.erachain.utils.TableMenuPopupUtil;
 public class Send_TableModel extends JTable implements Observer {
 
 
-    private static final Logger LOGGER = LoggerFactory            .getLogger(Send_TableModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Send_TableModel.class);
     Comparator<MessageBuf> comparator = new Comparator<MessageBuf>() {
         public int compare(MessageBuf c1, MessageBuf c2) {
             long diff = c2.getTimestamp() - c1.getTimestamp();

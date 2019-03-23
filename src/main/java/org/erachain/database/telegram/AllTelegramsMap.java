@@ -18,10 +18,8 @@ public class AllTelegramsMap extends DBMap<String, Transaction> {
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.ALL_TELEGRAM_RESET_TYPE);
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.ALL_TELEGRAMT_LIST_TYPE);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ALL_TELEGRAMT_ADD_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.ALL_TELEGRAMT_REMOVE_TYPE);
-            }
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ALL_TELEGRAMT_ADD_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.ALL_TELEGRAMT_REMOVE_TYPE);
         }
     }
 

@@ -27,7 +27,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class SettingLangFrame extends JDialog {
 
-    private static final Logger LOGGER = LoggerFactory            .getLogger(SettingLangFrame.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SettingLangFrame.class);
     private JList<LangFile> listLang;
     private JComboBox<String> size_Font;
     private JButton nextButton;

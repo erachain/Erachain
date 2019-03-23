@@ -41,13 +41,11 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
                 this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
             if (observeList > 0)
                 this.observableData.put(DBMap.NOTIFY_LIST, observeList);
-            if (databaseSet.isDynamicGUI()) {
-                if (observeAdd > 0) {
-                    observableData.put(DBMap.NOTIFY_ADD, observeAdd);
-                }
-                if (observeRemove > 0) {
-                    observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
-                }
+            if (observeAdd > 0) {
+                observableData.put(DBMap.NOTIFY_ADD, observeAdd);
+            }
+            if (observeRemove > 0) {
+                observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
             }
         }
     }

@@ -40,6 +40,7 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                 new Boolean[] { false, false, false, false, false, false, false, false }, false);
 
         LOGGER = LoggerFactory.getLogger(PeersTableModel.class.getName());
+
         addObservers();
 
     }

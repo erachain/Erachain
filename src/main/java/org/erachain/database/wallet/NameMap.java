@@ -28,10 +28,8 @@ public class NameMap extends DBMap<Tuple2<String, String>, Name> {
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_ADD_NAME_TYPE);
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_NAME_TYPE);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_NAME_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_NAME_TYPE);
-            }
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_NAME_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_NAME_TYPE);
         }
     }
 

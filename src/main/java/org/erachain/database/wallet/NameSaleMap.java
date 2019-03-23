@@ -30,10 +30,8 @@ public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal> {
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_NAME_SALE_TYPE);
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_NAME_SALE_TYPE);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_NAME_SALE_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_NAME_SALE_TYPE);
-            }
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_NAME_SALE_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_NAME_SALE_TYPE);
         }
     }
 

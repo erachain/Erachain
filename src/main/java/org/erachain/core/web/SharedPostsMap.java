@@ -12,8 +12,6 @@ import java.util.Map;
 
 public class SharedPostsMap extends DCMap<byte[], List<String>> {
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     public SharedPostsMap(DCSet dcSet, DB database) {
         super(dcSet, database);
     }

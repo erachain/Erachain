@@ -34,7 +34,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
     public static final int COLUMN_RECIPIENT = 6;
     public static final int COLUMN_FEE = 7;
     public static final int COLUMN_SIZE = 8;
-    static Logger LOGGER = LoggerFactory.getLogger(Payment_Orders_TableModel.class.getName());
+
     private SortableList<Tuple2<String, String>, Transaction> transactions;
     //ItemAssetMap dbItemAssetMap;
     private ArrayList<R_Send> trans;
@@ -44,6 +44,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
         super(new String[]{"Confirmation", "Timestamp", "Type", "Creator", "Item",
                 "Amount", "Recipient", "Fee", "Size"}, true);
 
+        LOGGER = LoggerFactory.getLogger(Payment_Orders_TableModel.class.getName());
     }
 
     @Override
