@@ -31,8 +31,6 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
     public static final int COLUMN_FEE = 7;
     public static final int COLUMN_SIZE = 8;
 
-    private SortableList<Tuple2<String, String>, Transaction> transactions;
-
     /**
      * В динамическом режиме перерисовывается автоматически по событию GUI_REPAINT
      * - перерисовка страницы целой, поэтому не так тормозит основные процессы.<br>
@@ -49,39 +47,13 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
     }
 
     @Override
-    public SortableList<Tuple2<String, String>, Transaction> getSortableList() {
-        return this.transactions;
-    }
-
-    public Transaction getItem(int row) {
-        return getTransaction(row);
-    }
-
-    public Transaction getTransaction(int row) {
-        Pair<Tuple2<String, String>, Transaction> data = this.transactions.get(row);
-        if (data == null || data.getB() == null) {
-            return null;
-        }
-        return data.getB();
-    }
-
-    @Override
-    public int getRowCount() {
-        if (this.transactions == null) {
-            return 0;
-        }
-
-        return this.transactions.size();
-    }
-
-    @Override
     public Object getValueAt(int row, int column) {
 
-        if (this.transactions == null || this.transactions.size() - 1 < row) {
+        if (this.listSorted == null || this.listSorted.size() - 1 < row) {
             return null;
         }
 
-        Pair<Tuple2<String, String>, Transaction> data = this.transactions.get(row);
+        Pair<Tuple2<String, String>, Transaction> data = this.listSorted.get(row);
 
         if (data == null || data.getB() == null) {
             return null;
@@ -301,18 +273,13 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
     }
 
     @Override
-    public long getMapSize() {
-        return listSorted.size();
-    }
-
-    @Override
     public void getIntervalThis(long startBack, long endBack) {
-        transactions = new SortableList<Tuple2<String, String>, Transaction>(
+        listSorted = new SortableList<Tuple2<String, String>, Transaction>(
                 map,
                 ((TransactionMap)map).getFromToKeys(startBack, endBack));
 
         DCSet dcSet = DCSet.getInstance();
-        for (Pair<Tuple2<String, String>, Transaction> item: transactions) {
+        for (Pair<Tuple2<String, String>, Transaction> item: listSorted) {
             if (item.getB() == null)
                 continue;
 
