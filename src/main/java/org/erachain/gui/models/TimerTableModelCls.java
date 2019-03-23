@@ -7,13 +7,10 @@ import org.slf4j.Logger;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
-import java.util.List;
-import java.util.Observable;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 @SuppressWarnings("serial")
-public abstract class TimerTableModelCls<U> extends AbstractTableModel {
+public abstract class TimerTableModelCls<U> extends AbstractTableModel implements Observer {
 
     private String name;
     private long timeout;
@@ -154,9 +151,8 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel {
         return map.DEFAULT_INDEX;
     }
 
-    //public abstract int getMapSize();
     public long getMapSize() {
-        return 0;
+        return map.size();
     }
 
     /**

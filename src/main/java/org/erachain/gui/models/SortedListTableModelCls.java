@@ -2,6 +2,7 @@ package org.erachain.gui.models;
 
 import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
+import org.erachain.utils.Pair;
 
 @SuppressWarnings("serial")
 public abstract class SortedListTableModelCls<T, U> extends TimerTableModelCls<U> {
@@ -39,6 +40,10 @@ public abstract class SortedListTableModelCls<T, U> extends TimerTableModelCls<U
     @Override
     public U getItem(int k) {
         return this.list.get(k).getB();
+    }
+
+    public Pair<T, U> getPairItem(int k) {
+        return this.list.get(k);
     }
 
     public SortableList<T, U> getSortableList() {

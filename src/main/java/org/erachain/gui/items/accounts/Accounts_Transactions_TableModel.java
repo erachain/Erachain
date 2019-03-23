@@ -12,12 +12,12 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
-import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -26,7 +26,7 @@ import java.util.*;
 ////////
 
 @SuppressWarnings("serial")
-public class Accounts_Transactions_TableModel extends AbstractTableModel implements Observer {
+public class Accounts_Transactions_TableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TRANSACTION = 1;
     public static final int COLUMN_AMOUNT = 2;
@@ -43,29 +43,20 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
     private Object[] trans_List;
     private boolean isEncrypted = true;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Date", "RecNo", "Amount",
-            "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "Type Asset"});
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
-
-    private SortableList<Tuple2<String, String>, Transaction> sortableItems;
     private Account sender;
-
     private AssetCls asset;
-
     private byte[] privateKey;
-
     private byte[] publicKey;
 
     private HashSet actionTypes;
 
     public Accounts_Transactions_TableModel() {
-        //sender = new Account("");
-        // trans_List = new ArrayList<Trans>();
+        super(Controller.getInstance().wallet.database.getTransactionMap(),
+                new String[]{"Date", "RecNo", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "Type Asset"},
+                new Boolean[]{false, true, true, false, false}, false);
 
-       // r_Trans = new ArrayList<Transaction>();
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
-        // Controller.getInstance().addObserver(this);
+       addObservers();
+
     }
 
     public void repaint() {
@@ -76,8 +67,8 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
     public void set_Account(Account sender) {
 
         this.sender = sender;
-        if (sortableItems != null)
-            sortableItems.setFilter(this.sender.getAddress());
+        if (list != null)
+            list.setFilter(this.sender.getAddress());
 
     }
 
@@ -92,35 +83,10 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 
     }
 
-    // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
-    }
-
-    public Class<? extends Object> getColumnClass(int c) { // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
     public Transaction getItem(int row) {
         return ((Trans) this.trans_List[row]).transaction;
     }
 
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
-    }
 
     @Override
     public int getRowCount() {
@@ -130,47 +96,13 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
         return trans_List.length;
     }
 
-    @SuppressWarnings("null")
-    private BigDecimal get_summ() {
-        BigDecimal res = new BigDecimal("0");
-        for (int i = 0; i < trans_List.length; i++) {
-
-
-            res = res.add(((Trans) trans_List[i]).amount);
-        }
-        return res;
-
-    }
-
     @Override
     public Object getValueAt(int row, int column) {
-        // if(this.r_Trans == null || row > this.r_Trans.size() - 1 ||
-        // this.r_Trans.isEmpty() )
-        // {
-        // return null;
-        // }
-        // Transaction r_Tran = this.r_Trans.get(row);
-
 
         if (this.trans_List == null || this.trans_List.length == 0 || sender == null) {
             return null;
         }
-        // summa
-/*		if (row == this.trans_List.length){
-			
-			switch (column){
-			case COLUMN_TIMESTAMP:
-				return Lang.getInstance().translate("Total")+":";
-			case COLUMN_AMOUNT:
-				return get_summ();
-			
-			}
-			
-			
-			
-			return null;
-		}
-		*/
+
         // fill table
 
         Trans r_Tran = (Trans) trans_List[row];
@@ -270,18 +202,6 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        // try
-        // {
-        this.syncUpdate(o, arg);
-        // }
-        // catch(Exception e)
-        // {
-        // GUI ERROR
-        // }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -305,10 +225,10 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.trans_List == null) {
                 
-                sortableItems = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
+                list = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
                 //sortableItems.registerObserver();
                 //Controller.getInstance().wallet.database.getTransactionMap().addObserver(sortableItems);
-                sortableItems.sort(TransactionMap.ADDRESS_INDEX, true);
+                list.sort(TransactionMap.ADDRESS_INDEX, true);
                 // this.r_Trans.sort(NameMap.NAME_INDEX);
                 get_R_Send();
                
@@ -341,12 +261,12 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 
     public void get_R_Send() {
 
-        if (this.sender == null || this.asset == null || sortableItems == null)
+        if (this.sender == null || this.asset == null || list == null)
             return;
 
         trans_Hash_Map = new HashMap<String, Trans>();
         trans_List = null;
-        Iterator<Pair<Tuple2<String, String>, Transaction>> s_it = sortableItems.iterator();
+        Iterator<Pair<Tuple2<String, String>, Transaction>> s_it = list.iterator();
         while (s_it.hasNext()) {
             Pair<Tuple2<String, String>, Transaction> tt = s_it.next();
             Transaction ttt = tt.getB();
@@ -435,8 +355,16 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 
     }
 
-    public void deleteObserver() {
-        Controller.getInstance().wallet.database.getTransactionMap().deleteObserver(this);
+    public void addObservers() {
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            map.addObserver(this);
+
+    }
+
+    public void deleteObservers() {
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            map.deleteObserver(this);
+        }
 
     }
 

@@ -3,23 +3,25 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.imprints.ImprintCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
+import org.erachain.database.wallet.TransactionMap;
+import org.erachain.database.wallet.WItemImprintMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, String>, ImprintCls> implements Observer {
+public class WalletItemImprintsTableModel extends SortedListTableModelCls<Tuple2<String, String>, ImprintCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_CONFIRMED = 3;
     public static final int COLUMN_FAVORITE = 4;
-
-    private SortableList<Tuple2<String, String>, ImprintCls> imprints;
 
     public WalletItemImprintsTableModel() {
         super(Controller.getInstance().wallet.database.getImprintMap(), "WalletItemImprintsTableModel", 1000,
@@ -28,26 +30,12 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
     }
 
     @Override
-    public SortableList<Tuple2<String, String>, ImprintCls> getSortableList() {
-        return this.imprints;
-    }
-
-    public ImprintCls getItem(int row) {
-        return this.imprints.get(row).getB();
-    }
-
-    @Override
-    public int getRowCount() {
-        return this.imprints.size();
-    }
-
-    @Override
     public Object getValueAt(int row, int column) {
-        if (this.imprints == null || row > this.imprints.size() - 1) {
+        if (this.list == null || row > this.list.size() - 1) {
             return null;
         }
 
-        ImprintCls imprint = this.imprints.get(row).getB();
+        ImprintCls imprint = this.list.get(row).getB();
 
         switch (column) {
             case COLUMN_KEY:
@@ -78,33 +66,34 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
         ObserverMessage message = (ObserverMessage) arg;
 
         //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.LIST_IMPRINT_TYPE || message.getType() == ObserverMessage.WALLET_LIST_IMPRINT_TYPE) {
-            if (this.imprints == null) {
-                this.imprints = (SortableList<Tuple2<String, String>, ImprintCls>) message.getValue();
-                //this.imprints.registerObserver();
-                //this.imprints.sort(PollMap.NAME_INDEX);
-            }
+        if (message.getType() == ObserverMessage.LIST_IMPRINT_TYPE
+                || message.getType() == ObserverMessage.WALLET_LIST_IMPRINT_TYPE) {
 
+            needUpdate = false;
+            getInterval();
             this.fireTableDataChanged();
         }
 
         //CHECK IF LIST UPDATED
         if (message.getType() == ObserverMessage.ADD_IMPRINT_TYPE || message.getType() == ObserverMessage.REMOVE_IMPRINT_TYPE
                 || message.getType() == ObserverMessage.WALLET_ADD_IMPRINT_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_IMPRINT_TYPE) {
-            this.fireTableDataChanged();
+            needUpdate = true;
         }
     }
 
-    public void addObservers() {
-        Controller.getInstance().wallet.database.getImprintMap().addObserver(this);
+    @Override
+    public void getInterval() {
+        list = new SortableList<Tuple2<String, String>, ImprintCls>(
+                map, map.getKeys());
+    }
 
+    public void addObservers() {
+        map.addObserver(this);
+        Controller.getInstance().guiTimer.addObserver(this);
     }
 
     public void deleteObservers() {
-        //this.persons.removeObserver();
-        //Controller.getInstance().deleteWalletObserver(this);
-        Controller.getInstance().wallet.database.getImprintMap().deleteObserver(this);
-        //Controller.getInstance().wallet.database.getImprintMap().deleteObserver(imprints);
-        //imprints.removeObserver();
+        Controller.getInstance().guiTimer.deleteObserver(this);
+        map.deleteObserver(this);
     }
 }

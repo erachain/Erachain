@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.*;
 import org.erachain.database.SortableList;
+import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.library.library;
 import org.erachain.lang.Lang;
@@ -272,7 +273,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             return;
 
         //REGISTER ON WALLET TRANSACTIONS
-        Controller.getInstance().getWallet().database.getTransactionMap().addObserver(this);
+        map.addObserver(this);
         // for UNCONFIRMEDs
         DCSet.getInstance().getTransactionMap().addObserver(this);
         // for ??
@@ -294,21 +295,21 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         if (Controller.getInstance().doesWalletDatabaseExists())
             return;
 
-        Controller.getInstance().getWallet().database.getTransactionMap().deleteObserver(this);
+        map.deleteObserver(this);
         DCSet.getInstance().getTransactionMap().deleteObserver(this);
         /// ??? Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);
     }
 
     @Override
     public long getMapSize() {
-        return Controller.getInstance().getWallet().database.getTransactionMap().size();
+        return map.size();
     }
 
     @Override
     public void getIntervalThis(long startBack, long endBack) {
         transactions = new SortableList<Tuple2<String, String>, Transaction>(
-                Controller.getInstance().getWallet().database.getTransactionMap(),
-                Controller.getInstance().getWallet().database.getTransactionMap().getFromToKeys(startBack, endBack));
+                map,
+                ((TransactionMap)map).getFromToKeys(startBack, endBack));
 
         DCSet dcSet = DCSet.getInstance();
         for (Pair<Tuple2<String, String>, Transaction> item: transactions) {

@@ -172,7 +172,7 @@ public class TelegramSplitPanel extends Split_Panel {
         rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(Settings.getInstance().getTelegramDefaultReciever());
         int k = accountModel.getRowCount();
         for(int i = 0;i<k;i++){
-           if(accountModel.getAccount(i).getA().equals(Settings.getInstance().getTelegramDefaultReciever())){
+           if(accountModel.getPairItem(i).getA().equals(Settings.getInstance().getTelegramDefaultReciever())){
                tableFavoriteAccounts.setRowSelectionInterval(tableFavoriteAccounts.convertRowIndexToModel(i), tableFavoriteAccounts.convertRowIndexToModel(i)); 
            }
         }
@@ -316,7 +316,7 @@ public class TelegramSplitPanel extends Split_Panel {
         public void actionPerformed(ActionEvent e) {
 
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            Pair<String, Tuple2<String, String>> account = accountModel.getAccount(row);
+            Pair<String, Tuple2<String, String>> account = accountModel.getPairItem(row);
             StringSelection value = new StringSelection(account.getA());
             clipboard.setContents(value, null);
         }
@@ -328,7 +328,7 @@ public class TelegramSplitPanel extends Split_Panel {
         public void actionPerformed(ActionEvent e) {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
-            Pair<String, Tuple2<String, String>> account = accountModel.getAccount(row);
+            Pair<String, Tuple2<String, String>> account = accountModel.getPairItem(row);
             byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(account.getA());
             PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
             StringSelection value = new StringSelection(public_Account.getBase58());
@@ -340,7 +340,7 @@ public class TelegramSplitPanel extends Split_Panel {
     JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
     Send_Coins_item_Menu.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            Pair<String, Tuple2<String, String>> account1 = accountModel.getAccount(row);
+            Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
             Account account = new Account(account1.getA());
             new Account_Send_Dialog(null, null, account, null);
 
@@ -351,7 +351,7 @@ public class TelegramSplitPanel extends Split_Panel {
     JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail"));
     Send_Mail_item_Menu.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            Pair<String, Tuple2<String, String>> account1 = accountModel.getAccount(row);
+            Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
             Account account = new Account(account1.getA());
             new Mail_Send_Dialog(null, null, account, null);
 
@@ -362,7 +362,7 @@ public class TelegramSplitPanel extends Split_Panel {
     JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Edit name"));
     setName.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            Pair<String, Tuple2<String, String>> account1 = accountModel.getAccount(row);
+            Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
 
             new Account_Set_Name_Dialog(account1.getA());
             tableFavoriteAccounts.repaint();
@@ -395,7 +395,7 @@ public class TelegramSplitPanel extends Split_Panel {
             int row = tableFavoriteAccounts.getSelectedRow();
             try {
                 row = tableFavoriteAccounts.convertRowIndexToModel(row);
-                Pair<String, Tuple2<String, String>> ac = accountModel.getAccount(row);
+                Pair<String, Tuple2<String, String>> ac = accountModel.getPairItem(row);
                 Controller.getInstance().wallet.database.getAccountsPropertisMap().delete(ac.getA());
             } catch (Exception e1) {
                 // TODO Auto-generated catch block
