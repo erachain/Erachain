@@ -175,6 +175,12 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
 
 
 	private long timePoint;
+
+    /**
+     * нужно только для сортировки при измнении таблицы
+     * @param o
+     * @param object
+     */
     @Override
     public void update(Observable o, Object object) {
 

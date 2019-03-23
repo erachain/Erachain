@@ -33,6 +33,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     static Logger LOGGER = LoggerFactory.getLogger(BlockGenerator.class.getName());
 
+    private static int WAIT_STEP_MS = 100;
+
     private static Controller ctrl = Controller.getInstance();
     private static int local_status = 0;
     private PrivateKeyAccount acc_winner;
@@ -770,8 +772,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             int shiftTime = (int) (((wait_new_block_broadcast * (previousTarget - winned_winValue) * 10) / previousTarget));
                             wait_new_block_broadcast = wait_new_block_broadcast + shiftTime;
 
-                            if (wait_new_block_broadcast < 0) {
-                                wait_new_block_broadcast = 0;
+                            if (wait_new_block_broadcast < WAIT_STEP_MS << 1) {
+                                wait_new_block_broadcast = WAIT_STEP_MS << 1;
                             } else if (wait_new_block_broadcast > BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
                                 wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
                             }
@@ -784,13 +786,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                                 LOGGER.info("@@@@@@@@ wait for new winner and BROADCAST: " + wait_new_block_broadcast / 1000);
                                 // SLEEP and WATCH break
-                                wait_step = wait_new_block_broadcast / 100;
+                                wait_step = wait_new_block_broadcast / WAIT_STEP_MS;
 
                                 this.setMonitorStatus("wait for new winner and BROADCAST: " + wait_new_block_broadcast / 1000);
 
                                 do {
                                     try {
-                                        Thread.sleep(100);
+                                        Thread.sleep(WAIT_STEP_MS);
                                     } catch (InterruptedException e) {
                                     }
 
