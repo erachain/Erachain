@@ -361,5 +361,12 @@ public class AccountMap extends Observable {
         }
     }
 
+    public void reset() {
+        synchronized (this.publickKeys) {
+            this.publickKeys.clear();
+            this.acountsNoMap.clear();
+            this.assetsBalanceMap.clear();
+        }
+    }
 
 }
