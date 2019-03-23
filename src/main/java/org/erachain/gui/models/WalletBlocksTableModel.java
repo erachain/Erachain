@@ -108,47 +108,50 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
         return null;
     }
 
+    private int count;
+
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE) {
-            //this.blocks.registerObserver();
-            //Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.blocks);
-            //this.blocks = (SortableList<Tuple2<String, String>, Block.BlockHead>) message.getValue();
             this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
-            //this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
             this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
                 || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
                 ) {
-            // тут вставить обработку на запрос обновления - не обновлять сразу - а раз в 30 секунд только
-            // как это сделано в Мои Ордера
-            //CHECK IF LIST UPDATED
-            //this.blocks = (SortableList<Tuple2<String, String>, Block.BlockHead>) message.getValue();
+            this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
             this.fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE
                 ) {
             //CHECK IF LIST UPDATED
             this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
-            //this.blocks.registerObserver();
-            //this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            this.fireTableDataChanged();
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT
+        ) {
+
+            if (count++ < 1000)
+                return;
+
+            count = 0;
+
+            this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
+            this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
             this.fireTableDataChanged();
         }
     }
 
     public void addObservers() {
         Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this);
-        this.blocks = Controller.getInstance().wallet.database.getBlocksHeadMap().getList();
-        Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this.blocks);
-        this.blocks.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
+        Controller.getInstance().guiTimer.addObserver(this);
     }
 
     public void deleteObservers() {
+        Controller.getInstance().guiTimer.deleteObserver(this);
         Controller.getInstance().wallet.database.getBlocksHeadMap().deleteObserver(this);
-        Controller.getInstance().wallet.database.getBlocksHeadMap().deleteObserver(this.blocks);
     }
 
     @Override

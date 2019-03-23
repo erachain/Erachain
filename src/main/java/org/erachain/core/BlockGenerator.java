@@ -766,17 +766,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 return;
                             }
 
-                            if (true) {
-                                wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1;
-                                int shiftTime = (int) (((wait_new_block_broadcast * (previousTarget - winned_winValue) * 10) / previousTarget));
-                                wait_new_block_broadcast = wait_new_block_broadcast + shiftTime;
-                            } else {
-                                wait_new_block_broadcast = (BlockChain.WIN_TIMEPOINT >> 1)
-                                        + BlockChain.WIN_TIMEPOINT * 4 * (int) ((previousTarget - winned_winValue) / previousTarget);
-                            }
+                            wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2;
+                            int shiftTime = (int) (((wait_new_block_broadcast * (previousTarget - winned_winValue) * 10) / previousTarget));
+                            wait_new_block_broadcast = wait_new_block_broadcast + shiftTime;
 
-                            if (wait_new_block_broadcast < (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 3)) {
-                                wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 3;
+                            if (wait_new_block_broadcast < 0) {
+                                wait_new_block_broadcast = 0;
                             } else if (wait_new_block_broadcast > BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
                                 wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
                             }
