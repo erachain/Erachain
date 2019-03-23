@@ -139,7 +139,7 @@ public class WalletOrdersTableModel extends SortedListTableModelCls<Tuple2<Strin
 
         Set<Tuple2<String, Long>> keys = ((OrderMap) map).getKeys();
 
-        if (end > listSorted.size()) end = listSorted.size();
+        if (end > map.size()) end = map.size();
 
         listSorted = SortableList.makeSortableList(map, true,  (int)(end - start));
 

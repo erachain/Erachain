@@ -73,6 +73,17 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
         }
     }
 
+    // необходимо переопределить так у супер класса по размеру SortedList
+    // а нам надо по Лист
+    @Override
+    public int getRowCount() {
+        if (list == null) {
+            return 0;
+        }
+
+        return list.size();
+    }
+
     //public abstract int getMapSize();
     @Override
     public long getMapSize() {

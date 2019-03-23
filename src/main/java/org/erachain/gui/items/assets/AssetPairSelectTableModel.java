@@ -9,15 +9,12 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.gui.models.TimerTableModelCls;
-import org.erachain.lang.Lang;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple6;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
 
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -150,7 +147,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<AssetCls> impl
 
     public void set_Filter_By_Name(String str) {
         filter_Name = str;
-        assets = db.get_By_Name(filter_Name, false);
+        assets = db.findByName(filter_Name, false);
         this.fireTableDataChanged();
 
     }

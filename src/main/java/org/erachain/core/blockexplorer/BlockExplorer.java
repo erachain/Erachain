@@ -1,7 +1,6 @@
 package org.erachain.core.blockexplorer;
 
 import org.apache.commons.net.util.Base64;
-import org.erachain.at.AT;
 import org.erachain.at.AT_Transaction;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
@@ -22,7 +21,6 @@ import org.erachain.core.voting.Poll;
 import org.erachain.core.voting.PollOption;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TradeMap;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.gui.models.PersonAccountsModel;
@@ -2945,7 +2943,7 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                listPersons = dcSet.getItemPersonMap().get_By_Name(search, false);
+                listPersons = dcSet.getItemPersonMap().findByName(search, false);
             }
         } catch (Exception e) {
             //Ошибка при поиске - пробрасываем WrongSearchException для отображения пустого списка элементов
@@ -2997,7 +2995,7 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                listAssets = dcSet.getItemAssetMap().get_By_Name(search, false);
+                listAssets = dcSet.getItemAssetMap().findByName(search, false);
             }
         } catch (Exception e) {
             logger.info("Wrong search while process assets... ");
@@ -3049,7 +3047,7 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                listStatuses = dcSet.getItemStatusMap().get_By_Name(search, false);
+                listStatuses = dcSet.getItemStatusMap().findByName(search, false);
             }
         } catch (Exception e) {
             logger.info("Wrong search while process statuses... ");

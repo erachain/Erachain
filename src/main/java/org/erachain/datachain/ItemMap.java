@@ -125,9 +125,43 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
 
     }
 
+    // get list keys in name substring str
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<Long> findKeysByName(String str, boolean caseCharacter) {
+
+        // TODO сделать поиск по ограничению  не перебором
+
+        if (str == null || str.length() < 3){
+            return null;
+        }
+
+        if (!caseCharacter) {
+            str = str.toLowerCase();
+        }
+
+        List<Long> result = new ArrayList<>();
+
+        Iterator<Long> iterator = this.getIterator(DEFAULT_INDEX, false);
+
+        while (iterator.hasNext()) {
+
+            Long itemKey = iterator.next();
+            ItemCls item = get(itemKey);
+            String s1 = item.getName();
+            if (!caseCharacter) {
+                s1 = s1.toLowerCase();
+            }
+
+            if (s1.contains(str))
+                result.add(itemKey);
+        }
+
+        return result;
+    }
+
     // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<ItemCls> get_By_Name(String str, boolean caseCharacter) {
+    public List<ItemCls> findByName(String str, boolean caseCharacter) {
 
         // TODO сделать поиск по ограничению  не перебором
 
@@ -157,6 +191,7 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
 
         return result;
     }
+
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {
         return ((BTreeMap)map).subMap(fromKey, toKey).values();
     }
