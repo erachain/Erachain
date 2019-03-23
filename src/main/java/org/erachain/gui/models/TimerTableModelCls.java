@@ -152,10 +152,10 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     }
 
     public long getMapSize() {
-        if (list == null)
+        if (map == null)
             return 0;
 
-        return list.size();
+        return map.size();
     }
 
     /**
