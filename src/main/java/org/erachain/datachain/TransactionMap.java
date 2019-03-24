@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import com.google.common.collect.ForwardingNavigableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
@@ -113,6 +114,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
+
 
         if (Controller.getInstance().onlyProtocolIndexing)
             // NOT USE SECONDARY INDEXES
@@ -314,6 +316,10 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {
 
         List<Long> treeKeys = new ArrayList<Long>();
+
+        //NavigableMap set = new NavigableMap<Long, Transaction>();
+        // NodeIterator
+
 
         // DESCENDING + 1000
         Iterable iterable = this.indexes.get(TIMESTAMP_INDEX + DESCENDING_SHIFT_INDEX);
