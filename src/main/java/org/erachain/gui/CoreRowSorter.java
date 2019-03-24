@@ -1,7 +1,6 @@
 package org.erachain.gui;
 
 import org.erachain.gui.models.SortedListTableModelCls;
-import org.erachain.gui.models.TableModelCls;
 
 import javax.swing.*;
 import javax.swing.table.TableModel;

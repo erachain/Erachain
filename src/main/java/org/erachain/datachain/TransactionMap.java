@@ -50,9 +50,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     @SuppressWarnings("rawtypes")
     private NavigableSet typeKey;
 
-    BTreeMap AUTOKEY_INDEX;
-    protected Atomic.Long atomicKey;
-
     public TransactionMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
@@ -62,8 +59,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_UNC_TRANSACTION_TYPE);
             this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
         }
-
-        this.atomicKey = database.getAtomicLong("dc_transactions" + "_atomicKey");
 
     }
 
@@ -176,18 +171,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                     }
                 });
 
-        this.AUTOKEY_INDEX = database.createTreeMap("AUTOKEY_INDEX")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
-
-        //BIND
-        Bind.secondaryKey(map, this.AUTOKEY_INDEX, new Fun.Function2<Long, Long, Transaction>() {
-            @Override
-            public Long run(Long key, Transaction value) {
-                return -atomicKey.get();
-            }
-        });
-
         return map;
     }
 
@@ -296,10 +279,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     public boolean set(byte[] signature, Transaction transaction) {
 
-        if (this.atomicKey != null) {
-            this.atomicKey.incrementAndGet();
-        }
-
         Long key = Longs.fromByteArray(signature);
 
         return this.set(key, transaction);
@@ -317,11 +296,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     }
 
     public Transaction delete(byte[] signature) {
-
-        if (this.atomicKey != null) {
-            this.atomicKey.decrementAndGet();
-        }
-
         return this.delete(Longs.fromByteArray(signature));
     }
 
@@ -339,10 +313,20 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     @SuppressWarnings("unchecked")
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {
-        // тут так нельзя так как удаляются записи внутри диапазона и размер становится меньше
-        // TODO
-        error
-        return AUTOKEY_INDEX.subMap(fromKey, toKey).values();
+
+        List<Long> treeKeys = new ArrayList<Long>();
+
+        // DESCENDING + 1000
+        Iterable iterable = this.indexes.get(TIMESTAMP_INDEX + DESCENDING_SHIFT_INDEX);
+        Iterable iterableLimit = Iterables.limit(Iterables.skip(iterable, (int) fromKey), (int) (toKey - fromKey));
+
+        Iterator<Tuple2<Long, Long>> iterator = iterableLimit.iterator();
+        while (iterator.hasNext()) {
+            treeKeys.add(iterator.next().b);
+        }
+
+        return treeKeys;
+
     }
 
     /**
@@ -429,7 +413,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     }
 
 
-        public List<Transaction> getUnconfirmedTransaction(Iterable keys) {
+    public List<Transaction> getUnconfirmedTransaction(Iterable keys) {
         Iterator iter = keys.iterator();
         List<Transaction> transactions = new ArrayList<>();
         Transaction item;

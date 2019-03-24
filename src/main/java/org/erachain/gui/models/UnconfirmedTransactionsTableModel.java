@@ -28,7 +28,7 @@ public class UnconfirmedTransactionsTableModel extends SortedListTableModelCls<L
     {
         super(DCSet.getInstance().getTransactionMap(),
                 new String[]{"Timestamp", "Type", "Name", "Creator", "Fee"},
-                new Boolean[]{true, false, true, true, false}, true);
+                new Boolean[]{true, false, true, true, false}, false);
 
         LOGGER = LoggerFactory.getLogger(UnconfirmedTransactionsTableModel.class);
 
