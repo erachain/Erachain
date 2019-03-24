@@ -35,6 +35,8 @@ public class WalletOrdersTableModel extends SortedListTableModelCls<Tuple2<Strin
         super(Controller.getInstance().wallet.database.getOrderMap(),
                 new String[]{"Timestamp", "Block - transaction", "Amount", "Have", "Price",
                 "Want", "Total", "Left", "Creator", "Status"}, true);
+
+        addObservers();
     }
 
     @Override
@@ -115,6 +117,8 @@ public class WalletOrdersTableModel extends SortedListTableModelCls<Tuple2<Strin
         return null;
     }
 
+    private int count;
+
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -131,6 +135,20 @@ public class WalletOrdersTableModel extends SortedListTableModelCls<Tuple2<Strin
             needUpdate = true;
         } else if (message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE) {
             needUpdate = true;
+
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT
+                && Controller.getInstance().isDynamicGUI()
+                && needUpdate) {
+
+            if (count++ < 4)
+                return;
+
+            count = 0;
+            needUpdate = false;
+
+            getInterval();
+            fireTableDataChanged();
+
         }
 
     }
