@@ -20,53 +20,35 @@ public class UnconfirmedTransactionsTableModel extends SortedListTableModelCls<L
 
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TYPE = 1;
-    public static final int COLUMN_FEE = 2;
-
-    SortableList<Long, Transaction> list;
+    public static final int COLUMN_NAME = 2;
+    public static final int COLUMN_CREATOR = 3;
+    public static final int COLUMN_FEE = 4;
 
     public UnconfirmedTransactionsTableModel()
     {
         super(DCSet.getInstance().getTransactionMap(),
-                new String[]{"Timestamp", "Type", "Fee"},
-                new Boolean[]{true, false, false}, true);
+                new String[]{"Timestamp", "Type", "Name", "Creator", "Fee"},
+                new Boolean[]{true, false, true, true, false}, true);
 
         LOGGER = LoggerFactory.getLogger(UnconfirmedTransactionsTableModel.class);
-    }
 
-    @Override
-    public SortableList<Long, Transaction> getSortableList() {
-        return this.list;
-    }
+        addObservers();
 
-    public Transaction getItem(int row) {
-        return getTransaction(row);
-    }
-
-    public Transaction getTransaction(int row) {
-        if (list == null
-                || row >= list.size())
-            return null;
-
-        return list.get(row).getB();
-    }
-
-    @Override
-    public int getRowCount() {
-        if (this.list == null) {
-            return 0;
-        }
-
-        return this.list.size();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
         try {
-            if (this.list == null || this.list.size() <= row) {
+            if (this.listSorted == null || this.listSorted.size() <= row) {
                 return null;
             }
 
-            Transaction transaction = this.list.get(row).getB();
+            Pair<Long, Transaction> pair = this.listSorted.get(row);
+
+            if (pair == null)
+                return null;
+
+            Transaction transaction = pair.getB();
             if (transaction == null)
                 return null;
 
@@ -78,6 +60,14 @@ public class UnconfirmedTransactionsTableModel extends SortedListTableModelCls<L
                 case COLUMN_TYPE:
 
                     return Lang.getInstance().translate(transaction.viewTypeName());
+
+                case COLUMN_NAME:
+
+                    return Lang.getInstance().translate(transaction.viewFullTypeName());
+
+                case COLUMN_CREATOR:
+
+                    return transaction.viewCreator();
 
                 case COLUMN_FEE:
 
@@ -101,7 +91,12 @@ public class UnconfirmedTransactionsTableModel extends SortedListTableModelCls<L
         int type = message.getType();
 
         if (type == ObserverMessage.LIST_UNC_TRANSACTION_TYPE) {
-            needUpdate = true;
+
+            count = 0;
+            needUpdate = false;
+
+            getInterval();
+            fireTableDataChanged();
 
         } else if (type == ObserverMessage.RESET_UNC_TRANSACTION_TYPE) {
             needUpdate = false;
@@ -132,15 +127,15 @@ public class UnconfirmedTransactionsTableModel extends SortedListTableModelCls<L
 
         map.addObserver(this);
 
-        Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
-
-        getInterval();
-        fireTableDataChanged();
+        super.addObservers();
 
     }
 
     public void deleteObservers() {
         map.deleteObserver(this);
+
+        super.deleteObservers();
+
     }
 
     @Override
@@ -150,10 +145,10 @@ public class UnconfirmedTransactionsTableModel extends SortedListTableModelCls<L
 
     @Override
     public void getIntervalThis(long startBack, long endBack) {
-        list = new SortableList<Long, Transaction>(map, ((TransactionMap)map).getFromToKeys(startBack, endBack));
+        listSorted = new SortableList<Long, Transaction>(map, ((TransactionMap)map).getFromToKeys(startBack, endBack));
 
         DCSet dcSet = DCSet.getInstance();
-        for (Pair<Long, Transaction> item: list) {
+        for (Pair<Long, Transaction> item: listSorted) {
             if (item.getB() == null)
                 continue;
 

@@ -44,6 +44,8 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
 
         LOGGER = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
 
+        addObservers();
+
     }
 
     @Override
@@ -55,23 +57,21 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
 
         Pair<Tuple2<String, String>, Transaction> data = this.listSorted.get(row);
 
-        if (data == null || data.getB() == null) {
+        if (data == null) {
             return null;
         }
-
-        Tuple2<String, String> addr1 = data.getA();
-        if (addr1 == null)
-            return null;
-
-        String creator_address = data.getA().a;
-        //Account creator = new Account(data.getA().a);
-        //Account recipient = null; // = new Account(data.getA().b);
 
         Transaction transaction = data.getB();
         if (transaction == null)
             return null;
 
-        transaction.setDC(DCSet.getInstance());
+        Tuple2<String, String> address = data.getA();
+        if (address == null)
+            return null;
+
+        //String creator_address = data.getA().a;
+        //Account creator = new Account(data.getA().a);
+        //Account recipient = null; // = new Account(data.getA().b);
 
         //creator = transaction.getCreator();
         String itemName = "";
@@ -91,7 +91,7 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
                 return null;
 
             itemName = item.toString();
-            creator_address = transGen.getRecipient().getAddress();
+            //creator_address = transGen.getRecipient().getAddress();
         } else if (transaction instanceof IssueItemRecord) {
             IssueItemRecord transIssue = (IssueItemRecord) transaction;
             ItemCls item = transIssue.getItem();
@@ -190,7 +190,11 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
 
-            needUpdate = true;
+            count = 0;
+            needUpdate = false;
+
+            getInterval();
+            fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.WALLET_RESET_TRANSACTION_TYPE) {
 
@@ -221,7 +225,6 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
             needUpdate = true;
 
         } else if (message.getType() == ObserverMessage.GUI_REPAINT
-                && Controller.getInstance().isDynamicGUI()
                 && needUpdate) {
 
             if (count++ < 4)
@@ -244,16 +247,13 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
         //REGISTER ON WALLET TRANSACTIONS
         map.addObserver(this);
 
-        Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
-
-        getInterval();
-        fireTableDataChanged();
+        super.addObservers();
 
     }
 
     public void deleteObservers() {
 
-        Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
+        super.deleteObservers();
 
         if (Controller.getInstance().doesWalletDatabaseExists())
             return;

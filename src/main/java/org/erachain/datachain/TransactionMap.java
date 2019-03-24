@@ -339,6 +339,9 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     @SuppressWarnings("unchecked")
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {
+        // тут так нельзя так как удаляются записи внутри диапазона и размер становится меньше
+        // TODO
+        error
         return AUTOKEY_INDEX.subMap(fromKey, toKey).values();
     }
 

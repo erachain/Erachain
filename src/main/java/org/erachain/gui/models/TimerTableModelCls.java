@@ -184,11 +184,18 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     public void addObservers() {
         if (timeout > 0)
             initTimer();
+        else {
+            Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
+        }
 
     }
 
     public void deleteObservers() {
-        stopTimer();
+        if (timeout > 0)
+            stopTimer();
+        else {
+            Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
+        }
     }
 
     public void stopTimer() {

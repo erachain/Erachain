@@ -66,7 +66,7 @@ public class DebugTabPane extends JTabbedPane {
                     row = transactionsTable.convertRowIndexToModel(row);
 
                     //GET TRANSACTION
-                    Transaction transaction = transactionsTableModel.getTransaction(row);
+                    Transaction transaction = transactionsTableModel.getItem(row);
 
                     //SHOW DETAIL SCREEN OF TRANSACTION
                     TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
