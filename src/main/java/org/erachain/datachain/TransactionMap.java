@@ -311,7 +311,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         return this.get(Longs.fromByteArray(signature));
     }
 
-    @SuppressWarnings("unchecked")
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {
 
         List<Long> treeKeys = new ArrayList<Long>();

@@ -1,6 +1,7 @@
 package org.erachain.database.wallet;
 //09/03
 
+import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.Trade;
@@ -197,7 +198,27 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
     }
 
     public Collection<Tuple2<String, String>> getFromToKeys(long fromKey, long toKey) {
-        return AUTOKEY_INDEX.subMap(fromKey, toKey).values();
+
+        if (true) {
+            // РАБОТАЕТ намного БЫСТРЕЕ
+            return AUTOKEY_INDEX.subMap(fromKey, toKey).values();
+        } else {
+
+            // перебор по NEXT очень медленный
+            List<Tuple2<String, String>> treeKeys = new ArrayList<Tuple2<String, String>>();
+
+            // DESCENDING + 1000
+            Iterable iterable = this.indexes.get(TIMESTAMP_INDEX + DESCENDING_SHIFT_INDEX);
+            Iterable iterableLimit = Iterables.limit(Iterables.skip(iterable, (int) fromKey), (int) (toKey - fromKey));
+
+            Iterator<Tuple2<Long, Tuple2<String, String>>> iterator = iterableLimit.iterator();
+            while (iterator.hasNext()) {
+                treeKeys.add(iterator.next().b);
+            }
+
+            return treeKeys;
+        }
+
     }
 
     public Transaction delete(Tuple2<String, String> key) {

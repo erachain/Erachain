@@ -11,10 +11,14 @@ import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -263,13 +267,28 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
 
     @Override
     public void getIntervalThis(long startBack, long endBack) {
+
+        // тут могут быть пустые элементы - пропустим их
+        Collection<Tuple2<String, String>> keysAll = ((TransactionMap) map).getFromToKeys(startBack, endBack);
+        Collection<Tuple2<String, String>> keys = new ArrayList<Tuple2<String, String>>();
+        for (Tuple2<String, String> key: keysAll) {
+
+            Object item = map.get(key);
+            if (item == null)
+                continue;
+
+            keys.add(key);
+
+        }
+
         listSorted = new SortableList<Tuple2<String, String>, Transaction>(
-                map, ((TransactionMap)map).getFromToKeys(startBack, endBack));
+                map, keys);
 
         DCSet dcSet = DCSet.getInstance();
         for (Pair<Tuple2<String, String>, Transaction> item: listSorted) {
-            if (item.getB() == null)
+            if (item.getB() == null) {
                 continue;
+            }
 
             item.getB().setDC_HeightSeq(dcSet);
             item.getB().calcFee();
