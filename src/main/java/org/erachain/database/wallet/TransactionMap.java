@@ -23,6 +23,15 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentNavigableMap;
 
+/**
+ * Транзакции относящиеся к моим счетам. Сюда же записываться должны и неподтвержденные<br>
+ * А когда они подтверждаются они будут перезаписываться поверх.
+ * Тогда неподтвержденные будут показывать что они не сиполнились.
+ * И их пользователь сможет сам удалить вручную или командой - удалить все неподтвержденные
+ * <hr>
+ * Ключ: счет + подпись<br>
+ * Значение: транзакция
+ */
 public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
 
     BTreeMap AUTOKEY_INDEX;

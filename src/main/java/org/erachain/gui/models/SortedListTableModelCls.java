@@ -42,6 +42,10 @@ public abstract class SortedListTableModelCls<T, U> extends TimerTableModelCls<U
         return this.listSorted.get(k).getB();
     }
 
+    public T getKey(int k) {
+        return this.listSorted.get(k).getA();
+    }
+
     public Pair<T, U> getPairItem(int k) {
         return this.listSorted.get(k);
     }

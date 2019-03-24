@@ -214,11 +214,6 @@ public class Payment_Orders_TableModel extends SortedListTableModelCls<Tuple2<St
             read_trans();
             this.fireTableDataChanged();
 
-        } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE
-                //|| message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE
-                ) {
-            Transaction transaction = (Transaction) message.getValue();
-            library.notifySysTrayRecord(transaction);
         }
 
         if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE

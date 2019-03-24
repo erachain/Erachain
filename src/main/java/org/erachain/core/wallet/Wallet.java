@@ -1283,41 +1283,6 @@ public class Wallet extends Observable implements Observer {
 				continue;
 			}
 
-			// CHECK IF NAME REGISTRATION
-			else if (transaction instanceof RegisterNameTransaction) {
-				this.processNameRegistration((RegisterNameTransaction) transaction);
-			}
-
-			// CHECK IF NAME UPDATE
-			else if (transaction instanceof UpdateNameTransaction) {
-				this.processNameUpdate((UpdateNameTransaction) transaction);
-			}
-
-			// CHECK IF NAME SALE
-			else if (transaction instanceof SellNameTransaction) {
-				this.processNameSale((SellNameTransaction) transaction);
-			}
-
-			// CHECK IF NAME SALE
-			else if (transaction instanceof CancelSellNameTransaction) {
-				this.processCancelNameSale((CancelSellNameTransaction) transaction);
-			}
-
-			// CHECK IF NAME PURCHASE
-			else if (transaction instanceof BuyNameTransaction) {
-				this.processNamePurchase((BuyNameTransaction) transaction);
-			}
-
-			// CHECK IF POLL CREATION
-			else if (transaction instanceof CreatePollTransaction) {
-				this.processPollCreation((CreatePollTransaction) transaction);
-			}
-
-			// CHECK IF POLL VOTE
-			else if (transaction instanceof VoteOnPollTransaction) {
-				this.processPollVote((VoteOnPollTransaction) transaction);
-			}
-
 			// CHECK IF ITEM ISSUE
 			else if (transaction instanceof IssueItemRecord) {
 				this.processItemIssue((IssueItemRecord) transaction);
@@ -1387,42 +1352,6 @@ public class Wallet extends Observable implements Observer {
 			if (transaction instanceof R_Send) {
 				continue;
 			}
-
-			// CHECK IF NAME REGISTRATION
-			else if (transaction instanceof RegisterNameTransaction) {
-				this.orphanNameRegistration((RegisterNameTransaction) transaction);
-			}
-
-			// CHECK IF NAME UPDATE
-			else if (transaction instanceof UpdateNameTransaction) {
-				this.orphanNameUpdate((UpdateNameTransaction) transaction);
-			}
-
-			// CHECK IF NAME SALE
-			else if (transaction instanceof SellNameTransaction) {
-				this.orphanNameSale((SellNameTransaction) transaction);
-			}
-
-			// CHECK IF CANCEL NAME SALE
-			else if (transaction instanceof CancelSellNameTransaction) {
-				this.orphanCancelNameSale((CancelSellNameTransaction) transaction);
-			}
-
-			// CHECK IF CANCEL NAME SALE
-			else if (transaction instanceof BuyNameTransaction) {
-				this.orphanNamePurchase((BuyNameTransaction) transaction);
-			}
-
-			// CHECK IF POLL CREATION
-			else if (transaction instanceof CreatePollTransaction) {
-				this.orphanPollCreation((CreatePollTransaction) transaction);
-			}
-
-			// CHECK IF POLL VOTE
-			else if (transaction instanceof VoteOnPollTransaction) {
-				this.orphanPollVote((VoteOnPollTransaction) transaction);
-			}
-
 			// CHECK IF ITEM ISSUE
 			else if (transaction instanceof IssueItemRecord) {
 				this.orphanItemIssue((IssueItemRecord) transaction);
@@ -1471,201 +1400,6 @@ public class Wallet extends Observable implements Observer {
 		// + tickets/(block.getTransactionCount()+1) );
 
     }
-
-	private void processNameRegistration(RegisterNameTransaction nameRegistration) {
-		// CHECK IF WALLET IS OPEN
-		if (!this.exists()) {
-			return;
-		}
-
-		// CHECK IF WE ARE OWNER
-		if (this.accountExists(nameRegistration.getName().getOwner().getAddress())) {
-			// ADD NAME
-			this.database.getNameMap().add(nameRegistration.getName());
-		}
-	}
-
-	private void orphanNameRegistration(RegisterNameTransaction nameRegistration) {
-		// CHECK IF WALLET IS OPEN
-		if (!this.exists()) {
-			return;
-		}
-
-		// CHECK IF WE ARE OWNER
-		if (this.accountExists(nameRegistration.getName().getOwner().getAddress())) {
-			// DELETE NAME
-			this.database.getNameMap().delete(nameRegistration.getName());
-		}
-	}
-
-	private void processPollCreation(CreatePollTransaction pollCreation) {
-		// CHECK IF WALLET IS OPEN
-		if (!this.exists()) {
-			return;
-		}
-
-		// CHECK IF WE ARE OWNER
-		if (this.accountExists(pollCreation.getPoll().getCreator().getAddress())) {
-			// ADD POLL
-            this.database.getPollMap_old().add(pollCreation.getPoll());
-		}
-	}
-
-	private void orphanPollCreation(CreatePollTransaction pollCreation) {
-		// CHECK IF WALLET IS OPEN
-		if (!this.exists()) {
-			return;
-		}
-
-		// CHECK IF WE ARE OWNER
-		if (this.accountExists(pollCreation.getPoll().getCreator().getAddress())) {
-			// DELETE POLL
-            this.database.getPollMap_old().delete(pollCreation.getPoll());
-		}
-	}
-
-	private void processPollVote(VoteOnPollTransaction pollVote) {
-		// CHECK IF WALLET IS OPEN
-		if (!this.exists()) {
-			return;
-		}
-
-		// CHECK IF WE ARE OWNER
-		Poll poll = DCSet.getInstance().getPollMap().get(pollVote.getPoll());
-		if (this.accountExists(poll.getCreator().getAddress())) {
-			// UPDATE POLL
-            this.database.getPollMap_old().add(poll);
-		}
-	}
-
-	private void orphanPollVote(VoteOnPollTransaction pollVote) {
-		// CHECK IF WALLET IS OPEN
-		if (!this.exists()) {
-			return;
-		}
-
-		// CHECK IF WE ARE OWNER
-		Poll poll = DCSet.getInstance().getPollMap().get(pollVote.getPoll());
-		if (this.accountExists(poll.getCreator().getAddress())) {
-			// UPDATE POLL
-            this.database.getPollMap_old().add(poll);
-		}
-	}
-
-	private void processNameUpdate(UpdateNameTransaction nameUpdate) {
-		// CHECK IF WE ARE OWNER
-		if (this.accountExists(nameUpdate.getCreator().getAddress())) {
-			// CHECK IF OWNER CHANGED
-			if (!nameUpdate.getCreator().getAddress().equals(nameUpdate.getName().getOwner().getAddress())) {
-				// DELETE PREVIOUS NAME
-				Name name = DCSet.getInstance().getUpdateNameMap().get(nameUpdate);
-				this.database.getNameMap().delete(nameUpdate.getCreator(), name);
-			}
-		}
-
-		// CHECK IF WE ARE NEW OWNER
-		if (this.accountExists(nameUpdate.getName().getOwner().getAddress())) {
-			// ADD NAME
-			this.database.getNameMap().add(nameUpdate.getName());
-		}
-	}
-
-	private void orphanNameUpdate(UpdateNameTransaction nameUpdate) {
-		// CHECK IF WE WERE OWNER
-		if (this.accountExists(nameUpdate.getCreator().getAddress())) {
-			// CHECK IF OWNER WAS CHANGED
-			if (!nameUpdate.getCreator().getAddress().equals(nameUpdate.getName().getOwner().getAddress())) {
-				// ADD PREVIOUS NAME
-				Name name = DCSet.getInstance().getNameMap().get(nameUpdate.getName().getName());
-				this.database.getNameMap().add(name);
-
-			}
-		}
-
-		// CHECK IF WE WERE NEW OWNER
-		if (this.accountExists(nameUpdate.getName().getOwner().getAddress())) {
-			// ADD NAME
-			this.database.getNameMap().delete(nameUpdate.getName());
-		}
-	}
-
-	private void processNameSale(SellNameTransaction nameSaleTransaction) {
-		// CHECK IF WE ARE SELLER
-		if (this.accountExists(nameSaleTransaction.getNameSale().getName().getOwner().getAddress())) {
-			// ADD TO DATABASE
-			this.database.getNameSaleMap().add(nameSaleTransaction.getNameSale());
-		}
-	}
-
-	private void orphanNameSale(SellNameTransaction nameSaleTransaction) {
-		// CHECK IF WE ARE SELLER
-		if (this.accountExists(nameSaleTransaction.getNameSale().getName().getOwner().getAddress())) {
-			// REMOVE FROM DATABASE
-			this.database.getNameSaleMap().delete(nameSaleTransaction.getNameSale());
-		}
-	}
-
-	private void processCancelNameSale(CancelSellNameTransaction cancelNameSaleTransaction) {
-		// CHECK IF WE ARE SELLER
-		if (this.accountExists(cancelNameSaleTransaction.getCreator().getAddress())) {
-			// REMOVE FROM DATABASE
-			BigDecimal amount = DCSet.getInstance().getCancelSellNameMap().get(cancelNameSaleTransaction);
-			NameSale nameSale = new NameSale(cancelNameSaleTransaction.getName(), amount);
-			this.database.getNameSaleMap().delete(nameSale);
-		}
-	}
-
-	private void orphanCancelNameSale(CancelSellNameTransaction cancelNameSaleTransaction) {
-		// CHECK IF WE ARE SELLER
-		if (this.accountExists(cancelNameSaleTransaction.getCreator().getAddress())) {
-			// ADD TO DATABASE
-			NameSale nameSale = DCSet.getInstance().getNameExchangeMap()
-					.getNameSale(cancelNameSaleTransaction.getName());
-			this.database.getNameSaleMap().add(nameSale);
-		}
-	}
-
-	private void processNamePurchase(BuyNameTransaction namePurchase) {
-		// CHECK IF WE ARE BUYER
-		if (this.accountExists(namePurchase.getCreator().getAddress())) {
-			// ADD NAME
-			Name name = DCSet.getInstance().getNameMap().get(namePurchase.getNameSale().getKey());
-			this.database.getNameMap().add(name);
-		}
-
-		// CHECK IF WE ARE SELLER
-		Account seller = namePurchase.getSeller();
-		if (this.accountExists(seller.getAddress())) {
-			// DELETE NAMESALE
-			this.database.getNameSaleMap().delete(seller, namePurchase.getNameSale());
-
-			// DELETE NAME
-			Name name = DCSet.getInstance().getNameMap().get(namePurchase.getNameSale().getKey());
-			name.setOwner(seller);
-			this.database.getNameMap().delete(seller, name);
-		}
-	}
-
-	private void orphanNamePurchase(BuyNameTransaction namePurchase) {
-		// CHECK IF WE WERE BUYER
-		if (this.accountExists(namePurchase.getCreator().getAddress())) {
-			// DELETE NAME
-			Name name = namePurchase.getNameSale().getName();
-			name.setOwner(namePurchase.getCreator());
-			this.database.getNameMap().delete(namePurchase.getCreator(), name);
-		}
-
-		// CHECK IF WE WERE SELLER
-		Account seller = namePurchase.getSeller();
-		if (this.accountExists(seller.getAddress())) {
-			// ADD NAMESALE
-			this.database.getNameSaleMap().add(namePurchase.getNameSale());
-
-			// ADD NAME
-			Name name = namePurchase.getNameSale().getName();
-			this.database.getNameMap().add(name);
-		}
-	}
 
 	private void processItemIssue(IssueItemRecord issueItem) {
 		// CHECK IF WALLET IS OPEN
@@ -1913,12 +1647,65 @@ public class Wallet extends Observable implements Observer {
         if (this.database == null)
 			return;
 
-		Controller cnt = Controller.getInstance();
-		if (cnt.isProcessingWalletSynchronize() || cnt.isNeedSyncWallet())
-			return;
-
         ObserverMessage message = (ObserverMessage) arg;
         int type = message.getType();
+
+        if (type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
+
+            // прилетающие неподтвержденные тоже проверяем и если это относится к нам
+            // то закатываем себе в кошелек.
+            // потом они при переподтверждении обновятся
+            // но если нет то останутся висеть и пользователь сам их должен удалить
+            // это как раз сигнал что такая не подтвердилась трнзакция
+
+            Pair<Long, Transaction> item = (Pair<Long, Transaction>) message.getValue();
+            Transaction transaction = item.getB();
+
+            List<Account> accounts = this.getAccounts();
+            synchronized (accounts) {
+                for (Account account : accounts) {
+                    // CHECK IF INVOLVED
+                    if (transaction.isInvolved(account)) {
+                        // ADD TO ACCOUNT TRANSACTIONS
+                        if (!this.database.getTransactionMap().add(account, transaction)) {
+                            // UPDATE UNCONFIRMED BALANCE for ASSET
+                        }
+                    }
+                }
+            }
+
+            return;
+
+        } else if (type == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
+            if (Controller.getInstance().useGui) {
+                Pair<Tuple2<String, String>, Transaction> item = (Pair<Tuple2<String, String>, Transaction>) message.getValue();
+                Transaction transaction = item.getB();
+                library.notifySysTrayRecord(transaction);
+            }
+
+            return;
+
+        } else if (type == ObserverMessage.ADD_ORDER_TYPE
+				|| type == ObserverMessage.ADD_COMPL_ORDER_TYPE) {
+            // UPDATE FULFILLED
+            Order order = (Order) message.getValue();
+            if (!this.accountExists(order.getCreator().getAddress()))
+                return;
+
+            Tuple2<String, Long> key = new Tuple2<String, Long>(order.getCreator().getAddress(), order.getId());
+            if (this.database.getOrderMap().contains(key)) {
+                this.database.getOrderMap().set(key, order);
+            }
+
+            return;
+
+        }
+
+        //////////// PROCESS BLOCKS ////////////
+
+        Controller cnt = Controller.getInstance();
+        if (cnt.isProcessingWalletSynchronize() || cnt.isNeedSyncWallet())
+            return;
 
         if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
 
@@ -1946,73 +1733,28 @@ public class Wallet extends Observable implements Observer {
                 this.database.commit();
 
 		} else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
-		{
-			// тут при откате основной цепочки нужно тоже откатывать блоки
-			// - иначе потом окнцов не найдем и нужно полная синхронизация
-			if (this.synchronizeStatus)
-				return;
+        {
+            // тут при откате основной цепочки нужно тоже откатывать блоки
+            // - иначе потом окнцов не найдем и нужно полная синхронизация
+            if (this.synchronizeStatus)
+                return;
 
             Block block = (Block) message.getValue();
 
             // TODO сделать фактори которая синхронно по оереди с синхронизацией это будет разруливать
-			// CHECK IF WE NEED TO RESYNC
-			// BY SIGNATURE !!!!
-            if (checkNeedSyncWallet(block.getSignature()))
-			{
-				return;
-			}
+            // CHECK IF WE NEED TO RESYNC
+            // BY SIGNATURE !!!!
+            if (checkNeedSyncWallet(block.getSignature())) {
+                return;
+            }
 
-			// CHECK BLOCK
-			this.orphanBlock(block);
+            // CHECK BLOCK
+            this.orphanBlock(block);
 
             //this.database.clearCache();
             //this.database.commit();
+        }
 
-		} else if (type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
-
-        	if (Controller.getInstance().useGui) {
-				Pair<byte[], Transaction> item = (Pair<byte[], Transaction>) message.getValue();
-				Transaction transaction = item.getB();
-
-				library.notifySysTrayRecord(transaction);
-			}
-
-		} else if (type == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
-            ;
-		} else if (type == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) {
-			;
-		} else if (type == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-            ;
-		} else if (type == ObserverMessage.ADD_ORDER_TYPE
-				|| type == ObserverMessage.ADD_COMPL_ORDER_TYPE) {
-			// UPDATE FULFILLED
-			Order order = (Order) message.getValue();
-			if (!this.accountExists(order.getCreator().getAddress()))
-				return;
-
-			Tuple2<String, Long> key = new Tuple2<String, Long>(order.getCreator().getAddress(), order.getId());
-			if (this.database.getOrderMap().contains(key)) {
-				this.database.getOrderMap().set(key, order);
-			}
-
-		}
-		/*
-		 * else if (type == ObserverMessage.ADD_AT_TX_TYPE)
-		 * //.WALLET_ADD_AT_TX_TYPE) { this.processATTransaction(
-		 * (Tuple2<Tuple2<Integer, Integer>, AT_Transaction>) message.getValue()
-		 * ); }
-		 *
-		 * else if (type ==
-		 * ObserverMessage.REMOVE_AT_TX)//.WALLET_REMOVE_AT_TX) {
-		 * this.orphanATTransaction( (Tuple2<Tuple2<Integer, Integer>,
-		 * AT_Transaction>) message.getValue() ); }
-		 *
-		 * //ADD ORDER else if(type ==
-		 * ObserverMessage.ADD_ORDER_TYPE //.WALLET_ADD_ORDER_TYPE ||
-		 * type == ObserverMessage.REMOVE_ORDER_TYPE)
-		 * //.WALLET_REMOVE_ORDER_TYPE) { this.addOrder((Order)
-		 * message.getValue()); }
-		 */
 	}
 
 	// CLOSE

@@ -198,27 +198,24 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
             getInterval();
             this.fireTableDataChanged();
 
-        } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
-                    || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
+        // это старое событие - сейчас таймер сам запускает обновление
+        } else if (false && (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
+                    || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)) {
 
             // если прилетел блок или откатился и нужно обновить - то обновляем
             needUpdate = true;
 
-        } else if (message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
-                            || message.getType() == ObserverMessage.WALLET_SYNC_STATUS) {
+            // это старое событие - сейчас таймер сам запускает обновление
+        } else if (false && (message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
+                            || message.getType() == ObserverMessage.WALLET_SYNC_STATUS)) {
 
             needUpdate = true;
 
         } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
-            // INCOME
 
             needUpdate = true;
 
-            Transaction transaction = (Transaction) message.getValue();
-            library.notifySysTrayRecord(transaction);
-
         } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE
-                //|| message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE
                 ) {
 
             needUpdate = true;
@@ -246,10 +243,6 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
 
         //REGISTER ON WALLET TRANSACTIONS
         map.addObserver(this);
-        // for UNCONFIRMEDs
-        DCSet.getInstance().getTransactionMap().addObserver(this);
-        // for ??
-        ///Controller.getInstance().wallet.database.getPersonMap().addObserver(transactions);
 
         Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
 
@@ -262,21 +255,16 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
 
         Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
 
-        //dbItemAssetMap = DLSet.getInstance().getItemAssetMap();
-
         if (Controller.getInstance().doesWalletDatabaseExists())
             return;
 
         map.deleteObserver(this);
-        DCSet.getInstance().getTransactionMap().deleteObserver(this);
-        /// ??? Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);
     }
 
     @Override
     public void getIntervalThis(long startBack, long endBack) {
         listSorted = new SortableList<Tuple2<String, String>, Transaction>(
-                map,
-                ((TransactionMap)map).getFromToKeys(startBack, endBack));
+                map, ((TransactionMap)map).getFromToKeys(startBack, endBack));
 
         DCSet dcSet = DCSet.getInstance();
         for (Pair<Tuple2<String, String>, Transaction> item: listSorted) {
