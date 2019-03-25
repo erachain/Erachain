@@ -156,7 +156,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                new Account_Name_Add();
+                new AccountNameAdd();
             }
 
         });

@@ -118,7 +118,7 @@ public class TelegramSplitPanel extends Split_Panel {
             // TODO Auto-generated method stub
            
                 // TODO Auto-generated method stub
-                new Account_Name_Add();
+                new AccountNameAdd();
            
         }
         

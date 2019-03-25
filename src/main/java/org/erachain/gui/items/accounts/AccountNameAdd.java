@@ -25,10 +25,10 @@ import java.util.List;
 /**
  * @author Саша
  */
-public class Account_Name_Add extends javax.swing.JDialog {
+public class AccountNameAdd extends javax.swing.JDialog {
 
     AccountsPropertisMap db = Controller.getInstance().wallet.database.getAccountsPropertisMap();
-    private Account_Name_Add th;
+    private AccountNameAdd th;
     // Variables declaration - do not modify
     private javax.swing.ButtonGroup buttonGroupSelectType;
     private javax.swing.JButton jButton_Cancel;
@@ -40,13 +40,14 @@ public class Account_Name_Add extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextArea jTextArea_Description;
-    private javax.swing.JTextField jTextField_Account;
-    private javax.swing.JTextField jTextField_Name;
+    private javax.swing.JTextArea jTextAreaDescription;
+    private javax.swing.JTextField jTextFieldAccount;
+    private javax.swing.JTextField jTextFieldName;
+
     /**
      * Creates new form Account_Show
      */
-    public Account_Name_Add() {
+    public AccountNameAdd() {
 
         super();
         th = this;
@@ -88,37 +89,22 @@ public class Account_Name_Add extends javax.swing.JDialog {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                // TODO Auto-generated method stub
-                String name = th.jTextField_Name.getText();
-                String desc = th.jTextArea_Description.getText();
-                JSONObject ans = new JSONObject();
-
-                // account in db?
-
-                if (name.length() == 0 && desc.length() == 0) {
-
-                    setVisible(false);
+                String name = th.jTextFieldName.getText();
+                String description = th.jTextAreaDescription.getText();
+                if (name.trim().length() == 0 || description.trim().length() == 0) {
+                    JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Empty name or description"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     return;
-                } else if (name.length() == 0) {
-                    name = "";
                 }
-                if (desc.length() != 0) {
-                    // write description
-                    ans.put("description", desc);
-
-                }
-                String acc = th.jTextField_Account.getText();
-                Account acc1;
                 try {
-                    acc1 = new Account(acc);
+                    JSONObject ans = new JSONObject();
+                    ans.put("description", description);
+                    String acc = th.jTextFieldAccount.getText();
+                    new Account(acc);
                     db.set(acc, new Tuple2(name, StrJSonFine.convert(ans)));
                     setVisible(false);
-                    return;
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid Account"), Lang.getInstance().translate("Invalid Account"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid Account!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                 }
-                //dispose();
             }
 
         });
@@ -142,16 +128,16 @@ public class Account_Name_Add extends javax.swing.JDialog {
         buttonGroupSelectType = new javax.swing.ButtonGroup();
         jLabel_Title = new javax.swing.JLabel();
         jLabel_Name = new javax.swing.JLabel();
-        jTextField_Name = new javax.swing.JTextField();
+        jTextFieldName = new javax.swing.JTextField();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea_Description = new javax.swing.JTextArea();
+        jTextAreaDescription = new javax.swing.JTextArea();
         jPanel1 = new javax.swing.JPanel();
         jButton_OK = new javax.swing.JButton();
         jButton_Cancel = new javax.swing.JButton();
         jLabel_Description = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel_Account = new javax.swing.JLabel();
-        jTextField_Account = new javax.swing.JTextField();
+        jTextFieldAccount = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
@@ -178,7 +164,7 @@ public class Account_Name_Add extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
         getContentPane().add(jLabel_Name, gridBagConstraints);
 
-        jTextField_Name.setToolTipText("");
+        jTextFieldName.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
@@ -187,11 +173,11 @@ public class Account_Name_Add extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.3;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-        getContentPane().add(jTextField_Name, gridBagConstraints);
+        getContentPane().add(jTextFieldName, gridBagConstraints);
 
-        jTextArea_Description.setColumns(20);
-        jTextArea_Description.setRows(5);
-        jScrollPane2.setViewportView(jTextArea_Description);
+        jTextAreaDescription.setColumns(20);
+        jTextAreaDescription.setRows(5);
+        jScrollPane2.setViewportView(jTextAreaDescription);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -255,7 +241,7 @@ public class Account_Name_Add extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
         getContentPane().add(jLabel_Account, gridBagConstraints);
 
-        jTextField_Account.setToolTipText("");
+        jTextFieldAccount.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
@@ -264,7 +250,7 @@ public class Account_Name_Add extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.3;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-        getContentPane().add(jTextField_Account, gridBagConstraints);
+        getContentPane().add(jTextFieldAccount, gridBagConstraints);
 
         pack();
 
