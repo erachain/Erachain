@@ -22,7 +22,7 @@ import java.util.Observer;
 @SuppressWarnings("serial")
 public class BlocksTableModel extends AbstractTableModel implements Observer {
 
-    public static final int maxSize = 50;
+    public static final int maxSize = 100;
 
     public static final int COLUMN_HEIGHT = 0;
     public static final int COLUMN_TIMESTAMP = 1;
