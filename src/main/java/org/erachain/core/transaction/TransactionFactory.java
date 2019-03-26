@@ -21,7 +21,7 @@ public class TransactionFactory {
     public Transaction parse(byte[] data, int asDeal) throws Exception {
         //READ TYPE
         int type = Byte.toUnsignedInt(data[0]);
-        //LOGGER.info(" 1: " + parsedAssetTransfer.getKey() );
+        //logger.info(" 1: " + parsedAssetTransfer.getKey() );
 
 
         switch (type) {

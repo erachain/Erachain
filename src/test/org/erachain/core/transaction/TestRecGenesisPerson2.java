@@ -85,12 +85,12 @@ public class TestRecGenesisPerson2 {
         assertEquals(Transaction.VALIDATE_OK, genesisIssuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CONVERT TO BYTES
-        //LOGGER.info("CREATOR: " + genesisIssuePersonTransaction.getCreator().getPublicKey());
+        //logger.info("CREATOR: " + genesisIssuePersonTransaction.getCreator().getPublicKey());
         byte[] rawGenesisIssuePersonRecord = genesisIssuePersonTransaction.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
         assertEquals(rawGenesisIssuePersonRecord.length, genesisIssuePersonTransaction.getDataLength(Transaction.FOR_NETWORK, true));
-        //LOGGER.info("rawGenesisIssuePersonRecord.length") + ": + rawGenesisIssuePersonRecord.length);
+        //logger.info("rawGenesisIssuePersonRecord.length") + ": + rawGenesisIssuePersonRecord.length);
 
         try {
             //PARSE FROM BYTES

@@ -72,7 +72,7 @@ public class Peer extends MonitoredThread {
 
     public Peer(Network network, Socket socket, String description) {
 
-        //LOGGER.debug("@@@ new Peer(ConnectionCallback callback, Socket socket) : " + socket.getInetAddress().getHostAddress());
+        //logger.debug("@@@ new Peer(ConnectionCallback callback, Socket socket) : " + socket.getInetAddress().getHostAddress());
 
         try {
             this.network = network;
@@ -513,7 +513,7 @@ public class Peer extends MonitoredThread {
         }
 
         if (USE_MONITOR) this.setMonitorStatus("halted");
-        //LOGGER.debug(this + " - halted");
+        //logger.debug(this + " - halted");
 
     }
 
@@ -696,7 +696,7 @@ public class Peer extends MonitoredThread {
         this.sender.close();
 
         if (socket != null) {
-            //LOGGER.debug(this + " SOCKET: \n"
+            //logger.debug(this + " SOCKET: \n"
             //        + (this.socket.isBound()? " isBound " : "")
             //        + (this.socket.isConnected()? " isConnected " : "")
             //        + (this.socket.isInputShutdown()? " isInputShutdown " : "")

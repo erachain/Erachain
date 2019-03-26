@@ -157,7 +157,7 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
         return null;
 
         //} catch (Exception e) {
-        // LOGGER.error(e.getMessage(),e);
+        // logger.error(e.getMessage(),e);
         //	return null;
         //}
     }

@@ -48,7 +48,7 @@ public class Model_Account_Transactions extends SortedListTableModelCls<Tuple2<S
     public Model_Account_Transactions() {
         super(new String[]{"Account", "Amount", "Type"}, true);
 
-        LOGGER = LoggerFactory.getLogger(Model_Account_Transactions.class.getName());
+        logger = LoggerFactory.getLogger(Model_Account_Transactions.class.getName());
 
         this.transactions_Asset = new ArrayList<Transaction>();
         this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();

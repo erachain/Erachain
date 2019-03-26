@@ -507,7 +507,7 @@ public class TransactionTests3AssetsAsPack {
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issueAssetTransaction.sign(maker, asPack);
         issueAssetTransaction.process(gb, asPack);
-        //LOGGER.info("IssueAssetTransaction .creator.getBalance(1, db): " + account.getBalance(1, dcSet));
+        //logger.info("IssueAssetTransaction .creator.getBalance(1, db): " + account.getBalance(1, dcSet));
         key = asset.getKey(db);
 
         //CREATE ORDER
@@ -517,8 +517,8 @@ public class TransactionTests3AssetsAsPack {
         createOrderTransaction.process(gb, asPack);
 
         //this.creator.getBalance(1, db).compareTo(this.fee) == -1)
-        //LOGGER.info("createOrderTransaction.creator.getBalance(1, db): " + createOrderTransaction.getCreator().getBalance(1, dcSet));
-        //LOGGER.info("CreateOrderTransaction.creator.getBalance(1, db): " + account.getBalance(1, dcSet));
+        //logger.info("createOrderTransaction.creator.getBalance(1, db): " + createOrderTransaction.getCreator().getBalance(1, dcSet));
+        //logger.info("CreateOrderTransaction.creator.getBalance(1, db): " + account.getBalance(1, dcSet));
 
         //CREATE CANCEL ORDER
         CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(maker, new byte[]{5, 6}, FEE_POWER, System.currentTimeMillis(), 0l, new byte[]{1, 2});

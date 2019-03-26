@@ -6,12 +6,10 @@ import org.erachain.core.transaction.*;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.library.library;
 import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.*;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Null;
@@ -44,7 +42,7 @@ public class Payment_Orders_TableModel extends SortedListTableModelCls<Tuple2<St
         super(new String[]{"Confirmation", "Timestamp", "Type", "Creator", "Item",
                 "Amount", "Recipient", "Fee", "Size"}, true);
 
-        LOGGER = LoggerFactory.getLogger(Payment_Orders_TableModel.class.getName());
+        logger = LoggerFactory.getLogger(Payment_Orders_TableModel.class.getName());
     }
 
     @Override
@@ -179,7 +177,7 @@ public class Payment_Orders_TableModel extends SortedListTableModelCls<Tuple2<St
 
         //} catch (Exception e) {
         //GUI ERROR
-        //	LOGGER.error(e.getMessage(),e);
+        //	logger.error(e.getMessage(),e);
         //	return null;
         //}
 

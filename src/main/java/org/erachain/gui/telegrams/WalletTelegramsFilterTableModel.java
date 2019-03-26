@@ -124,7 +124,7 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
 
         // } catch (Exception e) {
         // GUI ERROR
-        // LOGGER.error(e.getMessage(),e);
+        // logger.error(e.getMessage(),e);
         // return null;
         // }
 

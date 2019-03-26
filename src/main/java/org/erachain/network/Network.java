@@ -138,7 +138,7 @@ public class Network extends Observable {
             return;
         }
 
-        //LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer);
+        //logger.info(Lang.getInstance().translate("Connection successfull : ") + peer);
 
         boolean asNew = true;
         for (Peer peerKnown : this.knownPeers) {
@@ -210,7 +210,7 @@ public class Network extends Observable {
                 }
             }
         } catch (Exception e) {
-            //LOGGER.error(e.getMessage(),e);
+            //logger.error(e.getMessage(),e);
         }
 
         return false;
@@ -235,7 +235,7 @@ public class Network extends Observable {
                 }
             }
         } catch (Exception e) {
-            //LOGGER.error(e.getMessage(),e);
+            //logger.error(e.getMessage(),e);
         }
 
         return peer;
@@ -543,7 +543,7 @@ public class Network extends Observable {
     public void onMessageMySelf(Peer sender, byte[] remoteID) {
 
         if (Arrays.equals(remoteID, controller.getFoundMyselfID())) {
-            //LOGGER.info("network.onMessage - Connected to self. Disconnection.");
+            //logger.info("network.onMessage - Connected to self. Disconnection.");
 
             Network.myselfAddress = sender.getAddress();
             sender.ban(99999, null);
@@ -590,7 +590,7 @@ public class Network extends Observable {
     }
 
     public void pingAllPeers(boolean onlySynchronized) {
-        //LOGGER.debug("Broadcasting PING ALL");
+        //logger.debug("Broadcasting PING ALL");
 
         BlockChain chain = controller.getBlockChain();
         Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
@@ -617,7 +617,7 @@ public class Network extends Observable {
 
         }
 
-        //LOGGER.debug("Broadcasting PING ALL end");
+        //logger.debug("Broadcasting PING ALL end");
     }
 
     public void broadcast(Message message, boolean onlySynchronized) {
@@ -648,7 +648,7 @@ public class Network extends Observable {
         }
 
         //if (exclude != null && !exclude.isEmpty())
-        //    LOGGER.debug(message + " exclude: " + exclude.size());
+        //    logger.debug(message + " exclude: " + exclude.size());
 
         for (Peer peer : this.knownPeers) {
 
@@ -682,7 +682,7 @@ public class Network extends Observable {
         HashSet<Peer> exclude = (HashSet<Peer>)this.handledWinBlockMessages.get(winBlock.getHandledID());
 
         //if (exclude != null && !exclude.isEmpty())
-        //    LOGGER.debug(winBlock + " exclude: " + exclude.size());
+        //    logger.debug(winBlock + " exclude: " + exclude.size());
 
         for (Peer peer : this.knownPeers) {
 
@@ -707,7 +707,7 @@ public class Network extends Observable {
             }
         }
 
-        //LOGGER.debug("ASYNC Broadcasting end " + message.viewType());
+        //logger.debug("ASYNC Broadcasting end " + message.viewType());
     }
 
     @Override

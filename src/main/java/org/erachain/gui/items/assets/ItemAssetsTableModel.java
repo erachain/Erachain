@@ -21,7 +21,7 @@ public class ItemAssetsTableModel extends SearchItemsTableModel {
         super(DCSet.getInstance().getItemAssetMap(), new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"},
                 new Boolean[]{false, true, true, false, false, false, false, false},
                 COLUMN_FAVORITE);
-        LOGGER = LoggerFactory.getLogger(ItemAssetsTableModel.class.getName());
+        logger = LoggerFactory.getLogger(ItemAssetsTableModel.class.getName());
     }
 
     @Override

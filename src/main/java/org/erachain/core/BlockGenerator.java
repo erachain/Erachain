@@ -107,7 +107,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         if (ctrl.getActivePeersCounter() < (BlockChain.DEVELOP_USE? 3 : 5))
             return;
 
-        //LOGGER.debug("try check better WEIGHT peers");
+        //logger.debug("try check better WEIGHT peers");
 
         Peer peer = null;
         Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
@@ -665,7 +665,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     ////syncForgingStatus();
 
                     //Timestamp timestamp = new Timestamp(NTP.getTime());
-                    //LOGGER.info("NTP.getTime() " + timestamp);
+                    //logger.info("NTP.getTime() " + timestamp);
 
                     //waitWin = bchain.getWaitWinBuffer();
 
@@ -1002,7 +1002,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         && ctrl.getActivePeersCounter() > (BlockChain.DEVELOP_USE? 1 : 3)) {
                     // если случилась патовая ситуация то найдем более сильную цепочку (не по высоте)
                     // если есть сильнее то сделаем откат у себя
-                    //LOGGER.debug("try resolve PAT situation");
+                    //logger.debug("try resolve PAT situation");
                     try {
                         Thread.sleep(10000);
                     } catch (InterruptedException e) {
