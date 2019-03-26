@@ -1986,7 +1986,7 @@ public class BlockExplorer {
     public Map jsonQueryPeers(UriInfo info) {
 
         int start = 0;
-        int end = 20;
+        int end = 100;
         int view = 0;
         int sortPing = 0;
         PeersTableModel model_Peers = new PeersTableModel();
