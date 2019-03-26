@@ -3142,7 +3142,8 @@ public class BlockExplorer {
             } else {
                 out.put("signature", Base58.encode(transaction.getSignature()));
                 out.put("date", DateTimeFormat.timestamptoString(transaction.getTimestamp()));
-
+                String typeName = transaction.viewFullTypeName();
+                out.put("type", typeName);
                 if (transaction.getCreator() == null) {
                     out.put("creator", GenesisBlock.CREATOR.getAddress());
                     out.put("creator_addr", "GENESIS");
@@ -3180,7 +3181,6 @@ public class BlockExplorer {
                 out.put("confirmations", transaction.getConfirmations(height));
 
             }
-
 
 
             long absKey = transaction.getAbsKey();
@@ -3226,11 +3226,6 @@ public class BlockExplorer {
         return output;
 
     }
-
-
-
-
-
 
 
 }
