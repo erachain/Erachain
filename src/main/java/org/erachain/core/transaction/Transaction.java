@@ -682,6 +682,10 @@ public abstract class Transaction {
         return this.signature;
     }
 
+    public long getReference() {
+        return this.reference;
+    }
+
     public List<byte[]> getSignatures() {
         return null;
     }

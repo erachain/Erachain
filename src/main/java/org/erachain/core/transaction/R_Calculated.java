@@ -42,21 +42,9 @@ public class R_Calculated extends TransactionAmount {
 
     }
 
-    public R_Calculated(byte[] typeBytes, Account recipient, long key,
-                        BigDecimal amount, String message, long txReference, byte[] signature) {
-        this(typeBytes, recipient, key, amount, message, txReference);
-        this.signature = signature;
-    }
-
     public R_Calculated(Account recipient, long key,
                         BigDecimal amount, String message, long txReference) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, recipient, key, amount, message, txReference);
-    }
-
-    public R_Calculated(Account recipient, long key,
-                        BigDecimal amount, String message, long txReference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, recipient, key, amount, message, txReference);
-        this.signature = signature;
     }
 
     // GETTERS/SETTERS
@@ -64,6 +52,11 @@ public class R_Calculated extends TransactionAmount {
     @Override
     public String viewTypeName() {
         return NAME_ID;
+    }
+
+    @Override
+    public String viewSignature() {
+        return "calculated_" + Transaction.viewDBRef(reference) + ":" + viewHeightSeq();
     }
 
     @Override
