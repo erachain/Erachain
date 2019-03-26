@@ -28,7 +28,7 @@ import java.util.*;
 ////////
 
 @SuppressWarnings("serial")
-public class Accounts_Transactions_TableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> {
+public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TRANSACTION = 1;
     public static final int COLUMN_AMOUNT = 2;
@@ -61,7 +61,7 @@ public class Accounts_Transactions_TableModel extends SortedListTableModelCls<Tu
 
     private HashSet actionTypes;
 
-    public Accounts_Transactions_TableModel() {
+    public AccountsTransactionsTableModel() {
         super(Controller.getInstance().wallet.database.getTransactionMap(),
                 new String[]{"Date", "RecNo", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "Type Asset"},
                 new Boolean[]{false, true, true, false, false}, false);
@@ -154,7 +154,7 @@ public class Accounts_Transactions_TableModel extends SortedListTableModelCls<Tu
             case COLUMN_MESSAGE:
 
                 if (r_Tran.transaction.getType() != Transaction.SEND_ASSET_TRANSACTION)
-                    return Lang.getInstance().translate("Genesis Transaction");
+                    return "";
 
                 R_Send rs = ((R_Send) r_Tran.transaction);
                 if (rs == rs)

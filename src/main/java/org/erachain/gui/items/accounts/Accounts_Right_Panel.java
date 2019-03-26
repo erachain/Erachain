@@ -27,7 +27,7 @@ public class Accounts_Right_Panel extends JPanel {
      * 
      */
     private static final long serialVersionUID = 1L;
-    public Accounts_Transactions_TableModel table_Model;
+    public AccountsTransactionsTableModel table_Model;
     @SuppressWarnings("rawtypes")
     public MTable jTable1;
     // Variables declaration - do not modify
@@ -67,7 +67,7 @@ public class Accounts_Right_Panel extends JPanel {
         jMenu5 = new javax.swing.JMenu();
         jToggleButton2 = new javax.swing.JToggleButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        table_Model = new Accounts_Transactions_TableModel();
+        table_Model = new AccountsTransactionsTableModel();
         jTable1 = new MTable(table_Model);
         
     // sort from column     
