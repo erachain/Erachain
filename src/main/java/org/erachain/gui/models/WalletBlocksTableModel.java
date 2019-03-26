@@ -26,7 +26,7 @@ public class WalletBlocksTableModel extends SortedListTableModelCls<Tuple2<Strin
     public static final int COLUMN_FEE = 6;
 
     public WalletBlocksTableModel() {
-        super(Controller.getInstance().wallet.database.getBlocksHeadMap(), "WalletBlocksTableModel", 1000,
+        super(Controller.getInstance().wallet.database.getBlocksHeadMap(),
                 new String[]{"Height", "Timestamp", "Creator account", "Gen.Balance", "dtWV", "Transactions", "Fee"},
                 new Boolean[]{false, true, true, false, false, true, false}, true);
 

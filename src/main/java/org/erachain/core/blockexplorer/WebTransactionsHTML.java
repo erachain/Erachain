@@ -573,6 +573,9 @@ public class WebTransactionsHTML {
                         + "</a><br>";
             }
 
+            out += Lang.getInstance().translateFromLangObj("Public Key", langObj) + " : "
+                    + Base58.encode(tr.getCreator().getPublicKey()) + "<br>";
+            out += Lang.getInstance().translateFromLangObj("Signature", langObj) + " : " + Base58.encode(tr.getSignature()) + "<br>";
 
         }
         out += "</table>";

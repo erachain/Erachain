@@ -136,6 +136,11 @@ function statement(data){
 
 	output +='</div>';
 
+	output +='<div>';
+    output += '<hr><label>' + data.Label_pubKey + '</label>&nbsp;&nbsp;'  + data.pubKey ;
+    output += '<br><label>' + data.Label_signature + '</label>&nbsp;&nbsp;'  + data.sign ;
+    output +='</div>';
+
     // vouches
 	if(data.hasOwnProperty('vouches_table')){
         output +='<hr>' + data.vouches_table;

@@ -2163,9 +2163,14 @@ public class BlockExplorer {
         output.put("Label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
         output.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
         output.put("Label_No", Lang.getInstance().translateFromLangObj("No.", langObj));
+        output.put("Label_pubKey", Lang.getInstance().translateFromLangObj("Public Key", langObj));
+        output.put("Label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
 
         output.put("block", block);
         output.put("seqNo", seqNo);
+
+        output.put("pubKey", Base58.encode(trans.getCreator().getPublicKey()));
+        output.put("sign", Base58.encode(trans.getSignature()));
 
         //TemplateCls statement = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
 
