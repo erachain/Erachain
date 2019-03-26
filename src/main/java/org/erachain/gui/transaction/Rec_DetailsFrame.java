@@ -199,9 +199,15 @@ public class Rec_DetailsFrame extends JPanel //JFrame
         copy_Transaction_Sign.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
+                StringSelection value;
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection value = new StringSelection(Base58.encode(record.getSignature()));
+                if (record.getSignature() != null) {
+                    value = new StringSelection(Base58.encode(record.getSignature()));
+                } else {
+                    value = new StringSelection("null");
+                }
                 clipboard.setContents(value, null);
+
             }
         });
         shorn_Info_Meny.add(copy_Transaction_Sign);

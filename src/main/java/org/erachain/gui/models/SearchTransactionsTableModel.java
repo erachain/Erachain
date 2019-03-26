@@ -37,21 +37,22 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<Transaction
 
     public void setBlockNumber(String string) {
 
+        list = new ArrayList<>();
+
         try {
             block_No = Integer.parseInt(string);
         } catch (NumberFormatException e) {
-            list = new ArrayList<>();
             Transaction transaction = DCSet.getInstance().getTransactionFinalMap().getRecord(string);
             if (transaction != null) {
                 transaction.setDC(DCSet.getInstance());
                 list.add(transaction);
             }
-            needUpdate = true;
+            this.fireTableDataChanged();
             return;
         }
 
         list = (List<Transaction>) DCSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(block_No);
-        needUpdate = true;
+        this.fireTableDataChanged();
 
     }
 
@@ -66,9 +67,8 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<Transaction
             list = new ArrayList();
             list.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress()));//.findTransactions(address, sender=address, recipient=address, minHeight=0, maxHeight=0, type=0, service=0, desc=false, offset=0, limit=0);//.getTransactionsByBlock(block_No);
 
-            needUpdate = true;
-
         }
+        this.fireTableDataChanged();
 
     }
 
