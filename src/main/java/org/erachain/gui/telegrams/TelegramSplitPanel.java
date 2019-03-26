@@ -58,7 +58,7 @@ public class TelegramSplitPanel extends Split_Panel {
  //   private RightTelegramPanel rightPanel;
     private AccountsComboBoxModel accountsModel;
     static TelegramSplitPanel th ;
-    private Accounts_Name_TableModel accountModel;
+    private AccountsNameTableModel accountModel;
     private MTable tableFavoriteAccounts;
     protected int row;
     private Account recipient;
@@ -93,7 +93,7 @@ public class TelegramSplitPanel extends Split_Panel {
     // EVENTS on CURSOR
    // accountPanel.table.getSelectionModel().addListSelectionListener(new Account_Tab_Listener());
    
-    accountModel = new Accounts_Name_TableModel( Lang.getInstance().translate(new String[]{"No.", "Account", "Name"}));
+    accountModel = new AccountsNameTableModel( Lang.getInstance().translate(new String[]{"No.", "Account", "Name"}));
    tableFavoriteAccounts = new MTable(this.accountModel);
    
    

@@ -23,6 +23,8 @@ public class WalletItemImprintsTableModel extends SortedListTableModelCls<Tuple2
         super(Controller.getInstance().wallet.database.getImprintMap(), "WalletItemImprintsTableModel", 1000,
                 new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false}, false);
+
+        addObservers();
     }
 
     @Override
@@ -77,6 +79,7 @@ public class WalletItemImprintsTableModel extends SortedListTableModelCls<Tuple2
         }
     }
 
+    // TODO сделать постранично
     @Override
     public void getInterval() {
         listSorted = new SortableList<Tuple2<String, String>, ImprintCls>(
@@ -84,12 +87,16 @@ public class WalletItemImprintsTableModel extends SortedListTableModelCls<Tuple2
     }
 
     public void addObservers() {
-        map.addObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            map.addObserver(this);
+        }
         Controller.getInstance().guiTimer.addObserver(this);
     }
 
     public void deleteObservers() {
         Controller.getInstance().guiTimer.deleteObserver(this);
-        map.deleteObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            map.deleteObserver(this);
+        }
     }
 }

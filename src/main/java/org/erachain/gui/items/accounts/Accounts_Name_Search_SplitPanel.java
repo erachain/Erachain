@@ -53,7 +53,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
     static Logger LOGGER = LoggerFactory.getLogger(Accounts_Name_Search_SplitPanel.class.getName());
     protected My_JFileChooser chooser;
     protected int row;
-    private Accounts_Name_TableModel tableModelImprints;
+    private AccountsNameTableModel tableModelImprints;
     private JButton button3_ToolBar_LeftPanel;
     private AccountsPropertisMap db;
 
@@ -83,7 +83,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
         jButton2_jToolBar_RightPanel.setVisible(false);
 
         // CREATE TABLE
-        this.tableModelImprints = new Accounts_Name_TableModel();
+        this.tableModelImprints = new AccountsNameTableModel();
         final MTable imprintsTable = new MTable(this.tableModelImprints);
 
         // CHECKBOX FOR FAVORITE

@@ -17,7 +17,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class Accounts_Name_TableModel extends SortedListTableModelCls<String, Tuple2<String, String>> implements Observer {
+public class AccountsNameTableModel extends SortedListTableModelCls<String, Tuple2<String, String>> implements Observer {
     public static final int COLUMN_ADDRESS = 1;
     public static final int COLUMN_NAME = 2;
     public static final int COLUMN_DESCRIPTION = 3;
@@ -27,7 +27,7 @@ public class Accounts_Name_TableModel extends SortedListTableModelCls<String, Tu
     private Account accountCLS;
     private Pair<String, Tuple2<String, String>> account;
 
-    public Accounts_Name_TableModel() {
+    public AccountsNameTableModel() {
         super(Controller.getInstance().wallet.database.getAccountsPropertisMap(),
                 new String[]{"No.", "Account", "Name", "Description", "Person"},
                 new Boolean[]{true, false, false, false}, false);
@@ -36,7 +36,7 @@ public class Accounts_Name_TableModel extends SortedListTableModelCls<String, Tu
 
     }
 
-    public Accounts_Name_TableModel(String[] columnNames) {
+    public AccountsNameTableModel(String[] columnNames) {
         super(new String[]{"No.", "Account", "Name", "Description", "Person"},
                 new Boolean[]{true, false, false, false}, false);
 
