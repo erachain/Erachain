@@ -163,7 +163,7 @@ public class R_SendResource {
             jsonObject = (JSONObject) JSONValue.parse(x);
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
-            ///LOGGER.error(e.getMessage());
+            ///logger.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
 
@@ -389,7 +389,7 @@ public class R_SendResource {
                             continue;
                         }
 
-                        // not work in Threads - LOGGER.info("TEST1: " + OnDealClick.resultMess(result));
+                        // not work in Threads - logger.info("TEST1: " + OnDealClick.resultMess(result));
                         try {
                             Thread.sleep(10000);
                         } catch (InterruptedException e) {
@@ -406,7 +406,7 @@ public class R_SendResource {
                         return;
 
                 } catch (Exception e10) {
-                    // not see in Thread - LOGGER.error(e10.getMessage(), e10);
+                    // not see in Thread - logger.error(e10.getMessage(), e10);
                 }
 
             } while (true);

@@ -19,7 +19,7 @@ public class Start {
 
     //@Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
 
-    // LOGGER of WEBSERVERS
+    // logger of WEBSERVERS
 //    public DispatcherServlet dispatcherServlet() {
 //        return new Logging();
 //    }

@@ -74,12 +74,12 @@ public class TestRecGenesisAsset {
         assertEquals(Transaction.VALIDATE_OK, genesisIssueAssetTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CONVERT TO BYTES
-        //LOGGER.info("CREATOR: " + genesisIssueAssetTransaction.getCreator().getPublicKey());
+        //logger.info("CREATOR: " + genesisIssueAssetTransaction.getCreator().getPublicKey());
         byte[] rawGenesisIssueAssetTransaction = genesisIssueAssetTransaction.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
         assertEquals(rawGenesisIssueAssetTransaction.length, genesisIssueAssetTransaction.getDataLength(Transaction.FOR_NETWORK, true));
-        //LOGGER.info("rawGenesisIssueAssetTransaction.length") + ": + rawGenesisIssueAssetTransaction.length);
+        //logger.info("rawGenesisIssueAssetTransaction.length") + ": + rawGenesisIssueAssetTransaction.length);
 
         try {
             //PARSE FROM BYTES

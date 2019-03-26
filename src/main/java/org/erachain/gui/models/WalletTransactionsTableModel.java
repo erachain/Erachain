@@ -6,16 +6,13 @@ import org.erachain.core.transaction.*;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.library.library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,7 +43,7 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
                 new String[]{"Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"},
                 new Boolean[]{true, true, true, true, true, true, true, false, false}, true);
 
-        LOGGER = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
+        logger = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
 
         addObservers();
 

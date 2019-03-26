@@ -39,7 +39,7 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                 "Online Time", "Version" },
                 new Boolean[] { false, false, false, false, false, false, false, false }, false);
 
-        LOGGER = LoggerFactory.getLogger(PeersTableModel.class.getName());
+        logger = LoggerFactory.getLogger(PeersTableModel.class.getName());
 
         addObservers();
 

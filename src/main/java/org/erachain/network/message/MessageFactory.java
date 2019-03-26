@@ -170,7 +170,7 @@ public class MessageFactory {
 
                 // может быть это повтор?
                 if (!sender.network.checkHandledTelegramMessages(data, sender, false)) {
-                    //LOGGER.debug(sender + " <-- Telegram REPEATED...");
+                    //logger.debug(sender + " <-- Telegram REPEATED...");
                     return null;
                 }
 
@@ -186,7 +186,7 @@ public class MessageFactory {
                 // то разрешить парсинг прилетающего блока, иначе не заморачиваться даже
                 // так чтобы не было постоянной синхронизации форжинга
                 if (!sender.network.checkHandledTransactionMessages(data, sender, false)) {
-                    //LOGGER.debug(sender + " <-- Transaction REPEATED...");
+                    //logger.debug(sender + " <-- Transaction REPEATED...");
                     return null;
                 }
 
@@ -201,7 +201,7 @@ public class MessageFactory {
                 if (//!Controller.getInstance().isStatusOK() ||
                         !sender.network.checkHandledWinBlockMessages(data, sender, false)
                 ) {
-                    //LOGGER.debug(sender + " <-- Win Block REPEATED...");
+                    //logger.debug(sender + " <-- Win Block REPEATED...");
                     return null;
                 }
 

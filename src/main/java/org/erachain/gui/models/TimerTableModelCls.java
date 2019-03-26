@@ -28,7 +28,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     protected long size = 0;
 
     protected DBMap map;
-    protected Logger LOGGER;
+    protected Logger logger;
 
     public TimerTableModelCls(String[] columnNames, boolean descending) {
         this.columnNames = columnNames;
@@ -76,7 +76,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
                             needUpdate = false;
                         }
                     } catch (Exception e) {
-                        //LOGGER.error(e.getMessage(),e);
+                        //logger.error(e.getMessage(),e);
                         String err = e.getMessage();
                     }
                 }
@@ -135,8 +135,8 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         try {
             this.syncUpdate(o, arg);
         } catch (Exception e) {
-            if (LOGGER != null)
-                LOGGER.error(e.getMessage(),e);
+            if (logger != null)
+                logger.error(e.getMessage(),e);
         }
     }
 

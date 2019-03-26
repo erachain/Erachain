@@ -288,11 +288,11 @@ public class BlockExplorerTest {
 
         Transaction transaction = getTransaction(Base58.decode("4JXPXqdP7GT743AoX2m8vHBeWNrKvBcf71TcDLfLeMn6rmV5uyVRDcV5gLspNquZyatY4tHB9RXDWKahEM85oTJv"));
         Account account = new Account("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ");
-        //LOGGER.error(transaction.getAmount(account));
+        //logger.error(transaction.getAmount(account));
 
         transaction = getTransaction(Base58.decode("4JXPXqdP7GT743AoX2m8vHBeWNrKvBcf71TcDLfLeMn6rmV5uyVRDcV5gLspNquZyatY4tHB9RXDWKahEM85oTJv"));
         account = new Account("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ");
-        //LOGGER.error(transaction.getAmount(account));
+        //logger.error(transaction.getAmount(account));
     }
 
     public Transaction getTransaction(byte[] signature) {

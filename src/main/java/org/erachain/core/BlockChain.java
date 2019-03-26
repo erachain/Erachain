@@ -831,7 +831,7 @@ public class BlockChain {
 
     public List<byte[]> getSignatures(DCSet dcSet, byte[] parentSignature) {
 
-        //LOGGER.debug("getSignatures for ->" + Base58.encode(parent));
+        //logger.debug("getSignatures for ->" + Base58.encode(parent));
 
         List<byte[]> headers = new ArrayList<byte[]>();
 
@@ -857,11 +857,11 @@ public class BlockChain {
                 else
                     break;
             } while (parentSignature != null && counter++ < packet);
-            //LOGGER.debug("get size " + counter);
+            //logger.debug("get size " + counter);
         } else if (Arrays.equals(parentSignature, this.CHECKPOINT.b)) {
             headers.add(parentSignature);
         } else {
-            //LOGGER.debug("*** getSignatures NOT FOUND !");
+            //logger.debug("*** getSignatures NOT FOUND !");
         }
 
         return headers;

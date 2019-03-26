@@ -182,7 +182,7 @@ public abstract class Trader extends Thread {
             int error = ((Long)jsonObject.get("error")).intValue();
             if (error == INVALID_TIMESTAMP) {
                 // INVALIT TIMESTAMP
-                //LOGGER.info("CREATE - TRY ANEW");
+                //logger.info("CREATE - TRY ANEW");
                 try {
                     Thread.sleep(100);
                 } catch (Exception e) {
@@ -206,7 +206,7 @@ public abstract class Trader extends Thread {
         String result;
 
         result = this.apiClient.executeCommand("GET trade/get/" + orderID);
-        //LOGGER.info("GET: " + Base58.encode(orderID) + "\n" + result);
+        //logger.info("GET: " + Base58.encode(orderID) + "\n" + result);
 
         JSONObject jsonObject = null;
         try {
@@ -248,7 +248,7 @@ public abstract class Trader extends Thread {
             int error = ((Long) jsonObject.get("error")).intValue();
             if (error == INVALID_TIMESTAMP) {
                 // INVALIT TIMESTAMP
-                //LOGGER.info("CANCEL - TRY ANEW");
+                //logger.info("CANCEL - TRY ANEW");
                 try {
                     Thread.sleep(100);
                 } catch (Exception e) {
@@ -275,7 +275,7 @@ public abstract class Trader extends Thread {
 
         sendRequest = this.apiClient.executeCommand("GET trade/getbyaddress/" + address
                     + '/' + haveKey + '/' + wantKey);
-        //LOGGER.info("GET by address: " + "\n" + sendRequest);
+        //logger.info("GET by address: " + "\n" + sendRequest);
 
         JSONArray jsonArray = null;
         try {
@@ -518,7 +518,7 @@ public abstract class Trader extends Thread {
             // make copy of LIST - for concerent DELETE
             for (String orderID: new ArrayList<>(schemeItems)) {
                 result = this.apiClient.executeCommand("GET trade/get/" + orderID);
-                //LOGGER.info("GET: " + Base58.encode(orderID) + "\n" + result);
+                //logger.info("GET: " + Base58.encode(orderID) + "\n" + result);
 
                 JSONObject jsonObject = null;
                 try {

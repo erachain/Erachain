@@ -471,10 +471,10 @@ public abstract class ItemCls {
         }
 
         //DELETE ORPHAN DATA
-        //LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 2");
+        //logger.debug("<<<<< core.item.ItemCls.removeFromMap 2");
         this.getDBIssueMap(db).delete(this.reference);
 
-        //LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 3");
+        //logger.debug("<<<<< core.item.ItemCls.removeFromMap 3");
 
         return thisKey;
 
