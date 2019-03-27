@@ -414,8 +414,8 @@ public class WebTransactionsHTML {
         UnionCls union = (UnionCls) unionIssue.getItem();
         out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
                 + unionIssue.getItem().getName() + "<br>";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
-                + unionIssue.getItem().getDescription() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
+        //        + unionIssue.getItem().getDescription() + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Birthday", langObj) + ":</b> "
                 + union.getBirthdayStr() + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Parent", langObj) + ":</b> "
@@ -429,8 +429,8 @@ public class WebTransactionsHTML {
         IssueStatusRecord statusIssue = (IssueStatusRecord) transaction;
         out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
                 + statusIssue.getItem().getName() + "<br>";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
-                + statusIssue.getItem().getDescription() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
+        //        + statusIssue.getItem().getDescription() + "<br>";
 
         return out;
     }
@@ -441,8 +441,8 @@ public class WebTransactionsHTML {
         IssueTemplateRecord templateIssue = (IssueTemplateRecord) transaction;
         out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
                 + templateIssue.getItem().getName() + "<br>";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
-                + templateIssue.getItem().getDescription() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
+        //        + templateIssue.getItem().getDescription() + "<br>";
 
         return out;
     }
@@ -453,8 +453,8 @@ public class WebTransactionsHTML {
         IssueImprintRecord imprintIssue = (IssueImprintRecord) transaction;
         out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
                 + imprintIssue.getItem().getName() + "<br>";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
-                + imprintIssue.getItem().getDescription() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
+        //        + imprintIssue.getItem().getDescription() + "<br>";
 
         return out;
     }
@@ -474,8 +474,8 @@ public class WebTransactionsHTML {
         if (person.getGender() == 1)
             out += Lang.getInstance().translateFromLangObj("Female", langObj);
         out += "<br>";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
-                + person.getDescription() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
+        //        + person.getDescription() + "<br>";
         if (person.getOwner().getPerson() != null) {
             // out += "<b>" + Lang.getInstance().translateFromLangObj("Owner",
             // langObj) + ":</b> <a href=?person="
