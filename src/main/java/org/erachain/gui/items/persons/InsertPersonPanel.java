@@ -11,12 +11,11 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.erachain.ntp.NTP;
 import org.erachain.utils.Pair;
 
 import javax.swing.*;
@@ -391,7 +390,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
                     // text, Lang.getInstance().translate("Issue Asset"),
                     // JOptionPane.YES_NO_OPTION);
 
-                    Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, result.getA(),
+                    IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, result.getA(),
                             " ",
                             (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                             Lang.getInstance().translate("Confirmation transaction issue person"));
@@ -454,14 +453,14 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtEyeColor.setText("");
         txtHairСolor.setText("");
         txtHeight.setText("");
-        //imgButes = null;
+        //imgBytes = null;
         add_Image_Panel.reset();
         txt_Sign.setText("");
         txt_public_key.setText("");
         txtBirthdayTxt.setText("");
         txtDeathdayTxt.setText("");
         txtGenderTxt.setText("");
-        //imgButes = null;
+        //imgBytes = null;
         iconLabel.setIcon(null);
 
     }

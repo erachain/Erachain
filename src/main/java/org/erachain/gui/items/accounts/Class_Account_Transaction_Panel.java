@@ -12,7 +12,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.AccountRenderer;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.assets.AssetsComboBoxModel;
-import org.erachain.gui.library.M_DecimalFormatedTextField;
+import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -27,9 +27,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.MaskFormatter;
-
-import org.apache.commons.net.util.Base64;
 
 import org.erachain.controller.Controller;
 
@@ -41,11 +38,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
-import java.text.ParseException;
 
 @SuppressWarnings("serial")
 
@@ -57,7 +51,7 @@ public class Class_Account_Transaction_Panel extends JPanel {
 
     public JComboBox<Account> cbxFrom;
     public JTextField txtTo;
-    public M_DecimalFormatedTextField txtAmount;
+    public MDecimalFormatedTextField txtAmount;
     public JComboBox<String> txtFeePow;
     public JTextArea txtMessage;
     public JCheckBox encryptedCHcKBox;
@@ -442,7 +436,7 @@ public class Class_Account_Transaction_Panel extends JPanel {
         
         
        
-        txtAmount = new M_DecimalFormatedTextField();
+        txtAmount = new MDecimalFormatedTextField();
         int scale = 8;
         if(asset!=null)scale = asset.getScale();
         txtAmount.setScale(scale);
@@ -471,7 +465,7 @@ public class Class_Account_Transaction_Panel extends JPanel {
         feetxtGBC.anchor = GridBagConstraints.NORTH;
         feetxtGBC.gridx = 3;
         feetxtGBC.gridy = y;
-        txtFeePow = new JComboBox();//new M_DecimalFormatedTextField();
+        txtFeePow = new JComboBox();//new MDecimalFormatedTextField();
         txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
         txtFeePow.setSelectedIndex(0);
         

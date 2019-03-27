@@ -5,7 +5,7 @@ import org.erachain.core.transaction.R_SignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Split_Panel;
 import org.erachain.gui.items.persons.ItemsPersonsTableModel;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 public class Search_Statements_SplitPanel extends Split_Panel {
 
     private static final long serialVersionUID = 2717571093561259483L;
-    protected Issue_Confirm_Dialog ddd;
+    protected IssueConfirmDialog ddd;
     // для прозрачности
     int alpha = 255;
     int alpha_int;

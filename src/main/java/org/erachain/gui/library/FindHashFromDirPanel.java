@@ -4,10 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
-import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
@@ -19,8 +17,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.table.DefaultTableModel;
-
-import org.bouncycastle.util.Integers;
 
 import org.erachain.lang.Lang;
 import org.erachain.utils.FileHash;
@@ -48,11 +44,11 @@ public class FindHashFromDirPanel extends javax.swing.JPanel {
             
             jButtonSelectDir.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    My_JFileChooser fileopen = new My_JFileChooser();
-                    fileopen.setFileSelectionMode(My_JFileChooser.DIRECTORIES_ONLY);
+                    fileChooser fileopen = new fileChooser();
+                    fileopen.setFileSelectionMode(fileChooser.DIRECTORIES_ONLY);
                   //  fileopen.setCurrentDirectory(new File(textDataFolder.getText()));
                     int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set data dir"));
-                    if (ret == My_JFileChooser.APPROVE_OPTION) {
+                    if (ret == fileChooser.APPROVE_OPTION) {
                         jTextFieldDir.setText(fileopen.getSelectedFile().toString());
                         
                     }

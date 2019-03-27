@@ -118,7 +118,7 @@ public class DCSet extends DBASet implements Observer {
 
         try {
             this.database = database;
-            this.actions = 0l;
+            this.actions = 0L;
 
             this.blockMap = new BlockMap(this, database);
             //this.blockCreatorMap = new BlockCreatorMap(this, database);

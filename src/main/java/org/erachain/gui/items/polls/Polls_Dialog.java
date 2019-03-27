@@ -12,7 +12,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.AccountRenderer;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.ComboBoxModelItemsAll;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.OptionsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
@@ -269,7 +269,7 @@ public class Polls_Dialog extends JDialog {
 
         // CHECK VALIDATE MESSAGE
         String Status_text = "";
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, transaction,
+        IssueConfirmDialog dd = new IssueConfirmDialog(null, true, transaction,
                 Lang.getInstance().translate("Vote on Poll"),
                 (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction"));

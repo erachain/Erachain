@@ -23,7 +23,7 @@ public abstract class DBMap<T, U> extends Observable {
 
     public int DESCENDING_SHIFT_INDEX = 10000;
 
-    public int DEFAULT_INDEX = 0;
+    public static int DEFAULT_INDEX = 0;
     private static Logger logger = LoggerFactory.getLogger(DBMap.class.getName());
     protected IDB databaseSet;
     protected Map<T, U> map;

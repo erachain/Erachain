@@ -8,8 +8,8 @@ import org.erachain.core.transaction.IssueTemplateRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
-import org.erachain.gui.library.My_Add_Image_Panel;
+import org.erachain.gui.library.IssueConfirmDialog;
+import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssueTemplateDetailsFrame;
@@ -40,8 +40,8 @@ public class IssueTemplatePanel extends JPanel {
     private javax.swing.JTextField jTextField_Title;
     private GridBagConstraints gridBagConstraints_1;
     private GridBagConstraints gridBagConstraints_2;
-    private My_Add_Image_Panel add_Image_Panel;
-    private My_Add_Image_Panel add_Logo_Icon_Panel;
+    private AddImageLabel add_Image_Panel;
+    private AddImageLabel add_Logo_Icon_Panel;
     private JLabel lblNewLabel;
     private GridBagConstraints gridBagConstraints_3;
     private GridBagConstraints gridBagConstraints_4;
@@ -102,8 +102,8 @@ public class IssueTemplatePanel extends JPanel {
 
         }
 
-        byte[] icon = add_Logo_Icon_Panel.imgButes;
-        byte[] image = add_Image_Panel.imgButes;
+        byte[] icon = add_Logo_Icon_Panel.getImgBytes();
+        byte[] image = add_Image_Panel.getImgBytes();
 
         // CREATE PLATE
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
@@ -127,7 +127,7 @@ public class IssueTemplatePanel extends JPanel {
         // int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text,
         // Lang.getInstance().translate("Issue Asset"), JOptionPane.YES_NO_OPTION);
 
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,  issueTemplate,
+        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true,  issueTemplate,
                 text,
                 (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation transaction issue template"));
@@ -227,7 +227,7 @@ public class IssueTemplatePanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
         gridBagConstraints.insets = new Insets(0, 15, 5, 5);
         add(jLabel_Account_Creator, gridBagConstraints);
-        add_Image_Panel = new My_Add_Image_Panel(
+        add_Image_Panel = new AddImageLabel(
                 Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
 
         gridBagConstraints_3 = new java.awt.GridBagConstraints();
@@ -267,7 +267,7 @@ public class IssueTemplatePanel extends JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new Insets(0, 0, 5, 15);
         add(jTextField_Title, gridBagConstraints);
-        add_Logo_Icon_Panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add Logo"), 50, 50);
+        add_Logo_Icon_Panel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), 50, 50);
 
         GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
         gbc_lblNewLabel.insets = new Insets(0, 0, 5, 0);

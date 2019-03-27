@@ -11,7 +11,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.R_Send;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.items.assets.AssetsComboBoxModel;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.Send_TableModel;
@@ -709,7 +709,7 @@ public class Send_Panel extends JPanel {
 
 
         String Status_text = "";
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
+        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
 
