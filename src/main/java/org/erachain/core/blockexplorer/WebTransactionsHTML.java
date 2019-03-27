@@ -630,7 +630,7 @@ public class WebTransactionsHTML {
 
 
 
-    public String get_Vouches(Fun.Tuple2<Integer, PersonCls> creatorPersonItem,
+    public String getVouchesNew(Fun.Tuple2<Integer, PersonCls> creatorPersonItem,
                               Transaction transaction, JSONObject langObj) {
 
         String personSign;
@@ -654,26 +654,27 @@ public class WebTransactionsHTML {
         String out;
 
         if (vouchesItem.b.size() == 1) {
-            out = "<b><center>" + Lang.getInstance().translateFromLangObj("Signatories", langObj) + "</center></b> "
-                    + "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + "1:<br>" + personSign;
+            out = "<b><center>" + Lang.getInstance().translateFromLangObj("Signatures of the parties", langObj) + "</center></b> "
+                    + "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " 1:<br>" + personSign;
 
             Transaction signTransaction = map.get(vouchesItem.b.get(0));
-            out += "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + "2:<br>"
+            out += "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " 2:<br>"
                     + htmlSignifier(signTransaction, langObj);
 
         } else {
             out = "<b><center>" + Lang.getInstance().translateFromLangObj("Signatories", langObj) + "</center></b> "
-                    + "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + "1:<br>" + personSign;
+                    + "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " 1:<br>" + personSign;
+
+            int count = 1;
+            for (Long txKey: vouchesItem.b) {
+
+                Transaction signTransaction = map.get(txKey);
+                out += "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " " + ++count
+                        +":<br>" + htmlSignifier(signTransaction, langObj);
+
+            }
         }
 
-        int count = 1;
-        for (Long txKey: vouchesItem.b) {
-
-            Transaction signTransaction = map.get(txKey);
-            out += "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + ++count
-                    +":<br>" + htmlSignifier(signTransaction, langObj);
-
-        }
         out += "</table>";
 
         return out;

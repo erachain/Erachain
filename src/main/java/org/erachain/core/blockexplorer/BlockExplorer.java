@@ -2444,7 +2444,7 @@ public class BlockExplorer {
 
         output.put("date", df.format(new Date(trans.getTimestamp())).toString());
 
-        output.put("vouches_table", WebTransactionsHTML.getInstance().get_Vouches(personItem, trans, langObj));
+        output.put("vouches_table", WebTransactionsHTML.getInstance().getVouchesNew(personItem, trans, langObj));
 
 
         return output;
