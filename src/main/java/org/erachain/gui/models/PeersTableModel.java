@@ -199,16 +199,16 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
 
         } else if (message.getType() == ObserverMessage.UPDATE_PEER_TYPE) {
             Peer peer1 = (Peer) message.getValue();
+
             int n = 0;
             for (Peer peer2 : this.list) {
                 if (Arrays.equals(peer1.getAddress().getAddress(), peer2.getAddress().getAddress())) {
-                    /// this.peersStatus.set(n, true);
+                    setView(view);
+                    this.fireTableRowsUpdated(n, n);
                     break;
                 }
                 n++;
             }
-            setView(view);
-            this.fireTableRowsUpdated(n, n);
 
         } else if (message.getType() == ObserverMessage.ADD_PEER_TYPE) {
             setView(view);

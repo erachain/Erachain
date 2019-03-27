@@ -98,7 +98,7 @@ function statement(data){
 	//output += lastBlock(data.lastBlock);
 
 	output += '<table><tr><td>';
-	output +='<div style="word-wrap: break-word;  width: 800px;">';
+	output +='<div style="word-wrap: break-word;  width: 1000px;">';
 	output +=  data.Label_type +':<b>' + data.type + '</b>';
 	output +=' &nbsp&nbsp'+data.Label_block + ': <a href=?block='+ data.block + get_lang()+'><b>' + data.block +'</b></a>';
 	output +=' &nbsp&nbsp'+data.Label_seqNo+': <a href=?tx='+data.block+'-'+data.seqNo+get_lang()+'><b>'+data.block+'-'+data.seqNo+'</b></a>';
@@ -113,7 +113,7 @@ function statement(data){
 	if(data.hasOwnProperty('statement')){
     	output +='<hr>' + data.statement;
     } else if(data.hasOwnProperty('title')){
-        output +='<br><b>' + data.Label_title + '</b>:' + data.title;
+        output +='<br><b>' + data.Label_title + '</b>:' + data.title + "<hr>";
     }
 
 
@@ -136,10 +136,16 @@ function statement(data){
 
 	output +='</div>';
 
-	output +='<div>';
-    output += '<hr><label>' + data.Label_pubKey + '</label>&nbsp;&nbsp;'  + data.pubKey ;
-    output += '<br><label>' + data.Label_signature + '</label>&nbsp;&nbsp;'  + data.sign ;
-    output +='</div>';
+    // нужно вместо готового HTML в подписантах передавать данные сюда и тут рисовать
+	//output +='<hr><div>';
+    //if (data.creator_key !="") {
+    //    output += '<br><a href=?person='+ data.creator_key + get_lang()+'><b>' + data.creator_name +'</b></a> (';
+    //}
+
+    //output += '<label>' + data.Label_pubKey + ':</label>&nbsp;&nbsp;'  + data.pubKey + ')' ;
+    //output += '<br><label>' + data.Label_signature + ':</label>&nbsp;&nbsp;';
+    //output += '<a href=?tx='+ data.sign + get_lang()+'>' + data.sign +'</a>';
+    //output +='</div>';
 
     // vouches
 	if(data.hasOwnProperty('vouches_table')){

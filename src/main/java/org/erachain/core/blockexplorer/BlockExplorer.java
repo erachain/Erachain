@@ -2433,53 +2433,18 @@ public class BlockExplorer {
 
         output.put("creator", trans.getCreator().getPersonAsString());
 
-        if (trans.getCreator().getPerson() != null) {
-            output.put("creator_key", trans.getCreator().getPerson().b.getKey());
-            output.put("creator_name", trans.getCreator().getPerson().b.getName());
+        Tuple2<Integer, PersonCls> personItem = trans.getCreator().getPerson();
+        if (personItem != null) {
+            output.put("creator_key", personItem.b.getKey());
+            output.put("creator_name", personItem.b.getName());
         } else {
             output.put("creator_key", "");
             output.put("creator_name", "");
         }
 
-        // output.put("name", person.getName());
         output.put("date", df.format(new Date(trans.getTimestamp())).toString());
-        // output.put("description", person.getDescription());
 
-        // vouchers
-        /* output.put("Label_vouchs", Lang.getInstance().translateFromLangObj("Certified", langObj));
-        output.put("Label_accounts_table_adress", Lang.getInstance().translateFromLangObj("Address", langObj));
-        output.put("Label_accounts_table_data", Lang.getInstance().translateFromLangObj("Date", langObj));
-        output.put("Label_accounts_table_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-
-       Map vouchesJSON = new LinkedHashMap();
-
-        WebStatementsVouchTableModel table_sing_model = null;//new WebStatementsVouchTableModel(trans);
-        if (table_sing_model== null) return output;
-        int rowCount = table_sing_model.getRowCount();
-
-        if (rowCount > 0) {
-            for (int i = 0; i < rowCount; i++) {
-
-                Transaction vouch_Tr = (Transaction) table_sing_model.getValueAt(i, 3);
-                Map vouchJSON = new LinkedHashMap();
-                vouchJSON.put("date", vouch_Tr.viewTimestamp());
-                vouchJSON.put("block", "" + vouch_Tr.getBlockHeight());
-                vouchJSON.put("seqNo", "" + vouch_Tr.getSeqNo());
-                vouchJSON.put("creator", vouch_Tr.getCreator().getAddress());
-
-                Tuple2<Integer, PersonCls> personInfo = vouch_Tr.getCreator().getPerson();
-                if (personInfo != null) {
-                    PersonCls person = personInfo.b;
-                    vouchJSON.put("creator_name", person.getName());
-                    vouchJSON.put("creator_key", "" + person.getKey());
-                }
-
-                vouchesJSON.put(i, vouchJSON);
-            }
-        }
-        output.put("vouches", vouchesJSON);
-        */
-        output.put("vouches_table", WebTransactionsHTML.getInstance().get_Vouches(trans, langObj));
+        output.put("vouches_table", WebTransactionsHTML.getInstance().get_Vouches(personItem, trans, langObj));
 
 
         return output;
