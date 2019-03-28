@@ -12,7 +12,7 @@ import org.erachain.gui.PasswordPane;
 import org.erachain.gui.Split_Panel;
 import org.erachain.gui.items.mails.Mail_Send_Dialog;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.My_JFileChooser;
+import org.erachain.gui.library.fileChooser;
 import org.erachain.gui.models.WalletItemImprintsTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -51,7 +51,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
      */
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = LoggerFactory.getLogger(Accounts_Name_Search_SplitPanel.class.getName());
-    protected My_JFileChooser chooser;
+    protected fileChooser chooser;
     protected int row;
     private AccountsNameTableModel tableModelImprints;
     private JButton button3_ToolBar_LeftPanel;
@@ -295,7 +295,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                chooser = new My_JFileChooser();
+                chooser = new fileChooser();
 
                 chooser.setDialogTitle(Lang.getInstance().translate("Save File"));
                 // chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -374,7 +374,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
 
-                chooser = new My_JFileChooser();
+                chooser = new fileChooser();
 
                 chooser.setDialogTitle(Lang.getInstance().translate("Open File"));
                 // chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

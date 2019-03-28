@@ -14,7 +14,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.statuses.ComboBoxModelItemsStatuses;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.records.Record_Info;
@@ -260,7 +260,7 @@ public class PersonSetStatusDialog extends JDialog {
         );
 
         String Status_text = "";
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
+        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
 
         SetStatusToItemDetailsFrame ww = new SetStatusToItemDetailsFrame((R_SetStatusToItem) transaction);

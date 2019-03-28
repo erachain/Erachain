@@ -423,7 +423,7 @@ public class library {
      */
     public static void saveJSONStringToEraFile(Container parent, String JSONString){
         // String raw = Base58.encode(transaction.toBytes(false, null));
-        My_JFileChooser chooser = new My_JFileChooser();
+        fileChooser chooser = new fileChooser();
         chooser.setDialogTitle(Lang.getInstance().translate("Save File"));
         // chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);

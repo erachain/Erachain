@@ -1,37 +1,17 @@
 package org.erachain.gui.library;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.Format;
-import java.text.NumberFormat;
 
-import javax.swing.JFormattedTextField;
 import javax.swing.JTextField;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
-import javax.swing.text.NavigationFilter.FilterBypass;
 
-public class M_DecimalFormatedTextField extends JTextField {
+public class MDecimalFormatedTextField extends JTextField {
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
-    private M_DecimalFormatedTextField th;
+    private MDecimalFormatedTextField th;
     private int scale = 8;
     protected int curr_Dot;
     //  maskType =0 - float (1.02)
@@ -41,7 +21,7 @@ public class M_DecimalFormatedTextField extends JTextField {
     public int maskInteger = 1;
     public int maskFloat = 0;
     public int maskLong = 2;
-    public M_DecimalFormatedTextField() {
+    public MDecimalFormatedTextField() {
         super();
         th = this;
         this.addKeyListener(new KeyAdapter() {
