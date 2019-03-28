@@ -816,12 +816,12 @@ public class IssuePersonPanel extends JPanel {
         txtBirthLatitude.add(popup);
         txtBirthLatitude.setComponentPopupMenu(popup);
 
-        JMenuItem jMenuItemCopy = new JMenuItem("Copy", KeyEvent.VK_C);
+        JMenuItem jMenuItemCopy = new JMenuItem(Lang.getInstance().translate("Копировать"), KeyEvent.VK_C);
         jMenuItemCopy.setMnemonic(KeyEvent.VK_C);
         jMenuItemCopy.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_C, ActionEvent.CTRL_MASK));
 
-        JMenuItem jMenuItemPaste = new JMenuItem("Paste", KeyEvent.VK_P);
+        JMenuItem jMenuItemPaste = new JMenuItem(Lang.getInstance().translate("Вставить"), KeyEvent.VK_P);
         jMenuItemPaste.setMnemonic(KeyEvent.VK_P);
         jMenuItemPaste.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_P, ActionEvent.CTRL_MASK));
