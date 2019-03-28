@@ -176,6 +176,16 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
         return transactions;
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Iterator<Tuple2<String, String>> getAddressIterator(Account account) {
+
+        Set<Tuple2<String, String>> accountKeys = ((BTreeMap) this.map).subMap(
+                Fun.t2(account.getAddress(), null),
+                Fun.t2(account.getAddress(), Fun.HI())).keySet();
+
+        return accountKeys.iterator();
+    }
+
     public List<Pair<Account, Transaction>> get(List<Account> accounts, int limit) {
         List<Pair<Account, Transaction>> transactions = new ArrayList<Pair<Account, Transaction>>();
 

@@ -30,16 +30,16 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
         // оно еще ен готово так как таблица вторая не присвоена - ниже привяжемся к наблюдениям
         this.map = map;
         this.favoriteMap = favoriteMap;
-        this.COLUMN_FAVORITE = favorite;
+        COLUMN_FAVORITE = favorite;
 
-        this.RESET_EVENT = resetObserver;
-        this.ADD_EVENT = addObserver;
-        this.DELETE_EVENT = deleteObserver;
-        this.LIST_EVENT = listObserver;
+        RESET_EVENT = resetObserver;
+        ADD_EVENT = addObserver;
+        DELETE_EVENT = deleteObserver;
+        LIST_EVENT = listObserver;
 
         // теперь нужно опять послать событие чтобы загрузить
         getInterval();
-        this.fireTableDataChanged();
+        fireTableDataChanged();
         needUpdate = false;
 
         // переиницализация после установуи таблиц
@@ -55,7 +55,7 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
         int type = message.getType();
         if (type == LIST_EVENT) {
             getInterval();
-            this.fireTableDataChanged();
+            fireTableDataChanged();
             needUpdate = false;
 
         } else if (type == ADD_EVENT) {
@@ -68,7 +68,7 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
 
         } else if (type == RESET_EVENT) {
             getInterval();
-            this.fireTableDataChanged();
+            fireTableDataChanged();
             needUpdate = false;
         }
     }
@@ -99,15 +99,15 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
 
     @Override
     public void getIntervalThis(long startBack, long endBack) {
-        this.listSorted = new SortableList<Long, ItemCls>((ItemMap)map, favoriteMap.getFromToKeys(0, 999999999));
-        this.listSorted.sort();
+        listSorted = new SortableList<Long, ItemCls>(map, favoriteMap.getFromToKeys(0, 999999999));
+        listSorted.sort();
 
-        this.list = new ArrayList<ItemCls>();
+        list = new ArrayList<>();
         for (Pair<Long, ItemCls> key: listSorted) {
-            if (key.getB() == null)
+            if (key.getB() == null) {
                 continue;
-
-            this.list.add((ItemCls)map.get(key.getA()));
+            }
+            list.add((ItemCls)map.get(key.getA()));
         }
 
     }

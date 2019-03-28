@@ -3142,21 +3142,32 @@
             output += '<td align="right">' + data.Label_total_transactions + ': ' + data.totaltransactions + "</table>";
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  ' +
                 'class="table table-striped" style="border: 1px solid #ddd;">';
-            output += '<tr><td><b>' + data.Label_Height + ' <td><b>' + data.Label_Time
-                + '<td><b>' + data.Label_Generator + '<td><b>' + data.Label_TXs + '<td><b>'
-                + data.Label_Fee + '<td><b>' + data.Label_Target + '<td><b>' + data.Label_Gen_balance + '<td><b>WV dtWV';
+            output += '<tr>' +
+                '<td><b>' + data.Label_Height +
+                '<td><b>' + data.Label_Target +
+                '<td><b>' + data.Label_Time +
+                '<td><b>' + data.Label_Generator +
+                '<td><b>' + data.Label_Gen_balance +
+                '<td><b>' + data.Label_Delta_Height +
+                '<td><b>' + data.Label_WV +
+                '<td><b>' + data.Label_dtWV +
+                '<td><b>' + data.Label_TXs +
+                '<td><b>' + data.Label_Fee;
 
             //Отображение таблицы элементов блоков
             var length = Object.keys(data.Blocks).length;
             for (var key = length - 1; key >= 0; key--) {
-                output += '<tr>';
-                output += '<td><a href=?block=' + data.Blocks[key].height + get_lang() + '>' + data.Blocks[key].height + '</a><td>'
-                    + data.Blocks[key].dateTime + '<td>' + '<a href=?addr=' + data.Blocks[key].generator
-                    + get_lang() + '>' + data.Blocks[key].generator;
-                output += '<td>' + data.Blocks[key].transactionsCount + '<td>' +
-                    addCommas(data.Blocks[key].totalFee) + '<td>' + addCommas(data.Blocks[key].target);
-                output += '<td>' + addCommas(data.Blocks[key].generatingBalance)
-                    + '<td>' + addCommas(data.Blocks[key].winValue) + ' ' + addCommas(data.Blocks[key].winValueTargetted);
+                output += '<tr>' +
+                    '<td><a href=?block=' + data.Blocks[key].height + get_lang() + '>' + data.Blocks[key].height + '</a>' +
+                    '<td>' + addCommas(data.Blocks[key].target) +
+                    '<td>' + data.Blocks[key].dateTime +
+                    '<td>' + '<a href=?addr=' + data.Blocks[key].generator + get_lang() + '>' + data.Blocks[key].generator +
+                    '<td>' + addCommas(data.Blocks[key].generatingBalance) +
+                    '<td>' + data.Blocks[key].deltaHeight +
+                    '<td>' + addCommas(data.Blocks[key].winValue) +
+                    '<td>' + addCommas(data.Blocks[key].winValueTargeted)+ '%'+
+                    '<td>' + data.Blocks[key].transactionsCount +
+                    '<td>' + addCommas(data.Blocks[key].totalFee);
             }
 
             //Отображение ссылки предыдущая
@@ -3246,7 +3257,7 @@
             output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 ' +
                 'class="table table-striped" style="border: 1px solid #ddd;"><tr>';
             output += '<td><b>' + data.label_table_key + ': <b>' + data.label_table_asset_name +
-                '<td><b>'+data.label_operations+'<td><b>' + data.label_table_asset_creator;
+                '<td><b>' + data.label_operations + '<td><b>' + data.label_table_asset_creator;
             output += '<td><b>' + data.label_table_asset_movable + '<td><b>' +
                 data.label_table_asset_amount + '<td><b>' + data.label_table_asset_divisible;
 
@@ -3255,7 +3266,7 @@
             for (var i = length - 1; i >= 0; i--) {
                 output += '<tr>';
                 output += '<td> <a href=?asset=' + encodeURIComponent(data.Assets[i].key) + get_lang() + '>';
-                output += '<b>' + data.Assets[i].key+ '</b>: ' + htmlFilter(data.Assets[i].name);
+                output += '<b>' + data.Assets[i].key + '</b>: ' + htmlFilter(data.Assets[i].name);
                 if (data.Assets[i].icon.length > 0)
                     output += '<img src="data:image/gif;base64,' + data.Assets[i].icon + '" width="100" /> <br>';
                 output += '</a>';

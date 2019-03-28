@@ -5,11 +5,9 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
-import org.erachain.network.Peer;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -34,26 +32,27 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<Transaction
 
     public SearchTransactionsTableModel() {
         super(new String[]{"Timestamp", "Block", "Seq_no", "Type", "Amount", AssetCls.FEE_NAME}, false);
-        LOGGER = LoggerFactory.getLogger(SearchTransactionsTableModel.class.getName());
+        logger = LoggerFactory.getLogger(SearchTransactionsTableModel.class.getName());
     }
 
     public void setBlockNumber(String string) {
 
+        list = new ArrayList<>();
+
         try {
             block_No = Integer.parseInt(string);
         } catch (NumberFormatException e) {
-            list = new ArrayList<>();
             Transaction transaction = DCSet.getInstance().getTransactionFinalMap().getRecord(string);
             if (transaction != null) {
                 transaction.setDC(DCSet.getInstance());
                 list.add(transaction);
             }
-            needUpdate = true;
+            this.fireTableDataChanged();
             return;
         }
 
         list = (List<Transaction>) DCSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(block_No);
-        needUpdate = true;
+        this.fireTableDataChanged();
 
     }
 
@@ -68,9 +67,8 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<Transaction
             list = new ArrayList();
             list.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress()));//.findTransactions(address, sender=address, recipient=address, minHeight=0, maxHeight=0, type=0, service=0, desc=false, offset=0, limit=0);//.getTransactionsByBlock(block_No);
 
-            needUpdate = true;
-
         }
+        this.fireTableDataChanged();
 
     }
 
@@ -121,7 +119,7 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<Transaction
             return null;
 
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }

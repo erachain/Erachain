@@ -1,11 +1,9 @@
 package org.erachain.gui.items.other;
 
 import org.erachain.database.wallet.BlocksHeadMap;
-import org.erachain.gui.CoreRowSorter;
 import org.erachain.gui.Split_Panel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.WalletBlocksTableModel;
-import org.erachain.gui.models.WalletTransactionsTableModel;
 import org.erachain.lang.Lang;
 
 import java.util.Map;
@@ -44,7 +42,7 @@ public class Generated_Blocks_Panel extends Split_Panel {
         indexes.put(WalletBlocksTableModel.COLUMN_HEIGHT, BlocksHeadMap.TIMESTAMP_INDEX);
         indexes.put(WalletBlocksTableModel.COLUMN_TIMESTAMP, BlocksHeadMap.TIMESTAMP_INDEX);
         indexes.put(WalletBlocksTableModel.COLUMN_GENERATOR, BlocksHeadMap.GENERATOR_INDEX);
-        indexes.put(WalletBlocksTableModel.COLUMN_BASETARGET, BlocksHeadMap.BALANCE_INDEX);
+        indexes.put(WalletBlocksTableModel.COLUMN_GB, BlocksHeadMap.BALANCE_INDEX);
         indexes.put(WalletBlocksTableModel.COLUMN_TRANSACTIONS, BlocksHeadMap.TRANSACTIONS_INDEX);
         indexes.put(WalletBlocksTableModel.COLUMN_FEE, BlocksHeadMap.FEE_INDEX);
         //sorter = new CoreRowSorter(blocksModel, indexes);

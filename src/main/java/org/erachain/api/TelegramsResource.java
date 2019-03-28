@@ -743,7 +743,7 @@ public class TelegramsResource {
                         return;
 
                 } catch (Exception e10) {
-                    // not see in Thread - LOGGER.error(e10.getMessage(), e10);
+                    // not see in Thread - logger.error(e10.getMessage(), e10);
                 }
 
             } while (true);

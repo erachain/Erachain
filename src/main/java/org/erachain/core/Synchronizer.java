@@ -142,7 +142,7 @@ public class Synchronizer {
                 throw new Exception(mess);
 
             }
-            // LOGGER.debug("*** core.Synchronizer.checkNewBlocks - try orphan:
+            // logger.debug("*** core.Synchronizer.checkNewBlocks - try orphan:
             // " + lastBlock.getHeight(fork));
             if (cnt.isOnStopping())
                 throw new Exception("on stopping");
@@ -398,7 +398,7 @@ public class Synchronizer {
             throw new Exception("on stopping");
 
         /*
-         * LOGGER.error("Synchronizing from peer: " + peer.toString() + ":" +
+         * logger.error("Synchronizing from peer: " + peer.toString() + ":" +
          * peer);
          */
 
@@ -468,7 +468,7 @@ public class Synchronizer {
                 }
 
                 ///blockFromPeer.setCalcGeneratingBalance(dcSet); // NEED SET it
-                ///LOGGER.debug("BLOCK Calc Generating Balance");
+                ///logger.debug("BLOCK Calc Generating Balance");
 
                 if (cnt.isOnStopping()) {
                     // STOP BLOCKBUFFER
@@ -593,7 +593,7 @@ public class Synchronizer {
     private List<byte[]> getBlockSignatures(byte[] header, Peer peer) throws Exception {
 
         /*
-         * LOGGER.
+         * logger.
          * error("core.Synchronizer.getBlockSignatures(byte[], Peer) for: " +
          * Base58.encode(header));
          */
@@ -776,7 +776,7 @@ public class Synchronizer {
 
             blocks.add(block);
             bytesGet += 1500 + block.getDataLength(false);
-            ///LOGGER.debug("block added with RECS:" + block.getTransactionCount() + " bytesGet kb: " + bytesGet / 1000);
+            ///logger.debug("block added with RECS:" + block.getTransactionCount() + " bytesGet kb: " + bytesGet / 1000);
             if (bytesGet > BYTES_MAX_GET) {
                 break;
             }

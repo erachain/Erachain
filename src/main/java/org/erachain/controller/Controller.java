@@ -1127,7 +1127,7 @@ public class Controller extends Observable {
 
     public boolean broadcastUnconfirmedToPeer(Peer peer) {
 
-        // LOGGER.info(peer + " sended UNCONFIRMED ++++ START ");
+        // logger.info(peer + " sended UNCONFIRMED ++++ START ");
 
         byte[] peerByte = peer.getAddress().getAddress();
 
@@ -1157,7 +1157,7 @@ public class Controller extends Observable {
             if (transaction == null)
                 continue;
 
-            // LOGGER.error(" time " + transaction.viewTimestamp());
+            // logger.error(" time " + transaction.viewTimestamp());
 
             if (counter > BlockChain.ON_CONNECT_SEND_UNCONFIRMED_UNTIL
                     // дело в том что при коннекте новому узлу надо все же
@@ -1224,7 +1224,7 @@ public class Controller extends Observable {
 
         }
 
-        // LOGGER.info(peer + " sended UNCONFIRMED counter: " +
+        // logger.info(peer + " sended UNCONFIRMED counter: " +
         // counter);
 
         //NOTIFY OBSERVERS
@@ -1425,16 +1425,16 @@ public class Controller extends Observable {
                         : this.dcSet.getBlockSignsMap().get(headers.get(0))));
 
                 /*
-                 * LOGGER.error(message.getId() +
+                 * logger.error(message.getId() +
                  * " controller.Controller.onMessage(Message).GET_SIGNATURES_TYPE ->"
                  * + Base58.encode(getHeadersMessage.getParent()));
                  *
                  * if (!headers.isEmpty()) {
-                 * LOGGER.error("this.blockChain.getSignatures.get(0) -> " +
-                 * Base58.encode( headers.get(0) )); LOGGER.
+                 * logger.error("this.blockChain.getSignatures.get(0) -> " +
+                 * Base58.encode( headers.get(0) )); logger.
                  * error("this.blockChain.getSignatures.get(headers.size()-1) -> "
                  * + Base58.encode( headers.get(headers.size()-1) )); } else
-                 * { LOGGER.
+                 * { logger.
                  * error("controller.Controller.onMessage(Message).GET_SIGNATURES_TYPE -> NOT FOUND!"
                  * ); }
                  */
@@ -1519,7 +1519,7 @@ public class Controller extends Observable {
 
     public void broadcastHWeightFull() {
 
-        // LOGGER.info("broadcast winBlock " + newBlock.toString(this.dcSet));
+        // logger.info("broadcast winBlock " + newBlock.toString(this.dcSet));
 
         // CREATE MESSAGE
         // GET HEIGHT
@@ -1618,7 +1618,7 @@ public class Controller extends Observable {
          * //this.blockChain.getHWeight(dcSet, false);
          * dcSet.getBlockSignsMap().setFullWeight(maxPeerWeight); this.status =
          * STATUS_OK; return true; } } }
-         * //LOGGER.info("Controller.isUpToDate getMaxPeerHWeight:" +
+         * //logger.info("Controller.isUpToDate getMaxPeerHWeight:" +
          * maxPeerWeight + "<=" + chainWeight);
          *
          * boolean result = maxPeerWeight <= chainWeight; if (result) {
@@ -2433,7 +2433,7 @@ public class Controller extends Observable {
 
         LOGGER.info("+++ flushNewBlockGenerated OK");
 
-        /// LOGGER.info("and broadcast it");
+        /// logger.info("and broadcast it");
 
         // broadcast my HW
         broadcastHWeightFull();

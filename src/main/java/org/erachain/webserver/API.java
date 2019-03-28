@@ -732,7 +732,7 @@ public class API {
             }
 
         } catch (Exception e) {
-            //LOGGER.error(e.getMessage());
+            //logger.error(e.getMessage());
             out.put("error", APIUtils.errorMess(-1, e.toString() + " on step: " + step));
             return out;
         }
@@ -747,7 +747,7 @@ public class API {
         try {
             transactionBytes = Base58.decode(rawDataBase58);
         } catch (Exception e) {
-            //LOGGER.error(e.getMessage());
+            //logger.error(e.getMessage());
             out.put("error", APIUtils.errorMess(-1, e.toString() + " INVALID_RAW_DATA"));
             return out;
         }

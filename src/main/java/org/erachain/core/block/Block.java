@@ -1261,7 +1261,7 @@ public class Block {
         // TODO - show it to USER
         long blockTime = this.getTimestamp();
         long thisTimestamp = NTP.getTime();
-        //LOGGER.debug("*** Block[" + height + "] " + new Timestamp(myTime));
+        //logger.debug("*** Block[" + height + "] " + new Timestamp(myTime));
 
         if (blockTime + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > thisTimestamp) {
             LOGGER.debug("*** Block[" + this.heightBlock + ":" + Base58.encode(this.signature).substring(0, 10) + "].timestamp invalid >NTP.getTime(): "
@@ -1288,7 +1288,7 @@ public class Block {
 				//cnt.getBlockChain().getLastBlocksForTarget(dcSet)
 				previousForgingHeight
 				) > 0) {
-			LOGGER.debug("*** Block[" + height + "] REPEATED WIN invalid");
+			logger.debug("*** Block[" + height + "] REPEATED WIN invalid");
 			return false;
 		}
 		 */
@@ -1499,10 +1499,10 @@ public class Block {
                 if (andProcess) {
 
                     //SET PARENT
-                    ///LOGGER.debug("[" + seq + "] try refsMap.set" );
+                    ///logger.debug("[" + seq + "] try refsMap.set" );
                     if (isPrimarySet) {
                         //REMOVE FROM UNCONFIRMED DATABASE
-                        ///LOGGER.debug("[" + seq + "] try unconfirmedMap delete" );
+                        ///logger.debug("[" + seq + "] try unconfirmedMap delete" );
                         processTimingLocal = System.nanoTime();
                         unconfirmedMap.delete(transactionSignature);
                         processTimingLocalDiff = System.nanoTime() - processTimingLocal;
@@ -1518,7 +1518,7 @@ public class Block {
                         ;
                     } else {
 
-                        ///LOGGER.debug("[" + seq + "] try finalMap.set" );
+                        ///logger.debug("[" + seq + "] try finalMap.set" );
                         processTimingLocal = System.nanoTime();
                         Long key = Transaction.makeDBRef(this.heightBlock, seq);
                         finalMap.set(key, transaction);
@@ -1684,7 +1684,7 @@ public class Block {
                     new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true);
         }
 
-        //LOGGER.debug("<<< core.block.Block.orphan(DLSet) #3");
+        //logger.debug("<<< core.block.Block.orphan(DLSet) #3");
 
     }
 
@@ -1779,7 +1779,7 @@ public class Block {
 		/*
 		if (!dcSet.isFork()) {
 			int lastHeight = dcSet.getBlocksHeadMap().getLastBlock().getHeight(dcSet);
-			LOGGER.error("*** core.block.Block.process(DLSet)[" + (this.getParentHeight(dcSet) + 1)
+			logger.error("*** core.block.Block.process(DLSet)[" + (this.getParentHeight(dcSet) + 1)
 					+ "] SET new last Height: " + lastHeight
 					+ " getHeightMap().getHeight: " + this.height_process);
 		}
@@ -1877,7 +1877,7 @@ public class Block {
                 if (cnt.isOnStopping())
                     throw new Exception("on stoping");
 
-                //LOGGER.debug("[" + seq + "] record is process" );
+                //logger.debug("[" + seq + "] record is process" );
 
                 // NEED set DC for WIPED too
                 transaction.setDC(dcSet, Transaction.FOR_NETWORK, this.heightBlock, ++seqNo);
@@ -1897,10 +1897,10 @@ public class Block {
                 transactionSignature = transaction.getSignature();
 
                 //SET PARENT
-                ///LOGGER.debug("[" + seq + "] try refsMap.set" );
+                ///logger.debug("[" + seq + "] try refsMap.set" );
 
                 //REMOVE FROM UNCONFIRMED DATABASE
-                ///LOGGER.debug("[" + seq + "] try unconfirmedMap delete" );
+                ///logger.debug("[" + seq + "] try unconfirmedMap delete" );
                 timerStart = System.currentTimeMillis();
                 unconfirmedMap.delete(transactionSignature);
                 timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
@@ -1915,11 +1915,11 @@ public class Block {
                     if (cnt.isOnStopping())
                         throw new Exception("on stoping");
 
-                    ///LOGGER.debug("[" + seq + "] try finalMap.set" );
+                    ///logger.debug("[" + seq + "] try finalMap.set" );
                     timerStart = System.currentTimeMillis();
                     finalMap.set(key, transaction);
                     timerFinalMap_set += System.currentTimeMillis() - timerStart;
-                    //LOGGER.debug("[" + seq + "] try transFinalMapSinds.set" );
+                    //logger.debug("[" + seq + "] try transFinalMapSinds.set" );
                     timerStart = System.currentTimeMillis();
                     transFinalMapSinds.set(transactionSignature, key);
                     List<byte[]> signatures = transaction.getSignatures();
@@ -1959,7 +1959,7 @@ public class Block {
         if (cnt.isOnStopping())
             throw new Exception("on stoping");
 
-        //LOGGER.debug("<<< core.block.Block.orphan(DLSet) #0");
+        //logger.debug("<<< core.block.Block.orphan(DLSet) #0");
         if (this.heightBlock == 1) {
             // GENESIS BLOCK cannot be orphanED
             return;
@@ -1980,10 +1980,10 @@ public class Block {
         this.forgingInfoUpdate = null;
 
         //ORPHAN TRANSACTIONS
-        //LOGGER.debug("<<< core.block.Block.orphan(DLSet) #2 ORPHAN TRANSACTIONS");
+        //logger.debug("<<< core.block.Block.orphan(DLSet) #2 ORPHAN TRANSACTIONS");
         this.orphanTransactions(dcSet, heightBlock);
 
-        //LOGGER.debug("<<< core.block.Block.orphan(DLSet) #2f FEE");
+        //logger.debug("<<< core.block.Block.orphan(DLSet) #2f FEE");
 
         //REMOVE FEE
         feeProcess(dcSet, true);
@@ -2010,7 +2010,7 @@ public class Block {
             //DELETE BLOCK FROM DB
         dcSet.getBlockMap().remove(this.signature, this.reference, this.creator);
 
-        //LOGGER.debug("<<< core.block.Block.orphan(DLSet) #4");
+        //logger.debug("<<< core.block.Block.orphan(DLSet) #4");
 
         long tickets = System.currentTimeMillis() - start;
         LOGGER.debug("[" + this.heightBlock + "] orphaning time: " + (System.currentTimeMillis() - start) * 0.001
@@ -2051,7 +2051,7 @@ public class Block {
                 throw new Exception("on stoping");
 
             Transaction transaction = transactions.get(i);
-            //LOGGER.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
+            //logger.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
 
             // (!) seqNo = i + 1
             transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, seqNo);

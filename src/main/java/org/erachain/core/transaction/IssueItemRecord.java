@@ -195,10 +195,10 @@ public abstract class IssueItemRecord extends Transaction {
         //UPDATE CREATOR
         super.orphan(block, asDeal);
 
-        //LOGGER.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 1");
+        //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 1");
         //DELETE FROM DATABASE
         long key = this.item.removeFromMap(this.dcSet, START_KEY);
-        //LOGGER.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 2");
+        //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 2");
     }
 
     @Override

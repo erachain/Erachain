@@ -110,7 +110,7 @@ public class TelegramsTableModel extends DefaultTableModel implements Observer {
 
         // } catch (Exception e) {
         // GUI ERROR
-        // LOGGER.error(e.getMessage(),e);
+        // logger.error(e.getMessage(),e);
         // return null;
         // }
 

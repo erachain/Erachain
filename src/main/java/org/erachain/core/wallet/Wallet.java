@@ -647,7 +647,7 @@ public class Wallet extends Observable implements Observer {
 
 						this.syncHeight = height;
 
-						//LOGGER.debug("try Commit");
+						//logger.debug("try Commit");
 						this.database.commit();
 
                         if (Controller.getInstance().isOnStopping())
@@ -1394,7 +1394,7 @@ public class Wallet extends Observable implements Observer {
         this.database.setLastBlockSignature(block.blockHead.reference); // .reference
 
         // long tickets = System.currentTimeMillis() - start;
-		// LOGGER.info("WALLET [" + block.getHeightByParent(DCSet.getInstance())
+		// logger.info("WALLET [" + block.getHeightByParent(DCSet.getInstance())
 		// + "] orphaning time: " + tickets*0.001
 		// + " TXs = " + block.getTransactionCount() + " millsec/record:"
 		// + tickets/(block.getTransactionCount()+1) );

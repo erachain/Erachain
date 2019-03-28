@@ -50,14 +50,14 @@ public class RaterWEX extends Rater {
             json = (JSONObject) JSONValue.parse(result);
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
-            ///LOGGER.error(e.getMessage());
+            ///logger.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
 
         if (json == null)
             return;
 
-        //LOGGER.info("WEX : " + result);
+        //logger.info("WEX : " + result);
 
         JSONObject pair;
         BigDecimal price;
