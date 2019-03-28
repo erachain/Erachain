@@ -64,7 +64,7 @@ public class My_Order_Pauments_SplitPanel extends Split_Panel {
             @Override
             public void ancestorRemoved(AncestorEvent arg0) {
                 // TODO Auto-generated method stub
-                payment_Orders_model.removeObservers();
+                payment_Orders_model.deleteObservers();
             }
 
 
@@ -128,7 +128,7 @@ public class My_Order_Pauments_SplitPanel extends Split_Panel {
     @Override
     public void onClose() {
         // delete observer left panel
-        payment_Orders_model.removeObservers();
+        payment_Orders_model.deleteObservers();
         // get component from right panel
         Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
         // if Person_Info 002 delay on close

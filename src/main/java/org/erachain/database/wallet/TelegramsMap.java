@@ -19,10 +19,8 @@ public class TelegramsMap extends DBMap<String, Transaction> {
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_TELEGRAM_TYPE);
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_TELEGRAM_TYPE);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_TELEGRAM_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_TELEGRAM_TYPE);
-            }
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_TELEGRAM_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_TELEGRAM_TYPE);
         }
     }
    

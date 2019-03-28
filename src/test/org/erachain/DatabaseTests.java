@@ -233,7 +233,7 @@ public class DatabaseTests {
         Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet));
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
-        //LOGGER.info(asset.toString() + " getQuantity " + asset.getQuantity());
+        //logger.info(asset.toString() + " getQuantity " + asset.getQuantity());
 
         long key = asset.getKey(dcSet);
 

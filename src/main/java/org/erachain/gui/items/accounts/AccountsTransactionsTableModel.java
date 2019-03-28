@@ -6,19 +6,21 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.transCalculated.Calculated;
+import org.erachain.core.transCalculated.CalculatedAmount;
 import org.erachain.core.transaction.GenesisTransferAssetTransaction;
+import org.erachain.core.transaction.R_Calculated;
 import org.erachain.core.transaction.R_Send;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -26,7 +28,7 @@ import java.util.*;
 ////////
 
 @SuppressWarnings("serial")
-public class Accounts_Transactions_TableModel extends AbstractTableModel implements Observer {
+public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TRANSACTION = 1;
     public static final int COLUMN_AMOUNT = 2;
@@ -34,8 +36,9 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
     public static final int COLUMN_TYPE = 4;
     public static final int COLUMN_SENDER = 5;
     public static final int COLUMN_RECIPIENT = 6;
-    public static final int COLUMN_MESSAGE = 7;
-    public static final int COLUMN_CONFIRM = 8;
+    public static final int COLUMN_TITLE = 7;
+    public static final int COLUMN_MESSAGE = 8;
+    public static final int COLUMN_CONFIRM = 9;
     public static final int COLUMN_ACTION_TYPE = 19;
 
  //   private List<Transaction> r_Trans;
@@ -58,14 +61,13 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 
     private HashSet actionTypes;
 
-    public Accounts_Transactions_TableModel() {
-        //sender = new Account("");
-        // trans_List = new ArrayList<Trans>();
+    public AccountsTransactionsTableModel() {
+        super(Controller.getInstance().wallet.database.getTransactionMap(),
+                new String[]{"Date", "RecNo", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "Type Asset"},
+                new Boolean[]{false, true, true, false, false}, false);
 
-       // r_Trans = new ArrayList<Transaction>();
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
-        // Controller.getInstance().addObserver(this);
+       addObservers();
+
     }
 
     public void repaint() {
@@ -76,8 +78,8 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
     public void set_Account(Account sender) {
 
         this.sender = sender;
-        if (sortableItems != null)
-            sortableItems.setFilter(this.sender.getAddress());
+        if (listSorted != null)
+            listSorted.setFilter(this.sender.getAddress());
 
     }
 
@@ -92,35 +94,10 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 
     }
 
-    // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
-    }
-
-    public Class<? extends Object> getColumnClass(int c) { // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
     public Transaction getItem(int row) {
         return ((Trans) this.trans_List[row]).transaction;
     }
 
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
-    }
 
     @Override
     public int getRowCount() {
@@ -130,47 +107,13 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
         return trans_List.length;
     }
 
-    @SuppressWarnings("null")
-    private BigDecimal get_summ() {
-        BigDecimal res = new BigDecimal("0");
-        for (int i = 0; i < trans_List.length; i++) {
-
-
-            res = res.add(((Trans) trans_List[i]).amount);
-        }
-        return res;
-
-    }
-
     @Override
     public Object getValueAt(int row, int column) {
-        // if(this.r_Trans == null || row > this.r_Trans.size() - 1 ||
-        // this.r_Trans.isEmpty() )
-        // {
-        // return null;
-        // }
-        // Transaction r_Tran = this.r_Trans.get(row);
-
 
         if (this.trans_List == null || this.trans_List.length == 0 || sender == null) {
             return null;
         }
-        // summa
-/*		if (row == this.trans_List.length){
-			
-			switch (column){
-			case COLUMN_TIMESTAMP:
-				return Lang.getInstance().translate("Total")+":";
-			case COLUMN_AMOUNT:
-				return get_summ();
-			
-			}
-			
-			
-			
-			return null;
-		}
-		*/
+
         // fill table
 
         Trans r_Tran = (Trans) trans_List[row];
@@ -205,10 +148,13 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
             case COLUMN_CONFIRM:
                 return r_Tran.transaction.isConfirmed(DCSet.getInstance());
 
+            case COLUMN_TITLE:
+                return r_Tran.title;
+
             case COLUMN_MESSAGE:
 
                 if (r_Tran.transaction.getType() != Transaction.SEND_ASSET_TRANSACTION)
-                    return Lang.getInstance().translate("Genesis Transaction");
+                    return "";
 
                 R_Send rs = ((R_Send) r_Tran.transaction);
                 if (rs == rs)
@@ -250,18 +196,6 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
                     return ("unknown password");
                 }
             case COLUMN_ACTION_TYPE:
-			
-			/*
-			if (r_Tran.transaction.getType() == Transaction.SEND_ASSET_TRANSACTION){
-				R_Send rs1 = ((R_Send) r_Tran.transaction);
-				return rs1.viewFullTypeName();
-				
-			}else{
-				GenesisTransferAssetTransaction rs2 = (GenesisTransferAssetTransaction)r_Tran.transaction;
-				
-				return rs2.viewFullTypeName();
-			}
-			*/
 
                 return r_Tran.transaction.viewFullTypeName();
 
@@ -270,65 +204,33 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        // try
-        // {
-        this.syncUpdate(o, arg);
-        // }
-        // catch(Exception e)
-        // {
-        // GUI ERROR
-        // }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
-        if (message.getType() == ObserverMessage.WALLET_STATUS) {
-            // int status = (int) message.getValue();
-
-            // if(status == Wallet.STATUS_LOCKED)
-            // {
-            // cryptoCloseAll();
-            //		get_R_Send();
-            // }
-        }
-
-        // if( message.getType() == ObserverMessage.NETWORK_STATUS ||
-        // (int)message.getValue() == Controller.STATUS_OK ) {
-        // this.fireTableDataChanged();
-        // }
-
         // CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.trans_List == null) {
-                
-                sortableItems = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
-                //sortableItems.registerObserver();
-                Controller.getInstance().wallet.database.getTransactionMap().addObserver(sortableItems);
-                sortableItems.sort(TransactionMap.ADDRESS_INDEX, true);
-                // this.r_Trans.sort(NameMap.NAME_INDEX);
+
                 get_R_Send();
                
             }
 
-            //	this.fireTableDataChanged();
-        }
+        } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
+            if (trans_Parse((Transaction) message.getValue())) {
+                needUpdate = true;
+            }
 
-        // CHECK IF LIST UPDATED
-        if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
-            //get_R_Send();
-            trans_Parse((Transaction) message.getValue());
+        } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
+            Object transaction = message.getValue();
+            if (transaction != null && trans_Hash_Map != null && trans_Hash_Map.remove((Transaction) transaction) != null) {
+                needUpdate = true;
+            }
 
-        }
-        // CHECK IF LIST UPDATED
-        if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-            //get_R_Send();
-            Object sss = message.getValue();
-            if (sss != null && trans_Hash_Map != null)
-                trans_Hash_Map.remove((Transaction) sss);
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
+
+            needUpdate = false;
+            this.fireTableDataChanged();
 
         }
 
@@ -341,16 +243,20 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 
     public void get_R_Send() {
 
-        if (this.sender == null || this.asset == null || sortableItems == null)
+        if (this.sender == null || this.asset == null)
             return;
+
+        Iterator<Tuple2<String, String>> keysIterator = ((TransactionMap) map).getAddressIterator(this.sender);
 
         trans_Hash_Map = new HashMap<String, Trans>();
         trans_List = null;
-        Iterator<Pair<Tuple2<String, String>, Transaction>> s_it = sortableItems.iterator();
-        while (s_it.hasNext()) {
-            Pair<Tuple2<String, String>, Transaction> tt = s_it.next();
-            Transaction ttt = tt.getB();
-            trans_Parse(ttt);
+        int counter = 0;
+        while (keysIterator.hasNext() && counter < 333) {
+            Tuple2<String, String> key = keysIterator.next();
+            Transaction transaction = (Transaction) map.get(key);
+            if (trans_Parse(transaction)) {
+                counter++;
+            }
         }
 
         trans_List = trans_Hash_Map.values().toArray();
@@ -358,85 +264,98 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
         this.fireTableDataChanged();
     }
 
-    private void trans_Parse(Transaction ttt) {
+    private boolean trans_Parse(Transaction transaction) {
 
 
         if (this.asset == null)
-            return;
+            return false;
 
-        if (ttt.getAbsKey() != this.asset.getKey()) return;
+        if (transaction.getAbsKey() != this.asset.getKey())
+            return false;
 
         Trans trr = new Trans();
-        if (ttt.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-            R_Send tttt = (R_Send) ttt;
-            trr.owner = tttt.getCreator();
-            trr.recipient = tttt.getRecipient();
-            trr.transaction = tttt;
-            trr.amount = tttt.getAmount();
+        if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+            R_Send r_send = (R_Send) transaction;
+            trr.owner = r_send.getCreator();
+            trr.recipient = r_send.getRecipient();
+            trr.transaction = r_send;
+            trr.amount = r_send.getAmount();
+            trr.title = r_send.getHead();
+
             //if send for *-1
             // view all types
             if (actionTypes == null || actionTypes.isEmpty()) {
 
-                if (tttt.getCreator().getAddress().equals(this.sender.getAddress()))
-                    trr.amount = tttt.getAmount().multiply(new BigDecimal("-1"));
+                if (r_send.getCreator().getAddress().equals(this.sender.getAddress()))
+                    trr.amount = r_send.getAmount().multiply(new BigDecimal("-1"));
 
 
-                trans_Hash_Map.put(ttt.viewSignature(), trr);
-                return;
-            }
+                trans_Hash_Map.put(transaction.viewSignature(), trr);
+            } else
             // view set types
-            if (actionTypes.contains(tttt.viewFullTypeName())) {
+            if (actionTypes.contains(r_send.viewFullTypeName())) {
 
-                if (tttt.getCreator().getAddress().equals(this.sender.getAddress()))
-                    trr.amount = tttt.getAmount().multiply(new BigDecimal("-1"));
+                if (r_send.getCreator().getAddress().equals(this.sender.getAddress()))
+                    trr.amount = r_send.getAmount().multiply(new BigDecimal("-1"));
 
 
-                trans_Hash_Map.put(ttt.viewSignature(), trr);
+                trans_Hash_Map.put(transaction.viewSignature(), trr);
             }
 
-
-        } else if (ttt.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
-            GenesisTransferAssetTransaction ttt1 = (GenesisTransferAssetTransaction) ttt;
-
-            // String a = ttt1.getCreator().getAddress();
+        } else if (transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
+            GenesisTransferAssetTransaction gen_send = (GenesisTransferAssetTransaction) transaction;
 
             String cr = "";
-            if (ttt1.getCreator() != null) cr = ttt1.getCreator().getAddress();
+            if (gen_send.getCreator() != null) cr = gen_send.getCreator().getAddress();
             // if is owner
             String own = "";
-            if (ttt1.getOwner() != null) own = ttt1.getOwner().getAddress();
+            if (gen_send.getOwner() != null) own = gen_send.getOwner().getAddress();
 
 
-            trr.transaction = ttt1;
-            trr.amount = ttt1.getAmount();
-            // if send
+            trr.transaction = gen_send;
+            trr.amount = gen_send.getAmount();
+            trr.title = "GENESIS";
 
-
-            if (!ttt1.getRecipient().getAddress().equals(this.sender.getAddress()))
-                trr.amount = ttt1.getAmount().multiply(new BigDecimal("-1"));
+            if (!gen_send.getRecipient().getAddress().equals(this.sender.getAddress()))
+                trr.amount = gen_send.getAmount().multiply(new BigDecimal("-1"));
             // if is creator
-            if (ttt1.getCreator() != null) trr.owner = ttt1.getCreator();
+            if (gen_send.getCreator() != null) trr.owner = gen_send.getCreator();
             // if is owner
-            if (ttt1.getOwner() != null) trr.owner = ttt1.getOwner();
-            trr.recipient = ttt1.getRecipient();
+            if (gen_send.getOwner() != null) trr.owner = gen_send.getOwner();
+            trr.recipient = gen_send.getRecipient();
+            trans_Hash_Map.put(transaction.viewSignature(), trr);
 
-            // view all types
-            if (actionTypes == null || actionTypes.isEmpty()) {
+        } else if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
+            R_Calculated calculated = (R_Calculated) transaction;
 
-                trans_Hash_Map.put(ttt.viewSignature(), trr);
-                return;
-            }
-            // view set types
-            if (actionTypes.contains(ttt1.viewTypeName())) {
-                trans_Hash_Map.put(ttt.viewSignature(), trr);
-            }
+            trr.transaction = calculated;
+            trr.amount = calculated.getAmount();
+            trr.recipient = calculated.getRecipient();
+            trr.title = calculated.getMessage();
+            trans_Hash_Map.put(calculated.viewSignature(), trr);
 
         }
 
+        return true;
+
     }
 
-    public void deleteObserver() {
-        Controller.getInstance().wallet.database.getTransactionMap().deleteObserver(this);
+    public void addObservers() {
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            map.addObserver(this);
+        }
+
+        super.addObservers();
+
+    }
+
+    public void deleteObservers() {
+
+        super.deleteObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            map.deleteObserver(this);
+        }
 
     }
 
@@ -444,8 +363,8 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
         public BigDecimal amount;
         public Account owner;
         public Account recipient;
+        public String title;
         public Transaction transaction;
-
     }
 
 }

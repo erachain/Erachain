@@ -322,7 +322,7 @@ public class UI_Setting_Panel extends javax.swing.JPanel {
                                 long time_of_translation = Long.parseLong(internetValue.get("_timestamp_of_translation_").toString());
 
                                 try {
-                                    //LOGGER.error("try lang file: " + langFileName);
+                                    //logger.error("try lang file: " + langFileName);
                                     JSONObject oldLangFile = Lang.openLangFile(langFileName);
 
                                     if (oldLangFile == null) {

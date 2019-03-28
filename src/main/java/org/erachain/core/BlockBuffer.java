@@ -82,7 +82,7 @@ public class BlockBuffer extends Thread {
                 long timePoint = System.currentTimeMillis();
 
                 //SEND MESSAGE TO PEER
-                BlockMessage response = (BlockMessage) peer.getResponse(message, Synchronizer.GET_BLOCK_TIMEOUT);
+                BlockMessage response = (BlockMessage) peer.getResponse(message, Synchronizer.GET_BLOCK_TIMEOUT >> 1);
 
                 //CHECK IF WE GOT RESPONSE
                 if (response == null) {
@@ -143,7 +143,7 @@ public class BlockBuffer extends Thread {
         this.counter = this.signatures.indexOf(signature);
 
         //
-        block = this.blocks.get(signature).poll(BlockChain.HARD_WORK?30000 : (Synchronizer.GET_BLOCK_TIMEOUT >> 1),
+        block = this.blocks.get(signature).poll(BlockChain.HARD_WORK?30000 : (Synchronizer.GET_BLOCK_TIMEOUT),
                 TimeUnit.MILLISECONDS);
         if (block == null) {
             throw new Exception("Block buffer error 3 =null");

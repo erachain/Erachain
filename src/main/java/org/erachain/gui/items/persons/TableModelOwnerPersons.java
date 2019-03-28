@@ -135,7 +135,7 @@ public class TableModelOwnerPersons<U, T> extends AbstractTableModel implements 
                 persons = new ArrayList<Pair<U, PersonCls>>();
                 this.persons_S_List = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
                 //	this.persons_S_List.addFilterField("name");
-                this.persons_S_List.registerObserver();
+                //this.persons_S_List.registerObserver();
                 get_List();
             }
 
@@ -150,7 +150,7 @@ public class TableModelOwnerPersons<U, T> extends AbstractTableModel implements 
     }
 
     public void removeObservers() {
-        if (persons_S_List != null) this.persons_S_List.removeObserver();
+        //if (persons_S_List != null) this.persons_S_List.removeObserver();
         persomMap.deleteObserver(this);
     }
 

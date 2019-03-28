@@ -25,8 +25,7 @@ import java.util.List;
 
 @SuppressWarnings("serial")
 public class RecoverWalletFrame extends JFrame {
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(RecoverWalletFrame.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RecoverWalletFrame.class);
     private NoWalletFrame parent;
     private JTextField seedTxt;
     private JTextField passwordTxt;

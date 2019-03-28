@@ -34,19 +34,28 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
     public static final int BALANCE_INDEX = 3;
     public static final int TRANSACTIONS_INDEX = 4;
     public static final int FEE_INDEX = 5;
-    static Logger logger = LoggerFactory.getLogger(BlocksHeadMap.class.getName());
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
+    static Logger logger = LoggerFactory.getLogger(BlocksHeadMap.class.getName());
+
+    /**
+     * для сортировки с SortableList задает по умолчанию клю по Высоте блока:<br>
+     *     DEFAULT_INDEX = TIMESTAMP_INDEX
+     *
+     * @param dWSet
+     * @param database
+     */
     public BlocksHeadMap(DWSet dWSet, DB database) {
         super(dWSet, database);
+
+        // for sort in SortedList
+        // in gui.models.WalletBlocksTableModel.syncUpdate
+        DEFAULT_INDEX = TIMESTAMP_INDEX;
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_BLOCK_TYPE);
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_BLOCK_TYPE);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_BLOCK_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_BLOCK_TYPE);
-            }
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_BLOCK_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_BLOCK_TYPE);
         }
     }
 

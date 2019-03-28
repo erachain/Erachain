@@ -10,8 +10,6 @@ import java.util.*;
 
 public class NameStorageMap extends DCMap<String, Map<String, String>> {
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     public NameStorageMap(DCSet dcSet, DB database) {
         super(dcSet, database);
     }

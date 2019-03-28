@@ -8,20 +8,18 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
-import org.erachain.lang.Lang;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple6;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
 
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class AssetPairSelectTableModel extends AbstractTableModel implements Observer {
+public class AssetPairSelectTableModel extends TimerTableModelCls<AssetCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ORDERS_COUNT = 2;
@@ -34,74 +32,19 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
     public long key;
     public List<ItemCls> assets;
     Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> all;
-    private String[] columnNames = {Lang.getInstance().translate("Key"), Lang.getInstance().translate("Name"),
-            Lang.getInstance().translate("<html>Orders<br>count</html>"), Lang.getInstance().translate("Orders Volume"),
-            Lang.getInstance().translate("<html>Trades<br>count</html>"),
-            Lang.getInstance().translate("Trades Volume")};
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, false, false, false, false};
     private String filter_Name;
     private ItemAssetMap db;
 
     public AssetPairSelectTableModel(long key)// , String action)
     {
+        super(DCSet.getInstance().getItemAssetMap(), new String[]{"Key", "Name", "<html>Orders<br>count</html>", "Orders Volume",
+                "<html>Trades<br>count</html>", "Trades Volume"},
+                new Boolean[]{false, true, false, false, false, false}, false);
+
         this.key = key;
-        db = DCSet.getInstance().getItemAssetMap();
-        // Controller.getInstance().addObserver(this);
-        /*
-         * Collection<ItemCls> assetsBuf =
-         * Controller.getInstance().getAllItems(ItemCls.ASSET_TYPE); this.assets
-         * = new ArrayList<ItemCls>();
-         *
-         * for (ItemCls item : assetsBuf) { AssetCls asset = (AssetCls) item;
-         * if(asset.getKey() != this.key) { /* if (action =="Buy"){ if
-         * (Controller.getInstance().isAddressIsMine(asset.getCreator().
-         * getAddress())) assets.add(asset); }else
-         */
-        /*
-         * assets.add(asset); } }
-         */
         this.all = BlockExplorer.getInstance().calcForAsset(DCSet.getInstance().getOrderMap().getOrders(this.key),
                 DCSet.getInstance().getTradeMap().getTrades(this.key));
 
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
-    }
-
-    @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    public Class<? extends Object> getColumnClass(int c) { // set column type
-
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
-    public AssetCls getAsset(int row) {
-
-        return (AssetCls) this.assets.get(row);
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return columnNames[index];
-    }
-
-    @Override
-    public int getRowCount() {
-        if (assets == null)
-            return 0;
-        return this.assets.size();
     }
 
     @Override
@@ -169,15 +112,6 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            // GUI ERROR
-        }
-    }
-
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
@@ -213,7 +147,7 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 
     public void set_Filter_By_Name(String str) {
         filter_Name = str;
-        assets = db.get_By_Name(filter_Name, false);
+        assets = db.findByName(filter_Name, false);
         this.fireTableDataChanged();
 
     }

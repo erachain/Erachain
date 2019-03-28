@@ -52,8 +52,6 @@ public class BlockMap extends DCMap<Integer, Block> {
 
 
         if (databaseSet.isWithObserver()) {
-            if (databaseSet.isDynamicGUI()) {
-            }
         }
 
 

@@ -6,12 +6,10 @@ import org.erachain.core.transaction.*;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.library.library;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.*;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Null;
@@ -23,7 +21,7 @@ import java.util.Observer;
 
 @SuppressWarnings("serial")
 // in list of org.erachain.records in wallet
-public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer {
+public class Payment_Orders_TableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> implements Observer {
 
     public static final int COLUMN_CONFIRMATIONS = 0;
     public static final int COLUMN_TIMESTAMP = 1;
@@ -34,16 +32,17 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
     public static final int COLUMN_RECIPIENT = 6;
     public static final int COLUMN_FEE = 7;
     public static final int COLUMN_SIZE = 8;
-    static Logger LOGGER = LoggerFactory.getLogger(Payment_Orders_TableModel.class.getName());
+
     private SortableList<Tuple2<String, String>, Transaction> transactions;
     //ItemAssetMap dbItemAssetMap;
     private ArrayList<R_Send> trans;
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
 
     public Payment_Orders_TableModel() {
-        super(new String[]{
-                        "Confirmation", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
+        super(new String[]{"Confirmation", "Timestamp", "Type", "Creator", "Item",
+                "Amount", "Recipient", "Fee", "Size"}, true);
 
+        logger = LoggerFactory.getLogger(Payment_Orders_TableModel.class.getName());
     }
 
     @Override
@@ -178,7 +177,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
 
         //} catch (Exception e) {
         //GUI ERROR
-        //	LOGGER.error(e.getMessage(),e);
+        //	logger.error(e.getMessage(),e);
         //	return null;
         //}
 
@@ -202,7 +201,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
         if (false && messageType == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.transactions == null) {
                 transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
-                transactions.registerObserver();
+                //transactions.registerObserver();
                 transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
                 read_trans();
                 this.fireTableDataChanged();
@@ -213,11 +212,6 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
             read_trans();
             this.fireTableDataChanged();
 
-        } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE
-                //|| message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE
-                ) {
-            Transaction transaction = (Transaction) message.getValue();
-            library.notifySysTrayRecord(transaction);
         }
 
         if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
@@ -245,13 +239,13 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
 
         Controller.getInstance().addWalletObserver(this);
     }
 
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
 
         Controller.getInstance().deleteObserver(this);
     }

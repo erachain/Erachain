@@ -53,7 +53,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
     static Logger LOGGER = LoggerFactory.getLogger(Accounts_Name_Search_SplitPanel.class.getName());
     protected My_JFileChooser chooser;
     protected int row;
-    private Accounts_Name_TableModel tableModelImprints;
+    private AccountsNameTableModel tableModelImprints;
     private JButton button3_ToolBar_LeftPanel;
     private AccountsPropertisMap db;
 
@@ -83,7 +83,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
         jButton2_jToolBar_RightPanel.setVisible(false);
 
         // CREATE TABLE
-        this.tableModelImprints = new Accounts_Name_TableModel();
+        this.tableModelImprints = new AccountsNameTableModel();
         final MTable imprintsTable = new MTable(this.tableModelImprints);
 
         // CHECKBOX FOR FAVORITE
@@ -156,7 +156,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                new Account_Name_Add();
+                new AccountNameAdd();
             }
 
         });
@@ -196,7 +196,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
             public void actionPerformed(ActionEvent e) {
 
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                Pair<String, Tuple2<String, String>> account = tableModelImprints.getAccount(row);
+                Pair<String, Tuple2<String, String>> account = tableModelImprints.getPairItem(row);
                 StringSelection value = new StringSelection(account.getA());
                 clipboard.setContents(value, null);
             }
@@ -208,7 +208,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
-                Pair<String, Tuple2<String, String>> account = tableModelImprints.getAccount(row);
+                Pair<String, Tuple2<String, String>> account = tableModelImprints.getPairItem(row);
                 byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(account.getA());
                 PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
                 StringSelection value = new StringSelection(public_Account.getBase58());
@@ -220,7 +220,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
         JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getAccount(row);
+                Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
                 Account account = new Account(account1.getA());
                 new Account_Send_Dialog(null, null, account, null);
 
@@ -231,7 +231,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
         JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getAccount(row);
+                Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
                 Account account = new Account(account1.getA());
                 new Mail_Send_Dialog(null, null, account, null);
 
@@ -242,7 +242,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
         JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Edit name"));
         setName.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getAccount(row);
+                Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
 
                 new Account_Set_Name_Dialog(account1.getA());
                 imprintsTable.repaint();
@@ -275,7 +275,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
                 int row = imprintsTable.getSelectedRow();
                 try {
                     row = imprintsTable.convertRowIndexToModel(row);
-                    Pair<String, Tuple2<String, String>> ac = tableModelImprints.getAccount(row);
+                    Pair<String, Tuple2<String, String>> ac = tableModelImprints.getPairItem(row);
                     db.delete(ac.getA());
                 } catch (Exception e1) {
                     // TODO Auto-generated catch block
@@ -446,7 +446,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
     @Override
     public void onClose() {
         // delete observer left panel
-        tableModelImprints.deleteObserver();
+        tableModelImprints.deleteObservers();
         // get component from right panel
         Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
         // if Person_Info 002 delay on close

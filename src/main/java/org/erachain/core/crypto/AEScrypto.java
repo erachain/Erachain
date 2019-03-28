@@ -49,7 +49,7 @@ public class AEScrypto {
             decryptdata = aesDecrypt(encryptdata2, password, ivconst);
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            //LOGGER.error(e.getMessage(),e);
+            //logger.error(e.getMessage(),e);
         }
 
 

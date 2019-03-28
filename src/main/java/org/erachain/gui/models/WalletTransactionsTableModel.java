@@ -4,8 +4,8 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.*;
 import org.erachain.database.SortableList;
+import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.library.library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
@@ -14,11 +14,13 @@ import org.mapdb.Fun.Tuple2;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer {
+public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> implements Observer {
 
     public static final int COLUMN_CONFIRMATIONS = 0;
     public static final int COLUMN_TIMESTAMP = 1;
@@ -30,8 +32,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     public static final int COLUMN_FEE = 7;
     public static final int COLUMN_SIZE = 8;
 
-    private SortableList<Tuple2<String, String>, Transaction> transactions;
-
     /**
      * В динамическом режиме перерисовывается автоматически по событию GUI_REPAINT
      * - перерисовка страницы целой, поэтому не так тормозит основные процессы.<br>
@@ -41,64 +41,38 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     public WalletTransactionsTableModel() {
         super(Controller.getInstance().getWallet().database.getTransactionMap(),
                 new String[]{"Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"},
-                new Boolean[]{true, true, true, true, true, true, true, false, false});
+                new Boolean[]{true, true, true, true, true, true, true, false, false}, true);
 
-        LOGGER = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
+        logger = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
 
-    }
+        addObservers();
 
-    @Override
-    public SortableList<Tuple2<String, String>, Transaction> getSortableList() {
-        return this.transactions;
-    }
-
-    public Transaction getItem(int row) {
-        return getTransaction(row);
-    }
-
-    public Transaction getTransaction(int row) {
-        Pair<Tuple2<String, String>, Transaction> data = this.transactions.get(row);
-        if (data == null || data.getB() == null) {
-            return null;
-        }
-        return data.getB();
-    }
-
-    @Override
-    public int getRowCount() {
-        if (this.transactions == null) {
-            return 0;
-        }
-
-        return this.transactions.size();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
 
-        if (this.transactions == null || this.transactions.size() - 1 < row) {
+        if (this.listSorted == null || this.listSorted.size() - 1 < row) {
             return null;
         }
 
-        Pair<Tuple2<String, String>, Transaction> data = this.transactions.get(row);
+        Pair<Tuple2<String, String>, Transaction> data = this.listSorted.get(row);
 
-        if (data == null || data.getB() == null) {
+        if (data == null) {
             return null;
         }
-
-        Tuple2<String, String> addr1 = data.getA();
-        if (addr1 == null)
-            return null;
-
-        String creator_address = data.getA().a;
-        //Account creator = new Account(data.getA().a);
-        //Account recipient = null; // = new Account(data.getA().b);
 
         Transaction transaction = data.getB();
         if (transaction == null)
             return null;
 
-        transaction.setDC(DCSet.getInstance());
+        Tuple2<String, String> address = data.getA();
+        if (address == null)
+            return null;
+
+        //String creator_address = data.getA().a;
+        //Account creator = new Account(data.getA().a);
+        //Account recipient = null; // = new Account(data.getA().b);
 
         //creator = transaction.getCreator();
         String itemName = "";
@@ -118,7 +92,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
                 return null;
 
             itemName = item.toString();
-            creator_address = transGen.getRecipient().getAddress();
+            //creator_address = transGen.getRecipient().getAddress();
         } else if (transaction instanceof IssueItemRecord) {
             IssueItemRecord transIssue = (IssueItemRecord) transaction;
             ItemCls item = transIssue.getItem();
@@ -217,7 +191,11 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
 
-            needUpdate = true;
+            count = 0;
+            needUpdate = false;
+
+            getInterval();
+            fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.WALLET_RESET_TRANSACTION_TYPE) {
 
@@ -225,33 +203,29 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             getInterval();
             this.fireTableDataChanged();
 
-        } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
-                    || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
+        // это старое событие - сейчас таймер сам запускает обновление
+        } else if (false && (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
+                    || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)) {
 
             // если прилетел блок или откатился и нужно обновить - то обновляем
             needUpdate = true;
 
-        } else if (message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
-                            || message.getType() == ObserverMessage.WALLET_SYNC_STATUS) {
+            // это старое событие - сейчас таймер сам запускает обновление
+        } else if (false && (message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
+                            || message.getType() == ObserverMessage.WALLET_SYNC_STATUS)) {
 
             needUpdate = true;
 
         } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
-            // INCOME
 
             needUpdate = true;
 
-            Transaction transaction = (Transaction) message.getValue();
-            library.notifySysTrayRecord(transaction);
-
         } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE
-                //|| message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE
                 ) {
 
             needUpdate = true;
 
         } else if (message.getType() == ObserverMessage.GUI_REPAINT
-                && Controller.getInstance().isDynamicGUI()
                 && needUpdate) {
 
             if (count++ < 4)
@@ -266,54 +240,52 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
 
         if (!Controller.getInstance().doesWalletDatabaseExists())
             return;
 
         //REGISTER ON WALLET TRANSACTIONS
-        Controller.getInstance().getWallet().database.getTransactionMap().addObserver(this);
-        // for UNCONFIRMEDs
-        DCSet.getInstance().getTransactionMap().addObserver(this);
-        // for ??
-        ///Controller.getInstance().wallet.database.getPersonMap().addObserver(transactions);
+        map.addObserver(this);
 
-        Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
-
-        getInterval();
-        fireTableDataChanged();
+        super.addObservers();
 
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
 
-        Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
-
-        //dbItemAssetMap = DLSet.getInstance().getItemAssetMap();
+        super.deleteObservers();
 
         if (Controller.getInstance().doesWalletDatabaseExists())
             return;
 
-        Controller.getInstance().getWallet().database.getTransactionMap().deleteObserver(this);
-        DCSet.getInstance().getTransactionMap().deleteObserver(this);
-        /// ??? Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);
-    }
-
-    @Override
-    public long getMapSize() {
-        return Controller.getInstance().getWallet().database.getTransactionMap().size();
+        map.deleteObserver(this);
     }
 
     @Override
     public void getIntervalThis(long startBack, long endBack) {
-        transactions = new SortableList<Tuple2<String, String>, Transaction>(
-                Controller.getInstance().getWallet().database.getTransactionMap(),
-                Controller.getInstance().getWallet().database.getTransactionMap().getFromToKeys(startBack, endBack));
+
+        // тут могут быть пустые элементы - пропустим их
+        Collection<Tuple2<String, String>> keysAll = ((TransactionMap) map).getFromToKeys(startBack, endBack);
+        Collection<Tuple2<String, String>> keys = new ArrayList<Tuple2<String, String>>();
+        for (Tuple2<String, String> key: keysAll) {
+
+            Object item = map.get(key);
+            if (item == null)
+                continue;
+
+            keys.add(key);
+
+        }
+
+        listSorted = new SortableList<Tuple2<String, String>, Transaction>(
+                map, keys);
 
         DCSet dcSet = DCSet.getInstance();
-        for (Pair<Tuple2<String, String>, Transaction> item: transactions) {
-            if (item.getB() == null)
+        for (Pair<Tuple2<String, String>, Transaction> item: listSorted) {
+            if (item.getB() == null) {
                 continue;
+            }
 
             item.getB().setDC_HeightSeq(dcSet);
             item.getB().calcFee();

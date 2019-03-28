@@ -42,10 +42,8 @@ public class BalanceMap extends DCMap<Tuple2<Long, Long>,
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, reset_BALANCE_TYPE);
             this.observableData.put(DBMap.NOTIFY_LIST, list_BALANCE_TYPE);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, add_BALANCE_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, remove_BALANCE_TYPE);
-            }
+            this.observableData.put(DBMap.NOTIFY_ADD, add_BALANCE_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, remove_BALANCE_TYPE);
         }
     }
 

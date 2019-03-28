@@ -110,7 +110,7 @@ public class TelegramsTableModel extends DefaultTableModel implements Observer {
 
         // } catch (Exception e) {
         // GUI ERROR
-        // LOGGER.error(e.getMessage(),e);
+        // logger.error(e.getMessage(),e);
         // return null;
         // }
 
@@ -134,7 +134,7 @@ public class TelegramsTableModel extends DefaultTableModel implements Observer {
         if (message.getType() == ObserverMessage.ALL_TELEGRAMT_LIST_TYPE) {
             if (this.transactions == null) {
                 this.transactions = (SortableList<String, Transaction>) message.getValue();
-                this.transactions.registerObserver();
+                //this.transactions.registerObserver();
 
             }
            

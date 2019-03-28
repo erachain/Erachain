@@ -9,7 +9,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -25,7 +25,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class Model_Account_Transactions extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer {
+public class Model_Account_Transactions extends SortedListTableModelCls<Tuple2<String, String>, Transaction> implements Observer {
     public static final int COLUMN_AMOUNT = 1;
     public static final int COLUMN_TRANSACTION = 2;
     private static final int COLUMN_ADDRESS = 0;
@@ -46,9 +46,9 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
 
     @SuppressWarnings("unchecked")
     public Model_Account_Transactions() {
-        super(new String[]{"Account", "Amount", "Type"});
+        super(new String[]{"Account", "Amount", "Type"}, true);
 
-        LOGGER = LoggerFactory.getLogger(Model_Account_Transactions.class.getName());
+        logger = LoggerFactory.getLogger(Model_Account_Transactions.class.getName());
 
         this.transactions_Asset = new ArrayList<Transaction>();
         this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
@@ -202,7 +202,7 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.transactions == null) {
                 this.transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
-                this.transactions.registerObserver();
+                //this.transactions.registerObserver();
                 this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
 
                 this.transactions_Asset.clear();
@@ -268,12 +268,26 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
         return totalBalance;
     }
 
-    protected void addObserversThis() {
-        Controller.getInstance().addWalletObserver(this);
-        //	Controller.getInstance().addObserver(this);
+    public void addObservers() {
+        super.addObservers();
+        //Controller.getInstance().addWalletObserver(this);
+
+        // REGISTER ON ACCOUNTS
+        Controller.getInstance().wallet.database.getAccountMap().addObserver(this);
+
+        // REGISTER ON TRANSACTIONS
+        Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
+
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
+        // REGISTER ON ACCOUNTS
+        Controller.getInstance().wallet.database.getAccountMap().deleteObserver(this);
+
+        // REGISTER ON TRANSACTIONS
+        Controller.getInstance().wallet.database.getTransactionMap().deleteObserver(this);
+
+        super.deleteObservers();
     }
 
     @Override

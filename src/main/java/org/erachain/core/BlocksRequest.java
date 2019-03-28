@@ -57,7 +57,7 @@ public class BlocksRequest extends MonitoredThread {
         GetBlockMessage getBlockMessage = (GetBlockMessage) message;
 
         /*
-         * LOGGER.
+         * logger.
          * error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
          * + " form PEER: " + getBlockMessage.getSender().toString()
          * + " sign: " +

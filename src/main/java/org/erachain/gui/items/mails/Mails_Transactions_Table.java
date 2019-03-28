@@ -57,7 +57,7 @@ import org.erachain.utils.TableMenuPopupUtil;
 @SuppressWarnings("serial")
 public class Mails_Transactions_Table extends JTable implements Observer {
 
-    private static final Logger LOGGER = LoggerFactory            .getLogger(Mails_Transactions_Table.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Mails_Transactions_Table.class);
     public Boolean incoming;
     Comparator<MessageBuf> comparator = new Comparator<MessageBuf>() {
         public int compare(MessageBuf c1, MessageBuf c2) {

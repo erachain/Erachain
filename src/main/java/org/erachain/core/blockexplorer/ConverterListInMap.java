@@ -14,6 +14,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,12 +44,15 @@ public class ConverterListInMap {
             blockJSON.put("generatingBalance", block.getForgingValue());
             blockJSON.put("target", block.getTarget());
             blockJSON.put("winValue", block.getWinValue());
-            blockJSON.put("winValueTargetted", block.calcWinValueTargeted() - 100000);
+            blockJSON.put("winValueTargeted", block.calcWinValueTargeted() - 100000);
             blockJSON.put("transactionsCount", block.getTransactionCount());
             blockJSON.put("timestamp", block.getTimestamp());
             blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
             block.loadHeadMind(dcSet);
             blockJSON.put("totalFee", block.viewFeeAsBigDecimal());
+            Block.BlockHead blockHead = block.blockHead;
+            Fun.Tuple2<Integer, Integer> forgingPoint = blockHead.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
+            blockJSON.put("deltaHeight", blockHead.heightBlock - forgingPoint.a);
             result.put(i, blockJSON);
         }
         return result;
@@ -61,7 +65,7 @@ public class ConverterListInMap {
      * @return словарь с добавленной информацией из списка персон
      * с ключами соответствующими номерам элементов в исходном списке
      */
-    public static  Map personsJSON(List<PersonCls> persons) {
+    public static Map personsJSON(List<PersonCls> persons) {
         //Результирующий сортированный в порядке добавления словарь(map)
         Map result = new LinkedHashMap();
         for (int i = 0; i < persons.size(); i++) {
@@ -84,7 +88,7 @@ public class ConverterListInMap {
      * @return словарь с добавленной информацией из списка активов
      * с ключами соответствующими номерам элементов в исходном списке
      */
-    public static  Map assetsJSON(List<AssetCls> assets, DCSet dcSet, JSONObject langObj) {
+    public static Map assetsJSON(List<AssetCls> assets, DCSet dcSet, JSONObject langObj) {
         //Результирующий сортированный в порядке добавления словарь(map)
         Map result = new LinkedHashMap();
         for (int i = 0; i < assets.size(); i++) {
@@ -108,6 +112,7 @@ public class ConverterListInMap {
         }
         return result;
     }
+
     /**
      * Перегоняет информацию из списка шаблонов или статусов в словарь
      *
@@ -140,11 +145,6 @@ public class ConverterListInMap {
         }
         return result;
     }
-
-
-
-
-
 
 
 }

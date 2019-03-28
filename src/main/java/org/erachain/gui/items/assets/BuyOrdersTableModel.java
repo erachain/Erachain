@@ -4,7 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.SortableList;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.NumberAsString;
@@ -16,7 +16,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class BuyOrdersTableModel extends TableModelCls<Long, Order> implements Observer {
+public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> implements Observer {
     //public static final int COLUMN_BUYING_PRICE = -1;
     public static final int COLUMN_AMOUNT_WANT = 0;
     public static final int COLUMN_PRICE = 1;
@@ -36,7 +36,7 @@ public class BuyOrdersTableModel extends TableModelCls<Long, Order> implements O
     private long wantKey;
 
     public BuyOrdersTableModel(AssetCls have, AssetCls want) {
-        super(new String[]{"Want", "Price", "Have"});
+        super(new String[]{"Want", "Price", "Have"}, true);
 
         this.have = have;
         this.want = want;
@@ -232,14 +232,14 @@ public class BuyOrdersTableModel extends TableModelCls<Long, Order> implements O
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         Controller.getInstance().addObserver(this);
         //this.orders.registerObserver();
 
     }
 
-    public void removeObserversThis() {
-        this.orders.removeObserver();
+    public void deleteObservers() {
+        //this.orders.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 

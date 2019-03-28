@@ -127,7 +127,7 @@ public class DWSet extends DBASet {
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
                 .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
 
-                //.mmapFileEnablePartial()
+                .mmapFileEnablePartial()
                 //.compressionEnable()
 
                 .make();
@@ -170,6 +170,16 @@ public class DWSet extends DBASet {
         return this.accountsPropertisMap;
     }
 
+    /**
+     * Транзакции относящиеся к моим счетам. Сюда же записываться должны и неподтвержденные<br>
+     * А когда они подтверждаются они будут перезаписываться поверх.
+     * Тогда неподтвержденные будут показывать что они не сиполнились.
+     * И их пользователь сможет сам удалить вручную или командой - удалить все неподтвержденные
+     * <hr>
+     * Ключ: счет + подпись<br>
+     * Значение: транзакция
+     * @return TransactionMap
+     */
     public TransactionMap getTransactionMap() {
         return this.transactionMap;
     }
@@ -363,7 +373,7 @@ public class DWSet extends DBASet {
     @Override
     public synchronized void commit() {
         if (this.uses != 0
-                //|| System.currentTimeMillis() - commitPoint < 50000
+                || System.currentTimeMillis() - commitPoint < 10000
         )
             return;
 

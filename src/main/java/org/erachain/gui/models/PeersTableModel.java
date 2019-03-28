@@ -12,8 +12,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+/**
+ * TODO тут нужно применить SortableList для сортировки по полям?
+ * Или тут более изящно сортировка сделана?
+ */
 @SuppressWarnings("serial")
-public class PeersTableModel extends TimerTableModelCls implements Observer {
+public class PeersTableModel extends TimerTableModelCls<Peer> implements Observer {
 
     private static final int COLUMN_ADDRESS = 0;
     private static final int COLUMN_HEIGHT = 1;
@@ -24,17 +28,20 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
     private static final int COLUMN_ONLINE_TIME = 6;
     private static final int COLUMN_VERSION = 7;
 
-    private List<Peer> peers;
-
+    /**
+     * для сортировки по полям в особом виде
+     */
     List<Peer> peersView = new ArrayList<Peer>();
     int view = 1;
 
     public PeersTableModel() {
         super(new String[] { "IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago",
                 "Online Time", "Version" },
-                new Boolean[] { false, false, false, false, false, false, false, false });
+                new Boolean[] { false, false, false, false, false, false, false, false }, false);
 
-        LOGGER = LoggerFactory.getLogger(PeersTableModel.class.getName());
+        logger = LoggerFactory.getLogger(PeersTableModel.class.getName());
+
+        addObservers();
 
     }
 
@@ -90,9 +97,9 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
 
         peersView.clear();
         if (view != 0) {
-            peersView.addAll(peers);
+            peersView.addAll(list);
         } else {
-            for (Peer peer : peers) {
+            for (Peer peer : list) {
                 if (view == 0) {
                     if (peer.isUsed())
                         peersView.add(peer);
@@ -103,27 +110,13 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
     }
 
     @Override
-    public Peer getItem(int k) {
-        return this.peers.get(k);
-    }
-
-    @Override
-    public int getRowCount() {
-        if (peersView == null) {
-            return 0;
-        }
-
-        return peersView.size();
-    }
-
-    @Override
     public Object getValueAt(int row, int column) {
         if (peersView == null || this.peersView.size() - 1 < row) {
             return null;
         }
 
         if (Controller.getInstance().isOnStopping()) {
-            this.removeObservers();
+            this.deleteObservers();
             return null;
         }
 
@@ -194,48 +187,49 @@ public class PeersTableModel extends TimerTableModelCls implements Observer {
         ObserverMessage message = (ObserverMessage) arg;
 
         if (Controller.getInstance().isOnStopping()) {
-            this.removeObservers();
+            this.deleteObservers();
             return;
         }
 
         if (message.getType() == ObserverMessage.LIST_PEER_TYPE) {
 
-            this.peers = (List<Peer>) message.getValue();
+            this.list = (List<Peer>) message.getValue();
             setView(view);
             needUpdate = true;
-            this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.UPDATE_PEER_TYPE) {
             Peer peer1 = (Peer) message.getValue();
+
             int n = 0;
-            for (Peer peer2 : this.peers) {
+            for (Peer peer2 : this.list) {
                 if (Arrays.equals(peer1.getAddress().getAddress(), peer2.getAddress().getAddress())) {
-                    /// this.peersStatus.set(n, true);
+                    setView(view);
+                    this.fireTableRowsUpdated(n, n);
                     break;
                 }
                 n++;
             }
-            setView(view);
-            needUpdate = true;
-            this.fireTableRowsUpdated(n, n);
 
         } else if (message.getType() == ObserverMessage.ADD_PEER_TYPE) {
             setView(view);
             needUpdate = true;
-            this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.REMOVE_PEER_TYPE) {
             setView(view);
             needUpdate = true;
+
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT
+                && needUpdate) {
+            needUpdate = false;
             this.fireTableDataChanged();
         }
     }
 
-    protected void addObserversThis() {
+    public void addObservers() {
         Controller.getInstance().addActivePeersObserver(this);
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         Controller.getInstance().removeActivePeersObserver(this);
     }
 

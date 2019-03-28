@@ -66,7 +66,7 @@ public class DebugTabPane extends JTabbedPane {
                     row = transactionsTable.convertRowIndexToModel(row);
 
                     //GET TRANSACTION
-                    Transaction transaction = transactionsTableModel.getTransaction(row);
+                    Transaction transaction = transactionsTableModel.getItem(row);
 
                     //SHOW DETAIL SCREEN OF TRANSACTION
                     TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
@@ -78,7 +78,7 @@ public class DebugTabPane extends JTabbedPane {
         //	this.addTab(Lang.getInstance().translate("Transactions"), new JScrollPane(this.transactionsTable));
 
         //BLOCKS TABLE MODEL
-        this.blocksTableModel = new BlocksTableModel(false);
+        this.blocksTableModel = new BlocksTableModel();
         JTable blocksTable = new MTable(this.blocksTableModel);
 
         //BLOCKS SORTER
@@ -117,9 +117,9 @@ public class DebugTabPane extends JTabbedPane {
 
     public void close() {
         //REMOVE OBSERVERS/HANLDERS
-        this.peersTableModel.removeObservers();
+        this.peersTableModel.deleteObservers();
 
-        this.transactionsTableModel.removeObservers();
+        this.transactionsTableModel.deleteObservers();
 
         this.blocksTableModel.removeObservers();
 

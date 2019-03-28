@@ -21,7 +21,9 @@ public abstract class DBMap<T, U> extends Observable {
     public static final int NOTIFY_LIST = 4;
     //public static final int NOTIFY_COUNT = 5;
 
-    public static final int DEFAULT_INDEX = 0;
+    public int DESCENDING_SHIFT_INDEX = 10000;
+
+    public static int DEFAULT_INDEX = 0;
     private static Logger logger = LoggerFactory.getLogger(DBMap.class.getName());
     protected IDB databaseSet;
     protected Map<T, U> map;
@@ -74,12 +76,12 @@ public abstract class DBMap<T, U> extends Observable {
      */
     @SuppressWarnings("unchecked")
     protected <V> void createIndex(int index, NavigableSet<?> indexSet, NavigableSet<?> descendingIndexSet, Function2<V, T, U> function) {
-        assert(index > 0 && index < 10000);
+        assert(index > 0 && index < DESCENDING_SHIFT_INDEX);
         Bind.secondaryKey((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) indexSet, function);
         this.indexes.put(index, (NavigableSet<Tuple2<?, T>>) indexSet);
 
         Bind.secondaryKey((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) descendingIndexSet, function);
-        this.indexes.put(index + 10000, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
+        this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
     }
 
     /**
@@ -94,12 +96,12 @@ public abstract class DBMap<T, U> extends Observable {
      */
     @SuppressWarnings("unchecked")
     protected <V> void createIndexes(int index, NavigableSet<?> indexSet, NavigableSet<?> descendingIndexSet, Function2<V[], T, U> function) {
-        assert(index > 0 && index < 10000);
+        assert(index > 0 && index < DESCENDING_SHIFT_INDEX);
         Bind.secondaryKeys((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) indexSet, function);
         this.indexes.put(index, (NavigableSet<Tuple2<?, T>>) indexSet);
 
         Bind.secondaryKeys((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) descendingIndexSet, function);
-        this.indexes.put(index + 10000, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
+        this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
     }
 
     public void addUses() {
@@ -245,7 +247,10 @@ public abstract class DBMap<T, U> extends Observable {
     }
 
     /**
-     * уведомляет только счетчик если он разрешен, иначе Список
+     * Соединяется прямо к списку SortableList для отображения в ГУИ
+     * Нужен только для сортировки<br>
+     * TODO надо его убрать отсюла нафиг чтобы не тормозило и только
+     * по месту работало окнкретно как надо
      * @param o
      */
     @Override
@@ -259,24 +264,31 @@ public abstract class DBMap<T, U> extends Observable {
         //NOTIFY
         if (this.observableData != null) {
             if (this.observableData.containsKey(NOTIFY_LIST)) {
-                //CREATE LIST
-                SortableList<T, U> list;
-                if (this.size() < 1000) {
-                    list = new SortableList<T, U>(this);
-                } else {
-                    // обрезаем полный список в базе до 1000
-                    Iterator iterator = this.getIterator(DEFAULT_INDEX, false);
-                    List<T> keys = new ArrayList<T>();
-                    int i = 0;
-                    while (iterator.hasNext() && ++i < 1000) {
-                        keys.add((T)iterator.next());
+                if (false) {
+                    //CREATE LIST
+                    SortableList<T, U> list;
+                    if (this.size() < 1000) {
+                        list = new SortableList<T, U>(this);
+                    } else {
+                        // обрезаем полный список в базе до 1000
+                        Iterator iterator = this.getIterator(DEFAULT_INDEX, false);
+                        List<T> keys = new ArrayList<T>();
+                        int i = 0;
+                        while (iterator.hasNext() && ++i < 1000) {
+                            keys.add((T) iterator.next());
+                        }
+
+                        list = new SortableList<T, U>(this, keys);
                     }
 
-                    list = new SortableList<T, U>(this, keys);
-                }
+                    //UPDATE
+                    o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), list));
+                } else {
 
-                //UPDATE
-                o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), list));
+                    //UPDATE
+                    o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), this));
+
+                }
             }
         }
 
@@ -297,7 +309,7 @@ public abstract class DBMap<T, U> extends Observable {
             // IT IS INDEX ID in this.indexes
 
             if (descending) {
-                index += 10000;
+                index += DESCENDING_SHIFT_INDEX;
             }
 
             IndexIterator<T> u = new IndexIterator<T>(this.indexes.get(index));

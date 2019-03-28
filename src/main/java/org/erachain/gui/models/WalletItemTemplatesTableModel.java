@@ -12,7 +12,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, String>, TemplateCls> implements Observer {
+public class WalletItemTemplatesTableModel extends SortedListTableModelCls<Tuple2<String, String>, TemplateCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -22,7 +22,7 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
     private SortableList<Tuple2<String, String>, TemplateCls> templates;
 
     public WalletItemTemplatesTableModel() {
-        super(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"});
+        super(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"}, false);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
         if (message.getType() == ObserverMessage.LIST_TEMPLATE_TYPE) {
             if (this.templates == null) {
                 this.templates = (SortableList<Tuple2<String, String>, TemplateCls>) message.getValue();
-                this.templates.registerObserver();
+                //this.templates.registerObserver();
                 //this.templates.sort(PollMap.NAME_INDEX);
             }
 
@@ -95,11 +95,11 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
 
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         Controller.getInstance().addWalletObserver(this);
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
     }
 
 }

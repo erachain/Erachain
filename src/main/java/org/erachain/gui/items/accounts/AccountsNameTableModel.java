@@ -3,8 +3,7 @@ package org.erachain.gui.items.accounts;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
-import org.erachain.database.wallet.AccountsPropertisMap;
-import org.erachain.lang.Lang;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
@@ -13,95 +12,44 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class Accounts_Name_TableModel extends AbstractTableModel implements Observer {
+public class AccountsNameTableModel extends SortedListTableModelCls<String, Tuple2<String, String>> implements Observer {
     public static final int COLUMN_ADDRESS = 1;
     public static final int COLUMN_NAME = 2;
     public static final int COLUMN_DESCRIPTION = 3;
     public static final int COLUMN_PERSON = 4;
     public final int COLUMN_NO = 0;
-    //	public static final int COLUMN_WAINTING_BALANCE = 2;
-    //public static final int COLUMN_GENERATING_BALANCE = 3;
-    //public static final int COLUMN_FEE_BALANCE = 4;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"No.", "Account", "Name", "Description", "Person"}); // "Waiting"
-    private Boolean[] column_AutuHeight = new Boolean[]{true, false, false, false};
-    private AccountsPropertisMap dbAccounts;
+
     private Account accountCLS;
-    private SortableList<String, Tuple2<String, String>> accounts;
     private Pair<String, Tuple2<String, String>> account;
 
+    public AccountsNameTableModel() {
+        super(Controller.getInstance().wallet.database.getAccountsPropertisMap(),
+                new String[]{"No.", "Account", "Name", "Description", "Person"},
+                new Boolean[]{true, false, false, false}, false);
 
-    public Accounts_Name_TableModel() {
-        init();
+        addObservers();
 
     }
 
-    public Accounts_Name_TableModel(String[] columnNames) {
-        this.columnNames = columnNames;
-        init();
-        this.fireTableStructureChanged();
-    }
+    public AccountsNameTableModel(String[] columnNames) {
+        super(new String[]{"No.", "Account", "Name", "Description", "Person"},
+                new Boolean[]{true, false, false, false}, false);
 
-    private void init() {
-        if (Controller.getInstance().doesWalletDatabaseExists()) {
-            dbAccounts = Controller.getInstance().wallet.database.getAccountsPropertisMap();
-            dbAccounts.addObserver(this);
-        }
-    }
-
-    @Override
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
-    }
-
-    public Pair<String, Tuple2<String, String>> getAccount(int row) {
-        return accounts.get(row);
-    }
-
-    @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return columnNames[index];
-    }
-
-    @Override
-    public int getRowCount() {
-
-        if (this.accounts == null)
-            return 0;
-
-        return this.accounts.size();
+        addObservers();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.accounts == null || row > this.accounts.size() - 1) {
+        if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
 
-        account = this.accounts.get(row);
+        account = this.listSorted.get(row);
         if (account == null) {
             return null;
         }
@@ -165,48 +113,46 @@ public class Accounts_Name_TableModel extends AbstractTableModel implements Obse
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
         if (message.getType() == ObserverMessage.WALLET_ACCOUNT_PROPERTIES_LIST) {
 
+            needUpdate = false;
+            getInterval();
+            this.fireTableDataChanged();
 
-            this.accounts = (SortableList<String, Tuple2<String, String>>) message.getValue();
-            this.accounts.registerObserver();
+        } else if (message.getType() == ObserverMessage.WALLET_ACCOUNT_PROPERTIES_ADD) {
+
+            needUpdate = false;
+            getInterval();
+            this.fireTableDataChanged();
+
+        } else if (message.getType() == ObserverMessage.WALLET_ACCOUNT_PROPERTIES_DELETE) {
+
+            needUpdate = false;
+            getInterval();
             this.fireTableDataChanged();
         }
-
-        if (message.getType() == ObserverMessage.WALLET_ACCOUNT_PROPERTIES_ADD) {
-            //this.Accounts.add(((PublicKeyAccount)message.getValue()));
-            this.fireTableDataChanged();
-        }
-
-        if (message.getType() == ObserverMessage.WALLET_ACCOUNT_PROPERTIES_DELETE) {
-            // обновляем данные
-
-            this.fireTableDataChanged();
-        }
-
 
     }
 
+    @Override
+    public void getInterval() {
+        this.listSorted = new SortableList<String, Tuple2<String, String>>(map, map.getKeys());
+        this.listSorted.sort();
+    }
 
-    public void deleteObserver() {
-
-        if (dbAccounts != null) {
-            dbAccounts.deleteObserver(this);
-            this.accounts.removeObserver();
+    public void addObservers() {
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            map.addObserver(this);
         }
+    }
 
+    public void deleteObservers() {
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            map.deleteObserver(this);
+        }
     }
 }

@@ -34,6 +34,7 @@ public class Info_Templates extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel_Image;
     private GridBagConstraints gridBagConstraints_1;
     private GridBagConstraints gridBagConstraints_2;
+
     public Info_Templates(TemplateCls template) {
         this.template = template;
         initComponents();
