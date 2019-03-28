@@ -21,7 +21,7 @@ import java.util.concurrent.BlockingQueue;
 public class BlocksRequest extends MonitoredThread {
 
     private final static boolean USE_MONITOR = true;
-    private final static boolean logPings = true;
+    //private final static boolean logPings = true;
     private boolean runned;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BlocksRequest.class);
@@ -57,28 +57,43 @@ public class BlocksRequest extends MonitoredThread {
 
         GetBlockMessage getBlockMessage = (GetBlockMessage) message;
 
-        if (true) {
-            LOGGER.error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
+        LOGGER.debug("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
                     + " form PEER: " + getBlockMessage.getSender().toString()
                     + " sign: " + Base58.encode(getBlockMessage.getSignature()));
-        }
 
         if (USE_MONITOR)
-            this.setMonitorStatus("GET_BLOCK_TYPE -> " + Base58.encode(getBlockMessage.getSignature());
+            this.setMonitorStatus("try GET_BLOCK " + Base58.encode(getBlockMessage.getSignature()));
 
         // ASK BLOCK FROM BLOCKCHAIN
         Block newBlock = this.blockChain.getBlock(dcSet, getBlockMessage.getSignature());
+
+        if (USE_MONITOR) {
+            this.setMonitorStatusAfter();
+            if (newBlock == null) {
+                String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
+                this.setMonitorStatus(mess);
+            }
+        }
+
+        if (newBlock == null) {
+            String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
+            //Controller.getInstance().banPeerOnError(message.getSender(), mess);
+        }
 
         // CREATE RESPONSE WITH SAME ID
         Message response = MessageFactory.getInstance().createBlockMessage(newBlock);
         response.setId(message.getId());
 
-        // SEND RESPONSE BACK WITH SAME ID
-        message.getSender().offerMessage(response);
 
-        if (false && newBlock == null) {
-            String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
-            //banPeerOnError(message.getSender(), mess);
+        // SEND RESPONSE BACK WITH SAME ID
+        if (USE_MONITOR) {
+            this.setMonitorStatus("try GET_BLOCK " + Base58.encode(getBlockMessage.getSignature()));
+        }
+
+        boolean result = message.getSender().offerMessage(response);
+
+        if (USE_MONITOR) {
+            this.setMonitorStatus("offerMessage " + (result?" OK" : " bad"));
         }
 
         return 3 + newBlock.getTransactionCount();
@@ -105,6 +120,8 @@ public class BlocksRequest extends MonitoredThread {
                 break;
             } catch (InterruptedException e) {
                 break;
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
             }
 
             // FREEZE sometimes
