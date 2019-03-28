@@ -45,7 +45,7 @@ import org.erachain.datachain.TransactionMap;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
 import org.erachain.gui.GuiTimer;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.lang.Lang;
 import org.erachain.network.Network;
 import org.erachain.network.Peer;
@@ -3401,7 +3401,7 @@ public class Controller extends Observable {
                 // show error dialog
                 if (useGui) {
                     if (Settings.getInstance().isGuiEnabled()) {
-                        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, null,
+                        IssueConfirmDialog dd = new IssueConfirmDialog(null, true, null,
                                 Lang.getInstance().translate("STARTUP ERROR") + ": " + e.getMessage(), 600, 400, Lang.getInstance().translate(" "));
                         dd.jButton1.setVisible(false);
                         dd.jButton2.setText(Lang.getInstance().translate("Cancel"));

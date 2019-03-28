@@ -14,7 +14,7 @@ import org.erachain.gui.AccountRenderer;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.assets.Asset_Info;
 import org.erachain.gui.items.assets.AssetsComboBoxModel;
-import org.erachain.gui.library.M_DecimalFormatedTextField;
+import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -470,7 +470,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
        jLabel_Asset = new javax.swing.JLabel();
        jComboBox_Asset = new javax.swing.JComboBox<>();
        jLabel_Ammount = new javax.swing.JLabel();
-       jTextField_Ammount = new M_DecimalFormatedTextField();
+       jTextField_Ammount = new MDecimalFormatedTextField();
        jLabel_Fee = new javax.swing.JLabel();
        jComboBox_Fee = new javax.swing.JComboBox<>();
        jButton_ok = new javax.swing.JButton();
@@ -750,7 +750,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
    private javax.swing.JScrollPane jScrollPane2;
    private javax.swing.JTextArea jTextArea_Account_Description;
    public javax.swing.JTextArea jTextArea_Description;
-   public M_DecimalFormatedTextField jTextField_Ammount;
+   public MDecimalFormatedTextField jTextField_Ammount;
    public javax.swing.JTextField jTextField_Mess_Title;
    private javax.swing.JTextField jTextField_Recive_Detail;
    public javax.swing.JTextField jTextField_To;

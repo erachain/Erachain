@@ -9,7 +9,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.transaction.CreateOrderDetailsFrame;
 import org.erachain.lang.Lang;
@@ -203,7 +203,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                 
                 Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
 
-                Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, createOrder,
+                IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, createOrder,
                         (int) (MainFrame.getInstance().getWidth() / 1.2),
                         (int) (MainFrame.getInstance().getHeight() / 1.2),
                         "");
@@ -352,7 +352,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                 Order order = buyOrdersTableModel.getOrder(row);
                 Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
 
-                Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, createOrder,
+                IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, createOrder,
                         (int) (MainFrame.getInstance().getWidth() / 1.2),
                         (int) (MainFrame.getInstance().getHeight() / 1.2),
                         "");

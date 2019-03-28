@@ -8,7 +8,7 @@ import org.erachain.core.transaction.R_SignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
@@ -272,7 +272,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         // Lang.getInstance().translate("Issue Asset"),
         // JOptionPane.YES_NO_OPTION);
 
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, issueDoc,
+        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, issueDoc,
                 text,
                 (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation transaction issue document"));

@@ -9,7 +9,7 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.R_Send;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 
@@ -48,7 +48,7 @@ public class Account_Take_Hold_Panel extends AssetSendPanel {
         // test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);
 
         String Status_text = "";
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, transaction,
+        IssueConfirmDialog dd = new IssueConfirmDialog(null, true, transaction,
                 Lang.getInstance().translate("Holden"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction"));
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);

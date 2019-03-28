@@ -243,7 +243,7 @@ public class Issue_Send_Payment_Order extends javax.swing.JPanel {
         // Transaction.VALIDATE_OK);
 
         String Status_text = "";
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
+        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Send Payment Order"), (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2),
                 Status_text, Lang.getInstance().translate("Confirmation transaction send payment order"));
 

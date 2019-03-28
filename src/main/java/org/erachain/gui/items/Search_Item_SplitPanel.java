@@ -6,7 +6,7 @@ import org.erachain.utils.MenuPopupUtil;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 
-import org.erachain.gui.library.M_DecimalFormatedTextField;
+import org.erachain.gui.library.MDecimalFormatedTextField;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,7 +15,7 @@ public class Search_Item_SplitPanel extends Item_SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
     protected SearchItemsTableModel search_Table_Model;
-    private M_DecimalFormatedTextField key_Item;
+    private MDecimalFormatedTextField key_Item;
 //	protected JMenuItem favorite_menu_items;
 //	protected JPopupMenu menu_Table;
 //	protected ItemCls item_Menu;
@@ -37,7 +37,7 @@ public class Search_Item_SplitPanel extends Item_SplitPanel {
         // search Panel
         this.searchToolBar_LeftPanel.setVisible(true);
         this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Find Key") + ":"));
-        key_Item = new M_DecimalFormatedTextField();
+        key_Item = new MDecimalFormatedTextField();
         key_Item.setMaskType(key_Item.maskLong);
         key_Item.setToolTipText("");
         key_Item.setAlignmentX(1.0F);

@@ -10,8 +10,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.AccountRenderer;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
-import org.erachain.gui.library.M_DecimalFormatedTextField;
+import org.erachain.gui.library.IssueConfirmDialog;
+import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.CreateOrderDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
@@ -33,8 +33,8 @@ import java.math.RoundingMode;
 public class CreateOrderPanel extends JPanel {
     static Logger LOGGER = LoggerFactory.getLogger(CreateOrderPanel.class.getName());
     public JComboBox<Account> cbxAccount;
-    public M_DecimalFormatedTextField txtAmountHave;
-    public M_DecimalFormatedTextField txtPrice;
+    public MDecimalFormatedTextField txtAmountHave;
+    public MDecimalFormatedTextField txtPrice;
     private AssetCls have;
     private AssetCls want;
     private JButton sellButton;
@@ -171,7 +171,7 @@ public class CreateOrderPanel extends JPanel {
 
         // AMOUNT
         detailGBC.gridy++;
-        this.txtAmountHave = new M_DecimalFormatedTextField();
+        this.txtAmountHave = new MDecimalFormatedTextField();
         // set scale
         this.txtAmountHave.setScale(have==null? 8: buying? want.getScale() : have.getScale());
         this.add(this.txtAmountHave, detailGBC);
@@ -190,7 +190,7 @@ public class CreateOrderPanel extends JPanel {
         this.add(priceLabel, labelGBC);
         // PRICE
         detailGBC.gridy++;
-        txtPrice = new M_DecimalFormatedTextField();
+        txtPrice = new MDecimalFormatedTextField();
         // set scale
 
         txtPrice.setScale(setScale(have, want));
@@ -543,7 +543,7 @@ public class CreateOrderPanel extends JPanel {
                 amountWant.setScale(this.want.getScale(), RoundingMode.HALF_DOWN), feePow);
 
         String Status_text = "";
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
+        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
                 (int) (MainFrame.getInstance().getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction") + ": "
