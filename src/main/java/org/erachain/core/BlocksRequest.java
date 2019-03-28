@@ -2,6 +2,7 @@ package org.erachain.core;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.Peer;
 import org.erachain.network.message.BlockWinMessage;
@@ -56,13 +57,14 @@ public class BlocksRequest extends MonitoredThread {
 
         GetBlockMessage getBlockMessage = (GetBlockMessage) message;
 
-        /*
-         * logger.
-         * error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
-         * + " form PEER: " + getBlockMessage.getSender().toString()
-         * + " sign: " +
-         * Base58.encode(getBlockMessage.getSignature()));
-         */
+        if (true) {
+            LOGGER.error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
+                    + " form PEER: " + getBlockMessage.getSender().toString()
+                    + " sign: " + Base58.encode(getBlockMessage.getSignature()));
+        }
+
+        if (USE_MONITOR)
+            this.setMonitorStatus("GET_BLOCK_TYPE -> " + Base58.encode(getBlockMessage.getSignature());
 
         // ASK BLOCK FROM BLOCKCHAIN
         Block newBlock = this.blockChain.getBlock(dcSet, getBlockMessage.getSignature());
@@ -87,7 +89,13 @@ public class BlocksRequest extends MonitoredThread {
         runned = true;
         //Message message;
         int counter = 0;
+
+        this.initMonitor();
+
         while (runned) {
+
+            this.setMonitorPoint();
+
             try {
                 counter += processMessage(blockingQueue.take());
             } catch (OutOfMemoryError e) {
