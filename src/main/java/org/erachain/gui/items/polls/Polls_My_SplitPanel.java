@@ -68,9 +68,9 @@ public class Polls_My_SplitPanel extends Split_Panel {
     }
 
     @Override
-    public void delay_on_close() {
+    public void onClose() {
         // delete observer left panel
-        my_Poll_Model.removeObservers();
+        my_Poll_Model.deleteObservers();
         // get component from right panel
         // Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
         // if Person_Info 002 delay on close

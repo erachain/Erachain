@@ -37,7 +37,7 @@ public class Synchronizer {
     private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class);
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
     public static int BAN_BLOCK_TIMES = 8 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60;
-    private static int MAX_ORPHAN_TRANSACTIONS = 100000;
+    private static int MAX_ORPHAN_TRANSACTIONS = BlockChain.DEVELOP_USE? 200000: 50000;
     // private boolean run = true;
     // private Block runedBlock;
     private Peer fromPeer;
@@ -55,19 +55,23 @@ public class Synchronizer {
         // SEND MESSAGE TO PEER
         BlockMessage response = (BlockMessage) peer.getResponse(message, check ? GET_BLOCK_TIMEOUT << 1 : GET_BLOCK_TIMEOUT);
 
+        // если ошибка то банить нужно в любом случае - чтобы не зацикливаться на этом пире
+
         // CHECK IF WE GOT RESPONSE
         if (response == null) {
             if (check) {
                 return null;
             } else {
                 // ERROR
-                throw new Exception("Peer timed out");
+                String mess = "*** getBlock: Peer timed out";
+                peer.ban(mess);
+                throw new Exception(mess);
             }
         }
 
         Block block = response.getBlock();
         if (block == null) {
-            String mess = "*** Dishonest peer - Block is NULL";
+            String mess = "*** getBlock: Block is NULL";
             peer.ban(mess);
             throw new Exception(mess);
         }
@@ -75,7 +79,7 @@ public class Synchronizer {
         // CHECK BLOCK SIGNATURE
         if (!block.isSignatureValid()) {
             int banTime = BAN_BLOCK_TIMES;
-            String mess = "*** Dishonest peer - Invalid block --signature. Ban for " + banTime;
+            String mess = "*** getBlock: Dishonest peer - Invalid block --signature. Ban for " + banTime;
             peer.ban(banTime, mess);
             throw new Exception(mess);
         }
@@ -85,7 +89,7 @@ public class Synchronizer {
             block.getTransactions();
         } catch (Exception e) {
             int banTime = BAN_BLOCK_TIMES << 1;
-            String mess = "*** Dishonest peer - Invalid block --зфкыу Екфтыфсешщты. Ban for " + banTime;
+            String mess = "*** getBlock: Dishonest peer - Invalid block on parse transactions. Ban for " + banTime;
             peer.ban(banTime, mess);
             throw new Exception(mess);
         }
@@ -137,18 +141,25 @@ public class Synchronizer {
                 peer.ban(BAN_BLOCK_TIMES, mess);
                 throw new Exception(mess);
 
-            } else if (countTransactionToOrphan > MAX_ORPHAN_TRANSACTIONS) {
-                String mess = "Dishonest peer by on lastCommonBlock[" + lastCommonBlock.getHeight()
-                        + "] - reached MAX_ORPHAN_TRANSACTIONS: " + MAX_ORPHAN_TRANSACTIONS;
-                peer.ban(BAN_BLOCK_TIMES >> 2, mess);
-                throw new Exception(mess);
             }
-            // LOGGER.debug("*** core.Synchronizer.checkNewBlocks - try orphan:
+            // logger.debug("*** core.Synchronizer.checkNewBlocks - try orphan:
             // " + lastBlock.getHeight(fork));
             if (cnt.isOnStopping())
                 throw new Exception("on stopping");
 
             int height = lastBlock.getHeight();
+
+            fork.getTransactionMap().clearByDeadTimeAndLimit(
+                    cnt.getBlockChain().getTimestamp(height), false);
+
+            // проверим на переполнение откаченных трнзакций
+            if (countTransactionToOrphan > MAX_ORPHAN_TRANSACTIONS) {
+                String mess = "Dishonest peer by on lastCommonBlock[" + lastCommonBlock.getHeight()
+                        + "] - reached MAX_ORPHAN_TRANSACTIONS: " + MAX_ORPHAN_TRANSACTIONS;
+                peer.ban(BAN_BLOCK_TIMES >> 2, mess);
+                throw new Exception(mess);
+            }
+
             int bbb = fork.getBlockMap().size();
             int hhh = fork.getBlocksHeadsMap().size();
             int sss = fork.getBlockSignsMap().size();
@@ -387,7 +398,7 @@ public class Synchronizer {
             throw new Exception("on stopping");
 
         /*
-         * LOGGER.error("Synchronizing from peer: " + peer.toString() + ":" +
+         * logger.error("Synchronizing from peer: " + peer.toString() + ":" +
          * peer);
          */
 
@@ -438,6 +449,7 @@ public class Synchronizer {
                     blockFromPeer = blockBuffer.getBlock(signature);
                 } catch (Exception e) {
                     blockBuffer.stopThread();
+                    peer.ban(0, "get block BUFFER - " + e.getMessage());
                     throw new Exception(e);
                 }
 
@@ -456,7 +468,7 @@ public class Synchronizer {
                 }
 
                 ///blockFromPeer.setCalcGeneratingBalance(dcSet); // NEED SET it
-                ///LOGGER.debug("BLOCK Calc Generating Balance");
+                ///logger.debug("BLOCK Calc Generating Balance");
 
                 if (cnt.isOnStopping()) {
                     // STOP BLOCKBUFFER
@@ -581,7 +593,7 @@ public class Synchronizer {
     private List<byte[]> getBlockSignatures(byte[] header, Peer peer) throws Exception {
 
         /*
-         * LOGGER.
+         * logger.
          * error("core.Synchronizer.getBlockSignatures(byte[], Peer) for: " +
          * Base58.encode(header));
          */
@@ -764,7 +776,7 @@ public class Synchronizer {
 
             blocks.add(block);
             bytesGet += 1500 + block.getDataLength(false);
-            ///LOGGER.debug("block added with RECS:" + block.getTransactionCount() + " bytesGet kb: " + bytesGet / 1000);
+            ///logger.debug("block added with RECS:" + block.getTransactionCount() + " bytesGet kb: " + bytesGet / 1000);
             if (bytesGet > BYTES_MAX_GET) {
                 break;
             }
@@ -854,12 +866,6 @@ public class Synchronizer {
                             } catch (Exception e) {
                                 LOGGER.error(e.getMessage(), e);
                             }
-                        } else if (countObserv_COUNT != null) {
-                            try {
-                                dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_COUNT, countObserv_COUNT);
-                            } catch (Exception e) {
-                                LOGGER.error(e.getMessage(), e);
-                            }
                         }
 
                     try {
@@ -934,12 +940,6 @@ public class Synchronizer {
                         } catch (Exception e) {
                             LOGGER.error(e.getMessage(), e);
                         }
-                    } else if (countObserv_COUNT != null) {
-                        try {
-                            dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_COUNT, countObserv_COUNT);
-                        } catch (Exception e) {
-                            LOGGER.error(e.getMessage(), e);
-                        }
                     }
 
                     try {
@@ -971,6 +971,6 @@ public class Synchronizer {
         // if (runedBlock != null)
         // runedBlock.stop();
 
-        // this.pipeProcessOrOrphan(DBSet.getInstance(), null, false);
+        // this.pipeProcessOrOrphan(DLSet.getInstance(), null, false);
     }
 }

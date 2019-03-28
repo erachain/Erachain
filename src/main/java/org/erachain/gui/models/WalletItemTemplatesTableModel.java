@@ -5,7 +5,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 
@@ -13,7 +12,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, String>, TemplateCls> implements Observer {
+public class WalletItemTemplatesTableModel extends SortedListTableModelCls<Tuple2<String, String>, TemplateCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -22,10 +21,8 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
 
     private SortableList<Tuple2<String, String>, TemplateCls> templates;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"});
-
     public WalletItemTemplatesTableModel() {
-        Controller.getInstance().addWalletListener(this);
+        super(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"}, false);
     }
 
     @Override
@@ -35,16 +32,6 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
 
     public TemplateCls getItem(int row) {
         return this.templates.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -86,15 +73,6 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -103,7 +81,7 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
         if (message.getType() == ObserverMessage.LIST_TEMPLATE_TYPE) {
             if (this.templates == null) {
                 this.templates = (SortableList<Tuple2<String, String>, TemplateCls>) message.getValue();
-                this.templates.registerObserver();
+                //this.templates.registerObserver();
                 //this.templates.sort(PollMap.NAME_INDEX);
             }
 
@@ -114,5 +92,14 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
         if (message.getType() == ObserverMessage.ADD_TEMPLATE_TYPE || message.getType() == ObserverMessage.REMOVE_TEMPLATE_TYPE) {
             this.fireTableDataChanged();
         }
+
     }
+
+    public void addObservers() {
+        Controller.getInstance().addWalletObserver(this);
+    }
+
+    public void deleteObservers() {
+    }
+
 }

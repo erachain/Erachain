@@ -12,7 +12,7 @@ import java.util.Map;
  * Ключ: номер (автоинкремент)<br>
  * Значение: Объединение<br>
  */
-public class ItemUnionMap extends Item_Map {
+public class ItemUnionMap extends ItemMap {
 
     static final String NAME = "item_unions";
     static final int TYPE = ItemCls.UNION_TYPE;

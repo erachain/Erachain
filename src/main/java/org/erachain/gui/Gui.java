@@ -3,6 +3,10 @@ package org.erachain.gui;
 
 import java.awt.TrayIcon.MessageType;
 import java.io.File;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JFrame;
 import javax.swing.RowFilter;
@@ -17,6 +21,7 @@ import org.erachain.gui.create.SettingLangFrame;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
+import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.SysTray;
 
 import static org.erachain.gui.library.library.Set_GUI_Look_And_Feel;
@@ -30,6 +35,7 @@ public class Gui extends JFrame {
 
     private static Gui maingui;
     private MainFrame mainframe;
+    private GuiTimer guiTimer;
 
     private Gui() throws Exception {
 

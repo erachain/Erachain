@@ -157,7 +157,7 @@ public class Incoming_Mails_SplitPanel extends Split_Panel {
     }
 
     @Override
-    public void delay_on_close() {
+    public void onClose() {
         // delete observer left panel
         incoming_Mails_Model.removeObservers();
         // get component from right panel

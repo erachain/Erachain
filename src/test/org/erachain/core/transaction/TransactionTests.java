@@ -1251,8 +1251,8 @@ String  s= "";
 
         NameSale nameSaleInvalid = new NameSale(longName, nameSale.getAmount());
         //nameSale = new NameSale(longName, nameSale.getAmount());
-        //LOGGER.info("nameSaleLong " + nameSaleLong);
-        //LOGGER.info("nameSaleLong getOwner "  + nameSaleLong.getName(databaseSet).getOwner());
+        //logger.info("nameSaleLong " + nameSaleLong);
+        //logger.info("nameSaleLong getOwner "  + nameSaleLong.getName(databaseSet).getOwner());
         //// nameSaleLong --- nameSale -> owner
         namePurchaseTransaction = new BuyNameTransaction(buyer, nameSaleInvalid, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet));
 
@@ -1287,7 +1287,7 @@ String  s= "";
         //CHECK IF NAME UPDATE IS INVALID
         assertEquals(Transaction.NO_BALANCE, namePurchaseTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
-        // setConfirmedBalance(long key, BigDecimal amount, DBSet db)
+        // setConfirmedBalance(long key, BigDecimal amount, DLSet db)
         buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(2000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
         //CREATE NAME UPDATE INVALID REFERENCE
@@ -1312,11 +1312,11 @@ String  s= "";
         //nameSaleTransaction.process();
         nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        //LOGGER.addAppender(null);
+        //logger.addAppender(null);
         LOGGER.debug("nameSale ");
         LOGGER.info("nameSale " + nameSale.getName(databaseSet));
         LOGGER.info("nameSale " + nameSale.getName(databaseSet));
-        //LOGGER.info("nameSale " + nameSale.getName(databaseSet).getOwner());
+        //logger.info("nameSale " + nameSale.getName(databaseSet).getOwner());
 
         //CREATE CANCEL NAME SALE
         BuyNameTransaction namePurchaseTransaction = new BuyNameTransaction(maker, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, last_ref);
@@ -1712,7 +1712,7 @@ String  s= "";
         init();
 
         //CREATE SIGNATURE
-        //LOGGER.info("asdasd");
+        //logger.info("asdasd");
         long timestamp = NTP.getTime();
         Poll poll = new Poll(maker, "test", "this is the value", Arrays.asList(new PollOption("test"), new PollOption("test2")));
         //CREATE POLL CREATION
@@ -1777,7 +1777,7 @@ String  s= "";
 
 
         //CHECK IF POLL VOTE IS INVALID
-        ///LOGGER.info("pollVote.getFee: " + pollVote.getFee());
+        ///logger.info("pollVote.getFee: " + pollVote.getFee());
         /// fee = 0 assertEquals(Transaction.NOT_ENOUGH_FEE, pollVote.isValid(databaseSet));
 
         //CREATE POLL CREATION INVALID REFERENCE
@@ -2095,7 +2095,7 @@ String  s= "";
 	{
 
 		//CREATE EMPTY MEMORY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
+		DLSet databaseSet = DLSet.createEmptyDatabaseSet();
 
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());

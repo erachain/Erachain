@@ -21,7 +21,7 @@ public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<Stri
     public BalancesComboBoxModel(Account account) {
         Controller.getInstance().addObserver(this);
         this.balances = Controller.getInstance().getBalances(account);
-        this.balances.registerObserver();
+        ///this.balances.registerObserver();
 
         this.update();
     }
@@ -65,6 +65,6 @@ public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<Stri
 
     public void removeObservers() {
         Controller.getInstance().deleteObserver(this);
-        this.balances.removeObserver();
+        //this.balances.removeObserver();
     }
 }

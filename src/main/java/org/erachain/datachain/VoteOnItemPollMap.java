@@ -24,18 +24,15 @@ import java.util.*;
  * TODO: передлать короткий Счет на байты
  */
 public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public VoteOnItemPollMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_VOTEPOLL_TYPE);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_VOTEPOLL_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_VOTEPOLL_TYPE);
-            }
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_VOTEPOLL_TYPE);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_VOTEPOLL_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_VOTEPOLL_TYPE);
         }
 
     }
@@ -64,11 +61,6 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, 
     @Override
     protected Stack<Tuple2<Integer, Integer>> getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

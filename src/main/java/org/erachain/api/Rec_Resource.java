@@ -51,7 +51,7 @@ public class Rec_Resource {
             jsonObject = new JSONObject(queryParameters);
         } catch (NullPointerException | ClassCastException e) {
             // JSON EXCEPTION
-            //LOGGER.error(e.getMessage());
+            //logger.error(e.getMessage());
             //return Response.status(500).entity(ApiErrorFactory.getInstance().createError(
             //		ApiErrorFactory.ERROR_JSON)).build();
             return APIUtils.errorMess(ApiErrorFactory.ERROR_JSON, ApiErrorFactory.getInstance().createError(
@@ -205,7 +205,7 @@ public class Rec_Resource {
                             encryptMessage = new byte[]{1};
 
                     } catch (Exception e1) {
-                        //LOGGER.info(e1);
+                        //logger.info(e1);
                         return APIUtils.errorMess(-step, e1.toString() + " on step: " + step);
                     }
                     record = new R_Send((byte) version, (byte) property1, (byte) property2,
@@ -329,7 +329,7 @@ public class Rec_Resource {
                     Ints.toByteArray(port)));
 
         } catch (Exception e) {
-            //LOGGER.error(e.getMessage());
+            //logger.error(e.getMessage());
             return APIUtils.errorMess(-step, e.toString() + " on step: " + step);
         }
 
@@ -452,7 +452,7 @@ public class Rec_Resource {
             jsonObject = new JSONObject(queryParameters);
         } catch (NullPointerException | ClassCastException e) {
             // JSON EXCEPTION
-            //LOGGER.error(e.getMessage());
+            //logger.error(e.getMessage());
             return APIUtils.errorMess(ApiErrorFactory.ERROR_JSON, ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_JSON).toString());
         }
@@ -475,7 +475,7 @@ public class Rec_Resource {
             step++;
             reference = jsonObject.containsKey("reference") ? Long.parseLong(((List<String>) jsonObject.get("reference")).get(0)) : 0l;
         } catch (Exception e1) {
-            //LOGGER.info(e1);
+            //logger.info(e1);
             return APIUtils.errorMess(-step, e1.toString() + " on step: " + step);
         }
 
@@ -549,7 +549,7 @@ public class Rec_Resource {
             }
 
         } catch (Exception e) {
-            //LOGGER.error(e.getMessage());
+            //logger.error(e.getMessage());
             return APIUtils.errorMess(-1, e.toString() + " on step: " + step);
         }
     }

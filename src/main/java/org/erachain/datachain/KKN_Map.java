@@ -27,7 +27,6 @@ public class KKN_Map extends DCMap<
                         byte[] // transaction.getReference
                         >>>> {
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
     private String name;
 
     public KKN_Map(DCSet databaseSet, DB database,
@@ -39,11 +38,9 @@ public class KKN_Map extends DCMap<
         this.name = name;
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, observerMessage_reset);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, observerMessage_add);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, observerMessage_remove);
-            }
             this.observableData.put(DBMap.NOTIFY_LIST, observerMessage_list);
+            this.observableData.put(DBMap.NOTIFY_ADD, observerMessage_add);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, observerMessage_remove);
         }
 
     }
@@ -77,11 +74,6 @@ public class KKN_Map extends DCMap<
     @Override
     protected TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>> getDefaultValue() {
         return new TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>>();
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     @SuppressWarnings("unchecked")

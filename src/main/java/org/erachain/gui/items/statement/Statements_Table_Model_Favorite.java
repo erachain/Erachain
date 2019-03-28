@@ -110,7 +110,7 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
 
             //	case COLUMN_TEMPLATE:
 
-            //	return ItemCls.getItem(DBSet.getInstance(), ItemCls.TEMPLATE_TYPE, record.getKey()).toString();
+            //	return ItemCls.getItem(DLSet.getInstance(), ItemCls.TEMPLATE_TYPE, record.getKey()).toString();
 
             case COLUMN_BODY:
 
@@ -157,7 +157,7 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
         return null;
 
         //} catch (Exception e) {
-        // LOGGER.error(e.getMessage(),e);
+        // logger.error(e.getMessage(),e);
         //	return null;
         //}
     }
@@ -179,7 +179,7 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
         if (message.getType() == ObserverMessage.LIST_STATEMENT_FAVORITES_TYPE) {
             if (this.transactions == null) {
                 transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
-                transactions.registerObserver();
+                //transactions.registerObserver();
                 SortableList<Tuple2<String, String>, Transaction> sss = Controller.getInstance().wallet.database.getDocumentFavoritesSet().getList();
                 this.fireTableDataChanged();
             }
@@ -204,39 +204,11 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
 
     }
 
-    private List<Transaction> read_Statement_old() {
-        List<Transaction> tran;
-        ArrayList<Transaction> db_transactions;
-        db_transactions = new ArrayList<Transaction>();
-        tran = new ArrayList<Transaction>();
-        // база данных
-        DCSet dcSet = DCSet.getInstance();
-        // читаем все блоки
-        SortableList<Integer, Block> lists = dcSet.getBlockMap().getList();
-        // проходим по блокам
-        for (Pair<Integer, Block> list : lists) {
-
-            // читаем транзакции из блока
-            db_transactions = (ArrayList<Transaction>) list.getB().getTransactions();
-            // проходим по транзакциям
-            for (Transaction transaction : db_transactions) {
-                // если ноте то пишем в transactions
-                if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION)
-                    transaction.setDC(dcSet);
-                    tran.add(transaction);
-
-            }
-
-        }
-        return tran;
-
-    }
-
     public void removeObservers() {
 
         if (Controller.getInstance().doesWalletDatabaseExists()) {
             Controller.getInstance().wallet.database.getDocumentFavoritesSet().deleteObserver(this);
-            transactions.removeObserver();
+            //transactions.removeObserver();
         }
     }
 

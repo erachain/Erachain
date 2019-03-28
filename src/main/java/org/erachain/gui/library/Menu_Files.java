@@ -138,7 +138,7 @@ public class Menu_Files extends JMenu {
             public void actionPerformed(ActionEvent e) {
 
 //        		String raw = Base58.encode(transaction.toBytes(false, null));
-                My_JFileChooser chooser = new My_JFileChooser();
+                fileChooser chooser = new fileChooser();
                 chooser.setDialogTitle(Lang.getInstance().translate("Open File"));
                 //chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 chooser.setDialogType(javax.swing.JFileChooser.OPEN_DIALOG);

@@ -33,24 +33,92 @@ import org.jvnet.substance.skin.SubstanceNebulaBrickWallLookAndFeel;
 public class library {
 
     // PLAY SOUND
-    public static void notifySysTrayRecord(Transaction record) {
+    public static void notifySysTrayRecord(Transaction transaction) {
 
-        R_Send r_Send = (R_Send) record;
-        Account account = Controller.getInstance().getAccountByAddress(r_Send.getRecipient().getAddress());
-        if (account != null) {
-            if (Settings.getInstance().isSoundReceiveMessageEnabled()) {
-                PlaySound.getInstance().playSound("receivemessage.wav", record.getSignature());
-            }
+        if (transaction.getCreator() == null)
+            return;
 
-            SysTray.getInstance().sendMessage("Payment received",
-                    "From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + account.getPersonAsString() + "\n"
-                            + "Asset Key" + ": " + r_Send.getAbsKey() + ", " + "Amount" + ": "
-                            + r_Send.getAmount().toPlainString(),
-                    MessageType.INFO);
-        } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-            PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
+        if (transaction.noDCSet())
+            transaction.setDC_HeightSeq(DCSet.getInstance());
+
+        switch ( transaction.getType()) {
+            case Transaction.SEND_ASSET_TRANSACTION:
+                R_Send r_Send = (R_Send) transaction;
+
+                // AS RECIPIENT
+                Account account = Controller.getInstance().getAccountByAddress(r_Send.getRecipient().getAddress());
+                if (account != null) {
+                    if (r_Send.hasAmount()) {
+                        if (Settings.getInstance().isSoundReceivePaymentEnabled())
+                            PlaySound.getInstance().playSound("receivepayment.wav", transaction.getSignature());
+
+                        SysTray.getInstance().sendMessage("Payment received",
+                                "From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + r_Send.getRecipient().getPersonAsString() + "\n"
+                                        + "Asset Key" + ": " + r_Send.getAbsKey() + ", " + "Amount" + ": "
+                                        + r_Send.getAmount().toPlainString()
+                                        + (r_Send.getHead() != null? "\n Title" + ":" + r_Send.getHead() : "")
+                                ,
+                                MessageType.INFO);
+
+                    } else {
+                        if (Settings.getInstance().isSoundReceiveMessageEnabled())
+                            PlaySound.getInstance().playSound("receivemessage.wav", transaction.getSignature());
+
+                        SysTray.getInstance().sendMessage("Message received",
+                                "From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + r_Send.getRecipient().getPersonAsString() + "\n"
+                                        + (r_Send.getHead() != null? "\n Title" + ":" + r_Send.getHead() : "")
+                                ,
+                                MessageType.INFO);
+
+                    }
+
+                    return;
+                }
+
+                account = Controller.getInstance().getAccountByAddress(r_Send.getCreator().getAddress());
+                if (account != null) {
+                    if (r_Send.hasAmount()) {
+
+                        if (Settings.getInstance().isSoundNewTransactionEnabled())
+                            PlaySound.getInstance().playSound("newtransaction.wav", transaction.getSignature());
+
+                        SysTray.getInstance().sendMessage("Payment send",
+                                "From: " + transaction.getCreator().getPersonAsString() + "\nTo: " + r_Send.getRecipient().getPersonAsString() + "\n"
+                                        + "Asset Key" + ": " + r_Send.getAbsKey() + ", " + "Amount" + ": "
+                                        + r_Send.getAmount().toPlainString()
+                                        + (r_Send.getHead() != null? "\n Title" + ":" + r_Send.getHead() : "")
+                                ,
+                                MessageType.INFO);
+
+                    } else {
+
+                        if (Settings.getInstance().isSoundNewTransactionEnabled())
+                            PlaySound.getInstance().playSound("newtransaction.wav", transaction.getSignature());
+
+                        SysTray.getInstance().sendMessage("Message send",
+                                "From: " + transaction.getCreator().getPersonAsString() + "\nTo: " + r_Send.getRecipient().getPersonAsString() + "\n"
+                                        + (r_Send.getHead() != null? "\n Title" + ":" + r_Send.getHead() : "")
+                                ,
+                                MessageType.INFO);
+
+                    }
+                    return;
+                }
+
+            default:
+                account = Controller.getInstance().getAccountByAddress(transaction.getCreator().getAddress());
+                if (account != null) {
+                    if (Settings.getInstance().isSoundNewTransactionEnabled()) {
+                        PlaySound.getInstance().playSound("newtransaction.wav", transaction.getSignature());
+                    }
+
+                    SysTray.getInstance().sendMessage("Transaction send",
+                            "From: " + transaction.getCreator().getPersonAsString() + "\n"
+                                    + transaction.toString()
+                            ,
+                            MessageType.INFO);
+                }
         }
-
     }
 
     public static void Set_GUI_Look_And_Feel(String text) {
@@ -355,7 +423,7 @@ public class library {
      */
     public static void saveJSONStringToEraFile(Container parent, String JSONString){
         // String raw = Base58.encode(transaction.toBytes(false, null));
-        My_JFileChooser chooser = new My_JFileChooser();
+        fileChooser chooser = new fileChooser();
         chooser.setDialogTitle(Lang.getInstance().translate("Save File"));
         // chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);

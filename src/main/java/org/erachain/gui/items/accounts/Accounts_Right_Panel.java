@@ -1,7 +1,7 @@
 package org.erachain.gui.items.accounts;
 
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.Renderer_BigDecimals;
@@ -27,7 +27,7 @@ public class Accounts_Right_Panel extends JPanel {
      * 
      */
     private static final long serialVersionUID = 1L;
-    public Accounts_Transactions_TableModel table_Model;
+    public AccountsTransactionsTableModel table_Model;
     @SuppressWarnings("rawtypes")
     public MTable jTable1;
     // Variables declaration - do not modify
@@ -67,7 +67,7 @@ public class Accounts_Right_Panel extends JPanel {
         jMenu5 = new javax.swing.JMenu();
         jToggleButton2 = new javax.swing.JToggleButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        table_Model = new Accounts_Transactions_TableModel();
+        table_Model = new AccountsTransactionsTableModel();
         jTable1 = new MTable(table_Model);
         
     // sort from column     
@@ -171,7 +171,7 @@ public class Accounts_Right_Panel extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                Transaction transaction = table_Model.getItem(th.row);
-               Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Lang.getInstance().translate("Transaction"));
+               IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Lang.getInstance().translate("Transaction"));
                dd.setLocationRelativeTo(th);
                dd.setVisible(true);
             }

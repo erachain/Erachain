@@ -5,8 +5,8 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.Issue_ItemMap;
-import org.erachain.datachain.Item_Map;
+import org.erachain.datachain.IssueItemMap;
+import org.erachain.datachain.ItemMap;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 
@@ -232,7 +232,6 @@ public abstract class AssetCls extends ItemCls {
 
     @Override
     public int getMinNameLen() {
-
         return 1;
     }
 
@@ -319,12 +318,12 @@ public abstract class AssetCls extends ItemCls {
 
     // DB
     @Override
-    public Item_Map getDBMap(DCSet db) {
+    public ItemMap getDBMap(DCSet db) {
         return db.getItemAssetMap();
     }
 
     @Override
-    public Issue_ItemMap getDBIssueMap(DCSet db) {
+    public IssueItemMap getDBIssueMap(DCSet db) {
         return db.getIssueAssetMap();
     }
 

@@ -48,8 +48,8 @@ public class My_Accounts_SplitPanel extends Split_Panel {
     }
 
     @Override
-    public void delay_on_close() {
-        rightPanel.table_Model.deleteObserver();
+    public void onClose() {
+        rightPanel.table_Model.deleteObservers();
         accountPanel.tableModel.deleteObserver();
         Controller.getInstance().deleteObserver(accountPanel.reload_Button);
         Controller.getInstance().deleteObserver(accountPanel.newAccount_Button);

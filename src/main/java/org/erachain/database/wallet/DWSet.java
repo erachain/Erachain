@@ -1,6 +1,7 @@
 package org.erachain.database.wallet;
 // 30/03 ++
 
+import org.erachain.controller.Controller;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -10,7 +11,7 @@ import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
-import org.erachain.database.IDB;
+import org.erachain.database.DBASet;
 import org.erachain.settings.Settings;
 import org.mapdb.Atomic.Var;
 import org.mapdb.DB;
@@ -18,16 +19,9 @@ import org.mapdb.DBMaker;
 
 import java.io.File;
 
-//import org.mapdb.Serializer;
+public class DWSet extends DBASet {
 
-public class DWSet implements IDB {
-    private final File WALLET_FILE;
-
-    private static final String VERSION = "version";
     private static final String LAST_BLOCK = "lastBlock";
-
-    private DB database;
-    private int uses;
 
     private Var<Long> licenseKeyVar;
     private Long licenseKey;
@@ -47,28 +41,63 @@ public class DWSet implements IDB {
     private WItemUnionMap unionMap;
     private WItemPollMap pollMap;
     private OrderMap orderMap;
-    private FavoriteItemAsset assetFavoritesSet;
-    private FavoriteItemTemplate templateFavoritesSet;
-    private FavoriteItemImprint imprintFavoritesSet;
-    private FavoriteItemPoll pollFavoriteSet;
+    private FavoriteItemMapAsset assetFavoritesSet;
+    private FavoriteItemMapTemplate templateFavoritesSet;
+    private FavoriteItemMapImprint imprintFavoritesSet;
+    private FavoriteItemMapPoll pollFavoriteSet;
     private TelegramsMap telegramsMap;
 
-    private FavoriteItemPerson personFavoritesSet;
-    private FavoriteItemStatus statusFavoritesSet;
-    private FavoriteItemUnion unionFavoritesSet;
+    private FavoriteItemMapPerson personFavoritesSet;
+    private FavoriteItemMapStatus statusFavoritesSet;
+    private FavoriteItemMapUnion unionFavoritesSet;
 
     private FavoriteDocument statementFavoritesSet;
 
-    public DWSet() {
+    public DWSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI) {
+        super(dbFile, database, withObserver,  dynamicGUI);
+
+        // LICENCE SIGNED
+        this.licenseKeyVar = database.getAtomicVar("licenseKey");
+        this.licenseKey = this.licenseKeyVar.get();
+
+        this.accountMap = new AccountMap(this, this.database);
+        this.accountsPropertisMap = new AccountsPropertisMap(this, this.database);
+        this.transactionMap = new TransactionMap(this, this.database);
+        this.blocksHeadMap = new BlocksHeadMap(this, this.database);
+        this.nameMap = new NameMap(this, this.database);
+        this.nameSaleMap = new NameSaleMap(this, this.database);
+        this.pollMap_old = new PollMap(this, this.database);
+        this.assetMap = new WItemAssetMap(this, this.database);
+        this.imprintMap = new WItemImprintMap(this, this.database);
+        this.TemplateMap = new WItemTemplateMap(this, this.database);
+        this.personMap = new WItemPersonMap(this, this.database);
+        this.statusMap = new WItemStatusMap(this, this.database);
+        this.unionMap = new WItemUnionMap(this, this.database);
+        this.pollMap = new WItemPollMap(this, this.database);
+        this.orderMap = new OrderMap(this, this.database);
+        this.assetFavoritesSet = new FavoriteItemMapAsset(this, this.database);
+        this.templateFavoritesSet = new FavoriteItemMapTemplate(this, this.database);
+        this.imprintFavoritesSet = new FavoriteItemMapImprint(this, this.database);
+        this.pollFavoriteSet = new FavoriteItemMapPoll(this, this.database);
+        this.personFavoritesSet = new FavoriteItemMapPerson(this, this.database);
+        this.statusFavoritesSet = new FavoriteItemMapStatus(this, this.database);
+        this.unionFavoritesSet = new FavoriteItemMapUnion(this, this.database);
+        this.statementFavoritesSet = new FavoriteDocument(this, this.database);
+        this.telegramsMap = new TelegramsMap(this,this.database);
+
+    }
+
+    public static DWSet reCreateDB(boolean withObserver, boolean dynamicGUI) {
+
         //OPEN WALLET
-        WALLET_FILE = new File(Settings.getInstance().getDataWalletDir(), "wallet.dat");
-        WALLET_FILE.getParentFile().mkdirs();
+        File dbFile = new File(Settings.getInstance().getDataWalletDir(), "wallet.dat");
+        dbFile.getParentFile().mkdirs();
 
         //DELETE TRANSACTIONS
         //File transactionFile = new File(Settings.getInstance().getWalletDir(), "wallet.dat.t");
         //transactionFile.delete();
 
-        this.database = DBMaker.newFileDB(WALLET_FILE)
+        DB database = DBMaker.newFileDB(dbFile)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 //.cacheSize(2048)
 
@@ -88,59 +117,23 @@ public class DWSet implements IDB {
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++
-                /// ICREATOR
+
+                // вызывает java.io.IOError: java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
+                // на ситема с Виндой в момент синхронизации кошелька когда там многот транзакций для этого кошелька
                 .commitFileSyncDisable() // ++
+
+                //.asyncWriteFlushDelay(30000)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
                 .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
 
+                .mmapFileEnablePartial()
                 //.compressionEnable()
 
                 .make();
 
-        uses = 0;
+        return new DWSet(dbFile, database, withObserver, dynamicGUI);
 
-        // LICENCE SIGNED
-        this.licenseKeyVar = database.getAtomicVar("licenseKey");
-        this.licenseKey = this.licenseKeyVar.get();
-
-
-        this.accountMap = new AccountMap(this, this.database);
-        this.accountsPropertisMap = new AccountsPropertisMap(this, this.database);
-        this.transactionMap = new TransactionMap(this, this.database);
-        this.blocksHeadMap = new BlocksHeadMap(this, this.database);
-        this.nameMap = new NameMap(this, this.database);
-        this.nameSaleMap = new NameSaleMap(this, this.database);
-        this.pollMap_old = new PollMap(this, this.database);
-        this.assetMap = new WItemAssetMap(this, this.database);
-        this.imprintMap = new WItemImprintMap(this, this.database);
-        this.TemplateMap = new WItemTemplateMap(this, this.database);
-        this.personMap = new WItemPersonMap(this, this.database);
-        this.statusMap = new WItemStatusMap(this, this.database);
-        this.unionMap = new WItemUnionMap(this, this.database);
-        this.pollMap = new WItemPollMap(this, this.database);
-        this.orderMap = new OrderMap(this, this.database);
-        this.assetFavoritesSet = new FavoriteItemAsset(this, this.database);
-        this.templateFavoritesSet = new FavoriteItemTemplate(this, this.database);
-        this.imprintFavoritesSet = new FavoriteItemImprint(this, this.database);
-        this.pollFavoriteSet = new FavoriteItemPoll(this, this.database);
-        this.personFavoritesSet = new FavoriteItemPerson(this, this.database);
-        this.statusFavoritesSet = new FavoriteItemStatus(this, this.database);
-        this.unionFavoritesSet = new FavoriteItemUnion(this, this.database);
-        this.statementFavoritesSet = new FavoriteDocument(this, this.database);
-        this.telegramsMap = new TelegramsMap(this,this.database);
-
-    }
-
-    public boolean exists() {
-        return WALLET_FILE.exists();
-    }
-
-    public int getVersion() {
-        this.uses++;
-        int u = this.database.getAtomicInteger(VERSION).intValue();
-        this.uses--;
-        return u;
     }
 
     public Long getLicenseKey() {
@@ -151,34 +144,6 @@ public class DWSet implements IDB {
 
         this.licenseKey = key;
         this.licenseKeyVar.set(this.licenseKey);
-
-    }
-
-    public void setVersion(int version) {
-        this.uses++;
-        this.database.getAtomicInteger(VERSION).set(version);
-        this.uses--;
-    }
-
-    public void addUses() {
-        this.uses++;
-
-    }
-
-    public void outUses() {
-        this.uses--;
-    }
-
-    public boolean isBusy() {
-        if (this.uses > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public void openDBSet() {
 
     }
 
@@ -205,6 +170,16 @@ public class DWSet implements IDB {
         return this.accountsPropertisMap;
     }
 
+    /**
+     * Транзакции относящиеся к моим счетам. Сюда же записываться должны и неподтвержденные<br>
+     * А когда они подтверждаются они будут перезаписываться поверх.
+     * Тогда неподтвержденные будут показывать что они не сиполнились.
+     * И их пользователь сможет сам удалить вручную или командой - удалить все неподтвержденные
+     * <hr>
+     * Ключ: счет + подпись<br>
+     * Значение: транзакция
+     * @return TransactionMap
+     */
     public TransactionMap getTransactionMap() {
         return this.transactionMap;
     }
@@ -311,24 +286,24 @@ public class DWSet implements IDB {
         return this.orderMap;
     }
 
-    public FavoriteItemAsset getAssetFavoritesSet() {
+    public FavoriteItemMapAsset getAssetFavoritesSet() {
         return this.assetFavoritesSet;
     }
 
-    public FavoriteItemTemplate getTemplateFavoritesSet() {
+    public FavoriteItemMapTemplate getTemplateFavoritesSet() {
         return this.templateFavoritesSet;
     }
 
-    public FavoriteItemImprint getImprintFavoritesSet() {
+    public FavoriteItemMapImprint getImprintFavoritesSet() {
         return this.imprintFavoritesSet;
     }
 
-    public FavoriteItemPoll getPollFavoritesSet() {
+    public FavoriteItemMapPoll getPollFavoritesSet() {
         return this.pollFavoriteSet;
     }
 
 
-    public FavoriteItemPerson getPersonFavoritesSet() {
+    public FavoriteItemMapPerson getPersonFavoritesSet() {
         return this.personFavoritesSet;
     }
 
@@ -336,15 +311,15 @@ public class DWSet implements IDB {
         return this.statementFavoritesSet;
     }
 
-    public FavoriteItemStatus getStatusFavoritesSet() {
+    public FavoriteItemMapStatus getStatusFavoritesSet() {
         return this.statusFavoritesSet;
     }
 
-    public FavoriteItemUnion getUnionFavoritesSet() {
+    public FavoriteItemMapUnion getUnionFavoritesSet() {
         return this.unionFavoritesSet;
     }
 
-    public FavoriteItem getItemFavoritesSet(ItemCls item) {
+    public FavoriteItemMap getItemFavoritesSet(ItemCls item) {
         if (item instanceof AssetCls) {
             return this.assetFavoritesSet;
         } else if (item instanceof ImprintCls) {
@@ -393,36 +368,60 @@ public class DWSet implements IDB {
 
     }
 
-    public void clearCache() {
-        this.database.getEngine().clearCache();
-    }
+    long commitPoint;
 
     @Override
-    public void commit() {
+    public synchronized void commit() {
+        if (this.uses != 0
+                || System.currentTimeMillis() - commitPoint < 10000
+        )
+            return;
+
         this.uses++;
         this.database.commit();
         this.uses--;
 
+        commitPoint = System.currentTimeMillis();
+
     }
 
-    public void rollback() {
+    /**
+     * закрываем без коммита! - чтобы при запуске продолжитть?
+     */
+    @Override
+    public void close() {
+
+        if (this.database == null || this.database.isClosed())
+            return;
+
+        int step = 0;
+        if (Controller.getInstance().wallet.synchronizeStatus) {
+            // STOP syncronize Wallet
+            Controller.getInstance().wallet.synchronizeBodyStop = true;
+
+            while (Controller.getInstance().wallet.synchronizeStatus && ++step < 500) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                }
+
+            }
+        }
+
+        step = 0;
+        while (uses > 0 && ++step < 100) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+
+        }
+
         this.uses++;
         this.database.rollback();
+        this.database.close();
         this.uses--;
 
     }
 
-    @Override
-    public void close() {
-        if (this.database != null) {
-            if (!this.database.isClosed()) {
-                this.uses++;
-                //this.database.rollback();
-                this.database.commit();
-                this.database.close();
-                this.uses--;
-
-            }
-        }
-    }
 }

@@ -37,8 +37,6 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple5<
         Tuple2<BigDecimal, BigDecimal>  // on HOLD
         >> {
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     @SuppressWarnings("rawtypes")
     private BTreeMap assetKeyMap;
 
@@ -47,11 +45,9 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple5<
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_BALANCE_TYPE);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_BALANCE_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_BALANCE_TYPE);
-            }
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_BALANCE_TYPE);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_BALANCE_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_BALANCE_TYPE);
         }
     }
 
@@ -152,11 +148,6 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple5<
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO));
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
 	/*

@@ -15,7 +15,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
@@ -260,7 +260,7 @@ public class APIUtils {
         boolean confirmed = true;
         if (Gui.isGuiStarted()) {
             String Status_text = "";
-            Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
+            IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                     Lang.getInstance().translate("Send Mail"), (600), (450), Status_text,
                     Lang.getInstance().translate("Confirmation Transaction"));
             Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
@@ -354,7 +354,7 @@ public class APIUtils {
             
         } catch (NullPointerException | ClassCastException e) {
             // JSON EXCEPTION
-            // LOGGER.error(e.getMessage());
+            // logger.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
         

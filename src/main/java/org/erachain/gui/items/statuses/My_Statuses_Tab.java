@@ -27,7 +27,7 @@ public class My_Statuses_Tab extends Split_Panel {
     private MTable table;
     private TableColumn favoriteColumn;
     private My_Statuses_Tab tSP;
-    //	private  TableModelItemStatuses tableModelItemStatuses;
+    //	private  StatusesItemsTableModel tableModelItemStatuses;
     private Status_Info info1;
     // My statuses
     public My_Statuses_Tab() {
@@ -250,9 +250,9 @@ public class My_Statuses_Tab extends Split_Panel {
     }
 
     @Override
-    public void delay_on_close() {
+    public void onClose() {
         // delete observer left panel
-        statusesModel.removeObservers();
+        statusesModel.deleteObservers();
         // get component from right panel
         Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
         // if Person_Info 002 delay on close

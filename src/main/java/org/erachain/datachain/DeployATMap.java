@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class DeployATMap extends DCMap<byte[], Long> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public DeployATMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -40,11 +39,6 @@ public class DeployATMap extends DCMap<byte[], Long> {
     @Override
     protected Long getDefaultValue() {
         return -1l;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     public Long get(Transaction transaction) {

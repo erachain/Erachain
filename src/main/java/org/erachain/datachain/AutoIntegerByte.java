@@ -19,7 +19,6 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
     static Logger LOGGER = LoggerFactory.getLogger(AutoIntegerByte.class.getName());
 
     // protected int type;
-    protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
     protected Atomic.Integer atomicKey;
     protected int key;
 
@@ -38,14 +37,12 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
         if (databaseSet.isWithObserver()) {
             if (observeReset > 0)
                 this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
-            if (databaseSet.isDynamicGUI()) {
-                if (observeAdd > 0)
-                    this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
-                if (observeRemove > 0)
-                    this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
-            }
             if (observeList > 0)
                 this.observableData.put(DBMap.NOTIFY_LIST, observeList);
+            if (observeAdd > 0)
+                this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
+            if (observeRemove > 0)
+                this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
         }
     }
 
@@ -79,11 +76,6 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
     @Override
     protected byte[] getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     public long add(byte[] item) {

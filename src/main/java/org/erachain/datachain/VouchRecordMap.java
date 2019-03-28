@@ -28,18 +28,15 @@ import java.util.Map;
  */
 
 public class VouchRecordMap extends DCMap<Long, Tuple2<BigDecimal, List<Long>>> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public VouchRecordMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_VOUCH_TYPE);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_VOUCH_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_VOUCH_TYPE);
-            }
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_VOUCH_TYPE);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_VOUCH_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_VOUCH_TYPE);
         }
     }
 
@@ -80,11 +77,6 @@ public class VouchRecordMap extends DCMap<Long, Tuple2<BigDecimal, List<Long>>> 
     @Override
     protected Tuple2<BigDecimal, List<Long>> getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
 }

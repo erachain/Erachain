@@ -11,13 +11,11 @@ public class ObserverMessage {
     public static final int ADD_TRANSACTION_TYPE = 7;
     public static final int REMOVE_TRANSACTION_TYPE = 8;
     public static final int LIST_TRANSACTION_TYPE = 9;
-    public static final int COUNT_TRANSACTION_TYPE = 10;
 
     public static final int RESET_UNC_TRANSACTION_TYPE = 11;
     public static final int ADD_UNC_TRANSACTION_TYPE = 12;
     public static final int REMOVE_UNC_TRANSACTION_TYPE = 13;
     public static final int LIST_UNC_TRANSACTION_TYPE = 14;
-    public static final int COUNT_UNC_TRANSACTION_TYPE = 15;
 
     public static final int RESET_PEER_TYPE = 16;
     public static final int ADD_PEER_TYPE = 17;
@@ -129,7 +127,6 @@ public class ObserverMessage {
     public static final int ADD_CLACULATED_TYPE = 167;
     public static final int REMOVE_CLACULATED_TYPE = 168;
     public static final int LIST_CLACULATED_TYPE = 169;
-    public static final int COUNT_CLACULATED_TYPE = 170;
 
     public static final int RESET_COMPL_ORDER_TYPE = 201;
     public static final int ADD_COMPL_ORDER_TYPE = 202;
@@ -229,7 +226,6 @@ public class ObserverMessage {
     public static final int WALLET_ADD_TRANSACTION_TYPE = 10012;
     public static final int WALLET_REMOVE_TRANSACTION_TYPE = 10013;
     public static final int WALLET_LIST_TRANSACTION_TYPE = 10014;
-    public static final int WALLET_COUNT_TRANSACTION_TYPE = 10015;
 
     public static final int WALLET_RESET_ORDER_TYPE = 10021;
     public static final int WALLET_ADD_ORDER_TYPE = 10022;
@@ -250,9 +246,10 @@ public class ObserverMessage {
     public static final int WALLET_ADD_POLL_TYPE = 10052;
     public static final int WALLET_REMOVE_POLL_TYPE = 10053;
     public static final int WALLET_LIST_POLL_TYPE = 10054;
-    public static final int WALLET_LIST_POLL_FAVORITES_TYPE = 10055;
-    public static final int WALLET_ADD_POLL_FAVORITES_TYPE = 10056;
-    public static final int WALLET_DELETE_POLL_FAVORITE_TYPE = 10057;
+    public static final int WALLET_RESET_POLL_FAVORITES_TYPE = 10055;
+    public static final int WALLET_ADD_POLL_FAVORITES_TYPE = 10058;
+    public static final int WALLET_DELETE_POLL_FAVORITES_TYPE = 10059;
+    public static final int WALLET_LIST_POLL_FAVORITES_TYPE = 10057;
 
 
     public static final int WALLET_RESET_ASSET_TYPE = 10061;
@@ -264,17 +261,19 @@ public class ObserverMessage {
     public static final int WALLET_ADD_IMPRINT_TYPE = 10072;
     public static final int WALLET_REMOVE_IMPRINT_TYPE = 10073;
     public static final int WALLET_LIST_IMPRINT_TYPE = 10074;
-    public static final int LIST_IMPRINT_FAVORITES_TYPE = 10075;
-    public static final int ADD_IMPRINT_TYPE_FAVORITES_TYPE = 10077;
-    public static final int DELETE_IMPRINT_FAVORITES_TYPE = 10078;
+    public static final int RESET_IMPRINT_FAVORITES_TYPE = 10076;
+    public static final int ADD_IMPRINT_FAVORITES_TYPE = 10077;
+    public static final int REMOVE_IMPRINT_FAVORITES_TYPE = 10078;
+    public static final int LIST_IMPRINT_FAVORITES_TYPE = 10079;
 
     public static final int WALLET_RESET_TEMPLATE_TYPE = 10081;
     public static final int WALLET_ADD_TEMPLATE_TYPE = 10082;
     public static final int WALLET_REMOVE_TEMPLATE_TYPE = 10083;
     public static final int WALLET_LIST_TEMPLATE_TYPE = 10084;
-    public static final int LIST_TEMPLATE_FAVORITES_TYPE = 10086;
-    public static final int ADD_TEMPLATE_TYPE_FAVORITES_TYPE = 10087;
-    public static final int DELETE_TEMPLATE_FAVORITES_TYPE = 10088;
+    public static final int RESET_TEMPLATE_FAVORITES_TYPE = 10086;
+    public static final int ADD_TEMPLATE_FAVORITES_TYPE = 10087;
+    public static final int REMOVE_TEMPLATE_FAVORITES_TYPE = 10088;
+    public static final int LIST_TEMPLATE_FAVORITES_TYPE = 10089;
 
     public static final int WALLET_RESET_PERSON_TYPE = 10091;
     public static final int WALLET_ADD_PERSON_TYPE = 10092;
@@ -289,9 +288,10 @@ public class ObserverMessage {
     public static final int WALLET_ADD_STATUS_TYPE = 12002;
     public static final int WALLET_REMOVE_STATUS_TYPE = 12003;
     public static final int WALLET_LIST_STATUS_TYPE = 12004;
-    public static final int LIST_STATUS_FAVORITES_TYPE = 12006;
-    public static final int ADD_STATUS_TYPE_FAVORITES_TYPE = 12007;
+    public static final int RESET_STATUS_FAVORITES_TYPE = 12006;
+    public static final int ADD_STATUS_FAVORITES_TYPE = 12007;
     public static final int DELETE_STATUS_FAVORITES_TYPE = 12008;
+    public static final int LIST_STATUS_FAVORITES_TYPE = 12009;
 
     public static final int WALLET_RESET_UNION_TYPE = 12011;
     public static final int WALLET_ADD_UNION_TYPE = 12012;
@@ -317,6 +317,7 @@ public class ObserverMessage {
     public static final int  RPC_WORK_TYPE = 20000;
 
     public static final int  GUI_ABOUT_TYPE = 1000000001;
+    public static final int  GUI_REPAINT = 1100000001;
 
 
     private int type;

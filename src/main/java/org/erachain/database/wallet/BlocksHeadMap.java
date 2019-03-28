@@ -28,22 +28,35 @@ import java.util.*;
  */
 
 public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead> {
-// нужно сделать так: public class BlocksHeadMap extends DCMap<Integer, Block.BlockHead> {
+    // нужно сделать так: public class BlocksHeadMap extends DCMap<Integer, Block.BlockHead> {
     public static final int TIMESTAMP_INDEX = 1;
     public static final int GENERATOR_INDEX = 2;
     public static final int BALANCE_INDEX = 3;
     public static final int TRANSACTIONS_INDEX = 4;
     public static final int FEE_INDEX = 5;
-    static Logger LOGGER = LoggerFactory.getLogger(BlocksHeadMap.class.getName());
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
+    static Logger logger = LoggerFactory.getLogger(BlocksHeadMap.class.getName());
+
+    /**
+     * для сортировки с SortableList задает по умолчанию клю по Высоте блока:<br>
+     *     DEFAULT_INDEX = TIMESTAMP_INDEX
+     *
+     * @param dWSet
+     * @param database
+     */
     public BlocksHeadMap(DWSet dWSet, DB database) {
         super(dWSet, database);
 
-        this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_BLOCK_TYPE);
-        this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_BLOCK_TYPE);
-        this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_BLOCK_TYPE);
-        this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_BLOCK_TYPE);
+        // for sort in SortedList
+        // in gui.models.WalletBlocksTableModel.syncUpdate
+        DEFAULT_INDEX = TIMESTAMP_INDEX;
+
+        if (databaseSet.isWithObserver()) {
+            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_BLOCK_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_BLOCK_TYPE);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_BLOCK_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_BLOCK_TYPE);
+        }
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -152,11 +165,6 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public Block.BlockHead getLast() {
 
         List<Pair<Account, Block.BlockHead>> blocks = new ArrayList<Pair<Account, Block.BlockHead>>();
@@ -188,7 +196,7 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
             }
         } catch (Exception e) {
             //ERROR
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
 
         return blocks;
@@ -201,7 +209,6 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
             //FOR EACH ACCOUNTS
             synchronized (accounts) {
                 for (Account account : accounts) {
-
                     List<Block.BlockHead> accountBlocks = get(account, limit);
                     for (Block.BlockHead block : accountBlocks) {
                         blocks.add(new Pair<Account, Block.BlockHead>(account, block));
@@ -209,8 +216,7 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
                 }
             }
         } catch (Exception e) {
-            //ERROR
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
 
         return blocks;
@@ -225,26 +231,23 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
 
         //DELETE TRANSACTIONS
         for (Tuple2<String, String> key : accountBlocks.keySet()) {
-            this.delete(key);
-            this.databaseSet.commit();
+            delete(key);
         }
     }
 
     public void delete(Block.BlockHead block) {
-        this.delete(new Tuple2<String, String>(block.creator.getAddress(), new String(block.signature)));
-        this.databaseSet.commit();
+        delete(new Tuple2<String, String>(block.creator.getAddress(), new String(block.signature)));
     }
 
     public void deleteAll(List<Account> accounts) {
         for (Account account : accounts) {
-            this.delete(account);
+            delete(account);
         }
     }
 
     public boolean add(Block.BlockHead block) {
         boolean result = this.set(new Tuple2<String, String>(block.creator.getAddress(),
                 new String(block.signature)), block);
-        this.databaseSet.commit();
         return result;
     }
 
@@ -253,7 +256,7 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
         for (Account account : blocks.keySet()) {
             //FOR EACH TRANSACTION
             for (Block.BlockHead block : blocks.get(account)) {
-                this.add(block);
+                add(block);
             }
         }
     }

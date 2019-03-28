@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 // import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 //import org.erachain.core.BlockChain;
-//import org.erachain.database.DBSet;
+//import org.erachain.database.DLSet;
 //import database.TransactionMap;
 //import org.erachain.lang.Lang;
 
@@ -38,7 +38,7 @@ public class RaterPolonex extends Rater {
             json = (JSONObject) JSONValue.parse(result);
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
-            ///LOGGER.error(e.getMessage());
+            ///logger.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
 

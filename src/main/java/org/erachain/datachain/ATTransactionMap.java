@@ -14,7 +14,6 @@ import java.util.*;
 
 public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transaction> {
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
     @SuppressWarnings("rawtypes")
@@ -25,11 +24,9 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_AT_TX_TYPE);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_AT_TX_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_AT_TX);
-            }
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_AT_TXS);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_AT_TX_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_AT_TX);
         }
     }
 
@@ -100,11 +97,6 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public boolean add(Integer blockHeight, int seq, AT_Transaction atTx) {
         atTx.setBlockHeight(blockHeight);
         atTx.setSeq(seq);
@@ -131,7 +123,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         }
 
         if (this.parent != null)
-            this.parent.getDBSet().getATTransactionMap().delete(height);
+            ((DCSet)this.parent.getDBSet()).getATTransactionMap().delete(height);
 
     }
 
@@ -150,7 +142,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         }
 
         if (this.parent != null)
-            this.parent.getDBSet().getATTransactionMap().deleteAllAfterHeight(height);
+            ((DCSet)this.parent.getDBSet()).getATTransactionMap().deleteAllAfterHeight(height);
 
     }
 
@@ -171,7 +163,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         }
 
         if (this.parent != null)
-            txs.putAll(this.parent.getDBSet().getATTransactionMap().getATTransactions(height));
+            txs.putAll(((DCSet)this.parent.getDBSet()).getATTransactionMap().getATTransactions(height));
 
         return txs;
 
@@ -188,7 +180,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         }
 
         if (this.parent != null)
-            ats.addAll(this.parent.getDBSet().getATTransactionMap().getATTransactionsBySender(sender));
+            ats.addAll(((DCSet)this.parent.getDBSet()).getATTransactionMap().getATTransactionsBySender(sender));
 
         return ats;
     }
@@ -205,7 +197,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         }
 
         if (this.parent != null)
-            ats.addAll(this.parent.getDBSet().getATTransactionMap().getBlExpATTransactionsBySender(sender));
+            ats.addAll(((DCSet)this.parent.getDBSet()).getATTransactionMap().getBlExpATTransactionsBySender(sender));
 
         return ats;
     }
@@ -221,7 +213,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         }
 
         if (this.parent != null)
-            ats.addAll(this.parent.getDBSet().getATTransactionMap().getATTransactionsByRecipient(recipient));
+            ats.addAll(((DCSet)this.parent.getDBSet()).getATTransactionMap().getATTransactionsByRecipient(recipient));
 
         return ats;
     }
@@ -238,7 +230,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         }
 
         if (this.parent != null)
-            ats.addAll(this.parent.getDBSet().getATTransactionMap().getBlExpATTransactionsByRecipient(recipient));
+            ats.addAll(((DCSet)this.parent.getDBSet()).getATTransactionMap().getBlExpATTransactionsByRecipient(recipient));
 
         return ats;
     }

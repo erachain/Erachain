@@ -15,11 +15,10 @@ import java.awt.event.ActionListener;
 
 public class Imprints_Favorite_SplitPanel extends Item_SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private static Imprints_Favorite_TableModel table_Model = new Imprints_Favorite_TableModel();
     private Imprints_Favorite_SplitPanel th;
 
     public Imprints_Favorite_SplitPanel() {
-        super(table_Model, "Persons_Favorite_SplitPanel");
+        super(new FavoriteImprintsTableModel(), "Persons_Favorite_SplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Persons"));
         th = this;
         JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
@@ -49,9 +48,4 @@ public class Imprints_Favorite_SplitPanel extends Item_SplitPanel {
         return new Imprints_Info_Panel((ImprintCls) item);
     }
 
-    @Override
-    protected void splitClose() {
-        table_Model.removeObservers();
-
-    }
 }

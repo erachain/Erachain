@@ -1,10 +1,12 @@
 package org.erachain.gui.models;
 
+import com.sun.org.apache.xpath.internal.operations.Or;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
+import org.erachain.database.wallet.OrderMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
@@ -12,14 +14,10 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 
 @SuppressWarnings("serial")
-public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, Order> implements Observer {
+public class WalletOrdersTableModel extends SortedListTableModelCls<Tuple2<String, Long>, Order> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_BLOCK = 1;
     public static final int COLUMN_AMOUNT = 2;
@@ -30,62 +28,23 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
     public static final int COLUMN_LEFT = 7;
     public static final int COLUMN_CREATOR = 8;
     public static final int COLUMN_STATUS = 9;
-    int start = 0, step = 100;
 
-    private SortableList<Tuple2<String, Long>, Order> orders;
-    List<Pair<Tuple2<String, Long>, Order>> pp = new ArrayList<Pair<Tuple2<String, Long>, Order>>();
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", " ", "Amount", "Have", "Price", "Want", "Total", "Left", "Creator", "Status"});
+    //List<Pair<Tuple2<String, Long>, Order>> pp = new ArrayList<Pair<Tuple2<String, Long>, Order>>();
 
     public WalletOrdersTableModel() {
-        columnNames[COLUMN_BLOCK] = Lang.getInstance().translate("Block - transaction");
-        Controller.getInstance().addWalletListener(this);
-    }
+        super(Controller.getInstance().wallet.database.getOrderMap(),
+                new String[]{"Timestamp", "Block - transaction", "Amount", "Have", "Price",
+                "Want", "Total", "Left", "Creator", "Status"}, true);
 
-    @Override
-    public SortableList<Tuple2<String, Long>, Order> getSortableList() {
-        return this.orders;
-    }
-
-    @Override
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
-    public Order getOrder(int row) {
-        if (this.pp == null || row >= this.pp.size())
-            return null;
-
-        Pair<Tuple2<String, Long>, Order> item = this.pp.get(row);
-        if (item == null)
-            return null;
-
-        return item.getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
-    }
-
-    @Override
-    public int getRowCount() {
-        //	 return this.orders.size();
-        return (this.pp == null) ? 0 : this.pp.size();
-
+        addObservers();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.pp == null || row >= this.pp.size()) {
+        if (this.listSorted == null || row >= this.listSorted.size()) {
             return null;
         }
-        Pair<Tuple2<String, Long>, Order> item = this.pp.get(row);
+        Pair<Tuple2<String, Long>, Order> item = this.listSorted.get(row);
         if (item == null)
             return null;
 
@@ -158,15 +117,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-            String msg = e.getMessage();
-        }
-    }
+    private int count;
 
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
@@ -174,77 +125,60 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_RESET_ORDER_TYPE) {
-            this.pp.clear();
+            this.listSorted.clear();
             this.fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
-            if (this.orders == null) {
-                this.orders = (SortableList<Tuple2<String, Long>, Order>) message.getValue();
-                this.orders.sort(0, true);
-                this.orders.registerObserver();
-            }
-            getInterval(start, step);
+            needUpdate = false;
+            getInterval();
             this.fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE) {
-            //CHECK IF LIST UPDATED
-            Pair<Tuple2<String, Long>, Order> item = (Pair<Tuple2<String, Long>, Order>) message.getValue();
-            //this.pp.add(0, item);
-            //this.fireTableRowsInserted(0, 0);
-            getInterval(start, step);
-            this.fireTableDataChanged();
-
+            needUpdate = true;
         } else if (message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE) {
-            //CHECK IF LIST UPDATED
-            //this.pp.remove(0);
-            //this.fireTableRowsDeleted(0, 0);
-            getInterval(start, step);
-            this.fireTableDataChanged();
+            needUpdate = true;
+
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT
+                && Controller.getInstance().isDynamicGUI()
+                && needUpdate) {
+
+            if (count++ < 4)
+                return;
+
+            count = 0;
+            needUpdate = false;
+
+            getInterval();
+            fireTableDataChanged();
+
         }
+
+    }
+
+    @Override
+    public void getIntervalThis(long startBack, long endBack) {
+        listSorted = new SortableList<Tuple2<String, Long>, Order>(
+                map, ((OrderMap)map).getFromToKeys(startBack, endBack));
 
     }
 
     public void addObservers() {
         if (Controller.getInstance().doesWalletDatabaseExists()) {
-            this.orders.registerObserver();
-            Controller.getInstance().addWalletListener(this);
+            map.addObserver(this);
         }
+
+        Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
+
+        getInterval();
+        fireTableDataChanged();
+
     }
 
-    public void removeObservers() {
+    public void deleteObservers() {
+
+        Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
+
         if (Controller.getInstance().doesWalletDatabaseExists()) {
-            this.orders.removeObserver();
-            Controller.getInstance().deleteWalletObserver(this);
+            map.deleteObserver(this);
         }
-    }
-
-    @Override
-    public Object getItem(int k) {
-        if (this.orders == null)
-            return null;
-
-        // TODO Auto-generated method stub
-        return this.orders.get(k).getB();
-    }
-
-    public void getInterval(int start, int step) {
-
-        if (this.orders == null || orders.isEmpty())
-            pp = new ArrayList<>();
-
-        // pp.c.clear();
-        int end = start + step;
-        //if (start > orders.size()) start = orders.size();
-        if (end > orders.size()) end = orders.size();
-
-        this.start = start;
-        this.step = step;
-
-        // new (!) LIST
-        pp = new ArrayList<>(this.orders.subList(start, end));
-
-    }
-
-    public void setInterval(int start, int step) {
-        getInterval(start, step);
     }
 
 }

@@ -23,15 +23,16 @@ public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal> {
     public static final int SELLER_INDEX = 2;
     public static final int AMOUNT_INDEX = 3;
     static Logger LOGGER = LoggerFactory.getLogger(NameSaleMap.class.getName());
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public NameSaleMap(DWSet dWSet, DB database) {
         super(dWSet, database);
 
-        this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_NAME_SALE_TYPE);
-        this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_NAME_SALE_TYPE);
-        this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_NAME_SALE_TYPE);
-        this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_NAME_SALE_TYPE);
+        if (databaseSet.isWithObserver()) {
+            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_NAME_SALE_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_NAME_SALE_TYPE);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_NAME_SALE_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_NAME_SALE_TYPE);
+        }
     }
 
     @Override
@@ -103,11 +104,6 @@ public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal> {
     @Override
     protected BigDecimal getDefaultValue() {
         return BigDecimal.ZERO;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

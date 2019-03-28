@@ -298,7 +298,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
     public void orphan(Block block, int asDeal) {
         // RISE ERROR
         DCSet err = null;
-        err.commit();
+        err.hashCode();
 
 		/* IT CANNOT BE orphanED !!!
 		 *

@@ -59,7 +59,7 @@ public class TestChain {
     // INIT PERSONS
     private void init() {
 
-        //dcSet = DBSet.createEmptyDatabaseSet();
+        //dcSet = DLSet.createEmptyDatabaseSet();
         dcSet = DCSet.getInstance();
 
     }

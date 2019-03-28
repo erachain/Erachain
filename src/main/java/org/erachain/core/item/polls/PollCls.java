@@ -6,8 +6,8 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.Issue_ItemMap;
-import org.erachain.datachain.Item_Map;
+import org.erachain.datachain.IssueItemMap;
+import org.erachain.datachain.ItemMap;
 import org.erachain.datachain.VoteOnItemPollMap;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -54,11 +54,11 @@ public abstract class PollCls extends ItemCls {
     }
 
     // DB
-    public Item_Map getDBMap(DCSet dc) {
+    public ItemMap getDBMap(DCSet dc) {
         return dc.getItemPollMap();
     }
 
-    public Issue_ItemMap getDBIssueMap(DCSet dc) {
+    public IssueItemMap getDBIssueMap(DCSet dc) {
         return dc.getIssuePollMap();
     }
 

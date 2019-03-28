@@ -4,8 +4,8 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.gui.Split_Panel;
-import org.erachain.gui.items.records.Records_Search_SplitPanel;
-import org.erachain.gui.library.My_JFileChooser;
+import org.erachain.gui.items.records.SearchTransactionsSplitPanel;
+import org.erachain.gui.library.fileChooser;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -21,7 +21,7 @@ import java.io.IOException;
 
 public class Other_Search_Blocks extends Split_Panel {
 
-    Records_Search_SplitPanel rp = new Records_Search_SplitPanel();
+    SearchTransactionsSplitPanel rp = new SearchTransactionsSplitPanel();
     private Other_Seasrch_BlocksTableModel tamleModel;
     private JTable Table_Hash;
     private int start;
@@ -131,7 +131,7 @@ public class Other_Search_Blocks extends Split_Panel {
         // JFileChooser chooser = new JFileChooser();
         // руссификация диалога выбора файла
         // new All_Options().setUpdateUI(chooser);
-        My_JFileChooser chooser = new My_JFileChooser();
+        fileChooser chooser = new fileChooser();
         chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
 
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

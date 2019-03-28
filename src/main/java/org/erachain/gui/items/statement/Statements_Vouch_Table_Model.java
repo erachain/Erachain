@@ -161,9 +161,8 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 
             }
 
-            List<Long> keys = DCSet.getInstance().getVouchRecordMap().get(Transaction.makeDBRef(this.blockNo, this.recNo)).b;
             transactions.clear();
-            for (Long key : keys) {
+            for (Long key : vouches.b) {
                 // write R-Vouch transaction
                 transactions.add((R_Vouch) DCSet.getInstance().getTransactionFinalMap().get(key));
 

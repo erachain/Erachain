@@ -11,8 +11,6 @@ import java.util.*;
 //Integer -> blockHeight (f.e 0 -> 1000 -> 2000 if we keep state every 1000s blocks), byte[] -> atId , byte[] stateBytes
 public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     @SuppressWarnings("rawtypes")
     private NavigableSet allATStates;
 
@@ -98,7 +96,7 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
 
         if (this.parent != null) {
 
-            states.putAll(this.parent.getDBSet().getATStateMap().getStates(blockHeight));
+            states.putAll(((DCSet)this.parent.getDBSet()).getATStateMap().getStates(blockHeight));
 
             if (this.deleted != null) {
                 //DELETE DELETED
@@ -129,7 +127,7 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
 
         // in .deleted
         if (false && this.parent != null) {
-            this.parent.getDBSet().getATStateMap().deleteStatesAfter(blockHeight);
+            ((DCSet)this.parent.getDBSet()).getATStateMap().deleteStatesAfter(blockHeight);
         }
     }
 
@@ -137,11 +135,5 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
     protected byte[] getDefaultValue() {
         return null;
     }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
 
 }

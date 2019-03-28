@@ -26,16 +26,16 @@ import java.util.*;
 public class FavoriteDocument extends DBMap<Tuple2<String, String>, Transaction> implements Observer {
 
     static Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class.getName());
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public FavoriteDocument(DWSet dWSet, DB database) {
         super(dWSet, database);
 
-        //	DCSet.getInstance().getTransactionFinalMap().addObserver(this);
-        this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_STATEMENT_FAVORITES_TYPE);
-        this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_STATEMENT_FAVORITES_TYPE);
-        this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.DELETE_STATEMENT_FAVORITES_TYPE);
-        this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_STATEMENT_FAVORITES_TYPE);
+        if (databaseSet.isWithObserver()) {
+            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_STATEMENT_FAVORITES_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_STATEMENT_FAVORITES_TYPE);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_STATEMENT_FAVORITES_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.DELETE_STATEMENT_FAVORITES_TYPE);
+        }
     }
 
     @SuppressWarnings({})
@@ -58,11 +58,6 @@ public class FavoriteDocument extends DBMap<Tuple2<String, String>, Transaction>
     @Override
     protected Transaction getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

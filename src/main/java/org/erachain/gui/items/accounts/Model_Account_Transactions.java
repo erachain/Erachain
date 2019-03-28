@@ -9,12 +9,13 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Null;
 import java.math.BigDecimal;
@@ -24,7 +25,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class Model_Account_Transactions extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer {
+public class Model_Account_Transactions extends SortedListTableModelCls<Tuple2<String, String>, Transaction> implements Observer {
     public static final int COLUMN_AMOUNT = 1;
     public static final int COLUMN_TRANSACTION = 2;
     private static final int COLUMN_ADDRESS = 0;
@@ -33,7 +34,7 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
     //public static final int COLUMN_GENERATING_BALANCE = 3;
     //	public static final int COLUMN_FEE_BALANCE = 3;
     List<Tuple2<Tuple3<String, Long, String>, BigDecimal>> cred;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Amount", "Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
+    //private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Amount", "Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
     private Boolean[] column_AutuHeight = new Boolean[]{true, false, false, false};
     private List<PublicKeyAccount> publicKeyAccounts;
     private Account account;
@@ -45,13 +46,14 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
 
     @SuppressWarnings("unchecked")
     public Model_Account_Transactions() {
+        super(new String[]{"Account", "Amount", "Type"}, true);
+
+        logger = LoggerFactory.getLogger(Model_Account_Transactions.class.getName());
+
         this.transactions_Asset = new ArrayList<Transaction>();
         this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
         cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
         account = new Account("");
-
-        Controller.getInstance().addWalletListener(this);
-        //	Controller.getInstance().addObserver(this);
 
     }
 
@@ -67,13 +69,13 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
     }
 
     // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
+    public Boolean[] getColumnAutoHeight() {
 
         return this.column_AutuHeight;
     }
 
     // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
+    public void setColumnAutoHeight(Boolean[] arg0) {
         this.column_AutuHeight = arg0;
     }
 
@@ -115,16 +117,6 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
     }
 
     @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return columnNames[index];
-    }
-
-    @Override
     public int getRowCount() {
 
         return transactions_Asset.size();
@@ -157,13 +149,13 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
 			/*
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
-			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
+			balance = account.getBalance(this.asset.getKey(DLSet.getInstance()));
 			str = NumberAsString.getInstance().numberAsString(balance.a) + "/" + balance.b.toPlainString() + "/" + balance.c.toPlainString();
 			return str;
 		case COLUMN_WAINTING_BALANCE:
 			if (this.asset == null) return "-";
-			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
-			unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DBSet.getInstance()));
+			balance = account.getBalance(this.asset.getKey(DLSet.getInstance()));
+			unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DLSet.getInstance()));
 			str = NumberAsString.getInstance().numberAsString(unconfBalance.a.subtract(balance.a))
 					+ "/" + unconfBalance.b.subtract(balance.b).toPlainString()
 					+ "/" + unconfBalance.c.subtract(balance.c).toPlainString();
@@ -210,7 +202,7 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.transactions == null) {
                 this.transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
-                this.transactions.registerObserver();
+                //this.transactions.registerObserver();
                 this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
 
                 this.transactions_Asset.clear();
@@ -242,7 +234,7 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
             cred.clear();
             for (PublicKeyAccount account : this.publicKeyAccounts) {
                 cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
-                //cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
+                //cred.addAll(DLSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
             }
 
 
@@ -276,8 +268,30 @@ public class Model_Account_Transactions extends TableModelCls<Tuple2<String, Str
         return totalBalance;
     }
 
+    public void addObservers() {
+        super.addObservers();
+        //Controller.getInstance().addWalletObserver(this);
+
+        // REGISTER ON ACCOUNTS
+        Controller.getInstance().wallet.database.getAccountMap().addObserver(this);
+
+        // REGISTER ON TRANSACTIONS
+        Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
+
+    }
+
+    public void deleteObservers() {
+        // REGISTER ON ACCOUNTS
+        Controller.getInstance().wallet.database.getAccountMap().deleteObserver(this);
+
+        // REGISTER ON TRANSACTIONS
+        Controller.getInstance().wallet.database.getTransactionMap().deleteObserver(this);
+
+        super.deleteObservers();
+    }
+
     @Override
-    public Object getItem(int k) {
+    public Transaction getItem(int k) {
         // TODO Auto-generated method stub
         return transactions_Asset.get(k);
     }

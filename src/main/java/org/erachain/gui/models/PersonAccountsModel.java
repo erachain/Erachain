@@ -2,7 +2,6 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
@@ -31,7 +30,7 @@ public class PersonAccountsModel extends AbstractTableModel implements Observer 
     private static final HashSet<Account> Account = null;
 
     long key_person_table;
-    TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+    TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DLSet.getInstance().getPersonAddressMap().getItems(person.getKey());
     SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Name", "Date", "Verifier"}); //, "Data"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, true};
@@ -294,13 +293,16 @@ public class PersonAccountsModel extends AbstractTableModel implements Observer 
 
     public void addObservers() {
 
-        Controller.getInstance().addWalletListener(this);
+        //// зацикливает обсерверы при первой иницализации
+        ////Controller.getInstance().addWalletObserver(this);
+
+
 
     }
 
 
     public void removeObservers() {
 
-        Controller.getInstance().deleteObserver(this);
+        ////Controller.getInstance().deleteObserver(this);
     }
 }

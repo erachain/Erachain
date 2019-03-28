@@ -34,7 +34,7 @@ public class WalletStatus extends JLabel implements Observer {
             this.lockedIcon = new ImageIcon(lockedImage.getScaledInstance(20, 16, Image.SCALE_SMOOTH));
 
             //LISTEN ON WALLET
-            Controller.getInstance().addWalletListener(this);
+            Controller.getInstance().addWalletObserver(this);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

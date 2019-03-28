@@ -4,7 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.SortableList;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.NumberAsString;
@@ -16,9 +16,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class SellOrdersTableModel extends
-        TableModelCls<Long, Order>
-        implements Observer {
+public class SellOrdersTableModel extends SortedListTableModelCls<Long, Order> implements Observer {
     public static final int COLUMN_AMOUNT_HAVE = 0;
     public static final int COLUMN_PRICE = 1;
     public static final int COLUMN_AMOUNT_WANT = 2;
@@ -29,13 +27,14 @@ public class SellOrdersTableModel extends
     public SortableList<Long, Order> orders;
     BigDecimal sumAmountHave;
     BigDecimal sumAmountWant;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Have", "Price", "Want"});
     private AssetCls have;
     private AssetCls want;
     private long haveKey;
     private long wantKey;
 
     public SellOrdersTableModel(AssetCls have, AssetCls want) {
+        super(new String[]{"Have", "Price", "Want"}, true);
+
         this.have = have;
         this.want = want;
 
@@ -44,14 +43,11 @@ public class SellOrdersTableModel extends
 
         this.orders = Controller.getInstance().getOrders(have, want, false);
 
-        columnNames[COLUMN_PRICE] += " " + want.getShort();
-        columnNames[COLUMN_AMOUNT_HAVE] += " " + have.getShort();
-        columnNames[COLUMN_AMOUNT_WANT] += " " + want.getShort();
+        //columnNames[COLUMN_PRICE] += " " + want.getShort();
+        //columnNames[COLUMN_AMOUNT_HAVE] += " " + have.getShort();
+        //columnNames[COLUMN_AMOUNT_WANT] += " " + want.getShort();
 
         totalCalc();
-
-        Controller.getInstance().addObserver(this);
-        //this.orders.registerObserver();
 
     }
 
@@ -76,16 +72,6 @@ public class SellOrdersTableModel extends
 
     public Order getOrder(int row) {
         return this.orders.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -221,13 +207,17 @@ public class SellOrdersTableModel extends
         }
     }
 
-    public void removeObservers() {
-        this.orders.removeObserver();
+    public void addObservers() {
+        Controller.getInstance().addObserver(this);
+    }
+
+    public void deleteObservers() {
+        //this.orders.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 
     @Override
-    public Object getItem(int k) {
+    public Order getItem(int k) {
         // TODO Auto-generated method stub
         return this.orders.get(k).getB();
     }

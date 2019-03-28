@@ -8,7 +8,7 @@ import org.erachain.core.web.NameStorageMap;
 import org.erachain.core.web.OrphanNameStorageHelperMap;
 import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
-import org.erachain.database.IDB;
+import org.erachain.database.DBASet;
 import org.erachain.settings.Settings;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -24,7 +24,7 @@ import java.util.Observer;
  * Но почемуто парент хранится в каждой таблице - хотя там сразу ссылка на форкнутую таблицу есть
  * а в ней уже хранится объект набора DCSet
  */
-public class DCSet implements Observer, IDB {
+public class DCSet extends DBASet implements Observer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_BYTE << 3;
@@ -33,16 +33,15 @@ public class DCSet implements Observer, IDB {
     private static boolean isStoped = false;
     private volatile static DCSet instance;
     private DCSet parent;
-    private int uses;
 
     private boolean inMemory = false;
 
     private BlockChain bchain;
 
     private AddressForging addressForging;
-    private Credit_AddressesMap credit_AddressesMap;
+    private CreditAddressesMap credit_AddressesMap;
     private ItemAssetBalanceMap assetBalanceMap;
-    private AddressStatement_Refs addressStatement_Refs;
+    private AddressStatementRefs addressStatement_Refs;
     private ItemAssetBalanceMap assetBalanceAccountingMap;
     private KKAssetStatusMap kKAssetStatusMap;
     private KKPersonStatusMap kKPersonStatusMap;
@@ -54,12 +53,12 @@ public class DCSet implements Observer, IDB {
     private KKStatusUnionMap kKStatusUnionMap;
     private AddressPersonMap addressPersonMap;
     private PersonAddressMap personAddressMap;
-    private KK_KPersonStatusUnionMap kK_KPersonStatusUnionMap;
+    private KKKMapPersonStatusUnion kK_KPersonStatusUnionMapPersonStatusUnionTable;
     private VouchRecordMap vouchRecordMap;
     private HashesMap hashesMap;
     private HashesSignsMap hashesSignsMap;
 
-    private AddressTime_SignatureMap addressTime_SignatureMap;
+    private AddressTimeSignatureMap addressTime_SignatureMap;
     private BlockMap blockMap;
     //private BlockCreatorMap blockCreatorMap;
     private BlockSignsMap blockSignsMap;
@@ -111,18 +110,15 @@ public class DCSet implements Observer, IDB {
 
     private DB database;
     private long actions = (long) (Math.random() * (ACTIONS_BEFORE_COMMIT >> 1));
-    private boolean withObserver;// observe
-    private boolean dynamicGUI;// observe
 
-    public DCSet(DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory) {
+    public DCSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory) {
+        super(dbFile, database, withObserver, dynamicGUI);
+
         this.inMemory = inMemory;
-        uses = 1;
-        this.withObserver = withObserver;
-        this.dynamicGUI = dynamicGUI;
 
         try {
             this.database = database;
-            this.actions = 0l;
+            this.actions = 0L;
 
             this.blockMap = new BlockMap(this, database);
             //this.blockCreatorMap = new BlockCreatorMap(this, database);
@@ -130,9 +126,9 @@ public class DCSet implements Observer, IDB {
             this.blocksHeadsMap = new BlocksHeadsMap(this, database);
             this.referenceMap = new ReferenceMap(this, database);
             this.addressForging = new AddressForging(this, database);
-            this.credit_AddressesMap = new Credit_AddressesMap(this, database);
+            this.credit_AddressesMap = new CreditAddressesMap(this, database);
             this.assetBalanceMap = new ItemAssetBalanceMap(this, database);
-            this.addressStatement_Refs = new AddressStatement_Refs(this, database);
+            this.addressStatement_Refs = new AddressStatementRefs(this, database);
             this.assetBalanceAccountingMap = new ItemAssetBalanceMap(this, database);
 
             this.kKAssetStatusMap = new KKAssetStatusMap(this, database);
@@ -145,7 +141,7 @@ public class DCSet implements Observer, IDB {
             this.kKStatusUnionMap = new KKStatusUnionMap(this, database);
             this.addressPersonMap = new AddressPersonMap(this, database);
             this.personAddressMap = new PersonAddressMap(this, database);
-            this.kK_KPersonStatusUnionMap = new KK_KPersonStatusUnionMap(this, database);
+            this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(this, database);
             this.transactionFinalMap = new TransactionFinalMap(this, database);
             this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(this, database);
 
@@ -154,7 +150,7 @@ public class DCSet implements Observer, IDB {
             this.vouchRecordMap = new VouchRecordMap(this, database);
             this.hashesMap = new HashesMap(this, database);
             this.hashesSignsMap = new HashesSignsMap(this, database);
-            this.addressTime_SignatureMap = new AddressTime_SignatureMap(this, database);
+            this.addressTime_SignatureMap = new AddressTimeSignatureMap(this, database);
             this.nameMap = new NameMap(this, database);
             this.nameStorageMap = new NameStorageMap(this, database);
             this.orphanNameStorageMap = new OrphanNameStorageMap(this, database);
@@ -239,12 +235,11 @@ public class DCSet implements Observer, IDB {
         this.parent = parent;
         ///this.database = parent.database.snapshot();
         this.bchain = parent.bchain;
-        this.withObserver = false;
 
         this.addressForging = new AddressForging(parent.addressForging);
-        this.credit_AddressesMap = new Credit_AddressesMap(parent.credit_AddressesMap);
+        this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap);
         this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap);
-        this.addressStatement_Refs = new AddressStatement_Refs(parent.addressStatement_Refs);
+        this.addressStatement_Refs = new AddressStatementRefs(parent.addressStatement_Refs);
         this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap);
         this.kKAssetStatusMap = new KKAssetStatusMap(parent.kKAssetStatusMap);
         this.kKPersonStatusMap = new KKPersonStatusMap(parent.kKPersonStatusMap);
@@ -257,7 +252,7 @@ public class DCSet implements Observer, IDB {
         this.kKStatusUnionMap = new KKStatusUnionMap(parent.kKStatusUnionMap);
         this.addressPersonMap = new AddressPersonMap(parent.addressPersonMap);
         this.personAddressMap = new PersonAddressMap(parent.personAddressMap);
-        this.kK_KPersonStatusUnionMap = new KK_KPersonStatusUnionMap(parent.kK_KPersonStatusUnionMap);
+        this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(parent.kK_KPersonStatusUnionMapPersonStatusUnionTable);
         this.transactionFinalMap = new TransactionFinalMap(parent.transactionFinalMap, this);
         this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(parent.transactionFinalCalculatedMap, this);
         this.transactionFinalMapSigns = new TransactionFinalMapSigns(parent.transactionFinalMapSigns);
@@ -266,7 +261,7 @@ public class DCSet implements Observer, IDB {
         this.hashesMap = new HashesMap(parent.hashesMap);
         this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap);
 
-        this.addressTime_SignatureMap = new AddressTime_SignatureMap(parent.addressTime_SignatureMap);
+        this.addressTime_SignatureMap = new AddressTimeSignatureMap(parent.addressTime_SignatureMap);
         this.blockMap = new BlockMap(parent.blockMap, this);
         //this.blockCreatorMap = new BlockCreatorMap(parent.blockCreatorMap);
         this.blockSignsMap = new BlockSignsMap(parent.blockSignsMap, this);
@@ -339,7 +334,7 @@ public class DCSet implements Observer, IDB {
 
     public static DCSet getInstance(boolean withObserver, boolean dynamicGUI) throws Exception {
         if (instance == null) {
-            reCreateDatabase(withObserver, dynamicGUI);
+            reCreateDB(withObserver, dynamicGUI);
         }
 
         return instance;
@@ -360,7 +355,7 @@ public class DCSet implements Observer, IDB {
      * @param dynamicGUI [true] - for switch on GUI observers fir dynamic interface
      * @throws Exception
      */
-    public static void reCreateDatabase(boolean withObserver, boolean dynamicGUI) throws Exception {
+    public static void reCreateDB(boolean withObserver, boolean dynamicGUI) throws Exception {
 
         //OPEN DB
         File dbFile = new File(Settings.getInstance().getDataDir(), "chain.dat");
@@ -390,9 +385,9 @@ public class DCSet implements Observer, IDB {
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
-                //.snapshotEnable()
-                /// ICREATOR
                 .commitFileSyncDisable() // ++
+
+                //.snapshotEnable()
                 //.asyncWriteEnable()
                 //.asyncWriteFlushDelay(100)
                 //.cacheHardRefEnable()
@@ -415,7 +410,7 @@ public class DCSet implements Observer, IDB {
                 .make();
 
         //CREATE INSTANCE
-        instance = new DCSet(database, withObserver, dynamicGUI, false);
+        instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false);
         if (instance.actions < 0) {
             dbFile.delete();
             throw new Exception("error in DATACHAIN:" + instance.actions);
@@ -434,7 +429,7 @@ public class DCSet implements Observer, IDB {
                 //.newMemoryDirectDB()
                 .make();
 
-        instance = new DCSet(database, false, false, true);
+        instance = new DCSet(null, database, false, false, true);
         return instance;
     }
 
@@ -462,14 +457,6 @@ public class DCSet implements Observer, IDB {
         return isStoped;
     }
 
-    public boolean isWithObserver() {
-        return this.withObserver;
-    }
-
-    public boolean isDynamicGUI() {
-        return this.dynamicGUI;
-    }
-
     public boolean inMemory() {
         return this.inMemory || this.parent != null;
     }
@@ -488,20 +475,6 @@ public class DCSet implements Observer, IDB {
             return;
         }
         this.uses--;
-    }
-
-    @Override
-    public boolean isBusy() {
-        if (this.uses > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public void openDBSet() {
-
     }
 
     /**
@@ -526,8 +499,7 @@ public class DCSet implements Observer, IDB {
         this.kKStatusUnionMap.reset();
         this.addressPersonMap.reset();
         this.personAddressMap.reset();
-        ;
-        this.kK_KPersonStatusUnionMap.reset();
+        this.kK_KPersonStatusUnionMapPersonStatusUnionTable.reset();
         this.vouchRecordMap.reset();
         this.hashesMap.reset();
         this.hashesSignsMap.reset();
@@ -641,7 +613,7 @@ public class DCSet implements Observer, IDB {
      * <b>Значение:</b> сумма средств
      *
      */
-    public Credit_AddressesMap getCredit_AddressesMap() {
+    public CreditAddressesMap getCredit_AddressesMap() {
         return this.credit_AddressesMap;
     }
 
@@ -663,7 +635,7 @@ public class DCSet implements Observer, IDB {
      * Хранит для этого адреса и времени создания ссылки на транзакции типа Statement, см. супер класс
      * @return
      */
-    public AddressStatement_Refs getAddressStatement_Refs() {
+    public AddressStatementRefs getAddressStatement_Refs() {
         return this.addressStatement_Refs;
     }
 
@@ -721,7 +693,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * Назначает статус для актива. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * Назначает статус для актива. Использует схему карты Ключ + Ключ - Значение: KKMap,
      * в котрой по ключу ищем значение там карта по ключу еще и
      * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
 
@@ -732,7 +704,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * Назначает статус для персоны. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * Назначает статус для персоны. Использует схему карты Ключ + Ключ - Значение: KKMap,
      * в котрой по ключу ищем значение там карта по ключу еще и
      * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись.<br>
      *     <br>
@@ -757,7 +729,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * Назначает статус для актива. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * Назначает статус для актива. Использует схему карты Ключ + Ключ - Значение: KKMap,
      * в котрой по ключу ищем значение там карта по ключу еще и
      * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
 
@@ -768,7 +740,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * Назначает актив для объединения. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * Назначает актив для объединения. Использует схему карты Ключ + Ключ - Значение: KKMap,
      * в котрой по ключу ищем значение там карта по ключу еще и
      * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
 
@@ -779,7 +751,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * Назначает персон для объединения. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * Назначает персон для объединения. Использует схему карты Ключ + Ключ - Значение: KKMap,
      * в котрой по ключу ищем значение там карта по ключу еще и
      * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
 
@@ -790,7 +762,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * Назначает голосования для объединения. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * Назначает голосования для объединения. Использует схему карты Ключ + Ключ - Значение: KKMap,
      * в котрой по ключу ищем значение там карта по ключу еще и
      * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
 
@@ -801,7 +773,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * Назначает статус для объединения. Использует схему карты Ключ + Ключ - Значение: KK_Map,
+     * Назначает статус для объединения. Использует схему карты Ключ + Ключ - Значение: KKMap,
      * в котрой по ключу ищем значение там карта по ключу еще и
      * результат это Стэк из значений Начало, Конец, Данные, Ссылка на запись
 
@@ -818,8 +790,8 @@ public class DCSet implements Observer, IDB {
 
      * @return dcMap
      */
-    public KK_KPersonStatusUnionMap getPersonStatusUnionMap() {
-        return this.kK_KPersonStatusUnionMap;
+    public KKKMapPersonStatusUnion getPersonStatusUnionMap() {
+        return this.kK_KPersonStatusUnionMapPersonStatusUnionTable;
     }
 
     /**
@@ -923,7 +895,7 @@ public class DCSet implements Observer, IDB {
      *
      * @return
      */
-    public AddressTime_SignatureMap getAddressTime_SignatureMap() {
+    public AddressTimeSignatureMap getAddressTime_SignatureMap() {
         return this.addressTime_SignatureMap;
     }
 
@@ -1083,7 +1055,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * see datachain.Issue_ItemMap
+     * see datachain.IssueItemMap
      *
      * @return
      */
@@ -1127,7 +1099,7 @@ public class DCSet implements Observer, IDB {
     }
 
 /**
- * see datachain.Issue_ItemMap
+ * see datachain.IssueItemMap
  *
  * @return
  */
@@ -1145,7 +1117,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * see datachain.Issue_ItemMap
+     * see datachain.IssueItemMap
      *
      * @return
      */
@@ -1158,7 +1130,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * see datachain.Issue_ItemMap
+     * see datachain.IssueItemMap
      *
      * @return
      */
@@ -1167,7 +1139,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * see datachain.Item_Map
+     * see datachain.ItemMap
      *
      * @return
      */
@@ -1176,7 +1148,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * see datachain.Issue_ItemMap
+     * see datachain.IssueItemMap
      *
      * @return
      */
@@ -1185,7 +1157,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * see datachain.Item_Map
+     * see datachain.ItemMap
      *
      * @return
      */
@@ -1194,7 +1166,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * see datachain.Issue_ItemMap
+     * see datachain.IssueItemMap
      *
      * @return
      */
@@ -1203,7 +1175,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * see datachain.Item_Map
+     * see datachain.ItemMap
      *
      * @return
      */
@@ -1212,7 +1184,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * see datachain.Issue_ItemMap
+     * see datachain.IssueItemMap
      *
      * @return
      */
@@ -1221,7 +1193,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * see datachain.Item_Map
+     * see datachain.ItemMap
      *
      * @return
      */
@@ -1230,7 +1202,7 @@ public class DCSet implements Observer, IDB {
     }
 
     /**
-     * see datachain.Issue_ItemMap
+     * see datachain.IssueItemMap
      *
      * @return
      */
@@ -1243,7 +1215,7 @@ public class DCSet implements Observer, IDB {
      * @param type тип Сущности
      * @return
      */
-    public Item_Map getItem_Map(int type) {
+    public ItemMap getItem_Map(int type) {
 
         switch (type) {
             case ItemCls.ASSET_TYPE: {
@@ -1349,10 +1321,6 @@ public class DCSet implements Observer, IDB {
         }
     }
 
-    public void clearCache() {
-        this.database.getEngine().clearCache();
-    }
-
     @Override
     public void commit() {
         this.actions += 100;
@@ -1400,7 +1368,7 @@ public class DCSet implements Observer, IDB {
     }
     
     public String toString() {
-        return this.isFork()? "forked" : "main" + " "  + super.toString();
+        return (this.isFork()? "forked " : "")  + super.toString();
     }
 
 

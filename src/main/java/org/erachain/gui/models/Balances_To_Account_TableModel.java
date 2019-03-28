@@ -29,7 +29,7 @@ public class Balances_To_Account_TableModel extends AbstractTableModel implement
         this.key = key;
         Controller.getInstance().addObserver(this);
         this.balances = Controller.getInstance().getBalances(key);
-        this.balances.registerObserver();
+        //this.balances.registerObserver();
     }
 
 
@@ -108,7 +108,7 @@ public class Balances_To_Account_TableModel extends AbstractTableModel implement
     }
 
     public void removeObservers() {
-        this.balances.removeObserver();
+        //this.balances.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 }

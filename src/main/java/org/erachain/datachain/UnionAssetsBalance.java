@@ -9,7 +9,7 @@ import org.erachain.utils.ObserverMessage;
  * Ключ: Номер Объединания + Номер Актива
  * Значение: балансы
  */
-public class UnionAssetsBalance extends _BalanceMap {
+public class UnionAssetsBalance extends BalanceMap {
     static final String NAME = "union";
 
     public UnionAssetsBalance(DCSet databaseSet, DB database) {

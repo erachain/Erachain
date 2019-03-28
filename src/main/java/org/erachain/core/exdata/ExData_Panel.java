@@ -581,7 +581,7 @@ public class ExData_Panel extends javax.swing.JPanel {
         // JFileChooser chooser = new JFileChooser();
         // руссификация диалога выбора файла
         // new All_Options().setUpdateUI(chooser);
-        My_JFileChooser chooser = new My_JFileChooser();
+        fileChooser chooser = new fileChooser();
         chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
 
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -663,7 +663,7 @@ public class ExData_Panel extends javax.swing.JPanel {
         // JFileChooser chooser = new JFileChooser();
         // руссификация диалога выбора файла
         // new All_Options().setUpdateUI(chooser);
-        My_JFileChooser chooser = new My_JFileChooser();
+        fileChooser chooser = new fileChooser();
         chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
 
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
