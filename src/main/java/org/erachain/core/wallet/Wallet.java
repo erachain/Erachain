@@ -1452,7 +1452,9 @@ public class Wallet extends Observable implements Observer {
 		if (creator == null)
 			return;
 
-		DCSet db = DCSet.getInstance();
+        addOwnerInFavorites(sertifyPubKeys);
+
+        DCSet db = DCSet.getInstance();
 
 		boolean personalized = false;
 		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = db.getPersonAddressMap().getItems(sertifyPubKeys.getKey());
@@ -1493,7 +1495,19 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
-	private void orphanSertifyPerson(R_SertifyPubKeys sertifyPubKeys) {
+    private void addOwnerInFavorites(R_SertifyPubKeys sertifyPubKeys) {
+        List<PublicKeyAccount> sertifiedPublicKeys = sertifyPubKeys.getSertifiedPublicKeys();
+
+        for (PublicKeyAccount key : sertifiedPublicKeys) {
+            if (this.accountExists(key.getAddress())) {
+                long personKey = sertifyPubKeys.getKey();
+                this.database.getPersonFavoritesSet().add(personKey);
+                break;
+            }
+        }
+    }
+
+    private void orphanSertifyPerson(R_SertifyPubKeys sertifyPubKeys) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
