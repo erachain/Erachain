@@ -100,9 +100,9 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
                 int wheelRotation = e.getWheelRotation();
                 double scale;
                 if (wheelRotation > 0) {
-                    scale = 0.5d;
+                    scale = 0.9d;
                 } else if (wheelRotation < 0) {
-                    scale = 2d;
+                    scale = 1.1d;
                 } else {
                     scale = 1d;
                 }
