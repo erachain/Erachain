@@ -10,8 +10,6 @@ import java.util.*;
 
 public class NameStorageMap extends DCMap<String, Map<String, String>> {
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     public NameStorageMap(DCSet dcSet, DB database) {
         super(dcSet, database);
     }
@@ -35,11 +33,6 @@ public class NameStorageMap extends DCMap<String, Map<String, String>> {
     @Override
     protected Map<String, String> getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     protected void createIndexes(DB database) {

@@ -1,6 +1,6 @@
 package org.erachain.gui.settings;
 
-import org.erachain.gui.library.My_JFileChooser;
+import org.erachain.gui.library.fileChooser;
 import org.erachain.lang.Lang;
 import org.erachain.lang.LangFile;
 import org.erachain.settings.Settings;
@@ -218,11 +218,11 @@ public class SettingsBasicPanel extends JPanel {
         gbc_btnBrowseDataFolder.gridy = 8;
         btnBrowseDataFolder.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                My_JFileChooser fileopen = new My_JFileChooser();
-                fileopen.setFileSelectionMode(My_JFileChooser.DIRECTORIES_ONLY);
+                fileChooser fileopen = new fileChooser();
+                fileopen.setFileSelectionMode(fileChooser.DIRECTORIES_ONLY);
                 fileopen.setCurrentDirectory(new File(textDataFolder.getText()));
                 int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set data dir"));
-                if (ret == My_JFileChooser.APPROVE_OPTION) {
+                if (ret == fileChooser.APPROVE_OPTION) {
                     textDataFolder.setText(fileopen.getSelectedFile().toString());
                 }
             }

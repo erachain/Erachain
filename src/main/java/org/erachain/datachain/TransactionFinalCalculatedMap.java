@@ -35,7 +35,6 @@ import java.util.*;
  * ++ address_type_txs
  */
 public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer, Long>, Calculated> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
@@ -52,15 +51,11 @@ public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer
     public TransactionFinalCalculatedMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
-        if (false && databaseSet.isWithObserver()) {
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_CLACULATED_TYPE);
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_CLACULATED_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_CLACULATED_TYPE);
-                this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_CLACULATED_TYPE);
-            } else {
-                this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.COUNT_CLACULATED_TYPE);
-            }
+        if (databaseSet.isWithObserver()) {
+            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_CLACULATED_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_CLACULATED_TYPE);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_CLACULATED_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_CLACULATED_TYPE);
         }
     }
 
@@ -98,7 +93,7 @@ public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer
         //	Bind.secondaryKey(map, this.block_Key, new Fun.Function2<Integer, Tuple2<Integer, Integer>, Calculated>() {
         //		@Override
         //		public Integer run(Tuple2<Integer, Integer> key, Calculated val) {
-        //			return val.getBlockHeightByParentOrLast(getDBSet());
+        //			return val.getBlockHeightByParentOrLast((DCSet)databaseSet);
         //		}
         //	});
 
@@ -160,11 +155,6 @@ public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer
     @Override
     protected Calculated getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

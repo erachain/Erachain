@@ -3,8 +3,6 @@ package org.erachain.gui.items.documents;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.crypto.Base58;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.R_Hashes;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -13,7 +11,7 @@ import org.erachain.gui.Split_Panel;
 import org.erachain.gui.items.link_hashes.Issue_Hash_Imprint;
 import org.erachain.gui.items.link_hashes.Table_Model_Issue_Hashes;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.My_JFileChooser;
+import org.erachain.gui.library.fileChooser;
 import org.erachain.lang.Lang;
 import org.erachain.utils.FileHash;
 import org.erachain.utils.Pair;
@@ -23,8 +21,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -210,7 +206,7 @@ public class Write_Documents_Hashes_Panel extends Split_Panel {
         //JFileChooser chooser = new JFileChooser();
         // руссификация диалога выбора файла
         //new All_Options().setUpdateUI(chooser);
-        My_JFileChooser chooser = new My_JFileChooser();
+        fileChooser chooser = new fileChooser();
         chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
 
 

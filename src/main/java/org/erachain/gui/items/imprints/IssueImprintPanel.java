@@ -8,7 +8,7 @@ import org.erachain.core.transaction.IssueImprintRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.lang.Lang;
@@ -325,7 +325,7 @@ public class IssueImprintPanel extends JPanel {
 
             //	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
 
-            Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, result,
+            IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, result,
                     text, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
             dd.setLocationRelativeTo(th);
             dd.setVisible(true);

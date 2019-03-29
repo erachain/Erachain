@@ -77,7 +77,7 @@ public class Incoming_Mails_Panel extends JPanel // implements ItemListener
 
         // render
         //	table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-        //	table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()), tableModel.get_Column_AutoHeight())); // set renderer
+        //	table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()), tableModel.getColumnAutoHeight())); // set renderer
 		
 	
 				

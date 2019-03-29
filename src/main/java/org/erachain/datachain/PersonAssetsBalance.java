@@ -10,7 +10,7 @@ import org.erachain.utils.ObserverMessage;
  * Ключ: Номер Перосны + Номер Актива
  * Значение: Балансы
  */
-public class PersonAssetsBalance extends _BalanceMap {
+public class PersonAssetsBalance extends BalanceMap {
     static final String NAME = "person";
 
     public PersonAssetsBalance(DCSet databaseSet, DB database) {

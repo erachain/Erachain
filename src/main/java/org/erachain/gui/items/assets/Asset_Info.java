@@ -236,7 +236,7 @@ public class Asset_Info extends JTextPane {
     }
 
     public void delay_on_Close() {
-        // 	balancesTableModel.removeObservers();
+        // 	balancesTableModel.deleteObservers();
 
     }
     // Variables declaration - do not modify

@@ -1,11 +1,9 @@
 package org.erachain.gui.items.other;
 
 import org.erachain.database.wallet.BlocksHeadMap;
-import org.erachain.gui.CoreRowSorter;
 import org.erachain.gui.Split_Panel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.WalletBlocksTableModel;
-import org.erachain.gui.models.WalletTransactionsTableModel;
 import org.erachain.lang.Lang;
 
 import java.util.Map;
@@ -15,7 +13,7 @@ public class Generated_Blocks_Panel extends Split_Panel {
 
     private static final long serialVersionUID = -4045744114543168423L;
     WalletBlocksTableModel blocksModel;
-    private WalletTransactionsTableModel transactionsModel;
+    //private WalletTransactionsTableModel transactionsModel;
     private MTable transactionsTable;
 
     public Generated_Blocks_Panel() {
@@ -33,7 +31,7 @@ public class Generated_Blocks_Panel extends Split_Panel {
 
         Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 
-        CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
+        //CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
 
         //TRANSACTIONS
         blocksModel = new WalletBlocksTableModel();
@@ -44,11 +42,11 @@ public class Generated_Blocks_Panel extends Split_Panel {
         indexes.put(WalletBlocksTableModel.COLUMN_HEIGHT, BlocksHeadMap.TIMESTAMP_INDEX);
         indexes.put(WalletBlocksTableModel.COLUMN_TIMESTAMP, BlocksHeadMap.TIMESTAMP_INDEX);
         indexes.put(WalletBlocksTableModel.COLUMN_GENERATOR, BlocksHeadMap.GENERATOR_INDEX);
-        indexes.put(WalletBlocksTableModel.COLUMN_BASETARGET, BlocksHeadMap.BALANCE_INDEX);
+        indexes.put(WalletBlocksTableModel.COLUMN_GB, BlocksHeadMap.BALANCE_INDEX);
         indexes.put(WalletBlocksTableModel.COLUMN_TRANSACTIONS, BlocksHeadMap.TRANSACTIONS_INDEX);
         indexes.put(WalletBlocksTableModel.COLUMN_FEE, BlocksHeadMap.FEE_INDEX);
-        sorter = new CoreRowSorter(blocksModel, indexes);
-        jTable_jScrollPanel_LeftPanel.setRowSorter(sorter);
+        //sorter = new CoreRowSorter(blocksModel, indexes);
+        //jTable_jScrollPanel_LeftPanel.setRowSorter(sorter);
         jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
         //	setRowHeightFormat(true);
 

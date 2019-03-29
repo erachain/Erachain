@@ -5,18 +5,16 @@ import org.erachain.core.item.polls.PollCls;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.PollMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemPollsTableModel extends TableModelCls<Tuple2<String, String>, PollCls> implements Observer {
+public class WalletItemPollsTableModel extends SortedListTableModelCls<Tuple2<String, String>, PollCls> implements Observer {
     public static final int COLUMN_NAME = 0;
     public static final int COLUMN_ADDRESS = 1;
     public static final int COLUMN_TOTAL_VOTES = 2;
@@ -24,16 +22,8 @@ public class WalletItemPollsTableModel extends TableModelCls<Tuple2<String, Stri
 
     private SortableList<Tuple2<String, String>, PollCls> polls;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Name", "Creator", "Total Votes", "Confirmed"});
-
     public WalletItemPollsTableModel() {
-
-        addObservers();
-    }
-
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
+        super(new String[]{"Name", "Creator", "Total Votes", "Confirmed"}, true);
     }
 
     @Override
@@ -43,16 +33,6 @@ public class WalletItemPollsTableModel extends TableModelCls<Tuple2<String, Stri
 
     public PollCls getPoll(int row) {
         return polls.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -100,15 +80,6 @@ public class WalletItemPollsTableModel extends TableModelCls<Tuple2<String, Stri
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -117,7 +88,7 @@ public class WalletItemPollsTableModel extends TableModelCls<Tuple2<String, Stri
         if (message.getType() == ObserverMessage.LIST_POLL_TYPE) {
             if (this.polls == null) {
                 this.polls = (SortableList<Tuple2<String, String>, PollCls>) message.getValue();
-                this.polls.registerObserver();
+                //this.polls.registerObserver();
                 this.polls.sort(PollMap.NAME_INDEX);
             }
 
@@ -130,18 +101,16 @@ public class WalletItemPollsTableModel extends TableModelCls<Tuple2<String, Stri
         }
     }
 
-    public void removeObservers() {
-
-        Controller.getInstance().deleteObserver(this);
-
+    public void addObservers() {
+        Controller.getInstance().addWalletObserver(this);
     }
 
-    public void addObservers() {
-        Controller.getInstance().addWalletListener(this);
+    public void deleteObservers() {
+        Controller.getInstance().deleteObserver(this);
     }
 
     @Override
-    public Object getItem(int k) {
+    public PollCls getItem(int k) {
         // TODO Auto-generated method stub
         return polls.get(k).getB();
     }

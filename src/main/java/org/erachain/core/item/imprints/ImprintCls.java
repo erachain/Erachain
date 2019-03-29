@@ -4,8 +4,8 @@ package org.erachain.core.item.imprints;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.Issue_ItemMap;
-import org.erachain.datachain.Item_Map;
+import org.erachain.datachain.IssueItemMap;
+import org.erachain.datachain.ItemMap;
 
 public abstract class ImprintCls extends ItemCls {
 
@@ -32,11 +32,11 @@ public abstract class ImprintCls extends ItemCls {
     }
 
     // DB
-    public Item_Map getDBMap(DCSet db) {
+    public ItemMap getDBMap(DCSet db) {
         return db.getItemImprintMap();
     }
 
-    public Issue_ItemMap getDBIssueMap(DCSet db) {
+    public IssueItemMap getDBIssueMap(DCSet db) {
         return db.getIssueImprintMap();
     }
 

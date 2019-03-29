@@ -8,8 +8,7 @@ import org.erachain.core.transaction.R_Vouch;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
-import org.erachain.gui.*;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
@@ -110,7 +109,7 @@ public class VouchRecordDialog extends JDialog {
 
         Transaction record = null;
         if (text.length() < 40) {
-            //record = R_Vouch.getVouchingRecord(DBSet.getInstance(), jTextField_recordID.getText());
+            //record = R_Vouch.getVouchingRecord(DLSet.getInstance(), jTextField_recordID.getText());
             record = DCSet.getInstance().getTransactionFinalMap().getRecord(text);
         } else {
             record = Transaction.findByDBRef(DCSet.getInstance(), Base58.decode(text));
@@ -171,7 +170,7 @@ public class VouchRecordDialog extends JDialog {
         //Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 0);
 
         String Status_text = "";
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
+        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
         //Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
         VouchingDetailsFrame ww = new VouchingDetailsFrame((R_Vouch) transaction);

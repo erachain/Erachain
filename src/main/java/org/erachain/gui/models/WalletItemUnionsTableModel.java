@@ -5,16 +5,14 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, String>, UnionCls> implements Observer {
+public class WalletItemUnionsTableModel extends SortedListTableModelCls<Tuple2<String, String>, UnionCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -23,12 +21,9 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
 
     private SortableList<Tuple2<String, String>, UnionCls> unions;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"});
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
-
     public WalletItemUnionsTableModel() {
-
-        addObservers();
+        super(new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"},
+                new Boolean[]{false, true, true, false, false}, true);
 
     }
 
@@ -37,34 +32,8 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
         return this.unions;
     }
 
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
-    }
-
     public UnionCls getItem(int row) {
         return this.unions.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -124,7 +93,7 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
         if (message.getType() == ObserverMessage.LIST_UNION_TYPE) {
             if (this.unions == null) {
                 this.unions = (SortableList<Tuple2<String, String>, UnionCls>) message.getValue();
-                this.unions.registerObserver();
+                //this.unions.registerObserver();
                 //this.unions.sort(PollMap.NAME_INDEX);
             }
 
@@ -137,14 +106,12 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
         }
     }
 
-    public void removeObservers() {
-
-        Controller.getInstance().deleteObserver(this);
-
+    public void addObservers() {
+        Controller.getInstance().addWalletObserver(this);
     }
 
-    public void addObservers() {
-        Controller.getInstance().addWalletListener(this);
+    public void deleteObservers() {
+        Controller.getInstance().deleteObserver(this);
     }
 
 }

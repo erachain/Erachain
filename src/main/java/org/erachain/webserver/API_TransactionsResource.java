@@ -8,7 +8,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.library.library;
-import org.erachain.gui.models.TransactionsTableModel;
+import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.TransactionTimestampComparator;
@@ -300,7 +300,7 @@ public class API_TransactionsResource {
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(ff.toJSONString()).build();
         }
-        // TransactionsTableModel a = new TransactionsTableModel();
+        // SearchTransactionsTableModel a = new SearchTransactionsTableModel();
         // a.Find_Transactions_from_Address(address);
         // result =a.getTransactions();
         Integer type;
@@ -393,16 +393,21 @@ public class API_TransactionsResource {
     @SuppressWarnings("unchecked")
     @GET
     @Path("getbyblock")
-    public Response getByBlock(@QueryParam("block") String block) {
+    public Response getByBlock(@QueryParam("block") int blockNo) {
         JSONObject ff = new JSONObject();
-        List<Transaction> result;
 
-        TransactionsTableModel transactionsTableModel = new TransactionsTableModel();
-        transactionsTableModel.setBlockNumber(block);
-        result = transactionsTableModel.getTransactions();
-        if (result == null || result.isEmpty()) {
+        Block block = DCSet.getInstance().getBlockMap().get(blockNo);
+        if (block == null) {
+            ff.put("error", "block not found");
+            return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(ff.toJSONString()).build();
+        }
 
-            ff.put("message", "null");
+        List<Transaction> result = block.getTransactions();
+        if (result == null) {
+
+            ff.put("error", "null");
             return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(ff.toJSONString()).build();
@@ -410,10 +415,9 @@ public class API_TransactionsResource {
 
         JSONArray array = new JSONArray();
         for (Transaction trans : result) {
-
             array.add(trans.toJson());
         }
-        // json.put("transactions", array);
+
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(array.toJSONString()).build();

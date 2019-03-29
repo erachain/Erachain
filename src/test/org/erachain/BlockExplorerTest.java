@@ -51,7 +51,7 @@ public class BlockExplorerTest {
                 .make();
 
         //CREATE INSTANCE
-        return new DCSet(database, false, false, false);
+        return new DCSet(dbFile, database, false, false, false);
     }
 
     public void maxBalance() {
@@ -139,7 +139,7 @@ public class BlockExplorerTest {
             List<String> listaddr = new ArrayList<>();
             listaddr.add(addr);
 
-            Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(listaddr, 1);
+            Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(listaddr.get(0), 1);
 
             Map<Long, String> totalBalance = (Map<Long, String>) output.get("balance").get("total");
 
@@ -288,11 +288,11 @@ public class BlockExplorerTest {
 
         Transaction transaction = getTransaction(Base58.decode("4JXPXqdP7GT743AoX2m8vHBeWNrKvBcf71TcDLfLeMn6rmV5uyVRDcV5gLspNquZyatY4tHB9RXDWKahEM85oTJv"));
         Account account = new Account("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ");
-        //LOGGER.error(transaction.getAmount(account));
+        //logger.error(transaction.getAmount(account));
 
         transaction = getTransaction(Base58.decode("4JXPXqdP7GT743AoX2m8vHBeWNrKvBcf71TcDLfLeMn6rmV5uyVRDcV5gLspNquZyatY4tHB9RXDWKahEM85oTJv"));
         account = new Account("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ");
-        //LOGGER.error(transaction.getAmount(account));
+        //logger.error(transaction.getAmount(account));
     }
 
     public Transaction getTransaction(byte[] signature) {

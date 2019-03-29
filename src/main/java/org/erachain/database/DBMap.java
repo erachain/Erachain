@@ -1,6 +1,6 @@
 package org.erachain.database;
-// upd 09/03
 
+import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
@@ -13,21 +13,23 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-//import org.erachain.database.wallet.DWSet;
-
 public abstract class DBMap<T, U> extends Observable {
 
     public static final int NOTIFY_RESET = 1;
     public static final int NOTIFY_ADD = 2;
     public static final int NOTIFY_REMOVE = 3;
     public static final int NOTIFY_LIST = 4;
-    public static final int NOTIFY_COUNT = 5;
+    //public static final int NOTIFY_COUNT = 5;
 
-    public static final int DEFAULT_INDEX = 0;
-    static Logger logger = LoggerFactory.getLogger(DBMap.class.getName());
+    public int DESCENDING_SHIFT_INDEX = 10000;
+
+    public static int DEFAULT_INDEX = 0;
+    private static Logger logger = LoggerFactory.getLogger(DBMap.class.getName());
     protected IDB databaseSet;
     protected Map<T, U> map;
     protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
+
+    protected Map<Integer, Integer> observableData;
 
     public DBMap() {
     }
@@ -41,15 +43,16 @@ public abstract class DBMap<T, U> extends Observable {
         //CREATE INDEXES
         this.indexes = new HashMap<Integer, NavigableSet<Tuple2<?, T>>>();
         this.createIndexes(database);
+
+        if (databaseSet.isWithObserver()) {
+            observableData = new HashMap<Integer, Integer>(8, 1);
+        }
+
     }
 
-    public Map<T, U> getMap() {
-        return map;
-    }
 
-
-    public DCSet getDBSet() {
-        return (DCSet) this.databaseSet;
+    public IDB getDBSet() {
+        return this.databaseSet;
     }
 
 
@@ -58,8 +61,6 @@ public abstract class DBMap<T, U> extends Observable {
     protected abstract Map<T, U> getMemoryMap();
 
     protected abstract U getDefaultValue();
-
-    protected abstract Map<Integer, Integer> getObservableData();
 
     protected abstract void createIndexes(DB database);
 
@@ -75,12 +76,12 @@ public abstract class DBMap<T, U> extends Observable {
      */
     @SuppressWarnings("unchecked")
     protected <V> void createIndex(int index, NavigableSet<?> indexSet, NavigableSet<?> descendingIndexSet, Function2<V, T, U> function) {
-        assert(index > 0 && index < 10000);
+        assert(index > 0 && index < DESCENDING_SHIFT_INDEX);
         Bind.secondaryKey((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) indexSet, function);
         this.indexes.put(index, (NavigableSet<Tuple2<?, T>>) indexSet);
 
         Bind.secondaryKey((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) descendingIndexSet, function);
-        this.indexes.put(index + 10000, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
+        this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
     }
 
     /**
@@ -95,12 +96,12 @@ public abstract class DBMap<T, U> extends Observable {
      */
     @SuppressWarnings("unchecked")
     protected <V> void createIndexes(int index, NavigableSet<?> indexSet, NavigableSet<?> descendingIndexSet, Function2<V[], T, U> function) {
-        assert(index > 0 && index < 10000);
+        assert(index > 0 && index < DESCENDING_SHIFT_INDEX);
         Bind.secondaryKeys((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) indexSet, function);
         this.indexes.put(index, (NavigableSet<Tuple2<?, T>>) indexSet);
 
         Bind.secondaryKeys((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) descendingIndexSet, function);
-        this.indexes.put(index + 10000, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
+        this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
     }
 
     public void addUses() {
@@ -161,66 +162,71 @@ public abstract class DBMap<T, U> extends Observable {
         return u;
     }
 
+    /**
+     * уведомляет только счетчик если он разрешен, иначе Добавить
+     * @param key
+     * @param value
+     * @return
+     */
     public boolean set(T key, U value) {
         this.addUses();
-        try {
+        //try {
 
             U old = this.map.put(key, value);
 
             //COMMIT and NOTIFY if not FORKED
-            // TODO
-            this.databaseSet.commit();
+            // TODO - удалить тут этот ак как у нас везде управляемый внешний коммит
+            if (false) this.databaseSet.commit();
 
-            //NOTIFY ADD
-            if (this.getObservableData().containsKey(NOTIFY_ADD)) {
-                this.setChanged();
-                this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_ADD), value));
+            //NOTIFY
+            if (this.observableData != null && (old == null || !old.equals(value))) {
+                if (this.observableData.containsKey(NOTIFY_ADD)) {
+                    this.setChanged();
+                    this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_ADD), value));
+                }
             }
 
-            if (this.getObservableData().containsKey(NOTIFY_COUNT)) {
-                this.setChanged();
-                this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this)); /// SLOW .size()));
-            }
-
-            this.outUses();
-            return old != null;
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
+        //    this.outUses();
+        //    return old != null;
+        //} catch (Exception e) {
+        //    logger.error(e.getMessage(), e);
+        //}
 
         this.outUses();
         return false;
     }
 
+    /**
+     * уведомляет только счетчик если он разрешен, иначе Удалить
+     * @param key
+     * @return
+     */
     public U delete(T key) {
 
         this.addUses();
 
         U value;
 
-        try {
+        //try {
             //REMOVE
             if (this.map.containsKey(key)) {
                 value = this.map.remove(key);
 
-                //NOTIFY REMOVE
-                if (this.getObservableData().containsKey(NOTIFY_REMOVE)) {
-                    this.setChanged();
-                    this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_REMOVE), value));
-                }
-
-                if (this.getObservableData().containsKey(NOTIFY_COUNT)) {
-                    this.setChanged();
-                    this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this)); /// SLOW .size()));
+                //NOTIFY
+                if (this.observableData != null) {
+                    if (this.observableData.containsKey(NOTIFY_REMOVE)) {
+                        this.setChanged();
+                        this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_REMOVE), value));
+                    }
                 }
 
             } else
                 value = null;
 
-        } catch (Exception e) {
-            value = null;
-            logger.error(e.getMessage(), e);
-        }
+        //} catch (Exception e) {
+        //    value = null;
+        //    logger.error(e.getMessage(), e);
+        //}
 
         this.outUses();
 
@@ -240,6 +246,13 @@ public abstract class DBMap<T, U> extends Observable {
         return false;
     }
 
+    /**
+     * Соединяется прямо к списку SortableList для отображения в ГУИ
+     * Нужен только для сортировки<br>
+     * TODO надо его убрать отсюла нафиг чтобы не тормозило и только
+     * по месту работало окнкретно как надо
+     * @param o
+     */
     @Override
     public void addObserver(Observer o) {
 
@@ -248,18 +261,35 @@ public abstract class DBMap<T, U> extends Observable {
         //ADD OBSERVER
         super.addObserver(o);
 
-        //NOTIFY LIST if this not FORK
-        if (this.getObservableData().containsKey(NOTIFY_LIST)) {
-            //CREATE LIST
-            SortableList<T, U> list = new SortableList<T, U>(this);
+        //NOTIFY
+        if (this.observableData != null) {
+            if (this.observableData.containsKey(NOTIFY_LIST)) {
+                if (false) {
+                    //CREATE LIST
+                    SortableList<T, U> list;
+                    if (this.size() < 1000) {
+                        list = new SortableList<T, U>(this);
+                    } else {
+                        // обрезаем полный список в базе до 1000
+                        Iterator iterator = this.getIterator(DEFAULT_INDEX, false);
+                        List<T> keys = new ArrayList<T>();
+                        int i = 0;
+                        while (iterator.hasNext() && ++i < 1000) {
+                            keys.add((T) iterator.next());
+                        }
 
-            //UPDATE
-            o.update(null, new ObserverMessage(this.getObservableData().get(NOTIFY_LIST), list));
-        }
+                        list = new SortableList<T, U>(this, keys);
+                    }
 
-        if (this.getObservableData().containsKey(NOTIFY_COUNT)) {
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this)); /// SLOW .size()));
+                    //UPDATE
+                    o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), list));
+                } else {
+
+                    //UPDATE
+                    o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), this));
+
+                }
+            }
         }
 
         this.outUses();
@@ -279,7 +309,7 @@ public abstract class DBMap<T, U> extends Observable {
             // IT IS INDEX ID in this.indexes
 
             if (descending) {
-                index += 10000;
+                index += DESCENDING_SHIFT_INDEX;
             }
 
             IndexIterator<T> u = new IndexIterator<T>(this.indexes.get(index));
@@ -302,11 +332,21 @@ public abstract class DBMap<T, U> extends Observable {
 
     public SortableList<T, U> getList() {
         addUses();
-        SortableList<T, U> result = new SortableList<T, U>(this);
+        SortableList<T, U> list;
+        if (this.size() < 1000) {
+            list = new SortableList<T, U>(this);
+        } else {
+            // обрезаем полный список в базе до 1000
+            list = SortableList.makeSortableList(this, false, 1000);
+        }
+
         outUses();
-        return result;
+        return list;
     }
 
+    /**
+     * уведомляет только счетчик если он разрешен, иначе Сбросить
+     */
     public void reset() {
         this.addUses();
 
@@ -318,19 +358,14 @@ public abstract class DBMap<T, U> extends Observable {
             set.clear();
         }
 
-        //NOTIFY LIST
-        if (this.getObservableData().containsKey(NOTIFY_RESET)) {
-            //CREATE LIST
-            /////SortableList<T, U> list = new SortableList<T, U>(this);
+        // NOTYFIES
+        if (this.observableData != null) {
+            //NOTIFY LIST
+            if (this.observableData.containsKey(NOTIFY_RESET)) {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_RESET), this));
+            }
 
-            //UPDATE
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_RESET), null));
-        }
-
-        if (this.getObservableData().containsKey(NOTIFY_COUNT)) {
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this));
         }
 
         this.outUses();

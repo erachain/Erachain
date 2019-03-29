@@ -6,7 +6,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.DateTimeFormat;
@@ -20,8 +20,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
-        Trade> implements Observer {
+public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>, Trade> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TYPE = 1;
     public static final int COLUMN_ASSET_1 = 2;
@@ -41,10 +40,9 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
     private long haveKey;
     private long wantKey;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Check 1", "Price", "Check 2"});
-
     public TradesTableModel(AssetCls have, AssetCls want) {
-        Controller.getInstance().addObserver(this);
+
+        super(new String[]{"Timestamp", "Type", "Check 1", "Price", "Check 2"}, true);
 
         this.have = have;
         this.want = want;
@@ -53,13 +51,11 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
         this.wantKey = this.want.getKey();
 
         this.trades = Controller.getInstance().getTrades(have, want);
-        this.trades.registerObserver();
+        //this.trades.registerObserver();
 
-        this.columnNames[2] = have.getShort();
-
-        this.columnNames[4] = want.getShort();
-
-        this.columnNames[3] = Lang.getInstance().translate("Price") + ": " + this.columnNames[4];
+        //this.columnNames[2] = have.getShort();
+        //this.columnNames[4] = want.getShort();
+        //this.columnNames[3] = Lang.getInstance().translate("Price") + ": " + this.columnNames[4];
 
         ///totalCalc();
     }
@@ -95,16 +91,6 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
             return null;
 
         return this.trades.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -267,13 +253,17 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
 
     }
 
-    public void removeObservers() {
-        this.trades.removeObserver();
+    public void addObservers() {
+        Controller.getInstance().addObserver(this);
+    }
+
+    public void deleteObservers() {
+        //this.trades.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 
     @Override
-    public Object getItem(int k) {
+    public Trade getItem(int k) {
         // TODO Auto-generated method stub
         Pair<Tuple2<Long, Long>, Trade> rec = this.trades.get(k);
         if (rec == null)

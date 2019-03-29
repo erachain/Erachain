@@ -5,7 +5,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.Split_Panel;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -21,7 +21,7 @@ import java.awt.event.*;
 public class Item_SplitPanel extends Split_Panel {
 
     private static final long serialVersionUID = 2717571093561259483L;
-    protected TableModelCls table_Model;
+    protected SortedListTableModelCls table_Model;
     protected JMenuItem favorite_menu_items;
     protected JPopupMenu menu_Table;
     protected ItemCls item_Menu;
@@ -29,7 +29,7 @@ public class Item_SplitPanel extends Split_Panel {
     protected TableColumnModel tableColumnMode;
 
     @SuppressWarnings("rawtypes")
-    public Item_SplitPanel(TableModelCls table_Model1, String gui_Name) {
+    public Item_SplitPanel(SortedListTableModelCls table_Model1, String gui_Name) {
 
         super(gui_Name);
         this.table_Model = table_Model1;
@@ -38,7 +38,6 @@ public class Item_SplitPanel extends Split_Panel {
         toolBar_LeftPanel.setVisible(true);
         button1_ToolBar_LeftPanel.setVisible(false);
         button2_ToolBar_LeftPanel.setVisible(false);
-
 
         // not show My filter
         searth_My_JCheckBox_LeftPanel.setVisible(false);
@@ -54,8 +53,8 @@ public class Item_SplitPanel extends Split_Panel {
             public void mouseMoved(MouseEvent e) {
 
                 if (jTable_jScrollPanel_LeftPanel.columnAtPoint(e.getPoint()) == table_Model.COLUMN_FAVORITE) {
-
                     jTable_jScrollPanel_LeftPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
                 } else {
                     jTable_jScrollPanel_LeftPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 }
@@ -78,9 +77,9 @@ public class Item_SplitPanel extends Split_Panel {
                 int row;
                 try {
                     row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-               
-                item_Table_Selected = (ItemCls) table_Model.getItem(jTable_jScrollPanel_LeftPanel
-                        .convertRowIndexToModel(row));
+
+                    item_Table_Selected = (ItemCls) table_Model.getItem(jTable_jScrollPanel_LeftPanel
+                            .convertRowIndexToModel(row));
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     return;
@@ -182,27 +181,17 @@ public class Item_SplitPanel extends Split_Panel {
     }
 
     @Override
-    public void delay_on_close() {
-        jTable_jScrollPanel_LeftPanel = null;
-        table_Model = null;
-        favorite_menu_items = null;
-        menu_Table = null;
-        item_Menu = null;
-        item_Table_Selected = null;
-        splitClose();
-    }
-
-    protected void splitClose() {
-
+    public void onClose() {
+        table_Model.deleteObservers();
     }
 
     public void favorite_set(ItemCls itemCls) {
 
         // CHECK IF FAVORITES
         if (Controller.getInstance().isItemFavorite(itemCls)) {
-           int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") +"?", Lang.getInstance().translate("Delete from favorite") , JOptionPane.OK_CANCEL_OPTION);
-           
-           if (dd ==0) Controller.getInstance().removeItemFavorite(itemCls);
+            int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+
+            if (dd == 0) Controller.getInstance().removeItemFavorite(itemCls);
         } else {
 
             Controller.getInstance().addItemFavorite(itemCls);
@@ -219,7 +208,5 @@ public class Item_SplitPanel extends Split_Panel {
     protected void table_mouse_2_Click(ItemCls item) {
 
     }
-
-    ;
 
 }

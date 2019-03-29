@@ -6,31 +6,24 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemPollMap;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 
-import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class ItemPollsTableModel extends TableModelCls<Long, ItemCls> implements Observer {
+public class ItemPollsTableModel extends SortedListTableModelCls<Long, ItemCls> implements Observer {
     public static final int COLUMN_NAME = 0;
     public static final int COLUMN_VOTES = 2;
     private static final int COLUMN_CREATOR = 1;
     private AssetCls asset;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Name", "Creator", "Total Votes"});
     private SortableList<Long, ItemCls> polls;
-    private ItemPollMap map;
 
     public ItemPollsTableModel() {
-        this.asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
-        //Controller.getInstance().addObserver(this);
-        map = DCSet.getInstance().getItemPollMap();
-        polls = map.getList();
+        super(DCSet.getInstance().getItemPollMap(),
+                new String[]{"Name", "Creator", "Total Votes"}, true);
     }
 
     public void setAsset(AssetCls asset) {
@@ -38,28 +31,9 @@ public class ItemPollsTableModel extends TableModelCls<Long, ItemCls> implements
         this.fireTableDataChanged();
     }
 
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
     @Override
     public SortableList<Long, ItemCls> getSortableList() {
         return this.polls;
-    }
-
-    public PollCls getPoll(int row) {
-        return (PollCls) this.polls.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -105,15 +79,6 @@ public class ItemPollsTableModel extends TableModelCls<Long, ItemCls> implements
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -122,7 +87,7 @@ public class ItemPollsTableModel extends TableModelCls<Long, ItemCls> implements
         if (message.getType() == ObserverMessage.LIST_POLL_TYPE) {
             if (this.polls == null) {
                 this.polls = (SortableList<Long, ItemCls>) message.getValue();
-                this.polls.registerObserver();
+                ///this.polls.registerObserver();
             }
 
             this.fireTableDataChanged();
@@ -134,14 +99,19 @@ public class ItemPollsTableModel extends TableModelCls<Long, ItemCls> implements
         }
     }
 
-    public void removeObservers() {
+    public void addObservers() {
+        this.asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
+        //Controller.getInstance().addObserver(this);
+        polls = map.getList();
+    }
+
+    public void deleteObservers() {
         //if(this.polls!=null)this.polls.removeObserver();
         //DCSet.getInstance().getPollMap().deleteObserver(this);
     }
 
     @Override
-    public Object getItem(int k) {
-        // TODO Auto-generated method stub
+    public ItemCls getItem(int k) {
         return this.polls.get(k).getB();
     }
 }

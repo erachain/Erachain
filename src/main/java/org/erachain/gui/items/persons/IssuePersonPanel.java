@@ -12,9 +12,9 @@ import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
-import org.erachain.gui.library.My_Add_Image_Panel;
+import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
@@ -27,12 +27,10 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.event.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -77,12 +75,12 @@ public class IssuePersonPanel extends JPanel {
     protected javax.swing.JPanel jPanel1;
     protected javax.swing.JPanel jPanel2;
     protected javax.swing.JScrollPane jScrollPane1;
-    protected My_Add_Image_Panel add_Image_Panel;
+    protected AddImageLabel add_Image_Panel;
     protected JCheckBox alive_CheckBox;
 
     // End of variables declaration
 
-    //protected byte[] imgButes;
+    //protected byte[] imgBytes;
     protected JPanel Panel;
     protected JPanel mainPanel;
     protected JScrollPane mainScrollPane1;
@@ -138,26 +136,6 @@ public class IssuePersonPanel extends JPanel {
         this.setMinimumSize(new Dimension(0, 0));
         this.setVisible(true);
 
-    }
-
-    @SuppressWarnings("resource")
-    protected static byte[] getBytesFromFile(File file) throws IOException {
-        InputStream is = new FileInputStream(file);
-        long length = file.length();
-        if (length > Integer.MAX_VALUE) {
-            // File is too large
-        }
-        byte[] bytes = new byte[(int) length];
-        int offset = 0;
-        int numRead = 0;
-        while (offset < bytes.length && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
-            offset += numRead;
-        }
-        if (offset < bytes.length) {
-            throw new IOException("Could not completely read file " + file.getName());
-        }
-        is.close();
-        return bytes;
     }
 
     protected void initLabelsText() {
@@ -331,7 +309,7 @@ public class IssuePersonPanel extends JPanel {
         Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(forIssue, creator,
                 this.txtName.getText(), feePow, birthday, deathday, gender, this.txtSNILS.getText(), birthLatitude,
                 birthLongitude, this.txtSkinColor.getText(), this.txtEyeColor.getText(), this.txtHairСolor.getText(),
-                height, null, add_Image_Panel.imgButes, this.txtareaDescription.getText(), owner, null);
+                height, null, add_Image_Panel.getImgBytes(), this.txtareaDescription.getText(), owner, null);
 
         IssuePersonRecord issuePersonRecord = (IssuePersonRecord) result.getA();
 
@@ -368,7 +346,7 @@ public class IssuePersonPanel extends JPanel {
             // text, Lang.getInstance().translate("Issue Asset"),
             // JOptionPane.YES_NO_OPTION);
 
-            Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, issuePersonRecord,
+            IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, issuePersonRecord,
                     " ",
                     (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                     Lang.getInstance().translate("Confirmation transaction issue person"));
@@ -475,7 +453,7 @@ public class IssuePersonPanel extends JPanel {
         txtGender = new javax.swing.JComboBox<>();
         mainPanel = new javax.swing.JPanel();
         mainScrollPane1 = new javax.swing.JScrollPane();
-        add_Image_Panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add image").concat(" (%1% - %2% bytes)")
+        add_Image_Panel = new AddImageLabel(Lang.getInstance().translate("Add image").concat(" (%1% - %2% bytes)")
                 .replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH >> 2)))
                 .replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH), 350, 350);
         alive_CheckBox = new JCheckBox();

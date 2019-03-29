@@ -10,336 +10,287 @@ import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
-import org.erachain.gui.library.M_DecimalFormatedTextField;
-import org.erachain.gui.library.My_Add_Image_Panel;
+import org.erachain.gui.library.IssueConfirmDialog;
+import org.erachain.gui.library.MDecimalFormatedTextField;
+import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  * @author Саша
  */
-public class IssueAssetPanel extends javax.swing.JPanel {
-    
-    protected byte[] imgButes;
-    protected byte[] iconButes;
-    private IssueAssetPanel th;
-    // Variables declaration - do not modify
-    private javax.swing.JLabel Title_jLabel;
-    private javax.swing.JLabel account_jLabel;
-    private javax.swing.JTextArea txtareaDescription;
-    private javax.swing.JLabel description_jLabel;
-    private javax.swing.JLabel fee_jLabel;
-    private JComboBox<String> txtFeePow;
-    private javax.swing.JButton issue_jButton;
-    private JComboBox<Account> cbxFrom;
-    private JComboBox<AssetType> cbxAssetType;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel name_jLabel;
-    private javax.swing.JTextField txtName;
-    private javax.swing.JLabel quantity_jLabel;
-    private M_DecimalFormatedTextField txtQuantity;
-    private javax.swing.JLabel scale_jLabel;
-    
-    private My_Add_Image_Panel add_Image_Panel;
-    private My_Add_Image_Panel add_Logo_Icon_Panel;
-    private AssetTypesComboBoxModel assetTypeModet;
-    private JLabel type_jLabel;
-    private JTextArea textaresAssetTypeDescription;
-    private JComboBox<String> txtScale;
-    
-    /**
-     * Creates new form Issue_Asset_Panel_01
-     */
+public class IssueAssetPanel extends JPanel {
+
+    private final int heightLogo = 150;
+    private final int widthLogo = 150;
+    private final int widthImage = 200;
+    private final int heghtImage = 150;
+    private JLabel titleJLabel = new JLabel();
+    private JLabel accountJLabel = new JLabel();
+    private JLabel descriptionJLabel = new JLabel();
+    private JLabel feeJLabel = new JLabel();
+    private JLabel scaleJLabel = new JLabel();
+    private JLabel nameJLabel = new JLabel();
+    private JLabel quantityJLabel = new JLabel();
+    private JLabel typeJLabel = new JLabel();
+
+    private JComboBox<String> textFeePow = new JComboBox();
+    private JComboBox<Account> fromJComboBox = new JComboBox<>(new AccountsComboBoxModel());
+    private JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
+    private JComboBox<String> textScale = new JComboBox<>();
+    private JButton issueJButton = new JButton();
+    private JScrollPane jScrollPane1 = new JScrollPane();
+    private JTextField textName = new JTextField();
+    private JTextArea textAreaDescription = new JTextArea();
+    // description asset type
+    private JTextArea textareasAssetTypeDescription = new JTextArea();
+    private MDecimalFormatedTextField textQuantity = new MDecimalFormatedTextField();
+
+    private AddImageLabel addImageLabel;
+    private AddImageLabel addLogoIconLabel;
+    private AssetTypesComboBoxModel assetTypesComboBoxModel;
+
     public IssueAssetPanel() {
-        th = this;
         initComponents();
-        
-        account_jLabel.setText(Lang.getInstance().translate("Account") + ":");
-        
-        name_jLabel.setText(Lang.getInstance().translate("Name") + ":");
-        txtName.setText("");
-        Title_jLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        Title_jLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Title_jLabel.setText(Lang.getInstance().translate("Issue Asset"));
-        Title_jLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        description_jLabel.setText(Lang.getInstance().translate("Description") + ":");
-        type_jLabel.setText(Lang.getInstance().translate("Type") + ":");
-        txtareaDescription.setLineWrap(true);
-        txtareaDescription.setText("");
-        quantity_jLabel.setText(Lang.getInstance().translate("Quantity") + ":");
-        
-        txtQuantity.setMaskType(txtQuantity.maskLong);
-        txtQuantity.setText("1");
-        scale_jLabel.setText(Lang.getInstance().translate("Scale") + ":");
-        fee_jLabel.setText(Lang.getInstance().translate("Fee Power") + ":");
-        txtFeePow.setSelectedItem("0");
-        issue_jButton.setText(Lang.getInstance().translate("Issue"));
-        issue_jButton.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                // TODO Auto-generated method stub
-                onIssueClick();
-            }
-        });
+
+        accountJLabel.setText(Lang.getInstance().translate("Account") + ":");
+
+        nameJLabel.setText(Lang.getInstance().translate("Name") + ":");
+        textName.setText("");
+        titleJLabel.setFont(new Font("Tahoma", Font.PLAIN, 18)); 
+        titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleJLabel.setText(Lang.getInstance().translate("Issue Asset"));
+        titleJLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+        descriptionJLabel.setText(Lang.getInstance().translate("Description") + ":");
+        typeJLabel.setText(Lang.getInstance().translate("Type") + ":");
+        textAreaDescription.setLineWrap(true);
+        textAreaDescription.setText("");
+        quantityJLabel.setText(Lang.getInstance().translate("Quantity") + ":");
+
+        textQuantity.setMaskType(textQuantity.maskLong);
+        textQuantity.setText("1");
+        scaleJLabel.setText(Lang.getInstance().translate("Scale") + ":");
+        feeJLabel.setText(Lang.getInstance().translate("Fee Power") + ":");
+        textFeePow.setSelectedItem("0");
+        issueJButton.setText(Lang.getInstance().translate("Issue"));
+        issueJButton.addActionListener(arg0 -> onIssueClick());
         // select combobox Asset type
-        cbxAssetType.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO Auto-generated method stub
-                
-                JComboBox ss = (JComboBox) e.getSource();
-                AssetType aa = (AssetType) ss.getSelectedItem();
-                textaresAssetTypeDescription.setText(aa.getDescription());
-            }
+        assetTypeJComboBox.addActionListener(e -> {
+            JComboBox source = (JComboBox) e.getSource();
+            AssetType assetType = (AssetType) source.getSelectedItem();
+            textareasAssetTypeDescription.setText(assetType.getDescription());
         });
-        
+
         // set start text area asset type
-        textaresAssetTypeDescription.setText(((AssetType) assetTypeModet.getSelectedItem()).getDescription());
-        add_Logo_Icon_Panel.setPreferredSize(new Dimension(250, 50));
-        
-       
+        textareasAssetTypeDescription.setText(((AssetType) assetTypesComboBoxModel.getSelectedItem()).getDescription());
+
+
     }
-    
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">
+
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
-        
-        account_jLabel = new javax.swing.JLabel();
-        cbxFrom = new JComboBox<Account>(new AccountsComboBoxModel());
-        cbxAssetType = new JComboBox();
-        name_jLabel = new javax.swing.JLabel();
-        txtName = new javax.swing.JTextField();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        txtareaDescription = new javax.swing.JTextArea();
-        Title_jLabel = new javax.swing.JLabel();
-        description_jLabel = new javax.swing.JLabel();
-        type_jLabel = new javax.swing.JLabel();
-        quantity_jLabel = new javax.swing.JLabel();
-        txtQuantity = new M_DecimalFormatedTextField();
-        scale_jLabel = new javax.swing.JLabel();
-        txtScale = new JComboBox<String>();
-        fee_jLabel = new javax.swing.JLabel();
-        txtFeePow = new JComboBox();
-        issue_jButton = new javax.swing.JButton();
-        // size from widht
-        add_Image_Panel = new My_Add_Image_Panel(
-                Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
-        // size from height
-        add_Logo_Icon_Panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add Logo"), 50, 50);
-        setLayout(new java.awt.GridBagLayout());
-        account_jLabel.setText("jLabel2");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints;
+        addImageLabel = new AddImageLabel(
+                Lang.getInstance().translate("Add image") + " "
+                        + Lang.getInstance().translate("(max 1024 kB)"), widthImage, heghtImage);
+        addLogoIconLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), widthLogo, heightLogo);
+
+        setLayout(new GridBagLayout());
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 7);
-        add(account_jLabel, gridBagConstraints);
-        
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new Insets(0, 0, 6, 7);
+        add(accountJLabel, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 5;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 8);
-        add(cbxFrom, gridBagConstraints);
-        
-        name_jLabel.setText("jLabel3");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new Insets(0, 0, 6, 8);
+        add(fromJComboBox, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 7);
-        add(name_jLabel, gridBagConstraints);
-        
-        txtName.setText("jTextField1");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new Insets(0, 0, 6, 7);
+        add(nameJLabel, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 0);
-        add(txtName, gridBagConstraints);
-        
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 8);
-        add(add_Logo_Icon_Panel, gridBagConstraints);
-        
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new Insets(0, 0, 6, 0);
+        add(textName, gridBagConstraints);
+
+
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridheight = 3;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(0, 12, 8, 8);
+
+        addImageLabel.setPreferredSize(new Dimension(widthImage, heghtImage));
+        add(addImageLabel, gridBagConstraints);
+
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridheight = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 12, 8, 8);
+
+        addLogoIconLabel.setPreferredSize(new Dimension(widthLogo, heightLogo));
+        add(addLogoIconLabel, gridBagConstraints);
         
-        add_Image_Panel.setPreferredSize(new Dimension(250, 350));
-        add(add_Image_Panel, gridBagConstraints);
-        
-        assetTypeModet = new AssetTypesComboBoxModel();
-        cbxAssetType.setModel(assetTypeModet);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+
+        assetTypesComboBoxModel = new AssetTypesComboBoxModel();
+        assetTypeJComboBox.setModel(assetTypesComboBoxModel);
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.gridwidth = 6;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 8);
-        add(cbxAssetType, gridBagConstraints);
-        // description asset type
-        textaresAssetTypeDescription = new JTextArea();
-        textaresAssetTypeDescription.setLineWrap(true);
-        textaresAssetTypeDescription.setWrapStyleWord(true);
-        textaresAssetTypeDescription.setEditable(false);
-        textaresAssetTypeDescription.setEnabled(false);
-        textaresAssetTypeDescription.setColumns(20);
-        textaresAssetTypeDescription.setRows(5);
+        gridBagConstraints.insets = new Insets(0, 0, 6, 8);
+        add(assetTypeJComboBox, gridBagConstraints);
+
+        textareasAssetTypeDescription.setLineWrap(true);
+        textareasAssetTypeDescription.setWrapStyleWord(true);
+        textareasAssetTypeDescription.setEditable(false);
+        textareasAssetTypeDescription.setEnabled(false);
+        textareasAssetTypeDescription.setColumns(20);
+        textareasAssetTypeDescription.setRows(5);
+
         JScrollPane jScrollPane2 = new JScrollPane();
-        jScrollPane2.setViewportView(textaresAssetTypeDescription);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        jScrollPane2.setViewportView(textareasAssetTypeDescription);
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 5;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.weighty = 0.05;
         gridBagConstraints.gridwidth = 6;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 8);
+        gridBagConstraints.insets = new Insets(0, 0, 6, 8);
         add(jScrollPane2, gridBagConstraints);
-        
-        txtareaDescription.setColumns(20);
-        txtareaDescription.setRows(5);
-        jScrollPane1.setViewportView(txtareaDescription);
-        
-        gridBagConstraints = new java.awt.GridBagConstraints();
+
+        textAreaDescription.setColumns(20);
+        textAreaDescription.setRows(5);
+        jScrollPane1.setViewportView(textAreaDescription);
+
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 6;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.3;
         gridBagConstraints.weighty = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 8);
+        gridBagConstraints.insets = new Insets(0, 0, 6, 8);
         add(jScrollPane1, gridBagConstraints);
-        
-        Title_jLabel.setText("jLabel1");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 8;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(8, 6, 6, 9);
-        add(Title_jLabel, gridBagConstraints);
-        
-        description_jLabel.setText("jLabel9");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new Insets(8, 6, 6, 9);
+        add(titleJLabel, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 7);
-        add(description_jLabel, gridBagConstraints);
-        
-        type_jLabel.setText("jLabel9");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(0, 0, 7, 7);
+        add(descriptionJLabel, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 7);
-        add(type_jLabel, gridBagConstraints);
-        
-        quantity_jLabel.setText("jLabel6");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(0, 0, 7, 7);
+        add(typeJLabel, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 7);
-        add(quantity_jLabel, gridBagConstraints);
-        
-        txtQuantity.setText("jTextField2");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(0, 0, 7, 7);
+        add(quantityJLabel, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 6;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 10);
-        add(txtQuantity, gridBagConstraints);
-        
-        scale_jLabel.setText("jLabel7");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new Insets(0, 0, 7, 10);
+        add(textQuantity, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 6;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 7);
-        add(scale_jLabel, gridBagConstraints);
-        
-        txtScale.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6",
-                "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
-                "21", "22", "23"})); /// , "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8"}));
-        txtScale.setSelectedIndex(8);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new Insets(0, 0, 7, 7);
+        add(scaleJLabel, gridBagConstraints);
+
+        textScale.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(24)));
+        textScale.setSelectedIndex(8);
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 6;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 0);
-        add(txtScale, gridBagConstraints);
-        
-        fee_jLabel.setText("jLabel8");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new Insets(0, 0, 7, 0);
+        add(textScale, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
-        add(fee_jLabel, gridBagConstraints);
-        
-        txtFeePow = new JComboBox();
-        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        add(feeJLabel, gridBagConstraints);
+
+        textFeePow = new JComboBox();
+
+        textFeePow.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(9)));
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 7;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 10);
-        add(txtFeePow, gridBagConstraints);
-        
-        // issue_jButton.setText("jButton3");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new Insets(0, 0, 10, 10);
+        add(textFeePow, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 7;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
-        add(issue_jButton, gridBagConstraints);
-    }// </editor-fold>
-    
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        add(issueJButton, gridBagConstraints);
+    }
+
+    private String[] fillAndReceiveStringArray(int size) {
+        String[] modelTextScale = new String[size];
+        for (int i = 0; i < modelTextScale.length; i++) {
+            modelTextScale[i] = i + "";
+        }
+        return modelTextScale;
+    }
+
     public void onIssueClick() {
         // DISABLE
-        issue_jButton.setEnabled(false);
-        
+        issueJButton.setEnabled(false);
+
         // CHECK IF WALLET UNLOCKED
         if (!Controller.getInstance().isWalletUnlocked()) {
             // ASK FOR PASSWORD
@@ -348,156 +299,124 @@ public class IssueAssetPanel extends javax.swing.JPanel {
                 // WRONG PASSWORD
                 JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid password"),
                         Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
-                
+
                 // ENABLE
-                issue_jButton.setEnabled(true);
-                
+                issueJButton.setEnabled(true);
+
                 return;
             }
         }
-        
+
         // READ CREATOR
-        Account sender = (Account) this.cbxFrom.getSelectedItem();
-        
+        Account sender = (Account) fromJComboBox.getSelectedItem();
+
         int parsestep = 0;
         try {
-            
+
             // READ FEE POW
-            int feePow = Integer.parseInt((String)this.txtFeePow.getSelectedItem());
-            
+            int feePow = Integer.parseInt((String) textFeePow.getSelectedItem());
+
             // READ SCALE
             parsestep++;
-            byte scale = Byte.parseByte((String) this.txtScale.getSelectedItem());
-            
-            
+            byte scale = Byte.parseByte((String) textScale.getSelectedItem());
+
+
             // READ QUANTITY
             parsestep++;
-            long quantity = Long.parseLong(this.txtQuantity.getText());
+            long quantity = Long.parseLong(textQuantity.getText());
             int asDeal = Transaction.FOR_NETWORK;
-            
+
             // CREATE ASSET
             parsestep++;
             // SCALE, ASSET_TYPE, QUANTITY
             PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-            int asset_type = 0;
             // if (currency_unmovabl_chk.isSelected()) asset_type = 1;
             // if (claim_right_obligation_chk.isSelected()) asset_type = 2;
             parsestep++;
-            asset_type = ((AssetType) assetTypeModet.getSelectedItem()).getId();
-            
+            int assetType = ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getId();
+
             IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction) Controller.getInstance().issueAsset(
-                    creator, this.txtName.getText(), this.txtareaDescription.getText(), add_Logo_Icon_Panel.imgButes,
-                    add_Image_Panel.imgButes, false, scale, asset_type, quantity, feePow);
-            
+                    creator, textName.getText(), textAreaDescription.getText(), addLogoIconLabel.getImgBytes(),
+                    addImageLabel.getImgBytes(), false, scale, assetType, quantity, feePow);
+
             AssetCls asset = (AssetCls) issueAssetTransaction.getItem();
-            
-            // Issue_Asset_Confirm_Dialog cont = new
-            // Issue_Asset_Confirm_Dialog(issueAssetTransaction);
+
             String text = "<HTML><body>";
             text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
-                    + Lang.getInstance().translate("Issue Asset") + "<br><br><br>";
-            text += Lang.getInstance().translate("Creator") + ":&nbsp;" + issueAssetTransaction.getCreator() + "<br>";
-            text += "[" + asset.getKey() + "]" + Lang.getInstance().translate("Name") + ":&nbsp;" + asset.viewName()
-                    + "<br>";
-            text += Lang.getInstance().translate("Quantity") + ":&nbsp;" + asset.getQuantity().toString() + "<br>";
-            // text += Lang.getInstance().translate("Movable") +":&nbsp;"+
-            // Lang.getInstance().translate(((AssetCls)issueAssetTransaction.getItem()).isMovable()+"")+
-            // "<br>";
-            text += Lang.getInstance().translate("Asset Type") + ":&nbsp;"
-                    + Lang.getInstance().translate(asset.viewAssetType() + "") + "<br>";
-            text += Lang.getInstance().translate("Scale") + ":&nbsp;" + asset.getScale() + "<br>";
-            text += Lang.getInstance().translate("Description") + ":<br>"
-                    + library.to_HTML(Lang.getInstance().translate(asset.viewDescription()))
-                    + "<br>";
-            String Status_text = "";
-            
-            // System.out.print("\n"+ text +"\n");
-            // UIManager.put("OptionPane.cancelButtonText", "Отмена");
-            // UIManager.put("OptionPane.okButtonText", "Готово");
-            
-            // int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(),
-            // text, Lang.getInstance().translate("Issue Asset"),
-            // JOptionPane.YES_NO_OPTION);
-            
-            Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, issueAssetTransaction,
-                    text, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
+                    + Lang.getInstance().translate("Issue Asset") + "<br><br><br>"
+                    + Lang.getInstance().translate("Creator") + ":&nbsp;" + issueAssetTransaction.getCreator() + "<br>"
+                    + "[" + asset.getKey() + "]" + Lang.getInstance().translate("Name") + ":&nbsp;" + asset.viewName() + "<br>"
+                    + Lang.getInstance().translate("Quantity") + ":&nbsp;" + asset.getQuantity().toString() + "<br>"
+                    + Lang.getInstance().translate("Asset Type") + ":&nbsp;"
+                    + Lang.getInstance().translate(asset.viewAssetType() + "") + "<br>"
+                    + Lang.getInstance().translate("Scale") + ":&nbsp;" + asset.getScale() + "<br>"
+                    + Lang.getInstance().translate("Description") + ":<br>"
+                    + library.to_HTML(Lang.getInstance().translate(asset.viewDescription())) + "<br>";
+            String statusText = "";
+
+            IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(),
+                    true, issueAssetTransaction,
+                    text, (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), statusText,
                     Lang.getInstance().translate("Confirmation Transaction"));
-            dd.setLocationRelativeTo(th);
-            dd.setVisible(true);
-            
+            confirmDialog.setLocationRelativeTo(this);
+            confirmDialog.setVisible(true);
+
             // JOptionPane.OK_OPTION
-            if (!dd.isConfirm) { // s!= JOptionPane.OK_OPTION) {
-                
-                issue_jButton.setEnabled(true);
-                
+            if (!confirmDialog.isConfirm) {
+                issueJButton.setEnabled(true);
                 return;
             }
-            
+
             // VALIDATE AND PROCESS
             int result = Controller.getInstance().getTransactionCreator().afterCreate(issueAssetTransaction, asDeal);
-            
+
             // CHECK VALIDATE MESSAGE
             switch (result) {
                 case Transaction.VALIDATE_OK:
-                    
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
                             Lang.getInstance().translate("Asset issue has been sent!"),
                             Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-                    
                     break;
-                
                 case Transaction.INVALID_QUANTITY:
-                    
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
                             Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"),
                             JOptionPane.ERROR_MESSAGE);
                     break;
-                
                 case Transaction.NOT_ENOUGH_FEE:
-                    
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
                             Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%",
                                     AssetCls.FEE_NAME),
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
-                
                 case Transaction.INVALID_NAME_LENGTH:
-                    
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Name must be between %m and %M characters!")
-                                    .replace("%m", "" + issueAssetTransaction.getItem().getMinNameLen())
-                                    .replace("%M", "" + ItemCls.MAX_NAME_LENGTH),
+                            Lang.getInstance().translate("Name must be between") + " "
+                                    + issueAssetTransaction.getItem().getMinNameLen() + " "
+                                    + Lang.getInstance().translate("and") + " "
+                                    + ItemCls.MAX_NAME_LENGTH + " "
+                                    + Lang.getInstance().translate("characters!"),
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
-                
                 case Transaction.INVALID_DESCRIPTION_LENGTH:
-                    
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
                             Lang.getInstance().translate("Description must be between 1 and 1000 characters!"),
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
-                
                 case Transaction.INVALID_PAYMENTS_LENGTH:
-                    
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
                             Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"),
                             JOptionPane.ERROR_MESSAGE);
                     break;
-                
                 case Transaction.CREATOR_NOT_PERSONALIZED:
-                    
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
                             Lang.getInstance().translate("Issuer account not personalized!"),
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
-                
                 default:
-                    
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
                             Lang.getInstance().translate("Unknown error") + "[" + result + "]!",
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
-                
             }
         } catch (Exception e) {
             switch (parsestep) {
@@ -513,7 +432,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
                     break;
                 case 2:
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Invalid Quantity!"), Lang.getInstance().translate("Error"),
+                            Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"),
                             JOptionPane.ERROR_MESSAGE);
                     break;
                 case 4:
@@ -528,9 +447,8 @@ public class IssueAssetPanel extends javax.swing.JPanel {
                     break;
             }
         }
-        
+
         // ENABLE
-        issue_jButton.setEnabled(true);
+        issueJButton.setEnabled(true);
     }
-    // End of variables declaration
 }

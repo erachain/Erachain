@@ -1,5 +1,6 @@
 package org.erachain.core;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.network.Peer;
@@ -42,6 +43,12 @@ public class BlockBuffer extends Thread {
     public void run() {
         while (this.run) {
             for (int i = 0; i < this.signatures.size() && i < this.counter + BUFFER_SIZE; i++) {
+
+                if (Controller.getInstance().isOnStopping()) {
+                    stopThread();
+                    break;
+                }
+
                 byte[] signature = this.signatures.get(i);
 
                 //CHECK IF WE HAVE ALREADY LOADED THIS BLOCK
@@ -75,7 +82,7 @@ public class BlockBuffer extends Thread {
                 long timePoint = System.currentTimeMillis();
 
                 //SEND MESSAGE TO PEER
-                BlockMessage response = (BlockMessage) peer.getResponse(message, Synchronizer.GET_BLOCK_TIMEOUT);
+                BlockMessage response = (BlockMessage) peer.getResponse(message, Synchronizer.GET_BLOCK_TIMEOUT >> 1);
 
                 //CHECK IF WE GOT RESPONSE
                 if (response == null) {
@@ -136,10 +143,10 @@ public class BlockBuffer extends Thread {
         this.counter = this.signatures.indexOf(signature);
 
         //
-        block = this.blocks.get(signature).poll(BlockChain.HARD_WORK?30000 : (Synchronizer.GET_BLOCK_TIMEOUT >> 1),
+        block = this.blocks.get(signature).poll(BlockChain.HARD_WORK?30000 : (Synchronizer.GET_BLOCK_TIMEOUT),
                 TimeUnit.MILLISECONDS);
         if (block == null) {
-            throw new Exception("Block buffer error 3");
+            throw new Exception("Block buffer error 3 =null");
         }
 
         return block;

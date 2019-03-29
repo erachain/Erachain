@@ -29,7 +29,7 @@ public class ItemsFavorites_not implements Observer {
         this.type = type;
         this.favorites = new ArrayList<Long>();
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         Controller.getInstance().addObserver(this);
         ///this.reload();
         //this.getAssets();

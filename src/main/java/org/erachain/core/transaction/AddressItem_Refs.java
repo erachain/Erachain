@@ -24,12 +24,12 @@ public abstract class AddressItem_Refs extends Transaction {
     }
 
     /*
-    public AddressItem_Refs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature)
+    public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature)
     {
         this(typeBytes, NAME_ID, creator, item, feePow, timestamp, reference);
         this.signature = signature;
         if (item.getReference() == null) item.setReference(signature); // set reference
-        //item.resolveKey(DBSet.getInstance());
+        //item.resolveKey(DLSet.getInstance());
         ///// if (timestamp > 1000 ) setDB; // not asPaack
     }
      */
@@ -37,7 +37,7 @@ public abstract class AddressItem_Refs extends Transaction {
         this(typeBytes, NAME_ID, creator, item, (byte) 0, 0l, null);
         this.signature = signature;
         if (this.item.getReference() == null) this.item.setReference(signature);
-        //item.resolveKey(DBSet.getInstance());
+        //item.resolveKey(DLSet.getInstance());
     }
 
     //GETTERS/SETTERS

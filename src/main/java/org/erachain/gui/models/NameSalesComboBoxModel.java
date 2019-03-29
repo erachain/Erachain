@@ -20,7 +20,7 @@ public class NameSalesComboBoxModel extends DefaultComboBoxModel<NameSale> imple
     private SortableList<Tuple2<String, String>, BigDecimal> nameSales;
 
     public NameSalesComboBoxModel() {
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class NameSalesComboBoxModel extends DefaultComboBoxModel<NameSale> imple
         if (message.getType() == ObserverMessage.LIST_NAME_SALE_TYPE) {
             if (this.nameSales == null) {
                 this.nameSales = (SortableList<Tuple2<String, String>, BigDecimal>) message.getValue();
-                this.nameSales.registerObserver();
+                //this.nameSales.registerObserver();
                 this.nameSales.sort(NameSaleMap.NAME_INDEX);
             }
 

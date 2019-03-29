@@ -19,7 +19,6 @@ import java.util.*;
 
 @SuppressWarnings("rawtypes")
 public class ATMap extends DCMap<String, AT> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     private NavigableSet typeATs;
     private NavigableSet creatorATs;
@@ -37,11 +36,9 @@ public class ATMap extends DCMap<String, AT> {
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_AT_TYPE);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_AT_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_AT_TYPE);
-            }
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_ATS);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_AT_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_AT_TYPE);
         }
     }
 
@@ -216,11 +213,6 @@ public class ATMap extends DCMap<String, AT> {
     @Override
     protected AT getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     public boolean add(AT at) {

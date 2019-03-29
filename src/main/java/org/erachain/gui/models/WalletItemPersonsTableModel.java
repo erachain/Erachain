@@ -5,18 +5,16 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.util.Collections;
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, String>, PersonCls> implements Observer {
+public class WalletItemPersonsTableModel extends SortedListTableModelCls<Tuple2<String, String>, PersonCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -25,33 +23,15 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 
     private SortableList<Tuple2<String, String>, PersonCls> persons;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
-
     public WalletItemPersonsTableModel() {
-        //Controller.getInstance().addWalletListener(this);
-        addObservers();
+        super(Controller.getInstance().wallet.database.getPersonMap(), "WalletItemPersonsTableModel", 1000,
+                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
+                new Boolean[]{false, true, true, false, false}, true);
     }
 
     @Override
     public SortableList<Tuple2<String, String>, PersonCls> getSortableList() {
         return this.persons;
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
-    }
-
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
     }
 
     public PersonCls getItem(int row) {
@@ -60,16 +40,6 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
             return null;
 
         return personRes.getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -116,15 +86,6 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -133,7 +94,7 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
         if (message.getType() == ObserverMessage.LIST_PERSON_TYPE || message.getType() == ObserverMessage.WALLET_LIST_PERSON_TYPE) {
             if (this.persons == null) {
                 this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
-                this.persons.registerObserver();
+                //this.persons.registerObserver();
                 // sort from comparator
                 Collections.sort(this.persons, (a, b) -> a.getB().getName().compareToIgnoreCase(b.getB().getName()));
             }
@@ -154,16 +115,15 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
         if (Controller.getInstance().doesWalletDatabaseExists())
             Controller.getInstance().wallet.database.getPersonMap().addObserver(this);
 
+        super.addObservers();
+
     }
 
+    public void deleteObservers() {
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getPersonMap().deleteObserver(this);
 
-    public void removeObservers() {
-        if (!Controller.getInstance().doesWalletDatabaseExists())
-            return;
+        super.deleteObservers();
 
-        //this.persons.removeObserver();
-        //Controller.getInstance().deleteWalletObserver(this);
-        Controller.getInstance().wallet.database.getPersonMap().deleteObserver(this);
-        persons.removeObserver();
     }
 }

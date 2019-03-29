@@ -125,8 +125,8 @@ public class AccountsTableModel extends AbstractTableModel implements Observer {
 			/*
 		case COLUMN_WAINTING_BALANCE:
 			if (this.asset == null) return "-";
-			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
-			unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DBSet.getInstance()));
+			balance = account.getBalance(this.asset.getKey(DLSet.getInstance()));
+			unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DLSet.getInstance()));
 			str = NumberAsString.formatAsString(unconfBalance.a.subtract(balance.a))
 					+ "/" + unconfBalance.b.subtract(balance.b).toPlainString()
 					+ "/" + unconfBalance.c.subtract(balance.c).toPlainString();

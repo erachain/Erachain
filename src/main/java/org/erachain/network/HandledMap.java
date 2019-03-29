@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class HandledMap<K, V> extends ConcurrentHashMap {
 
+    public static final int PEERS_SIZE = 1<<5;
     private int max_size;
     private List<K> handledList;
 
@@ -37,9 +38,7 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
         if (!super.containsKey(key)) {
 
             // Если еще нет данных
-            //sendersSet = new CopyOnWriteArrayList();
-            //sendersSet = Collections.synchronizedSet(new HashSet<Peer>());
-            sendersSet = new HashSet<Peer>(10, 1f);
+            sendersSet = new HashSet<Peer>(PEERS_SIZE, 1f);
 
             sendersSet.add(sender);
 

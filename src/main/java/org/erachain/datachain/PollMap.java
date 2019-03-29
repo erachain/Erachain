@@ -11,18 +11,15 @@ import java.util.Map;
 
 @Deprecated
 public class PollMap extends DCMap<String, Poll> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public PollMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_POLL_TYPE);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_POLL_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_POLL_TYPE);
-            }
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_POLL_TYPE);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_POLL_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_POLL_TYPE);
         }
     }
 
@@ -81,11 +78,6 @@ public class PollMap extends DCMap<String, Poll> {
     @Override
     protected Poll getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     public boolean contains(Poll poll) {

@@ -4,8 +4,8 @@ package org.erachain.core.item.templates;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.Issue_ItemMap;
-import org.erachain.datachain.Item_Map;
+import org.erachain.datachain.IssueItemMap;
+import org.erachain.datachain.ItemMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,25 +49,25 @@ public abstract class TemplateCls extends ItemCls {
     }
 
     public List<String> getVarNames() {
-        if (variables != null)
+        if (variables != null)  {
             return variables;
+        }
 
-        variables = new ArrayList<String>();
+        variables = new ArrayList<>();
         Matcher matcher = varsPattern.matcher(description);
         while (matcher.find()) {
             String varName = matcher.group(1);
             variables.add(varName);
-            //description = description.replace(matcher.group(), getImgHtml(url));
         }
         return variables;
     }
 
     // DB
-    public Item_Map getDBMap(DCSet db) {
+    public ItemMap getDBMap(DCSet db) {
         return db.getItemTemplateMap();
     }
 
-    public Issue_ItemMap getDBIssueMap(DCSet db) {
+    public IssueItemMap getDBIssueMap(DCSet db) {
         return db.getIssueTemplateMap();
     }
 

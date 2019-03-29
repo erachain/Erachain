@@ -1,6 +1,7 @@
 package org.erachain.gui.items.other;
 
 import org.erachain.controller.Controller;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.Split_Panel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.Wallet_Orphan_Button;
@@ -10,7 +11,6 @@ import org.erachain.gui.models.PeersTableModel;
 import org.erachain.gui.models.WalletBlocksTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
-import org.erachain.network.PeerManager;
 import org.erachain.utils.TableMenuPopupUtil;
 
 import javax.swing.*;
@@ -28,7 +28,7 @@ public class Other_Split_Panel extends Split_Panel {
     private GridBagConstraints gridBagConstraints;
     private JLabel jLabel_Peer_Title;
     private JScrollPane jScrollPane_Peers_Table;
-    private BlocksTableModel All_Blocks_TableModel;
+    private BlocksTableModel allBlocksTableModel;
     private MTable jTable_All_Block;
     private WalletBlocksTableModel blocksModel;
     private MTable jTable_My_Block;
@@ -70,7 +70,7 @@ public class Other_Split_Panel extends Split_Panel {
                 // TODO Auto-generated method stub
                 int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
                 int rowRow = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-                item_Peer_Menu = peersTableModel.get_Peers(rowRow);
+                item_Peer_Menu = peersTableModel.getItem(rowRow);
                 
             }
             
@@ -214,8 +214,8 @@ public class Other_Split_Panel extends Split_Panel {
         leftPanel.removeAll();
         jSplitPanel.setLeftComponent(jPanel2);
         
-        this.All_Blocks_TableModel = new BlocksTableModel(true);
-        this.jTable_All_Block = new MTable(this.All_Blocks_TableModel);
+        allBlocksTableModel = new BlocksTableModel();
+        this.jTable_All_Block = new MTable(this.allBlocksTableModel);
         // this.jTable_All_Block.setEnabled(false);
         
         // TRANSACTIONS
@@ -260,13 +260,13 @@ public class Other_Split_Panel extends Split_Panel {
         JPanel jPanel8 = new JPanel();
         jPanel8.setLayout(new java.awt.GridBagLayout());
         
-        JLabel jLabel_All_Block = new JLabel();
-        jLabel_All_Block.setText(Lang.getInstance().translate("Last 100 blocks"));
+        JLabel jLabelAllBlock = new JLabel();
+        jLabelAllBlock.setText(Lang.getInstance().translate("Last 100 blocks")+". "+Lang.getInstance().translate("Sum win value chain blocks:")+Controller.getInstance().getBlockChain().getFullWeight(DCSet.getInstance()));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(11, 11, 0, 11);
-        jPanel8.add(jLabel_All_Block, gridBagConstraints);
+        jPanel8.add(jLabelAllBlock, gridBagConstraints);
         
         return_Button = new Wallet_Orphan_Button();
         
@@ -301,12 +301,12 @@ public class Other_Split_Panel extends Split_Panel {
     }
     
     @Override
-    public void delay_on_close() {
+    public void onClose() {
         
-        blocksModel.deleteObserver();
-        peersTableModel.deleteObserver();
-        All_Blocks_TableModel.removeObservers();
-        Controller.getInstance().addObserver(sync_Button);
+        blocksModel.deleteObservers();
+        peersTableModel.deleteObservers();
+        allBlocksTableModel.removeObservers();
+        Controller.getInstance().deleteObserver(sync_Button);
         
     }
     

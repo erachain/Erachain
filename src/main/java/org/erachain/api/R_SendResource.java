@@ -126,33 +126,7 @@ public class R_SendResource {
                           @QueryParam("encoding") int encoding,
                           @QueryParam("encrypt") boolean encrypt, @QueryParam("password") String password) {
 
-        APIUtils.askAPICallAllowed(password, "GET send\n ", request, true);
-
-        JSONObject out = new JSONObject();
-        Controller cntr = Controller.getInstance();
-
-        boolean needAmount = false;
-        Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr,
-                assetKey, true,
-                amount, needAmount,
-                title, message, encoding, encrypt);
-
-        Transaction transaction = result.getB();
-        if (transaction == null) {
-            out.put("error", result.getA());
-            out.put("error_message", OnDealClick.resultMess(result.getA()));
-            return out.toJSONString();
-        }
-
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-
-        if (validate == Transaction.VALIDATE_OK)
-            return transaction.toJson().toJSONString();
-        else {
-            out.put("error", validate);
-            out.put("error_message", OnDealClick.resultMess(validate));
-            return out.toJSONString();
-        }
+        return sendGet(creatorStr, recipientStr, feePowStr, assetKey, amount, title, message,encoding,encrypt, password);
 
     }
 
@@ -189,7 +163,7 @@ public class R_SendResource {
             jsonObject = (JSONObject) JSONValue.parse(x);
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
-            ///LOGGER.error(e.getMessage());
+            ///logger.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
 
@@ -415,7 +389,7 @@ public class R_SendResource {
                             continue;
                         }
 
-                        // not work in Threads - LOGGER.info("TEST1: " + OnDealClick.resultMess(result));
+                        // not work in Threads - logger.info("TEST1: " + OnDealClick.resultMess(result));
                         try {
                             Thread.sleep(10000);
                         } catch (InterruptedException e) {
@@ -432,7 +406,7 @@ public class R_SendResource {
                         return;
 
                 } catch (Exception e10) {
-                    // not see in Thread - LOGGER.error(e10.getMessage(), e10);
+                    // not see in Thread - logger.error(e10.getMessage(), e10);
                 }
 
             } while (true);

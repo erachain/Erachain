@@ -33,7 +33,7 @@ public class WebPersonStatusesModel extends AbstractTableModel implements Observ
     List<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>> statusesRows;
 
     SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
-    //TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+    //TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DLSet.getInstance().getPersonAddressMap().getItems(person.getKey());
     String from_date_str;
     String to_date_str;
 
@@ -51,7 +51,7 @@ public class WebPersonStatusesModel extends AbstractTableModel implements Observ
     public WebPersonStatusesModel(long person_Key) {
 
         itemKey = person_Key;
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         statuses = dcSet.getPersonStatusMap().get(itemKey);
         statusesMap = dcSet.getItemStatusMap();
         setRows();

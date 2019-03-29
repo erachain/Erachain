@@ -8,8 +8,8 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.Issue_ItemMap;
-import org.erachain.datachain.Item_Map;
+import org.erachain.datachain.IssueItemMap;
+import org.erachain.datachain.ItemMap;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple6;
@@ -126,13 +126,13 @@ public abstract class ItemCls {
     public abstract int getItemTypeInt();
 
     public abstract String getItemTypeStr();
-    //public abstract FavoriteItem getDBFavoriteMap();
+    //public abstract FavoriteItemMap getDBFavoriteMap();
 
     public abstract String getItemSubType();
 
-    public abstract Item_Map getDBMap(DCSet db);
+    public abstract ItemMap getDBMap(DCSet db);
 
-    public abstract Issue_ItemMap getDBIssueMap(DCSet db);
+    public abstract IssueItemMap getDBIssueMap(DCSet db);
 
     public byte[] getType() {
         return this.typeBytes;
@@ -195,7 +195,7 @@ public abstract class ItemCls {
 
     public long getHeight(DCSet db) {
         //INSERT INTO DATABASE
-        Item_Map dbMap = this.getDBMap(db);
+        ItemMap dbMap = this.getDBMap(db);
         long key = dbMap.getLastKey();
         return key;
 
@@ -433,7 +433,7 @@ public abstract class ItemCls {
     //
     public void insertToMap(DCSet db, long startKey) {
         //INSERT INTO DATABASE
-        Item_Map dbMap = this.getDBMap(db);
+        ItemMap dbMap = this.getDBMap(db);
 
         long newKey;
         Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
@@ -471,10 +471,10 @@ public abstract class ItemCls {
         }
 
         //DELETE ORPHAN DATA
-        //LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 2");
+        //logger.debug("<<<<< core.item.ItemCls.removeFromMap 2");
         this.getDBIssueMap(db).delete(this.reference);
 
-        //LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 3");
+        //logger.debug("<<<<< core.item.ItemCls.removeFromMap 3");
 
         return thisKey;
 

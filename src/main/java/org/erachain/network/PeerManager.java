@@ -5,9 +5,13 @@ import org.erachain.network.message.Message;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MonitoredThread;
+import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +39,28 @@ public class PeerManager extends MonitoredThread {
     public void addPeer(Peer peer, int banForMinutes) {
         //ADD TO DATABASE
         if (!Controller.getInstance().isOnStopping()) {
-            Controller.getInstance().getDBSet().getPeerMap().addPeer(peer, banForMinutes);
+            try {
+                Controller.getInstance().getDBSet().getPeerMap().addPeer(peer, banForMinutes);
+            } catch (Exception e) {
+
+                // TODO понять почему произошла ошибка https://lab.erachain.org/erachain/Erachain/issues/669
+                LOGGER.error(e.getMessage(), e);
+                LOGGER.error("try delete error peer");
+                try {
+                    Controller.getInstance().getDBSet().getPeerMap().delete(peer.getAddress().getAddress());
+                } catch (Exception eIO) {
+                    LOGGER.error(eIO.getMessage(), eIO);
+                    LOGGER.error("try reCreateDB");
+                    try {
+                        Controller.getInstance().getDBSet().close();
+                        Controller.getInstance().reCreateDB();
+                    } catch (Exception eIO2) {
+                        LOGGER.error(eIO.getMessage(), eIO2);
+                        Controller.getInstance().stopAll(38);
+                    }
+                }
+
+            }
         }
     }
 

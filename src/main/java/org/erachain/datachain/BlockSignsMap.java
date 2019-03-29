@@ -17,7 +17,6 @@ import java.util.TreeMap;
  * занчение: номер блока (высота, height)<br>
  */
 public class BlockSignsMap extends DCMap<Long, Integer> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public BlockSignsMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -58,11 +57,6 @@ public class BlockSignsMap extends DCMap<Long, Integer> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
     public boolean contains(byte[] signature) {
         Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
                 signature[4], signature[5], signature[6], signature[7]);
@@ -95,7 +89,7 @@ public class BlockSignsMap extends DCMap<Long, Integer> {
         if (value == null)
             return null;
 
-        return this.getDBSet().getBlockMap().get(value);
+        return ((DCSet)this.databaseSet).getBlockMap().get(value);
 
     }
 

@@ -8,21 +8,19 @@ import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class AllTelegramsMap extends DBMap<String, Transaction> {
-    
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-      
 
-    public AllTelegramsMap(TelegramSet dWSet, DB database) {
+    public AllTelegramsMap(DGSet dWSet, DB database) {
         super(dWSet, database);
 
-        this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.ALL_TELEGRAM_RESET_TYPE);
-        this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ALL_TELEGRAMT_ADD_TYPE);
-        this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.ALL_TELEGRAMT_REMOVE_TYPE);
-        this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.ALL_TELEGRAMT_LIST_TYPE);
+        if (databaseSet.isWithObserver()) {
+            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.ALL_TELEGRAM_RESET_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.ALL_TELEGRAMT_LIST_TYPE);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ALL_TELEGRAMT_ADD_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.ALL_TELEGRAMT_REMOVE_TYPE);
+        }
     }
 
    
@@ -31,10 +29,10 @@ public class AllTelegramsMap extends DBMap<String, Transaction> {
     protected Map<String, Transaction> getMap(DB database) {
       //OPEN MAP
        return database.createTreeMap("telegrams")
-              .keySerializer(BTreeKeySerializer.BASIC)
+               .keySerializer(BTreeKeySerializer.BASIC)
                .valueSerializer(new TransactionSerializer())
-              .counterEnable()
-              .makeOrGet();
+               .counterEnable()
+               .makeOrGet();
     }
 
     @Override
@@ -49,11 +47,6 @@ public class AllTelegramsMap extends DBMap<String, Transaction> {
         return null;
     }
 
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        // TODO Auto-generated method stub
-        return this.observableData;
-    }
 
     @Override
     protected void createIndexes(DB database) {

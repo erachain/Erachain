@@ -16,12 +16,12 @@ import java.util.TreeSet;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.erachain.gui.library.fileChooser;
 import org.json.simple.JSONObject;
 
 import org.erachain.controller.Controller;
 import org.erachain.gui.library.Menu_Deals;
 import org.erachain.gui.library.Menu_Files;
-import org.erachain.gui.library.My_JFileChooser;
 import org.erachain.gui.status.StatusPanel;
 import org.erachain.gui2.Main_Panel;
 import org.erachain.lang.Lang;
@@ -32,7 +32,7 @@ import org.erachain.utils.SaveStrToFile;
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame implements Observer {
     private static MainFrame instance;
-   private JSONObject settingsJSONbuf;
+    private JSONObject settingsJSONbuf;
     private JSONObject main_Frame_settingsJSON;
     // Variables declaration - do not modify
     public Menu_Files jMenu_Files;
@@ -55,7 +55,7 @@ public class MainFrame extends JFrame implements Observer {
         }
 
         th = this;
-    //    this.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
+        //    this.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         Controller.getInstance().addObserver(this);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         settingsJSONbuf = new JSONObject();
@@ -82,7 +82,7 @@ public class MainFrame extends JFrame implements Observer {
         mainPanel = Main_Panel.getInstance();
         // statusPanel = new StatusPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu_Files= new Menu_Files();
+        jMenu_Files = new Menu_Files();
         jMenu2 = new Menu_Deals();
 
 
@@ -147,17 +147,17 @@ public class MainFrame extends JFrame implements Observer {
                 // TODO Auto-generated method stub
                 // read settings
                 // You can still stop closing if you want to
-                int res = JOptionPane.showConfirmDialog(th, Lang.getInstance().translate("Are you sure you want to close?"),  Lang.getInstance().translate("Close?"), JOptionPane.YES_NO_OPTION);
-                if ( res != 0 ) return;
-                    closeFrame();
-                    th.dispose();
-                    java.awt.EventQueue.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            new ClosingDialog();
-                        }
-                    });
-             }
+                int res = JOptionPane.showConfirmDialog(th, Lang.getInstance().translate("Are you sure you want to close?"), Lang.getInstance().translate("Close?"), JOptionPane.YES_NO_OPTION);
+                if (res != 0) return;
+                closeFrame();
+                th.dispose();
+                java.awt.EventQueue.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        new ClosingDialog();
+                    }
+                });
+            }
 
             @Override
             public void windowDeactivated(WindowEvent arg0) {
@@ -316,7 +316,8 @@ public class MainFrame extends JFrame implements Observer {
         }
 
     }
-    public void closeFrame(){
+
+    public void closeFrame() {
         int lDiv;
         int div;
         Split_Panel sP;
@@ -373,9 +374,9 @@ public class MainFrame extends JFrame implements Observer {
         settingsJSON.put("Main_Frame_Selected_Tab", mainPanel.jTabbedPane1.getSelectedIndex() + "");
 
         settingsJSONbuf.put("Main_Frame_Setting", settingsJSON);
-        settingsJSONbuf.put("FileChooser_Path", new String(My_JFileChooser.get_Default_Path()));
-        settingsJSONbuf.put("FileChooser_Wight", My_JFileChooser.get_Default_Width());
-        settingsJSONbuf.put("FileChooser_Height", My_JFileChooser.get_Default_Height());
+        settingsJSONbuf.put("FileChooser_Path", new String(fileChooser.get_Default_Path()));
+        settingsJSONbuf.put("FileChooser_Wight", fileChooser.get_Default_Width());
+        settingsJSONbuf.put("FileChooser_Height", fileChooser.get_Default_Height());
 
         settingsJSONbuf.put("Telegram_Sender", Settings.getInstance().getTelegramDefaultSender());
         settingsJSONbuf.put("Telegram_Reciever", Settings.getInstance().getTelegramDefaultReciever());

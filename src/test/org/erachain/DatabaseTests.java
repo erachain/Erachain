@@ -189,7 +189,7 @@ public class DatabaseTests {
     public void databaseAssets() {
 
         try {
-            DCSet.reCreateDatabase(false, false);
+            DCSet.reCreateDB(false, false);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -206,7 +206,7 @@ public class DatabaseTests {
         ItemAssetMap dbMap = dcSet.getItemAssetMap();
         Collection<ItemCls> assets = dbMap.getValues();
         for (ItemCls asset : assets) {
-            //Asset asset = DBSet.getInstance().getAssetMap().get(key);
+            //Asset asset = DLSet.getInstance().getAssetMap().get(key);
             AssetCls aa = (AssetCls) asset;
             LOGGER.info("ASSET - " + asset.getKey(dcSet) + " : " + asset.getName()
                     + " : " + aa.getQuantity()
@@ -218,7 +218,7 @@ public class DatabaseTests {
         dbMap.add(dbMap.get(1l));
         LOGGER.info("keys " + dbMap.getKeys());
 
-        //Collection<Asset> issues = DBSet.getInstance().getIssueAssetMap.getValuesAll();
+        //Collection<Asset> issues = DLSet.getInstance().getIssueAssetMap.getValuesAll();
 
         //long key = db.);
 
@@ -233,7 +233,7 @@ public class DatabaseTests {
         Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet));
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
-        //LOGGER.info(asset.toString() + " getQuantity " + asset.getQuantity());
+        //logger.info(asset.toString() + " getQuantity " + asset.getQuantity());
 
         long key = asset.getKey(dcSet);
 

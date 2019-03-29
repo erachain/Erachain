@@ -5,7 +5,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
@@ -16,7 +16,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Trade> implements Observer {
+public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>, Trade> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TYPE = 1;
     public static final int COLUMN_AMOUNT = 2;
@@ -26,12 +26,11 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tra
     private SortableList<Tuple2<Long, Long>, Trade> trades;
     private Order order;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Amount", "Price", "Total"});
-
     public OrderTradesTableModel(Order order) {
+        super(new String[]{"Timestamp", "Type", "Amount", "Price", "Total"}, true);
+
         this.order = order;
         this.trades = DCSet.getInstance().getTradeMap().getTrades(order.getId());
-        this.trades.registerObserver();
     }
 
     @Override
@@ -41,16 +40,6 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tra
 
     public Trade getTrade(int row) {
         return this.trades.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -134,13 +123,17 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tra
         }
     }
 
-    public void removeObservers() {
-        this.trades.removeObserver();
+    public void addObservers() {
+        //this.trades.registerObserver();
+    }
+
+    public void deleteObservers() {
+        //this.trades.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 
     @Override
-    public Object getItem(int k) {
+    public Trade getItem(int k) {
         // TODO Auto-generated method stub
         return this.trades.get(k).getB();
     }

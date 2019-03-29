@@ -14,7 +14,7 @@ import org.erachain.gui.AccountRenderer;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.accounts.Accounts_ComboBox_Model;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.Send_TableModel;
@@ -726,7 +726,7 @@ public class Mail_Send_Panel extends JPanel {
         // Transaction.VALIDATE_OK);
 
         String Status_text = "";
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
+        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Send Mail"), (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2),
                 Status_text, Lang.getInstance().translate("Confirmation transaction send mail"));
 

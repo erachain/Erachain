@@ -7,9 +7,9 @@ import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.My_Add_Image_Panel;
+import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.CreateOptionsTableModel;
@@ -36,8 +36,8 @@ public class IssuePollPanel extends JPanel {
     private JButton createButton;
     private CreateOptionsTableModel optionsTableModel;
     private IssuePollPanel th;
-    private My_Add_Image_Panel add_Image_Panel;
-    private My_Add_Image_Panel add_Logo_Icon_Panel;
+    private AddImageLabel add_Image_Panel;
+    private AddImageLabel add_Logo_Icon_Panel;
     final MTable table;
 
     public IssuePollPanel() {
@@ -96,7 +96,7 @@ public class IssuePollPanel extends JPanel {
         labelGBC.gridx = 1;
 
         // ICON
-        add_Image_Panel = new My_Add_Image_Panel(
+        add_Image_Panel = new AddImageLabel(
                 Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
 
         GridBagConstraints gbc_add_Image_Panel = new GridBagConstraints();
@@ -122,7 +122,7 @@ public class IssuePollPanel extends JPanel {
         gbc_txtName.gridx = 2;
         gbc_txtName.gridy = 1;
         this.add(this.txtName, gbc_txtName);
-        add_Logo_Icon_Panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add Logo"), 50, 50);
+        add_Logo_Icon_Panel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), 50, 50);
 
         GridBagConstraints gbc_add_Logo_Icon_Panel = new GridBagConstraints();
         gbc_add_Logo_Icon_Panel.insets = new Insets(0, 0, 5, 0);
@@ -320,8 +320,8 @@ public class IssuePollPanel extends JPanel {
         }
 
 
-        byte[] icon = add_Logo_Icon_Panel.imgButes;
-        byte[] image = add_Image_Panel.imgButes;
+        byte[] icon = add_Logo_Icon_Panel.getImgBytes();
+        byte[] image = add_Image_Panel.getImgBytes();
 
         // CREATE POLL
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
@@ -349,7 +349,7 @@ public class IssuePollPanel extends JPanel {
         text += "<br>    ";
 
         String Status_text = "";
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, issuePoll,
+        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, issuePoll,
                 text,
                 (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction"));

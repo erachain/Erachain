@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import com.google.common.collect.ForwardingNavigableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
@@ -43,8 +44,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class);
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
     @SuppressWarnings("rawtypes")
@@ -56,14 +55,10 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_UNC_TRANSACTION_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
-                this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_UNC_TRANSACTION_TYPE);
-            } else {
-                this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.COUNT_UNC_TRANSACTION_TYPE);
-            }
+            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_UNC_TRANSACTION_TYPE);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_UNC_TRANSACTION_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
         }
 
     }
@@ -120,6 +115,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                 .counterEnable()
                 .makeOrGet();
 
+
         if (Controller.getInstance().onlyProtocolIndexing)
             // NOT USE SECONDARY INDEXES
             return map;
@@ -140,7 +136,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                     public String[] run(Long key, Transaction val) {
                         List<String> recps = new ArrayList<String>();
 
-                        val.setDC(getDBSet());
+                        val.setDC((DCSet)databaseSet);
 
                         for (Account acc : val.getRecipientAccounts()) {
                             // recps.add(acc.getAddress() + val.viewTimestamp()); уникальнось внутри Бинда делается
@@ -160,7 +156,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                         List<Fun.Tuple3<String, Long, Integer>> recps = new ArrayList<Fun.Tuple3<String, Long, Integer>>();
                         Integer type = val.getType();
 
-                        val.setDC(getDBSet());
+                        val.setDC((DCSet)databaseSet);
 
                         for (Account acc : val.getInvolvedAccounts()) {
                             recps.add(new Fun.Tuple3<String, Long, Integer>(acc.getAddress(), val.getTimestamp(), type));
@@ -190,11 +186,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     @Override
     protected Transaction getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     public Iterator<Long> getTimestampIterator() {
@@ -238,7 +229,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             }
 
             if (!notSetDCSet)
-                transaction.setDC(this.getDBSet());
+                transaction.setDC((DCSet)databaseSet);
 
             values.add(transaction);
 
@@ -292,12 +283,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         Long key = Longs.fromByteArray(signature);
 
-        //if (this.map.containsKey(key)) {
-        //    return true;
-        //}
-
-        //this.getDBSet().updateUncTxCounter(1);
-
         return this.set(key, transaction);
 
     }
@@ -308,18 +293,6 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     }
 
-    public Transaction delete(Long key) {
-
-        // delete BROADCASTS
-        //this.peersBroadcasted.remove(key);
-
-        //if (this.contains(key))
-        //    this.getDBSet().updateUncTxCounter(-1);
-
-        return super.delete(key);
-    }
-
-
     public void delete(Transaction transaction) {
         this.delete(transaction.getSignature());
     }
@@ -327,6 +300,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     public Transaction delete(byte[] signature) {
         return this.delete(Longs.fromByteArray(signature));
     }
+
     public boolean contains(byte[] signature) {
         return this.contains(Longs.fromByteArray(signature));
     }
@@ -337,6 +311,27 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     public Transaction get(byte[] signature) {
         return this.get(Longs.fromByteArray(signature));
+    }
+
+    public Collection<Long> getFromToKeys(long fromKey, long toKey) {
+
+        List<Long> treeKeys = new ArrayList<Long>();
+
+        //NavigableMap set = new NavigableMap<Long, Transaction>();
+        // NodeIterator
+
+
+        // DESCENDING + 1000
+        Iterable iterable = this.indexes.get(TIMESTAMP_INDEX + DESCENDING_SHIFT_INDEX);
+        Iterable iterableLimit = Iterables.limit(Iterables.skip(iterable, (int) fromKey), (int) (toKey - fromKey));
+
+        Iterator<Tuple2<Long, Long>> iterator = iterableLimit.iterator();
+        while (iterator.hasNext()) {
+            treeKeys.add(iterator.next().b);
+        }
+
+        return treeKeys;
+
     }
 
     /**
@@ -423,7 +418,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     }
 
 
-        public List<Transaction> getUnconfirmedTransaction(Iterable keys) {
+    public List<Transaction> getUnconfirmedTransaction(Iterable keys) {
         Iterator iter = keys.iterator();
         List<Transaction> transactions = new ArrayList<>();
         Transaction item;
@@ -473,7 +468,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                 ok = false;
 
             if (!ok) {
-                transaction.setDC(this.getDBSet());
+                transaction.setDC((DCSet)databaseSet);
                 HashSet<Account> recipients = transaction.getRecipientAccounts();
 
                 if (recipients == null || recipients.isEmpty() || !recipients.contains(account)) {
@@ -506,7 +501,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                 break;
 
             transaction = this.get(iterator.next());
-            transaction.setDC(this.getDBSet());
+            transaction.setDC((DCSet)databaseSet);
             values.add(transaction);
         }
         iterator = null;
@@ -526,7 +521,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             if (type != 0 && type != transaction.getType())
                 continue;
 
-            transaction.setDC(this.getDBSet());
+            transaction.setDC((DCSet)databaseSet);
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             if (recipients == null || recipients.isEmpty())
                 continue;

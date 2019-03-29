@@ -14,7 +14,7 @@ public class ComboBoxModelItemsImprints_NONE extends DefaultComboBoxModel<Imprin
     Lock lock = new ReentrantLock();
 
     public ComboBoxModelItemsImprints_NONE() {
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
     }
 
     @Override

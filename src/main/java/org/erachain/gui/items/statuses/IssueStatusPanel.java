@@ -8,8 +8,8 @@ import org.erachain.core.transaction.IssueStatusRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
-import org.erachain.gui.library.My_Add_Image_Panel;
+import org.erachain.gui.library.IssueConfirmDialog;
+import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
@@ -29,8 +29,8 @@ public class IssueStatusPanel extends JPanel {
     private JButton issueButton;
     private JCheckBox jCheck_Unique;
     private IssueStatusPanel th;
-    private My_Add_Image_Panel add_Image_Panel;
-    private My_Add_Image_Panel add_Logo_Icon_Panel;
+    private AddImageLabel add_Image_Panel;
+    private AddImageLabel add_Logo_Icon_Panel;
 
     // @SuppressWarnings({ "unchecked", "rawtypes" })
     public IssueStatusPanel() {
@@ -79,7 +79,7 @@ public class IssueStatusPanel extends JPanel {
         // this.add(info_Label, labelGBC);
         gridy++;
 
-        add_Image_Panel = new My_Add_Image_Panel(
+        add_Image_Panel = new AddImageLabel(
                 Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
         GridBagConstraints gbc_add_Image_Panel = new GridBagConstraints();
         gbc_add_Image_Panel.anchor = GridBagConstraints.NORTH;
@@ -123,7 +123,7 @@ public class IssueStatusPanel extends JPanel {
         gbc_txtName.gridy = 2;
         this.add(txtName, gbc_txtName);
 
-        add_Logo_Icon_Panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add Logo"), 50, 50);
+        add_Logo_Icon_Panel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), 50, 50);
 
         GridBagConstraints gbc_add_Logo_Icon_Panel = new GridBagConstraints();
         gbc_add_Logo_Icon_Panel.anchor = GridBagConstraints.EAST;
@@ -249,8 +249,8 @@ public class IssueStatusPanel extends JPanel {
             return;
         }
 
-        byte[] icon = add_Logo_Icon_Panel.imgButes;
-        byte[] image = add_Image_Panel.imgButes;
+        byte[] icon = add_Logo_Icon_Panel.getImgBytes();
+        byte[] image = add_Image_Panel.getImgBytes();
 
         boolean unique = jCheck_Unique.isSelected();
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
@@ -271,7 +271,7 @@ public class IssueStatusPanel extends JPanel {
 
         //System.out.print("\n" + text + "\n");
 
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, issue_Status,
+        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, issue_Status,
                 text,
                 (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction"));

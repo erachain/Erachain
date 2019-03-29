@@ -1,29 +1,22 @@
 package org.erachain.gui.items.assets;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Split_Panel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.SetIntervalPanel;
-import org.erachain.gui.models.WalletItemAssetsTableModel;
 import org.erachain.gui.models.WalletOrdersTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
-
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 public class My_Order_Tab extends Split_Panel {
 
@@ -47,7 +40,7 @@ public class My_Order_Tab extends Split_Panel {
         jButton2_jToolBar_RightPanel.setVisible(false);
 
         // set interval panel
-        setIntervalPanel = new SetIntervalPanel(Transaction.CREATE_ORDER_TRANSACTION);
+        setIntervalPanel = new SetIntervalPanel(Controller.getInstance().wallet.database.getOrderMap(), Transaction.CREATE_ORDER_TRANSACTION);
         GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -267,7 +260,7 @@ public class My_Order_Tab extends Split_Panel {
                 if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0)
                     i = jTable_jScrollPanel_LeftPanel
                             .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow());
-                order = ordersModel.getOrder(i);
+                order = ordersModel.getItem(i);
                 if (order == null)
                     return;
                 jScrollPane_jPanel_RightPanel.setViewportView(new Order_Info_Panel(order));
@@ -301,8 +294,8 @@ public class My_Order_Tab extends Split_Panel {
     }
     
     @Override
-    public void delay_on_close() {
-        ordersModel.removeObservers();
+    public void onClose() {
+        ordersModel.deleteObservers();
         setIntervalPanel.removeObservers();
         
     }

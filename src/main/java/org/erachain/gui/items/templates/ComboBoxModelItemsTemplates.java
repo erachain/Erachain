@@ -14,7 +14,7 @@ public class ComboBoxModelItemsTemplates extends DefaultComboBoxModel<TemplateCl
     Lock lock = new ReentrantLock();
 
     public ComboBoxModelItemsTemplates() {
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletFavoritesObserver(this);
     }
 
     @Override

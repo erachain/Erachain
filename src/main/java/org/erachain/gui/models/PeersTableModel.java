@@ -8,13 +8,16 @@ import org.erachain.network.Peer;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
 import java.util.*;
 
+/**
+ * TODO тут нужно применить SortableList для сортировки по полям?
+ * Или тут более изящно сортировка сделана?
+ */
 @SuppressWarnings("serial")
-public class PeersTableModel extends AbstractTableModel implements Observer {
+public class PeersTableModel extends TimerTableModelCls<Peer> implements Observer {
 
     private static final int COLUMN_ADDRESS = 0;
     private static final int COLUMN_HEIGHT = 1;
@@ -24,39 +27,22 @@ public class PeersTableModel extends AbstractTableModel implements Observer {
     private static final int COLUMN_FINDING_AGO = 5;
     private static final int COLUMN_ONLINE_TIME = 6;
     private static final int COLUMN_VERSION = 7;
-    String[] columnNames = new String[] { "IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago",
-            "Online Time", "Version" };
-    private Timer timer;
-    private List<Peer> peers;
+
+    /**
+     * для сортировки по полям в особом виде
+     */
     List<Peer> peersView = new ArrayList<Peer>();
     int view = 1;
-    // String[] columnNames = Lang.getInstance().translate(new String[]{"IP",
-    // "Height", "Ping mc", "Reliable", "Initiator", "Finding ago", "Online
-    // Time", "Version"});
-    private Boolean[] column_AutuHeight = new Boolean[] { false, false, false, false, false, false, false, false };
 
     public PeersTableModel() {
-        Controller.getInstance().addActivePeersObserver(this);
+        super(new String[] { "IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago",
+                "Online Time", "Version" },
+                new Boolean[] { false, false, false, false, false, false, false, false }, false);
 
-        if (this.timer == null) {
-            this.timer = new Timer("Peers Table");
+        logger = LoggerFactory.getLogger(PeersTableModel.class.getName());
 
-            TimerTask action = new TimerTask() {
-                public void run() {
-                    try {
-                        fireTableDataChanged();
-                    } catch (Exception e) {
-                        // LOGGER.error(e.getMessage(),e);
-                    }
-                }
-            };
+        addObservers();
 
-            this.timer.schedule(action,
-                    // Settings.getInstance().getPingInterval()>>1,
-                    5000,
-                    // Settings.getInstance().getPingInterval()
-                    10000);
-        }
     }
 
     // sort to Reliable
@@ -104,11 +90,16 @@ public class PeersTableModel extends AbstractTableModel implements Observer {
     // view ==1 all
     public void setView(int view) {
         this.view = view;
+
+        if (peersView == null) {
+            peersView = new ArrayList<Peer>();
+        }
+
         peersView.clear();
         if (view != 0) {
-            peersView.addAll(peers);
+            peersView.addAll(list);
         } else {
-            for (Peer peer : peers) {
+            for (Peer peer : list) {
                 if (view == 0) {
                     if (peer.isUsed())
                         peersView.add(peer);
@@ -118,49 +109,6 @@ public class PeersTableModel extends AbstractTableModel implements Observer {
       
     }
 
-    public Class<? extends Object> getColumnClass(int c) { // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
-    }
-
-    public Peer get_Peers(int row) {
-        if (row < 0)
-            return null;
-        return peers.get(row);
-    }
-
-    @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return Lang.getInstance().translate(columnNames[index]);
-    }
-
-    public String getColumnNameNO_Translate(int index) {
-        return columnNames[index];
-    }
-
-    @Override
-    public int getRowCount() {
-        if (peersView == null) {
-            return 0;
-        }
-
-        return peersView.size();
-    }
-
     @Override
     public Object getValueAt(int row, int column) {
         if (peersView == null || this.peersView.size() - 1 < row) {
@@ -168,7 +116,7 @@ public class PeersTableModel extends AbstractTableModel implements Observer {
         }
 
         if (Controller.getInstance().isOnStopping()) {
-            this.timer.cancel();
+            this.deleteObservers();
             return null;
         }
 
@@ -234,60 +182,55 @@ public class PeersTableModel extends AbstractTableModel implements Observer {
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            // GUI ERROR
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
         if (Controller.getInstance().isOnStopping()) {
-            this.timer.cancel();
+            this.deleteObservers();
             return;
         }
 
         if (message.getType() == ObserverMessage.LIST_PEER_TYPE) {
 
-            this.peers = (List<Peer>) message.getValue();
+            this.list = (List<Peer>) message.getValue();
             setView(view);
-            this.fireTableDataChanged();
+            needUpdate = true;
 
         } else if (message.getType() == ObserverMessage.UPDATE_PEER_TYPE) {
             Peer peer1 = (Peer) message.getValue();
+
             int n = 0;
-            for (Peer peer2 : this.peers) {
+            for (Peer peer2 : this.list) {
                 if (Arrays.equals(peer1.getAddress().getAddress(), peer2.getAddress().getAddress())) {
-                    /// this.peersStatus.set(n, true);
+                    setView(view);
+                    this.fireTableRowsUpdated(n, n);
                     break;
                 }
                 n++;
             }
-            setView(view);
-            this.fireTableRowsUpdated(n, n);
 
         } else if (message.getType() == ObserverMessage.ADD_PEER_TYPE) {
             setView(view);
-            this.fireTableDataChanged();
+            needUpdate = true;
 
         } else if (message.getType() == ObserverMessage.REMOVE_PEER_TYPE) {
             setView(view);
+            needUpdate = true;
+
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT
+                && needUpdate) {
+            needUpdate = false;
             this.fireTableDataChanged();
         }
     }
 
-    public void deleteObserver() {
-        Controller.getInstance().removeActivePeersObserver(this);
-        if (this.timer != null){
-            this.timer.cancel();
-            this.timer = null;
-        }
+    public void addObservers() {
+        Controller.getInstance().addActivePeersObserver(this);
+    }
 
+    public void deleteObservers() {
+        Controller.getInstance().removeActivePeersObserver(this);
     }
 
 }

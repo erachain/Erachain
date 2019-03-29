@@ -5,15 +5,10 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.*;
-import org.erachain.gui.*;
-import org.erachain.gui.*;
-import org.erachain.gui.*;
-import org.erachain.gui.*;
 import org.erachain.gui.models.BlocksTableModel;
-import org.erachain.gui.models.Debug_Transactions_Table_Model;
+import org.erachain.gui.models.UnconfirmedTransactionsTableModel;
 import org.erachain.gui.models.PeersTableModel;
-import org.erachain.gui.models.TransactionsTableModel;
+import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -34,7 +29,7 @@ public class DebugTabPane extends JTabbedPane {
     static Logger LOGGER = Logger.getLogger(DebugTabPane.class.getName());
 
     private PeersTableModel peersTableModel;
-    private Debug_Transactions_Table_Model transactionsTableModel;
+    private UnconfirmedTransactionsTableModel transactionsTableModel;
     private BlocksTableModel blocksTableModel;
     private LoggerTextArea loggerTextArea;
     private MTable transactionsTable;
@@ -53,12 +48,12 @@ public class DebugTabPane extends JTabbedPane {
         //	this.addTab(Lang.getInstance().translate("Peers"), new JScrollPane(new MTable(this.peersTableModel)));
 
         //TRANSACTIONS TABLE MODEL
-        this.transactionsTableModel = new Debug_Transactions_Table_Model();
+        this.transactionsTableModel = new UnconfirmedTransactionsTableModel();
         this.transactionsTable = new MTable(this.transactionsTableModel);
 
         //TRANSACTIONS SORTER
         Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-        indexes.put(TransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
+        indexes.put(SearchTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
         //CoreRowSorter sorter = new CoreRowSorter(transactionsTableModel, indexes);
         //transactionsTable.setRowSorter(sorter);
 
@@ -71,7 +66,7 @@ public class DebugTabPane extends JTabbedPane {
                     row = transactionsTable.convertRowIndexToModel(row);
 
                     //GET TRANSACTION
-                    Transaction transaction = transactionsTableModel.getTransaction(row);
+                    Transaction transaction = transactionsTableModel.getItem(row);
 
                     //SHOW DETAIL SCREEN OF TRANSACTION
                     TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
@@ -83,7 +78,7 @@ public class DebugTabPane extends JTabbedPane {
         //	this.addTab(Lang.getInstance().translate("Transactions"), new JScrollPane(this.transactionsTable));
 
         //BLOCKS TABLE MODEL
-        this.blocksTableModel = new BlocksTableModel(false);
+        this.blocksTableModel = new BlocksTableModel();
         JTable blocksTable = new MTable(this.blocksTableModel);
 
         //BLOCKS SORTER
@@ -122,9 +117,9 @@ public class DebugTabPane extends JTabbedPane {
 
     public void close() {
         //REMOVE OBSERVERS/HANLDERS
-        this.peersTableModel.deleteObserver();
+        this.peersTableModel.deleteObservers();
 
-        this.transactionsTableModel.removeObservers();
+        this.transactionsTableModel.deleteObservers();
 
         this.blocksTableModel.removeObservers();
 

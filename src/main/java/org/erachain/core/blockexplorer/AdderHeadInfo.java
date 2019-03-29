@@ -21,14 +21,17 @@ public class AdderHeadInfo {
         output.put("Label_total_transactions",
                 Lang.getInstance().translateFromLangObj("Total Transactions", langObj));
         output.put("Label_Height", Lang.getInstance().translateFromLangObj("Height", langObj));
-        output.put("Label_Time", Lang.getInstance().translateFromLangObj("Time", langObj));
-        output.put("Label_Generator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        output.put("Label_Time", Lang.getInstance().translateFromLangObj("Timestamp creation block", langObj));
+        output.put("Label_Generator", Lang.getInstance().translateFromLangObj("Creator account", langObj));
         output.put("Label_Gen_balance", Lang.getInstance().translateFromLangObj("Gen.Balance", langObj));
         output.put("Label_TXs", Lang.getInstance().translateFromLangObj("TXs", langObj));
         output.put("Label_Fee", Lang.getInstance().translateFromLangObj("Fee", langObj));
         output.put("Label_Target", Lang.getInstance().translateFromLangObj("Target", langObj));
         addLaterPrevious(output, langObj);
         output.put("Label_Blocks", Lang.getInstance().translateFromLangObj("Blocks", langObj));
+        output.put("Label_Delta_Height", Lang.getInstance().translateFromLangObj("Delta Height", langObj));
+        output.put("Label_WV", Lang.getInstance().translateFromLangObj("WV", langObj));
+        output.put("Label_dtWV", Lang.getInstance().translateFromLangObj("dtWV", langObj));
     }
 
     /**

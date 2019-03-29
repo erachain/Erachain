@@ -22,7 +22,6 @@ import java.util.*;
  * @return
  */
 public class OrderMap extends DCMap<Long, Order> {
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     private static boolean  useWantHaveKeys = true;
     @SuppressWarnings("rawtypes")
@@ -37,11 +36,9 @@ public class OrderMap extends DCMap<Long, Order> {
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_ORDER_TYPE);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_ORDER_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_ORDER_TYPE);
-            }
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_ORDER_TYPE);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_ORDER_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_ORDER_TYPE);
         }
     }
 
@@ -145,11 +142,6 @@ public class OrderMap extends DCMap<Long, Order> {
     @Override
     protected Order getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     // GET KEYs with FORKED rules

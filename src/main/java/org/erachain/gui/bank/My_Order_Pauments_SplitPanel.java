@@ -64,7 +64,7 @@ public class My_Order_Pauments_SplitPanel extends Split_Panel {
             @Override
             public void ancestorRemoved(AncestorEvent arg0) {
                 // TODO Auto-generated method stub
-                payment_Orders_model.removeObservers();
+                payment_Orders_model.deleteObservers();
             }
 
 
@@ -104,7 +104,7 @@ public class My_Order_Pauments_SplitPanel extends Split_Panel {
 
                 if (e.getClickCount() == 1 & e.getButton() == e.BUTTON1) {
 
-                    //	if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == TableModelPersons.COLUMN_FAVORITE){
+                    //	if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == ItemsPersonsTableModel.COLUMN_FAVORITE){
                     //		row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
                     //	 PersonCls asset = my_PersonsModel.getItem(row);
                     //	favorite_set( jTable_jScrollPanel_LeftPanel);
@@ -126,9 +126,9 @@ public class My_Order_Pauments_SplitPanel extends Split_Panel {
     }
 
     @Override
-    public void delay_on_close() {
+    public void onClose() {
         // delete observer left panel
-        payment_Orders_model.removeObservers();
+        payment_Orders_model.deleteObservers();
         // get component from right panel
         Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
         // if Person_Info 002 delay on close

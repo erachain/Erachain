@@ -4,6 +4,7 @@ import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple4;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -29,8 +30,6 @@ public class AddressPersonMap extends DCMap<String, Stack<Tuple4<
         Integer, // block height
         Integer>>> // transaction index
 {
-    private Map<Integer, Integer> observableData = new TreeMap<Integer, Integer>(); // icreator -HashMap
-
     public AddressPersonMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
@@ -60,11 +59,6 @@ public class AddressPersonMap extends DCMap<String, Stack<Tuple4<
     @Override
     protected Stack<Tuple4<Long, Integer, Integer, Integer>> getDefaultValue() {
         return new Stack<Tuple4<Long, Integer, Integer, Integer>>();
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     ///////////////////////////////

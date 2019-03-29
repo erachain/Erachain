@@ -4,10 +4,9 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
-import org.erachain.gui.items.records.Records_UnConfirmed_Panel;
+import org.erachain.gui.items.records.UnconfirmedTransactionsPanel;
 import org.erachain.gui2.Main_Panel;
 import org.erachain.lang.Lang;
-import org.erachain.ntp.NTP;
 import org.erachain.utils.ObserverMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,14 +24,20 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 
     private TransactionMap map;
     private int counter;
+    private boolean needUpdate;
+
 
     public UnconfirmTransactionStatus() {
         super("| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0 0/usec");
 
         map = DCSet.getInstance().getTransactionMap();
-        map.addObserver(this);
-        DCSet.getInstance().getBlockMap().addObserver(this);
         counter = map.size();
+
+        map.addObserver(this);
+
+        DCSet.getInstance().getBlockMap().addObserver(this);
+        Controller.getInstance().guiTimer.addObserver(this);
+
         refresh();
 
         this.addMouseListener(new MouseListener() {
@@ -69,57 +74,50 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 
                 // Main_Panel.getInstance().ccase1(
                 // Lang.getInstance().translate("My Records"),
-                // Records_My_SplitPanel.getInstance());
+                // MyTransactionsSplitPanel.getInstance());
+
                 Main_Panel.getInstance().insertTab(Lang.getInstance().translate("Unconfirmed Records"),
-                        Records_UnConfirmed_Panel.getInstance());
+                        UnconfirmedTransactionsPanel.getInstance());
             }
 
         });
     }
 
-    private static long lastUpdate;
     @Override
     public void update(Observable arg0, Object arg1) {
-
-        // TODO Auto-generated method stub
-        // if (Controller.getInstance().needUpToDate())
-        // return;
 
         ObserverMessage message = (ObserverMessage) arg1;
 
         switch (message.getType()) {
             case ObserverMessage.ADD_UNC_TRANSACTION_TYPE:
                 counter++;
-                if (NTP.getTime() - lastUpdate > 2000) {
-                    refresh();
-                }
+                needUpdate = true;
                 return;
             case ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE:
                 counter--;
-                if (NTP.getTime() - lastUpdate > 2000) {
-                    refresh();
-                }
+                needUpdate = true;
                 return;
             case ObserverMessage.CHAIN_ADD_BLOCK_TYPE:
-                if (NTP.getTime() - lastUpdate > 2000) {
-                    counter = map.size();
-                    refresh();
-                }
+                needUpdate = true;
                 return;
             case ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE:
-                if (NTP.getTime() - lastUpdate > 2000) {
-                    counter = map.size();
+                needUpdate = true;
+                return;
+            case ObserverMessage.CHAIN_RESET_BLOCK_TYPE:
+                counter = 0;
+                needUpdate = false;
+                refresh();
+                return;
+            case ObserverMessage.GUI_REPAINT:
+                if (needUpdate) {
+                    needUpdate = false;
                     refresh();
                 }
                 return;
-
         }
     }
 
-    long missedMessages = 0l;
     private void refresh() {
-
-        lastUpdate = NTP.getTime();
 
         String mess;
         if (counter > 0) {

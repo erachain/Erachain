@@ -34,7 +34,7 @@ public abstract class IssueItemRecord extends Transaction {
         this(typeBytes, NAME_ID, creator, item, feePow, timestamp, reference);
         this.signature = signature;
         if (item.getReference() == null) item.setReference(signature); // set reference
-        //item.resolveKey(DBSet.getInstance());
+        //item.resolveKey(DLSet.getInstance());
         //if (timestamp > 1000 ) this.calcFee(); // not asPaack
     }
 
@@ -42,7 +42,7 @@ public abstract class IssueItemRecord extends Transaction {
         this(typeBytes, NAME_ID, creator, item, (byte) 0, 0l, null);
         this.signature = signature;
         if (this.item.getReference() == null) this.item.setReference(signature);
-        //item.resolveKey(DBSet.getInstance());
+        //item.resolveKey(DLSet.getInstance());
     }
 
     //GETTERS/SETTERS
@@ -195,10 +195,10 @@ public abstract class IssueItemRecord extends Transaction {
         //UPDATE CREATOR
         super.orphan(block, asDeal);
 
-        //LOGGER.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 1");
+        //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 1");
         //DELETE FROM DATABASE
         long key = this.item.removeFromMap(this.dcSet, START_KEY);
-        //LOGGER.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 2");
+        //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 2");
     }
 
     @Override

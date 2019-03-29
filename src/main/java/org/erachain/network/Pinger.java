@@ -54,7 +54,7 @@ public class Pinger extends Thread {
 
     private boolean tryPing(long timeSOT) {
 
-        //LOGGER.info("try PING " + this.peer);
+        //logger.info("try PING " + this.peer);
 
         peer.addPingCounter();
 
@@ -94,7 +94,7 @@ public class Pinger extends Thread {
             this.ping = (int) (System.currentTimeMillis() - start) + 1;
         }
 
-        //LOGGER.info("PING " + this.peer);
+        //logger.info("PING " + this.peer);
         Controller.getInstance().getDBSet().getPeerMap().addPeer(peer, 0);
 
         if (response.getType() == Message.HWEIGHT_TYPE) {
@@ -156,7 +156,7 @@ public class Pinger extends Thread {
             }
         }
 
-        LOGGER.info(this + " - halted");
+        //logger.debug(this + " - halted");
 
     }
 

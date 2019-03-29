@@ -61,6 +61,16 @@ public class ApiClient {
                             ""
                     },
                     {
+                            "GET core/monitor?log=true",
+                            "Returns the monitor info",
+                            ""
+                    },
+                    {
+                            "GET core/monitor/{path}?log=true",
+                            "Returns the monitor info. {path} = network_acceptor/network_creator/block_generator",
+                            ""
+                    },
+                    {
                             "GET seed/<length>",
                             "Returns a base58 encoded random seed of 32 bytes. Use the optional parameter length to request a seed of <length> bytes.",
                             ""

@@ -3,28 +3,21 @@ package org.erachain.gui.items.imprints;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.database.SortableList;
-import org.erachain.gui.models.TableModelCls;
-import org.erachain.lang.Lang;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.utils.ObserverMessage;
 
-import javax.validation.constraints.Null;
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class TableModelImprints extends TableModelCls<Long, ImprintCls> implements Observer {
+public class TableModelImprints extends SortedListTableModelCls<Long, ImprintCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
-    //public static final int COLUMN_AMOUNT = 3;
-    //public static final int COLUMN_ASSET_TYPE = 4;
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true};
     private SortableList<Long, ImprintCls> imprints;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner"});//, "Quantity"});//, "Divisible"});
-
     public TableModelImprints() {
-        Controller.getInstance().addObserver(this);
+        super(new String[]{"Key", "Name", "Owner"}, new Boolean[]{false, true, true}, false);
     }
 
     @Override
@@ -32,35 +25,8 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
         return this.imprints;
     }
 
-    // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
-    }
-
-
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
     public ImprintCls getImprint(int row) {
         return this.imprints.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
     }
 
     @Override
@@ -114,7 +80,7 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
             if (this.imprints == null) {
                 this.imprints = (SortableList<Long, ImprintCls>) message.getValue();
                 this.imprints.addFilterField("name");
-                this.imprints.registerObserver();
+                //this.imprints.registerObserver();
             }
 
             this.fireTableDataChanged();
@@ -126,13 +92,17 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
         }
     }
 
-    public void removeObservers() {
-        this.imprints.removeObserver();
+    public void addObservers() {
+        Controller.getInstance().addObserver(this);
+    }
+
+    public void deleteObservers() {
+        //this.imprints.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 
     @Override
-    public Object getItem(int k) {
+    public ImprintCls getItem(int k) {
         // TODO Auto-generated method stub
         return this.imprints.get(k).getB();
     }

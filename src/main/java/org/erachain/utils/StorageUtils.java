@@ -254,7 +254,7 @@ public class StorageUtils {
                                 DiffHelper.patch(oldValueOpt, (String) patchJsonKey.get(key)));
                     } catch (Throwable e) {
                         LOGGER.info("Invalid patch!");
-                        //LOGGER.info(Level.FINE, "Invalid patch!" e);
+                        //logger.info(Level.FINE, "Invalid patch!" e);
                     }
                 }
             }

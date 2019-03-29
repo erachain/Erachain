@@ -50,9 +50,9 @@ public class AgransTests {
     @Test
     public void testBigDecimal() {
 
-        //LOGGER.error(BigDecimal.ONE.compareTo(BigDecimal.ZERO));
-        //LOGGER.error(BigDecimal.ZERO.compareTo(BigDecimal.ONE));
-        //LOGGER.error(BigDecimal.ONE.compareTo(BigDecimal.ONE));
+        //logger.error(BigDecimal.ONE.compareTo(BigDecimal.ZERO));
+        //logger.error(BigDecimal.ZERO.compareTo(BigDecimal.ONE));
+        //logger.error(BigDecimal.ONE.compareTo(BigDecimal.ONE));
 
     }
 

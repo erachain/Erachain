@@ -47,30 +47,26 @@ import java.util.Map.Entry;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class BlockExplorer {
-    public static final String LANG_DEFAULT = "en";
+    private static final String LANG_DEFAULT = "en";
     private static final Logger logger = LoggerFactory.getLogger(BlockExplorer.class);
-    //    private static final long FEE_KEY = Transaction.FEE_KEY;
     private volatile static BlockExplorer blockExplorer;
     private JSONObject langObj;
     private Locale local = new Locale("ru", "RU"); // Date format
     private DateFormat df = DateFormat.getDateInstance(DateFormat.DATE_FIELD, local); // for
-    // date
-    // format
     private String langFile;
     private DCSet dcSet;
     private Map output;
-
-    public Map getOutput() {
-        return output;
-    }
 
     public static BlockExplorer getInstance() {
         if (blockExplorer == null) {
             blockExplorer = new BlockExplorer();
             blockExplorer.dcSet = DCSet.getInstance();
         }
-
         return blockExplorer;
+    }
+
+    public Map getOutput() {
+        return output;
     }
 
     public static String timestampToStr(long timestamp) {
@@ -101,7 +97,7 @@ public class BlockExplorer {
 
         logger.info("try lang file: " + langFile);
 
-        langObj = Lang.getInstance().openLangFile(langFile);
+        langObj = Lang.openLangFile(langFile);
 
         List<Tuple2<String, String>> langs = Lang.getInstance().getLangListToWeb();
 
@@ -134,11 +130,8 @@ public class BlockExplorer {
 //        }
 
         if (info.getQueryParameters().containsKey("q")) {
-
             if (info.getQueryParameters().containsKey("search")) {
-
                 String type = info.getQueryParameters().getFirst("search");
-                logger.info("type=" + type);
                 String search = info.getQueryParameters().getFirst("q");
                 switch (type) {
                     case "persons":
@@ -199,7 +192,6 @@ public class BlockExplorer {
                     } catch (Exception e) {
                         output.put("error", e.getMessage());
                         logger.error(e.getMessage(), e);
-                        //output.put("queryTimeMs", stopwatchAll.elapsedTime());
                         return output;
                     }
                 }
@@ -213,18 +205,18 @@ public class BlockExplorer {
             }
         } else if (info.getQueryParameters().containsKey("blocks")) {
             output.putAll(jsonQueryBlocks(start));
-            //peers
-        } else if (info.getQueryParameters().containsKey("peers")) {
+        }
+        //peers
+        else if (info.getQueryParameters().containsKey("peers")) {
             output.putAll(jsonQueryPeers(info));
-            // last block
-        } else if (info.getQueryParameters().containsKey("lastBlock")) {
-            output = jsonQueryLastBlock();
-            // address
-        } else if (info.getQueryParameters().containsKey("addr")) {
-            if (info.getQueryParameters().containsKey("page")) {
-                pageNumber = Integer.parseInt(info.getQueryParameters().getFirst("page"));
-            }
-            output.putAll(jsonQueryAddress(info.getQueryParameters().get("addr"), pageNumber));
+        }
+        //todo Gleb непонятно зачем. Информация о последнем блоке добавляется в другом месте. URL с таким параметром не нашел.
+//        else if (info.getQueryParameters().containsKey("lastBlock")) {
+//            output = jsonQueryLastBlock();
+//        }
+        // address
+        else if (info.getQueryParameters().containsKey("addr")) {
+            output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("addr"), pageNumber));
             // name
         } else if (info.getQueryParameters().containsKey("name")) {
 
@@ -289,7 +281,7 @@ public class BlockExplorer {
         }
         // templates list
         else if (info.getQueryParameters().containsKey("templates")) {
-            output.put("search", "template");
+            output.put("search", "block");
             output.putAll(jsonQueryTemplates(start));
         }
         // statises list
@@ -299,7 +291,7 @@ public class BlockExplorer {
         }
         // template
         else if (info.getQueryParameters().containsKey("template")) {
-            output.put("search", "template");
+            output.put("search", "block");
             output.putAll(jsonQueryTemplate(Long.valueOf(info.getQueryParameters().getFirst("template"))));
         }
         // status
@@ -327,8 +319,6 @@ public class BlockExplorer {
         }
         // time guery
         output.put("queryTimeMs", stopwatchAll.elapsedTime());
-
-
         return output;
     }
 
@@ -1409,140 +1399,9 @@ public class BlockExplorer {
         return transactionsJSON(account, transactions, 0, 0);
     }
 
-    public LinkedHashMap transactionsJSON(Account account, List<Transaction> transactions, int fromIndex, int toIndex) {
-        LinkedHashMap output = new LinkedHashMap();
-        // Creator or Recipient if ACCOUNT is SET
-        int i1 = 0;
-        // use negate for amount
-        boolean outcome;
-        int type;
-        int height = Controller.getInstance().getMyHeight();
-
-        LinkedHashMap transactionsJSON = new LinkedHashMap();
-        List<Transaction> transactionList = (toIndex == 0) ? transactions
-                : transactions.subList(fromIndex, Math.min(toIndex, transactions.size()));
-        for (Transaction transaction : transactionList) {
-
-            // SET + HEIGHT + SEQNO
-            if (transaction.getType() == 100) {
-                transaction.setDC(dcSet);
-            }
-            transaction.setDC(dcSet);
-
-            outcome = true;
-
-            LinkedHashMap transactionJSON = new LinkedHashMap();
-
-            transactionJSON.put("block", transaction.getBlockHeight());// .getSeqNo(dcSet));
-
-            transactionJSON.put("seqNo", transaction.getSeqNo());
-
-            if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
-                R_Calculated txCalculated = (R_Calculated) transaction;
-                outcome = txCalculated.getAmount().signum() < 0;
-
-                transactionJSON.put("reference", "--");
-                transactionJSON.put("signature", transaction.getBlockHeight() + "-" + transaction.getSeqNo());
-                transactionJSON.put("date", txCalculated.getMessage());
-
-                transactionJSON.put("confirmations", transaction.getConfirmations(height));
-
-                transactionJSON.put("creator", txCalculated.getRecipient().getPersonAsString());
-                transactionJSON.put("creator_addr", txCalculated.getRecipient().getAddress());
-
-                transactionJSON.put("size", "--");
-                transactionJSON.put("fee", "--");
-
-            } else {
-                transactionJSON.put("signature", Base58.encode(transaction.getSignature()));
-                transactionJSON.put("date", DateTimeFormat.timestamptoString(transaction.getTimestamp()));
-
-                if (transaction.getCreator() == null) {
-                    transactionJSON.put("creator", GenesisBlock.CREATOR.getAddress());
-                    transactionJSON.put("creator_addr", "GENESIS");
-                    if (transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
-                        outcome = false;
-                    }
-
-                } else {
-
-                    transactionJSON.put("publickey", Base58.encode(transaction.getCreator().getPublicKey()));
-
-                    Account atSideAccount;
-                    atSideAccount = transaction.getCreator();
-                    if (account != null) {
-                        atSideAccount = transaction.getCreator();
-                        type = transaction.getType();
-                        if (type == Transaction.SEND_ASSET_TRANSACTION) {
-                            R_Send rSend = (R_Send) transaction;
-                            if (rSend.getCreator().equals(account)) {
-                                outcome = false;
-                                atSideAccount = rSend.getRecipient();
-                            }
-                            // возврат и взять на харенение обратный
-                            outcome = outcome ^ !rSend.isBackward() ^ (rSend.getActionType() == TransactionAmount.ACTION_HOLD);
-                        }
-                    }
-
-                    transactionJSON.put("creator", atSideAccount.getPersonAsString());
-                    transactionJSON.put("creator_addr", atSideAccount.getAddress());
-
-                }
-
-                transactionJSON.put("size", transaction.viewSize(Transaction.FOR_NETWORK));
-                transactionJSON.put("fee", transaction.getFee());
-                transactionJSON.put("confirmations", transaction.getConfirmations(height));
-
-            }
-
-            transactionJSON.put("type", Lang.getInstance().translateFromLangObj(transaction.viewFullTypeName(), langObj));
-
-            long absKey = transaction.getAbsKey();
-            String amount = transaction.viewAmount();
-            if (absKey > 0) {
-                if (amount.length() > 0) {
-                    transactionJSON.put("amount_key",
-                            (outcome ? "-" : "+") + transaction.viewAmount() + ":" + absKey);
-                } else {
-                    transactionJSON.put("amount_key", "" + absKey);
-                }
-            } else {
-                transactionJSON.put("amount_key", "");
-            }
-
-            if (transaction.viewRecipient() == null) {
-                transactionJSON.put("recipient", "-");
-            } else {
-                transactionJSON.put("recipient", transaction.viewRecipient());
-            }
-
-            transactionsJSON.put(i1, transactionJSON);
-            i1++;
-        }
-
-        output.put("transactions", transactionsJSON);
-        output.put("label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
-        output.put("label_date", Lang.getInstance().translateFromLangObj("Date", langObj));
-        output.put("label_type_transaction", Lang.getInstance().translateFromLangObj("Type", langObj));
-        output.put("label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_atside", Lang.getInstance().translateFromLangObj("Side", langObj));
-        output.put("label_asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
-        output.put("label_amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
-        output.put("label_confirmations", Lang.getInstance().translateFromLangObj("Confirmations", langObj));
-        output.put("label_recipient", Lang.getInstance().translateFromLangObj("Recipient", langObj));
-        output.put("label_size", Lang.getInstance().translateFromLangObj("Size", langObj));
-        output.put("label_seqNo", Lang.getInstance().translateFromLangObj("SeqNo", langObj));
-        output.put("label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
-        output.put("label_amount_key", Lang.getInstance().translateFromLangObj("Amount:Key", langObj));
-        output.put("label_fee", Lang.getInstance().translateFromLangObj("Fee", langObj));
-        output.put("label_transactions_table", Lang.getInstance().translateFromLangObj("Transactions", langObj));
-
-        return output;
-
-    }
 
     @SuppressWarnings("static-access")
-    private LinkedHashMap Balance_JSON(Account account) {
+    private LinkedHashMap balanceJSON(Account account) {
 
         // balance assets from
         LinkedHashMap output = new LinkedHashMap();
@@ -2040,22 +1899,21 @@ public class BlockExplorer {
     }
 
     @SuppressWarnings({"serial", "static-access"})
-    public Map jsonQueryAddress(List<String> addresses, int pageNumber) {
+    public Map jsonQueryAddress(String address, int pageNumber) {
 
-        List<Transaction> tt = dcSet.getTransactionFinalMap().getTransactionsByAddress(addresses.get(0));
-        addresses = new ArrayList<>(new LinkedHashSet<String>(addresses));
+        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddress(address);
         LinkedHashMap output = new LinkedHashMap();
-        output.put("account", addresses.get(0));
+        output.put("account", address);
 
-        Account acc = new Account(addresses.get(0));
-        long person_key = (long) -10;
-        Tuple2<Integer, PersonCls> pp = acc.getPerson();
+        Account acc = new Account(address);
+        long personKey = -10;
+        Tuple2<Integer, PersonCls> person = acc.getPerson();
 
-        if (pp != null) {
+        if (person != null) {
             output.put("label_person_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-            output.put("person_Img", Base64.encodeBase64String(pp.b.getImage()));
-            output.put("Person_Name", pp.b.getName());
-            person_key = pp.b.getKey();
+            output.put("person_Img", Base64.encodeBase64String(person.b.getImage()));
+            output.put("Person_Name", person.b.getName());
+            personKey = person.b.getKey();
 
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balabce_LIA = acc.getBalance(AssetCls.LIA_KEY);
             output.put("registered", balabce_LIA.a.b.toPlainString());
@@ -2064,15 +1922,15 @@ public class BlockExplorer {
             output.put("label_certified", Lang.getInstance().translateFromLangObj("Certified", langObj));
 
         }
-        output.put("person_key", person_key);
+        output.put("person_key", personKey);
         output.put("label_account", Lang.getInstance().translateFromLangObj("Account", langObj));
 
         // balance assets from
-        output.put("Balance", Balance_JSON(new Account(addresses.get(0))));
+        output.put("Balance", balanceJSON(new Account(address)));
 
         // Transactions view
-        output.put("Transactions", transactionsJSON(acc, tt, (pageNumber - 1) * 100, pageNumber * 100));
-        output.put("pageCount", (int) Math.ceil((tt.size()) / 100d));
+        output.put("Transactions", transactionsJSON(acc, transactions, (pageNumber - 1) * 100, pageNumber * 100));
+        output.put("pageCount", (int) Math.ceil((transactions.size()) / 100d));
         output.put("pageNumber", pageNumber);
 
         output.put("type", "standardAccount");
@@ -2128,7 +1986,7 @@ public class BlockExplorer {
     public Map jsonQueryPeers(UriInfo info) {
 
         int start = 0;
-        int end = 20;
+        int end = 100;
         int view = 0;
         int sortPing = 0;
         PeersTableModel model_Peers = new PeersTableModel();
@@ -2178,8 +2036,8 @@ public class BlockExplorer {
 
         for (int column = 0; column < column_Count; column++) {
 
-            output.put("Label_" + model_Peers.getColumnNameNO_Translate(column).replace(' ', '_'),
-                    Lang.getInstance().translateFromLangObj(model_Peers.getColumnNameNO_Translate(column), langObj));
+            output.put("Label_" + model_Peers.getColumnNameOrigin(column).replace(' ', '_'),
+                    Lang.getInstance().translateFromLangObj(model_Peers.getColumnNameOrigin(column), langObj));
         }
 
         Map out_peers = new LinkedHashMap();
@@ -2195,7 +2053,7 @@ public class BlockExplorer {
             Map out_peer = new LinkedHashMap();
 
             for (int column = 0; column < column_Count; column++) {
-                out_peer.put(model_Peers.getColumnNameNO_Translate(column).replace(' ', '_'),
+                out_peer.put(model_Peers.getColumnNameOrigin(column).replace(' ', '_'),
                         model_Peers.getValueAt(row, column).toString());
 
             }
@@ -2305,9 +2163,14 @@ public class BlockExplorer {
         output.put("Label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
         output.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
         output.put("Label_No", Lang.getInstance().translateFromLangObj("No.", langObj));
+        output.put("Label_pubKey", Lang.getInstance().translateFromLangObj("Public Key", langObj));
+        output.put("Label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
 
         output.put("block", block);
         output.put("seqNo", seqNo);
+
+        output.put("pubKey", Base58.encode(trans.getCreator().getPublicKey()));
+        output.put("sign", Base58.encode(trans.getSignature()));
 
         //TemplateCls statement = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
 
@@ -2570,53 +2433,18 @@ public class BlockExplorer {
 
         output.put("creator", trans.getCreator().getPersonAsString());
 
-        if (trans.getCreator().getPerson() != null) {
-            output.put("creator_key", trans.getCreator().getPerson().b.getKey());
-            output.put("creator_name", trans.getCreator().getPerson().b.getName());
+        Tuple2<Integer, PersonCls> personItem = trans.getCreator().getPerson();
+        if (personItem != null) {
+            output.put("creator_key", personItem.b.getKey());
+            output.put("creator_name", personItem.b.getName());
         } else {
             output.put("creator_key", "");
             output.put("creator_name", "");
         }
 
-        // output.put("name", person.getName());
         output.put("date", df.format(new Date(trans.getTimestamp())).toString());
-        // output.put("description", person.getDescription());
 
-        // vouchers
-        /* output.put("Label_vouchs", Lang.getInstance().translateFromLangObj("Certified", langObj));
-        output.put("Label_accounts_table_adress", Lang.getInstance().translateFromLangObj("Address", langObj));
-        output.put("Label_accounts_table_data", Lang.getInstance().translateFromLangObj("Date", langObj));
-        output.put("Label_accounts_table_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-
-       Map vouchesJSON = new LinkedHashMap();
-
-        WebStatementsVouchTableModel table_sing_model = null;//new WebStatementsVouchTableModel(trans);
-        if (table_sing_model== null) return output;
-        int rowCount = table_sing_model.getRowCount();
-
-        if (rowCount > 0) {
-            for (int i = 0; i < rowCount; i++) {
-
-                Transaction vouch_Tr = (Transaction) table_sing_model.getValueAt(i, 3);
-                Map vouchJSON = new LinkedHashMap();
-                vouchJSON.put("date", vouch_Tr.viewTimestamp());
-                vouchJSON.put("block", "" + vouch_Tr.getBlockHeight());
-                vouchJSON.put("seqNo", "" + vouch_Tr.getSeqNo());
-                vouchJSON.put("creator", vouch_Tr.getCreator().getAddress());
-
-                Tuple2<Integer, PersonCls> personInfo = vouch_Tr.getCreator().getPerson();
-                if (personInfo != null) {
-                    PersonCls person = personInfo.b;
-                    vouchJSON.put("creator_name", person.getName());
-                    vouchJSON.put("creator_key", "" + person.getKey());
-                }
-
-                vouchesJSON.put(i, vouchJSON);
-            }
-        }
-        output.put("vouches", vouchesJSON);
-        */
-        output.put("vouches_table", WebTransactionsHTML.getInstance().get_Vouches(trans, langObj));
+        output.put("vouches_table", WebTransactionsHTML.getInstance().getVouchesNew(personItem, trans, langObj));
 
 
         return output;
@@ -3085,7 +2913,7 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                listPersons = dcSet.getItemPersonMap().get_By_Name(search, false);
+                listPersons = dcSet.getItemPersonMap().findByName(search, false);
             }
         } catch (Exception e) {
             //Ошибка при поиске - пробрасываем WrongSearchException для отображения пустого списка элементов
@@ -3137,7 +2965,7 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                listAssets = dcSet.getItemAssetMap().get_By_Name(search, false);
+                listAssets = dcSet.getItemAssetMap().findByName(search, false);
             }
         } catch (Exception e) {
             logger.info("Wrong search while process assets... ");
@@ -3189,7 +3017,7 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                listStatuses = dcSet.getItemStatusMap().get_By_Name(search, false);
+                listStatuses = dcSet.getItemStatusMap().findByName(search, false);
             }
         } catch (Exception e) {
             logger.info("Wrong search while process statuses... ");
@@ -3223,5 +3051,146 @@ public class BlockExplorer {
 
 
 //  todo Gleb -----------------------------------------------------------------------------------------------------------
+
+    private LinkedHashMap transactionsJSON(Account account, List<Transaction> transactions, int fromIndex, int toIndex) {
+        LinkedHashMap output = new LinkedHashMap();
+        int i = 0;
+        boolean outcome;
+        int type;
+        int height = Controller.getInstance().getMyHeight();
+
+        LinkedHashMap transactionsJSON = new LinkedHashMap();
+        List<Transaction> transactionList = (toIndex == 0) ? transactions
+                : transactions.subList(fromIndex, Math.min(toIndex, transactions.size()));
+        for (Transaction transaction : transactionList) {
+
+            transaction.setDC(dcSet);
+
+            outcome = true;
+
+            LinkedHashMap out = new LinkedHashMap();
+
+            out.put("block", transaction.getBlockHeight());// .getSeqNo(dcSet));
+
+            out.put("seqNo", transaction.getSeqNo());
+
+            if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
+                R_Calculated txCalculated = (R_Calculated) transaction;
+                outcome = txCalculated.getAmount().signum() < 0;
+
+                out.put("reference", "--");
+                out.put("signature", transaction.getBlockHeight() + "-" + transaction.getSeqNo());
+
+
+                String message = txCalculated.getMessage();
+                if (message.equals("forging")) {
+                    out.put("date", DateTimeFormat.timestamptoString(dcSet.getBlockMap().get(transaction.getBlockHeight()).getTimestamp()));
+                } else {
+                    out.put("date", message);
+                }
+
+                String typeName = transaction.viewFullTypeName();
+                if (typeName.equals("_protocol_")) {
+                    out.put("type", message);
+                } else {
+                    out.put("type", typeName);
+                }
+
+                out.put("confirmations", transaction.getConfirmations(height));
+
+                out.put("creator", txCalculated.getRecipient().getPersonAsString());
+                out.put("creator_addr", txCalculated.getRecipient().getAddress());
+
+                out.put("size", "--");
+                out.put("fee", "--");
+
+            } else {
+                out.put("signature", Base58.encode(transaction.getSignature()));
+                out.put("date", DateTimeFormat.timestamptoString(transaction.getTimestamp()));
+                String typeName = transaction.viewFullTypeName();
+                out.put("type", typeName);
+                if (transaction.getCreator() == null) {
+                    out.put("creator", GenesisBlock.CREATOR.getAddress());
+                    out.put("creator_addr", "GENESIS");
+                    if (transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
+                        outcome = false;
+                    }
+
+                } else {
+
+                    out.put("publickey", Base58.encode(transaction.getCreator().getPublicKey()));
+
+                    Account atSideAccount;
+                    atSideAccount = transaction.getCreator();
+                    if (account != null) {
+                        atSideAccount = transaction.getCreator();
+                        type = transaction.getType();
+                        if (type == Transaction.SEND_ASSET_TRANSACTION) {
+                            R_Send rSend = (R_Send) transaction;
+                            if (rSend.getCreator().equals(account)) {
+                                outcome = false;
+                                atSideAccount = rSend.getRecipient();
+                            }
+                            // возврат и взять на харенение обратный
+                            outcome = outcome ^ !rSend.isBackward() ^ (rSend.getActionType() == TransactionAmount.ACTION_HOLD);
+                        }
+                    }
+
+                    out.put("creator", atSideAccount.getPersonAsString());
+                    out.put("creator_addr", atSideAccount.getAddress());
+
+                }
+
+                out.put("size", transaction.viewSize(Transaction.FOR_NETWORK));
+                out.put("fee", transaction.getFee());
+                out.put("confirmations", transaction.getConfirmations(height));
+
+            }
+
+
+            long absKey = transaction.getAbsKey();
+            String amount = transaction.viewAmount();
+            if (absKey > 0) {
+                if (amount.length() > 0) {
+                    out.put("amount_key",
+                            (outcome ? "-" : "+") + transaction.viewAmount() + ":" + absKey);
+                } else {
+                    out.put("amount_key", "" + absKey);
+                }
+            } else {
+                out.put("amount_key", "");
+            }
+
+            if (transaction.viewRecipient() == null) {
+                out.put("recipient", "-");
+            } else {
+                out.put("recipient", transaction.viewRecipient());
+            }
+
+            transactionsJSON.put(i, out);
+            i++;
+        }
+
+        output.put("transactions", transactionsJSON);
+        output.put("label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
+        output.put("label_date", Lang.getInstance().translateFromLangObj("Date", langObj));
+        output.put("label_type_transaction", Lang.getInstance().translateFromLangObj("Type", langObj));
+        output.put("label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        output.put("label_atside", Lang.getInstance().translateFromLangObj("Side", langObj));
+        output.put("label_asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
+        output.put("label_amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
+        output.put("label_confirmations", Lang.getInstance().translateFromLangObj("Confirmations", langObj));
+        output.put("label_recipient", Lang.getInstance().translateFromLangObj("Recipient", langObj));
+        output.put("label_size", Lang.getInstance().translateFromLangObj("Size", langObj));
+        output.put("label_seqNo", Lang.getInstance().translateFromLangObj("SeqNo", langObj));
+        output.put("label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
+        output.put("label_amount_key", Lang.getInstance().translateFromLangObj("Amount:Key", langObj));
+        output.put("label_fee", Lang.getInstance().translateFromLangObj("Fee", langObj));
+        output.put("label_transactions_table", Lang.getInstance().translateFromLangObj("Transactions", langObj));
+
+        return output;
+
+    }
+
 
 }

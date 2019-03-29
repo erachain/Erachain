@@ -12,8 +12,6 @@ import java.util.Map;
 
 public class OrphanNameStorageHelperMap extends DCMap<String, List<byte[]>> {
 
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
     public OrphanNameStorageHelperMap(DCSet dcSet, DB database) {
         super(dcSet, database);
     }
@@ -38,14 +36,8 @@ public class OrphanNameStorageHelperMap extends DCMap<String, List<byte[]>> {
     }
 
     @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
-    }
-
-    @Override
     protected void createIndexes(DB database) {
     }
-
 
     public void add(String name, byte[] signatureOfTx) {
         List<byte[]> list = this.get(name);

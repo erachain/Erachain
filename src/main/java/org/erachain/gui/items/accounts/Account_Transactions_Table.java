@@ -60,7 +60,7 @@ import org.erachain.utils.TableMenuPopupUtil;
 public class Account_Transactions_Table extends JTable implements Observer {
 
 
-    private static final Logger LOGGER = LoggerFactory            .getLogger(Account_Transactions_Table.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Account_Transactions_Table.class);
     Comparator<MessageBuf> comparator = new Comparator<MessageBuf>() {
         public int compare(MessageBuf c1, MessageBuf c2) {
             long diff = c2.getTimestamp() - c1.getTimestamp();
@@ -262,7 +262,7 @@ public class Account_Transactions_Table extends JTable implements Observer {
             }
         });
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
         Controller.getInstance().addObserver(this);
     }
 

@@ -21,15 +21,16 @@ public class NameMap extends DBMap<Tuple2<String, String>, Name> {
     public static final int NAME_INDEX = 1;
     public static final int OWNER_INDEX = 2;
     static Logger LOGGER = LoggerFactory.getLogger(NameMap.class.getName());
-    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public NameMap(DWSet dWSet, DB database) {
         super(dWSet, database);
 
-        this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_ADD_NAME_TYPE);
-        this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_NAME_TYPE);
-        this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_NAME_TYPE);
-        this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_NAME_TYPE);
+        if (databaseSet.isWithObserver()) {
+            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_ADD_NAME_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_NAME_TYPE);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_NAME_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_NAME_TYPE);
+        }
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -85,11 +86,6 @@ public class NameMap extends DBMap<Tuple2<String, String>, Name> {
     @Override
     protected Name getDefaultValue() {
         return null;
-    }
-
-    @Override
-    protected Map<Integer, Integer> getObservableData() {
-        return this.observableData;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

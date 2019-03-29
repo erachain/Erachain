@@ -7,11 +7,9 @@ import org.mapdb.DB;
 import java.util.Map;
 
 /**
- * see datachain.Issue_ItemMap
- *
- * @return
+ * see datachain.IssueItemMap
  */
-public class IssueAssetMap extends Issue_ItemMap {
+public class IssueAssetMap extends IssueItemMap {
 
     public IssueAssetMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

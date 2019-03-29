@@ -1,22 +1,18 @@
 package org.erachain.gui.bank;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.*;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.*;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Null;
-import java.awt.TrayIcon.MessageType;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -25,7 +21,7 @@ import java.util.Observer;
 
 @SuppressWarnings("serial")
 // in list of org.erachain.records in wallet
-public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer {
+public class Payment_Orders_TableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> implements Observer {
 
     public static final int COLUMN_CONFIRMATIONS = 0;
     public static final int COLUMN_TIMESTAMP = 1;
@@ -36,20 +32,17 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
     public static final int COLUMN_RECIPIENT = 6;
     public static final int COLUMN_FEE = 7;
     public static final int COLUMN_SIZE = 8;
-    static Logger LOGGER = LoggerFactory.getLogger(Payment_Orders_TableModel.class.getName());
+
     private SortableList<Tuple2<String, String>, Transaction> transactions;
     //ItemAssetMap dbItemAssetMap;
     private ArrayList<R_Send> trans;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{
-            "Confirmation", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
 
     public Payment_Orders_TableModel() {
+        super(new String[]{"Confirmation", "Timestamp", "Type", "Creator", "Item",
+                "Amount", "Recipient", "Fee", "Size"}, true);
 
-        addObservers();
-
-        //dbItemAssetMap = DBSet.getInstance().getItemAssetMap();
-
+        logger = LoggerFactory.getLogger(Payment_Orders_TableModel.class.getName());
     }
 
     @Override
@@ -58,7 +51,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
     }
 
 
-    public Object getItem(int row) {
+    public Transaction getItem(int row) {
         return this.transactions.get(row).getB();
     }
 
@@ -73,16 +66,6 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
             return null;
         }
         return data.getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return columnNames[index];
     }
 
     @Override
@@ -194,7 +177,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
 
         //} catch (Exception e) {
         //GUI ERROR
-        //	LOGGER.error(e.getMessage(),e);
+        //	logger.error(e.getMessage(),e);
         //	return null;
         //}
 
@@ -218,7 +201,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
         if (false && messageType == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.transactions == null) {
                 transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
-                transactions.registerObserver();
+                //transactions.registerObserver();
                 transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
                 read_trans();
                 this.fireTableDataChanged();
@@ -229,29 +212,6 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
             read_trans();
             this.fireTableDataChanged();
 
-        } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE
-                || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-            if (Controller.getInstance().getStatus() == Controller.STATUS_OK
-                    && (DCSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature()))) {
-                int type = ((Transaction) message.getValue()).getType();
-                if (type == Transaction.SEND_ASSET_TRANSACTION) {
-                    R_Send r_Send = (R_Send) message.getValue();
-                    Account account = Controller.getInstance().getAccountByAddress(((R_Send) message.getValue()).getRecipient().getAddress());
-                    if (account != null) {
-                        if (Settings.getInstance().isSoundReceiveMessageEnabled()) {
-                            PlaySound.getInstance().playSound("receivemessage.wav", ((Transaction) message.getValue()).getSignature());
-                        }
-
-                        SysTray.getInstance().sendMessage("Payment received", "From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + account.getPersonAsString()
-                                + "\n" + "Asset Key" + ": " + r_Send.getAbsKey()
-                                + ", " + "Amount" + ": " + r_Send.getAmount().toPlainString(), MessageType.INFO);
-                    } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-                        PlaySound.getInstance().playSound("newtransaction.wav", ((Transaction) message.getValue()).getSignature());
-                    }
-                } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-                    PlaySound.getInstance().playSound("newtransaction.wav", ((Transaction) message.getValue()).getSignature());
-                }
-            }
         }
 
         if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
@@ -281,11 +241,11 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
 
     public void addObservers() {
 
-        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addWalletObserver(this);
     }
 
 
-    public void removeObservers() {
+    public void deleteObservers() {
 
         Controller.getInstance().deleteObserver(this);
     }

@@ -139,7 +139,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
                 // "
                 // "
                 // +
-                // block.getTimestamp(DBSet.getInstance())/
+                // block.getTimestamp(DLSet.getInstance())/
                 // 1000;
 
                 case COLUMN_GENERATOR:
