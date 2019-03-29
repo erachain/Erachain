@@ -1,6 +1,6 @@
 package org.erachain.core.crypto;
 
-import org.whispersystems.curve25519.java.*;
+import org.whispersystems.curve25519.*;
 import org.erachain.utils.Pair;
 
 import java.security.MessageDigest;
