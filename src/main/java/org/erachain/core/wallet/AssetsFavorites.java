@@ -82,12 +82,9 @@ public class AssetsFavorites implements Observer {
                 || ((Controller.getInstance().getStatus() == Controller.STATUS_OK) &&
                 (
                         message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE
-                                ||
-                                message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE
-                                ||
-                                message.getType() == ObserverMessage.ADD_BALANCE_TYPE
-                                ||
-                                message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE
+                        || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE
+                        //|| message.getType() == ObserverMessage.ADD_BALANCE_TYPE
+                        //|| message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE
                 ))) {
             this.reload();
         }
