@@ -24,6 +24,8 @@ import org.erachain.utils.Pair;
 import javax.swing.*;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -787,6 +789,58 @@ public class IssuePersonPanel extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 0);
         mainPanel.add(jLabel_Title, gridBagConstraints);
 
+        /* Added Copy, Paste in GEO (by Samartsev. 18.03.2019) */
+        JPopupMenu popup = new JPopupMenu();
+        txtBirthLatitude.add(popup);
+        txtBirthLatitude.setComponentPopupMenu(popup);
+
+        JMenuItem jMenuItemCopy = new JMenuItem(Lang.getInstance().translate("Копировать"), KeyEvent.VK_C);
+        jMenuItemCopy.setMnemonic(KeyEvent.VK_C);
+        jMenuItemCopy.setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_C, ActionEvent.CTRL_MASK));
+
+        JMenuItem jMenuItemPaste = new JMenuItem(Lang.getInstance().translate("Вставить"), KeyEvent.VK_P);
+        jMenuItemPaste.setMnemonic(KeyEvent.VK_P);
+        jMenuItemPaste.setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_P, ActionEvent.CTRL_MASK));
+
+        popup.add(jMenuItemCopy);
+        popup.add(jMenuItemPaste);
+
+        jMenuItemCopy.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                copyToClipboard();
+            }
+
+            public void copyToClipboard() {
+                Toolkit toolkit = Toolkit.getDefaultToolkit();
+                Clipboard clipboard = toolkit.getSystemClipboard();
+                StringSelection coordString = new StringSelection(txtBirthLatitude.getText());
+                clipboard.setContents(coordString, null);
+            }
+        });
+
+
+        jMenuItemPaste.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pasteFromClipboard();
+            }
+            public void pasteFromClipboard() {
+                Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+                Transferable t = c.getContents(this);
+                if (t == null)
+                    return;
+                try {
+                    txtBirthLatitude.setText((String) t.getTransferData(DataFlavor.stringFlavor));
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
         /*
          * try { AccFormat = new MaskFormatter("****-**-**");
          * AccFormat.setValidCharacters("1,2,3,4,5,6,7,8,9,0"); //
@@ -827,7 +881,9 @@ public class IssuePersonPanel extends JPanel {
 
 }
 
-// Фильтр выбора файлов определенного типа
+/**
+ * Фильтр выбора файлов определенного типа
+ */
 class FileFilterExt extends javax.swing.filechooser.FileFilter {
     String extension; // расширение файла
     String description; // описание типа файлов
@@ -854,5 +910,4 @@ class FileFilterExt extends javax.swing.filechooser.FileFilter {
     public String getDescription() {
         return description;
     }
-
 }
