@@ -40,7 +40,7 @@ public class DealsPopupMenu extends JPopupMenu {
         sendAsset = new JMenuItem();
         sendAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new Account_Send_Dialog(asset, pubKey, null, null);
+                new AccountSendDialog(asset, pubKey, null, null);
 
             }
         });
@@ -51,7 +51,7 @@ public class DealsPopupMenu extends JPopupMenu {
         debtAsset = new JMenuItem(Lang.getInstance().translate("Lend"));
         debtAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new Account_Lend_Dialog(asset, pubKey);
+                new AccountLendDialog(asset, pubKey);
 
             }
         });
@@ -60,7 +60,7 @@ public class DealsPopupMenu extends JPopupMenu {
         debtAssetReturn = new JMenuItem(Lang.getInstance().translate("Repay Debt"));
         debtAssetReturn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new Account_Repay_Debt_Dialog(asset, pubKey);
+                new AccountRepayDebtDialog(asset, pubKey);
             }
         });
         this.add(debtAssetReturn);
@@ -69,7 +69,7 @@ public class DealsPopupMenu extends JPopupMenu {
         debtAssetBackward = new JMenuItem(Lang.getInstance().translate("Confiscate Debt"));
         debtAssetBackward.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new Account_Confiscate_Debt_Dialog(asset, pubKey);
+                new AccountConfiscateDebtDialog(asset, pubKey);
             }
         });
         this.add(debtAssetBackward);
@@ -79,7 +79,7 @@ public class DealsPopupMenu extends JPopupMenu {
         holdAsset = new JMenuItem(Lang.getInstance().translate("Hold"));
         holdAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new Account_Take_Hold_Dialog(asset, pubKey);
+                new AccountTakeHoldDialog(asset, pubKey);
 
             }
         });
@@ -142,7 +142,7 @@ public class DealsPopupMenu extends JPopupMenu {
         JMenuItem set_name = new JMenuItem(Lang.getInstance().translate("Edit name"));
         set_name.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new Account_Set_Name_Dialog(pubKey.getAddress());
+                new AccountSetNameDialog(pubKey.getAddress());
                 table.repaint();
             }
         });

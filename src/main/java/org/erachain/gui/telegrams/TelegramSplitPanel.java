@@ -12,9 +12,9 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.Split_Panel;
+import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.accounts.*;
-import org.erachain.gui.items.mails.Mail_Send_Dialog;
+import org.erachain.gui.items.mails.MailSendDialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.lang.Lang;
@@ -44,7 +44,7 @@ import java.nio.charset.StandardCharsets;
 *
 * @author Саша
 */
-public class TelegramSplitPanel extends Split_Panel {
+public class TelegramSplitPanel extends SplitPanel {
 
    /**
     * Creates new form TelegramSplitPanel
@@ -52,7 +52,7 @@ public class TelegramSplitPanel extends Split_Panel {
     LeftTelegram leftTelegram;
     RightTelegramPanel rightTelegramPanel;
     private static final long serialVersionUID = 1L;
-    public Accounts_Panel accountPanel;
+    public AccountsPanel accountPanel;
   //  public AssetCls assetSelect;
     private Account selecArg;
  //   private RightTelegramPanel rightPanel;
@@ -84,7 +84,7 @@ public class TelegramSplitPanel extends Split_Panel {
     PanelGBC.weighty = 1;
     PanelGBC.gridx = 0;
     PanelGBC.gridy = 0;
-    accountPanel = new Accounts_Panel();
+    accountPanel = new AccountsPanel();
     leftTelegram = new LeftTelegram();
     rightTelegramPanel= new RightTelegramPanel();
     this.leftPanel.add(leftTelegram, PanelGBC);
@@ -342,7 +342,7 @@ public class TelegramSplitPanel extends Split_Panel {
         public void actionPerformed(ActionEvent e) {
             Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
             Account account = new Account(account1.getA());
-            new Account_Send_Dialog(null, null, account, null);
+            new AccountSendDialog(null, null, account, null);
 
         }
     });
@@ -353,7 +353,7 @@ public class TelegramSplitPanel extends Split_Panel {
         public void actionPerformed(ActionEvent e) {
             Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
             Account account = new Account(account1.getA());
-            new Mail_Send_Dialog(null, null, account, null);
+            new MailSendDialog(null, null, account, null);
 
         }
     });
@@ -364,7 +364,7 @@ public class TelegramSplitPanel extends Split_Panel {
         public void actionPerformed(ActionEvent e) {
             Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
 
-            new Account_Set_Name_Dialog(account1.getA());
+            new AccountSetNameDialog(account1.getA());
             tableFavoriteAccounts.repaint();
 
         }

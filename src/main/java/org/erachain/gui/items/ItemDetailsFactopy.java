@@ -2,7 +2,7 @@ package org.erachain.gui.items;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.unions.UnionCls;
-import org.erachain.gui.items.unions.Union_Info;
+import org.erachain.gui.items.unions.UnionInfo;
 
 import javax.swing.*;
 
@@ -37,8 +37,8 @@ public class ItemDetailsFactopy extends JPanel {
             case ItemCls.PERSON_TYPE:
                 return null;
             case ItemCls.UNION_TYPE:
-                Union_Info cc;
-                cc = new Union_Info();
+                UnionInfo cc;
+                cc = new UnionInfo();
                 cc.show_Union_001((UnionCls) item);
                 return cc;
         }

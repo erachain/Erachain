@@ -7,10 +7,9 @@ import org.erachain.SettingTests;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.erachain.api.ApiClient;
 //import test.CallRemoteApi;
 //import test.SettingTests;
-import org.erachain.webserver.API_TelegramsResource;
+
 
 public class API_TelegramsResourceTest extends SettingTests {
 
@@ -19,7 +18,7 @@ public class API_TelegramsResourceTest extends SettingTests {
      */
     @Test
     public void Default() {
-        Response annotation = new API_TelegramsResource().Default();
+        Response annotation = new APITelegramsResource().Default();
         Assert.assertEquals(annotation.getStatus(), 200);
         Assert.assertNotNull(annotation.getEntity());
     }

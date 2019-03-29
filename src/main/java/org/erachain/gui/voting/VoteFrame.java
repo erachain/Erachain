@@ -13,7 +13,7 @@ import org.erachain.gui.AccountRenderer;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.ComboBoxModelItemsAll;
 import org.erachain.gui.models.AccountsComboBoxModel;
-import org.erachain.gui.models.OptionsComboBoxModel_old;
+import org.erachain.gui.models.OptionsComboBoxModelOld;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Pair;
 
@@ -159,7 +159,7 @@ public class VoteFrame extends JFrame {
 
         //CBX ACCOUNT
         detailGBC.gridy = 5;
-        this.cbxOptions = new JComboBox<PollOption>(new OptionsComboBoxModel_old(poll.getOptions()));
+        this.cbxOptions = new JComboBox<PollOption>(new OptionsComboBoxModelOld(poll.getOptions()));
         this.cbxOptions.setSelectedIndex(option);
         this.cbxOptions.setRenderer(new DefaultListCellRenderer() {
             @SuppressWarnings("rawtypes")

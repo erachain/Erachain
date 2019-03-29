@@ -222,7 +222,7 @@ public class PollDetailPanel extends JPanel {
         }
         row = this.optionsTable.convertRowIndexToModel(row);
 
-        new Polls_Dialog(this.poll, row, asset);
+        new PollsDialog(this.poll, row, asset);
     }
 
     public void setAsset(AssetCls asset) {

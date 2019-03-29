@@ -21,7 +21,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.Split_Panel;
+import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.UnconfirmedTransactionsTableModel;
@@ -86,7 +86,7 @@ public class UnconfirmedTransactionsPanel extends JPanel
             }
         });
 
-        Split_Panel record_stpit = new Split_Panel("");
+        SplitPanel record_stpit = new SplitPanel("");
         record_stpit.toolBar_LeftPanel.setVisible(false);
         record_stpit.jToolBar_RightPanel.setVisible(false);
         record_stpit.searchToolBar_LeftPanel.setVisible(false);

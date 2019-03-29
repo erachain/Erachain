@@ -7,7 +7,7 @@ import org.erachain.utils.MenuPopupUtil;
 import javax.swing.*;
 
 @SuppressWarnings("serial")
-public class IssueImprintDetailsFrame extends Rec_DetailsFrame {
+public class IssueImprintDetailsFrame extends RecDetailsFrame {
     public IssueImprintDetailsFrame(IssueImprintRecord imprintIssue) {
         super(imprintIssue);
 

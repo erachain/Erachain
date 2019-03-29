@@ -14,9 +14,9 @@ public class SettingsTabPane extends JTabbedPane {
     public SettingsKnownPeersPanel settingsKnownPeersPanel;
     public SettingsBasicPanel settingsBasicPanel;
     public SettingsAllowedPanel settingsAllowedPanel;
-    public UI_Setting_Panel uI_Settings_Panel;
+    public UISettingPanel uI_Settings_Panel;
 
-    public BackUP_Setting_Panel backUp_Setting_Panel;
+    public BackUPSettingPanel backUp_Setting_Panel;
 
     public RatesSettingPanel rates_Setting_Panel;
 
@@ -37,11 +37,11 @@ public class SettingsTabPane extends JTabbedPane {
         JScrollPane scrollPane3 = new JScrollPane(settingsAllowedPanel);
         this.addTab(Lang.getInstance().translate("Access permission"), scrollPane3);
 
-        uI_Settings_Panel = new UI_Setting_Panel();
+        uI_Settings_Panel = new UISettingPanel();
         JScrollPane scrollPane4 = new JScrollPane(uI_Settings_Panel);
         this.addTab(Lang.getInstance().translate("UI Settings"), scrollPane4);
 
-        backUp_Setting_Panel = new BackUP_Setting_Panel();
+        backUp_Setting_Panel = new BackUPSettingPanel();
         JScrollPane scrollPane5 = new JScrollPane(backUp_Setting_Panel);
         this.addTab(Lang.getInstance().translate("BackUp Settings"), scrollPane5);
 

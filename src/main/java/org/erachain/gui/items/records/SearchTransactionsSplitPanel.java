@@ -3,9 +3,9 @@ package org.erachain.gui.items.records;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.Split_Panel;
+import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.Voush_Library_Panel;
+import org.erachain.gui.library.VoushLibraryPanel;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.gui.records.VouchRecordDialog;
@@ -30,10 +30,10 @@ import java.util.List;
 /**
  * search transactions
  */
-public class SearchTransactionsSplitPanel extends Split_Panel {
+public class SearchTransactionsSplitPanel extends SplitPanel {
 
     public JPanel info_Panel;
-    public Voush_Library_Panel voush_Library_Panel;
+    public VoushLibraryPanel voush_Library_Panel;
     SearchTransactionsTableModel transactionsTableModel;
     JScrollPane jScrollPane4;
     private JTextField sender_address;
@@ -177,7 +177,7 @@ public class SearchTransactionsSplitPanel extends Split_Panel {
         transactionsTableModel.deleteObservers();
         // get component from right panel
         Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
-        // if Person_Info 002 delay on close
+        // if PersonInfo 002 delay on close
         //		  if (c1.getClass() == this.info_Panel.getClass()) voush_Library_Panel.onClose();
 
     }
@@ -250,7 +250,7 @@ public class SearchTransactionsSplitPanel extends Split_Panel {
                     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
                     gridBagConstraints.weightx = 1.0;
                     gridBagConstraints.weighty = 1.0;
-                    voush_Library_Panel = new Voush_Library_Panel(voting);
+                    voush_Library_Panel = new VoushLibraryPanel(voting);
                     info_Panel.add(voush_Library_Panel, gridBagConstraints);
 
                 }

@@ -2,17 +2,17 @@ package org.erachain.gui.transaction;
 
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.IssueAssetTransaction;
-import org.erachain.gui.items.assets.Asset_Info;
+import org.erachain.gui.items.assets.AssetInfo;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
 
 @SuppressWarnings("serial")
-public class IssueAssetDetailsFrame extends Rec_DetailsFrame {
+public class IssueAssetDetailsFrame extends RecDetailsFrame {
     public IssueAssetDetailsFrame(IssueAssetTransaction assetIssue) {
         super(assetIssue);
 
-        Asset_Info as_info = new Asset_Info((AssetCls) assetIssue.getItem());
+        AssetInfo as_info = new AssetInfo((AssetCls) assetIssue.getItem());
         //LABEL NAME
         ++labelGBC.gridy;
         labelGBC.gridwidth = 4;

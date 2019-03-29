@@ -4,8 +4,8 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.GenesisBlock;
-import org.erachain.gui.items.accounts.Account_Send_Dialog;
-import org.erachain.gui.items.mails.Mail_Send_Dialog;
+import org.erachain.gui.items.accounts.AccountSendDialog;
+import org.erachain.gui.items.mails.MailSendDialog;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -76,7 +76,7 @@ public class HyperLinkAccount {
         JMenuItem Send_Coins_Crator = new JMenuItem(Lang.getInstance().translate("Send asset"));
         Send_Coins_Crator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new Account_Send_Dialog(null, null, account, null);
+                new AccountSendDialog(null, null, account, null);
             }
         });
         account_Menu.add(Send_Coins_Crator);
@@ -85,7 +85,7 @@ public class HyperLinkAccount {
         Send_Mail_Creator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                new Mail_Send_Dialog(null, null, account, null);
+                new MailSendDialog(null, null, account, null);
             }
         });
         account_Menu.add(Send_Mail_Creator);
