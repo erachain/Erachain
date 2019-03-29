@@ -31,6 +31,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
 import java.io.File;
@@ -800,12 +804,12 @@ public class IssuePersonPanel extends JPanel {
         txtBirthLatitude.add(popup);
         txtBirthLatitude.setComponentPopupMenu(popup);
 
-        JMenuItem jMenuItemCopy = new JMenuItem("Copy", KeyEvent.VK_C);
+        JMenuItem jMenuItemCopy = new JMenuItem(Lang.getInstance().translate("Копировать"), KeyEvent.VK_C);
         jMenuItemCopy.setMnemonic(KeyEvent.VK_C);
         jMenuItemCopy.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_C, ActionEvent.CTRL_MASK));
 
-        JMenuItem jMenuItemPaste = new JMenuItem("Paste", KeyEvent.VK_P);
+        JMenuItem jMenuItemPaste = new JMenuItem(Lang.getInstance().translate("Вставить"), KeyEvent.VK_P);
         jMenuItemPaste.setMnemonic(KeyEvent.VK_P);
         jMenuItemPaste.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_P, ActionEvent.CTRL_MASK));
@@ -887,7 +891,9 @@ public class IssuePersonPanel extends JPanel {
 
 }
 
-// Фильтр выбора файлов определенного типа
+/**
+ * Фильтр выбора файлов определенного типа
+ */
 class FileFilterExt extends javax.swing.filechooser.FileFilter {
     String extension; // расширение файла
     String description; // описание типа файлов
@@ -914,5 +920,4 @@ class FileFilterExt extends javax.swing.filechooser.FileFilter {
     public String getDescription() {
         return description;
     }
-
 }
