@@ -1,7 +1,7 @@
 package org.erachain.utils;
 // 16/03
 
-import org.erachain.at.AT_Transaction;
+import org.erachain.at.ATTransaction;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
@@ -70,7 +70,7 @@ public class BlExpUnit implements Comparable<BlExpUnit> {
     private int getOrder(Object unit) {
         if (unit instanceof Block) {
             return 4;
-        } else if (unit instanceof AT_Transaction) {
+        } else if (unit instanceof ATTransaction) {
             return 3;
         } else if (unit instanceof Trade) {
             return 2;

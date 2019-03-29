@@ -9,7 +9,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.transaction.IssuePersonRecord;
-import org.erachain.core.transaction.R_SetStatusToItem;
+import org.erachain.core.transaction.RSetStatusToItem;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.DCSet;
@@ -55,7 +55,7 @@ public class TestRecSetStatusToItem {
     PersonCls personGeneral;
     PersonCls person;
     IssuePersonRecord issuePersonTransaction;
-    R_SetStatusToItem setStatusTransaction;
+    RSetStatusToItem setStatusTransaction;
     private byte[] icon = new byte[]{1, 3, 4, 5, 6, 9}; // default value
     private byte[] image = new byte[]{4, 11, 32, 23, 45, 122, 11, -45}; // default value
     private byte[] ownerSignature = new byte[Crypto.SIGNATURE_LENGTH];
@@ -95,7 +95,7 @@ public class TestRecSetStatusToItem {
         personkey = person.getKey(db);
 
         timestamp += 100;
-        setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key,
+        setStatusTransaction = new RSetStatusToItem(maker, FEE_POWER, status_key,
                 person.getItemTypeInt(), person.getKey(db),
                 to_date, birthDay + 1000,
                 45646533, 987978972,
@@ -123,7 +123,7 @@ public class TestRecSetStatusToItem {
         assertEquals(true, setStatusTransaction.isSignatureValid(db));
 
         //INVALID SIGNATURE
-        setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key,
+        setStatusTransaction = new RSetStatusToItem(maker, FEE_POWER, status_key,
                 person.getItemTypeInt(), person.getKey(db), to_date, null,
                 323234, 2342342, null, "test TEST 11".getBytes(Charset.forName("UTF-8")), 0l, null,
                 timestamp, maker.getLastTimestamp(db), new byte[64]);
@@ -146,10 +146,10 @@ public class TestRecSetStatusToItem {
         //CHECK DATA LENGTH
         assertEquals(rawIssueStatusTransaction.length, setStatusTransaction.getDataLength(Transaction.FOR_NETWORK, true));
 
-        R_SetStatusToItem parsedSetStatusTransaction = null;
+        RSetStatusToItem parsedSetStatusTransaction = null;
         try {
             //PARSE FROM BYTES
-            parsedSetStatusTransaction = (R_SetStatusToItem) TransactionFactory.getInstance().parse(rawIssueStatusTransaction, Transaction.FOR_NETWORK);
+            parsedSetStatusTransaction = (RSetStatusToItem) TransactionFactory.getInstance().parse(rawIssueStatusTransaction, Transaction.FOR_NETWORK);
             LOGGER.info("parsedSetStatusTransaction: " + parsedSetStatusTransaction);
 
         } catch (Exception e) {
@@ -161,7 +161,7 @@ public class TestRecSetStatusToItem {
                 setStatusTransaction.getDataLength(Transaction.FOR_NETWORK, true));
 
         //CHECK INSTANCE
-        assertEquals(true, parsedSetStatusTransaction instanceof R_SetStatusToItem);
+        assertEquals(true, parsedSetStatusTransaction instanceof RSetStatusToItem);
 
         //CHECK SIGNATURE
         assertEquals(true, Arrays.equals(setStatusTransaction.getSignature(), parsedSetStatusTransaction.getSignature()));
@@ -223,7 +223,7 @@ public class TestRecSetStatusToItem {
         assertEquals((long) endDate, Long.MIN_VALUE);
 
         to_date = timestamp + 1234L * 84600000L;
-        R_SetStatusToItem setStatusTransaction_2 = new R_SetStatusToItem(maker, FEE_POWER, status_key,
+        RSetStatusToItem setStatusTransaction_2 = new RSetStatusToItem(maker, FEE_POWER, status_key,
                 person.getItemTypeInt(), person.getKey(db), to_date, null,
                 234354, 546567,
                 "wersdfsdfsdftest TEST".getBytes(Charset.forName("UTF-8")),

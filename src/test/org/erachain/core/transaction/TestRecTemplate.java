@@ -54,7 +54,7 @@ public class TestRecTemplate {
     TemplateCls template;
     long templateKey = -1;
     IssueTemplateRecord issueTemplateRecord;
-    R_SignNote signNoteRecord;
+    RSignNote signNoteRecord;
     ItemTemplateMap templateMap;
     private byte[] icon = new byte[]{1, 3, 4, 5, 6, 9}; // default value
     private byte[] image = new byte[]{4, 11, 32, 23, 45, 122, 11, -45}; // default value
@@ -256,14 +256,14 @@ public class TestRecTemplate {
 
         initTemplate(true);
 
-        signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 10, maker.getLastTimestamp(db));
+        signNoteRecord = new RSignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 10, maker.getLastTimestamp(db));
         signNoteRecord.sign(maker, asPack);
 
         //CHECK IF ISSUE PLATE TRANSACTION IS VALID
         assertEquals(true, signNoteRecord.isSignatureValid(db));
 
         //INVALID SIGNATURE
-        signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 10, maker.getLastTimestamp(db), new byte[64]);
+        signNoteRecord = new RSignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 10, maker.getLastTimestamp(db), new byte[64]);
 
         //CHECK IF ISSUE PLATE IS INVALID
         assertEquals(false, signNoteRecord.isSignatureValid(db));
@@ -276,7 +276,7 @@ public class TestRecTemplate {
 
         initTemplate(true);
 
-        signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 10, maker.getLastTimestamp(db));
+        signNoteRecord = new RSignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 10, maker.getLastTimestamp(db));
         signNoteRecord.sign(maker, asPack);
 
         //CONVERT TO BYTES
@@ -287,11 +287,11 @@ public class TestRecTemplate {
 
         try {
             //PARSE FROM BYTES
-            R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, Transaction.FOR_NETWORK);
+            RSignNote parsedSignNoteRecord = (RSignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, Transaction.FOR_NETWORK);
             LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
 
             //CHECK INSTANCE
-            assertEquals(true, parsedSignNoteRecord instanceof R_SignNote);
+            assertEquals(true, parsedSignNoteRecord instanceof RSignNote);
 
             //CHECK SIGNATURE
             assertEquals(true, Arrays.equals(signNoteRecord.getSignature(), parsedSignNoteRecord.getSignature()));
@@ -323,7 +323,7 @@ public class TestRecTemplate {
 
         // NOT DATA
         data = null;
-        signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 20, maker.getLastTimestamp(db));
+        signNoteRecord = new RSignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 20, maker.getLastTimestamp(db));
         signNoteRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
@@ -334,11 +334,11 @@ public class TestRecTemplate {
 
         try {
             //PARSE FROM BYTES
-            R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, Transaction.FOR_NETWORK);
+            RSignNote parsedSignNoteRecord = (RSignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, Transaction.FOR_NETWORK);
             LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
 
             //CHECK INSTANCE
-            assertEquals(true, parsedSignNoteRecord instanceof R_SignNote);
+            assertEquals(true, parsedSignNoteRecord instanceof RSignNote);
 
             //CHECK SIGNATURE
             assertEquals(true, Arrays.equals(signNoteRecord.getSignature(), parsedSignNoteRecord.getSignature()));
@@ -370,7 +370,7 @@ public class TestRecTemplate {
         // NOT KEY
         //data = null;
         templateKey = 0;
-        signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 20, maker.getLastTimestamp(db));
+        signNoteRecord = new RSignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 20, maker.getLastTimestamp(db));
         signNoteRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
@@ -381,11 +381,11 @@ public class TestRecTemplate {
 
         try {
             //PARSE FROM BYTES
-            R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, Transaction.FOR_NETWORK);
+            RSignNote parsedSignNoteRecord = (RSignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, Transaction.FOR_NETWORK);
             LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
 
             //CHECK INSTANCE
-            assertEquals(true, parsedSignNoteRecord instanceof R_SignNote);
+            assertEquals(true, parsedSignNoteRecord instanceof RSignNote);
 
             //CHECK SIGNATURE
             assertEquals(true, Arrays.equals(signNoteRecord.getSignature(), parsedSignNoteRecord.getSignature()));
@@ -417,7 +417,7 @@ public class TestRecTemplate {
         // NOT KEY
         data = null;
         templateKey = 0;
-        signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 20, maker.getLastTimestamp(db));
+        signNoteRecord = new RSignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 20, maker.getLastTimestamp(db));
         signNoteRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
@@ -428,11 +428,11 @@ public class TestRecTemplate {
 
         try {
             //PARSE FROM BYTES
-            R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, Transaction.FOR_NETWORK);
+            RSignNote parsedSignNoteRecord = (RSignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, Transaction.FOR_NETWORK);
             LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
 
             //CHECK INSTANCE
-            assertEquals(true, parsedSignNoteRecord instanceof R_SignNote);
+            assertEquals(true, parsedSignNoteRecord instanceof RSignNote);
 
             //CHECK SIGNATURE
             assertEquals(true, Arrays.equals(signNoteRecord.getSignature(), parsedSignNoteRecord.getSignature()));
@@ -471,7 +471,7 @@ public class TestRecTemplate {
 
         initTemplate(true);
 
-        signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 10, maker.getLastTimestamp(db));
+        signNoteRecord = new RSignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 10, maker.getLastTimestamp(db));
         signNoteRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         assertEquals(Transaction.VALIDATE_OK, signNoteRecord.isValid(Transaction.FOR_NETWORK, flags));
 

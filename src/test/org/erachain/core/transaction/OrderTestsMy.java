@@ -296,7 +296,7 @@ public class OrderTestsMy {
         byte noData = (byte) 128;
         // assertEquals((byte)-1, (byte)128);
         assertEquals((byte) 128, (byte) -128);
-        // assertEquals(org.erachain.core.transaction.R_Send.NO_DATA_MASK));
+        // assertEquals(org.erachain.core.transaction.RSend.NO_DATA_MASK));
 
         BigDecimal amountTest = new BigDecimal("123456781234567812345678");
         BigDecimal amountForParse = new BigDecimal("1234567812345678");

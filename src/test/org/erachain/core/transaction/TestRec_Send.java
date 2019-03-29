@@ -95,7 +95,7 @@ public class TestRec_Send {
         byte noData = (byte) 128;
         //assertEquals((byte)-1, (byte)128);
         assertEquals((byte) 128, (byte) -128);
-        //assertEquals(org.erachain.core.transaction.R_Send.NO_DATA_MASK));
+        //assertEquals(org.erachain.core.transaction.RSend.NO_DATA_MASK));
 
         BigDecimal amountTest = new BigDecimal("123456781234567812345678");
         BigDecimal amountForParse = new BigDecimal("1234567812345678");
@@ -114,9 +114,9 @@ public class TestRec_Send {
         int toScale = BlockChain.AMOUNT_DEDAULT_SCALE - TransactionAmount.SCALE_MASK_HALF;
         assertEquals("11111".equals(Integer.toBinaryString(fromScale - toScale)), true);
 
-        R_Send r_Send;
+        RSend r_Send;
         byte[] raw_r_Send;
-        R_Send r_Send_2;
+        RSend r_Send_2;
         for (scale = fromScale; scale >= toScale; scale--) {
 
             amount = amountTest.scaleByPowerOfTen(-scale);
@@ -159,7 +159,7 @@ public class TestRec_Send {
             // TRY PARSE - PRICISION must be LESS
             amount = amountForParse.scaleByPowerOfTen(-scale);
 
-            r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey23,
+            r_Send = new RSend(maker, FEE_POWER, recipient, assetKey23,
                     amount,
                     "", null, isText, encrypted, timestamp, 123l
             );
@@ -173,7 +173,7 @@ public class TestRec_Send {
 
             r_Send_2 = null;
             try {
-                r_Send_2 = (R_Send) R_Send.Parse(raw_r_Send, Transaction.FOR_NETWORK);
+                r_Send_2 = (RSend) RSend.Parse(raw_r_Send, Transaction.FOR_NETWORK);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
                 assertEquals(null, true);
@@ -182,7 +182,7 @@ public class TestRec_Send {
             // FOR DEBUG POINT
             if (!r_Send.getAmount().equals(r_Send_2.getAmount())) {
                 try {
-                    r_Send_2 = (R_Send) R_Send.Parse(raw_r_Send, Transaction.FOR_NETWORK);
+                    r_Send_2 = (RSend) RSend.Parse(raw_r_Send, Transaction.FOR_NETWORK);
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
                 }
@@ -199,7 +199,7 @@ public class TestRec_Send {
             assertEquals(Arrays.equals(r_Send.getSignature(), r_Send_2.getSignature()), true);
             
             // NAGATIVE AMOUNT
-            r_Send = new R_Send(maker, FEE_POWER, recipient, ERA_KEY,
+            r_Send = new RSend(maker, FEE_POWER, recipient, ERA_KEY,
                     amount.negate(),
                     head, data, isText, encrypted, timestamp, 123l
             );
@@ -209,7 +209,7 @@ public class TestRec_Send {
 
             r_Send_2 = null;
             try {
-                r_Send_2 = (R_Send) R_Send.Parse(raw_r_Send, Transaction.FOR_NETWORK);
+                r_Send_2 = (RSend) RSend.Parse(raw_r_Send, Transaction.FOR_NETWORK);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             }
@@ -228,7 +228,7 @@ public class TestRec_Send {
 
         // IS VALID
         BigDecimal bal_A_keyA = amountForParse.scaleByPowerOfTen(-thisScale);
-        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, FEE_POWER, recipient, assetKey,
                 bal_A_keyA,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -238,7 +238,7 @@ public class TestRec_Send {
 
         // INVALID
         bal_A_keyA = amountForParse.scaleByPowerOfTen(-thisScale - 1);
-        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, FEE_POWER, recipient, assetKey,
                 bal_A_keyA,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -248,7 +248,7 @@ public class TestRec_Send {
         ///////////////////////
         // INVALID
         BigDecimal amountInvalid = amountTest;
-        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey + 1,
+        r_Send = new RSend(maker, FEE_POWER, recipient, assetKey + 1,
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -260,14 +260,14 @@ public class TestRec_Send {
         assetA.insertToMap(db, 0l);
         assetKey = assetA.getKey(db);
 
-        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, FEE_POWER, recipient, assetKey,
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_LENGHT_SO_LONG);
 
-        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, FEE_POWER, recipient, assetKey,
                 amountInvalid.negate(),
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -276,7 +276,7 @@ public class TestRec_Send {
 
         // INVALID
         amountInvalid = amountForParse.scaleByPowerOfTen(-fromScale - 1);
-        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, FEE_POWER, recipient, assetKey,
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -284,7 +284,7 @@ public class TestRec_Send {
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_SCALE_WRONG);
 
         amountInvalid = amountForParse.scaleByPowerOfTen(-toScale + 1);
-        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, FEE_POWER, recipient, assetKey,
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -315,9 +315,9 @@ public class TestRec_Send {
         assetBIG.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
         long assetKeyBIG = assetBIG.getKey(db);
 
-        R_Send r_Send;
+        RSend r_Send;
         byte[] raw_r_Send;
-        R_Send r_Send_2;
+        RSend r_Send_2;
         for (scale = fromScale; scale >= toScale; scale--) {
 
             amount = amountTest.scaleByPowerOfTen(-scale);
@@ -360,7 +360,7 @@ public class TestRec_Send {
             // TRY PARSE - PRICISION must be LESS
             amount = amountForParse.scaleByPowerOfTen(-scale);
 
-            r_Send = new R_Send(maker, FEE_POWER, recipient, assetKeyBIG,
+            r_Send = new RSend(maker, FEE_POWER, recipient, assetKeyBIG,
                     amount,
                     "", null, isText, encrypted, timestamp, 123l
             );
@@ -374,7 +374,7 @@ public class TestRec_Send {
 
             r_Send_2 = null;
             try {
-                r_Send_2 = (R_Send) R_Send.Parse(raw_r_Send, Transaction.FOR_NETWORK);
+                r_Send_2 = (RSend) RSend.Parse(raw_r_Send, Transaction.FOR_NETWORK);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
                 assertEquals(null, true);
@@ -383,7 +383,7 @@ public class TestRec_Send {
             // FOR DEBUG POINT
             if (!r_Send.getAmount().equals(r_Send_2.getAmount())) {
                 try {
-                    r_Send_2 = (R_Send) R_Send.Parse(raw_r_Send, Transaction.FOR_NETWORK);
+                    r_Send_2 = (RSend) RSend.Parse(raw_r_Send, Transaction.FOR_NETWORK);
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
                 }
@@ -400,7 +400,7 @@ public class TestRec_Send {
             assertEquals(Arrays.equals(r_Send.getSignature(), r_Send_2.getSignature()), true);
             
             // NAGATIVE AMOUNT
-            r_Send = new R_Send(maker, FEE_POWER, recipient, ERA_KEY,
+            r_Send = new RSend(maker, FEE_POWER, recipient, ERA_KEY,
                     amount.negate(),
                     head, data, isText, encrypted, timestamp, 123l
             );
@@ -410,7 +410,7 @@ public class TestRec_Send {
 
             r_Send_2 = null;
             try {
-                r_Send_2 = (R_Send) R_Send.Parse(raw_r_Send, Transaction.FOR_NETWORK);
+                r_Send_2 = (RSend) RSend.Parse(raw_r_Send, Transaction.FOR_NETWORK);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             }
@@ -429,7 +429,7 @@ public class TestRec_Send {
 
         // IS VALID
         BigDecimal bal_A_keyA = amountForParse.scaleByPowerOfTen(-thisScale);
-        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, FEE_POWER, recipient, assetKey,
                 bal_A_keyA,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -439,7 +439,7 @@ public class TestRec_Send {
 
         // VALID because trailing ZERO - amount.stripTrailingZeros()
         bal_A_keyA = amountForParse.scaleByPowerOfTen(-thisScale - 1);
-        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, FEE_POWER, recipient, assetKey,
                 bal_A_keyA,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -449,7 +449,7 @@ public class TestRec_Send {
         ///////////////////////
         // INVALID
         BigDecimal amountInvalid = amountTest;
-        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey + 1,
+        r_Send = new RSend(maker, FEE_POWER, recipient, assetKey + 1,
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -457,14 +457,14 @@ public class TestRec_Send {
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.ITEM_ASSET_NOT_EXIST);
 
         // INVALID
-        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, FEE_POWER, recipient, assetKey,
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_LENGHT_SO_LONG);
 
-        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, FEE_POWER, recipient, assetKey,
                 amountInvalid.negate(),
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -473,7 +473,7 @@ public class TestRec_Send {
 
         // INVALID
         amountInvalid = amountForParse.scaleByPowerOfTen(-fromScale - 1);
-        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, FEE_POWER, recipient, assetKey,
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -481,7 +481,7 @@ public class TestRec_Send {
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.VALIDATE_OK);
 
         amountInvalid = amountForParse.scaleByPowerOfTen(-toScale + 1);
-        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, FEE_POWER, recipient, assetKey,
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -499,7 +499,7 @@ public class TestRec_Send {
         init();
 
         /// MESSAGE + AMOUNT
-        R_Send r_SendV3 = new R_Send(
+        RSend r_SendV3 = new RSend(
                 maker, FEE_POWER,
                 recipient,
                 ERA_KEY,
@@ -528,9 +528,9 @@ public class TestRec_Send {
         assertEquals(rawMessageTransactionV3.length, r_SendV3.getDataLength(Transaction.FOR_NETWORK, true));
 
 
-        R_Send messageTransactionV3_2 = null;
+        RSend messageTransactionV3_2 = null;
         try {
-            messageTransactionV3_2 = (R_Send) R_Send.Parse(rawMessageTransactionV3, Transaction.FOR_NETWORK);
+            messageTransactionV3_2 = (RSend) RSend.Parse(rawMessageTransactionV3, Transaction.FOR_NETWORK);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -549,7 +549,7 @@ public class TestRec_Send {
         r_SendV3.orphan(block, Transaction.FOR_NETWORK);
         assertEquals((long) maker.getLastTimestamp(db), gb.getTimestamp());
 
-        r_SendV3 = new R_Send(
+        r_SendV3 = new RSend(
                 maker, FEE_POWER,
                 recipient,
                 ERA_KEY,
@@ -578,7 +578,7 @@ public class TestRec_Send {
 
         messageTransactionV3_2 = null;
         try {
-            messageTransactionV3_2 = (R_Send) R_Send.Parse(rawMessageTransactionV3, Transaction.FOR_NETWORK);
+            messageTransactionV3_2 = (RSend) RSend.Parse(rawMessageTransactionV3, Transaction.FOR_NETWORK);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -598,7 +598,7 @@ public class TestRec_Send {
         r_SendV3.orphan(block, Transaction.FOR_NETWORK);
         assertEquals((long) maker.getLastTimestamp(db), gb.getTimestamp());
 
-        r_SendV3 = new R_Send(
+        r_SendV3 = new RSend(
                 maker, FEE_POWER,
                 recipient,
                 ERA_KEY,
@@ -626,7 +626,7 @@ public class TestRec_Send {
 
         messageTransactionV3_2 = null;
         try {
-            messageTransactionV3_2 = (R_Send) R_Send.Parse(rawMessageTransactionV3, Transaction.FOR_NETWORK);
+            messageTransactionV3_2 = (RSend) RSend.Parse(rawMessageTransactionV3, Transaction.FOR_NETWORK);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -643,7 +643,7 @@ public class TestRec_Send {
         //// EMPTY - NOT AMOUNT and NOT TEXT
         r_SendV3.orphan(block, Transaction.FOR_NETWORK);
 
-        r_SendV3 = new R_Send(
+        r_SendV3 = new RSend(
                 maker, FEE_POWER,
                 recipient,
                 ERA_KEY,
@@ -671,7 +671,7 @@ public class TestRec_Send {
 
         messageTransactionV3_2 = null;
         try {
-            messageTransactionV3_2 = (R_Send) R_Send.Parse(rawMessageTransactionV3, Transaction.FOR_NETWORK);
+            messageTransactionV3_2 = (RSend) RSend.Parse(rawMessageTransactionV3, Transaction.FOR_NETWORK);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -689,7 +689,7 @@ public class TestRec_Send {
         amount = amount.negate();
         recipient.changeBalance(db, false, -ERA_KEY, amount.negate(), false);
         /// MESSAGE + AMOUNT
-        r_SendV3 = new R_Send(
+        r_SendV3 = new RSend(
                 maker, FEE_POWER,
                 recipient,
                 -ERA_KEY,
@@ -714,7 +714,7 @@ public class TestRec_Send {
         assertEquals(rawMessageTransactionV3.length, r_SendV3.getDataLength(Transaction.FOR_NETWORK, true));
 
         try {
-            messageTransactionV3_2 = (R_Send) R_Send.Parse(rawMessageTransactionV3, Transaction.FOR_NETWORK);
+            messageTransactionV3_2 = (RSend) RSend.Parse(rawMessageTransactionV3, Transaction.FOR_NETWORK);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -897,7 +897,7 @@ public class TestRec_Send {
 
         long era_key = 1l;
         /// DISCREDIR_ADDRESSES
-        R_Send r_Send = new R_Send(maker, FEE_POWER, recipient, era_key, amount, "", null, isText, encrypted, timestamp, 1l);
+        RSend r_Send = new RSend(maker, FEE_POWER, recipient, era_key, amount, "", null, isText, encrypted, timestamp, 1l);
 
         byte[] data = r_Send.toBytes(Transaction.FOR_NETWORK, true);
         int port = Controller.getInstance().getNetworkPort();
@@ -905,7 +905,7 @@ public class TestRec_Send {
         byte[] digest = Crypto.getInstance().digest(data);
         digest = Bytes.concat(digest, digest);
 
-        R_Send r_SendSigned = new R_Send(maker, FEE_POWER, recipient, era_key, amount, "", null, isText, encrypted, timestamp, 1l, digest);
+        RSend r_SendSigned = new RSend(maker, FEE_POWER, recipient, era_key, amount, "", null, isText, encrypted, timestamp, 1l, digest);
         String raw = Base58.encode(r_SendSigned.toBytes(Transaction.FOR_NETWORK, true));
         System.out.print(raw);
 
@@ -922,7 +922,7 @@ public class TestRec_Send {
 
 
         /// MESSAGE + AMOUNT
-        R_Calculated txCalculated = new R_Calculated(recipient, ERA_KEY, amount,
+        RCalculated txCalculated = new RCalculated(recipient, ERA_KEY, amount,
                 head, timestamp
         );
 
@@ -931,9 +931,9 @@ public class TestRec_Send {
         assertEquals(rawCalculated.length, length);
 
 
-        R_Calculated txCalculated_2 = null;
+        RCalculated txCalculated_2 = null;
         try {
-            txCalculated_2 = (R_Calculated) R_Calculated.Parse(rawCalculated);
+            txCalculated_2 = (RCalculated) RCalculated.Parse(rawCalculated);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -942,7 +942,7 @@ public class TestRec_Send {
         assertEquals(txCalculated.getAmount(), txCalculated_2.getAmount());
         assertEquals(txCalculated.getMessage(), txCalculated_2.getMessage());
 
-        txCalculated = new R_Calculated(recipient, ERA_KEY, null,
+        txCalculated = new RCalculated(recipient, ERA_KEY, null,
                 head, timestamp
         );
 
@@ -953,7 +953,7 @@ public class TestRec_Send {
 
         txCalculated_2 = null;
         try {
-            txCalculated_2 = (R_Calculated) R_Calculated.Parse(rawCalculated);
+            txCalculated_2 = (RCalculated) RCalculated.Parse(rawCalculated);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

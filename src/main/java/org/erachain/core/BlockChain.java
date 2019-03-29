@@ -220,7 +220,7 @@ public class BlockChain {
     // need RIGHTS for PERSON account
     public static final BigDecimal MINOR_ERA_BALANCE_BD = BigDecimal.valueOf(MINOR_ERA_BALANCE);
 
-    // GIFTS for R_SertifyPubKeys
+    // GIFTS for RSertifyPubKeys
     public static final int GIFTED_COMPU_AMOUNT_4_10 = FEE_PER_BYTE_4_10 << 8;
     public static final BigDecimal GIFTED_COMPU_AMOUNT_BD_4_10 = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_4_10, FEE_SCALE);
     public static final int GIFTED_COMPU_AMOUNT_FOR_PERSON_4_10 = GIFTED_COMPU_AMOUNT_4_10 << 3;
@@ -1059,7 +1059,7 @@ public class BlockChain {
 			{
 				transaction.setDC(dcSet, false);
 
-				if (false && transaction instanceof R_SertifyPubKeys) {
+				if (false && transaction instanceof RSertifyPubKeys) {
 					//	amount = BlockChain.GIFTED_ERA_AMOUNT.intValue();
 					//	incomed_amount += amount;
 

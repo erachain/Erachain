@@ -66,7 +66,7 @@ public class TestRecPerson {
     long genesisPersonKey = -1;
     long personKey = -1;
     IssuePersonRecord issuePersonTransaction;
-    R_SertifyPubKeys r_SertifyPubKeys;
+    RSertifyPubKeys r_SertifyPubKeys;
     KKPersonStatusMap dbPS;
     PersonAddressMap dbPA;
     AddressPersonMap dbAP;
@@ -154,7 +154,7 @@ public class TestRecPerson {
 
         //CREATE PERSONALIZE REcORD
         timestamp += 100;
-        r_SertifyPubKeys = new R_SertifyPubKeys(version, certifier, FEE_POWER, personKey,
+        r_SertifyPubKeys = new RSertifyPubKeys(version, certifier, FEE_POWER, personKey,
                 sertifiedPublicKeys,
                 timestamp, certifier.getLastTimestamp(db));
 
@@ -374,19 +374,19 @@ public class TestRecPerson {
         //r_SertifyPerson.process(db, false);
 
         //CREATE INVALID PERSONALIZE RECORD NOT ENOUGH ERM BALANCE
-        R_SertifyPubKeys personalizeRecord_0 = new R_SertifyPubKeys(0, userAccount1, FEE_POWER, personKey,
+        RSertifyPubKeys personalizeRecord_0 = new RSertifyPubKeys(0, userAccount1, FEE_POWER, personKey,
                 sertifiedPublicKeys,
                 356, timestamp, userAccount1.getLastTimestamp(db));
         assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID PERSONALIZE RECORD KEY NOT EXIST
-        personalizeRecord_0 = new R_SertifyPubKeys(0, certifier, FEE_POWER, personKey + 10,
+        personalizeRecord_0 = new RSertifyPubKeys(0, certifier, FEE_POWER, personKey + 10,
                 sertifiedPublicKeys,
                 356, timestamp, certifier.getLastTimestamp(db));
         assertEquals(Transaction.ITEM_PERSON_NOT_EXIST, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID ISSUE PERSON FOR INVALID PERSONALIZE
-        personalizeRecord_0 = new R_SertifyPubKeys(0, userAccount1, FEE_POWER, personKey,
+        personalizeRecord_0 = new RSertifyPubKeys(0, userAccount1, FEE_POWER, personKey,
                 sertifiedPublicKeys,
                 356, timestamp, userAccount1.getLastTimestamp(db));
         //CREATE INVALID ISSUE PERSON - NOT FEE
@@ -404,7 +404,7 @@ public class TestRecPerson {
         sertifiedPublicKeys011.add(new PublicKeyAccount(new byte[60]));
         sertifiedPublicKeys011.add(new PublicKeyAccount(userAccount2.getPublicKey()));
         sertifiedPublicKeys011.add(new PublicKeyAccount(userAccount3.getPublicKey()));
-        personalizeRecord_0 = new R_SertifyPubKeys(0, certifier, FEE_POWER, personKey,
+        personalizeRecord_0 = new RSertifyPubKeys(0, certifier, FEE_POWER, personKey,
                 sertifiedPublicKeys011,
                 356, timestamp, certifier.getLastTimestamp(db));
         assertEquals(Transaction.INVALID_PUBLIC_KEY, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
@@ -425,7 +425,7 @@ public class TestRecPerson {
         assertEquals(true, r_SertifyPubKeys.isSignatureValid(db));
 
         version = 1;
-        r_SertifyPubKeys = new R_SertifyPubKeys(version, certifier, FEE_POWER, personKey,
+        r_SertifyPubKeys = new RSertifyPubKeys(version, certifier, FEE_POWER, personKey,
                 sertifiedPublicKeys,
                 timestamp, certifier.getLastTimestamp(db));
 
@@ -476,10 +476,10 @@ public class TestRecPerson {
 
         try {
             //PARSE FROM BYTES
-            R_SertifyPubKeys parsedPersonTransfer = (R_SertifyPubKeys) TransactionFactory.getInstance().parse(rawPersonTransfer, Transaction.FOR_NETWORK);
+            RSertifyPubKeys parsedPersonTransfer = (RSertifyPubKeys) TransactionFactory.getInstance().parse(rawPersonTransfer, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
-            assertEquals(true, parsedPersonTransfer instanceof R_SertifyPubKeys);
+            assertEquals(true, parsedPersonTransfer instanceof RSertifyPubKeys);
 
             //CHECK TYPEBYTES
             assertEquals(true, Arrays.equals(r_SertifyPubKeys.getTypeBytes(), parsedPersonTransfer.getTypeBytes()));
@@ -603,7 +603,7 @@ public class TestRecPerson {
 
         ////////// TO DATE ////////
         // .a - personKey, .b - end_date, .c - block height, .d - reference
-        int to_date = R_SertifyPubKeys.DEFAULT_DURATION + (int) (r_SertifyPubKeys.getTimestamp() / 86400000.0);
+        int to_date = RSertifyPubKeys.DEFAULT_DURATION + (int) (r_SertifyPubKeys.getTimestamp() / 86400000.0);
 
         // PERSON STATUS ALIVE - beg_date = person birthDay
         //assertEquals( (long)person.getBirthday(), (long)dbPS.getItem(personKey, ALIVE_KEY).a);
@@ -691,7 +691,7 @@ public class TestRecPerson {
         /////////////////////////////////////////////// TEST DURATIONS
         // TRY DURATIONS
         int end_date = 222;
-        r_SertifyPubKeys = new R_SertifyPubKeys(0, certifier, FEE_POWER, personKey,
+        r_SertifyPubKeys = new RSertifyPubKeys(0, certifier, FEE_POWER, personKey,
                 sertifiedPublicKeys,
                 end_date, timestamp, certifier.getLastTimestamp(db));
         r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
@@ -708,7 +708,7 @@ public class TestRecPerson {
 
         // TEST LIST and STACK
         int end_date2 = -12;
-        r_SertifyPubKeys = new R_SertifyPubKeys(0, certifier, FEE_POWER, personKey,
+        r_SertifyPubKeys = new RSertifyPubKeys(0, certifier, FEE_POWER, personKey,
                 sertifiedPublicKeys,
                 end_date2, timestamp, certifier.getLastTimestamp(db));
         r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
@@ -821,7 +821,7 @@ public class TestRecPerson {
 
         ////////// TO DATE ////////
         // .a - personKey, .b - end_date, .c - block height, .d - reference
-        int to_date = R_SertifyPubKeys.DEFAULT_DURATION + (int) (r_SertifyPubKeys.getTimestamp() / 86400000.0);
+        int to_date = RSertifyPubKeys.DEFAULT_DURATION + (int) (r_SertifyPubKeys.getTimestamp() / 86400000.0);
 
         // PERSON STATUS ALIVE - beg_date = person birthDay
         //assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));

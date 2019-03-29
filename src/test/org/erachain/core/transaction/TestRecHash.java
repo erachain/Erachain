@@ -41,7 +41,7 @@ public class TestRecHash {
     byte[] seed = Crypto.getInstance().digest("test".getBytes());
     byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
     PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
-    R_Hashes hashesRecord;
+    RHashes hashesRecord;
     //CREATE EMPTY MEMORY DATABASE
     private DCSet db;
     private GenesisBlock gb;
@@ -72,14 +72,14 @@ public class TestRecHash {
 
         init();
 
-        hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db));
+        hashesRecord = new RHashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db));
         hashesRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE PLATE TRANSACTION IS VALID
         assertEquals(true, hashesRecord.isSignatureValid(db));
 
         //INVALID SIGNATURE
-        hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db), new byte[64]);
+        hashesRecord = new RHashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db), new byte[64]);
 
         //CHECK IF ISSUE PLATE IS INVALID
         assertEquals(false, hashesRecord.isSignatureValid(db));
@@ -92,7 +92,7 @@ public class TestRecHash {
         init();
 
 
-        hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db));
+        hashesRecord = new RHashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db));
         hashesRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
@@ -101,16 +101,16 @@ public class TestRecHash {
         //CHECK DATA LENGTH
         assertEquals(rawHashesRecord.length, hashesRecord.getDataLength(Transaction.FOR_NETWORK, true));
 
-        R_Hashes parsed = null;
+        RHashes parsed = null;
         try {
             //PARSE FROM BYTES
-            parsed = (R_Hashes) TransactionFactory.getInstance().parse(rawHashesRecord, Transaction.FOR_NETWORK);
+            parsed = (RHashes) TransactionFactory.getInstance().parse(rawHashesRecord, Transaction.FOR_NETWORK);
         } catch (Exception e) {
             fail("Exception while parsing transaction. " + e);
         }
 
         //CHECK INSTANCE
-        assertEquals(true, parsed instanceof R_Hashes);
+        assertEquals(true, parsed instanceof RHashes);
 
         //CHECK TIMESTAMP
         assertEquals(hashesRecord.getTimestamp(), parsed.getTimestamp());
@@ -149,7 +149,7 @@ public class TestRecHash {
         byte[] hash0 = maker.getPublicKey();
         hashes[0] = hash0;
 
-        hashesRecord = new R_Hashes(maker, FEE_POWER, null, data, hashes, timestamp + 10, maker.getLastTimestamp(db));
+        hashesRecord = new RHashes(maker, FEE_POWER, null, data, hashes, timestamp + 10, maker.getLastTimestamp(db));
         hashesRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(Transaction.VALIDATE_OK, hashesRecord.isValid(Transaction.FOR_NETWORK, flags));

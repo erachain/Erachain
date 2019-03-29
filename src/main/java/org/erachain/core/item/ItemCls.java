@@ -6,6 +6,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.transaction.RSetStatusToItem;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
@@ -358,7 +359,7 @@ public abstract class ItemCls {
     public String toString(DCSet db, byte[] data) {
         String str = this.toString(db);
 
-        Tuple6<Long, Long, byte[], byte[], Long, byte[]> tuple = org.erachain.core.transaction.R_SetStatusToItem.unpackData(data);
+        Tuple6<Long, Long, byte[], byte[], Long, byte[]> tuple = RSetStatusToItem.unpackData(data);
 
         if (str.contains("%1") && tuple.a != null)
             str = str.replace("%1", tuple.a.toString());

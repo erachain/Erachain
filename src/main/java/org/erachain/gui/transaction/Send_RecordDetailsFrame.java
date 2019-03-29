@@ -5,11 +5,10 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RSend;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.*;
 import org.erachain.gui.library.MTextPane;
-import org.erachain.gui.library.M_Accoutn_Text_Field;
+import org.erachain.gui.library.MAccoutnTextField;
 import org.erachain.lang.Lang;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -23,14 +22,14 @@ import java.awt.event.ActionListener;
 import java.io.UnsupportedEncodingException;
 
 @SuppressWarnings("serial")
-public class Send_RecordDetailsFrame extends Rec_DetailsFrame {
+public class Send_RecordDetailsFrame extends RecDetailsFrame {
     private static final Logger LOGGER = LoggerFactory.getLogger(Send_RecordDetailsFrame.class);
     private JTextField messageText;
     private JScrollPane jScrollPane1;
     private MTextPane jTextArea_Messge;
     private Send_RecordDetailsFrame th;
 
-    public Send_RecordDetailsFrame(final R_Send r_Send) {
+    public Send_RecordDetailsFrame(final RSend r_Send) {
         super(r_Send);
         th = this;
         //LABEL RECIPIENT
@@ -40,7 +39,7 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame {
 
         //RECIPIENT
         ++detailGBC.gridy;
-        M_Accoutn_Text_Field recipient = new M_Accoutn_Text_Field(r_Send.getRecipient());
+        MAccoutnTextField recipient = new MAccoutnTextField(r_Send.getRecipient());
         //	JTextField recipient = new JTextField(r_Send.getRecipient().getAddress());
         recipient.setEditable(false);
         //	MenuPopupUtil.installContextMenu(recipient);
@@ -164,7 +163,7 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame {
                                 byte[] ddd = AEScrypto.dataDecrypt(r_data, privateKey, publicKey);
                                 String sss = new String(ddd, "UTF-8");
                                 String str = (new String(AEScrypto.dataDecrypt(r_data, privateKey, publicKey), "UTF-8"));
-                                jTextArea_Messge.set_text(str); //"{{" +  str.substring(0,R_Send.MAX_DATA_VIEW) + "...}}");
+                                jTextArea_Messge.set_text(str); //"{{" +  str.substring(0,RSend.MAX_DATA_VIEW) + "...}}");
                             } catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
                                 jTextArea_Messge.set_text("unknown password");
                                 LOGGER.error(e1.getMessage(), e1);

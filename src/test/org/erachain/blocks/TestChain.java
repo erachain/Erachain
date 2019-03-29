@@ -9,7 +9,7 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.IssuePersonRecord;
-import org.erachain.core.transaction.R_SertifyPubKeys;
+import org.erachain.core.transaction.RSertifyPubKeys;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlocksHeadsMap;
 import org.erachain.datachain.DCSet;
@@ -48,7 +48,7 @@ public class TestChain {
     PersonCls person;
     long personKey = -1;
     IssuePersonRecord issuePersonTransaction;
-    R_SertifyPubKeys r_SertifyPubKeys;
+    RSertifyPubKeys r_SertifyPubKeys;
     //int version = 0; // without signs of person
     int version = 1; // with signs of person
     private BlockChain blockChain;

@@ -3,9 +3,9 @@ package org.erachain.core.block;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.erachain.at.AT_Block;
-import org.erachain.at.AT_Controller;
-import org.erachain.at.AT_Exception;
+import org.erachain.at.ATBlock;
+import org.erachain.at.ATController;
+import org.erachain.at.ATException;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -13,8 +13,8 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.core.transaction.R_Calculated;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RCalculated;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.DCSet;
@@ -88,7 +88,7 @@ public class Block {
     protected long totalFee;
     protected long emittedFee;
     public Block.BlockHead blockHead;
-    public List<R_Calculated> txCalculated;
+    public List<RCalculated> txCalculated;
 
     // BODY
     protected List<Transaction> transactions;
@@ -1326,9 +1326,9 @@ public class Block {
         if (this.atBytes != null && this.atBytes.length > 0) {
             try {
 
-                AT_Block atBlock = AT_Controller.validateATs(this.getBlockATs(), dcSet.getBlockMap().last().getHeight() + 1, dcSet);
+                ATBlock atBlock = ATController.validateATs(this.getBlockATs(), dcSet.getBlockMap().last().getHeight() + 1, dcSet);
                 //this.atFees = atBlock.getTotalFees();
-            } catch (NoSuchAlgorithmException | AT_Exception e) {
+            } catch (NoSuchAlgorithmException | ATException e) {
                 LOGGER.error(e.getMessage(), e);
                 return false;
             }
@@ -1393,7 +1393,7 @@ public class Block {
                     this.txCalculated = null;
                 } else {
                     // make pool for calculated
-                    this.txCalculated = new ArrayList<R_Calculated>();
+                    this.txCalculated = new ArrayList<RCalculated>();
                 }
             } else {
                 long processTiming = System.nanoTime();
@@ -1514,7 +1514,7 @@ public class Block {
                         return false;
 
                     if (TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
-                            && ((R_Send)transaction).getAssetKey() != 1) {
+                            && ((RSend)transaction).getAssetKey() != 1) {
                         ;
                     } else {
 
@@ -1543,12 +1543,12 @@ public class Block {
                 } else {
 
                     if (TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
-                            && ((R_Send) transaction).getAssetKey() != 1) {
+                            && ((RSend) transaction).getAssetKey() != 1) {
                         ;
                     } else {
 
                         // for some TRANSACTIONs need add to FINAM MAP etc.
-                        // R_SertifyPubKeys - in same BLOCK with IssuePersonRecord
+                        // RSertifyPubKeys - in same BLOCK with IssuePersonRecord
 
                         processTimingLocal = System.nanoTime();
                         Long key = Transaction.makeDBRef(this.heightBlock, seq);
@@ -1671,9 +1671,9 @@ public class Block {
             // MAKE CALCULATED TRANSACTIONS
             if (!dcSet.isFork() && !asOrphan && !Controller.getInstance().noCalculated) {
                 if (this.txCalculated == null)
-                    this.txCalculated = new ArrayList<R_Calculated>();
+                    this.txCalculated = new ArrayList<RCalculated>();
 
-                this.txCalculated.add(new R_Calculated(this.creator, Transaction.FEE_KEY,
+                this.txCalculated.add(new RCalculated(this.creator, Transaction.FEE_KEY,
                         totalFee, "forging", Transaction.makeDBRef(this.heightBlock, 0)));
             }
         }
@@ -1796,7 +1796,7 @@ public class Block {
         // MAKE CALCULATER TRANSACTIONS
         if (this.txCalculated != null && !this.txCalculated.isEmpty()) {
             TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
-            R_Calculated txCalculated;
+            RCalculated txCalculated;
             int size = this.txCalculated.size();
             int indexStart = this.transactionCount + 1;
             long key;
@@ -1857,7 +1857,7 @@ public class Block {
                 this.txCalculated = null;
             } else {
                 // make pool for calculated
-                this.txCalculated = new ArrayList<R_Calculated>();
+                this.txCalculated = new ArrayList<RCalculated>();
             }
 
             //DLSet dbSet = Controller.getInstance().getDBSet();
@@ -1906,7 +1906,7 @@ public class Block {
                 timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
 
                 if (TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
-                        && ((R_Send)transaction).getAssetKey() != 1) {
+                        && ((RSend)transaction).getAssetKey() != 1) {
                         ;
                 } else {
 

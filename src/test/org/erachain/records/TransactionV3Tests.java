@@ -9,7 +9,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.ArbitraryTransactionV3;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
@@ -80,7 +80,7 @@ public class TransactionV3Tests {
         init();
 
 
-        R_Send messageTransactionV3 = new R_Send(
+        RSend messageTransactionV3 = new RSend(
                 maker, FEE_POWER, //	ATFunding
                 recipient,
                 ERM_KEY,
@@ -105,9 +105,9 @@ public class TransactionV3Tests {
         assertEquals(rawMessageTransactionV3.length, messageTransactionV3.getDataLength(Transaction.FOR_NETWORK, true));
 
 
-        R_Send messageTransactionV3_2 = null;
+        RSend messageTransactionV3_2 = null;
         try {
-            messageTransactionV3_2 = (R_Send) R_Send.Parse(rawMessageTransactionV3, Transaction.FOR_NETWORK);
+            messageTransactionV3_2 = (RSend) RSend.Parse(rawMessageTransactionV3, Transaction.FOR_NETWORK);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

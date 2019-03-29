@@ -3,7 +3,7 @@ package org.erachain.gui.transaction;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.core.transaction.R_SertifyPubKeys;
+import org.erachain.core.transaction.RSertifyPubKeys;
 import org.erachain.lang.Lang;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -12,11 +12,11 @@ import org.erachain.utils.MenuPopupUtil;
 import javax.swing.*;
 
 @SuppressWarnings("serial")
-public class SertifyPubKeysDetailsFrame extends Rec_DetailsFrame {
+public class SertifyPubKeysDetailsFrame extends RecDetailsFrame {
     private static final Logger LOGGER = LoggerFactory.getLogger(SertifyPubKeysDetailsFrame.class);
     private JTextField messageText;
 
-    public SertifyPubKeysDetailsFrame(final R_SertifyPubKeys sertifyPubKeysRecord) {
+    public SertifyPubKeysDetailsFrame(final RSertifyPubKeys sertifyPubKeysRecord) {
         super(sertifyPubKeysRecord);
 
         //LABEL PERSON

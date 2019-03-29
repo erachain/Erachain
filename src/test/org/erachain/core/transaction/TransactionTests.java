@@ -104,13 +104,13 @@ String  s= "";
         init();
 
         //CREATE PAYMENT
-        Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, last_ref);
+        Transaction payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, last_ref);
         payment.sign(maker, Transaction.FOR_NETWORK);
         //CHECK IF PAYMENT SIGNATURE IS VALID
         assertEquals(true, payment.isSignatureValid(db));
 
         //INVALID SIGNATURE
-        payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp + 1, last_ref, new byte[64]);
+        payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp + 1, last_ref, new byte[64]);
 
         //CHECK IF PAYMENT SIGNATURE IS INVALID
         assertEquals(false, payment.isSignatureValid(db));
@@ -123,25 +123,25 @@ String  s= "";
 
 
         //CREATE VALID PAYMENT
-        Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.5).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db));
+        Transaction payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.5).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db));
         assertEquals(Transaction.VALIDATE_OK, payment.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID PAYMENT INVALID RECIPIENT ADDRESS
-        payment = new R_Send(maker, FEE_POWER, new Account("test"), FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db) + 10);
+        payment = new RSend(maker, FEE_POWER, new Account("test"), FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db) + 10);
         assertEquals(Transaction.INVALID_ADDRESS, payment.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID PAYMENT NEGATIVE AMOUNT
-        payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(-100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db));
+        payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(-100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db));
         assertEquals(Transaction.NEGATIVE_AMOUNT, payment.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID PAYMENT WRONG REFERENCE
-        payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, -123L, new byte[64]);
+        payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, -123L, new byte[64]);
         assertEquals(Transaction.INVALID_REFERENCE, payment.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID PAYMENT WRONG TIMESTAMP
-        payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getLastTimestamp(db), maker.getLastTimestamp(db));
+        payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getLastTimestamp(db), maker.getLastTimestamp(db));
         assertEquals(Transaction.INVALID_TIMESTAMP, payment.isValid(Transaction.FOR_NETWORK, flags));
-        payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getLastTimestamp(db) - 10, maker.getLastTimestamp(db));
+        payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getLastTimestamp(db) - 10, maker.getLastTimestamp(db));
         assertEquals(Transaction.INVALID_TIMESTAMP, payment.isValid(Transaction.FOR_NETWORK, flags));
 
     }
@@ -151,7 +151,7 @@ String  s= "";
         init();
 
         //CREATE VALID PAYMENT
-        Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db));
+        Transaction payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db));
         payment.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
@@ -159,10 +159,10 @@ String  s= "";
 
         try {
             //PARSE FROM BYTES
-            R_Send parsedPayment = (R_Send) TransactionFactory.getInstance().parse(rawPayment, Transaction.FOR_NETWORK);
+            RSend parsedPayment = (RSend) TransactionFactory.getInstance().parse(rawPayment, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
-            assertEquals(true, parsedPayment instanceof R_Send);
+            assertEquals(true, parsedPayment instanceof RSend);
 
             //CHECK SIGNATURE
             assertEquals(true, Arrays.equals(payment.getSignature(), parsedPayment.getSignature()));
@@ -206,7 +206,7 @@ String  s= "";
 
         //CREATE PAYMENT
         BigDecimal amount = BigDecimal.valueOf(0.5).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-        Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, amount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, last_ref);
+        Transaction payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, amount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, last_ref);
         payment.sign(maker, Transaction.FOR_NETWORK);
         BigDecimal fee = payment.getFee();
         payment.process(gb, Transaction.FOR_NETWORK);
@@ -233,7 +233,7 @@ String  s= "";
         init();
 
         //CREATE PAYMENT
-        Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, last_ref);
+        Transaction payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, last_ref);
         payment.sign(maker, Transaction.FOR_NETWORK);
         payment.process(gb, Transaction.FOR_NETWORK);
 
@@ -241,7 +241,7 @@ String  s= "";
         BigDecimal amount2 = recipient.getBalanceUSE(FEE_KEY, databaseSet);
 
         //CREATE PAYMENT2
-        Transaction payment2 = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, last_ref);
+        Transaction payment2 = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, last_ref);
         payment2.sign(maker, Transaction.FOR_NETWORK);
         payment.process(gb, Transaction.FOR_NETWORK);
 

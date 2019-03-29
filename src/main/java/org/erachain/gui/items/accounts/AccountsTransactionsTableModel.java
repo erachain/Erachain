@@ -6,11 +6,9 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transCalculated.Calculated;
-import org.erachain.core.transCalculated.CalculatedAmount;
 import org.erachain.core.transaction.GenesisTransferAssetTransaction;
-import org.erachain.core.transaction.R_Calculated;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RCalculated;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
@@ -18,7 +16,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
 import java.io.UnsupportedEncodingException;
@@ -156,7 +153,7 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
                 if (r_Tran.transaction.getType() != Transaction.SEND_ASSET_TRANSACTION)
                     return "";
 
-                R_Send rs = ((R_Send) r_Tran.transaction);
+                RSend rs = ((RSend) r_Tran.transaction);
                 if (rs == rs)
                     return rs.getHead();
                 if (!rs.isEncrypted())
@@ -190,7 +187,7 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
                     byte[] ddd = AEScrypto.dataDecrypt(rs.getData(), privateKey, publicKey);
                     String sss = new String(ddd, "UTF-8");
                     String str1 = (new String(AEScrypto.dataDecrypt(rs.getData(), privateKey, publicKey), "UTF-8"));
-                    return str1; // "{{" + str.substring(0,R_Send.MAX_DATA_VIEW) +
+                    return str1; // "{{" + str.substring(0,RSend.MAX_DATA_VIEW) +
                     // "...}}");
                 } catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
                     return ("unknown password");
@@ -275,7 +272,7 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
 
         Trans trr = new Trans();
         if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-            R_Send r_send = (R_Send) transaction;
+            RSend r_send = (RSend) transaction;
             trr.owner = r_send.getCreator();
             trr.recipient = r_send.getRecipient();
             trr.transaction = r_send;
@@ -326,7 +323,7 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             trans_Hash_Map.put(transaction.viewSignature(), trr);
 
         } else if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
-            R_Calculated calculated = (R_Calculated) transaction;
+            RCalculated calculated = (RCalculated) transaction;
 
             trr.transaction = calculated;
             trr.amount = calculated.getAmount();

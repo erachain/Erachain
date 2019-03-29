@@ -8,9 +8,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.ArbitraryTransactionV3;
-import org.erachain.core.transaction.R_Send;
-import org.erachain.gui.*;
-import org.erachain.gui.*;
+import org.erachain.core.transaction.RSend;
 import org.erachain.gui.transaction.ArbitraryTransactionDetailsFrame;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.ntp.NTP;
@@ -29,7 +27,7 @@ public class txWindowTest {
     public void windowTest() {
 
         new Send_RecordDetailsFrame(
-                (R_Send) Controller.getInstance().getTransaction(Base58.decode("2kGG3Nmu2VNatZ8MAL1PF5r3VUZyY5FsbPve9G2zJ1UL1x3NHDU96VFWn2cXvqHnvdjvY2jt3kuGTkgabr2JQXAx"))
+                (RSend) Controller.getInstance().getTransaction(Base58.decode("2kGG3Nmu2VNatZ8MAL1PF5r3VUZyY5FsbPve9G2zJ1UL1x3NHDU96VFWn2cXvqHnvdjvY2jt3kuGTkgabr2JQXAx"))
         );
 
 

@@ -113,7 +113,7 @@ public class TestRec_Send_OutsideClaims {
         //////////////// VALIDATE
         
         /// invalid CLAIM
-        R_Send r_SendV3 = new R_Send(version,
+        RSend r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
                 maker, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
@@ -123,7 +123,7 @@ public class TestRec_Send_OutsideClaims {
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.INVALID_BACKWARD_ACTION);
 
         /// invalid CLAIM
-        r_SendV3 = new R_Send(version,
+        r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
                 recipientPK, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
@@ -133,7 +133,7 @@ public class TestRec_Send_OutsideClaims {
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_BALANCE);
 
         /// invalid CLAIM
-        r_SendV3 = new R_Send(version,
+        r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
                 recipientPK, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
@@ -144,7 +144,7 @@ public class TestRec_Send_OutsideClaims {
 
         /////////// PROCESS
         /// CLAIM
-        r_SendV3 = new R_Send(version,
+        r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
                 maker, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
@@ -169,7 +169,7 @@ public class TestRec_Send_OutsideClaims {
 
         assertEquals(r_SendV3.isSignatureValid(db), true);
 
-        r_SendV3 = new R_Send(version,
+        r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
                 recipientPK, FEE_POWER, recipient2, keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
@@ -194,7 +194,7 @@ public class TestRec_Send_OutsideClaims {
 
         //////// TRY IN CLAIM to not emitter
         long credit_keyA = -keyA;
-        r_SendV3 = new R_Send(version,
+        r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
                 recipientPK, FEE_POWER, recipient2, credit_keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
@@ -204,7 +204,7 @@ public class TestRec_Send_OutsideClaims {
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.INVALID_CLAIM_DEBT_RECIPIENT);
 
         //////// TRY RE CLAIM to not emitter
-        r_SendV3 = new R_Send(version,
+        r_SendV3 = new RSend(version,
                 this.prop1_backward,
                 prop2,
                 recipientPK, FEE_POWER, recipient2, credit_keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
@@ -214,7 +214,7 @@ public class TestRec_Send_OutsideClaims {
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.INVALID_CLAIM_DEBT_RECIPIENT);
 
         //////// TRY IN CLAIM to EMITTER - NO BALANCE
-        r_SendV3 = new R_Send(version,
+        r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
                 recipientPK2, FEE_POWER, maker, credit_keyA, new BigDecimal(2), head, data, isText, encrypted, timestamp, ++timestamp);
@@ -224,7 +224,7 @@ public class TestRec_Send_OutsideClaims {
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_BALANCE);
 
         //////// TRY IN CLAIM to EMITTER - VALID
-        r_SendV3 = new R_Send(version,
+        r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
                 recipientPK, FEE_POWER, maker, credit_keyA, new BigDecimal(2), head, data, isText, encrypted, timestamp, ++timestamp);
@@ -248,7 +248,7 @@ public class TestRec_Send_OutsideClaims {
         assertEquals(BigDecimal.valueOf(2), balanceB.b.b);
 
         //////// TRY backward IN CLAIM to EMITTER - VALID
-        r_SendV3 = new R_Send(version,
+        r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
                 recipientPK, FEE_POWER, maker, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
@@ -275,7 +275,7 @@ public class TestRec_Send_OutsideClaims {
         assertEquals(BigDecimal.valueOf(1), balanceB.b.b);
 
         //////// TRY backward IN CLAIM FROM EMITTER - INVALID !
-        r_SendV3 = new R_Send(version,
+        r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
                 maker, FEE_POWER, recipientPK, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
@@ -285,7 +285,7 @@ public class TestRec_Send_OutsideClaims {
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.INVALID_CLAIM_DEBT_RECIPIENT);
 
         //////// TRY CLOSE OVER amount CLAIM to EMITTER - INVALID
-        r_SendV3 = new R_Send(version,
+        r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
                 recipientPK, FEE_POWER, maker, keyA, new BigDecimal(10), head, data, isText, encrypted, timestamp, ++timestamp);
@@ -295,7 +295,7 @@ public class TestRec_Send_OutsideClaims {
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_INCLAIM_BALANCE);
 
         //////// TRY CLOSE CLAIM to EMITTER - VALID
-        r_SendV3 = new R_Send(version,
+        r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
                 recipientPK, FEE_POWER, maker, keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
@@ -326,7 +326,7 @@ public class TestRec_Send_OutsideClaims {
         */
 
         //////// TRY CLOSE CLAIM to EMITTER - VALID
-        r_SendV3 = new R_Send(version,
+        r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
                 recipientPK2, FEE_POWER, maker, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
@@ -338,7 +338,7 @@ public class TestRec_Send_OutsideClaims {
         r_SendV3.process(gb, Transaction.FOR_NETWORK);
 
         //////// TRY CLOSE CLAIM to EMITTER - VALID
-        r_SendV3 = new R_Send(version,
+        r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
                 recipientPK2, FEE_POWER, maker, keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);

@@ -9,7 +9,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.GenesisTransferAssetTransaction;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
@@ -597,7 +597,7 @@ public class GeneratorTests {
         for (int i = 0; i < 10; i++) {
 
             //CREATE VALID PAYMENT
-            Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.01), timestamp++, generator.getLastTimestamp(snapshot));
+            Transaction payment = new RSend(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.01), timestamp++, generator.getLastTimestamp(snapshot));
             payment.sign(generator, Transaction.FOR_NETWORK);
 
             //PROCESS IN DB
@@ -669,7 +669,7 @@ public class GeneratorTests {
         for (int i = 0; i < max_count; i++) {
 
             //CREATE VALID PAYMENT
-            Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.001),
+            Transaction payment = new RSend(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.001),
                     "sss", new byte[3000], new byte[]{1}, new byte[]{0},
                     timestamp++, generator.getLastTimestamp(snapshot));
 
@@ -746,7 +746,7 @@ public class GeneratorTests {
         long timestamp = timestampStart;
 
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
-        Transaction payment = new R_Send(userAccount1, FEE_POWER, recipient, ERM_KEY, BigDecimal.valueOf(2000),
+        Transaction payment = new RSend(userAccount1, FEE_POWER, recipient, ERM_KEY, BigDecimal.valueOf(2000),
                 timestamp++, userAccount1.getLastTimestamp(dcSet));
         payment.sign(userAccount1, Transaction.FOR_NETWORK);
         assertEquals(payment.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);

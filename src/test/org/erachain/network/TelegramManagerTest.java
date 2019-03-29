@@ -11,7 +11,7 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.message.Message;
@@ -89,7 +89,7 @@ public class TelegramManagerTest {
             //transaction = cntr.r_Send(
             //        sender, FEE_POWER, recipient1, 0l, amount,
             //        title + i, isText, data, encrypted);
-            transaction = new R_Send(sender, FEE_POWER, recipient1, 0l, amount, title + i, message, isText, encrypted, timestamp, 0l);
+            transaction = new RSend(sender, FEE_POWER, recipient1, 0l, amount, title + i, message, isText, encrypted, timestamp, 0l);
             transaction.sign(sender, Transaction.FOR_NETWORK);
 
 
@@ -191,7 +191,7 @@ public class TelegramManagerTest {
 
             String message = user + ":" + randomPrice;
 
-            Transaction transaction = new R_Send(creator, (byte) 0, recipient, 0, amount, phone,
+            Transaction transaction = new RSend(creator, (byte) 0, recipient, 0, amount, phone,
                     message.getBytes(), new byte[1], new byte[1],
                     System.currentTimeMillis(), 0l);
             transaction.sign(creator, Transaction.FOR_NETWORK);
@@ -256,7 +256,7 @@ public class TelegramManagerTest {
 
         String message = "{\"info\":\"sldkf jslkfd jsldfk\"}";
 
-        transaction = new R_Send(sender, (byte) 0, recipient1, 0, amount, "---",
+        transaction = new RSend(sender, (byte) 0, recipient1, 0, amount, "---",
                 message.getBytes(), new byte[1], new byte[1],
                 System.currentTimeMillis(), 0l);
         transaction.sign(sender, Transaction.FOR_NETWORK);
@@ -271,7 +271,7 @@ public class TelegramManagerTest {
         message = "{\"info\":\"sldkf jslkfd jsldfk\",\"__DELETE\":{\"list\":[\""
                 + transaction.viewSignature() + "\"]}}";
 
-        transaction = new R_Send(sender, (byte) 0, recipient1, 0, amount, "---",
+        transaction = new RSend(sender, (byte) 0, recipient1, 0, amount, "---",
                 message.getBytes(), new byte[]{1}, new byte[1],
                 System.currentTimeMillis(), 0l);
         transaction.sign(sender, Transaction.FOR_NETWORK);

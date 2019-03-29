@@ -14,14 +14,14 @@ import org.mapdb.Fun.Tuple5;
 import java.util.Arrays;
 import java.util.HashSet;
 
-public class GenesisCertifyPersonRecord extends Genesis_Record {
+public class GenesisCertifyPersonRecord extends GenesisRecord {
 
     private static final byte TYPE_ID = (byte) Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION;
     private static final String NAME_ID = "GENESIS Certify Person";
     private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
 
 
-    private static final int BASE_LENGTH = Genesis_Record.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH;
+    private static final int BASE_LENGTH = GenesisRecord.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH;
 
     private Account recipient;
     private long key;

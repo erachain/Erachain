@@ -5,7 +5,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.message.Message;
@@ -137,13 +137,13 @@ public class TelegramManager extends Thread {
                             continue;
 
                         if (filter != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                            String head = ((R_Send) transaction).getHead();
+                            String head = ((RSend) transaction).getHead();
                             if (!filter.equals(head))
                                 continue;
                         }
 
                         if (recipient != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                            Account account = ((R_Send) transaction).getRecipient();
+                            Account account = ((RSend) transaction).getRecipient();
                             if (!account.equals(recipient))
                                 continue;
                         }
@@ -173,7 +173,7 @@ public class TelegramManager extends Thread {
                     continue;
 
                 if (filter != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                    String head = ((R_Send) transaction).getHead();
+                    String head = ((RSend) transaction).getHead();
                     if (!filter.equals(head))
                         continue;
                 }
@@ -290,13 +290,13 @@ public class TelegramManager extends Thread {
                     continue;
 
                 if (filter != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                    String head = ((R_Send) transaction).getHead();
+                    String head = ((RSend) transaction).getHead();
                     if (!filter.equals(head))
                         continue;
                 }
 
                 if (recipient != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                    Account account = ((R_Send) transaction).getRecipient();
+                    Account account = ((RSend) transaction).getRecipient();
                     if (!account.equals(recipient))
                         continue;
                 }
@@ -330,7 +330,7 @@ public class TelegramManager extends Thread {
                 continue;
 
             if (filter != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                String head = ((R_Send) transaction).getHead();
+                String head = ((RSend) transaction).getHead();
                 if (!filter.equals(head))
                     continue;
             }
@@ -433,7 +433,7 @@ public class TelegramManager extends Thread {
         boolean hasLoad = true;
 
         if (transactionCommand.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-            R_Send tx = (R_Send) transactionCommand;
+            RSend tx = (RSend) transactionCommand;
             if (tx.isEncrypted() || !tx.isText() || tx.getData() == null)
                 return hasLoad;
 

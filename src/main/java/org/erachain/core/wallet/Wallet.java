@@ -3,7 +3,7 @@ package org.erachain.core.wallet;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
-import org.erachain.at.AT_Transaction;
+import org.erachain.at.ATTransaction;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -1072,7 +1072,7 @@ public class Wallet extends Observable implements Observer {
 		long absKey = key < 0 ? -key : key;
 		String address = account.getAddress();
 
-		if (!asOrphan && transaction instanceof R_Send) {
+		if (!asOrphan && transaction instanceof RSend) {
 			// ADD to FAVORITES
 			if (!this.database.getAssetFavoritesSet().contains(transaction.getAbsKey()))
 				this.database.getAssetFavoritesSet().add(transaction.getAbsKey());
@@ -1121,7 +1121,7 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
-	private void processATTransaction(Tuple2<Tuple2<Integer, Integer>, AT_Transaction> atTx) {
+	private void processATTransaction(Tuple2<Tuple2<Integer, Integer>, ATTransaction> atTx) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1167,7 +1167,7 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
-	private void orphanATTransaction(Tuple2<Tuple2<Integer, Integer>, AT_Transaction> atTx) {
+	private void orphanATTransaction(Tuple2<Tuple2<Integer, Integer>, ATTransaction> atTx) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1279,7 +1279,7 @@ public class Wallet extends Observable implements Observer {
 			this.processTransaction(transaction);
 
 			// SKIP PAYMENT TRANSACTIONS
-			if (transaction instanceof R_Send) {
+			if (transaction instanceof RSend) {
 				continue;
 			}
 
@@ -1289,8 +1289,8 @@ public class Wallet extends Observable implements Observer {
 			}
 
 			// CHECK IF SERTIFY PErSON
-			else if (transaction instanceof R_SertifyPubKeys) {
-				this.processSertifyPerson((R_SertifyPubKeys) transaction);
+			else if (transaction instanceof RSertifyPubKeys) {
+				this.processSertifyPerson((RSertifyPubKeys) transaction);
 			}
 
 			// CHECK IF ORDER CREATION
@@ -1349,7 +1349,7 @@ public class Wallet extends Observable implements Observer {
 			this.orphanTransaction(transaction);
 
 			// CHECK IF PAYMENT
-			if (transaction instanceof R_Send) {
+			if (transaction instanceof RSend) {
 				continue;
 			}
 			// CHECK IF ITEM ISSUE
@@ -1358,8 +1358,8 @@ public class Wallet extends Observable implements Observer {
 			}
 
 			// CHECK IF SERTIFY PErSON
-			else if (transaction instanceof R_SertifyPubKeys) {
-				this.orphanSertifyPerson((R_SertifyPubKeys) transaction);
+			else if (transaction instanceof RSertifyPubKeys) {
+				this.orphanSertifyPerson((RSertifyPubKeys) transaction);
 			}
 
 			// CHECK IF ORDER CREATION
@@ -1441,7 +1441,7 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
-	private void processSertifyPerson(R_SertifyPubKeys sertifyPubKeys) {
+	private void processSertifyPerson(RSertifyPubKeys sertifyPubKeys) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1495,7 +1495,7 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
-    private void addOwnerInFavorites(R_SertifyPubKeys sertifyPubKeys) {
+    private void addOwnerInFavorites(RSertifyPubKeys sertifyPubKeys) {
         List<PublicKeyAccount> sertifiedPublicKeys = sertifyPubKeys.getSertifiedPublicKeys();
 
         for (PublicKeyAccount key : sertifiedPublicKeys) {
@@ -1507,7 +1507,7 @@ public class Wallet extends Observable implements Observer {
         }
     }
 
-    private void orphanSertifyPerson(R_SertifyPubKeys sertifyPubKeys) {
+    private void orphanSertifyPerson(RSertifyPubKeys sertifyPubKeys) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;

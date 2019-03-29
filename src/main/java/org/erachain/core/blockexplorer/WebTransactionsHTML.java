@@ -13,7 +13,6 @@ import org.erachain.core.transaction.*;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.gui.Gui;
-import org.erachain.gui.items.statement.Statements_Vouch_Table_Model;
 import org.erachain.gui.models.PollOptionsTableModel;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
@@ -71,7 +70,7 @@ public class WebTransactionsHTML {
         switch (type) {
             case Transaction.SEND_ASSET_TRANSACTION:
                 output.put("body", r_Send_HTML(transaction, langObj));
-                output.put("message", ((R_Send)transaction).viewData());
+                output.put("message", ((RSend)transaction).viewData());
 
                 break;
             case Transaction.ISSUE_ASSET_TRANSACTION:
@@ -298,7 +297,7 @@ public class WebTransactionsHTML {
     private String hash_Record_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
         String out = "";
-        R_Hashes r_Hashes = (R_Hashes) transaction;
+        RHashes r_Hashes = (RHashes) transaction;
         out += "<b>" + Lang.getInstance().translateFromLangObj("URL", langObj) + ":</b> "
                 + new String(r_Hashes.getURL(), Charset.forName("UTF-8")) + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
@@ -311,7 +310,7 @@ public class WebTransactionsHTML {
     private String set_Status_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
         String out = "";
-        R_SetStatusToItem setStatusToItem = (R_SetStatusToItem) transaction;
+        RSetStatusToItem setStatusToItem = (RSetStatusToItem) transaction;
         ItemCls item = Controller.getInstance().getItem(setStatusToItem.getItemType(), setStatusToItem.getItemKey());
         long status_key = setStatusToItem.getKey();
         StatusCls status = Controller.getInstance().getItemStatus(status_key);
@@ -358,7 +357,7 @@ public class WebTransactionsHTML {
     private String serttify_Pub_Key_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
         String out = "";
-        R_SertifyPubKeys record = (R_SertifyPubKeys) transaction;
+        RSertifyPubKeys record = (RSertifyPubKeys) transaction;
         PersonCls person;
         person = Controller.getInstance().getPerson(record.getKey());
         out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> <a href=?person="
@@ -375,7 +374,7 @@ public class WebTransactionsHTML {
     private String sign_Note_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
         String out = "";
-        R_SignNote r_Statement = (R_SignNote) transaction;
+        RSignNote r_Statement = (RSignNote) transaction;
         if (r_Statement.getKey() > 0) {
             out += "<b>" + Lang.getInstance().translateFromLangObj("Key", langObj) + ":</b> "
                     + Controller.getInstance().getTemplate(r_Statement.getKey()).toString() + "<br>";
@@ -392,7 +391,7 @@ public class WebTransactionsHTML {
     private String vouch_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
         String out = "";
-        R_Vouch vouchRecord = (R_Vouch) transaction;
+        RVouch vouchRecord = (RVouch) transaction;
         Transaction record = DCSet.getInstance().getTransactionFinalMap().get(vouchRecord.getVouchHeight(),
                 vouchRecord.getVouchSeqNo());
 		/*out += "<b>" + Lang.getInstance().translateFromLangObj("height-seqNo", langObj) + ":</b> <a href=?tx="
@@ -526,7 +525,7 @@ public class WebTransactionsHTML {
 
     private String r_Send_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
-        R_Send tr = (R_Send) transaction;
+        RSend tr = (RSend) transaction;
         String out = "";
 
         out += "<b>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ":</b> <a href=?addr="

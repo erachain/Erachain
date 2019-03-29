@@ -1,6 +1,5 @@
 package org.erachain.blocks;
 
-import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.BlockGenerator;
 import org.erachain.core.account.Account;
@@ -12,7 +11,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.GenesisIssueAssetTransaction;
 import org.erachain.core.transaction.GenesisTransferAssetTransaction;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
@@ -76,7 +75,7 @@ public class BlockTests {
     }
 
     private void initTrans(List<Transaction> transactions, long timestamp) {
-        payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100), timestamp, generator.getLastTimestamp(db));
+        payment = new RSend(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100), timestamp, generator.getLastTimestamp(db));
         payment.sign(generator, Transaction.FOR_NETWORK);
         transactions.add(payment);
 
@@ -328,7 +327,7 @@ public class BlockTests {
         assertEquals(true, newBlock.isSignatureValid());
 
         //INVALID TRANSACTION HASH
-        Transaction payment = new R_Send(generator, FEE_POWER, generator, FEE_KEY, BigDecimal.valueOf(1), timestamp, generator.getLastTimestamp(db));
+        Transaction payment = new RSend(generator, FEE_POWER, generator, FEE_KEY, BigDecimal.valueOf(1), timestamp, generator.getLastTimestamp(db));
         payment.sign(generator, Transaction.FOR_NETWORK);
         transactions.add(payment);
 
@@ -357,7 +356,7 @@ public class BlockTests {
         //ADD TRANSACTION
         Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
         long timestamp = newBlock.getTimestamp();
-        payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100), timestamp, generator.getLastTimestamp(db));
+        payment = new RSend(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100), timestamp, generator.getLastTimestamp(db));
         payment.sign(generator, Transaction.FOR_NETWORK);
         assertEquals(Transaction.VALIDATE_OK, payment.isValid(Transaction.FOR_NETWORK, flags));
         transactions = new ArrayList<Transaction>();
@@ -379,7 +378,7 @@ public class BlockTests {
                 1000, 1000l, 1000l);
 
         //ADD TRANSACTION
-        payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(200), NTP.getTime(), generator.getLastTimestamp(db), payment.getSignature());
+        payment = new RSend(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(200), NTP.getTime(), generator.getLastTimestamp(db), payment.getSignature());
         transactions = new ArrayList<Transaction>();
         transactions.add(payment);
 
@@ -458,7 +457,7 @@ public class BlockTests {
                 1000, 1000l, 1000l);
         Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
         long timestamp = newBlock.getTimestamp();
-        Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(-100), timestamp, generator.getLastTimestamp(db));
+        Transaction payment = new RSend(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(-100), timestamp, generator.getLastTimestamp(db));
         payment.sign(generator, Transaction.FOR_NETWORK);
 
         transactions = new ArrayList<Transaction>();
@@ -522,7 +521,7 @@ public class BlockTests {
         //GENERATE PAYMENT 1
         Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
         long timestamp = block.getTimestamp();
-        Transaction payment1 = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100), timestamp, generator.getLastTimestamp(db));
+        Transaction payment1 = new RSend(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100), timestamp, generator.getLastTimestamp(db));
         payment1.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         payment1.sign(generator, Transaction.FOR_NETWORK);
         assertEquals(Transaction.VALIDATE_OK, payment1.isValid(Transaction.FOR_NETWORK, flags));
@@ -534,7 +533,7 @@ public class BlockTests {
 
         //GENERATE PAYMENT 2
         Account recipient2 = new Account("7AfGz1FJ6tUnxxKSAHfcjroFEm8jSyVm7r");
-        Transaction payment2 = new R_Send(generator, FEE_POWER, recipient2, FEE_KEY, BigDecimal.valueOf(100), timestamp, generator.getLastTimestamp(fork));
+        Transaction payment2 = new RSend(generator, FEE_POWER, recipient2, FEE_KEY, BigDecimal.valueOf(100), timestamp, generator.getLastTimestamp(fork));
         payment2.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         payment2.sign(generator, Transaction.FOR_NETWORK);
         assertEquals(Transaction.VALIDATE_OK, payment2.isValid(Transaction.FOR_NETWORK, flags));
@@ -620,7 +619,7 @@ public class BlockTests {
         Account recipient1 = new Account("7JU8UTuREAJG2yht5ASn7o1Ur34P1nvTk5");
         // TIMESTAMP for org.erachain.records make lower
         long timestamp = block.getTimestamp() - 1000;
-        Transaction payment1 = new R_Send(generator, FEE_POWER, recipient1, FEE_KEY, BigDecimal.valueOf(100), timestamp++, generator.getLastTimestamp(fork));
+        Transaction payment1 = new RSend(generator, FEE_POWER, recipient1, FEE_KEY, BigDecimal.valueOf(100), timestamp++, generator.getLastTimestamp(fork));
         payment1.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         payment1.sign(generator, Transaction.FOR_NETWORK);
         assertEquals(Transaction.VALIDATE_OK, payment1.isValid(Transaction.FOR_NETWORK, flags));
@@ -631,7 +630,7 @@ public class BlockTests {
 
         //GENERATE PAYMENT 2
         Account recipient2 = new Account("7G1G45RX4td59daBv6PoN84nAJA49NZ47i");
-        Transaction payment2 = new R_Send(generator, FEE_POWER, recipient2, ERM_KEY,
+        Transaction payment2 = new RSend(generator, FEE_POWER, recipient2, ERM_KEY,
                 BigDecimal.valueOf(10), timestamp++, generator.getLastTimestamp(fork));
         payment2.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         payment2.sign(generator, Transaction.FOR_NETWORK);
