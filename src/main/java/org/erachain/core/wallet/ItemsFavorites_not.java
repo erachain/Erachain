@@ -87,13 +87,9 @@ public class ItemsFavorites_not implements Observer {
         if ((message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK)
                 || ((Controller.getInstance().getStatus() == Controller.STATUS_OK) &&
                 (
-                        message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE
-                                ||
-                                message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE
-                                ||
-                                message.getType() == ObserverMessage.ADD_BALANCE_TYPE
-                                ||
-                                message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE
+                        message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE
+                            // || message.getType() == ObserverMessage.ADD_BALANCE_TYPE
+                            // || message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE
                 ))) {
             this.reload();
         }
