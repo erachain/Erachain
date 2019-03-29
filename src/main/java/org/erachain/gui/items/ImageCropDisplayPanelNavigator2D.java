@@ -150,14 +150,18 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
 
     public BufferedImage getSnapshot() {
-        BufferedImage snapshot = new BufferedImage(image.getWidth(),image.getHeight(),BufferedImage.TYPE_INT_ARGB);
+        Point2D.Double pointSrc = new Point2D.Double(image.getWidth(), image.getHeight());
+        Point2D.Double pointDst = new Point2D.Double();
+        currentTransform.transform(pointSrc, pointDst);
+
+        BufferedImage snapshot = new BufferedImage((int) pointDst.getX(), (int) pointDst.getY(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = (Graphics2D) snapshot.getGraphics();
         g2d.transform(currentTransform);
-        g2d.drawImage(image, 0,0, this);
+        g2d.drawImage(image, 0, 0, this);
         try {
             return snapshot.getSubimage(cropX, cropY, cropWidth, cropHeight);
         } catch (RasterFormatException e) {
-            logger.error("Error size of sub image",e);
+            logger.error("Error size of sub image", e);
             return image;
         }
 
