@@ -1,7 +1,6 @@
 package org.erachain.api;
 
 import org.erachain.SettingTests;
-import org.erachain.api.ApiClient;
 import org.erachain.traders.CallRemoteApi;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -15,8 +14,6 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import static org.erachain.SettingTests.WALLET_PASSWORD;
 
 public class TelegramsResourceTest extends SettingTests {
     /**

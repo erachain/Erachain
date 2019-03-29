@@ -3,8 +3,6 @@ package org.erachain.api;
 import org.erachain.SettingTests;
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.erachain.api.ApiClient;
 //import test.SettingTests;
 
 public class AddressesResourceTest extends SettingTests {

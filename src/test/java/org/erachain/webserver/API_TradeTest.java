@@ -6,7 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 //import test.CallRemoteApi;
 //import test.SettingTests;
-import org.erachain.api.ApiClient;
+
 /**
  * Test Trade API
  */

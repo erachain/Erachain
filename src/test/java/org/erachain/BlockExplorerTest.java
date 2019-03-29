@@ -17,7 +17,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
 

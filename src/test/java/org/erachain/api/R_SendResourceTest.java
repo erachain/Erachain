@@ -1,7 +1,6 @@
 package org.erachain.api;
 
 import org.erachain.SettingTests;
-import org.erachain.api.ApiClient;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.Assert;
@@ -10,8 +9,6 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.erachain.SettingTests.WALLET_PASSWORD;
 
 
 public class R_SendResourceTest extends SettingTests {

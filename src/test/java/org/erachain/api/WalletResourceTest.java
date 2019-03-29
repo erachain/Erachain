@@ -1,7 +1,6 @@
 package org.erachain.api;
 
 import org.erachain.SettingTests;
-import org.erachain.api.ApiClient;
 import org.junit.Assert;
 import org.junit.Test;
 //import test.SettingTests;
