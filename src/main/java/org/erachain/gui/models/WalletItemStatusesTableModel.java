@@ -23,7 +23,7 @@ public class WalletItemStatusesTableModel extends SortedListTableModelCls<Tuple2
 
     public WalletItemStatusesTableModel() {
         super(Controller.getInstance().wallet.database.getStatusMap(),
-                        new String[]{"Key", "Name", "Creator", "Unique", "Confirmed", "Favorite"},
+                new String[]{"Key", "Name", "Creator", "Unique", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false, false}, false);
     }
 

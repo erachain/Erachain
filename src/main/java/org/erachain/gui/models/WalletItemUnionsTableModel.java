@@ -19,27 +19,11 @@ public class WalletItemUnionsTableModel extends SortedListTableModelCls<Tuple2<S
     public static final int COLUMN_CONFIRMED = 3;
     public static final int COLUMN_FAVORITE = 4;
 
-    private SortableList<Tuple2<String, String>, UnionCls> unions;
-
     public WalletItemUnionsTableModel() {
-        super(new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"},
+        super(Controller.getInstance().wallet.database.getUnionMap(),
+                new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false, false}, true);
 
-    }
-
-    @Override
-    public SortableList<Tuple2<String, String>, UnionCls> getSortableList() {
-        return this.unions;
-    }
-
-    public UnionCls getItem(int row) {
-        return this.unions.get(row).getB();
-    }
-
-    @Override
-    public int getRowCount() {
-
-        return (this.unions == null) ? 0 : this.unions.size();
     }
 
     @Override
@@ -76,23 +60,14 @@ public class WalletItemUnionsTableModel extends SortedListTableModelCls<Tuple2<S
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.LIST_UNION_TYPE) {
-            if (this.unions == null) {
-                this.unions = (SortableList<Tuple2<String, String>, UnionCls>) message.getValue();
+            if (this.listSorted == null) {
+                this.listSorted = (SortableList<Tuple2<String, String>, UnionCls>) message.getValue();
                 //this.unions.registerObserver();
                 //this.unions.sort(PollMap.NAME_INDEX);
             }

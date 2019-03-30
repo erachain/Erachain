@@ -21,31 +21,10 @@ public class WalletItemPersonsTableModel extends SortedListTableModelCls<Tuple2<
     public static final int COLUMN_CONFIRMED = 3;
     public static final int COLUMN_FAVORITE = 4;
 
-    private SortableList<Tuple2<String, String>, PersonCls> persons;
-
     public WalletItemPersonsTableModel() {
-        super(Controller.getInstance().wallet.database.getPersonMap(), "WalletItemPersonsTableModel", 1000,
+        super(Controller.getInstance().wallet.database.getPersonMap(),
                 new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false, false}, true);
-    }
-
-    @Override
-    public SortableList<Tuple2<String, String>, PersonCls> getSortableList() {
-        return this.persons;
-    }
-
-    public PersonCls getItem(int row) {
-        Pair<Tuple2<String, String>, PersonCls> personRes = this.persons.get(row);
-        if (personRes == null)
-            return null;
-
-        return personRes.getB();
-    }
-
-    @Override
-    public int getRowCount() {
-
-        return this.persons == null ? 0 : this.persons.size();
     }
 
     @Override

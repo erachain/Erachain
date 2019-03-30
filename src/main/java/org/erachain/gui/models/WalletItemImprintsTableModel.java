@@ -20,7 +20,7 @@ public class WalletItemImprintsTableModel extends SortedListTableModelCls<Tuple2
     public static final int COLUMN_FAVORITE = 4;
 
     public WalletItemImprintsTableModel() {
-        super(Controller.getInstance().wallet.database.getImprintMap(), "WalletItemImprintsTableModel", 1000,
+        super(Controller.getInstance().wallet.database.getImprintMap(),
                 new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false}, false);
 

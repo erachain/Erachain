@@ -21,21 +21,10 @@ public class WalletItemAssetsTableModel extends SortedListTableModelCls<Tuple2<S
     public static final int COLUMN_CONFIRMED = 5;
     public static final int COLUMN_FAVORITE = 6;
 
-    private SortableList<Tuple2<String, String>, AssetCls> assets;
-
     public WalletItemAssetsTableModel() {
-        super(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Confirmed", "Favorite"},
+        super(Controller.getInstance().wallet.database.getAssetMap(),
+                new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false, false, false, false, false}, true);
-
-    }
-
-    public AssetCls getAsset(int row) {
-        return this.assets.get(row).getB();
-    }
-
-    @Override
-    public int getRowCount() {
-        return (this.assets == null) ? 0 : this.assets.size();
     }
 
     @Override

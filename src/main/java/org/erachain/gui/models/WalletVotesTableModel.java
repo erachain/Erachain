@@ -19,25 +19,9 @@ public class WalletVotesTableModel extends SortedListTableModelCls<Tuple2<String
     public static final int COLUMN_TOTAL_VOTES = 2;
     private static final int COLUMN_CONFIRMED = 3;
 
-    private SortableList<Tuple2<String, String>, Poll> polls;
-
     public WalletVotesTableModel() {
-        super(new String[]{"Name", "Creator", "Total Votes", "Confirmed"}, true);
-    }
-
-    @Override
-    public SortableList<Tuple2<String, String>, Poll> getSortableList() {
-        return polls;
-    }
-
-    public Poll getPoll(int row) {
-        return polls.get(row).getB();
-    }
-
-    @Override
-    public int getRowCount() {
-
-        return (this.polls == null) ? 0 : this.polls.size();
+        super(Controller.getInstance().wallet.database.getpollMap(),
+                new String[]{"Name", "Creator", "Total Votes", "Confirmed"}, true);
     }
 
     @Override

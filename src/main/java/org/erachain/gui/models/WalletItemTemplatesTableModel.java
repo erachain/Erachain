@@ -18,25 +18,10 @@ public class WalletItemTemplatesTableModel extends SortedListTableModelCls<Tuple
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_CONFIRMED = 3;
     public static final int COLUMN_FAVORITE = 4;
-
-    private SortableList<Tuple2<String, String>, TemplateCls> templates;
-
+    
     public WalletItemTemplatesTableModel() {
-        super(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"}, false);
-    }
-
-    @Override
-    public SortableList<Tuple2<String, String>, TemplateCls> getSortableList() {
-        return this.templates;
-    }
-
-    public TemplateCls getItem(int row) {
-        return this.templates.get(row).getB();
-    }
-
-    @Override
-    public int getRowCount() {
-        return this.templates.size();
+        super(Controller.getInstance().wallet.database.getTemplateMap(),
+                new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"}, false);
     }
 
     @Override
