@@ -102,16 +102,23 @@ public class WalletVotesTableModel extends SortedListTableModelCls<Tuple2<String
 
 
     public void addObservers() {
-        Controller.getInstance().addWalletObserver(this);
+
+        super.addObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.addObserver(this);
+
     }
 
     public void deleteObservers() {
-        Controller.getInstance().deleteObserver(this);
+        super.deleteObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.deleteObserver(this);
     }
 
-    @Override
-    public Poll getItem(int k) {
-        // TODO Auto-generated method stub
-        return polls.get(k).getB();
-    }
 }

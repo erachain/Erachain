@@ -107,11 +107,23 @@ public class WalletItemUnionsTableModel extends SortedListTableModelCls<Tuple2<S
     }
 
     public void addObservers() {
-        Controller.getInstance().addWalletObserver(this);
+
+        super.addObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.addObserver(this);
+
     }
 
     public void deleteObservers() {
-        Controller.getInstance().deleteObserver(this);
+        super.deleteObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.deleteObserver(this);
     }
 
 }

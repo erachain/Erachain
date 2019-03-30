@@ -87,16 +87,22 @@ public class WalletItemImprintsTableModel extends SortedListTableModelCls<Tuple2
     }
 
     public void addObservers() {
-        if (Controller.getInstance().doesWalletDatabaseExists()) {
-            map.addObserver(this);
-        }
-        Controller.getInstance().guiTimer.addObserver(this);
+
+        super.addObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.addObserver(this);
+
     }
 
     public void deleteObservers() {
-        Controller.getInstance().guiTimer.deleteObserver(this);
-        if (Controller.getInstance().doesWalletDatabaseExists()) {
-            map.deleteObserver(this);
-        }
+        super.deleteObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.deleteObserver(this);
     }
 }

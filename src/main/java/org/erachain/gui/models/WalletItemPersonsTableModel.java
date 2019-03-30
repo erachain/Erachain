@@ -112,18 +112,22 @@ public class WalletItemPersonsTableModel extends SortedListTableModelCls<Tuple2<
     }
 
     public void addObservers() {
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            Controller.getInstance().wallet.database.getPersonMap().addObserver(this);
 
         super.addObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.addObserver(this);
 
     }
 
     public void deleteObservers() {
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            Controller.getInstance().wallet.database.getPersonMap().deleteObserver(this);
-
         super.deleteObservers();
 
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.deleteObserver(this);
     }
 }

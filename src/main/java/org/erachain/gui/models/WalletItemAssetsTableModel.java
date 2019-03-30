@@ -108,13 +108,22 @@ public class WalletItemAssetsTableModel extends SortedListTableModelCls<Tuple2<S
 
     public void addObservers() {
 
-        Controller.getInstance().addWalletObserver(this);
+        super.addObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.addObserver(this);
+
     }
 
-
     public void deleteObservers() {
+        super.deleteObservers();
 
-        Controller.getInstance().deleteObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.deleteObserver(this);
     }
 
 }

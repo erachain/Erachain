@@ -161,24 +161,23 @@ public class WalletOrdersTableModel extends SortedListTableModelCls<Tuple2<Strin
     }
 
     public void addObservers() {
-        if (Controller.getInstance().doesWalletDatabaseExists()) {
-            map.addObserver(this);
-        }
 
-        Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
+        super.addObservers();
 
-        getInterval();
-        fireTableDataChanged();
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.addObserver(this);
 
     }
 
     public void deleteObservers() {
+        super.deleteObservers();
 
-        Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
 
-        if (Controller.getInstance().doesWalletDatabaseExists()) {
-            map.deleteObserver(this);
-        }
+        map.deleteObserver(this);
     }
 
 }
