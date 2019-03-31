@@ -31,7 +31,6 @@ import java.util.List;
  */
 public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Transaction>> {
 
-    static final int KEY_LENGHT = 12;
     public static final int TIMESTAMP_INDEX = 1;
     //public static final int ADDRESS_INDEX = 2;
     //public static final int AMOUNT_INDEX = 3;
@@ -40,8 +39,6 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
 
     public TransactionMap(DWSet dWSet, DB database) {
         super(dWSet, database);
-
-        //this.atomicKey = database.getAtomicLong("TransactionMap_atomicKey");
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_TRANSACTION_TYPE);
@@ -117,21 +114,7 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
                 .counterEnable()
                 .makeOrGet();
 
-        if (true) {
-            makeAutoKey(database, map, "dw_transactions");
-        } else {
-            this.AUTOKEY_INDEX = database.createTreeMap("dw_transactions_AUTOKEY_INDEX")
-                    .comparator(Fun.COMPARATOR)
-                    .makeOrGet();
-
-            //BIND
-            Bind.secondaryKey(map, this.AUTOKEY_INDEX, new Fun.Function2<Long, Tuple2<Long, Long>, Tuple2<Long, Transaction>>() {
-                @Override
-                public Long run(Tuple2<Long, Long> key, Tuple2<Long, Transaction> value) {
-                    return value.a;
-                }
-            });
-        }
+        makeAutoKey(database, map, "dw_transactions");
 
         return map;
     }

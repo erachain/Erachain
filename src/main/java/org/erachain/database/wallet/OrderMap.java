@@ -3,6 +3,7 @@ package org.erachain.database.wallet;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.AutoKeyDBMap;
 import org.erachain.database.DBMap;
 import org.erachain.database.IDB;
 import org.erachain.database.serializer.OrderSerializer;
@@ -34,15 +35,10 @@ Tuple3
 	private BigDecimal fulfilledWant;
 
  */
-public class OrderMap extends DBMap<Tuple2<String, Long>, Order> {
-
-    BTreeMap AUTOKEY_INDEX;
-    private Atomic.Long atomicKey;
+public class OrderMap extends AutoKeyDBMap<Tuple2<String, Long>, Tuple2<Long, Order>> {
 
     public OrderMap(IDB databaseSet, DB database) {
         super(databaseSet, database);
-
-        this.atomicKey = database.getAtomicLong("OrderMap_atomicKey");
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_ORDER_TYPE);
@@ -57,53 +53,33 @@ public class OrderMap extends DBMap<Tuple2<String, Long>, Order> {
     }
 
     @Override
-    protected Map<Tuple2<String, Long>, Order> getMap(DB database) {
+    protected Map<Tuple2<String, Long>, Tuple2<Long, Order>> getMap(DB database) {
         //OPEN MAP
         return this.openMap(database);
     }
 
     @Override
-    protected Map<Tuple2<String, Long>, Order> getMemoryMap() {
+    protected Map<Tuple2<String, Long>, Tuple2<Long, Order>> getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
         return this.openMap(database);
     }
 
-    private Map<Tuple2<String, Long>, Order> openMap(DB database) {
+    private Map<Tuple2<String, Long>, Tuple2<Long, Order>> openMap(DB database) {
         //OPEN MAP
-        BTreeMap<Tuple2<String, Long>, Order> map = database.createTreeMap("orders")
+        BTreeMap<Tuple2<String, Long>, Tuple2<Long, Order>> map = database.createTreeMap("orders")
                 //.keySerializer(BTreeKeySerializer.TUPLE2)
-                .valueSerializer(new OrderSerializer())
+                .valueSerializer(new LongOrderSerializer())
                 .makeOrGet();
 
-        this.AUTOKEY_INDEX = database.createTreeMap("dw_transactions_AUTOKEY_INDEX")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
-
-        //BIND
-        Bind.secondaryKey(map, this.AUTOKEY_INDEX, new Fun.Function2<Long, Tuple2<String, Long>, Order>() {
-            @Override
-            public Long run(Tuple2<String, Long> key, Order value) {
-                return -atomicKey.get();
-            }
-        });
+        makeAutoKey(database, map, "orders");
 
         //RETURN
         return map;
     }
 
-    @Override
-    protected Order getDefaultValue() {
-        return null;
-    }
-
-    public Collection<Tuple2<String, Long>> getFromToKeys(long fromKey, long toKey) {
-        return AUTOKEY_INDEX.subMap(fromKey, toKey).values();
-    }
-
     public void add(Order order) {
-
         this.set(new Tuple2<String, Long>(order.getCreator().getAddress(), order.getId()), order);
     }
 
@@ -124,13 +100,6 @@ public class OrderMap extends DBMap<Tuple2<String, Long>, Order> {
         this.delete(new Tuple2<String, Long>(order.getCreator().getAddress(), order.getId()));
     }
 
-    public Order delete(Tuple2<String, Long> key) {
-        if (this.atomicKey != null) {
-            this.atomicKey.decrementAndGet();
-        }
-        return super.delete(key);
-    }
-
     public void deleteAll(List<Account> accounts) {
         for (Account account : accounts) {
             this.delete(account);
@@ -138,10 +107,7 @@ public class OrderMap extends DBMap<Tuple2<String, Long>, Order> {
     }
 
     public boolean set(Tuple2<String, Long> key, Order order) {
-        if (this.atomicKey != null) {
-            this.atomicKey.incrementAndGet();
-        }
-        return super.set(key, order);
+        return super.set(key, new Tuple2<Long, Order>(null, order));
     }
 
     public void addAll(Map<Account, List<Order>> orders) {
@@ -161,7 +127,7 @@ public class OrderMap extends DBMap<Tuple2<String, Long>, Order> {
         Order order;
         Order orderFromChain;
         for (Tuple2<String, Long> key: map.keySet()) {
-            order = map.get(key);
+            order = map.get(key).b;
             if (dcSet.getOrderMap().contains(key.b))
                 // ACTIVE
                 orderFromChain = dcSet.getOrderMap().get(key.b);
