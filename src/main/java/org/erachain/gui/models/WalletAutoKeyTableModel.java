@@ -24,8 +24,6 @@ import java.util.Observer;
 @SuppressWarnings("serial")
 public abstract class WalletAutoKeyTableModel<T, U> extends SortedListTableModelCls<T, U> {
 
-    protected AutoKeyDBMap map;
-
     private int reset_type;
     private int list_type;
     private int add_type;
@@ -39,9 +37,8 @@ public abstract class WalletAutoKeyTableModel<T, U> extends SortedListTableModel
     public WalletAutoKeyTableModel(AutoKeyDBMap map, String[] columnNames, Boolean[] column_AutoHeight, boolean descending,
                int reset_type, int list_type, int add_type, int remove_type) {
 
-        super(columnNames, column_AutoHeight, descending);
+        super(map, columnNames, column_AutoHeight, descending);
 
-        this.map = map;
         this.reset_type = reset_type;
         this.list_type = list_type;
         this.add_type = add_type;
@@ -125,7 +122,7 @@ public abstract class WalletAutoKeyTableModel<T, U> extends SortedListTableModel
     public void getIntervalThis(long startBack, long endBack) {
 
         // тут могут быть пустые элементы - пропустим их
-        Collection<T> keys = map.getFromToKeys(startBack, endBack);
+        Collection<T> keys = ((AutoKeyDBMap)map).getFromToKeys(startBack, endBack);
         listSorted = new SortableList<T, U>(map, keys);
 
     }

@@ -63,6 +63,9 @@ public class WalletTransactionsTableModel extends WalletAutoKeyTableModel<Tuple2
             return null;
         }
 
+        if (data.getB() == null)
+            return null;
+
         Transaction transaction = data.getB().b;
         if (transaction == null)
             return null;
