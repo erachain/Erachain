@@ -27,11 +27,11 @@ public class WalletItemPollsTableModel extends SortedListTableModelCls<Tuple2<St
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.polls == null || row > this.polls.size() - 1) {
+        if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
 
-        Pair<Tuple2<String, String>, PollCls> data = this.polls.get(row);
+        Pair<Tuple2<String, String>, PollCls> data = this.listSorted.get(row);
 
         if (data == null || data.getB() == null) {
             return -1;
@@ -70,10 +70,10 @@ public class WalletItemPollsTableModel extends SortedListTableModelCls<Tuple2<St
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.LIST_POLL_TYPE) {
-            if (this.polls == null) {
-                this.polls = (SortableList<Tuple2<String, String>, PollCls>) message.getValue();
+            if (this.listSorted == null) {
+                this.listSorted = (SortableList<Tuple2<String, String>, PollCls>) message.getValue();
                 //this.polls.registerObserver();
-                this.polls.sort(PollMap.NAME_INDEX);
+                this.listSorted.sort(PollMap.NAME_INDEX);
             }
 
             this.fireTableDataChanged();

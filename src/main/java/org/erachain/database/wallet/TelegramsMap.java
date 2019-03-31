@@ -29,7 +29,7 @@ public class TelegramsMap extends DBMap<String, Transaction> {
       //OPEN MAP
         return database.createTreeMap("telegrams1")
                 .keySerializer(BTreeKeySerializer.STRING)
-                .valueSerializer(new  TransactionSerializer())
+                .valueSerializer(new TransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
     }

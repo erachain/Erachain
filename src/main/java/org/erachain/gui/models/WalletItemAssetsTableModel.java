@@ -29,12 +29,12 @@ public class WalletItemAssetsTableModel extends SortedListTableModelCls<Tuple2<S
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.assets == null || row > this.assets.size() - 1) {
+        if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
 
         try {
-            AssetCls asset = this.assets.get(row).getB();
+            AssetCls asset = this.listSorted.get(row).getB();
 
             switch (column) {
                 case COLUMN_KEY:
@@ -79,8 +79,8 @@ public class WalletItemAssetsTableModel extends SortedListTableModelCls<Tuple2<S
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.LIST_ASSET_TYPE || message.getType() == ObserverMessage.WALLET_LIST_ASSET_TYPE) {
-            if (this.assets == null) {
-                this.assets = (SortableList<Tuple2<String, String>, AssetCls>) message.getValue();
+            if (this.listSorted == null) {
+                this.listSorted = (SortableList<Tuple2<String, String>, AssetCls>) message.getValue();
                 //this.assets.registerObserver();
                 //this.assets.sort(PollMap.NAME_INDEX);
             }

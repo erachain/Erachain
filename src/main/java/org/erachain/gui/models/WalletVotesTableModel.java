@@ -20,17 +20,17 @@ public class WalletVotesTableModel extends SortedListTableModelCls<Tuple2<String
     private static final int COLUMN_CONFIRMED = 3;
 
     public WalletVotesTableModel() {
-        super(Controller.getInstance().wallet.database.getpollMap(),
+        super(Controller.getInstance().wallet.database.getPollMap(),
                 new String[]{"Name", "Creator", "Total Votes", "Confirmed"}, true);
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.polls == null || row > this.polls.size() - 1) {
+        if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
 
-        Pair<Tuple2<String, String>, Poll> data = this.polls.get(row);
+        Pair<Tuple2<String, String>, Poll> data = this.listSorted.get(row);
 
         if (data == null || data.getB() == null) {
             return -1;
@@ -69,10 +69,10 @@ public class WalletVotesTableModel extends SortedListTableModelCls<Tuple2<String
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_POLL_TYPE) {
-            if (this.polls == null) {
-                this.polls = (SortableList<Tuple2<String, String>, Poll>) message.getValue();
+            if (this.listSorted == null) {
+                this.listSorted = (SortableList<Tuple2<String, String>, Poll>) message.getValue();
                 //this.polls.registerObserver();
-                this.polls.sort(PollMap.NAME_INDEX);
+                this.listSorted.sort(PollMap.NAME_INDEX);
             }
 
             this.fireTableDataChanged();

@@ -18,7 +18,7 @@ public class WalletItemTemplatesTableModel extends SortedListTableModelCls<Tuple
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_CONFIRMED = 3;
     public static final int COLUMN_FAVORITE = 4;
-    
+
     public WalletItemTemplatesTableModel() {
         super(Controller.getInstance().wallet.database.getTemplateMap(),
                 new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"}, false);
@@ -26,11 +26,11 @@ public class WalletItemTemplatesTableModel extends SortedListTableModelCls<Tuple
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.templates == null || row > this.templates.size() - 1) {
+        if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
 
-        TemplateCls template = this.templates.get(row).getB();
+        TemplateCls template = this.listSorted.get(row).getB();
 
         switch (column) {
             case COLUMN_KEY:
@@ -64,8 +64,8 @@ public class WalletItemTemplatesTableModel extends SortedListTableModelCls<Tuple
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.LIST_TEMPLATE_TYPE) {
-            if (this.templates == null) {
-                this.templates = (SortableList<Tuple2<String, String>, TemplateCls>) message.getValue();
+            if (this.listSorted == null) {
+                this.listSorted = (SortableList<Tuple2<String, String>, TemplateCls>) message.getValue();
                 //this.templates.registerObserver();
                 //this.templates.sort(PollMap.NAME_INDEX);
             }

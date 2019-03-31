@@ -225,7 +225,7 @@ public class DWSet extends DBASet {
         return this.unionMap;
     }
 
-    public WItemPollMap getpollMap() {
+    public WItemPollMap getPollMap() {
         return this.pollMap;
     }
 

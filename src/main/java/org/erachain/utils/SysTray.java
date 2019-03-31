@@ -195,8 +195,8 @@ public class SysTray implements Observer {
                 Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
                 indexes.put(WalletTransactionsTableModel.COLUMN_CONFIRMATIONS, TransactionMap.TIMESTAMP_INDEX);
                 indexes.put(WalletTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
-                indexes.put(WalletTransactionsTableModel.COLUMN_CREATOR, TransactionMap.ADDRESS_INDEX);
-                indexes.put(WalletTransactionsTableModel.COLUMN_AMOUNT, TransactionMap.AMOUNT_INDEX);
+                //indexes.put(WalletTransactionsTableModel.COLUMN_CREATOR, TransactionMap.ADDRESS_INDEX);
+                //indexes.put(WalletTransactionsTableModel.COLUMN_AMOUNT, TransactionMap.AMOUNT_INDEX);
                 CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
                 transactionsTable.setRowSorter(sorter);
 
@@ -209,7 +209,7 @@ public class SysTray implements Observer {
                             row = transactionsTable.convertRowIndexToModel(row);
 
                             //GET TRANSACTION
-                            Transaction transaction = transactionsModel.getItem(row);
+                            Transaction transaction = transactionsModel.getItem(row).b;
 
                             //SHOW DETAIL SCREEN OF TRANSACTION
                             TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);

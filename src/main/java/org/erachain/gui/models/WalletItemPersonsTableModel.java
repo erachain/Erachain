@@ -29,11 +29,11 @@ public class WalletItemPersonsTableModel extends SortedListTableModelCls<Tuple2<
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.persons == null || row > this.persons.size() - 1) {
+        if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
 
-        Pair<Tuple2<String, String>, PersonCls> personRes = this.persons.get(row);
+        Pair<Tuple2<String, String>, PersonCls> personRes = this.listSorted.get(row);
         if (personRes == null)
             return null;
 
@@ -71,11 +71,11 @@ public class WalletItemPersonsTableModel extends SortedListTableModelCls<Tuple2<
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.LIST_PERSON_TYPE || message.getType() == ObserverMessage.WALLET_LIST_PERSON_TYPE) {
-            if (this.persons == null) {
-                this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
+            if (this.listSorted == null) {
+                this.listSorted = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
                 //this.persons.registerObserver();
                 // sort from comparator
-                Collections.sort(this.persons, (a, b) -> a.getB().getName().compareToIgnoreCase(b.getB().getName()));
+                Collections.sort(this.listSorted, (a, b) -> a.getB().getName().compareToIgnoreCase(b.getB().getName()));
             }
 
             this.fireTableDataChanged();

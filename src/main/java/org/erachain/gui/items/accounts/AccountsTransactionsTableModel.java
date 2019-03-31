@@ -16,10 +16,14 @@ import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.SortedListTableModelCls;
+import org.erachain.gui.models.WalletAutoKeyTableModel;
+import org.erachain.gui.models.WalletItemAssetsTableModel;
+import org.erachain.gui.models.WalletTransactionsTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -28,7 +32,7 @@ import java.util.*;
 ////////
 
 @SuppressWarnings("serial")
-public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> {
+public class AccountsTransactionsTableModel extends WalletAutoKeyTableModel<Tuple2<Long, Long>, Tuple2<Long, Transaction>> {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TRANSACTION = 1;
     public static final int COLUMN_AMOUNT = 2;
@@ -40,10 +44,11 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
     public static final int COLUMN_MESSAGE = 8;
     public static final int COLUMN_CONFIRM = 9;
     public static final int COLUMN_ACTION_TYPE = 19;
+    public static final int COLUMN_NUMBER = 20;
 
  //   private List<Transaction> r_Trans;
-    private HashMap<String, Trans> trans_Hash_Map;
-    private Object[] trans_List;
+    //private HashMap<String, Trans> trans_Hash_Map;
+    //private Object[] trans_List;
     private boolean isEncrypted = true;
 
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Date", "RecNo", "Amount",
@@ -51,6 +56,7 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
 
     private SortableList<Tuple2<String, String>, Transaction> sortableItems;
+
     private Account sender;
 
     private AssetCls asset;
@@ -64,15 +70,12 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
     public AccountsTransactionsTableModel() {
         super(Controller.getInstance().wallet.database.getTransactionMap(),
                 new String[]{"Date", "RecNo", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "Type Asset"},
-                new Boolean[]{false, true, true, false, false}, false);
+                new Boolean[]{false, true, true, false, false}, false,
+                ObserverMessage.WALLET_RESET_TRANSACTION_TYPE, ObserverMessage.WALLET_LIST_TRANSACTION_TYPE,
+                ObserverMessage.WALLET_ADD_TRANSACTION_TYPE, ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE);
 
-       addObservers();
+        logger = LoggerFactory.getLogger(AccountsTransactionsTableModel.class.getName());
 
-    }
-
-    public void repaint() {
-
-        this.fireTableDataChanged();
     }
 
     public void set_Account(Account sender) {
@@ -94,69 +97,58 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
 
     }
 
-    public Transaction getItem(int row) {
-        return ((Trans) this.trans_List[row]).transaction;
-    }
-
-
-    @Override
-    public int getRowCount() {
-        // return this.r_Trans.size();
-        if (trans_List == null || trans_List.length == 0)
-            return 0;
-        return trans_List.length;
-    }
-
     @Override
     public Object getValueAt(int row, int column) {
 
-        if (this.trans_List == null || this.trans_List.length == 0 || sender == null) {
+        if (this.listSorted == null || this.listSorted.size() == 0 || sender == null) {
             return null;
         }
 
         // fill table
 
-        Trans r_Tran = (Trans) trans_List[row];
+        Pair<Tuple2<Long, Long>, Tuple2<Long, Transaction>> item = listSorted.get(row);
+        Transaction transaction = item.getB().b;
 
         String str;
         switch (column) {
             case COLUMN_TIMESTAMP:
-                if (r_Tran.transaction.getTimestamp() == 0)
+                if (transaction.getTimestamp() == 0)
                     return "---";
-                return r_Tran.transaction.viewTimestamp();
+                return transaction.viewTimestamp();
            
             case COLUMN_TRANSACTION:
 
-                if (r_Tran.transaction.isConfirmed(DCSet.getInstance()))
-                    return r_Tran.transaction.viewHeightSeq();
+                if (transaction.isConfirmed(DCSet.getInstance()))
+                    return transaction.viewHeightSeq();
                 return "-";
             case COLUMN_AMOUNT:
                 //	if (r_Tran.transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION)
-                return r_Tran.amount;
+                return transaction.getAmount();
             case COLUMN_ASSET:
-                return Controller.getInstance().getAsset(r_Tran.transaction.getAbsKey()).toString();
+                return Controller.getInstance().getAsset(transaction.getAbsKey()).toString();
 
             case COLUMN_TYPE:
-                return r_Tran.transaction.viewFullTypeName();
+                return transaction.viewFullTypeName();
             case COLUMN_RECIPIENT:
-                return r_Tran.transaction.viewRecipient();
+                return transaction.viewRecipient();
             case COLUMN_SENDER:
-                if (r_Tran.owner == null)
-                    return "GENESIS";
-                return r_Tran.transaction.viewCreator();
+                return transaction.viewCreator();
 
             case COLUMN_CONFIRM:
-                return r_Tran.transaction.isConfirmed(DCSet.getInstance());
+                return transaction.isConfirmed(DCSet.getInstance());
 
             case COLUMN_TITLE:
-                return r_Tran.title;
+                if (transaction instanceof R_Send)
+                    return ((R_Send) transaction).getHead();
+                return "";
 
             case COLUMN_MESSAGE:
 
-                if (r_Tran.transaction.getType() != Transaction.SEND_ASSET_TRANSACTION)
+                if (!(transaction instanceof R_Send)) {
                     return "";
+                }
 
-                R_Send rs = ((R_Send) r_Tran.transaction);
+                R_Send rs = ((R_Send) transaction);
                 if (rs == rs)
                     return rs.getHead();
                 if (!rs.isEncrypted())
@@ -168,7 +160,7 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
 
                 // IF SENDER ANOTHER
                 // if(account == null)
-                if (!r_Tran.transaction.getCreator().getAddress().equals(this.sender.getAddress()))
+                if (!transaction.getCreator().getAddress().equals(this.sender.getAddress()))
 
                 {
                     PrivateKeyAccount accountRecipient = Controller.getInstance()
@@ -197,48 +189,20 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
                 }
             case COLUMN_ACTION_TYPE:
 
-                return r_Tran.transaction.viewFullTypeName();
+                return transaction.viewFullTypeName();
+
+            case COLUMN_NUMBER:
+                return item.getB().a;
 
         }
 
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
+    public void getIntervalThis(long startBack, long endBack) {
 
-        // CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-            if (this.trans_List == null) {
-
-                get_R_Send();
-               
-            }
-
-        } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
-            if (trans_Parse((Transaction) message.getValue())) {
-                needUpdate = true;
-            }
-
-        } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-            Object transaction = message.getValue();
-            if (transaction != null && trans_Hash_Map != null && trans_Hash_Map.remove((Transaction) transaction) != null) {
-                needUpdate = true;
-            }
-
-        } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
-
-            needUpdate = false;
-            this.fireTableDataChanged();
-
-        }
-
-    }
-
-    public void set_ActionTypes(HashSet str) {
-        actionTypes = str;
-
+        //super.getIntervalThis(startBack, endBack);
+        get_R_Send();
     }
 
     public void get_R_Send() {
@@ -246,20 +210,21 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
         if (this.sender == null || this.asset == null)
             return;
 
-        Iterator<Tuple2<String, String>> keysIterator = ((TransactionMap) map).getAddressIterator(this.sender);
+        TransactionMap mapThis = (TransactionMap) map;
+        Iterator<Tuple2<Long, Long>> keysIterator = mapThis.getAddressIterator(this.sender);
 
-        trans_Hash_Map = new HashMap<String, Trans>();
-        trans_List = null;
+        //trans_Hash_Map = new HashMap<String, Trans>();
+        //trans_List = null;
         int counter = 0;
         while (keysIterator.hasNext() && counter < 333) {
-            Tuple2<String, String> key = keysIterator.next();
-            Transaction transaction = (Transaction) map.get(key);
+            Tuple2<Long, Long> key = keysIterator.next();
+            Transaction transaction = mapThis.get(key).b;
             if (trans_Parse(transaction)) {
                 counter++;
             }
         }
 
-        trans_List = trans_Hash_Map.values().toArray();
+        //trans_List = trans_Hash_Map.values().toArray();
 
         this.fireTableDataChanged();
     }
@@ -290,7 +255,7 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
                     trr.amount = r_send.getAmount().multiply(new BigDecimal("-1"));
 
 
-                trans_Hash_Map.put(transaction.viewSignature(), trr);
+                //trans_Hash_Map.put(transaction.viewSignature(), trr);
             } else
             // view set types
             if (actionTypes.contains(r_send.viewFullTypeName())) {
@@ -299,7 +264,7 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
                     trr.amount = r_send.getAmount().multiply(new BigDecimal("-1"));
 
 
-                trans_Hash_Map.put(transaction.viewSignature(), trr);
+                //trans_Hash_Map.put(transaction.viewSignature(), trr);
             }
 
         } else if (transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
@@ -323,7 +288,7 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             // if is owner
             if (gen_send.getOwner() != null) trr.owner = gen_send.getOwner();
             trr.recipient = gen_send.getRecipient();
-            trans_Hash_Map.put(transaction.viewSignature(), trr);
+            //trans_Hash_Map.put(transaction.viewSignature(), trr);
 
         } else if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
             R_Calculated calculated = (R_Calculated) transaction;
@@ -332,7 +297,7 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             trr.amount = calculated.getAmount();
             trr.recipient = calculated.getRecipient();
             trr.title = calculated.getMessage();
-            trans_Hash_Map.put(calculated.viewSignature(), trr);
+            //trans_Hash_Map.put(calculated.viewSignature(), trr);
 
         }
 
@@ -340,24 +305,6 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
 
     }
 
-    public void addObservers() {
-        if (Controller.getInstance().doesWalletDatabaseExists()) {
-            map.addObserver(this);
-        }
-
-        super.addObservers();
-
-    }
-
-    public void deleteObservers() {
-
-        super.deleteObservers();
-
-        if (Controller.getInstance().doesWalletDatabaseExists()) {
-            map.deleteObserver(this);
-        }
-
-    }
 
     class Trans {
         public BigDecimal amount;

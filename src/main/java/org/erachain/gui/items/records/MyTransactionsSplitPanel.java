@@ -32,7 +32,7 @@ public class MyTransactionsSplitPanel extends Split_Panel {
 
     private static MyTransactionsSplitPanel instance;
     public Voush_Library_Panel voush_Library_Panel;
-    protected Tuple2<String, String> selectedTransactionKey;
+    protected Tuple2<Long, Long> selectedTransactionKey;
     protected Transaction selectedTransaction;
     private JPanel records_Info_Panel;
     private JPopupMenu menu;
@@ -111,7 +111,7 @@ public class MyTransactionsSplitPanel extends Split_Panel {
                 int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
                 row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
                 if (row < 0) return;
-                selectedTransaction = records_model.getItem(row);
+                selectedTransaction = records_model.getItem(row).b;
                 selectedTransactionKey = records_model.getPairItem(row).getA();
             }
 
@@ -128,7 +128,7 @@ public class MyTransactionsSplitPanel extends Split_Panel {
                 int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
                 row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
                 if (row < 0) return;
-                selectedTransaction = records_model.getItem(row);
+                selectedTransaction = records_model.getItem(row).b;
                 selectedTransactionKey = records_model.getPairItem(row).getA();
 
             }
@@ -161,8 +161,8 @@ public class MyTransactionsSplitPanel extends Split_Panel {
                     return;
 
                 // code delete
-                Controller.getInstance().getWallet().database.getTransactionMap()
-                        .delete(selectedTransactionKey);
+                //Controller.getInstance().getWallet().database.getTransactionMap()
+                //        .delete(selectedTransactionKey);
 
             }
         });
@@ -269,8 +269,8 @@ public class MyTransactionsSplitPanel extends Split_Panel {
         public void valueChanged(ListSelectionEvent arg0) {
             Transaction trans = null;
             if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 && jTable_jScrollPanel_LeftPanel.getSelectedRow() < records_model.getRowCount()) {
-                trans = (Transaction) records_model.getItem(jTable_jScrollPanel_LeftPanel
-                        .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+                trans = records_model.getItem(jTable_jScrollPanel_LeftPanel
+                        .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow())).b;
 
                 records_Info_Panel = new JPanel();
                 records_Info_Panel.setLayout(new GridBagLayout());

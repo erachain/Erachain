@@ -80,7 +80,7 @@ public class VotingPanel extends JPanel {
 
                 if (e.getClickCount() == 2) {
                     row = table.convertRowIndexToModel(row);
-                    Poll poll = pollsModel.getPoll(row);
+                    Poll poll = pollsModel.getItem(row);
                     new PollFrame(poll, Controller.getInstance().getAsset(AssetCls.FEE_KEY));
                 }
             }

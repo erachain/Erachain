@@ -28,11 +28,11 @@ public class WalletItemUnionsTableModel extends SortedListTableModelCls<Tuple2<S
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.unions == null || row > this.unions.size() - 1) {
+        if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
 
-        UnionCls union = this.unions.get(row).getB();
+        UnionCls union = this.listSorted.get(row).getB();
 
         switch (column) {
             case COLUMN_KEY:

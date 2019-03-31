@@ -1,15 +1,12 @@
 package org.erachain.database.wallet;
 //09/03
 
-import com.google.common.collect.Iterables;
-import org.erachain.controller.Controller;
+import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
-import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.AutoKeyDBMap;
 import org.erachain.database.DBMap;
-import org.erachain.database.SortableList;
-import org.erachain.database.serializer.TransactionSerializer;
-import org.erachain.datachain.DCSet;
+import org.erachain.database.serializer.LongAndTransactionSerializer;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.erachain.utils.ReverseComparator;
@@ -18,11 +15,8 @@ import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.ConcurrentNavigableMap;
 
 /**
  * Транзакции относящиеся к моим счетам. Сюда же записываться должны и неподтвержденные<br>
@@ -32,18 +26,15 @@ import java.util.concurrent.ConcurrentNavigableMap;
  * Вообще тут реализация как СТЕК - удалить можно только если это верхний элемент.
  * Добавление вверх или обновляем существующий по AUTOKEY_INDEX
  * <hr>
- * Ключ: счет + подпись<br>
+ * Ключ: первых байт счета + время создания<br>
  * Значение: транзакция
  */
-public class TransactionMap extends DBMap<Tuple2<String, String>, Tuple2<Long, Transaction>> {
-
-    BTreeMap AUTOKEY_INDEX;
-    //private Atomic.Long atomicKey;
+public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Transaction>> {
 
     static final int KEY_LENGHT = 12;
     public static final int TIMESTAMP_INDEX = 1;
-    public static final int ADDRESS_INDEX = 2;
-    public static final int AMOUNT_INDEX = 3;
+    //public static final int ADDRESS_INDEX = 2;
+    //public static final int AMOUNT_INDEX = 3;
 
     static Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class.getName());
 
@@ -63,103 +54,106 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Tuple2<Long, T
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes(DB database) {
         //TIMESTAMP INDEX
-        NavigableSet<Tuple2<Long, Tuple2<String, String>>> timestampIndex = database.createTreeSet("transactions_index_timestamp")
+        NavigableSet<Tuple2<Long, Tuple2<Long, Long>>> timestampIndex = database.createTreeSet("transactions_index_timestamp")
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
-        NavigableSet<Tuple2<Long, Tuple2<String, String>>> descendingTimestampIndex = database.createTreeSet("transactions_index_timestamp_descending")
+        NavigableSet<Tuple2<Long, Tuple2<Long, Long>>> descendingTimestampIndex = database.createTreeSet("transactions_index_timestamp_descending")
                 .comparator(new ReverseComparator(Fun.COMPARATOR))
                 .makeOrGet();
 
-        createIndex(TIMESTAMP_INDEX, timestampIndex, descendingTimestampIndex, new Fun.Function2<Long, Tuple2<String, String>, Tuple2<Long, Transaction>>() {
+        createIndex(TIMESTAMP_INDEX, timestampIndex, descendingTimestampIndex, new Fun.Function2<Long, Tuple2<Long, Long>, Tuple2<Long, Transaction>>() {
             @Override
-            public Long run(Tuple2<String, String> key, Tuple2<Long, Transaction> value) {
+            public Long run(Tuple2<Long, Long> key, Tuple2<Long, Transaction> value) {
                 return value.b.getTimestamp();
             }
         });
 
+        /* - это как основной индекс можно брать
         //ADDRESS INDEX
-        NavigableSet<Tuple2<String, Tuple2<String, String>>> addressIndex = database.createTreeSet("transactions_index_address")
+        NavigableSet<Tuple2<String, Tuple2<Long, Long>>> addressIndex = database.createTreeSet("transactions_index_address")
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
-        NavigableSet<Tuple2<String, Tuple2<String, String>>> descendingAddressIndex = database.createTreeSet("transactions_index_address_descending")
+        NavigableSet<Tuple2<String, Tuple2<Long, Long>>> descendingAddressIndex = database.createTreeSet("transactions_index_address_descending")
                 .comparator(new ReverseComparator(Fun.COMPARATOR))
                 .makeOrGet();
 
-        createIndex(ADDRESS_INDEX, addressIndex, descendingAddressIndex, new Fun.Function2<String, Tuple2<String, String>, Tuple2<Long, Transaction>>() {
+        createIndex(ADDRESS_INDEX, addressIndex, descendingAddressIndex, new Fun.Function2<String, Tuple2<Long, Long>, Tuple2<Long, Transaction>>() {
             @Override
-            public String run(Tuple2<String, String> key, Tuple2<Long, Transaction> value) {
+            public String run(Tuple2<Long, Long> key, Tuple2<Long, Transaction> value) {
                 return key.b;
             }
         });
+        */
 
+        /* это вообще не информативнй индекс не нужен
         //AMOUNT INDEX
-        NavigableSet<Tuple2<BigDecimal, Tuple2<String, String>>> amountIndex = database.createTreeSet("transactions_index_amount")
+        NavigableSet<Tuple2<BigDecimal, Tuple2<Long, Long>>> amountIndex = database.createTreeSet("transactions_index_amount")
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
-        NavigableSet<Tuple2<BigDecimal, Tuple2<String, String>>> descendingAmountIndex = database.createTreeSet("transactions_index_amount_descending")
+        NavigableSet<Tuple2<BigDecimal, Tuple2<Long, Long>>> descendingAmountIndex = database.createTreeSet("transactions_index_amount_descending")
                 .comparator(new ReverseComparator(Fun.COMPARATOR))
                 .makeOrGet();
 
-        createIndex(AMOUNT_INDEX, amountIndex, descendingAmountIndex, new Fun.Function2<BigDecimal, Tuple2<String, String>, Tuple2<Long, Transaction>>() {
+        createIndex(AMOUNT_INDEX, amountIndex, descendingAmountIndex, new Fun.Function2<BigDecimal, Tuple2<Long, Long>, Tuple2<Long, Transaction>>() {
             @Override
-            public BigDecimal run(Tuple2<String, String> key, Tuple2<Long, Transaction> value) {
+            public BigDecimal run(Tuple2<Long, Long> key, Tuple2<Long, Transaction> value) {
                 Account account = new Account(key.a);
                 return value.b.getAmount(account);
             }
         });
+        */
 
     }
 
     @Override
-    protected Map<Tuple2<String, String>, Tuple2<Long, Transaction>> getMap(DB database) {
+    protected Map<Tuple2<Long, Long>, Tuple2<Long, Transaction>> getMap(DB database) {
         //OPEN MAP
         BTreeMap map = database.createTreeMap("transactions")
                 .keySerializer(BTreeKeySerializer.TUPLE2)
-                .valueSerializer(new TransactionSerializer())
+                .valueSerializer(new LongAndTransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
 
-        this.AUTOKEY_INDEX = database.createTreeMap("dw_transactions_AUTOKEY_INDEX")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
+        if (true) {
+            makeAutoKey(database, map, "dw_transactions");
+        } else {
+            this.AUTOKEY_INDEX = database.createTreeMap("dw_transactions_AUTOKEY_INDEX")
+                    .comparator(Fun.COMPARATOR)
+                    .makeOrGet();
 
-        //BIND
-        Bind.secondaryKey(map, this.AUTOKEY_INDEX, new Fun.Function2<Long, Tuple2<String, String>, Tuple2<Long, Transaction>>() {
-            @Override
-            public Long run(Tuple2<String, String> key, Tuple2<Long, Transaction> value) {
-                return value.a;
-           }
-        });
+            //BIND
+            Bind.secondaryKey(map, this.AUTOKEY_INDEX, new Fun.Function2<Long, Tuple2<Long, Long>, Tuple2<Long, Transaction>>() {
+                @Override
+                public Long run(Tuple2<Long, Long> key, Tuple2<Long, Transaction> value) {
+                    return value.a;
+                }
+            });
+        }
 
         return map;
     }
 
     @Override
-    protected Map<Tuple2<String, String>, Tuple2<Long, Transaction>> getMemoryMap() {
-        return new TreeMap<Tuple2<String, String>, Tuple2<Long, Transaction>>(Fun.TUPLE2_COMPARATOR);
-    }
-
-    @Override
-    protected Tuple2<Long, Transaction> getDefaultValue() {
-        return null;
+    protected Map<Tuple2<Long, Long>, Tuple2<Long, Transaction>> getMemoryMap() {
+        return new TreeMap<Tuple2<Long, Long>, Tuple2<Long, Transaction>>(Fun.TUPLE2_COMPARATOR);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Tuple2<Long, Transaction>> get(Account account, int limit) {
-        List<Tuple2<Long, Transaction>> transactions = new ArrayList<Tuple2<Long, Transaction>>();
+    public List<Transaction> get(Account account, int limit) {
+        List<Transaction> transactions = new ArrayList<Transaction>();
 
         try {
             //GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-			/*Map<Tuple2<String, String>, Tuple2<Long, Transaction>> accountTransactions = ((BTreeMap) this.map).subMap(
-					Fun.t2(null, account.getAddress()),
-					Fun.t2(Fun.HI(), account.getAddress()));*/
+			/*Map<Tuple2<Long, Long>, Tuple2<Long, Transaction>> accountTransactions = ((BTreeMap) this.map).subMap(
+					Fun.t2(null, Longs.fromByteArray(account.getShortAddressBytes())),
+					Fun.t2(Fun.HI(), Longs.fromByteArray(account.getShortAddressBytes())));*/
 
-            Map<Tuple2<String, String>, Tuple2<Long, Transaction>> accountTransactions = ((BTreeMap) this.map).subMap(
-                    Fun.t2(account.getAddress(), null),
-                    Fun.t2(account.getAddress(), Fun.HI()));
+            Map<Tuple2<Long, Long>, Tuple2<Long, Transaction>> accountTransactions = ((BTreeMap) this.map).subMap(
+                    Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
+                    Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()));
 
             //GET ITERATOR
             Iterator<Tuple2<Long, Transaction>> iterator = accountTransactions.values().iterator();
@@ -167,7 +161,7 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Tuple2<Long, T
             //RETURN {LIMIT} TRANSACTIONS
             int counter = 0;
             while (iterator.hasNext() && counter < limit) {
-                transactions.add(iterator.next());
+                transactions.add(iterator.next().b);
                 counter++;
             }
         } catch (Exception e) {
@@ -179,25 +173,25 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Tuple2<Long, T
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterator<Tuple2<String, String>> getAddressIterator(Account account) {
+    public Iterator<Tuple2<Long, Long>> getAddressIterator(Account account) {
 
-        Set<Tuple2<String, String>> accountKeys = ((BTreeMap) this.map).subMap(
-                Fun.t2(account.getAddress(), null),
-                Fun.t2(account.getAddress(), Fun.HI())).keySet();
+        Set<Tuple2<Long, Long>> accountKeys = ((BTreeMap) this.map).subMap(
+                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
+                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI())).keySet();
 
         return accountKeys.iterator();
     }
 
-    public List<Pair<Account, Tuple2<Long, Transaction>>> get(List<Account> accounts, int limit) {
-        List<Pair<Account, Tuple2<Long, Transaction>>> transactions = new ArrayList<Pair<Account, Tuple2<Long, Transaction>>>();
+    public List<Pair<Account, Transaction>> get(List<Account> accounts, int limit) {
+        List<Pair<Account, Transaction>> transactions = new ArrayList<Pair<Account, Transaction>>();
 
         try {
             //FOR EACH ACCOUNTS
             synchronized (accounts) {
                 for (Account account : accounts) {
-                    List<Tuple2<Long, Transaction>> accountTransactions = get(account, limit);
-                    for (Tuple2<Long, Transaction> transaction: accountTransactions) {
-                        transactions.add(new Pair<Account, Tuple2<Long, Transaction>>(account, transaction));
+                    List<Transaction> accountTransactions = get(account, limit);
+                    for (Transaction transaction: accountTransactions) {
+                        transactions.add(new Pair<Account, Transaction>(account, transaction));
                     }
                 }
             }
@@ -209,64 +203,22 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Tuple2<Long, T
         return transactions;
     }
 
-    public Collection<Tuple2<String, String>> getFromToKeys(long fromKey, long toKey) {
-
-        if (true) {
-            // РАБОТАЕТ намного БЫСТРЕЕ
-            return AUTOKEY_INDEX.subMap(fromKey, toKey).values();
-        } else {
-
-            // перебор по NEXT очень медленный
-            List<Tuple2<String, String>> treeKeys = new ArrayList<Tuple2<String, String>>();
-
-            // DESCENDING + 1000
-            Iterable iterable = this.indexes.get(TIMESTAMP_INDEX + DESCENDING_SHIFT_INDEX);
-            Iterable iterableLimit = Iterables.limit(Iterables.skip(iterable, (int) fromKey), (int) (toKey - fromKey));
-
-            Iterator<Tuple2<Long, Tuple2<String, String>>> iterator = iterableLimit.iterator();
-            while (iterator.hasNext()) {
-                treeKeys.add(iterator.next().b);
-            }
-
-            return treeKeys;
-        }
-
-    }
-
-    /**
-     * удаляет только если это верхний элемент. Инача ничего не делаем, так как иначе размер собъется
-     *
-     * @param key
-     * @return
-     */
-    public Tuple2<Long, Transaction> delete(Tuple2<String, String> key) {
-
-        Tuple2<Long, Transaction> item = super.get(key);
-        if (item == null) {
-            return item;
-        }
-
-        if (item.a.equals(size()))
-            return super.delete(key);
-
-        return item;
-    }
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void delete(Account account) {
         //GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-        Map<Tuple2<String, String>, Tuple2<Long, Transaction>> accountTransactions = ((BTreeMap) this.map).subMap(
-                Fun.t2(account.getAddress(), null),
-                Fun.t2(account.getAddress(), Fun.HI()));
+        Map<Tuple2<Long, Long>, Tuple2<Long, Transaction>> accountTransactions = ((BTreeMap) this.map).subMap(
+                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
+                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()));
 
         //DELETE TRANSACTIONS
-        for (Tuple2<String, String> key : accountTransactions.keySet()) {
+        for (Tuple2<Long, Long> key : accountTransactions.keySet()) {
             this.delete(key);
         }
     }
 
-    public void delete(Account account, Tuple2<Long, Transaction> transaction) {
-        this.delete(new Tuple2<String, String>(account.getAddress(), new String(transaction.b.getSignature()).substring(KEY_LENGHT)));
+    public void delete(Account account, Transaction transaction) {
+        ////this.delete(new Tuple2<Long, Long>(account.getAddress(), new String(transaction.getSignature()).substring(KEY_LENGHT)));
+        this.delete(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()), transaction.getTimestamp()));
     }
 
     public void deleteAll(List<Account> accounts) {
@@ -275,27 +227,9 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Tuple2<Long, T
         }
     }
 
-    /**
-     * добавляем только в конец по AUTOKEY_INDEX, иначе обновляем
-     * @param key
-     * @param transaction
-     * @return
-     */
-    public boolean set(Tuple2<String, String> key, Transaction transaction) {
-
-        if (this.contains(key)) {
-            // если запись тут уже есть то при перезаписи не меняем AUTO_KEY
-            Tuple2<Long, Transaction> item = super.get(key);
-            return super.set(key, new Tuple2<Long, Transaction>(item.a, transaction));
-
-        } else {
-            // новый элемент - добавим в конец карты
-            return super.set(key, new Tuple2<Long, Transaction>(-((long)size() + 1), transaction));
-        }
-    }
-
     public boolean add(Account account, Transaction transaction) {
-        return this.set(new Tuple2<String, String>(account.getAddress(), new String(transaction.getSignature()).substring(KEY_LENGHT)), transaction);
+        return this.set(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()), transaction.getTimestamp()),
+                new Tuple2<>(null, transaction));
     }
 
     public void addAll(Map<Account, List<Transaction>> transactions) {
