@@ -15,6 +15,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.database.AutoKeyAtomic;
 import org.erachain.datachain.AddressTimeSignatureMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
