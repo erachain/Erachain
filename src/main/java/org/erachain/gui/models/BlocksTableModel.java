@@ -138,9 +138,6 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
             boolean needFire = false;
             while (blocks.size() > maxSize) {
                 blocks.remove(maxSize);
-                needFire = true;
-            }
-            if (needFire) {
                 fireTableRowsDeleted(maxSize, maxSize);
             }
         } else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
