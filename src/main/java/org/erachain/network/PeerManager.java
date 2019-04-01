@@ -97,6 +97,7 @@ public class PeerManager extends MonitoredThread {
                 //processPeers(blockingQueue.take());
                 peer = blockingQueue.poll(10, TimeUnit.SECONDS);
             } catch (java.lang.OutOfMemoryError e) {
+                LOGGER.error(e.getMessage(), e);
                 Controller.getInstance().stopAll(71);
                 break;
             } catch (java.lang.IllegalMonitorStateException e) {
