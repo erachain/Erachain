@@ -159,6 +159,7 @@ public class TransactionsPool extends MonitoredThread {
             try {
                 processMessage(blockingQueue.take());
             } catch (OutOfMemoryError e) {
+                LOGGER.error(e.getMessage(), e);
                 Controller.getInstance().stopAll(56);
                 return;
             } catch (IllegalMonitorStateException e) {
