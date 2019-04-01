@@ -635,7 +635,7 @@ public class Block {
             return dcSet.getBlockMap().get(parentHeight);
         } catch (Exception e) {
             // TODO Auto-generated catch block
-           return null;
+            return null;
         }
     }
 
@@ -1650,14 +1650,14 @@ public class Block {
 
             if (!rich.equals(this.creator.getAddress())) {
                 emittedFee = this.blockHead.totalFee>>1;
-                
+
                 Account richAccount = new Account(rich);
                 richAccount.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY,
                         new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true);
             } else {
                 emittedFee = this.blockHead.emittedFee;
             }
-            
+
         } else {
             emittedFee = this.blockHead.emittedFee;
         }
@@ -1907,7 +1907,7 @@ public class Block {
 
                 if (TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
                         && ((R_Send)transaction).getAssetKey() != 1) {
-                        ;
+                    ;
                 } else {
 
                     Long key = Transaction.makeDBRef(this.heightBlock, seq);
@@ -2007,7 +2007,7 @@ public class Block {
             }
         }
 
-            //DELETE BLOCK FROM DB
+        //DELETE BLOCK FROM DB
         dcSet.getBlockMap().remove(this.signature, this.reference, this.creator);
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #4");
@@ -2038,6 +2038,8 @@ public class Block {
         Controller cnt = Controller.getInstance();
         //DLSet dbSet = Controller.getInstance().getDBSet();
 
+        boolean notFork = !dcSet.isFork();
+
         TransactionMap unconfirmedMap = dcSet.getTransactionMap();
         TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
         TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
@@ -2066,17 +2068,19 @@ public class Block {
                 }
             }
 
-            //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
-            unconfirmedMap.add(transaction);
+            if (notFork) {
+                //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
+                unconfirmedMap.add(transaction);
 
-            Long key = Transaction.makeDBRef(height, seqNo);
+                Long key = Transaction.makeDBRef(height, seqNo);
 
-            finalMap.delete(key);
-            transFinalMapSinds.delete(transaction.getSignature());
-            List<byte[]> signatures = transaction.getSignatures();
-            if (signatures != null) {
-                for (byte[] itemSignature : signatures) {
-                    transFinalMapSinds.delete(itemSignature);
+                finalMap.delete(key);
+                transFinalMapSinds.delete(transaction.getSignature());
+                List<byte[]> signatures = transaction.getSignatures();
+                if (signatures != null) {
+                    for (byte[] itemSignature : signatures) {
+                        transFinalMapSinds.delete(itemSignature);
+                    }
                 }
             }
 
@@ -2088,7 +2092,7 @@ public class Block {
 
     @Override
     public String toString() {
-        
+
         return "[" + this.getHeight() + "]"
                 + (this.winValue != 0 ? " WV: " + this.winValue : "")
                 + " TX: " + this.transactionCount
