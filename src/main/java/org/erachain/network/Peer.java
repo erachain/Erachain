@@ -379,6 +379,7 @@ public class Peer extends MonitoredThread {
                     /// просто дальше ждем - все нормально
                     continue;
                 } catch (java.lang.OutOfMemoryError e) {
+                    LOGGER.error(e.getMessage(), e);
                     Controller.getInstance().stopAll(82);
                     return;
                 } catch (EOFException e) {
@@ -413,6 +414,7 @@ public class Peer extends MonitoredThread {
                     ban(network.banForActivePeersCounter(), "peer in TimeOut and -ping");
                     break;
                 } catch (java.lang.OutOfMemoryError e) {
+                    LOGGER.error(e.getMessage(), e);
                     Controller.getInstance().stopAll(83);
                     break;
                 } catch (EOFException e) {
@@ -478,6 +480,7 @@ public class Peer extends MonitoredThread {
                         poll.add(message);
 
                     } catch (java.lang.OutOfMemoryError e) {
+                        LOGGER.error(e.getMessage(), e);
                         Controller.getInstance().stopAll(84);
                         break;
 
@@ -499,6 +502,7 @@ public class Peer extends MonitoredThread {
                     try {
                         this.network.onMessage(message);
                     } catch (java.lang.OutOfMemoryError e) {
+                        LOGGER.error(e.getMessage(), e);
                         Controller.getInstance().stopAll(88);
                         break;
                     }
@@ -592,6 +596,7 @@ public class Peer extends MonitoredThread {
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
         } catch (java.lang.OutOfMemoryError e) {
+            LOGGER.error(e.getMessage(), e);
             Controller.getInstance().stopAll(86);
             return null;
         } catch (InterruptedException e) {

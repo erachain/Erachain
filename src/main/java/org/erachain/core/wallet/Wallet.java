@@ -635,6 +635,7 @@ public class Wallet extends Observable implements Observer {
 					try {
 						this.processBlock(dcSet, block);
 					} catch (java.lang.OutOfMemoryError e) {
+						LOGGER.error(e.getMessage(), e);
 						Controller.getInstance().stopAll(44);
 						return;
 					}

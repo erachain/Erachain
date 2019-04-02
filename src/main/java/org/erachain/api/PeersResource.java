@@ -87,22 +87,43 @@ public class PeersResource {
         return array.toJSONString();
     }
 
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @GET
     @Path("detail")
     public String getDetail() {
         List<Peer> activePeers = Controller.getInstance().getActivePeers();
-        Map output = new LinkedHashMap();
+        Map output = getMapPeers(activePeers);
+        return JSONValue.toJSONString(output);
+    }
 
-        for (int i = 0; i < activePeers.size(); i++) {
-            Peer peer = activePeers.get(i);
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @GET
+    @Path("detail/knownpeers")
+    public String getDetailKnownPeers() {
+        List<Peer> knownPeers = Controller.getInstance().network.getKnownPeers();
+        Map output = getMapPeers(knownPeers);
+        return JSONValue.toJSONString(output);
+    }
+
+
+    /**
+     *
+     * @param peers
+     * @return
+     */
+    private Map getMapPeers(List<Peer> peers) {
+        Map map = new LinkedHashMap();
+
+        for (int i = 0; i < peers.size(); i++) {
+            Peer peer = peers.get(i);
 
             if (peer != null) {
-                output.put(peer.getAddress().getHostAddress(), this.getDetail(peer));
+                map.put(peer.getAddress().getHostAddress(), this.getDetail(peer));
             }
         }
-
-        return JSONValue.toJSONString(output);
+        return map;
     }
 
     @GET
