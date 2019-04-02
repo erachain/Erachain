@@ -14,9 +14,11 @@ plugins {
     id 'java'
     id 'idea'
     id 'groovy'
+    //    id 'org.springframework.boot' version '2.0.5.RELEASE'
 }
 
 ext {
+    //git = org.ajoberstar.grgit.Grgit.open()
     slf4jVersion = '1.7.25'
     git = Grgit.open(dir: rootProject.rootDir)
     rev = git.head().id
@@ -24,9 +26,11 @@ ext {
     springbootVersion = '2.0.5.RELEASE'
 }
 
+//String versionEra = "4.11.08-${git.head().abbreviatedId}"
 String versionEra = "4.11.11 beta RC"
 archivesBaseName = 'Erachain'
 group 'org.erachain'
+//version versionEra
 sourceCompatibility = 1.8
 
 repositories {
@@ -41,7 +45,7 @@ compileJava {
 }
 
 dependencies {
-    compile files('libs/whisperSystems-1.0.0.jar')
+
     compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.54'
     compile group: 'commons-io', name: 'commons-io', version: '2.4'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
@@ -67,18 +71,37 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.3.7.v20160115'
     compile group: 'org.eclipse.jetty', name: 'jetty-util', version: '9.3.7.v20160115'
     compile group: 'org.swinglabs', name: 'pdf-renderer', version: '1.0.5'
+
     compile "org.slf4j:slf4j-log4j12:${slf4jVersion}"
+
+    //compile group: 'com.google.guava', name: 'guava', version: '19.0'
+    //compile group: 'com.coverity.security', name: 'coverity-escapers', version: '1.1.1'
+    //compile group: 'org.jvnet.mimepull', name: 'mimepull', version: '1.9.6'
+    //compile group: 'com.twitter', name: 'twitter-text', version: '1.13.0'
+
+
     compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
     compile group: 'javax.activation', name: 'activation', version: '1.1.1'
+
+    //compile "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
+    //compile "org.springframework.boot:spring-boot:${springbootVersion}"
 }
 
 jar {
+    //mainClassName = "org.erachain.Start"
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
+
+//    from {
+//        configurations.runtime
+//    }
+
     baseName = "erachain"
     destinationDir project.file('build/libs/Erachain')
+
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+
     manifest {
         attributes(
                 'Main-Class': 'org.erachain.Start',
@@ -87,6 +110,7 @@ jar {
                 'Build-Time': new Date().format("yyyy-MM-dd HH:mm:ssZ"),
                 'Git-Commit': rev,
                 'Git-Branch': git.branch.current.getName(),
+//                'Class-Path': configurations.runtime.files.collect{"libs/"+"$it.name" }.join(' ')
         )
     }
 }
@@ -148,10 +172,17 @@ task CopyResourse {
     }
 }
 task CreateZip(type: Zip) {
+
     from 'build/libs/'
     include 'Erachain/'
     archiveName 'Erachain' + '.zip'
     destinationDir(file('build/libs/'))
 }
 
+//task copyToLib(type: Copy){
+//    into "build/libs/Erachain/libs"
+//    from configurations.runtime
+//}
+
+//build.dependsOn(copyToLib)
 
