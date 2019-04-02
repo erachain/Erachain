@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class R_SendResourceTest extends SettingTests {
+public class RSendResourceTest extends SettingTests {
 
 
     @Test

@@ -23,9 +23,9 @@ import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
 
 
-public class TestRec_Send_OutsideClaims {
+public class TestRecSendOutsideClaims {
 
-    static Logger LOGGER = LoggerFactory.getLogger(TestRec_Send_OutsideClaims.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRecSendOutsideClaims.class.getName());
 
     //Long Transaction.FOR_NETWORK = null;
 

@@ -10,7 +10,7 @@ import org.junit.Test;
 /**
  * Test Trade API
  */
-public class API_TradeTest extends SettingTests {
+public class APITradeTest extends SettingTests {
 
     /**
      * Test on get documentation by API inside project

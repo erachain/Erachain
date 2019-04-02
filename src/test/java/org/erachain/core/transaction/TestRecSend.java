@@ -28,9 +28,9 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 
-public class TestRec_Send {
+public class TestRecSend {
 
-    static Logger LOGGER = LoggerFactory.getLogger(TestRec_Send.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRecSend.class.getName());
 
     //Long Transaction.FOR_NETWORK = null;
     long assetKeyTest = 1011;

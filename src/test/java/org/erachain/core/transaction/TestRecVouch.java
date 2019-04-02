@@ -21,9 +21,9 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class TestRec_Vouch {
+public class TestRecVouch {
 
-    static Logger LOGGER = LoggerFactory.getLogger(TestRec_Vouch.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRecVouch.class.getName());
 
     //Long releaserReference = null;
 

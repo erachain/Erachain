@@ -20,9 +20,9 @@ import java.math.BigDecimal;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestRec_Send_InSideAsset {
+public class TestRecSendInSideAsset {
 
-    static Logger LOGGER = LoggerFactory.getLogger(TestRec_Send_InSideAsset.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRecSendInSideAsset.class.getName());
 
     //Long Transaction.FOR_NETWORK = null;
 

@@ -21,9 +21,9 @@ import java.math.BigDecimal;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-public class TestRec_Send_Movable {
+public class TestRecSendMovable {
 
-    static Logger LOGGER = LoggerFactory.getLogger(TestRec_Send_Movable.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TestRecSendMovable.class.getName());
 
     Long releaserReference = null;
 

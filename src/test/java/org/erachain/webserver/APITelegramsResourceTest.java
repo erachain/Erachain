@@ -11,7 +11,7 @@ import org.junit.Test;
 //import test.SettingTests;
 
 
-public class API_TelegramsResourceTest extends SettingTests {
+public class APITelegramsResourceTest extends SettingTests {
 
     /**
      * check documentation is not null and status 200
