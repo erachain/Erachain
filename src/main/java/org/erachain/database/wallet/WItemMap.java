@@ -16,19 +16,19 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 // TODO reference as TIMESTAMP of transaction
-public class WItem_Map extends DBMap<Tuple2<String, String>, ItemCls> {
+public class WItemMap extends DBMap<Tuple2<String, String>, ItemCls> {
 
     public static final int NAME_INDEX = 1;
     public static final int CREATOR_INDEX = 2;
-    static Logger LOGGER = LoggerFactory.getLogger(WItem_Map.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(WItemMap.class.getName());
     protected int type;
     protected String name;
 
-    public WItem_Map(DWSet dWSet, DB database, int type, String name,
-                     int observeReset,
-                     int observeAdd,
-                     int observeRemove,
-                     int observeList
+    public WItemMap(DWSet dWSet, DB database, int type, String name,
+                    int observeReset,
+                    int observeAdd,
+                    int observeRemove,
+                    int observeList
     ) {
         super(dWSet, database);
 

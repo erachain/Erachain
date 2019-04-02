@@ -9,7 +9,7 @@ import org.mapdb.Fun.Tuple2;
 
 import java.util.Map;
 
-public class WItemPollMap extends WItem_Map {
+public class WItemPollMap extends WItemMap {
 
     static final String NAME = "poll";
     static final int TYPE = ItemCls.UNION_TYPE;

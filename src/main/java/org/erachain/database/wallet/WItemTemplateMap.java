@@ -9,7 +9,7 @@ import org.mapdb.Fun.Tuple2;
 
 import java.util.Map;
 
-public class WItemTemplateMap extends WItem_Map {
+public class WItemTemplateMap extends WItemMap {
 
     //static Logger logger = LoggerFactory.getLogger(WItemTemplateMap.class.getName());
     static final String NAME = "template";
