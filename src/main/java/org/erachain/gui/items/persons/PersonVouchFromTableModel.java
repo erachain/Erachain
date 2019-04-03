@@ -137,7 +137,8 @@ public class PersonVouchFromTableModel extends TimerTableModelCls<RSertifyPubKey
                     }
                 }
             }
-        } else if (message.getType() == ObserverMessage.GUI_REPAINT) {
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
+            needUpdate = false;
             this.fireTableDataChanged();
         }
 
