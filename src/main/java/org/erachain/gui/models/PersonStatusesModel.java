@@ -1,5 +1,6 @@
 package org.erachain.gui.models;
 
+import javafx.util.Pair;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.statuses.StatusCls;
@@ -46,7 +47,8 @@ public class PersonStatusesModel extends TimerTableModelCls<Tuple2<Long, Tuple5<
 
     public PersonStatusesModel(long personKey) {
 
-        super(DCSet.getInstance().getPersonStatusMap(), new String[]{"Status", "Period", "Creator"},
+        super(DCSet.getInstance().getPersonStatusMap(),
+                new String[]{"Status", "Period", "Creator"},
                 new Boolean[]{true, false}, false);
 
         itemKey = personKey;
@@ -137,24 +139,32 @@ public class PersonStatusesModel extends TimerTableModelCls<Tuple2<Long, Tuple5<
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.LIST_STATUS_TYPE) {
 
-            setRows();
-
+            setRows(null);
             this.fireTableDataChanged();
+
         } else if (
                 message.getType() == ObserverMessage.ADD_PERSON_STATUS_TYPE
                         || message.getType() == ObserverMessage.REMOVE_PERSON_STATUS_TYPE)
         {
-            needUpdate = true;
+            Pair<Long, TreeMap> item = (Pair<Long, TreeMap>) message.getValue();
+            if (item.getKey().equals(itemKey)) {
+                needUpdate = true;
+                setRows(item.getValue());
+            }
+
         } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
-            setRows();
+            needUpdate = false;
+            this.fireTableDataChanged();
         }
     }
 
-    public void setRows() {
+    public void setRows(TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> reload) {
 
-        needUpdate = false;
-
-        statuses = dcSet.getPersonStatusMap().get(itemKey);
+        if (reload == null) {
+            statuses = dcSet.getPersonStatusMap().get(itemKey);
+        } else {
+            statuses = reload;
+        }
 
         statusesRows = new ArrayList<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>>();
 
@@ -193,8 +203,6 @@ public class PersonStatusesModel extends TimerTableModelCls<Tuple2<Long, Tuple5<
             Collections.sort(statusesRows, comparator);
 
         }
-
-        this.fireTableDataChanged();
 
     }
 
