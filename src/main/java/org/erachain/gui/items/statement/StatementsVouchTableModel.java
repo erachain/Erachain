@@ -99,10 +99,10 @@ public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
 
             case COLUMN_HEIGHT:
 
-                return (int) (transaction.getBlockHeight());
+                return transaction.getBlockHeight();
 
             case COLUMN_CREATOR_NAME:
-                return ((Account) transaction.getCreator()).getPerson().b.getName();
+                return transaction.getCreator().getPerson().b.getName();
         }
 
         return null;
@@ -113,22 +113,8 @@ public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
         ObserverMessage message = (ObserverMessage) arg;
 
         if (message.getType() == ObserverMessage.LIST_VOUCH_TYPE) {
-            list.clear();
 
-            // read indexes to DB
-            Tuple2<BigDecimal, List<Long>> vouches = ((VouchRecordMap)map).get(Transaction.makeDBRef(this.blockNo, this.recNo));
-            if (vouches == null) {
-                fireTableDataChanged();
-                return;
-
-            }
-
-            for (Long key : vouches.b) {
-                // write R-Vouch transaction
-                list.add((RVouch) transactionMap.get(key));
-
-            }
-
+            setRows();
             fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.LIST_VOUCH_TYPE
@@ -136,8 +122,28 @@ public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
             needUpdate = true;
 
         } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
+
             needUpdate = false;
+            setRows();
             fireTableDataChanged();
+        }
+    }
+
+    public void setRows() {
+        list.clear();
+
+        // read indexes to DB
+        Tuple2<BigDecimal, List<Long>> vouches = ((VouchRecordMap)map).get(Transaction.makeDBRef(this.blockNo, this.recNo));
+        if (vouches == null) {
+            fireTableDataChanged();
+            return;
+
+        }
+
+        for (Long key : vouches.b) {
+            // write R-Vouch transaction
+            list.add((RVouch) transactionMap.get(key));
+
         }
     }
 
