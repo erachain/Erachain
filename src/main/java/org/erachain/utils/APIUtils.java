@@ -8,7 +8,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
@@ -117,7 +117,7 @@ public class APIUtils {
             } else {
                 //password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
                 // password =
-                // PasswordPane.showUnlockWalletDialog(Main_Panel.getInstance());
+                // PasswordPane.showUnlockWalletDialog(MainPanel.getInstance());
                 //Gui.getInstance().bringtoFront();
                 password = PasswordPane.showUnlockWalletDialog(Gui.getInstance());
                 //Gui.getInstance().bringtoFront();
@@ -250,7 +250,7 @@ public class APIUtils {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_WALLET_ADDRESS);
         }
         
-        // TODO R_Send insert!
+        // TODO RSend insert!
         Integer result;
         // SEND ASSET PAYMENT
         Transaction transaction = Controller.getInstance().r_Send(account, feePow, new Account(recipient),
@@ -263,7 +263,7 @@ public class APIUtils {
             IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                     Lang.getInstance().translate("Send Mail"), (600), (450), Status_text,
                     Lang.getInstance().translate("Confirmation Transaction"));
-            Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
+            Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);
             
             // ww.jTabbedPane1.setVisible(false);
             dd.jScrollPane1.setViewportView(ww);

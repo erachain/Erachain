@@ -12,7 +12,7 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.AccountRenderer;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.items.assets.Asset_Info;
+import org.erachain.gui.items.assets.AssetInfo;
 import org.erachain.gui.items.assets.AssetsComboBoxModel;
 import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.models.AccountsComboBoxModel;
@@ -155,7 +155,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
                    jTextField_Ammount.setScale(scale);
                  // set description
                  //  jTextArea_Account_Description.setText(asset.getDescription());
-                   jScrollPane2.setViewportView(new Asset_Info(asset));
+                   jScrollPane2.setViewportView(new AssetInfo(asset));
                    
                }
 
@@ -183,7 +183,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
                    if(asset!=null)scale = asset.getScale();
                    jTextField_Ammount.setScale(scale);
                   // jTextArea_Account_Description.setText(asset.getDescription());
-                   jScrollPane2.setViewportView(new Asset_Info(asset));
+                   jScrollPane2.setViewportView(new AssetInfo(asset));
                    
                }
 
@@ -244,7 +244,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
     MenuPopupUtil.installContextMenu(this.jTextField_Recive_Detail);
     jTextArea_Account_Description.setWrapStyleWord(true);
     jTextArea_Account_Description.setLineWrap(true);
-    jScrollPane2.setViewportView(new Asset_Info(asset)); //jTextArea_Account_Description);
+    jScrollPane2.setViewportView(new AssetInfo(asset)); //jTextArea_Account_Description);
    }
    
    private void refreshReceiverDetails() {

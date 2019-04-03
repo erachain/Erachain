@@ -7,13 +7,11 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base32;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.transaction.OnDealClick;
-import org.erachain.network.Peer;
-import org.erachain.network.TelegramManager;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.TelegramMessage;
@@ -72,9 +70,9 @@ public class TelegramsResource {
     private JSONObject decrypt(TelegramMessage telegram, JSONObject item) {
 
         Transaction transaction = telegram.getTransaction();
-        if (transaction instanceof R_Send) {
+        if (transaction instanceof RSend) {
 
-            R_Send r_Send = (R_Send) transaction;
+            RSend r_Send = (RSend) transaction;
             if (r_Send.isEncrypted()) {
 
                 byte[] dataMess = Controller.getInstance().decrypt(r_Send.getCreator(), r_Send.getRecipient(), r_Send.getData());
@@ -492,7 +490,7 @@ public class TelegramsResource {
             throw ApiErrorFactory.getInstance().createError(Transaction.TRANSACTION_DOES_NOT_EXIST);
         }
 
-        R_Send r_Send = (R_Send) telegram.getTransaction();
+        RSend r_Send = (RSend) telegram.getTransaction();
         byte[] r_data = r_Send.getData();
         if (r_data == null || r_data.length == 0)
             return null;
@@ -720,7 +718,7 @@ public class TelegramsResource {
                     } while (recipient.equals(creator));
 
                     // MAKE TELEGRAM
-                    Transaction transaction = new R_Send(creator, (byte) 0, recipient, 0, null,
+                    Transaction transaction = new RSend(creator, (byte) 0, recipient, 0, null,
                             "TEST 1", "TEST TEST TEST".getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
                             new byte[]{(byte) 1},
                             NTP.getTime(), 0l);

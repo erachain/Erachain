@@ -191,7 +191,7 @@ public class IssueStatementRecord extends Transaction {
             position += KEY_LENGTH;
         }
 
-        // DATA +++ - from org.erachain.core.transaction.R_Send.Parse(byte[], Long)
+        // DATA +++ - from org.erachain.core.transaction.RSend.Parse(byte[], Long)
         byte[] arbitraryData = null;
         byte[] encryptedByte = null;
         byte[] isTextByte = null;

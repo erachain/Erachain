@@ -7,9 +7,9 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.*;
-import org.erachain.gui.items.accounts.Account_Send_Panel;
-import org.erachain.gui.items.accounts.My_Accounts_SplitPanel;
-import org.erachain.gui.items.assets.Search_Assets_SplitPanel;
+import org.erachain.gui.items.accounts.AccountSendPanel;
+import org.erachain.gui.items.accounts.MyAccountsSplitPanel;
+import org.erachain.gui.items.assets.SearchAssetsSplitPanel;
 import org.erachain.gui.models.WalletTransactionsTableModel;
 import org.erachain.gui.settings.SettingsFrame;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
@@ -231,7 +231,7 @@ public class SysTray implements Observer {
                 //    frame.setSize(800, 600);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-                Account_Send_Panel ap = new Account_Send_Panel(null, null,null,null);
+                AccountSendPanel ap = new AccountSendPanel(null, null,null,null);
                 frame.getContentPane().add(ap);
                 frame.setIconImage(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
                 frame.pack();
@@ -248,7 +248,7 @@ public class SysTray implements Observer {
                 frame.setIconImage(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
                 frame.setSize(800, 600);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                Search_Assets_SplitPanel ap = new Search_Assets_SplitPanel(true);
+                SearchAssetsSplitPanel ap = new SearchAssetsSplitPanel(true);
                 frame.getContentPane().add(ap);
                 frame.pack();
                 frame.setLocationRelativeTo(null);
@@ -267,7 +267,7 @@ public class SysTray implements Observer {
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
                 frame.getContentPane().add(
-                        new My_Accounts_SplitPanel());
+                        new MyAccountsSplitPanel());
                 frame.setIconImage(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
                 frame.pack();
                 frame.setLocationRelativeTo(null);

@@ -1,7 +1,7 @@
 package org.erachain.core.crypto;
 
-import org.whispersystems.curve25519.java.*;
 import org.erachain.utils.Pair;
+import org.whispersystems.curve25519.java.*;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

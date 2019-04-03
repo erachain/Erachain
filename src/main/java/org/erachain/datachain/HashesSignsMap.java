@@ -16,7 +16,7 @@ import java.util.TreeMap;
 // hash[byte] -> Stack person + block.height + transaction.seqNo
 // Example - database.AddressPersonMap
 /** Набор хэшей - по хэшу поиск записи в котрой он участвует и
- * используется в транзакции org.erachain.core.transaction.R_Hashes
+ * используется в транзакции org.erachain.core.transaction.RHashes
  hash[byte] -> Stack person + block.height + transaction.seqNo
 
  * Ключ: хэш<br>

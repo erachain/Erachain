@@ -27,7 +27,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import org.erachain.controller.Controller;
-import org.erachain.gui.library.Menu_Files;
 import org.erachain.lang.Lang;
 import org.erachain.lang.LangFile;
 import org.erachain.network.Network;

@@ -9,8 +9,8 @@ import javax.swing.JPopupMenu;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.items.accounts.Account_Send_Dialog;
-import org.erachain.gui.items.mails.Mail_Send_Dialog;
+import org.erachain.gui.items.accounts.AccountSendDialog;
+import org.erachain.gui.items.mails.MailSendDialog;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
 
@@ -23,7 +23,7 @@ public class PersonListAddPopupMenuItem {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                new Account_Send_Dialog(null, null, null, (PersonCls) person);
+                new AccountSendDialog(null, null, null, (PersonCls) person);
             }
         });
 
@@ -35,7 +35,7 @@ public class PersonListAddPopupMenuItem {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                new Mail_Send_Dialog(null, null, null, (PersonCls)person);
+                new MailSendDialog(null, null, null, (PersonCls)person);
             }
         });
 

@@ -18,7 +18,7 @@ public class AssetPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify
     private javax.swing.JPanel jPanel1;
-    private Asset_Info jPanel3;
+    private AssetInfo jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
@@ -43,7 +43,7 @@ public class AssetPanel extends javax.swing.JPanel {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jPanel3 = new Asset_Info(asset);
+        jPanel3 = new AssetInfo(asset);
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
 

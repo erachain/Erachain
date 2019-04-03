@@ -1,7 +1,7 @@
 package org.erachain.core.blockexplorer;
 
 import org.apache.commons.net.util.Base64;
-import org.erachain.at.AT_Transaction;
+import org.erachain.at.ATTransaction;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
@@ -1595,12 +1595,12 @@ public class BlockExplorer {
             } else if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
                 /*
                 if (transaction.getSeqNo() > 0 && assetNames != null) {
-                    long assetkey = ((R_Send) unit).getAbsKey();
+                    long assetkey = ((RSend) unit).getAbsKey();
                     transactionDataJSON.put("asset", assetkey);
                     transactionDataJSON.put("assetName", assetNames.getMap().get(assetkey));
                 }
 
-                if (((R_Send) unit).isEncrypted()) {
+                if (((RSend) unit).isEncrypted()) {
                     transactionDataJSON.put("data", "encrypted");
                 }
                 */
@@ -1729,8 +1729,8 @@ public class BlockExplorer {
 
         }
 
-        if (unit instanceof AT_Transaction) {
-            AT_Transaction aTtransaction = (AT_Transaction) unit;
+        if (unit instanceof ATTransaction) {
+            ATTransaction aTtransaction = (ATTransaction) unit;
             transactionDataJSON = aTtransaction.toJSON();
 
             Block block = Controller.getInstance().getBlockByHeight(aTtransaction.getBlockHeight());
@@ -1738,9 +1738,9 @@ public class BlockExplorer {
             transactionDataJSON.put("timestamp", timestamp);
             transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(timestamp));
 
-            transactionDataJSON.put("confirmations", getHeight() - ((AT_Transaction) unit).getBlockHeight() + 1);
+            transactionDataJSON.put("confirmations", getHeight() - ((ATTransaction) unit).getBlockHeight() + 1);
 
-            if (((AT_Transaction) unit).getRecipient().equals("1111111111111111111111111")) {
+            if (((ATTransaction) unit).getRecipient().equals("1111111111111111111111111")) {
                 transactionDataJSON.put("generatorAddress", block.getCreator().getAddress());
             }
 
@@ -2154,7 +2154,7 @@ public class BlockExplorer {
         // TODO Auto-generated method stub
         Map output = new LinkedHashMap();
 
-        R_SignNote trans = (R_SignNote) dcSet.getTransactionFinalMap().get(new Integer(block),
+        RSignNote trans = (RSignNote) dcSet.getTransactionFinalMap().get(new Integer(block),
                 new Integer(seqNo));
         output.put("Label_type", Lang.getInstance().translateFromLangObj("Type", langObj));
         output.put("Label_statement", Lang.getInstance().translateFromLangObj("Statement", langObj));
@@ -2548,10 +2548,10 @@ public class BlockExplorer {
 
         int txsCount = all.size();
 
-        LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = dcSet.getATTransactionMap()
+        LinkedHashMap<Tuple2<Integer, Integer>, ATTransaction> atTxs = dcSet.getATTransactionMap()
                 .getATTransactions(block.getHeight());
 
-        for (Entry<Tuple2<Integer, Integer>, AT_Transaction> e : atTxs.entrySet()) {
+        for (Entry<Tuple2<Integer, Integer>, ATTransaction> e : atTxs.entrySet()) {
             all.add(e.getValue());
             aTTxsCount++;
         }
@@ -2598,7 +2598,7 @@ public class BlockExplorer {
 
         BigDecimal totalATAmount = BigDecimal.ZERO;
 
-        for (Map.Entry<Tuple2<Integer, Integer>, AT_Transaction> e : atTxs.entrySet()) {
+        for (Map.Entry<Tuple2<Integer, Integer>, ATTransaction> e : atTxs.entrySet()) {
             totalATAmount = totalATAmount.add(BigDecimal.valueOf(e.getValue().getAmount()));
         }
 
@@ -3075,7 +3075,7 @@ public class BlockExplorer {
             out.put("seqNo", transaction.getSeqNo());
 
             if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
-                R_Calculated txCalculated = (R_Calculated) transaction;
+                RCalculated txCalculated = (RCalculated) transaction;
                 outcome = txCalculated.getAmount().signum() < 0;
 
                 out.put("reference", "--");
@@ -3126,7 +3126,7 @@ public class BlockExplorer {
                         atSideAccount = transaction.getCreator();
                         type = transaction.getType();
                         if (type == Transaction.SEND_ASSET_TRANSACTION) {
-                            R_Send rSend = (R_Send) transaction;
+                            RSend rSend = (RSend) transaction;
                             if (rSend.getCreator().equals(account)) {
                                 outcome = false;
                                 atSideAccount = rSend.getRecipient();

@@ -4,7 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.transaction.R_Vouch;
+import org.erachain.core.transaction.RVouch;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
@@ -109,7 +109,7 @@ public class VouchRecordDialog extends JDialog {
 
         Transaction record = null;
         if (text.length() < 40) {
-            //record = R_Vouch.getVouchingRecord(DLSet.getInstance(), jTextField_recordID.getText());
+            //record = RVouch.getVouchingRecord(DLSet.getInstance(), jTextField_recordID.getText());
             record = DCSet.getInstance().getTransactionFinalMap().getRecord(text);
         } else {
             record = Transaction.findByDBRef(DCSet.getInstance(), Base58.decode(text));
@@ -172,8 +172,8 @@ public class VouchRecordDialog extends JDialog {
         String Status_text = "";
         IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
-        //Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
-        VouchingDetailsFrame ww = new VouchingDetailsFrame((R_Vouch) transaction);
+        //Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);
+        VouchingDetailsFrame ww = new VouchingDetailsFrame((RVouch) transaction);
 
         dd.jScrollPane1.setViewportView(ww);
         dd.setLocationRelativeTo(this);
@@ -283,7 +283,7 @@ public class VouchRecordDialog extends JDialog {
 
 
         jLabel_RecordInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        //   infoPanel = new Record_Info();
+        //   infoPanel = new RecordInfo();
 
         //info.show_001(record);
         //infoPanel.setFocusable(false);

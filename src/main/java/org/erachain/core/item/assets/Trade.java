@@ -184,7 +184,7 @@ public class Trade {
         data = Bytes.concat(data, wantKeyBytes);
 
         byte[] fill;
-
+                                
         //WRITE AMOUNT HAVE SCALE
         data = Bytes.concat(data, new byte[]{(byte)this.amountHave.scale()});
 

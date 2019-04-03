@@ -3,7 +3,7 @@ package org.erachain.gui.telegrams;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
@@ -108,7 +108,7 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
             return null;
         }
 
-        R_Send transaction = (R_Send) ttt.get(row).c;
+        RSend transaction = (RSend) ttt.get(row).c;
         if (transaction == null)
             return null;
 

@@ -9,7 +9,7 @@ import org.mapdb.Fun.Tuple2;
 
 import java.util.Map;
 
-public class WItemPersonMap extends WItem_Map {
+public class WItemPersonMap extends WItemMap {
 
     //static Logger logger = LoggerFactory.getLogger(WItemPersonMap.class.getName());
     static final String NAME = "person";

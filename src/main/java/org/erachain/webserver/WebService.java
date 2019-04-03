@@ -21,12 +21,12 @@ public class WebService {
         Set<Class<?>> s = new HashSet<Class<?>>();
         s.add(API.class);
         s.add(WebResource.class);
-        s.add(API_TransactionsResource.class);
-        s.add(API_Trade.class);
-        s.add(API_TelegramsResource.class);
-        s.add(API_Person.class);
-        s.add(API_Poll.class);
-        s.add(API_Documents.class);
+        s.add(APITransactionsResource.class);
+        s.add(APITrade.class);
+        s.add(APITelegramsResource.class);
+        s.add(APIPerson.class);
+        s.add(APIPoll.class);
+        s.add(APIDocuments.class);
 
         ResourceConfig config = new ResourceConfig(s);
         config.register(MultiPartFeature.class);

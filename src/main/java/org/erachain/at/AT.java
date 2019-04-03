@@ -12,7 +12,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.Iterator;
 
-public class AT extends AT_Machine_State {
+public class AT extends ATMachineState {
 
     private String name;
     private String description;
@@ -91,10 +91,10 @@ public class AT extends AT_Machine_State {
         bf.get(btags);
         String tags = new String(btags, Charset.forName("UTF-8"));
 
-        byte[] atId = new byte[AT_Constants.AT_ID_SIZE];
+        byte[] atId = new byte[ATConstants.AT_ID_SIZE];
         bf.get(atId);
 
-        byte[] creator = new byte[AT_Constants.AT_ID_SIZE];
+        byte[] creator = new byte[ATConstants.AT_ID_SIZE];
         bf.get(creator);
 
         short version = bf.getShort();

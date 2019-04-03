@@ -873,7 +873,7 @@ public abstract class Transaction {
                                  String message) {
 
         if (block != null && block.txCalculated != null) {
-            block.txCalculated.add(new R_Calculated(creator, assetKey, amount,
+            block.txCalculated.add(new RCalculated(creator, assetKey, amount,
                     message, this.dbRef));
             return true;
         }
@@ -1253,7 +1253,7 @@ public abstract class Transaction {
 
     public void process_gifts_turn(int level, long fee_gift, Account invitedAccount,
                                    long invitedPersonKey, boolean asOrphan,
-                                   List<R_Calculated> txCalculated, String message) {
+                                   List<RCalculated> txCalculated, String message) {
 
         if (fee_gift <= 0l)
             return;
@@ -1282,7 +1282,7 @@ public abstract class Transaction {
             invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " top level";
-                txCalculated.add(new R_Calculated(invitedAccount, FEE_KEY, giftBG,
+                txCalculated.add(new RCalculated(invitedAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
             return;
@@ -1305,7 +1305,7 @@ public abstract class Transaction {
             issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " level:" + level + " for @P:" + invitedPersonKey;
-                txCalculated.add(new R_Calculated(issuerAccount, FEE_KEY, giftBG,
+                txCalculated.add(new RCalculated(issuerAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
 
@@ -1321,7 +1321,7 @@ public abstract class Transaction {
 
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " level:" + level + " for @P:" + invitedPersonKey;
-                txCalculated.add(new R_Calculated(issuerAccount, FEE_KEY, giftBG,
+                txCalculated.add(new RCalculated(issuerAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
         }
@@ -1329,7 +1329,7 @@ public abstract class Transaction {
 
 
     public void process_gifts(int level, long fee_gift, Account creator, boolean asOrphan,
-                              List<R_Calculated> txCalculated, String message) {
+                              List<RCalculated> txCalculated, String message) {
 
         if (fee_gift <= 0l)
             return;

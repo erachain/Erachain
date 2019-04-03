@@ -7,7 +7,7 @@ import org.erachain.utils.MenuPopupUtil;
 import javax.swing.*;
 
 @SuppressWarnings("serial")
-public class CancelSellNameDetailsFrame extends Rec_DetailsFrame {
+public class CancelSellNameDetailsFrame extends RecDetailsFrame {
     public CancelSellNameDetailsFrame(CancelSellNameTransaction cancelNameSale) {
         super(cancelNameSale);
 

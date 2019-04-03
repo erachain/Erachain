@@ -3,7 +3,6 @@ package org.erachain.gui.transaction;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.gui.Gui;
-import org.erachain.gui.*;
 import org.erachain.gui.models.PaymentsTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.BigDecimalStringComparator;
@@ -14,7 +13,7 @@ import javax.swing.table.TableRowSorter;
 import java.nio.charset.Charset;
 
 @SuppressWarnings("serial")
-public class ArbitraryTransactionDetailsFrame extends Rec_DetailsFrame {
+public class ArbitraryTransactionDetailsFrame extends RecDetailsFrame {
     public ArbitraryTransactionDetailsFrame(ArbitraryTransaction arbitraryTransaction) {
         super(arbitraryTransaction);
 

@@ -33,7 +33,7 @@ package org.erachain.gui2;
 
 
 import org.erachain.gui.*;
-import org.erachain.gui.items.other.Other_Split_Panel;
+import org.erachain.gui.items.other.OtherSplitPanel;
 import org.json.simple.JSONObject;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SaveStrToFile;
@@ -140,11 +140,11 @@ public class ButtonTabComponent extends JPanel {
                 if (settingsJSONbuf.containsKey("Main_Frame_Setting"))
                     settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
                 HashMap outTabbedDiv = new HashMap();
-                if (p_Comp instanceof Other_Split_Panel) {
-                    Other_Split_Panel sP = ((Other_Split_Panel) p_Comp);
+                if (p_Comp instanceof OtherSplitPanel) {
+                    OtherSplitPanel sP = ((OtherSplitPanel) p_Comp);
                     sP.onClose();
-                } else if (p_Comp instanceof Split_Panel) {
-                    Split_Panel sP = ((Split_Panel) p_Comp);
+                } else if (p_Comp instanceof SplitPanel) {
+                    SplitPanel sP = ((SplitPanel) p_Comp);
                     outTabbedDiv.put("Div_Orientation", sP.jSplitPanel.getOrientation() + "");
 
                     // write

@@ -2,7 +2,6 @@ package org.erachain.gui.transaction;
 
 import org.erachain.core.transaction.MultiPaymentTransaction;
 import org.erachain.gui.Gui;
-import org.erachain.gui.*;
 import org.erachain.gui.models.PaymentsTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.BigDecimalStringComparator;
@@ -11,7 +10,7 @@ import javax.swing.*;
 import javax.swing.table.TableRowSorter;
 
 @SuppressWarnings("serial")
-public class MultiPaymentDetailsFrame extends Rec_DetailsFrame {
+public class MultiPaymentDetailsFrame extends RecDetailsFrame {
     @SuppressWarnings("unchecked")
     public MultiPaymentDetailsFrame(MultiPaymentTransaction multiPayment) {
         super(multiPayment);

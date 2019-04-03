@@ -3,7 +3,7 @@ package org.erachain.gui.transaction;
 import org.erachain.core.transaction.CancelOrderTransaction;
 
 @SuppressWarnings("serial")
-public class CancelOrderDetailsFrame extends Rec_DetailsFrame {
+public class CancelOrderDetailsFrame extends RecDetailsFrame {
     public CancelOrderDetailsFrame(CancelOrderTransaction orderCreation) {
         super(orderCreation);
 

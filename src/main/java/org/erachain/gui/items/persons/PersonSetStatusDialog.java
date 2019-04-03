@@ -9,7 +9,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.statuses.StatusCls;
-import org.erachain.core.transaction.R_SetStatusToItem;
+import org.erachain.core.transaction.RSetStatusToItem;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
@@ -17,7 +17,7 @@ import org.erachain.gui.items.statuses.ComboBoxModelItemsStatuses;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
-import org.erachain.gui.records.Record_Info;
+import org.erachain.gui.records.RecordInfo;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.gui.transaction.SetStatusToItemDetailsFrame;
 import org.erachain.lang.Lang;
@@ -33,7 +33,7 @@ import java.util.List;
 public class PersonSetStatusDialog extends JDialog {
     private static final long serialVersionUID = 2717571093561259483L;
     private static Transaction parentRecord;
-    private static Record_Info infoPanel;
+    private static RecordInfo infoPanel;
     private javax.swing.JTextField jAData1Txt;
     private javax.swing.JTextField jAData2Txt;
     private javax.swing.JLabel jLabel1;
@@ -99,7 +99,7 @@ public class PersonSetStatusDialog extends JDialog {
         jComboBox_Status.setModel(new ComboBoxModelItemsStatuses());
         jComboBox_YourAddress.setModel(new AccountsComboBoxModel());
         jLabel_PersonInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        Person_Info info = new Person_Info();
+        PersonInfo info = new PersonInfo();
         info.show_001(person);
         info.setFocusable(false);
         jLabel_PersonInfo.setViewportView(info);
@@ -263,7 +263,7 @@ public class PersonSetStatusDialog extends JDialog {
         IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
 
-        SetStatusToItemDetailsFrame ww = new SetStatusToItemDetailsFrame((R_SetStatusToItem) transaction);
+        SetStatusToItemDetailsFrame ww = new SetStatusToItemDetailsFrame((RSetStatusToItem) transaction);
         dd.jScrollPane1.setViewportView(ww);
         dd.setLocationRelativeTo(this);
         dd.setVisible(true);

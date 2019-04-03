@@ -9,7 +9,7 @@ import org.mapdb.Fun.Tuple2;
 
 import java.util.Map;
 
-public class WItemUnionMap extends WItem_Map {
+public class WItemUnionMap extends WItemMap {
 
     static final String NAME = "union";
     static final int TYPE = ItemCls.UNION_TYPE;

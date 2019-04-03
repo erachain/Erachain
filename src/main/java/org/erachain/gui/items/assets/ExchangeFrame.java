@@ -14,7 +14,7 @@ public class ExchangeFrame extends JDialog {
     private static final long serialVersionUID = -7052380905136603354L;
     public CreateOrderPanel buyOrderPanel;
     String action;
-    //Echange_Sell_Buy_Panel tt;
+    //EchangeSellBuyPanel tt;
     String account;
     java.awt.GridBagConstraints gridBagConstraints;
     private AssetCls have;

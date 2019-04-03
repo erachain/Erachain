@@ -2,8 +2,7 @@ package org.erachain.gui.settings;
 
 import java.math.BigDecimal;
 
-import org.erachain.gui.*;
-import org.erachain.gui.library.M_TextField_Only_BigDecimal;
+import org.erachain.gui.library.MTextFieldOnlyBigDecimal;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MenuPopupUtil;
@@ -39,7 +38,7 @@ public class RatesSettingPanel extends javax.swing.JPanel {
 
         jLabelTitle = new javax.swing.JLabel();
         jLabelAsset = new javax.swing.JLabel();
-        jTextFieldRate = new M_TextField_Only_BigDecimal();
+        jTextFieldRate = new MTextFieldOnlyBigDecimal();
         jLabelFiat = new javax.swing.JLabel();
         jLabelBottom = new javax.swing.JLabel();
 
@@ -100,6 +99,6 @@ public class RatesSettingPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabelAsset;
     private javax.swing.JLabel jLabelFiat;
     private javax.swing.JLabel jLabelBottom;
-    private M_TextField_Only_BigDecimal jTextFieldRate;
+    private MTextFieldOnlyBigDecimal jTextFieldRate;
     // End of variables declaration                   
 }

@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 public class Exchange_Panel extends JPanel {
     private static final long serialVersionUID = -7052380905136603354L;
     public CreateOrderPanel buyOrderPanel;
-    Echange_Sell_Buy_Panel tt;
+    EchangeSellBuyPanel tt;
     String action;
     String account;
     java.awt.GridBagConstraints gridBagConstraints;
@@ -86,10 +86,10 @@ public class Exchange_Panel extends JPanel {
                 want = a;
 
                 jTextField_Asset_1.setText(have.viewName());
-                jScrollPane_jPanel_RightPanel.setViewportView(new Echange_Sell_Buy_Panel(have, want, action, account));
+                jScrollPane_jPanel_RightPanel.setViewportView(new EchangeSellBuyPanel(have, want, action, account));
 
                 jTextField_Asset_2.setText(want.viewName());
-                jScrollPane_jPanel_RightPanel.setViewportView(new Echange_Sell_Buy_Panel(have, want, action, account));
+                jScrollPane_jPanel_RightPanel.setViewportView(new EchangeSellBuyPanel(have, want, action, account));
 
             }
 
@@ -132,7 +132,7 @@ public class Exchange_Panel extends JPanel {
                     have = ss.pairAsset;
                     jTextField_Asset_1.setText(have.viewName());
                     jScrollPane_jPanel_RightPanel
-                            .setViewportView(new Echange_Sell_Buy_Panel(have, want, action, account));
+                            .setViewportView(new EchangeSellBuyPanel(have, want, action, account));
                 }
             }
         });
@@ -168,7 +168,7 @@ public class Exchange_Panel extends JPanel {
 
                     jTextField_Asset_2.setText(want.viewName());
                     jScrollPane_jPanel_RightPanel
-                            .setViewportView(new Echange_Sell_Buy_Panel(have, want, action, account));
+                            .setViewportView(new EchangeSellBuyPanel(have, want, action, account));
 
                 }
 
@@ -195,7 +195,7 @@ public class Exchange_Panel extends JPanel {
         // jScrollPane_jPanel_RightPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         // jScrollPane_jPanel_RightPanel.setHorizontalScrollBar(null);
         // jScrollPane_jPanel_RightPanel.setVerticalScrollBar(null);
-        jScrollPane_jPanel_RightPanel.setViewportView(new Echange_Sell_Buy_Panel(have, want, action, account));
+        jScrollPane_jPanel_RightPanel.setViewportView(new EchangeSellBuyPanel(have, want, action, account));
         // tt = new pane_Tab(have, want, action, account);
         add(jScrollPane_jPanel_RightPanel, gridBagConstraints);
     }

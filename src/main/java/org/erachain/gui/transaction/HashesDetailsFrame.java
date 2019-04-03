@@ -1,6 +1,6 @@
 package org.erachain.gui.transaction;
 
-import org.erachain.core.transaction.R_Hashes;
+import org.erachain.core.transaction.RHashes;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -8,8 +8,8 @@ import javax.swing.*;
 import java.nio.charset.Charset;
 
 @SuppressWarnings("serial")
-public class HashesDetailsFrame extends Rec_DetailsFrame {
-    public HashesDetailsFrame(R_Hashes r_Hashes) {
+public class HashesDetailsFrame extends RecDetailsFrame {
+    public HashesDetailsFrame(RHashes r_Hashes) {
         super(r_Hashes);
 
         //LABEL NAME
