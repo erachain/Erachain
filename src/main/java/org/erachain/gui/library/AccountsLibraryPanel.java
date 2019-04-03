@@ -156,7 +156,7 @@ public class AccountsLibraryPanel extends JPanel {
         menu_copy_Block_PublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection value = new StringSelection(person_Accounts_Model.get_No_Trancaction(row));
+                StringSelection value = new StringSelection(person_Accounts_Model.getTransactionHeightSeqNo(row));
                 clipboard.setContents(value, null);
             }
         });
