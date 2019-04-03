@@ -25,7 +25,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-//import org.erachain.gui.*;
 
 public class VouchRecordDialog extends JDialog {
 
@@ -33,6 +32,7 @@ public class VouchRecordDialog extends JDialog {
 
     private static Transaction record;
     Account account;
+
     // Variables declaration - do not modify
     private MButton jButton_Cansel;
     private MButton jButton_Confirm;
@@ -46,18 +46,14 @@ public class VouchRecordDialog extends JDialog {
     private javax.swing.JLabel jLabel_Title;
     private javax.swing.JLabel jLabel_Name_Records;
     private javax.swing.JLabel jLabel_YourAddress;
-    public VouchRecordDialog(Integer block_No, Integer rec_No, Account account) {
-        super();
-        vouch(block_No, rec_No, account);
 
+    public VouchRecordDialog(Integer block_No, Integer rec_No, Account account) {
+        vouch(block_No, rec_No, account);
     }
     //private javax.swing.JLabel jLabel_RecordInfo;
 
     public VouchRecordDialog(Integer block_No, Integer rec_No) {
-        super();
         vouch(block_No, rec_No, null);
-
-
     }
 
     private void vouch(Integer block_No, Integer rec_No, Account account) {
@@ -72,27 +68,25 @@ public class VouchRecordDialog extends JDialog {
         this.setIconImages(icons);
 
         initComponents();
+        setPreferredSize(new Dimension(1000, 800));
+        setMinimumSize(new Dimension(1000, 800));
+        setMaximumSize(new Dimension(1000, 800));
+
+
         if (block_No != null && rec_No != null) {
             jTextField_recordID.setText(block_No.toString() + "-" + rec_No.toString());
             VouchRecordDialog.record = refreshRecordDetails(jTextField_recordID.getText());
             jTextField_recordID.enable(false);
-
-
         }
-        //	setSize(400,300);
+
         this.setTitle(Lang.getInstance().translate("Vouch Record"));
         this.setResizable(true);
         this.setModal(true);
 
-//	    setPreferredSize(new Dimension(MainFrame.getInstance().desktopPane.getWidth()-100,MainFrame.getInstance().desktopPane.getHeight()-100));
         //PACK
-        this.setPreferredSize(MainFrame.getInstance().getPreferredSize());
         this.pack();
-        //       this.setResizable(false);
-      //  this.setSize(MainFrame.getInstance().getWidth() - 100, MainFrame.getInstance().getHeight() - 100);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
-        //MainFrame.this.add(comp, constraints).setFocusable(false);
     }
 
     //private Transaction refreshRecordDetails(JTextField recordTxt, JLabel recordDetails)
