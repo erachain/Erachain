@@ -133,7 +133,7 @@ public class AccountsLibraryPanel extends JPanel {
         copy_Creator_Address.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection value = new StringSelection(person_Accounts_Model.get_Creator_Account(row));
+                StringSelection value = new StringSelection(person_Accounts_Model.getCreator(row));
                 clipboard.setContents(value, null);
             }
         });
@@ -144,7 +144,7 @@ public class AccountsLibraryPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 byte[] publick_Key = Controller.getInstance()
-                        .getPublicKeyByAddress(person_Accounts_Model.get_Creator_Account(row));
+                        .getPublicKeyByAddress(person_Accounts_Model.getCreator(row));
                 PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
                 StringSelection value = new StringSelection(public_Account.getBase58());
                 clipboard.setContents(value, null);
