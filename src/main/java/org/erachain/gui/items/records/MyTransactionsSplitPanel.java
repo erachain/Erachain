@@ -3,10 +3,10 @@ package org.erachain.gui.items.records;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.Split_Panel;
+import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.SetIntervalPanel;
-import org.erachain.gui.library.Voush_Library_Panel;
+import org.erachain.gui.library.VoushLibraryPanel;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.WalletTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
@@ -25,13 +25,14 @@ import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class MyTransactionsSplitPanel extends Split_Panel {
+public class MyTransactionsSplitPanel extends SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
 
     private static MyTransactionsSplitPanel instance;
-    public Voush_Library_Panel voush_Library_Panel;
-    protected Transaction trans;
+    public VoushLibraryPanel voush_Library_Panel;
+    protected Tuple2<String, String> selectedTransactionKey;
+    protected Transaction selectedTransaction;
     private JPanel records_Info_Panel;
     private JPopupMenu menu;
     private JMenuItem item_Delete;
@@ -109,7 +110,8 @@ public class MyTransactionsSplitPanel extends Split_Panel {
                 int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
                 row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
                 if (row < 0) return;
-                trans = (Transaction) records_model.getItem(row);
+                selectedTransaction = records_model.getItem(row);
+                selectedTransactionKey = records_model.getPairItem(row).getA();
             }
 
             @Override
@@ -125,7 +127,8 @@ public class MyTransactionsSplitPanel extends Split_Panel {
                 int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
                 row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
                 if (row < 0) return;
-                trans = (Transaction) records_model.getItem(row);
+                selectedTransaction = records_model.getItem(row);
+                selectedTransactionKey = records_model.getPairItem(row).getA();
 
             }
 
@@ -139,43 +142,40 @@ public class MyTransactionsSplitPanel extends Split_Panel {
             public void actionPerformed(ActionEvent e) {
                 // code Rebroadcast
 
-                if (trans == null) return;
+                if (selectedTransaction == null) return;
                 // DLSet db = DLSet.getInstance();
-                Controller.getInstance().broadcastTransaction(trans);
+                Controller.getInstance().broadcastTransaction(selectedTransaction);
 
             }
         });
 
         menu.add(item_Rebroadcast);
+
         item_Delete = new JMenuItem(Lang.getInstance().translate("Delete"));
         item_Delete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+                if (selectedTransaction == null)
+                    return;
+
                 // code delete
-                //int row = my_Records_Panel.records_Table.getSelectedRow();
-                //row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
-                //Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
-                if (trans == null) return;
-                DCSet.getInstance().getTransactionMap().delete(trans);
+                Controller.getInstance().getWallet().database.getTransactionMap()
+                        .delete(selectedTransactionKey);
 
             }
         });
 
-        //menu.add(item_Delete);
+        menu.add(item_Delete);
         
         item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
         item_Save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                // code delete
-                //int row = my_Records_Panel.records_Table.getSelectedRow();
-                //row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
-                //Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
-                if (trans == null) return;
+                if (selectedTransaction == null) return;
                 // save
-                library.saveTransactionJSONtoFileSystem(getParent(), trans);
+                library.saveTransactionJSONtoFileSystem(getParent(), selectedTransaction);
             }
 
             
@@ -192,13 +192,13 @@ public class MyTransactionsSplitPanel extends Split_Panel {
                 //	int row = my_Records_Panel.records_Table.getSelectedRow();
                 //	row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
                 //	Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
-                if (trans == null) return;
-                item_Delete.setEnabled(true);
-                item_Rebroadcast.setEnabled(true);
-                if (trans.isConfirmed(DCSet.getInstance())) {
+                if (selectedTransaction == null) return;
+                if (selectedTransaction.isConfirmed(DCSet.getInstance())) {
                     item_Delete.setEnabled(false);
                     item_Rebroadcast.setEnabled(false);
-
+                } else {
+                    item_Delete.setEnabled(true);
+                    item_Rebroadcast.setEnabled(true);
                 }
             }
 
@@ -251,11 +251,11 @@ public class MyTransactionsSplitPanel extends Split_Panel {
     //@Override
     public void onClose() {
         // delete observer left panel
-        this.records_model.removeObservers();
+        this.records_model.deleteObservers();
         this.setIntervalPanel.removeObservers();
         // get component from right panel
         //	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
-        // if Person_Info 002 delay on close
+        // if PersonInfo 002 delay on close
         //	  if (c1.getClass() == this.records_Info_Panel.getClass()) voush_Library_Panel.onClose();
 
     }
@@ -305,7 +305,7 @@ public class MyTransactionsSplitPanel extends Split_Panel {
                     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
                     gridBagConstraints.weightx = 1.0;
                     gridBagConstraints.weighty = 1.0;
-                    voush_Library_Panel = new Voush_Library_Panel(trans);
+                    voush_Library_Panel = new VoushLibraryPanel(trans);
                     records_Info_Panel.add(voush_Library_Panel, gridBagConstraints);
 
                 }

@@ -21,7 +21,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.Split_Panel;
+import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.UnconfirmedTransactionsTableModel;
@@ -38,7 +38,6 @@ public class UnconfirmedTransactionsPanel extends JPanel
     private static UnconfirmedTransactionsPanel instance;
     private UnconfirmedTransactionsTableModel transactionsModel;
     private MTable transactionsTable;
-
 
     public UnconfirmedTransactionsPanel() {
         setName(Lang.getInstance().translate("Unconfirmed Records"));
@@ -87,7 +86,7 @@ public class UnconfirmedTransactionsPanel extends JPanel
             }
         });
 
-        Split_Panel record_stpit = new Split_Panel("");
+        SplitPanel record_stpit = new SplitPanel("");
         record_stpit.toolBar_LeftPanel.setVisible(false);
         record_stpit.jToolBar_RightPanel.setVisible(false);
         record_stpit.searchToolBar_LeftPanel.setVisible(false);
@@ -126,7 +125,7 @@ public class UnconfirmedTransactionsPanel extends JPanel
                             
 
                             // GET TRANSACTION
-                            Transaction transaction = transactionsModel.getTransaction(row);
+                            Transaction transaction = transactionsModel.getItem(row);
                             // SHOW DETAIL SCREEN OF TRANSACTION
                             // TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
 
@@ -178,7 +177,7 @@ public class UnconfirmedTransactionsPanel extends JPanel
 
                 int row = record_stpit.jTable_jScrollPanel_LeftPanel.getSelectedRow();
                 row = record_stpit.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-                Transaction trans = transactionsModel.getTransaction(row);
+                Transaction trans = transactionsModel.getItem(row);
                 DCSet dcSet = DCSet.getInstance();
                 trans.setDC(dcSet, Transaction.FOR_NETWORK, DCSet.getInstance().getBlockMap().size() + 1, 1);
                 if (trans.isValid(Transaction.FOR_NETWORK, 0) == Transaction.VALIDATE_OK)
@@ -196,7 +195,7 @@ public class UnconfirmedTransactionsPanel extends JPanel
                 // code delete
                 int row = record_stpit.jTable_jScrollPanel_LeftPanel.getSelectedRow();
                 row = record_stpit.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-                Transaction trans = transactionsModel.getTransaction(row);
+                Transaction trans = transactionsModel.getItem(row);
                 DCSet.getInstance().getTransactionMap().delete(trans);
 
             }
@@ -213,7 +212,7 @@ public class UnconfirmedTransactionsPanel extends JPanel
 
                 int row = record_stpit.jTable_jScrollPanel_LeftPanel.getSelectedRow();
                 row = record_stpit.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-                Transaction trans = transactionsModel.getTransaction(row);
+                Transaction trans = transactionsModel.getItem(row);
                 if (trans == null) return;
                 // save
                 library.saveTransactionJSONtoFileSystem(getParent(), trans);
@@ -243,6 +242,8 @@ public class UnconfirmedTransactionsPanel extends JPanel
 
         if (instance == null) {
             instance = new UnconfirmedTransactionsPanel();
+        } else {
+            instance.transactionsModel.addObservers();
         }
 
         return instance;

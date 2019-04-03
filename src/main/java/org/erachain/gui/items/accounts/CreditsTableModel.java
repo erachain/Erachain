@@ -8,7 +8,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -24,7 +24,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer {
+public class CreditsTableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> implements Observer {
     public static final int COLUMN_AMOUNT = 1;
     public static final int COLUMN_TRANSACTION = 2;
     private static final int COLUMN_ADDRESS = 0;
@@ -44,9 +44,9 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
     @SuppressWarnings("unchecked")
     public CreditsTableModel() {
         super(DCSet.getInstance().getCredit_AddressesMap(),
-                new String[]{"Account", "Amount", "Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
+                new String[]{"Account", "Amount", "Type"}, false);
 
-        LOGGER = LoggerFactory.getLogger(CreditsTableModel.class.getName());
+        logger = LoggerFactory.getLogger(CreditsTableModel.class.getName());
 
     }
 
@@ -202,7 +202,7 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.transactions == null) {
                 this.transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
-                this.transactions.registerObserver();
+                //this.transactions.registerObserver();
                 this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
 
                 this.transactions_Asset.clear();
@@ -266,7 +266,7 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
         return totalBalance;
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
 
         this.transactions_Asset = new ArrayList<Tuple2<Tuple2<String, String>, Transaction>>();
         this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
@@ -284,7 +284,7 @@ public class CreditsTableModel extends TableModelCls<Tuple2<String, String>, Tra
     }
 
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
     }
 
     @Override

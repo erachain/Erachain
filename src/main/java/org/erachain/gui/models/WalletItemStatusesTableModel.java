@@ -9,12 +9,11 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, String>, StatusCls> implements Observer {
+public class WalletItemStatusesTableModel extends SortedListTableModelCls<Tuple2<String, String>, StatusCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -26,7 +25,7 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
 
     public WalletItemStatusesTableModel() {
         super(new String[]{"Key", "Name", "Creator", "Unique", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false});
+                new Boolean[]{false, true, true, false, false}, false);
     }
 
     @Override
@@ -94,7 +93,7 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
         if (message.getType() == ObserverMessage.LIST_STATUS_TYPE) {
             if (this.statuses == null) {
                 this.statuses = (SortableList<Tuple2<String, String>, StatusCls>) message.getValue();
-                this.statuses.registerObserver();
+                //this.statuses.registerObserver();
                 //this.statuses.sort(PollMap.NAME_INDEX);
             }
 
@@ -107,12 +106,12 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         Controller.getInstance().addWalletObserver(this);
     }
 
-    public void removeObserversThis() {
-        if (this.statuses != null) this.statuses.removeObserver();
+    public void deleteObservers() {
+        //if (this.statuses != null) this.statuses.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 }

@@ -30,8 +30,8 @@ public class ApiService extends Observable {
         s.add(BlocksResource.class);
         s.add(AddressesResource.class);
         s.add(WalletResource.class);
-        s.add(R_SendResource.class);
-        s.add(Rec_PaymentResource.class);
+        s.add(RSendResource.class);
+        s.add(RecPaymentResource.class);
         s.add(NamesResource.class);
         s.add(NameSalesResource.class);
         s.add(PollsResource.class);
@@ -43,10 +43,10 @@ public class ApiService extends Observable {
         //s.add(CalcFeeResource.class);
         s.add(NameStorageResource.class);
         //	s.add(Rec_MessageResource.class);
-        s.add(Rec_Resource.class);
-        s.add(Rec_HashesResource.class);
+        s.add(RecResource.class);
+        s.add(RecHashesResource.class);
         s.add(AssetsResource.class);
-        s.add(Rec_StatementResource.class);
+        s.add(RecStatementResource.class);
         s.add(MultiPaymentResource.class);
         s.add(TradeResource.class);
 

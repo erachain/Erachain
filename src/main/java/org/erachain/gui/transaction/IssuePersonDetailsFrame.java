@@ -3,13 +3,12 @@ package org.erachain.gui.transaction;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.lang.Lang;
-import org.erachain.ntp.NTP;
 import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
 
 @SuppressWarnings("serial")
-public class IssuePersonDetailsFrame extends Rec_DetailsFrame {
+public class IssuePersonDetailsFrame extends RecDetailsFrame {
     public IssuePersonDetailsFrame(IssuePersonRecord personIssue) {
         super(personIssue);
 

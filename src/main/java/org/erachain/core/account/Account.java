@@ -425,10 +425,10 @@ public class Account {
      * if(ta.getKey() == ERA_KEY &
      * transaction.getAmount(this).compareTo(BigDecimal.ZERO) == 1) { balance =
      * balance.subtract(transaction.getAmount(this)); } } }
-     * LinkedHashMap<Tuple2<Integer,Integer>,AT_Transaction> atTxs =
+     * LinkedHashMap<Tuple2<Integer,Integer>,ATTransaction> atTxs =
      * db.getATTransactionMap().getATTransactions(block.getHeight(db));
-     * Iterator<AT_Transaction> iter = atTxs.values().iterator(); while (
-     * iter.hasNext() ) { AT_Transaction key = iter.next(); if (
+     * Iterator<ATTransaction> iter = atTxs.values().iterator(); while (
+     * iter.hasNext() ) { ATTransaction key = iter.next(); if (
      * key.getRecipient().equals( this.getAddress() ) ) { balance =
      * balance.subtract( BigDecimal.valueOf(key.getAmount()) ); } }
      *

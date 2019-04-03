@@ -9,7 +9,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.voting.Poll;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.AccountsComboBoxModel;
@@ -251,7 +251,7 @@ public class CreatePollFrame extends JFrame {
 
             //	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
 
-            Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, issue_voiting,
+            IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, issue_voiting,
                     text, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
             dd.setLocationRelativeTo(th);
             dd.setVisible(true);

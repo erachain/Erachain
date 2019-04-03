@@ -10,7 +10,7 @@ import java.util.Arrays;
 //import java.util.List;
 //import java.util.Map;
 // import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+
 //import org.json.simple.JSONObject;
 //import com.google.common.primitives.Bytes;
 //import org.erachain.core.account.Account;
@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 //import org.erachain.core.crypto.Crypto;
 //import org.erachain.core.item.ItemCls;
 
-public class GenesisIssuePersonRecord extends GenesisIssue_ItemRecord {
+public class GenesisIssuePersonRecord extends GenesisIssueItemRecord {
     private static final byte TYPE_ID = (byte) GENESIS_ISSUE_PERSON_TRANSACTION;
     private static final String NAME_ID = "GENESIS Issue Person";
 

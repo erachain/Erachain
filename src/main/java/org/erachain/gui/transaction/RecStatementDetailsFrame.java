@@ -5,9 +5,8 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
-import org.erachain.core.transaction.R_SignNote;
+import org.erachain.core.transaction.RSignNote;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.*;
 import org.erachain.gui.library.library;
 import org.erachain.lang.Lang;
 import org.slf4j.LoggerFactory;
@@ -24,12 +23,12 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 @SuppressWarnings("serial")
-public class RecStatementDetailsFrame extends Rec_DetailsFrame {
+public class RecStatementDetailsFrame extends RecDetailsFrame {
     private static final Logger LOGGER = LoggerFactory.getLogger(Send_RecordDetailsFrame.class);
     private JTextPane messageText;
     private RecStatementDetailsFrame th;
 
-    public RecStatementDetailsFrame(final R_SignNote r_Statement) {
+    public RecStatementDetailsFrame(final RSignNote r_Statement) {
         super(r_Statement);
         th = this;
         if (r_Statement.getKey() > 0) {

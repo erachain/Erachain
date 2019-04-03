@@ -5,6 +5,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemsTableModel;
 import org.erachain.lang.Lang;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
 public class ItemAssetsTableModel extends SearchItemsTableModel {
@@ -20,15 +21,16 @@ public class ItemAssetsTableModel extends SearchItemsTableModel {
         super(DCSet.getInstance().getItemAssetMap(), new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"},
                 new Boolean[]{false, true, true, false, false, false, false, false},
                 COLUMN_FAVORITE);
+        logger = LoggerFactory.getLogger(ItemAssetsTableModel.class.getName());
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.list == null || row > this.list.size() - 1) {
+        if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
 
-        AssetCls asset = (AssetCls) this.list.get(row);
+        AssetCls asset = (AssetCls) this.getItem(row);
 
         switch (column) {
             case COLUMN_KEY:

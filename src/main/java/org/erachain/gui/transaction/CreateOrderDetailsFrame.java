@@ -1,15 +1,13 @@
 package org.erachain.gui.transaction;
 
 import org.erachain.core.transaction.CreateOrderTransaction;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
 
 @SuppressWarnings("serial")
-public class CreateOrderDetailsFrame extends Rec_DetailsFrame {
+public class CreateOrderDetailsFrame extends RecDetailsFrame {
     public CreateOrderDetailsFrame(CreateOrderTransaction orderCreation) {
         super(orderCreation);
 

@@ -118,7 +118,7 @@ public class DCSet extends DBASet implements Observer {
 
         try {
             this.database = database;
-            this.actions = 0l;
+            this.actions = 0L;
 
             this.blockMap = new BlockMap(this, database);
             //this.blockCreatorMap = new BlockCreatorMap(this, database);
@@ -819,7 +819,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /** Набор хэшей - по хэшу поиск записи в котрой он участвует и
-     * используется в транзакции org.erachain.core.transaction.R_Hashes
+     * используется в транзакции org.erachain.core.transaction.RHashes
      hash[byte] -> Stack person + block.height + transaction.seqNo
 
      * Ключ: хэш<br>

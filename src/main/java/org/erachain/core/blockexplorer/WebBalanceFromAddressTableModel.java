@@ -84,7 +84,7 @@ public class WebBalanceFromAddressTableModel extends AbstractTableModel implemen
         }
 
 
-        ((SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>) this.balances).registerObserver();
+        //((SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>) this.balances).registerObserver();
     }
 
 
@@ -205,7 +205,7 @@ public class WebBalanceFromAddressTableModel extends AbstractTableModel implemen
     }
 
     public void removeObservers() {
-        this.balances.removeObserver();
+        //this.balances.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 

@@ -2,7 +2,7 @@ package org.erachain.gui.telegrams;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.lang.Lang;
@@ -88,7 +88,7 @@ public class TelegramsTableModel extends DefaultTableModel implements Observer {
             return null;
         }
 
-        R_Send transaction = (R_Send)this.transactions.get(row).getB();
+        RSend transaction = (RSend)this.transactions.get(row).getB();
         if (transaction == null)
             return null;
 
@@ -110,7 +110,7 @@ public class TelegramsTableModel extends DefaultTableModel implements Observer {
 
         // } catch (Exception e) {
         // GUI ERROR
-        // LOGGER.error(e.getMessage(),e);
+        // logger.error(e.getMessage(),e);
         // return null;
         // }
 
@@ -134,7 +134,7 @@ public class TelegramsTableModel extends DefaultTableModel implements Observer {
         if (message.getType() == ObserverMessage.ALL_TELEGRAMT_LIST_TYPE) {
             if (this.transactions == null) {
                 this.transactions = (SortableList<String, Transaction>) message.getValue();
-                this.transactions.registerObserver();
+                //this.transactions.registerObserver();
 
             }
            

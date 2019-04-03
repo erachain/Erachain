@@ -1,7 +1,7 @@
 package org.erachain.api;
 
-import org.erachain.at.AT_Constants;
-import org.erachain.at.AT_Error;
+import org.erachain.at.ATConstants;
+import org.erachain.at.ATError;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -192,7 +192,7 @@ public class ApiErrorFactory {
 
         //AT
         this.errorMessages.put(ERROR_INVALID_CREATION_BYTES, Lang.getInstance().translate("error in creation bytes"));
-        this.errorMessages.put(ERROR_INVALID_DESC_LENGTH, Lang.getInstance().translate("invalid description length. max length ") + AT_Constants.DESC_MAX_LENGTH);
+        this.errorMessages.put(ERROR_INVALID_DESC_LENGTH, Lang.getInstance().translate("invalid description length. max length ") + ATConstants.DESC_MAX_LENGTH);
         this.errorMessages.put(ERROR_EMPTY_CODE, Lang.getInstance().translate("code is empty"));
         //this.errorMessages.put(ERROR_DATA_SIZE, Lang.getInstance().translate("invalid data length"));
         this.errorMessages.put(ERROR_INVALID_TYPE_LENGTH, Lang.getInstance().translate("invalid type length"));
@@ -246,7 +246,7 @@ public class ApiErrorFactory {
 
         } else if (error > Transaction.AT_ERROR) {
             // AT errors
-            jsonObject.put("message", AT_Error.getATError(error - Transaction.AT_ERROR));
+            jsonObject.put("message", ATError.getATError(error - Transaction.AT_ERROR));
         } else {
             // errors for Transaction
             //jsonObject.put("message", this.errorMessages.get(error));

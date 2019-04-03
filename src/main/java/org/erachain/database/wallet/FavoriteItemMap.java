@@ -2,7 +2,6 @@ package org.erachain.database.wallet;
 
 import org.mapdb.DB;
 import org.erachain.utils.ObserverMessage;
-import org.mapdb.Fun;
 
 import java.util.*;
 
@@ -11,24 +10,21 @@ public class FavoriteItemMap extends Observable {
     protected DWSet dWSet;
     protected SortedSet<Long> itemsSet;
 
-    protected int observer_favorites;
+    protected int observerFavorites;
 
     // favorites init SET
-    public FavoriteItemMap(DWSet dWSet, DB database, int observer_favorites,
-                           String treeSet, int initialAdd //, WItem_Map map
-    ) {
+    public FavoriteItemMap(DWSet dWSet, DB database, int observerFavorites,
+                           String treeSet, int initialAdd) {
         this.dWSet = dWSet;
-        this.observer_favorites = observer_favorites;
+        this.observerFavorites = observerFavorites;
 
         //OPEN MAP
-        this.itemsSet = database.getTreeSet(treeSet + "Favorites");
+        itemsSet = database.getTreeSet(treeSet + "Favorites");
 
         for (long i = 1; i <= initialAdd; i++) {
             //CHECK IF CONTAINS ITEM
-            if (!this.itemsSet.contains(i)
-                //&& map.contains(i)
-            ) {
-                this.add(i);
+            if (!itemsSet.contains(i)) {
+                add(i);
             }
         }
     }
@@ -81,6 +77,6 @@ public class FavoriteItemMap extends Observable {
 
     protected void notifyFavorites() {
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(this.observer_favorites, this.itemsSet));
+        this.notifyObservers(new ObserverMessage(this.observerFavorites, this.itemsSet));
     }
 }

@@ -8,12 +8,11 @@ import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, String>, UnionCls> implements Observer {
+public class WalletItemUnionsTableModel extends SortedListTableModelCls<Tuple2<String, String>, UnionCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -23,7 +22,8 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
     private SortableList<Tuple2<String, String>, UnionCls> unions;
 
     public WalletItemUnionsTableModel() {
-        super(new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"}, new Boolean[]{false, true, true, false, false});
+        super(new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"},
+                new Boolean[]{false, true, true, false, false}, true);
 
     }
 
@@ -93,7 +93,7 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
         if (message.getType() == ObserverMessage.LIST_UNION_TYPE) {
             if (this.unions == null) {
                 this.unions = (SortableList<Tuple2<String, String>, UnionCls>) message.getValue();
-                this.unions.registerObserver();
+                //this.unions.registerObserver();
                 //this.unions.sort(PollMap.NAME_INDEX);
             }
 
@@ -106,11 +106,11 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         Controller.getInstance().addWalletObserver(this);
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         Controller.getInstance().deleteObserver(this);
     }
 

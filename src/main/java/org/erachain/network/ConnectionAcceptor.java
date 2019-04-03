@@ -74,6 +74,7 @@ public class ConnectionAcceptor extends MonitoredThread {
                     continue;
                 }
             } catch (java.lang.OutOfMemoryError e) {
+                LOGGER.error(e.getMessage(), e);
                 Controller.getInstance().stopAll(90);
                 break;
             } catch (java.net.SocketException e) {
@@ -121,7 +122,7 @@ public class ConnectionAcceptor extends MonitoredThread {
             try {
                 //CREATE PEER
                 ////new Peer(callback, connectionSocket);
-                //LOGGER.info("START ACCEPT CONNECT FROM " + connectionSocket.getInetAddress().getHostAddress()
+                //logger.info("START ACCEPT CONNECT FROM " + connectionSocket.getInetAddress().getHostAddress()
                 //		+ " isMy:" + Network.isMyself(connectionSocket.getInetAddress())
                 //		+ " my:" + Network.getMyselfAddress());
 
@@ -152,6 +153,7 @@ public class ConnectionAcceptor extends MonitoredThread {
                     }
                 }
             } catch (java.lang.OutOfMemoryError e) {
+                LOGGER.error(e.getMessage(), e);
                 Controller.getInstance().stopAll(89);
                 break;
             } catch (Exception e) {

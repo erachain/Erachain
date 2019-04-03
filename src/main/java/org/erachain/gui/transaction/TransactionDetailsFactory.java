@@ -1,8 +1,7 @@
 package org.erachain.gui.transaction;
 
 import org.erachain.core.transaction.*;
-import org.erachain.gui.*;
-import org.erachain.gui.items.statement.Statement_Info;
+import org.erachain.gui.items.statement.StatementInfo;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,16 +36,16 @@ public class TransactionDetailsFactory {
         switch (transaction.getType()) {
 
             case Transaction.CALCULATED_TRANSACTION:
-                R_Calculated r_Calc = (R_Calculated) transaction;
+                RCalculated r_Calc = (RCalculated) transaction;
 
-                R_CalculatedDetailsFrame frame = new R_CalculatedDetailsFrame(r_Calc);
+                RCalculatedDetailsFrame frame = new RCalculatedDetailsFrame(r_Calc);
                 gridBagConstraints.gridy = frame.labelGBC.gridy + 1;
                 frame.add(jLabel9, gridBagConstraints);
 
                 return frame;
 
             case Transaction.SEND_ASSET_TRANSACTION:
-                R_Send r_Send = (R_Send) transaction;
+                RSend r_Send = (RSend) transaction;
 
                 Send_RecordDetailsFrame send_RecordDetailsFrame = new Send_RecordDetailsFrame(r_Send);
                 gridBagConstraints.gridy = send_RecordDetailsFrame.labelGBC.gridy + 1;
@@ -56,7 +55,7 @@ public class TransactionDetailsFactory {
 
             case Transaction.SIGN_NOTE_TRANSACTION:
 
-                R_SignNote statement = (R_SignNote) transaction;
+                RSignNote statement = (RSignNote) transaction;
 
                 // RecStatementDetailsFrame recStatementDetailsFrame = new
                 // RecStatementDetailsFrame(statement);
@@ -64,9 +63,9 @@ public class TransactionDetailsFactory {
                 // =recStatementDetailsFrame.labelGBC.gridy+1;
                 // recStatementDetailsFrame. add(jLabel9, gridBagConstraints);
 
-                // recStatementDetailsFrame.add(new Statement_Info(statement))
+                // recStatementDetailsFrame.add(new StatementInfo(statement))
 
-                return new Statement_Info(statement);
+                return new StatementInfo(statement);
 
             case Transaction.REGISTER_NAME_TRANSACTION:
 
@@ -194,7 +193,7 @@ public class TransactionDetailsFactory {
 
             case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
 
-                R_SetStatusToItem setStatusToItem = (R_SetStatusToItem) transaction;
+                RSetStatusToItem setStatusToItem = (RSetStatusToItem) transaction;
 
                 SetStatusToItemDetailsFrame setStatusToItemDetailsFrame = new SetStatusToItemDetailsFrame(setStatusToItem);
                 gridBagConstraints.gridy = setStatusToItemDetailsFrame.labelGBC.gridy + 1;
@@ -233,7 +232,7 @@ public class TransactionDetailsFactory {
                 return multiPaymentDetailsFrame;
 
             case Transaction.VOUCH_TRANSACTION:
-                R_Vouch r_Vouch = (R_Vouch) transaction;
+                RVouch r_Vouch = (RVouch) transaction;
                 VouchingDetailsFrame vouchingDetailsFrame = new VouchingDetailsFrame(r_Vouch);
                 gridBagConstraints.gridy = vouchingDetailsFrame.labelGBC.gridy + 1;
                 vouchingDetailsFrame.add(jLabel9, gridBagConstraints);
@@ -241,7 +240,7 @@ public class TransactionDetailsFactory {
                 return vouchingDetailsFrame;
 
             case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
-                R_SertifyPubKeys sertifyPubKeysRecord = (R_SertifyPubKeys) transaction;
+                RSertifyPubKeys sertifyPubKeysRecord = (RSertifyPubKeys) transaction;
                 SertifyPubKeysDetailsFrame sertifyPubKeysDetailsFrame = new SertifyPubKeysDetailsFrame(
                         sertifyPubKeysRecord);
                 gridBagConstraints.gridy = sertifyPubKeysDetailsFrame.labelGBC.gridy + 1;
@@ -250,7 +249,7 @@ public class TransactionDetailsFactory {
                 return sertifyPubKeysDetailsFrame;
 
             case Transaction.HASHES_RECORD:
-                R_Hashes r_Hashes = (R_Hashes) transaction;
+                RHashes r_Hashes = (RHashes) transaction;
                 HashesDetailsFrame hashesDetailsFrame = new HashesDetailsFrame(r_Hashes);
                 gridBagConstraints.gridy = hashesDetailsFrame.labelGBC.gridy + 1;
                 hashesDetailsFrame.add(jLabel9, gridBagConstraints);

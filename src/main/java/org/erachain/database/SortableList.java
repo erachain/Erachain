@@ -10,7 +10,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Observer {
+public class SortableList<T, U> extends AbstractList<Pair<T, U>>// implements Observer
+{
 
     static Logger LOGGER = LoggerFactory.getLogger(SortableList.class.getName());
     private DBMap<T, U> db;
@@ -29,10 +30,10 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
         this.db = db;
 
         //LOAD DEFAULT ITERATOR
-        this.index = DBMap.DEFAULT_INDEX;
+        this.index = db.DEFAULT_INDEX;
         this.size = db.size();
         this.descending = false;
-        this.iterator = this.filter(db.getIterator(DBMap.DEFAULT_INDEX, this.descending));
+        this.iterator = this.filter(db.getIterator(db.DEFAULT_INDEX, this.descending));
         this.position = 0;
         additionalFilterFields = new ArrayList<String>();
     }
@@ -42,7 +43,7 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
         this.keys = keys;
 
         //LOAD DEFAULT ITERATOR
-        this.index = DBMap.DEFAULT_INDEX;
+        this.index = db.DEFAULT_INDEX;
         this.size = keys.size();
         this.descending = false;
         this.iterator = keys.iterator();
@@ -73,13 +74,13 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
      * на обработку событий - если прошло меньше времени то ничего не делать
      *
      */
-    public void registerObserver() {
-        this.db.addObserver(this);
-    }
+    //public void registerObserver() {
+    //    this.db.addObserver(this);
+    //}
 
-    public void removeObserver() {
-        this.db.deleteObserver(this);
-    }
+    //public void removeObserver() {
+     //   this.db.deleteObserver(this);
+    //}
 
 
     @Override
@@ -175,6 +176,11 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
 
 
 	private long timePoint;
+
+    /*
+     * нужно только для сортировки при измнении таблицы
+     * @param o
+     * @param object
     @Override
     public void update(Observable o, Object object) {
 
@@ -198,6 +204,7 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
         }
 
     }
+    */
 
     private Iterator<T> filter(Iterator<T> iterator) {
         if (this.pattern != null) {

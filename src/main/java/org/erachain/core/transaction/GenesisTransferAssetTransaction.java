@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class GenesisTransferAssetTransaction extends Genesis_Record {
+public class GenesisTransferAssetTransaction extends GenesisRecord {
 
     private static final byte TYPE_ID = (byte) Transaction.GENESIS_SEND_ASSET_TRANSACTION;
     private static final String NAME_ID = "GENESIS Send Asset";
@@ -29,7 +29,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
     private static final int OWNER_LENGTH = RECIPIENT_LENGTH;
     private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
 
-    private static final int BASE_LENGTH = Genesis_Record.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
+    private static final int BASE_LENGTH = GenesisRecord.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
 
     private Account owner;
     private Account recipient;

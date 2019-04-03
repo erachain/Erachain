@@ -8,11 +8,11 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.core.transaction.R_SertifyPubKeys;
+import org.erachain.core.transaction.RSertifyPubKeys;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
@@ -168,7 +168,7 @@ public class PersonConfirmDialog extends JDialog {
             return;
         }
 
-        Pair<Integer, Integer> toDateResult = ItemCls.resolveEndDayFromStr(toDateStr, R_SertifyPubKeys.DEFAULT_DURATION);
+        Pair<Integer, Integer> toDateResult = ItemCls.resolveEndDayFromStr(toDateStr, RSertifyPubKeys.DEFAULT_DURATION);
         if (toDateResult.getA() < 0) {
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid to Date"),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
@@ -215,10 +215,10 @@ public class PersonConfirmDialog extends JDialog {
                 person.getKey(), sertifiedPublicKeys, toDate);
 
         String Status_text = "";
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
+        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2),
                 (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
-        SertifyPubKeysDetailsFrame ww = new SertifyPubKeysDetailsFrame((R_SertifyPubKeys) transaction);
+        SertifyPubKeysDetailsFrame ww = new SertifyPubKeysDetailsFrame((RSertifyPubKeys) transaction);
         dd.jScrollPane1.setViewportView(ww);
         dd.setLocationRelativeTo(this);
         dd.setVisible(true);
@@ -286,7 +286,7 @@ public class PersonConfirmDialog extends JDialog {
         getContentPane().setLayout(layout);
 
         jLabel_PersonInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        Person_Info info = new Person_Info();
+        PersonInfo info = new PersonInfo();
         info.show_001(person);
         info.setFocusable(false);
         jLabel_PersonInfo.setViewportView(info);
@@ -294,7 +294,7 @@ public class PersonConfirmDialog extends JDialog {
         // jLabel_PersonInfo.setText(Lang.getInstance().translate("Public Keys
         // of") + " " + person.viewName() +":");
         // jLabel_PersonInfo.setText(new
-        // Person_Info().Get_HTML_Person_Info_001(person) );
+        // PersonInfo().Get_HTML_Person_Info_001(person) );
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;

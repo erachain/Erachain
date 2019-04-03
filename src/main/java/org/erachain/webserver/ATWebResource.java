@@ -2,12 +2,12 @@ package org.erachain.webserver;
 // 30/03
 
 import org.erachain.at.AT;
-import org.erachain.at.AT_API_Helper;
-import org.erachain.at.AT_Transaction;
+import org.erachain.at.ATAPIHelper;
+import org.erachain.at.ATTransaction;
 import com.google.common.collect.Lists;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.bouncycastle.util.encoders.Hex;
@@ -68,11 +68,11 @@ public class ATWebResource {
         return DCSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient(atId);
     }
 
-    public List<AT_Transaction> getOutgoingTransactions(String atId) {
+    public List<ATTransaction> getOutgoingTransactions(String atId) {
         return DCSet.getInstance().getATTransactionMap().getATTransactionsBySender(atId);
     }
 
-    public List<AT_Transaction> getOutgoingTransactions(AT at) {
+    public List<ATTransaction> getOutgoingTransactions(AT at) {
         return getOutgoingTransactions(Base58.encode(at.getId()));
     }
 
@@ -108,7 +108,7 @@ public class ATWebResource {
         int start = Integer.valueOf(startPos);
         AT at = getAT(atId);
 
-        return AT_API_Helper.getLong(Arrays.copyOfRange(at.getAp_data().array(), start, start + 8));
+        return ATAPIHelper.getLong(Arrays.copyOfRange(at.getAp_data().array(), start, start + 8));
     }
 
     public int getInt(String atId, String startPos) {
@@ -157,9 +157,9 @@ public class ATWebResource {
         return acc.getBalanceUSE(Transaction.FEE_KEY).toPlainString();
     }
 
-    public String getMessage(R_Send tx) {
-        if (tx instanceof R_Send) {
-            R_Send message = tx;
+    public String getMessage(RSend tx) {
+        if (tx instanceof RSend) {
+            RSend message = tx;
             if ((!message.isEncrypted())) {
                 return (message.isText()) ?
                         new String(message.getData(), Charset.forName("UTF-8")) :

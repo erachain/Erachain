@@ -1,8 +1,7 @@
 package org.erachain.core.blockexplorer;
 
 import org.apache.commons.net.util.Base64;
-import org.erachain.at.AT;
-import org.erachain.at.AT_Transaction;
+import org.erachain.at.ATTransaction;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
@@ -22,7 +21,6 @@ import org.erachain.core.voting.Poll;
 import org.erachain.core.voting.PollOption;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TradeMap;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.gui.models.PersonAccountsModel;
@@ -1597,12 +1595,12 @@ public class BlockExplorer {
             } else if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
                 /*
                 if (transaction.getSeqNo() > 0 && assetNames != null) {
-                    long assetkey = ((R_Send) unit).getAbsKey();
+                    long assetkey = ((RSend) unit).getAbsKey();
                     transactionDataJSON.put("asset", assetkey);
                     transactionDataJSON.put("assetName", assetNames.getMap().get(assetkey));
                 }
 
-                if (((R_Send) unit).isEncrypted()) {
+                if (((RSend) unit).isEncrypted()) {
                     transactionDataJSON.put("data", "encrypted");
                 }
                 */
@@ -1731,8 +1729,8 @@ public class BlockExplorer {
 
         }
 
-        if (unit instanceof AT_Transaction) {
-            AT_Transaction aTtransaction = (AT_Transaction) unit;
+        if (unit instanceof ATTransaction) {
+            ATTransaction aTtransaction = (ATTransaction) unit;
             transactionDataJSON = aTtransaction.toJSON();
 
             Block block = Controller.getInstance().getBlockByHeight(aTtransaction.getBlockHeight());
@@ -1740,9 +1738,9 @@ public class BlockExplorer {
             transactionDataJSON.put("timestamp", timestamp);
             transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(timestamp));
 
-            transactionDataJSON.put("confirmations", getHeight() - ((AT_Transaction) unit).getBlockHeight() + 1);
+            transactionDataJSON.put("confirmations", getHeight() - ((ATTransaction) unit).getBlockHeight() + 1);
 
-            if (((AT_Transaction) unit).getRecipient().equals("1111111111111111111111111")) {
+            if (((ATTransaction) unit).getRecipient().equals("1111111111111111111111111")) {
                 transactionDataJSON.put("generatorAddress", block.getCreator().getAddress());
             }
 
@@ -1988,7 +1986,7 @@ public class BlockExplorer {
     public Map jsonQueryPeers(UriInfo info) {
 
         int start = 0;
-        int end = 20;
+        int end = 100;
         int view = 0;
         int sortPing = 0;
         PeersTableModel model_Peers = new PeersTableModel();
@@ -2156,7 +2154,7 @@ public class BlockExplorer {
         // TODO Auto-generated method stub
         Map output = new LinkedHashMap();
 
-        R_SignNote trans = (R_SignNote) dcSet.getTransactionFinalMap().get(new Integer(block),
+        RSignNote trans = (RSignNote) dcSet.getTransactionFinalMap().get(new Integer(block),
                 new Integer(seqNo));
         output.put("Label_type", Lang.getInstance().translateFromLangObj("Type", langObj));
         output.put("Label_statement", Lang.getInstance().translateFromLangObj("Statement", langObj));
@@ -2165,9 +2163,14 @@ public class BlockExplorer {
         output.put("Label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
         output.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
         output.put("Label_No", Lang.getInstance().translateFromLangObj("No.", langObj));
+        output.put("Label_pubKey", Lang.getInstance().translateFromLangObj("Public Key", langObj));
+        output.put("Label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
 
         output.put("block", block);
         output.put("seqNo", seqNo);
+
+        output.put("pubKey", Base58.encode(trans.getCreator().getPublicKey()));
+        output.put("sign", Base58.encode(trans.getSignature()));
 
         //TemplateCls statement = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
 
@@ -2430,53 +2433,18 @@ public class BlockExplorer {
 
         output.put("creator", trans.getCreator().getPersonAsString());
 
-        if (trans.getCreator().getPerson() != null) {
-            output.put("creator_key", trans.getCreator().getPerson().b.getKey());
-            output.put("creator_name", trans.getCreator().getPerson().b.getName());
+        Tuple2<Integer, PersonCls> personItem = trans.getCreator().getPerson();
+        if (personItem != null) {
+            output.put("creator_key", personItem.b.getKey());
+            output.put("creator_name", personItem.b.getName());
         } else {
             output.put("creator_key", "");
             output.put("creator_name", "");
         }
 
-        // output.put("name", person.getName());
         output.put("date", df.format(new Date(trans.getTimestamp())).toString());
-        // output.put("description", person.getDescription());
 
-        // vouchers
-        /* output.put("Label_vouchs", Lang.getInstance().translateFromLangObj("Certified", langObj));
-        output.put("Label_accounts_table_adress", Lang.getInstance().translateFromLangObj("Address", langObj));
-        output.put("Label_accounts_table_data", Lang.getInstance().translateFromLangObj("Date", langObj));
-        output.put("Label_accounts_table_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-
-       Map vouchesJSON = new LinkedHashMap();
-
-        WebStatementsVouchTableModel table_sing_model = null;//new WebStatementsVouchTableModel(trans);
-        if (table_sing_model== null) return output;
-        int rowCount = table_sing_model.getRowCount();
-
-        if (rowCount > 0) {
-            for (int i = 0; i < rowCount; i++) {
-
-                Transaction vouch_Tr = (Transaction) table_sing_model.getValueAt(i, 3);
-                Map vouchJSON = new LinkedHashMap();
-                vouchJSON.put("date", vouch_Tr.viewTimestamp());
-                vouchJSON.put("block", "" + vouch_Tr.getBlockHeight());
-                vouchJSON.put("seqNo", "" + vouch_Tr.getSeqNo());
-                vouchJSON.put("creator", vouch_Tr.getCreator().getAddress());
-
-                Tuple2<Integer, PersonCls> personInfo = vouch_Tr.getCreator().getPerson();
-                if (personInfo != null) {
-                    PersonCls person = personInfo.b;
-                    vouchJSON.put("creator_name", person.getName());
-                    vouchJSON.put("creator_key", "" + person.getKey());
-                }
-
-                vouchesJSON.put(i, vouchJSON);
-            }
-        }
-        output.put("vouches", vouchesJSON);
-        */
-        output.put("vouches_table", WebTransactionsHTML.getInstance().get_Vouches(trans, langObj));
+        output.put("vouches_table", WebTransactionsHTML.getInstance().getVouchesNew(personItem, trans, langObj));
 
 
         return output;
@@ -2580,10 +2548,10 @@ public class BlockExplorer {
 
         int txsCount = all.size();
 
-        LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = dcSet.getATTransactionMap()
+        LinkedHashMap<Tuple2<Integer, Integer>, ATTransaction> atTxs = dcSet.getATTransactionMap()
                 .getATTransactions(block.getHeight());
 
-        for (Entry<Tuple2<Integer, Integer>, AT_Transaction> e : atTxs.entrySet()) {
+        for (Entry<Tuple2<Integer, Integer>, ATTransaction> e : atTxs.entrySet()) {
             all.add(e.getValue());
             aTTxsCount++;
         }
@@ -2630,7 +2598,7 @@ public class BlockExplorer {
 
         BigDecimal totalATAmount = BigDecimal.ZERO;
 
-        for (Map.Entry<Tuple2<Integer, Integer>, AT_Transaction> e : atTxs.entrySet()) {
+        for (Map.Entry<Tuple2<Integer, Integer>, ATTransaction> e : atTxs.entrySet()) {
             totalATAmount = totalATAmount.add(BigDecimal.valueOf(e.getValue().getAmount()));
         }
 
@@ -2945,7 +2913,7 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                listPersons = dcSet.getItemPersonMap().get_By_Name(search, false);
+                listPersons = dcSet.getItemPersonMap().findByName(search, false);
             }
         } catch (Exception e) {
             //Ошибка при поиске - пробрасываем WrongSearchException для отображения пустого списка элементов
@@ -2997,7 +2965,7 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                listAssets = dcSet.getItemAssetMap().get_By_Name(search, false);
+                listAssets = dcSet.getItemAssetMap().findByName(search, false);
             }
         } catch (Exception e) {
             logger.info("Wrong search while process assets... ");
@@ -3049,7 +3017,7 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                listStatuses = dcSet.getItemStatusMap().get_By_Name(search, false);
+                listStatuses = dcSet.getItemStatusMap().findByName(search, false);
             }
         } catch (Exception e) {
             logger.info("Wrong search while process statuses... ");
@@ -3107,7 +3075,7 @@ public class BlockExplorer {
             out.put("seqNo", transaction.getSeqNo());
 
             if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
-                R_Calculated txCalculated = (R_Calculated) transaction;
+                RCalculated txCalculated = (RCalculated) transaction;
                 outcome = txCalculated.getAmount().signum() < 0;
 
                 out.put("reference", "--");
@@ -3139,7 +3107,8 @@ public class BlockExplorer {
             } else {
                 out.put("signature", Base58.encode(transaction.getSignature()));
                 out.put("date", DateTimeFormat.timestamptoString(transaction.getTimestamp()));
-
+                String typeName = transaction.viewFullTypeName();
+                out.put("type", typeName);
                 if (transaction.getCreator() == null) {
                     out.put("creator", GenesisBlock.CREATOR.getAddress());
                     out.put("creator_addr", "GENESIS");
@@ -3157,7 +3126,7 @@ public class BlockExplorer {
                         atSideAccount = transaction.getCreator();
                         type = transaction.getType();
                         if (type == Transaction.SEND_ASSET_TRANSACTION) {
-                            R_Send rSend = (R_Send) transaction;
+                            RSend rSend = (RSend) transaction;
                             if (rSend.getCreator().equals(account)) {
                                 outcome = false;
                                 atSideAccount = rSend.getRecipient();
@@ -3177,7 +3146,6 @@ public class BlockExplorer {
                 out.put("confirmations", transaction.getConfirmations(height));
 
             }
-
 
 
             long absKey = transaction.getAbsKey();
@@ -3223,11 +3191,6 @@ public class BlockExplorer {
         return output;
 
     }
-
-
-
-
-
 
 
 }

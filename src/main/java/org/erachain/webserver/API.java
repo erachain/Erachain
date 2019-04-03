@@ -732,7 +732,7 @@ public class API {
             }
 
         } catch (Exception e) {
-            //LOGGER.error(e.getMessage());
+            //logger.error(e.getMessage());
             out.put("error", APIUtils.errorMess(-1, e.toString() + " on step: " + step));
             return out;
         }
@@ -747,7 +747,7 @@ public class API {
         try {
             transactionBytes = Base58.decode(rawDataBase58);
         } catch (Exception e) {
-            //LOGGER.error(e.getMessage());
+            //logger.error(e.getMessage());
             out.put("error", APIUtils.errorMess(-1, e.toString() + " INVALID_RAW_DATA"));
             return out;
         }
@@ -1219,7 +1219,7 @@ public class API {
         }
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
-        List<ItemCls> list = map.get_By_Name(filter, false);
+        List<ItemCls> list = map.findByName(filter, false);
 
         JSONArray array = new JSONArray();
 
@@ -1747,7 +1747,7 @@ public class API {
 
         ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
         // DOES ASSETID EXIST
-        List<ItemCls> list = map.get_By_Name(filter, false);
+        List<ItemCls> list = map.findByName(filter, false);
 
         JSONArray array = new JSONArray();
 

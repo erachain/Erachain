@@ -6,15 +6,14 @@ import org.erachain.database.SortableList;
 import org.erachain.database.wallet.FavoriteItemMap;
 import org.erachain.datachain.DCMap;
 import org.erachain.datachain.ItemMap;
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 
-import javax.ws.rs.PathParam;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls> implements Observer {
+public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Long, ItemCls> implements Observer {
 
     private final int RESET_EVENT;
     private final int ADD_EVENT;
@@ -25,26 +24,26 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
 
     public FavoriteItemModelTable(DCMap map, FavoriteItemMap favoriteMap, String[] columnNames, Boolean[] columnAutoHeight,
                                   int resetObserver, int addObserver, int deleteObserver, int listObserver, int favorite) {
-        super(columnNames, columnAutoHeight);
+        super(columnNames, columnAutoHeight, false);
 
         // в головной гласс нельзя таблицу передавать - чтобы там лишний раз не запускалась иницализация наблюдения
         // оно еще ен готово так как таблица вторая не присвоена - ниже привяжемся к наблюдениям
         this.map = map;
         this.favoriteMap = favoriteMap;
-        this.COLUMN_FAVORITE = favorite;
+        COLUMN_FAVORITE = favorite;
 
-        this.RESET_EVENT = resetObserver;
-        this.ADD_EVENT = addObserver;
-        this.DELETE_EVENT = deleteObserver;
-        this.LIST_EVENT = listObserver;
+        RESET_EVENT = resetObserver;
+        ADD_EVENT = addObserver;
+        DELETE_EVENT = deleteObserver;
+        LIST_EVENT = listObserver;
 
         // теперь нужно опять послать событие чтобы загрузить
         getInterval();
-        this.fireTableDataChanged();
+        fireTableDataChanged();
         needUpdate = false;
 
         // переиницализация после установуи таблиц
-        addObserversThis();
+        this.addObservers();
 
     }
 
@@ -56,7 +55,7 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
         int type = message.getType();
         if (type == LIST_EVENT) {
             getInterval();
-            this.fireTableDataChanged();
+            fireTableDataChanged();
             needUpdate = false;
 
         } else if (type == ADD_EVENT) {
@@ -69,9 +68,20 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
 
         } else if (type == RESET_EVENT) {
             getInterval();
-            this.fireTableDataChanged();
+            fireTableDataChanged();
             needUpdate = false;
         }
+    }
+
+    // необходимо переопределить так у супер класса по размеру SortedList
+    // а нам надо по Лист
+    @Override
+    public int getRowCount() {
+        if (list == null) {
+            return 0;
+        }
+
+        return list.size();
     }
 
     //public abstract int getMapSize();
@@ -89,26 +99,26 @@ public abstract class FavoriteItemModelTable extends TableModelCls<Long, ItemCls
 
     @Override
     public void getIntervalThis(long startBack, long endBack) {
-        this.listSorted = new SortableList<Long, ItemCls>((ItemMap)map, favoriteMap.getFromToKeys(0, 999999999));
-        this.listSorted.sort();
+        listSorted = new SortableList<Long, ItemCls>(map, favoriteMap.getFromToKeys(0, 999999999));
+        listSorted.sort();
 
-        this.list = new ArrayList<ItemCls>();
+        list = new ArrayList<>();
         for (Pair<Long, ItemCls> key: listSorted) {
-            if (key.getB() == null)
+            if (key.getB() == null) {
                 continue;
-
-            this.list.add((ItemCls)map.get(key.getA()));
+            }
+            list.add((ItemCls)map.get(key.getA()));
         }
 
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
         if (Controller.getInstance().doesWalletDatabaseExists()
             && favoriteMap != null)
             favoriteMap.addObserver(this);
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         if (Controller.getInstance().doesWalletDatabaseExists()
                 && favoriteMap != null)
             favoriteMap.deleteObserver(this);

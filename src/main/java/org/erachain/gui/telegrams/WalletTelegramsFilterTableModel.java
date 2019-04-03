@@ -3,7 +3,7 @@ package org.erachain.gui.telegrams;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
@@ -108,7 +108,7 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
             return null;
         }
 
-        R_Send transaction = (R_Send) ttt.get(row).c;
+        RSend transaction = (RSend) ttt.get(row).c;
         if (transaction == null)
             return null;
 
@@ -124,7 +124,7 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
 
         // } catch (Exception e) {
         // GUI ERROR
-        // LOGGER.error(e.getMessage(),e);
+        // logger.error(e.getMessage(),e);
         // return null;
         // }
 
@@ -148,7 +148,7 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
         if (message.getType() == ObserverMessage.WALLET_LIST_TELEGRAM_TYPE) {
             if (this.transactions == null) {
                 this.transactions = (SortableList<String, Transaction>) message.getValue();
-                this.transactions.registerObserver();
+                //this.transactions.registerObserver();
 
             }
             filter();

@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 //import java.math.BigInteger;
 
-public class GenesisIssueTemplateRecord extends GenesisIssue_ItemRecord {
+public class GenesisIssueTemplateRecord extends GenesisIssueItemRecord {
 
     private static final byte TYPE_ID = (byte) GENESIS_ISSUE_TEMPLATE_TRANSACTION;
     private static final String NAME_ID = "GENESIS Issue Template";

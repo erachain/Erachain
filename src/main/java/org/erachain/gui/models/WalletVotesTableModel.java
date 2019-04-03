@@ -8,13 +8,12 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletVotesTableModel extends TableModelCls<Tuple2<String, String>, Poll> implements Observer {
+public class WalletVotesTableModel extends SortedListTableModelCls<Tuple2<String, String>, Poll> implements Observer {
     public static final int COLUMN_NAME = 0;
     public static final int COLUMN_ADDRESS = 1;
     public static final int COLUMN_TOTAL_VOTES = 2;
@@ -23,7 +22,7 @@ public class WalletVotesTableModel extends TableModelCls<Tuple2<String, String>,
     private SortableList<Tuple2<String, String>, Poll> polls;
 
     public WalletVotesTableModel() {
-        super(new String[]{"Name", "Creator", "Total Votes", "Confirmed"});
+        super(new String[]{"Name", "Creator", "Total Votes", "Confirmed"}, true);
     }
 
     @Override
@@ -88,7 +87,7 @@ public class WalletVotesTableModel extends TableModelCls<Tuple2<String, String>,
         if (message.getType() == ObserverMessage.WALLET_LIST_POLL_TYPE) {
             if (this.polls == null) {
                 this.polls = (SortableList<Tuple2<String, String>, Poll>) message.getValue();
-                this.polls.registerObserver();
+                //this.polls.registerObserver();
                 this.polls.sort(PollMap.NAME_INDEX);
             }
 
@@ -102,11 +101,11 @@ public class WalletVotesTableModel extends TableModelCls<Tuple2<String, String>,
     }
 
 
-    public void addObserversThis() {
+    public void addObservers() {
         Controller.getInstance().addWalletObserver(this);
     }
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
         Controller.getInstance().deleteObserver(this);
     }
 

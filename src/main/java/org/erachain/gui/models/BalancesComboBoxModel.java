@@ -21,7 +21,7 @@ public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<Stri
     public BalancesComboBoxModel(Account account) {
         Controller.getInstance().addObserver(this);
         this.balances = Controller.getInstance().getBalances(account);
-        this.balances.registerObserver();
+        ///this.balances.registerObserver();
 
         this.update();
     }
@@ -39,7 +39,9 @@ public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<Stri
         ObserverMessage message = (ObserverMessage) arg;
 
         if ((message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK)
-                || (Controller.getInstance().getStatus() == Controller.STATUS_OK && (message.getType() == ObserverMessage.ADD_BALANCE_TYPE || message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE))) {
+                || (Controller.getInstance().getStatus() == Controller.STATUS_OK &&
+                (message.getType() == ObserverMessage.ADD_BALANCE_TYPE || message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE))
+        ) {
             this.update();
         }
     }
@@ -65,6 +67,6 @@ public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<Stri
 
     public void removeObservers() {
         Controller.getInstance().deleteObserver(this);
-        this.balances.removeObserver();
+        //this.balances.removeObserver();
     }
 }

@@ -142,17 +142,45 @@ public class Synchronizer {
                 throw new Exception(mess);
 
             }
-            // LOGGER.debug("*** core.Synchronizer.checkNewBlocks - try orphan:
+            // logger.debug("*** core.Synchronizer.checkNewBlocks - try orphan:
             // " + lastBlock.getHeight(fork));
             if (cnt.isOnStopping())
                 throw new Exception("on stopping");
 
             int height = lastBlock.getHeight();
 
-            fork.getTransactionMap().clearByDeadTimeAndLimit(
-                    cnt.getBlockChain().getTimestamp(height), false);
+            if (BlockChain.DEVELOP_USE) {
+                // TEST CORRUPT base
+                int bbb = fork.getBlockMap().size();
+                int hhh = fork.getBlocksHeadsMap().size();
+                int sss = fork.getBlockSignsMap().size();
+                assert (height == hhh);
+                assert (bbb == hhh);
+                assert (sss == hhh);
+            }
+
+            lastBlock.orphan(fork);
+            DCSet.getInstance().clearCache();
+
+            if (BlockChain.DEVELOP_USE) {
+                // TEST CORRUPT base
+                int height2 = lastBlock.getHeight();
+                int bbb2 = fork.getBlockMap().size();
+                int hhh2 = fork.getBlocksHeadsMap().size();
+                int sss2 = fork.getBlockSignsMap().size();
+                assert (height2 == hhh2);
+                assert (bbb2 == hhh2);
+                assert (sss2 == hhh2);
+            }
+
+            LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned! chain size: " + fork.getBlockMap().size());
+            lastBlock = blockMap.last();
+
+            //fork.getTransactionMap().clearByDeadTimeAndLimit(
+            //        cnt.getBlockChain().getTimestamp(height), false);
 
             // проверим на переполнение откаченных трнзакций
+            ////////countTransactionToOrphan += lastBlock.getTransactionCount();
             if (countTransactionToOrphan > MAX_ORPHAN_TRANSACTIONS) {
                 String mess = "Dishonest peer by on lastCommonBlock[" + lastCommonBlock.getHeight()
                         + "] - reached MAX_ORPHAN_TRANSACTIONS: " + MAX_ORPHAN_TRANSACTIONS;
@@ -160,27 +188,6 @@ public class Synchronizer {
                 throw new Exception(mess);
             }
 
-            int bbb = fork.getBlockMap().size();
-            int hhh = fork.getBlocksHeadsMap().size();
-            int sss = fork.getBlockSignsMap().size();
-            assert (height == hhh);
-            assert (bbb == hhh);
-            assert (sss == hhh);
-
-            // runedBlock = lastBlock; // FOR quick STOPPING
-            countTransactionToOrphan += lastBlock.getTransactionCount();
-            lastBlock.orphan(fork);
-
-            int height2 = lastBlock.getHeight();
-            int bbb2 = fork.getBlockMap().size();
-            int hhh2 = fork.getBlocksHeadsMap().size();
-            int sss2 = fork.getBlockSignsMap().size();
-            assert (height2 == hhh2);
-            assert (bbb2 == hhh2);
-            assert (sss2 == hhh2);
-
-            LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned! chain size: " + fork.getBlockMap().size());
-            lastBlock = blockMap.last();
         }
 
         LOGGER.debug("*** core.Synchronizer.checkNewBlocks - lastBlock[" + lastBlock.getHeight() + "]");
@@ -398,7 +405,7 @@ public class Synchronizer {
             throw new Exception("on stopping");
 
         /*
-         * LOGGER.error("Synchronizing from peer: " + peer.toString() + ":" +
+         * logger.error("Synchronizing from peer: " + peer.toString() + ":" +
          * peer);
          */
 
@@ -468,7 +475,7 @@ public class Synchronizer {
                 }
 
                 ///blockFromPeer.setCalcGeneratingBalance(dcSet); // NEED SET it
-                ///LOGGER.debug("BLOCK Calc Generating Balance");
+                ///logger.debug("BLOCK Calc Generating Balance");
 
                 if (cnt.isOnStopping()) {
                     // STOP BLOCKBUFFER
@@ -593,7 +600,7 @@ public class Synchronizer {
     private List<byte[]> getBlockSignatures(byte[] header, Peer peer) throws Exception {
 
         /*
-         * LOGGER.
+         * logger.
          * error("core.Synchronizer.getBlockSignatures(byte[], Peer) for: " +
          * Base58.encode(header));
          */
@@ -776,7 +783,7 @@ public class Synchronizer {
 
             blocks.add(block);
             bytesGet += 1500 + block.getDataLength(false);
-            ///LOGGER.debug("block added with RECS:" + block.getTransactionCount() + " bytesGet kb: " + bytesGet / 1000);
+            ///logger.debug("block added with RECS:" + block.getTransactionCount() + " bytesGet kb: " + bytesGet / 1000);
             if (bytesGet > BYTES_MAX_GET) {
                 break;
             }
@@ -804,9 +811,9 @@ public class Synchronizer {
         Integer countObserv_REMOVE = null;
         Integer countObserv_COUNT = null;
         if (observOn) {
-      //      countObserv_ADD = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_ADD);
-      //      countObserv_REMOVE = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_REMOVE);
-      //      countObserv_COUNT = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_COUNT);
+            //      countObserv_ADD = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_ADD);
+            //      countObserv_REMOVE = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_REMOVE);
+            //      countObserv_COUNT = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_COUNT);
         }
 
         Exception error = null;
@@ -860,13 +867,13 @@ public class Synchronizer {
 
                 if (observOn) {
 
-                        if (countObserv_ADD != null) {
-                            try {
-                                dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_ADD, countObserv_ADD);
-                            } catch (Exception e) {
-                                LOGGER.error(e.getMessage(), e);
-                            }
+                    if (countObserv_ADD != null) {
+                        try {
+                            dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_ADD, countObserv_ADD);
+                        } catch (Exception e) {
+                            LOGGER.error(e.getMessage(), e);
                         }
+                    }
 
                     try {
                         dcSet.getBlockMap().notifyOrphanChain(block);

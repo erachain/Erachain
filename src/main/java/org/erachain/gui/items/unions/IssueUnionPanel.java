@@ -8,8 +8,8 @@ import org.erachain.core.transaction.IssueUnionRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.library.Issue_Confirm_Dialog;
-import org.erachain.gui.library.My_Add_Image_Panel;
+import org.erachain.gui.library.IssueConfirmDialog;
+import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
@@ -41,8 +41,8 @@ public class IssueUnionPanel extends JPanel {
     private javax.swing.JLabel account_jLabel;
     private javax.swing.JLabel description_jLabel;
     private javax.swing.JLabel fee_jLabel;
-    private My_Add_Image_Panel add_logo_panel;
-    private My_Add_Image_Panel add_image_panel;
+    private AddImageLabel add_logo_panel;
+    private AddImageLabel add_image_panel;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel name_jLabel;
     private javax.swing.JLabel birthday_jLabel;
@@ -163,7 +163,7 @@ public class IssueUnionPanel extends JPanel {
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
         IssueUnionRecord issue_Union = (IssueUnionRecord) Controller.getInstance().issueUnion(
                 creator, this.txtName.getText(), birthday, parent, this.txtareaDescription.getText(),
-                add_logo_panel.imgButes, image,
+                add_logo_panel.getImgBytes(), image,
                 feePow);
         //Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
         String text = "<HTML><body>";
@@ -181,7 +181,7 @@ public class IssueUnionPanel extends JPanel {
 
         //	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
 
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, issue_Union,
+        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, issue_Union,
                 text, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
         dd.setLocationRelativeTo(th);
         dd.setVisible(true);
@@ -224,8 +224,8 @@ public class IssueUnionPanel extends JPanel {
 
         account_jLabel = new javax.swing.JLabel();
         name_jLabel = new javax.swing.JLabel();
-        add_logo_panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add Logo"), 50, 50);
-        add_image_panel = new My_Add_Image_Panel((Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024")), 250, 250);
+        add_logo_panel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), 50, 50);
+        add_image_panel = new AddImageLabel((Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024")), 250, 250);
         jScrollPane1 = new javax.swing.JScrollPane();
         title_jLabel = new javax.swing.JLabel();
         description_jLabel = new javax.swing.JLabel();

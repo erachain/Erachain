@@ -21,14 +21,14 @@ public class TransactionFactory {
     public Transaction parse(byte[] data, int asDeal) throws Exception {
         //READ TYPE
         int type = Byte.toUnsignedInt(data[0]);
-        //LOGGER.info(" 1: " + parsedAssetTransfer.getKey() );
+        //logger.info(" 1: " + parsedAssetTransfer.getKey() );
 
 
         switch (type) {
             case Transaction.SIGN_NOTE_TRANSACTION:
 
                 //PARSE PAYMENT TRANSACTION
-                return R_SignNote.Parse(data, asDeal);
+                return RSignNote.Parse(data, asDeal);
 
             case Transaction.REGISTER_NAME_TRANSACTION:
 
@@ -96,13 +96,13 @@ public class TransactionFactory {
             case Transaction.SEND_ASSET_TRANSACTION:
 
                 // PARSE MESSAGE TRANSACTION
-                return R_Send.Parse(data, asDeal);
+                return RSend.Parse(data, asDeal);
 
             case Transaction.HASHES_RECORD:
 
 
                 // PARSE ACCOUNTING TRANSACTION V3
-                return R_Hashes.Parse(data, asDeal);
+                return RHashes.Parse(data, asDeal);
 				
                     /*
             case Transaction.JSON_TRANSACTION:
@@ -115,22 +115,22 @@ public class TransactionFactory {
             case Transaction.VOUCH_TRANSACTION:
 
                 //PARSE CERTIFY PERSON TRANSACTION
-                return R_Vouch.Parse(data, asDeal);
+                return RVouch.Parse(data, asDeal);
 
             case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
 
                 //PARSE CERTIFY PERSON TRANSACTION
-                return R_SetStatusToItem.Parse(data, asDeal);
+                return RSetStatusToItem.Parse(data, asDeal);
 
             case Transaction.SET_UNION_TO_ITEM_TRANSACTION:
 
                 //PARSE CERTIFY PERSON TRANSACTION
-                return R_SetUnionToItem.Parse(data, asDeal);
+                return RSetUnionToItem.Parse(data, asDeal);
 
             case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
 
                 //PARSE CERTIFY PERSON TRANSACTION
-                return R_SertifyPubKeys.Parse(data, asDeal);
+                return RSertifyPubKeys.Parse(data, asDeal);
 
             case Transaction.ISSUE_ASSET_TRANSACTION:
 
@@ -170,7 +170,7 @@ public class TransactionFactory {
             case Transaction.CALCULATED_TRANSACTION:
 
                 //PARSE ISSUE PLATE TRANSACTION
-                return R_Calculated.Parse(data);
+                return RCalculated.Parse(data);
 
             /*
             case Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION:

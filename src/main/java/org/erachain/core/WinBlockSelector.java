@@ -111,6 +111,7 @@ public class WinBlockSelector extends MonitoredThread {
             try {
                 processMessage(blockingQueue.take());
             } catch (java.lang.OutOfMemoryError e) {
+                LOGGER.error(e.getMessage(), e);
                 Controller.getInstance().stopAll(86);
                 return;
             } catch (java.lang.IllegalMonitorStateException e) {

@@ -1,6 +1,6 @@
 package org.erachain.datachain;
 
-import org.erachain.at.AT_Transaction;
+import org.erachain.at.ATTransaction;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.ATTransactionSerializer;
@@ -12,7 +12,7 @@ import org.mapdb.Fun.Tuple2;
 import java.util.*;
 
 
-public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transaction> {
+public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, ATTransaction> {
 
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
@@ -25,10 +25,8 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_AT_TX_TYPE);
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_AT_TXS);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_AT_TX_TYPE);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_AT_TX);
-            }
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_AT_TX_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_AT_TX);
         }
     }
 
@@ -41,13 +39,13 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
     }
 
     @Override
-    protected Map<Tuple2<Integer, Integer>, AT_Transaction> getMap(DB database) {
+    protected Map<Tuple2<Integer, Integer>, ATTransaction> getMap(DB database) {
         //OPEN MAP
         return this.openMap(database);
     }
 
     @Override
-    protected Map<Tuple2<Integer, Integer>, AT_Transaction> getMemoryMap() {
+    protected Map<Tuple2<Integer, Integer>, ATTransaction> getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
@@ -55,9 +53,9 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
     }
 
     @SuppressWarnings("unchecked")
-    private Map<Tuple2<Integer, Integer>, AT_Transaction> openMap(DB database) {
+    private Map<Tuple2<Integer, Integer>, ATTransaction> openMap(DB database) {
         //OPEN MAP
-        BTreeMap<Tuple2<Integer, Integer>, AT_Transaction> map = database.createTreeMap("at_txs")
+        BTreeMap<Tuple2<Integer, Integer>, ATTransaction> map = database.createTreeMap("at_txs")
                 .valueSerializer(new ATTransactionSerializer())
                 .makeOrGet();
 
@@ -70,9 +68,9 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
-        Bind.secondaryKey(map, this.senderKey, new Fun.Function2<String, Tuple2<Integer, Integer>, AT_Transaction>() {
+        Bind.secondaryKey(map, this.senderKey, new Fun.Function2<String, Tuple2<Integer, Integer>, ATTransaction>() {
             @Override
-            public String run(Tuple2<Integer, Integer> key, AT_Transaction val) {
+            public String run(Tuple2<Integer, Integer> key, ATTransaction val) {
                 // TODO Auto-generated method stub
                 return val.getSender();
             }
@@ -82,9 +80,9 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
-        Bind.secondaryKey(map, this.recipientKey, new Fun.Function2<String, Tuple2<Integer, Integer>, AT_Transaction>() {
+        Bind.secondaryKey(map, this.recipientKey, new Fun.Function2<String, Tuple2<Integer, Integer>, ATTransaction>() {
             @Override
-            public String run(Tuple2<Integer, Integer> key, AT_Transaction val) {
+            public String run(Tuple2<Integer, Integer> key, ATTransaction val) {
                 return val.getRecipient();
             }
         });
@@ -95,17 +93,17 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
 
 
     @Override
-    protected AT_Transaction getDefaultValue() {
+    protected ATTransaction getDefaultValue() {
         return null;
     }
 
-    public boolean add(Integer blockHeight, int seq, AT_Transaction atTx) {
+    public boolean add(Integer blockHeight, int seq, ATTransaction atTx) {
         atTx.setBlockHeight(blockHeight);
         atTx.setSeq(seq);
         return this.set(new Tuple2<Integer, Integer>(blockHeight, seq), atTx);
     }
 
-    public DCMap<Tuple2<Integer, Integer>, AT_Transaction> getParent() {
+    public DCMap<Tuple2<Integer, Integer>, ATTransaction> getParent() {
         return this.parent;
     }
 
@@ -115,7 +113,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         BTreeMap map = (BTreeMap) this.map;
 
         //FILTER ALL ATS
-        Collection<Tuple2> keys = ((BTreeMap<Tuple2, AT_Transaction>) map).subMap(
+        Collection<Tuple2> keys = ((BTreeMap<Tuple2, ATTransaction>) map).subMap(
                 Fun.t2(height, null),
                 Fun.t2(height, Fun.HI())).keySet();
 
@@ -134,7 +132,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
         BTreeMap map = (BTreeMap) this.map;
 
         //FILTER ALL ATS
-        Collection<Tuple2> keys = ((BTreeMap<Tuple2, AT_Transaction>) map).subMap(
+        Collection<Tuple2> keys = ((BTreeMap<Tuple2, ATTransaction>) map).subMap(
                 Fun.t2(height, null),
                 Fun.t2(Fun.HI(), Fun.HI())).keySet();
 
@@ -150,12 +148,12 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
 
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> getATTransactions(Integer height) {
-        LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> txs = new LinkedHashMap<>();
+    public LinkedHashMap<Tuple2<Integer, Integer>, ATTransaction> getATTransactions(Integer height) {
+        LinkedHashMap<Tuple2<Integer, Integer>, ATTransaction> txs = new LinkedHashMap<>();
         BTreeMap map = (BTreeMap) this.map;
 
         //FILTER ALL ATS
-        Collection<Tuple2> keys = ((BTreeMap<Tuple2, AT_Transaction>) map).subMap(
+        Collection<Tuple2> keys = ((BTreeMap<Tuple2, ATTransaction>) map).subMap(
                 Fun.t2(height, null),
                 Fun.t2(height, Fun.HI())).keySet();
 
@@ -172,11 +170,11 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<AT_Transaction> getATTransactionsBySender(String sender) {
+    public List<ATTransaction> getATTransactionsBySender(String sender) {
         Iterable keys = Fun.filter(this.senderKey, sender);
         Iterator iter = keys.iterator();
 
-        List<AT_Transaction> ats = new ArrayList<>();
+        List<ATTransaction> ats = new ArrayList<>();
         while (iter.hasNext()) {
             ats.add(this.map.get(iter.next()));
         }
@@ -194,7 +192,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
 
         Set<BlExpUnit> ats = new TreeSet<>();
         while (iter.hasNext()) {
-            AT_Transaction aTtx = this.map.get(iter.next());
+            ATTransaction aTtx = this.map.get(iter.next());
             ats.add(new BlExpUnit(aTtx.getBlockHeight(), aTtx.getSeq(), aTtx));
         }
 
@@ -205,11 +203,11 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<AT_Transaction> getATTransactionsByRecipient(String recipient) {
+    public List<ATTransaction> getATTransactionsByRecipient(String recipient) {
         Iterable keys = Fun.filter(this.recipientKey, recipient);
         Iterator iter = keys.iterator();
 
-        List<AT_Transaction> ats = new ArrayList<>();
+        List<ATTransaction> ats = new ArrayList<>();
         while (iter.hasNext()) {
             ats.add(this.map.get(iter.next()));
         }
@@ -227,7 +225,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, AT_Transac
 
         Set<BlExpUnit> ats = new TreeSet<>();
         while (iter.hasNext()) {
-            AT_Transaction aTtx = this.map.get(iter.next());
+            ATTransaction aTtx = this.map.get(iter.next());
             ats.add(new BlExpUnit(aTtx.getBlockHeight(), aTtx.getSeq(), aTtx));
         }
 

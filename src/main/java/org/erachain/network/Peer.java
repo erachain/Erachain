@@ -72,7 +72,7 @@ public class Peer extends MonitoredThread {
 
     public Peer(Network network, Socket socket, String description) {
 
-        //LOGGER.debug("@@@ new Peer(ConnectionCallback callback, Socket socket) : " + socket.getInetAddress().getHostAddress());
+        //logger.debug("@@@ new Peer(ConnectionCallback callback, Socket socket) : " + socket.getInetAddress().getHostAddress());
 
         try {
             this.network = network;
@@ -379,6 +379,7 @@ public class Peer extends MonitoredThread {
                     /// просто дальше ждем - все нормально
                     continue;
                 } catch (java.lang.OutOfMemoryError e) {
+                    LOGGER.error(e.getMessage(), e);
                     Controller.getInstance().stopAll(82);
                     return;
                 } catch (EOFException e) {
@@ -413,6 +414,7 @@ public class Peer extends MonitoredThread {
                     ban(network.banForActivePeersCounter(), "peer in TimeOut and -ping");
                     break;
                 } catch (java.lang.OutOfMemoryError e) {
+                    LOGGER.error(e.getMessage(), e);
                     Controller.getInstance().stopAll(83);
                     break;
                 } catch (EOFException e) {
@@ -478,6 +480,7 @@ public class Peer extends MonitoredThread {
                         poll.add(message);
 
                     } catch (java.lang.OutOfMemoryError e) {
+                        LOGGER.error(e.getMessage(), e);
                         Controller.getInstance().stopAll(84);
                         break;
 
@@ -499,6 +502,7 @@ public class Peer extends MonitoredThread {
                     try {
                         this.network.onMessage(message);
                     } catch (java.lang.OutOfMemoryError e) {
+                        LOGGER.error(e.getMessage(), e);
                         Controller.getInstance().stopAll(88);
                         break;
                     }
@@ -513,7 +517,7 @@ public class Peer extends MonitoredThread {
         }
 
         if (USE_MONITOR) this.setMonitorStatus("halted");
-        //LOGGER.debug(this + " - halted");
+        //logger.debug(this + " - halted");
 
     }
 
@@ -592,6 +596,7 @@ public class Peer extends MonitoredThread {
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
         } catch (java.lang.OutOfMemoryError e) {
+            LOGGER.error(e.getMessage(), e);
             Controller.getInstance().stopAll(86);
             return null;
         } catch (InterruptedException e) {
@@ -696,7 +701,7 @@ public class Peer extends MonitoredThread {
         this.sender.close();
 
         if (socket != null) {
-            //LOGGER.debug(this + " SOCKET: \n"
+            //logger.debug(this + " SOCKET: \n"
             //        + (this.socket.isBound()? " isBound " : "")
             //        + (this.socket.isConnected()? " isConnected " : "")
             //        + (this.socket.isInputShutdown()? " isInputShutdown " : "")

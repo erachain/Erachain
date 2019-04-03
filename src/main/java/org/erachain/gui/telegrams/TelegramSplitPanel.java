@@ -12,9 +12,9 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.Split_Panel;
+import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.accounts.*;
-import org.erachain.gui.items.mails.Mail_Send_Dialog;
+import org.erachain.gui.items.mails.MailSendDialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.lang.Lang;
@@ -44,7 +44,7 @@ import java.nio.charset.StandardCharsets;
 *
 * @author Саша
 */
-public class TelegramSplitPanel extends Split_Panel {
+public class TelegramSplitPanel extends SplitPanel {
 
    /**
     * Creates new form TelegramSplitPanel
@@ -52,13 +52,13 @@ public class TelegramSplitPanel extends Split_Panel {
     LeftTelegram leftTelegram;
     RightTelegramPanel rightTelegramPanel;
     private static final long serialVersionUID = 1L;
-    public Accounts_Panel accountPanel;
+    public AccountsPanel accountPanel;
   //  public AssetCls assetSelect;
     private Account selecArg;
  //   private RightTelegramPanel rightPanel;
     private AccountsComboBoxModel accountsModel;
     static TelegramSplitPanel th ;
-    private Accounts_Name_TableModel accountModel;
+    private AccountsNameTableModel accountModel;
     private MTable tableFavoriteAccounts;
     protected int row;
     private Account recipient;
@@ -84,7 +84,7 @@ public class TelegramSplitPanel extends Split_Panel {
     PanelGBC.weighty = 1;
     PanelGBC.gridx = 0;
     PanelGBC.gridy = 0;
-    accountPanel = new Accounts_Panel();
+    accountPanel = new AccountsPanel();
     leftTelegram = new LeftTelegram();
     rightTelegramPanel= new RightTelegramPanel();
     this.leftPanel.add(leftTelegram, PanelGBC);
@@ -93,7 +93,7 @@ public class TelegramSplitPanel extends Split_Panel {
     // EVENTS on CURSOR
    // accountPanel.table.getSelectionModel().addListSelectionListener(new Account_Tab_Listener());
    
-    accountModel = new Accounts_Name_TableModel( Lang.getInstance().translate(new String[]{"No.", "Account", "Name"}));
+    accountModel = new AccountsNameTableModel( Lang.getInstance().translate(new String[]{"No.", "Account", "Name"}));
    tableFavoriteAccounts = new MTable(this.accountModel);
    
    
@@ -118,7 +118,7 @@ public class TelegramSplitPanel extends Split_Panel {
             // TODO Auto-generated method stub
            
                 // TODO Auto-generated method stub
-                new Account_Name_Add();
+                new AccountNameAdd();
            
         }
         
@@ -172,7 +172,7 @@ public class TelegramSplitPanel extends Split_Panel {
         rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(Settings.getInstance().getTelegramDefaultReciever());
         int k = accountModel.getRowCount();
         for(int i = 0;i<k;i++){
-           if(accountModel.getAccount(i).getA().equals(Settings.getInstance().getTelegramDefaultReciever())){
+           if(accountModel.getPairItem(i).getA().equals(Settings.getInstance().getTelegramDefaultReciever())){
                tableFavoriteAccounts.setRowSelectionInterval(tableFavoriteAccounts.convertRowIndexToModel(i), tableFavoriteAccounts.convertRowIndexToModel(i)); 
            }
         }
@@ -316,7 +316,7 @@ public class TelegramSplitPanel extends Split_Panel {
         public void actionPerformed(ActionEvent e) {
 
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            Pair<String, Tuple2<String, String>> account = accountModel.getAccount(row);
+            Pair<String, Tuple2<String, String>> account = accountModel.getPairItem(row);
             StringSelection value = new StringSelection(account.getA());
             clipboard.setContents(value, null);
         }
@@ -328,7 +328,7 @@ public class TelegramSplitPanel extends Split_Panel {
         public void actionPerformed(ActionEvent e) {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
-            Pair<String, Tuple2<String, String>> account = accountModel.getAccount(row);
+            Pair<String, Tuple2<String, String>> account = accountModel.getPairItem(row);
             byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(account.getA());
             PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
             StringSelection value = new StringSelection(public_Account.getBase58());
@@ -340,9 +340,9 @@ public class TelegramSplitPanel extends Split_Panel {
     JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
     Send_Coins_item_Menu.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            Pair<String, Tuple2<String, String>> account1 = accountModel.getAccount(row);
+            Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
             Account account = new Account(account1.getA());
-            new Account_Send_Dialog(null, null, account, null);
+            new AccountSendDialog(null, null, account, null);
 
         }
     });
@@ -351,9 +351,9 @@ public class TelegramSplitPanel extends Split_Panel {
     JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail"));
     Send_Mail_item_Menu.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            Pair<String, Tuple2<String, String>> account1 = accountModel.getAccount(row);
+            Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
             Account account = new Account(account1.getA());
-            new Mail_Send_Dialog(null, null, account, null);
+            new MailSendDialog(null, null, account, null);
 
         }
     });
@@ -362,9 +362,9 @@ public class TelegramSplitPanel extends Split_Panel {
     JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Edit name"));
     setName.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            Pair<String, Tuple2<String, String>> account1 = accountModel.getAccount(row);
+            Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
 
-            new Account_Set_Name_Dialog(account1.getA());
+            new AccountSetNameDialog(account1.getA());
             tableFavoriteAccounts.repaint();
 
         }
@@ -395,7 +395,7 @@ public class TelegramSplitPanel extends Split_Panel {
             int row = tableFavoriteAccounts.getSelectedRow();
             try {
                 row = tableFavoriteAccounts.convertRowIndexToModel(row);
-                Pair<String, Tuple2<String, String>> ac = accountModel.getAccount(row);
+                Pair<String, Tuple2<String, String>> ac = accountModel.getPairItem(row);
                 Controller.getInstance().wallet.database.getAccountsPropertisMap().delete(ac.getA());
             } catch (Exception e1) {
                 // TODO Auto-generated catch block

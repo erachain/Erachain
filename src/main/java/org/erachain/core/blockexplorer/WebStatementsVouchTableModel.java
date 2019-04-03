@@ -1,6 +1,6 @@
 package org.erachain.core.blockexplorer;
 
-import org.erachain.core.transaction.R_Vouch;
+import org.erachain.core.transaction.RVouch;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
@@ -105,7 +105,7 @@ public class WebStatementsVouchTableModel extends AbstractTableModel implements 
 
             Transaction transaction = this.transactions.get(row);
 
-            // R_Vouch i;
+            // RVouch i;
             switch (column) {
                 case COLUMN_TIMESTAMP:
 
@@ -133,7 +133,7 @@ public class WebStatementsVouchTableModel extends AbstractTableModel implements 
             return null;
 
         } catch (Exception e) {
-            // LOGGER.error(e.getMessage(),e);
+            // logger.error(e.getMessage(),e);
             return null;
         }
     }
@@ -172,7 +172,7 @@ public class WebStatementsVouchTableModel extends AbstractTableModel implements 
                 ) {
             Transaction ss = (Transaction) message.getValue();
             if (ss.getType() == Transaction.VOUCH_TRANSACTION) {
-                R_Vouch ss1 = (R_Vouch) ss;
+                RVouch ss1 = (RVouch) ss;
                 if (ss1.getVouchHeight() == blockNo
                         && ss1.getVouchSeqNo() == recNo
                         )

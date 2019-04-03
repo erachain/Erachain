@@ -2,15 +2,12 @@ package org.erachain.core.blockexplorer;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.transaction.R_SignNote;
+import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple3;
@@ -174,7 +171,7 @@ public class WebStatementsTableModelSearch extends AbstractTableModel implements
 
     public String get_person_key(int row) {
         String str = "";
-        R_SignNote record = (R_SignNote) this.transactions.get(row);
+        RSignNote record = (RSignNote) this.transactions.get(row);
         PublicKeyAccount creator = record.getCreator();
         if (creator.isPerson()) {
             return creator.getPerson().b.getKey() + "";
@@ -192,9 +189,9 @@ public class WebStatementsTableModelSearch extends AbstractTableModel implements
                 return null;
             }
 
-            // Transaction transaction = (R_SignNote)this.transactions.get(row);
+            // Transaction transaction = (RSignNote)this.transactions.get(row);
 
-            R_SignNote record = (R_SignNote) this.transactions.get(row);
+            RSignNote record = (RSignNote) this.transactions.get(row);
 
             switch (column) {
                 case COLUMN_TIMESTAMP:
@@ -262,7 +259,7 @@ public class WebStatementsTableModelSearch extends AbstractTableModel implements
             return null;
 
         } catch (Exception e) {
-            // LOGGER.error(e.getMessage(),e);
+            // logger.error(e.getMessage(),e);
             return null;
         }
     }

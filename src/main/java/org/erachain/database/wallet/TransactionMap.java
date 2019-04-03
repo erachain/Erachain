@@ -1,6 +1,7 @@
 package org.erachain.database.wallet;
 //09/03
 
+import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.Trade;
@@ -23,6 +24,15 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentNavigableMap;
 
+/**
+ * Транзакции относящиеся к моим счетам. Сюда же записываться должны и неподтвержденные<br>
+ * А когда они подтверждаются они будут перезаписываться поверх.
+ * Тогда неподтвержденные будут показывать что они не сиполнились.
+ * И их пользователь сможет сам удалить вручную или командой - удалить все неподтвержденные
+ * <hr>
+ * Ключ: счет + подпись<br>
+ * Значение: транзакция
+ */
 public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
 
     BTreeMap AUTOKEY_INDEX;
@@ -166,6 +176,16 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
         return transactions;
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Iterator<Tuple2<String, String>> getAddressIterator(Account account) {
+
+        Set<Tuple2<String, String>> accountKeys = ((BTreeMap) this.map).subMap(
+                Fun.t2(account.getAddress(), null),
+                Fun.t2(account.getAddress(), Fun.HI())).keySet();
+
+        return accountKeys.iterator();
+    }
+
     public List<Pair<Account, Transaction>> get(List<Account> accounts, int limit) {
         List<Pair<Account, Transaction>> transactions = new ArrayList<Pair<Account, Transaction>>();
 
@@ -187,9 +207,28 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction> {
         return transactions;
     }
 
-    @SuppressWarnings("unchecked")
     public Collection<Tuple2<String, String>> getFromToKeys(long fromKey, long toKey) {
-        return AUTOKEY_INDEX.subMap(fromKey, toKey).values();
+
+        if (true) {
+            // РАБОТАЕТ намного БЫСТРЕЕ
+            return AUTOKEY_INDEX.subMap(fromKey, toKey).values();
+        } else {
+
+            // перебор по NEXT очень медленный
+            List<Tuple2<String, String>> treeKeys = new ArrayList<Tuple2<String, String>>();
+
+            // DESCENDING + 1000
+            Iterable iterable = this.indexes.get(TIMESTAMP_INDEX + DESCENDING_SHIFT_INDEX);
+            Iterable iterableLimit = Iterables.limit(Iterables.skip(iterable, (int) fromKey), (int) (toKey - fromKey));
+
+            Iterator<Tuple2<Long, Tuple2<String, String>>> iterator = iterableLimit.iterator();
+            while (iterator.hasNext()) {
+                treeKeys.add(iterator.next().b);
+            }
+
+            return treeKeys;
+        }
+
     }
 
     public Transaction delete(Tuple2<String, String> key) {

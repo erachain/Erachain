@@ -3,9 +3,9 @@ package org.erachain.gui.items.records;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.Split_Panel;
+import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.Voush_Library_Panel;
+import org.erachain.gui.library.VoushLibraryPanel;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.gui.records.VouchRecordDialog;
@@ -30,10 +30,10 @@ import java.util.List;
 /**
  * search transactions
  */
-public class SearchTransactionsSplitPanel extends Split_Panel {
+public class SearchTransactionsSplitPanel extends SplitPanel {
 
     public JPanel info_Panel;
-    public Voush_Library_Panel voush_Library_Panel;
+    public VoushLibraryPanel voush_Library_Panel;
     SearchTransactionsTableModel transactionsTableModel;
     JScrollPane jScrollPane4;
     private JTextField sender_address;
@@ -110,7 +110,7 @@ public class SearchTransactionsSplitPanel extends Split_Panel {
 
                 int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
                 row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-                Transaction trans = transactionsTableModel.getTransaction(row);
+                Transaction trans = transactionsTableModel.getItem(row);
                 DCSet db = DCSet.getInstance();
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
 
@@ -127,7 +127,7 @@ public class SearchTransactionsSplitPanel extends Split_Panel {
 
                 int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
                 row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-                Transaction trans = transactionsTableModel.getTransaction(row);
+                Transaction trans = transactionsTableModel.getItem(row);
                 if (trans == null) return;
                 // save
                 library.saveTransactionJSONtoFileSystem(getParent(), trans);
@@ -159,7 +159,7 @@ public class SearchTransactionsSplitPanel extends Split_Panel {
                     row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
 
                     //GET TRANSACTION
-                    Transaction transaction = transactionsTableModel.getTransaction(row);
+                    Transaction transaction = transactionsTableModel.getItem(row);
 
                     //SHOW DETAIL SCREEN OF TRANSACTION
                     TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
@@ -174,10 +174,10 @@ public class SearchTransactionsSplitPanel extends Split_Panel {
     @Override
     public void onClose() {
         // delete observer left panel
-        transactionsTableModel.removeObservers();
+        transactionsTableModel.deleteObservers();
         // get component from right panel
         Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
-        // if Person_Info 002 delay on close
+        // if PersonInfo 002 delay on close
         //		  if (c1.getClass() == this.info_Panel.getClass()) voush_Library_Panel.onClose();
 
     }
@@ -199,7 +199,8 @@ public class SearchTransactionsSplitPanel extends Split_Panel {
             UnionCls union;
             Transaction voting = null;
             if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0) {
-                voting = (Transaction) transactionsTableModel.getTransaction(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+                voting = (Transaction) transactionsTableModel.getItem(jTable_jScrollPanel_LeftPanel
+                        .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 
                 //	Person_info_panel_001 info_panel = new Person_info_panel_001(voting, false);
 
@@ -249,7 +250,7 @@ public class SearchTransactionsSplitPanel extends Split_Panel {
                     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
                     gridBagConstraints.weightx = 1.0;
                     gridBagConstraints.weighty = 1.0;
-                    voush_Library_Panel = new Voush_Library_Panel(voting);
+                    voush_Library_Panel = new VoushLibraryPanel(voting);
                     info_Panel.add(voush_Library_Panel, gridBagConstraints);
 
                 }

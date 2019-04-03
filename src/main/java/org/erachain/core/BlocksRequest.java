@@ -2,6 +2,7 @@ package org.erachain.core;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.Peer;
 import org.erachain.network.message.BlockWinMessage;
@@ -20,7 +21,7 @@ import java.util.concurrent.BlockingQueue;
 public class BlocksRequest extends MonitoredThread {
 
     private final static boolean USE_MONITOR = true;
-    private final static boolean logPings = true;
+    //private final static boolean logPings = true;
     private boolean runned;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BlocksRequest.class);
@@ -56,27 +57,47 @@ public class BlocksRequest extends MonitoredThread {
 
         GetBlockMessage getBlockMessage = (GetBlockMessage) message;
 
-        /*
-         * LOGGER.
-         * error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
-         * + " form PEER: " + getBlockMessage.getSender().toString()
-         * + " sign: " +
-         * Base58.encode(getBlockMessage.getSignature()));
-         */
+        LOGGER.debug("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
+                    + " form PEER: " + getBlockMessage.getSender()
+                    + " sign: " + Base58.encode(getBlockMessage.getSignature()));
+
+        if (USE_MONITOR)
+            this.setMonitorStatus("try GET_BLOCK " + Base58.encode(getBlockMessage.getSignature()));
 
         // ASK BLOCK FROM BLOCKCHAIN
         Block newBlock = this.blockChain.getBlock(dcSet, getBlockMessage.getSignature());
+
+        LOGGER.debug(newBlock == null? "NOT found" : "found at " + newBlock.getHeight());
+
+        if (USE_MONITOR) {
+            this.setMonitorStatusAfter();
+            if (newBlock == null) {
+                String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
+                this.setMonitorStatus(mess);
+            }
+        }
+
+        if (newBlock == null) {
+            String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
+            //Controller.getInstance().banPeerOnError(message.getSender(), mess);
+        }
 
         // CREATE RESPONSE WITH SAME ID
         Message response = MessageFactory.getInstance().createBlockMessage(newBlock);
         response.setId(message.getId());
 
         // SEND RESPONSE BACK WITH SAME ID
-        message.getSender().offerMessage(response);
+        if (USE_MONITOR) {
+            this.setMonitorStatus("try GET_BLOCK " + Base58.encode(getBlockMessage.getSignature()));
+        }
 
-        if (false && newBlock == null) {
-            String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
-            //banPeerOnError(message.getSender(), mess);
+        boolean result = message.getSender().offerMessage(response);
+
+        LOGGER.debug("block [" + newBlock.getHeight() + "] "
+                + (result? "sended" : "not sended") + " -> " + getBlockMessage.getSender());
+
+        if (USE_MONITOR) {
+            this.setMonitorStatus("offerMessage " + (result?" OK" : " bad"));
         }
 
         return 3 + newBlock.getTransactionCount();
@@ -87,16 +108,25 @@ public class BlocksRequest extends MonitoredThread {
         runned = true;
         //Message message;
         int counter = 0;
+
+        this.initMonitor();
+
         while (runned) {
+
+            this.setMonitorPoint();
+
             try {
                 counter += processMessage(blockingQueue.take());
             } catch (OutOfMemoryError e) {
+                LOGGER.error(e.getMessage(), e);
                 Controller.getInstance().stopAll(76);
                 return;
             } catch (IllegalMonitorStateException e) {
                 break;
             } catch (InterruptedException e) {
                 break;
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
             }
 
             // FREEZE sometimes

@@ -141,6 +141,7 @@ public class Sender extends MonitoredThread {
                 }
 
             } catch (java.lang.OutOfMemoryError e) {
+                LOGGER.error(e.getMessage(), e);
                 Controller.getInstance().stopAll(85);
                 return false;
             } catch (java.lang.NullPointerException e) {
@@ -312,7 +313,7 @@ public class Sender extends MonitoredThread {
 
         }
 
-        //LOGGER.debug(this + " - halted");
+        //logger.debug(this + " - halted");
     }
 
     public void close() {

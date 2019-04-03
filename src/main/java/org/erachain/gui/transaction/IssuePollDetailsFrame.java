@@ -8,7 +8,7 @@ import org.erachain.utils.MenuPopupUtil;
 import javax.swing.*;
 
 @SuppressWarnings("serial")
-public class IssuePollDetailsFrame extends Rec_DetailsFrame {
+public class IssuePollDetailsFrame extends RecDetailsFrame {
     public IssuePollDetailsFrame(IssuePollRecord pollIssue) {
         super(pollIssue);
 

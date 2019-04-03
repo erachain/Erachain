@@ -1,7 +1,7 @@
 package org.erachain.api;
 
-import org.erachain.at.AT_Constants;
-import org.erachain.at.AT_Transaction;
+import org.erachain.at.ATConstants;
+import org.erachain.at.ATTransaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
@@ -43,10 +43,10 @@ public class ATResource {
     @GET
     @Path("/transactions/id/{id}")
     public static String getATTransactionsBySender(@PathParam("id") String id) {
-        List<AT_Transaction> txs = DCSet.getInstance().getATTransactionMap().getATTransactionsBySender(id);
+        List<ATTransaction> txs = DCSet.getInstance().getATTransactionMap().getATTransactionsBySender(id);
 
         JSONArray json = new JSONArray();
-        for (AT_Transaction tx : txs) {
+        for (ATTransaction tx : txs) {
             json.add(tx.toJSON());
         }
         return json.toJSONString();
@@ -71,10 +71,10 @@ public class ATResource {
     @GET
     @Path("/transactions/recipient/{id}")
     public static String getATTransactionsByRecipient(@PathParam("id") String id) {
-        List<AT_Transaction> txs = DCSet.getInstance().getATTransactionMap().getATTransactionsByRecipient(id);
+        List<ATTransaction> txs = DCSet.getInstance().getATTransactionMap().getATTransactionsByRecipient(id);
 
         JSONArray json = new JSONArray();
-        for (AT_Transaction tx : txs) {
+        for (ATTransaction tx : txs) {
             json.add(tx.toJSON());
         }
         return json.toJSONString();
@@ -155,25 +155,25 @@ public class ATResource {
 
         String name = (String) jsonObject.get("name");
 
-        if (name.getBytes(StandardCharsets.UTF_8).length > AT_Constants.NAME_MAX_LENGTH || name.length() < 1) {
+        if (name.getBytes(StandardCharsets.UTF_8).length > ATConstants.NAME_MAX_LENGTH || name.length() < 1) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_NAME_LENGTH);
         }
 
         String desc = (String) jsonObject.get("description");
 
-        if (desc.getBytes(StandardCharsets.UTF_8).length > AT_Constants.DESC_MAX_LENGTH || desc.length() < 1) {
+        if (desc.getBytes(StandardCharsets.UTF_8).length > ATConstants.DESC_MAX_LENGTH || desc.length() < 1) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_DESC_LENGTH);
         }
 
         String type = (String) jsonObject.get("type");
 
-        if (type.getBytes(StandardCharsets.UTF_8).length > AT_Constants.TYPE_MAX_LENGTH || type.length() < 1) {
+        if (type.getBytes(StandardCharsets.UTF_8).length > ATConstants.TYPE_MAX_LENGTH || type.length() < 1) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_TYPE_LENGTH);
         }
 
         String tags = (String) jsonObject.get("tags");
 
-        if (tags.getBytes(StandardCharsets.UTF_8).length > AT_Constants.TAGS_MAX_LENGTH || tags.length() < 1) {
+        if (tags.getBytes(StandardCharsets.UTF_8).length > ATConstants.TAGS_MAX_LENGTH || tags.length() < 1) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_TAGS_LENGTH);
         }
         int feePow;
@@ -235,7 +235,7 @@ public class ATResource {
         long lFee = Longs.fromByteArray(feePowBytes);
 
 
-        if ((cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE(DCSet.getInstance().getBlockMap().last()
+        if ((cpages + dpages + cspages + uspages) * ATConstants.getInstance().COST_PER_PAGE(DCSet.getInstance().getBlockMap().last()
                 .getHeight()) > lFee) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_FEE_POWER);
         }
@@ -259,7 +259,7 @@ public class ATResource {
         ByteBuffer creation = ByteBuffer.allocate(creationLength);
         creation.order(ByteOrder.LITTLE_ENDIAN);
 
-        creation.putShort(AT_Constants.getInstance().AT_VERSION(DCSet.getInstance().getBlockMap().last()
+        creation.putShort(ATConstants.getInstance().AT_VERSION(DCSet.getInstance().getBlockMap().last()
                 .getHeight()));
         creation.putShort((short) 0);
         creation.putShort((short) cpages);

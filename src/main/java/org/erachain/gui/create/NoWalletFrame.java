@@ -24,7 +24,6 @@ import javax.swing.JRadioButton;
 import javax.swing.border.EmptyBorder;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.gui.Gui;
 import org.erachain.lang.Lang;
 
@@ -134,7 +133,7 @@ public class NoWalletFrame extends JFrame {
 
                 //OPEN CREATE WALLET FRAME
                 th.setVisible(false);
-                new License_JFrame(true, th, 1);
+                new LicenseJFrame(true, th, 1);
 
             }
 
@@ -186,7 +185,7 @@ public class NoWalletFrame extends JFrame {
 
                 //OPEN CREATE WALLET FRAME
                 th.setVisible(false);
-                new License_JFrame(true, th, 2);
+                new LicenseJFrame(true, th, 2);
 
 
             }
@@ -239,7 +238,7 @@ public class NoWalletFrame extends JFrame {
 
                 //OPEN CREATE WALLET FRAME
                 th.setVisible(false);
-                new License_JFrame(true, th, 3);
+                new LicenseJFrame(true, th, 3);
 
             }
 
@@ -324,13 +323,13 @@ public class NoWalletFrame extends JFrame {
         if (createButton.isSelected()) {
             //OPEN CREATE WALLET FRAME
             this.setVisible(false);
-           // new License_JFrame(template, true, this, true);
+           // new LicenseJFrame(template, true, this, true);
         }
 
         if (recoverButton.isSelected()) {
             //OPEN RECOVER WALLET FRAME
             this.setVisible(false);
-          //  new License_JFrame(template, true, this, false);
+          //  new LicenseJFrame(template, true, this, false);
         }
     }
 

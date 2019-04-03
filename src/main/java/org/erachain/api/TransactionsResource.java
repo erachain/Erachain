@@ -7,7 +7,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
@@ -627,9 +627,9 @@ public class TransactionsResource {
                     transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
                     JSONObject json = transaction.toJson();
 
-                    if (transaction instanceof R_Send) {
+                    if (transaction instanceof RSend) {
 
-                        R_Send r_Send = (R_Send) transaction;
+                        RSend r_Send = (RSend) transaction;
                         byte[] r_data = null;
                         r_data = r_Send.getData();
 
@@ -832,7 +832,7 @@ public class TransactionsResource {
 
         JSONObject out = new JSONObject();
 
-        R_Send r_Send = (R_Send) transaction;
+        RSend r_Send = (RSend) transaction;
         Account account = Controller.getInstance().getAccountByAddress(r_Send.getCreator().getAddress());
         byte[] r_data = r_Send.getData();
         if (r_data == null || r_data.length == 0)

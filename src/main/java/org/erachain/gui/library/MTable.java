@@ -29,13 +29,13 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import org.erachain.gui.models.Renderer_Boolean;
+import org.erachain.gui.models.RendererBoolean;
+import org.erachain.gui.models.RendererRight;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.models.Renderer_Right;
 import org.erachain.lang.Lang;
 
 public class MTable<U, T> extends JTable {
@@ -125,20 +125,20 @@ public class MTable<U, T> extends JTable {
         // RowFilter.andFilter(filters);
 
         /*
-         * setDefaultRenderer(Integer.class, new Renderer_Right()); // set
-         * renderer setDefaultRenderer(String.class, new Renderer_Left()); //
-         * set renderer setDefaultRenderer(Long.class, new Renderer_Right()); //
+         * setDefaultRenderer(Integer.class, new RendererRight()); // set
+         * renderer setDefaultRenderer(String.class, new RendererLeft()); //
+         * set renderer setDefaultRenderer(Long.class, new RendererRight()); //
          * set renderer setDefaultRenderer(Boolean.class, new
-         * Renderer_Boolean()); // set renderer setDefaultRenderer(Tuple2.class,
-         * new Renderer_Left()); // set renderer setDefaultRenderer(Date.class,
-         * new Renderer_Right()); // set renderer
-         * setDefaultRenderer(PublicKeyAccount.class, new Renderer_Left()); //
+         * RendererBoolean()); // set renderer setDefaultRenderer(Tuple2.class,
+         * new RendererLeft()); // set renderer setDefaultRenderer(Date.class,
+         * new RendererRight()); // set renderer
+         * setDefaultRenderer(PublicKeyAccount.class, new RendererLeft()); //
          * set renderer //RenderingHints. setDefaultRenderer(Double.class, new
-         * Renderer_Right()); // set renderer
+         * RendererRight()); // set renderer
          *
          */
 
-        setDefaultRenderer(Boolean.class, new Renderer_Boolean());
+        setDefaultRenderer(Boolean.class, new RendererBoolean());
 
         show_search(true);
         addselectSelectedRow();
@@ -226,7 +226,7 @@ public class MTable<U, T> extends JTable {
 //							str = JOptionPane.showInputDialog(th, "filter BigDecimal col. = " + column.getHeaderValue(), sss);
                 String first_S = (first.a == null) ? "" : (String) first.a;
                 String second_S = (second.a == null) ? "" : (String) second.a;
-                MTable_search_Num_Dialog dialog = new MTable_search_Num_Dialog(column, BigDecimal.class, first.c, first_S, second.c, second_S);
+                MTableSearchNumDialog dialog = new MTableSearchNumDialog(column, BigDecimal.class, first.c, first_S, second.c, second_S);
                 int x = arg0.getXOnScreen() - dialog.getWidth() / 2;
                 if (MainFrame.getInstance().getX() > x) x = MainFrame.getInstance().getX();
                 int y = arg0.getYOnScreen() - dialog.getHeight();
@@ -242,7 +242,7 @@ public class MTable<U, T> extends JTable {
 
                 if (pp.b != null) {
                     //если есть данные то устанавливаем рендер
-                    column.setHeaderRenderer(new Renderer_Right());
+                    column.setHeaderRenderer(new RendererRight());
                     //формируем первый фильтр
                     String a = pp.b;
                     ComparisonType b = pp.a;
@@ -278,7 +278,7 @@ public class MTable<U, T> extends JTable {
 //				str = JOptionPane.showInputDialog(th, "filter BigDecimal col. = " + column.getHeaderValue(), sss);
                 String first_S = (first.a == null) ? "" : (String) first.a;
                 String second_S = (second.a == null) ? "" : (String) second.a;
-                MTable_search_Num_Dialog dialog = new MTable_search_Num_Dialog(column, Long.class, first.c, first_S, second.c, second_S);
+                MTableSearchNumDialog dialog = new MTableSearchNumDialog(column, Long.class, first.c, first_S, second.c, second_S);
                 int x = arg0.getXOnScreen() - dialog.getWidth() / 2;
                 if (MainFrame.getInstance().getX() > x) x = MainFrame.getInstance().getX();
                 int y = arg0.getYOnScreen() - dialog.getHeight();
@@ -292,7 +292,7 @@ public class MTable<U, T> extends JTable {
 
                 if (pp.b != null) {
                     //если есть данные то устанавливаем рендер
-                    column.setHeaderRenderer(new Renderer_Right());
+                    column.setHeaderRenderer(new RendererRight());
                     //формируем первый фильтр
                     String a = pp.b;
                     ComparisonType b = pp.a;
@@ -333,7 +333,7 @@ public class MTable<U, T> extends JTable {
 //					str = JOptionPane.showInputDialog(th, "filter BigDecimal col. = " + column.getHeaderValue(), sss);
                 String first_S = (first.a == null) ? "" : (String) first.a;
                 String second_S = (second.a == null) ? "" : (String) second.a;
-                MTable_search_Num_Dialog dialog = new MTable_search_Num_Dialog(column, Integer.class, first.c, first_S, second.c, second_S);
+                MTableSearchNumDialog dialog = new MTableSearchNumDialog(column, Integer.class, first.c, first_S, second.c, second_S);
                 int x = arg0.getXOnScreen() - dialog.getWidth() / 2;
                 if (MainFrame.getInstance().getX() > x) x = MainFrame.getInstance().getX();
                 int y = arg0.getYOnScreen() - dialog.getHeight();
@@ -347,7 +347,7 @@ public class MTable<U, T> extends JTable {
 
                 if (pp.b != null) {
                     //если есть данные то устанавливаем рендер
-                    column.setHeaderRenderer(new Renderer_Right());
+                    column.setHeaderRenderer(new RendererRight());
                     //формируем первый фильтр
                     String a = pp.b;
                     ComparisonType b = pp.a;
@@ -376,7 +376,7 @@ public class MTable<U, T> extends JTable {
                 str = JOptionPane.showInputDialog(th, Lang.getInstance().translate("Filter column") + ": " + column.getHeaderValue().toString(), sss);
                 if (str != null) {
                     if (!str.toString().equals("")) {
-                        column.setHeaderRenderer(new Renderer_Right());
+                        column.setHeaderRenderer(new RendererRight());
                         filters.put(col, new Tuple2(new Tuple3(str, RowFilter.regexFilter(".*" + str.toString() + ".*", col), null), new Tuple3(null, null, null)));
                     } else {
                         column.setHeaderRenderer(null);
@@ -394,7 +394,7 @@ public class MTable<U, T> extends JTable {
                 str = JOptionPane.showInputDialog(th, Lang.getInstance().translate("Filter column") + ": " + column.getHeaderValue().toString(), "data");
                 if (str != null) {
                     if (!str.toString().equals("")) {
-                        column.setHeaderRenderer(new Renderer_Right());
+                        column.setHeaderRenderer(new RendererRight());
                         filters.put(col, new Tuple2(new Tuple3(str, RowFilter.regexFilter(".*" + str.toString() + ".*", col), null), new Tuple3(null, null, null)));
                     } else {
                         column.setHeaderRenderer(null);
@@ -429,11 +429,11 @@ public class MTable<U, T> extends JTable {
                 } else if (n == 0) {
 
                     if (rememberChk.isSelected()) {
-                        column.setHeaderRenderer(new Renderer_Right());
+                        column.setHeaderRenderer(new RendererRight());
                         filters.remove(col);
                         filters.put(col, new Tuple2(new Tuple3(true, RowFilter.regexFilter(".*true.*", col), null), new Tuple3(null, null, null)));
                     } else {
-                        column.setHeaderRenderer(new Renderer_Right());
+                        column.setHeaderRenderer(new RendererRight());
                         filters.remove(col);
                         filters.put(col, new Tuple2(new Tuple3(false, RowFilter.regexFilter(".*false.*", col), null), new Tuple3(null, null, null)));
                     }

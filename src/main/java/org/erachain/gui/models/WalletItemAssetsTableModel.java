@@ -8,12 +8,11 @@ import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, String>, AssetCls> implements Observer {
+public class WalletItemAssetsTableModel extends SortedListTableModelCls<Tuple2<String, String>, AssetCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -26,13 +25,8 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 
     public WalletItemAssetsTableModel() {
         super(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false, false, false, false});
+                new Boolean[]{false, true, true, false, false, false, false, false}, true);
 
-    }
-
-    @Override
-    public SortableList<Tuple2<String, String>, AssetCls> getSortableList() {
-        return this.assets;
     }
 
     public AssetCls getAsset(int row) {
@@ -98,7 +92,7 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
         if (message.getType() == ObserverMessage.LIST_ASSET_TYPE || message.getType() == ObserverMessage.WALLET_LIST_ASSET_TYPE) {
             if (this.assets == null) {
                 this.assets = (SortableList<Tuple2<String, String>, AssetCls>) message.getValue();
-                this.assets.registerObserver();
+                //this.assets.registerObserver();
                 //this.assets.sort(PollMap.NAME_INDEX);
             }
 
@@ -112,20 +106,15 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
         }
     }
 
-    public void addObserversThis() {
+    public void addObservers() {
 
         Controller.getInstance().addWalletObserver(this);
     }
 
 
-    public void removeObserversThis() {
+    public void deleteObservers() {
 
         Controller.getInstance().deleteObserver(this);
     }
 
-    @Override
-    public AssetCls getItem(int k) {
-        // TODO Auto-generated method stub
-        return this.assets.get(k).getB();
-    }
 }

@@ -51,10 +51,8 @@ public class KKMap extends DCMap<
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, observerMessage_reset);
             this.observableData.put(DBMap.NOTIFY_LIST, observerMessage_list);
-            if (databaseSet.isDynamicGUI()) {
-                this.observableData.put(DBMap.NOTIFY_ADD, observerMessage_add);
-                this.observableData.put(DBMap.NOTIFY_REMOVE, observerMessage_remove);
-            }
+            this.observableData.put(DBMap.NOTIFY_ADD, observerMessage_add);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, observerMessage_remove);
         }
 
     }

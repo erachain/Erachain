@@ -1,6 +1,6 @@
 package org.erachain.gui.transaction;
 
-import org.erachain.core.transaction.R_Vouch;
+import org.erachain.core.transaction.RVouch;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
@@ -9,8 +9,8 @@ import org.erachain.utils.MenuPopupUtil;
 import javax.swing.*;
 
 @SuppressWarnings("serial")
-public class VouchingDetailsFrame extends Rec_DetailsFrame {
-    public VouchingDetailsFrame(R_Vouch vouchRecord) {
+public class VouchingDetailsFrame extends RecDetailsFrame {
+    public VouchingDetailsFrame(RVouch vouchRecord) {
         super(vouchRecord);
 
         //LABEL NAME

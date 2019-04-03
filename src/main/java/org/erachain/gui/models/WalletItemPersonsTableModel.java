@@ -9,13 +9,12 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
-import javax.validation.constraints.Null;
 import java.util.Collections;
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, String>, PersonCls> implements Observer {
+public class WalletItemPersonsTableModel extends SortedListTableModelCls<Tuple2<String, String>, PersonCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -27,7 +26,7 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
     public WalletItemPersonsTableModel() {
         super(Controller.getInstance().wallet.database.getPersonMap(), "WalletItemPersonsTableModel", 1000,
                 new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false});
+                new Boolean[]{false, true, true, false, false}, true);
     }
 
     @Override
@@ -95,7 +94,7 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
         if (message.getType() == ObserverMessage.LIST_PERSON_TYPE || message.getType() == ObserverMessage.WALLET_LIST_PERSON_TYPE) {
             if (this.persons == null) {
                 this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
-                this.persons.registerObserver();
+                //this.persons.registerObserver();
                 // sort from comparator
                 Collections.sort(this.persons, (a, b) -> a.getB().getName().compareToIgnoreCase(b.getB().getName()));
             }
@@ -112,20 +111,19 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
         }
     }
 
-    public void addObserversThis() {
-        //Controller.getInstance().addWalletObserver(this);
+    public void addObservers() {
         if (Controller.getInstance().doesWalletDatabaseExists())
             Controller.getInstance().wallet.database.getPersonMap().addObserver(this);
 
+        super.addObservers();
+
     }
 
-    public void removeObserversThis() {
-        if (!Controller.getInstance().doesWalletDatabaseExists())
-            return;
+    public void deleteObservers() {
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            Controller.getInstance().wallet.database.getPersonMap().deleteObserver(this);
 
-        //this.persons.removeObserver();
-        //Controller.getInstance().deleteWalletObserver(this);
-        Controller.getInstance().wallet.database.getPersonMap().deleteObserver(this);
-        persons.removeObserver();
+        super.deleteObservers();
+
     }
 }

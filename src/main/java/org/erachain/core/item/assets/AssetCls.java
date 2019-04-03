@@ -232,7 +232,6 @@ public abstract class AssetCls extends ItemCls {
 
     @Override
     public int getMinNameLen() {
-
         return 1;
     }
 

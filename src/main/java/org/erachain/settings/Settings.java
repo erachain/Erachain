@@ -423,14 +423,14 @@ public class Settings {
                 }
             }
 
-            //LOGGER.info(Lang.getInstance().translate("Peers loaded from Internet : ") + this.cacheInternetPeers.size());
+            //logger.info(Lang.getInstance().translate("Peers loaded from Internet : ") + this.cacheInternetPeers.size());
 
             return this.cacheInternetPeers;
 
         } catch (Exception e) {
             //RETURN EMPTY LIST
 
-            //LOGGER.debug(e.getMessage(), e);
+            //logger.debug(e.getMessage(), e);
             LOGGER.info(Lang.getInstance().translate("Peers loaded from Internet with errors : ") + this.cacheInternetPeers.size());
 
             return this.cacheInternetPeers;

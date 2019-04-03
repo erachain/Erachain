@@ -32,7 +32,7 @@ public class CalculatedFactory {
             case Calculated.CHANGE_BALANCE_CALCULATED:
 
                 // PARSE CHANGE BAlANCE
-                return C_Send.Parse(data);
+                return CSend.Parse(data);
         }
 
         throw new Exception("Invalid transaction type: " + type);

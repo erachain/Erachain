@@ -89,7 +89,7 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
 
         }
 
-        balances.registerObserver();
+        //balances.registerObserver();
     }
 
     public Class<?> getColumnClass(int c) { // set column type
@@ -158,15 +158,15 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
 
         // CHECK IF LIST UPDATED
         if ((message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK)
-                || (Controller.getInstance().getStatus() == Controller.STATUS_OK
-                && (message.getType() == ObserverMessage.ADD_BALANCE_TYPE
-                || message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE))) {
+                || (false && Controller.getInstance().getStatus() == Controller.STATUS_OK
+                        && (message.getType() == ObserverMessage.ADD_BALANCE_TYPE || message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE))
+        ) {
             this.fireTableDataChanged();
         }
     }
 
     public void removeObservers() {
-        this.balances.removeObserver();
+        //this.balances.removeObserver();
         Controller.getInstance().deleteObserver(this);
     }
 

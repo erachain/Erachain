@@ -2,7 +2,7 @@ package org.erachain.gui.items.mails;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
@@ -22,7 +22,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
     public static final int COLUMN_HEAD = 2;
 //	public static final int COLUMN_CONFIRM = 5;
     boolean incoming;
-    private ArrayList<R_Send> transactions;
+    private ArrayList<RSend> transactions;
     private String[] columnNames = Lang.getInstance()
             .translate(new String[]{"Confirmation", "Date", "Title", "Sender", "Reciever"});//, "Confirm" });
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false};
@@ -30,7 +30,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
     public TableModelMails(boolean incoming) {
 
         this.incoming = incoming;
-        transactions = new ArrayList<R_Send>();
+        transactions = new ArrayList<RSend>();
         if (Controller.getInstance().doesWalletDatabaseExists())
             Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
 
@@ -78,7 +78,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
             return null;
         }
 
-        R_Send tran = this.transactions.get(row);
+        RSend tran = this.transactions.get(row);
 
         switch (column) {
             case COLUMN_CONFIRMATION:
@@ -147,7 +147,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
                     .getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));
         }
 
-        for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(0, 1000, true)) {
+        for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(0, 300, true)) {
             if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
                 all_transactions.add(transaction);
             }
@@ -157,7 +157,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
         for (Transaction messagetx : all_transactions) {
             boolean is = false;
             if (!this.transactions.isEmpty()) {
-                for (R_Send message1 : this.transactions) {
+                for (RSend message1 : this.transactions) {
                     if (Arrays.equals(messagetx.getSignature(), message1.getSignature())) {
                         is = true;
                         break;
@@ -168,7 +168,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
                 if (messagetx.getAssetKey() == 0) {
                     for (Account account1 : Controller.getInstance().getAccounts()) {
-                        R_Send a = (R_Send) messagetx;
+                        RSend a = (RSend) messagetx;
                         if (a.getRecipient().getAddress().equals(account1.getAddress()) && incoming) {
                             this.transactions.add(a);
                         }

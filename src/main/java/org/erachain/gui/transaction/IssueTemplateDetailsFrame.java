@@ -1,7 +1,6 @@
 package org.erachain.gui.transaction;
 
 import org.erachain.core.transaction.IssueTemplateRecord;
-import org.erachain.gui.*;
 import org.erachain.gui.library.library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
@@ -9,7 +8,7 @@ import org.erachain.utils.MenuPopupUtil;
 import javax.swing.*;
 
 @SuppressWarnings("serial")
-public class IssueTemplateDetailsFrame extends Rec_DetailsFrame {
+public class IssueTemplateDetailsFrame extends RecDetailsFrame {
     public IssueTemplateDetailsFrame(IssueTemplateRecord templateIssue) {
         super(templateIssue);
 

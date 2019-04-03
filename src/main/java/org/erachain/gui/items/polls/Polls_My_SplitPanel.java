@@ -3,7 +3,7 @@ package org.erachain.gui.items.polls;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.polls.PollCls;
-import org.erachain.gui.Split_Panel;
+import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.WalletItemPersonsTableModel;
 import org.erachain.gui.models.WalletItemPollsTableModel;
@@ -17,7 +17,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-public class Polls_My_SplitPanel extends Split_Panel {
+public class Polls_My_SplitPanel extends SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
     // для прозрачности
     int alpha = 255;
@@ -70,12 +70,12 @@ public class Polls_My_SplitPanel extends Split_Panel {
     @Override
     public void onClose() {
         // delete observer left panel
-        my_Poll_Model.removeObservers();
+        my_Poll_Model.deleteObservers();
         // get component from right panel
         // Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
-        // if Person_Info 002 delay on close
-        // if (c1 instanceof Statement_Info) (
-        // (Statement_Info)c1).delay_on_Close();
+        // if PersonInfo 002 delay on close
+        // if (c1 instanceof StatementInfo) (
+        // (StatementInfo)c1).delay_on_Close();
 
     }
 

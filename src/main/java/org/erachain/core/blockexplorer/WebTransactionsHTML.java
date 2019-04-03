@@ -1,6 +1,7 @@
 package org.erachain.core.blockexplorer;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -10,17 +11,19 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.*;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.gui.Gui;
-import org.erachain.gui.items.statement.Statements_Vouch_Table_Model;
 import org.erachain.gui.models.PollOptionsTableModel;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 import org.erachain.utils.BigDecimalStringComparator;
 import org.erachain.utils.Converter;
 import org.erachain.utils.DateTimeFormat;
+import org.mapdb.Fun;
 
 import javax.swing.*;
 import javax.swing.table.TableRowSorter;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -67,7 +70,7 @@ public class WebTransactionsHTML {
         switch (type) {
             case Transaction.SEND_ASSET_TRANSACTION:
                 output.put("body", r_Send_HTML(transaction, langObj));
-                output.put("message", ((R_Send)transaction).viewData());
+                output.put("message", ((RSend)transaction).viewData());
 
                 break;
             case Transaction.ISSUE_ASSET_TRANSACTION:
@@ -294,7 +297,7 @@ public class WebTransactionsHTML {
     private String hash_Record_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
         String out = "";
-        R_Hashes r_Hashes = (R_Hashes) transaction;
+        RHashes r_Hashes = (RHashes) transaction;
         out += "<b>" + Lang.getInstance().translateFromLangObj("URL", langObj) + ":</b> "
                 + new String(r_Hashes.getURL(), Charset.forName("UTF-8")) + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
@@ -307,7 +310,7 @@ public class WebTransactionsHTML {
     private String set_Status_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
         String out = "";
-        R_SetStatusToItem setStatusToItem = (R_SetStatusToItem) transaction;
+        RSetStatusToItem setStatusToItem = (RSetStatusToItem) transaction;
         ItemCls item = Controller.getInstance().getItem(setStatusToItem.getItemType(), setStatusToItem.getItemKey());
         long status_key = setStatusToItem.getKey();
         StatusCls status = Controller.getInstance().getItemStatus(status_key);
@@ -354,7 +357,7 @@ public class WebTransactionsHTML {
     private String serttify_Pub_Key_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
         String out = "";
-        R_SertifyPubKeys record = (R_SertifyPubKeys) transaction;
+        RSertifyPubKeys record = (RSertifyPubKeys) transaction;
         PersonCls person;
         person = Controller.getInstance().getPerson(record.getKey());
         out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> <a href=?person="
@@ -371,7 +374,7 @@ public class WebTransactionsHTML {
     private String sign_Note_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
         String out = "";
-        R_SignNote r_Statement = (R_SignNote) transaction;
+        RSignNote r_Statement = (RSignNote) transaction;
         if (r_Statement.getKey() > 0) {
             out += "<b>" + Lang.getInstance().translateFromLangObj("Key", langObj) + ":</b> "
                     + Controller.getInstance().getTemplate(r_Statement.getKey()).toString() + "<br>";
@@ -388,7 +391,7 @@ public class WebTransactionsHTML {
     private String vouch_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
         String out = "";
-        R_Vouch vouchRecord = (R_Vouch) transaction;
+        RVouch vouchRecord = (RVouch) transaction;
         Transaction record = DCSet.getInstance().getTransactionFinalMap().get(vouchRecord.getVouchHeight(),
                 vouchRecord.getVouchSeqNo());
 		/*out += "<b>" + Lang.getInstance().translateFromLangObj("height-seqNo", langObj) + ":</b> <a href=?tx="
@@ -410,8 +413,8 @@ public class WebTransactionsHTML {
         UnionCls union = (UnionCls) unionIssue.getItem();
         out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
                 + unionIssue.getItem().getName() + "<br>";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
-                + unionIssue.getItem().getDescription() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
+        //        + unionIssue.getItem().getDescription() + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Birthday", langObj) + ":</b> "
                 + union.getBirthdayStr() + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Parent", langObj) + ":</b> "
@@ -425,8 +428,8 @@ public class WebTransactionsHTML {
         IssueStatusRecord statusIssue = (IssueStatusRecord) transaction;
         out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
                 + statusIssue.getItem().getName() + "<br>";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
-                + statusIssue.getItem().getDescription() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
+        //        + statusIssue.getItem().getDescription() + "<br>";
 
         return out;
     }
@@ -437,8 +440,8 @@ public class WebTransactionsHTML {
         IssueTemplateRecord templateIssue = (IssueTemplateRecord) transaction;
         out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
                 + templateIssue.getItem().getName() + "<br>";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
-                + templateIssue.getItem().getDescription() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
+        //        + templateIssue.getItem().getDescription() + "<br>";
 
         return out;
     }
@@ -449,8 +452,8 @@ public class WebTransactionsHTML {
         IssueImprintRecord imprintIssue = (IssueImprintRecord) transaction;
         out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
                 + imprintIssue.getItem().getName() + "<br>";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
-                + imprintIssue.getItem().getDescription() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
+        //        + imprintIssue.getItem().getDescription() + "<br>";
 
         return out;
     }
@@ -470,8 +473,8 @@ public class WebTransactionsHTML {
         if (person.getGender() == 1)
             out += Lang.getInstance().translateFromLangObj("Female", langObj);
         out += "<br>";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
-                + person.getDescription() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
+        //        + person.getDescription() + "<br>";
         if (person.getOwner().getPerson() != null) {
             // out += "<b>" + Lang.getInstance().translateFromLangObj("Owner",
             // langObj) + ":</b> <a href=?person="
@@ -522,7 +525,7 @@ public class WebTransactionsHTML {
 
     private String r_Send_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
-        R_Send tr = (R_Send) transaction;
+        RSend tr = (RSend) transaction;
         String out = "";
 
         out += "<b>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ":</b> <a href=?addr="
@@ -551,31 +554,128 @@ public class WebTransactionsHTML {
 
     public String get_Vouches(Transaction transaction, JSONObject langObj) {
 
+        Fun.Tuple2<BigDecimal, List<Long>> vouchesItem = DCSet.getInstance().getVouchRecordMap().get(transaction.getDBRef());
+        if (vouchesItem == null || vouchesItem.b.isEmpty())
+            return "";
 
-        Statements_Vouch_Table_Model model = new Statements_Vouch_Table_Model(transaction);
-        int row_count = model.getRowCount();
-        if (row_count == 0) return "";
+        TransactionFinalMap map = DCSet.getInstance().getTransactionFinalMap();
+
         String out = "<b>" + Lang.getInstance().translateFromLangObj("Certified", langObj) + ":</b> ";
-        //langObj
 
         out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td>" + Lang.getInstance().translateFromLangObj("Transaction", langObj) + "<td>" + Lang.getInstance().translateFromLangObj("Date", langObj) + "<td>" + Lang.getInstance().translateFromLangObj("Creator", langObj) + "</tr>";
-        for (int i = 0; i < row_count; i++) {
-            out += "<tr>";
-            out += "<td><a href=?tx=" + Base58.encode(model.getTrancaction(i).getSignature()) + get_Lang(langObj) + ">" + model.getTrancaction(i).getBlockHeight() + "-" + model.getTrancaction(i).getSeqNo() + "</a>";
-            out += "<td>" + model.getValueAt(i, 0);
+        for (Long txKey: vouchesItem.b) {
+
+            transaction = map.get(txKey);
+
+            out += "<tr>"
+                + "<td><a href=?tx=" + Base58.encode(transaction.getSignature()) + get_Lang(langObj) + ">" + transaction.getBlockHeight()
+                + "-" + transaction.getSeqNo() + "</a>"
+                + "<td>" + DateTimeFormat.timestamptoString(transaction.getTimestamp());
             out += "<td>";
-            Transaction tr = model.getTrancaction(i);
-            if (tr.getCreator().getPerson() != null) {
-                out += "<a href=?person=" + tr.getCreator().getPerson().b.getKey() + get_Lang(langObj) + ">"
-                        + tr.getCreator().viewPerson() + "</a><br>";
+
+            Fun.Tuple2<Integer, PersonCls> itemPerson = transaction.getCreator().getPerson();
+            if (itemPerson != null) {
+                out += "<a href=?person=" + itemPerson.b.getKey() + get_Lang(langObj) + "><b>"
+                        + itemPerson.b.getName() + "</b></a> ("
+                        + Lang.getInstance().translateFromLangObj("Public Key", langObj) + ": "
+                        + Base58.encode(transaction.getCreator().getPublicKey()) + ")<br>";
             } else {
-                out += "<a href=?addr=" + tr.getCreator().getAddress() + get_Lang(langObj) + ">" + tr.getCreator().getAddress()
-                        + "</a><br>";
+                out += "<a href=?addr=" + transaction.getCreator().getAddress() + get_Lang(langObj) + ">" + transaction.getCreator().getAddress()
+                        + "</a> ("
+                        + Lang.getInstance().translateFromLangObj("Public Key", langObj) + ": "
+                        + Base58.encode(transaction.getCreator().getPublicKey()) + ")<br>";
             }
 
+            out += Lang.getInstance().translateFromLangObj("Signature", langObj) + " : "
+                    + "<a href=?tx=" + Base58.encode(transaction.getSignature()) + ">" + transaction.getSignature() + "</a><br>";
 
         }
         out += "</table>";
+
+        return out;
+    }
+
+    public String htmlSignifier(long timestamp, Long personKey, String personName, PublicKeyAccount publicKey, byte[] signature, JSONObject langObj) {
+
+        String out = DateTimeFormat.timestamptoString(timestamp) + " ";
+        if (personKey != null) {
+            out += "<a href=?person=" + personKey + get_Lang(langObj) + "><b>"
+                    + personName + "</b></a> ("
+                    + Lang.getInstance().translateFromLangObj("Public key", langObj) + ": "
+                    + Base58.encode(publicKey.getPublicKey()) + ")<br>";
+        } else {
+            out += "<a href=?addr=" + publicKey.getAddress() + get_Lang(langObj) + ">" + publicKey.getAddress()
+                    + "</a> ("
+                    + Lang.getInstance().translateFromLangObj("Public key", langObj) + ": "
+                    + Base58.encode(publicKey.getPublicKey()) + ")<br>";
+        }
+
+        out += Lang.getInstance().translateFromLangObj("Signature", langObj) + ": "
+                + "<a href=?tx=" + Base58.encode(signature) + ">" + Base58.encode(signature) + "</a><br>";
+
+        return out;
+    }
+
+    public String htmlSignifier(Transaction transaction, JSONObject langObj) {
+
+        Fun.Tuple2<Integer, PersonCls> itemPerson = transaction.getCreator().getPerson();
+        if (itemPerson == null) {
+            return htmlSignifier(0, null, null, transaction.getCreator(), transaction.getSignature(), langObj);
+        }
+
+        return htmlSignifier(transaction.getTimestamp(), itemPerson.b.getKey(), itemPerson.b.getName(),
+                transaction.getCreator(), transaction.getSignature(), langObj);
+    }
+
+
+
+    public String getVouchesNew(Fun.Tuple2<Integer, PersonCls> creatorPersonItem,
+                              Transaction transaction, JSONObject langObj) {
+
+        String personSign;
+        if (creatorPersonItem != null) {
+            personSign = htmlSignifier(transaction.getTimestamp(), creatorPersonItem.b.getKey(),
+                    creatorPersonItem.b.getName(), transaction.getCreator(), transaction.getSignature(), langObj);;
+        } else {
+            personSign = htmlSignifier(0, null, null, transaction.getCreator(), transaction.getSignature(), langObj);;
+        }
+
+        Fun.Tuple2<BigDecimal, List<Long>> vouchesItem = DCSet.getInstance().getVouchRecordMap().get(transaction.getDBRef());
+
+        if (vouchesItem == null || vouchesItem.b.isEmpty()) {
+            String out = "<b><center>" + Lang.getInstance().translateFromLangObj("Signifier", langObj) + "</center></b> ";
+            out += personSign;
+            return out;
+        }
+
+
+        TransactionFinalMap map = DCSet.getInstance().getTransactionFinalMap();
+        String out;
+
+        if (vouchesItem.b.size() == 1) {
+            out = "<b><center>" + Lang.getInstance().translateFromLangObj("Signatures of the parties", langObj) + "</center></b> "
+                    + "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " 1:<br>" + personSign;
+
+            Transaction signTransaction = map.get(vouchesItem.b.get(0));
+            out += "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " 2:<br>"
+                    + htmlSignifier(signTransaction, langObj);
+
+        } else {
+            out = "<b><center>" + Lang.getInstance().translateFromLangObj("Signatories", langObj) + "</center></b> "
+                    + "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " 1:<br>" + personSign;
+
+            int count = 1;
+            for (Long txKey: vouchesItem.b) {
+
+                Transaction signTransaction = map.get(txKey);
+                out += "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " " + ++count
+                        +":<br>" + htmlSignifier(signTransaction, langObj);
+
+            }
+        }
+
+        out += "</table>";
+
         return out;
     }
 

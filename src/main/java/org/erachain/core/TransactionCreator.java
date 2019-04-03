@@ -669,8 +669,8 @@ public class TransactionCreator {
         long timestamp = NTP.getTime();
 
         //CREATE MESSAGE TRANSACTION
-        //messageTx = new R_Send(creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);
-        messageTx = new R_Send(creator, (byte) feePow, recipient, key, amount, title, message, isText, encryptMessage, timestamp, 0l);
+        //messageTx = new RSend(creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);
+        messageTx = new RSend(creator, (byte) feePow, recipient, key, amount, title, message, isText, encryptMessage, timestamp, 0l);
         messageTx.sign(creator, Transaction.FOR_NETWORK);
         messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
@@ -689,7 +689,7 @@ public class TransactionCreator {
         long timestamp = NTP.getTime();
 
         //CREATE MESSAGE TRANSACTION
-        messageTx = new R_Send(version, property1, property2, creator, (byte) feePow, recipient, key, amount, title,
+        messageTx = new RSend(version, property1, property2, creator, (byte) feePow, recipient, key, amount, title,
                 message, isText, encryptMessage, timestamp, 0l);
         messageTx.sign(creator, Transaction.FOR_NETWORK);
         messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
@@ -708,7 +708,7 @@ public class TransactionCreator {
         long timestamp = NTP.getTime();
 
         //CREATE MESSAGE TRANSACTION
-        recordNoteTx = new R_SignNote(version, property1, property1,
+        recordNoteTx = new RSignNote(version, property1, property1,
                 creator, (byte) feePow, key, message, isText, encrypted, timestamp, 0l);
         recordNoteTx.sign(creator, asDeal);
         recordNoteTx.setDC(this.fork, asDeal, this.blockHeight, ++this.seqNo);
@@ -730,7 +730,7 @@ public class TransactionCreator {
 
         //CREATE SERTIFY PERSON TRANSACTION
         //int version = 5; // without user sign
-        record = new R_SertifyPubKeys(version, creator, (byte) feePow, key,
+        record = new RSertifyPubKeys(version, creator, (byte) feePow, key,
                 userAccounts,
                 add_day, timestamp, 0l);
         record.sign(creator, asDeal);
@@ -751,7 +751,7 @@ public class TransactionCreator {
 
         //CREATE SERTIFY PERSON TRANSACTION
         //int version = 5; // without user sign
-        record = new R_Vouch(creator, (byte) feePow,
+        record = new RVouch(creator, (byte) feePow,
                 height, seq,
                 timestamp, 0l);
         record.sign(creator, asDeal);
@@ -778,7 +778,7 @@ public class TransactionCreator {
         }
 
         //CREATE MESSAGE TRANSACTION
-        messageTx = new R_Hashes(creator, (byte) feePow, url, data, hashes, timestamp, 0l);
+        messageTx = new RHashes(creator, (byte) feePow, url, data, hashes, timestamp, 0l);
         messageTx.sign(creator, Transaction.FOR_NETWORK);
         messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
@@ -816,7 +816,7 @@ public class TransactionCreator {
 
 		//CREATE SERTIFY PERSON TRANSACTION
 		//int version = 5; // without user sign
-		record = new R_SetStatusToItem(creator, (byte)feePow, key, item.getItemTypeInt(), item.getKey(),
+		record = new RSetStatusToItem(creator, (byte)feePow, key, item.getItemTypeInt(), item.getKey(),
 				beg_date, end_date, value_1, value_2, data, refParent,
 				timestamp, 0l);
 		record.sign(creator, asPack);
@@ -841,7 +841,7 @@ public class TransactionCreator {
 
         //CREATE SERTIFY PERSON TRANSACTION
         //int version = 5; // without user sign
-        record = new R_SetStatusToItem(creator, (byte) feePow, key, item.getItemTypeInt(), item.getKey(),
+        record = new RSetStatusToItem(creator, (byte) feePow, key, item.getItemTypeInt(), item.getKey(),
                 beg_date, end_date, value_1, value_2, data_1, data_2, refParent, descr,
                 timestamp, 0l);
         record.sign(creator, Transaction.FOR_NETWORK);

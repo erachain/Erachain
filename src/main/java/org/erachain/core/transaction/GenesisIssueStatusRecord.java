@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 //import java.math.BigInteger;
 
-public class GenesisIssueStatusRecord extends GenesisIssue_ItemRecord {
+public class GenesisIssueStatusRecord extends GenesisIssueItemRecord {
 
     private static final byte TYPE_ID = (byte) GENESIS_ISSUE_STATUS_TRANSACTION;
     private static final String NAME_ID = "GENESIS Issue Status";

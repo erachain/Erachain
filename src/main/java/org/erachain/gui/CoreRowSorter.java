@@ -1,6 +1,6 @@
 package org.erachain.gui;
 
-import org.erachain.gui.models.TableModelCls;
+import org.erachain.gui.models.SortedListTableModelCls;
 
 import javax.swing.*;
 import javax.swing.table.TableModel;
@@ -12,10 +12,10 @@ import java.util.Map;
 public class CoreRowSorter extends RowSorter<TableModel> {
 
     private List<SortKey> keys;
-    private TableModelCls<?, ?> model;
+    private SortedListTableModelCls<?, ?> model;
     private Map<Integer, Integer> indexes;
 
-    public CoreRowSorter(TableModelCls<?, ?> model, Map<Integer, Integer> indexes) {
+    public CoreRowSorter(SortedListTableModelCls<?, ?> model, Map<Integer, Integer> indexes) {
         this.keys = new ArrayList<SortKey>();
         this.model = model;
         this.indexes = indexes;
