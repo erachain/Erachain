@@ -9,7 +9,7 @@ import org.mapdb.Fun.Tuple2;
 
 import java.util.Map;
 
-public class WItemAssetMap extends WItem_Map {
+public class WItemAssetMap extends WItemMap {
     //static Logger logger = LoggerFactory.getLogger(WItemAssetMap.class.getName());
 
     static final String NAME = "asset";

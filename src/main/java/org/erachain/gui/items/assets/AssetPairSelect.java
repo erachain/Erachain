@@ -29,7 +29,7 @@ public class AssetPairSelect extends JDialog {
 
     public AssetPairSelectTableModel assetPairSelectTableModel;
     public AssetCls pairAsset;
-    AssetsPairSelect_Panel pair_Panel = new AssetsPairSelect_Panel();
+    AssetsPairSelectPanel pair_Panel = new AssetsPairSelectPanel();
     RowSorter sorter;
     private MDecimalFormatedTextField key_Item;
 
@@ -230,7 +230,7 @@ public class AssetPairSelect extends JDialog {
                     AssetPairSelectTableModel tableModelAssets1 = (AssetPairSelectTableModel) pair_Panel.jTable_jScrollPanel_LeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();
                     Object asset = tableModelAssets1.getItem(pair_Panel.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(pair_Panel.jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 
-                    pair_Panel.jScrollPane_jPanel_RightPanel.setViewportView(new Asset_Info((AssetCls) asset));
+                    pair_Panel.jScrollPane_jPanel_RightPanel.setViewportView(new AssetInfo((AssetCls) asset));
                     pair_Panel.button1_ToolBar_LeftPanel.setEnabled(true);
 
                 }

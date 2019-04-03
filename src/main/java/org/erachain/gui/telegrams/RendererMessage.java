@@ -12,6 +12,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.text.View;
 
+import org.erachain.core.transaction.RSend;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
@@ -22,9 +23,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
-import org.erachain.core.transaction.R_Send;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.*;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
@@ -82,7 +81,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
                  background = "#DCDCDC";
             }
            
-          String text = enscript(( R_Send)val.c);
+          String text = enscript((RSend)val.c);
           text = library.to_HTML(text);
           
           if (isSelected) {
@@ -102,7 +101,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
           }
             
           value = "<HTML><body style='background:"+background+";'><p>&nbsp;&nbsp;<img src='file:"+ image +"'>";
-          if ((( R_Send)val.c).isEncrypted()){
+          if (((RSend)val.c).isEncrypted()){
               
               value = value  +"&nbsp;&nbsp;<img src='file:"+ isScriptImage +"'>";
           }
@@ -149,7 +148,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
    
     
     
-    private  String enscript(R_Send trans) {
+    private  String enscript(RSend trans) {
 
         //  jTextArea_Messge.setContentType("text/html");
         //  if (trans.isText())  jTextArea_Messge.setContentType("text");

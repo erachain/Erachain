@@ -10,7 +10,7 @@ import org.erachain.utils.MenuPopupUtil;
 import javax.swing.*;
 
 @SuppressWarnings("serial")
-public class VoteOnItemPollDetailsFrame extends Rec_DetailsFrame {
+public class VoteOnItemPollDetailsFrame extends RecDetailsFrame {
     public VoteOnItemPollDetailsFrame(VoteOnItemPollTransaction pollVote) {
         super(pollVote);
 

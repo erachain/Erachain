@@ -229,7 +229,7 @@ public class DWSet extends DBASet {
         return this.pollMap;
     }
 
-    public WItem_Map getItemMap(ItemCls item) {
+    public WItemMap getItemMap(ItemCls item) {
         if (item instanceof AssetCls) {
             return this.assetMap;
         } else if (item instanceof ImprintCls) {
@@ -249,7 +249,7 @@ public class DWSet extends DBASet {
         }
     }
 
-    public WItem_Map getItemMap(int type) {
+    public WItemMap getItemMap(int type) {
         switch (type) {
             case ItemCls.ASSET_TYPE:
                 return this.assetMap;

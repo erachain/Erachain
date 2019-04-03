@@ -9,7 +9,7 @@ import org.mapdb.Fun.Tuple2;
 
 import java.util.Map;
 
-public class WItemStatusMap extends WItem_Map {
+public class WItemStatusMap extends WItemMap {
 
     //static Logger logger = LoggerFactory.getLogger(WItemStatusMap.class.getName());
     static final String NAME = "status";

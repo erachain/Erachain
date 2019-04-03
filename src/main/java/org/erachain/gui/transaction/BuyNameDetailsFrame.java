@@ -7,7 +7,7 @@ import org.erachain.utils.MenuPopupUtil;
 import javax.swing.*;
 
 @SuppressWarnings("serial")
-public class BuyNameDetailsFrame extends Rec_DetailsFrame {
+public class BuyNameDetailsFrame extends RecDetailsFrame {
     public BuyNameDetailsFrame(BuyNameTransaction namePurchase) {
         super(namePurchase);
 

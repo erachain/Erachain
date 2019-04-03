@@ -9,7 +9,7 @@ import org.mapdb.Fun.Tuple2;
 
 import java.util.Map;
 
-public class WItemImprintMap extends WItem_Map {
+public class WItemImprintMap extends WItemMap {
 
     //static Logger logger = LoggerFactory.getLogger(WItemImprintMap.class.getName());
     static final String NAME = "imprint";

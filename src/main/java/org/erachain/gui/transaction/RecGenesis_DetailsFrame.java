@@ -1,9 +1,8 @@
 package org.erachain.gui.transaction;
 
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.transaction.Genesis_Record;
+import org.erachain.core.transaction.GenesisRecord;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -19,7 +18,7 @@ public class RecGenesis_DetailsFrame extends JPanel //JFrame
     public GridBagConstraints labelGBC = new GridBagConstraints();
     public GridBagConstraints detailGBC = new GridBagConstraints();
 
-    public RecGenesis_DetailsFrame(final Genesis_Record record) {
+    public RecGenesis_DetailsFrame(final GenesisRecord record) {
 //		super(Lang.getInstance().translate(controller.Controller.APP_NAME) + " - " + Lang.getInstance().translate(record.viewTypeName()));
 
         //ICON

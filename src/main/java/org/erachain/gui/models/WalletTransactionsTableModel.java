@@ -100,15 +100,15 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
                 return null;
 
             itemName = item.getShort();
-        } else if (transaction instanceof GenesisIssue_ItemRecord) {
-            GenesisIssue_ItemRecord transIssue = (GenesisIssue_ItemRecord) transaction;
+        } else if (transaction instanceof GenesisIssueItemRecord) {
+            GenesisIssueItemRecord transIssue = (GenesisIssueItemRecord) transaction;
             ItemCls item = transIssue.getItem();
             if (item == null)
                 return null;
 
             itemName = item.getShort();
-        } else if (transaction instanceof R_SertifyPubKeys) {
-            R_SertifyPubKeys sertifyPK = (R_SertifyPubKeys) transaction;
+        } else if (transaction instanceof RSertifyPubKeys) {
+            RSertifyPubKeys sertifyPK = (RSertifyPubKeys) transaction;
             //recipient = transAmo.getRecipient();
             ItemCls item = DCSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
             if (item == null)

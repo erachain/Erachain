@@ -1,6 +1,6 @@
 package org.erachain.datachain;
 
-import org.erachain.at.AT_Constants;
+import org.erachain.at.ATConstants;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.mapdb.*;
@@ -65,7 +65,7 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
     //add State if it does not exist or update the state
     public void addOrUpdate(Integer blockHeight, byte[] atId, byte[] stateBytes) {
         //Height to store state
-        int height = (int) ((Math.round(blockHeight) / AT_Constants.STATE_STORE_DISTANCE) + 1) * AT_Constants.STATE_STORE_DISTANCE;
+        int height = (int) ((Math.round(blockHeight) / ATConstants.STATE_STORE_DISTANCE) + 1) * ATConstants.STATE_STORE_DISTANCE;
 
         this.set(new Tuple2<Integer, String>(height, Base58.encode(atId)), stateBytes);
     }
@@ -76,7 +76,7 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
         BTreeMap map = (BTreeMap) this.map;
 
         //Height to store state
-        int height = (int) ((Math.round(blockHeight) / AT_Constants.STATE_STORE_DISTANCE) + 1) * AT_Constants.STATE_STORE_DISTANCE;
+        int height = (int) ((Math.round(blockHeight) / ATConstants.STATE_STORE_DISTANCE) + 1) * ATConstants.STATE_STORE_DISTANCE;
 
         //FILTER ALL ATS
         Collection<Tuple2> keys = ((BTreeMap<Tuple2, String>) map).subMap(

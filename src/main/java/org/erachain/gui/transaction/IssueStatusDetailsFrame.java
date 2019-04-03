@@ -9,7 +9,7 @@ import javax.swing.*;
 //import org.erachain.core.item.statuses.StatusCls;
 
 @SuppressWarnings("serial")
-public class IssueStatusDetailsFrame extends Rec_DetailsFrame {
+public class IssueStatusDetailsFrame extends RecDetailsFrame {
     public IssueStatusDetailsFrame(IssueStatusRecord statusIssue) {
         super(statusIssue);
 

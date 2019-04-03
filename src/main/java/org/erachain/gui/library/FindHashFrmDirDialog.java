@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
@@ -13,12 +11,6 @@ import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JInternalFrame;
-
-import org.erachain.core.account.Account;
-import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.item.persons.PersonCls;
-import org.erachain.gui.items.accounts.Account_Send_Panel;
-import org.erachain.lang.Lang;
 
 public class FindHashFrmDirDialog  extends JDialog {
 

@@ -3,7 +3,7 @@ package org.erachain.gui.transaction;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
-import org.erachain.core.transaction.R_SetStatusToItem;
+import org.erachain.core.transaction.RSetStatusToItem;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.MenuPopupUtil;
@@ -12,8 +12,8 @@ import javax.swing.*;
 import java.nio.charset.Charset;
 
 @SuppressWarnings("serial")
-public class SetStatusToItemDetailsFrame extends Rec_DetailsFrame {
-    public SetStatusToItemDetailsFrame(R_SetStatusToItem setStatusToItem) {
+public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
+    public SetStatusToItemDetailsFrame(RSetStatusToItem setStatusToItem) {
         super(setStatusToItem);
 
         //ItemCls item = ItemCls.setStatusToItem.getItemType();

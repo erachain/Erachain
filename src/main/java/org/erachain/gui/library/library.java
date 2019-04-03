@@ -43,7 +43,7 @@ public class library {
 
         switch ( transaction.getType()) {
             case Transaction.SEND_ASSET_TRANSACTION:
-                R_Send r_Send = (R_Send) transaction;
+                RSend r_Send = (RSend) transaction;
 
                 // AS RECIPIENT
                 Account account = Controller.getInstance().getAccountByAddress(r_Send.getRecipient().getAddress());
@@ -472,7 +472,7 @@ public class library {
 
         case Transaction.SIGN_NOTE_TRANSACTION:
 
-            jsonString = ((R_SignNote) trans).toJson().toJSONString();
+            jsonString = ((RSignNote) trans).toJson().toJSONString();
             break;
             
         case Transaction.REGISTER_NAME_TRANSACTION:
@@ -540,7 +540,7 @@ public class library {
 
         case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
 
-            jsonString = ((R_SetStatusToItem) trans).toJson().toJSONString();
+            jsonString = ((RSetStatusToItem) trans).toJson().toJSONString();
             break;
            
         case Transaction.CREATE_ORDER_TRANSACTION:
@@ -559,19 +559,19 @@ public class library {
             break;
 
         case Transaction.SEND_ASSET_TRANSACTION:
-            jsonString = ((R_Send) trans).toJson().toJSONString();
+            jsonString = ((RSend) trans).toJson().toJSONString();
             break;
 
         case Transaction.VOUCH_TRANSACTION:
-            jsonString = ((R_Vouch) trans).toJson().toJSONString();
+            jsonString = ((RVouch) trans).toJson().toJSONString();
             break;
 
         case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
-            jsonString = ((R_SertifyPubKeys) trans).toJson().toJSONString();
+            jsonString = ((RSertifyPubKeys) trans).toJson().toJSONString();
             break;
 
         case Transaction.HASHES_RECORD:
-            jsonString = ((R_Hashes) trans).toJson().toJSONString();
+            jsonString = ((RHashes) trans).toJson().toJSONString();
             break;
 
         case Transaction.ISSUE_IMPRINT_TRANSACTION:

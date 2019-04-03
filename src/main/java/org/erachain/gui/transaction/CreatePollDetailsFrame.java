@@ -13,7 +13,7 @@ import javax.swing.*;
 import javax.swing.table.TableRowSorter;
 
 @SuppressWarnings("serial")
-public class CreatePollDetailsFrame extends Rec_DetailsFrame {
+public class CreatePollDetailsFrame extends RecDetailsFrame {
     @SuppressWarnings("unchecked")
     public CreatePollDetailsFrame(CreatePollTransaction pollCreation) {
         super(pollCreation);

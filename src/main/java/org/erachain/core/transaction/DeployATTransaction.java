@@ -6,9 +6,9 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.eclipse.jetty.util.StringUtil;
 import org.erachain.at.AT;
-import org.erachain.at.AT_Constants;
-import org.erachain.at.AT_Controller;
-import org.erachain.at.AT_Exception;
+import org.erachain.at.ATConstants;
+import org.erachain.at.ATController;
+import org.erachain.at.ATException;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
@@ -112,7 +112,7 @@ public class DeployATTransaction extends Transaction {
         int nameLength = Ints.fromByteArray(nameLengthBytes);
         position += NAME_SIZE_LENGTH;
 
-        if (nameLength < 1 || nameLength > AT_Constants.NAME_MAX_LENGTH) {
+        if (nameLength < 1 || nameLength > ATConstants.NAME_MAX_LENGTH) {
             throw new Exception("Invalid name length");
         }
 
@@ -125,7 +125,7 @@ public class DeployATTransaction extends Transaction {
         int descriptionLength = Ints.fromByteArray(descriptionLengthBytes);
         position += DESCRIPTION_SIZE_LENGTH;
 
-        if (descriptionLength < 1 || descriptionLength > AT_Constants.DESC_MAX_LENGTH) {
+        if (descriptionLength < 1 || descriptionLength > ATConstants.DESC_MAX_LENGTH) {
             throw new Exception("Invalid description length");
         }
 
@@ -138,7 +138,7 @@ public class DeployATTransaction extends Transaction {
         int typeLength = Ints.fromByteArray(typeLengthBytes);
         position += TYPE_SIZE_LENGTH;
 
-        if (typeLength < 1 || typeLength > AT_Constants.TYPE_MAX_LENGTH) {
+        if (typeLength < 1 || typeLength > ATConstants.TYPE_MAX_LENGTH) {
             throw new Exception("Invalid type length");
         }
 
@@ -151,7 +151,7 @@ public class DeployATTransaction extends Transaction {
         int tagsLength = Ints.fromByteArray(tagsLengthBytes);
         position += TAGS_SIZE_LENGTH;
 
-        if (tagsLength < 1 || tagsLength > AT_Constants.TAGS_MAX_LENGTH) {
+        if (tagsLength < 1 || tagsLength > ATConstants.TAGS_MAX_LENGTH) {
             throw new Exception("Invalid tags length");
         }
 
@@ -164,7 +164,7 @@ public class DeployATTransaction extends Transaction {
         int creationLength = Ints.fromByteArray(creationLengthBytes);
         position += CREATION_BYTES_SIZE_LENGTH;
 
-        if (creationLength < 1 || creationLength > AT_Constants.CREATION_BYTES_MAX_LENGTH) //TODO SEE WHAT IS BEST
+        if (creationLength < 1 || creationLength > ATConstants.CREATION_BYTES_MAX_LENGTH) //TODO SEE WHAT IS BEST
         {
             throw new Exception("Invalid creation bytes length");
         }
@@ -322,23 +322,23 @@ public class DeployATTransaction extends Transaction {
 
         //CHECK NAME LENGTH
         int nameLength = this.name.getBytes(StandardCharsets.UTF_8).length;
-        if (nameLength > AT_Constants.NAME_MAX_LENGTH || nameLength < 1) {
+        if (nameLength > ATConstants.NAME_MAX_LENGTH || nameLength < 1) {
             return INVALID_NAME_LENGTH;
         }
 
         //CHECK DESCRIPTION LENGTH
         int descriptionLength = this.description.getBytes(StandardCharsets.UTF_8).length;
-        if (descriptionLength > AT_Constants.DESC_MAX_LENGTH || descriptionLength < 1) {
+        if (descriptionLength > ATConstants.DESC_MAX_LENGTH || descriptionLength < 1) {
             return INVALID_DESCRIPTION_LENGTH;
         }
 
         int typeLength = this.type.getBytes(StandardCharsets.UTF_8).length;
-        if (typeLength > AT_Constants.TYPE_MAX_LENGTH || typeLength < 1) {
+        if (typeLength > ATConstants.TYPE_MAX_LENGTH || typeLength < 1) {
             return INVALID_TYPE_LENGTH;
         }
 
         int tagsLength = this.tags.getBytes(StandardCharsets.UTF_8).length;
-        if (tagsLength > AT_Constants.TYPE_MAX_LENGTH || tagsLength < 1) {
+        if (tagsLength > ATConstants.TYPE_MAX_LENGTH || tagsLength < 1) {
             return INVALID_TAGS_LENGTH;
         }
 
@@ -355,7 +355,7 @@ public class DeployATTransaction extends Transaction {
             balanceBytes = Bytes.concat(fill, balanceBytes);
 
             long lFee = Longs.fromByteArray(balanceBytes);
-            int returnCode = AT_Controller.checkCreationBytes(this.creationBytes, this.type, lFee, height, forkHeight, this.dcSet);
+            int returnCode = ATController.checkCreationBytes(this.creationBytes, this.type, lFee, height, forkHeight, this.dcSet);
             if (returnCode != 0) {
                 return returnCode + AT_ERROR;
             }
@@ -365,7 +365,7 @@ public class DeployATTransaction extends Transaction {
                 return 12 + AT_ERROR;
             }
 
-        } catch (AT_Exception e) {
+        } catch (ATException e) {
             //TODO CAN BE CHANGED TO HANDLE THE ERRORS BETTER
             return INVALID_CREATION_BYTES;
         }

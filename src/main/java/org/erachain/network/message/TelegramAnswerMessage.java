@@ -5,7 +5,7 @@ import org.bouncycastle.util.Strings;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base64;
-import org.erachain.core.transaction.R_Send;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
@@ -35,7 +35,7 @@ public class TelegramAnswerMessage extends Message {
                 byte[] transactionByte = Base64.decode((String) jsonTelegrams.get(i+""));
                 Transaction trans = null;
                 try {
-                    trans = R_Send.Parse(transactionByte, Transaction.FOR_NETWORK);
+                    trans = RSend.Parse(transactionByte, Transaction.FOR_NETWORK);
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
