@@ -42,7 +42,6 @@ public class BlockBuffer extends Thread {
 
     public void run() {
         while (this.run) {
-            int countSOT = 0;
             for (int i = 0; i < this.signatures.size() && i < this.counter + BUFFER_SIZE; i++) {
 
                 if (Controller.getInstance().isOnStopping()) {
@@ -56,13 +55,13 @@ public class BlockBuffer extends Thread {
                 if (!this.blocks.containsKey(signature)) {
                     //LOAD BLOCK
                     // время ожидания увеличиваем по мере номера блока - он ведь на той тсроне синхронно нам будет посылаться
-                    this.loadBlock(signature, ++countSOT * (Synchronizer.GET_BLOCK_TIMEOUT >> 2));
+                    this.loadBlock(signature, Synchronizer.GET_BLOCK_TIMEOUT + i * (Synchronizer.GET_BLOCK_TIMEOUT >> 1));
 
                 }
             }
 
             try {
-                Thread.sleep(10);
+                Thread.sleep(1);
             } catch (InterruptedException e) {
                 //ERROR SLEEPING
                 break;
