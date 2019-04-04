@@ -61,7 +61,7 @@ public class BlockBuffer extends Thread {
             }
 
             try {
-                Thread.sleep(1);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 //ERROR SLEEPING
                 break;
