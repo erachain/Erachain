@@ -2,18 +2,18 @@ package org.erachain.database.wallet;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.Order;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.database.AutoKeyDBMap;
 import org.erachain.database.DBMap;
 import org.erachain.database.IDB;
-import org.erachain.database.serializer.OrderSerializer;
+import org.erachain.database.serializer.LongAndOrderSerializer;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
-import org.mapdb.*;
+import org.mapdb.BTreeMap;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -70,7 +70,7 @@ public class OrderMap extends AutoKeyDBMap<Tuple2<String, Long>, Tuple2<Long, Or
         //OPEN MAP
         BTreeMap<Tuple2<String, Long>, Tuple2<Long, Order>> map = database.createTreeMap("orders")
                 //.keySerializer(BTreeKeySerializer.TUPLE2)
-                .valueSerializer(new LongOrderSerializer())
+                .valueSerializer(new LongAndOrderSerializer())
                 .makeOrGet();
 
         makeAutoKey(database, map, "orders");

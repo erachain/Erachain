@@ -1411,12 +1411,12 @@ public class Wallet extends Observable implements Observer {
 		ItemCls item = issueItem.getItem();
 		// item.resolveKey(DLSet.getInstance());
 		Account creator = item.getOwner();
-		if (creator == null)
-			return;
 
-		if (this.accountExists(creator.getAddress())) {
+		if (this.accountExists(issueItem.getCreator().getAddress())
+			|| creator != null && this.accountExists(creator.getAddress())) {
 			// ADD ASSET
-			this.database.getItemMap(item).add(creator.getAddress(), issueItem.getSignature(), item);
+			this.database.getItemMap(item).add(
+					creator.getAddress(), issueItem.getSignature(), item);
 
 			// ADD to FAVORITES
 			this.database.getItemFavoritesSet(item).add(item.getKey());

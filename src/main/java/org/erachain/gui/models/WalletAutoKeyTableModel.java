@@ -57,7 +57,7 @@ public abstract class WalletAutoKeyTableModel<T, U> extends SortedListTableModel
         ObserverMessage message = (ObserverMessage) arg;
 
         //CHECK IF NEW LIST
-        if (message.getType() == list_type) {
+        if (message.getType() == reset_type) {
 
             count = 0;
             needUpdate = false;
@@ -65,7 +65,7 @@ public abstract class WalletAutoKeyTableModel<T, U> extends SortedListTableModel
             listSorted = new SortableList<T, U>(map, new ArrayList<>());
             fireTableDataChanged();
 
-        } else if (message.getType() == reset_type) {
+        } else if (message.getType() == list_type) {
 
             count = 0;
             needUpdate = false;
