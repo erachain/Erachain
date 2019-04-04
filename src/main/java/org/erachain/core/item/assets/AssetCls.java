@@ -174,7 +174,7 @@ public abstract class AssetCls extends ItemCls {
     public static final int AS_INSIDE_ACCESS = 55;
 
     /**
-     * inside МЩЕУ
+     * inside VOTE
      * +++ права и доступы
      * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
      */
