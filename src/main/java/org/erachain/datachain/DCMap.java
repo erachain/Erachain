@@ -165,7 +165,8 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
                         if (
                                 observeItem.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
                                         || observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
-                                        || observeItem.equals(ObserverMessage.ADD_AT_TX_TYPE)
+                                        || observeItem.equals(ObserverMessage.ADD_PERSON_STATUS_TYPE)
+                                        || observeItem.equals(ObserverMessage.REMOVE_PERSON_STATUS_TYPE)
                         ) {
                             this.notifyObservers(new ObserverMessage(observeItem, new Pair<T, U>(key, value)));
                         } else {

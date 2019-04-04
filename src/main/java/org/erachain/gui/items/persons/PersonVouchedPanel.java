@@ -152,7 +152,7 @@ public class PersonVouchedPanel extends JPanel {
         copy_Creator_Address.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection value = new StringSelection(model.get_Public_Account(row).getAddress());
+                StringSelection value = new StringSelection(model.getPublicKey(row).getAddress());
                 clipboard.setContents(value, null);
             }
         });
@@ -162,7 +162,7 @@ public class PersonVouchedPanel extends JPanel {
         menu_copy_Creator_PublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                PublicKeyAccount public_Account = model.get_Public_Account(row);
+                PublicKeyAccount public_Account = model.getPublicKey(row);
                 StringSelection value = new StringSelection(public_Account.getBase58());
                 clipboard.setContents(value, null);
             }
@@ -174,7 +174,7 @@ public class PersonVouchedPanel extends JPanel {
         menu_copy_Block_PublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection value = new StringSelection(model.get_No_Trancaction(row));
+                StringSelection value = new StringSelection(model.getHeightSeq(row));
                 clipboard.setContents(value, null);
             }
         });
@@ -184,7 +184,7 @@ public class PersonVouchedPanel extends JPanel {
         JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset to Person"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Account account = (Account) model.get_Public_Account(row);
+                Account account = (Account) model.getPublicKey(row);
                 new AccountSendDialog(null, null, account, null);
                 ;
 
@@ -195,7 +195,7 @@ public class PersonVouchedPanel extends JPanel {
         JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail to Person"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Account account = (Account) model.get_Public_Account(row);
+                Account account = (Account) model.getPublicKey(row);
 
                 new MailSendDialog(null, null, account, null);
 

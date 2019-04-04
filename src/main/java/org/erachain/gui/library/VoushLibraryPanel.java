@@ -151,7 +151,7 @@ public class VoushLibraryPanel extends JPanel {
 
 
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                PublicKeyAccount public_Account = model.get_Public_Account(row);
+                PublicKeyAccount public_Account = model.getCreator(row);
                 StringSelection value = new StringSelection(public_Account.getAddress());
                 clipboard.setContents(value, null);
             }
@@ -166,7 +166,7 @@ public class VoushLibraryPanel extends JPanel {
                 // StringSelection(person.getCreator().getAddress().toString());
 
 
-                PublicKeyAccount public_Account = model.get_Public_Account(row);
+                PublicKeyAccount public_Account = model.getCreator(row);
                 StringSelection value = new StringSelection(public_Account.getBase58());
                 clipboard.setContents(value, null);
             }
@@ -182,7 +182,7 @@ public class VoushLibraryPanel extends JPanel {
                 // StringSelection(person.getCreator().getAddress().toString());
 
 
-                StringSelection value = new StringSelection(model.get_No_Trancaction(row));
+                StringSelection value = new StringSelection(model.getTransactionHeightSeqNo(row));
                 clipboard.setContents(value, null);
             }
         });
@@ -193,7 +193,7 @@ public class VoushLibraryPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
 
 
-                Account account = (Account) model.get_Public_Account(row);
+                Account account = (Account) model.getCreator(row);
 
                 new AccountSendDialog(null, null, account, null);
                 ;
@@ -207,7 +207,7 @@ public class VoushLibraryPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
 
 
-                Account account = (Account) model.get_Public_Account(row);
+                Account account = (Account) model.getCreator(row);
 
                 new MailSendDialog(null, null, account, null);
 

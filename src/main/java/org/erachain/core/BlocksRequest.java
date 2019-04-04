@@ -47,7 +47,9 @@ public class BlocksRequest extends MonitoredThread {
      * @param message
      */
     public void offerMessage(Message message) {
-        blockingQueue.offer(message);
+        if (!blockingQueue.offer(message)) {
+            LOGGER.debug("skip ---- " + message);
+        }
     }
 
     public int processMessage(Message message) {

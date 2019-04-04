@@ -1,94 +1,44 @@
 package org.erachain.gui.items.persons;
 
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemPersonMap;
-import org.erachain.lang.Lang;
+import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class TableModelOwnerPersons<U, T> extends AbstractTableModel implements Observer {
+public class TableModelOwnerPersons extends SortedListTableModelCls<String, PersonCls> {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_BORN = 2;
     public static final int COLUMN_ADDRESS = 3;
     public static final int COLUMN_FAVORITE = 4;
 
-    //	private SortableList<Long, PersonCls> persons;
-    private List<Pair<U, PersonCls>> persons;
-
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Birthday"});//, "Publisher", "Favorite"});
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false};
-    private SortableList<Tuple2<String, String>, PersonCls> persons_S_List;
-
-
-    private TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses;
-    private ItemPersonMap persomMap;
+    private long itemKey;
 
     public TableModelOwnerPersons(Long key) {
-        persomMap = DCSet.getInstance().getItemPersonMap();
-        addresses = DCSet.getInstance().getPersonAddressMap().getItems(key);
-        persomMap.addObserver(this);
-    }
+        super(DCSet.getInstance().getItemPersonMap(),
+                new String[]{"Key", "Name", "Birthday"},
+                new Boolean[]{false, true, true, false}, false);
 
+        itemKey = key;
 
-    public List<Pair<U, PersonCls>> getSortableList() {
-        return this.persons;
-    }
-
-
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
-    }
-
-    public PersonCls getPerson(int row) {
-        return this.persons.get(row).getB();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return this.columnNames[index];
-    }
-
-    @Override
-    public int getRowCount() {
-        if (this.persons == null) return 0;
-        return this.persons.size();
+        addObservers();
 
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.persons == null || row > this.persons.size() - 1) {
+        if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
 
-        PersonCls person = this.persons.get(row).getB();
+        PersonCls person = this.listSorted.get(row).getB();
 
         switch (column) {
             case COLUMN_KEY:
@@ -116,53 +66,51 @@ public class TableModelOwnerPersons<U, T> extends AbstractTableModel implements 
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.LIST_PERSON_TYPE) {
-            if (this.persons == null) {
-                persons = new ArrayList<Pair<U, PersonCls>>();
-                this.persons_S_List = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
-                //	this.persons_S_List.addFilterField("name");
-                //this.persons_S_List.registerObserver();
-                get_List();
-            }
 
+            setRows();
             this.fireTableDataChanged();
-        }
 
+        } else
         //CHECK IF LIST UPDATED
         if (message.getType() == ObserverMessage.ADD_PERSON_TYPE || message.getType() == ObserverMessage.REMOVE_PERSON_TYPE) {
-            get_List();
+
+            needUpdate = true;
+
+        } else
+        if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
+            needUpdate = false;
+            setRows();
             this.fireTableDataChanged();
         }
+    }
+
+    public void addObservers() {
+        super.addObservers();
+        map.addObserver(this);
     }
 
     public void removeObservers() {
-        //if (persons_S_List != null) this.persons_S_List.removeObserver();
-        persomMap.deleteObserver(this);
+        super.deleteObservers();
+        map.deleteObserver(this);
     }
 
     @SuppressWarnings("unchecked")
-    private void get_List() {
-        persons.clear();
+    private void setRows() {
 
-        for (Pair<Tuple2<String, String>, PersonCls> pp1 : persons_S_List) {
-            String creator = pp1.getB().getOwner().getAddress();
-            for (String ad : addresses.keySet()) {
-                if (ad.equals(creator)) persons.add((Pair<U, PersonCls>) pp1);
+        listSorted.clear();
 
+        Set<String> publicKeys = DCSet.getInstance().getPersonAddressMap().get(itemKey).keySet();
+
+        for (String publicKey: publicKeys) {
+            NavigableMap<Long, ItemCls> addresses = ((ItemPersonMap) map).getOwnerItems(publicKey);
+            for (Long key: addresses.keySet()) {
+                listSorted.add(new Pair(publicKey, addresses.get(key)));
             }
 
         }

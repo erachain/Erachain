@@ -4,6 +4,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base32;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.items.accounts.*;
+import org.erachain.gui.items.mails.Mail_Send_Dialog;
 import org.erachain.gui.models.AccountsTableModel;
 import org.erachain.lang.Lang;
 
@@ -25,14 +26,13 @@ public class DealsPopupMenu extends JPopupMenu {
     protected MTable table;
     
     private JMenuItem sendAsset;
+    private JMenuItem sendMail;
     private JMenuItem debtAsset;
     private JMenuItem debtAssetReturn;
     private JMenuItem debtAssetBackward;
     private JMenuItem holdAsset;
         
     public DealsPopupMenu(AccountsTableModel tableModel, MTable table, JComboBox<AssetCls> assetSelector) {
-        super();
-        
         this.tableModel = tableModel;
         this.table = table;
         this.assetSelector = assetSelector;
@@ -45,6 +45,15 @@ public class DealsPopupMenu extends JPopupMenu {
             }
         });
         this.add(sendAsset);
+
+        this.addSeparator();
+        sendMail = new JMenuItem();
+        sendMail.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new Mail_Send_Dialog(asset, pubKey, null, null);
+            }
+        });
+        this.add(sendMail);
 
         this.addSeparator();
 
@@ -191,6 +200,8 @@ public class DealsPopupMenu extends JPopupMenu {
             case AssetCls.AS_OUTSIDE_GOODS:
                 this.sendAsset.setText(Lang.getInstance().translate("Transfer to the ownership"));
 
+                this.sendMail.setText(Lang.getInstance().translate("Send Mail"));
+
                 this.holdAsset.setText(Lang.getInstance().translate("Confirm acceptance \"in hand\""));
                 this.holdAsset.setVisible(true);
 
@@ -203,6 +214,8 @@ public class DealsPopupMenu extends JPopupMenu {
                 
             case AssetCls.AS_INSIDE_ASSETS:
                 this.sendAsset.setText(Lang.getInstance().translate("Transfer to the ownership"));
+
+                this.sendMail.setText(Lang.getInstance().translate("Send Mail"));
 
                 this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
                 this.holdAsset.setVisible(true);
@@ -218,6 +231,8 @@ public class DealsPopupMenu extends JPopupMenu {
                 
             case AssetCls.AS_OUTSIDE_IMMOVABLE:
                 this.sendAsset.setText(Lang.getInstance().translate("Transfer to the ownership"));
+
+                this.sendMail.setText(Lang.getInstance().translate("Send Mail"));
 
                 this.holdAsset.setText(Lang.getInstance().translate("The employment security/received from security"));
                 this.holdAsset.setVisible(true);

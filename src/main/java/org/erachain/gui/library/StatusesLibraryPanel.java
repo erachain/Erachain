@@ -115,7 +115,7 @@ public class StatusesLibraryPanel extends JPanel {
         copy_Creator_Address.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection value = new StringSelection(statusModel.get_Creator_Account(row).getAddress());
+                StringSelection value = new StringSelection(statusModel.getCreator(row).getAddress());
                 clipboard.setContents(value, null);
             }
         });
@@ -126,7 +126,7 @@ public class StatusesLibraryPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 byte[] publick_Key = Controller.getInstance()
-                        .getPublicKeyByAddress(statusModel.get_Creator_Account(row).getAddress());
+                        .getPublicKeyByAddress(statusModel.getCreator(row).getAddress());
                 PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
                 StringSelection value = new StringSelection(public_Account.getBase58());
                 clipboard.setContents(value, null);
@@ -139,7 +139,7 @@ public class StatusesLibraryPanel extends JPanel {
         menu_copy_Block_PublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection value = new StringSelection(statusModel.get_No_Trancaction(row));
+                StringSelection value = new StringSelection(statusModel.getTransactionHeightSeqNo(row));
                 clipboard.setContents(value, null);
             }
         });
@@ -149,7 +149,7 @@ public class StatusesLibraryPanel extends JPanel {
         JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset to Creator"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Account account = statusModel.get_Creator_Account(row);
+                Account account = statusModel.getCreator(row);
                 new AccountSendDialog(null, null, account, null);
 
             }
@@ -159,7 +159,7 @@ public class StatusesLibraryPanel extends JPanel {
         JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail to creator"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Account account = statusModel.get_Creator_Account(row);
+                Account account = statusModel.getCreator(row);
                 new MailSendDialog(null, null, account, null);
 
             }
