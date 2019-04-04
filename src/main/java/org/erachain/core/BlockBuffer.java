@@ -54,13 +54,14 @@ public class BlockBuffer extends Thread {
                 //CHECK IF WE HAVE ALREADY LOADED THIS BLOCK
                 if (!this.blocks.containsKey(signature)) {
                     //LOAD BLOCK
-                    this.loadBlock(signature);
+                    // время ожидания увеличиваем по мере номера блока - он ведь на той тсроне синхронно нам будет посылаться
+                    this.loadBlock(signature, Synchronizer.GET_BLOCK_TIMEOUT + i * (Synchronizer.GET_BLOCK_TIMEOUT >> 1));
 
                 }
             }
 
             try {
-                Thread.sleep(1);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 //ERROR SLEEPING
                 break;
@@ -68,7 +69,7 @@ public class BlockBuffer extends Thread {
         }
     }
 
-    private void loadBlock(final byte[] signature) {
+    private void loadBlock(final byte[] signature, long timeSOT) {
         //CREATE QUEUE
         final BlockingQueue<Block> blockingQueue = new ArrayBlockingQueue<Block>(1);
         this.blocks.put(signature, blockingQueue);
@@ -82,7 +83,7 @@ public class BlockBuffer extends Thread {
                 long timePoint = System.currentTimeMillis();
 
                 //SEND MESSAGE TO PEER
-                BlockMessage response = (BlockMessage) peer.getResponse(message, Synchronizer.GET_BLOCK_TIMEOUT >> 1);
+                BlockMessage response = (BlockMessage) peer.getResponse(message, timeSOT);
 
                 //CHECK IF WE GOT RESPONSE
                 if (response == null) {
@@ -130,7 +131,7 @@ public class BlockBuffer extends Thread {
 
             //CHECK IF ALREADY LOADED BLOCK
             //LOAD BLOCK
-            this.loadBlock(signature);
+            this.loadBlock(signature, Synchronizer.GET_BLOCK_TIMEOUT >> 1);
 
             //GET BLOCK
             if (this.error) {
