@@ -21,12 +21,8 @@ import java.util.NavigableSet;
 
 public class ItemPersonMap extends ItemMap {
 
-    private static final int PERSON_NAME_INDEX = 1;
     static final String NAME = "item_persons";
     static final int TYPE = ItemCls.PERSON_TYPE;
-    private NavigableSet person_Name_Index;
-    private NavigableSet<Tuple2<String, Long>> name_Index;
-    private NavigableSet<Tuple2<String, Long>> name_descending_Index;
 
     public ItemPersonMap(DCSet databaseSet, DB database) {
         super(databaseSet, database,
@@ -54,41 +50,10 @@ public class ItemPersonMap extends ItemMap {
             // NOT USE SECONDARY INDEXES
             return map;
         }
-        // open name index
-        person_Name_Index = database.createTreeSet("person_name_index")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
+
+        makeOwnerKey(database);
+
         return map;
     }
 
-
-    @SuppressWarnings("unchecked")
-    protected void createIndexes(DB database) {
-        if (Controller.getInstance().onlyProtocolIndexing){
-            // NOT USE SECONDARY INDEXES
-            return;
-        }
-        //NAME INDEX
-        name_Index = database.createTreeSet("pp")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
-
-        name_descending_Index = database.createTreeSet("ppd")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
-                .makeOrGet();
-
-        createIndex(PERSON_NAME_INDEX, name_Index, name_descending_Index, (a, b) -> {
-            PersonCls person = (PersonCls) b;
-            return person.getName();
-        });
-
-    }
-
-    public NavigableSet<Tuple2<String, Long>> getNameIndex() {
-        return name_Index;
-    }
-
-    public NavigableSet<Tuple2<String, Long>> nameDescendingIndex() {
-        return name_descending_Index;
-    }
 }
