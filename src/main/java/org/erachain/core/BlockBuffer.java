@@ -42,6 +42,7 @@ public class BlockBuffer extends Thread {
 
     public void run() {
         while (this.run) {
+            int countSOT = 0;
             for (int i = 0; i < this.signatures.size() && i < this.counter + BUFFER_SIZE; i++) {
 
                 if (Controller.getInstance().isOnStopping()) {
@@ -54,7 +55,8 @@ public class BlockBuffer extends Thread {
                 //CHECK IF WE HAVE ALREADY LOADED THIS BLOCK
                 if (!this.blocks.containsKey(signature)) {
                     //LOAD BLOCK
-                    this.loadBlock(signature);
+                    // время ожидания увеличиваем по мере номера блока - он ведь на той тсроне синхронно нам будет посылаться
+                    this.loadBlock(signature, ++countSOT * (Synchronizer.GET_BLOCK_TIMEOUT >> 2));
 
                 }
             }
@@ -68,7 +70,7 @@ public class BlockBuffer extends Thread {
         }
     }
 
-    private void loadBlock(final byte[] signature) {
+    private void loadBlock(final byte[] signature, long timeSOT) {
         //CREATE QUEUE
         final BlockingQueue<Block> blockingQueue = new ArrayBlockingQueue<Block>(1);
         this.blocks.put(signature, blockingQueue);
@@ -82,7 +84,7 @@ public class BlockBuffer extends Thread {
                 long timePoint = System.currentTimeMillis();
 
                 //SEND MESSAGE TO PEER
-                BlockMessage response = (BlockMessage) peer.getResponse(message, Synchronizer.GET_BLOCK_TIMEOUT >> 1);
+                BlockMessage response = (BlockMessage) peer.getResponse(message, timeSOT);
 
                 //CHECK IF WE GOT RESPONSE
                 if (response == null) {
@@ -130,7 +132,7 @@ public class BlockBuffer extends Thread {
 
             //CHECK IF ALREADY LOADED BLOCK
             //LOAD BLOCK
-            this.loadBlock(signature);
+            this.loadBlock(signature, Synchronizer.GET_BLOCK_TIMEOUT >> 1);
 
             //GET BLOCK
             if (this.error) {
