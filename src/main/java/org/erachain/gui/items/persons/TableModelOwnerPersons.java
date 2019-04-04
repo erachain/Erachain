@@ -110,7 +110,7 @@ public class TableModelOwnerPersons extends SortedListTableModelCls<String, Pers
         for (String publicKey: publicKeys) {
             NavigableMap<Long, ItemCls> addresses = ((ItemPersonMap) map).getOwnerItems(publicKey);
             for (Long key: addresses.keySet()) {
-                listSorted.add(publicKey, (PersonCls) addresses.get(key));
+                listSorted.add(new Pair(publicKey, addresses.get(key)));
             }
 
         }

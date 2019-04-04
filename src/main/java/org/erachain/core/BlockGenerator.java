@@ -156,7 +156,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1).reference;
                 response = (SignaturesMessage) peer.getResponse(
                         MessageFactory.getInstance().createGetHeadersMessage(prevSignature),
-                        Synchronizer.GET_BLOCK_TIMEOUT >> 1);
+                        Synchronizer.GET_BLOCK_TIMEOUT >> 2);
             } catch (Exception e) {
                 ////peer.ban(1, "Cannot retrieve headers - from UPDATE");
                 LOGGER.debug("peers response error " + peer);
