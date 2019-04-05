@@ -1,6 +1,7 @@
 package org.erachain.gui.library;
 
 import org.erachain.gui.items.ImageCropDialog;
+import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.items.assets.CreateOrderPanel;
 import org.erachain.lang.Lang;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ public class AddImageLabel extends JLabel {
     private int bezelHeight;
     private Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    public AddImageLabel(String text, int bezelWidth, int bezelHeight) {
+    public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage) {
         this.bezelWidth = bezelWidth;
         this.bezelHeight = bezelHeight;
         imageLabelText = text;
@@ -36,8 +37,8 @@ public class AddImageLabel extends JLabel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1)  {
-                    addImage();
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    addImage(typeOfImage);
                 }
             }
         });
@@ -49,7 +50,7 @@ public class AddImageLabel extends JLabel {
     }
 
 
-    private void addImage() {
+    private void addImage(TypeOfImage typeOfImage) {
         // открыть диалог для файла
         fileChooser chooser = new fileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -60,7 +61,7 @@ public class AddImageLabel extends JLabel {
         int returnVal = chooser.showOpenDialog(getParent());
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = new File(chooser.getSelectedFile().getPath());
-            new ImageCropDialog(file, bezelWidth, bezelHeight) {
+            new ImageCropDialog(file, bezelWidth, bezelHeight,typeOfImage) {
                 @Override
                 public void onFinish(BufferedImage image) {
                     setIcon(new ImageIcon(image));
@@ -68,10 +69,14 @@ public class AddImageLabel extends JLabel {
                     setText(imageLabelText);
                     ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
                     try {
-                        ImageIO.write(image, "jpeg", imageStream);
+                        if (typeOfImage == TypeOfImage.GIF) {
+                            ImageIO.write(image, "gif", imageStream);
+                        } else if (typeOfImage == TypeOfImage.JPEG) {
+                            ImageIO.write(image, "jpeg", imageStream);
+                        }
                         imgBytes = imageStream.toByteArray();
                     } catch (Exception e) {
-                        logger.error("Can not write image in ImageCropDialog dialog onFinish method",e);
+                        logger.error("Can not write image in ImageCropDialog dialog onFinish method", e);
                     }
                 }
             };

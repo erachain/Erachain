@@ -217,8 +217,7 @@ public class IssuePersonRecord extends IssueItemRecord {
 
         if (person.isAlive(this.timestamp)) {
             // IF PERSON is LIVE
-            if (person.getImage().length < (MAX_IMAGE_LENGTH >> 1)
-                    || person.getImage().length > MAX_IMAGE_LENGTH) {
+            if (person.getImage().length > MAX_IMAGE_LENGTH) {
                 //int height = this.getBlockHeightByParent(this.dcSet);
                 if ( !(!BlockChain.DEVELOP_USE && this.height == 2998)
                         && this.height > 157640 // for all DEVELOPS

@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 public abstract class ImageCropDialog extends JDialog {
-    public ImageCropDialog(File imageFile, int cropWidth, int cropHeight) {
+    public ImageCropDialog(File imageFile, int cropWidth, int cropHeight, TypeOfImage typeOfImage) {
         JPanel contentPanel = new JPanel(new BorderLayout());
         ImageCropPanelNavigator2D imageCropPanel = new ImageCropPanelNavigator2D(imageFile, cropWidth, cropHeight);
         contentPanel.add(imageCropPanel, BorderLayout.CENTER);
@@ -17,7 +17,7 @@ public abstract class ImageCropDialog extends JDialog {
         c.gridx = 0;
         JButton okButton = new JButton("OK");
         okButton.addActionListener(e -> {
-            onFinish(imageCropPanel.getSnapshot());
+            onFinish(imageCropPanel.getSnapshot(typeOfImage));
             dispose();
         });
         buttonPanel.add(okButton, c);

@@ -12,6 +12,7 @@ import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.library.AddImageLabel;
@@ -453,7 +454,7 @@ public class IssuePersonPanel extends JPanel {
         mainScrollPane1 = new javax.swing.JScrollPane();
         add_Image_Panel = new AddImageLabel(Lang.getInstance().translate("Add image").concat(" (%1% - %2% bytes)")
                 .replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH >> 2)))
-                .replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH), 350, 350);
+                .replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH), 350, 350,TypeOfImage.JPEG);
         alive_CheckBox = new JCheckBox();
 
         this.issueButton.addActionListener(new ActionListener() {

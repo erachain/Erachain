@@ -1,5 +1,6 @@
 package org.erachain.gui.items;
 
+import com.sun.corba.se.impl.oa.toa.TOAImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,15 +150,24 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
     }
 
 
-    public BufferedImage getSnapshot() {
+    public BufferedImage getSnapshot(TypeOfImage typeOfImage) {
         Point2D.Double pointSrc = new Point2D.Double(image.getWidth(), image.getHeight());
         Point2D.Double pointDst = new Point2D.Double();
         currentTransform.transform(pointSrc, pointDst);
-
-        BufferedImage snapshot = new BufferedImage((int) pointDst.getX(), (int) pointDst.getY(), BufferedImage.TYPE_4BYTE_ABGR);
+        int type = -1;
+        if (typeOfImage==TypeOfImage.JPEG) {
+            type = BufferedImage.TYPE_INT_RGB;
+        } else if (typeOfImage== TypeOfImage.GIF) {
+            type = BufferedImage.TYPE_INT_ARGB;
+        }
+        BufferedImage snapshot = new BufferedImage((int) pointDst.getX(), (int) pointDst.getY(), type);
         Graphics2D g2d = (Graphics2D) snapshot.getGraphics();
         g2d.transform(currentTransform);
-        g2d.drawImage(image, 0, 0, this);
+        if (typeOfImage ==TypeOfImage.JPEG) {
+            g2d.drawImage(image, 0, 0, Color.WHITE, this);
+        } else if (typeOfImage ==TypeOfImage.GIF) {
+            g2d.drawImage(image, 0, 0, this);
+        }
         try {
             return snapshot.getSubimage(cropX, cropY, cropWidth, cropHeight);
         } catch (RasterFormatException e) {
