@@ -9,10 +9,8 @@ import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.LoggerFactory;
 
-import java.util.Observer;
-
 @SuppressWarnings("serial")
-public class WalletItemPersonsTableModel extends WalletAutoKeyTableModel<Tuple2<Long, Long>, Tuple2<Long, PersonCls>> implements Observer {
+public class WalletItemPersonsTableModel extends WalletAutoKeyTableModel<Tuple2<Long, Long>, Tuple2<Long, PersonCls>> {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -28,6 +26,9 @@ public class WalletItemPersonsTableModel extends WalletAutoKeyTableModel<Tuple2<
                 ObserverMessage.WALLET_ADD_PERSON_TYPE,  ObserverMessage.WALLET_REMOVE_PERSON_TYPE);
 
         logger = LoggerFactory.getLogger(WalletItemPersonsTableModel.class.getName());
+
+        addObservers();
+
     }
 
 
@@ -36,7 +37,7 @@ public class WalletItemPersonsTableModel extends WalletAutoKeyTableModel<Tuple2<
         if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
-        Pair<Tuple2<Long, Long>, Tuple2<Long, PersonCls>> personRes = this.listSorted.get(row);
+        Pair<Tuple2<Long , Long>, Tuple2<Long, PersonCls>> personRes = this.listSorted.get(row);
         if (personRes == null) {
             return null;
         }

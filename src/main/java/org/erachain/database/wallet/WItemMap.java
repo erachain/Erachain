@@ -1,15 +1,13 @@
 package org.erachain.database.wallet;
 
+import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.AutoKeyDBMap;
 import org.erachain.database.DBMap;
-import org.erachain.database.serializer.ItemSerializer;
+import org.erachain.database.serializer.LongItemSerializer;
 import org.erachain.utils.Pair;
-import org.mapdb.BTreeKeySerializer;
-import org.mapdb.BTreeMap;
-import org.mapdb.DB;
-import org.mapdb.Fun;
+import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 // TODO reference as TIMESTAMP of transaction
-public class WItemMap extends AutoKeyDBMap<Tuple2<String, String>, ItemCls> {
+public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, ItemCls>> {
 
     public static final int NAME_INDEX = 1;
     public static final int CREATOR_INDEX = 2;
@@ -31,10 +29,19 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<String, String>, ItemCls> {
                     int observeRemove,
                     int observeList
     ) {
-        super(dWSet, database);
+
+        // не создаем КАрту и Индексы так как не известно пока ИМЯ и ТИП
+        super(dWSet);
 
         this.type = type;
         this.name = name;
+
+        // ИМЯ и ТИП заданы, создаем карту и ИНдексы
+        map = getMap(database);
+
+        makeAutoKey(database, (Bind.MapWithModificationListener)map, "orders");
+
+        this.createIndexes(database);
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
@@ -46,70 +53,42 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<String, String>, ItemCls> {
 
     //@SuppressWarnings({ "unchecked", "rawtypes" })
     protected void createIndexes(DB database) {
-        //NAME INDEX
-		/*NavigableSet<Tuple2<String, Tuple2<String, String>>> nameIndex = database.createTreeSet("polls_index_name")
-				.comparator(Fun.COMPARATOR)
-				.makeOrGet();
-		
-		NavigableSet<Tuple2<String, Tuple2<String, String>>> descendingNameIndex = database.createTreeSet("polls_index_name_descending")
-				.comparator(new ReverseComparator(Fun.COMPARATOR))
-				.makeOrGet();
-		
-		createIndex(NAME_INDEX, nameIndex, descendingNameIndex, new Fun.Function2<String, Tuple2<String, String>, Poll>() {
-		   	@Override
-		    public String run(Tuple2<String, String> key, Poll value) {
-		   		return value.getName();
-		    }
-		});
-		
-		//CREATOR INDEX
-		NavigableSet<Tuple2<String, Tuple2<String, String>>> creatorIndex = database.createTreeSet("polls_index_creator")
-				.comparator(Fun.COMPARATOR)
-				.makeOrGet();
-		
-		NavigableSet<Tuple2<String, Tuple2<String, String>>> descendingCreatorIndex = database.createTreeSet("polls_index_creator_descending")
-				.comparator(new ReverseComparator(Fun.COMPARATOR))
-				.makeOrGet();
-		
-		createIndex(CREATOR_INDEX, creatorIndex, descendingCreatorIndex, new Fun.Function2<String, Tuple2<String, String>, Poll>() {
-		   	@Override
-		    public String run(Tuple2<String, String> key, Poll poll) {
-		   		return key.a;
-		    }
-		});*/
     }
 
     @Override
-    protected Map<Tuple2<String, String>, ItemCls> getMap(DB database) {
+    protected Map<Tuple2<Long, Long>, Tuple2<Long, ItemCls>> getMap(DB database) {
         //OPEN MAP
+        if (this.name == null)
+            return null;
+
         return database.createTreeMap(this.name)
                 .keySerializer(BTreeKeySerializer.TUPLE2)
-                .valueSerializer(new ItemSerializer(this.type))
+                .valueSerializer(new LongItemSerializer(this.type))
                 .counterEnable()
                 .makeOrGet();
     }
 
     @Override
-    protected Map<Tuple2<String, String>, ItemCls> getMemoryMap() {
-        return new TreeMap<Tuple2<String, String>, ItemCls>(Fun.TUPLE2_COMPARATOR);
+    protected Map<Tuple2<Long, Long>, Tuple2<Long, ItemCls>> getMemoryMap() {
+        return new TreeMap<Tuple2<Long, Long>, Tuple2<Long, ItemCls>>(Fun.TUPLE2_COMPARATOR);
     }
 
     @Override
-    protected ItemCls getDefaultValue() {
+    protected Tuple2<Long, ItemCls> getDefaultValue() {
         return null;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<ItemCls> get(Account account) {
-        List<ItemCls> items = new ArrayList<ItemCls>();
+    public List<Tuple2<Long, ItemCls>> get(Account account) {
+        List<Tuple2<Long, ItemCls>> items = new ArrayList<Tuple2<Long, ItemCls>>();
 
         try {
-            Map<Tuple2<String, String>, ItemCls> accountItems = ((BTreeMap) this.map).subMap(
-                    Fun.t2(account.getAddress(), null),
-                    Fun.t2(account.getAddress(), Fun.HI()));
+            Map<Tuple2<Long, Long>, Tuple2<Long, ItemCls>> accountItems = ((BTreeMap) this.map).subMap(
+                    Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
+                    Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()));
 
             //GET ITERATOR
-            Iterator<ItemCls> iterator = accountItems.values().iterator();
+            Iterator<Tuple2<Long, ItemCls>> iterator = accountItems.values().iterator();
 
             while (iterator.hasNext()) {
                 items.add(iterator.next());
@@ -129,9 +108,9 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<String, String>, ItemCls> {
             //FOR EACH ACCOUNTS
             synchronized (accounts) {
                 for (Account account : accounts) {
-                    List<ItemCls> accountItems = get(account);
-                    for (ItemCls item : accountItems) {
-                        items.add(new Pair<Account, ItemCls>(account, item));
+                    List<Tuple2<Long, ItemCls>> accountItems = get(account);
+                    for (Tuple2<Long, ItemCls> item : accountItems) {
+                        items.add(new Pair<Account, ItemCls>(account, item.b));
                     }
                 }
             }
@@ -146,18 +125,19 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<String, String>, ItemCls> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void delete(Account account) {
         //GET ALL POLLS THAT BELONG TO THAT ADDRESS
-        Map<Tuple2<String, String>, ItemCls> accountItems = ((BTreeMap) this.map).subMap(
-                Fun.t2(account.getAddress(), null),
-                Fun.t2(account.getAddress(), Fun.HI()));
+        Map<Tuple2<Long, Long>, Tuple2<Long, ItemCls>> accountItems = ((BTreeMap) this.map).subMap(
+                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
+                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()));
 
         //DELETE NAMES
-        for (Tuple2<String, String> key : accountItems.keySet()) {
+        for (Tuple2<Long, Long> key : accountItems.keySet()) {
             this.delete(key);
         }
     }
 
-    public void delete(String address, byte[] reference) {
-        this.delete(new Tuple2<String, String>(address, new String(reference)));
+    public void delete(Account account, long refDB) {
+        this.delete(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()),
+                refDB));
     }
 	
 	/*
@@ -170,8 +150,9 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<String, String>, ItemCls> {
 	}
 	*/
 
-    public boolean add(String address, byte[] reference, ItemCls item) {
-        return this.set(new Tuple2<String, String>(address, new String(reference)), item);
+    public boolean add(Account account, long refDB, ItemCls item) {
+        return this.set(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()),
+                refDB), new Tuple2<Long, ItemCls>(null, item));
     }
 	
 	/*

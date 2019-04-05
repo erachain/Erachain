@@ -33,7 +33,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
     }
 
     public DCMap(DCMap<T, U> parent, IDB dcSet) {
-        super();
+        super(dcSet);
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"

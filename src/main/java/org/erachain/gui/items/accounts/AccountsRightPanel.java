@@ -170,7 +170,7 @@ public class AccountsRightPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-               Transaction transaction = table_Model.getItem(th.row).b;
+               Transaction transaction = table_Model.getItem(th.row);
                IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Lang.getInstance().translate("Transaction"));
                dd.setLocationRelativeTo(th);
                dd.setVisible(true);

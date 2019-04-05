@@ -1,25 +1,13 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.item.ItemCls;
-import org.erachain.core.transaction.*;
 import org.erachain.database.AutoKeyDBMap;
-import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
-import org.erachain.database.wallet.TransactionMap;
-import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
-import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
-import org.mapdb.Fun.Tuple2;
-import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Observable;
-import java.util.Observer;
 
 @SuppressWarnings("serial")
 public abstract class WalletAutoKeyTableModel<T, U> extends SortedListTableModelCls<T, U> {
@@ -43,8 +31,6 @@ public abstract class WalletAutoKeyTableModel<T, U> extends SortedListTableModel
         this.list_type = list_type;
         this.add_type = add_type;
         this.remove_type = remove_type;
-
-        addObservers();
 
     }
 

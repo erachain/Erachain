@@ -4,7 +4,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base32;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.items.accounts.*;
-import org.erachain.gui.items.mails.Mail_Send_Dialog;
+import org.erachain.gui.items.mails.MailSendDialog;
 import org.erachain.gui.models.AccountsTableModel;
 import org.erachain.lang.Lang;
 
@@ -50,7 +50,7 @@ public class DealsPopupMenu extends JPopupMenu {
         sendMail = new JMenuItem();
         sendMail.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new Mail_Send_Dialog(asset, pubKey, null, null);
+                new MailSendDialog(asset, pubKey, null, null);
             }
         });
         this.add(sendMail);
@@ -447,10 +447,6 @@ public class DealsPopupMenu extends JPopupMenu {
                 this.debtAssetBackward.setVisible(true);
 
                 break;
-
         }
-
     }
-
-
 }

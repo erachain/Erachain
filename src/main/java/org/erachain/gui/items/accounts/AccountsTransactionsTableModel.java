@@ -243,14 +243,14 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
         if (this.sender == null || this.asset == null)
             return;
 
-        Iterator<Tuple2<String, String>> keysIterator = ((TransactionMap) map).getAddressIterator(this.sender);
+        Iterator<Tuple2<Long, Long>> keysIterator = ((TransactionMap) map).getAddressIterator(this.sender);
 
         trans_Hash_Map = new HashMap<String, Trans>();
         trans_List = null;
         int counter = 0;
         while (keysIterator.hasNext() && counter < 333) {
-            Tuple2<String, String> key = keysIterator.next();
-            Transaction transaction = (Transaction) map.get(key);
+            Tuple2<Long, Long> key = keysIterator.next();
+            Transaction transaction = ((Tuple2<Long, Transaction>) map.get(key)).b;
             if (trans_Parse(transaction)) {
                 counter++;
             }

@@ -1,20 +1,18 @@
 package org.erachain.gui.models;
 
-import com.sun.org.apache.xpath.internal.operations.Or;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.SortableList;
-import org.erachain.database.wallet.OrderMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class WalletOrdersTableModel extends WalletAutoKeyTableModel<Tuple2<String, Long>, Tuple2<Long, Order>> implements Observer {
@@ -35,6 +33,8 @@ public class WalletOrdersTableModel extends WalletAutoKeyTableModel<Tuple2<Strin
                 "Want", "Total", "Left", "Creator", "Status"}, new Boolean[]{true}, true,
                 ObserverMessage.WALLET_RESET_ORDER_TYPE, ObserverMessage.WALLET_LIST_ORDER_TYPE,
                 ObserverMessage.WALLET_ADD_ORDER_TYPE, ObserverMessage.WALLET_REMOVE_ORDER_TYPE);
+
+        logger = LoggerFactory.getLogger(WalletOrdersTableModel.class.getName());
 
         addObservers();
     }

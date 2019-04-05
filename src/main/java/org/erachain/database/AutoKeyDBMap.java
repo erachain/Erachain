@@ -1,28 +1,27 @@
 package org.erachain.database;
 
-import com.google.common.collect.Iterables;
-import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun;
-import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collection;
 
 public abstract class AutoKeyDBMap<T, U> extends DBMap<T, U> {
 
     protected BTreeMap AUTOKEY_INDEX;
+
+    public AutoKeyDBMap(IDB databaseSet) {
+        super(databaseSet);
+    }
 
     public AutoKeyDBMap(IDB databaseSet, DB database) {
         super(databaseSet, database);
 
     }
 
-    protected void makeAutoKey(DB database, BTreeMap map, String name) {
+    protected void makeAutoKey(DB database, Bind.MapWithModificationListener map, String name) {
 
         this.AUTOKEY_INDEX = database.createTreeMap(name + "_AUTOKEY_INDEX")
                 .comparator(Fun.COMPARATOR)
