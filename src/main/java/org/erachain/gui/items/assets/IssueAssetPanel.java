@@ -21,15 +21,13 @@ import org.erachain.lang.Lang;
 import javax.swing.*;
 import java.awt.*;
 
+import static org.erachain.gui.GUIConstants.*;
+
 /**
  * @author Саша
  */
 public class IssueAssetPanel extends JPanel {
 
-    private final int heightLogo = 150;
-    private final int widthLogo = 150;
-    private final int widthImage = 200;
-    private final int heghtImage = 150;
     private JLabel titleJLabel = new JLabel();
     private JLabel accountJLabel = new JLabel();
     private JLabel descriptionJLabel = new JLabel();
@@ -96,7 +94,7 @@ public class IssueAssetPanel extends JPanel {
         GridBagConstraints gridBagConstraints;
         addImageLabel = new AddImageLabel(
                 Lang.getInstance().translate("Add image") + " "
-                        + Lang.getInstance().translate("(max 1024 kB)"), widthImage, heghtImage, TypeOfImage.JPEG);
+                        + Lang.getInstance().translate("(max 1024 kB)"), widthImage, heightImage, TypeOfImage.JPEG);
         addLogoIconLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), widthLogo, heightLogo, TypeOfImage.GIF);
 
         setLayout(new GridBagLayout());
@@ -138,7 +136,7 @@ public class IssueAssetPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(0, 12, 8, 8);
 
-        addImageLabel.setPreferredSize(new Dimension(widthImage, heghtImage));
+        addImageLabel.setPreferredSize(new Dimension(widthImage, heightImage));
         add(addImageLabel, gridBagConstraints);
 
 
