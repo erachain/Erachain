@@ -154,7 +154,7 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         Point2D.Double pointDst = new Point2D.Double();
         currentTransform.transform(pointSrc, pointDst);
 
-        BufferedImage snapshot = new BufferedImage((int) pointDst.getX(), (int) pointDst.getY(), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage snapshot = new BufferedImage((int) pointDst.getX(), (int) pointDst.getY(), BufferedImage.TYPE_4BYTE_ABGR);
         Graphics2D g2d = (Graphics2D) snapshot.getGraphics();
         g2d.transform(currentTransform);
         g2d.drawImage(image, 0, 0, this);
