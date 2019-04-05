@@ -60,8 +60,8 @@ public class InsertPersonPanel extends IssuePersonPanel {
         th = this;
 
         init();
-        alive_CheckBox.setSelected(false);
-        alive_CheckBox.setVisible(false);
+        aliveCheckBox.setSelected(false);
+        aliveCheckBox.setVisible(false);
         // jLabel_Dead.setVisible(false);
         // txtDeathdayTxt.setVisible(false);
 
@@ -118,7 +118,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
         copyButton.setVisible(false);
 
-        add_Image_Panel.setVisible(false);
+        addImageLabel.setVisible(false);
         txtGender.setVisible(false);
         txtGenderTxt.setEditable(false);
         txtSNILS.setEditable(false);
@@ -454,7 +454,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtHairСolor.setText("");
         txtHeight.setText("");
         //imgBytes = null;
-        add_Image_Panel.reset();
+        addImageLabel.reset();
         txt_Sign.setText("");
         txt_public_key.setText("");
         txtBirthdayTxt.setText("");
