@@ -10,6 +10,7 @@ import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.library.AddImageLabel;
@@ -95,8 +96,8 @@ public class IssueAssetPanel extends JPanel {
         GridBagConstraints gridBagConstraints;
         addImageLabel = new AddImageLabel(
                 Lang.getInstance().translate("Add image") + " "
-                        + Lang.getInstance().translate("(max 1024 kB)"), widthImage, heghtImage);
-        addLogoIconLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), widthLogo, heightLogo);
+                        + Lang.getInstance().translate("(max 1024 kB)"), widthImage, heghtImage, TypeOfImage.JPEG);
+        addLogoIconLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), widthLogo, heightLogo, TypeOfImage.GIF);
 
         setLayout(new GridBagLayout());
         gridBagConstraints = new GridBagConstraints();

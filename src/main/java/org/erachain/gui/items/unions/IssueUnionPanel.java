@@ -8,6 +8,7 @@ import org.erachain.core.transaction.IssueUnionRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.library;
@@ -224,8 +225,8 @@ public class IssueUnionPanel extends JPanel {
 
         account_jLabel = new javax.swing.JLabel();
         name_jLabel = new javax.swing.JLabel();
-        add_logo_panel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), 50, 50);
-        add_image_panel = new AddImageLabel((Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024")), 250, 250);
+        add_logo_panel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), 50, 50,TypeOfImage.GIF);
+        add_image_panel = new AddImageLabel((Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024")), 250, 250,TypeOfImage.JPEG);
         jScrollPane1 = new javax.swing.JScrollPane();
         title_jLabel = new javax.swing.JLabel();
         description_jLabel = new javax.swing.JLabel();

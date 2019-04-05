@@ -7,6 +7,7 @@ import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.AddImageLabel;
@@ -97,7 +98,7 @@ public class IssuePollPanel extends JPanel {
 
         // ICON
         add_Image_Panel = new AddImageLabel(
-                Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
+                Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250,TypeOfImage.JPEG);
 
         GridBagConstraints gbc_add_Image_Panel = new GridBagConstraints();
         gbc_add_Image_Panel.anchor = GridBagConstraints.NORTH;
@@ -122,7 +123,7 @@ public class IssuePollPanel extends JPanel {
         gbc_txtName.gridx = 2;
         gbc_txtName.gridy = 1;
         this.add(this.txtName, gbc_txtName);
-        add_Logo_Icon_Panel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), 50, 50);
+        add_Logo_Icon_Panel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), 50, 50, TypeOfImage.GIF);
 
         GridBagConstraints gbc_add_Logo_Icon_Panel = new GridBagConstraints();
         gbc_add_Logo_Icon_Panel.insets = new Insets(0, 0, 5, 0);
