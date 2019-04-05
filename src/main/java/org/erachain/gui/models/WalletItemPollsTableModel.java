@@ -20,34 +20,18 @@ public class WalletItemPollsTableModel extends SortedListTableModelCls<Tuple2<St
     public static final int COLUMN_TOTAL_VOTES = 2;
     private static final int COLUMN_CONFIRMED = 3;
 
-    private SortableList<Tuple2<String, String>, PollCls> polls;
-
     public WalletItemPollsTableModel() {
-        super(new String[]{"Name", "Creator", "Total Votes", "Confirmed"}, true);
-    }
-
-    @Override
-    public SortableList<Tuple2<String, String>, PollCls> getSortableList() {
-        return polls;
-    }
-
-    public PollCls getPoll(int row) {
-        return polls.get(row).getB();
-    }
-
-    @Override
-    public int getRowCount() {
-
-        return (this.polls == null) ? 0 : this.polls.size();
+        super(Controller.getInstance().wallet.database.getPollMap(),
+                new String[]{"Name", "Creator", "Total Votes", "Confirmed"}, true);
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.polls == null || row > this.polls.size() - 1) {
+        if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
 
-        Pair<Tuple2<String, String>, PollCls> data = this.polls.get(row);
+        Pair<Tuple2<String, String>, PollCls> data = this.listSorted.get(row);
 
         if (data == null || data.getB() == null) {
             return -1;
@@ -86,10 +70,10 @@ public class WalletItemPollsTableModel extends SortedListTableModelCls<Tuple2<St
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.LIST_POLL_TYPE) {
-            if (this.polls == null) {
-                this.polls = (SortableList<Tuple2<String, String>, PollCls>) message.getValue();
+            if (this.listSorted == null) {
+                this.listSorted = (SortableList<Tuple2<String, String>, PollCls>) message.getValue();
                 //this.polls.registerObserver();
-                this.polls.sort(PollMap.NAME_INDEX);
+                this.listSorted.sort(PollMap.NAME_INDEX);
             }
 
             this.fireTableDataChanged();
@@ -102,16 +86,23 @@ public class WalletItemPollsTableModel extends SortedListTableModelCls<Tuple2<St
     }
 
     public void addObservers() {
-        Controller.getInstance().addWalletObserver(this);
+
+        super.addObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.addObserver(this);
+
     }
 
     public void deleteObservers() {
-        Controller.getInstance().deleteObserver(this);
+        super.deleteObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.deleteObserver(this);
     }
 
-    @Override
-    public PollCls getItem(int k) {
-        // TODO Auto-generated method stub
-        return polls.get(k).getB();
-    }
 }

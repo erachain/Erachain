@@ -2,6 +2,7 @@ package org.erachain.database.wallet;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.item.ItemCls;
+import org.erachain.database.AutoKeyDBMap;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.utils.Pair;
@@ -16,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 // TODO reference as TIMESTAMP of transaction
-public class WItemMap extends DBMap<Tuple2<String, String>, ItemCls> {
+public class WItemMap extends AutoKeyDBMap<Tuple2<String, String>, ItemCls> {
 
     public static final int NAME_INDEX = 1;
     public static final int CREATOR_INDEX = 2;

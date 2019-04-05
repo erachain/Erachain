@@ -20,7 +20,7 @@ public class WalletItemImprintsTableModel extends SortedListTableModelCls<Tuple2
     public static final int COLUMN_FAVORITE = 4;
 
     public WalletItemImprintsTableModel() {
-        super(Controller.getInstance().wallet.database.getImprintMap(), "WalletItemImprintsTableModel", 1000,
+        super(Controller.getInstance().wallet.database.getImprintMap(),
                 new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false}, false);
 
@@ -87,16 +87,22 @@ public class WalletItemImprintsTableModel extends SortedListTableModelCls<Tuple2
     }
 
     public void addObservers() {
-        if (Controller.getInstance().doesWalletDatabaseExists()) {
-            map.addObserver(this);
-        }
-        Controller.getInstance().guiTimer.addObserver(this);
+
+        super.addObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.addObserver(this);
+
     }
 
     public void deleteObservers() {
-        Controller.getInstance().guiTimer.deleteObserver(this);
-        if (Controller.getInstance().doesWalletDatabaseExists()) {
-            map.deleteObserver(this);
-        }
+        super.deleteObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.deleteObserver(this);
     }
 }
