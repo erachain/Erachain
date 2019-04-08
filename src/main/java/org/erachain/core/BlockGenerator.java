@@ -101,7 +101,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
      ^ путем выбора люолее сильной а не длинной
      * так же кажые 10 блоков проверяеем самую толстую цепочку
      */
-    private void checkWeightPeers() {
+    public void checkWeightPeers() {
         // MAY BE PAT SITUATION
 
         if (ctrl.getActivePeersCounter() < (BlockChain.DEVELOP_USE? 3 : 5))
