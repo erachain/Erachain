@@ -12,6 +12,7 @@ import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.library.AddImageLabel;
@@ -31,6 +32,9 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
 import java.util.Calendar;
 import java.util.TimeZone;
+
+import static org.erachain.gui.GUIConstants.heightImage;
+import static org.erachain.gui.GUIConstants.widthImage;
 
 @SuppressWarnings("serial")
 public class IssuePersonPanel extends JPanel {
@@ -54,27 +58,28 @@ public class IssuePersonPanel extends JPanel {
     protected JTextField txtHeight;
     protected MButton copyButton;
     protected MButton issueButton;
-    protected javax.swing.JLabel jLabel_Fee;
-    protected javax.swing.JLabel jLabel9;
-    protected javax.swing.JLabel jLabel_Account;
-    protected javax.swing.JLabel jLabel_BirthLatitude;
-    protected javax.swing.JLabel jLabel_BirthLongitude;
-    protected javax.swing.JLabel jLabel_Born;
-    protected javax.swing.JLabel jLabel_Dead;
-    protected javax.swing.JLabel jLabel_Description;
-    protected javax.swing.JLabel jLabel_EyeColor;
-    protected javax.swing.JLabel jLabel_Gender;
-    protected javax.swing.JLabel jLabel_HairСolor;
-    protected javax.swing.JLabel jLabel_Height;
-    protected javax.swing.JLabel jLabel_Name;
-    protected javax.swing.JLabel jLabel_SNILS;
-    protected javax.swing.JLabel jLabel_SkinColor;
-    protected javax.swing.JLabel jLabel_Title;
-    protected javax.swing.JPanel jPanel1;
-    protected javax.swing.JPanel jPanel2;
-    protected javax.swing.JScrollPane jScrollPane1;
-    protected AddImageLabel add_Image_Panel;
-    protected JCheckBox alive_CheckBox;
+    protected JLabel jLabel_Fee;
+    protected JLabel jLabel9;
+    protected JLabel jLabel_Account;
+    protected JLabel jLabel_BirthLatitude;
+    protected JLabel jLabel_BirthLongitude;
+    protected JLabel jLabel_Born;
+    protected JLabel jLabel_Dead;
+    protected JLabel jLabel_Description;
+    protected JLabel jLabel_EyeColor;
+    protected JLabel jLabel_Gender;
+    protected JLabel jLabel_HairСolor;
+    protected JLabel jLabel_Height;
+    protected JLabel jLabel_Name;
+    protected JLabel jLabel_SNILS;
+    protected JLabel jLabel_SkinColor;
+    protected JLabel jLabel_Title;
+    protected JPanel jPanel1;
+    protected JPanel jPanel2;
+    protected JScrollPane jScrollPane1;
+    protected AddImageLabel addImageLabel;
+    protected JCheckBox aliveCheckBox;
+
 
     // End of variables declaration
 
@@ -153,14 +158,14 @@ public class IssuePersonPanel extends JPanel {
         jLabel_BirthLatitude.setText(Lang.getInstance().translate("Coordinates of Birth") + ":");
         jLabel_SNILS.setText(Lang.getInstance().translate("Person number") + ":");
         jLabel_Dead.setText(Lang.getInstance().translate("Deathday") + ":");
-        alive_CheckBox.setText(Lang.getInstance().translate("Alive") + "?");
-        alive_CheckBox.setSelected(true);
-        alive_CheckBox.addActionListener(new ActionListener() {
+        aliveCheckBox.setText(Lang.getInstance().translate("Alive") + "?");
+        aliveCheckBox.setSelected(true);
+        aliveCheckBox.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                if (alive_CheckBox.isSelected()) {
+                if (aliveCheckBox.isSelected()) {
                     txtDeathday.setVisible(false);
                     jLabel_Dead.setVisible(false);
 
@@ -249,7 +254,7 @@ public class IssuePersonPanel extends JPanel {
             } catch (Exception ed1) {
                 deathday = birthday - 1;
             }
-            if (alive_CheckBox.isSelected())
+            if (aliveCheckBox.isSelected())
                 deathday = birthday - 1;
             parse++;
             // birthLatitude =
@@ -307,7 +312,7 @@ public class IssuePersonPanel extends JPanel {
         Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(forIssue, creator,
                 this.txtName.getText(), feePow, birthday, deathday, gender, this.txtSNILS.getText(), birthLatitude,
                 birthLongitude, this.txtSkinColor.getText(), this.txtEyeColor.getText(), this.txtHairСolor.getText(),
-                height, null, add_Image_Panel.getImgBytes(), this.txtareaDescription.getText(), owner, null);
+                height, null, addImageLabel.getImgBytes(), this.txtareaDescription.getText(), owner, null);
 
         IssuePersonRecord issuePersonRecord = (IssuePersonRecord) result.getA();
 
@@ -406,7 +411,7 @@ public class IssuePersonPanel extends JPanel {
         // txtEyeColor.setText("");
         // txtHairСolor.setText("");
         // txtHeight.setText("");
-        add_Image_Panel.reset();
+        addImageLabel.reset();
     }
 
     @SuppressWarnings({"unchecked"})
@@ -414,47 +419,49 @@ public class IssuePersonPanel extends JPanel {
     protected void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jLabel_Gender = new javax.swing.JLabel();
-        jLabel_Born = new javax.swing.JLabel();
-        jLabel_Dead = new javax.swing.JLabel();
-        jLabel_SNILS = new javax.swing.JLabel();
-        txtSNILS = new javax.swing.JTextField();
-        jLabel_SkinColor = new javax.swing.JLabel();
-        txtSkinColor = new javax.swing.JTextField();
-        jLabel_EyeColor = new javax.swing.JLabel();
-        txtEyeColor = new javax.swing.JTextField();
-        jLabel_HairСolor = new javax.swing.JLabel();
-        txtHairСolor = new javax.swing.JTextField();
-        jLabel_Height = new javax.swing.JLabel();
-        txtHeight = new javax.swing.JTextField();
-        jLabel_BirthLatitude = new javax.swing.JLabel();
-        txtBirthLatitude = new javax.swing.JTextField();
-        jLabel_BirthLongitude = new javax.swing.JLabel();
-        txtBirthLongitude = new javax.swing.JTextField();
-        jLabel_Fee = new javax.swing.JLabel();
+        jLabel_Gender = new JLabel();
+        jLabel_Born = new JLabel();
+        jLabel_Dead = new JLabel();
+        jLabel_SNILS = new JLabel();
+        txtSNILS = new JTextField();
+        jLabel_SkinColor = new JLabel();
+        txtSkinColor = new JTextField();
+        jLabel_EyeColor = new JLabel();
+        txtEyeColor = new JTextField();
+        jLabel_HairСolor = new JLabel();
+        txtHairСolor = new JTextField();
+        jLabel_Height = new JLabel();
+        txtHeight = new JTextField();
+        jLabel_BirthLatitude = new JLabel();
+        txtBirthLatitude = new JTextField();
+        jLabel_BirthLongitude = new JLabel();
+        txtBirthLongitude = new JTextField();
+        jLabel_Fee = new JLabel();
         txtFeePow = new JComboBox<String>();
         txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
         txtFeePow.setSelectedIndex(0);
-        jPanel1 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        txtareaDescription = new javax.swing.JTextArea();
-        txtName = new javax.swing.JTextField();
-        jLabel_Name = new javax.swing.JLabel();
-        jLabel_Account = new javax.swing.JLabel();
-        jLabel_Description = new javax.swing.JLabel();
-        cbxFrom = new javax.swing.JComboBox<>();
-        jLabel9 = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
+        jPanel1 = new JPanel();
+        jScrollPane1 = new JScrollPane();
+        txtareaDescription = new JTextArea();
+        txtName = new JTextField();
+        jLabel_Name = new JLabel();
+        jLabel_Account = new JLabel();
+        jLabel_Description = new JLabel();
+        cbxFrom = new JComboBox<>();
+        jLabel9 = new JLabel();
+        jPanel2 = new JPanel();
         issueButton = new MButton(Lang.getInstance().translate("Create and insert Person"), 2);
         copyButton = new MButton(Lang.getInstance().translate("Create Person and copy to clipboard"), 2);
-        jLabel_Title = new javax.swing.JLabel();
-        txtGender = new javax.swing.JComboBox<>();
-        mainPanel = new javax.swing.JPanel();
-        mainScrollPane1 = new javax.swing.JScrollPane();
-        add_Image_Panel = new AddImageLabel(Lang.getInstance().translate("Add image").concat(" (%1% - %2% bytes)")
-                .replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH >> 2)))
-                .replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH), 350, 350);
-        alive_CheckBox = new JCheckBox();
+        jLabel_Title = new JLabel();
+        txtGender = new JComboBox<>();
+        mainPanel = new JPanel();
+        mainScrollPane1 = new JScrollPane();
+        addImageLabel = new AddImageLabel(Lang.getInstance().translate("Add image").concat(" (%1% - %2% bytes)")
+                .replace("%1%", "" +
+                        (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH >> 2)))
+                .replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH),
+                widthImage, heightImage,TypeOfImage.JPEG);
+        aliveCheckBox = new JCheckBox();
 
         this.issueButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -508,7 +515,7 @@ public class IssuePersonPanel extends JPanel {
         gridBagConstraints.gridy = 6;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        mainPanel.add(alive_CheckBox, gridBagConstraints);
+        mainPanel.add(aliveCheckBox, gridBagConstraints);
 
         jLabel_Dead.setText("Dead");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -684,7 +691,7 @@ public class IssuePersonPanel extends JPanel {
         gridBagConstraints.weightx = 0.05;
         // jPanel1.add(iconButton, gridBagConstraints);
 
-        jPanel1.add(add_Image_Panel, gridBagConstraints);
+        jPanel1.add(addImageLabel, gridBagConstraints);
         txtareaDescription.setColumns(20);
         txtareaDescription.setRows(5);
         jScrollPane1.setViewportView(txtareaDescription);

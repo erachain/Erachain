@@ -8,6 +8,7 @@ import org.erachain.core.transaction.IssueTemplateRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.library;
@@ -17,6 +18,8 @@ import org.erachain.lang.Lang;
 
 import javax.swing.*;
 import java.awt.*;
+
+import static org.erachain.gui.GUIConstants.*;
 
 @SuppressWarnings("serial")
 public class IssueTemplatePanel extends JPanel {
@@ -41,11 +44,12 @@ public class IssueTemplatePanel extends JPanel {
     private GridBagConstraints gridBagConstraints_1;
     private GridBagConstraints gridBagConstraints_2;
     private AddImageLabel add_Image_Panel;
-    private AddImageLabel add_Logo_Icon_Panel;
+    private AddImageLabel addLogoIconPanel;
     private JLabel lblNewLabel;
     private GridBagConstraints gridBagConstraints_3;
     private GridBagConstraints gridBagConstraints_4;
     private GridBagConstraints gridBagConstraints_5;
+
     public IssueTemplatePanel() {
 
         // CLOSE
@@ -102,7 +106,7 @@ public class IssueTemplatePanel extends JPanel {
 
         }
 
-        byte[] icon = add_Logo_Icon_Panel.getImgBytes();
+        byte[] icon = addLogoIconPanel.getImgBytes();
         byte[] image = add_Image_Panel.getImgBytes();
 
         // CREATE PLATE
@@ -228,7 +232,9 @@ public class IssueTemplatePanel extends JPanel {
         gridBagConstraints.insets = new Insets(0, 15, 5, 5);
         add(jLabel_Account_Creator, gridBagConstraints);
         add_Image_Panel = new AddImageLabel(
-                Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
+                Lang.getInstance().translate("Add image") +
+                        (" (max %1%kB)").replace("%1%", "1024"),
+                widthImage, heightImage,TypeOfImage.JPEG);
 
         gridBagConstraints_3 = new java.awt.GridBagConstraints();
         gridBagConstraints_3.gridheight = 4;
@@ -267,13 +273,14 @@ public class IssueTemplatePanel extends JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new Insets(0, 0, 5, 15);
         add(jTextField_Title, gridBagConstraints);
-        add_Logo_Icon_Panel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), 50, 50);
+        addLogoIconPanel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
+                widthLogo, heightLogo,TypeOfImage.GIF);
 
         GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
         gbc_lblNewLabel.insets = new Insets(0, 0, 5, 0);
         gbc_lblNewLabel.gridx = 7;
         gbc_lblNewLabel.gridy = 4;
-        add(add_Logo_Icon_Panel, gbc_lblNewLabel);
+        add(addLogoIconPanel, gbc_lblNewLabel);
         jLabel_Content = new javax.swing.JLabel();
 
         jLabel_Content.setText(Lang.getInstance().translate("Content") + ":");

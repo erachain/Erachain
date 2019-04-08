@@ -7,6 +7,7 @@ import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.AddImageLabel;
@@ -26,6 +27,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+import static org.erachain.gui.GUIConstants.*;
+
 @SuppressWarnings("serial")
 public class IssuePollPanel extends JPanel {
     protected int selRow;
@@ -36,8 +39,8 @@ public class IssuePollPanel extends JPanel {
     private JButton createButton;
     private CreateOptionsTableModel optionsTableModel;
     private IssuePollPanel th;
-    private AddImageLabel add_Image_Panel;
-    private AddImageLabel add_Logo_Icon_Panel;
+    private AddImageLabel addImagePanel;
+    private AddImageLabel addLogoIconPanel;
     final MTable table;
 
     public IssuePollPanel() {
@@ -96,8 +99,10 @@ public class IssuePollPanel extends JPanel {
         labelGBC.gridx = 1;
 
         // ICON
-        add_Image_Panel = new AddImageLabel(
-                Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
+        addImagePanel = new AddImageLabel(
+                Lang.getInstance().translate("Add image") +
+                        (" (max %1%kB)").replace("%1%", "1024"),
+                widthImage, heightImage,TypeOfImage.JPEG);
 
         GridBagConstraints gbc_add_Image_Panel = new GridBagConstraints();
         gbc_add_Image_Panel.anchor = GridBagConstraints.NORTH;
@@ -105,7 +110,7 @@ public class IssuePollPanel extends JPanel {
         gbc_add_Image_Panel.insets = new Insets(0, 0, 5, 5);
         gbc_add_Image_Panel.gridx = 0;
         gbc_add_Image_Panel.gridy = 1;
-        add(add_Image_Panel, gbc_add_Image_Panel);
+        add(addImagePanel, gbc_add_Image_Panel);
 
         // LABEL NAME
         labelGBC.gridy = 1;
@@ -122,13 +127,14 @@ public class IssuePollPanel extends JPanel {
         gbc_txtName.gridx = 2;
         gbc_txtName.gridy = 1;
         this.add(this.txtName, gbc_txtName);
-        add_Logo_Icon_Panel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), 50, 50);
+        addLogoIconPanel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
+                widthLogo, heightLogo, TypeOfImage.GIF);
 
         GridBagConstraints gbc_add_Logo_Icon_Panel = new GridBagConstraints();
         gbc_add_Logo_Icon_Panel.insets = new Insets(0, 0, 5, 0);
         gbc_add_Logo_Icon_Panel.gridx = 3;
         gbc_add_Logo_Icon_Panel.gridy = 1;
-        add(add_Logo_Icon_Panel, gbc_add_Logo_Icon_Panel);
+        add(addLogoIconPanel, gbc_add_Logo_Icon_Panel);
 
         JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
         GridBagConstraints gbc_descriptionLabel = new GridBagConstraints();
@@ -320,8 +326,8 @@ public class IssuePollPanel extends JPanel {
         }
 
 
-        byte[] icon = add_Logo_Icon_Panel.getImgBytes();
-        byte[] image = add_Image_Panel.getImgBytes();
+        byte[] icon = addLogoIconPanel.getImgBytes();
+        byte[] image = addImagePanel.getImgBytes();
 
         // CREATE POLL
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());

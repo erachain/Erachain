@@ -7,8 +7,6 @@ import java.io.File;
 
 public class ImageCropPanelNavigator2D extends JPanel {
     private ImageCropDisplayPanelNavigator2D imageCropDisplayPanelNavigator2D;
-    private JSlider zoomSlider;
-    private JSlider frameSlider;
 
 
     public ImageCropPanelNavigator2D(File imageFile, int cropWidth, int cropHeight) {
@@ -18,7 +16,7 @@ public class ImageCropPanelNavigator2D extends JPanel {
     }
 
 
-    public BufferedImage getSnapshot() {
-        return imageCropDisplayPanelNavigator2D.getSnapshot();
+    public BufferedImage getSnapshot(TypeOfImage typeOfImage) {
+        return imageCropDisplayPanelNavigator2D.getSnapshot(typeOfImage);
     }
 }

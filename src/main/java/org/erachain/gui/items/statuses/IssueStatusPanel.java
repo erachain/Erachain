@@ -8,6 +8,7 @@ import org.erachain.core.transaction.IssueStatusRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.library;
@@ -20,6 +21,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import static org.erachain.gui.GUIConstants.*;
+
 @SuppressWarnings("serial")
 public class IssueStatusPanel extends JPanel {
     private JComboBox<Account> cbxFrom;
@@ -29,8 +32,9 @@ public class IssueStatusPanel extends JPanel {
     private JButton issueButton;
     private JCheckBox jCheck_Unique;
     private IssueStatusPanel th;
-    private AddImageLabel add_Image_Panel;
-    private AddImageLabel add_Logo_Icon_Panel;
+    private AddImageLabel addImageLabel;
+    private AddImageLabel addLogoIconPanel;
+
 
     // @SuppressWarnings({ "unchecked", "rawtypes" })
     public IssueStatusPanel() {
@@ -40,10 +44,10 @@ public class IssueStatusPanel extends JPanel {
 
         // LAYOUT
         GridBagLayout gridBagLayout = new GridBagLayout();
-        gridBagLayout.rowHeights = new int[] { 0, 0, 0, 83, 0, 0, 0, 0 };
-        gridBagLayout.columnWidths = new int[] { -16, 0, 0, 0, 216, 0, 0, 0 };
-        gridBagLayout.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-        gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0 };
+        gridBagLayout.rowHeights = new int[]{0, 0, 0, 83, 0, 0, 0, 0};
+        gridBagLayout.columnWidths = new int[]{-16, 0, 0, 0, 216, 0, 0, 0};
+        gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+        gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0};
         this.setLayout(gridBagLayout);
 
         // COMBOBOX GBC
@@ -79,8 +83,10 @@ public class IssueStatusPanel extends JPanel {
         // this.add(info_Label, labelGBC);
         gridy++;
 
-        add_Image_Panel = new AddImageLabel(
-                Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
+        addImageLabel = new AddImageLabel(
+                Lang.getInstance().translate("Add image") +
+                        (" (max %1%kB)").replace("%1%", "1024"),
+                widthImage, heightImage, TypeOfImage.JPEG);
         GridBagConstraints gbc_add_Image_Panel = new GridBagConstraints();
         gbc_add_Image_Panel.anchor = GridBagConstraints.NORTH;
         gbc_add_Image_Panel.fill = GridBagConstraints.HORIZONTAL;
@@ -89,7 +95,7 @@ public class IssueStatusPanel extends JPanel {
         gbc_add_Image_Panel.insets = new Insets(0, 0, 5, 5);
         gbc_add_Image_Panel.gridx = 0;
         gbc_add_Image_Panel.gridy = 1;
-        add(add_Image_Panel, gbc_add_Image_Panel);
+        add(addImageLabel, gbc_add_Image_Panel);
         JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
         GridBagConstraints gbc_fromLabel = new GridBagConstraints();
         gbc_fromLabel.anchor = GridBagConstraints.WEST;
@@ -123,14 +129,15 @@ public class IssueStatusPanel extends JPanel {
         gbc_txtName.gridy = 2;
         this.add(txtName, gbc_txtName);
 
-        add_Logo_Icon_Panel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), 50, 50);
+        addLogoIconPanel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
+                widthLogo, heightLogo, TypeOfImage.GIF);
 
         GridBagConstraints gbc_add_Logo_Icon_Panel = new GridBagConstraints();
         gbc_add_Logo_Icon_Panel.anchor = GridBagConstraints.EAST;
         gbc_add_Logo_Icon_Panel.insets = new Insets(0, 0, 5, 5);
         gbc_add_Logo_Icon_Panel.gridx = 6;
         gbc_add_Logo_Icon_Panel.gridy = 2;
-        add(add_Logo_Icon_Panel, gbc_add_Logo_Icon_Panel);
+        add(addLogoIconPanel, gbc_add_Logo_Icon_Panel);
         JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
         GridBagConstraints gbc_descriptionLabel = new GridBagConstraints();
         gbc_descriptionLabel.anchor = GridBagConstraints.NORTHWEST;
@@ -162,7 +169,7 @@ public class IssueStatusPanel extends JPanel {
         gbc_feeLabel.gridy = 4;
         this.add(feeLabel, gbc_feeLabel);
         txtFeePow = new JComboBox<String>();
-        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
         txtFeePow.setSelectedIndex(0);
         GridBagConstraints gbc_txtFeePow = new GridBagConstraints();
         gbc_txtFeePow.gridwidth = 3;
@@ -233,14 +240,14 @@ public class IssueStatusPanel extends JPanel {
         try {
 
             // READ FEE POW
-            feePow = Integer.parseInt((String)this.txtFeePow.getSelectedItem());
+            feePow = Integer.parseInt((String) this.txtFeePow.getSelectedItem());
 
         } catch (Exception e) {
             String mess = "Invalid pars... " + parse;
             switch (parse) {
-            case 0:
-                mess = "Invalid fee power 0..6";
-                break;
+                case 0:
+                    mess = "Invalid fee power 0..6";
+                    break;
             }
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(e + mess),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
@@ -249,8 +256,8 @@ public class IssueStatusPanel extends JPanel {
             return;
         }
 
-        byte[] icon = add_Logo_Icon_Panel.getImgBytes();
-        byte[] image = add_Image_Panel.getImgBytes();
+        byte[] icon = addLogoIconPanel.getImgBytes();
+        byte[] image = addImageLabel.getImgBytes();
 
         boolean unique = jCheck_Unique.isSelected();
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());

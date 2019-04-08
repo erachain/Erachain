@@ -8,6 +8,7 @@ import org.erachain.core.transaction.IssueUnionRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.library;
@@ -23,6 +24,8 @@ import java.awt.event.ActionListener;
 import java.sql.Timestamp;
 import java.text.ParseException;
 
+import static org.erachain.gui.GUIConstants.*;
+
 //import java.math.BigDecimal;
 //import org.erachain.settings.Settings;
 
@@ -37,16 +40,16 @@ public class IssueUnionPanel extends JPanel {
     private JButton issueButton;
     private IssueUnionPanel th;
     // Variables declaration - do not modify
-    private javax.swing.JLabel title_jLabel;
-    private javax.swing.JLabel account_jLabel;
-    private javax.swing.JLabel description_jLabel;
-    private javax.swing.JLabel fee_jLabel;
-    private AddImageLabel add_logo_panel;
-    private AddImageLabel add_image_panel;
+    private JLabel titleJLabel;
+    private JLabel accountJLabel;
+    private JLabel descriptionJLabel;
+    private JLabel feeJLabel;
+    private AddImageLabel addLogoPanel;
+    private AddImageLabel addImagePanel;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel name_jLabel;
-    private javax.swing.JLabel birthday_jLabel;
-    private javax.swing.JLabel parent_jLabel;
+    private JLabel nameJLabel;
+    private JLabel birthdayJLabel;
+    private JLabel parentJLabel;
 
     public IssueUnionPanel() {
 //		super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Issue Union"));
@@ -63,7 +66,7 @@ public class IssueUnionPanel extends JPanel {
 
         initComponents();
 
-        add_logo_panel.setPreferredSize(new Dimension(250, 50));
+        addLogoPanel.setPreferredSize(new Dimension(250, 50));
 
 
         //BUTTON Register
@@ -163,7 +166,7 @@ public class IssueUnionPanel extends JPanel {
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
         IssueUnionRecord issue_Union = (IssueUnionRecord) Controller.getInstance().issueUnion(
                 creator, this.txtName.getText(), birthday, parent, this.txtareaDescription.getText(),
-                add_logo_panel.getImgBytes(), image,
+                addLogoPanel.getImgBytes(), image,
                 feePow);
         //Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
         String text = "<HTML><body>";
@@ -220,27 +223,30 @@ public class IssueUnionPanel extends JPanel {
     }
 
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
+        GridBagConstraints gridBagConstraints;
 
-        account_jLabel = new javax.swing.JLabel();
-        name_jLabel = new javax.swing.JLabel();
-        add_logo_panel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), 50, 50);
-        add_image_panel = new AddImageLabel((Lang.getInstance().translate("Add image") + (" (max %1%kB)").replace("%1%", "1024")), 250, 250);
+        accountJLabel = new JLabel();
+        nameJLabel = new JLabel();
+        addLogoPanel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
+                widthLogo, heightLogo,TypeOfImage.GIF);
+        addImagePanel = new AddImageLabel((Lang.getInstance().translate("Add image") +
+                (" (max %1%kB)").replace("%1%", "1024")),
+                widthImage, heightImage,TypeOfImage.JPEG);
         jScrollPane1 = new javax.swing.JScrollPane();
-        title_jLabel = new javax.swing.JLabel();
-        description_jLabel = new javax.swing.JLabel();
-        birthday_jLabel = new javax.swing.JLabel();
-        parent_jLabel = new javax.swing.JLabel();
-        fee_jLabel = new javax.swing.JLabel();
+        titleJLabel = new JLabel();
+        descriptionJLabel = new JLabel();
+        birthdayJLabel = new JLabel();
+        parentJLabel = new JLabel();
+        feeJLabel = new JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
-        account_jLabel.setText(Lang.getInstance().translate("Account") + ":");
+        accountJLabel.setText(Lang.getInstance().translate("Account") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 7);
-        add(account_jLabel, gridBagConstraints);
+        add(accountJLabel, gridBagConstraints);
 
         this.cbxFrom = new JComboBox<Account>(new AccountsComboBoxModel());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -252,12 +258,12 @@ public class IssueUnionPanel extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 8);
         add(cbxFrom, gridBagConstraints);
 
-        name_jLabel.setText(Lang.getInstance().translate("Name") + ":");
+        nameJLabel.setText(Lang.getInstance().translate("Name") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 7);
-        add(name_jLabel, gridBagConstraints);
+        add(nameJLabel, gridBagConstraints);
 
         txtName.setText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -274,16 +280,16 @@ public class IssueUnionPanel extends JPanel {
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 8);
-        add(add_logo_panel, gridBagConstraints);
+        add(addLogoPanel, gridBagConstraints);
 
-        add_image_panel.setPreferredSize(new java.awt.Dimension(250, 350));
+        addImagePanel.setPreferredSize(new java.awt.Dimension(250, 350));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridheight = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 8, 8);
-        add(add_image_panel, gridBagConstraints);
+        add(addImagePanel, gridBagConstraints);
 
         txtareaDescription.setColumns(20);
         txtareaDescription.setRows(5);
@@ -299,9 +305,9 @@ public class IssueUnionPanel extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 8);
         add(jScrollPane1, gridBagConstraints);
 
-        title_jLabel.setText(Lang.getInstance().translate("Issue Union"));
-        title_jLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        title_jLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        titleJLabel.setText(Lang.getInstance().translate("Issue Union"));
+        titleJLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        titleJLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -309,23 +315,23 @@ public class IssueUnionPanel extends JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 6, 6, 9);
-        add(title_jLabel, gridBagConstraints);
+        add(titleJLabel, gridBagConstraints);
 
-        description_jLabel.setText(Lang.getInstance().translate("Description") + ":");
+        descriptionJLabel.setText(Lang.getInstance().translate("Description") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 7);
-        add(description_jLabel, gridBagConstraints);
+        add(descriptionJLabel, gridBagConstraints);
 
-        birthday_jLabel.setText(Lang.getInstance().translate("Birthday") + ":");
+        birthdayJLabel.setText(Lang.getInstance().translate("Birthday") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 7);
-        add(birthday_jLabel, gridBagConstraints);
+        add(birthdayJLabel, gridBagConstraints);
 
 //TXT Birthday
 
@@ -351,12 +357,12 @@ public class IssueUnionPanel extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 10);
         add(txtBirthday, gridBagConstraints);
 
-        parent_jLabel.setText(Lang.getInstance().translate("Parent") + ":");
+        parentJLabel.setText(Lang.getInstance().translate("Parent") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 5;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 7);
-        add(parent_jLabel, gridBagConstraints);
+        add(parentJLabel, gridBagConstraints);
 
         txtParent.setText("0");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -368,12 +374,12 @@ public class IssueUnionPanel extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 0);
         add(txtParent, gridBagConstraints);
 
-        fee_jLabel.setText(Lang.getInstance().translate("Fee Power") + ":");
+        feeJLabel.setText(Lang.getInstance().translate("Fee Power") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
-        add(fee_jLabel, gridBagConstraints);
+        add(feeJLabel, gridBagConstraints);
 
         txtFeePow = new JComboBox<String>();
         txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
