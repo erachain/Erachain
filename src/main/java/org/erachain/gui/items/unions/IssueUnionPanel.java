@@ -228,10 +228,10 @@ public class IssueUnionPanel extends JPanel {
         accountJLabel = new JLabel();
         nameJLabel = new JLabel();
         addLogoPanel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
-                widthLogo, heightLogo,TypeOfImage.GIF);
+                WIDTH_LOGO, HEIGHT_LOGO,TypeOfImage.GIF);
         addImagePanel = new AddImageLabel((Lang.getInstance().translate("Add image") +
                 (" (max %1%kB)").replace("%1%", "1024")),
-                widthImage, heightImage,TypeOfImage.JPEG);
+                WIDTH_IMAGE, HEIGHT_IMAGE,TypeOfImage.JPEG);
         jScrollPane1 = new javax.swing.JScrollPane();
         titleJLabel = new JLabel();
         descriptionJLabel = new JLabel();

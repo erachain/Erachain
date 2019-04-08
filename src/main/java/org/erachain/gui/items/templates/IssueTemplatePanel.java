@@ -234,7 +234,7 @@ public class IssueTemplatePanel extends JPanel {
         add_Image_Panel = new AddImageLabel(
                 Lang.getInstance().translate("Add image") +
                         (" (max %1%kB)").replace("%1%", "1024"),
-                widthImage, heightImage,TypeOfImage.JPEG);
+                WIDTH_IMAGE, HEIGHT_IMAGE,TypeOfImage.JPEG);
 
         gridBagConstraints_3 = new java.awt.GridBagConstraints();
         gridBagConstraints_3.gridheight = 4;
@@ -274,7 +274,7 @@ public class IssueTemplatePanel extends JPanel {
         gridBagConstraints.insets = new Insets(0, 0, 5, 15);
         add(jTextField_Title, gridBagConstraints);
         addLogoIconPanel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
-                widthLogo, heightLogo,TypeOfImage.GIF);
+                WIDTH_LOGO, HEIGHT_LOGO,TypeOfImage.GIF);
 
         GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
         gbc_lblNewLabel.insets = new Insets(0, 0, 5, 0);

@@ -30,6 +30,7 @@ public class IssuePersonRecord extends IssueItemRecord {
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference, byte[] signature) {
         super(typeBytes, NAME_ID, creator, person, feePow, timestamp, reference, signature);
     }
+
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp,
                              Long reference, byte[] signature, long feeLong) {
         super(typeBytes, NAME_ID, creator, person, feePow, timestamp, reference, signature);
@@ -189,85 +190,82 @@ public class IssuePersonRecord extends IssueItemRecord {
 
     @Override
     public int isValid(int asDeal, long flags) {
-
-        PersonCls person = (PersonCls) this.getItem();
-
+        PersonCls person = (PersonCls) getItem();
         // FOR PERSONS need LIMIT DESCRIPTION because it may be make with 0 COMPU balance
         int descriptionLength = person.getDescription().getBytes(StandardCharsets.UTF_8).length;
         if (descriptionLength > 8000) {
             return INVALID_DESCRIPTION_LENGTH;
         }
-
         // birthLatitude -90..90; birthLongitude -180..180
-        if (person.getBirthLatitude() > 90 || person.getBirthLatitude() < -90)
+        if (person.getBirthLatitude() > 90 || person.getBirthLatitude() < -90) {
             return Transaction.ITEM_PERSON_LATITUDE_ERROR;
-        if (person.getBirthLongitude() > 180 || person.getBirthLongitude() < -180)
+        }
+        if (person.getBirthLongitude() > 180 || person.getBirthLongitude() < -180) {
             return Transaction.ITEM_PERSON_LONGITUDE_ERROR;
-        if (person.getRace().getBytes(StandardCharsets.UTF_8).length > 255) return Transaction.ITEM_PERSON_RACE_ERROR;
-        if (person.getGender() > 10) return Transaction.ITEM_PERSON_GENDER_ERROR;
-        if (person.getSkinColor().getBytes(StandardCharsets.UTF_8).length > 255)
+        }
+        if (person.getRace().getBytes(StandardCharsets.UTF_8).length > 255) {
+            return Transaction.ITEM_PERSON_RACE_ERROR;
+        }
+        if (person.getGender() > 10) {
+            return Transaction.ITEM_PERSON_GENDER_ERROR;
+        }
+        if (person.getSkinColor().getBytes(StandardCharsets.UTF_8).length > 255) {
             return Transaction.ITEM_PERSON_SKIN_COLOR_ERROR;
-        if (person.getEyeColor().getBytes(StandardCharsets.UTF_8).length > 255)
+        }
+        if (person.getEyeColor().getBytes(StandardCharsets.UTF_8).length > 255) {
             return Transaction.ITEM_PERSON_EYE_COLOR_ERROR;
-        if (person.getHairColor().getBytes(StandardCharsets.UTF_8).length > 255)
+        }
+        if (person.getHairColor().getBytes(StandardCharsets.UTF_8).length > 255) {
             return Transaction.ITEM_PERSON_HAIR_COLOR_ERROR;
-        //int ii = Math.abs(person.getHeight());
-        //if (Math.abs(person.getHeight()) < 1) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
-        if (person.getHeight() > 255) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
-
-        if (person.isAlive(this.timestamp)) {
+        }
+        if (person.getHeight() > 255) {
+            return Transaction.ITEM_PERSON_HEIGHT_ERROR;
+        }
+        if (person.isAlive(timestamp)) {
             // IF PERSON is LIVE
             if (person.getImage().length > MAX_IMAGE_LENGTH) {
-                //int height = this.getBlockHeightByParent(this.dcSet);
-                if ( !(!BlockChain.DEVELOP_USE && this.height == 2998)
-                        && this.height > 157640 // for all DEVELOPS
-
-                ) {
+                if (!(!BlockChain.DEVELOP_USE && height == 2998) && height > 157640) {
                     // early blocks has wrong ISSUE_PERSON with 0 image length - in block 2998
                     return Transaction.INVALID_IMAGE_LENGTH;
                 }
             }
-        } else {
-            // person is DIE - any PHOTO
         }
-
         if (person instanceof PersonHuman) {
             PersonHuman human = (PersonHuman) person;
-            if (human.isMustBeSigned()
-                    && !Arrays.equals(person.getOwner().getPublicKey(), this.creator.getPublicKey())) {
+            if (human.isMustBeSigned() && !Arrays.equals(person.getOwner().getPublicKey(), creator.getPublicKey())) {
                 // OWNER of personal INFO not is CREATOR
                 if (human.getOwnerSignature() == null) {
                     return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;
                 }
-                if (!human.isSignatureValid(this.dcSet)) {
+                if (!human.isSignatureValid(dcSet)) {
                     return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;
                 }
             }
         }
 
         // IF BALANCE 0 or more - not check FEE
-        boolean check_fee_balance = this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) < 0;        
-        int res = super.isValid(asDeal, flags | (check_fee_balance? 0l : NOT_VALIDATE_FLAG_FEE) | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
-
+        boolean checkFeeBalance = creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) < 0;
+        int res = super.isValid(asDeal, flags |
+                (checkFeeBalance ? 0L : NOT_VALIDATE_FLAG_FEE) | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
         // FIRST PERSONS INSERT as ADMIN
-        boolean creator_admin = false;
-        if (!this.creator.isPerson(dcSet, height)) {
-            long count = this.dcSet.getItemPersonMap().getLastKey();
+        boolean creatorAdmin = false;
+        if (!creator.isPerson(dcSet, height)) {
+            long count = dcSet.getItemPersonMap().getLastKey();
             if (count < 20) {
                 // FIRST Persons only by ME
                 // FIRST Persons only by ADMINS
                 for (String admin : BlockChain.GENESIS_ADMINS) {
-                    if (this.creator.equals(admin)) {
-                        creator_admin = true;
+                    if (creator.equals(admin)) {
+                        creatorAdmin = true;
                         break;
                     }
                 }
             }
-            if (!creator_admin)
+            if (!creatorAdmin)  {
                 return CREATOR_NOT_PERSONALIZED;
+            }
         }
         return res;
-
     }
 
     //PROCESS/ORPHAN
@@ -311,8 +309,7 @@ public class IssuePersonRecord extends IssueItemRecord {
     }
 
     @Override
-    public long calcBaseFee()
-    {
+    public long calcBaseFee() {
 
         PersonCls person = (PersonCls) this.item;
 

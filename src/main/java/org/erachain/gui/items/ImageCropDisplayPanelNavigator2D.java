@@ -20,7 +20,6 @@ import java.util.ArrayList;
 
 public class ImageCropDisplayPanelNavigator2D extends JPanel {
     private final int cropY;
-    private final int originalCropWidth;
     private final int cropHeight;
     private int cropX;
     private int cropWidth;
@@ -36,7 +35,6 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
     public ImageCropDisplayPanelNavigator2D(File imageFile, int cropWidth, int cropHeight) {
         setPreferredSize(new Dimension(600, 500));
         this.cropWidth = cropWidth;
-        originalCropWidth = cropWidth;
         this.cropHeight = cropHeight;
         cropX = getPreferredSize().width / 2 - cropWidth / 2;
         cropY = getPreferredSize().height / 2 - cropHeight / 2;

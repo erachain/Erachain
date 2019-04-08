@@ -37,7 +37,7 @@ public class IssueAssetPanel extends JPanel {
     private JLabel quantityJLabel = new JLabel();
     private JLabel typeJLabel = new JLabel();
 
-    private JComboBox<String> textFeePow = new JComboBox();
+    private JComboBox<String> textFeePow = new JComboBox<>();
     private JComboBox<Account> fromJComboBox = new JComboBox<>(new AccountsComboBoxModel());
     private JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
     private JComboBox<String> textScale = new JComboBox<>();
@@ -93,9 +93,8 @@ public class IssueAssetPanel extends JPanel {
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
         addImageLabel = new AddImageLabel(
-                Lang.getInstance().translate("Add image") + " "
-                        + Lang.getInstance().translate("(max 1024 kB)"), widthImage, heightImage, TypeOfImage.JPEG);
-        addLogoIconLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), widthLogo, heightLogo, TypeOfImage.GIF);
+                Lang.getInstance().translate("Add image"), WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG);
+        addLogoIconLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF);
 
         setLayout(new GridBagLayout());
         gridBagConstraints = new GridBagConstraints();
@@ -136,7 +135,7 @@ public class IssueAssetPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(0, 12, 8, 8);
 
-        addImageLabel.setPreferredSize(new Dimension(widthImage, heightImage));
+        addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
         add(addImageLabel, gridBagConstraints);
 
 
@@ -145,7 +144,7 @@ public class IssueAssetPanel extends JPanel {
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridheight = 4;
 
-        addLogoIconLabel.setPreferredSize(new Dimension(widthLogo, heightLogo));
+        addLogoIconLabel.setPreferredSize(new Dimension(WIDTH_LOGO, HEIGHT_LOGO));
         add(addLogoIconLabel, gridBagConstraints);
         
 
@@ -258,7 +257,6 @@ public class IssueAssetPanel extends JPanel {
         gridBagConstraints.insets = new Insets(0, 0, 10, 0);
         add(feeJLabel, gridBagConstraints);
 
-        textFeePow = new JComboBox();
 
         textFeePow.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(9)));
         gridBagConstraints = new GridBagConstraints();
@@ -289,21 +287,8 @@ public class IssueAssetPanel extends JPanel {
     public void onIssueClick() {
         // DISABLE
         issueJButton.setEnabled(false);
-
-        // CHECK IF WALLET UNLOCKED
-        if (!Controller.getInstance().isWalletUnlocked()) {
-            // ASK FOR PASSWORD
-            String password = PasswordPane.showUnlockWalletDialog(this);
-            if (!Controller.getInstance().unlockWallet(password)) {
-                // WRONG PASSWORD
-                JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid password"),
-                        Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
-
-                // ENABLE
-                issueJButton.setEnabled(true);
-
-                return;
-            }
+        if (checkWalletUnlock()){
+            return;
         }
 
         // READ CREATOR
@@ -449,5 +434,24 @@ public class IssueAssetPanel extends JPanel {
 
         // ENABLE
         issueJButton.setEnabled(true);
+    }
+
+    private boolean checkWalletUnlock() {
+        // CHECK IF WALLET UNLOCKED
+        if (!Controller.getInstance().isWalletUnlocked()) {
+            // ASK FOR PASSWORD
+            String password = PasswordPane.showUnlockWalletDialog(this);
+            if (!Controller.getInstance().unlockWallet(password)) {
+                // WRONG PASSWORD
+                JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid password"),
+                        Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+
+                // ENABLE
+                issueJButton.setEnabled(true);
+
+                return true;
+            }
+        }
+        return false;
     }
 }

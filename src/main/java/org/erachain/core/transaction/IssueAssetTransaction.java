@@ -17,16 +17,10 @@ import java.util.Map;
 public class IssueAssetTransaction extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
     private static final String NAME_ID = "Issue Asset";
-
-    public static final long START_KEY = 1000l; // << 20;
-
-    //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
-
-    //private AssetCls asset;
+    public static final long START_KEY = 1000L;
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference);
-        //this.asset = asset;
     }
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -56,25 +50,15 @@ public class IssueAssetTransaction extends IssueItemRecord {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, asset, feePow, timestamp, reference);
     }
 
-    //GETTERS/SETTERS
-    //public static String getName() { return "Issue Asset"; }
-
-
-    // RETURN START KEY in tot GEMESIS
     public long getStartKey(int height) {
-
         if (height < BlockChain.VERS_4_11) {
-            return 1000l;
+            return 1000L;
         }
-
         return START_KEY;
 
     }
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
-        //boolean asPack = releaserReference != null;
-
-        //CHECK IF WE MATCH BLOCK LENGTH
         int test_len;
         if (asDeal == Transaction.FOR_MYPACK) {
             test_len = BASE_LENGTH_AS_MYPACK;
@@ -85,11 +69,9 @@ public class IssueAssetTransaction extends IssueItemRecord {
         } else {
             test_len = BASE_LENGTH;
         }
-
         if (data.length < test_len) {
             throw new Exception("Data does not match block length " + data.length);
         }
-
         // READ TYPE
         byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
         int position = TYPE_LENGTH;
@@ -132,13 +114,9 @@ public class IssueAssetTransaction extends IssueItemRecord {
             position += FEE_LENGTH;
         }
 
-        /////
-
         //READ ASSET
         // asset parse without reference - if is = signature
         AssetCls asset = AssetFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
-        position += asset.getDataLength(false);
-
         if (asDeal > Transaction.FOR_MYPACK) {
             return new IssueAssetTransaction(typeBytes, creator, asset, feePow, timestamp, reference, signatureBytes, feeLong);
         } else {
@@ -147,51 +125,22 @@ public class IssueAssetTransaction extends IssueItemRecord {
     }
 
     public long getAssetKey(DCSet db) {
-        return this.getItem().getKey(db);
+        return getItem().getKey(db);
     }
 
     @Override
     public BigDecimal getAmount() {
-        return new BigDecimal(((AssetCls) this.getItem()).getQuantity());
+        return new BigDecimal(((AssetCls) getItem()).getQuantity());
     }
 
     @Override
     public BigDecimal getAmount(String address) {
-
-        if (address.equals(this.creator.getAddress())) {
-            return this.getAmount();
+        if (address.equals(creator.getAddress())) {
+            return getAmount();
         }
-
-        AssetCls asset = (AssetCls) this.item;
+        AssetCls asset = (AssetCls) item;
         return BigDecimal.ZERO.setScale(asset.getScale());
     }
-
-	/*
-	@Override
-	public BigDecimal getAmount(Account account) {
-		String address = account.getAddress();
-		return getAmount(address);
-	}
-	 */
-
-	/*
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        super.setDC(dcSet, asDeal, blockHeight, seqNo);
-
-        AssetCls asset = (AssetCls) this.item;
-
-        if (false && dcSet.getItemAssetMap().getLastKey() < BlockChain.AMOUNT_SCALE_FROM) {
-            // MAKE OLD STYLE ASSET with DEVISIBLE:
-            // PROP1 = 0 (unMOVABLE, SCALE = 8, assetTYPE = 1 (divisible)
-            asset = new AssetVenture((byte) 0, asset.getOwner(), asset.getName(),
-                    asset.getIcon(), asset.getImage(), asset.getDescription(), AssetCls.AS_INSIDE_ASSETS, asset.getScale(), asset.getQuantity());
-            this.item = asset;
-        }
-
-    }
-    */
-
-    //VALIDATE
 
     @Override
     public String viewAmount(String address) {
@@ -200,23 +149,19 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     //PARSE CONVERT
 
-    //@Override
     @Override
     public int isValid(int asDeal, long flags) {
 
         int result = super.isValid(asDeal, flags);
-        if (result != Transaction.VALIDATE_OK) return result;
-
+        if (result != Transaction.VALIDATE_OK){
+            return result;
+        }
         //CHECK QUANTITY
-        AssetCls asset = (AssetCls) this.getItem();
-        //long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;
-        long maxQuantity = Long.MAX_VALUE;
+        AssetCls asset = (AssetCls) getItem();
         long quantity = asset.getQuantity();
-        //if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
-        if (quantity > maxQuantity || quantity < -1) {
+        if (quantity < -1) {
             return INVALID_QUANTITY;
         }
-
         return Transaction.VALIDATE_OK;
     }
 
@@ -225,28 +170,12 @@ public class IssueAssetTransaction extends IssueItemRecord {
     public JSONObject toJson() {
         //GET BASE
         JSONObject transaction = super.toJson();
-        AssetCls asset = (AssetCls) this.getItem();
+        AssetCls asset = (AssetCls) getItem();
         //ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
         transaction.put("asset", asset.toJson());
-
         return transaction;
     }
 
-
-	/*
-	//@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference)
-	{
-
-		byte[] data = super.toBytes(withSign, releaserReference);
-
-		//WRITE ASSET
-		// without reference
-		data = Bytes.concat(data, this.asset.toBytes(false));
-
-		return data;
-	}
-	 */
 
     //PROCESS/ORPHAN
 
@@ -255,17 +184,15 @@ public class IssueAssetTransaction extends IssueItemRecord {
     public void process(Block block, int asDeal) {
         //UPDATE CREATOR
         super.process(block, asDeal);
-
         //ADD ASSETS TO OWNER
-        //this.creator.setBalance(this.getItem().getKey(db), new BigDecimal(((AssetCls)this.getItem()).getQuantity()).setScale(), db);
         AssetCls asset = (AssetCls) this.getItem();
         long quantity = asset.getQuantity();
         if (quantity > 0) {
-            this.creator.changeBalance(this.dcSet, false, asset.getKey(this.dcSet),
+            creator.changeBalance(this.dcSet, false, asset.getKey(dcSet),
                     new BigDecimal(quantity).setScale(0), false);
 
             // make HOLD balance
-            this.creator.changeBalance(this.dcSet, false, asset.getKey(this.dcSet),
+            creator.changeBalance(this.dcSet, false, asset.getKey(dcSet),
                     new BigDecimal(-quantity).setScale(0), false);
                 
         }
@@ -277,59 +204,24 @@ public class IssueAssetTransaction extends IssueItemRecord {
     public void orphan(Block block, int asDeal) {
         //UPDATE CREATOR
         super.orphan(block, asDeal);
-
         //REMOVE ASSETS FROM OWNER
         AssetCls asset = (AssetCls) this.getItem();
         long quantity = asset.getQuantity();
         if (quantity > 0) {
-            //this.creator.setBalance(this.getItem().getKey(db), BigDecimal.ZERO.setScale(), db);
-            this.creator.changeBalance(this.dcSet, true, asset.getKey(this.dcSet),
+            creator.changeBalance(dcSet, true, asset.getKey(dcSet),
                     new BigDecimal(quantity).setScale(0), false);
 
-            this.creator.changeBalance(this.dcSet, true, asset.getKey(this.dcSet),
+            creator.changeBalance(dcSet, true, asset.getKey(dcSet),
                     new BigDecimal(-quantity).setScale(0), false);
         }
     }
 
-	/*
-	@Override
-	public HashSet<Account> getInvolvedAccounts()
-	{
-		return this.getRecipientAccounts();
-	}
-
-	@Override
-	public HashSet<Account> getRecipientAccounts()
-	{
-		HashSet<Account> accounts = new HashSet<>();
-		accounts.add(this.creator);
-		return accounts;
-	}
-
-	@Override
-	public boolean isInvolved(Account account)
-	{
-		String address = account.getAddress();
-
-		if(address.equals(this.creator.getAddress()))
-		{
-			return true;
-		}
-
-		return false;
-	}
-	 */
-
-    //@Override
     public Map<String, Map<Long, BigDecimal>> getAssetAmount() {
         Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
-
-        assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
-
-        AssetCls asset = (AssetCls) this.getItem();
-        assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), asset.getKey(this.dcSet),
+        assetAmount = subAssetAmount(assetAmount, creator.getAddress(), FEE_KEY, fee);
+        AssetCls asset = (AssetCls) getItem();
+        assetAmount = addAssetAmount(assetAmount, creator.getAddress(), asset.getKey(dcSet),
                 new BigDecimal(asset.getQuantity()).setScale(0));
-
         return assetAmount;
     }
 
