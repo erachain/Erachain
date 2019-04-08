@@ -101,11 +101,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
      ^ путем выбора люолее сильной а не длинной
      * так же кажые 10 блоков проверяеем самую толстую цепочку
      */
-    public void checkWeightPeers() {
+    public boolean checkWeightPeers() {
         // MAY BE PAT SITUATION
 
-        if (ctrl.getActivePeersCounter() < (BlockChain.DEVELOP_USE? 3 : 5))
-            return;
+        if (ctrl.getActivePeersCounter() < (BlockChain.DEVELOP_USE? 2 : 4))
+            return false;
 
         //logger.debug("try check better WEIGHT peers");
 
@@ -115,7 +115,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         if (maxPeer.c != null) {
             // если мы не в синхроне то выход
             LOGGER.debug("need UPDATE from " + maxPeer );
-            return;
+            return false;
         }
 
         this.setMonitorStatus("checkWeightPeers");
@@ -129,21 +129,21 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             }
 
             if (ctrl.isOnStopping()) {
-                return;
+                return true;
             }
 
 
             maxPeer = ctrl.getMaxPeerHWeight(0, true);
             if (maxPeer.c == null)
-                return;
+                return false;
 
             peer = maxPeer.c;
 
             if (myHW.a >= maxPeer.a && myHW.b >= maxPeer.b)
-                return;
+                return false;
 
             if (myHW.a < 2)
-                return;
+                return false;
 
             LOGGER.debug("better WEIGHT peers found: "
                     //+ peer
@@ -188,7 +188,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     try {
                         ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
                         //ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                        return;
+                        return true;
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
                         ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
@@ -198,7 +198,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 LOGGER.debug("I to orphan - peer has better Weight " + maxPeer);
                 try {
                     ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                    return;
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
                     ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
@@ -207,9 +206,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 // more then 2 - need to UPDATE
                 LOGGER.debug("to update - peers " + maxPeer
                         + " headers: " + headersSize);
-                return;
             }
+            return true;
         } while (--counter > 0);
+
+        return false;
 
     }
 

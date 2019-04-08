@@ -1731,8 +1731,9 @@ public class Controller extends Observable {
             throw new Exception("peer is unconnected");
         }
 
-        this.blockGenerator.checkWeightPeers();
-        throw new Exception("New Better Peer is found " + betterPeerHW.c);
+        if (this.blockGenerator.checkWeightPeers()) {
+            throw new Exception("New Better Peer is found " + betterPeerHW.c);
+        }
 
     }
 
