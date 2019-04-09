@@ -99,9 +99,13 @@ public class AccountNameAdd extends javax.swing.JDialog {
                     JSONObject ans = new JSONObject();
                     ans.put("description", description);
                     String acc = th.jTextFieldAccount.getText();
-                    new Account(acc);
-                    db.set(acc, new Tuple2(name, StrJSonFine.convert(ans)));
-                    setVisible(false);
+                    if (acc.length() == 34) {
+                        new Account(acc);
+                        db.set(acc, new Tuple2(name, StrJSonFine.convert(ans)));
+                        setVisible(false);
+                    } else {
+                        JOptionPane.showMessageDialog(null, Lang.getInstance().translate("invalid name length"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    }
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid Account!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                 }
