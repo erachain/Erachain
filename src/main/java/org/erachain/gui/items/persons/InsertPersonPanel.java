@@ -27,6 +27,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.util.TimeZone;
 
+import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
+
 public class InsertPersonPanel extends IssuePersonPanel {
     private static final Logger logger = LoggerFactory.getLogger(InsertPersonPanel.class.getName());
     private static final long serialVersionUID = 1L;
@@ -312,20 +314,6 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
     }
 
-    private boolean checkWalletUnlock() {
-        // CHECK IF WALLET UNLOCKED
-        if (!Controller.getInstance().isWalletUnlocked()) {
-            // ASK FOR PASSWORD
-            String password = PasswordPane.showUnlockWalletDialog(this);
-            if (!Controller.getInstance().unlockWallet(password)) {
-                // WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
-                        Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
-                return true;
-            }
-        }
-        return false;
-    }
 
     private void eraseFields() {
         txtFeePow.setSelectedItem("0");

@@ -153,24 +153,44 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         Point2D.Double pointDst = new Point2D.Double();
         currentTransform.transform(pointSrc, pointDst);
         int type = -1;
-        if (typeOfImage==TypeOfImage.JPEG) {
+        if (typeOfImage == TypeOfImage.JPEG) {
             type = BufferedImage.TYPE_INT_RGB;
-        } else if (typeOfImage== TypeOfImage.GIF) {
+        } else if (typeOfImage == TypeOfImage.GIF) {
             type = BufferedImage.TYPE_INT_ARGB;
         }
         BufferedImage snapshot = new BufferedImage((int) pointDst.getX(), (int) pointDst.getY(), type);
         Graphics2D g2d = (Graphics2D) snapshot.getGraphics();
         g2d.transform(currentTransform);
-        if (typeOfImage ==TypeOfImage.JPEG) {
+        if (typeOfImage == TypeOfImage.JPEG) {
             g2d.drawImage(image, 0, 0, Color.WHITE, this);
-        } else if (typeOfImage ==TypeOfImage.GIF) {
+        } else if (typeOfImage == TypeOfImage.GIF) {
             g2d.drawImage(image, 0, 0, this);
         }
+        Point2D.Double zeroPoint = new Point2D.Double(0, 0);
+        Point2D.Double pointZeroDst = new Point2D.Double();
+        currentTransform.transform(zeroPoint, pointZeroDst);
+
+        Point2D.Double cropPoint = new Point2D.Double(cropX + cropWidth, cropY + cropHeight);
+        Point2D.Double pointCropDst = new Point2D.Double();
+        currentTransform.transform(cropPoint, pointCropDst);
+
         try {
+            if (pointZeroDst.x > cropX && pointZeroDst.y > cropY) {
+                return snapshot.getSubimage((int) pointZeroDst.x, (int) pointZeroDst.y,
+                        (int) (cropPoint.x - pointZeroDst.x), (int) (cropPoint.y - pointZeroDst.y));
+            } else if (pointZeroDst.x > cropX) {
+                return snapshot.getSubimage((int) pointZeroDst.x, (int) pointZeroDst.y,
+                        cropWidth, (int) (cropPoint.y - pointZeroDst.y));
+
+            } else if (pointZeroDst.y > cropY) {
+                return snapshot.getSubimage((int) pointZeroDst.x, (int) pointZeroDst.y,
+                        (int) (cropPoint.x - pointZeroDst.x), cropHeight);
+            }
             return snapshot.getSubimage(cropX, cropY, cropWidth, cropHeight);
         } catch (RasterFormatException e) {
-            logger.error("Error size of sub image", e);
-            return image;
+            logger.info("Error size of sub image");
+            return snapshot.getSubimage((int) pointZeroDst.x, (int) pointZeroDst.y,
+                    snapshot.getWidth() - (int) pointZeroDst.x, snapshot.getHeight() - (int) pointZeroDst.y);
         }
 
     }

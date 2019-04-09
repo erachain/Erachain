@@ -10,7 +10,6 @@ import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
@@ -33,8 +32,9 @@ import java.awt.event.*;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import static org.erachain.gui.GUIConstants.HEIGHT_IMAGE;
-import static org.erachain.gui.GUIConstants.WIDTH_IMAGE;
+import static org.erachain.gui.items.utils.GUIConstants.HEIGHT_IMAGE;
+import static org.erachain.gui.items.utils.GUIConstants.WIDTH_IMAGE;
+import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 @SuppressWarnings("serial")
 public class IssuePersonPanel extends JPanel {
@@ -486,7 +486,7 @@ public class IssuePersonPanel extends JPanel {
             copyButton.setEnabled(true);
             return;
         }
-        if (checkWalletUnlock()){
+        if (checkWalletUnlock(copyButton)){
             return;
         }
 
@@ -625,23 +625,7 @@ public class IssuePersonPanel extends JPanel {
         copyButton.setEnabled(true);
     }
 
-    private boolean checkWalletUnlock() {
-        // CHECK IF WALLET UNLOCKED
-        if (!Controller.getInstance().isWalletUnlocked()) {
-            // ASK FOR PASSWORD
-            String password = PasswordPane.showUnlockWalletDialog(this);
-            if (!Controller.getInstance().unlockWallet(password)) {
-                // WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
-                        Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
-                // ENABLE
-                copyButton.setEnabled(false);
-                return true;
-            }
-        }
-        return false;
-    }
 
 }
 

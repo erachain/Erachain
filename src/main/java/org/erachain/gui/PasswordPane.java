@@ -20,10 +20,6 @@ import org.erachain.lang.Lang;
 
 public class PasswordPane {
     public static String showUnlockWalletDialog(Component parent) {
-
-        ///
-        ///parent = null;
-
         JPanel userPanel = new JPanel();
         userPanel.setLayout(new GridLayout(2, 2));
 
@@ -66,7 +62,7 @@ public class PasswordPane {
         //a JPanel containing the dialog components we want
 
         int n = JOptionPane.showOptionDialog(
-                (Component) parent,
+                parent,
                 userPanel,
                 Lang.getInstance().translate("Unlock Wallet"),
                 JOptionPane.YES_NO_CANCEL_OPTION,

@@ -71,7 +71,6 @@ public class MainFrame extends JFrame implements Observer {
         if (instance == null) {
             instance = new MainFrame();
         }
-
         return instance;
     }
 

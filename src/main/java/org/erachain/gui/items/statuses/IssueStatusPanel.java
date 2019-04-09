@@ -7,7 +7,6 @@ import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.IssueStatusRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.AddImageLabel;
@@ -18,10 +17,9 @@ import org.erachain.lang.Lang;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import static org.erachain.gui.GUIConstants.*;
+import static org.erachain.gui.items.utils.GUIConstants.*;
+import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 public class IssueStatusPanel extends JPanel {
     private JComboBox<Account> cbxFrom;
@@ -186,7 +184,7 @@ public class IssueStatusPanel extends JPanel {
     public void onIssueClick() {
         // DISABLE
         issueButton.setEnabled(false);
-        if (checkWalletUnlock()) {
+        if (checkWalletUnlock(issueButton)) {
             return;
         }
         // READ CREATOR
@@ -241,25 +239,6 @@ public class IssueStatusPanel extends JPanel {
         }
         // ENABLE
         issueButton.setEnabled(true);
-    }
-
-    private boolean checkWalletUnlock() {
-        // CHECK IF WALLET UNLOCKED
-        if (!Controller.getInstance().isWalletUnlocked()) {
-            // ASK FOR PASSWORD
-            String password = PasswordPane.showUnlockWalletDialog(this);
-            if (!Controller.getInstance().unlockWallet(password)) {
-                // WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
-                        Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
-
-                // ENABLE
-                issueButton.setEnabled(true);
-
-                return true;
-            }
-        }
-        return false;
     }
 
     private void clearPanel() {

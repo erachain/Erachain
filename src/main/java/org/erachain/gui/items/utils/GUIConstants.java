@@ -1,4 +1,4 @@
-package org.erachain.gui;
+package org.erachain.gui.items.utils;
 
 public class GUIConstants {
     public static final int WIDTH_IMAGE = 240;

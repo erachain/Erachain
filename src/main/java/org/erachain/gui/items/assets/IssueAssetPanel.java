@@ -9,7 +9,6 @@ import org.erachain.core.item.assets.AssetType;
 import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MDecimalFormatedTextField;
@@ -21,7 +20,8 @@ import org.erachain.lang.Lang;
 import javax.swing.*;
 import java.awt.*;
 
-import static org.erachain.gui.GUIConstants.*;
+import static org.erachain.gui.items.utils.GUIConstants.*;
+import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 /**
  * @author Саша
@@ -287,7 +287,7 @@ public class IssueAssetPanel extends JPanel {
     public void onIssueClick() {
         // DISABLE
         issueJButton.setEnabled(false);
-        if (checkWalletUnlock()){
+        if (checkWalletUnlock(issueJButton)){
             return;
         }
 
@@ -436,22 +436,5 @@ public class IssueAssetPanel extends JPanel {
         issueJButton.setEnabled(true);
     }
 
-    private boolean checkWalletUnlock() {
-        // CHECK IF WALLET UNLOCKED
-        if (!Controller.getInstance().isWalletUnlocked()) {
-            // ASK FOR PASSWORD
-            String password = PasswordPane.showUnlockWalletDialog(this);
-            if (!Controller.getInstance().unlockWallet(password)) {
-                // WRONG PASSWORD
-                JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid password"),
-                        Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
-                // ENABLE
-                issueJButton.setEnabled(true);
-
-                return true;
-            }
-        }
-        return false;
-    }
 }

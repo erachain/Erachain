@@ -24,7 +24,7 @@ import java.awt.event.ActionListener;
 import java.sql.Timestamp;
 import java.text.ParseException;
 
-import static org.erachain.gui.GUIConstants.*;
+import static org.erachain.gui.items.utils.GUIConstants.*;
 
 //import java.math.BigDecimal;
 //import org.erachain.settings.Settings;
