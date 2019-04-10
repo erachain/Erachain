@@ -24,6 +24,7 @@ public class AddImageLabel extends JLabel {
     private int bezelHeight;
     private Logger logger = LoggerFactory.getLogger(getClass().getName());
     private JLabel label = new JLabel();
+
     public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage) {
         setLayout(new BorderLayout());
         label.setText(text);
@@ -61,9 +62,13 @@ public class AddImageLabel extends JLabel {
         int returnVal = chooser.showOpenDialog(getParent());
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = new File(chooser.getSelectedFile().getPath());
-            new ImageCropDialog(file, bezelWidth, bezelHeight,typeOfImage) {
+            new ImageCropDialog(file, bezelWidth, bezelHeight, typeOfImage) {
                 @Override
                 public void onFinish(BufferedImage image) {
+                    if (image == null) {
+                        logger.error("Image does not setup");
+                        return;
+                    }
                     setIcon(new ImageIcon(image));
                     setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
                     ByteArrayOutputStream imageStream = new ByteArrayOutputStream();

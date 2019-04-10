@@ -149,16 +149,16 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
 
     public BufferedImage getSnapshot(TypeOfImage typeOfImage) {
-        Point2D.Double pointSrc = new Point2D.Double(image.getWidth(), image.getHeight());
-        Point2D.Double pointDst = new Point2D.Double();
-        currentTransform.transform(pointSrc, pointDst);
+        Point2D.Double pointSrcRightBottomImage = new Point2D.Double(image.getWidth(), image.getHeight());
+        Point2D.Double pointDstRightBottomImage = new Point2D.Double();
+        currentTransform.transform(pointSrcRightBottomImage, pointDstRightBottomImage);
         int type = -1;
         if (typeOfImage == TypeOfImage.JPEG) {
             type = BufferedImage.TYPE_INT_RGB;
         } else if (typeOfImage == TypeOfImage.GIF) {
             type = BufferedImage.TYPE_INT_ARGB;
         }
-        BufferedImage snapshot = new BufferedImage((int) pointDst.getX(), (int) pointDst.getY(), type);
+        BufferedImage snapshot = new BufferedImage((int) pointDstRightBottomImage.getX(), (int) pointDstRightBottomImage.getY(), type);
         Graphics2D g2d = (Graphics2D) snapshot.getGraphics();
         g2d.transform(currentTransform);
         if (typeOfImage == TypeOfImage.JPEG) {
@@ -170,22 +170,73 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         Point2D.Double pointZeroDst = new Point2D.Double();
         currentTransform.transform(zeroPoint, pointZeroDst);
 
-        Point2D.Double cropPoint = new Point2D.Double(cropX + cropWidth, cropY + cropHeight);
-        Point2D.Double pointCropDst = new Point2D.Double();
-        currentTransform.transform(cropPoint, pointCropDst);
+        Point2D.Double cropPointRightBottom = new Point2D.Double(cropX + cropWidth, cropY + cropHeight);
+        Point2D.Double pointCropDstRightBottom = new Point2D.Double();
+        currentTransform.transform(cropPointRightBottom, pointCropDstRightBottom);
 
         try {
+
+            if (pointZeroDst.x > cropPointRightBottom.x
+                    || pointZeroDst.y > cropPointRightBottom.y
+                    || pointDstRightBottomImage.x < cropX
+                    || pointDstRightBottomImage.y < cropY) {
+                return null;
+            }
+
+
+            if (pointZeroDst.x < cropX && pointZeroDst.y > cropY
+                    && pointDstRightBottomImage.x > cropPointRightBottom.x
+                    && pointDstRightBottomImage.y < cropPointRightBottom.y) {
+                return snapshot.getSubimage(cropX, (int) pointZeroDst.y, cropWidth, (int) (cropPointRightBottom.y - pointZeroDst.y));
+            } else if (pointZeroDst.x < cropX && pointZeroDst.y > cropY
+                    && pointDstRightBottomImage.x < cropPointRightBottom.x
+                    && pointDstRightBottomImage.y < cropPointRightBottom.y) {
+                return snapshot.getSubimage(cropX, (int) pointZeroDst.y,
+                        (int) (pointDstRightBottomImage.x - cropX), (int) (pointDstRightBottomImage.y - pointZeroDst.y));
+            } else if (pointZeroDst.x > cropX && pointZeroDst.y > cropY
+                    && pointDstRightBottomImage.x > cropPointRightBottom.x
+                    && pointDstRightBottomImage.y < cropPointRightBottom.y) {
+                return snapshot.getSubimage((int) pointZeroDst.x, (int) pointZeroDst.y,
+                        (int) (cropPointRightBottom.x - pointZeroDst.x), (int) (pointDstRightBottomImage.y - pointZeroDst.y));
+            }
+            if (pointZeroDst.x > cropX && pointZeroDst.y < cropY
+                    && pointDstRightBottomImage.x < cropPointRightBottom.x
+                    && pointDstRightBottomImage.y > cropPointRightBottom.y) {
+                return snapshot.getSubimage((int) pointZeroDst.x, cropY, (int) (cropPointRightBottom.x - pointZeroDst.x), cropHeight);
+            } else if (pointZeroDst.x > cropX && pointZeroDst.y < cropY
+                    && pointDstRightBottomImage.x < cropPointRightBottom.x
+                    && pointDstRightBottomImage.y < cropPointRightBottom.y) {
+                return snapshot.getSubimage((int) pointZeroDst.x, cropY,
+                        (int) (pointDstRightBottomImage.x - pointZeroDst.x), (int) (pointDstRightBottomImage.y - cropY));
+            } else if (pointZeroDst.x > cropX && pointZeroDst.y > cropY
+                    && pointDstRightBottomImage.x < cropPointRightBottom.x
+                    && pointDstRightBottomImage.y > cropPointRightBottom.y) {
+                return snapshot.getSubimage((int) pointZeroDst.x, (int) pointZeroDst.y,
+                        (int) (pointDstRightBottomImage.x - pointZeroDst.x), (int) (cropPointRightBottom.y - pointZeroDst.y));
+            }
             if (pointZeroDst.x > cropX && pointZeroDst.y > cropY) {
                 return snapshot.getSubimage((int) pointZeroDst.x, (int) pointZeroDst.y,
-                        (int) (cropPoint.x - pointZeroDst.x), (int) (cropPoint.y - pointZeroDst.y));
+                        (int) (cropPointRightBottom.x - pointZeroDst.x), (int) (cropPointRightBottom.y - pointZeroDst.y));
             } else if (pointZeroDst.x > cropX) {
-                return snapshot.getSubimage((int) pointZeroDst.x, (int) pointZeroDst.y,
-                        cropWidth, (int) (cropPoint.y - pointZeroDst.y));
+                return snapshot.getSubimage((int) pointZeroDst.x, cropY,
+                        (int) (cropPointRightBottom.x - pointZeroDst.x), cropHeight);
 
             } else if (pointZeroDst.y > cropY) {
-                return snapshot.getSubimage((int) pointZeroDst.x, (int) pointZeroDst.y,
-                        (int) (cropPoint.x - pointZeroDst.x), cropHeight);
+                return snapshot.getSubimage(cropX, (int) pointZeroDst.y,
+                        cropWidth, (int) (cropPointRightBottom.y - pointZeroDst.y));
             }
+            if (pointDstRightBottomImage.x < cropPointRightBottom.x && pointDstRightBottomImage.y < cropPointRightBottom.y) {
+                return snapshot.getSubimage(cropX, cropY,
+                        (int) (pointDstRightBottomImage.x - cropX), (int) (pointDstRightBottomImage.y - cropY));
+            } else if (pointDstRightBottomImage.x < cropPointRightBottom.x) {
+                return snapshot.getSubimage(cropX, cropY,
+                        (int) (pointDstRightBottomImage.x - cropX), cropHeight);
+
+            } else if (pointDstRightBottomImage.y < cropPointRightBottom.y) {
+                return snapshot.getSubimage(cropX, cropY,
+                        cropWidth, (int) (pointDstRightBottomImage.y - cropY));
+            }
+
             return snapshot.getSubimage(cropX, cropY, cropWidth, cropHeight);
         } catch (RasterFormatException e) {
             logger.info("Error size of sub image");
