@@ -16,6 +16,7 @@ import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.*;
+import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
 
 import java.lang.reflect.Array;
@@ -48,6 +49,9 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
     private NavigableSet recipientKey;
     @SuppressWarnings("rawtypes")
     private NavigableSet typeKey;
+
+    @SuppressWarnings("rawtypes")
+    private NavigableSet titleKey;
 
     //@SuppressWarnings("rawtypes")
     //private NavigableSet block_Key;
@@ -89,7 +93,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         this.senderKey = database.createTreeSet("sender_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
         // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
-        Bind.secondaryKey(map, this.senderKey, new Fun.Function2<String, Long, Transaction>() {
+        Bind.secondaryKey(map, this.senderKey, new Function2<String, Long, Transaction>() {
             @Override
             public String run(Long key, Transaction val) {
                 Account account = val.getCreator();
@@ -101,7 +105,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         this.recipientKey = database.createTreeSet("recipient_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
         Bind.secondaryKeys(map, this.recipientKey,
-                new Fun.Function2<String[], Long, Transaction>() {
+                new Function2<String[], Long, Transaction>() {
                     @Override
                     public String[] run(Long key, Transaction val) {
                         List<String> recps = new ArrayList<String>();
@@ -121,7 +125,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         this.typeKey = database.createTreeSet("address_type_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
         Bind.secondaryKeys(map, this.typeKey,
-                new Fun.Function2<Tuple2<String, Integer>[], Long, Transaction>() {
+                new Function2<Tuple2<String, Integer>[], Long, Transaction>() {
                     @Override
                     public Tuple2<String, Integer>[] run(Long key, Transaction val) {
                         List<Tuple2<String, Integer>> recps = new ArrayList<Tuple2<String, Integer>>();
@@ -139,6 +143,17 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
                         return ret;
                     }
                 });
+
+        this.titleKey = database.createTreeSet("title_type_txs").comparator(Fun.COMPARATOR).makeOrGet();
+
+        // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
+        Bind.secondaryKey(map, this.titleKey,
+                new Function2<Tuple2<String, Integer>, Long, Transaction>() {
+            @Override
+            public Tuple2<String, Integer> run(Long key, Transaction val) {
+                return new Tuple2<String, Integer>(val.getTitle(), val.getType());
+            }
+        });
 
         return map;
 
@@ -274,6 +289,30 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         Iterable keys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(address, type));
         Iterator iter = keys.iterator();
         keys = null;
+        List<Transaction> txs = new ArrayList<>();
+        int counter = 0;
+        Transaction item;
+        Long key;
+        while (iter.hasNext() && (limit == 0 || counter < limit)) {
+            key = (Long) iter.next();
+            Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+            item = this.map.get(key);
+            item.setDC((DCSet)databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+
+            txs.add(item);
+            counter++;
+        }
+        iter = null;
+        return txs;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    // TODO ERROR - not use PARENT MAP and DELETED in FORK
+    public List<Transaction> getTransactionsByTitleAndType(String filter, Integer type, int limit, boolean descending) {
+
+        Iterable keys = Fun.filter(this.titleKey, new Tuple2<String, Integer>(filter, type));
+        Iterator iter = keys.iterator();
+
         List<Transaction> txs = new ArrayList<>();
         int counter = 0;
         Transaction item;

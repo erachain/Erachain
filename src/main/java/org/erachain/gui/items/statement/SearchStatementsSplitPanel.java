@@ -152,8 +152,8 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                             jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
                             return;
                         }
-                        //	jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
-                        // ddd.dispose();
+                        jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
+                        ddd.dispose();
                         jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
                     }
                 }.start();

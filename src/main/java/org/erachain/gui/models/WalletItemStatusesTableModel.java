@@ -91,27 +91,25 @@ public class WalletItemStatusesTableModel extends SortedListTableModelCls<Tuple2
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.LIST_STATUS_TYPE) {
-            if (this.statuses == null) {
-                this.statuses = (SortableList<Tuple2<String, String>, StatusCls>) message.getValue();
-                //this.statuses.registerObserver();
-                //this.statuses.sort(PollMap.NAME_INDEX);
-            }
-
             this.fireTableDataChanged();
-        }
+        } else
 
-        //CHECK IF LIST UPDATED
         if (message.getType() == ObserverMessage.ADD_STATUS_TYPE || message.getType() == ObserverMessage.REMOVE_STATUS_TYPE) {
-            this.fireTableDataChanged();
+            needUpdate = true;
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
+                this.fireTableDataChanged();
+                needUpdate = false;
         }
     }
 
     public void addObservers() {
+
+        super.addObservers();
         Controller.getInstance().addWalletObserver(this);
     }
 
     public void deleteObservers() {
-        //if (this.statuses != null) this.statuses.removeObserver();
+        super.deleteObservers();
         Controller.getInstance().deleteObserver(this);
     }
 }

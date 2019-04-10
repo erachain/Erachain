@@ -662,6 +662,10 @@ public abstract class Transaction {
         return this.fee.unscaledValue().longValue();
     }
 
+    public String getTitle() {
+        return null;
+    }
+
     /*
      * public Long getReference() { return this.reference; }
      */

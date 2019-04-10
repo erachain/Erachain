@@ -144,49 +144,24 @@ public class StatementsTableModelSearch extends AbstractTableModel {
         return null;
     }
 
-    private List<RSignNote> read_Statement(String str, Long key, boolean b) {
-        List<RSignNote> tran;
-        ArrayList<Transaction> db_transactions;
-        db_transactions = new ArrayList<Transaction>();
-        tran = new ArrayList<RSignNote>();
-        // база данных
+    private List<RSignNote> read_Statement(String str, Long key, boolean isLowerCase) {
+
         DCSet dcSet = DCSet.getInstance();
-        // читаем все блоки
-        SortableList<Integer, Block> lists = dcSet.getBlockMap().getList();
-        // проходим по блокам
-        for (Pair<Integer, Block> list : lists) {
-
-            // читаем транзакции из блока
-            db_transactions = (ArrayList<Transaction>) list.getB().getTransactions();
-            // проходим по транзакциям
-            for (Transaction transaction : db_transactions) {
-                // если ноте то пишем в transactions
-
-                if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
-                    RSignNote statement = (RSignNote) transaction;
-                    // filter Title
-                    statement = (RSignNote) transaction;
-                    if (str != null && !str.equals("")) {
-
-                        if (filter_str(str, statement, b)) {
-                            statement.setDC_HeightSeq(dcSet);
-                            tran.add(statement);
-                        }
-                    }
-                    if (key > 0) {
-                        if (statement.getKey() == key) {
-                            statement.setDC_HeightSeq(dcSet);
-                            tran.add(statement);
-                        }
-                    }
-                }
-            }
-        }
-
-        // filter key
+        List<RSignNote> tran = new ArrayList<RSignNote>();
         if (key > 0) {
-
+            tran.add((RSignNote)dcSet.getTransactionFinalMap().get(key));
+            return tran;
         }
+
+        List<Transaction> lists = dcSet.getTransactionFinalMap().getTransactionsByTitleAndType(str,
+                Transaction.SIGN_NOTE_TRANSACTION, 1000, isLowerCase);
+
+        for (Transaction transaction: lists) {
+
+            transaction.setDC_HeightSeq(dcSet);
+            tran.add((RSignNote) transaction);
+        }
+
         return tran;
     }
 
@@ -207,13 +182,13 @@ public class StatementsTableModelSearch extends AbstractTableModel {
         fireTableDataChanged();
     }
 
-    public void set_Filter_By_Name(String str, boolean b) {
-        transactions = read_Statement(str, (long) -1, b);
+    public void set_Filter_By_Name(String str, boolean isLowerCase) {
+        transactions = read_Statement(str, 0l, isLowerCase);
         fireTableDataChanged();
 
     }
 
-    private boolean filter_str(String filter, RSignNote record, boolean case1) {
+    private boolean filter_str(String filter, RSignNote record, boolean isLowerCase) {
         if (record.getData() == null)
             return false;
 
@@ -222,7 +197,7 @@ public class StatementsTableModelSearch extends AbstractTableModel {
             try {
                 a = record.parse_Data_V2_Without_Files();
                 String base = a.b;
-                if (!case1) {
+                if (!isLowerCase) {
                     filter = filter.toLowerCase();
                     base = base.toLowerCase();
                 }

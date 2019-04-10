@@ -53,6 +53,11 @@ public abstract class IssueItemRecord extends Transaction {
     }
 
     @Override
+    public String getTitle() {
+        return this.item.getName();
+    }
+
+    @Override
     public String viewItemName() {
         return item.toString();
     }

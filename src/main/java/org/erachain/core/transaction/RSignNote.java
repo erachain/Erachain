@@ -449,6 +449,17 @@ public class RSignNote extends Transaction {
         return this.key;
     }
 
+    @Override
+    public String getTitle() {
+        try {
+            return this.parse_Data_V2().a;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return null;
+        }
+
+    }
+
     public byte[] getData() {
         return this.data;
     }
