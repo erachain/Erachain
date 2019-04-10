@@ -205,7 +205,8 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                 if (Arrays.equals(peer1.getAddress().getAddress(),
                                   peer2.getAddress().getAddress())) {
                     setView(view);
-                    this.fireTableRowsUpdated(n-1, n);
+                    if (n < this.getRowCount())
+                        this.fireTableRowsUpdated(n, n);
                     break;
                 }
                 n++;

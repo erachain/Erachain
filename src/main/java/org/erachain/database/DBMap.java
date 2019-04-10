@@ -36,7 +36,7 @@ public abstract class DBMap<T, U> extends Observable {
         //CREATE INDEXES
         this.indexes = new HashMap<Integer, NavigableSet<Tuple2<?, T>>>();
 
-        if (databaseSet.isWithObserver()) {
+        if (databaseSet != null && databaseSet.isWithObserver()) {
             observableData = new HashMap<Integer, Integer>(8, 1);
         }
     }
