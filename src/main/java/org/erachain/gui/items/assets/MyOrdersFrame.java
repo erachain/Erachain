@@ -94,7 +94,7 @@ public class MyOrdersFrame extends JFrame {
                 int row = ordersTable.getSelectedRow();
                 row = ordersTable.convertRowIndexToModel(row);
 
-                Order order = ordersTableModel.getItem(row);
+                Order order = ordersTableModel.getItem(row).b;
                 new TradesFrame(order);
             }
         });
@@ -106,7 +106,7 @@ public class MyOrdersFrame extends JFrame {
                 int row = ordersTable.getSelectedRow();
                 row = ordersTable.convertRowIndexToModel(row);
 
-                Order order = ordersTableModel.getItem(row);
+                Order order = ordersTableModel.getItem(row).b;
                 new CancelOrderFrame(order);
             }
         });
@@ -125,7 +125,7 @@ public class MyOrdersFrame extends JFrame {
 
                 if (e.getClickCount() == 2) {
                     row = ordersTable.convertRowIndexToModel(row);
-                    Order order = ordersTableModel.getItem(row);
+                    Order order = ordersTableModel.getItem(row).b;
                     new TradesFrame(order);
                 }
             }

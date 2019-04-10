@@ -260,7 +260,7 @@ public class MyOrderTab extends SplitPanel {
                 if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0)
                     i = jTable_jScrollPanel_LeftPanel
                             .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow());
-                order = ordersModel.getItem(i);
+                order = ordersModel.getItem(i).b;
                 if (order == null)
                     return;
                 jScrollPane_jPanel_RightPanel.setViewportView(new OrderInfoPanel(order));

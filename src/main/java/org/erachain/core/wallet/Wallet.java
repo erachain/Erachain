@@ -1410,14 +1410,26 @@ public class Wallet extends Observable implements Observer {
 
 		// CHECK IF WE ARE OWNER
 		ItemCls item = issueItem.getItem();
-		// item.resolveKey(DLSet.getInstance());
-		Account creator = item.getOwner();
-		if (creator == null)
+
+		if (this.accountExists(issueItem.getCreator().getAddress())) {
+			// ADD ASSET
+			this.database.getItemMap(item).add(
+					issueItem.getCreator(), issueItem.getDBRef(), item);
+			// ADD to FAVORITES
+			this.database.getItemFavoritesSet(item).add(item.getKey());
+
 			return;
 
-		if (this.accountExists(creator.getAddress())) {
+		}
+
+		// item.resolveKey(DLSet.getInstance());
+		Account owner = item.getOwner();
+
+		if (owner != null && this.accountExists(owner.getAddress())) {
+
 			// ADD ASSET
-			this.database.getItemMap(item).add(creator.getAddress(), issueItem.getSignature(), item);
+			this.database.getItemMap(item).add(
+					owner, issueItem.getDBRef(), item);
 
 			// ADD to FAVORITES
 			this.database.getItemFavoritesSet(item).add(item.getKey());
@@ -1438,7 +1450,7 @@ public class Wallet extends Observable implements Observer {
 
 		if (this.accountExists(creator.getAddress())) {
 			// DELETE ASSET
-			this.database.getItemMap(item).delete(creator.getAddress(), issueItem.getSignature());
+			this.database.getItemMap(item).delete(creator, issueItem.getDBRef());
 		}
 	}
 
