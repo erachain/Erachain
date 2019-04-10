@@ -1,12 +1,9 @@
 package org.erachain.gui.items.statement;
 
-import org.erachain.core.block.Block;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
-import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple3;
@@ -144,7 +141,7 @@ public class StatementsTableModelSearch extends AbstractTableModel {
         return null;
     }
 
-    private List<RSignNote> read_Statement(String str, Long key, boolean isLowerCase) {
+    private List<RSignNote> getTransactionByStatement(String str, Long key, boolean isLowerCase) {
 
         DCSet dcSet = DCSet.getInstance();
         List<RSignNote> tran = new ArrayList<RSignNote>();
@@ -173,7 +170,7 @@ public class StatementsTableModelSearch extends AbstractTableModel {
             return;
         if (new Long(text) < 1)
             return;
-        transactions = read_Statement("", new Long(text), false);
+        transactions = getTransactionByStatement("", new Long(text), false);
         fireTableDataChanged();
     }
 
@@ -183,7 +180,7 @@ public class StatementsTableModelSearch extends AbstractTableModel {
     }
 
     public void set_Filter_By_Name(String str, boolean isLowerCase) {
-        transactions = read_Statement(str, 0l, isLowerCase);
+        transactions = getTransactionByStatement(str, 0l, isLowerCase);
         fireTableDataChanged();
 
     }
