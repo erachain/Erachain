@@ -34,34 +34,54 @@ public class IssuePollPanel extends JPanel {
     private AddImageLabel addImageLabel;
     private AddImageLabel addLogoIconLabel;
     private final MTable table;
+    private JLabel titleJLabel = new JLabel();
 
     public IssuePollPanel() {
-        // LAYOUT
-        GridBagLayout gridBagLayout = new GridBagLayout();
-        gridBagLayout.rowHeights = new int[]{0, 0, 88, 0, 0, 0, 0};
-        gridBagLayout.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0};
-        setLayout(gridBagLayout);
+        setLayout(new GridBagLayout());
+        optionsTableModel = new CreateOptionsTableModel(new Object[]{Lang.getInstance().translate("Name")}, 0);
+        addImageLabel = new AddImageLabel(
+                Lang.getInstance().translate("Add image"), WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG);
+        addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
 
-        // TEXTFIELD GBC
-        GridBagConstraints txtGBC = new GridBagConstraints();
-        txtGBC.insets = new Insets(5, 5, 5, 0);
-        txtGBC.fill = GridBagConstraints.HORIZONTAL;
-        txtGBC.anchor = GridBagConstraints.NORTHWEST;
-        txtGBC.weightx = 1;
-        txtGBC.gridwidth = 2;
-        txtGBC.gridx = 2;
-        txtGBC.gridy = 0;
-        cbxFrom = new JComboBox<>(new AccountsComboBoxModel());
-        add(cbxFrom, txtGBC);
+        addLogoIconLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
+                WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF);
+        addLogoIconLabel.setPreferredSize(new Dimension(WIDTH_LOGO, HEIGHT_LOGO));
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+
+
+        titleJLabel.setFont(FONT_TITLE);
+        titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleJLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+        titleJLabel.setText(Lang.getInstance().translate("Issue Poll"));
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
+        add(titleJLabel, gridBagConstraints);
+
+        GridBagConstraints gbcAddImagePanel = new GridBagConstraints();
+        gbcAddImagePanel.gridx = 0;
+        gbcAddImagePanel.gridy = 2;
+        gbcAddImagePanel.gridheight = 2;
+        gbcAddImagePanel.anchor = GridBagConstraints.NORTH;
+        add(addImageLabel, gbcAddImagePanel);
+
+        GridBagConstraints gbcAddLogoIconPanel = new GridBagConstraints();
+        gbcAddLogoIconPanel.gridx = 0;
+        gbcAddLogoIconPanel.gridy = 4;
+        gbcAddImagePanel.gridheight = 1;
+        add(addLogoIconLabel, gbcAddLogoIconPanel);
 
         // BUTTON GBC
         GridBagConstraints buttonGBC = new GridBagConstraints();
-        buttonGBC.insets = new Insets(5, 5, 0, 5);
-        buttonGBC.fill = GridBagConstraints.NONE;
-        buttonGBC.anchor = GridBagConstraints.NORTHWEST;
-        buttonGBC.gridwidth = 2;
         buttonGBC.gridx = 0;
-        buttonGBC.gridy = 6;
+        buttonGBC.gridy = 7;
+        buttonGBC.gridwidth = 3;
+        buttonGBC.anchor = GridBagConstraints.CENTER;
         // BUTTON Register
         createButton = new JButton(Lang.getInstance().translate("Create"));
         createButton.addActionListener(e -> onRegisterClick());
@@ -69,98 +89,80 @@ public class IssuePollPanel extends JPanel {
 
         JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
         GridBagConstraints gbcFromLabel = new GridBagConstraints();
-        gbcFromLabel.insets = new Insets(0, 0, 5, 5);
         gbcFromLabel.gridx = 1;
-        gbcFromLabel.gridy = 0;
+        gbcFromLabel.gridy = 1;
+        gbcFromLabel.anchor = GridBagConstraints.NORTHEAST;
         add(fromLabel, gbcFromLabel);
-
-
-        optionsTableModel = new CreateOptionsTableModel(new Object[]{Lang.getInstance().translate("Name")}, 0);
 
         // LABEL GBC
         GridBagConstraints labelGBC = new GridBagConstraints();
-        labelGBC.insets = new Insets(5, 5, 5, 5);
-        labelGBC.fill = GridBagConstraints.HORIZONTAL;
-        labelGBC.anchor = GridBagConstraints.NORTHWEST;
-        labelGBC.weightx = 0;
-        labelGBC.weighty = 0;
         labelGBC.gridx = 1;
-        labelGBC.gridy = 1;
+        labelGBC.gridy = 2;
+        labelGBC.anchor = GridBagConstraints.NORTHEAST;
         JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
         add(nameLabel, labelGBC);
 
-        // ICON
-        addImageLabel = new AddImageLabel(
-                Lang.getInstance().translate("Add image"), WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG);
-
-        GridBagConstraints gbcAddImagePanel = new GridBagConstraints();
-        gbcAddImagePanel.anchor = GridBagConstraints.NORTH;
-        gbcAddImagePanel.gridheight = 3;
-        gbcAddImagePanel.insets = new Insets(0, 0, 5, 5);
-        gbcAddImagePanel.gridx = 0;
-        gbcAddImagePanel.gridy = 1;
-        addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
-
-        add(addImageLabel, gbcAddImagePanel);
-
-        GridBagConstraints gbcTxtName = new GridBagConstraints();
-        gbcTxtName.fill = GridBagConstraints.HORIZONTAL;
-        gbcTxtName.insets = new Insets(0, 0, 5, 5);
-        gbcTxtName.gridx = 2;
-        gbcTxtName.gridy = 1;
-        add(txtName, gbcTxtName);
-
-        addLogoIconLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
-                WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF);
-        addLogoIconLabel.setPreferredSize(new Dimension(WIDTH_LOGO, HEIGHT_LOGO));
-
-        GridBagConstraints gbcAddLogoIconPanel = new GridBagConstraints();
-        gbcAddLogoIconPanel.insets = new Insets(0, 0, 5, 0);
-        gbcAddImagePanel.gridheight = 1;
-        gbcAddLogoIconPanel.gridx = 0;
-        gbcAddLogoIconPanel.gridy = 5;
-        add(addLogoIconLabel, gbcAddLogoIconPanel);
-
         JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
         GridBagConstraints gbcDescriptionLabel = new GridBagConstraints();
-        gbcDescriptionLabel.anchor = GridBagConstraints.NORTH;
-        gbcDescriptionLabel.insets = new Insets(0, 0, 5, 5);
         gbcDescriptionLabel.gridx = 1;
-        gbcDescriptionLabel.gridy = 2;
-        this.add(descriptionLabel, gbcDescriptionLabel);
+        gbcDescriptionLabel.gridy = 3;
+        gbcDescriptionLabel.anchor = GridBagConstraints.NORTHEAST;
+        add(descriptionLabel, gbcDescriptionLabel);
+
+        JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
+        GridBagConstraints gbcOptionsLabel = new GridBagConstraints();
+        gbcOptionsLabel.gridx = 1;
+        gbcOptionsLabel.gridy = 4;
+        gbcOptionsLabel.anchor = GridBagConstraints.NORTHEAST;
+        add(optionsLabel, gbcOptionsLabel);
+
+        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
+        GridBagConstraints gbcFeeLabel = new GridBagConstraints();
+        gbcFeeLabel.gridx = 1;
+        gbcFeeLabel.gridy = 6;
+        gbcFeeLabel.anchor = GridBagConstraints.NORTHEAST;
+        add(feeLabel, gbcFeeLabel);
+
+        // TEXTFIELD GBC
+        GridBagConstraints txtGBC = new GridBagConstraints();
+        txtGBC.gridx = 2;
+        txtGBC.gridy = 1;
+        txtGBC.gridwidth = 2;
+        txtGBC.fill = GridBagConstraints.HORIZONTAL;
+        txtGBC.anchor = GridBagConstraints.NORTHWEST;
+        cbxFrom = new JComboBox<>(new AccountsComboBoxModel());
+        add(cbxFrom, txtGBC);
+
+        GridBagConstraints gbcTxtName = new GridBagConstraints();
+        gbcTxtName.gridx = 2;
+        gbcTxtName.gridy = 2;
+        gbcTxtName.fill = GridBagConstraints.HORIZONTAL;
+        gbcTxtName.weightx = 0.1;
+        add(txtName, gbcTxtName);
+
+
 
         // TXTAREA NAME
         GridBagConstraints gbcDescription = new GridBagConstraints();
-        gbcDescription.gridwidth = 2;
         gbcDescription.gridx = 2;
-        gbcDescription.gridy = 2;
-        gbcDescription.weighty = 0.3;
-        gbcDescription.insets = new Insets(0, 5, 5, 0);
+        gbcDescription.gridy = 3;
+        gbcDescription.weighty = 0.1;
+        gbcDescription.weightx = 0.1;
+        gbcDescription.gridwidth = 2;
         gbcDescription.fill = GridBagConstraints.BOTH;
         gbcDescription.anchor = GridBagConstraints.NORTHWEST;
         JScrollPane scrollPaneDescription = new JScrollPane();
         scrollPaneDescription.setViewportView(txtareaDescription);
         add(scrollPaneDescription, gbcDescription);
 
-
-
-        JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
-        GridBagConstraints gbcOptionsLabel = new GridBagConstraints();
-        gbcOptionsLabel.anchor = GridBagConstraints.NORTH;
-        gbcOptionsLabel.insets = new Insets(0, 0, 5, 5);
-        gbcOptionsLabel.gridx = 1;
-        gbcOptionsLabel.gridy = 3;
-        add(optionsLabel, gbcOptionsLabel);
-
         // TABLE OPTIONS
         GridBagConstraints gbcOptionalTable = new GridBagConstraints();
-        gbcOptionalTable.gridwidth = 2;
-        gbcOptionalTable.insets = new Insets(0, 0, 5, 0);
         gbcOptionalTable.gridx = 2;
-        gbcOptionalTable.gridy = 3;
+        gbcOptionalTable.gridy = 4;
         gbcOptionalTable.weighty = 0.1;
+        gbcOptionalTable.gridwidth = 2;
         gbcOptionalTable.fill = GridBagConstraints.BOTH;
-        gbcOptionalTable.anchor = GridBagConstraints.NORTHWEST;
+        gbcOptionalTable.anchor = GridBagConstraints.CENTER;
         table = new MTable(optionsTableModel);
         JScrollPane scrollPaneOptionalTable = new JScrollPane();
         scrollPaneOptionalTable.setViewportView(table);
@@ -169,29 +171,21 @@ public class IssuePollPanel extends JPanel {
         JButton deleteButton = new JButton(Lang.getInstance().translate("Delete"));
         deleteButton.addActionListener(e -> deleteRow());
         GridBagConstraints gbcDeleteButton = new GridBagConstraints();
-        gbcDeleteButton.gridwidth = 2;
-        gbcDeleteButton.fill = GridBagConstraints.HORIZONTAL;
-        gbcDeleteButton.insets = new Insets(0, 0, 5, 5);
         gbcDeleteButton.gridx = 2;
-        gbcDeleteButton.gridy = 4;
+        gbcDeleteButton.gridy = 5;
+        gbcDeleteButton.fill = GridBagConstraints.HORIZONTAL;
+        gbcDeleteButton.gridwidth = 2;
         add(deleteButton, gbcDeleteButton);
 
-        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
-        GridBagConstraints gbcFeeLabel = new GridBagConstraints();
-        gbcFeeLabel.insets = new Insets(0, 0, 5, 5);
-        gbcFeeLabel.gridx = 1;
-        gbcFeeLabel.gridy = 5;
-        add(feeLabel, gbcFeeLabel);
 
         txtFee.setModel(new DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
         txtFee.setSelectedIndex(0);
 
         GridBagConstraints gbcTxtFee = new GridBagConstraints();
-        gbcTxtFee.gridwidth = 2;
-        gbcTxtFee.fill = GridBagConstraints.HORIZONTAL;
-        gbcTxtFee.insets = new Insets(0, 0, 5, 5);
         gbcTxtFee.gridx = 2;
-        gbcTxtFee.gridy = 5;
+        gbcTxtFee.gridy = 6;
+        gbcTxtFee.fill = GridBagConstraints.HORIZONTAL;
+        gbcTxtFee.gridwidth = 2;
         add(txtFee, gbcTxtFee);
 
         JPopupMenu menu = new JPopupMenu();

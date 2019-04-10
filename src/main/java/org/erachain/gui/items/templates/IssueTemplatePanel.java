@@ -17,14 +17,12 @@ import org.erachain.lang.Lang;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
 import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 @SuppressWarnings("serial")
 public class IssueTemplatePanel extends JPanel {
-    private final int SIZE_FONT_TITLE = 20;
     private JComboBox<Account> jComboBoxAccountCreator = new JComboBox<>(new AccountsComboBoxModel());
     private JButton jButtonCreate = new JButton();
     private JLabel jLabelAccountCreator = new JLabel();
@@ -144,7 +142,7 @@ public class IssueTemplatePanel extends JPanel {
 
         jLabelIssueTemplate.setHorizontalAlignment(SwingConstants.CENTER);
         jLabelIssueTemplate.setText(Lang.getInstance().translate("Issue Template"));
-        jLabelIssueTemplate.setFont(new Font(Font.SERIF, Font.BOLD, SIZE_FONT_TITLE));
+        jLabelIssueTemplate.setFont(FONT_TITLE);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -192,10 +190,9 @@ public class IssueTemplatePanel extends JPanel {
 
         jLabelContent.setText(Lang.getInstance().translate("Content") + ":");
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridheight = 2;
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
         gridBagConstraints.insets = new Insets(0, 15, 5, 5);
         add(jLabelContent, gridBagConstraints);
 

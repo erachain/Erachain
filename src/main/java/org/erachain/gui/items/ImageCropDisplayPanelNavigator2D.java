@@ -43,25 +43,20 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         } catch (IOException e) {
             logger.error("Error read image File in crop component", e);
         }
-
-
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 currentPoint = e.getPoint();
             }
-
             @Override
             public void mouseReleased(MouseEvent e) {
                 int button = e.getButton();
                 Point newPoint = e.getPoint();
                 currentPoint = newPoint;
-
                 // сброс всего в исходное положение по правой кнопке мыши
                 if (button == MouseEvent.BUTTON3) {
                     currentTransform = new AffineTransform();
                 }
-
                 // сброс только масштаба по средней кнопке мыши
                 if (button == MouseEvent.BUTTON2) {
                     AffineTransform newTransform = new AffineTransform();
@@ -84,7 +79,6 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
                 newTransform.concatenate(currentTransform);
                 currentTransform = newTransform;
             }
-
             @Override
             public void mouseMoved(MouseEvent e) {
                 try {
@@ -182,8 +176,6 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
                     || pointDstRightBottomImage.y < cropY) {
                 return null;
             }
-
-
             if (pointZeroDst.x < cropX && pointZeroDst.y > cropY
                     && pointDstRightBottomImage.x > cropPointRightBottom.x
                     && pointDstRightBottomImage.y < cropPointRightBottom.y) {
@@ -236,7 +228,6 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
                 return snapshot.getSubimage(cropX, cropY,
                         cropWidth, (int) (pointDstRightBottomImage.y - cropY));
             }
-
             return snapshot.getSubimage(cropX, cropY, cropWidth, cropHeight);
         } catch (RasterFormatException e) {
             logger.info("Error size of sub image");

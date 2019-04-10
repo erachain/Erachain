@@ -10,7 +10,6 @@ import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
@@ -71,11 +70,12 @@ public class InsertPersonPanel extends IssuePersonPanel {
     }
 
     private void init() {
+        titleJLabel.setText("Enter Person");
         textPersonNumber.setText("");
-        this.txtBirthLatitude.setText("");
-        this.txtBirthLongitude.setText("");
-        this.txtHeight.setText("");
-        this.txtFeePow.setSelectedItem("0");
+        txtBirthLatitude.setText("");
+        txtBirthLongitudeLatitude.setText("");
+        txtHeight.setText("");
+        txtFeePow.setSelectedItem("0");
         txtName.setEditable(false);
         txtareaDescription.setEditable(false);
         txtBirthday.setVisible(false);
@@ -84,13 +84,12 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtDeathdayTxt.setVisible(false);
         txtDeathdayTxt.setEditable(false);
 
-
         addImageLabel.setVisible(false);
-        txtGender.setVisible(false);
+        comboBoxGender.setVisible(false);
         txtGenderTxt.setEditable(false);
         textPersonNumber.setEditable(false);
         txtBirthLatitude.setEditable(false);
-        txtBirthLongitude.setEditable(false);
+        txtBirthLongitudeLatitude.setEditable(false);
         txtSkinColor.setEditable(false);
         txtEyeColor.setEditable(false);
         txtHairColor.setEditable(false);
@@ -208,8 +207,8 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
             txtareaDescription.setText(person.getDescription() == null ? "" : person.getDescription());
 
-            txtGender.setSelectedIndex(person.getGender());
-            txtGenderTxt.setText(txtGender.getSelectedItem().toString());
+            comboBoxGender.setSelectedIndex(person.getGender());
+            txtGenderTxt.setText(comboBoxGender.getSelectedItem().toString());
 
             if (person.getRace() != null) {
                 textPersonNumber.setText(person.getRace());
@@ -322,7 +321,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtGenderTxt.setText("");
         textPersonNumber.setText("");
         txtBirthLatitude.setText("");
-        txtBirthLongitude.setText("");
+        txtBirthLongitudeLatitude.setText("");
         txtSkinColor.setText("");
         txtEyeColor.setText("");
         txtHairColor.setText("");
