@@ -21,31 +21,20 @@ public class WalletItemAssetsTableModel extends SortedListTableModelCls<Tuple2<S
     public static final int COLUMN_CONFIRMED = 5;
     public static final int COLUMN_FAVORITE = 6;
 
-    private SortableList<Tuple2<String, String>, AssetCls> assets;
-
     public WalletItemAssetsTableModel() {
-        super(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Confirmed", "Favorite"},
+        super(Controller.getInstance().wallet.database.getAssetMap(),
+                new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false, false, false, false, false}, true);
-
-    }
-
-    public AssetCls getAsset(int row) {
-        return this.assets.get(row).getB();
-    }
-
-    @Override
-    public int getRowCount() {
-        return (this.assets == null) ? 0 : this.assets.size();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.assets == null || row > this.assets.size() - 1) {
+        if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
 
         try {
-            AssetCls asset = this.assets.get(row).getB();
+            AssetCls asset = this.listSorted.get(row).getB();
 
             switch (column) {
                 case COLUMN_KEY:
@@ -90,8 +79,8 @@ public class WalletItemAssetsTableModel extends SortedListTableModelCls<Tuple2<S
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.LIST_ASSET_TYPE || message.getType() == ObserverMessage.WALLET_LIST_ASSET_TYPE) {
-            if (this.assets == null) {
-                this.assets = (SortableList<Tuple2<String, String>, AssetCls>) message.getValue();
+            if (this.listSorted == null) {
+                this.listSorted = (SortableList<Tuple2<String, String>, AssetCls>) message.getValue();
                 //this.assets.registerObserver();
                 //this.assets.sort(PollMap.NAME_INDEX);
             }
@@ -108,13 +97,22 @@ public class WalletItemAssetsTableModel extends SortedListTableModelCls<Tuple2<S
 
     public void addObservers() {
 
-        Controller.getInstance().addWalletObserver(this);
+        super.addObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.addObserver(this);
+
     }
 
-
     public void deleteObservers() {
+        super.deleteObservers();
 
-        Controller.getInstance().deleteObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.deleteObserver(this);
     }
 
 }

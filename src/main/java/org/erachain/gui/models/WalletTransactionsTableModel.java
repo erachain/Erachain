@@ -20,7 +20,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> implements Observer {
+public class WalletTransactionsTableModel extends WalletAutoKeyTableModel<Tuple2<Long, Long>, Tuple2<Long, Transaction>> implements Observer {
 
     public static final int COLUMN_CONFIRMATIONS = 0;
     public static final int COLUMN_TIMESTAMP = 1;
@@ -31,6 +31,7 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
     public static final int COLUMN_RECIPIENT = 6;
     public static final int COLUMN_FEE = 7;
     public static final int COLUMN_SIZE = 8;
+    public static final int COLUMN_NUMBER = 9;
 
     /**
      * В динамическом режиме перерисовывается автоматически по событию GUI_REPAINT
@@ -41,11 +42,11 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
     public WalletTransactionsTableModel() {
         super(Controller.getInstance().getWallet().database.getTransactionMap(),
                 new String[]{"Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"},
-                new Boolean[]{true, true, true, true, true, true, true, false, false}, true);
+                new Boolean[]{true, true, true, true, true, true, true, false, false}, true,
+                ObserverMessage.WALLET_RESET_TRANSACTION_TYPE, ObserverMessage.WALLET_LIST_TRANSACTION_TYPE,
+                ObserverMessage.WALLET_ADD_TRANSACTION_TYPE,  ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE);
 
         logger = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
-
-        addObservers();
 
     }
 
@@ -56,17 +57,20 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
             return null;
         }
 
-        Pair<Tuple2<String, String>, Transaction> data = this.listSorted.get(row);
+        Pair<Tuple2<Long, Long>, Tuple2<Long, Transaction>> data = this.listSorted.get(row);
 
         if (data == null) {
             return null;
         }
 
-        Transaction transaction = data.getB();
+        if (data.getB() == null)
+            return null;
+
+        Transaction transaction = data.getB().b;
         if (transaction == null)
             return null;
 
-        Tuple2<String, String> address = data.getA();
+        Tuple2<Long, Long> address = data.getA();
         if (address == null)
             return null;
 
@@ -173,122 +177,27 @@ public class WalletTransactionsTableModel extends SortedListTableModelCls<Tuple2
 
             case COLUMN_SIZE:
                 return transaction.viewSize(Transaction.FOR_NETWORK);
+
+            case COLUMN_NUMBER:
+                return data.getB();
         }
 
         return null;
 
     }
 
-    private int count;
-
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        if (Controller.getInstance().wallet.database == null)
-            return;
-
-        ObserverMessage message = (ObserverMessage) arg;
-
-        //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-
-            count = 0;
-            needUpdate = false;
-
-            getInterval();
-            fireTableDataChanged();
-
-        } else if (message.getType() == ObserverMessage.WALLET_RESET_TRANSACTION_TYPE) {
-
-            needUpdate = false;
-            getInterval();
-            this.fireTableDataChanged();
-
-        // это старое событие - сейчас таймер сам запускает обновление
-        } else if (false && (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
-                    || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)) {
-
-            // если прилетел блок или откатился и нужно обновить - то обновляем
-            needUpdate = true;
-
-            // это старое событие - сейчас таймер сам запускает обновление
-        } else if (false && (message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
-                            || message.getType() == ObserverMessage.WALLET_SYNC_STATUS)) {
-
-            needUpdate = true;
-
-        } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
-
-            needUpdate = true;
-
-        } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE
-                ) {
-
-            needUpdate = true;
-
-        } else if (message.getType() == ObserverMessage.GUI_REPAINT
-                && needUpdate) {
-
-            if (count++ < 4)
-                return;
-
-            count = 0;
-            needUpdate = false;
-
-            getInterval();
-            fireTableDataChanged();
-
-        }
-    }
-
-    public void addObservers() {
-
-        if (!Controller.getInstance().doesWalletDatabaseExists())
-            return;
-
-        //REGISTER ON WALLET TRANSACTIONS
-        map.addObserver(this);
-
-        super.addObservers();
-
-    }
-
-    public void deleteObservers() {
-
-        super.deleteObservers();
-
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            return;
-
-        map.deleteObserver(this);
-    }
-
-    @Override
     public void getIntervalThis(long startBack, long endBack) {
 
-        // тут могут быть пустые элементы - пропустим их
-        Collection<Tuple2<String, String>> keysAll = ((TransactionMap) map).getFromToKeys(startBack, endBack);
-        Collection<Tuple2<String, String>> keys = new ArrayList<Tuple2<String, String>>();
-        for (Tuple2<String, String> key: keysAll) {
-
-            Object item = map.get(key);
-            if (item == null)
-                continue;
-
-            keys.add(key);
-
-        }
-
-        listSorted = new SortableList<Tuple2<String, String>, Transaction>(
-                map, keys);
+        super.getIntervalThis(startBack, endBack);
 
         DCSet dcSet = DCSet.getInstance();
-        for (Pair<Tuple2<String, String>, Transaction> item: listSorted) {
+        for (Pair<Tuple2<Long, Long>, Tuple2<Long, Transaction>> item: listSorted) {
             if (item.getB() == null) {
                 continue;
             }
 
-            item.getB().setDC_HeightSeq(dcSet);
-            item.getB().calcFee();
+            item.getB().b.setDC_HeightSeq(dcSet);
+            item.getB().b.calcFee();
         }
 
     }

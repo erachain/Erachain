@@ -21,35 +21,19 @@ public class WalletItemStatusesTableModel extends SortedListTableModelCls<Tuple2
     public static final int COLUMN_CONFIRMED = 4;
     public static final int COLUMN_FAVORITE = 5;
 
-    private SortableList<Tuple2<String, String>, StatusCls> statuses;
-
     public WalletItemStatusesTableModel() {
-        super(new String[]{"Key", "Name", "Creator", "Unique", "Confirmed", "Favorite"},
+        super(Controller.getInstance().wallet.database.getStatusMap(),
+                new String[]{"Key", "Name", "Creator", "Unique", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false, false}, false);
     }
 
     @Override
-    public SortableList<Tuple2<String, String>, StatusCls> getSortableList() {
-        return this.statuses;
-    }
-
-    public StatusCls getItem(int row) {
-        return this.statuses.get(row).getB();
-    }
-
-    @Override
-    public int getRowCount() {
-
-        return (this.statuses == null) ? 0 : this.statuses.size();
-    }
-
-    @Override
     public Object getValueAt(int row, int column) {
-        if (this.statuses == null || row > this.statuses.size() - 1) {
+        if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
 
-        Pair<Tuple2<String, String>, StatusCls> res = this.statuses.get(row);
+        Pair<Tuple2<String, String>, StatusCls> res = this.listSorted.get(row);
         if (res == null)
             return null;
 
@@ -92,24 +76,32 @@ public class WalletItemStatusesTableModel extends SortedListTableModelCls<Tuple2
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.LIST_STATUS_TYPE) {
             this.fireTableDataChanged();
-        } else
-
-        if (message.getType() == ObserverMessage.ADD_STATUS_TYPE || message.getType() == ObserverMessage.REMOVE_STATUS_TYPE) {
+        } else if (message.getType() == ObserverMessage.ADD_STATUS_TYPE || message.getType() == ObserverMessage.REMOVE_STATUS_TYPE) {
+            //CHECK IF LIST UPDATED
             needUpdate = true;
         } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
-                this.fireTableDataChanged();
-                needUpdate = false;
+            needUpdate = false;
+            this.fireTableDataChanged();
         }
     }
 
     public void addObservers() {
 
         super.addObservers();
-        Controller.getInstance().addWalletObserver(this);
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.addObserver(this);
+
     }
 
     public void deleteObservers() {
         super.deleteObservers();
-        Controller.getInstance().deleteObserver(this);
+
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            return;
+
+        map.deleteObserver(this);
     }
 }

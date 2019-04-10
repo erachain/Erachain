@@ -321,6 +321,9 @@ public class Synchronizer {
             if (cnt.isOnStopping())
                 throw new Exception("on stopping");
 
+            // THROWN is new Better Peer
+            cnt.checkNewBetterPeer(peer);
+
             // ADD ORPHANED TRANSACTIONS
             // orphanedTransactions.addAll(lastBlock.getTransactions());
             for (Transaction transaction : lastBlock.getTransactions()) {
@@ -341,6 +344,9 @@ public class Synchronizer {
         // PROCESS THE NEW BLOCKS
         LOGGER.debug("*** synchronize PROCESS NEW blocks.size:" + newBlocks.size());
         for (Block block : newBlocks) {
+
+            // THROWN is new Better Peer
+            cnt.checkNewBetterPeer(peer);
 
             if (cnt.isOnStopping())
                 throw new Exception("on stopping");
@@ -447,6 +453,9 @@ public class Synchronizer {
                     blockBuffer.stopThread();
                     throw new Exception("on stopping");
                 }
+
+                // THROWN is new Better Peer
+                cnt.checkNewBetterPeer(peer);
 
                 // GET BLOCK
                 LOGGER.debug("try get BLOCK from BUFFER");

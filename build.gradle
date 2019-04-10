@@ -120,13 +120,20 @@ sourceSets {
         java {
             srcDir 'src/main/java'
         }
+        resources {
+            srcDir 'ERA/resources'
+        }
     }
 
     test {
         java {
             srcDir 'src/test/java'
         }
+        resources {
+            srcDir 'ERA/resources'
+        }
     }
+
 }
 
 build {

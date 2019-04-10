@@ -1310,10 +1310,14 @@ public class Controller extends Observable {
 
     }
 
+    public boolean newPeerConnected;
+
     /**
      * учет времени полного длисконекта ноды
      */
     public void actionAfterConnect() {
+
+        newPeerConnected = true;
 
         if (this.connectTimer == null) {
             this.connectTimer = new Timer("Action after connect");
@@ -1704,6 +1708,33 @@ public class Controller extends Observable {
 
     public boolean isNSUpToDate() {
         return !Settings.getInstance().updateNameStorage();
+    }
+
+
+    public synchronized void checkNewBetterPeer(Peer currentBetterPeer) throws Exception {
+
+        if (!newPeerConnected)
+            return;
+
+        newPeerConnected = false;
+
+        Tuple3<Integer, Long, Peer> betterPeerHW = this.getMaxPeerHWeight(0, true);
+        if (betterPeerHW != null) {
+            Tuple2<Integer, Long> currentHW = getHWeightOfPeer(currentBetterPeer);
+            if (currentHW != null && (currentHW.a > betterPeerHW.a || currentHW.b >= betterPeerHW.b
+                || currentBetterPeer.equals(betterPeerHW.c))) {
+                // новый пир не лучше - продолжим синхронизацию не прерываясь
+                return;
+            }
+        } else {
+            // пиров нет вообще - прекратим синхронизацию
+            throw new Exception("peer is unconnected");
+        }
+
+        if (this.blockGenerator.checkWeightPeers()) {
+            throw new Exception("New Better Peer is found " + betterPeerHW.c);
+        }
+
     }
 
     public void update(int shift) {
