@@ -1721,8 +1721,8 @@ public class Controller extends Observable {
         Tuple3<Integer, Long, Peer> betterPeerHW = this.getMaxPeerHWeight(0, true);
         if (betterPeerHW != null) {
             Tuple2<Integer, Long> currentHW = getHWeightOfPeer(currentBetterPeer);
-            if (currentHW.a > betterPeerHW.a || currentHW.b >= betterPeerHW.b
-                || currentBetterPeer.equals(betterPeerHW.c)) {
+            if (currentHW != null && (currentHW.a > betterPeerHW.a || currentHW.b >= betterPeerHW.b
+                || currentBetterPeer.equals(betterPeerHW.c))) {
                 // новый пир не лучше - продолжим синхронизацию не прерываясь
                 return;
             }
