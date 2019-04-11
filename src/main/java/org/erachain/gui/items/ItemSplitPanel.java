@@ -23,8 +23,8 @@ public class ItemSplitPanel extends SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
     protected SortedListTableModelCls table_Model;
     protected JMenuItem favorite_menu_items;
-    protected JPopupMenu menu_Table;
-    protected ItemCls item_Menu;
+    protected JPopupMenu menuTable;
+    protected ItemCls itemMenu;
     protected ItemCls item_Table_Selected = null;
     protected TableColumnModel tableColumnMode;
 
@@ -88,7 +88,7 @@ public class ItemSplitPanel extends SplitPanel {
                     return;
 
                 try {
-                    jScrollPane_jPanel_RightPanel.setViewportView(get_show(item_Table_Selected));
+                    jScrollPane_jPanel_RightPanel.setViewportView(getShow(item_Table_Selected));
                 } catch (Exception e) {
                     jScrollPane_jPanel_RightPanel.setViewportView(null);
                 }
@@ -126,7 +126,7 @@ public class ItemSplitPanel extends SplitPanel {
             }
         });
 
-        menu_Table = new JPopupMenu();
+        menuTable = new JPopupMenu();
         // favorite menu
         favorite_menu_items = new JMenuItem();
         favorite_menu_items.addActionListener(new ActionListener() {
@@ -138,7 +138,7 @@ public class ItemSplitPanel extends SplitPanel {
             }
         });
 
-        menu_Table.addPopupMenuListener(new PopupMenuListener() {
+        menuTable.addPopupMenuListener(new PopupMenuListener() {
 
             @Override
             public void popupMenuCanceled(PopupMenuEvent arg0) {
@@ -157,13 +157,13 @@ public class ItemSplitPanel extends SplitPanel {
                 // TODO Auto-generated method stub
 
                 // TODO Auto-generated method stub
-                item_Menu = (ItemCls) table_Model.getItem(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+                itemMenu = (ItemCls) table_Model.getItem(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 
                 // IF ASSET CONFIRMED AND NOT ERM
 
                 favorite_menu_items.setVisible(true);
                 // CHECK IF FAVORITES
-                if (Controller.getInstance().isItemFavorite(item_Menu)) {
+                if (Controller.getInstance().isItemFavorite(itemMenu)) {
                     favorite_menu_items.setText(Lang.getInstance().translate("Remove Favorite"));
                 } else {
                     favorite_menu_items.setText(Lang.getInstance().translate("Add Favorite"));
@@ -174,8 +174,8 @@ public class ItemSplitPanel extends SplitPanel {
 
         });
 
-        menu_Table.add(favorite_menu_items);
-        TableMenuPopupUtil.installContextMenu(jTable_jScrollPanel_LeftPanel, menu_Table);
+        menuTable.add(favorite_menu_items);
+        TableMenuPopupUtil.installContextMenu(jTable_jScrollPanel_LeftPanel, menuTable);
         jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
 
     }
@@ -200,7 +200,7 @@ public class ItemSplitPanel extends SplitPanel {
 
     }
 
-    protected Component get_show(ItemCls item) {
+    protected Component getShow(ItemCls item) {
         return null;
 
     }

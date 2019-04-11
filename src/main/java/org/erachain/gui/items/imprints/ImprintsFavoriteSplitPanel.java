@@ -26,25 +26,25 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
         vsend_Coins_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new AccountSendDialog(null, null, null, (PersonCls) th.item_Menu);
+                new AccountSendDialog(null, null, null, (PersonCls) th.itemMenu);
             }
         });
 
-        th.menu_Table.add(vsend_Coins_Item);
+        th.menuTable.add(vsend_Coins_Item);
         JMenuItem send_Mail_Item = new JMenuItem(Lang.getInstance().translate("Send Mail"));
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new MailSendDialog(null, null, null, (PersonCls) th.item_Menu);
+                new MailSendDialog(null, null, null, (PersonCls) th.itemMenu);
             }
         });
 
-        th.menu_Table.add(send_Mail_Item);
+        th.menuTable.add(send_Mail_Item);
     }
 
     // show details
     @Override
-    public Component get_show(ItemCls item) {
+    public Component getShow(ItemCls item) {
         return new ImprintsInfoPanel((ImprintCls) item);
     }
 

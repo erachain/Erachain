@@ -17,8 +17,8 @@ public class SearchItemSplitPanel extends ItemSplitPanel {
     protected SearchItemsTableModel search_Table_Model;
     private MDecimalFormatedTextField key_Item;
 //	protected JMenuItem favorite_menu_items;
-//	protected JPopupMenu menu_Table;
-//	protected ItemCls item_Menu;
+//	protected JPopupMenu menuTable;
+//	protected ItemCls itemMenu;
 //	protected ItemCls item_Table_Selected = null;
 
     @SuppressWarnings("rawtypes")

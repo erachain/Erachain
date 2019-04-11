@@ -15,58 +15,54 @@ import java.awt.event.ActionListener;
 
 public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    //private static FavoriteAssetsTableModel table_Model = ;
-    private AssetsFavoriteSplitPanel th;
 
     public AssetsFavoriteSplitPanel() {
         super(new FavoriteAssetsTableModel(), "AssetsFavoriteSplitPanel");
-        this.setName(Lang.getInstance().translate("Favorite Assets"));
+        setName(Lang.getInstance().translate("Favorite Assets"));
 
-        th = this;
         JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
 
         sell.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new ExchangeFrame((AssetCls) th.item_Menu, null, "To sell", "");
+                new ExchangeFrame((AssetCls) itemMenu, null, "To sell", "");
             }
         });
 
-        JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
-        excahge.addActionListener(new ActionListener() {
+        JMenuItem exchange = new JMenuItem(Lang.getInstance().translate("Exchange"));
+        exchange.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new ExchangeFrame((AssetCls) th.item_Menu, null, "", "");
+                new ExchangeFrame((AssetCls) itemMenu, null, "", "");
             }
         });
 
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new ExchangeFrame((AssetCls) th.item_Menu, null, "Buy", "");
+                new ExchangeFrame((AssetCls) itemMenu, null, "Buy", "");
             }
         });
 
-        JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
-        vouch_menu.addActionListener(new ActionListener() {
+        JMenuItem vouchMenu = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        vouchMenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 DCSet db = DCSet.getInstance();
-                Transaction trans = db.getTransactionFinalMap()
-                        .get(((AssetCls) th.item_Menu).getReference());
-                new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
+                Transaction transaction = db.getTransactionFinalMap().get(itemMenu.getReference());
+                new VouchRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
 
             }
         });
-        th.menu_Table.addSeparator();
-        th.menu_Table.add(excahge);
-        th.menu_Table.addSeparator();
-        th.menu_Table.add(buy);
-        th.menu_Table.add(sell);
-        th.menu_Table.addSeparator();
-        th.menu_Table.add(vouch_menu);
+        menuTable.addSeparator();
+        menuTable.add(exchange);
+        menuTable.addSeparator();
+        menuTable.add(buy);
+        menuTable.add(sell);
+        menuTable.addSeparator();
+        menuTable.add(vouchMenu);
     }
 
     // show details
     @Override
-    public Component get_show(ItemCls item) {
+    public Component getShow(ItemCls item) {
         return new AssetInfo((AssetCls) item);
     }
 

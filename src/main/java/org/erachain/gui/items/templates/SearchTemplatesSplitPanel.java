@@ -30,19 +30,19 @@ public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                TemplateCls template = (TemplateCls) th.item_Menu;
+                TemplateCls template = (TemplateCls) th.itemMenu;
                 if (template == null) return;
                 Transaction trans = DCSet.getInstance().getTransactionFinalMap().get(template.getReference());
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
             }
         });
-        this.menu_Table.add(vouch_Item);
+        this.menuTable.add(vouch_Item);
     }
 
 
     //show details
     @Override
-    protected Component get_show(ItemCls item) {
+    protected Component getShow(ItemCls item) {
         return new InfoTemplates((TemplateCls) item);
 
     }

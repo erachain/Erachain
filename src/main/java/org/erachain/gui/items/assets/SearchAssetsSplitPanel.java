@@ -34,7 +34,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
         sell.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new ExchangeFrame((AssetCls) th.item_Menu, null, "To sell", "");
+                new ExchangeFrame((AssetCls) th.itemMenu, null, "To sell", "");
             }
         });
 
@@ -42,7 +42,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new ExchangeFrame((AssetCls) th.item_Menu, null, "", "");
+                new ExchangeFrame((AssetCls) th.itemMenu, null, "", "");
             }
         });
 
@@ -50,7 +50,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new ExchangeFrame((AssetCls) th.item_Menu, null, "Buy", "");
+                new ExchangeFrame((AssetCls) th.itemMenu, null, "Buy", "");
             }
         });
 
@@ -59,7 +59,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 DCSet db = DCSet.getInstance();
-                Transaction trans = db.getTransactionFinalMap().get(th.item_Menu.getReference());
+                Transaction trans = db.getTransactionFinalMap().get(th.itemMenu.getReference());
 
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
 
@@ -69,18 +69,18 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
 
 //	nameSalesMenu.add(favorite);
         if (search_and_exchange) {
-            this.menu_Table.add(excahge);
-            this.menu_Table.addSeparator();
-            this.menu_Table.add(buy);
+            this.menuTable.add(excahge);
+            this.menuTable.addSeparator();
+            this.menuTable.add(buy);
 
-            this.menu_Table.add(sell);
-            this.menu_Table.addSeparator();
+            this.menuTable.add(sell);
+            this.menuTable.addSeparator();
 
-            this.menu_Table.addSeparator();
+            this.menuTable.addSeparator();
 
-            this.menu_Table.add(vouch_menu);
+            this.menuTable.add(vouch_menu);
         } else {
-            this.menu_Table.remove(this.favorite_menu_items);
+            this.menuTable.remove(this.favorite_menu_items);
         }
 
 
@@ -89,7 +89,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
 
     //show details
     @Override
-    protected Component get_show(ItemCls item) {
+    protected Component getShow(ItemCls item) {
 
         return new AssetInfo((AssetCls) item);
 
