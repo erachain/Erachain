@@ -60,7 +60,6 @@ public class IssueUnionPanel extends JPanel {
         initComponents();
 
 
-
         //BUTTON Register
 
 
@@ -105,7 +104,7 @@ public class IssueUnionPanel extends JPanel {
         try {
 
             //READ FEE POW
-            feePow = Integer.parseInt((String)this.txtFeePow.getSelectedItem());
+            feePow = Integer.parseInt((String) this.txtFeePow.getSelectedItem());
             // READ BIRTHDAY
             parse++;
             String bd = txtBirthday.getText();
@@ -190,13 +189,12 @@ public class IssueUnionPanel extends JPanel {
         setLayout(new GridBagLayout());
         GridBagConstraints gridBagConstraints;
 
-        addImageLabel = new AddImageLabel((Lang.getInstance().translate("Add image") +
-                (" (max %1%kB)").replace("%1%", "1024")),
-                WIDTH_IMAGE, HEIGHT_IMAGE,TypeOfImage.JPEG);
-        addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE,HEIGHT_IMAGE));
+        addImageLabel = new AddImageLabel((Lang.getInstance().translate("Add image")),
+                WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG);
+        addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
 
         addLogoLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
-                WIDTH_LOGO, HEIGHT_LOGO,TypeOfImage.GIF);
+                WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF);
         addLogoLabel.setPreferredSize(new Dimension(WIDTH_LOGO, HEIGHT_LOGO));
 
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -211,21 +209,25 @@ public class IssueUnionPanel extends JPanel {
         add(titleJLabel, gridBagConstraints);
 
 
-        addImageLabel.setPreferredSize(new java.awt.Dimension(250, 350));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridheight = 3;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(0, 12, 8, 8);
         add(addImageLabel, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.gridy = 5;
         add(addLogoLabel, gridBagConstraints);
 
-
+        issueButton.setText(Lang.getInstance().translate("Issue"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        add(issueButton, gridBagConstraints);
 
         accountJLabel.setText(Lang.getInstance().translate("Account") + ":");
         gridBagConstraints = new GridBagConstraints();
@@ -248,13 +250,13 @@ public class IssueUnionPanel extends JPanel {
         birthdayJLabel.setText(Lang.getInstance().translate("Birthday") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         add(birthdayJLabel, gridBagConstraints);
 
         feeJLabel.setText(Lang.getInstance().translate("Fee Power") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         add(feeJLabel, gridBagConstraints);
 
 
@@ -285,6 +287,7 @@ public class IssueUnionPanel extends JPanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.gridheight = 3;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
@@ -295,22 +298,22 @@ public class IssueUnionPanel extends JPanel {
         try {
             formatter = new MaskFormatter("####-##-##");
         } catch (ParseException e) {
-            logger.error("",e);
+            logger.error("", e);
         }
         txtBirthday = new JFormattedTextField(formatter);
         txtBirthday.setText("1970-12-08");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         add(txtBirthday, gridBagConstraints);
 
-        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
         txtFeePow.setSelectedIndex(0);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new Insets(0, 0, 10, 10);
@@ -319,23 +322,19 @@ public class IssueUnionPanel extends JPanel {
         parentJLabel.setText(Lang.getInstance().translate("Parent") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.insets = new Insets(0, 0, 7, 7);
         add(parentJLabel, gridBagConstraints);
 
         txtParent.setText("0");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         add(txtParent, gridBagConstraints);
 
-        issueButton.setText(Lang.getInstance().translate("Issue"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 6;
-        add(issueButton, gridBagConstraints);
+
     }
 
 }

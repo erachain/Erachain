@@ -131,6 +131,7 @@ public class IssuePersonPanel extends JPanel {
 
         addImageLabel = new AddImageLabel(Lang.getInstance().translate("Add image"),
                 WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG);
+        addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
 
         // SET ONE TIME ZONE for Birthday
         TimeZone tz = TimeZone.getDefault();
@@ -150,8 +151,6 @@ public class IssuePersonPanel extends JPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 8;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new Insets(8, 6, 6, 9);
         mainPanel.add(titleJLabel, gridBagConstraints);
 
 
@@ -410,7 +409,6 @@ public class IssuePersonPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.05;
-        addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
         jPanelHead.add(addImageLabel, gridBagConstraints);
 
         txtareaDescription.setColumns(20);

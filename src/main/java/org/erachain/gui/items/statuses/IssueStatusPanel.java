@@ -45,9 +45,6 @@ public class IssueStatusPanel extends JPanel {
                 WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF);
         addLogoIconPanel.setPreferredSize(new Dimension(WIDTH_LOGO, HEIGHT_LOGO));
 
-
-
-
         JLabel labelCaption = new JLabel();
         labelCaption.setFont(FONT_TITLE);
         labelCaption.setText(Lang.getInstance().translate("Create Status"));
@@ -56,35 +53,29 @@ public class IssueStatusPanel extends JPanel {
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 6;
+        gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.3;
-        gridBagConstraints.insets = new Insets(8, 15, 8, 15);
         add(labelCaption, gridBagConstraints);
 
 
         GridBagConstraints gbcAddImagePanel = new GridBagConstraints();
         gbcAddImagePanel.gridx = 0;
         gbcAddImagePanel.gridy = 1;
-        gbcAddImagePanel.gridheight = 2;
-        gbcAddImagePanel.anchor = GridBagConstraints.CENTER;
+        gbcAddImagePanel.gridheight = 3;
+        gbcAddImagePanel.insets = new Insets(0, 12, 8, 8);
         add(addImageLabel, gbcAddImagePanel);
 
         GridBagConstraints gbcAddLogoIconPanel = new GridBagConstraints();
         gbcAddLogoIconPanel.gridx = 0;
-        gbcAddLogoIconPanel.gridy = 4;
-        gbcAddLogoIconPanel.anchor = GridBagConstraints.EAST;
-        gbcAddLogoIconPanel.insets = new Insets(0, 0, 5, 5);
+        gbcAddLogoIconPanel.gridy = 5;
         add(addLogoIconPanel, gbcAddLogoIconPanel);
 
         issueButton = new JButton(Lang.getInstance().translate("Issue"));
         issueButton.addActionListener(e -> onIssueClick());
         GridBagConstraints gbcIssueButton = new GridBagConstraints();
-        gbcIssueButton.insets = new Insets(0, 0, 5, 5);
         gbcIssueButton.gridx = 0;
-        gbcIssueButton.gridy = 6;
-        gbcIssueButton.gridwidth = 3;
+        gbcIssueButton.gridy = 8;
+        gbcIssueButton.gridwidth = 5;
         gbcIssueButton.anchor = GridBagConstraints.CENTER;
         add(issueButton, gbcIssueButton);
 
@@ -92,6 +83,7 @@ public class IssueStatusPanel extends JPanel {
         GridBagConstraints gbcFromLabel = new GridBagConstraints();
         gbcFromLabel.gridx = 1;
         gbcFromLabel.gridy = 1;
+        gbcFromLabel.anchor = GridBagConstraints.NORTHEAST;
         add(fromLabel, gbcFromLabel);
 
         JLabel nameLabel = new JLabel(
@@ -99,26 +91,28 @@ public class IssueStatusPanel extends JPanel {
         GridBagConstraints gbcNameLabel = new GridBagConstraints();
         gbcNameLabel.gridx = 1;
         gbcNameLabel.gridy = 2;
-        gbcNameLabel.anchor = GridBagConstraints.WEST;
+        gbcNameLabel.anchor = GridBagConstraints.NORTHEAST;
         add(nameLabel, gbcNameLabel);
 
         JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
         GridBagConstraints gbcDescriptionLabel = new GridBagConstraints();
         gbcDescriptionLabel.gridx = 1;
         gbcDescriptionLabel.gridy = 3;
-        gbcDescriptionLabel.anchor = GridBagConstraints.NORTHWEST;
+        gbcDescriptionLabel.anchor = GridBagConstraints.NORTHEAST;
         add(descriptionLabel, gbcDescriptionLabel);
 
         JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + " (0..6)" + ":");
         GridBagConstraints gbcFeeLabel = new GridBagConstraints();
         gbcFeeLabel.gridx = 1;
-        gbcFeeLabel.gridy = 4;
+        gbcFeeLabel.gridy = 6;
+        gbcFeeLabel.anchor = GridBagConstraints.NORTHEAST;
         add(feeLabel, gbcFeeLabel);
 
         JLabel singleLabel = new JLabel(Lang.getInstance().translate("Single") + ":");
         GridBagConstraints gbcSingleLabel = new GridBagConstraints();
         gbcSingleLabel.gridx = 1;
-        gbcSingleLabel.gridy = 5;
+        gbcSingleLabel.gridy = 7;
+        gbcSingleLabel.anchor = GridBagConstraints.NORTHEAST;
         add(singleLabel, gbcSingleLabel);
 
 
@@ -127,16 +121,16 @@ public class IssueStatusPanel extends JPanel {
         GridBagConstraints gbcCbxFrom = new GridBagConstraints();
         gbcCbxFrom.gridx = 2;
         gbcCbxFrom.gridy = 1;
-        gbcCbxFrom.gridwidth = 2;
         gbcCbxFrom.fill = GridBagConstraints.HORIZONTAL;
+        gbcCbxFrom.gridwidth = 3;
         add(cbxFrom, gbcCbxFrom);
 
 
         GridBagConstraints gbcTxtName = new GridBagConstraints();
         gbcTxtName.gridx = 2;
         gbcTxtName.gridy = 2;
-        gbcTxtName.fill = GridBagConstraints.BOTH;
-        gbcTxtName.gridwidth = 2;
+        gbcTxtName.fill = GridBagConstraints.HORIZONTAL;
+        gbcTxtName.gridwidth = 3;
         add(txtName, gbcTxtName);
 
 
@@ -151,7 +145,8 @@ public class IssueStatusPanel extends JPanel {
         gbcScrollDescription.fill = GridBagConstraints.BOTH;
         gbcScrollDescription.weightx = 0.1;
         gbcScrollDescription.weighty = 0.1;
-        gbcScrollDescription.gridwidth = 2;
+        gbcScrollDescription.gridwidth = 3;
+        gbcScrollDescription.gridheight = 3;
         scrollDescription.setViewportView(txtareaDescription);
         add(scrollDescription, gbcScrollDescription);
 
@@ -160,18 +155,17 @@ public class IssueStatusPanel extends JPanel {
         txtFeePow.setSelectedIndex(0);
         GridBagConstraints gbcTxtFeePow = new GridBagConstraints();
         gbcTxtFeePow.gridx = 2;
-        gbcTxtFeePow.gridy = 4;
+        gbcTxtFeePow.gridy = 6;
         gbcTxtFeePow.fill = GridBagConstraints.HORIZONTAL;
-        gbcTxtFeePow.gridwidth = 2;
+        gbcTxtFeePow.gridwidth = 3;
         add(txtFeePow, gbcTxtFeePow);
 
 
         jcheckUnique = new JCheckBox();
         GridBagConstraints gbcJCheckUnique = new GridBagConstraints();
-        gbcJCheckUnique.anchor = GridBagConstraints.WEST;
-        gbcJCheckUnique.insets = new Insets(0, 0, 5, 5);
         gbcJCheckUnique.gridx = 2;
-        gbcJCheckUnique.gridy = 5;
+        gbcJCheckUnique.gridy = 7;
+        gbcJCheckUnique.anchor = GridBagConstraints.NORTHEAST;
         add(jcheckUnique, gbcJCheckUnique);
 
 

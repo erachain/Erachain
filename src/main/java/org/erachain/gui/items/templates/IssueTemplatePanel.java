@@ -160,7 +160,7 @@ public class IssueTemplatePanel extends JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(0, 0, 6, 8);
+        gridBagConstraints.insets = new Insets(0, 12, 8, 8);
         add(addImageLabel, gridBagConstraints);
 
         addLogoIconPanel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
