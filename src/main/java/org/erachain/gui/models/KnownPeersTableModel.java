@@ -18,11 +18,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
 
-@SuppressWarnings("serial")
 public class KnownPeersTableModel extends AbstractTableModel implements Observer {
 
-    //	private static final int COLUMN_ADDRESS = 0;
-//	public static final int COLUMN_CONNECTED = 1;
     private static final int COLUMN_ADDRESS = 0;
     private static final int COLUMN_HEIGHT = 1;
     private static final int COLUMN_PINGMC = 2;
@@ -31,47 +28,41 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
     private static final int COLUMN_FINDING_AGO = 5;
     private static final int COLUMN_ONLINE_TIME = 6;
     private static final int COLUMN_VERSION = 7;
-    static Logger LOGGER = LoggerFactory.getLogger(KnownPeersTableModel.class.getName());
-    //	private String[] columnNames = {"IP", Lang.getInstance().translate("Connected now")};
-//	String[] columnNames = new String[]{"IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago", "Online Time", "Version"};
-    String[] columnNames = Lang.getInstance().translate(new String[]{"IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago", "Online Time", "Version"});
+    static Logger logger = LoggerFactory.getLogger(KnownPeersTableModel.class.getName());
+    String[] columnNames = Lang.getInstance().translate(new String[]{"IP", "Height",
+            "Ping mc", "Reliable", "Initiator", "Finding ago", "Online Time", "Version"});
     private List<Peer> peers;
-    private ArrayList<Boolean> peersStatus = new ArrayList<Boolean>();
+    private List<Boolean> peersStatus = new ArrayList<Boolean>();
 
-    @SuppressWarnings("unused")
     public KnownPeersTableModel() {
         peers = Settings.getInstance().getKnownPeers();
-
-        for (Peer peer : peers) {
+        for (int i = 0; i < peers.size(); i++) {
             peersStatus.add(false);
         }
         Controller.getInstance().addActivePeersObserver(this);
     }
 
     public List<String> getPeers() {
-        List<String> peersstr = new ArrayList<String>();
+        List<String> result = new ArrayList<String>();
         for (Peer peer : peers) {
-            peersstr.add(peer.getAddress().getHostAddress());
+            result.add(peer.getAddress().getHostAddress());
         }
-        return peersstr;
+        return result;
     }
 
     public void addAddress(String address) {
-        InetAddress address1;
         try {
-            address1 = InetAddress.getByName(address);
-            Peer peer = new Peer(address1);
+            Peer peer = new Peer(InetAddress.getByName(address));
             peers.add(peer);
             peersStatus.add(false);
-            this.fireTableDataChanged();
+            fireTableDataChanged();
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
     }
 
     public void deleteAddress(int row) {
-        String address = this.getValueAt(row, 0).toString();
+        String address = getValueAt(row, 0).toString();
         int n = JOptionPane.showConfirmDialog(
                 new JFrame(), Lang.getInstance().translate("Do you want to remove address %address%?").replace("%address%", address),
                 Lang.getInstance().translate("Confirmation"),
@@ -79,7 +70,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
         if (n == JOptionPane.YES_OPTION) {
             peers.remove(row);
             peersStatus.remove(row);
-            this.fireTableDataChanged();
+            fireTableDataChanged();
         }
     }
 
@@ -98,49 +89,25 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
         if (peers == null) {
             return 0;
         }
-
         return peers.size();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-	/*	if(peers == null)
-		{
-			return null;
-		}
-		
-		Peer peer = peers.get(row);
-		if  (peer == null)
-			return null;
-
-		Boolean peerStatus = peersStatus.get(row);
-		if  (peerStatus == null)
-			return null;
-
-		switch(column)
-		{
-			case COLUMN_ADDRESS:
-				return peer.getAddress().getHostAddress().toString();
-			
-			case COLUMN_CONNECTED:
-				return peersStatus;
-		}
-		
-		return null;
-		*/
-
-        if (peers == null || this.peers.size() - 1 < row) {
+        if (peers == null || peers.size() - 1 < row) {
             return null;
         }
 
         Peer peer = peers.get(row);
 
-        if (peer == null || DCSet.getInstance().isStoped())
+        if (peer == null || DCSet.getInstance().isStoped())  {
             return null;
+        }
 
         PeerInfo peerInfo = Controller.getInstance().getDBSet().getPeerMap().getInfo(peer.getAddress());
-        if (peerInfo == null)
+        if (peerInfo == null){
             return null;
+        }
 
         switch (column) {
             case COLUMN_ADDRESS:
