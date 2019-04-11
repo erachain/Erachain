@@ -23,7 +23,7 @@ import java.util.*;
  */
 public abstract class DCMap<T, U> extends DBMap<T, U> {
 
-    static Logger LOGGER = LoggerFactory.getLogger(DCMap.class.getName());
+    protected Logger LOGGER;
     protected DCMap<T, U> parent;
     protected List<T> deleted;
     private int shiftSize;
@@ -33,7 +33,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
     }
 
     public DCMap(DCMap<T, U> parent, IDB dcSet) {
-        super();
+        super(dcSet);
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
@@ -47,7 +47,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
 
         this.parent = parent;
 
-        this.databaseSet = dcSet;
+        //this.databaseSet = dcSet;
 
         // OPEN MAP
         this.map = this.getMemoryMap();

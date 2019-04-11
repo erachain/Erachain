@@ -1,7 +1,5 @@
 package org.erachain.database;
 
-import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
@@ -31,7 +29,16 @@ public abstract class DBMap<T, U> extends Observable {
 
     protected Map<Integer, Integer> observableData;
 
-    public DBMap() {
+    public DBMap(IDB databaseSet) {
+
+        this.databaseSet = databaseSet;
+
+        //CREATE INDEXES
+        this.indexes = new HashMap<Integer, NavigableSet<Tuple2<?, T>>>();
+
+        if (databaseSet != null && databaseSet.isWithObserver()) {
+            observableData = new HashMap<Integer, Integer>(8, 1);
+        }
     }
 
     public DBMap(IDB databaseSet, DB database) {
@@ -42,7 +49,10 @@ public abstract class DBMap<T, U> extends Observable {
 
         //CREATE INDEXES
         this.indexes = new HashMap<Integer, NavigableSet<Tuple2<?, T>>>();
-        this.createIndexes(database);
+
+        if (this.map !=  null) {
+            this.createIndexes(database);
+        }
 
         if (databaseSet.isWithObserver()) {
             observableData = new HashMap<Integer, Integer>(8, 1);

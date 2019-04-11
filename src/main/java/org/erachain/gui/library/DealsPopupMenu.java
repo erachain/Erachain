@@ -447,10 +447,6 @@ public class DealsPopupMenu extends JPopupMenu {
                 this.debtAssetBackward.setVisible(true);
 
                 break;
-
         }
-
     }
-
-
 }
