@@ -17,7 +17,12 @@ import java.util.Map;
 public class IssueAssetTransaction extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
     private static final String NAME_ID = "Issue Asset";
-    public static final long START_KEY = 1000L;
+
+    public static final long START_KEY = 1000l; // << 20;
+
+    //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
+
+    //private AssetCls asset;
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference);
@@ -50,6 +55,11 @@ public class IssueAssetTransaction extends IssueItemRecord {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, asset, feePow, timestamp, reference);
     }
 
+    //GETTERS/SETTERS
+    //public static String getName() { return "Issue Asset"; }
+
+
+    // RETURN START KEY in tot GEMESIS
     public long getStartKey(int height) {
         if (height < BlockChain.VERS_4_11) {
             return 1000L;
@@ -59,6 +69,9 @@ public class IssueAssetTransaction extends IssueItemRecord {
     }
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
+        //boolean asPack = releaserReference != null;
+
+        //CHECK IF WE MATCH BLOCK LENGTH
         int test_len;
         if (asDeal == Transaction.FOR_MYPACK) {
             test_len = BASE_LENGTH_AS_MYPACK;
@@ -117,6 +130,8 @@ public class IssueAssetTransaction extends IssueItemRecord {
         //READ ASSET
         // asset parse without reference - if is = signature
         AssetCls asset = AssetFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+        position += asset.getDataLength(false);
+
         if (asDeal > Transaction.FOR_MYPACK) {
             return new IssueAssetTransaction(typeBytes, creator, asset, feePow, timestamp, reference, signatureBytes, feeLong);
         } else {
@@ -142,6 +157,33 @@ public class IssueAssetTransaction extends IssueItemRecord {
         return BigDecimal.ZERO.setScale(asset.getScale());
     }
 
+	/*
+	@Override
+	public BigDecimal getAmount(Account account) {
+		String address = account.getAddress();
+		return getAmount(address);
+	}
+	 */
+
+	/*
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        super.setDC(dcSet, asDeal, blockHeight, seqNo);
+
+        AssetCls asset = (AssetCls) this.item;
+
+        if (false && dcSet.getItemAssetMap().getLastKey() < BlockChain.AMOUNT_SCALE_FROM) {
+            // MAKE OLD STYLE ASSET with DEVISIBLE:
+            // PROP1 = 0 (unMOVABLE, SCALE = 8, assetTYPE = 1 (divisible)
+            asset = new AssetVenture((byte) 0, asset.getOwner(), asset.getName(),
+                    asset.getIcon(), asset.getImage(), asset.getDescription(), AssetCls.AS_INSIDE_ASSETS, asset.getScale(), asset.getQuantity());
+            this.item = asset;
+        }
+
+    }
+    */
+
+    //VALIDATE
+
     @Override
     public String viewAmount(String address) {
         return this.getAmount().toString();
@@ -149,6 +191,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     //PARSE CONVERT
 
+    //@Override
     @Override
     public int isValid(int asDeal, long flags) {
 
@@ -157,9 +200,12 @@ public class IssueAssetTransaction extends IssueItemRecord {
             return result;
         }
         //CHECK QUANTITY
-        AssetCls asset = (AssetCls) getItem();
+        AssetCls asset = (AssetCls) this.getItem();
+        //long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;
+        long maxQuantity = Long.MAX_VALUE;
         long quantity = asset.getQuantity();
-        if (quantity < -1) {
+        //if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
+        if (quantity > maxQuantity || quantity < -1) {
             return INVALID_QUANTITY;
         }
         return Transaction.VALIDATE_OK;
@@ -177,6 +223,21 @@ public class IssueAssetTransaction extends IssueItemRecord {
     }
 
 
+	/*
+	//@Override
+	public byte[] toBytes(boolean withSign, byte[] releaserReference)
+	{
+
+		byte[] data = super.toBytes(withSign, releaserReference);
+
+		//WRITE ASSET
+		// without reference
+		data = Bytes.concat(data, this.asset.toBytes(false));
+
+		return data;
+	}
+	 */
+
     //PROCESS/ORPHAN
 
     //@Override
@@ -185,6 +246,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
         //UPDATE CREATOR
         super.process(block, asDeal);
         //ADD ASSETS TO OWNER
+        //this.creator.setBalance(this.getItem().getKey(db), new BigDecimal(((AssetCls)this.getItem()).getQuantity()).setScale(), db);
         AssetCls asset = (AssetCls) this.getItem();
         long quantity = asset.getQuantity();
         if (quantity > 0) {
@@ -208,7 +270,8 @@ public class IssueAssetTransaction extends IssueItemRecord {
         AssetCls asset = (AssetCls) this.getItem();
         long quantity = asset.getQuantity();
         if (quantity > 0) {
-            creator.changeBalance(dcSet, true, asset.getKey(dcSet),
+            //this.creator.setBalance(this.getItem().getKey(db), BigDecimal.ZERO.setScale(), db);
+            this.creator.changeBalance(this.dcSet, true, asset.getKey(this.dcSet),
                     new BigDecimal(quantity).setScale(0), false);
 
             creator.changeBalance(dcSet, true, asset.getKey(dcSet),
@@ -216,6 +279,36 @@ public class IssueAssetTransaction extends IssueItemRecord {
         }
     }
 
+	/*
+	@Override
+	public HashSet<Account> getInvolvedAccounts()
+	{
+		return this.getRecipientAccounts();
+	}
+
+	@Override
+	public HashSet<Account> getRecipientAccounts()
+	{
+		HashSet<Account> accounts = new HashSet<>();
+		accounts.add(this.creator);
+		return accounts;
+	}
+
+	@Override
+	public boolean isInvolved(Account account)
+	{
+		String address = account.getAddress();
+
+		if(address.equals(this.creator.getAddress()))
+		{
+			return true;
+		}
+
+		return false;
+	}
+	 */
+
+    //@Override
     public Map<String, Map<Long, BigDecimal>> getAssetAmount() {
         Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
         assetAmount = subAssetAmount(assetAmount, creator.getAddress(), FEE_KEY, fee);
