@@ -228,6 +228,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         if (person.isAlive(this.timestamp)) {
             // IF PERSON is LIVE
             if (person.getImage().length > MAX_IMAGE_LENGTH) {
+                //int height = this.getBlockHeightByParent(this.dcSet);
                 if (!(!BlockChain.DEVELOP_USE && height == 2998) && height > 157640) {
                     // early blocks has wrong ISSUE_PERSON with 0 image length - in block 2998
                     return Transaction.INVALID_IMAGE_LENGTH;

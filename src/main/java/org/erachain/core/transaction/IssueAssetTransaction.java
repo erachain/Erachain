@@ -26,6 +26,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference);
+        //this.asset = asset;
     }
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -250,11 +251,11 @@ public class IssueAssetTransaction extends IssueItemRecord {
         AssetCls asset = (AssetCls) this.getItem();
         long quantity = asset.getQuantity();
         if (quantity > 0) {
-            creator.changeBalance(this.dcSet, false, asset.getKey(dcSet),
+            creator.changeBalance(dcSet, false, asset.getKey(dcSet),
                     new BigDecimal(quantity).setScale(0), false);
 
             // make HOLD balance
-            creator.changeBalance(this.dcSet, false, asset.getKey(dcSet),
+            creator.changeBalance(dcSet, false, asset.getKey(dcSet),
                     new BigDecimal(-quantity).setScale(0), false);
                 
         }
