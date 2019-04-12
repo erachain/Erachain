@@ -32,8 +32,8 @@ public class MyTemplatesTab extends SplitPanel {
         this.setName("My Template");
         searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
-        button1_ToolBar_LeftPanel.setVisible(false);
-        button2_ToolBar_LeftPanel.setVisible(false);
+        button1ToolBarLeftPanel.setVisible(false);
+        button2ToolBarLeftPanel.setVisible(false);
         jButton1_jToolBar_RightPanel.setVisible(false);
         jButton2_jToolBar_RightPanel.setVisible(false);
 
@@ -84,11 +84,11 @@ public class MyTemplatesTab extends SplitPanel {
 
 
         // add listener
-        //		jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(table);
+        //		jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(table);
         // show
-        this.jTable_jScrollPanel_LeftPanel.setModel(assetsModel);
-        this.jTable_jScrollPanel_LeftPanel = table;
-        jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+        this.jTableJScrollPanelLeftPanel.setModel(assetsModel);
+        this.jTableJScrollPanelLeftPanel = table;
+        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         // UPDATE FILTER ON TEXT CHANGE
         searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
@@ -122,7 +122,7 @@ public class MyTemplatesTab extends SplitPanel {
         });
 
 
-        this.jTable_jScrollPanel_LeftPanel.addComponentListener(new ComponentListener() {
+        this.jTableJScrollPanelLeftPanel.addComponentListener(new ComponentListener() {
 
             @Override
             public void componentHidden(ComponentEvent arg0) {
@@ -140,7 +140,7 @@ public class MyTemplatesTab extends SplitPanel {
             public void componentResized(ComponentEvent arg0) {
                 // TODO Auto-generated method stub
 
-                //	Table_Render("2", pair_Panel.jTable_jScrollPanel_LeftPanel);
+                //	Table_Render("2", pair_Panel.jTableJScrollPanelLeftPanel);
 
                 //		new Table_Formats().Table_Row_Auto_Height(table);
 

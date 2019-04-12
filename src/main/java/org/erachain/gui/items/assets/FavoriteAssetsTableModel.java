@@ -7,15 +7,14 @@ import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 
-@SuppressWarnings("serial")
 public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
-    public static final int COLUMN_ASSET_TYPE = 3;
+    private static final int COLUMN_ASSET_TYPE = 3;
     public static final int COLUMN_AMOUNT = 4;
     public static final int COLUMN_FAVORITE = 5;
-    public static final int COLUMN_I_OWNER = 6;
+    private static final int COLUMN_I_OWNER = 6;
 
     public FavoriteAssetsTableModel() {
         super(DCSet.getInstance().getItemAssetMap(),
@@ -31,46 +30,29 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.list == null || row > this.list.size() - 1) {
+        if (list == null || row >= list.size()) {
             return null;
         }
-
-        AssetCls asset = (AssetCls) this.list.get(row);
-        if (asset == null)
+        AssetCls asset = (AssetCls) list.get(row);
+        if (asset == null) {
             return null;
-
+        }
         switch (column) {
             case COLUMN_KEY:
-
                 return asset.getKey();
-
             case COLUMN_NAME:
-
                 return asset.viewName();
-
             case COLUMN_ADDRESS:
-
                 return asset.getOwner().getPersonAsString();
-
             case COLUMN_ASSET_TYPE:
-
                 return Lang.getInstance().translate(asset.viewAssetType());
-
             case COLUMN_AMOUNT:
-
                 return asset.getTotalQuantity(DCSet.getInstance());
-
             case COLUMN_FAVORITE:
-
                 return asset.isFavorite();
-
             case COLUMN_I_OWNER:
-
-                if (Controller.getInstance().isAddressIsMine(asset.getOwner().getAddress()))
-                    return true;
-                return false;
+                return Controller.getInstance().isAddressIsMine(asset.getOwner().getAddress());
         }
-
         return null;
     }
 

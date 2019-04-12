@@ -47,7 +47,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         this.setName(Lang.getInstance().translate("Search Records"));
 
         this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Insert height block or block-seqNo") + ":");
-        this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Insert account") + ":"));
+        this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Insert account") + ":"));
         sender_address = new JTextField();
         sender_address.setToolTipText("");
         sender_address.setAlignmentX(1.0F);
@@ -58,7 +58,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         MenuPopupUtil.installContextMenu(sender_address);
 
-        this.toolBar_LeftPanel.add(sender_address);
+        this.toolBarLeftPanel.add(sender_address);
         sender_address.addActionListener(new ActionListener() {
 
             @Override
@@ -71,16 +71,16 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         });
 
-        this.button1_ToolBar_LeftPanel.setVisible(false);
-        this.button2_ToolBar_LeftPanel.setVisible(false);
-        this.searth_Favorite_JCheckBox_LeftPanel.setVisible(false);
-        this.searth_My_JCheckBox_LeftPanel.setVisible(false);
+        this.button1ToolBarLeftPanel.setVisible(false);
+        this.button2ToolBarLeftPanel.setVisible(false);
+        this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
+        this.searchMyJCheckBoxLeftPanel.setVisible(false);
         this.jButton1_jToolBar_RightPanel.setVisible(false);
         this.jButton2_jToolBar_RightPanel.setVisible(false);
 
 
         // 	Records_Table_Model records_Model = new Records_Table_Model();
-        // 	this.jTable_jScrollPanel_LeftPanel = new JTable(records_Model);
+        // 	this.jTableJScrollPanelLeftPanel = new JTable(records_Model);
 
         MenuPopupUtil.installContextMenu(this.searchTextField_SearchToolBar_LeftPanel);
         this.searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener() {
@@ -97,9 +97,9 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         //TRANSACTIONS TABLE MODEL
         this.transactionsTableModel = new SearchTransactionsTableModel();
-        this.jTable_jScrollPanel_LeftPanel = new MTable(this.transactionsTableModel);
+        this.jTableJScrollPanelLeftPanel = new MTable(this.transactionsTableModel);
 
-        this.jTable_jScrollPanel_LeftPanel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        this.jTableJScrollPanelLeftPanel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
         // MENU
         JPopupMenu mainMenu = new JPopupMenu();
@@ -108,8 +108,8 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-                row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 Transaction trans = transactionsTableModel.getItem(row);
                 DCSet db = DCSet.getInstance();
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
@@ -125,8 +125,8 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-                row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 Transaction trans = transactionsTableModel.getItem(row);
                 if (trans == null) return;
                 // save
@@ -138,25 +138,25 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         mainMenu.add(item_Save);
 
-       // this.jTable_jScrollPanel_LeftPanel.setComponentPopupMenu(mainMenu);
-        TableMenuPopupUtil.installContextMenu(this.jTable_jScrollPanel_LeftPanel, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+       // this.jTableJScrollPanelLeftPanel.setComponentPopupMenu(mainMenu);
+        TableMenuPopupUtil.installContextMenu(this.jTableJScrollPanelLeftPanel, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
 
-        this.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
+        this.jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 
         //TRANSACTIONS SORTER
         //		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
         //		indexes.put(SearchTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
         //		CoreRowSorter sorter = new CoreRowSorter(transactionsTableModel, indexes);
-        //		this.jTable_jScrollPanel_LeftPanel.setRowSorter(sorter);
+        //		this.jTableJScrollPanelLeftPanel.setRowSorter(sorter);
 
         //TRANSACTION DETAILS
-        this.jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() {
+        this.jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     //GET ROW
-                    int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-                    row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                    int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                    row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
 
                     //GET TRANSACTION
                     Transaction transaction = transactionsTableModel.getItem(row);
@@ -167,7 +167,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             }
         });
 
-        this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);
+        this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
 
     }
 
@@ -176,7 +176,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         // delete observer left panel
         transactionsTableModel.deleteObservers();
         // get component from right panel
-        Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+        Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
         //		  if (c1.getClass() == this.info_Panel.getClass()) voush_Library_Panel.onClose();
 
@@ -198,16 +198,16 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             //создаем объект персоны
             UnionCls union;
             Transaction voting = null;
-            if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0) {
-                voting = (Transaction) transactionsTableModel.getItem(jTable_jScrollPanel_LeftPanel
-                        .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0) {
+                voting = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel
+                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
 
                 //	Person_info_panel_001 info_panel = new Person_info_panel_001(voting, false);
 
                 //	votingDetailsPanel = new VotingDetailPanel(voting, (AssetCls)allVotingsPanel.cbxAssets.getSelectedItem());
-                //	votingDetailsPanel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
-                //jScrollPane_jPanel_RightPanel.setHorizontalScrollBar(null);
-                //	jScrollPane_jPanel_RightPanel.setViewportView(votingDetailsPanel);
+                //	votingDetailsPanel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,jScrollPaneJPanelRightPanel.getSize().height-50));
+                //jScrollPaneJPanelRightPanel.setHorizontalScrollBar(null);
+                //	jScrollPaneJPanelRightPanel.setViewportView(votingDetailsPanel);
                 //jSplitPanel.setRightComponent(votingDetailsPanel);
 
 
@@ -255,7 +255,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
                 }
 
-                jScrollPane_jPanel_RightPanel.setViewportView(info_Panel);
+                jScrollPaneJPanelRightPanel.setViewportView(info_Panel);
 
             }
         }

@@ -8,12 +8,13 @@ import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
@@ -21,106 +22,91 @@ import java.awt.event.*;
 public class ItemSplitPanel extends SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
-    protected SortedListTableModelCls table_Model;
-    protected JMenuItem favorite_menu_items;
+    protected SortedListTableModelCls tableModel;
+    protected JMenuItem favoriteMenuItems;
     protected JPopupMenu menuTable;
     protected ItemCls itemMenu;
-    protected ItemCls item_Table_Selected = null;
-    protected TableColumnModel tableColumnMode;
+    protected ItemCls itemTableSelected = null;
+    private static Logger logger = LoggerFactory.getLogger(ItemSplitPanel.class.getName());
+
 
     @SuppressWarnings("rawtypes")
-    public ItemSplitPanel(SortedListTableModelCls table_Model1, String gui_Name) {
-
-        super(gui_Name);
-        this.table_Model = table_Model1;
+    public ItemSplitPanel(SortedListTableModelCls tableModel, String guiName) {
+        super(guiName);
+        this.tableModel = tableModel;
         // not show buttons
-        jToolBar_RightPanel.setVisible(false);
-        toolBar_LeftPanel.setVisible(true);
-        button1_ToolBar_LeftPanel.setVisible(false);
-        button2_ToolBar_LeftPanel.setVisible(false);
+        jToolBarRightPanel.setVisible(false);
+        toolBarLeftPanel.setVisible(true);
+        button1ToolBarLeftPanel.setVisible(false);
+        button2ToolBarLeftPanel.setVisible(false);
 
         // not show My filter
-        searth_My_JCheckBox_LeftPanel.setVisible(false);
-        searth_Favorite_JCheckBox_LeftPanel.setVisible(false);
+        searchMyJCheckBoxLeftPanel.setVisible(false);
+        searchFavoriteJCheckBoxLeftPanel.setVisible(false);
 
         // CREATE TABLE
-        jTable_jScrollPanel_LeftPanel = new MTable(this.table_Model);
-        TableColumnModel columnModel = jTable_jScrollPanel_LeftPanel.getColumnModel();
+        jTableJScrollPanelLeftPanel = new MTable(this.tableModel);
+        TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
         columnModel.getColumn(0).setMaxWidth((100));
 
         // hand cursor for Favorite column
-        jTable_jScrollPanel_LeftPanel.addMouseMotionListener(new MouseMotionListener() {
+        jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionAdapter() {
             public void mouseMoved(MouseEvent e) {
-
-                if (jTable_jScrollPanel_LeftPanel.columnAtPoint(e.getPoint()) == table_Model.COLUMN_FAVORITE) {
-                    jTable_jScrollPanel_LeftPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
+                if (jTableJScrollPanelLeftPanel.columnAtPoint(e.getPoint()) == ItemSplitPanel.this.tableModel.COLUMN_FAVORITE) {
+                    jTableJScrollPanelLeftPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 } else {
-                    jTable_jScrollPanel_LeftPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    jTableJScrollPanelLeftPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 }
-            }
-
-            public void mouseDragged(MouseEvent e) {
             }
         });
 
         // select row
-        jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+        jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(arg0 -> {
 
-            @Override
-            public void valueChanged(ListSelectionEvent arg0) {
-
-                if (jTable_jScrollPanel_LeftPanel == null || jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0) {
-                    jScrollPane_jPanel_RightPanel.setViewportView(null);
-                    return;
-                }
-                int row;
-                try {
-                    row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-
-                    item_Table_Selected = (ItemCls) table_Model.getItem(jTable_jScrollPanel_LeftPanel
-                            .convertRowIndexToModel(row));
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    return;
-                }
-                if (item_Table_Selected == null)
-                    return;
-
-                try {
-                    jScrollPane_jPanel_RightPanel.setViewportView(getShow(item_Table_Selected));
-                } catch (Exception e) {
-                    jScrollPane_jPanel_RightPanel.setViewportView(null);
-                }
-                //	item_Table_Selected = null;
-
+            if (jTableJScrollPanelLeftPanel == null || jTableJScrollPanelLeftPanel.getSelectedRow() < 0) {
+                jScrollPaneJPanelRightPanel.setViewportView(null);
+                return;
             }
+            try {
+                itemTableSelected = (ItemCls) ItemSplitPanel.this.tableModel.getItem(jTableJScrollPanelLeftPanel
+                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            } catch (Exception e) {
+                logger.error(e.getMessage(),e);
+                return;
+            }
+            if (itemTableSelected == null)  {
+                return;
+            }
+            try {
+                jScrollPaneJPanelRightPanel.setViewportView(getShow(itemTableSelected));
+            } catch (Exception e) {
+                jScrollPaneJPanelRightPanel.setViewportView(null);
+            }
+            //	itemTableSelected = null;
 
         });
 
         // UPDATE FILTER ON TEXT CHANGE
 
 
-        // jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+        // jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
         // mouse from favorine column
-        jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() {
-            @SuppressWarnings("static-access")
+        jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                Point p = e.getPoint();
-                int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
-                jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
-                row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-                ItemCls item = (ItemCls) table_Model.getItem(row);
+                Point point = e.getPoint();
+                int row = jTableJScrollPanelLeftPanel.rowAtPoint(point);
+                jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
+                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+                ItemCls item = (ItemCls) ItemSplitPanel.this.tableModel.getItem(row);
 
                 if (e.getClickCount() == 2) {
-                    table_mouse_2_Click(item);
+                    tableMouse2Click(item);
                 }
 
-                if (e.getClickCount() == 1 & e.getButton() == e.BUTTON1) {
-
-                    if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == table_Model.COLUMN_FAVORITE) {
-                        favorite_set(item);
+                if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
+                    if (jTableJScrollPanelLeftPanel.getSelectedColumn() == ItemSplitPanel.this.tableModel.COLUMN_FAVORITE) {
+                        favoriteSet(item);
                     }
                 }
             }
@@ -128,45 +114,37 @@ public class ItemSplitPanel extends SplitPanel {
 
         menuTable = new JPopupMenu();
         // favorite menu
-        favorite_menu_items = new JMenuItem();
-        favorite_menu_items.addActionListener(new ActionListener() {
+        favoriteMenuItems = new JMenuItem();
+        favoriteMenuItems.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-                row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-                favorite_set((ItemCls) table_Model.getItem(row));
+                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+                favoriteSet((ItemCls) ItemSplitPanel.this.tableModel.getItem(row));
 
             }
         });
 
-        menuTable.addPopupMenuListener(new PopupMenuListener() {
+        menuTable.addPopupMenuListener(new PopupMenuListener()
+         {
 
             @Override
             public void popupMenuCanceled(PopupMenuEvent arg0) {
-                // TODO Auto-generated method stub
-
             }
 
             @Override
             public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
-                // TODO Auto-generated method stub
-
             }
 
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
-                // TODO Auto-generated method stub
-
-                // TODO Auto-generated method stub
-                itemMenu = (ItemCls) table_Model.getItem(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
-
+                itemMenu = (ItemCls) ItemSplitPanel.this.tableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
                 // IF ASSET CONFIRMED AND NOT ERM
-
-                favorite_menu_items.setVisible(true);
+                favoriteMenuItems.setVisible(true);
                 // CHECK IF FAVORITES
                 if (Controller.getInstance().isItemFavorite(itemMenu)) {
-                    favorite_menu_items.setText(Lang.getInstance().translate("Remove Favorite"));
+                    favoriteMenuItems.setText(Lang.getInstance().translate("Remove Favorite"));
                 } else {
-                    favorite_menu_items.setText(Lang.getInstance().translate("Add Favorite"));
+                    favoriteMenuItems.setText(Lang.getInstance().translate("Add Favorite"));
                 }
 
             }
@@ -174,39 +152,36 @@ public class ItemSplitPanel extends SplitPanel {
 
         });
 
-        menuTable.add(favorite_menu_items);
-        TableMenuPopupUtil.installContextMenu(jTable_jScrollPanel_LeftPanel, menuTable);
-        jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+        menuTable.add(favoriteMenuItems);
+        TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menuTable);
+        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
     }
 
     @Override
     public void onClose() {
-        table_Model.deleteObservers();
+        tableModel.deleteObservers();
     }
 
-    public void favorite_set(ItemCls itemCls) {
-
+    private void favoriteSet(ItemCls itemCls) {
         // CHECK IF FAVORITES
         if (Controller.getInstance().isItemFavorite(itemCls)) {
-            int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
-
-            if (dd == 0) Controller.getInstance().removeItemFavorite(itemCls);
+            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+            if (showConfirmDialog == 0) {
+                Controller.getInstance().removeItemFavorite(itemCls);
+            }
         } else {
-
             Controller.getInstance().addItemFavorite(itemCls);
         }
-        jTable_jScrollPanel_LeftPanel.repaint();
+        ((DefaultTableModel) jTableJScrollPanelLeftPanel.getModel()).fireTableDataChanged();
 
     }
 
     protected Component getShow(ItemCls item) {
         return null;
-
     }
 
-    protected void table_mouse_2_Click(ItemCls item) {
-
+    protected void tableMouse2Click(ItemCls item) {
     }
 
 }

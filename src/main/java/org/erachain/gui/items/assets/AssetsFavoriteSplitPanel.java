@@ -22,34 +22,20 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
 
         JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
 
-        sell.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                new ExchangeFrame((AssetCls) itemMenu, null, "To sell", "");
-            }
-        });
+        sell.addActionListener(e -> new ExchangeFrame((AssetCls) itemMenu, null, "To sell", ""));
 
         JMenuItem exchange = new JMenuItem(Lang.getInstance().translate("Exchange"));
-        exchange.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                new ExchangeFrame((AssetCls) itemMenu, null, "", "");
-            }
-        });
+        exchange.addActionListener(e -> new ExchangeFrame((AssetCls) itemMenu, null, "", ""));
 
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
-        buy.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                new ExchangeFrame((AssetCls) itemMenu, null, "Buy", "");
-            }
-        });
+        buy.addActionListener(e -> new ExchangeFrame((AssetCls) itemMenu, null, "Buy", ""));
 
         JMenuItem vouchMenu = new JMenuItem(Lang.getInstance().translate("Vouch"));
-        vouchMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                DCSet db = DCSet.getInstance();
-                Transaction transaction = db.getTransactionFinalMap().get(itemMenu.getReference());
-                new VouchRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
+        vouchMenu.addActionListener(e -> {
+            DCSet db = DCSet.getInstance();
+            Transaction transaction = db.getTransactionFinalMap().get(itemMenu.getReference());
+            new VouchRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
 
-            }
         });
         menuTable.addSeparator();
         menuTable.add(exchange);

@@ -30,8 +30,8 @@ public class MyUnionsTab extends SplitPanel {
         setName(Lang.getInstance().translate("My Unions"));
         searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
-        button1_ToolBar_LeftPanel.setVisible(false);
-        button2_ToolBar_LeftPanel.setVisible(false);
+        button1ToolBarLeftPanel.setVisible(false);
+        button2ToolBarLeftPanel.setVisible(false);
         jButton1_jToolBar_RightPanel.setVisible(false);
         jButton2_jToolBar_RightPanel.setVisible(false);
         //TABLE
@@ -89,9 +89,9 @@ public class MyUnionsTab extends SplitPanel {
             }
         });
         // set show
-        jTable_jScrollPanel_LeftPanel.setModel(unionsModel);
-        jTable_jScrollPanel_LeftPanel = tableUnion;
-        jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+        jTableJScrollPanelLeftPanel.setModel(unionsModel);
+        jTableJScrollPanelLeftPanel = tableUnion;
+        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
         // new info panel
         UnionInfo info1 = new UnionInfo();
         // обработка изменения положения курсора в таблице
@@ -111,7 +111,7 @@ public class MyUnionsTab extends SplitPanel {
                 }
             }
         });
-        jScrollPane_jPanel_RightPanel.setViewportView(info1);
+        jScrollPaneJPanelRightPanel.setViewportView(info1);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class MyUnionsTab extends SplitPanel {
         // delete observer left panel
         unionsModel.deleteObservers();
         // get component from right panel
-        Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+        Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
         //  if (c1 instanceof StatementInfo) ( (StatementInfo)c1).delay_on_Close();
 

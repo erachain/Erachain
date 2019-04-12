@@ -31,15 +31,15 @@ public class SearchLinkedHash extends SplitPanel {
 
         this.jButton2_jToolBar_RightPanel.setVisible(false);
         this.jButton1_jToolBar_RightPanel.setVisible(false);
-        this.searth_Favorite_JCheckBox_LeftPanel.setVisible(false);
-        this.searth_My_JCheckBox_LeftPanel.setVisible(false);
+        this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
+        this.searchMyJCheckBoxLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(true);
         this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Hash"));
         this.searchTextField_SearchToolBar_LeftPanel.setMinimumSize(new Dimension(500, 20));
-        this.button2_ToolBar_LeftPanel.setVisible(false);
-        this.button1_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Search hash"));
+        this.button2ToolBarLeftPanel.setVisible(false);
+        this.button1ToolBarLeftPanel.setText(Lang.getInstance().translate("Search hash"));
 
-        this.button1_ToolBar_LeftPanel.addActionListener(new ActionListener() {
+        this.button1ToolBarLeftPanel.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -72,7 +72,7 @@ public class SearchLinkedHash extends SplitPanel {
             public void valueChanged(ListSelectionEvent arg0) {
 
                 if (Table_Hash == null || Table_Hash.getSelectedRow() < 0) {
-                    jScrollPane_jPanel_RightPanel.setViewportView(null);
+                    jScrollPaneJPanelRightPanel.setViewportView(null);
                     return;
                 }
                 Tuple3<Long, Integer, Integer> item_Table_Selected = tamleModel.getHashInfo(Table_Hash
@@ -82,46 +82,46 @@ public class SearchLinkedHash extends SplitPanel {
 
                 Transaction tr = DCSet.getInstance().getTransactionFinalMap().get(item_Table_Selected.b, item_Table_Selected.c);
 
-                jScrollPane_jPanel_RightPanel.setViewportView(new RecDetailsFrame(tr));
+                jScrollPaneJPanelRightPanel.setViewportView(new RecDetailsFrame(tr));
                 item_Table_Selected = null;
 
             }
 
         });
 
-        this.jScrollPanel_LeftPanel.setViewportView(Table_Hash);
+        this.jScrollPanelLeftPanel.setViewportView(Table_Hash);
 
     }
 
     private void find() {
         String search = searchTextField_SearchToolBar_LeftPanel.getText();
         if (search.equals("")) {
-            jScrollPane_jPanel_RightPanel.setViewportView(null);
+            jScrollPaneJPanelRightPanel.setViewportView(null);
             tamleModel.clear();
             Label_search_Info_Panel.setText(Lang.getInstance().translate("Enter more  2 characters"));
-            jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+            jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
             return;
         }
         if (search.length() < 3) {
             Label_search_Info_Panel.setText(Lang.getInstance().translate("Enter more  2 characters"));
-            jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+            jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
             return;
         }
         //	key_Item.setText("");
 
         Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
-        jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+        jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
         new Thread() {
             @Override
             public void run() {
                 tamleModel.setHash(search);
                 if (tamleModel.getRowCount() < 1) {
                     Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found"));
-                    jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
-                    jScrollPane_jPanel_RightPanel.setViewportView(null);
+                    jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
+                    jScrollPaneJPanelRightPanel.setViewportView(null);
                     return;
                 }
-                jScrollPanel_LeftPanel.setViewportView(Table_Hash);
+                jScrollPanelLeftPanel.setViewportView(Table_Hash);
             }
         }.start();
     }
@@ -153,7 +153,7 @@ public class SearchLinkedHash extends SplitPanel {
             // преобразуем в байты
             long file_len = file.length();
             if (file_len > Integer.MAX_VALUE) {
-                // table_Model.addRow(new Object[] { "",
+                // tableModel.addRow(new Object[] { "",
                 // Lang.getInstance().translate("length very long") + " - " +
                 // file_name });
                 // continue;
@@ -165,7 +165,7 @@ public class SearchLinkedHash extends SplitPanel {
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-                // table_Model.addRow(new Object[] { "",
+                // tableModel.addRow(new Object[] { "",
                 // Lang.getInstance().translate("error streaming") + " - " +
                 // file_name });
                 // continue;
@@ -175,7 +175,7 @@ public class SearchLinkedHash extends SplitPanel {
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-                // table_Model.addRow(new Object[] { "",
+                // tableModel.addRow(new Object[] { "",
                 // Lang.getInstance().translate("error reading") + " - " +
                 // file_name });
                 // continue;
@@ -190,7 +190,7 @@ public class SearchLinkedHash extends SplitPanel {
 
             /// HASHING
             String hashe = Base58.encode(Crypto.getInstance().digest(fileInArray));
-            // table_Model.addRow(new Object[] { hashes,
+            // tableModel.addRow(new Object[] { hashes,
             // Lang.getInstance().translate("from file ") + file_name });
             this.searchTextField_SearchToolBar_LeftPanel.setText(hashe);
             find();

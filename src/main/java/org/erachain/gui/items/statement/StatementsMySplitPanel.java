@@ -35,14 +35,14 @@ public class StatementsMySplitPanel extends SplitPanel {
         this.setName(Lang.getInstance().translate("My Statements"));
         this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
-        this.button1_ToolBar_LeftPanel.setVisible(false);
-        this.button2_ToolBar_LeftPanel.setVisible(false);
+        this.button1ToolBarLeftPanel.setVisible(false);
+        this.button2ToolBarLeftPanel.setVisible(false);
         this.jButton1_jToolBar_RightPanel.setVisible(false);
         this.jButton2_jToolBar_RightPanel.setVisible(false);
 
 
         // not show My filter
-        this.searth_My_JCheckBox_LeftPanel.setVisible(false);
+        this.searchMyJCheckBoxLeftPanel.setVisible(false);
 
         //TABLE
 
@@ -89,9 +89,9 @@ public class StatementsMySplitPanel extends SplitPanel {
 			// UPDATE FILTER ON TEXT CHANGE
 			this.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new My_Search());
 			*/        // SET VIDEO
-        //this.jTable_jScrollPanel_LeftPanel.setModel(my_PersonsModel);
-        this.jTable_jScrollPanel_LeftPanel = new MTable(my_Statements_Model); //my_Statements_table;
-        //this.jTable_jScrollPanel_LeftPanel.setTableHeader(null);
+        //this.jTableJScrollPanelLeftPanel.setModel(my_PersonsModel);
+        this.jTableJScrollPanelLeftPanel = new MTable(my_Statements_Model); //my_Statements_table;
+        //this.jTableJScrollPanelLeftPanel.setTableHeader(null);
         // sorter
         search_Sorter = new TableRowSorter(my_Statements_Model);
         ArrayList<SortKey> keys = new ArrayList<RowSorter.SortKey>();
@@ -99,13 +99,13 @@ public class StatementsMySplitPanel extends SplitPanel {
         keys.add(new RowSorter.SortKey(0, SortOrder.DESCENDING));
         search_Sorter.setSortKeys(keys);
         ((DefaultRowSorter<?, ?>) search_Sorter).setSortsOnUpdates(true);
-        this.jTable_jScrollPanel_LeftPanel.setRowSorter(search_Sorter);
-        this.jTable_jScrollPanel_LeftPanel.setEditingColumn(0);
-        this.jTable_jScrollPanel_LeftPanel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        this.jTable_jScrollPanel_LeftPanel.setAutoCreateRowSorter(true);
-        this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);
+        this.jTableJScrollPanelLeftPanel.setRowSorter(search_Sorter);
+        this.jTableJScrollPanelLeftPanel.setEditingColumn(0);
+        this.jTableJScrollPanelLeftPanel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.jTableJScrollPanelLeftPanel.setAutoCreateRowSorter(true);
+        this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
         // EVENTS on CURSOR
-        this.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
+        this.jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
 //			 Dimension size = MainFrame.getInstance().desktopPane.getSize();
 //			 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
         // jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
@@ -122,7 +122,7 @@ public class StatementsMySplitPanel extends SplitPanel {
         // delete observer left panel
         my_Statements_Model.removeObservers();
         // get component from right panel
-        Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+        Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
         if (c1 instanceof StatementInfo) ((StatementInfo) c1).delay_on_Close();
 
@@ -136,13 +136,13 @@ public class StatementsMySplitPanel extends SplitPanel {
 
 
             Transaction statement = null;
-            if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0)
-                statement = my_Statements_Model.get_Statement(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0)
+                statement = my_Statements_Model.get_Statement(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
 
             if (statement == null) return;
             StatementInfo info_panel = new StatementInfo(statement);
-            info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width - 50, jScrollPane_jPanel_RightPanel.getSize().height - 50));
-            jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+            info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));
+            jScrollPaneJPanelRightPanel.setViewportView(info_panel);
             //	jSplitPanel.setRightComponent(info_panel);
         }
 

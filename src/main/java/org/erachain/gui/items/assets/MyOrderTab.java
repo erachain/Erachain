@@ -34,8 +34,8 @@ public class MyOrderTab extends SplitPanel {
         this.setName(Lang.getInstance().translate("My Orders"));
         searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
-        button1_ToolBar_LeftPanel.setVisible(false);
-        button2_ToolBar_LeftPanel.setVisible(false);
+        button1ToolBarLeftPanel.setVisible(false);
+        button2ToolBarLeftPanel.setVisible(false);
         jButton1_jToolBar_RightPanel.setVisible(false);
         jButton2_jToolBar_RightPanel.setVisible(false);
 
@@ -66,12 +66,12 @@ public class MyOrderTab extends SplitPanel {
         // table = new MTable(ordersModel);
 
         // add listener
-        // jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(table);
+        // jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(table);
         // show
-        this.jTable_jScrollPanel_LeftPanel = new MTable(ordersModel);
-        // this.jTable_jScrollPanel_LeftPanel = table;
-        jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
-        jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+        this.jTableJScrollPanelLeftPanel = new MTable(ordersModel);
+        // this.jTableJScrollPanelLeftPanel = table;
+        jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
+        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         // UPDATE FILTER ON TEXT CHANGE
         searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
@@ -104,12 +104,12 @@ public class MyOrderTab extends SplitPanel {
             @Override
             public void ancestorAdded(AncestorEvent arg0) {
                 // TODO Auto-generated method stub
-                row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+                row = jTableJScrollPanelLeftPanel.getSelectedRow();
                 if (row < 1) {
                     return;
                 }
 
-                row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
 
             }
 
@@ -132,7 +132,7 @@ public class MyOrderTab extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                favorite_set(jTable_jScrollPanel_LeftPanel);
+                favorite_set(jTableJScrollPanelLeftPanel);
 
             }
         });
@@ -155,8 +155,8 @@ public class MyOrderTab extends SplitPanel {
             public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
                 // TODO Auto-generated method stub
 
-                row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-                row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
 
             }
 
@@ -187,7 +187,7 @@ public class MyOrderTab extends SplitPanel {
         });
         assetsMenu.add(dividend);
         // table.setComponentPopupMenu(assetsMenu);
-        TableMenuPopupUtil.installContextMenu(this.jTable_jScrollPanel_LeftPanel, assetsMenu); // SELECT
+        TableMenuPopupUtil.installContextMenu(this.jTableJScrollPanelLeftPanel, assetsMenu); // SELECT
                                                                                                // ROW
                                                                                                // ON
                                                                                                // WHICH
@@ -196,21 +196,21 @@ public class MyOrderTab extends SplitPanel {
                                                                                                // BUTTON
 
         // MOUSE ADAPTER
-        this.jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() {
+        this.jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 Point p = e.getPoint();
-                int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
-                jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
+                int row = jTableJScrollPanelLeftPanel.rowAtPoint(p);
+                jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
             }
         });
 
-        this.jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() {
+        this.jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 Point p = e.getPoint();
-                int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
-                jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
+                int row = jTableJScrollPanelLeftPanel.rowAtPoint(p);
+                jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
                 /*
                  * if(e.getClickCount() == 2) { row =
                  * table.convertRowIndexToModel(row); AssetCls asset =
@@ -220,7 +220,7 @@ public class MyOrderTab extends SplitPanel {
                  * if (table.getSelectedColumn() ==
                  * WalletItemAssetsTableModel.COLUMN_FAVORITE){ row =
                  * table.convertRowIndexToModel(row); AssetCls asset =
-                 * orderModel.getAsset(row); favorite_set( table);
+                 * orderModel.getAsset(row); favoriteSet( table);
                  * 
                  * 
                  * 
@@ -257,13 +257,13 @@ public class MyOrderTab extends SplitPanel {
             try {
                 Order order = null;
                 int i = 0;
-                if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0)
-                    i = jTable_jScrollPanel_LeftPanel
-                            .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow());
+                if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0)
+                    i = jTableJScrollPanelLeftPanel
+                            .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow());
                 order = ordersModel.getItem(i).b;
                 if (order == null)
                     return;
-                jScrollPane_jPanel_RightPanel.setViewportView(new OrderInfoPanel(order));
+                jScrollPaneJPanelRightPanel.setViewportView(new OrderInfoPanel(order));
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

@@ -24,11 +24,11 @@ public class MyAccountsSplitPanel extends SplitPanel {
     public MyAccountsSplitPanel() {
         super("MyAccountsSplitPanel");
 
-        this.jScrollPanel_LeftPanel.setVisible(false);
+        this.jScrollPanelLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);
-        this.toolBar_LeftPanel.setVisible(false);
+        this.toolBarLeftPanel.setVisible(false);
         this.setName(Lang.getInstance().translate("My Accounts"));
-        this.jToolBar_RightPanel.setVisible(false);
+        this.jToolBarRightPanel.setVisible(false);
 
         GridBagConstraints PanelGBC = new GridBagConstraints();
         PanelGBC.fill = GridBagConstraints.BOTH;
@@ -72,7 +72,7 @@ public class MyAccountsSplitPanel extends SplitPanel {
             rightPanel.table_Model.set_Account(account);
             rightPanel.table_Model.fireTableDataChanged();
             rightPanel.set_Asset(asset);
-            jScrollPane_jPanel_RightPanel.setViewportView(rightPanel);
+            jScrollPaneJPanelRightPanel.setViewportView(rightPanel);
             
         }
 

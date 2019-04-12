@@ -71,11 +71,11 @@ public class TelegramSplitPanel extends SplitPanel {
     public TelegramSplitPanel() {
     super("TelegramSplitPanel");
    //th = this;
-    this.jScrollPanel_LeftPanel.setVisible(false);
+    this.jScrollPanelLeftPanel.setVisible(false);
     this.searchToolBar_LeftPanel.setVisible(false);
-    this.toolBar_LeftPanel.setVisible(false);
+    this.toolBarLeftPanel.setVisible(false);
     this.setName(Lang.getInstance().translate("My Accounts"));
-    this.jToolBar_RightPanel.setVisible(false);
+    this.jToolBarRightPanel.setVisible(false);
 
     GridBagConstraints PanelGBC = new GridBagConstraints();
     PanelGBC.fill = GridBagConstraints.BOTH;
@@ -412,7 +412,7 @@ public class TelegramSplitPanel extends SplitPanel {
 }
 
 public void onClose() {
-  //  rightPanel.table_Model.deleteObserver();
+  //  rightPanel.tableModel.deleteObserver();
     accountPanel.tableModel.deleteObserver();
     Controller.getInstance().deleteObserver(accountPanel.reload_Button);
     Controller.getInstance().deleteObserver(accountPanel.newAccount_Button);
@@ -432,10 +432,10 @@ class Account_Tab_Listener implements ListSelectionListener {
  //       if (account.equals(selecArg) && asset.equals(assetSelect)) return;
         selecArg = account;
 //        assetSelect = asset;
- //       rightPanel.table_Model.set_Account(account);
- //       rightPanel.table_Model.fireTableDataChanged();
+ //       rightPanel.tableModel.set_Account(account);
+ //       rightPanel.tableModel.fireTableDataChanged();
  //       rightPanel.set_Asset(asset);
-   //     jScrollPane_jPanel_RightPanel.setViewportView(rightPanel);
+   //     jScrollPaneJPanelRightPanel.setViewportView(rightPanel);
         
     }
 

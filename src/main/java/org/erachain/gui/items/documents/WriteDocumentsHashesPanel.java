@@ -36,11 +36,11 @@ public class WriteDocumentsHashesPanel extends SplitPanel {
         super("WriteDocumentsHashesPanel");
         // left panel
 
-        this.toolBar_LeftPanel.setVisible(false);
+        this.toolBarLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);
-        this.jTable_jScrollPanel_LeftPanel.setVisible(false);
+        this.jTableJScrollPanelLeftPanel.setVisible(false);
         issue_Hash_Imprint = new IssueHashImprint();
-        this.jScrollPanel_LeftPanel.setViewportView(issue_Hash_Imprint);
+        this.jScrollPanelLeftPanel.setViewportView(issue_Hash_Imprint);
 
         issue_Hash_Imprint.jButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -49,7 +49,7 @@ public class WriteDocumentsHashesPanel extends SplitPanel {
         });
 
         // Right panel
-        // this.jToolBar_RightPanel.setSize(WIDTH, 200);
+        // this.jToolBarRightPanel.setSize(WIDTH, 200);
         jButton2_jToolBar_RightPanel.setText(Lang.getInstance().translate("Import Hashs"));
         // jButton2_jToolBar_RightPanel.setSize(70, 30);
         // jButton2_jToolBar_RightPanel.setPreferredSize(new
@@ -94,12 +94,12 @@ public class WriteDocumentsHashesPanel extends SplitPanel {
             }
         });
 
-        jToolBar_RightPanel.add(jButton3_jToolBar_RightPanel);
+        jToolBarRightPanel.add(jButton3_jToolBar_RightPanel);
 
 
         table_Model = new TableModelIssueHashes(0);
         Table_Hash = new MTable(table_Model);
-        this.jScrollPane_jPanel_RightPanel.setViewportView(Table_Hash);
+        this.jScrollPaneJPanelRightPanel.setViewportView(Table_Hash);
 
     }
 

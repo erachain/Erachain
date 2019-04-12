@@ -22,12 +22,12 @@ public class GeneratedBlocksPanel extends SplitPanel {
         searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 
         // not show buttons
-        jToolBar_RightPanel.setVisible(false);
-        toolBar_LeftPanel.setVisible(false);
+        jToolBarRightPanel.setVisible(false);
+        toolBarLeftPanel.setVisible(false);
 
 // not show My filter
-        searth_My_JCheckBox_LeftPanel.setVisible(false);
-        searth_Favorite_JCheckBox_LeftPanel.setVisible(false);
+        searchMyJCheckBoxLeftPanel.setVisible(false);
+        searchFavoriteJCheckBoxLeftPanel.setVisible(false);
 
         Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 
@@ -35,7 +35,7 @@ public class GeneratedBlocksPanel extends SplitPanel {
 
         //TRANSACTIONS
         blocksModel = new WalletBlocksTableModel();
-        jTable_jScrollPanel_LeftPanel = new MTable(blocksModel);
+        jTableJScrollPanelLeftPanel = new MTable(blocksModel);
 
         //TRANSACTIONS SORTER
         indexes = new TreeMap<Integer, Integer>();
@@ -46,8 +46,8 @@ public class GeneratedBlocksPanel extends SplitPanel {
         indexes.put(WalletBlocksTableModel.COLUMN_TRANSACTIONS, BlocksHeadMap.TRANSACTIONS_INDEX);
         indexes.put(WalletBlocksTableModel.COLUMN_FEE, BlocksHeadMap.FEE_INDEX);
         //sorter = new CoreRowSorter(blocksModel, indexes);
-        //jTable_jScrollPanel_LeftPanel.setRowSorter(sorter);
-        jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+        //jTableJScrollPanelLeftPanel.setRowSorter(sorter);
+        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
         //	setRowHeightFormat(true);
 
         // this.addTab(Lang.getInstance().translate("Generated Blocks"), new JScrollPane(blocksTable));

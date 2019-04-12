@@ -80,7 +80,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
 
             this.menuTable.add(vouch_menu);
         } else {
-            this.menuTable.remove(this.favorite_menu_items);
+            this.menuTable.remove(this.favoriteMenuItems);
         }
 
 
@@ -97,7 +97,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
 
     // mouse 2 click
     @Override
-    protected void table_mouse_2_Click(ItemCls item) {
+    protected void tableMouse2Click(ItemCls item) {
 
         new ExchangeFrame((AssetCls) item, null, "", "");
     }

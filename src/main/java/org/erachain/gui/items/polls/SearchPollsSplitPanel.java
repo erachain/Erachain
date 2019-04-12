@@ -47,7 +47,7 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
 //			new UnionSetStatusDialog(th, (UnionCls) itemMenu);
 
-                PollCls poll = (PollCls) (item_Table_Selected);
+                PollCls poll = (PollCls) (itemTableSelected);
                 AssetCls AssetCls = DCSet.getInstance().getItemAssetMap().get((long) (1));
                 new PollsDialog(poll, 0, AssetCls);
             }

@@ -31,12 +31,12 @@ public class Polls_My_SplitPanel extends SplitPanel {
         this.setName(Lang.getInstance().translate("My Polls"));
         this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
-        this.button1_ToolBar_LeftPanel.setVisible(false);
-        this.button2_ToolBar_LeftPanel.setVisible(false);
+        this.button1ToolBarLeftPanel.setVisible(false);
+        this.button2ToolBarLeftPanel.setVisible(false);
         this.jButton1_jToolBar_RightPanel.setVisible(false);
         this.jButton2_jToolBar_RightPanel.setVisible(false);
         // not show My filter
-        this.searth_My_JCheckBox_LeftPanel.setVisible(false);
+        this.searchMyJCheckBoxLeftPanel.setVisible(false);
         // TABLE
         my_Poll_Model = new WalletItemPollsTableModel();
         my_Poll_table = new MTable(my_Poll_Model);
@@ -56,9 +56,9 @@ public class Polls_My_SplitPanel extends SplitPanel {
         // UPDATE FILTER ON TEXT CHANGE
         this.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new My_Search());
         // SET VIDEO
-        this.jTable_jScrollPanel_LeftPanel.setModel(my_Poll_Model);
-        this.jTable_jScrollPanel_LeftPanel = my_Poll_table;
-        this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);
+        this.jTableJScrollPanelLeftPanel.setModel(my_Poll_Model);
+        this.jTableJScrollPanelLeftPanel = my_Poll_table;
+        this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
         // EVENTS on CURSOR
         my_Poll_table.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
         // Dimension size = MainFrame.getInstance().desktopPane.getSize();
@@ -72,7 +72,7 @@ public class Polls_My_SplitPanel extends SplitPanel {
         // delete observer left panel
         my_Poll_Model.deleteObservers();
         // get component from right panel
-        // Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+        // Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
         // if (c1 instanceof StatementInfo) (
         // (StatementInfo)c1).delay_on_Close();
@@ -89,7 +89,7 @@ public class Polls_My_SplitPanel extends SplitPanel {
                 return;
             PollsDetailPanel pollDetailsPanel = new PollsDetailPanel(poll,
                     Controller.getInstance().getAsset(AssetCls.FEE_KEY));
-            jScrollPane_jPanel_RightPanel.setViewportView(pollDetailsPanel);
+            jScrollPaneJPanelRightPanel.setViewportView(pollDetailsPanel);
         }
 
     }
