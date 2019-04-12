@@ -68,6 +68,7 @@ public class IssuePollPanel extends JPanel {
         gbcAddImagePanel.gridy = 2;
         gbcAddImagePanel.gridheight = 2;
         gbcAddImagePanel.anchor = GridBagConstraints.NORTH;
+        gbcAddImagePanel.insets = new Insets(0, 12, 8, 8);
         add(addImageLabel, gbcAddImagePanel);
 
         GridBagConstraints gbcAddLogoIconPanel = new GridBagConstraints();
