@@ -734,7 +734,6 @@
 
             if (data.asset.this.img.length > 0) output += '<img src="data:image/gif;base64,' + data.asset.this.img + '" style=" max-width: 100%;" />';
 
-            if (data.asset.this.icon.length > 0) output += '<img src="data:image/gif;base64,' + data.asset.this.icon + '"  />';
 
             output += '<br><br>';
 
@@ -745,6 +744,10 @@
 
 
             output += '<b>' + data.asset.label_Description + ':</b> ' + fformat(data.asset.this.description);
+
+            output += '<br><br>';
+
+            if (data.asset.this.icon.length > 0) output += '<img src="data:image/gif;base64,' + data.asset.this.icon + '"  />';
 
             output += '<br><br>';
 
