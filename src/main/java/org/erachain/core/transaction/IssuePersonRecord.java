@@ -218,10 +218,14 @@ public class IssuePersonRecord extends IssueItemRecord {
         if (person.getHairColor().getBytes(StandardCharsets.UTF_8).length > 255) {
             return Transaction.ITEM_PERSON_HAIR_COLOR_ERROR;
         }
+
+        //int ii = Math.abs(person.getHeight());
+        //if (Math.abs(person.getHeight()) < 1) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
         if (person.getHeight() > 255) {
             return Transaction.ITEM_PERSON_HEIGHT_ERROR;
         }
-        if (person.isAlive(timestamp)) {
+
+        if (person.isAlive(this.timestamp)) {
             // IF PERSON is LIVE
             if (person.getImage().length > MAX_IMAGE_LENGTH) {
                 if (!(!BlockChain.DEVELOP_USE && height == 2998) && height > 157640) {
@@ -229,6 +233,8 @@ public class IssuePersonRecord extends IssueItemRecord {
                     return Transaction.INVALID_IMAGE_LENGTH;
                 }
             }
+        } else {
+            // person is DIE - any PHOTO
         }
         if (person instanceof PersonHuman) {
             PersonHuman human = (PersonHuman) person;
@@ -261,7 +267,7 @@ public class IssuePersonRecord extends IssueItemRecord {
                     }
                 }
             }
-            if (!creatorAdmin)  {
+            if (!creatorAdmin) {
                 return CREATOR_NOT_PERSONALIZED;
             }
         }
