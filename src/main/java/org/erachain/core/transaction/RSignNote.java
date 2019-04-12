@@ -463,7 +463,7 @@ public class RSignNote extends Transaction {
     public String getTitle() {
 
         if (isEncrypted()) {
-            return "";
+            return "encrypted";
         }
 
         if (getVersion() == 2) {
@@ -478,7 +478,7 @@ public class RSignNote extends Transaction {
 
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
-                return "";
+                return "err " + e.getMessage();
             }
 
         } else {
@@ -488,11 +488,15 @@ public class RSignNote extends Transaction {
 
                 JSONObject data = new JSONObject();
                 data = (JSONObject) JSONValue.parseWithException(new String(getData(), Charset.forName("UTF-8")));
+                String title = data.get("Title").toString();
+                if (title == null || title.equals(""))
+                    return "null";
+
                 return (String) data.get("Title");
 
             } catch (ParseException e) {
                 LOGGER.error(e.getMessage(), e);
-                return "";
+                return "err " + e.getMessage();
             }
         }
     }
