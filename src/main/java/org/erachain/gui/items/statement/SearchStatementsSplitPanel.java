@@ -65,7 +65,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 searchTextField_SearchToolBar_LeftPanel.setText("");
-                search_Table_Model.Find_item_from_key(key_Item.getText());
+                search_Table_Model.findByKey(key_Item.getText());
                 if (search_Table_Model.getRowCount() < 1)
                     return;
                 selected_Item = 0;
@@ -146,7 +146,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                 new Thread() {
                     @Override
                     public void run() {
-                        search_Table_Model.set_Filter_By_Name(search, false);
+                        search_Table_Model.setFilterByName(search, false);
                         if (search_Table_Model.getRowCount() < 1) {
                             Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Documents"));
                             jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
@@ -202,7 +202,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                 if (jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0)
                     return;
 
-                Transaction statement = search_Table_Model.get_Statement(jTable_jScrollPanel_LeftPanel
+                Transaction statement = search_Table_Model.getItem(jTable_jScrollPanel_LeftPanel
                         .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
                 if (statement == null)
                     return;
@@ -274,7 +274,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         int row = personsTable.getSelectedRow();
         row = personsTable.convertRowIndexToModel(row);
 
-        Transaction person = search_Table_Model.get_Statement(row);
+        Transaction person = search_Table_Model.getItem(row);
         // new AssetPairSelect(asset.getKey());
 
         // CHECK IF FAVORITES
@@ -298,7 +298,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
             if (jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0)
                 return;
 
-            Transaction statement = search_Table_Model.get_Statement(jTable_jScrollPanel_LeftPanel
+            Transaction statement = search_Table_Model.getItem(jTable_jScrollPanel_LeftPanel
                     .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
             StatementInfo info_panel = new StatementInfo(statement);
             info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width - 50,

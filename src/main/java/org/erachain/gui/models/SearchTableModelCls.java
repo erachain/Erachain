@@ -1,0 +1,120 @@
+package org.erachain.gui.models;
+
+import org.erachain.controller.Controller;
+import org.erachain.database.DBMap;
+import org.erachain.lang.Lang;
+import org.slf4j.Logger;
+
+import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
+import java.util.*;
+
+@SuppressWarnings("serial")
+public abstract class SearchTableModelCls<U> extends AbstractTableModel {
+
+    private String name;
+    private String[] columnNames;
+    protected boolean needUpdate;
+    protected boolean descending;
+
+    protected List<U> list;
+
+    protected Boolean[] columnAutoHeight;
+
+    protected long start = 0;
+    protected int step = 50;
+    protected long size = 0;
+
+    protected DBMap map;
+    protected Logger logger;
+
+    public SearchTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
+        this.map = map;
+        this.columnNames = columnNames;
+        this.columnAutoHeight = columnAutoHeight;
+        this.descending = descending;
+    }
+    public Boolean[] getColumnAutoHeight() {
+        return this.columnAutoHeight;
+    }
+
+    // устанавливаем колонки которым изменить высоту
+    public void setColumnAutoHeight(Boolean[] arg0) {
+        this.columnAutoHeight = arg0;
+    }
+
+    @Override
+    public int getColumnCount() {
+        return columnNames.length;
+    }
+
+    @Override
+    //     private String[] columnNames = Lang.getInstance().translate();
+    public String getColumnName(int index) {
+        return Lang.getInstance().translate(columnNames[index]);
+    }
+
+    public String getColumnNameOrigin(int index) {
+        return columnNames[index];
+    }
+
+    public U getItem(int row) {
+        if (list == null)
+            return null;
+
+        return this.list.get(row);
+    }
+
+    public int getRowCount() {
+        return (this.list == null) ? 0 : this.list.size();
+    }
+
+    public abstract Object getValueAt(int row, int column);
+
+    public Class<? extends Object> getColumnClass(int c) {
+        Object o = getValueAt(0, c);
+        return o == null ? Null.class : o.getClass();
+    }
+
+    //public abstract void getIntervalThis(int startBack, int endBack);
+    public void getIntervalThis(long start, long end) {
+    }
+
+    public int getMapDefaultIndex() {
+        if (map == null)
+            return 0;
+
+        return map.DEFAULT_INDEX;
+    }
+
+    public long getMapSize() {
+        if (map == null)
+            return 0;
+
+        return map.size();
+    }
+
+    /**
+     * если descending установлен, то ключ отрицательный значит и его вычисляем обратно.
+     * То есть 10-я запись имеет ключ -9 (отричательный). Тогда отсчет start=0 будет идти от последней записи
+     * с отступом step
+     */
+    public void getInterval() {
+
+        if (descending) {
+            long startBack = -getMapSize() + start;
+            getIntervalThis(startBack, startBack + step);
+        } else {
+            getIntervalThis(start, start + step);
+        }
+
+    }
+
+    public void setInterval(int start, int step) {
+        this.start = start;
+        this.step = step;
+
+        getInterval();
+    }
+
+}
