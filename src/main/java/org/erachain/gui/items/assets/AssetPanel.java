@@ -50,7 +50,7 @@ public class AssetPanel extends javax.swing.JPanel {
         setLayout(new java.awt.GridBagLayout());
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
-        //jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        //jPanelHead.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jScrollPane1.setBorder(null);
         jScrollPane2.setBorder(null);
 

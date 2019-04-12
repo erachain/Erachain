@@ -6,11 +6,10 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.TypeOfImage;
+import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.CreateOptionsTableModel;
@@ -19,292 +18,203 @@ import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
 import javax.swing.*;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
-import static org.erachain.gui.GUIConstants.*;
+import static org.erachain.gui.items.utils.GUIConstants.*;
+import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
-@SuppressWarnings("serial")
 public class IssuePollPanel extends JPanel {
-    protected int selRow;
     private JComboBox<Account> cbxFrom;
-    private JComboBox<String> txtFee;
-    private JTextField txtName;
-    private JTextArea txtareaDescription;
+    private JComboBox<String> txtFee = new JComboBox<>();
+    private JTextField txtName = new JTextField();
+    private JTextArea txtareaDescription = new JTextArea();
     private JButton createButton;
     private CreateOptionsTableModel optionsTableModel;
-    private IssuePollPanel th;
-    private AddImageLabel addImagePanel;
-    private AddImageLabel addLogoIconPanel;
-    final MTable table;
+    private AddImageLabel addImageLabel;
+    private AddImageLabel addLogoIconLabel;
+    private final MTable table;
+    private JLabel titleJLabel = new JLabel();
 
     public IssuePollPanel() {
+        setLayout(new GridBagLayout());
+        optionsTableModel = new CreateOptionsTableModel(new Object[]{Lang.getInstance().translate("Name")}, 0);
+        addImageLabel = new AddImageLabel(
+                Lang.getInstance().translate("Add image"), WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG);
+        addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
 
-        // LAYOUT
-        GridBagLayout gridBagLayout = new GridBagLayout();
-        gridBagLayout.rowHeights = new int[]{0, 0, 88, 0, 0, 0, 0};
-        gridBagLayout.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0};
-        this.setLayout(gridBagLayout);
-        th = this;
+        addLogoIconLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
+                WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF);
+        addLogoIconLabel.setPreferredSize(new Dimension(WIDTH_LOGO, HEIGHT_LOGO));
 
-        // COMBOBOX GBC
-        GridBagConstraints cbxGBC = new GridBagConstraints();
-        cbxGBC.insets = new Insets(5, 5, 5, 5);
-        cbxGBC.fill = GridBagConstraints.NONE;
-        cbxGBC.anchor = GridBagConstraints.NORTHWEST;
-        cbxGBC.weightx = 0;
-        cbxGBC.gridx = 1;
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
-        // TEXTFIELD GBC
-        GridBagConstraints txtGBC = new GridBagConstraints();
-        txtGBC.insets = new Insets(5, 5, 5, 0);
-        txtGBC.fill = GridBagConstraints.HORIZONTAL;
-        txtGBC.anchor = GridBagConstraints.NORTHWEST;
-        txtGBC.weightx = 1;
-        txtGBC.gridwidth = 2;
-        txtGBC.gridx = 2;
+
+        titleJLabel.setFont(FONT_TITLE);
+        titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleJLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+        titleJLabel.setText(Lang.getInstance().translate("Issue Poll"));
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
+        add(titleJLabel, gridBagConstraints);
+
+        GridBagConstraints gbcAddImagePanel = new GridBagConstraints();
+        gbcAddImagePanel.gridx = 0;
+        gbcAddImagePanel.gridy = 2;
+        gbcAddImagePanel.gridheight = 2;
+        gbcAddImagePanel.anchor = GridBagConstraints.NORTH;
+        gbcAddImagePanel.insets = new Insets(0, 12, 8, 8);
+        add(addImageLabel, gbcAddImagePanel);
+
+        GridBagConstraints gbcAddLogoIconPanel = new GridBagConstraints();
+        gbcAddLogoIconPanel.gridx = 0;
+        gbcAddLogoIconPanel.gridy = 4;
+        gbcAddImagePanel.gridheight = 1;
+        add(addLogoIconLabel, gbcAddLogoIconPanel);
 
         // BUTTON GBC
         GridBagConstraints buttonGBC = new GridBagConstraints();
-        buttonGBC.insets = new Insets(5, 5, 0, 5);
-        buttonGBC.fill = GridBagConstraints.NONE;
-        buttonGBC.anchor = GridBagConstraints.NORTHWEST;
-        buttonGBC.gridwidth = 2;
         buttonGBC.gridx = 0;
+        buttonGBC.gridy = 7;
+        buttonGBC.gridwidth = 3;
+        buttonGBC.anchor = GridBagConstraints.CENTER;
+        // BUTTON Register
+        createButton = new JButton(Lang.getInstance().translate("Create"));
+        createButton.addActionListener(e -> onRegisterClick());
+        add(createButton, buttonGBC);
+
         JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
-        GridBagConstraints gbc_fromLabel = new GridBagConstraints();
-        gbc_fromLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_fromLabel.gridx = 1;
-        gbc_fromLabel.gridy = 0;
-        this.add(fromLabel, gbc_fromLabel);
-
-        // COMBOBOX FROM
-        txtGBC.gridy = 0;
-        this.cbxFrom = new JComboBox<Account>(new AccountsComboBoxModel());
-        this.add(this.cbxFrom, txtGBC);
-
-        this.optionsTableModel = new CreateOptionsTableModel(new Object[]{Lang.getInstance().translate("Name")}, 0);
+        GridBagConstraints gbcFromLabel = new GridBagConstraints();
+        gbcFromLabel.gridx = 1;
+        gbcFromLabel.gridy = 1;
+        gbcFromLabel.anchor = GridBagConstraints.NORTHEAST;
+        add(fromLabel, gbcFromLabel);
 
         // LABEL GBC
         GridBagConstraints labelGBC = new GridBagConstraints();
-        labelGBC.insets = new Insets(5, 5, 5, 5);
-        labelGBC.fill = GridBagConstraints.HORIZONTAL;
-        labelGBC.anchor = GridBagConstraints.NORTHWEST;
-        labelGBC.weightx = 0;
         labelGBC.gridx = 1;
-
-        // ICON
-        addImagePanel = new AddImageLabel(
-                Lang.getInstance().translate("Add image") +
-                        (" (max %1%kB)").replace("%1%", "1024"),
-                widthImage, heightImage,TypeOfImage.JPEG);
-
-        GridBagConstraints gbc_add_Image_Panel = new GridBagConstraints();
-        gbc_add_Image_Panel.anchor = GridBagConstraints.NORTH;
-        gbc_add_Image_Panel.gridheight = 3;
-        gbc_add_Image_Panel.insets = new Insets(0, 0, 5, 5);
-        gbc_add_Image_Panel.gridx = 0;
-        gbc_add_Image_Panel.gridy = 1;
-        add(addImagePanel, gbc_add_Image_Panel);
-
-        // LABEL NAME
-        labelGBC.gridy = 1;
+        labelGBC.gridy = 2;
+        labelGBC.anchor = GridBagConstraints.NORTHEAST;
         JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
-        this.add(nameLabel, labelGBC);
-
-        // LABEL FEE
-        labelGBC.gridy = 5;
-        labelGBC.weighty = 0;
-        this.txtName = new JTextField();
-        GridBagConstraints gbc_txtName = new GridBagConstraints();
-        gbc_txtName.fill = GridBagConstraints.HORIZONTAL;
-        gbc_txtName.insets = new Insets(0, 0, 5, 5);
-        gbc_txtName.gridx = 2;
-        gbc_txtName.gridy = 1;
-        this.add(this.txtName, gbc_txtName);
-        addLogoIconPanel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
-                widthLogo, heightLogo, TypeOfImage.GIF);
-
-        GridBagConstraints gbc_add_Logo_Icon_Panel = new GridBagConstraints();
-        gbc_add_Logo_Icon_Panel.insets = new Insets(0, 0, 5, 0);
-        gbc_add_Logo_Icon_Panel.gridx = 3;
-        gbc_add_Logo_Icon_Panel.gridy = 1;
-        add(addLogoIconPanel, gbc_add_Logo_Icon_Panel);
+        add(nameLabel, labelGBC);
 
         JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
-        GridBagConstraints gbc_descriptionLabel = new GridBagConstraints();
-        gbc_descriptionLabel.anchor = GridBagConstraints.NORTH;
-        gbc_descriptionLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_descriptionLabel.gridx = 1;
-        gbc_descriptionLabel.gridy = 2;
-        this.add(descriptionLabel, gbc_descriptionLabel);
-
-        // TXTAREA NAME
-        // TABLE OPTIONS
-        GridBagConstraints txtGBC2 = new GridBagConstraints();
-        txtGBC2.gridwidth = 2;
-        txtGBC2.gridx = 2;
-        txtGBC2.gridy = 2;
-        txtGBC2.weighty = 0.3;
-        txtGBC2.insets = new Insets(0, 5, 5, 0);
-        txtGBC2.fill = GridBagConstraints.BOTH;
-        txtGBC2.anchor = GridBagConstraints.NORTHWEST;
-        JScrollPane ss = new JScrollPane();
-        this.add(ss, txtGBC2);
-        this.txtareaDescription = new JTextArea();
-        ss.setViewportView(txtareaDescription);
-
-        // BUTTON Register
-        buttonGBC.gridy = 6;
-        createButton = new JButton(Lang.getInstance().translate("Create"));
-        createButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onRegisterClick();
-            }
-        });
+        GridBagConstraints gbcDescriptionLabel = new GridBagConstraints();
+        gbcDescriptionLabel.gridx = 1;
+        gbcDescriptionLabel.gridy = 3;
+        gbcDescriptionLabel.anchor = GridBagConstraints.NORTHEAST;
+        add(descriptionLabel, gbcDescriptionLabel);
 
         JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
-        GridBagConstraints gbc_optionsLabel = new GridBagConstraints();
-        gbc_optionsLabel.anchor = GridBagConstraints.NORTH;
-        gbc_optionsLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_optionsLabel.gridx = 1;
-        gbc_optionsLabel.gridy = 3;
-        this.add(optionsLabel, gbc_optionsLabel);
+        GridBagConstraints gbcOptionsLabel = new GridBagConstraints();
+        gbcOptionsLabel.gridx = 1;
+        gbcOptionsLabel.gridy = 4;
+        gbcOptionsLabel.anchor = GridBagConstraints.NORTHEAST;
+        add(optionsLabel, gbcOptionsLabel);
+
+        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
+        GridBagConstraints gbcFeeLabel = new GridBagConstraints();
+        gbcFeeLabel.gridx = 1;
+        gbcFeeLabel.gridy = 6;
+        gbcFeeLabel.anchor = GridBagConstraints.NORTHEAST;
+        add(feeLabel, gbcFeeLabel);
+
+        // TEXTFIELD GBC
+        GridBagConstraints txtGBC = new GridBagConstraints();
+        txtGBC.gridx = 2;
+        txtGBC.gridy = 1;
+        txtGBC.gridwidth = 2;
+        txtGBC.fill = GridBagConstraints.HORIZONTAL;
+        txtGBC.anchor = GridBagConstraints.NORTHWEST;
+        cbxFrom = new JComboBox<>(new AccountsComboBoxModel());
+        add(cbxFrom, txtGBC);
+
+        GridBagConstraints gbcTxtName = new GridBagConstraints();
+        gbcTxtName.gridx = 2;
+        gbcTxtName.gridy = 2;
+        gbcTxtName.fill = GridBagConstraints.HORIZONTAL;
+        gbcTxtName.weightx = 0.1;
+        add(txtName, gbcTxtName);
+
+
+
+        // TXTAREA NAME
+        GridBagConstraints gbcDescription = new GridBagConstraints();
+        gbcDescription.gridx = 2;
+        gbcDescription.gridy = 3;
+        gbcDescription.weighty = 0.1;
+        gbcDescription.weightx = 0.1;
+        gbcDescription.gridwidth = 2;
+        gbcDescription.fill = GridBagConstraints.BOTH;
+        gbcDescription.anchor = GridBagConstraints.NORTHWEST;
+        JScrollPane scrollPaneDescription = new JScrollPane();
+        scrollPaneDescription.setViewportView(txtareaDescription);
+        add(scrollPaneDescription, gbcDescription);
 
         // TABLE OPTIONS
-        GridBagConstraints txtGBC1 = new GridBagConstraints();
-        txtGBC1.gridwidth = 2;
-        txtGBC1.insets = new Insets(0, 0, 5, 0);
-        txtGBC1.gridx = 2;
-        txtGBC1.gridy = 3;
-        txtGBC1.weighty = 0.1;
-        txtGBC1.fill = GridBagConstraints.BOTH;
-        txtGBC1.anchor = GridBagConstraints.NORTHWEST;
+        GridBagConstraints gbcOptionalTable = new GridBagConstraints();
+        gbcOptionalTable.gridx = 2;
+        gbcOptionalTable.gridy = 4;
+        gbcOptionalTable.weighty = 0.1;
+        gbcOptionalTable.gridwidth = 2;
+        gbcOptionalTable.fill = GridBagConstraints.BOTH;
+        gbcOptionalTable.anchor = GridBagConstraints.CENTER;
         table = new MTable(optionsTableModel);
-        
-        JScrollPane scroll = new JScrollPane();
-        scroll.setViewportView(table);
-        this.add(scroll, txtGBC1);
+        JScrollPane scrollPaneOptionalTable = new JScrollPane();
+        scrollPaneOptionalTable.setViewportView(table);
+        add(scrollPaneOptionalTable, gbcOptionalTable);
+
         JButton deleteButton = new JButton(Lang.getInstance().translate("Delete"));
-        deleteButton.addActionListener(new ActionListener() {
+        deleteButton.addActionListener(e -> deleteRow());
+        GridBagConstraints gbcDeleteButton = new GridBagConstraints();
+        gbcDeleteButton.gridx = 2;
+        gbcDeleteButton.gridy = 5;
+        gbcDeleteButton.fill = GridBagConstraints.HORIZONTAL;
+        gbcDeleteButton.gridwidth = 2;
+        add(deleteButton, gbcDeleteButton);
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
 
-                delrow();
-            }
-        });
-
-        GridBagConstraints gbc_deleteButton = new GridBagConstraints();
-        gbc_deleteButton.gridwidth = 2;
-        gbc_deleteButton.fill = GridBagConstraints.HORIZONTAL;
-        gbc_deleteButton.insets = new Insets(0, 0, 5, 5);
-        gbc_deleteButton.gridx = 2;
-        gbc_deleteButton.gridy = 4;
-        this.add(deleteButton, gbc_deleteButton);
-        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
-        GridBagConstraints gbc_feeLabel = new GridBagConstraints();
-        gbc_feeLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_feeLabel.gridx = 1;
-        gbc_feeLabel.gridy = 5;
-        this.add(feeLabel, gbc_feeLabel);
-        txtFee = new JComboBox<String>();
-        txtFee.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFee.setModel(new DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
         txtFee.setSelectedIndex(0);
-        GridBagConstraints gbc_txtFee = new GridBagConstraints();
-        gbc_txtFee.gridwidth = 2;
-        gbc_txtFee.fill = GridBagConstraints.HORIZONTAL;
-        gbc_txtFee.insets = new Insets(0, 0, 5, 5);
-        gbc_txtFee.gridx = 2;
-        gbc_txtFee.gridy = 5;
-        this.add(this.txtFee, gbc_txtFee);
-        this.add(createButton, buttonGBC);
+
+        GridBagConstraints gbcTxtFee = new GridBagConstraints();
+        gbcTxtFee.gridx = 2;
+        gbcTxtFee.gridy = 6;
+        gbcTxtFee.fill = GridBagConstraints.HORIZONTAL;
+        gbcTxtFee.gridwidth = 2;
+        add(txtFee, gbcTxtFee);
 
         JPopupMenu menu = new JPopupMenu();
-
-        menu.addPopupMenuListener(new PopupMenuListener() {
-
-            @Override
-            public void popupMenuCanceled(PopupMenuEvent arg0) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
-                // TODO Auto-generated method stub
-                if (optionsTableModel.getRowCount() > 1) {
-                    selRow = table.getSelectedRow();
-
-                }
-
-            }
-        });
-
         JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Delete"));
-        copyAddress.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-
-                delrow();
-            }
-        });
+        copyAddress.addActionListener(e -> deleteRow());
         menu.add(copyAddress);
-
-     //   table.setComponentPopupMenu(menu);
         TableMenuPopupUtil.installContextMenu(table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
-
-
-        // PACK
-        // this.pack();
-        // this.setResizable(false);
-        // this.setLocationRelativeTo(null);
-        this.setMinimumSize(new Dimension(0, 0));
-        this.setVisible(true);
+        setVisible(true);
     }
 
     public void onRegisterClick() {
         // DISABLE
-        this.createButton.setEnabled(false);
-
-        // CHECK IF WALLET UNLOCKED
-        if (!Controller.getInstance().isWalletUnlocked()) {
-            // ASK FOR PASSWORD
-            String password = PasswordPane.showUnlockWalletDialog(this);
-            if (!Controller.getInstance().unlockWallet(password)) {
-                // WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
-                        Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
-
-                // ENABLE
-                this.createButton.setEnabled(true);
-                return;
-            }
+        createButton.setEnabled(false);
+        if (checkWalletUnlock(createButton)){
+            return;
         }
 
         // READ CREATOR
         Account sender = (Account) cbxFrom.getSelectedItem();
-        int feePow = 0;
-
+        int feePow;
         try {
             // READ FEE POWER
-            feePow =  Integer.parseInt((String)this.txtFee.getSelectedItem());
-
+            feePow = Integer.parseInt((String) txtFee.getSelectedItem());
         } catch (Exception e) {
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee Power!"),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             // ENABLE
-            this.createButton.setEnabled(true);
+            createButton.setEnabled(true);
             return;
         }
 
@@ -312,30 +222,25 @@ public class IssuePollPanel extends JPanel {
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Null Options!"),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             // ENABLE
-            this.createButton.setEnabled(true);
+            createButton.setEnabled(true);
             return;
-
         }
         if (optionsTableModel.getRowCount() == 1 && optionsTableModel.getValueAt(0, 0).equals("")) {
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Null Options!"),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             // ENABLE
-            this.createButton.setEnabled(true);
+            createButton.setEnabled(true);
             return;
-
         }
-
-
-        byte[] icon = addLogoIconPanel.getImgBytes();
-        byte[] image = addImagePanel.getImgBytes();
+        byte[] icon = addLogoIconLabel.getImgBytes();
+        byte[] image = addImageLabel.getImgBytes();
 
         // CREATE POLL
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
         IssuePollRecord issuePoll = (IssuePollRecord) Controller.getInstance().issuePoll(creator,
-                this.txtName.getText(), this.txtareaDescription.getText(),
-                this.optionsTableModel.getOptions(), icon, image, feePow);
+                txtName.getText(), txtareaDescription.getText(),
+                optionsTableModel.getOptions(), icon, image, feePow);
 
-        // Issue_Asset_Confirm_Dialog(issueAssetTransaction);
         String text = "<HTML><body>";
         text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
                 + Lang.getInstance().translate("Issue Voting") + "<br><br><br>";
@@ -345,32 +250,28 @@ public class IssuePollPanel extends JPanel {
                 + library.to_HTML(this.txtareaDescription.getText()) + "<br>";
         text += "<br>" + Lang.getInstance().translate("Options") + ":<br>";
 
-        List<String> op = this.optionsTableModel.getOptions();
+        List<String> options = optionsTableModel.getOptions();
 
-        int i;
-        for (i = 0; i < op.size(); i++) {
-            text += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + op.get(i);
+        for (int i = 0; i < options.size(); i++) {
+            text += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + options.get(i);
 
         }
         text += "<br>    ";
-
-        String Status_text = "";
-        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, issuePoll,
-                text,
-                (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
+        String statusText = "";
+        IssueConfirmDialog issueConfirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, issuePoll,
+                text, (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), statusText,
                 Lang.getInstance().translate("Confirmation Transaction"));
-        dd.setLocationRelativeTo(th);
-        dd.setVisible(true);
+        issueConfirmDialog.setLocationRelativeTo(this);
+        issueConfirmDialog.setVisible(true);
 
         // JOptionPane.OK_OPTION
-        if (!dd.isConfirm) {
-            this.createButton.setEnabled(true);
+        if (!issueConfirmDialog.isConfirm) {
+            createButton.setEnabled(true);
             return;
         }
 
         // VALIDATE AND PROCESS
         int result = Controller.getInstance().getTransactionCreator().afterCreate(issuePoll, Transaction.FOR_NETWORK);
-
         if (result == Transaction.VALIDATE_OK) {
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Poll issue has been sent") + "!",
                     Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
@@ -381,14 +282,16 @@ public class IssuePollPanel extends JPanel {
         }
 
         // ENABLE
-        this.createButton.setEnabled(true);
+        createButton.setEnabled(true);
     }
-    private void delrow(){
+
+
+
+    private void deleteRow() {
         if (optionsTableModel.getRowCount() > 1) {
             int selRow = table.getSelectedRow();
             if (selRow != -1) {
-                ((DefaultTableModel) optionsTableModel).removeRow(selRow);
-                
+                optionsTableModel.removeRow(selRow);
             }
         }
     }

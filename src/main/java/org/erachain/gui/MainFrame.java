@@ -71,7 +71,6 @@ public class MainFrame extends JFrame implements Observer {
         if (instance == null) {
             instance = new MainFrame();
         }
-
         return instance;
     }
 
@@ -100,7 +99,7 @@ public class MainFrame extends JFrame implements Observer {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.2;
-        // getContentPane().add(jPanel1, gridBagConstraints);
+        // getContentPane().add(jPanelHead, gridBagConstraints);
 
         add(mainPanel, BorderLayout.CENTER);
 
@@ -117,7 +116,7 @@ public class MainFrame extends JFrame implements Observer {
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.2;
-        // getContentPane().add(jPanel2, gridBagConstraints);
+        // getContentPane().add(jPanelCopyButton, gridBagConstraints);
         // this.add(new StatusPanel(), BorderLayout.SOUTH);
 
         jMenu_Files.setText(Lang.getInstance().translate("File"));

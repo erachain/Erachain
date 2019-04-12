@@ -210,7 +210,7 @@ public class OtherSplitPanel extends SplitPanel {
         gridBagConstraints.insets = new java.awt.Insets(7, 11, 11, 11);
         jPanel2.add(jScrollPane_Peers_Table, gridBagConstraints);
         
-        // jScrollPanel_LeftPanel.setViewportView(jPanel2);
+        // jScrollPanel_LeftPanel.setViewportView(jPanelCopyButton);
         leftPanel.removeAll();
         jSplitPanel.setLeftComponent(jPanel2);
         

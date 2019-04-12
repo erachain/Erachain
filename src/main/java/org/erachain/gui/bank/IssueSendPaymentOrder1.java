@@ -329,7 +329,7 @@ class IssueSendPaymentOrder1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(jTextField_Ammount, gridBagConstraints);
 
-        //  jLabel_Description.setText("Description");
+        //  jLabelDescription.setText("Description");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 30;

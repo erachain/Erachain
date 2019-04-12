@@ -90,7 +90,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
             //jTextArea_Messge.setText();
 
             jTextArea_Messge.setPreferredSize(new Dimension(300, 200));
-            //   jScrollPane1.setMaximumSize(new Dimension(600,800));
+            //   scrollPaneDescription.setMaximumSize(new Dimension(600,800));
 
             jScrollPane1.setViewportView(jTextArea_Messge);
 

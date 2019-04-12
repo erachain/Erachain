@@ -121,7 +121,7 @@ public class library {
         }
     }
 
-    public static void Set_GUI_Look_And_Feel(String text) {
+    public static void setGuiLookAndFeel(String text) {
         String name_font = "Courier";
         int size_font;
 
