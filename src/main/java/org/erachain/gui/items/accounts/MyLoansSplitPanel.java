@@ -18,11 +18,11 @@ public class MyLoansSplitPanel extends SplitPanel {
     public MyLoansSplitPanel() {
         super("MyLoansSplitPanel");
         //	LayoutManager favoritesGBC = this.getLayout();
-        this.jScrollPanel_LeftPanel.setVisible(false);
+        this.jScrollPanelLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);
-        this.toolBar_LeftPanel.setVisible(false);
+        this.toolBarLeftPanel.setVisible(false);
         this.setName(Lang.getInstance().translate("My Loans"));
-        this.jToolBar_RightPanel.setVisible(false);
+        this.jToolBarRightPanel.setVisible(false);
 
         GridBagConstraints PanelGBC = new GridBagConstraints();
         PanelGBC.fill = GridBagConstraints.BOTH;
@@ -37,7 +37,7 @@ public class MyLoansSplitPanel extends SplitPanel {
 
         this.leftPanel.add(accountPanel, PanelGBC);
         //this.rightPanel1.add(rightPanel,PanelGBC);
-        jScrollPane_jPanel_RightPanel.setViewportView(rightPanel);
+        jScrollPaneJPanelRightPanel.setViewportView(rightPanel);
 
         // EVENTS on CURSOR
         accountPanel.table.getSelectionModel().addListSelectionListener(new Account_Tab_Listener());

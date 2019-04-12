@@ -84,6 +84,11 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
         return list.size();
     }
 
+    @Override
+    public ItemCls getItem(int k) {
+        return list.get(k);
+    }
+
     //public abstract int getMapSize();
     @Override
     public long getMapSize() {

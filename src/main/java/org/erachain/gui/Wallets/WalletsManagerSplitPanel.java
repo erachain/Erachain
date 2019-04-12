@@ -22,18 +22,18 @@ public class WalletsManagerSplitPanel extends SplitPanel {
     public WalletsManagerSplitPanel() {
         super("WalletsManagerSplitPanel");
 //		LayoutManager favoritesGBC = this.getLayout();
-        this.jScrollPanel_LeftPanel.setVisible(false);
+        this.jScrollPanelLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);
-        this.toolBar_LeftPanel.setVisible(true);
-        this.button1_ToolBar_LeftPanel.setVisible(true);
-        this.button1_ToolBar_LeftPanel.setBorder(new LineBorder(Color.BLACK));
-        this.button1_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Add wallet"));
-        this.button2_ToolBar_LeftPanel.setVisible(false);
+        this.toolBarLeftPanel.setVisible(true);
+        this.button1ToolBarLeftPanel.setVisible(true);
+        this.button1ToolBarLeftPanel.setBorder(new LineBorder(Color.BLACK));
+        this.button1ToolBarLeftPanel.setText(Lang.getInstance().translate("Add wallet"));
+        this.button2ToolBarLeftPanel.setVisible(false);
 
         this.setName(Lang.getInstance().translate("Wallets Manager"));
-        this.jToolBar_RightPanel.setVisible(false);
+        this.jToolBarRightPanel.setVisible(false);
 
-        button1_ToolBar_LeftPanel.addActionListener(new ActionListener() {
+        button1ToolBarLeftPanel.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -68,7 +68,7 @@ public class WalletsManagerSplitPanel extends SplitPanel {
 
         //	this.leftPanel.add( accountPanel, PanelGBC);
         //this.rightPanel1.add(rightPanel,PanelGBC);
-        //	jScrollPane_jPanel_RightPanel.setViewportView(rightPanel);
+        //	jScrollPaneJPanelRightPanel.setViewportView(rightPanel);
         //	 this.jSplitPanel.setDividerLocation(0.3);
 
 

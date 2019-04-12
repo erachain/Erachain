@@ -87,8 +87,8 @@ public class UnconfirmedTransactionsPanel extends JPanel
         });
 
         SplitPanel record_stpit = new SplitPanel("");
-        record_stpit.toolBar_LeftPanel.setVisible(false);
-        record_stpit.jToolBar_RightPanel.setVisible(false);
+        record_stpit.toolBarLeftPanel.setVisible(false);
+        record_stpit.jToolBarRightPanel.setVisible(false);
         record_stpit.searchToolBar_LeftPanel.setVisible(false);
 
         // Dimension size = MainFrame.getInstance().desktopPane.getSize();
@@ -97,14 +97,14 @@ public class UnconfirmedTransactionsPanel extends JPanel
         // record_stpit.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 
         // show
-        // record_stpit.jTable_jScrollPanel_LeftPanel.setModel(transactionsModel);
-        record_stpit.jTable_jScrollPanel_LeftPanel = transactionsTable;
-        record_stpit.jTable_jScrollPanel_LeftPanel.isFontSet();
+        // record_stpit.jTableJScrollPanelLeftPanel.setModel(transactionsModel);
+        record_stpit.jTableJScrollPanelLeftPanel = transactionsTable;
+        record_stpit.jTableJScrollPanelLeftPanel.isFontSet();
 
-        record_stpit.jScrollPanel_LeftPanel.setViewportView(record_stpit.jTable_jScrollPanel_LeftPanel);
+        record_stpit.jScrollPanelLeftPanel.setViewportView(record_stpit.jTableJScrollPanelLeftPanel);
 
         // обработка изменения положения курсора в таблице
-        record_stpit.jTable_jScrollPanel_LeftPanel.getSelectionModel()
+        record_stpit.jTableJScrollPanelLeftPanel.getSelectionModel()
                 .addListSelectionListener(new ListSelectionListener() {
                     @SuppressWarnings({"unused"})
                     @Override
@@ -116,12 +116,12 @@ public class UnconfirmedTransactionsPanel extends JPanel
                         SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
                         // создаем объект персоны
                         UnionCls union;
-                        if (record_stpit.jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0) {
+                        if (record_stpit.jTableJScrollPanelLeftPanel.getSelectedRow() >= 0) {
 
                             // GET ROW
-                            int row = record_stpit.jTable_jScrollPanel_LeftPanel.getSelectedRow();
+                            int row = record_stpit.jTableJScrollPanelLeftPanel.getSelectedRow();
                             try {
-                                row = record_stpit.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                                row = record_stpit.jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                             
 
                             // GET TRANSACTION
@@ -155,10 +155,10 @@ public class UnconfirmedTransactionsPanel extends JPanel
                             gridBagConstraints.weighty = 1.0;
                             panel.add(jLabel9, gridBagConstraints);
 
-                            record_stpit.jScrollPane_jPanel_RightPanel.setViewportView(panel);
+                            record_stpit.jScrollPaneJPanelRightPanel.setViewportView(panel);
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
-                                record_stpit.jScrollPane_jPanel_RightPanel.setViewportView(null);
+                                record_stpit.jScrollPaneJPanelRightPanel.setViewportView(null);
                             }
                         }
                     }
@@ -175,8 +175,8 @@ public class UnconfirmedTransactionsPanel extends JPanel
             public void actionPerformed(ActionEvent e) {
                 // code Rebroadcast
 
-                int row = record_stpit.jTable_jScrollPanel_LeftPanel.getSelectedRow();
-                row = record_stpit.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                int row = record_stpit.jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = record_stpit.jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 Transaction trans = transactionsModel.getItem(row);
                 DCSet dcSet = DCSet.getInstance();
                 trans.setDC(dcSet, Transaction.FOR_NETWORK, DCSet.getInstance().getBlockMap().size() + 1, 1);
@@ -193,8 +193,8 @@ public class UnconfirmedTransactionsPanel extends JPanel
             public void actionPerformed(ActionEvent e) {
 
                 // code delete
-                int row = record_stpit.jTable_jScrollPanel_LeftPanel.getSelectedRow();
-                row = record_stpit.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                int row = record_stpit.jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = record_stpit.jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 Transaction trans = transactionsModel.getItem(row);
                 DCSet.getInstance().getTransactionMap().delete(trans);
 
@@ -210,8 +210,8 @@ public class UnconfirmedTransactionsPanel extends JPanel
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                int row = record_stpit.jTable_jScrollPanel_LeftPanel.getSelectedRow();
-                row = record_stpit.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                int row = record_stpit.jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = record_stpit.jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 Transaction trans = transactionsModel.getItem(row);
                 if (trans == null) return;
                 // save
@@ -222,7 +222,7 @@ public class UnconfirmedTransactionsPanel extends JPanel
         });
         menu.add(item_Save);
         
-        TableMenuPopupUtil.installContextMenu(record_stpit.jTable_jScrollPanel_LeftPanel, menu);
+        TableMenuPopupUtil.installContextMenu(record_stpit.jTableJScrollPanelLeftPanel, menu);
 
         // this.add(this.transactionsTable);
 

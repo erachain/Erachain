@@ -41,11 +41,11 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 
         // not show buttons
-        jToolBar_RightPanel.setVisible(false);
-        toolBar_LeftPanel.setVisible(false);
+        jToolBarRightPanel.setVisible(false);
+        toolBarLeftPanel.setVisible(false);
 
         // not show My filter
-        searth_My_JCheckBox_LeftPanel.setVisible(false);
+        searchMyJCheckBoxLeftPanel.setVisible(false);
 
         //CREATE TABLE
         search_Table_Model = new StatementsTableModelFavorite();
@@ -72,19 +72,19 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         // UPDATE FILTER ON TEXT CHANGE
         searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new search_tab_filter());
         // SET VIDEO
-        jTable_jScrollPanel_LeftPanel = new MTable(this.search_Table_Model);
-        //	jTable_jScrollPanel_LeftPanel = search_Table;
+        jTableJScrollPanelLeftPanel = new MTable(this.search_Table_Model);
+        //	jTableJScrollPanelLeftPanel = search_Table;
         //sorter from 0 column
         search_Sorter = new TableRowSorter(search_Table_Model);
         ArrayList<SortKey> keys = new ArrayList<RowSorter.SortKey>();
         keys.add(new RowSorter.SortKey(0, SortOrder.DESCENDING));
         search_Sorter.setSortKeys(keys);
         ((DefaultRowSorter<?, ?>) search_Sorter).setSortsOnUpdates(true);
-        this.jTable_jScrollPanel_LeftPanel.setRowSorter(search_Sorter);
-        jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+        this.jTableJScrollPanelLeftPanel.setRowSorter(search_Sorter);
+        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
         //	setRowHeightFormat(true);
         // Event LISTENER
-        jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
+        jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 
         JPopupMenu menu = new JPopupMenu();
 
@@ -106,32 +106,32 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
 
         vouch_Item.addActionListener(e -> {
 
-            if (jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0) return;
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
 
 
-            Transaction statement = search_Table_Model.get_Statement(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+            Transaction statement = search_Table_Model.get_Statement(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             if (statement == null) return;
             new VouchRecordDialog(statement.getBlockHeight(), statement.getSeqNo());
         });
 
         menu.add(vouch_Item);
 
-        TableMenuPopupUtil.installContextMenu(jTable_jScrollPanel_LeftPanel, menu);
+        TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menu);
 
-        jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() {
+        jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 Point p = e.getPoint();
-                int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
-                jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
+                int row = jTableJScrollPanelLeftPanel.rowAtPoint(p);
+                jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
 
 
                 if (e.getClickCount() == 1 & e.getButton() == MouseEvent.BUTTON1) {
 
-                    if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == StatementsTableModelFavorite.COLUMN_FAVORITE) {
-                        //	row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                    if (jTableJScrollPanelLeftPanel.getSelectedColumn() == StatementsTableModelFavorite.COLUMN_FAVORITE) {
+                        //	row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                         //	 PersonCls asset = search_Table_Model.getPerson(row);
-                        favorite_set(jTable_jScrollPanel_LeftPanel);
+                        favorite_set(jTableJScrollPanelLeftPanel);
 
 
                     }
@@ -149,7 +149,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         // delete observer left panel
         search_Table_Model.removeObservers();
         // get component from right panel
-        Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+        Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
         if (c1 instanceof StatementInfo) ((StatementInfo) c1).delay_on_Close();
 
@@ -220,13 +220,13 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         @Override
         public void valueChanged(ListSelectionEvent arg0) {
 
-            if (jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0)
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
                 return;
 
-            Transaction statement = search_Table_Model.get_Statement(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+            Transaction statement = search_Table_Model.get_Statement(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             StatementInfo info_panel = new StatementInfo(statement);
-            info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width - 50, jScrollPane_jPanel_RightPanel.getSize().height - 50));
-            jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+            info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));
+            jScrollPaneJPanelRightPanel.setViewportView(info_panel);
             //	jSplitPanel.setRightComponent(info_panel);
         }
     }

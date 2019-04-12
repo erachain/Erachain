@@ -44,8 +44,8 @@ public class SearchDocumentHash extends SplitPanel {
                 if (person != null) {
                     PersonInfo002 info_panel = new PersonInfo002(person, false);
                     //info_panel..key_jLabel.setText(Lang.getInstance().translate("Information about the Signer"));
-                    info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width - 50, jScrollPane_jPanel_RightPanel.getSize().height - 50));
-                    jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+                    info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));
+                    jScrollPaneJPanelRightPanel.setViewportView(info_panel);
                 }
 
             }
@@ -55,13 +55,13 @@ public class SearchDocumentHash extends SplitPanel {
 
         this.jButton2_jToolBar_RightPanel.setVisible(false);
         this.jButton1_jToolBar_RightPanel.setVisible(false);
-        this.searth_Favorite_JCheckBox_LeftPanel.setVisible(false);
-        this.searth_My_JCheckBox_LeftPanel.setVisible(false);
+        this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
+        this.searchMyJCheckBoxLeftPanel.setVisible(false);
         this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Hash"));
         this.searchTextField_SearchToolBar_LeftPanel.setMinimumSize(new Dimension(500, 20));
         this.searchTextField_SearchToolBar_LeftPanel.setPreferredSize(new Dimension(500, 20));
-        this.button2_ToolBar_LeftPanel.setVisible(false);
-        this.button1_ToolBar_LeftPanel.setVisible(false);
+        this.button2ToolBarLeftPanel.setVisible(false);
+        this.button1ToolBarLeftPanel.setVisible(false);
         JButton search_Button = new JButton();
         this.searchToolBar_LeftPanel.add(search_Button);
 
@@ -112,7 +112,7 @@ public class SearchDocumentHash extends SplitPanel {
         });
 
 
-        this.jScrollPanel_LeftPanel.setViewportView(Table_Hash);
+        this.jScrollPanelLeftPanel.setViewportView(Table_Hash);
 
 
     }
@@ -148,7 +148,7 @@ public class SearchDocumentHash extends SplitPanel {
             // преобразуем в байты
             long file_len = file.length();
             if (file_len > Integer.MAX_VALUE) {
-                //		table_Model.addRow(new Object[] { "",
+                //		tableModel.addRow(new Object[] { "",
                 //				Lang.getInstance().translate("length very long") + " - " + file_name });
                 //		continue;
             }
@@ -159,7 +159,7 @@ public class SearchDocumentHash extends SplitPanel {
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-                //		table_Model.addRow(new Object[] { "",
+                //		tableModel.addRow(new Object[] { "",
                 //				Lang.getInstance().translate("error streaming") + " - " + file_name });
                 //		continue;
             }
@@ -168,7 +168,7 @@ public class SearchDocumentHash extends SplitPanel {
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-                //		table_Model.addRow(new Object[] { "",
+                //		tableModel.addRow(new Object[] { "",
                 //				Lang.getInstance().translate("error reading") + " - " + file_name });
                 //		continue;
             }
@@ -182,14 +182,14 @@ public class SearchDocumentHash extends SplitPanel {
 
             /// HASHING
             String hashe = Base58.encode(Crypto.getInstance().digest(fileInArray));
-            //	table_Model.addRow(new Object[] { hashes,
+            //	tableModel.addRow(new Object[] { hashes,
             //			Lang.getInstance().translate("from file ") + file_name });
             this.searchTextField_SearchToolBar_LeftPanel.setText(hashe);
 
             model_Hashs.Set_Data(hashe);
             //	model_Hashs = new ModelHashesInfo(hashe);
             //		Table_Hash = new JTable(model_Hashs);
-            //	this.jScrollPanel_LeftPanel.setViewportView(Table_Hash);
+            //	this.jScrollPanelLeftPanel.setViewportView(Table_Hash);
 
 
         }

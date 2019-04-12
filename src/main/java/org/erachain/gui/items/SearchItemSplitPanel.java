@@ -16,10 +16,10 @@ public class SearchItemSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
     protected SearchItemsTableModel search_Table_Model;
     private MDecimalFormatedTextField key_Item;
-//	protected JMenuItem favorite_menu_items;
-//	protected JPopupMenu menu_Table;
-//	protected ItemCls item_Menu;
-//	protected ItemCls item_Table_Selected = null;
+//	protected JMenuItem favoriteMenuItems;
+//	protected JPopupMenu menuTable;
+//	protected ItemCls itemMenu;
+//	protected ItemCls itemTableSelected = null;
 
     @SuppressWarnings("rawtypes")
     public SearchItemSplitPanel(SearchItemsTableModel search_Table_Model1, String gui_Name, String search_Label_Text) {
@@ -30,13 +30,13 @@ public class SearchItemSplitPanel extends ItemSplitPanel {
         searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 
         // CHECKBOX FOR FAVORITE
-        TableColumn favorite_Column = jTable_jScrollPanel_LeftPanel.getColumnModel()
+        TableColumn favorite_Column = jTableJScrollPanelLeftPanel.getColumnModel()
                 .getColumn(search_Table_Model.COLUMN_FAVORITE);
         favorite_Column.setMaxWidth(1000);
         favorite_Column.setPreferredWidth(50);
         // search Panel
         this.searchToolBar_LeftPanel.setVisible(true);
-        this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Find Key") + ":"));
+        this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Find Key") + ":"));
         key_Item = new MDecimalFormatedTextField();
         key_Item.setMaskType(key_Item.maskLong);
         key_Item.setToolTipText("");
@@ -48,7 +48,7 @@ public class SearchItemSplitPanel extends ItemSplitPanel {
 
         MenuPopupUtil.installContextMenu(key_Item);
 
-        this.toolBar_LeftPanel.add(key_Item);
+        this.toolBarLeftPanel.add(key_Item);
         key_Item.addActionListener(new ActionListener() {
 
             @Override
@@ -56,19 +56,19 @@ public class SearchItemSplitPanel extends ItemSplitPanel {
                 // TODO Auto-generated method stub
                 searchTextField_SearchToolBar_LeftPanel.setText("");
                 Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
-                jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+                jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                 new Thread() {
                     @Override
                     public void run() {
                         search_Table_Model.findByKey(key_Item.getText());
                         if (search_Table_Model.getRowCount() > 0) {
-                            jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
-                            jTable_jScrollPanel_LeftPanel. getSelectionModel().addSelectionInterval(0, 0);
+                            jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
+                            jTableJScrollPanelLeftPanel. getSelectionModel().addSelectionInterval(0, 0);
                             return;
                         }
                         Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found"));
-                        jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
-                        jScrollPane_jPanel_RightPanel.setViewportView(null);
+                        jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
+                        jScrollPaneJPanelRightPanel.setViewportView(null);
                     }
                 }.start();
             }
@@ -85,33 +85,33 @@ public class SearchItemSplitPanel extends ItemSplitPanel {
                 // GET VALUE
                 String search = searchTextField_SearchToolBar_LeftPanel.getText();
                 if (search.equals("")) {
-                    jScrollPane_jPanel_RightPanel.setViewportView(null);
+                    jScrollPaneJPanelRightPanel.setViewportView(null);
                     search_Table_Model.clear();
                     Label_search_Info_Panel.setText(Lang.getInstance().translate("Enter more  2 characters"));
-                    jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+                    jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                     return;
                 }
                 if (search.length() < 3) {
                     Label_search_Info_Panel.setText(Lang.getInstance().translate("Enter more  2 characters"));
-                    jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+                    jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                     return;
                 }
                 key_Item.setText("");
 
                 Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
-                jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+                jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                 new Thread() {
                     @Override
                     public void run() {
                         search_Table_Model.findByName(search);
                         if (search_Table_Model.getRowCount() < 1) {
                             Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found"));
-                            jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
-                            jScrollPane_jPanel_RightPanel.setViewportView(null);
+                            jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
+                            jScrollPaneJPanelRightPanel.setViewportView(null);
                             return;
                         }
-                        jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
-                        jTable_jScrollPanel_LeftPanel. getSelectionModel().addSelectionInterval(0, 0);
+                        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
+                        jTableJScrollPanelLeftPanel. getSelectionModel().addSelectionInterval(0, 0);
                     }
                 }.start();
             }

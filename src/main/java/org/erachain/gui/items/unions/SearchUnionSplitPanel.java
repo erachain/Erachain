@@ -26,24 +26,24 @@ public class SearchUnionSplitPanel extends SearchItemSplitPanel {
         JMenuItem confirm_Menu = new JMenuItem(Lang.getInstance().translate("Confirm"));
         confirm_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new UnionConfirmDialog(th, (UnionCls) item_Menu);
+                new UnionConfirmDialog(th, (UnionCls) itemMenu);
             }
         });
-        this.menu_Table.add(confirm_Menu);
+        this.menuTable.add(confirm_Menu);
 
         JMenuItem setStatus_Menu = new JMenuItem(Lang.getInstance().translate("Set status"));
         setStatus_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new UnionSetStatusDialog(th, (UnionCls) item_Menu);
+                new UnionSetStatusDialog(th, (UnionCls) itemMenu);
             }
         });
-        this.menu_Table.add(setStatus_Menu);
+        this.menuTable.add(setStatus_Menu);
 
     }
 
     // show details
     @Override
-    public Component get_show(ItemCls item) {
+    public Component getShow(ItemCls item) {
 
         UnionInfo union_Info = new UnionInfo();
         union_Info.show_Union_001((UnionCls) item);

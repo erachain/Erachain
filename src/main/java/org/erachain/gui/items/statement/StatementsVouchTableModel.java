@@ -130,7 +130,11 @@ public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
     }
 
     public void setRows() {
-        list.clear();
+        if (list == null) {
+            list = new ArrayList<>();
+        } else {
+            list.clear();
+        }
 
         // read indexes to DB
         Tuple2<BigDecimal, List<Long>> vouches = ((VouchRecordMap)map).get(Transaction.makeDBRef(this.blockNo, this.recNo));

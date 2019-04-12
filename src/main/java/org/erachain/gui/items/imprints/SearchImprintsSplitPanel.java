@@ -26,8 +26,8 @@ public class SearchImprintsSplitPanel extends SplitPanel {
         searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         searthLabel_SearchToolBar_LeftPanel.setVisible(true);
 // not show buttons
-        button1_ToolBar_LeftPanel.setVisible(false);
-        button2_ToolBar_LeftPanel.setVisible(false);
+        button1ToolBarLeftPanel.setVisible(false);
+        button2ToolBarLeftPanel.setVisible(false);
         jButton1_jToolBar_RightPanel.setVisible(false);
         jButton2_jToolBar_RightPanel.setVisible(false);
 
@@ -78,17 +78,17 @@ public class SearchImprintsSplitPanel extends SplitPanel {
         });
 
 // set showvideo			
-        jTable_jScrollPanel_LeftPanel.setModel(this.tableModelImprints);
-        jTable_jScrollPanel_LeftPanel = imprintsTable;
-        jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+        jTableJScrollPanelLeftPanel.setModel(this.tableModelImprints);
+        jTableJScrollPanelLeftPanel = imprintsTable;
+        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         // Event LISTENER
-        jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+        jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent arg0) {
                 ImprintCls imprint = null;
-                if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0)
-                    imprint = tableModelImprints.getImprint(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+                if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0)
+                    imprint = tableModelImprints.getImprint(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
 
 
                 //	info.show_001(person);
@@ -96,8 +96,8 @@ public class SearchImprintsSplitPanel extends SplitPanel {
                 //	search_Person_SplitPanel.jSplitPanel.setDividerLocation(search_Person_SplitPanel.jSplitPanel.getDividerLocation());
                 //	search_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
                 ImprintsInfoPanel info_panel = new ImprintsInfoPanel(imprint);
-                info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width - 50, jScrollPane_jPanel_RightPanel.getSize().height - 50));
-                jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+                info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));
+                jScrollPaneJPanelRightPanel.setViewportView(info_panel);
             }
         });
 	
@@ -142,7 +142,7 @@ public class SearchImprintsSplitPanel extends SplitPanel {
         // delete observer left panel
         tableModelImprints.deleteObservers();
         // get component from right panel
-        Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+        Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
         if (c1 instanceof ImprintsInfoPanel) ((ImprintsInfoPanel) c1).delay_on_Close();
 

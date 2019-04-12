@@ -31,11 +31,11 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                new AccountSendDialog(null, null, null, (PersonCls) th.item_Menu);
+                new AccountSendDialog(null, null, null, (PersonCls) th.itemMenu);
             }
         });
 
-      //  this.menu_Table.add(vsend_Coins_Item);
+      //  this.menuTable.add(vsend_Coins_Item);
         
         
         JMenuItem send_Mail_Item = new JMenuItem(Lang.getInstance().translate("Send Mail"));
@@ -43,11 +43,11 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                new MailSendDialog(null, null, null, (PersonCls) th.item_Menu);
+                new MailSendDialog(null, null, null, (PersonCls) th.itemMenu);
             }
         });
 
-     //   this.menu_Table.add(send_Mail_Item);
+     //   this.menuTable.add(send_Mail_Item);
   
 //    add items in menu
       
@@ -58,11 +58,11 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
                 public void actionPerformed(ActionEvent e) {
 
                     @SuppressWarnings("unused")
-                    PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) th.item_Menu);
+                    PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) th.itemMenu);
                     
                 }
             });
-            this.menu_Table.add(set_Status_Item);
+            this.menuTable.add(set_Status_Item);
 
             JMenuItem attestPubKey_Item = new JMenuItem(Lang.getInstance().translate("Attest public key for person"));
            
@@ -72,18 +72,18 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
 
 
                     @SuppressWarnings("unused")
-                    PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) th.item_Menu, th.item_Menu.getOwner());
+                    PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) th.itemMenu, th.itemMenu.getOwner());
                    
                 }
             });
-            this.menu_Table.add(attestPubKey_Item);
+            this.menuTable.add(attestPubKey_Item);
 
             JMenuItem vouchPerson_Item = new JMenuItem(Lang.getInstance().translate("Vouch the person info"));
             vouchPerson_Item.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
 
-                    PersonCls per = (PersonCls) th.item_Menu;
+                    PersonCls per = (PersonCls) th.itemMenu;
                     byte[] ref = per.getReference();
                     Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
                     int blockNo = transaction.getBlockHeight();
@@ -92,7 +92,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
                    
                 }
             });
-            this.menu_Table.add(vouchPerson_Item);
+            this.menuTable.add(vouchPerson_Item);
 
       
         
@@ -101,7 +101,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
 
     // show details
     @Override
-    public Component get_show(ItemCls item) {
+    public Component getShow(ItemCls item) {
 
         return new PersonInfo002((PersonCls) item, true);
 

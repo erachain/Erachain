@@ -41,8 +41,8 @@ public class MyBalanceTab extends SplitPanel {
         this.setName(Lang.getInstance().translate("My Balance"));
         searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
-        button1_ToolBar_LeftPanel.setVisible(false);
-        button2_ToolBar_LeftPanel.setVisible(false);
+        button1ToolBarLeftPanel.setVisible(false);
+        button2ToolBarLeftPanel.setVisible(false);
         jButton1_jToolBar_RightPanel.setVisible(false);
         jButton2_jToolBar_RightPanel.setVisible(false);
 
@@ -117,12 +117,12 @@ public class MyBalanceTab extends SplitPanel {
 
 
 // add listener
-//		jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(table);
+//		jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(table);
 // show	
-        this.jTable_jScrollPanel_LeftPanel.setModel(BalancesModel);
-        this.jTable_jScrollPanel_LeftPanel = table;
-        jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
-        jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+        this.jTableJScrollPanelLeftPanel.setModel(BalancesModel);
+        this.jTableJScrollPanelLeftPanel = table;
+        jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
+        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         // UPDATE FILTER ON TEXT CHANGE
         searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
@@ -333,7 +333,7 @@ public class MyBalanceTab extends SplitPanel {
 				if (table.getSelectedColumn() == WalletItemAssetsTableModel.COLUMN_FAVORITE){
 					row = table.convertRowIndexToModel(row);
 					AssetCls asset = orderModel.getAsset(row);
-					favorite_set( table);	
+					favoriteSet( table);
 					
 					
 					
@@ -399,12 +399,12 @@ if(order.getKey() >= AssetCls.INITIAL_FAVORITES)
                 asset = BalancesModel.getAsset(table.convertRowIndexToModel(table.getSelectedRow()));
             if (asset == null) return;
             //AssetDetailsPanel001 info_panel = new AssetDetailsPanel001(asset);
-            //info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
+            //info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,jScrollPaneJPanelRightPanel.getSize().height-50));
             int div = th.jSplitPanel.getDividerLocation();
             int or = th.jSplitPanel.getOrientation();
             AssetInfo info_panel = new AssetInfo(asset);
-            //info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
-            jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+            //info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,jScrollPaneJPanelRightPanel.getSize().height-50));
+            jScrollPaneJPanelRightPanel.setViewportView(info_panel);
             //jSplitPanel.setRightComponent(info_panel);
             jSplitPanel.setDividerLocation(div);
             jSplitPanel.setOrientation(or);

@@ -25,17 +25,17 @@ public class TemplatesFavoriteSplitPanel extends ItemSplitPanel {
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 DCSet db = DCSet.getInstance();
-                Transaction trans = db.getTransactionFinalMap().get(((TemplateCls) th.item_Menu).getReference());
+                Transaction trans = db.getTransactionFinalMap().get(((TemplateCls) th.itemMenu).getReference());
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
 
             }
         });
-        th.menu_Table.add(vouch_menu);
+        th.menuTable.add(vouch_menu);
     }
 
     // show details
     @Override
-    public Component get_show(ItemCls item) {
+    public Component getShow(ItemCls item) {
         return new InfoTemplates((TemplateCls) item);
     }
 

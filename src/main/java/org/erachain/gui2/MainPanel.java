@@ -19,7 +19,7 @@ import javax.swing.tree.TreePath;
 import org.erachain.core.BlockChain;
 import org.erachain.gui.Wallets.WalletsManagerSplitPanel;
 import org.erachain.gui.bank.IssueSendPaymentOrder;
-import org.erachain.gui.bank.MyOrde_PaumentsSplitPanel;
+import org.erachain.gui.bank.MyOrderPaimentsSplitPanel;
 import org.erachain.gui.items.accounts.AccountsNameSearchSplitPanel;
 import org.erachain.gui.items.accounts.MyAccountsSplitPanel;
 import org.erachain.gui.items.accounts.MyLoansSplitPanel;
@@ -294,8 +294,8 @@ public class MainPanel extends javax.swing.JPanel {
         }
 
         if (str.equals(Lang.getInstance().translate("My Payments Orders"))
-                || str.equals("MyOrde_PaumentsSplitPanel")) {
-            insertTab(Lang.getInstance().translate("My Payments Orders"), new MyOrde_PaumentsSplitPanel());
+                || str.equals("MyOrderPaimentsSplitPanel")) {
+            insertTab(Lang.getInstance().translate("My Payments Orders"), new MyOrderPaimentsSplitPanel());
             return;
         }
 

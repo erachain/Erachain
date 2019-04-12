@@ -35,11 +35,11 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
            public void actionPerformed(ActionEvent e) {
 
                @SuppressWarnings("unused")
-               PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) th.item_Menu);
+               PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) th.itemMenu);
                
            }
        });
-       this.menu_Table.add(set_Status_Item);
+       this.menuTable.add(set_Status_Item);
 
        JMenuItem attestPubKey_Item = new JMenuItem(Lang.getInstance().translate("Attest Public Key for Person"));
       
@@ -49,18 +49,18 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
 
 
                @SuppressWarnings("unused")
-               PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) th.item_Menu, th.item_Menu.getOwner());
+               PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) th.itemMenu, th.itemMenu.getOwner());
               
            }
        });
-       this.menu_Table.add(attestPubKey_Item);
+       this.menuTable.add(attestPubKey_Item);
 
        JMenuItem vouchPerson_Item = new JMenuItem(Lang.getInstance().translate("Vouch the Person Info"));
        vouchPerson_Item.addActionListener(new ActionListener() {
            @Override
            public void actionPerformed(ActionEvent e) {
 
-               PersonCls per = (PersonCls) th.item_Menu;
+               PersonCls per = (PersonCls) th.itemMenu;
                byte[] ref = per.getReference();
                Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
                int blockNo = transaction.getBlockHeight();
@@ -69,14 +69,14 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
               
            }
        });
-       this.menu_Table.add(vouchPerson_Item);
+       this.menuTable.add(vouchPerson_Item);
 
        
 
     }
     // show details
     @Override
-    public Component get_show(ItemCls item) {
+    public Component getShow(ItemCls item) {
         return new PersonInfo002((PersonCls) item, true);
     }
 

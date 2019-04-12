@@ -10,9 +10,9 @@ public class SearchAccountsSplitPanel extends SplitPanel {
 
 //		LayoutManager favoritesGBC = this.getLayout();
 
-        this.toolBar_LeftPanel.setVisible(false);
+        this.toolBarLeftPanel.setVisible(false);
         this.setName(Lang.getInstance().translate("Search Accounts"));
-        this.jToolBar_RightPanel.setVisible(false);
+        this.jToolBarRightPanel.setVisible(false);
 
     }
 
