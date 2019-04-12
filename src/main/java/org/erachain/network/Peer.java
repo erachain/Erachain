@@ -274,8 +274,8 @@ public class Peer extends MonitoredThread {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Peer) {
-            return Arrays.equals(((Peer)obj).address.getAddress(),
-                    this.address.getAddress());
+            return Arrays.equals(((Peer)obj).getAddress().getAddress(),
+                    address.getAddress());
         }
         return false;
     }

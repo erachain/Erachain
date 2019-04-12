@@ -2300,8 +2300,7 @@ public class BlockExplorer {
                         try {
                             params = (JSONObject) JSONValue.parseWithException(str);
                         } catch (ParseException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                            logger.error(e.getMessage(),e);
                         }
                         Set<String> kS = params.keySet();
 
@@ -2325,8 +2324,7 @@ public class BlockExplorer {
                     try {
                         params = (JSONObject) JSONValue.parseWithException(str);
                     } catch (ParseException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        logger.error(e.getMessage(),e);
                     }
                     Set<String> kS = params.keySet();
 
@@ -2337,8 +2335,12 @@ public class BlockExplorer {
                         ss = (JSONObject) params.get(s);
 
                         files += i + " " + ss.get("FN");
-                        files += "<a href ='../apidocuments/getFile?download=false&block=" + block + "&seqNo=" + seqNo + "&name=" + ss.get("FN") + "'> " + Lang.getInstance().translateFromLangObj("View", langObj) + " </a>";
-                        files += "<a href ='../apidocuments/getFile?download=true&block=" + block + "&seqNo=" + seqNo + "&name=" + ss.get("FN") + "'> " + Lang.getInstance().translateFromLangObj("Download", langObj) + "</a><br>";
+//                        files += "<a href ='../apidocuments/getFile?download=false&block="
+//                                + block + "&seqNo=" + seqNo + "&name=" + ss.get("FN") + "'> "
+//                                + Lang.getInstance().translateFromLangObj("View", langObj) + " </a>";
+                        files += "<a href ='../apidocuments/getFile?download=true&block="
+                                + block + "&seqNo=" + seqNo + "&name=" + ss.get("FN") + "'> "
+                                + Lang.getInstance().translateFromLangObj("Download", langObj) + "</a><br>";
                     }
 
                     output.put("files", files);
@@ -2352,8 +2354,7 @@ public class BlockExplorer {
                     try {
                         params = (JSONObject) JSONValue.parseWithException(str);
                     } catch (ParseException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        logger.error(e.getMessage(),e);
                     }
                     Set<String> kS = params.keySet();
 
@@ -2364,8 +2365,12 @@ public class BlockExplorer {
                         ss = (JSONObject) params.get(s);
 
                         files += i + " " + ss.get("File_Name");
-                        files += "<a href = '../apidocuments/getFile?download=false&block=" + block + "&seqNo=" + seqNo + "&name=" + ss.get("File_Name") + "'> " + Lang.getInstance().translateFromLangObj("View", langObj) + " </a><br>";
-                        files += "<a href = '../apidocuments/getFile?download=true&block=" + block + "&seqNo=" + seqNo + "&name=" + ss.get("File_Name") + "'> " + Lang.getInstance().translateFromLangObj("Download", langObj) + " </a><br>";
+//                        files += "<a href = '../apidocuments/getFile?download=false&block="
+//                                + block + "&seqNo=" + seqNo + "&name=" + ss.get("File_Name")
+//                                + "'> " + Lang.getInstance().translateFromLangObj("View", langObj) + " </a><br>";
+                        files += "<a href = '../apidocuments/getFile?download=true&block="
+                                + block + "&seqNo=" + seqNo + "&name=" + ss.get("File_Name")
+                                + "'> " + Lang.getInstance().translateFromLangObj("Download", langObj) + " </a><br>";
                     }
 
                     output.put("files", files);

@@ -229,7 +229,7 @@ public class MailInfo extends javax.swing.JPanel {
      */
 
         //jTextArea_Messge.setText();
-        //    jScrollPane1.setViewportView(jTextArea_Messge);
+        //    scrollPaneDescription.setViewportView(jTextArea_Messge);
 
 
         gridBagConstraints.gridx = 1;

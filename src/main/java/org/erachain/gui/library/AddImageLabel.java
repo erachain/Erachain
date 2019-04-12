@@ -20,20 +20,21 @@ public class AddImageLabel extends JLabel {
 
     private static final long serialVersionUID = 1L;
     private byte[] imgBytes;
-    private String imageLabelText;
     private int bezelWidth;
     private int bezelHeight;
     private Logger logger = LoggerFactory.getLogger(getClass().getName());
+    private JLabel label = new JLabel();
 
     public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage) {
+        setLayout(new BorderLayout());
+        label.setText(text);
+        add(label, BorderLayout.NORTH);
         this.bezelWidth = bezelWidth;
         this.bezelHeight = bezelHeight;
-        imageLabelText = text;
         setCursor(new Cursor(Cursor.HAND_CURSOR));
         setBorder(BorderFactory.createEtchedBorder());
         setVerticalAlignment(SwingConstants.TOP);
         setHorizontalAlignment(SwingConstants.CENTER);
-        setText(imageLabelText);
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -61,12 +62,15 @@ public class AddImageLabel extends JLabel {
         int returnVal = chooser.showOpenDialog(getParent());
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = new File(chooser.getSelectedFile().getPath());
-            new ImageCropDialog(file, bezelWidth, bezelHeight,typeOfImage) {
+            new ImageCropDialog(file, bezelWidth, bezelHeight, typeOfImage) {
                 @Override
                 public void onFinish(BufferedImage image) {
+                    if (image == null) {
+                        logger.error("Image does not setup");
+                        return;
+                    }
                     setIcon(new ImageIcon(image));
                     setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
-                    setText(imageLabelText);
                     ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
                     try {
                         if (typeOfImage == TypeOfImage.GIF) {
@@ -86,7 +90,6 @@ public class AddImageLabel extends JLabel {
     public void reset() {
         imgBytes = null;
         setIcon(null);
-        setText(imageLabelText);
     }
 
     public byte[] getImgBytes() {

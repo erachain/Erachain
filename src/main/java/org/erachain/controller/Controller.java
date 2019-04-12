@@ -128,7 +128,7 @@ public class Controller extends Observable {
     public static final int STATUS_SYNCHRONIZING = 1;
     public static final int STATUS_OK = 2;
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
-    public  boolean useGui = true;
+    public boolean useGui = true;
     private List<Thread> threads = new ArrayList<Thread>();
     public static long buildTimestamp;
     private static Controller instance;
@@ -174,7 +174,7 @@ public class Controller extends Observable {
     private long transactionMakeTimingAverage;
 
     public boolean backUP = false;
-    public  String[] seedCommand;
+    public String[] seedCommand;
     public boolean noCalculated;
     public boolean noUseWallet;
     public boolean noDataWallet;
@@ -258,6 +258,7 @@ public class Controller extends Observable {
     public void setDynamicGUI(boolean dynamicGUI) {
         this.dynamicGUI = dynamicGUI;
     }
+
     public boolean isDynamicGUI() {
         return this.dynamicGUI;
     }
@@ -329,6 +330,7 @@ public class Controller extends Observable {
 
     /**
      * Среднее время обработки неподтвержденной транзакции при ее прилете из сети
+     *
      * @return
      */
     public long getUnconfigmedMessageTimingAverage() {
@@ -343,6 +345,7 @@ public class Controller extends Observable {
     public long getTransactionMakeTimingAverage() {
         return transactionMakeTimingAverage;
     }
+
     public void setTransactionMakeTimingAverage(long transactionMakeTimingAverage) {
         this.transactionMakeTimingAverage = transactionMakeTimingAverage;
     }
@@ -398,9 +401,8 @@ public class Controller extends Observable {
     public Pair<String, Long> getVersionOfPeer(Peer peer) {
         if (peersVersions != null && peersVersions.containsKey(peer)) {
             return peersVersions.get(peer);
-        } else {
-            return new Pair<String, Long>("", 0l);
         }
+        return new Pair<String, Long>("", 0L);
     }
 
     public int getStatus() {
@@ -679,7 +681,7 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Start API Service")));
             LOGGER.info(Lang.getInstance().translate("Start API Service"));
-           this.rpcService = new ApiService();
+            this.rpcService = new ApiService();
             this.rpcServiceRestart();
         }
 
@@ -761,7 +763,7 @@ public class Controller extends Observable {
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Telegram OK")));
 
         // CREATE BLOCKGENERATOR
-        this.blockGenerator = new BlockGenerator(this.dcSet, this.blockChain,true);
+        this.blockGenerator = new BlockGenerator(this.dcSet, this.blockChain, true);
         // START UPDATES and BLOCK BLOCKGENERATOR
         this.blockGenerator.start();
 
@@ -925,14 +927,15 @@ public class Controller extends Observable {
     }
 
     public ApiService getRPCService() {
-        if (this.rpcService == null){
+        if (this.rpcService == null) {
             this.rpcService = new ApiService();
         }
-               return rpcService;
+        return rpcService;
     }
+
     public void rpcServiceRestart() {
         getRPCService();
-       this.rpcService.stop();
+        this.rpcService.stop();
 
         // START API SERVICE
         if (Settings.getInstance().isRpcEnabled()) {
@@ -1032,7 +1035,7 @@ public class Controller extends Observable {
         if (dcSet.isBusy())
             this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DCSet is busy...")));
-            LOGGER.info("DCSet is busy...");
+        LOGGER.info("DCSet is busy...");
 
         i = 0;
         while (i++ < 10 && dcSet.isBusy()) {
@@ -1111,6 +1114,7 @@ public class Controller extends Observable {
 
     /**
      * Total time in disconnect
+     *
      * @return
      */
     public long getToOfflineTime() {
@@ -1160,9 +1164,9 @@ public class Controller extends Observable {
             // logger.error(" time " + transaction.viewTimestamp());
 
             if (counter > BlockChain.ON_CONNECT_SEND_UNCONFIRMED_UNTIL
-                    // дело в том что при коннекте новому узлу надо все же
-                    // передавать все так как он может собрать пустой блок
-                    /////&& !map.needBroadcasting(transaction, peerByte)
+                // дело в том что при коннекте новому узлу надо все же
+                // передавать все так как он может собрать пустой блок
+                /////&& !map.needBroadcasting(transaction, peerByte)
             )
                 break;
 
@@ -1345,6 +1349,7 @@ public class Controller extends Observable {
     }
 
     private long statusObserveTime;
+
     // used from NETWORK
     public void afterDisconnect(Peer peer) {
 
@@ -1462,8 +1467,8 @@ public class Controller extends Observable {
                 VersionMessage versionMessage = (VersionMessage) message;
 
                 // ADD TO LIST
-                    this.peersVersions.put(versionMessage.getSender(), new Pair<String, Long>(
-                            versionMessage.getStrVersion(), versionMessage.getBuildDateTime()));
+                this.peersVersions.put(versionMessage.getSender(), new Pair<String, Long>(
+                        versionMessage.getStrVersion(), versionMessage.getBuildDateTime()));
 
                 break;
 
@@ -1509,7 +1514,7 @@ public class Controller extends Observable {
         LOGGER.info("broadcast winBlock " + newBlock.toString() + " size:" + newBlock.getTransactionCount());
 
         // CREATE MESSAGE
-        BlockWinMessage blockWinMessage = (BlockWinMessage)MessageFactory.getInstance().createWinBlockMessage(newBlock);
+        BlockWinMessage blockWinMessage = (BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(newBlock);
 
         if (this.isOnStopping())
             return;
@@ -1722,7 +1727,7 @@ public class Controller extends Observable {
         if (betterPeerHW != null) {
             Tuple2<Integer, Long> currentHW = getHWeightOfPeer(currentBetterPeer);
             if (currentHW != null && (currentHW.a > betterPeerHW.a || currentHW.b >= betterPeerHW.b
-                || currentBetterPeer.equals(betterPeerHW.c))) {
+                    || currentBetterPeer.equals(betterPeerHW.c))) {
                 // новый пир не лучше - продолжим синхронизацию не прерываясь
                 return;
             }
@@ -3228,11 +3233,11 @@ public class Controller extends Observable {
         super.deleteObserver(o);
     }
 
-    public void addSingleObserver(Observer o){
-       super.addObserver(o);
+    public void addSingleObserver(Observer o) {
+        super.addObserver(o);
     }
 
-    public void deleteSingleObserver(Observer o){
+    public void deleteSingleObserver(Observer o) {
         super.deleteObserver(o);
     }
 
@@ -3240,6 +3245,7 @@ public class Controller extends Observable {
         this.wallet.addObserver(o);
         this.guiTimer.addObserver(o); // обработка repaintGUI
     }
+
     public void deleteWalletObserver(Observer o) {
         this.guiTimer.deleteObserver(o); // нужно для перерисовки раз в 2 сек
         this.wallet.deleteObserver(o);
@@ -3249,12 +3255,13 @@ public class Controller extends Observable {
         this.wallet.addFavoritesObserver(o);
         this.guiTimer.addObserver(o); // обработка repaintGUI
     }
+
     public void deleteWalletFavoritesObserver(Observer o) {
         this.guiTimer.deleteObserver(o); // нужно для перерисовки раз в 2 сек
         this.wallet.deleteObserver(o);
     }
 
-    public void startApplication(String args[]){
+    public void startApplication(String args[]) {
         boolean cli = false;
 
         // get GRADLE bild time
@@ -3349,7 +3356,7 @@ public class Controller extends Observable {
         if (useGui) {
 
             this.about_frame = AboutFrame.getInstance();
-            this.addSingleObserver( about_frame);
+            this.addSingleObserver(about_frame);
             this.about_frame.setUserClose(false);
             this.about_frame.setModal(false);
             this.about_frame.setVisible(true);
@@ -3373,7 +3380,7 @@ public class Controller extends Observable {
 
                 String licenseFile = "Erachain Licence Agreement (genesis).txt";
                 File f = new File(licenseFile);
-                if(!f.exists()) {
+                if (!f.exists()) {
 
                     LOGGER.error("License file not found: " + licenseFile);
 
@@ -3413,7 +3420,7 @@ public class Controller extends Observable {
                             about_frame.setVisible(false);
                         }
                     } catch (Exception e1) {
-                        if (about_frame!=null) {
+                        if (about_frame != null) {
                             about_frame.setVisible(false);
                             about_frame.dispose();
                         }
@@ -3457,7 +3464,7 @@ public class Controller extends Observable {
                 }
 
 
-                if (about_frame!=null) {
+                if (about_frame != null) {
                     about_frame.setVisible(false);
                     about_frame.dispose();
                 }
@@ -3475,7 +3482,7 @@ public class Controller extends Observable {
 
                 if (command.equals("quit")) {
 
-                    if (about_frame!=null) {
+                    if (about_frame != null) {
                         about_frame.setVisible(false);
                         about_frame.dispose();
                     }

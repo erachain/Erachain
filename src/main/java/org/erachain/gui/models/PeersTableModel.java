@@ -31,13 +31,13 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
     /**
      * для сортировки по полям в особом виде
      */
-    List<Peer> peersView = new ArrayList<Peer>();
-    int view = 1;
+    private List<Peer> peersView = new ArrayList<Peer>();
+    private int view = 1;
 
     public PeersTableModel() {
-        super(new String[] { "IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago",
-                "Online Time", "Version" },
-                new Boolean[] { false, false, false, false, false, false, false, false }, false);
+        super(new String[]{"IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago",
+                        "Online Time", "Version"},
+                new Boolean[]{false, false, false, false, false, false, false, false}, false);
 
         logger = LoggerFactory.getLogger(PeersTableModel.class.getName());
 
@@ -52,15 +52,14 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
         peersView.sort(new Comparator<Peer>() {
             @Override
             public int compare(Peer o1, Peer o2) {
-                // TODO Auto-generated method stub
                 int ret = 0;
                 PeerInfo peerInfo1 = Controller.getInstance().getDBSet().getPeerMap().getInfo(o1.getAddress());
                 PeerInfo peerInfo2 = Controller.getInstance().getDBSet().getPeerMap().getInfo(o2.getAddress());
                 if (sort == 0)
-                    ret =peerInfo1.getWhitePingCouner() > peerInfo2.getWhitePingCouner()? 1: -1;
+                    ret = peerInfo1.getWhitePingCouner() > peerInfo2.getWhitePingCouner() ? 1 : -1;
                 if (sort == 1)
-                    ret =peerInfo1.getWhitePingCouner() < peerInfo2.getWhitePingCouner()? 1: -1;
-           //     fireTableDataChanged();
+                    ret = peerInfo1.getWhitePingCouner() < peerInfo2.getWhitePingCouner() ? 1 : -1;
+                //     fireTableDataChanged();
                 return ret;
             }
         });
@@ -76,37 +75,31 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                 // TODO Auto-generated method stub
                 int ret = 0;
                 if (sort == 0)
-                    ret = o1.getPing() > o2.getPing()? 1: -1;
+                    ret = o1.getPing() > o2.getPing() ? 1 : -1;
                 if (sort == 1)
-                    ret = o1.getPing() < o2.getPing()? 1: -1;
-          //      fireTableDataChanged();
+                    ret = o1.getPing() < o2.getPing() ? 1 : -1;
+                //      fireTableDataChanged();
                 return ret;
             }
         });
     }
-    
+
     // view peer
-    // view = 0 only Active Peers
-    // view ==1 all
+    // view == 0 only Active Peers
+    // view == 1 all
     public void setView(int view) {
         this.view = view;
-
-        if (peersView == null) {
-            peersView = new ArrayList<Peer>();
-        }
-
         peersView.clear();
-        if (view != 0) {
-            peersView.addAll(list);
-        } else {
+        if (view == 0) {
             for (Peer peer : list) {
-                if (view == 0) {
-                    if (peer.isUsed())
-                        peersView.add(peer);
+                if (peer.isUsed()) {
+                    peersView.add(peer);
                 }
             }
+        } else if (view == 1) {
+            peersView.addAll(list);
         }
-      
+
     }
 
     @Override
@@ -130,52 +123,52 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
             return null;
 
         switch (column) {
-        case COLUMN_ADDRESS:
-            return peer.getAddress().getHostAddress();
+            case COLUMN_ADDRESS:
+                return peer.getAddress().getHostAddress();
 
-        case COLUMN_HEIGHT:
-            if (!peer.isUsed()) {
-                int banMinutes = Controller.getInstance().getDBSet().getPeerMap().getBanMinutes(peer);
-                if (banMinutes > 0) {
-                    return Lang.getInstance().translate("Banned") + " " + banMinutes + "m";
-                } else {
-                    return Lang.getInstance().translate("Broken");
+            case COLUMN_HEIGHT:
+                if (!peer.isUsed()) {
+                    int banMinutes = Controller.getInstance().getDBSet().getPeerMap().getBanMinutes(peer);
+                    if (banMinutes > 0) {
+                        return Lang.getInstance().translate("Banned") + " " + banMinutes + "m";
+                    } else {
+                        return Lang.getInstance().translate("Broken");
+                    }
                 }
-            }
-            Tuple2<Integer, Long> res = Controller.getInstance().getHWeightOfPeer(peer);
-            if (res == null) {
-                return Lang.getInstance().translate("Waiting...");
-            } else {
-                return res.a.toString() + " " + res.b.toString();
-            }
+                Tuple2<Integer, Long> res = Controller.getInstance().getHWeightOfPeer(peer);
+                if (res == null) {
+                    return Lang.getInstance().translate("Waiting...");
+                } else {
+                    return res.a.toString() + " " + res.b.toString();
+                }
 
-        case COLUMN_PINGMC:
-            if (!peer.isUsed()) {
-                return Lang.getInstance().translate("Broken");
-            } else if (peer.getPing() > 1000000) {
-                return Lang.getInstance().translate("Waiting...");
-            } else {
-                return peer.getPing();
-            }
+            case COLUMN_PINGMC:
+                if (!peer.isUsed()) {
+                    return Lang.getInstance().translate("Broken");
+                } else if (peer.getPing() > 1000000) {
+                    return Lang.getInstance().translate("Waiting...");
+                } else {
+                    return peer.getPing();
+                }
 
-        case COLUMN_REILABLE:
-            return peerInfo.getWhitePingCouner();
+            case COLUMN_REILABLE:
+                return peerInfo.getWhitePingCouner();
 
-        case COLUMN_INITIATOR:
-            if (peer.isWhite()) {
-                return Lang.getInstance().translate("You");
-            } else {
-                return Lang.getInstance().translate("Remote");
-            }
+            case COLUMN_INITIATOR:
+                if (peer.isWhite()) {
+                    return Lang.getInstance().translate("You");
+                } else {
+                    return Lang.getInstance().translate("Remote");
+                }
 
-        case COLUMN_FINDING_AGO:
-            return DateTimeFormat.timeAgo(peerInfo.getFindingTime());
+            case COLUMN_FINDING_AGO:
+                return DateTimeFormat.timeAgo(peerInfo.getFindingTime());
 
-        case COLUMN_ONLINE_TIME:
-            return DateTimeFormat.timeAgo(peer.getConnectionTime());
+            case COLUMN_ONLINE_TIME:
+                return DateTimeFormat.timeAgo(peer.getConnectionTime());
 
-        case COLUMN_VERSION:
-            return Controller.getInstance().getVersionOfPeer(peer).getA();
+            case COLUMN_VERSION:
+                return Controller.getInstance().getVersionOfPeer(peer).getA();
 
         }
 
@@ -187,31 +180,29 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
         ObserverMessage message = (ObserverMessage) arg;
 
         if (Controller.getInstance().isOnStopping()) {
-            this.deleteObservers();
+            deleteObservers();
             return;
         }
 
         if (message.getType() == ObserverMessage.LIST_PEER_TYPE) {
 
-            this.list = (List<Peer>) message.getValue();
+            list = (List<Peer>) message.getValue();
             setView(view);
             needUpdate = true;
 
         } else if (message.getType() == ObserverMessage.UPDATE_PEER_TYPE) {
-            Peer peer1 = (Peer) message.getValue();
-
-            int n = 0;
-            for (Peer peer2 : this.list) {
-                if (Arrays.equals(peer1.getAddress().getAddress(),
-                                  peer2.getAddress().getAddress())) {
-                    setView(view);
-                    if (n < this.getRowCount())
-                        this.fireTableRowsUpdated(n, n);
-                    break;
+            setView(view);
+            fireTableDataChanged();
+            Peer peerValue = (Peer) message.getValue();
+            for (int i = 0; i < peersView.size(); i++) {
+                Peer peer = peersView.get(i);
+                if (peerValue.equals(peer)) {
+                    if (i < getRowCount()) {
+                        fireTableRowsUpdated(i, i);
+                        break;
+                    }
                 }
-                n++;
             }
-
         } else if (message.getType() == ObserverMessage.ADD_PEER_TYPE) {
             setView(view);
             needUpdate = true;
@@ -223,7 +214,7 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
         } else if (message.getType() == ObserverMessage.GUI_REPAINT
                 && needUpdate) {
             needUpdate = false;
-            this.fireTableDataChanged();
+            fireTableDataChanged();
         }
     }
 
