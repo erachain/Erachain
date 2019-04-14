@@ -207,11 +207,11 @@ public class Wallet extends Observable implements Observer {
 	*/
 
 	public boolean exists() {
-		if (Controller.getInstance().noUseWallet)
+		if (Controller.getInstance().noUseWallet){
 			return false;
-
-		String p = Settings.getInstance().getWalletDir();
-		return new File(p).exists();
+		}
+		String walletDir = Settings.getInstance().getWalletDir();
+		return new File(walletDir).exists();
 	}
 
 	public List<Pair<Account, Transaction>> getLastTransactions(int limit) {
@@ -340,11 +340,10 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	public boolean isItemFavorite(ItemCls item) {
-		if (!this.exists()) {
+		if (!exists()) {
 			return false;
 		}
-
-		return this.database.isItemFavorite(item);
+		return database.isItemFavorite(item);
 	}
 
 	public void addTransactionFavorite(Transaction transaction) {

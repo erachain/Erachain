@@ -69,16 +69,16 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         });
 
-        this.button1_ToolBar_LeftPanel.setVisible(false);
-        this.button2_ToolBar_LeftPanel.setVisible(false);
-        this.searth_Favorite_JCheckBox_LeftPanel.setVisible(false);
-        this.searth_My_JCheckBox_LeftPanel.setVisible(false);
+        this.button1ToolBarLeftPanel.setVisible(false);
+        this.button2ToolBarLeftPanel.setVisible(false);
+        this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
+        this.searchMyJCheckBoxLeftPanel.setVisible(false);
         this.jButton1_jToolBar_RightPanel.setVisible(false);
         this.jButton2_jToolBar_RightPanel.setVisible(false);
 
 
         // 	Records_Table_Model records_Model = new Records_Table_Model();
-        // 	this.jTable_jScrollPanel_LeftPanel = new JTable(records_Model);
+        // 	this.jTableJScrollPanelLeftPanel = new JTable(records_Model);
 
         MenuPopupUtil.installContextMenu(this.searchTextField_SearchToolBar_LeftPanel);
         this.searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener() {
@@ -96,9 +96,9 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         //TRANSACTIONS TABLE MODEL
         this.transactionsTableModel = new SearchTransactionsTableModel();
-        this.jTable_jScrollPanel_LeftPanel = new MTable(this.transactionsTableModel);
+        this.jTableJScrollPanelLeftPanel = new MTable(this.transactionsTableModel);
 
-        this.jTable_jScrollPanel_LeftPanel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        this.jTableJScrollPanelLeftPanel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
         // MENU
         JPopupMenu mainMenu = new JPopupMenu();
@@ -107,8 +107,8 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-                row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 Transaction trans = transactionsTableModel.getItem(row);
                 DCSet db = DCSet.getInstance();
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
@@ -124,8 +124,8 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-                row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 Transaction trans = transactionsTableModel.getItem(row);
                 if (trans == null) return;
                 // save
@@ -137,25 +137,25 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         mainMenu.add(item_Save);
 
-       // this.jTable_jScrollPanel_LeftPanel.setComponentPopupMenu(mainMenu);
-        TableMenuPopupUtil.installContextMenu(this.jTable_jScrollPanel_LeftPanel, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+       // this.jTableJScrollPanelLeftPanel.setComponentPopupMenu(mainMenu);
+        TableMenuPopupUtil.installContextMenu(this.jTableJScrollPanelLeftPanel, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
 
-        this.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
+        this.jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 
         //TRANSACTIONS SORTER
         //		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
         //		indexes.put(SearchTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
         //		CoreRowSorter sorter = new CoreRowSorter(transactionsTableModel, indexes);
-        //		this.jTable_jScrollPanel_LeftPanel.setRowSorter(sorter);
+        //		this.jTableJScrollPanelLeftPanel.setRowSorter(sorter);
 
         //TRANSACTION DETAILS
-        this.jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() {
+        this.jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     //GET ROW
-                    int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-                    row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                    int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                    row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
 
                     //GET TRANSACTION
                     Transaction transaction = transactionsTableModel.getItem(row);
@@ -275,7 +275,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
                 }
 
-                jScrollPane_jPanel_RightPanel.setViewportView(info_Panel);
+                jScrollPaneJPanelRightPanel.setViewportView(info_Panel);
 
             }
         }

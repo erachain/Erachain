@@ -61,8 +61,8 @@ public class DWSet extends DBASet {
         super(dbFile, database, withObserver,  dynamicGUI);
 
         // LICENCE SIGNED
-        this.licenseKeyVar = database.getAtomicVar("licenseKey");
-        this.licenseKey = this.licenseKeyVar.get();
+        licenseKeyVar = database.getAtomicVar("licenseKey");
+        licenseKey = licenseKeyVar.get();
 
         this.accountMap = new AccountMap(this, this.database);
         this.accountsPropertisMap = new AccountsPropertisMap(this, this.database);
@@ -319,19 +319,19 @@ public class DWSet extends DBASet {
 
     public FavoriteItemMap getItemFavoritesSet(ItemCls item) {
         if (item instanceof AssetCls) {
-            return this.assetFavoritesSet;
+            return assetFavoritesSet;
         } else if (item instanceof ImprintCls) {
-            return this.imprintFavoritesSet;
+            return imprintFavoritesSet;
         } else if (item instanceof PollCls) {
-            return this.pollFavoriteSet;
+            return pollFavoriteSet;
         } else if (item instanceof TemplateCls) {
-            return this.templateFavoritesSet;
+            return templateFavoritesSet;
         } else if (item instanceof PersonCls) {
-            return this.personFavoritesSet;
+            return personFavoritesSet;
         } else if (item instanceof StatusCls) {
-            return this.statusFavoritesSet;
+            return statusFavoritesSet;
         } else if (item instanceof UnionCls) {
-            return this.unionFavoritesSet;
+            return unionFavoritesSet;
         } else {
             return null;
         }

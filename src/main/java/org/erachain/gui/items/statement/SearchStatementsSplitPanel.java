@@ -42,12 +42,12 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         setName(Lang.getInstance().translate("Search Statements"));
         searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         this.searchToolBar_LeftPanel.setVisible(true);
-        this.searth_Favorite_JCheckBox_LeftPanel.setVisible(false);
+        this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
 
         // not show buttons
-        jToolBar_RightPanel.setVisible(false);
-        toolBar_LeftPanel.setVisible(false);
-        this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Find Key") + ":"));
+        jToolBarRightPanel.setVisible(false);
+        toolBarLeftPanel.setVisible(false);
+        this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Find Key") + ":"));
         key_Item = new JTextField();
         key_Item.setToolTipText("");
         key_Item.setAlignmentX(1.0F);
@@ -58,7 +58,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
 
         MenuPopupUtil.installContextMenu(key_Item);
 
-        this.toolBar_LeftPanel.add(key_Item);
+        this.toolBarLeftPanel.add(key_Item);
 
 
         key_Item.addActionListener(new ActionListener() {
@@ -71,18 +71,18 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                 if (search_Table_Model.getRowCount() < 1)
                     return;
                 selected_Item = 0;
-                jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(selected_Item, selected_Item);
+                jTableJScrollPanelLeftPanel.setRowSelectionInterval(selected_Item, selected_Item);
 
             }
 
         });
 
         // not show My filter
-        searth_My_JCheckBox_LeftPanel.setVisible(false);
+        searchMyJCheckBoxLeftPanel.setVisible(false);
 
         // CREATE TABLE
         search_Table_Model = new StatementsTableModelSearch();
-        jTable_jScrollPanel_LeftPanel = new MTable(this.search_Table_Model);
+        jTableJScrollPanelLeftPanel = new MTable(this.search_Table_Model);
 
 
         // Custom renderer for the String column;
@@ -90,23 +90,23 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         // );
 
         // CHECKBOX FOR FAVORITE
-        TableColumn favoriteColumn = jTable_jScrollPanel_LeftPanel.getColumnModel()
-                .getColumn(search_Table_Model.COLUMN_FAVORITE);
+        TableColumn favoriteColumn = jTableJScrollPanelLeftPanel.getColumnModel()
+                .getColumn(StatementsTableModelSearch.COLUMN_FAVORITE);
         // favoriteColumn.setCellRenderer(new RendererBoolean());
         favoriteColumn.setMinWidth(150);
         favoriteColumn.setMaxWidth(300);
         favoriteColumn.setPreferredWidth(100);
 
         // hand cursor for Favorite column
-        jTable_jScrollPanel_LeftPanel.addMouseMotionListener(new MouseMotionListener() {
+        jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionListener() {
             public void mouseMoved(MouseEvent e) {
 
                 if (jTable_jScrollPanel_LeftPanel
                         .columnAtPoint(e.getPoint()) == search_Table_Model.COLUMN_FAVORITE) {
 
-                    jTable_jScrollPanel_LeftPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    jTableJScrollPanelLeftPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 } else {
-                    jTable_jScrollPanel_LeftPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    jTableJScrollPanelLeftPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 }
             }
 
@@ -128,22 +128,22 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                 // TODO Auto-generated method stub
                 // GET VALUE
                 String search = searchTextField_SearchToolBar_LeftPanel.getText();
-                jScrollPanel_LeftPanel.setViewportView(null);
-                jScrollPane_jPanel_RightPanel.setViewportView(null);
+                jScrollPanelLeftPanel.setViewportView(null);
+                jScrollPaneJPanelRightPanel.setViewportView(null);
 
                 if (search.equals("")) {
                     search_Table_Model.clear();
                     Label_search_Info_Panel.setText(Lang.getInstance().translate("Fill field Search"));
-                    jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+                    jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
 
                     return;
                 }
                 // if (search.length()<3) return;
                 key_Item.setText("");
                 // show message
-                // jTable_jScrollPanel_LeftPanel.setVisible(false);//
+                // jTableJScrollPanelLeftPanel.setVisible(false);//
                 Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
-                jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+                jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
 
                 new Thread() {
                     @Override
@@ -151,7 +151,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                         search_Table_Model.setFilterByName(search);
                         if (search_Table_Model.getRowCount() < 1) {
                             Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Documents"));
-                            jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+                            jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                             return;
                         }
                         jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
@@ -164,18 +164,18 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         });
         // SET VIDEO
 
-        // jTable_jScrollPanel_LeftPanel = search_Table;
+        // jTableJScrollPanelLeftPanel = search_Table;
         // sorter from 0 column
         search_Sorter = new TableRowSorter(search_Table_Model);
         ArrayList<SortKey> keys = new ArrayList<RowSorter.SortKey>();
         keys.add(new RowSorter.SortKey(0, SortOrder.DESCENDING));
         search_Sorter.setSortKeys(keys);
         ((DefaultRowSorter<?, ?>) search_Sorter).setSortsOnUpdates(true);
-        this.jTable_jScrollPanel_LeftPanel.setRowSorter(search_Sorter);
-        jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+        this.jTableJScrollPanelLeftPanel.setRowSorter(search_Sorter);
+        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
         // setRowHeightFormat(true);
         // Event LISTENER
-        jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
+        jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 
         JPopupMenu menu = new JPopupMenu();
 
@@ -200,7 +200,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                if (jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0)
+                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
                     return;
 
                 Transaction statement = search_Table_Model.getItem(jTable_jScrollPanel_LeftPanel
@@ -215,14 +215,14 @@ public class SearchStatementsSplitPanel extends SplitPanel {
 
         menu.add(vouch_Item);
 
-        TableMenuPopupUtil.installContextMenu(jTable_jScrollPanel_LeftPanel, menu);
+        TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menu);
 
-        jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() {
+        jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 Point p = e.getPoint();
-                int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
-                //	jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
+                int row = jTableJScrollPanelLeftPanel.rowAtPoint(p);
+                //	jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
 
                 if (e.getClickCount() == 1 & e.getButton() == MouseEvent.BUTTON1) {
 
@@ -262,7 +262,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
     public void onClose() {
         // delete observer left panel
         // get component from right panel
-        Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+        Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
         if (c1 instanceof StatementInfo)
             ((StatementInfo) c1).delay_on_Close();
@@ -289,7 +289,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         @Override
         public void valueChanged(ListSelectionEvent arg0) {
 
-            if (jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0)
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
                 return;
 
             Transaction transaction = search_Table_Model.getItem(jTable_jScrollPanel_LeftPanel

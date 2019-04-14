@@ -44,8 +44,8 @@ public class OtherSplitPanel extends SplitPanel {
         // TODO Auto-generated constructor stub
         jLabel_Peer_Title = new JLabel();
         this.peersTableModel = new PeersTableModel();
-        this.jTable_jScrollPanel_LeftPanel.setModel(this.peersTableModel);
-        this.jTable_jScrollPanel_LeftPanel.setAutoCreateRowSorter(true);
+        this.jTableJScrollPanelLeftPanel.setModel(this.peersTableModel);
+        this.jTableJScrollPanelLeftPanel.setAutoCreateRowSorter(true);
         
         peers_Menu = new JPopupMenu();
         
@@ -68,8 +68,8 @@ public class OtherSplitPanel extends SplitPanel {
                 // TODO Auto-generated method stub
                 
                 // TODO Auto-generated method stub
-                int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-                int rowRow = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                int rowRow = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 item_Peer_Menu = peersTableModel.getItem(rowRow);
                 
             }
@@ -170,10 +170,10 @@ public class OtherSplitPanel extends SplitPanel {
         });
         // peers_Menu.add(allow_Item);
         
-        TableMenuPopupUtil.installContextMenu(this.jTable_jScrollPanel_LeftPanel, peers_Menu);
+        TableMenuPopupUtil.installContextMenu(this.jTableJScrollPanelLeftPanel, peers_Menu);
         
-        this.toolBar_LeftPanel.setVisible(false);
-        this.jToolBar_RightPanel.setVisible(false);
+        this.toolBarLeftPanel.setVisible(false);
+        this.jToolBarRightPanel.setVisible(false);
         // this.jTable_Peers.setEnabled(false);
         
         jPanel2 = new JPanel();
@@ -193,12 +193,12 @@ public class OtherSplitPanel extends SplitPanel {
         jScrollPane_Peers_Table = new JScrollPane();
         jScrollPane_Peers_Table.setBorder(null);
         
-        jScrollPane_Peers_Table.setViewportView(jTable_jScrollPanel_LeftPanel);
+        jScrollPane_Peers_Table.setViewportView(jTableJScrollPanelLeftPanel);
         jScrollPane_Peers_Table.setMinimumSize(new Dimension(0, 0));
-        jTable_jScrollPanel_LeftPanel.setMinimumSize(new Dimension(0, 0));
+        jTableJScrollPanelLeftPanel.setMinimumSize(new Dimension(0, 0));
         // jTable_Peers.setPreferredSize(jTable_Peers.getPreferredSize());
         jPanel2.setMinimumSize(new Dimension(0, 0));
-        jTable_jScrollPanel_LeftPanel.setOpaque(false);
+        jTableJScrollPanelLeftPanel.setOpaque(false);
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -210,7 +210,7 @@ public class OtherSplitPanel extends SplitPanel {
         gridBagConstraints.insets = new java.awt.Insets(7, 11, 11, 11);
         jPanel2.add(jScrollPane_Peers_Table, gridBagConstraints);
         
-        // jScrollPanel_LeftPanel.setViewportView(jPanel2);
+        // jScrollPanelLeftPanel.setViewportView(jPanel2);
         leftPanel.removeAll();
         jSplitPanel.setLeftComponent(jPanel2);
         
@@ -295,7 +295,7 @@ public class OtherSplitPanel extends SplitPanel {
         jSplitPane5.setRightComponent(jPanel8);
         // jSplitPane5.setRightComponent(jScrollPane_My_Block_Table);
         
-        jScrollPane_jPanel_RightPanel.setViewportView(jSplitPane5);
+        jScrollPaneJPanelRightPanel.setViewportView(jSplitPane5);
         jSplitPane5.setDividerLocation(0.5);
         
     }

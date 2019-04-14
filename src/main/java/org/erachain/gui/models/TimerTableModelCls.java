@@ -21,7 +21,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
 
     protected List<U> list;
 
-    protected Boolean[] columnAutoHeight; // = new Boolean[]{true, true, true, true, true, true, true, false, false};
+    private Boolean[] columnAutoHeight; // = new Boolean[]{true, true, true, true, true, true, true, false, false};
 
     protected long start = 0;
     protected int step = 50;

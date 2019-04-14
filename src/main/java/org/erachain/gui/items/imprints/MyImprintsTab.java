@@ -32,8 +32,8 @@ public class MyImprintsTab extends SplitPanel {
         this.setName("My Hashes");
         searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
-        button1_ToolBar_LeftPanel.setVisible(false);
-        button2_ToolBar_LeftPanel.setVisible(false);
+        button1ToolBarLeftPanel.setVisible(false);
+        button2ToolBarLeftPanel.setVisible(false);
         jButton1_jToolBar_RightPanel.setVisible(false);
         jButton2_jToolBar_RightPanel.setVisible(false);
 
@@ -82,9 +82,9 @@ public class MyImprintsTab extends SplitPanel {
         // EVENTS on CURSOR
         table.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
 // show	
-        this.jTable_jScrollPanel_LeftPanel.setModel(assetsModel);
-        this.jTable_jScrollPanel_LeftPanel = table;
-        jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+        this.jTableJScrollPanelLeftPanel.setModel(assetsModel);
+        this.jTableJScrollPanelLeftPanel = table;
+        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         // UPDATE FILTER ON TEXT CHANGE
         searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
@@ -115,7 +115,7 @@ public class MyImprintsTab extends SplitPanel {
         });
 
 
-        this.jTable_jScrollPanel_LeftPanel.addComponentListener(new ComponentListener() {
+        this.jTableJScrollPanelLeftPanel.addComponentListener(new ComponentListener() {
 
             @Override
             public void componentHidden(ComponentEvent arg0) {
@@ -133,7 +133,7 @@ public class MyImprintsTab extends SplitPanel {
             public void componentResized(ComponentEvent arg0) {
                 // TODO Auto-generated method stub
 
-                //	Table_Render("2", pair_Panel.jTable_jScrollPanel_LeftPanel);
+                //	Table_Render("2", pair_Panel.jTableJScrollPanelLeftPanel);
 
                 //		new Table_Formats().Table_Row_Auto_Height(table);
 
@@ -337,8 +337,8 @@ public class MyImprintsTab extends SplitPanel {
                 imprint = assetsModel.getItem(table.convertRowIndexToModel(table.getSelectedRow()));
             if (imprint == null) return;
             ImprintsInfoPanel info_panel = new ImprintsInfoPanel(imprint);
-            info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width - 50, jScrollPane_jPanel_RightPanel.getSize().height - 50));
-            jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+            info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));
+            jScrollPaneJPanelRightPanel.setViewportView(info_panel);
         }
 
     }

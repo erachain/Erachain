@@ -388,7 +388,7 @@ public class VouchRecordDialog extends JDialog {
         gridBagConstraints.weightx = 1.0;
         //    gridBagConstraints.insets = new java.awt.Insets(12, 9, 11, 9);
         gridBagConstraints.insets = new java.awt.Insets(12, 23, 0, 9);
-        //      getContentPane().add(jLabel_Title, gridBagConstraints);
+        //      getContentPane().add(jLabelTitle, gridBagConstraints);
         jLabel_Title.setText(Lang.getInstance().translate("Information about the record"));
         getContentPane().add(jLabel_Title, gridBagConstraints);
 
@@ -401,7 +401,7 @@ public class VouchRecordDialog extends JDialog {
         gridBagConstraints.weightx = 1.0;
         //    gridBagConstraints.insets = new java.awt.Insets(12, 9, 11, 9);
         gridBagConstraints.insets = new java.awt.Insets(12, 23, 0, 9);
-        //      getContentPane().add(jLabel_Title, gridBagConstraints);
+        //      getContentPane().add(jLabelTitle, gridBagConstraints);
 
         getContentPane().add(jLabel_Name_Records, gridBagConstraints);
 

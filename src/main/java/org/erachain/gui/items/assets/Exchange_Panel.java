@@ -190,11 +190,11 @@ public class Exchange_Panel extends JPanel {
         gridBagConstraints.weighty = 0.2;
 
         jScrollPane_jPanel_RightPanel = new javax.swing.JScrollPane();
-        // jScrollPane_jPanel_RightPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        // jScrollPaneJPanelRightPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 
-        // jScrollPane_jPanel_RightPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        // jScrollPane_jPanel_RightPanel.setHorizontalScrollBar(null);
-        // jScrollPane_jPanel_RightPanel.setVerticalScrollBar(null);
+        // jScrollPaneJPanelRightPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        // jScrollPaneJPanelRightPanel.setHorizontalScrollBar(null);
+        // jScrollPaneJPanelRightPanel.setVerticalScrollBar(null);
         jScrollPane_jPanel_RightPanel.setViewportView(new EchangeSellBuyPanel(have, want, action, account));
         // tt = new pane_Tab(have, want, action, account);
         add(jScrollPane_jPanel_RightPanel, gridBagConstraints);

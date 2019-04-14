@@ -238,8 +238,8 @@ public class AssetInfo extends JTextPane {
 
     }
     // Variables declaration - do not modify
-    //  private javax.swing.JPanel jPanel1;
-    // private javax.swing.JScrollPane jScrollPane1;
+    //  private javax.swing.JPanel jPanelHead;
+    // private javax.swing.JScrollPane scrollPaneDescription;
     //  private javax.swing.JScrollPane jScrollPane3;
 
     // End of variables declaration

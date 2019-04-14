@@ -3,10 +3,6 @@ package org.erachain.gui;
 
 import java.awt.TrayIcon.MessageType;
 import java.io.File;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.swing.JFrame;
 import javax.swing.RowFilter;
@@ -14,17 +10,14 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import org.erachain.controller.Controller;
-import org.erachain.gui.*;
-import org.erachain.gui.*;
 import org.erachain.gui.create.NoWalletFrame;
 import org.erachain.gui.create.SettingLangFrame;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.SysTray;
 
-import static org.erachain.gui.library.library.Set_GUI_Look_And_Feel;
+import static org.erachain.gui.library.library.setGuiLookAndFeel;
 
 public class Gui extends JFrame {
 
@@ -33,14 +26,14 @@ public class Gui extends JFrame {
 
     public static final long PERIOD_UPDATE = 30000; // in MS
 
-    private static Gui maingui;
+    private volatile static Gui maingui;
     private MainFrame mainframe;
     private GuiTimer guiTimer;
 
     private Gui() throws Exception {
 
 
-        Set_GUI_Look_And_Feel("");
+        setGuiLookAndFeel("");
 
         if (Settings.getInstance().Dump().containsKey("lang")) {
             File langFile = new File(Settings.getInstance().getLangDir(), Settings.getInstance().getLangFileName());
@@ -51,7 +44,7 @@ public class Gui extends JFrame {
             new SettingLangFrame();
         }
 
-        Set_GUI_Look_And_Feel("");
+        setGuiLookAndFeel("");
 
         //CHECK IF WALLET EXISTS
         if (!Controller.getInstance().noUseWallet && !Controller.getInstance().doesWalletExists()) {

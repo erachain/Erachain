@@ -25,17 +25,17 @@ public class StatusesFavoriteSplitPanel extends ItemSplitPanel {
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 DCSet db = DCSet.getInstance();
-                Transaction trans = db.getTransactionFinalMap().get(((StatusCls) th.item_Menu).getReference());
+                Transaction trans = db.getTransactionFinalMap().get(((StatusCls) th.itemMenu).getReference());
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
 
             }
         });
-        th.menu_Table.add(vouch_menu);
+        th.menuTable.add(vouch_menu);
     }
 
     // show details
     @Override
-    public Component get_show(ItemCls item) {
+    public Component getShow(ItemCls item) {
         StatusInfo info = new StatusInfo();
         info.show_001((StatusCls) item);
         return info;

@@ -15,7 +15,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 
-public class MyOrde_PaumentsSplitPanel extends SplitPanel {
+public class MyOrderPaimentsSplitPanel extends SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
     // для прозрачности
     int alpha = 255;
@@ -25,20 +25,20 @@ public class MyOrde_PaumentsSplitPanel extends SplitPanel {
     private TableRowSorter my_Sorter;
 
 
-    public MyOrde_PaumentsSplitPanel() {
+    public MyOrderPaimentsSplitPanel() {
         super("PersonsMySplitPanel");
 
         //	this.setName(Lang.getInstance().translate("My Persons"));
         this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
-        this.button1_ToolBar_LeftPanel.setVisible(false);
-        this.button2_ToolBar_LeftPanel.setVisible(false);
+        this.button1ToolBarLeftPanel.setVisible(false);
+        this.button2ToolBarLeftPanel.setVisible(false);
         this.jButton1_jToolBar_RightPanel.setVisible(false);
         this.jButton2_jToolBar_RightPanel.setVisible(false);
 
 
         // not show My filter
-        this.searth_My_JCheckBox_LeftPanel.setVisible(false);
+        this.searchMyJCheckBoxLeftPanel.setVisible(false);
 
         //TABLE
         payment_Orders_model = new PaymentOrdersTableModel();
@@ -86,28 +86,28 @@ public class MyOrde_PaumentsSplitPanel extends SplitPanel {
         // UPDATE FILTER ON TEXT CHANGE
         this.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new My_Search());
         // SET VIDEO
-        this.jTable_jScrollPanel_LeftPanel.setModel(payment_Orders_model);
-        this.jTable_jScrollPanel_LeftPanel = payment_Orders_table;
-        this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);
+        this.jTableJScrollPanelLeftPanel.setModel(payment_Orders_model);
+        this.jTableJScrollPanelLeftPanel = payment_Orders_table;
+        this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
         //		this.setRowHeightFormat(true);
 
         // EVENTS on CURSOR
         payment_Orders_table.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
 
-        jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() {
+        jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 Point p = e.getPoint();
-                int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
-                jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
+                int row = jTableJScrollPanelLeftPanel.rowAtPoint(p);
+                jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
 
 
                 if (e.getClickCount() == 1 & e.getButton() == e.BUTTON1) {
 
-                    //	if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == ItemsPersonsTableModel.COLUMN_FAVORITE){
-                    //		row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                    //	if (jTableJScrollPanelLeftPanel.getSelectedColumn() == ItemsPersonsTableModel.COLUMN_FAVORITE){
+                    //		row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                     //	 PersonCls asset = my_PersonsModel.getItem(row);
-                    //	favorite_set( jTable_jScrollPanel_LeftPanel);
+                    //	favoriteSet( jTableJScrollPanelLeftPanel);
 
 
                     //	}
@@ -130,7 +130,7 @@ public class MyOrde_PaumentsSplitPanel extends SplitPanel {
         // delete observer left panel
         payment_Orders_model.deleteObservers();
         // get component from right panel
-        Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+        Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
         //	  if (c1 instanceof PersonInfo002) ( (PersonInfo002)c1).delay_on_Close();
 
@@ -146,8 +146,8 @@ public class MyOrde_PaumentsSplitPanel extends SplitPanel {
             //		if (my_Person_table.getSelectedRow() >= 0 )	person = my_PersonsModel.getItem(my_Person_table.convertRowIndexToModel(my_Person_table.getSelectedRow()));
             //		if (person == null) return;
             //		PersonInfo002 info_panel = new PersonInfo002(person, false);
-            //		info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
-            //		jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+            //		info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,jScrollPaneJPanelRightPanel.getSize().height-50));
+            //		jScrollPaneJPanelRightPanel.setViewportView(info_panel);
         }
 
     }

@@ -8,9 +8,9 @@ import java.util.*;
 public class FavoriteItemMap extends Observable {
 
     protected DWSet dWSet;
-    protected SortedSet<Long> itemsSet;
+    private SortedSet<Long> itemsSet;
 
-    protected int observerFavorites;
+    private int observerFavorites;
 
     // favorites init SET
     public FavoriteItemMap(DWSet dWSet, DB database, int observerFavorites,
@@ -30,53 +30,49 @@ public class FavoriteItemMap extends Observable {
     }
 
     public void replace(List<Long> keys) {
-        this.itemsSet.clear();
-        this.itemsSet.addAll(keys);
-        this.dWSet.commit();
-
+        itemsSet.clear();
+        itemsSet.addAll(keys);
+        dWSet.commit();
         //NOTIFY
-        this.notifyFavorites();
+        notifyFavorites();
     }
 
     public void add(Long key) {
-        this.itemsSet.add(key);
-        this.dWSet.commit();
-
+        itemsSet.add(key);
+        dWSet.commit();
         //NOTIFY
-        this.notifyFavorites();
+        notifyFavorites();
     }
 
     public void delete(Long key) {
-        this.itemsSet.remove(key);
-        this.dWSet.commit();
-
+        itemsSet.remove(key);
+        dWSet.commit();
         //NOTIFY
         this.notifyFavorites();
     }
 
     public boolean contains(Long key) {
-        return this.itemsSet.contains(key);
+        return itemsSet.contains(key);
     }
 
     public long size() {
-        return this.itemsSet.size();
+        return itemsSet.size();
     }
 
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {
-        return this.itemsSet.subSet(fromKey, toKey);
+        return itemsSet.subSet(fromKey, toKey);
     }
 
     @Override
     public void addObserver(Observer o) {
         //ADD OBSERVER
         super.addObserver(o);
-
         //NOTIFY LIST
-        this.notifyFavorites();
+        notifyFavorites();
     }
 
-    protected void notifyFavorites() {
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(this.observerFavorites, this.itemsSet));
+    private void notifyFavorites() {
+        setChanged();
+        notifyObservers(new ObserverMessage(observerFavorites, itemsSet));
     }
 }

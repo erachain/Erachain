@@ -27,28 +27,28 @@ public class PollsFavoriteSplitPanel extends ItemSplitPanel {
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 DCSet db = DCSet.getInstance();
-                Transaction trans = db.getTransactionFinalMap().get(((TemplateCls) th.item_Menu).getReference());
+                Transaction trans = db.getTransactionFinalMap().get(((TemplateCls) th.itemMenu).getReference());
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
 
             }
         });
-        th.menu_Table.add(vouch_menu);
+        th.menuTable.add(vouch_menu);
         JMenuItem setVote_Menu = new JMenuItem(Lang.getInstance().translate("Voting"));
         setVote_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-//				new UnionSetStatusDialog(th, (UnionCls) item_Menu);
+//				new UnionSetStatusDialog(th, (UnionCls) itemMenu);
 
-                PollCls poll = (PollCls) (item_Table_Selected);
+                PollCls poll = (PollCls) (itemTableSelected);
                 AssetCls AssetCls = DCSet.getInstance().getItemAssetMap().get((long) (1));
                 new PollsDialog(poll, 0, AssetCls);
             }
         });
-        th.menu_Table.add(setVote_Menu);
+        th.menuTable.add(setVote_Menu);
     }
 
     // show details
     @Override
-    public Component get_show(ItemCls item) {
+    public Component getShow(ItemCls item) {
         AssetCls AssetCls = DCSet.getInstance().getItemAssetMap().get((long) (1));
         PollsDetailPanel pollInfo = new PollsDetailPanel((PollCls) item, AssetCls);
 

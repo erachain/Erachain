@@ -35,13 +35,13 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         this.setName(Lang.getInstance().translate("Incoming Mails"));
         this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
-        this.button1_ToolBar_LeftPanel.setVisible(false);
-        this.button2_ToolBar_LeftPanel.setVisible(false);
+        this.button1ToolBarLeftPanel.setVisible(false);
+        this.button2ToolBarLeftPanel.setVisible(false);
         this.jButton1_jToolBar_RightPanel.setVisible(false);
         this.jButton2_jToolBar_RightPanel.setVisible(false);
 
         // not show My filter
-        this.searth_My_JCheckBox_LeftPanel.setVisible(false);
+        this.searchMyJCheckBoxLeftPanel.setVisible(false);
 
         // TABLE
         incoming_Mails_Model = new TableModelMails(true);
@@ -145,9 +145,9 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         // UPDATE FILTER ON TEXT CHANGE
         this.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new My_Search());
         // SET VIDEO
-        this.jTable_jScrollPanel_LeftPanel.setModel(incoming_Mails_Model);
-        this.jTable_jScrollPanel_LeftPanel = inciming_Mail_Table;
-        this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);
+        this.jTableJScrollPanelLeftPanel.setModel(incoming_Mails_Model);
+        this.jTableJScrollPanelLeftPanel = inciming_Mail_Table;
+        this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
         // this.setRowHeightFormat(true);
 
         // EVENTS on CURSOR
@@ -160,7 +160,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         // delete observer left panel
         incoming_Mails_Model.removeObservers();
         // get component from right panel
-        Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+        Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
         if (c1 instanceof MailInfo) ((MailInfo) c1).delay_on_Close();
 
@@ -181,7 +181,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
                 return;
             MailInfo info_panel = new MailInfo(mail);
 
-            jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+            jScrollPaneJPanelRightPanel.setViewportView(info_panel);
 
         }
 

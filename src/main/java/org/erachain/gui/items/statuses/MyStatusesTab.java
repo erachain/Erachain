@@ -36,8 +36,8 @@ public class MyStatusesTab extends SplitPanel {
         setName(Lang.getInstance().translate("My Statuses"));
         searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
-        button1_ToolBar_LeftPanel.setVisible(false);
-        button2_ToolBar_LeftPanel.setVisible(false);
+        button1ToolBarLeftPanel.setVisible(false);
+        button2ToolBarLeftPanel.setVisible(false);
         jButton1_jToolBar_RightPanel.setVisible(false);
         jButton2_jToolBar_RightPanel.setVisible(false);
 
@@ -74,7 +74,7 @@ public class MyStatusesTab extends SplitPanel {
         favoriteColumn.setMinWidth(50);
         favoriteColumn.setMaxWidth(90);
         favoriteColumn.setPreferredWidth(90);//.setWidth(30);
-        searth_Favorite_JCheckBox_LeftPanel.addActionListener(new ActionListener() {
+        searchFavoriteJCheckBoxLeftPanel.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -109,11 +109,11 @@ public class MyStatusesTab extends SplitPanel {
 
         // set video
         //jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel.setModel(this.tableModelStatuses);
-        jTable_jScrollPanel_LeftPanel.setModel(statusesModel);
+        jTableJScrollPanelLeftPanel.setModel(statusesModel);
         //jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel = statusesTable;
-        jTable_jScrollPanel_LeftPanel = table;
+        jTableJScrollPanelLeftPanel = table;
         //jScrollPanel_Panel2_Tabbed_Panel_Left_Panel.setViewportView(jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel); // statusesTable;
-        jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
 
         // select row table statuses
@@ -138,7 +138,7 @@ public class MyStatusesTab extends SplitPanel {
                 tSP.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
             }
         });
-        tSP.jScrollPane_jPanel_RightPanel.setViewportView(info1);
+        tSP.jScrollPaneJPanelRightPanel.setViewportView(info1);
 
         // MENU
 
@@ -190,8 +190,8 @@ public class MyStatusesTab extends SplitPanel {
                                                     }
 
         );
-   //     jTable_jScrollPanel_LeftPanel.setComponentPopupMenu(my_Statuses_Table_menu);
-        TableMenuPopupUtil.installContextMenu(this.jTable_jScrollPanel_LeftPanel, my_Statuses_Table_menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+   //     jTableJScrollPanelLeftPanel.setComponentPopupMenu(my_Statuses_Table_menu);
+        TableMenuPopupUtil.installContextMenu(this.jTableJScrollPanelLeftPanel, my_Statuses_Table_menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
 
     }
@@ -229,7 +229,7 @@ public class MyStatusesTab extends SplitPanel {
         RowFilter<Object, Object> fooBarFilter;
         statusesModel.fireTableDataChanged();
 
-        if (search_Status_SplitPanel.searth_Favorite_JCheckBox_LeftPanel.isSelected()) {
+        if (search_Status_SplitPanel.searchFavoriteJCheckBoxLeftPanel.isSelected()) {
 
             ArrayList<RowFilter<Object, Object>> filters = new ArrayList<RowFilter<Object, Object>>(2);
             filters.add(RowFilter.regexFilter(".*" + search + ".*", statusesModel.COLUMN_NAME));
@@ -245,7 +245,7 @@ public class MyStatusesTab extends SplitPanel {
         ((DefaultRowSorter) sorter).setRowFilter(fooBarFilter);
 
         statusesModel.fireTableDataChanged();
-        //	String a = search_Status_SplitPanel.searth_Favorite_JCheckBox_LeftPanel.isSelected().get.getText();
+        //	String a = search_Status_SplitPanel.searchFavoriteJCheckBoxLeftPanel.isSelected().get.getText();
         //	a = a+ " ";
     }
 
@@ -254,7 +254,7 @@ public class MyStatusesTab extends SplitPanel {
         // delete observer left panel
         statusesModel.deleteObservers();
         // get component from right panel
-        Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+        Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
         if (c1 instanceof StatusInfo) ((StatusInfo) c1).delay_on_Close();
 

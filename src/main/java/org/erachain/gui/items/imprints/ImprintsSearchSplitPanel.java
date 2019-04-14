@@ -19,7 +19,7 @@ public class ImprintsSearchSplitPanel extends SearchItemSplitPanel {
 
     // show details
     @Override
-    public Component get_show(ItemCls item) {
+    public Component getShow(ItemCls item) {
 
         return new ImprintsInfoPanel((ImprintCls) item);
 

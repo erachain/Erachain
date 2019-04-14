@@ -47,11 +47,11 @@ public class IssueLinkedHashPanel extends SplitPanel {
         // gridBagLayout.columnWeights = new double[]{1.0};
         // left panel
 
-        this.toolBar_LeftPanel.setVisible(false);
+        this.toolBarLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);
-        this.jTable_jScrollPanel_LeftPanel.setVisible(false);
+        this.jTableJScrollPanelLeftPanel.setVisible(false);
         issue_Hash_Imprint = new IssueHashImprint();
-        this.jScrollPanel_LeftPanel.setViewportView(issue_Hash_Imprint);
+        this.jScrollPanelLeftPanel.setViewportView(issue_Hash_Imprint);
 
         issue_Hash_Imprint.jButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -60,7 +60,7 @@ public class IssueLinkedHashPanel extends SplitPanel {
         });
 
         JPanel panel = new JPanel();
-        jToolBar_RightPanel.add(panel);
+        jToolBarRightPanel.add(panel);
 
         JButton btnNewButton = new JButton();
         btnNewButton.setText(Lang.getInstance().translate("Delete Hash"));
@@ -125,7 +125,7 @@ public class IssueLinkedHashPanel extends SplitPanel {
 
         table_Model = new TableModelIssueHashes(0);
         Table_Hash = new JTable(table_Model);
-        this.jScrollPane_jPanel_RightPanel.setViewportView(Table_Hash);
+        this.jScrollPaneJPanelRightPanel.setViewportView(Table_Hash);
 
     }
 

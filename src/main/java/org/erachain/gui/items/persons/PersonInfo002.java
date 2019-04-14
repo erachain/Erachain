@@ -115,7 +115,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
 
         jPanel3.setLayout(new java.awt.GridBagLayout());
         JPanel jPanel1 = new javax.swing.JPanel();
-        //	 jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        //	 jPanelHead.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel1.setLayout(new java.awt.GridBagLayout());
         JLabel jLabel1N = new JLabel();
         jLabel1N.setText(Lang.getInstance().translate("Name") + ":");
@@ -196,7 +196,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 3, 8);
 
         if (person.isConfirmed()) {
-          //  jPanel1.add(btn_Block, gridBagConstraints);
+          //  jPanelHead.add(btn_Block, gridBagConstraints);
             btn_Block.addMouseListener(new MouseListener() {
 
                 @Override
@@ -252,7 +252,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
-        //	add(jLabel_Name, gridBagConstraints);
+        //	add(jLabelName, gridBagConstraints);
 
         jTextField_Name.setEditable(false);
         jTextField_Name.setText(person.viewName());
