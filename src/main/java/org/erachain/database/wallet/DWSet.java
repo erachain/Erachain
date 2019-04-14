@@ -11,6 +11,7 @@ import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.settings.Settings;
 import org.mapdb.Atomic.Var;
@@ -41,6 +42,9 @@ public class DWSet extends DBASet {
     private WItemUnionMap unionMap;
     private WItemPollMap pollMap;
     private OrderMap orderMap;
+
+    private FavoriteTransactionMap transactionFavoritesSet;
+
     private FavoriteItemMapAsset assetFavoritesSet;
     private FavoriteItemMapTemplate templateFavoritesSet;
     private FavoriteItemMapImprint imprintFavoritesSet;
@@ -75,6 +79,8 @@ public class DWSet extends DBASet {
         this.unionMap = new WItemUnionMap(this, this.database);
         this.pollMap = new WItemPollMap(this, this.database);
         this.orderMap = new OrderMap(this, this.database);
+
+        this.transactionFavoritesSet = new FavoriteTransactionMap(this, this.database);
         this.assetFavoritesSet = new FavoriteItemMapAsset(this, this.database);
         this.templateFavoritesSet = new FavoriteItemMapTemplate(this, this.database);
         this.imprintFavoritesSet = new FavoriteItemMapImprint(this, this.database);
@@ -270,20 +276,12 @@ public class DWSet extends DBASet {
         return null;
     }
 
-    public void addItemToFavorite(ItemCls item) {
-        getItemFavoritesSet(item).add(item.getKey());
-    }
-
-    public void removeItemFromFavorite(ItemCls item) {
-        getItemFavoritesSet(item).delete(item.getKey());
-    }
-
-    public boolean isItemFavorite(ItemCls item) {
-        return getItemFavoritesSet(item).contains(item.getKey());
-    }
-
     public OrderMap getOrderMap() {
         return this.orderMap;
+    }
+
+    public FavoriteTransactionMap getTransactionFavoritesSet() {
+        return this.transactionFavoritesSet;
     }
 
     public FavoriteItemMapAsset getAssetFavoritesSet() {
@@ -339,6 +337,29 @@ public class DWSet extends DBASet {
         }
         
           
+    }
+
+    //////////////// FAVORITES ///////////
+    public void addTransactionToFavorite(Transaction transaction) {
+        getTransactionFavoritesSet().add(transaction.getDBRef());
+    }
+    public void removeTransactionFromFavorite(Transaction transaction) {
+        getTransactionFavoritesSet().delete(transaction.getDBRef());
+    }
+    public boolean isTransactionFavorite(Transaction transaction) {
+        return getTransactionFavoritesSet().contains(transaction.getDBRef());
+    }
+
+    public void addItemToFavorite(ItemCls item) {
+        getItemFavoritesSet(item).add(item.getKey());
+    }
+
+    public void removeItemFromFavorite(ItemCls item) {
+        getItemFavoritesSet(item).delete(item.getKey());
+    }
+
+    public boolean isItemFavorite(ItemCls item) {
+        return getItemFavoritesSet(item).contains(item.getKey());
     }
 
     public TelegramsMap getTelegramsMap() {

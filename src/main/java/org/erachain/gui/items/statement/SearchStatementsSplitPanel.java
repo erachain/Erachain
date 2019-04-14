@@ -9,6 +9,7 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.RecDetailsFrame;
+import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -273,16 +274,13 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         int row = personsTable.getSelectedRow();
         row = personsTable.convertRowIndexToModel(row);
 
-        Transaction person = search_Table_Model.getItem(row);
-        // new AssetPairSelect(asset.getKey());
+        Transaction transaction = (Transaction)search_Table_Model.getItem(row);
 
         // CHECK IF FAVORITES
-        if (((RSignNote) person).isFavorite()) {
-
-            Controller.getInstance().wallet.database.getDocumentFavoritesSet().delete(person);
+        if (cnt.isTransactionFavorite(transaction)) {
+            Controller.getInstance().wallet.database.getTransactionFavoritesSet().delete(transaction.getDBRef());
         } else {
-
-            Controller.getInstance().wallet.database.getDocumentFavoritesSet().add(person);
+            Controller.getInstance().wallet.database.getTransactionFavoritesSet().add(transaction.getDBRef());
         }
 
         personsTable.repaint();
@@ -300,10 +298,11 @@ public class SearchStatementsSplitPanel extends SplitPanel {
             Transaction transaction = search_Table_Model.getItem(jTable_jScrollPanel_LeftPanel
                     .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
             JPanel info_panel;
-            if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
+            if (false && transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
                 info_panel = new StatementInfo(transaction);
             } else {
-                info_panel = new RecDetailsFrame(transaction);
+                //info_panel = new RecDetailsFrame(transaction);
+                info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
             }
 
             info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width - 50,

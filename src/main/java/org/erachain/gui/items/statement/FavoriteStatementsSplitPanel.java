@@ -5,6 +5,7 @@ import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.persons.ItemsPersonsTableModel;
+import org.erachain.gui.items.records.FavoriteTransactionTableModel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
@@ -31,7 +32,8 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
     // для прозрачности
     int alpha = 255;
     int alpha_int;
-    private StatementsTableModelFavorite search_Table_Model;
+    // private StatementsTableModelFavorite search_Table_Model;
+    private FavoriteTransactionTableModel favotitesTable;
     //	private MTable search_Table;
     private RowSorter<ItemsPersonsTableModel> search_Sorter;
 
@@ -48,7 +50,9 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         searth_My_JCheckBox_LeftPanel.setVisible(false);
 
         //CREATE TABLE
-        search_Table_Model = new StatementsTableModelFavorite();
+        //search_Table_Model = new StatementsTableModelFavorite();
+        favotitesTable = new FavoriteTransactionTableModel();
+
         //	search_Table = new MTable(this.search_Table_Model);
         //	TableColumnModel columnModel = search_Table.getColumnModel(); // read column model
         //		columnModel.getColumn(0).setMaxWidth((100));
@@ -72,10 +76,10 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         // UPDATE FILTER ON TEXT CHANGE
         searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new search_tab_filter());
         // SET VIDEO
-        jTable_jScrollPanel_LeftPanel = new MTable(this.search_Table_Model);
+        jTable_jScrollPanel_LeftPanel = new MTable(this.favotitesTable);
         //	jTable_jScrollPanel_LeftPanel = search_Table;
         //sorter from 0 column
-        search_Sorter = new TableRowSorter(search_Table_Model);
+        search_Sorter = new TableRowSorter(favotitesTable);
         ArrayList<SortKey> keys = new ArrayList<RowSorter.SortKey>();
         keys.add(new RowSorter.SortKey(0, SortOrder.DESCENDING));
         search_Sorter.setSortKeys(keys);
@@ -109,7 +113,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
             if (jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0) return;
 
 
-            Transaction statement = search_Table_Model.get_Statement(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+            Transaction statement = (Transaction) favotitesTable.getItem(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
             if (statement == null) return;
             new VouchRecordDialog(statement.getBlockHeight(), statement.getSeqNo());
         });
@@ -147,7 +151,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
     @Override
     public void onClose() {
         // delete observer left panel
-        search_Table_Model.removeObservers();
+        favotitesTable.deleteObservers();
         // get component from right panel
         Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
@@ -161,7 +165,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         int row = personsTable.getSelectedRow();
         row = personsTable.convertRowIndexToModel(row);
 
-        Transaction person = search_Table_Model.get_Statement(row);
+        Transaction person = (Transaction)favotitesTable.getItem(row);
         //new AssetPairSelect(asset.getKey());
 
 
@@ -169,7 +173,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         if (((RSignNote) person).isFavorite()) {
             row = personsTable.getSelectedRow();
             Controller.getInstance().wallet.database.getDocumentFavoritesSet().delete(person);
-            if (search_Table_Model.getRowCount() == 0) return;
+            if (favotitesTable.getRowCount() == 0) return;
             if (row > 0) personsTable.addRowSelectionInterval(row - 1, row - 1);
             else personsTable.addRowSelectionInterval(0, 0);
         } else {
@@ -205,12 +209,12 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
 
             // SET FILTER
             //tableModelPersons.getSortableList().setFilter(search);
-            search_Table_Model.fireTableDataChanged();
+            favotitesTable.fireTableDataChanged();
 
             RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
             ((DefaultRowSorter) search_Sorter).setRowFilter(filter);
 
-            search_Table_Model.fireTableDataChanged();
+            favotitesTable.fireTableDataChanged();
 
         }
     }
@@ -223,8 +227,8 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
             if (jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0)
                 return;
 
-            Transaction statement = search_Table_Model.get_Statement(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
-            StatementInfo info_panel = new StatementInfo(statement);
+            Transaction transaction = (Transaction)favotitesTable.getItem(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+            StatementInfo info_panel = new StatementInfo(transaction);
             info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width - 50, jScrollPane_jPanel_RightPanel.getSize().height - 50));
             jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
             //	jSplitPanel.setRightComponent(info_panel);

@@ -1,5 +1,6 @@
 package org.erachain.gui.items.statement;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.SearchTableModelCls;
@@ -13,17 +14,17 @@ import java.util.List;
 public class StatementsTableModelSearch extends SearchTableModelCls<Transaction> {
 
     public static final int COLUMN_TIMESTAMP = 0;
-    public static final int COLUMN_CREATOR = 1;
-    // public static final int COLUMN_TEMPLATE = 2;
-    public static final int COLUMN_BODY = 2;
-    public static final int COLUMN_FAVORITE = 3;
+    public static final int COLUMN_TYPE = 1;
+    public static final int COLUMN_CREATOR = 2;
+    public static final int COLUMN_TITLE = 3;
+    public static final int COLUMN_FAVORITE = 4;
     private static final long serialVersionUID = 1L;
 
     public StatementsTableModelSearch() {
 
         super(DCSet.getInstance().getTransactionFinalMap(),
-                new String[]{"Timestamp",
-                "Creator", "Statement", "Favorite"}, new Boolean[]{true, true, true, false}, false);
+                new String[]{"Timestamp", "Type",
+                "Creator", "Statement", "Favorite"}, new Boolean[]{true, true, true, true, false}, false);
 
         logger = LoggerFactory.getLogger(this.getClass());
 
@@ -35,21 +36,19 @@ public class StatementsTableModelSearch extends SearchTableModelCls<Transaction>
             return null;
         }
 
-        Transaction record = this.list.get(row);
+        Transaction transaction = this.list.get(row);
 
         switch (column) {
             case COLUMN_TIMESTAMP:
-
-                return record.viewTimestamp();
-
-            case COLUMN_BODY:
-                return record.getTitle();
+                return transaction.viewTimestamp();
+            case COLUMN_TYPE:
+                return transaction.viewFullTypeName();
             case COLUMN_CREATOR:
-
-                return record.getCreator().getPersonAsString();
-
+                return transaction.getCreator().getPersonAsString();
+            case COLUMN_TITLE:
+                return transaction.getTitle();
             case COLUMN_FAVORITE:
-                return false; //record.isFavorite();
+                return Controller.getInstance().isTransactionFavorite(transaction);
         }
 
         return null;

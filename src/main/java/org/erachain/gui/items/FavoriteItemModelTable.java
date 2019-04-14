@@ -13,7 +13,7 @@ import org.erachain.utils.Pair;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Long, ItemCls> implements Observer {
+public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Long, Object> implements Observer {
 
     private final int RESET_EVENT;
     private final int ADD_EVENT;
@@ -99,15 +99,15 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
 
     @Override
     public void getIntervalThis(long startBack, long endBack) {
-        listSorted = new SortableList<Long, ItemCls>(map, favoriteMap.getFromToKeys(0, 999999999));
+        listSorted = new SortableList<Long, Object>(map, favoriteMap.getFromToKeys(0, 999999999));
         listSorted.sort();
 
         list = new ArrayList<>();
-        for (Pair<Long, ItemCls> key: listSorted) {
+        for (Pair<Long, Object> key: listSorted) {
             if (key.getB() == null) {
                 continue;
             }
-            list.add((ItemCls)map.get(key.getA()));
+            list.add(map.get(key.getA()));
         }
 
     }

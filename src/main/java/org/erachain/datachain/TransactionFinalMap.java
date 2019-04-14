@@ -152,7 +152,8 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
                 new Function2<Tuple2<String, Integer>, Long, Transaction>() {
             @Override
             public Tuple2<String, Integer> run(Long key, Transaction val) {
-                return new Tuple2<String, Integer>(val.getTitle(), val.getType());
+                String title = val.getTitle();
+                return new Tuple2<String, Integer>(title == null? null: title.toLowerCase(), val.getType());
             }
         });
 
@@ -337,8 +338,10 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterable getKeysByTitleAndType(String filter, Integer type,  int offset, int limit) {
 
-        Iterable keys = Fun.filter(this.titleKey, new Tuple2<String, Integer>(filter, type), true,
-                new Tuple2<String, Integer>(filter + "я", //new String(new byte[]{(byte)254}),
+        String filtrLower = filter.toLowerCase();
+
+        Iterable keys = Fun.filter(this.titleKey, new Tuple2<String, Integer>(filtrLower, type), true,
+                new Tuple2<String, Integer>(filtrLower + new String(new byte[]{(byte)254}),
                         type), true);
 
         if (offset > 0)
