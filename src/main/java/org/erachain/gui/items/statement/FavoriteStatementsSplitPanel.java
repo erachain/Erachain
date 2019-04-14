@@ -3,6 +3,7 @@ package org.erachain.gui.items.statement;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.persons.ItemsPersonsTableModel;
 import org.erachain.gui.items.records.FavoriteTransactionTableModel;
@@ -20,10 +21,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 
 
@@ -53,26 +51,6 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         //CREATE TABLE
         //search_Table_Model = new StatementsTableModelFavorite();
         favotitesTable = new FavoriteTransactionTableModel();
-
-        //	search_Table = new MTable(this.search_Table_Model);
-        //	TableColumnModel columnModel = search_Table.getColumnModel(); // read column model
-        //		columnModel.getColumn(0).setMaxWidth((100));
-
-        //Custom renderer for the String column;
-
-        //	 this.search_Table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
-		
-	/*		
-		//CHECKBOX FOR FAVORITE
-				TableColumn favoriteColumn = search_Table.getColumnModel().getColumn(ItemsPersonsTableModel.COLUMN_FAVORITE);
-				favoriteColumn.setCellRenderer(new RendererBoolean());
-				favoriteColumn.setMinWidth(50);
-				favoriteColumn.setMaxWidth(50);
-				favoriteColumn.setPreferredWidth(50);
-	*/
-        //Sorter
-        //			 search_Sorter = new TableRowSorter<ItemsPersonsTableModel>(this.search_Table_Model);
-        //			search_Table.setRowSorter(search_Sorter);
 
         // UPDATE FILTER ON TEXT CHANGE
         searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new search_tab_filter());
@@ -126,26 +104,38 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+
                 Point p = e.getPoint();
                 int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
                 jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
 
+                if (e.getClickCount() == 1 & e.getButton() == e.BUTTON1) {
 
-                if (e.getClickCount() == 1 & e.getButton() == MouseEvent.BUTTON1) {
+                    if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == favotitesTable.COLUMN_FAVORITE) {
 
-                    if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == StatementsTableModelFavorite.COLUMN_FAVORITE) {
-                        //	row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-                        //	 PersonCls asset = search_Table_Model.getPerson(row);
-                        favorite_set(jTable_jScrollPanel_LeftPanel);
-
+                        row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                        Transaction transaction = (Transaction) favotitesTable.getItem(row);
+                        favorite_set(transaction);
 
                     }
-
-
                 }
             }
         });
 
+        jTable_jScrollPanel_LeftPanel.addMouseMotionListener(new MouseMotionListener() {
+            public void mouseMoved(MouseEvent e) {
+
+                if (jTable_jScrollPanel_LeftPanel.columnAtPoint(e.getPoint()) == favotitesTable.COLUMN_FAVORITE) {
+                    jTable_jScrollPanel_LeftPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+                } else {
+                    jTable_jScrollPanel_LeftPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                }
+            }
+
+            public void mouseDragged(MouseEvent e) {
+            }
+        });
 
     }
 
@@ -160,31 +150,18 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
 
     }
 
-    public void favorite_set(JTable personsTable) {
+    public void favorite_set(Transaction transaction) {
 
+        // CHECK IF FAVORITES
+        if (Controller.getInstance().isTransactionFavorite(transaction)) {
+            int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
 
-        int row = personsTable.getSelectedRow();
-        row = personsTable.convertRowIndexToModel(row);
-
-        Transaction person = (Transaction)favotitesTable.getItem(row);
-        //new AssetPairSelect(asset.getKey());
-
-
-        //CHECK IF FAVORITES
-        if (((RSignNote) person).isFavorite()) {
-            row = personsTable.getSelectedRow();
-            Controller.getInstance().wallet.database.getDocumentFavoritesSet().delete(person);
-            if (favotitesTable.getRowCount() == 0) return;
-            if (row > 0) personsTable.addRowSelectionInterval(row - 1, row - 1);
-            else personsTable.addRowSelectionInterval(0, 0);
+            if (dd == 0) Controller.getInstance().removeTransactionFavorite(transaction);
         } else {
 
-            Controller.getInstance().wallet.database.getDocumentFavoritesSet().add(person);
+            Controller.getInstance().addTransactionFavorite(transaction);
         }
-
-
-        personsTable.repaint();
-
+        jTable_jScrollPanel_LeftPanel.repaint();
 
     }
 

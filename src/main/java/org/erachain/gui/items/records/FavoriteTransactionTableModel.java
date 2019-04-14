@@ -12,17 +12,18 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("serial")
 public class FavoriteTransactionTableModel extends FavoriteItemModelTable {
     public static final int COLUMN_TIMESTAMP = 0;
-    public static final int COLUMN_TYPE = 1;
-    public static final int COLUMN_CREATOR = 2;
-    public static final int COLUMN_TITLE = 3;
-    public static final int COLUMN_FAVORITE = 4;
+    public static final int COLUMN_SEQNO = 1;
+    public static final int COLUMN_TYPE = 2;
+    public static final int COLUMN_CREATOR = 3;
+    public static final int COLUMN_TITLE = 4;
+    public static final int COLUMN_FAVORITE = 5;
     private static final long serialVersionUID = 1L;
 
     public FavoriteTransactionTableModel() {
         super(DCSet.getInstance().getTransactionFinalMap(),
                 Controller.getInstance().wallet.database.getTransactionFavoritesSet(),
-                new String[]{"Timestamp", "Type", "Creator", "Statement", "Favorite"},
-                new Boolean[]{true, true, true, true, false},
+                new String[]{"Timestamp", "SeqNo", "Type", "Creator", "Statement", "Favorite"},
+                new Boolean[]{true, true, true, true, true, false},
                 ObserverMessage.RESET_TRANSACTION_FAVORITES_TYPE,
                 ObserverMessage.ADD_TRANSACTION_FAVORITES_TYPE,
                 ObserverMessage.DELETE_TRANSACTION_FAVORITES_TYPE,
@@ -44,6 +45,8 @@ public class FavoriteTransactionTableModel extends FavoriteItemModelTable {
         switch (column) {
             case COLUMN_TIMESTAMP:
                 return transaction.viewTimestamp();
+            case COLUMN_SEQNO:
+                return transaction.viewHeightSeq();
             case COLUMN_TYPE:
                 return transaction.viewFullTypeName();
             case COLUMN_CREATOR:
