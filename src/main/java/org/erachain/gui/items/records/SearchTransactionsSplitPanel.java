@@ -6,7 +6,6 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.items.statement.StatementsTableModelSearch;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.VoushLibraryPanel;
 import org.erachain.gui.library.library;
@@ -36,7 +35,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
     public VoushLibraryPanel voush_Library_Panel;
     SearchTransactionsTableModel transactionsTableModel;
     JScrollPane jScrollPane4;
-    private JTextField sender_address;
+    private JTextField searchString;
 
     public SearchTransactionsSplitPanel() {
         super("SearchTransactionsSplitPanel");
@@ -48,24 +47,23 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Insert height block or block-seqNo") + ":");
         this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Set account, signature or title") + ":"));
-        sender_address = new JTextField();
-        sender_address.setToolTipText("");
-        sender_address.setAlignmentX(1.0F);
-        sender_address.setMinimumSize(new java.awt.Dimension(350, 20));
-        sender_address.setName(""); // NOI18N
-        sender_address.setPreferredSize(new java.awt.Dimension(350, 20));
-        sender_address.setMaximumSize(new java.awt.Dimension(2000, 20));
+        searchString = new JTextField();
+        searchString.setToolTipText("");
+        searchString.setAlignmentX(1.0F);
+        searchString.setMinimumSize(new java.awt.Dimension(350, 20));
+        searchString.setName(""); // NOI18N
+        searchString.setPreferredSize(new java.awt.Dimension(350, 20));
+        searchString.setMaximumSize(new java.awt.Dimension(2000, 20));
 
-        MenuPopupUtil.installContextMenu(sender_address);
+        MenuPopupUtil.installContextMenu(searchString);
 
-        this.toolBar_LeftPanel.add(sender_address);
-        sender_address.addActionListener(new ActionListener() {
+        this.toolBar_LeftPanel.add(searchString);
+        searchString.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                // TODO Auto-generated method stub
-                //searchTextField_SearchToolBar_LeftPanel.setText("");
-                transactionsTableModel.find(sender_address.getText());
+                transactionsTableModel.clear();
+                transactionsTableModel.find(searchString.getText());
 
             }
 
@@ -88,7 +86,8 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                sender_address.setText("");
+                //searchString.setText("");
+                transactionsTableModel.clear();
                 transactionsTableModel.setBlockNumber(searchTextField_SearchToolBar_LeftPanel.getText());
 
             }

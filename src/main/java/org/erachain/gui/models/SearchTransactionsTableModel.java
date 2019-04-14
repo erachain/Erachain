@@ -36,8 +36,8 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
 
     public SearchTransactionsTableModel() {
         super(DCSet.getInstance().getTransactionFinalMap(),
-                new String[]{"Timestamp", "Block", "SeqNo", "Type", "Titke", "Key", "Amount", "Favorite", AssetCls.FEE_NAME},
-                new Boolean[]{false, false, false, false, false, false, false},
+                new String[]{"Timestamp", "Block", "SeqNo", "Type", "Title", "Key", "Amount", "Favorite"},
+                new Boolean[]{true, true, true, true, true, true, true, true},
                 false);
 
         logger = LoggerFactory.getLogger(this.getClass().getName());
