@@ -226,19 +226,12 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             UnionCls union;
             Transaction voting = null;
             if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0) {
-                voting = (Transaction) transactionsTableModel.getItem(jTable_jScrollPanel_LeftPanel
-                        .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+                try {
+                    voting = (Transaction) transactionsTableModel.getItem(jTable_jScrollPanel_LeftPanel
+                            .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+                } catch (Exception e) {
 
-                //	Person_info_panel_001 info_panel = new Person_info_panel_001(voting, false);
-
-                //	votingDetailsPanel = new VotingDetailPanel(voting, (AssetCls)allVotingsPanel.cbxAssets.getSelectedItem());
-                //	votingDetailsPanel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
-                //jScrollPane_jPanel_RightPanel.setHorizontalScrollBar(null);
-                //	jScrollPane_jPanel_RightPanel.setViewportView(votingDetailsPanel);
-                //jSplitPanel.setRightComponent(votingDetailsPanel);
-
-
-                //   TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+                }
 
                 info_Panel = new JPanel();
                 info_Panel.setLayout(new GridBagLayout());

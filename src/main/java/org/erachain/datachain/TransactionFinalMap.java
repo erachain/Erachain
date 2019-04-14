@@ -148,12 +148,21 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         this.titleKey = database.createTreeSet("title_type_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
         // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
-        Bind.secondaryKey(map, this.titleKey,
-                new Function2<Tuple2<String, Integer>, Long, Transaction>() {
+        Bind.secondaryKeys(map, this.titleKey,
+                new Function2<Tuple2<String, Integer>[], Long, Transaction>() {
             @Override
-            public Tuple2<String, Integer> run(Long key, Transaction val) {
+            public Tuple2<String, Integer>[] run(Long key, Transaction val) {
                 String title = val.getTitle();
-                return new Tuple2<String, Integer>(title == null? null: title.toLowerCase(), val.getType());
+                if (title == null || title.isEmpty() || title.equals(""))
+                    return null;
+
+                String[] tokens = title.toLowerCase().split(" ");
+                Tuple2<String, Integer>[] keys = new Tuple2[tokens.length];
+                for (int i = 0; i < tokens.length; ++i) {
+                    keys[i] = new Tuple2<String, Integer>(tokens[i], val.getType());
+                }
+
+                return keys;
             }
         });
 
