@@ -46,7 +46,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         this.setName(Lang.getInstance().translate("Search Records"));
 
         this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Insert height block or block-seqNo") + ":");
-        this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Set account, signature or title") + ":"));
+        this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Set account, signature or title") + ":"));
         searchString = new JTextField();
         searchString.setToolTipText("");
         searchString.setAlignmentX(1.0F);
@@ -57,7 +57,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         MenuPopupUtil.installContextMenu(searchString);
 
-        this.toolBar_LeftPanel.add(searchString);
+        this.toolBarLeftPanel.add(searchString);
         searchString.addActionListener(new ActionListener() {
 
             @Override
@@ -166,15 +166,15 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             }
         });
 
-        jTable_jScrollPanel_LeftPanel.addMouseMotionListener(new MouseMotionListener() {
+        jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionListener() {
             public void mouseMoved(MouseEvent e) {
 
-                if (jTable_jScrollPanel_LeftPanel
+                if (jTableJScrollPanelLeftPanel
                         .columnAtPoint(e.getPoint()) == transactionsTableModel.COLUMN_FAVORITE) {
 
-                    jTable_jScrollPanel_LeftPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    jTableJScrollPanelLeftPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 } else {
-                    jTable_jScrollPanel_LeftPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    jTableJScrollPanelLeftPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 }
             }
 
@@ -182,18 +182,18 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             }
         });
 
-        jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() {
+        jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 Point p = e.getPoint();
-                int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
-                //	jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
+                int row = jTableJScrollPanelLeftPanel.rowAtPoint(p);
+                //	jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
 
                 if (e.getClickCount() == 1 & e.getButton() == MouseEvent.BUTTON1) {
 
-                    if (jTable_jScrollPanel_LeftPanel
+                    if (jTableJScrollPanelLeftPanel
                             .getSelectedColumn() == transactionsTableModel.COLUMN_FAVORITE) {
-                        row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                        row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                         Transaction transaction = (Transaction) transactionsTableModel.getItem(row);
                         favorite_set(transaction);
                     }
@@ -201,7 +201,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             }
         });
 
-        this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);
+        this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
 
     }
 
@@ -225,10 +225,10 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             //создаем объект персоны
             UnionCls union;
             Transaction voting = null;
-            if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0) {
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0) {
                 try {
-                    voting = (Transaction) transactionsTableModel.getItem(jTable_jScrollPanel_LeftPanel
-                            .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+                    voting = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel
+                            .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
                 } catch (Exception e) {
 
                 }
@@ -292,7 +292,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
             Controller.getInstance().addTransactionFavorite(transaction);
         }
-        jTable_jScrollPanel_LeftPanel.repaint();
+        jTableJScrollPanelLeftPanel.repaint();
 
     }
 

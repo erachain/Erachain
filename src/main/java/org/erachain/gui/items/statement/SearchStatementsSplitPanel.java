@@ -101,7 +101,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionListener() {
             public void mouseMoved(MouseEvent e) {
 
-                if (jTable_jScrollPanel_LeftPanel
+                if (jTableJScrollPanelLeftPanel
                         .columnAtPoint(e.getPoint()) == search_Table_Model.COLUMN_FAVORITE) {
 
                     jTableJScrollPanelLeftPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -154,8 +154,8 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                             jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                             return;
                         }
-                        jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
-                        jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+                        jTableJScrollPanelLeftPanel.setRowSelectionInterval(0, 0);
+                        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
                     }
                 }.start();
 
@@ -203,8 +203,8 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                 if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
                     return;
 
-                Transaction statement = search_Table_Model.getItem(jTable_jScrollPanel_LeftPanel
-                        .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+                Transaction statement = search_Table_Model.getItem(jTableJScrollPanelLeftPanel
+                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
                 if (statement == null)
                     return;
 
@@ -226,9 +226,9 @@ public class SearchStatementsSplitPanel extends SplitPanel {
 
                 if (e.getClickCount() == 1 & e.getButton() == MouseEvent.BUTTON1) {
 
-                    if (jTable_jScrollPanel_LeftPanel
+                    if (jTableJScrollPanelLeftPanel
                             .getSelectedColumn() == search_Table_Model.COLUMN_FAVORITE) {
-                        row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                        row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                         Transaction transaction = (Transaction) search_Table_Model.getItem(row);
                         favorite_set(transaction);
                     }
@@ -280,7 +280,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
 
             Controller.getInstance().addTransactionFavorite(transaction);
         }
-        jTable_jScrollPanel_LeftPanel.repaint();
+        jTableJScrollPanelLeftPanel.repaint();
 
     }
 
@@ -292,12 +292,12 @@ public class SearchStatementsSplitPanel extends SplitPanel {
             if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
                 return;
 
-            Transaction transaction = search_Table_Model.getItem(jTable_jScrollPanel_LeftPanel
-                    .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+            Transaction transaction = search_Table_Model.getItem(jTableJScrollPanelLeftPanel
+                    .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             JPanel info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
-            info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width - 50,
-                    jScrollPane_jPanel_RightPanel.getSize().height - 50));
-            jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+            info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50,
+                    jScrollPaneJPanelRightPanel.getSize().height - 50));
+            jScrollPaneJPanelRightPanel.setViewportView(info_panel);
             // jSplitPanel.setRightComponent(info_panel);
         }
     }

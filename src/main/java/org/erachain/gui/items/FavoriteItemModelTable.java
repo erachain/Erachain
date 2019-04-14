@@ -85,7 +85,7 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
     }
 
     @Override
-    public ItemCls getItem(int k) {
+    public Object getItem(int k) {
         return list.get(k);
     }
 

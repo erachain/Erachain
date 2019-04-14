@@ -137,15 +137,15 @@ public class StatementsMySplitPanel extends SplitPanel {
 
 
             Transaction transaction = null;
-            if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0)
-                transaction = my_Statements_Model.get_Statement(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0)
+                transaction = my_Statements_Model.get_Statement(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
 
             if (transaction == null) return;
 
             JPanel info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
 
-            info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width - 50, jScrollPane_jPanel_RightPanel.getSize().height - 50));
-            jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+            info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));
+            jScrollPaneJPanelRightPanel.setViewportView(info_panel);
             //	jSplitPanel.setRightComponent(info_panel);
         }
 
