@@ -21,8 +21,8 @@ public abstract class SearchTableModelCls<U> extends AbstractTableModel {
 
     protected Boolean[] columnAutoHeight;
 
-    protected long start = 0;
-    protected int step = 50;
+    protected int start = 0;
+    protected int step = 500;
     protected long size = 0;
 
     protected DBMap map;

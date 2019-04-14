@@ -18,6 +18,7 @@ import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.*;
 import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -311,7 +312,9 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
     public List<Transaction> getTransactionsByTitleAndType(String filter, Integer type, int limit, boolean descending) {
 
         Iterable keys = Fun.filter(this.titleKey, new Tuple2<String, Integer>(filter, type), true,
-                new Tuple2<String, Integer>(filter + new String(new byte[]{(byte)254}), type), true);
+                new Tuple2<String, Integer>(filter + "я", //new String(new byte[]{(byte)254}),
+                        type), true);
+
         Iterator iter = keys.iterator();
 
         List<Transaction> txs = new ArrayList<>();
@@ -329,6 +332,23 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         }
         iter = null;
         return txs;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Iterable getKeysByTitleAndType(String filter, Integer type,  int offset, int limit) {
+
+        Iterable keys = Fun.filter(this.titleKey, new Tuple2<String, Integer>(filter, type), true,
+                new Tuple2<String, Integer>(filter + "я", //new String(new byte[]{(byte)254}),
+                        type), true);
+
+        if (offset > 0)
+            keys = Iterables.skip(keys, offset);
+
+        if (limit > 0)
+            keys = Iterables.limit(keys, limit);
+
+        return keys;
+
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

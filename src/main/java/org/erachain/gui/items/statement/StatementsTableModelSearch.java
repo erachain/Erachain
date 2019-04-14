@@ -1,21 +1,16 @@
 package org.erachain.gui.items.statement;
 
-import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.SearchTableModelCls;
-import org.erachain.gui.models.TimerTableModelCls;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Observable;
 
-public class StatementsTableModelSearch extends SearchTableModelCls<RSignNote> {
+public class StatementsTableModelSearch extends SearchTableModelCls<Transaction> {
 
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_CREATOR = 1;
@@ -40,7 +35,7 @@ public class StatementsTableModelSearch extends SearchTableModelCls<RSignNote> {
             return null;
         }
 
-        RSignNote record = this.list.get(row);
+        Transaction record = this.list.get(row);
 
         switch (column) {
             case COLUMN_TIMESTAMP:
@@ -48,42 +43,13 @@ public class StatementsTableModelSearch extends SearchTableModelCls<RSignNote> {
                 return record.viewTimestamp();
 
             case COLUMN_BODY:
-
-                if (record.getData() == null)
-                    return "";
-
-                if (record.getVersion() == 2) {
-                    Tuple3<String, String, JSONObject> a;
-                    try {
-                        a = record.parse_Data_V2_Without_Files();
-
-                        return a.b;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                String str;
-                try {
-                    JSONObject data = (JSONObject) JSONValue
-                            .parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
-                    str = (String) data.get("!!&_Title");
-                    if (str == null)
-                        str = (String) data.get("Title");
-                } catch (Exception e) {
-                    str = new String(record.getData(), Charset.forName("UTF-8"));
-                }
-                if (str == null)
-                    return "";
-                if (str.length() > 50)
-                    return str.substring(0, 50) + "...";
-                return str;
+                return record.getTitle();
             case COLUMN_CREATOR:
 
                 return record.getCreator().getPersonAsString();
 
             case COLUMN_FAVORITE:
-                return record.isFavorite();
+                return false; //record.isFavorite();
         }
 
         return null;
@@ -91,6 +57,9 @@ public class StatementsTableModelSearch extends SearchTableModelCls<RSignNote> {
 
 
     public void findByKey(String text) {
+
+        clear();
+
         // TODO Auto-generated method stub
         if (text.equals("") || text == null)
             return;
@@ -101,31 +70,40 @@ public class StatementsTableModelSearch extends SearchTableModelCls<RSignNote> {
 
         Long key = new Long(text);
         if (key > 0) {
-            list.add((RSignNote)DCSet.getInstance().getTransactionFinalMap().get(key));
+            list.add(DCSet.getInstance().getTransactionFinalMap().get(key));
         }
 
         fireTableDataChanged();
     }
 
-    public void setFilterByName(String str, boolean isLowerCase) {
+    public void setFilterByName(String str) {
+
+        clear();
 
         DCSet dcSet = DCSet.getInstance();
 
-        List<Transaction> lists = dcSet.getTransactionFinalMap().getTransactionsByTitleAndType(str,
-                Transaction.SIGN_NOTE_TRANSACTION, 1000, isLowerCase);
+        Iterable keys = dcSet.getTransactionFinalMap().getKeysByTitleAndType(str,
+                Transaction.SIGN_NOTE_TRANSACTION, start, step);
 
-        for (Transaction transaction: lists) {
+        Iterator iterator = keys.iterator();
 
-            transaction.setDC_HeightSeq(dcSet);
-            list.add((RSignNote) transaction);
+        Transaction item;
+        Long key;
+
+        while (iterator.hasNext()) {
+            key = (Long) iterator.next();
+            Fun.Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+            item = (Transaction) map.get(key);
+            list.add(item);
         }
+
 
         fireTableDataChanged();
 
     }
 
     public void clear() {
-        list = new ArrayList<RSignNote>();
+        list = new ArrayList<Transaction>();
         fireTableDataChanged();
     }
 

@@ -8,6 +8,7 @@ import org.erachain.gui.items.persons.ItemsPersonsTableModel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui.transaction.RecDetailsFrame;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 public class SearchStatementsSplitPanel extends SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
-    protected IssueConfirmDialog ddd;
     // для прозрачности
     int alpha = 255;
     int alpha_int;
@@ -146,14 +146,13 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                 new Thread() {
                     @Override
                     public void run() {
-                        search_Table_Model.setFilterByName(search, false);
+                        search_Table_Model.setFilterByName(search);
                         if (search_Table_Model.getRowCount() < 1) {
                             Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Documents"));
                             jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
                             return;
                         }
                         jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
-                        ddd.dispose();
                         jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
                     }
                 }.start();
@@ -298,9 +297,15 @@ public class SearchStatementsSplitPanel extends SplitPanel {
             if (jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0)
                 return;
 
-            Transaction statement = search_Table_Model.getItem(jTable_jScrollPanel_LeftPanel
+            Transaction transaction = search_Table_Model.getItem(jTable_jScrollPanel_LeftPanel
                     .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
-            StatementInfo info_panel = new StatementInfo(statement);
+            JPanel info_panel;
+            if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
+                info_panel = new StatementInfo(transaction);
+            } else {
+                info_panel = new RecDetailsFrame(transaction);
+            }
+
             info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width - 50,
                     jScrollPane_jPanel_RightPanel.getSize().height - 50));
             jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
