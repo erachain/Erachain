@@ -1,48 +1,56 @@
 package org.erachain.gui.models;
 
 import org.erachain.core.account.Account;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
-import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 @SuppressWarnings("serial")
 /**
  * не перерисовыется по событиям - статичная таблица при поиске
  */
-public class SearchTransactionsTableModel extends TimerTableModelCls<Transaction> implements Observer {
+public class SearchTransactionsTableModel extends SearchTableModelCls<Transaction> {
 
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_BLOCK = 1;
     public static final int COLUMN_SEQ_NO = 2;
     public static final int COLUMN_TYPE = 3;
-    public static final int COLUMN_AMOUNT = 4;
-    public static final int COLUMN_FEE = 5;
+    public static final int COLUMN_TITLE = 4;
+    public static final int COLUMN_KEY = 5;
+    public static final int COLUMN_AMOUNT = 6;
+    public static final int COLUMN_FAVORITE = 7;
+    //public static final int COLUMN_FEE = 8;
 
-    Integer block_No;
+    Integer blockNo;
 
     public SearchTransactionsTableModel() {
-        super(new String[]{"Timestamp", "Block", "Seq_no", "Type", "Amount", AssetCls.FEE_NAME}, false);
-        logger = LoggerFactory.getLogger(SearchTransactionsTableModel.class.getName());
+        super(DCSet.getInstance().getTransactionFinalMap(),
+                new String[]{"Timestamp", "Block", "SeqNo", "Type", "Titke", "Key", "Amount", "Favorite", AssetCls.FEE_NAME},
+                new Boolean[]{false, false, false, false, false, false, false},
+                false);
+
+        logger = LoggerFactory.getLogger(this.getClass().getName());
     }
 
     public void setBlockNumber(String string) {
 
-        list = new ArrayList<>();
+        clear();
 
         try {
-            block_No = Integer.parseInt(string);
+            blockNo = Integer.parseInt(string);
         } catch (NumberFormatException e) {
-            Transaction transaction = DCSet.getInstance().getTransactionFinalMap().getRecord(string);
+            Transaction transaction = ((TransactionFinalMap)map).getRecord(string);
             if (transaction != null) {
                 transaction.setDC(DCSet.getInstance());
                 list.add(transaction);
@@ -51,23 +59,59 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<Transaction
             return;
         }
 
-        list = (List<Transaction>) DCSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(block_No);
+        list = (List<Transaction>) ((TransactionFinalMap)map).getTransactionsByBlock(blockNo);
         this.fireTableDataChanged();
 
     }
 
-    public void Find_Transactions_from_Address(String address) {
+    public void find(String filter) {
 
-        if (address == null || address.equals("")) return;
-        Tuple2<Account, String> accountResult = Account.tryMakeAccount(address);
+        clear();
+
+        if (filter == null || filter.isEmpty()) return;
+
+        Tuple2<Account, String> accountResult = Account.tryMakeAccount(filter);
         Account account = accountResult.a;
 
         if (account != null) {
+            // ИЩЕМ по СЧЕТУ
+            list = ((TransactionFinalMap)map).getTransactionsByAddress(account.getAddress());
+        } else {
 
-            list = new ArrayList();
-            list.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress()));//.findTransactions(address, sender=address, recipient=address, minHeight=0, maxHeight=0, type=0, service=0, desc=false, offset=0, limit=0);//.getTransactionsByBlock(block_No);
+            try {
 
+                // ИЩЕМ по ПОДПИСИ
+                byte[] signatute = Base58.decode(filter);
+                if (signatute.length > 40) {
+                    Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(signatute);
+                    list.add(DCSet.getInstance().getTransactionFinalMap().get(key));
+                }
+            } catch (NumberFormatException e) {
+            }
+
+            if (list.isEmpty()) {
+                // ИЩЕМ по Заголовку
+                DCSet dcSet = DCSet.getInstance();
+
+                Iterable keys = dcSet.getTransactionFinalMap().getKeysByTitleAndType(filter,
+                        0, start, step);
+
+                Iterator iterator = keys.iterator();
+
+                Transaction item;
+                Long key;
+
+                list = new ArrayList<>();
+
+                while (iterator.hasNext()) {
+                    key = (Long) iterator.next();
+                    Fun.Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                    item = (Transaction) map.get(key);
+                    list.add(item);
+                }
+            }
         }
+
         this.fireTableDataChanged();
 
     }
@@ -100,19 +144,25 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<Transaction
 
                     return transaction.getAmount();//.getAmount(transaction.getCreator()));
 
-                case COLUMN_FEE:
-
-                    return transaction.getFee();
-
                 case COLUMN_BLOCK:
 
                     return transaction.getBlockHeight();
 
+                case COLUMN_KEY:
+
+                    return transaction.getKey();
+
+                case COLUMN_TITLE:
+
+                    return transaction.getTitle();
+
+                case COLUMN_FAVORITE:
+
+                    return cnt.isTransactionFavorite(transaction);
+
                 case COLUMN_SEQ_NO:
                     return transaction.getSeqNo();
 
-                //		case COLUMN_NO:
-                //			return row;
             }
 
 
@@ -124,15 +174,9 @@ public class SearchTransactionsTableModel extends TimerTableModelCls<Transaction
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-
-        ObserverMessage message = (ObserverMessage) arg;
-
-        if (message.getType() == ObserverMessage.GUI_REPAINT) {
-            needUpdate = false;
-            this.fireTableDataChanged();
-        }
+    public void clear() {
+        list = new ArrayList<Transaction>();
+        fireTableDataChanged();
     }
 
 }

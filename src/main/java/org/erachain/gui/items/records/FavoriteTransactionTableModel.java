@@ -50,7 +50,9 @@ public class FavoriteTransactionTableModel extends FavoriteItemModelTable {
             case COLUMN_TYPE:
                 return transaction.viewFullTypeName();
             case COLUMN_CREATOR:
-                return transaction.getCreator().getPersonAsString();
+                if (transaction.getCreator() != null) {
+                    return transaction.getCreator().getPersonAsString();
+                } else return "GENESIS";
             case COLUMN_TITLE:
                 return transaction.getTitle();
             case COLUMN_FAVORITE:

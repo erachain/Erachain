@@ -8,7 +8,6 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.library.library;
-import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.TransactionTimestampComparator;
@@ -301,7 +300,7 @@ public class APITransactionsResource {
                     .entity(ff.toJSONString()).build();
         }
         // SearchTransactionsTableModel a = new SearchTransactionsTableModel();
-        // a.Find_Transactions_from_Address(address);
+        // a.findByAddress(address);
         // result =a.getTransactions();
         Integer type;
         try {

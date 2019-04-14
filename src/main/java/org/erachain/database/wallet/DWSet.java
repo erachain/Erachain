@@ -347,7 +347,10 @@ public class DWSet extends DBASet {
         getTransactionFavoritesSet().delete(transaction.getDBRef());
     }
     public boolean isTransactionFavorite(Transaction transaction) {
-        return getTransactionFavoritesSet().contains(transaction.getDBRef());
+        if (transaction.getDBRef() > 0) {
+            return getTransactionFavoritesSet().contains(transaction.getDBRef());
+        }
+        return false;
     }
 
     public void addItemToFavorite(ItemCls item) {

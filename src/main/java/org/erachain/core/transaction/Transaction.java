@@ -371,7 +371,7 @@ public abstract class Transaction {
 
     protected int height;
     protected int seqNo;
-    protected Long dbRef; // height + SeqNo
+    protected long dbRef; // height + SeqNo
 
     // TODO REMOVE REFERENCE - use TIMESTAMP as reference
     protected Long reference = 0l;

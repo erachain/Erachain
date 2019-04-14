@@ -1,9 +1,12 @@
 package org.erachain.gui.items.records;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.items.statement.StatementsTableModelSearch;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.VoushLibraryPanel;
 import org.erachain.gui.library.library;
@@ -19,10 +22,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -47,7 +47,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         this.setName(Lang.getInstance().translate("Search Records"));
 
         this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Insert height block or block-seqNo") + ":");
-        this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Insert account") + ":"));
+        this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Set account, signature or title") + ":"));
         sender_address = new JTextField();
         sender_address.setToolTipText("");
         sender_address.setAlignmentX(1.0F);
@@ -64,8 +64,8 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                searchTextField_SearchToolBar_LeftPanel.setText("");
-                transactionsTableModel.Find_Transactions_from_Address(sender_address.getText());
+                //searchTextField_SearchToolBar_LeftPanel.setText("");
+                transactionsTableModel.find(sender_address.getText());
 
             }
 
@@ -167,19 +167,47 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             }
         });
 
+        jTable_jScrollPanel_LeftPanel.addMouseMotionListener(new MouseMotionListener() {
+            public void mouseMoved(MouseEvent e) {
+
+                if (jTable_jScrollPanel_LeftPanel
+                        .columnAtPoint(e.getPoint()) == transactionsTableModel.COLUMN_FAVORITE) {
+
+                    jTable_jScrollPanel_LeftPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                } else {
+                    jTable_jScrollPanel_LeftPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                }
+            }
+
+            public void mouseDragged(MouseEvent e) {
+            }
+        });
+
+        jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Point p = e.getPoint();
+                int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
+                //	jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
+
+                if (e.getClickCount() == 1 & e.getButton() == MouseEvent.BUTTON1) {
+
+                    if (jTable_jScrollPanel_LeftPanel
+                            .getSelectedColumn() == transactionsTableModel.COLUMN_FAVORITE) {
+                        row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                        Transaction transaction = (Transaction) transactionsTableModel.getItem(row);
+                        favorite_set(transaction);
+                    }
+                }
+            }
+        });
+
         this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);
 
     }
 
     @Override
     public void onClose() {
-        // delete observer left panel
-        transactionsTableModel.deleteObservers();
-        // get component from right panel
-        Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
-        // if PersonInfo 002 delay on close
-        //		  if (c1.getClass() == this.info_Panel.getClass()) voush_Library_Panel.onClose();
-
     }
 
     public void listener() {
@@ -260,4 +288,20 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             }
         }
     }
+
+    public void favorite_set(Transaction transaction) {
+
+        // CHECK IF FAVORITES
+        if (Controller.getInstance().isTransactionFavorite(transaction)) {
+            int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+
+            if (dd == 0) Controller.getInstance().removeTransactionFavorite(transaction);
+        } else {
+
+            Controller.getInstance().addTransactionFavorite(transaction);
+        }
+        jTable_jScrollPanel_LeftPanel.repaint();
+
+    }
+
 }

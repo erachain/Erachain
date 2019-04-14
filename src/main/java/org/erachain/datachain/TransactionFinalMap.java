@@ -340,9 +340,11 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
 
         String filtrLower = filter.toLowerCase();
 
-        Iterable keys = Fun.filter(this.titleKey, new Tuple2<String, Integer>(filtrLower, type), true,
+        Iterable keys = Fun.filter(this.titleKey,
+                new Tuple2<String, Integer>(filtrLower,
+                        type==0?0:type), true,
                 new Tuple2<String, Integer>(filtrLower + new String(new byte[]{(byte)254}),
-                        type), true);
+                        type==0?Integer.MAX_VALUE:type), true);
 
         if (offset > 0)
             keys = Iterables.skip(keys, offset);

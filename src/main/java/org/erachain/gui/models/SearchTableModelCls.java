@@ -28,11 +28,14 @@ public abstract class SearchTableModelCls<U> extends AbstractTableModel {
     protected DBMap map;
     protected Logger logger;
 
+    protected Controller cnt;
+
     public SearchTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
         this.map = map;
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
         this.descending = descending;
+        cnt = Controller.getInstance();
     }
     public Boolean[] getColumnAutoHeight() {
         return this.columnAutoHeight;
