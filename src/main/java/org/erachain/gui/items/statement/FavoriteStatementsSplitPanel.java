@@ -8,6 +8,7 @@ import org.erachain.gui.items.persons.ItemsPersonsTableModel;
 import org.erachain.gui.items.records.FavoriteTransactionTableModel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -228,7 +229,13 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
                 return;
 
             Transaction transaction = (Transaction)favotitesTable.getItem(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
-            StatementInfo info_panel = new StatementInfo(transaction);
+
+            JPanel info_panel;
+            if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
+                info_panel = new StatementInfo(transaction);
+            } else {
+                info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+            }
             info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width - 50, jScrollPane_jPanel_RightPanel.getSize().height - 50));
             jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
             //	jSplitPanel.setRightComponent(info_panel);

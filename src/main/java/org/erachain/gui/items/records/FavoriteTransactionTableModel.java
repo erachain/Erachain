@@ -23,10 +23,10 @@ public class FavoriteTransactionTableModel extends FavoriteItemModelTable {
                 Controller.getInstance().wallet.database.getTransactionFavoritesSet(),
                 new String[]{"Timestamp", "Type", "Creator", "Statement", "Favorite"},
                 new Boolean[]{true, true, true, true, false},
-                ObserverMessage.RESET_ASSET_FAVORITES_TYPE,
-                ObserverMessage.ADD_ASSET_FAVORITES_TYPE,
-                ObserverMessage.DELETE_ASSET_FAVORITES_TYPE,
-                ObserverMessage.LIST_ASSET_FAVORITES_TYPE,
+                ObserverMessage.RESET_TRANSACTION_FAVORITES_TYPE,
+                ObserverMessage.ADD_TRANSACTION_FAVORITES_TYPE,
+                ObserverMessage.DELETE_TRANSACTION_FAVORITES_TYPE,
+                ObserverMessage.LIST_TRANSACTION_FAVORITES_TYPE,
                 COLUMN_FAVORITE);
 
         logger = LoggerFactory.getLogger(this.getClass());

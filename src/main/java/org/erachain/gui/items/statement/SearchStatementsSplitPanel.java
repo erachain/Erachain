@@ -298,10 +298,9 @@ public class SearchStatementsSplitPanel extends SplitPanel {
             Transaction transaction = search_Table_Model.getItem(jTable_jScrollPanel_LeftPanel
                     .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
             JPanel info_panel;
-            if (false && transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
+            if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
                 info_panel = new StatementInfo(transaction);
             } else {
-                //info_panel = new RecDetailsFrame(transaction);
                 info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
             }
 
