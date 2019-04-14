@@ -128,6 +128,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         polls_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Poll")));
         polls_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Polls")));
 
+        records_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Records")));
         records_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Records")));
         records_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Records")));
         records_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Unconfirmed Records")));

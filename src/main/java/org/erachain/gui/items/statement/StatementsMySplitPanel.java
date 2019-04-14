@@ -142,12 +142,7 @@ public class StatementsMySplitPanel extends SplitPanel {
 
             if (transaction == null) return;
 
-            JPanel info_panel;
-            if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
-                info_panel = new StatementInfo(transaction);
-            } else {
-                info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
-            }
+            JPanel info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
 
             info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width - 50, jScrollPane_jPanel_RightPanel.getSize().height - 50));
             jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
