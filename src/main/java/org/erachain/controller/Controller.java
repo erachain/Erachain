@@ -2310,14 +2310,6 @@ public class Controller extends Observable {
         return this.wallet.getPolls(account);
     }
 
-    /*
-     * public void addAssetFavorite(AssetCls asset) {
-     * this.wallet.addAssetFavorite(asset); }
-     */
-    public void addItemFavorite(ItemCls item) {
-        this.wallet.addItemFavorite(item);
-    }
-
     public ItemMap getItemMap(int type) {
         switch (type) {
             case ItemCls.ASSET_TYPE:
@@ -2332,13 +2324,28 @@ public class Controller extends Observable {
         return null;
     }
 
+    public void addItemFavorite(ItemCls item) {
+        this.wallet.addItemFavorite(item);
+    }
+
     public void removeItemFavorite(ItemCls item) {
         this.wallet.removeItemFavorite(item);
     }
 
-    public boolean isItemFavorite(ItemCls item) {
-        return this.wallet.isItemFavorite(item);
+    public boolean isItemFavorite(ItemCls item) { return this.wallet.isItemFavorite(item); }
+
+    public void addTransactionFavorite(Transaction transaction) {
+        this.wallet.addTransactionFavorite(transaction);
     }
+
+    public void removeTransactionFavorite(Transaction transaction) {
+        this.wallet.removeTransactionFavorite(transaction);
+    }
+
+    public boolean isTransactionFavorite(Transaction transaction) {
+        return this.wallet.isTransactionFavorite(transaction);
+    }
+
 
     public Collection<org.erachain.core.voting.Poll> getAllPolls() {
         return this.dcSet.getPollMap().getValues();

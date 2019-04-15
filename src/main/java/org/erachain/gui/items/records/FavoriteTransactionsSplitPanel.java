@@ -1,12 +1,11 @@
-package org.erachain.gui.items.statement;
+package org.erachain.gui.items.records;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.persons.ItemsPersonsTableModel;
-import org.erachain.gui.items.records.FavoriteTransactionTableModel;
+import org.erachain.gui.items.statement.StatementInfo;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
@@ -25,7 +24,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 
 
-public class FavoriteStatementsSplitPanel extends SplitPanel {
+public class FavoriteTransactionsSplitPanel extends SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
     // для прозрачности
@@ -36,9 +35,9 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
     //	private MTable search_Table;
     private RowSorter<ItemsPersonsTableModel> search_Sorter;
 
-    public FavoriteStatementsSplitPanel() {
+    public FavoriteTransactionsSplitPanel() {
         super("FavoriteStatementsSplitPanel");
-        setName(Lang.getInstance().translate("Favorite Documents"));
+        setName(Lang.getInstance().translate("Favorite Transactions"));
         searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 
         // not show buttons
@@ -59,8 +58,8 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         //	jTableJScrollPanelLeftPanel = search_Table;
         //sorter from 0 column
         search_Sorter = new TableRowSorter(favotitesTable);
-        ArrayList<SortKey> keys = new ArrayList<RowSorter.SortKey>();
-        keys.add(new RowSorter.SortKey(0, SortOrder.DESCENDING));
+        ArrayList<SortKey> keys = new ArrayList<SortKey>();
+        keys.add(new SortKey(0, SortOrder.DESCENDING));
         search_Sorter.setSortKeys(keys);
         ((DefaultRowSorter<?, ?>) search_Sorter).setSortsOnUpdates(true);
         this.jTableJScrollPanelLeftPanel.setRowSorter(search_Sorter);
@@ -205,7 +204,8 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
             if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
                 return;
 
-            Transaction transaction = (Transaction)favotitesTable.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            Transaction transaction = (Transaction)favotitesTable.getItem(
+                    jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
 
             JPanel info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
             info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));

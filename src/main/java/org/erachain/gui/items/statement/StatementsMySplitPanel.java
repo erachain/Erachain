@@ -3,6 +3,7 @@ package org.erachain.gui.items.statement;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -135,35 +136,19 @@ public class StatementsMySplitPanel extends SplitPanel {
         public void valueChanged(ListSelectionEvent arg0) {
 
 
-            Transaction statement = null;
+            Transaction transaction = null;
             if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0)
-                statement = my_Statements_Model.get_Statement(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+                transaction = my_Statements_Model.get_Statement(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
 
-            if (statement == null) return;
-            StatementInfo info_panel = new StatementInfo(statement);
+            if (transaction == null) return;
+
+            JPanel info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+
             info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);
             //	jSplitPanel.setRightComponent(info_panel);
         }
 
-    }
-
-    class My_Search implements DocumentListener {
-        public void changedUpdate(DocumentEvent e) {
-            onChange();
-        }
-
-        public void removeUpdate(DocumentEvent e) {
-            onChange();
-        }
-
-        public void insertUpdate(DocumentEvent e) {
-            onChange();
-        }
-
-        public void onChange() {
-
-        }
     }
 
 }

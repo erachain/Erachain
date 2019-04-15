@@ -1,8 +1,10 @@
 package org.erachain.gui.items.records;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.VoushLibraryPanel;
@@ -19,10 +21,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -36,7 +35,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
     public VoushLibraryPanel voush_Library_Panel;
     SearchTransactionsTableModel transactionsTableModel;
     JScrollPane jScrollPane4;
-    private JTextField sender_address;
+    private JTextField searchString;
 
     public SearchTransactionsSplitPanel() {
         super("SearchTransactionsSplitPanel");
@@ -47,25 +46,24 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         this.setName(Lang.getInstance().translate("Search Records"));
 
         this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Insert height block or block-seqNo") + ":");
-        this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Insert account") + ":"));
-        sender_address = new JTextField();
-        sender_address.setToolTipText("");
-        sender_address.setAlignmentX(1.0F);
-        sender_address.setMinimumSize(new java.awt.Dimension(350, 20));
-        sender_address.setName(""); // NOI18N
-        sender_address.setPreferredSize(new java.awt.Dimension(350, 20));
-        sender_address.setMaximumSize(new java.awt.Dimension(2000, 20));
+        this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Set account, signature or title") + ":"));
+        searchString = new JTextField();
+        searchString.setToolTipText("");
+        searchString.setAlignmentX(1.0F);
+        searchString.setMinimumSize(new java.awt.Dimension(350, 20));
+        searchString.setName(""); // NOI18N
+        searchString.setPreferredSize(new java.awt.Dimension(350, 20));
+        searchString.setMaximumSize(new java.awt.Dimension(2000, 20));
 
-        MenuPopupUtil.installContextMenu(sender_address);
+        MenuPopupUtil.installContextMenu(searchString);
 
-        this.toolBarLeftPanel.add(sender_address);
-        sender_address.addActionListener(new ActionListener() {
+        this.toolBarLeftPanel.add(searchString);
+        searchString.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                // TODO Auto-generated method stub
-                searchTextField_SearchToolBar_LeftPanel.setText("");
-                transactionsTableModel.Find_Transactions_from_Address(sender_address.getText());
+                transactionsTableModel.clear();
+                transactionsTableModel.find(searchString.getText());
 
             }
 
@@ -88,7 +86,8 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                sender_address.setText("");
+                //searchString.setText("");
+                transactionsTableModel.clear();
                 transactionsTableModel.setBlockNumber(searchTextField_SearchToolBar_LeftPanel.getText());
 
             }
@@ -167,19 +166,47 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             }
         });
 
+        jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionListener() {
+            public void mouseMoved(MouseEvent e) {
+
+                if (jTableJScrollPanelLeftPanel
+                        .columnAtPoint(e.getPoint()) == transactionsTableModel.COLUMN_FAVORITE) {
+
+                    jTableJScrollPanelLeftPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                } else {
+                    jTableJScrollPanelLeftPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                }
+            }
+
+            public void mouseDragged(MouseEvent e) {
+            }
+        });
+
+        jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Point p = e.getPoint();
+                int row = jTableJScrollPanelLeftPanel.rowAtPoint(p);
+                //	jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
+
+                if (e.getClickCount() == 1 & e.getButton() == MouseEvent.BUTTON1) {
+
+                    if (jTableJScrollPanelLeftPanel
+                            .getSelectedColumn() == transactionsTableModel.COLUMN_FAVORITE) {
+                        row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+                        Transaction transaction = (Transaction) transactionsTableModel.getItem(row);
+                        favorite_set(transaction);
+                    }
+                }
+            }
+        });
+
         this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
 
     }
 
     @Override
     public void onClose() {
-        // delete observer left panel
-        transactionsTableModel.deleteObservers();
-        // get component from right panel
-        Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
-        // if PersonInfo 002 delay on close
-        //		  if (c1.getClass() == this.info_Panel.getClass()) voush_Library_Panel.onClose();
-
     }
 
     public void listener() {
@@ -199,19 +226,12 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             UnionCls union;
             Transaction voting = null;
             if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0) {
-                voting = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel
-                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+                try {
+                    voting = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel
+                            .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+                } catch (Exception e) {
 
-                //	Person_info_panel_001 info_panel = new Person_info_panel_001(voting, false);
-
-                //	votingDetailsPanel = new VotingDetailPanel(voting, (AssetCls)allVotingsPanel.cbxAssets.getSelectedItem());
-                //	votingDetailsPanel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,jScrollPaneJPanelRightPanel.getSize().height-50));
-                //jScrollPaneJPanelRightPanel.setHorizontalScrollBar(null);
-                //	jScrollPaneJPanelRightPanel.setViewportView(votingDetailsPanel);
-                //jSplitPanel.setRightComponent(votingDetailsPanel);
-
-
-                //   TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+                }
 
                 info_Panel = new JPanel();
                 info_Panel.setLayout(new GridBagLayout());
@@ -260,4 +280,20 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             }
         }
     }
+
+    public void favorite_set(Transaction transaction) {
+
+        // CHECK IF FAVORITES
+        if (Controller.getInstance().isTransactionFavorite(transaction)) {
+            int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+
+            if (dd == 0) Controller.getInstance().removeTransactionFavorite(transaction);
+        } else {
+
+            Controller.getInstance().addTransactionFavorite(transaction);
+        }
+        jTableJScrollPanelLeftPanel.repaint();
+
+    }
+
 }

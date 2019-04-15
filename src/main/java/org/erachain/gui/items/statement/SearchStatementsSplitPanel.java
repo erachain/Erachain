@@ -3,11 +3,14 @@ package org.erachain.gui.items.statement;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.persons.ItemsPersonsTableModel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui.transaction.RecDetailsFrame;
+import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -25,7 +28,6 @@ import java.util.ArrayList;
 public class SearchStatementsSplitPanel extends SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
-    protected IssueConfirmDialog ddd;
     // для прозрачности
     int alpha = 255;
     int alpha_int;
@@ -65,7 +67,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 searchTextField_SearchToolBar_LeftPanel.setText("");
-                search_Table_Model.Find_item_from_key(key_Item.getText());
+                search_Table_Model.findByKey(key_Item.getText());
                 if (search_Table_Model.getRowCount() < 1)
                     return;
                 selected_Item = 0;
@@ -100,7 +102,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
             public void mouseMoved(MouseEvent e) {
 
                 if (jTableJScrollPanelLeftPanel
-                        .columnAtPoint(e.getPoint()) == StatementsTableModelSearch.COLUMN_FAVORITE) {
+                        .columnAtPoint(e.getPoint()) == search_Table_Model.COLUMN_FAVORITE) {
 
                     jTableJScrollPanelLeftPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 } else {
@@ -146,14 +148,13 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                 new Thread() {
                     @Override
                     public void run() {
-                        search_Table_Model.set_Filter_By_Name(search, false);
+                        search_Table_Model.setFilterByName(search);
                         if (search_Table_Model.getRowCount() < 1) {
                             Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Documents"));
                             jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                             return;
                         }
-                        //	jTableJScrollPanelLeftPanel.setRowSelectionInterval(0, 0);
-                        // ddd.dispose();
+                        jTableJScrollPanelLeftPanel.setRowSelectionInterval(0, 0);
                         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
                     }
                 }.start();
@@ -202,7 +203,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                 if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
                     return;
 
-                Transaction statement = search_Table_Model.get_Statement(jTableJScrollPanelLeftPanel
+                Transaction statement = search_Table_Model.getItem(jTableJScrollPanelLeftPanel
                         .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
                 if (statement == null)
                     return;
@@ -226,11 +227,10 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                 if (e.getClickCount() == 1 & e.getButton() == MouseEvent.BUTTON1) {
 
                     if (jTableJScrollPanelLeftPanel
-                            .getSelectedColumn() == StatementsTableModelSearch.COLUMN_FAVORITE) {
-                        // row =
-                        // jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-                        // PersonCls asset = search_Table_Model.getPerson(row);
-                        favorite_set(jTableJScrollPanelLeftPanel);
+                            .getSelectedColumn() == search_Table_Model.COLUMN_FAVORITE) {
+                        row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+                        Transaction transaction = (Transaction) search_Table_Model.getItem(row);
+                        favorite_set(transaction);
                     }
                 }
             }
@@ -269,24 +269,18 @@ public class SearchStatementsSplitPanel extends SplitPanel {
 
     }
 
-    public void favorite_set(JTable personsTable) {
-
-        int row = personsTable.getSelectedRow();
-        row = personsTable.convertRowIndexToModel(row);
-
-        Transaction person = search_Table_Model.get_Statement(row);
-        // new AssetPairSelect(asset.getKey());
+    public void favorite_set(Transaction transaction) {
 
         // CHECK IF FAVORITES
-        if (((RSignNote) person).isFavorite()) {
+        if (Controller.getInstance().isTransactionFavorite(transaction)) {
+            int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
 
-            Controller.getInstance().wallet.database.getDocumentFavoritesSet().delete(person);
+            if (dd == 0) Controller.getInstance().removeTransactionFavorite(transaction);
         } else {
 
-            Controller.getInstance().wallet.database.getDocumentFavoritesSet().add(person);
+            Controller.getInstance().addTransactionFavorite(transaction);
         }
-
-        personsTable.repaint();
+        jTableJScrollPanelLeftPanel.repaint();
 
     }
 
@@ -298,9 +292,9 @@ public class SearchStatementsSplitPanel extends SplitPanel {
             if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
                 return;
 
-            Transaction statement = search_Table_Model.get_Statement(jTableJScrollPanelLeftPanel
+            Transaction transaction = search_Table_Model.getItem(jTableJScrollPanelLeftPanel
                     .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-            StatementInfo info_panel = new StatementInfo(statement);
+            JPanel info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
             info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50,
                     jScrollPaneJPanelRightPanel.getSize().height - 50));
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);

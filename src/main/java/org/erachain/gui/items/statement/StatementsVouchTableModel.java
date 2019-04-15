@@ -130,6 +130,7 @@ public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
     }
 
     public void setRows() {
+
         if (list == null) {
             list = new ArrayList<>();
         } else {

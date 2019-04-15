@@ -1,196 +1,65 @@
 package org.erachain.gui.items.statement;
 
-import org.erachain.core.block.Block;
-import org.erachain.core.transaction.RSignNote;
+import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
+import org.erachain.gui.models.SearchTableModelCls;
 import org.erachain.utils.Pair;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public class StatementsTableModelSearch extends AbstractTableModel {
+public class StatementsTableModelSearch extends SearchTableModelCls<Transaction> {
 
     public static final int COLUMN_TIMESTAMP = 0;
-    public static final int COLUMN_CREATOR = 1;
-    // public static final int COLUMN_TEMPLATE = 2;
-    public static final int COLUMN_BODY = 2;
-    public static final int COLUMN_FAVORITE = 3;
+    public static final int COLUMN_TYPE = 1;
+    public static final int COLUMN_CREATOR = 2;
+    public static final int COLUMN_TITLE = 3;
+    public static final int COLUMN_FAVORITE = 4;
     private static final long serialVersionUID = 1L;
-    List<RSignNote> transactions;
-    private String[] columnNames = new String[]{"Timestamp",
-            "Creator"/* , "Template" */, "Statement", "Favorite"};// ,
-    // AssetCls.FEE_NAME});
-    private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, false};
 
     public StatementsTableModelSearch() {
 
-        clear();
-    }
+        super(DCSet.getInstance().getTransactionFinalMap(),
+                new String[]{"Timestamp", "Type",
+                "Creator", "Statement", "Favorite"}, new Boolean[]{true, true, true, true, false}, false);
 
-    // set class
-    public Class<? extends Object> getColumnClass(int c) { // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
+        logger = LoggerFactory.getLogger(this.getClass());
 
-    // читаем колонки которые изменяем высоту
-    public Boolean[] get_Column_AutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void set_get_Column_AutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
-    }
-
-    @Override
-    public int getColumnCount() {
-        return this.columnNames.length;
-    }
-
-    public Transaction get_Statement(int row) {
-
-        if (transactions == null || row < 0 || transactions.size() <= row)
-            return null;
-
-        return transactions.get(row);
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return Lang.getInstance().translate(columnNames[index]);
-    }
-
-    public String getColumnNameNO_Translate(int index) {
-        return columnNames[index];
-    }
-
-    @Override
-    public int getRowCount() {
-        return transactions.size();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.transactions == null || this.transactions.size() - 1 < row) {
+        if (this.list == null || this.list.size() - 1 < row) {
             return null;
         }
 
-        RSignNote record = (RSignNote) this.transactions.get(row);
+        Transaction transaction = this.list.get(row);
 
         switch (column) {
             case COLUMN_TIMESTAMP:
-
-                return record.viewTimestamp();
-            /*
-             * case COLUMN_TEMPLATE:
-             *
-             * if (record.getVersion() ==2) {
-             *
-             * return " "; } //view version 1
-             *
-             * return ItemCls.getItem(DLSet.getInstance(), ItemCls.TEMPLATE_TYPE,
-             * record.getKey()).toString();
-             */
-
-            case COLUMN_BODY:
-
-                if (record.getData() == null)
-                    return "";
-
-                if (record.getVersion() == 2) {
-                    Tuple3<String, String, JSONObject> a;
-                    try {
-                        a = record.parse_Data_V2_Without_Files();
-
-                        return a.b;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                String str;
-                try {
-                    JSONObject data = (JSONObject) JSONValue
-                            .parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
-                    str = (String) data.get("!!&_Title");
-                    if (str == null)
-                        str = (String) data.get("Title");
-                } catch (Exception e) {
-                    str = new String(record.getData(), Charset.forName("UTF-8"));
-                }
-                if (str == null)
-                    return "";
-                if (str.length() > 50)
-                    return str.substring(0, 50) + "...";
-                return str;// transaction.viewReference();//.viewProperies();
+                return transaction.viewTimestamp();
+            case COLUMN_TYPE:
+                return transaction.viewFullTypeName();
             case COLUMN_CREATOR:
-
-                return record.getCreator().getPersonAsString();
+                return transaction.getCreator().getPersonAsString();
+            case COLUMN_TITLE:
+                return transaction.getTitle();
             case COLUMN_FAVORITE:
-                return record.isFavorite();
+                return Controller.getInstance().isTransactionFavorite(transaction);
         }
 
         return null;
     }
 
-    private List<RSignNote> read_Statement(String str, Long key, boolean b) {
-        List<RSignNote> tran;
-        ArrayList<Transaction> db_transactions;
-        db_transactions = new ArrayList<Transaction>();
-        tran = new ArrayList<RSignNote>();
-        // база данных
-        DCSet dcSet = DCSet.getInstance();
-        // читаем все блоки
-        SortableList<Integer, Block> lists = dcSet.getBlockMap().getList();
-        // проходим по блокам
-        for (Pair<Integer, Block> list : lists) {
 
-            // читаем транзакции из блока
-            db_transactions = (ArrayList<Transaction>) list.getB().getTransactions();
-            // проходим по транзакциям
-            for (Transaction transaction : db_transactions) {
-                // если ноте то пишем в transactions
+    public void findByKey(String text) {
 
-                if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
-                    RSignNote statement = (RSignNote) transaction;
-                    // filter Title
-                    statement = (RSignNote) transaction;
-                    if (str != null && !str.equals("")) {
+        clear();
 
-                        if (filter_str(str, statement, b)) {
-                            statement.setDC_HeightSeq(dcSet);
-                            tran.add(statement);
-                        }
-                    }
-                    if (key > 0) {
-                        if (statement.getKey() == key) {
-                            statement.setDC_HeightSeq(dcSet);
-                            tran.add(statement);
-                        }
-                    }
-                }
-            }
-        }
-
-        // filter key
-        if (key > 0) {
-
-        }
-        return tran;
-    }
-
-    public void Find_item_from_key(String text) {
         // TODO Auto-generated method stub
         if (text.equals("") || text == null)
             return;
@@ -198,58 +67,49 @@ public class StatementsTableModelSearch extends AbstractTableModel {
             return;
         if (new Long(text) < 1)
             return;
-        transactions = read_Statement("", new Long(text), false);
+
+        Long key = new Long(text);
+        if (key > 0) {
+            list.add(DCSet.getInstance().getTransactionFinalMap().get(key));
+        }
+
         fireTableDataChanged();
+    }
+
+    public void setFilterByName(String filter) {
+
+        clear();
+
+        DCSet dcSet = DCSet.getInstance();
+
+        Pair<String, Iterable> result = dcSet.getTransactionFinalMap().getKeysByFilterAsArray(filter, start, step);
+
+        if (result.getA() != null) {
+            findMessage = result.getA();
+            return;
+        } else {
+            findMessage = "";
+        }
+
+        Iterator iterator = result.getB().iterator();
+
+        Transaction item;
+        Long key;
+
+        while (iterator.hasNext()) {
+            key = (Long) iterator.next();
+            item = (Transaction) map.get(key);
+            list.add(item);
+        }
+
+
+        fireTableDataChanged();
+
     }
 
     public void clear() {
-        transactions = new ArrayList<RSignNote>();
+        list = new ArrayList<Transaction>();
         fireTableDataChanged();
     }
 
-    public void set_Filter_By_Name(String str, boolean b) {
-        transactions = read_Statement(str, (long) -1, b);
-        fireTableDataChanged();
-
-    }
-
-    private boolean filter_str(String filter, RSignNote record, boolean case1) {
-        if (record.getData() == null)
-            return false;
-
-        if (record.getVersion() == 2) {
-            Tuple3<String, String, JSONObject> a;
-            try {
-                a = record.parse_Data_V2_Without_Files();
-                String base = a.b;
-                if (!case1) {
-                    filter = filter.toLowerCase();
-                    base = base.toLowerCase();
-                }
-                if (base.contains(filter))
-                    return true;
-
-                return false;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-
-        String str;
-        try {
-            JSONObject data = (JSONObject) JSONValue
-                    .parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
-            str = (String) data.get("!!&_Title");
-            if (str == null)
-                str = (String) data.get("Title");
-        } catch (Exception e) {
-            str = new String(record.getData(), Charset.forName("UTF-8"));
-        }
-        if (str == null)
-            return false;
-        if (str.contains(filter))
-            return true;
-        return false;
-    }
 }

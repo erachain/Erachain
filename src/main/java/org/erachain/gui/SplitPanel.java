@@ -12,6 +12,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.erachain.controller.Controller;
 import org.json.simple.JSONObject;
 
 import org.erachain.gui.library.MSplitPane;
@@ -57,8 +58,12 @@ public class SplitPanel extends javax.swing.JPanel {
      * Creates new form Doma2
      */
 
+    protected Controller cnt;
+
     public SplitPanel(String str) {
         super();
+
+        cnt = Controller.getInstance();
 
         initComponents();
         search_Info_Panel = new JPanel();

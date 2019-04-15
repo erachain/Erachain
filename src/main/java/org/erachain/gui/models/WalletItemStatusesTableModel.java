@@ -75,10 +75,6 @@ public class WalletItemStatusesTableModel extends SortedListTableModelCls<Tuple2
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.LIST_STATUS_TYPE) {
-            if (this.listSorted == null) {
-                this.listSorted = (SortableList<Tuple2<String, String>, StatusCls>) message.getValue();
-            }
-
             this.fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.ADD_STATUS_TYPE || message.getType() == ObserverMessage.REMOVE_STATUS_TYPE) {
             //CHECK IF LIST UPDATED

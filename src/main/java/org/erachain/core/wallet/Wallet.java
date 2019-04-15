@@ -301,14 +301,6 @@ public class Wallet extends Observable implements Observer {
         return this.database.getPollMap_old().get(account);
     }
 
-	public void addItemFavorite(ItemCls item) {
-		if (!this.exists()) {
-			return;
-		}
-
-		this.database.addItemToFavorite(item);
-	}
-
 	// тут нужно понять где это используется
 	public void replaseFavoriteItems(int type) {
 		if (!this.exists()) {
@@ -331,7 +323,13 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
-	// CREATE
+	public void addItemFavorite(ItemCls item) {
+		if (!this.exists()) {
+			return;
+		}
+
+		this.database.addItemToFavorite(item);
+	}
 
 	public void removeItemFavorite(ItemCls item) {
 		if (!this.exists()) {
@@ -348,6 +346,31 @@ public class Wallet extends Observable implements Observer {
 		return database.isItemFavorite(item);
 	}
 
+	public void addTransactionFavorite(Transaction transaction) {
+		if (!this.exists()) {
+			return;
+		}
+
+		this.database.addTransactionToFavorite(transaction);
+	}
+
+	public void removeTransactionFavorite(Transaction transaction) {
+		if (!this.exists()) {
+			return;
+		}
+
+		this.database.removeTransactionFromFavorite(transaction);
+	}
+
+	public boolean isTransactionFavorite(Transaction transaction) {
+		if (!this.exists()) {
+			return false;
+		}
+
+		return this.database.isTransactionFavorite(transaction);
+	}
+
+	// CREATE
 	public boolean create(byte[] seed, String password, int depth, boolean synchronize, String path,
 						  boolean withObserver, boolean dynamicGUI) {
 		String oldPath = Settings.getInstance().getWalletDir();

@@ -14,10 +14,14 @@ import org.erachain.database.DBMap;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.*;
+import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
+import javax.swing.text.html.HTMLDocument;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -48,6 +52,9 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
     private NavigableSet recipientKey;
     @SuppressWarnings("rawtypes")
     private NavigableSet typeKey;
+
+    @SuppressWarnings("rawtypes")
+    private NavigableSet titleKey;
 
     //@SuppressWarnings("rawtypes")
     //private NavigableSet block_Key;
@@ -89,7 +96,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         this.senderKey = database.createTreeSet("sender_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
         // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
-        Bind.secondaryKey(map, this.senderKey, new Fun.Function2<String, Long, Transaction>() {
+        Bind.secondaryKey(map, this.senderKey, new Function2<String, Long, Transaction>() {
             @Override
             public String run(Long key, Transaction val) {
                 Account account = val.getCreator();
@@ -101,7 +108,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         this.recipientKey = database.createTreeSet("recipient_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
         Bind.secondaryKeys(map, this.recipientKey,
-                new Fun.Function2<String[], Long, Transaction>() {
+                new Function2<String[], Long, Transaction>() {
                     @Override
                     public String[] run(Long key, Transaction val) {
                         List<String> recps = new ArrayList<String>();
@@ -121,7 +128,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         this.typeKey = database.createTreeSet("address_type_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
         Bind.secondaryKeys(map, this.typeKey,
-                new Fun.Function2<Tuple2<String, Integer>[], Long, Transaction>() {
+                new Function2<Tuple2<String, Integer>[], Long, Transaction>() {
                     @Override
                     public Tuple2<String, Integer>[] run(Long key, Transaction val) {
                         List<Tuple2<String, Integer>> recps = new ArrayList<Tuple2<String, Integer>>();
@@ -139,6 +146,27 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
                         return ret;
                     }
                 });
+
+        this.titleKey = database.createTreeSet("title_type_txs").comparator(Fun.COMPARATOR).makeOrGet();
+
+        // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
+        Bind.secondaryKeys(map, this.titleKey,
+                new Function2<Tuple2<String, Integer>[], Long, Transaction>() {
+            @Override
+            public Tuple2<String, Integer>[] run(Long key, Transaction val) {
+                String title = val.getTitle();
+                if (title == null || title.isEmpty() || title.equals(""))
+                    return null;
+
+                String[] tokens = title.toLowerCase().split(" ");
+                Tuple2<String, Integer>[] keys = new Tuple2[tokens.length];
+                for (int i = 0; i < tokens.length; ++i) {
+                    keys[i] = new Tuple2<String, Integer>(tokens[i], val.getType());
+                }
+
+                return keys;
+            }
+        });
 
         return map;
 
@@ -289,6 +317,162 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         }
         iter = null;
         return txs;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    // TODO ERROR - not use PARENT MAP and DELETED in FORK
+    public List<Transaction> getTransactionsByTitleAndType(String filter, Integer type, int limit, boolean descending) {
+
+        Iterable keys = Fun.filter(this.titleKey, new Tuple2<String, Integer>(filter, type), true,
+                new Tuple2<String, Integer>(filter + "я", //new String(new byte[]{(byte)254}),
+                        type), true);
+
+        Iterator iter = keys.iterator();
+
+        List<Transaction> txs = new ArrayList<>();
+        int counter = 0;
+        Transaction item;
+        Long key;
+        while (iter.hasNext() && (limit == 0 || counter < limit)) {
+            key = (Long) iter.next();
+            Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+            item = this.map.get(key);
+            item.setDC((DCSet)databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+
+            txs.add(item);
+            counter++;
+        }
+        iter = null;
+        return txs;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Iterable getKeysByTitleAndType(String filter, Integer type,  int offset, int limit) {
+
+        String filtrLower = filter.toLowerCase();
+
+        Iterable keys = Fun.filter(this.titleKey,
+                new Tuple2<String, Integer>(filtrLower,
+                        type==0?0:type), true,
+                new Tuple2<String, Integer>(filtrLower + new String(new byte[]{(byte)254}),
+                        type==0?Integer.MAX_VALUE:type), true);
+
+        if (offset > 0)
+            keys = Iterables.skip(keys, offset);
+
+        if (limit > 0)
+            keys = Iterables.limit(keys, limit);
+
+        return keys;
+
+    }
+
+
+    public Pair<Integer, HashSet<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray) {
+
+        Iterable keys;
+
+        String stepFilter = filterArray[step];
+        if (!stepFilter.endsWith("!")) {
+            // это сокращение для диаппазона
+            if (stepFilter.length() < 5) {
+                // ошибка - ищем как полное слово
+                keys = Fun.filter(this.titleKey,
+                        new Tuple2<String, Integer>(stepFilter, 0), true,
+                        new Tuple2<String, Integer>(stepFilter, Integer.MAX_VALUE), true);
+            } else {
+
+                // поиск диаппазона
+                keys = Fun.filter(this.titleKey,
+                        new Tuple2<String, Integer>(stepFilter, 0), true,
+                        new Tuple2<String, Integer>(stepFilter + new String(new byte[]{(byte) 254}), Integer.MAX_VALUE), true);
+            }
+
+        } else {
+            // поиск целиком
+
+            stepFilter = stepFilter.substring(0, stepFilter.length() -1);
+
+            keys = Fun.filter(this.titleKey,
+                    new Tuple2<String, Integer>(stepFilter, 0), true,
+                    new Tuple2<String, Integer>(stepFilter, Integer.MAX_VALUE), true);
+        }
+
+        if (step > 0) {
+
+            // погнали в РЕКУРСИЮ
+            Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(--step, filterArray);
+
+            if (result.getA() > 0) {
+                return result;
+            }
+
+            // в рекурсии все хорошо - соберем ключи
+            Iterator iterator = keys.iterator();
+            HashSet<Long> hashSet = result.getB();
+            HashSet<Long> andHashSet = new HashSet<Long>();
+
+            // берем только совпадающие в обоих списках
+            while (iterator.hasNext()) {
+                Long key = (Long) iterator.next();
+                if (hashSet.contains(key)) {
+                    andHashSet.add(key);
+                }
+            }
+
+            return new Pair<>(0, andHashSet);
+
+        } else {
+
+            // последний шаг - просто все добавим
+            Iterator iterator = keys.iterator();
+            HashSet<Long> hashSet = new HashSet<>();
+            while (iterator.hasNext()) {
+                Long key = (Long) iterator.next();
+                hashSet.add(key);
+            }
+
+            return new Pair<Integer, HashSet<Long>>(0, hashSet);
+
+        }
+
+    }
+
+    /**
+     * Делает поиск по нескольким ключам по Заголовкам и если ключ с ! - надо найти только это слово
+     * а не как фильтр. Иначе слово принимаем как фильтр на диаппазон
+     * и его длинна должна быть не мнее 5-ти символов. Например:
+     * "Ермолаев Дмитр." - Найдет всех Ермолаев с Дмитр....
+     * @param filter
+     * @param offset
+     * @param limit
+     * @return
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Pair<String, Iterable> getKeysByFilterAsArray(String filter, int offset, int limit) {
+
+        String filterLower = filter.toLowerCase();
+        String[] filterArray = filterLower.split(" ");
+
+        Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray);
+        if (result.getA() > 0) {
+            return new Pair<>("Error: filter key at " + (result.getA() - 1000) + "pos has length < 5", null);
+        }
+
+        HashSet<Long> hashSet = result.getB();
+
+        Iterable iterable;
+
+        if (offset > 0)
+            iterable = Iterables.skip(hashSet, offset);
+        else
+            iterable = hashSet;
+
+        if (limit > 0)
+            iterable = Iterables.limit(iterable, limit);
+
+        return new Pair<>(null, iterable);
+
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

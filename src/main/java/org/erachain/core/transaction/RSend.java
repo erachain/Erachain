@@ -328,6 +328,11 @@ public class RSend extends TransactionAmount {
 
     }
 
+    @Override
+    public String getTitle() {
+        return this.head;
+    }
+
     public String getHead() {
         return this.head;
     }

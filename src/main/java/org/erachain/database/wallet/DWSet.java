@@ -11,6 +11,7 @@ import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.settings.Settings;
 import org.mapdb.Atomic.Var;
@@ -41,6 +42,9 @@ public class DWSet extends DBASet {
     private WItemUnionMap unionMap;
     private WItemPollMap pollMap;
     private OrderMap orderMap;
+
+    private FavoriteTransactionMap transactionFavoritesSet;
+
     private FavoriteItemMapAsset assetFavoritesSet;
     private FavoriteItemMapTemplate templateFavoritesSet;
     private FavoriteItemMapImprint imprintFavoritesSet;
@@ -60,30 +64,32 @@ public class DWSet extends DBASet {
         licenseKeyVar = database.getAtomicVar("licenseKey");
         licenseKey = licenseKeyVar.get();
 
-        accountMap = new AccountMap(this, this.database);
-        accountsPropertisMap = new AccountsPropertisMap(this, this.database);
-        transactionMap = new TransactionMap(this, this.database);
-        blocksHeadMap = new BlocksHeadMap(this, this.database);
-        nameMap = new NameMap(this, this.database);
-        nameSaleMap = new NameSaleMap(this, this.database);
-        pollMap_old = new PollMap(this, this.database);
-        assetMap = new WItemAssetMap(this, this.database);
-        imprintMap = new WItemImprintMap(this, this.database);
-        TemplateMap = new WItemTemplateMap(this, this.database);
-        personMap = new WItemPersonMap(this, this.database);
-        statusMap = new WItemStatusMap(this, this.database);
-        unionMap = new WItemUnionMap(this, this.database);
-        pollMap = new WItemPollMap(this, this.database);
-        orderMap = new OrderMap(this, this.database);
-        assetFavoritesSet = new FavoriteItemMapAsset(this, this.database);
-        templateFavoritesSet = new FavoriteItemMapTemplate(this, this.database);
-        imprintFavoritesSet = new FavoriteItemMapImprint(this, this.database);
-        pollFavoriteSet = new FavoriteItemMapPoll(this, this.database);
-        personFavoritesSet = new FavoriteItemMapPerson(this, this.database);
-        statusFavoritesSet = new FavoriteItemMapStatus(this, this.database);
-        unionFavoritesSet = new FavoriteItemMapUnion(this, this.database);
-        statementFavoritesSet = new FavoriteDocument(this, this.database);
-        telegramsMap = new TelegramsMap(this,this.database);
+        this.accountMap = new AccountMap(this, this.database);
+        this.accountsPropertisMap = new AccountsPropertisMap(this, this.database);
+        this.transactionMap = new TransactionMap(this, this.database);
+        this.blocksHeadMap = new BlocksHeadMap(this, this.database);
+        this.nameMap = new NameMap(this, this.database);
+        this.nameSaleMap = new NameSaleMap(this, this.database);
+        this.pollMap_old = new PollMap(this, this.database);
+        this.assetMap = new WItemAssetMap(this, this.database);
+        this.imprintMap = new WItemImprintMap(this, this.database);
+        this.TemplateMap = new WItemTemplateMap(this, this.database);
+        this.personMap = new WItemPersonMap(this, this.database);
+        this.statusMap = new WItemStatusMap(this, this.database);
+        this.unionMap = new WItemUnionMap(this, this.database);
+        this.pollMap = new WItemPollMap(this, this.database);
+        this.orderMap = new OrderMap(this, this.database);
+
+        this.transactionFavoritesSet = new FavoriteTransactionMap(this, this.database);
+        this.assetFavoritesSet = new FavoriteItemMapAsset(this, this.database);
+        this.templateFavoritesSet = new FavoriteItemMapTemplate(this, this.database);
+        this.imprintFavoritesSet = new FavoriteItemMapImprint(this, this.database);
+        this.pollFavoriteSet = new FavoriteItemMapPoll(this, this.database);
+        this.personFavoritesSet = new FavoriteItemMapPerson(this, this.database);
+        this.statusFavoritesSet = new FavoriteItemMapStatus(this, this.database);
+        this.unionFavoritesSet = new FavoriteItemMapUnion(this, this.database);
+        this.statementFavoritesSet = new FavoriteDocument(this, this.database);
+        this.telegramsMap = new TelegramsMap(this,this.database);
 
     }
 
@@ -270,20 +276,12 @@ public class DWSet extends DBASet {
         return null;
     }
 
-    public void addItemToFavorite(ItemCls item) {
-        getItemFavoritesSet(item).add(item.getKey());
-    }
-
-    public void removeItemFromFavorite(ItemCls item) {
-        getItemFavoritesSet(item).delete(item.getKey());
-    }
-
-    public boolean isItemFavorite(ItemCls item) {
-        return getItemFavoritesSet(item).contains(item.getKey());
-    }
-
     public OrderMap getOrderMap() {
         return this.orderMap;
+    }
+
+    public FavoriteTransactionMap getTransactionFavoritesSet() {
+        return this.transactionFavoritesSet;
     }
 
     public FavoriteItemMapAsset getAssetFavoritesSet() {
@@ -339,6 +337,32 @@ public class DWSet extends DBASet {
         }
         
           
+    }
+
+    //////////////// FAVORITES ///////////
+    public void addTransactionToFavorite(Transaction transaction) {
+        getTransactionFavoritesSet().add(transaction.getDBRef());
+    }
+    public void removeTransactionFromFavorite(Transaction transaction) {
+        getTransactionFavoritesSet().delete(transaction.getDBRef());
+    }
+    public boolean isTransactionFavorite(Transaction transaction) {
+        if (transaction.getDBRef() > 0) {
+            return getTransactionFavoritesSet().contains(transaction.getDBRef());
+        }
+        return false;
+    }
+
+    public void addItemToFavorite(ItemCls item) {
+        getItemFavoritesSet(item).add(item.getKey());
+    }
+
+    public void removeItemFromFavorite(ItemCls item) {
+        getItemFavoritesSet(item).delete(item.getKey());
+    }
+
+    public boolean isItemFavorite(ItemCls item) {
+        return getItemFavoritesSet(item).contains(item.getKey());
     }
 
     public TelegramsMap getTelegramsMap() {

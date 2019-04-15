@@ -8,8 +8,12 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.templates.TemplateCls;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
@@ -262,7 +266,7 @@ public class RSignNote extends Transaction {
 
     }
 
-    public static Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> parse_Data_V2(byte[] data) throws Exception {
+    public static Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> parse_Data_V2(byte[] data, boolean onlyTitle) throws Exception {
         //Version, Title, JSON, Files
 
         //CHECK IF WE MATCH BLOCK LENGTH
@@ -281,6 +285,13 @@ public class RSignNote extends Transaction {
 
         byte[] titleByte = Arrays.copyOfRange(data, position, position + titleSize);
 
+        String title = new String(titleByte, Charset.forName("UTF-8"));
+        String version = new String(version_Byte, Charset.forName("UTF-8"));
+
+        if (onlyTitle) {
+            return new Tuple4(version, title, null, null);
+        }
+
         position += titleSize;
         //READ Length JSON PART
         byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + Transaction.DATA_JSON_PART_LENGTH);
@@ -291,8 +302,6 @@ public class RSignNote extends Transaction {
         byte[] arbitraryData = Arrays.copyOfRange(data, position, position + JSONSize);
         JSONObject json = (JSONObject) JSONValue.parseWithException(new String(arbitraryData, Charset.forName("UTF-8")));
 
-        String title = new String(titleByte, Charset.forName("UTF-8"));
-        String version = new String(version_Byte, Charset.forName("UTF-8"));
         position += JSONSize;
         HashMap<String, Tuple2<Boolean, byte[]>> out_Map = new HashMap<String, Tuple2<Boolean, byte[]>>();
         JSONObject files;
@@ -341,6 +350,7 @@ public class RSignNote extends Transaction {
 
             return new Tuple4(version, title, json, out_Map);
         }
+
         return new Tuple4(version, title, json, null);
     }
 
@@ -448,6 +458,49 @@ public class RSignNote extends Transaction {
     public long getKey() {
         return this.key;
     }
+
+    @Override
+    public String getTitle() {
+
+        if (isEncrypted()) {
+            return null;
+        }
+
+        if (getVersion() == 2) {
+
+            // version 2
+            Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map_Data;
+
+            try {
+                // парсим только заголовок
+                map_Data = parse_Data_V2(data, true);
+                return map_Data.b;
+
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+                return "error " + e.getMessage();
+            }
+
+        } else {
+
+            // version 1
+            try {
+
+                JSONObject data = new JSONObject();
+                data = (JSONObject) JSONValue.parseWithException(new String(getData(), Charset.forName("UTF-8")));
+                String title = data.get("Title").toString();
+                if (title == null || title.equals(""))
+                    return null;
+
+                return title;
+
+            } catch (ParseException e) {
+                LOGGER.error(e.getMessage(), e);
+                return "error " + e.getMessage();
+            }
+        }
+    }
+
 
     public byte[] getData() {
         return this.data;
@@ -700,7 +753,7 @@ public class RSignNote extends Transaction {
 
     public Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> parse_Data_V2() throws Exception {
 
-        return parse_Data_V2(this.data);
+        return parse_Data_V2(this.data, false);
 
     }
 

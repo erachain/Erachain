@@ -226,6 +226,10 @@ public class ObserverMessage {
     public static final int WALLET_ADD_TRANSACTION_TYPE = 10012;
     public static final int WALLET_REMOVE_TRANSACTION_TYPE = 10013;
     public static final int WALLET_LIST_TRANSACTION_TYPE = 10014;
+    public static final int RESET_TRANSACTION_FAVORITES_TYPE = 10016;
+    public static final int ADD_TRANSACTION_FAVORITES_TYPE = 10017;
+    public static final int DELETE_TRANSACTION_FAVORITES_TYPE = 10018;
+    public static final int LIST_TRANSACTION_FAVORITES_TYPE = 10019;
 
     public static final int WALLET_RESET_ORDER_TYPE = 10021;
     public static final int WALLET_ADD_ORDER_TYPE = 10022;

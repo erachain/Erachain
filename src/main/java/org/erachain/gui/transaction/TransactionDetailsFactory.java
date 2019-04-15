@@ -56,15 +56,6 @@ public class TransactionDetailsFactory {
             case Transaction.SIGN_NOTE_TRANSACTION:
 
                 RSignNote statement = (RSignNote) transaction;
-
-                // RecStatementDetailsFrame recStatementDetailsFrame = new
-                // RecStatementDetailsFrame(statement);
-                // gridBagConstraints.gridy
-                // =recStatementDetailsFrame.labelGBC.gridy+1;
-                // recStatementDetailsFrame. add(jLabel9, gridBagConstraints);
-
-                // recStatementDetailsFrame.add(new StatementInfo(statement))
-
                 return new StatementInfo(statement);
 
             case Transaction.REGISTER_NAME_TRANSACTION:

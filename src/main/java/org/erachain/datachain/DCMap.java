@@ -23,7 +23,7 @@ import java.util.*;
  */
 public abstract class DCMap<T, U> extends DBMap<T, U> {
 
-    protected Logger LOGGER;
+    protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
     protected DCMap<T, U> parent;
     protected List<T> deleted;
     private int shiftSize;
