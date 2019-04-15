@@ -380,12 +380,13 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
                 keys = Fun.filter(this.titleKey,
                         new Tuple2<String, Integer>(stepFilter, 0), true,
                         new Tuple2<String, Integer>(stepFilter, Integer.MAX_VALUE), true);
-            }
+            } else {
 
-            // поиск диаппазона
-            keys = Fun.filter(this.titleKey,
-                    new Tuple2<String, Integer>(stepFilter, 0), true,
-                    new Tuple2<String, Integer>(stepFilter + new String(new byte[]{(byte)254}), Integer.MAX_VALUE), true);
+                // поиск диаппазона
+                keys = Fun.filter(this.titleKey,
+                        new Tuple2<String, Integer>(stepFilter, 0), true,
+                        new Tuple2<String, Integer>(stepFilter + new String(new byte[]{(byte) 254}), Integer.MAX_VALUE), true);
+            }
 
         } else {
             // поиск целиком
