@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class AssetPairSelectTableModel extends TimerTableModelCls<AssetCls> implements Observer {
+public class AssetPairSelectTableModel extends TimerTableModelCls<ItemCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ORDERS_COUNT = 2;
@@ -137,7 +137,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<AssetCls> impl
     }
 
     public void clear() {
-        assets = new ArrayList<ItemCls>();
+        list = new ArrayList<ItemCls>();
         this.fireTableDataChanged();
 
     }
