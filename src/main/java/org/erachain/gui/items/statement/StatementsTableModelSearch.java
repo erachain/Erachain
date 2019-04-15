@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.SearchTableModelCls;
+import org.erachain.utils.Pair;
 import org.mapdb.Fun;
 import org.slf4j.LoggerFactory;
 
@@ -75,23 +76,28 @@ public class StatementsTableModelSearch extends SearchTableModelCls<Transaction>
         fireTableDataChanged();
     }
 
-    public void setFilterByName(String str) {
+    public void setFilterByName(String filter) {
 
         clear();
 
         DCSet dcSet = DCSet.getInstance();
 
-        Iterable keys = dcSet.getTransactionFinalMap().getKeysByTitleAndType(str,
-                Transaction.SIGN_NOTE_TRANSACTION, start, step);
+        Pair<String, Iterable> result = dcSet.getTransactionFinalMap().getKeysByFilterAsArray(filter, start, step);
 
-        Iterator iterator = keys.iterator();
+        if (result.getA() != null) {
+            findMessage = result.getA();
+            return;
+        } else {
+            findMessage = "";
+        }
+
+        Iterator iterator = result.getB().iterator();
 
         Transaction item;
         Long key;
 
         while (iterator.hasNext()) {
             key = (Long) iterator.next();
-            Fun.Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = (Transaction) map.get(key);
             list.add(item);
         }
