@@ -376,8 +376,10 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         if (!stepFilter.endsWith("!")) {
             // это сокращение для диаппазона
             if (stepFilter.length() < 5) {
-                // ошибка
-                return new Pair<>(1000 + step, null);
+                // ошибка - ищем как полное слово
+                keys = Fun.filter(this.titleKey,
+                        new Tuple2<String, Integer>(stepFilter, 0), true,
+                        new Tuple2<String, Integer>(stepFilter, Integer.MAX_VALUE), true);
             }
 
             // поиск диаппазона
