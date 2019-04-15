@@ -373,14 +373,12 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         Iterable keys;
 
         String stepFilter = filterArray[step];
-        if (stepFilter.endsWith(".")) {
+        if (!stepFilter.endsWith("!")) {
             // это сокращение для диаппазона
-            if (stepFilter.length() < 6) {
+            if (stepFilter.length() < 5) {
                 // ошибка
                 return new Pair<>(1000 + step, null);
             }
-
-            stepFilter = stepFilter.substring(0, stepFilter.length() -1);
 
             // поиск диаппазона
             keys = Fun.filter(this.titleKey,
@@ -389,6 +387,9 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
 
         } else {
             // поиск целиком
+
+            stepFilter = stepFilter.substring(0, stepFilter.length() -1);
+
             keys = Fun.filter(this.titleKey,
                     new Tuple2<String, Integer>(stepFilter, 0), true,
                     new Tuple2<String, Integer>(stepFilter, Integer.MAX_VALUE), true);
@@ -435,7 +436,8 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
     }
 
     /**
-     * Делает поиск по нескольким ключам по Заголовкам и если ключ с точкой - это фильтр на диаппазон
+     * Делает поиск по нескольким ключам по Заголовкам и если ключ с ! - надо найти только это слово
+     * а не как фильтр. Иначе слово принимаем как фильтр на диаппазон
      * и его длинна должна быть не мнее 5-ти символов. Например:
      * "Ермолаев Дмитр." - Найдет всех Ермолаев с Дмитр....
      * @param filter
