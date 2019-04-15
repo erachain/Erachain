@@ -70,7 +70,7 @@ public class APIPoll {
     @GET
     @Path("getPoll")
     public Response getPoll(@QueryParam("name") String name) {
-        List<ItemCls> listPolls = DCSet.getInstance().getItemPollMap().findByName(name, false);
+        List<ItemCls> listPolls = DCSet.getInstance().getItemPollMap().getByFilterAsArray(name, 0, 100);
 
         //CHECK IF NAME EXISTS
         if (listPolls == null || listPolls.isEmpty()) {

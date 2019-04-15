@@ -17,6 +17,8 @@ public abstract class SearchTableModelCls<U> extends AbstractTableModel {
     protected boolean needUpdate;
     protected boolean descending;
 
+    //public int COLUMN_FAVORITE = 1000;
+
     protected String findMessage;
 
     protected List<U> list;
@@ -32,13 +34,17 @@ public abstract class SearchTableModelCls<U> extends AbstractTableModel {
 
     protected Controller cnt;
 
-    public SearchTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
+    public SearchTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight,
+                               boolean descending) {
         this.map = map;
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
         this.descending = descending;
+        //COLUMN_FAVORITE = columnFavorite;
+
         cnt = Controller.getInstance();
     }
+
     public Boolean[] getColumnAutoHeight() {
         return this.columnAutoHeight;
     }
@@ -97,6 +103,9 @@ public abstract class SearchTableModelCls<U> extends AbstractTableModel {
             return 0;
 
         return map.size();
+    }
+
+    public synchronized void syncUpdate(Observable o, Object arg) {
     }
 
     /**

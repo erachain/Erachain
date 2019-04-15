@@ -43,17 +43,10 @@ public class ItemPersonMap extends ItemMap {
     @SuppressWarnings("unchecked")
     protected Map<Long, ItemCls> getMap(DB database) {
         //OPEN MAP
-        map = database.createTreeMap(NAME)
+        return database.createTreeMap(NAME)
                 .valueSerializer(new ItemSerializer(TYPE))
                 .makeOrGet();
-        if (Controller.getInstance().onlyProtocolIndexing) {
-            // NOT USE SECONDARY INDEXES
-            return map;
-        }
 
-        makeOwnerKey(database);
-
-        return map;
     }
 
 }

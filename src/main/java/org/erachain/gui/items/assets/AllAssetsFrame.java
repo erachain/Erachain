@@ -11,6 +11,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -90,10 +91,19 @@ public class AllAssetsFrame extends JFrame {
         TableColumn favoriteColumn = assetsTable.getColumnModel().getColumn(ItemAssetsTableModel.COLUMN_FAVORITE);
         favoriteColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
 
+        TableRowSorter search_Sorter = new TableRowSorter(tableModelItemAssets);
+        ArrayList<RowSorter.SortKey> keys = new ArrayList<RowSorter.SortKey>();
+        keys.add(new RowSorter.SortKey(0, SortOrder.DESCENDING));
+        search_Sorter.setSortKeys(keys);
+        ((DefaultRowSorter<?, ?>) search_Sorter).setSortsOnUpdates(true);
+        assetsTable.setRowSorter(search_Sorter);
+
+        /*
         //ASSETS SORTER
         Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
         CoreRowSorter sorter = new CoreRowSorter(this.tableModelItemAssets, indexes);
         assetsTable.setRowSorter(sorter);
+        */
 
         //CREATE SEARCH FIELD
         final JTextField txtSearch = new JTextField();
@@ -121,7 +131,7 @@ public class AllAssetsFrame extends JFrame {
                 String search = txtSearch.getText();
 
                 // SET FILTER
-                tableModelItemAssets.getSortableList().setFilter(search);
+                ///////////// not Sorted ! tableModelItemAssets.getSortableList().setFilter(search);
                 tableModelItemAssets.fireTableDataChanged();
             }
         });

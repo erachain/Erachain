@@ -4,8 +4,10 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.items.assets.ItemAssetsTableModel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.SortedListTableModelCls;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 import org.slf4j.Logger;
@@ -22,7 +24,7 @@ import java.awt.event.*;
 public class ItemSplitPanel extends SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
-    protected SortedListTableModelCls tableModel;
+    protected TimerTableModelCls tableModel;
     protected JMenuItem favoriteMenuItems;
     protected JPopupMenu menuTable;
     protected ItemCls itemMenu;
@@ -31,7 +33,7 @@ public class ItemSplitPanel extends SplitPanel {
 
 
     @SuppressWarnings("rawtypes")
-    public ItemSplitPanel(SortedListTableModelCls tableModel, String guiName) {
+    public ItemSplitPanel(TimerTableModelCls tableModel, String guiName) {
         super(guiName);
         this.tableModel = tableModel;
         // not show buttons
@@ -173,7 +175,7 @@ public class ItemSplitPanel extends SplitPanel {
         } else {
             Controller.getInstance().addItemFavorite(itemCls);
         }
-        ((DefaultTableModel) jTableJScrollPanelLeftPanel.getModel()).fireTableDataChanged();
+        ((SearchItemsTableModel) jTableJScrollPanelLeftPanel.getModel()).fireTableDataChanged();
 
     }
 

@@ -35,7 +35,6 @@ public class AssetPairSelect extends JDialog {
 
     public AssetPairSelect(long key, String action, String account) {
 
-        //	super(Lang.getInstance().translate("Erachain.org") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
         this.setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
         //ICON
         List<Image> icons = new ArrayList<Image>();
@@ -141,7 +140,7 @@ public class AssetPairSelect extends JDialog {
                 new Thread() {
                     @Override
                     public void run() {
-                        assetPairSelectTableModel.Find_item_from_key(key_Item.getText());
+                        assetPairSelectTableModel.findByKey(key_Item.getText());
                         if (assetPairSelectTableModel.getRowCount() < 1) {
                             pair_Panel.Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Assets"));
                             pair_Panel.jScrollPanelLeftPanel.setViewportView(pair_Panel.search_Info_Panel);

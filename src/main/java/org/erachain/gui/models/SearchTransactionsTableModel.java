@@ -29,9 +29,8 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
     public static final int COLUMN_TYPE = 3;
     public static final int COLUMN_TITLE = 4;
     public static final int COLUMN_KEY = 5;
-    public static final int COLUMN_AMOUNT = 6;
-    public static final int COLUMN_FAVORITE = 7;
-    //public static final int COLUMN_FEE = 8;
+    public static final int COLUMN_FAVORITE = 6;
+    public static final int COLUMN_AMOUNT = 7;
 
     Integer blockNo;
 

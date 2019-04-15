@@ -8,6 +8,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
+import org.erachain.datachain.ItemMap;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -30,10 +31,9 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<AssetCls> impl
     private static final Logger LOGGER = LoggerFactory.getLogger(AssetPairSelectTableModel.class);
 
     public long key;
-    public List<ItemCls> assets;
     Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> all;
+
     private String filter_Name;
-    private ItemAssetMap db;
 
     public AssetPairSelectTableModel(long key)// , String action)
     {
@@ -49,11 +49,11 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<AssetCls> impl
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.assets == null || row > this.assets.size() - 1) {
+        if (this.list == null || row > this.list.size() - 1) {
             return null;
         }
 
-        long key = this.assets.get(row).getKey();
+        long key = this.list.get(row).getKey();
         Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal> item = this.all.get(key);
 
         try {
@@ -66,7 +66,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<AssetCls> impl
 
                 case COLUMN_NAME:
 
-                    return this.assets.get(row).viewName();
+                    return this.list.get(row).viewName();
 
                 case COLUMN_ORDERS_COUNT:
 
@@ -77,7 +77,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<AssetCls> impl
 
 
                     return item == null ? "" : ("<html>" + (item.c == null ? "0" : NumberAsString.formatAsString(item.c)))
-                            + " " + this.assets.get(row).getShort() + "&hArr;  "//"<br>"
+                            + " " + this.list.get(row).getShort() + "&hArr;  "//"<br>"
                             + NumberAsString.formatAsString(item.d)
                             + " " + Controller.getInstance().getAsset(this.key).getShort()
                             + "</html>";
@@ -95,7 +95,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<AssetCls> impl
                     if (item == null) return "";
                     if (item.b > 0)
                         return "<html>" + NumberAsString.formatAsString(item.e)
-                                + " " + this.assets.get(row).getShort() + "&hArr; " //"<br>"
+                                + " " + this.list.get(row).getShort() + "&hArr; " //"<br>"
                                 + NumberAsString.formatAsString(item.f)
                                 + " " + Controller.getInstance().getAsset(this.key).getShort()
                                 + "</html>";
@@ -113,41 +113,25 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<AssetCls> impl
     }
 
     public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        // CHECK IF LIST UPDATED
-        if ((message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK)
-                || (false && Controller.getInstance().getStatus() == Controller.STATUS_OK
-                        && (message.getType() == ObserverMessage.ADD_BALANCE_TYPE || message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE))
-        ) {
-            // this.fireTableDataChanged();
-        }
     }
 
-    public void removeObservers() {
-        // this.balances.removeObserver();
-        Controller.getInstance().deleteObserver(this);
-    }
-
-    public void Find_item_from_key(String text) {
-        // TODO Auto-generated method stub
-        // TODO Auto-generated method stub
+    public void findByKey(String text) {
         if (text.equals("") || text == null)
             return;
         if (!text.matches("[0-9]*"))
             return;
         Long key_filter = new Long(text);
-        assets = new ArrayList<ItemCls>();
+        list = new ArrayList<>();
         AssetCls asset = Controller.getInstance().getAsset(key_filter);
         if (asset == null || asset.getKey() == this.key)
             return;
-        assets.add(asset);
+        list.add(asset);
         this.fireTableDataChanged();
     }
 
     public void set_Filter_By_Name(String str) {
         filter_Name = str;
-        assets = db.findByName(filter_Name, false);
+        list = ((ItemMap)map).getByFilterAsArray(filter_Name, 0, 1000);
         this.fireTableDataChanged();
 
     }

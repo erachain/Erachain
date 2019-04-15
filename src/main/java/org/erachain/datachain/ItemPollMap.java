@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.serializer.ItemSerializer;
 import org.mapdb.DB;
@@ -38,6 +39,7 @@ public class ItemPollMap extends ItemMap {
         return database.createTreeMap(NAME)
                 .valueSerializer(new ItemSerializer(TYPE))
                 .makeOrGet();
+
     }
 
 }
