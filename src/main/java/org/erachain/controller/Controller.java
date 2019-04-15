@@ -1705,8 +1705,10 @@ public class Controller extends Observable {
 
             // EXECUTE
             int res = connection.getResponseCode();
+            LOGGER.info("NotifyIncoming " + url_string + ": " + res);
+
         } catch (Exception e) {
-            // return -1;
+            LOGGER.error(e.getMessage(), e);
         }
 
     }
