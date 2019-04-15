@@ -463,47 +463,43 @@ public class MTable<U, T> extends JTable {
 
     }
  // selected select row for firechange model data 
-    public void addselectSelectedRow(){
+    public void addselectSelectedRow() {
         // Save selected row table
-        this.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+        this.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
-                @Override
-                public void valueChanged(ListSelectionEvent e) {
-                    // TODO Auto-generated method stub
-                    selectedRow=(e.getLastIndex());//jTable_Peers.getSelectedRow());
-            //        selectedCol.set(jTable_Peers.getSelectedColumn());
-                    
-                }
-                
-            });
-         
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                // TODO Auto-generated method stub
+                selectedRow = (e.getLastIndex());//jTable_Peers.getSelectedRow());
+                //        selectedCol.set(jTable_Peers.getSelectedColumn());
+
+            }
+
+        });
+
         // set selected row
         this.getModel().addTableModelListener(new TableModelListener() {
-               
-               
-                @Override
-                public void tableChanged(TableModelEvent e) {
-                    // TODO Auto-generated method stub
-             //       TableCellEditor editor=jTable_Peers.getCellEditor();
-             //       if (editor!=null) editor.cancelCellEditing();
 
-                   if(getSelectionModel().getMaxSelectionIndex()<0)return;
-                   if (selectedRow <0) selectedRow =0;
-              //      final int col=0;
-                //    if (row<0||col<0) return;
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                // TODO Auto-generated method stub
+
+                if (model.getRowCount() == 0) {
+                    return;
+                }
+
+                if (getSelectionModel().getMaxSelectionIndex() < 0) return;
+                if (selectedRow < 0) selectedRow = 0;
 
                 SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            // http://book.javanb.com/the-java-developers-almanac-1-4/egs/javax.swing.table/Sel.html
-                       //     jTable_Peers.changeSelection(row,col, false, false);
-                            getSelectionModel().addSelectionInterval(selectedRow, selectedRow);
-                         }
-                    });
-                }
-            });
+                    @Override
+                    public void run() {
+                        getSelectionModel().addSelectionInterval(selectedRow, selectedRow);
+                    }
+                });
+            }
+        });
 
-    
     }
    
     @Override
