@@ -380,6 +380,8 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
                 return new Pair<>(1000 + step, null);
             }
 
+            stepFilter = stepFilter.substring(0, stepFilter.length() -1);
+
             // поиск диаппазона
             keys = Fun.filter(this.titleKey,
                     new Tuple2<String, Integer>(stepFilter, 0), true,
@@ -404,14 +406,17 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
             // в рекурсии все хорошо - соберем ключи
             Iterator iterator = keys.iterator();
             HashSet<Long> hashSet = result.getB();
+            HashSet<Long> andHashSet = new HashSet<Long>();
+
+            // берем только совпадающие в обоих списках
             while (iterator.hasNext()) {
                 Long key = (Long) iterator.next();
-                if (!hashSet.contains(key)) {
-                    hashSet.add(key);
+                if (hashSet.contains(key)) {
+                    andHashSet.add(key);
                 }
             }
 
-            return result;
+            return new Pair<>(0, andHashSet);
 
         } else {
 
@@ -444,7 +449,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         String filterLower = filter.toLowerCase();
         String[] filterArray = filterLower.split(" ");
 
-        Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length, filterArray);
+        Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray);
         if (result.getA() > 0) {
             return new Pair<>("Error: filter key at " + (result.getA() - 1000) + "pos has length < 5", null);
         }
