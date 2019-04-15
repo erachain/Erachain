@@ -492,7 +492,7 @@ public class RSignNote extends Transaction {
                 if (title == null || title.equals(""))
                     return null;
 
-                return (String) data.get("Title");
+                return title;
 
             } catch (ParseException e) {
                 LOGGER.error(e.getMessage(), e);
