@@ -14,12 +14,14 @@ import org.erachain.database.DBMap;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.*;
 import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
+import javax.swing.text.html.HTMLDocument;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -362,6 +364,104 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
             keys = Iterables.limit(keys, limit);
 
         return keys;
+
+    }
+
+
+    public Pair<Integer, HashSet<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray) {
+
+        Iterable keys;
+
+        String stepFilter = filterArray[step];
+        if (stepFilter.endsWith(".")) {
+            // это сокращение для диаппазона
+            if (stepFilter.length() < 6) {
+                // ошибка
+                return new Pair<>(1000 + step, null);
+            }
+
+            // поиск диаппазона
+            keys = Fun.filter(this.titleKey,
+                    new Tuple2<String, Integer>(stepFilter, 0), true,
+                    new Tuple2<String, Integer>(stepFilter + new String(new byte[]{(byte)254}), Integer.MAX_VALUE), true);
+
+        } else {
+            // поиск целиком
+            keys = Fun.filter(this.titleKey,
+                    new Tuple2<String, Integer>(stepFilter, 0), true,
+                    new Tuple2<String, Integer>(stepFilter, Integer.MAX_VALUE), true);
+        }
+
+        if (step > 0) {
+
+            // погнали в РЕКУРСИЮ
+            Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(--step, filterArray);
+
+            if (result.getA() > 0) {
+                return result;
+            }
+
+            // в рекурсии все хорошо - соберем ключи
+            Iterator iterator = keys.iterator();
+            HashSet<Long> hashSet = result.getB();
+            while (iterator.hasNext()) {
+                Long key = (Long) iterator.next();
+                if (!hashSet.contains(key)) {
+                    hashSet.add(key);
+                }
+            }
+
+            return result;
+
+        } else {
+
+            // последний шаг - просто все добавим
+            Iterator iterator = keys.iterator();
+            HashSet<Long> hashSet = new HashSet<>();
+            while (iterator.hasNext()) {
+                Long key = (Long) iterator.next();
+                hashSet.add(key);
+            }
+
+            return new Pair<Integer, HashSet<Long>>(0, hashSet);
+
+        }
+
+    }
+
+    /**
+     * Делает поиск по нескольким ключам по Заголовкам и если ключ с точкой - это фильтр на диаппазон
+     * и его длинна должна быть не мнее 5-ти символов. Например:
+     * "Ермолаев Дмитр." - Найдет всех Ермолаев с Дмитр....
+     * @param filter
+     * @param offset
+     * @param limit
+     * @return
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Pair<String, Iterable> getKeysByFilterAsArray(String filter, int offset, int limit) {
+
+        String filterLower = filter.toLowerCase();
+        String[] filterArray = filterLower.split(" ");
+
+        Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length, filterArray);
+        if (result.getA() > 0) {
+            return new Pair<>("Error: filter key at " + (result.getA() - 1000) + "pos has length < 5", null);
+        }
+
+        HashSet<Long> hashSet = result.getB();
+
+        Iterable iterable;
+
+        if (offset > 0)
+            iterable = Iterables.skip(hashSet, offset);
+        else
+            iterable = hashSet;
+
+        if (limit > 0)
+            iterable = Iterables.limit(iterable, limit);
+
+        return new Pair<>(null, iterable);
 
     }
 

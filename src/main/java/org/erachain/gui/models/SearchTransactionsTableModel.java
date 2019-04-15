@@ -8,6 +8,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
+import org.erachain.utils.Pair;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.LoggerFactory;
@@ -93,10 +94,16 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
                 // ИЩЕМ по Заголовку
                 DCSet dcSet = DCSet.getInstance();
 
-                Iterable keys = dcSet.getTransactionFinalMap().getKeysByTitleAndType(filter,
-                        0, start, step);
+                Pair<String, Iterable> result = dcSet.getTransactionFinalMap().getKeysByFilterAsArray(filter, start, step);
 
-                Iterator iterator = keys.iterator();
+                if (result.getA() != null) {
+                    findMessage = result.getA();
+                    return;
+                } else {
+                    findMessage = "";
+                }
+
+                Iterator iterator = result.getB().iterator();
 
                 Transaction item;
                 Long key;
@@ -105,7 +112,6 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
 
                 while (iterator.hasNext()) {
                     key = (Long) iterator.next();
-                    Fun.Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
                     item = (Transaction) map.get(key);
                     list.add(item);
                 }
@@ -172,11 +178,6 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
             logger.error(e.getMessage(), e);
             return null;
         }
-    }
-
-    public void clear() {
-        list = new ArrayList<Transaction>();
-        fireTableDataChanged();
     }
 
 }

@@ -17,6 +17,8 @@ public abstract class SearchTableModelCls<U> extends AbstractTableModel {
     protected boolean needUpdate;
     protected boolean descending;
 
+    protected String findMessage;
+
     protected List<U> list;
 
     protected Boolean[] columnAutoHeight;
@@ -118,6 +120,12 @@ public abstract class SearchTableModelCls<U> extends AbstractTableModel {
         this.step = step;
 
         getInterval();
+    }
+
+    public void clear() {
+        findMessage = null;
+        list = new ArrayList<>();
+        fireTableDataChanged();
     }
 
 }
