@@ -387,6 +387,10 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
                         new Tuple2<String, Integer>(stepFilter, Integer.MAX_VALUE), true);
             } else {
 
+                if (stepFilter.length() > CUT_NAME_INDEX) {
+                    stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
+                }
+
                 // поиск диаппазона
                 keys = Fun.filter(this.titleKey,
                         new Tuple2<String, Integer>(stepFilter, 0), true,
@@ -397,6 +401,10 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
             // поиск целиком
 
             stepFilter = stepFilter.substring(0, stepFilter.length() -1);
+
+            if (stepFilter.length() > CUT_NAME_INDEX) {
+                stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
+            }
 
             keys = Fun.filter(this.titleKey,
                     new Tuple2<String, Integer>(stepFilter, 0), true,

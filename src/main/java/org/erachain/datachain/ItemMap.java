@@ -221,6 +221,10 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
                 keys = Fun.filter(this.nameKey, stepFilter);
             } else {
 
+                if (stepFilter.length() > CUT_NAME_INDEX) {
+                    stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
+                }
+
                 // поиск диаппазона
                 keys = Fun.filter(this.nameKey,
                         stepFilter, true,
@@ -231,6 +235,11 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
             // поиск целиком
 
             stepFilter = stepFilter.substring(0, stepFilter.length() -1);
+
+            if (stepFilter.length() > CUT_NAME_INDEX) {
+                stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
+            }
+
             keys = Fun.filter(this.nameKey, stepFilter);
         }
 
