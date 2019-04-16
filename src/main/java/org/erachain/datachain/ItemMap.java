@@ -1,8 +1,12 @@
 package org.erachain.datachain;
 
+import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
+import org.erachain.database.serializer.ItemSerializer;
+import org.erachain.utils.Pair;
 import org.erachain.utils.ReverseComparator;
 import org.mapdb.*;
 import org.slf4j.LoggerFactory;
@@ -28,8 +32,8 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
 
     private static final int NAME_INDEX = 1;
 
-    private NavigableSet<Fun.Tuple2<String, Long>> nameIndex;
-    private NavigableSet<Fun.Tuple2<String, Long>> nameDescendingIndex;
+    private NavigableSet nameKey;
+    //private NavigableSet<Fun.Tuple2<String, Long>> nameDescendingIndex;
 
 
     public ItemMap(DCSet databaseSet, DB database, String name) {
@@ -38,6 +42,9 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
         atomicKey = database.getAtomicLong(name + "_key");
         this.name = name;
         key = atomicKey.get();
+
+        makeOtherKeys(database);
+
     }
 
     public ItemMap(DCSet databaseSet, DB database,
@@ -75,10 +82,13 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
         this.key = key;
     }
 
-
-    protected void makeOwnerKey(DB database) {
+    protected void makeOtherKeys(DB database) {
 
         //////////////// NOT PROTOCOL INDEXES
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            // NOT USE SECONDARY INDEXES
+            return;
+        }
 
         //CHECK IF NOT MEMORY DATABASE
         if (parent != null) {
@@ -86,18 +96,28 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
         }
 
         //PAIR KEY
-        this.ownerKeyMap = database.createTreeMap(name + "owner_item_key")
+        this.ownerKeyMap = database.createTreeMap(name + "_owner_item_key")
                 //.comparator(Fun.TUPLE3_COMPARATOR)
                 .makeOrGet();
 
         //BIND OWNER KEY
-        Bind.secondaryKey((BTreeMap)map, this.ownerKeyMap, new Fun.Function2<String, Long, ItemCls>() {
+        Bind.secondaryKey((BTreeMap) map, this.ownerKeyMap, new Fun.Function2<String, Long, ItemCls>() {
             @Override
             public String run(Long key, ItemCls value) {
                 return value.getOwner().getAddress();
             }
         });
 
+        this.nameKey = database.createTreeSet(name + "_name_keys").comparator(Fun.COMPARATOR).makeOrGet();
+
+        // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
+        Bind.secondaryKeys((BTreeMap)map, this.nameKey,
+                new Fun.Function2<String[], Long, ItemCls>() {
+                    @Override
+                    public String[] run(Long key, ItemCls item) {
+                        return item.getName().toLowerCase().split(" ");
+                    }
+                });
     }
 
 
@@ -108,19 +128,21 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
             return;
         }
 
+        /*
         //NAME INDEX
-        nameIndex = database.createTreeSet("pp")
+        nameIndex = database.createTreeSet(name + "_name_keys")
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
-        nameDescendingIndex = database.createTreeSet("ppd")
+        nameDescendingIndex = database.createTreeSet(name + "_name_desc_keys")
                 .comparator(new ReverseComparator(Fun.COMPARATOR))
                 .makeOrGet();
 
-        createIndex(NAME_INDEX, nameIndex, nameDescendingIndex, (a, b) -> {
-            return b.getName();
+        createIndexes(NAME_INDEX, nameIndex, nameDescendingIndex, (key, item) -> {
+            return item.getName().toLowerCase().split(" ");
         });
 
+*/
     }
 
     @Override
@@ -178,68 +200,129 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
 
     }
 
-    // get list keys in name substring str
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Long> findKeysByName(String str, boolean caseCharacter) {
 
-        // TODO сделать поиск по ограничению  не перебором
+    public Pair<Integer, HashSet<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray) {
 
-        if (str == null || str.length() < 3){
-            return null;
-        }
+        Iterable keys;
 
-        if (!caseCharacter) {
-            str = str.toLowerCase();
-        }
+        String stepFilter = filterArray[step];
+        if (!stepFilter.endsWith("!")) {
+            // это сокращение для диаппазона
+            if (stepFilter.length() < 5) {
+                // ошибка - ищем как полное слово
+                keys = Fun.filter(this.nameKey, stepFilter);
+            } else {
 
-        List<Long> result = new ArrayList<>();
-
-        Iterator<Long> iterator = this.getIterator(DEFAULT_INDEX, false);
-
-        while (iterator.hasNext()) {
-
-            Long itemKey = iterator.next();
-            ItemCls item = get(itemKey);
-            String s1 = item.getName();
-            if (!caseCharacter) {
-                s1 = s1.toLowerCase();
+                // поиск диаппазона
+                keys = Fun.filter(this.nameKey,
+                        stepFilter, true,
+                        stepFilter + new String(new byte[]{(byte) 254}), true);
             }
 
-            if (s1.contains(str))
-                result.add(itemKey);
+        } else {
+            // поиск целиком
+
+            stepFilter = stepFilter.substring(0, stepFilter.length() -1);
+            keys = Fun.filter(this.nameKey, stepFilter);
         }
 
-        return result;
+        if (step > 0) {
+
+            // погнали в РЕКУРСИЮ
+            Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(--step, filterArray);
+
+            if (result.getA() > 0) {
+                return result;
+            }
+
+            // в рекурсии все хорошо - соберем ключи
+            Iterator iterator = keys.iterator();
+            HashSet<Long> hashSet = result.getB();
+            HashSet<Long> andHashSet = new HashSet<Long>();
+
+            // берем только совпадающие в обоих списках
+            while (iterator.hasNext()) {
+                Long key = (Long) iterator.next();
+                if (hashSet.contains(key)) {
+                    andHashSet.add(key);
+                }
+            }
+
+            return new Pair<>(0, andHashSet);
+
+        } else {
+
+            // последний шаг - просто все добавим
+            Iterator iterator = keys.iterator();
+            HashSet<Long> hashSet = new HashSet<>();
+            while (iterator.hasNext()) {
+                Long key = (Long) iterator.next();
+                hashSet.add(key);
+            }
+
+            return new Pair<Integer, HashSet<Long>>(0, hashSet);
+
+        }
+
+    }
+
+    /**
+     * Делает поиск по нескольким ключам по Заголовкам и если ключ с ! - надо найти только это слово
+     * а не как фильтр. Иначе слово принимаем как фильтр на диаппазон
+     * и его длинна должна быть не мнее 5-ти символов. Например:
+     * "Ермолаев Дмитр." - Найдет всех Ермолаев с Дмитр....
+     * @param filter
+     * @param offset
+     * @param limit
+     * @return
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Pair<String, Iterable> getKeysByFilterAsArray(String filter, int offset, int limit) {
+
+        String filterLower = filter.toLowerCase();
+        String[] filterArray = filterLower.split(" ");
+
+        Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray);
+        if (result.getA() > 0) {
+            return new Pair<>("Error: filter key at " + (result.getA() - 1000) + "pos has length < 5", null);
+        }
+
+        HashSet<Long> hashSet = result.getB();
+
+        Iterable iterable;
+
+        if (offset > 0)
+            iterable = Iterables.skip(hashSet, offset);
+        else
+            iterable = hashSet;
+
+        if (limit > 0)
+            iterable = Iterables.limit(iterable, limit);
+
+        return new Pair<>(null, iterable);
+
     }
 
     // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<ItemCls> findByName(String str, boolean caseCharacter) {
+    public List<ItemCls> getByFilterAsArray(String filter, int offset, int limit) {
 
-        // TODO сделать поиск по ограничению  не перебором
-
-        if (str == null || str.length() < 3){
-            return null;
+        if (filter == null || filter.isEmpty()){
+            return new ArrayList<>();
         }
 
-        if (!caseCharacter) {
-            str = str.toLowerCase();
+        Pair<String, Iterable> resultKeys = getKeysByFilterAsArray(filter, offset, limit);
+        if (resultKeys.getA() != null) {
+            return new ArrayList<>();
         }
 
         List<ItemCls> result = new ArrayList<>();
 
-        Iterator<Long> iterator = this.getIterator(DEFAULT_INDEX, false);
+        Iterator<Long> iterator = resultKeys.getB().iterator();
 
         while (iterator.hasNext()) {
-
             ItemCls item = get(iterator.next());
-            String s1 = item.getName();
-            if (!caseCharacter) {
-                s1 = s1.toLowerCase();
-            }
-
-            if (s1.contains(str))
-                result.add(item);
+            result.add(item);
         }
 
         return result;
@@ -252,14 +335,5 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
     public NavigableMap<Long, ItemCls> getOwnerItems(String ownerPublicKey) {
         return this.ownerKeyMap.subMap(ownerPublicKey, ownerPublicKey);
     }
-
-    public NavigableSet<Fun.Tuple2<String, Long>> getNameIndex() {
-        return nameIndex;
-    }
-
-    public NavigableSet<Fun.Tuple2<String, Long>> nameDescendingIndex() {
-        return nameDescendingIndex;
-    }
-
 
 }

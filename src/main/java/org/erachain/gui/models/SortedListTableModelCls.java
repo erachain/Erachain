@@ -9,8 +9,6 @@ public abstract class SortedListTableModelCls<T, U> extends TimerTableModelCls<U
 
     protected SortableList<T, U> listSorted;
 
-    public int COLUMN_FAVORITE = 1000;
-
     public SortedListTableModelCls(String[] columnNames, boolean descending) {
         super(columnNames, descending);
     }
@@ -28,9 +26,7 @@ public abstract class SortedListTableModelCls<T, U> extends TimerTableModelCls<U
     }
 
     public SortedListTableModelCls(DBMap map, String[] columnNames, Boolean[] column_AutoHeight, int favoriteColumn, boolean descending) {
-        super(map, columnNames, column_AutoHeight, descending);
-        this.COLUMN_FAVORITE = favoriteColumn;
-
+        super(map, columnNames, column_AutoHeight, favoriteColumn, descending);
     }
 
     public SortedListTableModelCls(DBMap map, String name, long timeout, String[] columnNames, Boolean[] column_AutoHeight, boolean descending) {

@@ -19,6 +19,8 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     protected boolean needUpdate;
     protected boolean descending;
 
+    public int COLUMN_FAVORITE = 1000;
+
     protected List<U> list;
 
     private Boolean[] columnAutoHeight; // = new Boolean[]{true, true, true, true, true, true, true, false, false};
@@ -52,6 +54,15 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
         this.descending = descending;
+    }
+
+    public TimerTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight, int favoriteColumn, boolean descending) {
+        this.map = map;
+        this.columnNames = columnNames;
+        this.columnAutoHeight = columnAutoHeight;
+        this.descending = descending;
+        this.COLUMN_FAVORITE = favoriteColumn;
+
     }
 
     public TimerTableModelCls(DBMap map, String name, long timeout, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {

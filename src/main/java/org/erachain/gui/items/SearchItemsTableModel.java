@@ -4,43 +4,50 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.ItemMap;
+import org.erachain.gui.models.SearchTableModelCls;
 import org.erachain.gui.models.SortedListTableModelCls;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.Pair;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Set;
+import javax.swing.text.html.HTMLDocument;
+import java.util.*;
 
 @SuppressWarnings("serial")
-public abstract class SearchItemsTableModel extends SortedListTableModelCls<Long, ItemCls> {
+public abstract class SearchItemsTableModel extends TimerTableModelCls<ItemCls> {
 
     public SearchItemsTableModel(DBMap itemsMap, String[] columnNames, Boolean[] column_AutoHeight, int favorite) {
-        super(itemsMap, columnNames, column_AutoHeight, favorite, false);
+        super(itemsMap, columnNames, column_AutoHeight, favorite,false);
+    }
+
+
+    public synchronized void syncUpdate(Observable o, Object arg) {
     }
 
     public void fill(List<Long> keys) {
         ItemCls item;
         list = new ArrayList<ItemCls>();
 
-        this.listSorted = new SortableList<Long, ItemCls>(this.map, keys);
-
-        for (Pair<Long, ItemCls> pair : listSorted) {
-            if (pair.getA() == null || pair.getA() < 1)
-                continue;
-
-            item = pair.getB();
-            if (item == null)
-                continue;
-
-            list.add(item);
+        for (Long key: keys) {
+            list.add((ItemCls)map.get(key));
         }
         this.fireTableDataChanged();
     }
 
+    public void fill(Iterator<Long> iterator) {
+
+        list = new ArrayList<ItemCls>();
+
+        while (iterator.hasNext()) {
+            list.add(((ItemMap)map).get(iterator.next()));
+        }
+
+        this.fireTableDataChanged();
+    }
+
     public void findByName(String filter) {
-        List<Long> keys = ((ItemMap) map).findKeysByName(filter, false);
-        fill(keys);
+        Pair<String, Iterable> result = ((ItemMap) map).getKeysByFilterAsArray(filter, 0, 1000);
+        Iterator iterator = result.getB().iterator();
+        fill(iterator);
     }
 
     public void findByKey(String text) {
@@ -61,25 +68,8 @@ public abstract class SearchItemsTableModel extends SortedListTableModelCls<Long
     }
 
     public void clear() {
-        List<Long> keys = new ArrayList<Long>();
-        fill(keys);
-
-    }
-
-    @Override
-    public void syncUpdate(Observable o, Object arg) { }
-
-    @Override
-    public ItemCls getItem(int row) {
-        return this.list.get(row);
-    }
-
-    @Override
-    public void addObservers() {
-    }
-
-    @Override
-    public void deleteObservers() {
+        list = new ArrayList<>();
+        fireTableDataChanged();
     }
 
 }

@@ -26,7 +26,7 @@ public class ItemAssetsTableModel extends SearchItemsTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.listSorted == null || row > this.listSorted.size() - 1) {
+        if (this.list == null || row > this.list.size() - 1) {
             return null;
         }
 

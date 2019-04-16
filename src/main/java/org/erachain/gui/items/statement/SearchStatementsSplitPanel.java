@@ -91,7 +91,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
 
         // CHECKBOX FOR FAVORITE
         TableColumn favoriteColumn = jTableJScrollPanelLeftPanel.getColumnModel()
-                .getColumn(StatementsTableModelSearch.COLUMN_FAVORITE);
+                .getColumn(search_Table_Model.COLUMN_FAVORITE);
         // favoriteColumn.setCellRenderer(new RendererBoolean());
         favoriteColumn.setMinWidth(150);
         favoriteColumn.setMaxWidth(300);

@@ -35,7 +35,6 @@ public class AssetPairSelect extends JDialog {
 
     public AssetPairSelect(long key, String action, String account) {
 
-        //	super(Lang.getInstance().translate("Erachain.org") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
         this.setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
         //ICON
         List<Image> icons = new ArrayList<Image>();
@@ -141,7 +140,7 @@ public class AssetPairSelect extends JDialog {
                 new Thread() {
                     @Override
                     public void run() {
-                        assetPairSelectTableModel.Find_item_from_key(key_Item.getText());
+                        assetPairSelectTableModel.findByKey(key_Item.getText());
                         if (assetPairSelectTableModel.getRowCount() < 1) {
                             pair_Panel.Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Assets"));
                             pair_Panel.jScrollPanelLeftPanel.setViewportView(pair_Panel.search_Info_Panel);
@@ -291,7 +290,7 @@ public class AssetPairSelect extends JDialog {
                     JTable target = (JTable) e.getSource();
                     int row = target.getSelectedRow();
 
-                    if (row < assetPairSelectTableModel.assets.size()) {
+                    if (row < assetPairSelectTableModel.getRowCount()) {
                         // Container ss = getParent();
                         //if (getParent().getClass().viewName() == "11")
 					/*	new ExchangeFrame(
@@ -359,7 +358,7 @@ public class AssetPairSelect extends JDialog {
     private void selectAsset() {
         if (pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow() >= 0) {
             AssetPairSelectTableModel tableModelAssets1 = (AssetPairSelectTableModel) pair_Panel.jTableJScrollPanelLeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTableJScrollPanelLeftPanel.getModel();
-            pairAsset = tableModelAssets1.getItem(pair_Panel.jTableJScrollPanelLeftPanel.convertRowIndexToModel(pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow()));
+            pairAsset = (AssetCls) tableModelAssets1.getItem(pair_Panel.jTableJScrollPanelLeftPanel.convertRowIndexToModel(pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow()));
             dispose();
         }
 

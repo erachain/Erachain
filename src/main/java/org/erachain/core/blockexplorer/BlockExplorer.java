@@ -2918,7 +2918,7 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                listPersons = dcSet.getItemPersonMap().findByName(search, false);
+                listPersons = dcSet.getItemPersonMap().getByFilterAsArray(search, 0, 100);
             }
         } catch (Exception e) {
             //Ошибка при поиске - пробрасываем WrongSearchException для отображения пустого списка элементов
@@ -2970,7 +2970,7 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                listAssets = dcSet.getItemAssetMap().findByName(search, false);
+                listAssets = dcSet.getItemAssetMap().getByFilterAsArray(search, 0, 100);
             }
         } catch (Exception e) {
             logger.info("Wrong search while process assets... ");
@@ -3022,7 +3022,7 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                listStatuses = dcSet.getItemStatusMap().findByName(search, false);
+                listStatuses = dcSet.getItemStatusMap().getByFilterAsArray(search, 0, 100);
             }
         } catch (Exception e) {
             logger.info("Wrong search while process statuses... ");

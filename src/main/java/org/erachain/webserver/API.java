@@ -1219,7 +1219,7 @@ public class API {
         }
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
-        List<ItemCls> list = map.findByName(filter, false);
+        List<ItemCls> list = map.getByFilterAsArray(filter, 0, 100);
 
         JSONArray array = new JSONArray();
 
@@ -1747,7 +1747,7 @@ public class API {
 
         ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
         // DOES ASSETID EXIST
-        List<ItemCls> list = map.findByName(filter, false);
+        List<ItemCls> list = map.getByFilterAsArray(filter, 0, 100);
 
         JSONArray array = new JSONArray();
 

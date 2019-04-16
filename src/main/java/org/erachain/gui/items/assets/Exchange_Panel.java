@@ -127,7 +127,6 @@ public class Exchange_Panel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
                 AssetPairSelect ss = new AssetPairSelect(want.getKey(), "", "");
-                ss.assetPairSelectTableModel.removeObservers();
                 if (ss.pairAsset != null) {
                     have = ss.pairAsset;
                     jTextField_Asset_1.setText(have.viewName());
@@ -162,7 +161,6 @@ public class Exchange_Panel extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 AssetPairSelect ss = new AssetPairSelect(have.getKey(), "", "");
-                ss.assetPairSelectTableModel.removeObservers();
                 if (ss.pairAsset != null) {
                     want = ss.pairAsset;
 
