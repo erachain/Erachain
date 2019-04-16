@@ -49,7 +49,6 @@ public class ExchangeFrame extends JDialog {
 
             AssetPairSelect ss = new AssetPairSelect(have.getKey(), action, account);
             this.want = ss.pairAsset;
-            ss.assetPairSelectTableModel.removeObservers();
         }
         if (this.want == null) {
             this.dispose();

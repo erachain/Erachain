@@ -290,7 +290,7 @@ public class AssetPairSelect extends JDialog {
                     JTable target = (JTable) e.getSource();
                     int row = target.getSelectedRow();
 
-                    if (row < assetPairSelectTableModel.assets.size()) {
+                    if (row < assetPairSelectTableModel.getRowCount()) {
                         // Container ss = getParent();
                         //if (getParent().getClass().viewName() == "11")
 					/*	new ExchangeFrame(
@@ -358,7 +358,7 @@ public class AssetPairSelect extends JDialog {
     private void selectAsset() {
         if (pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow() >= 0) {
             AssetPairSelectTableModel tableModelAssets1 = (AssetPairSelectTableModel) pair_Panel.jTableJScrollPanelLeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTableJScrollPanelLeftPanel.getModel();
-            pairAsset = tableModelAssets1.getItem(pair_Panel.jTableJScrollPanelLeftPanel.convertRowIndexToModel(pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow()));
+            pairAsset = (AssetCls) tableModelAssets1.getItem(pair_Panel.jTableJScrollPanelLeftPanel.convertRowIndexToModel(pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow()));
             dispose();
         }
 
