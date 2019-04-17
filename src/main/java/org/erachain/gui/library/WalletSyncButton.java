@@ -50,10 +50,10 @@ public class WalletSyncButton extends JButton implements Observer {
 
                 int number = 0;
                 for (PrivateKeyAccount privateAccount : Controller.getInstance().getPrivateKeyAccounts()) {
-                    if (Controller.getInstance().wallet.accountExists(privateAccount.getAddress()))
-                        continue;
                     Controller.getInstance().wallet.database.getAccountMap().add(privateAccount, ++number);
                 }
+
+                Controller.getInstance().wallet.database.commit();
 
                 int n = JOptionPane.showConfirmDialog(
                         new JFrame(), Lang.getInstance().translate("Sync wallet") + "?",
@@ -61,9 +61,6 @@ public class WalletSyncButton extends JButton implements Observer {
                         JOptionPane.OK_CANCEL_OPTION);
                 if (n != JOptionPane.OK_OPTION) return;
 
-                // GENERATE NEW ACCOUNT
-
-                // newAccount_Button.setEnabled(false);
                 // creane new thread
                 new Thread() {
                     @Override

@@ -2571,8 +2571,8 @@ public class Controller extends Observable {
         return this.dcSet.getTradeMap().getTradesSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet));
     }
 
-    public List<Trade> getTradeByTimestmp(long have, long want, long timestamp) {
-        return Trade.getTradeByTimestmp(this.dcSet, have, want, timestamp);
+    public List<Trade> getTradeByTimestmp(long have, long want, long timestamp, int limit) {
+        return dcSet.getTradeMap().getTradesByTimestamp(have, want, timestamp, limit);
     }
 
     // IMPRINTS

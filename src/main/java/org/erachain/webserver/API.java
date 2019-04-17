@@ -71,7 +71,7 @@ public class API {
         help.put("see /apiperson", "Help for person API");
         help.put("see /apipoll", "Help for polls API");
         help.put("see /apitelegrams", "Help for telegrams API");
-        help.put("see /apitrade", "Help for trade API");
+        help.put("see /apiexchange", "Help for exchange API");
         help.put("see /apirecords", "Help for transactions API");
 
         help.put("*** CHAIN ***", "");
