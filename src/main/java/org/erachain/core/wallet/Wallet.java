@@ -671,7 +671,7 @@ public class Wallet extends Observable implements Observer {
 						this.syncHeight = height;
 
 						//logger.debug("try Commit");
-						this.database.commit();
+						this.database.hardFlush();
 
                         if (Controller.getInstance().isOnStopping())
                             return;
@@ -715,7 +715,7 @@ public class Wallet extends Observable implements Observer {
 
             // тут возможно цепочка синхронизировалась или начала синхронизироваться и КОММИТ вызовет ошибку
             //  java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
-			this.database.commit();
+			this.database.hardFlush();
 
             this.database.clearCache();
 

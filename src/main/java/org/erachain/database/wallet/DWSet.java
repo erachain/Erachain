@@ -394,19 +394,23 @@ public class DWSet extends DBASet {
 
     long commitPoint;
 
-    @Override
-    public synchronized void commit() {
-        if (this.uses != 0
-                || System.currentTimeMillis() - commitPoint < 10000
-        )
-            return;
 
+    public synchronized void hardFlush() {
         this.uses++;
         this.database.commit();
         this.uses--;
 
         commitPoint = System.currentTimeMillis();
+    }
 
+    @Override
+    public void commit() {
+        if (this.uses != 0
+                || System.currentTimeMillis() - commitPoint < 10000
+        )
+            return;
+
+        hardFlush();
     }
 
     /**
