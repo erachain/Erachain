@@ -46,6 +46,8 @@ import java.util.*;
  */
 public class TransactionFinalMap extends DCMap<Long, Transaction> {
 
+    private static int CUT_NAME_INDEX = 12;
+
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
     @SuppressWarnings("rawtypes")
@@ -161,6 +163,9 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
                 String[] tokens = title.toLowerCase().split(" ");
                 Tuple2<String, Integer>[] keys = new Tuple2[tokens.length];
                 for (int i = 0; i < tokens.length; ++i) {
+                        if (tokens[i].length() > CUT_NAME_INDEX) {
+                            tokens[i] = tokens[i].substring(0, CUT_NAME_INDEX);
+                        }
                     keys[i] = new Tuple2<String, Integer>(tokens[i], val.getType());
                 }
 
@@ -382,6 +387,10 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
                         new Tuple2<String, Integer>(stepFilter, Integer.MAX_VALUE), true);
             } else {
 
+                if (stepFilter.length() > CUT_NAME_INDEX) {
+                    stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
+                }
+
                 // поиск диаппазона
                 keys = Fun.filter(this.titleKey,
                         new Tuple2<String, Integer>(stepFilter, 0), true,
@@ -392,6 +401,10 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
             // поиск целиком
 
             stepFilter = stepFilter.substring(0, stepFilter.length() -1);
+
+            if (stepFilter.length() > CUT_NAME_INDEX) {
+                stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
+            }
 
             keys = Fun.filter(this.titleKey,
                     new Tuple2<String, Integer>(stepFilter, 0), true,

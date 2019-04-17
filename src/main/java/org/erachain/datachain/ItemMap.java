@@ -24,6 +24,8 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
 
     private static Logger logger = LoggerFactory.getLogger(ItemMap.class.getName());
 
+    private static int CUT_NAME_INDEX = 12;
+
     protected Atomic.Long atomicKey;
     protected long key;
     protected String name;
@@ -115,7 +117,13 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
                 new Fun.Function2<String[], Long, ItemCls>() {
                     @Override
                     public String[] run(Long key, ItemCls item) {
-                        return item.getName().toLowerCase().split(" ");
+                        String[] keys = item.getName().toLowerCase().split(" ");
+                        for (int i=0; i < keys.length; ++i) {
+                            if (keys[i].length() > CUT_NAME_INDEX) {
+                                keys[i] = keys[i].substring(0, CUT_NAME_INDEX);
+                            }
+                        }
+                        return keys;
                     }
                 });
     }
@@ -213,6 +221,10 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
                 keys = Fun.filter(this.nameKey, stepFilter);
             } else {
 
+                if (stepFilter.length() > CUT_NAME_INDEX) {
+                    stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
+                }
+
                 // поиск диаппазона
                 keys = Fun.filter(this.nameKey,
                         stepFilter, true,
@@ -223,6 +235,11 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
             // поиск целиком
 
             stepFilter = stepFilter.substring(0, stepFilter.length() -1);
+
+            if (stepFilter.length() > CUT_NAME_INDEX) {
+                stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
+            }
+
             keys = Fun.filter(this.nameKey, stepFilter);
         }
 
