@@ -13,6 +13,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.transaction.Transaction;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 
 import org.erachain.datachain.DCSet;
@@ -93,6 +94,42 @@ public class Trade {
         BlockChain blockChain = Controller.getInstance().getBlockChain();
         Long timestamp = blockChain.getTimestamp(key.a) + key.b * 0; // for add SEQUENCE in asset.Trade
         return timestamp; // + this.sequence;
+    }
+
+    @SuppressWarnings("unchecked")
+    public JSONObject toJson(long keyForBuySell) {
+
+        JSONObject trade = new JSONObject();
+        trade.put("initiator", Transaction.viewDBRef(initiator));
+        trade.put("target", Transaction.viewDBRef(target));
+        trade.put("sequence", sequence);
+        if (keyForBuySell == haveKey) {
+            trade.put("type", "sell");
+
+            trade.put("haveKey", haveKey);
+            trade.put("wantKey", wantKey);
+
+            trade.put("amountHave", amountWant);
+            trade.put("amountWant", amountHave);
+
+            trade.put("price", calcPriceRevers());
+            trade.put("reversePrice", calcPrice());
+        } else {
+            trade.put("type", "buy");
+
+            trade.put("haveKey", wantKey);
+            trade.put("wantKey", haveKey);
+
+            trade.put("amountHave", amountHave);
+            trade.put("amountWant", amountWant);
+
+            trade.put("price", calcPrice());
+            trade.put("reversePrice", calcPriceRevers());
+
+        }
+
+        return trade;
+
     }
 
 

@@ -333,12 +333,12 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
         Iterable iterable;
 
         if (offset > 0) {
-            iterable = Iterables.skip(keys, limit);
+            iterable = Iterables.skip(keys, offset);
         } else {
             iterable = keys;
         }
 
-        if (limit > 0) {
+        if (limit > 0 && keys.size() > limit) {
             iterable = Iterables.limit(iterable, limit);
         }
 
@@ -378,7 +378,7 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
 
         Iterable iterable;
 
-        if (limit > 0) {
+        if (limit > 0 && keys.size() > limit) {
             iterable = Iterables.limit(keys, limit);
         } else {
             iterable = keys;

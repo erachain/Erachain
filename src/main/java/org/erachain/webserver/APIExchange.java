@@ -1,6 +1,8 @@
 package org.erachain.webserver;
 
 import com.google.common.collect.Iterables;
+import com.google.gson.internal.LinkedHashTreeMap;
+import com.sun.org.apache.xpath.internal.operations.Or;
 import javafx.print.Collation;
 import org.erachain.api.ApiErrorFactory;
 import com.google.gson.Gson;
@@ -15,6 +17,8 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.utils.StrJSonFine;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,16 +43,16 @@ public class APIExchange {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
-        help.put("apiexchange/orders?have={have}&want={want}&timestamp={timestamp}&limit={limit}",
+        help.put("apiexchange/orders?have={have}&want={want}&limit={limit}",
                 "Get orders from timestamp for HaveKey & WantKey, "
-                        + "limit is count record. The number of transactions is limited by input param.");
+                        + "limit is count record. The number of transactions is limited by input param. Max 50, default 20.");
         help.put("apiexchange/trades?have={have}&want={want}&timestamp={timestamp}&limit={limit}",
                 "Get trades from timestamp for HaveKey & WantKey, "
-                        + "limit is count record. The number of transactions is limited by input param.");
+                        + "limit is count record. The number of transactions is limited by input param. Max 200, default 50.");
         help.put("apiexchange/ordersfull?have={have}&want={want}&limit={limit}",
-                "Get Orders.");
+                "Get Orders. Only for local requests");
         help.put("apiexchange/tradesfull?have={have}&want={want}&limit={limit}",
-                "Get trades.");
+                "Get trades. Only for local requests");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -56,9 +60,9 @@ public class APIExchange {
 
     @GET
     @Path("orders")
-    // apiexchange/get?have=1&want=2&timestamp=3&limit=4
-    public Response getOrdersFromTimestamp(@QueryParam("have") Long have, @QueryParam("want") Long want,
-                              @QueryParam("timestamp") Long timestamp, @DefaultValue("20") @QueryParam("limit") Long limit) {
+    // apiexchange/get?have=1&want=2&&limit=4
+    public Response getOrders(@QueryParam("have") Long have, @QueryParam("want") Long want,
+                              @DefaultValue("20") @QueryParam("limit") Long limit) {
 
         ItemAssetMap map = this.dcSet.getItemAssetMap();
 
@@ -77,18 +81,32 @@ public class APIExchange {
             limitInt = 50;
 
 
-        List<Order> haveOrders = DCSet.getInstance().getOrderMap().getOrdersHave(have, limitInt);
-        List<Order> wantOrders = DCSet.getInstance().getOrderMap().getOrdersWant(want, limitInt);
+        List<Order> haveOrders = dcSet.getOrderMap().getOrdersHave(have, limitInt);
+        List<Order> wantOrders = dcSet.getOrderMap().getOrdersWant(want, limitInt);
 
-        Gson gs = new Gson();
-        Map resultMap = new LinkedHashMap();
-        resultMap.put("haveOrders", haveOrders);
-        resultMap.put("wantOrders", wantOrders);
-        String result = gs.toJson(map);
+        JSONObject result = new JSONObject();
+
+        // тут ошибка конвертации если пользовать StrJSonFine или gs
+        //  java.lang.NumberFormatException: For input string: "587341072695297-1"
+        // .entity(StrJSonFine.convert(output)) или gs.toJson(listResult)
+        ////////// ТАК у нас у Ордера есть toString - и Сборщики почемуто берут это а не .toJson
+        // поэтому делаем вручную
+        JSONArray arrayHave = new JSONArray();
+        for (Order order: haveOrders) {
+            arrayHave.add(order.toJson());
+        }
+        result.put("have", arrayHave);
+
+        JSONArray arrayWant = new JSONArray();
+        for (Order order: wantOrders) {
+            arrayWant.add(order.toJson());
+        }
+        result.put("want", arrayWant);
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(result).build();
+                .entity(result.toJSONString())
+                .build();
     }
 
     /**
@@ -107,7 +125,8 @@ public class APIExchange {
     @Path("trades")
     // apiexchange/get?have=1&want=2&timestamp=3&limit=4
     public Response getTradesFromTimestamp(@QueryParam("have") Long have, @QueryParam("want") Long want,
-                                      @QueryParam("timestamp") Long timestamp, @DefaultValue("20") @QueryParam("limit") Long limit) {
+                               @DefaultValue("0") @QueryParam("timestamp") Long timestamp,
+                               @DefaultValue("50") @QueryParam("limit") Long limit) {
 
         ItemAssetMap map = this.dcSet.getItemAssetMap();
         // DOES ASSETID EXIST
@@ -120,20 +139,21 @@ public class APIExchange {
                     Transaction.ITEM_ASSET_NOT_EXIST);
         }
 
-        //Long haveKey = Long.parseLong(have);
-        //Long wantKey = Long.parseLong(want);
         int limitInt = limit.intValue();
         if (limitInt > 200)
             limitInt = 200;
 
         List<Trade> listResult = cntrl.getTradeByTimestmp(have, want, timestamp, limitInt);
 
-        Gson gs = new Gson();
-        String result = gs.toJson(listResult);
+        JSONArray arrayJSON = new JSONArray();
+        for (Trade trade: listResult) {
+            arrayJSON.add(trade.toJson(have));
+        }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(result).build();
+                .entity(arrayJSON.toJSONString())
+                .build();
     }
 
     /**
@@ -158,7 +178,6 @@ public class APIExchange {
                     .header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
                     .entity("Not LOCAL request. Access denied.")
-                    //.entity(output.toJSONString())
                     .build();
         }
 
@@ -286,7 +305,6 @@ public class APIExchange {
                     .header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
                     .entity("Not LOCAL request. Access denied.")
-                    //.entity(output.toJSONString())
                     .build();
         }
 
@@ -317,7 +335,7 @@ public class APIExchange {
         BigDecimal tradeWantAmount = BigDecimal.ZERO;
         BigDecimal tradeHaveAmount = BigDecimal.ZERO;
 
-        TransactionFinalMap finalMap = DCSet.getInstance().getTransactionFinalMap();
+        TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
         Transaction createOrder;
 
         int i = 0;

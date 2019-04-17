@@ -194,7 +194,7 @@ public class OrderMap extends DCMap<Long, Order> {
                 Fun.t4(have, Fun.HI(), Fun.HI(), Fun.HI())).values();
 
         Iterable<Long> iterable;
-        if (limit > 0) {
+        if (limit > 0 && keys.size() > limit) {
             iterable = Iterables.limit(keys, limit);
         } else {
             iterable = keys;
@@ -229,7 +229,7 @@ public class OrderMap extends DCMap<Long, Order> {
                 Fun.t4(want, Fun.HI(), Fun.HI(), Fun.HI())).values();
 
         Iterable<Long> iterable;
-        if (limit > 0) {
+        if (limit > 0 && keys.size() > limit) {
             iterable = Iterables.limit(keys, limit);
         } else {
             iterable = keys;

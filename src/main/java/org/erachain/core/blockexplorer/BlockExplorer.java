@@ -840,7 +840,7 @@ public class BlockExplorer {
 
         // Collections.reverse(ordersWant);
 
-        List<Trade> trades = dcSet.getTradeMap().getTrades(have, want, 0, 0);
+        List<Trade> trades = dcSet.getTradeMap().getTrades(have, want, 0, 100);
 
         AssetCls assetHave = Controller.getInstance().getAsset(have);
         AssetCls assetWant = Controller.getInstance().getAsset(want);
@@ -1462,6 +1462,9 @@ public class BlockExplorer {
              * dcSet.getCompletedOrderMap().get(trade.getTarget()); }
              */
 
+            transactionDataJSON.put("amount", trade.getAmountHave().toPlainString());
+            transactionDataJSON.put("asset", trade.getHaveKey());
+
             transactionDataJSON.put("amountHave", trade.getAmountHave().toPlainString());
             transactionDataJSON.put("amountWant", trade.getAmountWant().toPlainString());
 
@@ -1955,7 +1958,7 @@ public class BlockExplorer {
         output.put("type", "trade");
         output.put("trade", query);
 
-        all.add(trade);
+        all.add(trade.toJson(0));
 
         all.add(Controller.getInstance().getTransaction(Base58.decode(signatures[0])));
         all.add(Controller.getInstance().getTransaction(Base58.decode(signatures[1])));
