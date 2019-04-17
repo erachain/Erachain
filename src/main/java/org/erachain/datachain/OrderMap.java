@@ -193,13 +193,17 @@ public class OrderMap extends DCMap<Long, Order> {
                 Fun.t4(have, null, null, null),
                 Fun.t4(have, Fun.HI(), Fun.HI(), Fun.HI())).values();
 
-        if (limit >0) {
-            keys = (Collection<Long>) Iterables.limit(keys, limit);
+        Iterable<Long> iterable;
+        if (limit > 0) {
+            iterable = Iterables.limit(keys, limit);
+        } else {
+            iterable = keys;
         }
 
+        Iterator iterator = iterable.iterator();
         List<Order> orders = new ArrayList<>();
-        for (Long key: keys) {
-            orders.add(get(key));
+        while (iterator.hasNext()) {
+            orders.add(get((Long) iterator.next()));
         }
 
         return orders;
@@ -224,13 +228,17 @@ public class OrderMap extends DCMap<Long, Order> {
                 Fun.t4(want, null, null, null),
                 Fun.t4(want, Fun.HI(), Fun.HI(), Fun.HI())).values();
 
-        if (limit >0) {
-            keys = (Collection<Long>) Iterables.limit(keys, limit);
+        Iterable<Long> iterable;
+        if (limit > 0) {
+            iterable = Iterables.limit(keys, limit);
+        } else {
+            iterable = keys;
         }
 
+        Iterator iterator = iterable.iterator();
         List<Order> orders = new ArrayList<>();
-        for (Long key: keys) {
-            orders.add(get(key));
+        while (iterator.hasNext()) {
+            orders.add(get((Long) iterator.next()));
         }
 
         return orders;

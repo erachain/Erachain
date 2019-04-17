@@ -330,18 +330,23 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
                 Fun.t3(pairKey, null, null),
                 Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
 
+        Iterable iterable;
+
         if (offset > 0) {
-            keys = (Collection<Tuple2<Long, Long>>) Iterables.skip(keys, limit);
+            iterable = Iterables.skip(keys, limit);
+        } else {
+            iterable = keys;
         }
 
         if (limit > 0) {
-            keys = (Collection<Tuple2<Long, Long>>) Iterables.limit(keys, limit);
+            iterable = Iterables.limit(iterable, limit);
         }
 
         List<Trade> trades = new ArrayList<Trade>();
 
-        for (Tuple2<Long, Long> key : keys) {
-            trades.add(this.get(key));
+        Iterator iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            trades.add(this.get((Tuple2<Long, Long>) iterator.next()));
         }
 
         //RETURN
@@ -371,14 +376,19 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
                 Fun.t3(pairKey, timestamp, timestamp),
                 Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
 
+        Iterable iterable;
+
         if (limit > 0) {
-            keys = (Collection<Tuple2<Long, Long>>) Iterables.limit(keys, limit);
+            iterable = Iterables.limit(keys, limit);
+        } else {
+            iterable = keys;
         }
 
         List<Trade> trades = new ArrayList<Trade>();
 
-        for (Tuple2<Long, Long> key : keys) {
-            trades.add(this.get(key));
+        Iterator iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            trades.add(this.get((Tuple2<Long, Long>) iterator.next()));
         }
 
         //RETURN
