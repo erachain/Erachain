@@ -1668,6 +1668,7 @@ public class Controller extends Observable {
         return true;
     }
 
+    private int skipNotify = 0;
     // https://127.0.0.1/7pay_in/tools/block_proc/ERA
     public void NotifyIncoming(List<Transaction> transactions) {
 
@@ -1691,8 +1692,12 @@ public class Controller extends Observable {
             }
         }
 
-        if (seqs.isEmpty())
+        if (seqs.isEmpty()
+                // раз в 10 блоков уведомлять что обновиться  надо
+                && ++skipNotify < 10)
             return;
+
+        skipNotify = 0;
 
         // SEE -
         // http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
