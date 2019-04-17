@@ -172,22 +172,19 @@ public class AccountsTableModel extends AbstractTableModel implements Observer {
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
-
-        if (message.getType() == ObserverMessage.LIST_ALL_ACCOUNT_TYPE || message.getType() == ObserverMessage.RESET_ALL_ACCOUNT_TYPE)
+        if (message.getType() == ObserverMessage.LIST_ALL_ACCOUNT_TYPE) {
+            ;
+        } else if (message.getType() == ObserverMessage.RESET_ALL_ACCOUNT_TYPE) {
+            this.publicKeyAccounts = new ArrayList<>();
             this.fireTableDataChanged();
 
-        if (message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE) {
+        } else if (message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE) {
             this.publicKeyAccounts.add(((PublicKeyAccount) message.getValue()));
             this.fireTableDataChanged();
-        }
-
-        if (message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE) {
-            // обновляем данные
-
+        } else if (message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE) {
             this.publicKeyAccounts.remove((message.getValue()));
             this.fireTableDataChanged();
         }
-
 
     }
 

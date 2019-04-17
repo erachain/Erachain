@@ -96,7 +96,7 @@ public class WalletBlocksTableModel extends SortedListTableModelCls<Tuple2<Strin
             listSorted.sort();
             fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.GUI_REPAINT) {
-            if (count++ < 1000) {
+            if (count++ < 4) {
                 return;
             }
             count = 0;

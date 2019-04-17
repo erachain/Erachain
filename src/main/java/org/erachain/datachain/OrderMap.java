@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.*;
 import org.erachain.database.DBMap;
@@ -174,7 +175,7 @@ public class OrderMap extends DCMap<Long, Order> {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private Collection<Long> getKeysHave(long have) {
+    public Collection<Long> getKeysHave(long have) {
 
         //FILTER ALL KEYS
         Collection<Long> keys = ((BTreeMap<Tuple4, Long>) this.haveWantKeyMap).subMap(
@@ -185,7 +186,31 @@ public class OrderMap extends DCMap<Long, Order> {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private Collection<Long> getKeysWant(long want) {
+    public List<Order> getOrdersHave(long have, int limit) {
+
+        //FILTER ALL KEYS
+        Collection<Long> keys = ((BTreeMap<Tuple4, Long>) this.haveWantKeyMap).subMap(
+                Fun.t4(have, null, null, null),
+                Fun.t4(have, Fun.HI(), Fun.HI(), Fun.HI())).values();
+
+        Iterable<Long> iterable;
+        if (limit > 0 && keys.size() > limit) {
+            iterable = Iterables.limit(keys, limit);
+        } else {
+            iterable = keys;
+        }
+
+        Iterator iterator = iterable.iterator();
+        List<Order> orders = new ArrayList<>();
+        while (iterator.hasNext()) {
+            orders.add(get((Long) iterator.next()));
+        }
+
+        return orders;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Collection<Long> getKeysWant(long want) {
 
         //FILTER ALL KEYS
         Collection<Long> keys = ((BTreeMap<Tuple4, Long>) this.wantHaveKeyMap).subMap(
@@ -193,6 +218,30 @@ public class OrderMap extends DCMap<Long, Order> {
                 Fun.t4(want, Fun.HI(), Fun.HI(), Fun.HI())).values();
 
         return keys;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<Order> getOrdersWant(long want, int limit) {
+
+        //FILTER ALL KEYS
+        Collection<Long> keys = ((BTreeMap<Tuple4, Long>) this.haveWantKeyMap).subMap(
+                Fun.t4(want, null, null, null),
+                Fun.t4(want, Fun.HI(), Fun.HI(), Fun.HI())).values();
+
+        Iterable<Long> iterable;
+        if (limit > 0 && keys.size() > limit) {
+            iterable = Iterables.limit(keys, limit);
+        } else {
+            iterable = keys;
+        }
+
+        Iterator iterator = iterable.iterator();
+        List<Order> orders = new ArrayList<>();
+        while (iterator.hasNext()) {
+            orders.add(get((Long) iterator.next()));
+        }
+
+        return orders;
     }
 
     public List<Order> getOrders(long haveWant) {
