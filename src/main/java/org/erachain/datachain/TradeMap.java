@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
@@ -312,7 +313,7 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Trade> getTrades(long have, long want) {
+    public List<Trade> getTrades(long have, long want, int offset, int limit) {
 
         if (this.pairKeyMap == null)
             return new ArrayList<Trade>();
@@ -329,6 +330,14 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
                 Fun.t3(pairKey, null, null),
                 Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
 
+        if (offset > 0) {
+            keys = (Collection<Tuple2<Long, Long>>) Iterables.skip(keys, limit);
+        }
+
+        if (limit > 0) {
+            keys = (Collection<Tuple2<Long, Long>>) Iterables.limit(keys, limit);
+        }
+
         List<Trade> trades = new ArrayList<Trade>();
 
         for (Tuple2<Long, Long> key : keys) {
@@ -341,12 +350,12 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
 
     /**
      * Get transaction by timestamp
-     *
-     * @param have      include
+     *  @param have      include
      * @param want      wish
      * @param timestamp is time
+     * @param limit
      */
-    public List<Trade> getTradesByTimestamp(long have, long want, long timestamp) {
+    public List<Trade> getTradesByTimestamp(long have, long want, long timestamp, int limit) {
 
         if (this.pairKeyMap == null)
             return new ArrayList<Trade>();
@@ -361,6 +370,10 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
         Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
                 Fun.t3(pairKey, timestamp, timestamp),
                 Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
+
+        if (limit > 0) {
+            keys = (Collection<Tuple2<Long, Long>>) Iterables.limit(keys, limit);
+        }
 
         List<Trade> trades = new ArrayList<Trade>();
 

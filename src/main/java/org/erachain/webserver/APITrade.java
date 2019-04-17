@@ -1,5 +1,7 @@
 package org.erachain.webserver;
 
+import com.google.common.collect.Iterables;
+import javafx.print.Collation;
 import org.erachain.api.ApiErrorFactory;
 import com.google.gson.Gson;
 import org.erachain.controller.Controller;
@@ -11,10 +13,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.datachain.TransactionFinalMap;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun;
 import org.erachain.utils.StrJSonFine;
+import org.mapdb.Fun;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -22,10 +22,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Path("apitrade")
 @Produces(MediaType.APPLICATION_JSON)
@@ -53,6 +50,43 @@ public class APITrade {
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
     }
 
+    @GET
+    @Path("ordersByTimestamp")
+    // apitrade/get?have=1&want=2&timestamp=3&limit=4
+    public Response getOrdersByTimestamp(@QueryParam("have") Long have, @QueryParam("want") Long want,
+                              @QueryParam("timestamp") Long timestamp, @DefaultValue("20") @QueryParam("limit") Long limit) {
+
+        ItemAssetMap map = this.dcSet.getItemAssetMap();
+        // DOES ASSETID EXIST
+        if (!map.contains(have)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+        if (!map.contains(want)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        //Long haveKey = Long.parseLong(have);
+        //Long wantKey = Long.parseLong(want);
+        int limitInt = limit.intValue();
+        if (limitInt > 50)
+            limitInt = 50;
+
+
+        List<Order> haveOrders = DCSet.getInstance().getOrderMap().getOrdersHave(have, limitInt);
+        List<Order> wantOrders = DCSet.getInstance().getOrderMap().getOrdersWant(want, limitInt);
+
+        Gson gs = new Gson();
+        String result = gs.toJson(listRusult);
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(result).build();
+    }
+
     /**
      * Get trades by timestamp. The number of transactions is limited by input
      * param.
@@ -68,17 +102,32 @@ public class APITrade {
     @GET
     @Path("get")
     // apitrade/get?have=1&want=2&timestamp=3&limit=4
-    public Response getTradeByAccount(@QueryParam("have") Long have, @QueryParam("want") Long want,
+    public Response getTrades(@QueryParam("have") Long have, @QueryParam("want") Long want,
                                       @QueryParam("timestamp") Long timestamp, @DefaultValue("20") @QueryParam("limit") Long limit) {
+
+        ItemAssetMap map = this.dcSet.getItemAssetMap();
+        // DOES ASSETID EXIST
+        if (!map.contains(have)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+        if (!map.contains(want)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
 
         //Long haveKey = Long.parseLong(have);
         //Long wantKey = Long.parseLong(want);
-        List<Trade> listRusult = cntrl.getTradeByTimestmp(have, want, timestamp);
+        int limitInt = limit.intValue();
+        if (limitInt > 200)
+            limitInt = 200;
 
-        List<Trade> tradeList = listRusult.subList(0, limit.intValue());
+        List<Trade> listRusult = cntrl.getTradeByTimestmp(have, want, timestamp, limitInt);
 
         Gson gs = new Gson();
-        String result = gs.toJson(tradeList);
+        String result = gs.toJson(listRusult);
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
@@ -219,7 +268,7 @@ public class APITrade {
     @Path("trades")
     // apitrade/trades?have=1&want=2&limit=20
     public Response trades(@QueryParam("have") Long have, @QueryParam("want") Long want,
-                           @DefaultValue("100") @QueryParam("limit") Long limit) {
+                           @DefaultValue("20") @QueryParam("limit") Long limit) {
 
         ItemAssetMap map = this.dcSet.getItemAssetMap();
         // DOES ASSETID EXIST
@@ -236,10 +285,11 @@ public class APITrade {
 
         Map output = new LinkedHashMap();
 
-        Map tradesJSON = new LinkedHashMap();
+        //Map tradesJSON = new LinkedHashMap();
+        List tradesJSON = new ArrayList();
 
         List<Trade> trades = dcSet.getTradeMap().getTrades(have,
-                want);
+                want, 0, 0);
 
         output.put("tradesCount", trades.size());
 
@@ -294,7 +344,7 @@ public class APITrade {
             tradeJSON.put("timestamp", trade.getTimestamp());
             tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
 
-            tradesJSON.put(i, tradeJSON);
+            tradesJSON.add(tradeJSON);
         }
         output.put("trades", tradesJSON);
 

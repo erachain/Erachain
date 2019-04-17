@@ -46,17 +46,6 @@ public class Trade {
         this.sequence = sequence;
     }
 
-    public static List<Trade> getTradeByTimestmp(DCSet dcSet, long have, long want, long timestamp) {
-        List<Trade> list = dcSet.getTradeMap().getTradesByTimestamp(have, want, timestamp);
-
-        List<Trade> trades = new ArrayList<Trade>();
-        for (Trade item : list) {
-            trades.add(item);
-        }
-
-        return trades;
-    }
-
     public Long getInitiator() {
         return this.initiator;
     }
