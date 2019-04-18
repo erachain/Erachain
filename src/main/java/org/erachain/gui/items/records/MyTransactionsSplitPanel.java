@@ -252,7 +252,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
     public void onClose() {
         // delete observer left panel
         this.records_model.deleteObservers();
-        this.setIntervalPanel.removeObservers();
+        this.setIntervalPanel.deleteObservers();
         // get component from right panel
         //	Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close

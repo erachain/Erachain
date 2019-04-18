@@ -296,7 +296,7 @@ public class MyOrderTab extends SplitPanel {
     @Override
     public void onClose() {
         ordersModel.deleteObservers();
-        setIntervalPanel.removeObservers();
+        setIntervalPanel.deleteObservers();
         
     }
     
