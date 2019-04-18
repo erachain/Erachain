@@ -127,7 +127,12 @@ public class OrderMap extends AutoKeyDBMap<Tuple2<String, Long>, Tuple2<Long, Or
         Order order;
         Order orderFromChain;
         for (Tuple2<String, Long> key: map.keySet()) {
+            Tuple2<Long, Order> item = map.get(key);
+            if (item == null || item.b == null)
+                continue;
+
             order = map.get(key).b;
+
             if (dcSet.getOrderMap().contains(key.b))
                 // ACTIVE
                 orderFromChain = dcSet.getOrderMap().get(key.b);
@@ -135,7 +140,7 @@ public class OrderMap extends AutoKeyDBMap<Tuple2<String, Long>, Tuple2<Long, Or
                 // CANCELED TOO
                 orderFromChain = dcSet.getCompletedOrderMap().get(key.b);
 
-            if (orderFromChain.getFulfilledHave().compareTo(order.getFulfilledHave()) == 0)
+            if (orderFromChain == null || orderFromChain.getFulfilledHave().compareTo(order.getFulfilledHave()) == 0)
                 continue;
 
             this.set(key, orderFromChain);
