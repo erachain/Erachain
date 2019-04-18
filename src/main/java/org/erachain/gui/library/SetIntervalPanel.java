@@ -3,6 +3,7 @@ package org.erachain.gui.library;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
+import org.erachain.gui.ObserverWaiter;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.slf4j.Logger;
@@ -12,28 +13,36 @@ import javax.swing.*;
 import java.util.Observable;
 import java.util.Observer;
 
-public class SetIntervalPanel extends JPanel implements Observer {
+public class SetIntervalPanel extends JPanel implements Observer, ObserverWaiter {
 
-    /**
-     * 
-     */
+    private final int RESET_EVENT;
+    private final int LIST_EVENT;
+    private final int ADD_EVENT;
+    private final int REMOVE_EVENT;
+
+    Logger LOGGER;
+
     private static final long serialVersionUID = 1L;
     DBMap map;
     private long size;
     private boolean needUpdate;
-
-    static Logger LOGGER = LoggerFactory.getLogger(SetIntervalPanel.class.getName());
 
     /**
      * В динамическом режиме перерисовывается при каждом прилете записи.<br>
      * Без динамического режима перерисовывается по внешнему таймеру из
      * gui.GuiTimer - только если было обновление
      */
-    public SetIntervalPanel(DBMap map, int type) {
-        this.type=type;
+    public SetIntervalPanel(DBMap map) {
         jLabelTotal = new JLabel();
         this.map = map;
         this.size = this.map.size();
+
+        RESET_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_RESET);
+        LIST_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_LIST);
+        ADD_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_ADD);
+        REMOVE_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_REMOVE);
+
+        LOGGER = LoggerFactory.getLogger(getClass().getName());
 
         initComponents();
 
@@ -111,7 +120,6 @@ public class SetIntervalPanel extends JPanel implements Observer {
     public javax.swing.JTextField jTextFieldStart;
     public javax.swing.JButton jButtonSetInterval;
     JLabel jLabelTotal;
-    public int type;
 
     // End of variables declaration
     @Override
@@ -130,82 +138,48 @@ public class SetIntervalPanel extends JPanel implements Observer {
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
-        // CHECK IF NEW LIST
+        if (message.getType() == ObserverMessage.GUI_REPAINT
+                && needUpdate) {
 
-        // order transactions
-        if (type == Transaction.CREATE_ORDER_TRANSACTION) {
+            needUpdate = false;
+            jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
 
-            if (message.getType() == ObserverMessage.GUI_REPAINT
-                    && needUpdate) {
+        } else if (message.getType() == RESET_EVENT) {
+            size = 0;
+            jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
 
-                needUpdate = false;
-                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
+        } else if (message.getType() == LIST_EVENT) {
+            size = map.size();
+            jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
 
-            } else if (message.getType() == ObserverMessage.WALLET_RESET_ORDER_TYPE) {
+        } else if (message.getType() == ADD_EVENT) {
+            ++size;
+            needUpdate = true;
 
-                size = 0;
-                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
-
-            } else if (message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
-
-                size = map.size();
-                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
-
-            } else if (message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE) {
-
-                ++size;
-                needUpdate = true;
-
-            } else if (message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE) {
-
-                --size;
-                needUpdate = true;
-
-            }
-
-        // all transactions
-        } else if (type  == Transaction.EXTENDED) {
-
-            if (message.getType() == ObserverMessage.GUI_REPAINT
-                    && needUpdate) {
-
-                needUpdate = false;
-                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
-
-            } else if (message.getType() == ObserverMessage.WALLET_RESET_TRANSACTION_TYPE) {
-
-                needUpdate = false;
-                size = 0;
-                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
-
-            } else if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-
-                needUpdate = false;
-                size = map.size();
-                jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
-
-            } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
-
-                ++size;
-                needUpdate = true;
-
-            } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-
-                --size;
-                needUpdate = true;
-
-            }
+        } else if (message.getType() == REMOVE_EVENT) {
+            --size;
+            needUpdate = true;
 
         }
 
     }
 
     public void addObservers() {
-        Controller.getInstance().addWalletObserver(this);
+
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
+            map.addObserver(this);
+        } else {
+            // ожидаем открытия кошелька
+            Controller.getInstance().wallet.addWaitingObserver(this);
+        }
     }
 
-    public void removeObservers() {
-        Controller.getInstance().deleteWalletObserver(this);
+    public void deleteObservers() {
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
+            map.deleteObserver(this);
+        }
     }
 
 }

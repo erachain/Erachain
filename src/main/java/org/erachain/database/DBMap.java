@@ -256,6 +256,18 @@ public abstract class DBMap<T, U> extends Observable {
         return false;
     }
 
+    public Map<Integer, Integer> getObservableData() {
+        return observableData;
+    }
+
+    public boolean checkObserverMessageType(int messageType, int thisMessageType) {
+        if (observableData == null || observableData.isEmpty() || !observableData.containsKey(thisMessageType))
+            return false;
+
+
+        return observableData.get(messageType) == thisMessageType;
+    }
+
     /**
      * Соединяется прямо к списку SortableList для отображения в ГУИ
      * Нужен только для сортировки<br>

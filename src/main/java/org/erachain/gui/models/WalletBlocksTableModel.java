@@ -74,22 +74,16 @@ public class WalletBlocksTableModel extends WalletSortedTableModel<Tuple2<String
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
         //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE) {
-            needUpdate = true;
+        if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate
+                || message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE
+                || message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE) {
+            needUpdate = false;
+            listSorted = SortableList.makeSortableList(map, true, 50);
+            listSorted.sort();
+            fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
                 || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE) {
             needUpdate = true;
-        } else if (message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE) {
-            count = 0;
-            needUpdate = false;
-            listSorted = SortableList.makeSortableList(map, true, 50);
-            listSorted.sort();
-            fireTableDataChanged();
-        } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
-            needUpdate = false;
-            listSorted = SortableList.makeSortableList(map, true, 50);
-            listSorted.sort();
-            fireTableDataChanged();
         }
     }
 

@@ -19,7 +19,7 @@ import java.util.Observable;
 public abstract class WalletSortedTableModel<T, U> extends SortedListTableModelCls<T, U> implements ObserverWaiter {
 
     public WalletSortedTableModel(DBMap map, String[] columnNames, Boolean[] column_AutoHeight, boolean descending) {
-        super(map, columnNames, column_AutoHeight, true);
+        super(map, columnNames, column_AutoHeight, descending);
 
         // сначала ЛОГЕР задаем
         logger = LoggerFactory.getLogger(this.getClass().getName());
