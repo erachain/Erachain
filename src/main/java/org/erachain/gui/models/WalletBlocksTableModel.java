@@ -81,25 +81,18 @@ public class WalletBlocksTableModel extends SortedListTableModelCls<Tuple2<Strin
         ObserverMessage message = (ObserverMessage) arg;
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE) {
-            listSorted = SortableList.makeSortableList(map, true, 50);
-            listSorted.sort(BlocksHeadMap.TIMESTAMP_INDEX, true);
-            fireTableDataChanged();
-
+            needUpdate = true;
         } else if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
                 || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE) {
-            listSorted = SortableList.makeSortableList(map, true, 50);
-            listSorted.sort();
-            fireTableDataChanged();
+            needUpdate = true;
         } else if (message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE) {
-            //CHECK IF LIST UPDATED
+            count = 0;
+            needUpdate = false;
             listSorted = SortableList.makeSortableList(map, true, 50);
             listSorted.sort();
             fireTableDataChanged();
-        } else if (message.getType() == ObserverMessage.GUI_REPAINT) {
-            if (count++ < 4) {
-                return;
-            }
-            count = 0;
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
+            needUpdate = false;
             listSorted = SortableList.makeSortableList(map, true, 50);
             listSorted.sort();
             fireTableDataChanged();
