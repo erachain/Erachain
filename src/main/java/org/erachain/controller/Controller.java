@@ -1284,6 +1284,15 @@ public class Controller extends Observable {
             }
         }
 
+        if (BlockChain.DEVELOP_USE) {
+            try {
+                synchronizer.checkBadBlock(peer);
+            } catch (Exception e) {
+                peer.ban(Synchronizer.BAN_BLOCK_TIMES << 2, "connection - BAD CHAIN");
+                return;
+            }
+        }
+
         if (this.isStopping)
             return; // MAY BE IT HARD BUSY
 
