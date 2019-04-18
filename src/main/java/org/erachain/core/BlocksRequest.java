@@ -20,7 +20,7 @@ import java.util.concurrent.BlockingQueue;
 
 public class BlocksRequest extends MonitoredThread {
 
-    private final static boolean USE_MONITOR = true;
+    private final static boolean USE_MONITOR = false;
     //private final static boolean logPings = true;
     private boolean runned;
 
