@@ -77,7 +77,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         this.toolBarLeftPanel.setVisible(false);
         
      // set interval panel
-        setIntervalPanel = new SetIntervalPanel(Controller.getInstance().wallet.database.getTransactionMap(), Transaction.EXTENDED);
+        setIntervalPanel = new SetIntervalPanel(Controller.getInstance().wallet.database.getTransactionMap());
         GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;

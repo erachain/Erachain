@@ -20,20 +20,19 @@ public class SetIntervalPanel extends JPanel implements Observer, ObserverWaiter
     private final int ADD_EVENT;
     private final int REMOVE_EVENT;
 
+    Logger LOGGER;
+
     private static final long serialVersionUID = 1L;
     DBMap map;
     private long size;
     private boolean needUpdate;
-
-    static Logger LOGGER = LoggerFactory.getLogger(SetIntervalPanel.class.getName());
 
     /**
      * В динамическом режиме перерисовывается при каждом прилете записи.<br>
      * Без динамического режима перерисовывается по внешнему таймеру из
      * gui.GuiTimer - только если было обновление
      */
-    public SetIntervalPanel(DBMap map, int type) {
-        this.type = type;
+    public SetIntervalPanel(DBMap map) {
         jLabelTotal = new JLabel();
         this.map = map;
         this.size = this.map.size();
@@ -42,6 +41,8 @@ public class SetIntervalPanel extends JPanel implements Observer, ObserverWaiter
         LIST_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_LIST);
         ADD_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_ADD);
         REMOVE_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_REMOVE);
+
+        LOGGER = LoggerFactory.getLogger(getClass().getName());
 
         initComponents();
 
@@ -119,7 +120,6 @@ public class SetIntervalPanel extends JPanel implements Observer, ObserverWaiter
     public javax.swing.JTextField jTextFieldStart;
     public javax.swing.JButton jButtonSetInterval;
     JLabel jLabelTotal;
-    public int type;
 
     // End of variables declaration
     @Override
