@@ -59,19 +59,19 @@ public class BlocksRequest extends MonitoredThread {
 
         GetBlockMessage getBlockMessage = (GetBlockMessage) message;
 
-        LOGGER.debug("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
+
+        if (USE_MONITOR) {
+            LOGGER.debug("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
                     + " form PEER: " + getBlockMessage.getSender()
                     + " sign: " + Base58.encode(getBlockMessage.getSignature()));
-
-        if (USE_MONITOR)
             this.setMonitorStatus("try GET_BLOCK " + Base58.encode(getBlockMessage.getSignature()));
+        }
 
         // ASK BLOCK FROM BLOCKCHAIN
         Block newBlock = this.blockChain.getBlock(dcSet, getBlockMessage.getSignature());
 
-        LOGGER.debug(newBlock == null? "NOT found" : "found at " + newBlock.getHeight());
-
         if (USE_MONITOR) {
+            LOGGER.debug(newBlock == null? "NOT found" : "found at " + newBlock.getHeight());
             this.setMonitorStatusAfter();
             if (newBlock == null) {
                 String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
@@ -95,10 +95,9 @@ public class BlocksRequest extends MonitoredThread {
 
         boolean result = message.getSender().offerMessage(response);
 
-        LOGGER.debug("block [" + newBlock.getHeight() + "] "
-                + (result? "sended" : "not sended") + " -> " + getBlockMessage.getSender());
-
         if (USE_MONITOR) {
+            LOGGER.debug("block [" + newBlock.getHeight() + "] "
+                    + (result? "sended" : "not sended") + " -> " + getBlockMessage.getSender());
             this.setMonitorStatus("offerMessage " + (result?" OK" : " bad"));
         }
 
