@@ -79,6 +79,8 @@ public class Wallet extends Observable implements Observer {
 			// OPEN WALLET
 			this.database = DWSet.reCreateDB(withObserver, dynamicGUI);
 
+			linkWaitingObservers();
+
 			if (withObserver) {
 				// ADD OBSERVER
 				// Controller.getInstance().addObserver(this);
@@ -445,6 +447,8 @@ public class Wallet extends Observable implements Observer {
 		for (int i = 1; i <= depth; i++) {
 			this.generateNewAccount();
 		}
+
+		linkWaitingObservers();
 
 		// SCAN TRANSACTIONS
 		if (synchronize) {
@@ -1014,16 +1018,18 @@ public class Wallet extends Observable implements Observer {
 
 	// OBSERVER
 
+	public void linkWaitingObservers() {
+		// добавим теперь раз кошелек открылся все ожидающие связи на наблюдения
+		for (ObserverWaiter observer : waitingObservers) {
+			observer.addObservers();
+		}
+		waitingObservers.clear();
+	}
+
 	@Override
 	public void addObserver(Observer o) {
 
 		super.addObserver(o);
-
-		// добавим теперь раз кошелек открылся все ожидающие связи на наблюдения
-		for (ObserverWaiter observer: waitingObservers) {
-			observer.addObservers();
-		}
-		waitingObservers.clear();
 
 		if (false && Controller.getInstance().doesWalletDatabaseExists()) {
 
