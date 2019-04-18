@@ -5,6 +5,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.BlocksHeadMap;
+import org.erachain.gui.ObserverWaiter;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -15,7 +16,7 @@ import java.math.BigDecimal;
 import java.util.Observable;
 
 @SuppressWarnings("serial")
-public class WalletBlocksTableModel extends SortedListTableModelCls<Tuple2<String, String>, Block.BlockHead> {
+public class WalletBlocksTableModel extends WalletSortedTableModel<Tuple2<String, String>, Block.BlockHead> {
     private int count;
     public static final int COLUMN_HEIGHT = 0;
     public static final int COLUMN_TIMESTAMP = 1;
@@ -29,13 +30,6 @@ public class WalletBlocksTableModel extends SortedListTableModelCls<Tuple2<Strin
         super(Controller.getInstance().wallet.database.getBlocksHeadMap(),
                 new String[]{"Height", "Timestamp", "Creator account", "Gen.Balance", "dtWV", "Transactions", "Fee"},
                 new Boolean[]{false, true, true, false, false, true, false}, true);
-
-        // сначала ЛОГЕР задаем
-        logger = LoggerFactory.getLogger(WalletBlocksTableModel.class.getName());
-
-        if (Controller.getInstance().doesWalletDatabaseExists()) {
-            addObservers();
-        }
     }
 
     @Override
@@ -97,26 +91,6 @@ public class WalletBlocksTableModel extends SortedListTableModelCls<Tuple2<Strin
             listSorted.sort();
             fireTableDataChanged();
         }
-    }
-
-    public void addObservers() {
-
-        super.addObservers();
-
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            return;
-
-        map.addObserver(this);
-
-    }
-
-    public void deleteObservers() {
-        super.deleteObservers();
-
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            return;
-
-        map.deleteObserver(this);
     }
 
 }

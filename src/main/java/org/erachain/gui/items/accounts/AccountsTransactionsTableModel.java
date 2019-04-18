@@ -13,6 +13,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.ObserverWaiter;
 import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
@@ -25,7 +26,7 @@ import java.util.*;
 ////////
 
 @SuppressWarnings("serial")
-public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> {
+public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> implements ObserverWaiter {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TRANSACTION = 1;
     public static final int COLUMN_AMOUNT = 2;
