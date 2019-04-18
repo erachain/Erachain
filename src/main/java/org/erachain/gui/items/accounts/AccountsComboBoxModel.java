@@ -3,6 +3,7 @@ package org.erachain.gui.items.accounts;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.ObserverWaiter;
 import org.mapdb.Fun.Tuple3;
 import org.erachain.utils.AccountBalanceComparator;
 import org.erachain.utils.ObserverMessage;
@@ -11,27 +12,25 @@ import javax.swing.*;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class AccountsComboBoxModel extends DefaultComboBoxModel implements Observer {
+public class AccountsComboBoxModel extends DefaultComboBoxModel implements Observer, ObserverWaiter {
 
-
+    private Observable observable;
     long key_person_table;
     TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses;
 
     public AccountsComboBoxModel(long person_Key) {
         //INSERT ALL ACCOUNTS
-//		List<Account> accounts = Controller.getInstance().getAccounts();
+		List<Account> accounts = Controller.getInstance().getAccounts();
 
-        Controller.getInstance().addWalletObserver(this);
         key_person_table = person_Key;
         addresses = DCSet.getInstance().getPersonAddressMap().getItems(key_person_table);
+        observable = Controller.getInstance().wallet.database.getAccountMap();
 
+        addObservers();
 
         synchronized (addresses) {
             sortAndAdd();
         }
-
-        Controller.getInstance().addWalletObserver(this);
-        Controller.getInstance().addObserver(this);
     }
 
     @Override
@@ -81,19 +80,27 @@ public class AccountsComboBoxModel extends DefaultComboBoxModel implements Obser
 //			this.addElement(account);
 //		}
 
-
         for (String addrses_key : addresses.keySet()) {
 
             this.addElement(addrses_key);
 
         }
 
+    }
+
+    public void addObservers() {
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            observable.addObserver(this);
+        } else {
+            // ожидаем открытия кошелька
+            Controller.getInstance().wallet.addWaitingObserver(this);
+        }
 
     }
 
 
     public void removeObservers() {
-        Controller.getInstance().deleteWalletObserver(this);
-        Controller.getInstance().deleteObserver(this);
+        if (Controller.getInstance().doesWalletDatabaseExists())
+            observable.deleteObserver(this);
     }
 }

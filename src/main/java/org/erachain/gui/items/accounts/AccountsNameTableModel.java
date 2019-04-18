@@ -3,6 +3,7 @@ package org.erachain.gui.items.accounts;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
+import org.erachain.gui.ObserverWaiter;
 import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -17,7 +18,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class AccountsNameTableModel extends SortedListTableModelCls<String, Tuple2<String, String>> implements Observer {
+public class AccountsNameTableModel extends SortedListTableModelCls<String, Tuple2<String, String>> implements ObserverWaiter {
     public static final int COLUMN_ADDRESS = 1;
     public static final int COLUMN_NAME = 2;
     public static final int COLUMN_DESCRIPTION = 3;
@@ -147,6 +148,9 @@ public class AccountsNameTableModel extends SortedListTableModelCls<String, Tupl
     public void addObservers() {
         if (Controller.getInstance().doesWalletDatabaseExists()) {
             map.addObserver(this);
+        } else {
+            // ожидаем открытия кошелька
+            Controller.getInstance().wallet.addWaitingObserver(this);
         }
     }
 
