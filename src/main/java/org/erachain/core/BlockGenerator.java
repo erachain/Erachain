@@ -948,7 +948,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 try {
                                     // если вдруг цепочка встала,, то догоняем не очень быстро чтобы принимать все
                                     // победные блоки не спеша
-                                    Thread.sleep(BlockChain.DEVELOP_USE ? 1000 : 10000);
+                                    Thread.sleep(BlockChain.DEVELOP_USE ? 500 : 5000);
                                 } catch (InterruptedException e) {
                                 }
                             }
