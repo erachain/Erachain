@@ -1089,7 +1089,6 @@ public class Wallet extends Observable implements Observer {
 
 		if (Controller.getInstance().doesWalletDatabaseExists()) {
 
-
 			// REGISTER ON ASSET FAVORITES
 			this.database.getAssetFavoritesSet().addObserver(o);
 
@@ -1772,41 +1771,13 @@ public class Wallet extends Observable implements Observer {
 
         //////////// PROCESS BLOCKS ////////////
 
-        Controller cnt = Controller.getInstance();
-        if (cnt.isProcessingWalletSynchronize() || cnt.isNeedSyncWallet())
+        if (this.synchronizeStatus) {
+            // идет синхронизация кошелька уже - не обрабатываем блоки тут
             return;
+        }
 
-        if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
-
-            if (!cnt.isStatusWaiting()
-				|| this.synchronizeStatus)
-                // идет синхронизация основной цепочки - не обрабатываем пока кошелек
-                return;
-
-            Block block = (Block) message.getValue();
-
-			// TODO сделать фактори которая синхронно по оереди с синхронизацией это будет разруливать
-
-			// CHECK IF WE NEED TO RESYNC
-			// BY REFERENCE !!!!
-            if (checkNeedSyncWallet(block.getReference()))
-			{
-				return;
-			}
-
-			// CHECK BLOCK
-			this.processBlock(DCSet.getInstance(), block);
-
-            //this.database.clearCache();
-            if (!synchronizeStatusCheck())
-                this.database.commit();
-
-		} else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)// .WALLET_REMOVE_BLOCK_TYPE)
+        if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)
         {
-            // тут при откате основной цепочки нужно тоже откатывать блоки
-            // - иначе потом окнцов не найдем и нужно полная синхронизация
-            if (this.synchronizeStatus)
-                return;
 
             Block block = (Block) message.getValue();
 
@@ -1822,9 +1793,24 @@ public class Wallet extends Observable implements Observer {
 
             //this.database.clearCache();
             //this.database.commit();
+        } else if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
+
+            Block block = (Block) message.getValue();
+
+			// TODO сделать фактори которая синхронно по оереди с синхронизацией это будет разруливать
+
+			// CHECK IF WE NEED TO RESYNC
+			// BY REFERENCE !!!!
+            if (checkNeedSyncWallet(block.getReference())) {
+				return;
+			}
+
+			// CHECK BLOCK
+			this.processBlock(DCSet.getInstance(), block);
+
         }
 
-	}
+    }
 
 	// CLOSE
 

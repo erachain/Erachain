@@ -77,7 +77,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         this.toolBarLeftPanel.setVisible(false);
         
      // set interval panel
-        setIntervalPanel = new SetIntervalPanel(Controller.getInstance().wallet.database.getTransactionMap(), Transaction.EXTENDED);
+        setIntervalPanel = new SetIntervalPanel(Controller.getInstance().wallet.database.getTransactionMap());
         GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -252,7 +252,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
     public void onClose() {
         // delete observer left panel
         this.records_model.deleteObservers();
-        this.setIntervalPanel.removeObservers();
+        this.setIntervalPanel.deleteObservers();
         // get component from right panel
         //	Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
