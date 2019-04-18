@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
+import org.erachain.gui.ObserverWaiter;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.json.simple.JSONObject;
@@ -17,7 +18,7 @@ import java.nio.charset.Charset;
 import java.util.Observable;
 import java.util.Observer;
 
-public class StatementsTableModelFavorite extends AbstractTableModel implements Observer {
+public class StatementsTableModelFavorite extends AbstractTableModel implements Observer, ObserverWaiter {
 
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_CREATOR = 1;

@@ -18,10 +18,12 @@ import org.erachain.core.naming.Name;
 import org.erachain.core.naming.NameSale;
 import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
+import org.erachain.database.DBMap;
 import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.SecureWalletDatabase;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.ObserverWaiter;
 import org.erachain.gui.library.library;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -30,6 +32,7 @@ import org.erachain.utils.Pair;
 import org.erachain.utils.SaveStrToFile;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
+import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
@@ -64,6 +67,7 @@ public class Wallet extends Observable implements Observer {
 	private Timer lockTimer; // = new Timer();
 	private int syncHeight;
 
+	private List<ObserverWaiter> waitingObservers = new ArrayList<>();
 	// CONSTRUCTORS
 
 	public Wallet(boolean withObserver, boolean dynamicGUI) {
@@ -74,6 +78,8 @@ public class Wallet extends Observable implements Observer {
 		if (this.exists()) {
 			// OPEN WALLET
 			this.database = DWSet.reCreateDB(withObserver, dynamicGUI);
+
+			linkWaitingObservers();
 
 			if (withObserver) {
 				// ADD OBSERVER
@@ -194,6 +200,10 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		return this.secureDatabase.getAccountSeedMap().getPrivateKeyAccount(address);
+	}
+
+	public void addWaitingObserver(ObserverWaiter observer) {
+		waitingObservers.add(observer);
 	}
 
 	/*
@@ -437,6 +447,8 @@ public class Wallet extends Observable implements Observer {
 		for (int i = 1; i <= depth; i++) {
 			this.generateNewAccount();
 		}
+
+		linkWaitingObservers();
 
 		// SCAN TRANSACTIONS
 		if (synchronize) {
@@ -1006,12 +1018,20 @@ public class Wallet extends Observable implements Observer {
 
 	// OBSERVER
 
+	public void linkWaitingObservers() {
+		// добавим теперь раз кошелек открылся все ожидающие связи на наблюдения
+		for (ObserverWaiter observer : waitingObservers) {
+			observer.addObservers();
+		}
+		waitingObservers.clear();
+	}
+
 	@Override
 	public void addObserver(Observer o) {
 
 		super.addObserver(o);
 
-		if (Controller.getInstance().doesWalletDatabaseExists()) {
+		if (false && Controller.getInstance().doesWalletDatabaseExists()) {
 
 			// REGISTER ON ACCOUNTS
 			this.database.getAccountMap().addObserver(o);

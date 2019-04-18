@@ -14,7 +14,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemPollsTableModel extends SortedListTableModelCls<Tuple2<String, String>, PollCls> implements Observer {
+public class WalletItemPollsTableModel extends WalletSortedTableModel<Tuple2<String, String>, PollCls> {
     public static final int COLUMN_NAME = 0;
     public static final int COLUMN_ADDRESS = 1;
     public static final int COLUMN_TOTAL_VOTES = 2;
@@ -22,7 +22,7 @@ public class WalletItemPollsTableModel extends SortedListTableModelCls<Tuple2<St
 
     public WalletItemPollsTableModel() {
         super(Controller.getInstance().wallet.database.getPollMap(),
-                new String[]{"Name", "Creator", "Total Votes", "Confirmed"}, true);
+                new String[]{"Name", "Creator", "Total Votes", "Confirmed"}, null,true);
     }
 
     @Override
@@ -83,26 +83,6 @@ public class WalletItemPollsTableModel extends SortedListTableModelCls<Tuple2<St
         if (message.getType() == ObserverMessage.ADD_POLL_TYPE || message.getType() == ObserverMessage.REMOVE_POLL_TYPE) {
             this.fireTableDataChanged();
         }
-    }
-
-    public void addObservers() {
-
-        super.addObservers();
-
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            return;
-
-        map.addObserver(this);
-
-    }
-
-    public void deleteObservers() {
-        super.deleteObservers();
-
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            return;
-
-        map.deleteObserver(this);
     }
 
 }

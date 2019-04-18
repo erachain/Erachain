@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Observable;
 
 @SuppressWarnings("serial")
-public abstract class WalletAutoKeyTableModel<T, U> extends SortedListTableModelCls<T, U> {
+public abstract class WalletAutoKeyTableModel<T, U> extends WalletSortedTableModel<T, U> {
 
     private int reset_type;
     private int list_type;
@@ -80,28 +80,6 @@ public abstract class WalletAutoKeyTableModel<T, U> extends SortedListTableModel
             fireTableDataChanged();
 
         }
-    }
-
-    public void addObservers() {
-
-        super.addObservers();
-
-        if (!Controller.getInstance().doesWalletDatabaseExists())
-            return;
-
-        //REGISTER ON WALLET TRANSACTIONS
-        map.addObserver(this);
-
-    }
-
-    public void deleteObservers() {
-
-        super.deleteObservers();
-
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            return;
-
-        map.deleteObserver(this);
     }
 
     @Override

@@ -12,7 +12,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemImprintsTableModel extends SortedListTableModelCls<Tuple2<String, String>, ImprintCls> implements Observer {
+public class WalletItemImprintsTableModel extends WalletSortedTableModel<Tuple2<String, String>, ImprintCls> {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -23,8 +23,6 @@ public class WalletItemImprintsTableModel extends SortedListTableModelCls<Tuple2
         super(Controller.getInstance().wallet.database.getImprintMap(),
                 new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false}, false);
-
-        addObservers();
     }
 
     @Override
@@ -86,23 +84,4 @@ public class WalletItemImprintsTableModel extends SortedListTableModelCls<Tuple2
                 map, map.getKeys());
     }
 
-    public void addObservers() {
-
-        super.addObservers();
-
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            return;
-
-        map.addObserver(this);
-
-    }
-
-    public void deleteObservers() {
-        super.deleteObservers();
-
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            return;
-
-        map.deleteObserver(this);
-    }
 }
