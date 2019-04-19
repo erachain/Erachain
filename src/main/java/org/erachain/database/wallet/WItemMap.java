@@ -44,7 +44,7 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
         // ИМЯ и ТИП заданы, создаем карту и ИНдексы
         map = getMap(database);
 
-        makeAutoKey(database, (Bind.MapWithModificationListener)map, "orders");
+        makeAutoKey(database, (Bind.MapWithModificationListener)map, name + "_wak");
 
         this.createIndexes(database);
 

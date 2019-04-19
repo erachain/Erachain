@@ -78,13 +78,4 @@ public class WalletItemAssetsTableModel extends WalletAutoKeyTableModel<Tuple2<L
         return null;
     }
 
-    @Override
-    public void getIntervalThis(long startBack, long endBack) {
-
-        // тут могут быть пустые элементы - пропустим их
-        Collection<Tuple2<Long, Long>> keys = ((AutoKeyDBMap)map).getFromToKeys(startBack, endBack);
-        listSorted = new SortableList<Tuple2<Long, Long>, Tuple2<Long, AssetCls>>(map, keys);
-
-    }
-
 }

@@ -12,7 +12,7 @@ public class WItemPollMap extends WItemMap {
 
     public WItemPollMap(DWSet dWSet, DB database) {
         super(dWSet, database,
-                TYPE, "item_unions",
+                TYPE, "item_polls",
                 ObserverMessage.WALLET_RESET_POLL_TYPE,
                 ObserverMessage.WALLET_ADD_POLL_TYPE,
                 ObserverMessage.WALLET_REMOVE_POLL_TYPE,
