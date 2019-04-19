@@ -2609,24 +2609,20 @@ public class Controller extends Observable {
     public ItemCls getItem(DCSet db, int type, long key) {
 
         switch (type) {
-            case ItemCls.ASSET_TYPE: {
+            case ItemCls.ASSET_TYPE:
                 return db.getItemAssetMap().get(key);
-            }
-            case ItemCls.IMPRINT_TYPE: {
+            case ItemCls.IMPRINT_TYPE:
                 return db.getItemImprintMap().get(key);
-            }
-            case ItemCls.TEMPLATE_TYPE: {
+            case ItemCls.TEMPLATE_TYPE:
                 return db.getItemTemplateMap().get(key);
-            }
-            case ItemCls.PERSON_TYPE: {
+            case ItemCls.PERSON_TYPE:
                 return db.getItemPersonMap().get(key);
-            }
-            case ItemCls.STATUS_TYPE: {
+            case ItemCls.POLL_TYPE:
+                return db.getItemPollMap().get(key);
+            case ItemCls.STATUS_TYPE:
                 return db.getItemStatusMap().get(key);
-            }
-            case ItemCls.UNION_TYPE: {
+            case ItemCls.UNION_TYPE:
                 return db.getItemUnionMap().get(key);
-            }
         }
         return null;
     }

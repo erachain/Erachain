@@ -35,12 +35,12 @@ public class ItemFactory {
                 return TemplateFactory.getInstance().parse(data, includeReference);
             case ItemCls.PERSON_TYPE:
                 return PersonFactory.getInstance().parse(data, includeReference);
+            case ItemCls.POLL_TYPE:
+                return PollFactory.getInstance().parse(data, includeReference);
             case ItemCls.STATUS_TYPE:
                 return StatusFactory.getInstance().parse(data, includeReference);
             case ItemCls.UNION_TYPE:
                 return UnionFactory.getInstance().parse(data, includeReference);
-            case ItemCls.POLL_TYPE:
-                return PollFactory.getInstance().parse(data, includeReference);
         }
 
         throw new Exception("Invalid ITEM type: " + type);
