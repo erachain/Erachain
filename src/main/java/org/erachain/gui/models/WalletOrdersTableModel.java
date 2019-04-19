@@ -30,13 +30,7 @@ public class WalletOrdersTableModel extends WalletAutoKeyTableModel<Tuple2<Strin
     public WalletOrdersTableModel() {
         super(Controller.getInstance().wallet.database.getOrderMap(),
                 new String[]{"Timestamp", "Block - transaction", "Amount", "Have", "Price",
-                "Want", "Total", "Left", "Creator", "Status"}, new Boolean[]{true}, true,
-                ObserverMessage.WALLET_RESET_ORDER_TYPE, ObserverMessage.WALLET_LIST_ORDER_TYPE,
-                ObserverMessage.WALLET_ADD_ORDER_TYPE, ObserverMessage.WALLET_REMOVE_ORDER_TYPE);
-
-        logger = LoggerFactory.getLogger(WalletOrdersTableModel.class.getName());
-
-        addObservers();
+                "Want", "Total", "Left", "Creator", "Status"}, new Boolean[]{true}, true);
     }
 
     @Override

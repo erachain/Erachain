@@ -53,7 +53,7 @@ public abstract class PollCls extends ItemCls {
         return this.options;
     }
 
-    // DB
+    @Override
     public ItemMap getDBMap(DCSet dc) {
         return dc.getItemPollMap();
     }

@@ -13,7 +13,7 @@ public class WItemTemplateMap extends WItemMap {
 
     public WItemTemplateMap(DWSet dWSet, DB database) {
         super(dWSet, database,
-                TYPE, "item_templates",
+                TYPE, NAME,
                 ObserverMessage.WALLET_RESET_TEMPLATE_TYPE,
                 ObserverMessage.WALLET_ADD_TEMPLATE_TYPE,
                 ObserverMessage.WALLET_REMOVE_TEMPLATE_TYPE,

@@ -22,7 +22,7 @@ import java.util.*;
  */
 public abstract class ItemMap extends DCMap<Long, ItemCls> {
 
-    private static Logger logger = LoggerFactory.getLogger(ItemMap.class.getName());
+    //private static Logger logger;
 
     private static int CUT_NAME_INDEX = 12;
 

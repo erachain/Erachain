@@ -6,13 +6,14 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemTemplatesTableModel extends WalletSortedTableModel<Tuple2<String, String>, TemplateCls> {
+public class WalletItemTemplatesTableModel extends WalletAutoKeyTableModel<Tuple2<Long, Long>, Tuple2<Long, TemplateCls>> {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -21,7 +22,8 @@ public class WalletItemTemplatesTableModel extends WalletSortedTableModel<Tuple2
 
     public WalletItemTemplatesTableModel() {
         super(Controller.getInstance().wallet.database.getTemplateMap(),
-                new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"}, null, false);
+                new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"},
+                new Boolean[]{true, true, true, true, true}, true);
     }
 
     @Override
@@ -30,7 +32,12 @@ public class WalletItemTemplatesTableModel extends WalletSortedTableModel<Tuple2
             return null;
         }
 
-        TemplateCls template = this.listSorted.get(row).getB();
+        Pair<Tuple2<Long , Long>, Tuple2<Long, TemplateCls>> pair = this.listSorted.get(row);
+        if (pair == null) {
+            return null;
+        }
+
+        TemplateCls template = pair.getB().b;
 
         switch (column) {
             case COLUMN_KEY:
@@ -56,28 +63,6 @@ public class WalletItemTemplatesTableModel extends WalletSortedTableModel<Tuple2
         }
 
         return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.LIST_TEMPLATE_TYPE) {
-            if (this.listSorted == null) {
-                this.listSorted = (SortableList<Tuple2<String, String>, TemplateCls>) message.getValue();
-                //this.templates.registerObserver();
-                //this.templates.sort(PollMap.NAME_INDEX);
-            }
-
-            this.fireTableDataChanged();
-        }
-
-        //CHECK IF LIST UPDATED
-        if (message.getType() == ObserverMessage.ADD_TEMPLATE_TYPE || message.getType() == ObserverMessage.REMOVE_TEMPLATE_TYPE) {
-            this.fireTableDataChanged();
-        }
-
     }
 
 }
