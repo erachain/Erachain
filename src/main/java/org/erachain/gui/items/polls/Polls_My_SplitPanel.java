@@ -84,7 +84,7 @@ public class Polls_My_SplitPanel extends SplitPanel {
         public void valueChanged(ListSelectionEvent arg0) {
             PollCls poll = null;
             if (my_Poll_table.getSelectedRow() >= 0)
-                poll = my_Poll_Model.getItem(my_Poll_table.convertRowIndexToModel(my_Poll_table.getSelectedRow()));
+                poll = my_Poll_Model.getItem(my_Poll_table.convertRowIndexToModel(my_Poll_table.getSelectedRow())).b;
             if (poll == null)
                 return;
             PollsDetailPanel pollDetailsPanel = new PollsDetailPanel(poll,

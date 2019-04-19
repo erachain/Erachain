@@ -21,13 +21,7 @@ public class WalletItemPersonsTableModel extends WalletAutoKeyTableModel<Tuple2<
     public WalletItemPersonsTableModel() {
         super(Controller.getInstance().getWallet().database.getPersonMap(),
                 new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false}, true,
-                ObserverMessage.WALLET_RESET_PERSON_TYPE, ObserverMessage.WALLET_LIST_PERSON_TYPE,
-                ObserverMessage.WALLET_ADD_PERSON_TYPE,  ObserverMessage.WALLET_REMOVE_PERSON_TYPE);
-
-        logger = LoggerFactory.getLogger(WalletItemPersonsTableModel.class.getName());
-
-        addObservers();
+                new Boolean[]{false, true, true, false, false}, true);
 
     }
 
@@ -37,11 +31,11 @@ public class WalletItemPersonsTableModel extends WalletAutoKeyTableModel<Tuple2<
         if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
-        Pair<Tuple2<Long , Long>, Tuple2<Long, PersonCls>> personRes = this.listSorted.get(row);
-        if (personRes == null) {
+        Pair<Tuple2<Long , Long>, Tuple2<Long, PersonCls>> pair = this.listSorted.get(row);
+        if (pair == null) {
             return null;
         }
-        PersonCls person = personRes.getB().b;
+        PersonCls person = pair.getB().b;
 
         switch (column) {
             case COLUMN_KEY:

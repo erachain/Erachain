@@ -2,17 +2,19 @@ package org.erachain.gui.models;
 ////////
 
 import org.erachain.controller.Controller;
+import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemUnionsTableModel extends WalletSortedTableModel<Tuple2<String, String>, UnionCls> {
+public class WalletItemUnionsTableModel extends WalletAutoKeyTableModel<Tuple2<Long, Long>, Tuple2<Long, UnionCls>> {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -32,7 +34,12 @@ public class WalletItemUnionsTableModel extends WalletSortedTableModel<Tuple2<St
             return null;
         }
 
-        UnionCls union = this.listSorted.get(row).getB();
+        Pair<Tuple2<Long , Long>, Tuple2<Long, UnionCls>> pair = this.listSorted.get(row);
+        if (pair == null) {
+            return null;
+        }
+
+        UnionCls union = pair.getB().b;
 
         switch (column) {
             case COLUMN_KEY:
@@ -58,27 +65,6 @@ public class WalletItemUnionsTableModel extends WalletSortedTableModel<Tuple2<St
         }
 
         return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.LIST_UNION_TYPE) {
-            if (this.listSorted == null) {
-                this.listSorted = (SortableList<Tuple2<String, String>, UnionCls>) message.getValue();
-                //this.unions.registerObserver();
-                //this.unions.sort(PollMap.NAME_INDEX);
-            }
-
-            this.fireTableDataChanged();
-        }
-
-        //CHECK IF LIST UPDATED
-        if (message.getType() == ObserverMessage.ADD_UNION_TYPE || message.getType() == ObserverMessage.REMOVE_UNION_TYPE) {
-            this.fireTableDataChanged();
-        }
     }
 
 }

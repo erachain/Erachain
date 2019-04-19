@@ -212,7 +212,7 @@ public class MyImprintsTab extends SplitPanel {
 
                                                 row = table.getSelectedRow();
                                                 row = table.convertRowIndexToModel(row);
-                                                ImprintCls asset = assetsModel.getItem(row);
+                                                ImprintCls asset = assetsModel.getItem(row).b;
 
                                                 //IF ASSET CONFIRMED AND NOT ERM
 
@@ -307,7 +307,7 @@ public class MyImprintsTab extends SplitPanel {
     public void favorite_set(JTable assetsTable) {
 
 
-        ImprintCls asset = assetsModel.getItem(row);
+        ImprintCls asset = assetsModel.getItem(row).b;
 //new AssetPairSelect(asset.getKey());
 
 
@@ -334,7 +334,7 @@ public class MyImprintsTab extends SplitPanel {
 
             ImprintCls imprint = null;
             if (table.getSelectedRow() >= 0)
-                imprint = assetsModel.getItem(table.convertRowIndexToModel(table.getSelectedRow()));
+                imprint = assetsModel.getItem(table.convertRowIndexToModel(table.getSelectedRow())).b;
             if (imprint == null) return;
             ImprintsInfoPanel info_panel = new ImprintsInfoPanel(imprint);
             info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));
