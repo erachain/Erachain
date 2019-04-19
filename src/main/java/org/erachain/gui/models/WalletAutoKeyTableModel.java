@@ -56,7 +56,9 @@ public abstract class WalletAutoKeyTableModel<T, U> extends WalletSortedTableMod
             listSorted = new SortableList<T, U>(map, new ArrayList<>());
             fireTableDataChanged();
 
-        } else if (message.getType() == LIST_EVENT) {
+        } else if (message.getType() == LIST_EVENT
+                || message.getType() == ObserverMessage.GUI_REPAINT
+                    && needUpdate) {
 
             count = 0;
             needUpdate = false;
@@ -71,18 +73,6 @@ public abstract class WalletAutoKeyTableModel<T, U> extends WalletSortedTableMod
         } else if (message.getType() == REMOVE_EVENT) {
 
             needUpdate = true;
-
-        } else if (message.getType() == ObserverMessage.GUI_REPAINT
-                && needUpdate) {
-
-            if (count++ < 4)
-                return;
-
-            count = 0;
-            needUpdate = false;
-
-            getInterval();
-            fireTableDataChanged();
 
         }
     }

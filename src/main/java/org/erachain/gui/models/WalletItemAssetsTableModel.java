@@ -3,6 +3,7 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.database.AutoKeyDBMap;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
@@ -10,6 +11,7 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
+import java.util.Collection;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -37,7 +39,8 @@ public class WalletItemAssetsTableModel extends WalletAutoKeyTableModel<Tuple2<L
         }
 
         Pair<Tuple2<Long , Long>, Tuple2<Long, AssetCls>> pair = this.listSorted.get(row);
-        if (pair == null) {
+        //Tuple2<Long, AssetCls> pair = this.listSorted.get(row);
+        if (pair == null || pair.getB() == null) {
             return null;
         }
         AssetCls asset = pair.getB().b;
@@ -73,6 +76,15 @@ public class WalletItemAssetsTableModel extends WalletAutoKeyTableModel<Tuple2<L
         }
 
         return null;
+    }
+
+    @Override
+    public void getIntervalThis(long startBack, long endBack) {
+
+        // тут могут быть пустые элементы - пропустим их
+        Collection<Tuple2<Long, Long>> keys = ((AutoKeyDBMap)map).getFromToKeys(startBack, endBack);
+        listSorted = new SortableList<Tuple2<Long, Long>, Tuple2<Long, AssetCls>>(map, keys);
+
     }
 
 }

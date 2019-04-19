@@ -17,7 +17,6 @@ public class WalletItemPersonsTableModel extends WalletAutoKeyTableModel<Tuple2<
     public static final int COLUMN_CONFIRMED = 3;
     public static final int COLUMN_FAVORITE = 4;
 
-
     public WalletItemPersonsTableModel() {
         super(Controller.getInstance().getWallet().database.getPersonMap(),
                 new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
@@ -25,14 +24,13 @@ public class WalletItemPersonsTableModel extends WalletAutoKeyTableModel<Tuple2<
 
     }
 
-
     @Override
     public Object getValueAt(int row, int column) {
         if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
         Pair<Tuple2<Long , Long>, Tuple2<Long, PersonCls>> pair = this.listSorted.get(row);
-        if (pair == null) {
+        if (pair == null || pair.getB() == null|| pair.getB().b == null) {
             return null;
         }
         PersonCls person = pair.getB().b;

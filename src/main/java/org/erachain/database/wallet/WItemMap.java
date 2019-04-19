@@ -15,6 +15,11 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 // TODO reference as TIMESTAMP of transaction
+
+/**
+ * key: Address + refDB</br>
+ * Value: autoIncrement + Object
+ */
 public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, ItemCls>> {
 
     public static final int NAME_INDEX = 1;
