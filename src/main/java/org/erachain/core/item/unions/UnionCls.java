@@ -59,7 +59,7 @@ public abstract class UnionCls extends ItemCls {
         return this.parent;
     }
 
-    // DB
+    @Override
     public ItemMap getDBMap(DCSet db) {
         return db.getItemUnionMap();
     }
