@@ -12,7 +12,7 @@ public class WItemUnionMap extends WItemMap {
 
     public WItemUnionMap(DWSet dWSet, DB database) {
         super(dWSet, database,
-                TYPE, "item_unions",
+                TYPE, NAME,
                 ObserverMessage.WALLET_RESET_UNION_TYPE,
                 ObserverMessage.WALLET_ADD_UNION_TYPE,
                 ObserverMessage.WALLET_REMOVE_UNION_TYPE,
