@@ -14,12 +14,12 @@ public class FavoriteItemMap extends Observable {
 
     // favorites init SET
     public FavoriteItemMap(DWSet dWSet, DB database, int observerFavorites,
-                           String treeSet, int initialAdd) {
+                           String name, int initialAdd) {
         this.dWSet = dWSet;
         this.observerFavorites = observerFavorites;
 
         //OPEN MAP
-        itemsSet = database.getTreeSet(treeSet + "Favorites");
+        itemsSet = database.getTreeSet(name + "Favorites");
 
         for (long i = 1; i <= initialAdd; i++) {
             //CHECK IF CONTAINS ITEM
