@@ -496,7 +496,20 @@ public abstract class TransactionAmount extends Transaction {
                 boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 
                 if (asset.isAccounting()) {
-                    
+
+                    switch ((int) absKey) {
+                        case ACTION_SEND:
+                            if (backward)
+                                return INVALID_BACKWARD_ACTION;
+                        case ACTION_DEBT:
+                            ;
+                        case ACTION_HOLD:
+                            if (!backward)
+                                return INVALID_HOLD_DIRECTION;
+                        case ACTION_SPEND:
+                            ;
+                    }
+
                     switch ((int) absKey) {
                         case 111:
                             return ITEM_ASSET_NOT_EXIST;
