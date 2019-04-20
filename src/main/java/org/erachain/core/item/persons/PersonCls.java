@@ -46,6 +46,8 @@ public abstract class PersonCls extends ItemCls {
             + SKIN_COLOR_SIZE_LENGTH + EYE_COLOR_SIZE_LENGTH + HAIR_COLOR_SIZE_LENGTH
             + HEIGHT_LENGTH;
 
+    public static String[] GENDERS_LIST = {"Male", "Female", "-"};
+
     // already exist in super - protected String name; // First Name|Middle Name|Last Name
     protected long birthday; // timestamp
     protected long deathday; // timestamp

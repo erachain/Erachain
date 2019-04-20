@@ -1131,8 +1131,12 @@ public class BlockExplorer {
         output.put("description", person.getDescription());
 
         String gender = Lang.getInstance().translateFromLangObj("Man", langObj);
-        if (person.getGender() != 0) {
+        if (person.getGender() == 0) {
+            gender = Lang.getInstance().translateFromLangObj("Man", langObj);
+        } else if (person.getGender() == 0) {
             gender = Lang.getInstance().translateFromLangObj("Woman", langObj);
+        } else {
+            gender = Lang.getInstance().translateFromLangObj("-", langObj);
         }
         output.put("gender", gender);
 

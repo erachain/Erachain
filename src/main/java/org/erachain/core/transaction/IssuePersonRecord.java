@@ -206,7 +206,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         if (person.getRace().getBytes(StandardCharsets.UTF_8).length > 255) {
             return Transaction.ITEM_PERSON_RACE_ERROR;
         }
-        if (person.getGender() > 10) {
+        if (person.getGender() < 0 || person.getGender() > 2) {
             return Transaction.ITEM_PERSON_GENDER_ERROR;
         }
         if (person.getSkinColor().getBytes(StandardCharsets.UTF_8).length > 255) {

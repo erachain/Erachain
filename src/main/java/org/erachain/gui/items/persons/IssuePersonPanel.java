@@ -6,6 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.core.transaction.Transaction;
@@ -99,9 +100,9 @@ public class IssuePersonPanel extends JPanel {
 
         });
 
-        String[] items = {Lang.getInstance().translate("Male"),
-                Lang.getInstance().translate("Female"),
-                Lang.getInstance().translate("-")};
+
+        String[] items = PersonCls.GENDERS_LIST;
+        items = Lang.getInstance().translate(items);
         comboBoxGender.setModel(new DefaultComboBoxModel<>(items));
         comboBoxGender.setSelectedIndex(2);
         setVisible(true);
