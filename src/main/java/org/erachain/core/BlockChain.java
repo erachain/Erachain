@@ -48,6 +48,7 @@ public class BlockChain {
     //public static final String TIME_ZONE = "GMT+3";
     //
     public static final boolean ROBINHOOD_USE = false;
+    public static final boolean ANONIM_SERT_USE = false;
     public static final int NEED_PEERS_FOR_UPDATE = HARD_WORK ? 2 : 1;
 
     public static final int MAX_ORPHAN = 1000; // max orphan blocks in chain

@@ -163,17 +163,10 @@ public class IssuePersonRecord extends IssueItemRecord {
         return null;
     }
 
-	/*
 	@Override
 	public boolean hasPublicText() {
-		for ( String admin: BlockChain.GENESIS_ADMINS) {
-			if (this.creator.equals(admin)) {
-				return false;
-			}
-		}
-		return true;
+        return !BlockChain.ANONIM_SERT_USE && !BlockChain.DEVELOP_USE;
 	}
-	 */
 
     @Override
     public List<PublicKeyAccount> getPublicKeys() {
@@ -225,7 +218,7 @@ public class IssuePersonRecord extends IssueItemRecord {
             return Transaction.ITEM_PERSON_HEIGHT_ERROR;
         }
 
-        if (person.isAlive(this.timestamp)) {
+        if (!BlockChain.ANONIM_SERT_USE && person.isAlive(this.timestamp)) {
             // IF PERSON is LIVE
             if (person.getImage().length > MAX_IMAGE_LENGTH) {
                 // 2998-1 - трнзакция забаненая
@@ -261,7 +254,8 @@ public class IssuePersonRecord extends IssueItemRecord {
                 (checkFeeBalance ? 0L : NOT_VALIDATE_FLAG_FEE) | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
         // FIRST PERSONS INSERT as ADMIN
         boolean creatorAdmin = false;
-        if (!BlockChain.DEVELOP_USE && !creator.isPerson(dcSet, height)) {
+        if (!BlockChain.ANONIM_SERT_USE
+                && !BlockChain.DEVELOP_USE && !creator.isPerson(dcSet, height)) {
             long count = dcSet.getItemPersonMap().getLastKey();
             if (count < 20) {
                 // FIRST Persons only by ME
