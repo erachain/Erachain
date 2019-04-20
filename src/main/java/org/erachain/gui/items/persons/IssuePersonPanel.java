@@ -98,9 +98,12 @@ public class IssuePersonPanel extends JPanel {
             }
 
         });
-        String[] items = {Lang.getInstance().translate("-"), Lang.getInstance().translate("Male"),
-                Lang.getInstance().translate("Female")};
+
+        String[] items = {Lang.getInstance().translate("Male"),
+                Lang.getInstance().translate("Female"),
+                Lang.getInstance().translate("-")};
         comboBoxGender.setModel(new DefaultComboBoxModel<>(items));
+        comboBoxGender.setSelectedIndex(2);
         setVisible(true);
     }
 
