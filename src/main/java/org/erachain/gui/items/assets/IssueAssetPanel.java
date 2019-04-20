@@ -15,6 +15,7 @@ import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.library;
 import org.erachain.gui.models.AccountsComboBoxModel;
+import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -348,16 +349,19 @@ public class IssueAssetPanel extends JPanel {
                                     AssetCls.FEE_NAME),
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
-                case Transaction.INVALID_NAME_LENGTH:
+                case Transaction.INVALID_NAME_LENGTH_MIN:
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Name must be between") + " "
-                                    + issueAssetTransaction.getItem().getMinNameLen() + " "
-                                    + Lang.getInstance().translate("and") + " "
-                                    + ItemCls.MAX_NAME_LENGTH + " "
-                                    + Lang.getInstance().translate("characters!"),
+                            Lang.getInstance().translate("Name must be more then %val characters!")
+                                    .replace("%val", "" + issueAssetTransaction.getItem().getMinNameLen()),
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
-                case Transaction.INVALID_DESCRIPTION_LENGTH:
+                case Transaction.INVALID_NAME_LENGTH_MAX:
+                    JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                            Lang.getInstance().translate("Name must be less then %val characters!")
+                                    .replace("%val", "" + ItemCls.MAX_NAME_LENGTH),
+                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    break;
+                case Transaction.INVALID_DESCRIPTION_LENGTH_MAX:
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
                             Lang.getInstance().translate("Description must be between 1 and 1000 characters!"),
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
@@ -373,8 +377,8 @@ public class IssueAssetPanel extends JPanel {
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
                 default:
-                    JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Unknown error") + "[" + result + "]!",
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.getInstance().translate(OnDealClick.resultMess(result)),
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
             }

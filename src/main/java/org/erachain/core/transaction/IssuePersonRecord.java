@@ -194,7 +194,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         // FOR PERSONS need LIMIT DESCRIPTION because it may be make with 0 COMPU balance
         int descriptionLength = person.getDescription().getBytes(StandardCharsets.UTF_8).length;
         if (descriptionLength > 8000) {
-            return INVALID_DESCRIPTION_LENGTH;
+            return INVALID_DESCRIPTION_LENGTH_MAX;
         }
         // birthLatitude -90..90; birthLongitude -180..180
         if (person.getBirthLatitude() > 90 || person.getBirthLatitude() < -90) {
@@ -231,8 +231,10 @@ public class IssuePersonRecord extends IssueItemRecord {
                 //int height = this.getBlockHeightByParent(this.dcSet);
                 if (!(!BlockChain.DEVELOP_USE && height == 2998) && height > 157640) {
                     // early blocks has wrong ISSUE_PERSON with 0 image length - in block 2998
-                    return Transaction.INVALID_IMAGE_LENGTH;
+                    return Transaction.INVALID_IMAGE_LENGTH_MAX;
                 }
+            } else if (person.getImage().length < MAX_IMAGE_LENGTH >> 1) {
+                return Transaction.INVALID_IMAGE_LENGTH_MIN;
             }
         } else {
             // person is DIE - any PHOTO

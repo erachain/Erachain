@@ -617,11 +617,15 @@ public class IssuePersonPanel extends JPanel {
                 }
 
             }
-        } else if (result.getB() == Transaction.INVALID_NAME_LENGTH) {
+        } else if (result.getB() == Transaction.INVALID_NAME_LENGTH_MIN) {
             JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                    Lang.getInstance().translate("Name must be between %m and %M characters!")
-                            .replace("%m", "" + issuePersonRecord.getItem().getMinNameLen())
-                            .replace("%M", "" + ItemCls.MAX_NAME_LENGTH),
+                    Lang.getInstance().translate("Name must be more then %val characters!")
+                            .replace("%val", "" + issuePersonRecord.getItem().getMinNameLen()),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+        } else if (result.getB() == Transaction.INVALID_NAME_LENGTH_MAX) {
+            JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                    Lang.getInstance().translate("Name must be less then %val characters!")
+                            .replace("%val", "" + ItemCls.MAX_NAME_LENGTH),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(new JFrame(),

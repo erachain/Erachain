@@ -243,7 +243,7 @@ public class VoteOnPollTransaction extends Transaction {
         //CHECK POLL LENGTH
         int pollLength = this.poll.getBytes(StandardCharsets.UTF_8).length;
         if (pollLength > 400 || pollLength < 10) {
-            return INVALID_NAME_LENGTH;
+            return INVALID_NAME_LENGTH_MAX;
         }
 
         //CHECK POLL LOWERCASE
