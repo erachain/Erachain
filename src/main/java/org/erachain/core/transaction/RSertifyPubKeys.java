@@ -461,7 +461,7 @@ public class RSertifyPubKeys extends Transaction {
         if (result != VALIDATE_OK)
             return result;
 
-        if (!this.creator.isPerson(dcSet, height)) {
+        if (!BlockChain.DEVELOP_USE && !this.creator.isPerson(dcSet, height)) {
             boolean creator_admin = false;
             long personsCount = dcSet.getItemPersonMap().getLastKey();
             if (personsCount < 20) {

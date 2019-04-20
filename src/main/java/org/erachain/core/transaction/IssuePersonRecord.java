@@ -228,12 +228,15 @@ public class IssuePersonRecord extends IssueItemRecord {
         if (person.isAlive(this.timestamp)) {
             // IF PERSON is LIVE
             if (person.getImage().length > MAX_IMAGE_LENGTH) {
-                //int height = this.getBlockHeightByParent(this.dcSet);
-                if (!(!BlockChain.DEVELOP_USE && height == 2998) && height > 157640) {
+                // 2998-1 - трнзакция забаненая
+                if (!(!BlockChain.DEVELOP_USE && height == 2998)
+                        && height > 157640) {
                     // early blocks has wrong ISSUE_PERSON with 0 image length - in block 2998
                     return Transaction.INVALID_IMAGE_LENGTH_MAX;
                 }
-            } else if (person.getImage().length < MAX_IMAGE_LENGTH >> 1) {
+                // 2998-1 - трнзакция забаненая
+            } else if (!(!BlockChain.DEVELOP_USE && height == 2998)
+                    && person.getImage().length < MAX_IMAGE_LENGTH >> 1) {
                 return Transaction.INVALID_IMAGE_LENGTH_MIN;
             }
         } else {
@@ -258,7 +261,7 @@ public class IssuePersonRecord extends IssueItemRecord {
                 (checkFeeBalance ? 0L : NOT_VALIDATE_FLAG_FEE) | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
         // FIRST PERSONS INSERT as ADMIN
         boolean creatorAdmin = false;
-        if (!creator.isPerson(dcSet, height)) {
+        if (!BlockChain.DEVELOP_USE && !creator.isPerson(dcSet, height)) {
             long count = dcSet.getItemPersonMap().getLastKey();
             if (count < 20) {
                 // FIRST Persons only by ME
