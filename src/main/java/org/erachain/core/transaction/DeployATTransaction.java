@@ -323,13 +323,13 @@ public class DeployATTransaction extends Transaction {
         //CHECK NAME LENGTH
         int nameLength = this.name.getBytes(StandardCharsets.UTF_8).length;
         if (nameLength > ATConstants.NAME_MAX_LENGTH || nameLength < 1) {
-            return INVALID_NAME_LENGTH;
+            return INVALID_NAME_LENGTH_MAX;
         }
 
         //CHECK DESCRIPTION LENGTH
         int descriptionLength = this.description.getBytes(StandardCharsets.UTF_8).length;
         if (descriptionLength > ATConstants.DESC_MAX_LENGTH || descriptionLength < 1) {
-            return INVALID_DESCRIPTION_LENGTH;
+            return INVALID_DESCRIPTION_LENGTH_MAX;
         }
 
         int typeLength = this.type.getBytes(StandardCharsets.UTF_8).length;

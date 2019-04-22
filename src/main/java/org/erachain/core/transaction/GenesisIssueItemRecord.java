@@ -85,13 +85,13 @@ public class GenesisIssueItemRecord extends GenesisRecord {
         //CHECK NAME LENGTH
         int nameLength = this.item.getName().getBytes(StandardCharsets.UTF_8).length;
         if (nameLength > ItemCls.MAX_NAME_LENGTH || nameLength < 1) {
-            return INVALID_NAME_LENGTH;
+            return INVALID_NAME_LENGTH_MAX;
         }
 
         //CHECK DESCRIPTION LENGTH
         int descriptionLength = this.item.getDescription().getBytes(StandardCharsets.UTF_8).length;
         if (descriptionLength > BlockChain.MAX_REC_DATA_BYTES) {
-            return INVALID_DESCRIPTION_LENGTH;
+            return INVALID_DESCRIPTION_LENGTH_MAX;
         }
 
         return VALIDATE_OK;

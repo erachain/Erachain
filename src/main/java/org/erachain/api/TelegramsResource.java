@@ -344,7 +344,7 @@ public class TelegramsResource {
 
         // title
         if (title != null && title.getBytes(StandardCharsets.UTF_8).length > 256) {
-            out.put("error", Transaction.INVALID_TITLE_LENGTH);
+            out.put("error", Transaction.INVALID_TITLE_LENGTH_MAX);
             out.put("error_message", "Invalid Title");
             out.put("status", "invalid");
             return out.toJSONString();

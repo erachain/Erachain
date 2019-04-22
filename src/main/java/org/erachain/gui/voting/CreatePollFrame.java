@@ -298,12 +298,12 @@ public class CreatePollFrame extends JFrame {
                     JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
 
-                case Transaction.INVALID_NAME_LENGTH:
+                case Transaction.INVALID_NAME_LENGTH_MAX:
 
                     JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Name must be between 1 and 100 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
 
-                case Transaction.INVALID_DESCRIPTION_LENGTH:
+                case Transaction.INVALID_DESCRIPTION_LENGTH_MAX:
 
                     JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Description must be between 1 and 1000 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     break;

@@ -108,10 +108,13 @@ public class OnDealClick {
                 mess = "Invalid public key";
                 break;
 
-            case Transaction.INVALID_NAME_LENGTH:
-                mess = "Invalid name length";
+            case Transaction.INVALID_NAME_LENGTH_MIN:
+                mess = "Invalid name MIN length";
                 break;
-            case Transaction.INVALID_VALUE_LENGTH:
+            case Transaction.INVALID_NAME_LENGTH_MAX:
+                mess = "Invalid name MAX length";
+                break;
+            case Transaction.INVALID_VALUE_LENGTH_MAX:
                 mess = "Invalid value length";
                 break;
             case Transaction.NAME_ALREADY_REGISTRED:
@@ -151,8 +154,11 @@ public class OnDealClick {
             case Transaction.INVALID_AMOUNT_IS_NULL:
                 mess = "Invalid amount is ZERO";
                 break;
-            case Transaction.INVALID_TITLE_LENGTH:
-                mess = "Invalid title length";
+            case Transaction.INVALID_TITLE_LENGTH_MIN:
+                mess = "Invalid title MIN length";
+                break;
+            case Transaction.INVALID_TITLE_LENGTH_MAX:
+                mess = "Invalid title MAX length";
                 break;
             case Transaction.INVALID_MESSAGE_FORMAT:
                 mess = "Invalid message format as data";
@@ -167,15 +173,24 @@ public class OnDealClick {
             case Transaction.NAME_NOT_LOWER_CASE:
                 mess = "Name not lower case";
                 break;
-            case Transaction.INVALID_ICON_LENGTH:
-                mess = "Invalid icon length";
+            case Transaction.INVALID_ICON_LENGTH_MIN:
+                mess = "Invalid icon MIN length";
                 break;
-            case Transaction.INVALID_IMAGE_LENGTH:
-                mess = "Invalid image length";
+            case Transaction.INVALID_ICON_LENGTH_MAX:
+                mess = "Invalid icon MAX length";
+                break;
+            case Transaction.INVALID_IMAGE_LENGTH_MIN:
+                mess = "Invalid image MIN length";
+                break;
+            case Transaction.INVALID_IMAGE_LENGTH_MAX:
+                mess = "Invalid image MAX length";
                 break;
 
-            case Transaction.INVALID_DESCRIPTION_LENGTH:
-                mess = "Invalid description length";
+            case Transaction.INVALID_DESCRIPTION_LENGTH_MIN:
+                mess = "Invalid description MIN length";
+                break;
+            case Transaction.INVALID_DESCRIPTION_LENGTH_MAX:
+                mess = "Invalid description MAX length";
                 break;
             case Transaction.INVALID_OPTIONS_LENGTH:
                 mess = "Invalid oprion length";

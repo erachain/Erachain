@@ -156,7 +156,7 @@ public class ATResource {
         String name = (String) jsonObject.get("name");
 
         if (name.getBytes(StandardCharsets.UTF_8).length > ATConstants.NAME_MAX_LENGTH || name.length() < 1) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_NAME_LENGTH);
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_NAME_LENGTH_MAX);
         }
 
         String desc = (String) jsonObject.get("description");

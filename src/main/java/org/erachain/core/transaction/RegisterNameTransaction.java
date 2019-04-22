@@ -172,7 +172,7 @@ public class RegisterNameTransaction extends Transaction {
         //CHECK NAME LENGTH
         int nameLength = this.name.getName().getBytes(StandardCharsets.UTF_8).length;
         if (nameLength > 400 || nameLength < 1) {
-            return INVALID_NAME_LENGTH;
+            return INVALID_NAME_LENGTH_MAX;
         }
 
         //CHECK IF LOWERCASE
@@ -183,7 +183,7 @@ public class RegisterNameTransaction extends Transaction {
         //CHECK VALUE LENGTH
         int valueLength = this.name.getValue().getBytes(StandardCharsets.UTF_8).length;
         if (valueLength > BlockChain.MAX_REC_DATA_BYTES || valueLength < 1) {
-            return INVALID_VALUE_LENGTH;
+            return INVALID_VALUE_LENGTH_MAX;
         }
 
         //CHECK OWNER

@@ -217,7 +217,7 @@ public class APIUtils {
                 String message_in = (String) jsonObject.get("message");
                 message = message_in.getBytes(StandardCharsets.UTF_8);
                 if (message.length > BlockChain.MAX_REC_DATA_BYTES) {
-                    throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_DESCRIPTION_LENGTH);
+                    throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_DESCRIPTION_LENGTH_MAX);
                 }
             }
             

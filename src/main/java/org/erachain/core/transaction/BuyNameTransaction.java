@@ -190,7 +190,7 @@ public class BuyNameTransaction extends Transaction {
         //CHECK NAME LENGTH
         int nameLength = this.nameSale.getKey().getBytes(StandardCharsets.UTF_8).length;
         if (nameLength > 400 || nameLength < 1) {
-            return INVALID_NAME_LENGTH;
+            return INVALID_NAME_LENGTH_MAX;
         }
 
         //CHECK IF NAME EXISTS

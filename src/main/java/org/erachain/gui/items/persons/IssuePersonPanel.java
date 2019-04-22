@@ -6,6 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.core.transaction.Transaction;
@@ -98,9 +99,12 @@ public class IssuePersonPanel extends JPanel {
             }
 
         });
-        String[] items = {Lang.getInstance().translate("-"), Lang.getInstance().translate("Male"),
-                Lang.getInstance().translate("Female")};
+
+
+        String[] items = PersonCls.GENDERS_LIST;
+        items = Lang.getInstance().translate(items);
         comboBoxGender.setModel(new DefaultComboBoxModel<>(items));
+        comboBoxGender.setSelectedIndex(2);
         setVisible(true);
     }
 
@@ -614,11 +618,15 @@ public class IssuePersonPanel extends JPanel {
                 }
 
             }
-        } else if (result.getB() == Transaction.INVALID_NAME_LENGTH) {
+        } else if (result.getB() == Transaction.INVALID_NAME_LENGTH_MIN) {
             JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                    Lang.getInstance().translate("Name must be between %m and %M characters!")
-                            .replace("%m", "" + issuePersonRecord.getItem().getMinNameLen())
-                            .replace("%M", "" + ItemCls.MAX_NAME_LENGTH),
+                    Lang.getInstance().translate("Name must be more then %val characters!")
+                            .replace("%val", "" + issuePersonRecord.getItem().getMinNameLen()),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+        } else if (result.getB() == Transaction.INVALID_NAME_LENGTH_MAX) {
+            JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                    Lang.getInstance().translate("Name must be less then %val characters!")
+                            .replace("%val", "" + ItemCls.MAX_NAME_LENGTH),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(new JFrame(),

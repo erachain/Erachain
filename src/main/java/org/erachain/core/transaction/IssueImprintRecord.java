@@ -168,8 +168,11 @@ public class IssueImprintRecord extends IssueItemRecord {
         //CHECK NAME LENGTH
         ItemCls item = this.getItem();
         int nameLength = item.getName().getBytes().length;
-        if (nameLength > 40 || nameLength < item.getMinNameLen()) {
-            return INVALID_NAME_LENGTH;
+        if (nameLength < item.getMinNameLen()) {
+            return INVALID_NAME_LENGTH_MIN;
+        }
+        if (nameLength > 40) {
+            return INVALID_NAME_LENGTH_MAX;
         }
 
         int result = super.isValid(asDeal, flags);

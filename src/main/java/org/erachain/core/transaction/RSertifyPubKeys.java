@@ -292,7 +292,7 @@ public class RSertifyPubKeys extends Transaction {
     // IT is only PERSONALITY record
     @Override
     public boolean hasPublicText() {
-        return true;
+        return !BlockChain.ANONIM_SERT_USE && !BlockChain.DEVELOP_USE;
     }
 
     //////// VIEWS
@@ -461,7 +461,8 @@ public class RSertifyPubKeys extends Transaction {
         if (result != VALIDATE_OK)
             return result;
 
-        if (!this.creator.isPerson(dcSet, height)) {
+        if (!BlockChain.ANONIM_SERT_USE
+                && !BlockChain.DEVELOP_USE && !this.creator.isPerson(dcSet, height)) {
             boolean creator_admin = false;
             long personsCount = dcSet.getItemPersonMap().getLastKey();
             if (personsCount < 20) {

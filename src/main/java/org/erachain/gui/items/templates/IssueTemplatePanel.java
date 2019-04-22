@@ -3,6 +3,7 @@ package org.erachain.gui.items.templates;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.IssueTemplateRecord;
 import org.erachain.core.transaction.Transaction;
@@ -108,13 +109,20 @@ public class IssueTemplatePanel extends JPanel {
                         Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                 break;
 
-            case Transaction.INVALID_NAME_LENGTH:
+            case Transaction.INVALID_NAME_LENGTH_MIN:
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Name must be between 1 and 100 characters!"),
+                        Lang.getInstance().translate("Name must be more then %val characters!")
+                                .replace("%val", "" + issueTemplate.getItem().getMinNameLen()),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                break;
+            case Transaction.INVALID_NAME_LENGTH_MAX:
+                JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                        Lang.getInstance().translate("Name must be less then %val characters!")
+                                .replace("%val", "" + ItemCls.MAX_NAME_LENGTH),
                         Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                 break;
 
-            case Transaction.INVALID_DESCRIPTION_LENGTH:
+            case Transaction.INVALID_DESCRIPTION_LENGTH_MAX:
                 JOptionPane.showMessageDialog(new JFrame(),
                         Lang.getInstance().translate("Description must be between 1 and 1000 characters!"),
                         Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);

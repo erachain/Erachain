@@ -19,7 +19,6 @@ import java.util.List;
 // import org.slf4j.LoggerFactory;
 
 public class IssuePersonRecord extends IssueItemRecord {
-    public static final int MAX_IMAGE_LENGTH = 20480;
     private static final byte TYPE_ID = (byte) ISSUE_PERSON_TRANSACTION;
     private static final String NAME_ID = "Issue Person";
 
@@ -163,17 +162,10 @@ public class IssuePersonRecord extends IssueItemRecord {
         return null;
     }
 
-	/*
 	@Override
 	public boolean hasPublicText() {
-		for ( String admin: BlockChain.GENESIS_ADMINS) {
-			if (this.creator.equals(admin)) {
-				return false;
-			}
-		}
-		return true;
+        return !BlockChain.ANONIM_SERT_USE && !BlockChain.DEVELOP_USE;
 	}
-	 */
 
     @Override
     public List<PublicKeyAccount> getPublicKeys() {
@@ -194,7 +186,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         // FOR PERSONS need LIMIT DESCRIPTION because it may be make with 0 COMPU balance
         int descriptionLength = person.getDescription().getBytes(StandardCharsets.UTF_8).length;
         if (descriptionLength > 8000) {
-            return INVALID_DESCRIPTION_LENGTH;
+            return INVALID_DESCRIPTION_LENGTH_MAX;
         }
         // birthLatitude -90..90; birthLongitude -180..180
         if (person.getBirthLatitude() > 90 || person.getBirthLatitude() < -90) {
@@ -206,7 +198,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         if (person.getRace().getBytes(StandardCharsets.UTF_8).length > 255) {
             return Transaction.ITEM_PERSON_RACE_ERROR;
         }
-        if (person.getGender() > 10) {
+        if (person.getGender() < 0 || person.getGender() > 2) {
             return Transaction.ITEM_PERSON_GENDER_ERROR;
         }
         if (person.getSkinColor().getBytes(StandardCharsets.UTF_8).length > 255) {
@@ -225,14 +217,19 @@ public class IssuePersonRecord extends IssueItemRecord {
             return Transaction.ITEM_PERSON_HEIGHT_ERROR;
         }
 
-        if (person.isAlive(this.timestamp)) {
+        if (!BlockChain.ANONIM_SERT_USE && person.isAlive(this.timestamp)) {
             // IF PERSON is LIVE
-            if (person.getImage().length > MAX_IMAGE_LENGTH) {
-                //int height = this.getBlockHeightByParent(this.dcSet);
-                if (!(!BlockChain.DEVELOP_USE && height == 2998) && height > 157640) {
+            if (person.getImage().length > person.getMAXimageLenght()) {
+                // 2998-1 - трнзакция забаненая
+                if (!(!BlockChain.DEVELOP_USE && height == 2998)
+                        && height > 157640) {
                     // early blocks has wrong ISSUE_PERSON with 0 image length - in block 2998
-                    return Transaction.INVALID_IMAGE_LENGTH;
+                    return Transaction.INVALID_IMAGE_LENGTH_MAX;
                 }
+                // 2998-1 - трнзакция забаненая
+            } else if (!(!BlockChain.DEVELOP_USE && height == 2998)
+                    && person.getImage().length < person.getMINimageLenght()) {
+                return Transaction.INVALID_IMAGE_LENGTH_MIN;
             }
         } else {
             // person is DIE - any PHOTO
@@ -256,7 +253,8 @@ public class IssuePersonRecord extends IssueItemRecord {
                 (checkFeeBalance ? 0L : NOT_VALIDATE_FLAG_FEE) | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
         // FIRST PERSONS INSERT as ADMIN
         boolean creatorAdmin = false;
-        if (!creator.isPerson(dcSet, height)) {
+        if (!BlockChain.ANONIM_SERT_USE
+                && !BlockChain.DEVELOP_USE && !creator.isPerson(dcSet, height)) {
             long count = dcSet.getItemPersonMap().getLastKey();
             if (count < 20) {
                 // FIRST Persons only by ME
