@@ -19,7 +19,6 @@ import java.util.List;
 // import org.slf4j.LoggerFactory;
 
 public class IssuePersonRecord extends IssueItemRecord {
-    public static final int MAX_IMAGE_LENGTH = 20480;
     private static final byte TYPE_ID = (byte) ISSUE_PERSON_TRANSACTION;
     private static final String NAME_ID = "Issue Person";
 
