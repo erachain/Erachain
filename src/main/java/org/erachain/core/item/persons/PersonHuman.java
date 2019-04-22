@@ -10,6 +10,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
@@ -100,7 +101,7 @@ public class PersonHuman extends PersonCls {
         int imageLength = Ints.fromByteArray(imageLengthBytes);
         position += IMAGE_SIZE_LENGTH;
 
-        if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
+        if (imageLength < 0 || imageLength > ItemCls.MAX_IMAGE_LENGTH) {
             throw new Exception("Invalid image length " + imageLength);
         }
 
