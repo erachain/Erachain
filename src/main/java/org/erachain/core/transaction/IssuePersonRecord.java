@@ -220,7 +220,7 @@ public class IssuePersonRecord extends IssueItemRecord {
 
         if (!BlockChain.ANONIM_SERT_USE && person.isAlive(this.timestamp)) {
             // IF PERSON is LIVE
-            if (person.getImage().length > MAX_IMAGE_LENGTH) {
+            if (person.getImage().length > person.getMAXimageLenght()) {
                 // 2998-1 - трнзакция забаненая
                 if (!(!BlockChain.DEVELOP_USE && height == 2998)
                         && height > 157640) {
@@ -229,7 +229,7 @@ public class IssuePersonRecord extends IssueItemRecord {
                 }
                 // 2998-1 - трнзакция забаненая
             } else if (!(!BlockChain.DEVELOP_USE && height == 2998)
-                    && person.getImage().length < MAX_IMAGE_LENGTH >> 1) {
+                    && person.getImage().length < person.getMINimageLenght()) {
                 return Transaction.INVALID_IMAGE_LENGTH_MIN;
             }
         } else {
