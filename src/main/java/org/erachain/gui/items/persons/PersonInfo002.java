@@ -288,10 +288,11 @@ public class PersonInfo002 extends javax.swing.JPanel {
 
 
         String descript = Lang.getInstance().translate("Gender") + ":";
-        if (person.getGender() == 0)
+        if (person.getGender() == 0) {
             descript = descript + Lang.getInstance().translate("Male");
-        if (person.getGender() == 1)
+        } else if (person.getGender() == 1) {
             descript = descript + Lang.getInstance().translate("Female");
+        }
         long bi = person.getBirthday();
         long de = person.getDeathday();
         String biStr = person.getBirthdayStr();

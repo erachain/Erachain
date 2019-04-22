@@ -241,7 +241,7 @@ public class CreatePollTransaction extends Transaction {
         //CHECK POLL NAME LENGTH
         int nameLength = this.poll.getName().getBytes(StandardCharsets.UTF_8).length;
         if (nameLength > 400 || nameLength < 1) {
-            return INVALID_NAME_LENGTH;
+            return INVALID_NAME_LENGTH_MAX;
         }
 
         //CHECK POLL NAME LOWERCASE
@@ -252,7 +252,7 @@ public class CreatePollTransaction extends Transaction {
         //CHECK POLL DESCRIPTION LENGTH
         int descriptionLength = this.poll.getDescription().getBytes(StandardCharsets.UTF_8).length;
         if (descriptionLength > BlockChain.MAX_REC_DATA_BYTES || descriptionLength < 1) {
-            return INVALID_DESCRIPTION_LENGTH;
+            return INVALID_DESCRIPTION_LENGTH_MAX;
         }
 
         //CHECK POLL DOES NOT EXIST ALREADY

@@ -75,7 +75,7 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
         ++detailGBC.gridy;
         String txt = "";
         if (person.getGender() == 0) txt = Lang.getInstance().translate("Male");
-        if (person.getGender() == 1) txt = Lang.getInstance().translate("Female");
+        else if (person.getGender() == 1) txt = Lang.getInstance().translate("Female");
         JTextField gender = new JTextField(txt);
 
         gender.setEditable(false);

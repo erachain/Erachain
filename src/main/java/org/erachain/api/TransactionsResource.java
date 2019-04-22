@@ -734,7 +734,7 @@ public class TransactionsResource {
             // TODO Auto-generated catch block
             // e.printStackTrace();
             // e.printStackTrace();
-            out.put("status_code", Transaction.INVALID_DESCRIPTION_LENGTH);
+            out.put("status_code", Transaction.INVALID_DESCRIPTION_LENGTH_MAX);
             out.put("status", "Invalid message");
             return out.toJSONString();
         }

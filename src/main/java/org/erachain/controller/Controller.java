@@ -2971,7 +2971,7 @@ public class Controller extends Observable {
         if (title == null)
             title = "";
         else if (title.getBytes(StandardCharsets.UTF_8).length > 256) {
-            return new Pair<Integer, Transaction>(Transaction.INVALID_TITLE_LENGTH, null);
+            return new Pair<Integer, Transaction>(Transaction.INVALID_TITLE_LENGTH_MAX, null);
         }
 
         byte[] messageBytes = null;

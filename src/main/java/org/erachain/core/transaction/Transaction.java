@@ -141,93 +141,100 @@ public abstract class Transaction {
 
     public static final int NO_INCLAIM_BALANCE = 49;
 
-    public static final int INVALID_NAME_LENGTH = 50;
-    public static final int INVALID_ICON_LENGTH = 51;
-    public static final int INVALID_IMAGE_LENGTH = 52;
-    public static final int INVALID_DESCRIPTION_LENGTH = 53;
-    public static final int INVALID_VALUE_LENGTH = 55;
-    public static final int INVALID_TITLE_LENGTH = 56;
+    public static final int INVALID_BACKWARD_ACTION = 117;
+    public static final int NOT_SELF_PERSONALIZY = 118;
+    public static final int PUB_KEY_NOT_PERSONALIZED = 119;
 
-    public static final int INVALID_BACKWARD_ACTION = 57;
-    public static final int NOT_SELF_PERSONALIZY = 58;
-    public static final int PUB_KEY_NOT_PERSONALIZED = 59;
+    public static final int INVALID_NAME_LENGTH_MIN = 151;
+    public static final int INVALID_NAME_LENGTH_MAX = 152;
+    public static final int INVALID_ICON_LENGTH_MIN = 153;
+    public static final int INVALID_ICON_LENGTH_MAX = 154;
+    public static final int INVALID_IMAGE_LENGTH_MIN = 155;
+    public static final int INVALID_IMAGE_LENGTH_MAX = 156;
+    public static final int INVALID_DESCRIPTION_LENGTH_MIN = 157;
+    public static final int INVALID_DESCRIPTION_LENGTH_MAX = 158;
+    public static final int INVALID_VALUE_LENGTH_MIN = 159;
+    public static final int INVALID_VALUE_LENGTH_MAX = 160;
+    public static final int INVALID_TITLE_LENGTH_MIN = 161;
+    public static final int INVALID_TITLE_LENGTH_MAX = 162;
 
+    public static final int NOT_DEBTABLE_ASSET = 171;
+    public static final int NOT_HOLDABLE_ASSET = 172;
+    public static final int NOT_SPENDABLE_ASSET = 173;
 
-    // NAMES
-    public static final int NAME_DOES_NOT_EXIST = 60;
-    public static final int NAME_ALREADY_REGISTRED = 61;
-    public static final int NAME_ALREADY_ON_SALE = 62;
-    public static final int NAME_NOT_FOR_SALE = 63;
-    public static final int BUYER_ALREADY_OWNER = 64;
-    public static final int NAME_NOT_LOWER_CASE = 65;
-    public static final int NAME_WITH_SPACE = 66;
-    public static final int CREATOR_NOT_OWNER = 67;
-    public static final int NAME_KEY_ALREADY_EXISTS = 68;
-    public static final int NAME_KEY_NOT_EXISTS = 69;
-    public static final int LAST_KEY_IS_DEFAULT_KEY = 70;
+    public static final int KEY_COLLISION = 194;
 
-    //
-    public static final int NOT_DEBTABLE_ASSET = 71;
-    public static final int NOT_HOLDABLE_ASSET = 72;
-    public static final int NOT_SPENDABLE_ASSET = 73;
-
-
-    // POLL
-    public static final int INVALID_OPTIONS_LENGTH = 80;
-    public static final int INVALID_OPTION_LENGTH = 81;
-    public static final int DUPLICATE_OPTION = 82;
-    public static final int POLL_ALREADY_CREATED = 83;
-    public static final int POLL_ALREADY_HAS_VOTES = 84;
-    public static final int POLL_NOT_EXISTS = 85;
-    public static final int POLL_OPTION_NOT_EXISTS = 86;
-    public static final int ALREADY_VOTED_FOR_THAT_OPTION = 87;
-    public static final int INVALID_DATA_LENGTH = 88;
-    public static final int INVALID_DATA = 89;
-    public static final int INVALID_PARAMS_LENGTH = 90;
-    public static final int INVALID_URL_LENGTH = 91;
-    public static final int INVALID_HEAD_LENGTH = 92;
-
-    public static final int KEY_COLLISION = 94;
-
-    public static final int INVALID_MESSAGE_FORMAT = 95;
-    public static final int INVALID_MESSAGE_LENGTH = 96;
-    public static final int UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT = 97;
+    public static final int INVALID_MESSAGE_FORMAT = 195;
+    public static final int INVALID_MESSAGE_LENGTH = 196;
+    public static final int UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT = 197;
 
 
     // ITEMS
-    public static final int INVALID_ITEM_KEY = 99;
-    public static final int INVALID_ITEM_VALUE = 100;
-    public static final int ITEM_DOES_NOT_EXIST = 101;
-    public static final int ITEM_ASSET_NOT_EXIST = 102;
-    public static final int ITEM_IMPRINT_DOES_NOT_EXIST = 103;
-    public static final int ITEM_TEMPLATE_NOT_EXIST = 104;
-    public static final int ITEM_PERSON_NOT_EXIST = 105;
-    public static final int ITEM_STATUS_NOT_EXIST = 106;
-    public static final int ITEM_UNION_NOT_EXIST = 107;
-    public static final int ITEM_DOES_NOT_STATUSED = 108;
-    public static final int ITEM_DOES_NOT_UNITED = 109;
-    public static final int ITEM_DUPLICATE_KEY = 110;
-    public static final int ITEM_DUPLICATE = 111;
-    public static final int ITEM_PERSON_IS_DEAD = 115;
-    public static final int AMOUNT_LENGHT_SO_LONG = 116;
-    public static final int AMOUNT_SCALE_SO_BIG = 117;
-    public static final int AMOUNT_SCALE_WRONG = 118;
-    public static final int ITEM_PERSON_LATITUDE_ERROR = 120;
-    public static final int ITEM_PERSON_LONGITUDE_ERROR = 121;
-    public static final int ITEM_PERSON_RACE_ERROR = 122;
-    public static final int ITEM_PERSON_GENDER_ERROR = 123;
-    public static final int ITEM_PERSON_SKIN_COLOR_ERROR = 124;
-    public static final int ITEM_PERSON_EYE_COLOR_ERROR = 125;
-    public static final int ITEM_PERSON_HAIR_COLOR_ERROR = 126;
-    public static final int ITEM_PERSON_HEIGHT_ERROR = 127;
-    public static final int ITEM_PERSON_OWNER_SIGNATURE_INVALID = 128;
-    public static final int INVALID_UPDATE_VALUE = 140;
-    public static final int INVALID_TRANSACTION_TYPE = 150;
-    public static final int INVALID_BLOCK_HEIGHT = 200;
-    public static final int INVALID_BLOCK_TRANS_SEQ_ERROR = 201;
-    public static final int TELEGRAM_DOES_NOT_EXIST = 240;
-    public static final int NOT_YET_RELEASED = 299;
-    public static final int AT_ERROR = 300;
+    public static final int INVALID_ITEM_KEY = 201;
+    public static final int INVALID_ITEM_VALUE = 202;
+    public static final int ITEM_DOES_NOT_EXIST = 203;
+    public static final int ITEM_ASSET_NOT_EXIST = 204;
+    public static final int ITEM_IMPRINT_DOES_NOT_EXIST = 205;
+    public static final int ITEM_TEMPLATE_NOT_EXIST = 206;
+    public static final int ITEM_PERSON_NOT_EXIST = 207;
+    public static final int ITEM_STATUS_NOT_EXIST = 208;
+    public static final int ITEM_UNION_NOT_EXIST = 209;
+    public static final int ITEM_DOES_NOT_STATUSED = 210;
+    public static final int ITEM_DOES_NOT_UNITED = 211;
+    public static final int ITEM_DUPLICATE_KEY = 212;
+    public static final int ITEM_DUPLICATE = 213;
+
+    public static final int ITEM_PERSON_IS_DEAD = 235;
+    public static final int AMOUNT_LENGHT_SO_LONG = 236;
+    public static final int AMOUNT_SCALE_SO_BIG = 237;
+    public static final int AMOUNT_SCALE_WRONG = 238;
+
+    public static final int ITEM_PERSON_LATITUDE_ERROR = 250;
+    public static final int ITEM_PERSON_LONGITUDE_ERROR = 251;
+    public static final int ITEM_PERSON_RACE_ERROR = 252;
+    public static final int ITEM_PERSON_GENDER_ERROR = 253;
+    public static final int ITEM_PERSON_SKIN_COLOR_ERROR = 254;
+    public static final int ITEM_PERSON_EYE_COLOR_ERROR = 255;
+    public static final int ITEM_PERSON_HAIR_COLOR_ERROR = 256;
+    public static final int ITEM_PERSON_HEIGHT_ERROR = 257;
+    public static final int ITEM_PERSON_OWNER_SIGNATURE_INVALID = 258;
+
+    // NAMES
+    public static final int NAME_DOES_NOT_EXIST = 5060;
+    public static final int NAME_ALREADY_REGISTRED = 5061;
+    public static final int NAME_ALREADY_ON_SALE = 5062;
+    public static final int NAME_NOT_FOR_SALE = 5063;
+    public static final int BUYER_ALREADY_OWNER = 5064;
+    public static final int NAME_NOT_LOWER_CASE = 5065;
+    public static final int NAME_WITH_SPACE = 5066;
+
+    public static final int CREATOR_NOT_OWNER = 367;
+    public static final int NAME_KEY_ALREADY_EXISTS = 368;
+    public static final int NAME_KEY_NOT_EXISTS = 369;
+    public static final int LAST_KEY_IS_DEFAULT_KEY = 370;
+
+    // POLL
+    public static final int INVALID_OPTIONS_LENGTH = 380;
+    public static final int INVALID_OPTION_LENGTH = 381;
+    public static final int DUPLICATE_OPTION = 382;
+    public static final int POLL_ALREADY_CREATED = 383;
+    public static final int POLL_ALREADY_HAS_VOTES = 384;
+    public static final int POLL_NOT_EXISTS = 385;
+    public static final int POLL_OPTION_NOT_EXISTS = 386;
+    public static final int ALREADY_VOTED_FOR_THAT_OPTION = 387;
+    public static final int INVALID_DATA_LENGTH = 388;
+    public static final int INVALID_DATA = 389;
+    public static final int INVALID_PARAMS_LENGTH = 390;
+    public static final int INVALID_URL_LENGTH = 391;
+    public static final int INVALID_HEAD_LENGTH = 392;
+
+    public static final int INVALID_UPDATE_VALUE = 540;
+    public static final int INVALID_TRANSACTION_TYPE = 550;
+    public static final int INVALID_BLOCK_HEIGHT = 599;
+    public static final int INVALID_BLOCK_TRANS_SEQ_ERROR = 501;
+    public static final int TELEGRAM_DOES_NOT_EXIST = 540;
+    public static final int NOT_YET_RELEASED = 599;
+    public static final int AT_ERROR = 600; // END error for org.erachain.api.ApiErrorFactory.ERROR
 
     // 
     // TYPES *******

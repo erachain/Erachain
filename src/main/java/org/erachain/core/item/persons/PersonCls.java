@@ -26,6 +26,9 @@ import java.util.Set;
 //birthLatitude -90..90; birthLongitude -180..180
 public abstract class PersonCls extends ItemCls {
 
+    private int MAX_IMAGE_LENGTH = 22000;
+    private int MIN_IMAGE_LENGTH = 8000;
+
     public static final int HUMAN = 1;
     public static final int DOG = 2;
     public static final int CAT = 3;
@@ -45,6 +48,8 @@ public abstract class PersonCls extends ItemCls {
     protected static final int BASE_LENGTH = BIRTHDAY_LENGTH + DEATHDAY_LENGTH + GENDER_LENGTH + RACE_SIZE_LENGTH + LATITUDE_LENGTH * 2
             + SKIN_COLOR_SIZE_LENGTH + EYE_COLOR_SIZE_LENGTH + HAIR_COLOR_SIZE_LENGTH
             + HEIGHT_LENGTH;
+
+    public static String[] GENDERS_LIST = {"Male", "Female", "-"};
 
     // already exist in super - protected String name; // First Name|Middle Name|Last Name
     protected long birthday; // timestamp
@@ -158,6 +163,14 @@ public abstract class PersonCls extends ItemCls {
 
     public int getHeight() {
         return Byte.toUnsignedInt(this.height);
+    }
+
+    public int getMAXimageLenght() {
+        return this.MAX_IMAGE_LENGTH;
+    }
+
+    public int getMINimageLenght() {
+        return this.MIN_IMAGE_LENGTH;
     }
 
     public boolean isAlive(long onThisTime) {
