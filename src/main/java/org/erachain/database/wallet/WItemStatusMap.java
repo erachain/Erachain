@@ -13,7 +13,7 @@ public class WItemStatusMap extends WItemMap {
 
     public WItemStatusMap(DWSet dWSet, DB database) {
         super(dWSet, database,
-                TYPE, "item_statuses",
+                TYPE, NAME,
                 ObserverMessage.WALLET_RESET_STATUS_TYPE,
                 ObserverMessage.WALLET_ADD_STATUS_TYPE,
                 ObserverMessage.WALLET_REMOVE_STATUS_TYPE,

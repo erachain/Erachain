@@ -13,7 +13,7 @@ public class WItemImprintMap extends WItemMap {
 
     public WItemImprintMap(DWSet dWSet, DB database) {
         super(dWSet, database,
-                TYPE, "item_imprints",
+                TYPE, NAME,
                 ObserverMessage.WALLET_RESET_IMPRINT_TYPE,
                 ObserverMessage.WALLET_ADD_IMPRINT_TYPE,
                 ObserverMessage.WALLET_REMOVE_IMPRINT_TYPE,

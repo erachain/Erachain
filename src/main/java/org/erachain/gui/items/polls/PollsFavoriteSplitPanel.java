@@ -36,7 +36,6 @@ public class PollsFavoriteSplitPanel extends ItemSplitPanel {
         JMenuItem setVote_Menu = new JMenuItem(Lang.getInstance().translate("Voting"));
         setVote_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-//				new UnionSetStatusDialog(th, (UnionCls) itemMenu);
 
                 PollCls poll = (PollCls) (itemTableSelected);
                 AssetCls AssetCls = DCSet.getInstance().getItemAssetMap().get((long) (1));

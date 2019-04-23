@@ -13,7 +13,7 @@ public class WItemPersonMap extends WItemMap {
 
     public WItemPersonMap(DWSet dWSet, DB database) {
         super(dWSet, database,
-                TYPE, "item_persons",
+                TYPE, NAME,
                 ObserverMessage.WALLET_RESET_PERSON_TYPE,
                 ObserverMessage.WALLET_ADD_PERSON_TYPE,
                 ObserverMessage.WALLET_REMOVE_PERSON_TYPE,

@@ -13,7 +13,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemStatusesTableModel extends WalletSortedTableModel<Tuple2<String, String>, StatusCls> {
+public class WalletItemStatusesTableModel extends WalletAutoKeyTableModel<Tuple2<Long, Long>, Tuple2<Long, StatusCls>> {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -24,7 +24,7 @@ public class WalletItemStatusesTableModel extends WalletSortedTableModel<Tuple2<
     public WalletItemStatusesTableModel() {
         super(Controller.getInstance().wallet.database.getStatusMap(),
                 new String[]{"Key", "Name", "Creator", "Unique", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false}, false);
+                new Boolean[]{false, true, true, false, false}, true);
     }
 
     @Override
@@ -33,11 +33,12 @@ public class WalletItemStatusesTableModel extends WalletSortedTableModel<Tuple2<
             return null;
         }
 
-        Pair<Tuple2<String, String>, StatusCls> res = this.listSorted.get(row);
-        if (res == null)
+        Pair<Tuple2<Long , Long>, Tuple2<Long, StatusCls>> pair = this.listSorted.get(row);
+        if (pair == null) {
             return null;
+        }
 
-        StatusCls status = res.getB();
+        StatusCls status = pair.getB().b;
 
         switch (column) {
             case COLUMN_KEY:
@@ -67,22 +68,6 @@ public class WalletItemStatusesTableModel extends WalletSortedTableModel<Tuple2<
         }
 
         return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.LIST_STATUS_TYPE) {
-            this.fireTableDataChanged();
-        } else if (message.getType() == ObserverMessage.ADD_STATUS_TYPE || message.getType() == ObserverMessage.REMOVE_STATUS_TYPE) {
-            //CHECK IF LIST UPDATED
-            needUpdate = true;
-        } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
-            needUpdate = false;
-            this.fireTableDataChanged();
-        }
     }
 
 }

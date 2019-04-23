@@ -265,13 +265,12 @@ public class DWSet extends DBASet {
                 return this.TemplateMap;
             case ItemCls.PERSON_TYPE:
                 return this.personMap;
+            case ItemCls.POLL_TYPE:
+                return this.pollMap;
             case ItemCls.STATUS_TYPE:
                 return this.statusMap;
             case ItemCls.UNION_TYPE:
                 return this.unionMap;
-            case ItemCls.POLL_TYPE:
-                return this.pollMap;
-
         }
         return null;
     }

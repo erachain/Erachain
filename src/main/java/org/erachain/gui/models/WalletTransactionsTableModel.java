@@ -42,11 +42,7 @@ public class WalletTransactionsTableModel extends WalletAutoKeyTableModel<Tuple2
     public WalletTransactionsTableModel() {
         super(Controller.getInstance().getWallet().database.getTransactionMap(),
                 new String[]{"Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"},
-                new Boolean[]{true, true, true, true, true, true, true, false, false}, true,
-                ObserverMessage.WALLET_RESET_TRANSACTION_TYPE, ObserverMessage.WALLET_LIST_TRANSACTION_TYPE,
-                ObserverMessage.WALLET_ADD_TRANSACTION_TYPE,  ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE);
-
-        logger = LoggerFactory.getLogger(WalletTransactionsTableModel.class.getName());
+                new Boolean[]{true, true, true, true, true, true, true, false, false}, true);
 
     }
 

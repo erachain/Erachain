@@ -2,17 +2,20 @@ package org.erachain.gui.models;
 ////////
 
 import org.erachain.controller.Controller;
+import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemImprintsTableModel extends WalletSortedTableModel<Tuple2<String, String>, ImprintCls> {
+public class WalletItemImprintsTableModel extends WalletAutoKeyTableModel<Tuple2<Long, Long>, Tuple2<Long, ImprintCls>> {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -22,7 +25,7 @@ public class WalletItemImprintsTableModel extends WalletSortedTableModel<Tuple2<
     public WalletItemImprintsTableModel() {
         super(Controller.getInstance().wallet.database.getImprintMap(),
                 new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false}, false);
+                new Boolean[]{false, true, true, false}, true);
     }
 
     @Override
@@ -31,7 +34,12 @@ public class WalletItemImprintsTableModel extends WalletSortedTableModel<Tuple2<
             return null;
         }
 
-        ImprintCls imprint = this.listSorted.get(row).getB();
+        Pair<Tuple2<Long , Long>, Tuple2<Long, ImprintCls>> pair = this.listSorted.get(row);
+        if (pair == null) {
+            return null;
+        }
+
+        ImprintCls imprint = pair.getB().b;
 
         switch (column) {
             case COLUMN_KEY:
@@ -55,33 +63,6 @@ public class WalletItemImprintsTableModel extends WalletSortedTableModel<Tuple2<
         }
 
         return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.LIST_IMPRINT_TYPE
-                || message.getType() == ObserverMessage.WALLET_LIST_IMPRINT_TYPE) {
-
-            needUpdate = false;
-            getInterval();
-            this.fireTableDataChanged();
-        }
-
-        //CHECK IF LIST UPDATED
-        if (message.getType() == ObserverMessage.ADD_IMPRINT_TYPE || message.getType() == ObserverMessage.REMOVE_IMPRINT_TYPE
-                || message.getType() == ObserverMessage.WALLET_ADD_IMPRINT_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_IMPRINT_TYPE) {
-            needUpdate = true;
-        }
-    }
-
-    // TODO сделать постранично
-    @Override
-    public void getInterval() {
-        listSorted = new SortableList<Tuple2<String, String>, ImprintCls>(
-                map, map.getKeys());
     }
 
 }

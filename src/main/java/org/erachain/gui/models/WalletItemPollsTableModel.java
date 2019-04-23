@@ -1,6 +1,7 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.PollMap;
@@ -14,7 +15,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemPollsTableModel extends WalletSortedTableModel<Tuple2<String, String>, PollCls> {
+public class WalletItemPollsTableModel extends WalletAutoKeyTableModel<Tuple2<Long, Long>, Tuple2<Long, PollCls>> {
     public static final int COLUMN_NAME = 0;
     public static final int COLUMN_ADDRESS = 1;
     public static final int COLUMN_TOTAL_VOTES = 2;
@@ -22,7 +23,8 @@ public class WalletItemPollsTableModel extends WalletSortedTableModel<Tuple2<Str
 
     public WalletItemPollsTableModel() {
         super(Controller.getInstance().wallet.database.getPollMap(),
-                new String[]{"Name", "Creator", "Total Votes", "Confirmed"}, null,true);
+                new String[]{"Name", "Creator", "Total Votes", "Confirmed"},
+                null,true);
     }
 
     @Override
@@ -31,12 +33,12 @@ public class WalletItemPollsTableModel extends WalletSortedTableModel<Tuple2<Str
             return null;
         }
 
-        Pair<Tuple2<String, String>, PollCls> data = this.listSorted.get(row);
-
-        if (data == null || data.getB() == null) {
-            return -1;
+        Pair<Tuple2<Long , Long>, Tuple2<Long, PollCls>> pair = this.listSorted.get(row);
+        if (pair == null) {
+            return null;
         }
-        PollCls poll = data.getB();
+
+        PollCls poll = pair.getB().b;
 
         switch (column) {
             case COLUMN_NAME:
@@ -62,27 +64,6 @@ public class WalletItemPollsTableModel extends WalletSortedTableModel<Tuple2<Str
         }
 
         return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.LIST_POLL_TYPE) {
-            if (this.listSorted == null) {
-                this.listSorted = (SortableList<Tuple2<String, String>, PollCls>) message.getValue();
-                //this.polls.registerObserver();
-                this.listSorted.sort(PollMap.NAME_INDEX);
-            }
-
-            this.fireTableDataChanged();
-        }
-
-        //CHECK IF LIST UPDATED
-        if (message.getType() == ObserverMessage.ADD_POLL_TYPE || message.getType() == ObserverMessage.REMOVE_POLL_TYPE) {
-            this.fireTableDataChanged();
-        }
     }
 
 }
