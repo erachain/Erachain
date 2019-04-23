@@ -637,6 +637,18 @@ public class Synchronizer {
         return response.getSignatures();
     }
 
+    static byte[] badCheck = Base58.decode("5SxUGJcgS29XA5rGGhTu9RnjSdoK4qtA8AgHEtANdLei11f386P6Net8MPPBVNKKJqkGKeHoAWg6N116fhCRrh2f");
+    public void checkBadBlock(Peer peer) throws Exception {
+        if (BlockChain.DEVELOP_USE) {
+            List<byte[]> headersCheck = this.getBlockSignatures(badCheck, peer);
+            if (!headersCheck.isEmpty()) {
+                String mess = "Dishonest peer: my CHECKPOINT SIGNATURE -> BAD FORK";
+                peer.ban(BAN_BLOCK_TIMES, mess);
+                throw new Exception(mess);
+            }
+        }
+    }
+
     private Tuple2<byte[], List<byte[]>> findHeaders(Peer peer, int peerHeight, byte[] lastBlockSignature,
                                                      int checkPointHeight) throws Exception {
 
