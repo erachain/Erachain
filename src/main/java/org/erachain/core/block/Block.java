@@ -1460,7 +1460,10 @@ public class Block {
                     transaction.setDC(validatingDC, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                     //CHECK IF VALID
-                    if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
+                    // так как мы в блоке такие транзакции уже проверяем то коллизию с неподтвержденными не проверяем
+                    // все равно их потом удалим - иначе при откатах может случиться оказия - что и в блоке она есть и в неподтвержденных
+                    if (transaction.isValid(Transaction.FOR_NETWORK, Transaction.NOT_VALIDATE_KEY_COLLISION)
+                            != Transaction.VALIDATE_OK) {
                         LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                 + ":" + transaction.viewFullTypeName()
                                 + " invalid code: " + transaction.isValid(Transaction.FOR_NETWORK, 0l)
