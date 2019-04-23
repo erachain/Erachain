@@ -221,16 +221,16 @@ public class IssuePersonRecord extends IssueItemRecord {
         if (!BlockChain.ANONIM_SERT_USE && person.isAlive(this.timestamp)) {
             // IF PERSON is LIVE
             if (person.getImage().length > person.getMAXimageLenght()) {
-                // 2998-1 - трнзакция забаненая
-                if (!(!BlockChain.DEVELOP_USE && height == 2998)
-                        && height > 157640) {
+                if (height > 157640) {
                     // early blocks has wrong ISSUE_PERSON with 0 image length - in block 2998
                     return Transaction.INVALID_IMAGE_LENGTH_MAX;
                 }
+            } else if (person.getImage().length < person.getMINimageLenght()) {
                 // 2998-1 - трнзакция забаненая
-            } else if (!(BlockChain.DEVELOP_USE && height < 300000)
-                    && person.getImage().length < person.getMINimageLenght()) {
-                return Transaction.INVALID_IMAGE_LENGTH_MIN;
+                if (!(BlockChain.DEVELOP_USE && height < 300000)
+                        && !(!BlockChain.DEVELOP_USE && height == 2998)) {
+                    return Transaction.INVALID_IMAGE_LENGTH_MIN;
+                }
             }
         } else {
             // person is DIE - any PHOTO
