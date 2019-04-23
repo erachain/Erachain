@@ -1288,7 +1288,9 @@ public class Controller extends Observable {
             try {
                 synchronizer.checkBadBlock(peer);
             } catch (Exception e) {
-                peer.ban(Synchronizer.BAN_BLOCK_TIMES << 2, "connection - BAD CHAIN");
+                if (!peer.isBanned()) {
+                    peer.ban(Synchronizer.BAN_BLOCK_TIMES, "lose connection: " + e.getMessage());
+                }
                 return;
             }
         }

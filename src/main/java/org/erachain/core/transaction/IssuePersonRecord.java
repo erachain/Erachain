@@ -217,6 +217,7 @@ public class IssuePersonRecord extends IssueItemRecord {
             return Transaction.ITEM_PERSON_HEIGHT_ERROR;
         }
 
+        // TODO  удалить правки протокола для новой цепочки NEW CHAIN
         if (!BlockChain.ANONIM_SERT_USE && person.isAlive(this.timestamp)) {
             // IF PERSON is LIVE
             if (person.getImage().length > person.getMAXimageLenght()) {
@@ -227,7 +228,7 @@ public class IssuePersonRecord extends IssueItemRecord {
                     return Transaction.INVALID_IMAGE_LENGTH_MAX;
                 }
                 // 2998-1 - трнзакция забаненая
-            } else if (!(!BlockChain.DEVELOP_USE && height == 2998)
+            } else if (!(BlockChain.DEVELOP_USE && height < 300000)
                     && person.getImage().length < person.getMINimageLenght()) {
                 return Transaction.INVALID_IMAGE_LENGTH_MIN;
             }
