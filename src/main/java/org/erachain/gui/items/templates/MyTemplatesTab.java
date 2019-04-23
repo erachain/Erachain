@@ -203,7 +203,7 @@ public class MyTemplatesTab extends SplitPanel {
         sell.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row);
+                AssetCls asset = assetsModel.getItem(row).b;
                 //	String account = assetsModel..getAccount(row);
                 //	AssetPairSelect a = new AssetPairSelect(asset.getKey(), "To sell", "");
 
@@ -216,7 +216,7 @@ public class MyTemplatesTab extends SplitPanel {
         excahge.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row);
+                AssetCls asset = assetsModel.getItem(row).b;
                 //		new AssetPairSelect(asset.getKey(), "","");
             }
         });
@@ -227,7 +227,7 @@ public class MyTemplatesTab extends SplitPanel {
         buy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row);
+                AssetCls asset = assetsModel.getItem(row).b;
                 //		new AssetPairSelect(asset.getKey(), "Buy","");
             }
         });
@@ -259,7 +259,7 @@ public class MyTemplatesTab extends SplitPanel {
 
                                                 row = table.getSelectedRow();
                                                 row = table.convertRowIndexToModel(row);
-                                                AssetCls asset = assetsModel.getItem(row);
+                                                AssetCls asset = assetsModel.getItem(row).b;
 
                                                 //IF ASSET CONFIRMED AND NOT ERM
 
@@ -297,7 +297,7 @@ public class MyTemplatesTab extends SplitPanel {
         details.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row);
+                AssetCls asset = assetsModel.getItem(row).b;
                 //			new AssetFrame(asset);
             }
         });
@@ -306,7 +306,7 @@ public class MyTemplatesTab extends SplitPanel {
         dividend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row);
+                AssetCls asset = assetsModel.getItem(row).b;
                 //		new PayDividendFrame(asset);
             }
         });
@@ -334,7 +334,7 @@ public class MyTemplatesTab extends SplitPanel {
 
                 if (e.getClickCount() == 2) {
                     row = table.convertRowIndexToModel(row);
-                    AssetCls asset = assetsModel.getItem(row);
+                    AssetCls asset = assetsModel.getItem(row).b;
                     //				new AssetPairSelect(asset.getKey(), "","");
                     //		new AssetFrame(asset);
                 }
@@ -342,7 +342,7 @@ public class MyTemplatesTab extends SplitPanel {
 
                     if (table.getSelectedColumn() == WalletItemAssetsTableModel.COLUMN_FAVORITE) {
                         row = table.convertRowIndexToModel(row);
-                        AssetCls asset = assetsModel.getItem(row);
+                        AssetCls asset = assetsModel.getItem(row).b;
                         favorite_set(table);
 
 
@@ -371,7 +371,7 @@ public class MyTemplatesTab extends SplitPanel {
     public void favorite_set(JTable assetsTable) {
 
 
-        AssetCls asset = assetsModel.getItem(row);
+        AssetCls asset = assetsModel.getItem(row).b;
         //new AssetPairSelect(asset.getKey());
 
         if (asset.getKey() >= AssetCls.INITIAL_FAVORITES) {

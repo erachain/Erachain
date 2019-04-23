@@ -10,6 +10,7 @@ import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,8 +71,7 @@ public class ItemSplitPanel extends SplitPanel {
                 return;
             }
             try {
-                itemTableSelected = (ItemCls) ItemSplitPanel.this.tableModel.getItem(jTableJScrollPanelLeftPanel
-                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+                itemTableSelected = getItem(jTableJScrollPanelLeftPanel.getSelectedRow());
             } catch (Exception e) {
                 logger.error(e.getMessage(),e);
                 return;
@@ -99,16 +99,16 @@ public class ItemSplitPanel extends SplitPanel {
                 Point point = e.getPoint();
                 int row = jTableJScrollPanelLeftPanel.rowAtPoint(point);
                 jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
-                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-                ItemCls item = (ItemCls) ItemSplitPanel.this.tableModel.getItem(row);
+
+                itemTableSelected = getItem(row);
 
                 if (e.getClickCount() == 2) {
-                    tableMouse2Click(item);
+                    tableMouse2Click(itemTableSelected);
                 }
 
                 if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
                     if (jTableJScrollPanelLeftPanel.getSelectedColumn() == ItemSplitPanel.this.tableModel.COLUMN_FAVORITE) {
-                        favoriteSet(item);
+                        favoriteSet(itemTableSelected);
                     }
                 }
             }
@@ -121,7 +121,7 @@ public class ItemSplitPanel extends SplitPanel {
             public void actionPerformed(ActionEvent e) {
                 int row = jTableJScrollPanelLeftPanel.getSelectedRow();
                 row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-                favoriteSet((ItemCls) ItemSplitPanel.this.tableModel.getItem(row));
+                favoriteSet(getItem(row));
 
             }
         });
@@ -139,7 +139,7 @@ public class ItemSplitPanel extends SplitPanel {
 
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
-                itemMenu = (ItemCls) ItemSplitPanel.this.tableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+                itemMenu = getItem(jTableJScrollPanelLeftPanel.getSelectedRow());
                 // IF ASSET CONFIRMED AND NOT ERM
                 favoriteMenuItems.setVisible(true);
                 // CHECK IF FAVORITES
@@ -148,9 +148,7 @@ public class ItemSplitPanel extends SplitPanel {
                 } else {
                     favoriteMenuItems.setText(Lang.getInstance().translate("Add Favorite"));
                 }
-
             }
-
 
         });
 
@@ -182,6 +180,17 @@ public class ItemSplitPanel extends SplitPanel {
     protected Component getShow(ItemCls item) {
         return null;
     }
+
+    protected ItemCls getItem(int row) {
+        Object item = ItemSplitPanel.this.tableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(row));
+        if (item instanceof Fun.Tuple2) {
+            return (ItemCls) ((Fun.Tuple2)item).b;
+        } else {
+            return (ItemCls)item;
+        }
+    }
+
+
 
     protected void tableMouse2Click(ItemCls item) {
     }

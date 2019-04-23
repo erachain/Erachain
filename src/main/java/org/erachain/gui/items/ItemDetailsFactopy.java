@@ -36,6 +36,8 @@ public class ItemDetailsFactopy extends JPanel {
                 return null;
             case ItemCls.PERSON_TYPE:
                 return null;
+            case ItemCls.POLL_TYPE:
+                return null;
             case ItemCls.UNION_TYPE:
                 UnionInfo cc;
                 cc = new UnionInfo();

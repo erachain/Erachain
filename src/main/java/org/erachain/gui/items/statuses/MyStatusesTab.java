@@ -128,7 +128,7 @@ public class MyStatusesTab extends SplitPanel {
             public void valueChanged(ListSelectionEvent arg0) {
                 StatusCls status = null;
                 if (table.getSelectedRow() >= 0)
-                    status = statusesModel.getItem(table.convertRowIndexToModel(table.getSelectedRow()));
+                    status = statusesModel.getItem(table.convertRowIndexToModel(table.getSelectedRow())).b;
                 if (status == null) return;
                 info1.show_001(status);
                 //	MainStatusesFrame.itemMy = status;
@@ -175,7 +175,7 @@ public class MyStatusesTab extends SplitPanel {
 
                                                             int row = table.getSelectedRow();
                                                             row = table.convertRowIndexToModel(row);
-                                                            StatusCls status = statusesModel.getItem(row);
+                                                            StatusCls status = statusesModel.getItem(row).b;
 
                                                             my_favorite.setVisible(true);
                                                             //CHECK IF FAVORITES
@@ -202,7 +202,7 @@ public class MyStatusesTab extends SplitPanel {
         int row = assetsTable.getSelectedRow();
         row = assetsTable.convertRowIndexToModel(row);
 
-        StatusCls status = statusesModel.getItem(row);
+        StatusCls status = statusesModel.getItem(row).b;
         //new AssetPairSelect(asset.getKey());
 
         if (status.getKey() >= StatusCls.INITIAL_FAVORITES) {

@@ -75,7 +75,7 @@ public class AssetsPanel extends JPanel {
                 int row = table.getSelectedRow();
                 row = table.convertRowIndexToModel(row);
 
-                AssetCls asset = assetsModel.getItem(row);
+                AssetCls asset = assetsModel.getItem(row).b;
                 new AssetFrame(asset);
             }
         });
@@ -87,7 +87,7 @@ public class AssetsPanel extends JPanel {
                 int row = table.getSelectedRow();
                 row = table.convertRowIndexToModel(row);
 
-                AssetCls asset = assetsModel.getItem(row);
+                AssetCls asset = assetsModel.getItem(row).b;
                 new PayDividendFrame(asset);
             }
         });
@@ -115,7 +115,7 @@ public class AssetsPanel extends JPanel {
 
                 if (e.getClickCount() == 2) {
                     row = table.convertRowIndexToModel(row);
-                    AssetCls asset = assetsModel.getItem(row);
+                    AssetCls asset = assetsModel.getItem(row).b;
                     new AssetFrame(asset);
                 }
             }
