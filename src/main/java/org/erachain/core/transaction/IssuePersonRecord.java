@@ -218,7 +218,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         }
 
         // TODO  удалить правки протокола для новой цепочки NEW CHAIN
-        if (!BlockChain.ANONIM_SERT_USE && person.isAlive(this.timestamp)) {
+        if (person.isAlive(this.timestamp)) {
             // IF PERSON is LIVE
             if (person.getImage().length > person.getMAXimageLenght()) {
                 if (height > 157640) {
