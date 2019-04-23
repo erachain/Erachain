@@ -26,8 +26,8 @@ import java.util.Set;
 //birthLatitude -90..90; birthLongitude -180..180
 public abstract class PersonCls extends ItemCls {
 
-    private int MAX_IMAGE_LENGTH = 22000;
-    private int MIN_IMAGE_LENGTH = 8000;
+    private int MAX_IMAGE_LENGTH = 20480;
+    private int MIN_IMAGE_LENGTH = MAX_IMAGE_LENGTH >> 1;
 
     public static final int HUMAN = 1;
     public static final int DOG = 2;
