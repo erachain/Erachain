@@ -141,7 +141,7 @@ public class TestRecPerson {
 
 
         //assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(db, Transaction.FOR_NETWORK));
-        assertEquals(Transaction.INVALID_IMAGE_LENGTH, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_IMAGE_LENGTH_MAX, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         issuePersonTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
@@ -319,7 +319,7 @@ public class TestRecPerson {
         init();
 
         //assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(db, Transaction.FOR_NETWORK));
-        assertEquals(Transaction.INVALID_IMAGE_LENGTH, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_IMAGE_LENGTH_MAX, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
         issuePersonTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issuePersonTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
