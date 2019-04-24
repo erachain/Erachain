@@ -2,6 +2,7 @@ package org.erachain.core.item.persons;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
@@ -26,7 +27,7 @@ import java.util.Set;
 //birthLatitude -90..90; birthLongitude -180..180
 public abstract class PersonCls extends ItemCls {
 
-    public static int MAX_IMAGE_LENGTH = 20480;
+    public static int MAX_IMAGE_LENGTH = BlockChain.DEVELOP_USE? 20480 : 28000;
     public static int MIN_IMAGE_LENGTH = MAX_IMAGE_LENGTH >> 1;
 
     public static final int HUMAN = 1;
