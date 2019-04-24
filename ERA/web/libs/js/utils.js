@@ -24,6 +24,6 @@ return marked(text);
 }
 
 //  return plain text
-return htmlFilter(wordwrap(text, 80, '\n', true));
+return htmlFilter(wordwrap(text, 0, '\n', true));
 
 }
