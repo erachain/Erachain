@@ -1279,7 +1279,7 @@ public class Controller extends Observable {
                 return;
             } else if (response.getSignatures().isEmpty()) {
                 // NO
-                peer.ban(Synchronizer.BAN_BLOCK_TIMES << 2, "connection - wrong GENESIS BLOCK");
+                peer.ban(Synchronizer.BAN_BLOCK_TIMES << 1, "connection - wrong GENESIS BLOCK");
                 return;
             }
         }
