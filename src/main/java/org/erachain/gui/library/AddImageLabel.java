@@ -90,18 +90,18 @@ public class AddImageLabel extends JLabel {
                             int templWidth = bezelWidth;
                             int templHeight = bezelHeight;
                             int counter = 0;
-                            while (imgBytes.length < minSize && counter++ < 10) {
+                            while (imgBytes.length < minSize && counter++ < 5) {
                                 imageStream.reset();
-                                templWidth *= 1.15;
-                                templHeight *= 1.15;
-                                Image scaledImage = image.getScaledInstance(templWidth, templHeight, Image.SCALE_SMOOTH);
+                                templWidth *= 1.2;
+                                templHeight *= 1.2;
+                                Image scaledImage = image.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
 
                                 if (typeOfImage == TypeOfImage.GIF) {
-                                    image =  new BufferedImage(templWidth, templHeight, BufferedImage.TYPE_INT_ARGB);
+                                    image = new BufferedImage(templWidth, templHeight, BufferedImage.TYPE_INT_ARGB);
                                     image.getGraphics().drawImage(scaledImage, 0, 0 , null);
                                     ImageIO.write(image, "gif", imageStream);
                                 } else {
-                                    image =  new BufferedImage(templWidth, templHeight, BufferedImage.TYPE_INT_RGB);
+                                    image = new BufferedImage(templWidth, templHeight, BufferedImage.TYPE_INT_RGB);
                                     image.getGraphics().drawImage(scaledImage, 0, 0 , null);
                                     ImageIO.write(image, "jpeg", imageStream);
                                 }
@@ -115,11 +115,11 @@ public class AddImageLabel extends JLabel {
                             int templWidth = bezelWidth;
                             int templHeight = bezelHeight;
                             int counter = 0;
-                            while (imgBytes.length > maxSize && counter++ < 20) {
+                            while (imgBytes.length > maxSize && counter++ < 10) {
                                 imageStream.reset();
-                                templWidth /= 1.1;
-                                templHeight /= 1.1;
-                                Image scaledImage = image.getScaledInstance(templWidth, templHeight, Image.SCALE_SMOOTH);
+                                templWidth /= 1.2;
+                                templHeight /= 1.2;
+                                Image scaledImage = image.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
 
                                 if (typeOfImage == TypeOfImage.GIF) {
                                     image =  new BufferedImage(templWidth, templHeight, BufferedImage.TYPE_INT_ARGB);
