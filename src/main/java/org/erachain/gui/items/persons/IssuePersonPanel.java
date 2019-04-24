@@ -134,7 +134,7 @@ public class IssuePersonPanel extends JPanel {
         copyButton.addActionListener(e -> onIssueClick(false));
 
         addImageLabel = new AddImageLabel(Lang.getInstance().translate("Add image"),
-                WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG);
+                WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG, PersonCls.MIN_IMAGE_LENGTH, PersonCls.MAX_IMAGE_LENGTH);
         addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
 
         // SET ONE TIME ZONE for Birthday

@@ -3,6 +3,8 @@ package org.erachain.gui.items.polls;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
@@ -40,11 +42,13 @@ public class IssuePollPanel extends JPanel {
         setLayout(new GridBagLayout());
         optionsTableModel = new CreateOptionsTableModel(new Object[]{Lang.getInstance().translate("Name")}, 0);
         addImageLabel = new AddImageLabel(
-                Lang.getInstance().translate("Add image"), WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG);
+                Lang.getInstance().translate("Add image"), WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG,
+                0, ItemCls.MAX_IMAGE_LENGTH);
         addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
 
         addLogoIconLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
-                WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF);
+                WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF,
+                0, ItemCls.MAX_ICON_LENGTH);
         addLogoIconLabel.setPreferredSize(new Dimension(WIDTH_LOGO, HEIGHT_LOGO));
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
