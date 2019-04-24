@@ -28,7 +28,7 @@ import java.util.Set;
 public abstract class PersonCls extends ItemCls {
 
     public static int MAX_IMAGE_LENGTH = BlockChain.DEVELOP_USE? 20480 : 28000;
-    public static int MIN_IMAGE_LENGTH = MAX_IMAGE_LENGTH >> 1;
+    public static int MIN_IMAGE_LENGTH = 10000;
 
     public static final int HUMAN = 1;
     public static final int DOG = 2;
