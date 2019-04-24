@@ -3,6 +3,7 @@ package org.erachain.gui.items.unions;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.IssueUnionRecord;
 import org.erachain.core.transaction.Transaction;
@@ -190,11 +191,12 @@ public class IssueUnionPanel extends JPanel {
         GridBagConstraints gridBagConstraints;
 
         addImageLabel = new AddImageLabel((Lang.getInstance().translate("Add image")),
-                WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG);
+                WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG, 0, ItemCls.MAX_IMAGE_LENGTH);
         addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
 
         addLogoLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
-                WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF);
+                WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF,
+                0, ItemCls.MAX_ICON_LENGTH);
         addLogoLabel.setPreferredSize(new Dimension(WIDTH_LOGO, HEIGHT_LOGO));
 
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);

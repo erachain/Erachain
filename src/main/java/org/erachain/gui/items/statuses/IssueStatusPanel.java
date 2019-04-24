@@ -3,6 +3,7 @@ package org.erachain.gui.items.statuses;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.IssueStatusRecord;
 import org.erachain.core.transaction.Transaction;
@@ -38,11 +39,11 @@ public class IssueStatusPanel extends JPanel {
 
         addImageLabel = new AddImageLabel(
                 Lang.getInstance().translate("Add image"),
-                WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG);
+                WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG, 0, ItemCls.MAX_IMAGE_LENGTH);
         addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
 
         addLogoIconPanel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
-                WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF);
+                WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF, 0, ItemCls.MAX_ICON_LENGTH);
         addLogoIconPanel.setPreferredSize(new Dimension(WIDTH_LOGO, HEIGHT_LOGO));
 
         JLabel labelCaption = new JLabel();
