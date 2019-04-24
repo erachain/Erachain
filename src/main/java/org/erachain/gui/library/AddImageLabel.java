@@ -90,10 +90,10 @@ public class AddImageLabel extends JLabel {
                             int templWidth = bezelWidth;
                             int templHeight = bezelHeight;
                             int counter = 0;
-                            while (imgBytes.length < minSize && counter++ < 5) {
+                            while (imgBytes.length < minSize && counter++ < 10) {
                                 imageStream.reset();
-                                templWidth *= 1.2;
-                                templHeight *= 1.2;
+                                templWidth *= 1.15;
+                                templHeight *= 1.15;
                                 Image scaledImage = image.getScaledInstance(templWidth, templHeight, Image.SCALE_SMOOTH);
 
                                 if (typeOfImage == TypeOfImage.GIF) {
@@ -115,10 +115,10 @@ public class AddImageLabel extends JLabel {
                             int templWidth = bezelWidth;
                             int templHeight = bezelHeight;
                             int counter = 0;
-                            while (imgBytes.length > maxSize && counter++ < 10) {
+                            while (imgBytes.length > maxSize && counter++ < 20) {
                                 imageStream.reset();
-                                templWidth /= 1.2;
-                                templHeight /= 1.2;
+                                templWidth /= 1.1;
+                                templHeight /= 1.1;
                                 Image scaledImage = image.getScaledInstance(templWidth, templHeight, Image.SCALE_SMOOTH);
 
                                 if (typeOfImage == TypeOfImage.GIF) {
