@@ -36,7 +36,7 @@ public class Synchronizer {
     private static final int BYTES_MAX_GET = 1024 << 10;
     private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class);
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
-    public static int BAN_BLOCK_TIMES = 7;
+    public static int BAN_BLOCK_TIMES = 4;
     private static int MAX_ORPHAN_TRANSACTIONS = BlockChain.DEVELOP_USE? 200000: 50000;
     // private boolean run = true;
     // private Block runedBlock;
