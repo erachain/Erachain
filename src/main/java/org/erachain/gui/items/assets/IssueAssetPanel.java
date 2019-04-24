@@ -83,9 +83,11 @@ public class IssueAssetPanel extends JPanel {
         GridBagConstraints gridBagConstraints;
 
         addImageLabel = new AddImageLabel(
-                Lang.getInstance().translate("Add image"), WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG);
+                Lang.getInstance().translate("Add image"), WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG,
+                0, ItemCls.MAX_IMAGE_LENGTH);
         addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
-        addLogoIconLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF);
+        addLogoIconLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF,
+                0, ItemCls.MAX_ICON_LENGTH);
         addLogoIconLabel.setPreferredSize(new Dimension(WIDTH_LOGO, HEIGHT_LOGO));
 
 
