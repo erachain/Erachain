@@ -5,10 +5,11 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.items.statuses.ComboBoxModelItemsStatuses;
+import org.erachain.gui.items.statuses.ComboBoxStatusesModel;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -32,7 +33,7 @@ public class UnionSetStatusDialog extends JDialog {
     // Variables declaration - do not modify
     private javax.swing.JButton jButton_Cansel;
     private javax.swing.JButton jButton_SetStatus;
-    private JComboBox<StatusCls> jComboBox_Status;
+    private JComboBox<ItemCls> jComboBox_Status;
     private JComboBox<Account> jComboBox_YourAddress;
     private javax.swing.JFormattedTextField jFormattedTextField_Fee;
     private javax.swing.JFormattedTextField jFormattedTextField_ToDo;
@@ -307,7 +308,7 @@ public class UnionSetStatusDialog extends JDialog {
         getContentPane().add(jLabel_Title, gridBagConstraints);
 
         //jComboBox_Status.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jComboBox_Status = new JComboBox<StatusCls>(new ComboBoxModelItemsStatuses());
+        jComboBox_Status = new JComboBox(new ComboBoxStatusesModel());
         jComboBox_Status.setMinimumSize(new java.awt.Dimension(400, 22));
         jComboBox_Status.setPreferredSize(new java.awt.Dimension(400, 22));
         jComboBox_Status.addActionListener(new java.awt.event.ActionListener() {

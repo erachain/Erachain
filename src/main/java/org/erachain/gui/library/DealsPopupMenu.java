@@ -2,6 +2,7 @@ package org.erachain.gui.library;
 
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base32;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.mails.MailSendDialog;
@@ -20,7 +21,7 @@ import java.awt.event.ActionListener;
 public class DealsPopupMenu extends JPopupMenu {
     
     public AccountsTableModel tableModel;
-    protected JComboBox<AssetCls> assetSelector;
+    protected JComboBox<ItemCls> assetSelector;
     protected AssetCls asset;
     protected PublicKeyAccount pubKey;
     protected MTable table;
@@ -32,7 +33,7 @@ public class DealsPopupMenu extends JPopupMenu {
     private JMenuItem debtAssetBackward;
     private JMenuItem holdAsset;
         
-    public DealsPopupMenu(AccountsTableModel tableModel, MTable table, JComboBox<AssetCls> assetSelector) {
+    public DealsPopupMenu(AccountsTableModel tableModel, MTable table, JComboBox<ItemCls> assetSelector) {
         this.tableModel = tableModel;
         this.table = table;
         this.assetSelector = assetSelector;

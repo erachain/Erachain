@@ -57,7 +57,7 @@ public class OutcomingMailsPanel extends JPanel // implements ItemListener
         favoritesGBC.gridy = 0;
 
         // ASSET FAVORITES
-        // cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
+        // cbxFavorites = new JComboBox<AssetCls>(new ComboBoxAssetsModel());
         // this.add(cbxFavorites, favoritesGBC);
 
         // TABLE

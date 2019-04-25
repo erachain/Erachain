@@ -27,9 +27,10 @@ import javax.swing.event.TableModelListener;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.items.assets.AssetsComboBoxModel;
+import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -42,7 +43,7 @@ public class CreditsPanel extends JPanel // implements ItemListener
 {
     //private JFrame parent;
 
-    public JComboBox<AssetCls> cbxFavorites;
+    public JComboBox<ItemCls> cbxFavorites;
     public CreditsTableModel tableModel;
     JTable table;
 
@@ -82,7 +83,7 @@ public class CreditsPanel extends JPanel // implements ItemListener
         favoritesGBC.gridy = 0;
 
         //ASSET FAVORITES
-        cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
+        cbxFavorites = new JComboBox<ItemCls>(new ComboBoxAssetsModel());
         this.add(cbxFavorites, favoritesGBC);
 
         //TABLE

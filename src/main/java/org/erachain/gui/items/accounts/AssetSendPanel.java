@@ -7,13 +7,14 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.AccountRenderer;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.assets.AssetInfo;
-import org.erachain.gui.items.assets.AssetsComboBoxModel;
+import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
@@ -109,12 +110,12 @@ public class AssetSendPanel extends javax.swing.JPanel {
        jComboBox_Account.setModel(accountsModel);
 
        // favorite combo box
-       jComboBox_Asset.setModel(new AssetsComboBoxModel());
+       jComboBox_Asset.setModel(new ComboBoxAssetsModel());
        if (asset != null) {
            this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
 
            for (int i = 0; i < jComboBox_Asset.getItemCount(); i++) {
-               AssetCls item = jComboBox_Asset.getItemAt(i);
+               ItemCls item = jComboBox_Asset.getItemAt(i);
                if (item.getKey() == asset.getKey()) {
                    // not worked jComboBox_Asset.setSelectedItem(asset);
                    jComboBox_Asset.setSelectedIndex(i);
@@ -734,7 +735,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
    public javax.swing.JButton jButton_ok;
    private javax.swing.JCheckBox jCheckBox_Enscript;
    private javax.swing.JComboBox<Account> jComboBox_Account;
-   public javax.swing.JComboBox<AssetCls> jComboBox_Asset;
+   public javax.swing.JComboBox<ItemCls> jComboBox_Asset;
    private javax.swing.JComboBox<String> jComboBox_Fee;
    private javax.swing.JLabel jLabel_Asset;
    private javax.swing.JLabel jLabel_Account;

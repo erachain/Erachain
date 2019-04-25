@@ -6,12 +6,13 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.AccountRenderer;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.items.assets.AssetsComboBoxModel;
+import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
@@ -58,7 +59,7 @@ public class ClassAccountTransactionPanel extends JPanel {
     public JCheckBox isText;
     public JButton sendButton;
     public AccountsComboBoxModel accountsModel;
-    public JComboBox<AssetCls> cbxFavorites;
+    public JComboBox<ItemCls> cbxFavorites;
     public JTextField txtRecDetails;
     public JLabel messageLabel;
     public JLabel icon;
@@ -523,10 +524,10 @@ public class ClassAccountTransactionPanel extends JPanel {
         // this.setVisible(true);
 
         // favorite combo box
-        cbxFavorites.setModel(new AssetsComboBoxModel());
+        cbxFavorites.setModel(new ComboBoxAssetsModel());
         if (asset != null) {
             for (int i = 0; i < cbxFavorites.getItemCount(); i++) {
-                AssetCls item = cbxFavorites.getItemAt(i);
+                ItemCls item = cbxFavorites.getItemAt(i);
                 if (item.getKey() == asset.getKey()) {
                     // not worked cbxFavorites.setSelectedItem(asset);
                     cbxFavorites.setSelectedIndex(i);
