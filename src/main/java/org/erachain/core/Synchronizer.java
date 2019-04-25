@@ -36,7 +36,7 @@ public class Synchronizer {
     private static final int BYTES_MAX_GET = 1024 << 10;
     private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class);
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
-    public static int BAN_BLOCK_TIMES = 8 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60;
+    public static int BAN_BLOCK_TIMES = 4;
     private static int MAX_ORPHAN_TRANSACTIONS = BlockChain.DEVELOP_USE? 200000: 50000;
     // private boolean run = true;
     // private Block runedBlock;
@@ -88,7 +88,7 @@ public class Synchronizer {
         try {
             block.getTransactions();
         } catch (Exception e) {
-            int banTime = BAN_BLOCK_TIMES << 1;
+            int banTime = BAN_BLOCK_TIMES;
             String mess = "*** getBlock: Dishonest peer - Invalid block on parse transactions. Ban for " + banTime;
             peer.ban(banTime, mess);
             throw new Exception(mess);
@@ -184,7 +184,7 @@ public class Synchronizer {
             if (countTransactionToOrphan > MAX_ORPHAN_TRANSACTIONS) {
                 String mess = "Dishonest peer by on lastCommonBlock[" + lastCommonBlock.getHeight()
                         + "] - reached MAX_ORPHAN_TRANSACTIONS: " + MAX_ORPHAN_TRANSACTIONS;
-                peer.ban(BAN_BLOCK_TIMES >> 2, mess);
+                peer.ban(mess);
                 throw new Exception(mess);
             }
 
@@ -222,7 +222,7 @@ public class Synchronizer {
                     String mess = "*** checkNewBlocks - already LAST and not equal SIGN! [" + height + "] "
                             + Base58.encode(block.getSignature())
                             + " from peer: " + peer;
-                    peer.ban(BAN_BLOCK_TIMES >> 3, mess);
+                    peer.ban(mess);
                     throw new Exception(mess);
                 }
             } else {
@@ -251,7 +251,7 @@ public class Synchronizer {
             } catch (Exception e) {
                 LOGGER.debug(e.getMessage(), e);
                 String mess = "Dishonest peer error block.getTransactions PARSE: " + height;
-                peer.ban(BAN_BLOCK_TIMES << 2, mess);
+                peer.ban(BAN_BLOCK_TIMES, mess);
                 throw new Exception(mess);
             }
 
@@ -273,7 +273,7 @@ public class Synchronizer {
 
                     // INVALID BLOCK THROW EXCEPTION
                     String mess = "Dishonest peer by weak FullWeight, heigh: " + height;
-                    peer.ban(BAN_BLOCK_TIMES >> 3, mess);
+                    peer.ban(mess);
                     throw new Exception(mess);
 
                 }
@@ -465,7 +465,7 @@ public class Synchronizer {
                     blockFromPeer = blockBuffer.getBlock(signature);
                 } catch (Exception e) {
                     blockBuffer.stopThread();
-                    peer.ban(0, "get block BUFFER - " + e.getMessage());
+                    peer.ban("get block BUFFER - " + e.getMessage());
                     throw new Exception(e);
                 }
 
