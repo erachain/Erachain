@@ -7,13 +7,14 @@ import com.toedter.calendar.JDateChooser;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.RSetStatusToItem;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.items.statuses.ComboBoxModelItemsStatuses;
+import org.erachain.gui.items.statuses.ComboBoxStatusesModel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
@@ -55,7 +56,7 @@ public class PersonSetStatusDialog extends JDialog {
     private PersonCls person;
     private MButton jButton_Cansel;
     private MButton jButton_SetStatus;
-    private JComboBox<StatusCls> jComboBox_Status;
+    private JComboBox<ItemCls> jComboBox_Status;
 
     /*
      * To change this license header, choose License Headers in Project Properties.
@@ -96,7 +97,7 @@ public class PersonSetStatusDialog extends JDialog {
         jLabel__Description.setText("%D (" + Lang.getInstance().translate("text") + ") :");
         ;
         jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + " (0..6):");
-        jComboBox_Status.setModel(new ComboBoxModelItemsStatuses());
+        jComboBox_Status.setModel(new ComboBoxStatusesModel());
         jComboBox_YourAddress.setModel(new AccountsComboBoxModel());
         jLabel_PersonInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         PersonInfo info = new PersonInfo();
