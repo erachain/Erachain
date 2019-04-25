@@ -55,6 +55,7 @@ public class PersonStatusesModel extends TimerTableModelCls<Tuple2<Long, Tuple5<
         statusesMap = dcSet.getItemStatusMap();
 
         addObservers();
+
     }
 
     public String getTransactionHeightSeqNo(int row) {
@@ -132,39 +133,8 @@ public class PersonStatusesModel extends TimerTableModelCls<Tuple2<Long, Tuple5<
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.LIST_STATUS_TYPE) {
-
-            setRows(null);
-            this.fireTableDataChanged();
-
-        } else if (
-                message.getType() == ObserverMessage.ADD_PERSON_STATUS_TYPE
-                        || message.getType() == ObserverMessage.REMOVE_PERSON_STATUS_TYPE)
-        {
-            Pair<Long, TreeMap> item = (Pair<Long, TreeMap>) message.getValue();
-            if (item.getKey().equals(itemKey)) {
-                needUpdate = true;
-                setRows(item.getValue());
-            }
-
-        } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
-            needUpdate = false;
-            this.fireTableDataChanged();
-        }
-    }
-
-    public void setRows(TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> reload) {
-
-        if (reload == null) {
-            statuses = dcSet.getPersonStatusMap().get(itemKey);
-        } else {
-            statuses = reload;
-        }
+    public void getIntervalThis(long start, long end) {
+        statuses = dcSet.getPersonStatusMap().get(itemKey);
 
         statusesRows = new ArrayList<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>>();
 
@@ -203,22 +173,6 @@ public class PersonStatusesModel extends TimerTableModelCls<Tuple2<Long, Tuple5<
             Collections.sort(statusesRows, comparator);
 
         }
-
-    }
-
-    public void addObservers() {
-
-        super.addObservers();
-
-        map.addObserver(this);
-
-    }
-
-    public void removeObservers() {
-
-        super.deleteObservers();
-
-        map.deleteObserver(this);
 
     }
 

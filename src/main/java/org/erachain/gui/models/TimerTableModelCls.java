@@ -3,6 +3,7 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBMap;
 import org.erachain.lang.Lang;
+import org.erachain.utils.ObserverMessage;
 import org.slf4j.Logger;
 
 import javax.swing.table.AbstractTableModel;
@@ -18,6 +19,11 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     private Timer timer;
     protected boolean needUpdate;
     protected boolean descending;
+
+    private int RESET_EVENT;
+    private int ADD_EVENT;
+    private int DELETE_EVENT;
+    private int LIST_EVENT;
 
     public int COLUMN_FAVORITE = 1000;
 
@@ -140,14 +146,28 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         return o == null ? Null.class : o.getClass();
     }
 
-    public abstract void syncUpdate(Observable o, Object arg);
-
     public void update(Observable o, Object arg) {
         try {
             this.syncUpdate(o, arg);
         } catch (Exception e) {
             if (logger != null)
                 logger.error(e.getMessage(),e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public synchronized void syncUpdate(Observable o, Object arg) {
+        ObserverMessage message = (ObserverMessage) arg;
+
+        if (message.getType() == ADD_EVENT
+                        || message.getType() == DELETE_EVENT) {
+            needUpdate = true;
+        } else if (message.getType() == LIST_EVENT
+                    || message.getType() == RESET_EVENT
+                    || message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
+            needUpdate = false;
+            getInterval();
+            this.fireTableDataChanged();
         }
     }
 
@@ -197,6 +217,17 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
             initTimer();
         else {
             Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
+            if (map != null) {
+
+                RESET_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_RESET);
+                LIST_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_LIST);
+                ADD_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_ADD);
+                DELETE_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_REMOVE);
+
+                map.addObserver(this);
+                getInterval();
+                fireTableDataChanged();
+            }
         }
 
     }
@@ -206,6 +237,9 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
             stopTimer();
         else {
             Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
+            if (map != null) {
+                map.deleteObserver(this);
+            }
         }
     }
 

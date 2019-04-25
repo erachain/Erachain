@@ -194,18 +194,4 @@ public class PersonAccountsModel extends TimerTableModelCls<Fun.Tuple5<String, I
 
     }
 
-    public void addObservers() {
-
-        super.addObservers();
-
-        map.addObserver(this);
-    }
-
-
-    public void removeObservers() {
-
-        super.deleteObservers();
-
-        map.deleteObserver(this);
-    }
 }
