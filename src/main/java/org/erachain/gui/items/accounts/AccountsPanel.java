@@ -21,9 +21,10 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.Gui;
-import org.erachain.gui.items.assets.AssetsComboBoxModel;
+import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.library.DealsPopupMenu;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.WalletCreateAccountButton;
@@ -41,7 +42,7 @@ public class AccountsPanel extends JPanel // implements ItemListener
 {
     //private JFrame parent;
 
-    public JComboBox<AssetCls> cbxFavorites;
+    public JComboBox<ItemCls> cbxFavorites;
     public AccountsTableModel tableModel;
     public WalletCreateAccountButton newAccount_Button;
     public WalletSyncButton reload_Button;
@@ -89,7 +90,7 @@ public class AccountsPanel extends JPanel // implements ItemListener
         favoritesGBC.gridy = 0;
 
         //ASSET FAVORITES
-        cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
+        cbxFavorites = new JComboBox<ItemCls>(new ComboBoxAssetsModel());
         this.add(cbxFavorites, favoritesGBC);
 
 

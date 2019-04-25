@@ -63,6 +63,10 @@ public class FavoriteItemMap extends Observable {
         return itemsSet.subSet(fromKey, toKey);
     }
 
+    public int getObserverEvent() {
+        return observerFavorites;
+    }
+
     @Override
     public void addObserver(Observer o) {
         //ADD OBSERVER
