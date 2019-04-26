@@ -63,7 +63,7 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
                 new Boolean[]{false, true, true, false, false}, false);
 
         dcSet = DCSet.getInstance();
-       addObservers();
+        addObservers();
 
     }
 
@@ -194,46 +194,8 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        // CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-            if (this.trans_List == null) {
-                get_R_Send();
-
-            }
-
-        } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
-            Transaction transaction = (Transaction) ((Tuple2) message.getValue()).b;
-            if (transaction != null && trans_Hash_Map != null) {
-                trans_Parse(transaction);
-                needUpdate = true;
-            }
-
-        } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-            Object transaction = message.getValue();
-            if (transaction != null && trans_Hash_Map != null && trans_Hash_Map.remove(((Tuple2)transaction).b) != null) {
-                needUpdate = true;
-            }
-
-        } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
-
-            needUpdate = false;
-            get_R_Send();
-            this.fireTableDataChanged();
-
-        }
-
-    }
-
-    public void set_ActionTypes(HashSet str) {
-        actionTypes = str;
-
-    }
-
-    public void get_R_Send() {
+    @Override
+    public void getIntervalThis(long start, long end) {
 
         if (this.sender == null || this.asset == null)
             return;
@@ -370,25 +332,6 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
         }
 
         return true;
-
-    }
-
-    public void addObservers() {
-        if (Controller.getInstance().doesWalletDatabaseExists()) {
-            map.addObserver(this);
-        }
-
-        super.addObservers();
-
-    }
-
-    public void deleteObservers() {
-
-        super.deleteObservers();
-
-        if (Controller.getInstance().doesWalletDatabaseExists()) {
-            map.deleteObserver(this);
-        }
 
     }
 
