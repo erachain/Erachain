@@ -61,7 +61,7 @@ public class AccountsNameTableModel extends SortedListTableModelCls<String, Tupl
         Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfBalance;
         String str;
 
-        JSONObject ansver;
+        JSONObject answer;
         switch (column) {
             case COLUMN_ADDRESS:
                 return account.getA();
@@ -88,11 +88,11 @@ public class AccountsNameTableModel extends SortedListTableModelCls<String, Tupl
                 return row + 1;
             case COLUMN_DESCRIPTION:
 
-                ansver = (JSONObject) JSONValue.parse(account.getB().b);
-                ansver = ansver == null ? new JSONObject() : ansver;
+                answer = (JSONObject) JSONValue.parse(account.getB().b);
+                answer = answer == null ? new JSONObject() : answer;
                 // set papams
-                if (ansver.containsKey("description")) {
-                    return ansver.get("description");
+                if (answer.containsKey("description")) {
+                    return answer.get("description");
                 }
                 return "";
 			/*
