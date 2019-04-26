@@ -214,7 +214,9 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             }
 
         } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
-            if (trans_Parse((Transaction) message.getValue())) {
+            Transaction transaction = (Transaction) ((Tuple2) message.getValue()).b;
+            if (transaction != null && trans_Hash_Map != null) {
+                trans_Parse(transaction);
                 needUpdate = true;
             }
 

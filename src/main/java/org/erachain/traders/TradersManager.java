@@ -52,7 +52,7 @@ public class TradersManager extends Observable {
         }
 
 
-        if (true) {
+        if (false) {
             //START RATERs THREADs
             RaterWEX raterForex = new RaterWEX(this, 300);
             this.knownRaters.add(raterForex);
