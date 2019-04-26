@@ -225,9 +225,14 @@ public class AssetPairSelect extends JDialog {
             @Override
             public void valueChanged(ListSelectionEvent arg0) {
 
-                if (pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow() >= 0) {
+                if (pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow() >= 0
+                        && pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow() < pair_Panel.jTableJScrollPanelLeftPanel.getRowCount() ) {
                     AssetPairSelectTableModel tableModelAssets1 = (AssetPairSelectTableModel) pair_Panel.jTableJScrollPanelLeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTableJScrollPanelLeftPanel.getModel();
-                    Object asset = tableModelAssets1.getItem(pair_Panel.jTableJScrollPanelLeftPanel.convertRowIndexToModel(pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow()));
+                    Object asset = tableModelAssets1.getItem(pair_Panel
+                            .jTableJScrollPanelLeftPanel
+                                .convertRowIndexToModel(pair_Panel
+                                    .jTableJScrollPanelLeftPanel
+                                        .getSelectedRow()));
 
                     pair_Panel.jScrollPaneJPanelRightPanel.setViewportView(new AssetInfo((AssetCls) asset));
                     pair_Panel.button1ToolBarLeftPanel.setEnabled(true);
