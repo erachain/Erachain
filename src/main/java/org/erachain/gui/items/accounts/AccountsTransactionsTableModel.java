@@ -100,14 +100,19 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
                 if (r_Tran.transaction.isConfirmed(DCSet.getInstance()))
                     return r_Tran.transaction.viewHeightSeq();
                 return "-";
+
             case COLUMN_AMOUNT:
                 return r_Tran.amount;
+
             case COLUMN_ASSET:
                 return Controller.getInstance().getAsset(r_Tran.key);
+
             case COLUMN_TYPE:
                 return r_Tran.transaction.viewFullTypeName();
+
             case COLUMN_RECIPIENT:
                 return r_Tran.recipient;
+
             case COLUMN_SENDER:
                 if (r_Tran.owner == null)
                     return "GENESIS";
