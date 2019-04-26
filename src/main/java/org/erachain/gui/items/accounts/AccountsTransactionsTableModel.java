@@ -6,10 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.GenesisTransferAssetTransaction;
-import org.erachain.core.transaction.RCalculated;
-import org.erachain.core.transaction.RSend;
-import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.*;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
@@ -58,12 +55,14 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
     private byte[] publicKey;
 
     private HashSet actionTypes;
+    private DCSet dcSet;
 
     public AccountsTransactionsTableModel() {
         super(Controller.getInstance().wallet.database.getTransactionMap(),
                 new String[]{"Date", "RecNo", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "Type Asset"},
                 new Boolean[]{false, true, true, false, false}, false);
 
+        dcSet = DCSet.getInstance();
        addObservers();
 
     }
@@ -129,15 +128,13 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
                     return r_Tran.transaction.viewHeightSeq();
                 return "-";
             case COLUMN_AMOUNT:
-                //	if (r_Tran.transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION)
                 return r_Tran.amount;
             case COLUMN_ASSET:
-                return Controller.getInstance().getAsset(r_Tran.transaction.getAbsKey()).toString();
-
+                return Controller.getInstance().getAsset(r_Tran.key);
             case COLUMN_TYPE:
                 return r_Tran.transaction.viewFullTypeName();
             case COLUMN_RECIPIENT:
-                return r_Tran.transaction.viewRecipient();
+                return r_Tran.recipient;
             case COLUMN_SENDER:
                 if (r_Tran.owner == null)
                     return "GENESIS";
@@ -276,8 +273,9 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
         Trans trr = new Trans();
         if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             RSend r_send = (RSend) transaction;
+            trr.key = r_send.getKey();
             trr.owner = r_send.getCreator();
-            trr.recipient = r_send.getRecipient();
+            trr.recipient = r_send.viewRecipient();
             trr.transaction = r_send;
             trr.amount = r_send.getAmount();
             trr.title = r_send.getHead();
@@ -311,10 +309,11 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             String own = "";
             if (gen_send.getOwner() != null) own = gen_send.getOwner().getAddress();
 
-
+            trr.key = gen_send.getKey();
             trr.transaction = gen_send;
+            trr.recipient = own;
             trr.amount = gen_send.getAmount();
-            trr.title = "GENESIS";
+            trr.title = "";
 
             if (!gen_send.getRecipient().getAddress().equals(this.sender.getAddress()))
                 trr.amount = gen_send.getAmount().multiply(new BigDecimal("-1"));
@@ -322,17 +321,40 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             if (gen_send.getCreator() != null) trr.owner = gen_send.getCreator();
             // if is owner
             if (gen_send.getOwner() != null) trr.owner = gen_send.getOwner();
-            trr.recipient = gen_send.getRecipient();
+            trr.recipient = gen_send.viewRecipient();
             trans_Hash_Map.put(transaction.viewSignature(), trr);
 
         } else if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
             RCalculated calculated = (RCalculated) transaction;
 
             trr.transaction = calculated;
+            trr.key = calculated.getKey();
             trr.amount = calculated.getAmount();
-            trr.recipient = calculated.getRecipient();
+            trr.recipient = calculated.viewRecipient();
             trr.title = calculated.getMessage();
             trans_Hash_Map.put(calculated.viewSignature(), trr);
+
+        } else if (transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
+            CreateOrderTransaction createOrder = (CreateOrderTransaction) transaction;
+
+            trr.key = createOrder.getKey();
+            trr.owner = createOrder.getCreator();
+            trr.transaction = createOrder;
+            trr.amount = createOrder.getAmount();
+            trr.recipient = "" + createOrder.getWantKey();
+            trr.title = ""+ createOrder.getAmountWant().toPlainString();
+            trans_Hash_Map.put(transaction.viewSignature(), trr);
+
+        } else if (transaction.getType() == Transaction.CANCEL_ORDER_TRANSACTION) {
+            CancelOrderTransaction cancelOrder = (CancelOrderTransaction) transaction;
+
+            trr.key = cancelOrder.getKey();
+            trr.owner = cancelOrder.getCreator();
+            trr.transaction = cancelOrder;
+            trr.amount = cancelOrder.getAmount();
+            trr.recipient = "" + cancelOrder.getOrderID();
+            trr.title = "";
+            trans_Hash_Map.put(transaction.viewSignature(), trr);
 
         }
 
@@ -360,9 +382,10 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
     }
 
     class Trans {
+        public Long key;
         public BigDecimal amount;
         public Account owner;
-        public Account recipient;
+        public String recipient;
         public String title;
         public Transaction transaction;
     }
