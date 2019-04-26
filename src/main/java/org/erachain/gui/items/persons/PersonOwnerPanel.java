@@ -3,6 +3,7 @@ package org.erachain.gui.items.persons;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.gui.items.accounts.AccountSendDialog;
 import org.erachain.gui.items.mails.MailSendDialog;
+import org.erachain.gui.items.statement.StatementsVouchTableModel;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -10,6 +11,7 @@ import org.erachain.utils.TableMenuPopupUtil;
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -35,6 +37,20 @@ public class PersonOwnerPanel extends JPanel {
 
         person_Accounts_Model = new TableModelOwnerPersons(person.getKey());
         jTable_My_Persons = new MTable(person_Accounts_Model);
+
+        //почемуто перестает показывать вообще всю инфо если включить тут TableColumn favorite_Column = jTable_My_Persons.getColumnModel().getColumn(TableModelOwnerPersons.COLUMN_FAVORITE);
+        //favorite_Column.setCellRenderer(jTable_My_Persons.getDefaultRenderer(Boolean.class));
+        //favorite_Column.setMinWidth(50);
+        //favorite_Column.setMaxWidth(150);
+        //favorite_Column.setPreferredWidth(100);
+
+        TableColumn height_Column = jTable_My_Persons.getColumnModel().getColumn(TableModelOwnerPersons.COLUMN_KEY);
+        //favoriteColumn.setCellRenderer(new RendererBoolean()); //personsTable.getDefaultRenderer(Boolean.class));
+        int rr = (int) (getFontMetrics(UIManager.getFont("Table.font")).stringWidth("0000222"));
+        height_Column.setMinWidth(rr + 1);
+        height_Column.setMaxWidth(rr * 10);
+        height_Column.setPreferredWidth(rr + 5);
+
 
         jScrollPane_Tab_My_Persons = new JScrollPane();
         jScrollPane_Tab_My_Persons.setViewportView(jTable_My_Persons);
