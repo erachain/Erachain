@@ -12,6 +12,7 @@ import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.gui.models.SortedListTableModelCls;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
@@ -23,7 +24,7 @@ import java.util.*;
 ////////
 
 @SuppressWarnings("serial")
-public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tuple2<Long, Long>, Transaction> implements ObserverWaiter {
+public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsTransactionsTableModel.Trans> implements ObserverWaiter {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TRANSACTION = 1;
     public static final int COLUMN_AMOUNT = 2;
@@ -35,11 +36,6 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
     public static final int COLUMN_MESSAGE = 8;
     public static final int COLUMN_CONFIRM = 9;
     public static final int COLUMN_ACTION_TYPE = 19;
-
- //   private List<Transaction> r_Trans;
-    private HashMap<String, Trans> trans_Hash_Map;
-
-    private Object[] trans_List;
 
     private boolean isEncrypted = true;
 
@@ -70,43 +66,27 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
     }
 
     public void set_Account(Account sender) {
-
         this.sender = sender;
-        if (listSorted != null)
-            listSorted.setFilter(this.sender.getAddress());
-
     }
 
     public void set_Asset(AssetCls asset) {
-
         this.asset = asset;
-
     }
 
     public void set_Encryption(boolean encr) {
         this.isEncrypted = encr;
-
-    }
-
-
-    @Override
-    public int getRowCount() {
-        // return this.r_Trans.size();
-        if (trans_List == null || trans_List.length == 0)
-            return 0;
-        return trans_List.length;
     }
 
     @Override
     public Object getValueAt(int row, int column) {
 
-        if (this.trans_List == null || this.trans_List.length == 0 || sender == null) {
+        if (this.list == null || this.list.size() == 0 || sender == null) {
             return null;
         }
 
         // fill table
 
-        Trans r_Tran = (Trans) trans_List[row];
+        Trans r_Tran = list.get(row);
 
         String str;
         switch (column) {
@@ -200,8 +180,8 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
 
         Iterator<Tuple2<Long, Long>> keysIterator = ((TransactionMap) map).getAddressDescendingIterator(this.sender);
 
-        trans_Hash_Map = new HashMap<String, Trans>();
-        trans_List = null;
+        list = new ArrayList<>();
+
         int counter = 0;
         while (keysIterator.hasNext() && counter < 333) {
             Tuple2<Long, Long> key = keysIterator.next();
@@ -211,9 +191,6 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             }
         }
 
-        trans_List = trans_Hash_Map.values().toArray();
-
-        this.fireTableDataChanged();
     }
 
     private boolean trans_Parse(Transaction transaction) {
@@ -248,18 +225,15 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
                         trr.amount = r_send.getAmount().multiply(new BigDecimal("-1"));
                     }
 
-
-                trans_Hash_Map.put(transaction.viewSignature(), trr);
             } else {
                 // view set types
                 if (actionTypes.contains(r_send.viewFullTypeName())) {
 
-                    if (r_send.getCreator().getAddress().equals(this.sender.getAddress()))
+                    if (r_send.getCreator().getAddress().equals(this.sender.getAddress())) {
                         if (r_send.getAmount() != null) {
                             trr.amount = r_send.getAmount().multiply(new BigDecimal("-1"));
                         }
-
-                    trans_Hash_Map.put(transaction.viewSignature(), trr);
+                    }
                 }
             }
         } else if (transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
@@ -284,7 +258,6 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             // if is owner
             if (gen_send.getOwner() != null) trr.owner = gen_send.getOwner();
             trr.recipient = gen_send.viewRecipient();
-            trans_Hash_Map.put(transaction.viewSignature(), trr);
 
         } else if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
             RCalculated calculated = (RCalculated) transaction;
@@ -294,7 +267,6 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             trr.amount = calculated.getAmount();
             trr.recipient = calculated.viewRecipient();
             trr.title = calculated.getMessage();
-            trans_Hash_Map.put(calculated.viewSignature(), trr);
 
         } else if (transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
             CreateOrderTransaction createOrder = (CreateOrderTransaction) transaction;
@@ -305,7 +277,6 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             trr.amount = createOrder.getAmount();
             trr.recipient = "" + createOrder.getWantKey();
             trr.title = ""+ createOrder.getAmountWant().toPlainString();
-            trans_Hash_Map.put(transaction.viewSignature(), trr);
 
         } else if (transaction.getType() == Transaction.CANCEL_ORDER_TRANSACTION) {
             CancelOrderTransaction cancelOrder = (CancelOrderTransaction) transaction;
@@ -316,7 +287,6 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             trr.amount = cancelOrder.getAmount();
             trr.recipient = "" + cancelOrder.getOrderID();
             trr.title = "";
-            trans_Hash_Map.put(transaction.viewSignature(), trr);
 
         } else {
             trr.key = transaction.getKey();
@@ -325,9 +295,10 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             trr.amount = transaction.getAmount();
             trr.recipient = "";
             trr.title = transaction.getTitle();
-            trans_Hash_Map.put(transaction.viewSignature(), trr);
 
         }
+
+        list.add(trr);
 
         return true;
 
