@@ -1208,7 +1208,7 @@ public class BlockExplorer {
                     String acc = personModel.getValueAt(i, 0).toString();
 
                     myIssuePersons.addAll(transactionsMap.getTransactionsByTypeAndAddress(acc,
-                            Transaction.ISSUE_PERSON_TRANSACTION, 0));
+                            Transaction.ISSUE_PERSON_TRANSACTION, 200));
 
                     Account account = new Account(acc);
                     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
@@ -1259,8 +1259,6 @@ public class BlockExplorer {
                     Stack<Tuple3<Integer, Integer, Integer>> stack = addresses.get(address);
                     Tuple3<Integer, Integer, Integer> item = stack.peek();
                     Transaction transactionIssue = transactionsMap.get(item.b, item.c);
-                    if (transactionIssue == null)
-                        continue;
 
                     Map accountJSON = new LinkedHashMap();
                     accountJSON.put("address", address);
@@ -1270,7 +1268,8 @@ public class BlockExplorer {
 
                     accountsJSON.put(i++, accountJSON);
 
-                    myIssuePersons.addAll(transactionsMap.getTransactionsByTypeAndAddress(address, Transaction.ISSUE_PERSON_TRANSACTION, 50));
+                    myIssuePersons.addAll(transactionsMap.getTransactionsByTypeAndAddress(address,
+                            Transaction.ISSUE_PERSON_TRANSACTION, 200));
 
                     Account account = new Account(address);
                     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance

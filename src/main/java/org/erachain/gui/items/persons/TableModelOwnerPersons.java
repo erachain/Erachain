@@ -59,22 +59,12 @@ public class TableModelOwnerPersons extends TimerTableModelCls<PersonCls> {
 
                 return person.viewName();
 
-            //	case COLUMN_ADDRESS:
-
-            //		return person.getOwner().getPersonAsString();
-
             case COLUMN_BORN:
 
-                //	DateFormat f = new DateFormat("DD-MM-YYYY");
-                //SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY");
-                //return  dateFormat.format( new Date(person.getBirthday()));
                 return person.getBirthdayStr();
 
             case COLUMN_FAVORITE:
 
-                //	DateFormat f = new DateFormat("DD-MM-YYYY");
-                //SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY");
-                //return  dateFormat.format( new Date(person.getBirthday()));
                 return person.isFavorite();
 
 
