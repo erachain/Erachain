@@ -67,11 +67,6 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
 
     }
 
-    public void repaint() {
-
-        this.fireTableDataChanged();
-    }
-
     public void set_Account(Account sender) {
 
         this.sender = sender;

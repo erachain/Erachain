@@ -85,7 +85,7 @@ public class AccountsRightPanel extends JPanel {
         
        // sort list  - AUTO sort
         List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-        sortKeys.add(new RowSorter.SortKey(table_Model.COLUMN_TRANSACTION, SortOrder.ASCENDING));
+        sortKeys.add(new RowSorter.SortKey(table_Model.COLUMN_TRANSACTION, SortOrder.DESCENDING));
         t.setSortKeys(sortKeys);
        // sort table
         jTable1.setRowSorter(t);
