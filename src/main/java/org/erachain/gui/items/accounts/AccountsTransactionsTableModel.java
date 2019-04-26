@@ -38,7 +38,9 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
 
  //   private List<Transaction> r_Trans;
     private HashMap<String, Trans> trans_Hash_Map;
+
     private Object[] trans_List;
+
     private boolean isEncrypted = true;
 
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Date", "RecNo", "Amount",
@@ -84,10 +86,6 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
     public void set_Encryption(boolean encr) {
         this.isEncrypted = encr;
 
-    }
-
-    public Transaction getItem(int row) {
-        return ((Trans) this.trans_List[row]).transaction;
     }
 
 
