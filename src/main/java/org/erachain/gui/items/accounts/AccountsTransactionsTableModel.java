@@ -26,7 +26,7 @@ import java.util.*;
 ////////
 
 @SuppressWarnings("serial")
-public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> implements ObserverWaiter {
+public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tuple2<Long, Long>, Transaction> implements ObserverWaiter {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TRANSACTION = 1;
     public static final int COLUMN_AMOUNT = 2;
@@ -48,7 +48,7 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "Type Asset"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
 
-    private SortableList<Tuple2<String, String>, Transaction> sortableItems;
+    private SortableList<Tuple2<Long, Long>, Transaction> sortableItems;
     private Account sender;
 
     private AssetCls asset;
