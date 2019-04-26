@@ -356,6 +356,15 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             trr.title = "";
             trans_Hash_Map.put(transaction.viewSignature(), trr);
 
+        } else {
+            trr.key = transaction.getKey();
+            trr.owner = transaction.getCreator();
+            trr.transaction = transaction;
+            trr.amount = transaction.getAmount();
+            trr.recipient = "";
+            trr.title = "";
+            trans_Hash_Map.put(transaction.viewSignature(), trr);
+
         }
 
         return true;
