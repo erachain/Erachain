@@ -243,7 +243,7 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
         if (this.sender == null || this.asset == null)
             return;
 
-        Iterator<Tuple2<Long, Long>> keysIterator = ((TransactionMap) map).getAddressIterator(this.sender);
+        Iterator<Tuple2<Long, Long>> keysIterator = ((TransactionMap) map).getAddressDescendingIterator(this.sender);
 
         trans_Hash_Map = new HashMap<String, Trans>();
         trans_List = null;
@@ -271,6 +271,8 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
                 // все для Компушек
             && this.asset.getKey() != Transaction.FEE_KEY)
                 return false;
+
+        transaction.setDC_HeightSeq(dcSet);
 
         Trans trr = new Trans();
         if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
