@@ -136,7 +136,7 @@ public class PersonOwnerPanel extends JPanel {
 
     public void delay_on_close() {
 
-        person_Accounts_Model.removeObservers();
+        person_Accounts_Model.deleteObservers();
 
 
     }

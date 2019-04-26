@@ -28,8 +28,7 @@ public class PersonStatusesModel extends TimerTableModelCls<Tuple2<Long, Tuple5<
     public static final int COLUMN_MAKER = 2;
     public static final int COLUMN_CREATOR_NAME = 30;
 
-    TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses;
-    List<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>> statusesRows;
+    //TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses;
 
     SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
     //TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DLSet.getInstance().getPersonAddressMap().getItems(person.getKey());
@@ -60,13 +59,13 @@ public class PersonStatusesModel extends TimerTableModelCls<Tuple2<Long, Tuple5<
 
     public String getTransactionHeightSeqNo(int row) {
 
-        Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>> value = statusesRows.get(row);
+        Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>> value = list.get(row);
         return value.b.d + "-" + value.b.e;
     }
 
     public Account getCreator(int row) {
 
-        Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>> value = statusesRows.get(row);
+        Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>> value = list.get(row);
 
         int block = value.b.d;
         int recNo = value.b.e;
@@ -77,11 +76,11 @@ public class PersonStatusesModel extends TimerTableModelCls<Tuple2<Long, Tuple5<
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (statusesRows == null || row > statusesRows.size() - 1) {
+        if (list == null || row > list.size() - 1) {
             return null;
         }
 
-        Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>> value = statusesRows.get(row);
+        Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>> value = list.get(row);
         int block;
         int recNo;
         Transaction record;
@@ -133,10 +132,11 @@ public class PersonStatusesModel extends TimerTableModelCls<Tuple2<Long, Tuple5<
         return null;
     }
 
+    @Override
     public void getIntervalThis(long start, long end) {
-        statuses = dcSet.getPersonStatusMap().get(itemKey);
+        TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses = dcSet.getPersonStatusMap().get(itemKey);
 
-        statusesRows = new ArrayList<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>>();
+        list = new ArrayList<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>>();
 
         for (long statusKey : statuses.keySet()) {
             Stack<Tuple5<Long, Long, byte[], Integer, Integer>> statusStack = statuses.get(statusKey);
@@ -147,10 +147,10 @@ public class PersonStatusesModel extends TimerTableModelCls<Tuple2<Long, Tuple5<
             StatusCls status = (StatusCls) statusesMap.get(statusKey);
             if (status.isUnique()) {
                 // UNIQUE - only on TOP of STACK
-                statusesRows.add(new Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>(statusKey, statusStack.peek()));
+                list.add(new Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>(statusKey, statusStack.peek()));
             } else {
                 for (Tuple5<Long, Long, byte[], Integer, Integer> statusItem : statusStack) {
-                    statusesRows.add(new Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>(statusKey, statusItem));
+                    list.add(new Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>(statusKey, statusItem));
                 }
             }
 
@@ -170,7 +170,7 @@ public class PersonStatusesModel extends TimerTableModelCls<Tuple2<Long, Tuple5<
                 }
             };
 
-            Collections.sort(statusesRows, comparator);
+            Collections.sort(list, comparator);
 
         }
 

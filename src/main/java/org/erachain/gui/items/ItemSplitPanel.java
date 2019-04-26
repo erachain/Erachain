@@ -80,6 +80,7 @@ public class ItemSplitPanel extends SplitPanel {
                 return;
             }
             try {
+                // TODO почемуто при выборе персоны сюда 2 раза прилетает и перерисовка дважды идет
                 jScrollPaneJPanelRightPanel.setViewportView(getShow(itemTableSelected));
             } catch (Exception e) {
                 jScrollPaneJPanelRightPanel.setViewportView(null);

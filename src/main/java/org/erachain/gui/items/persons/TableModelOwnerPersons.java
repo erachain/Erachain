@@ -5,6 +5,7 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemPersonMap;
 import org.erachain.gui.models.SortedListTableModelCls;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
@@ -12,7 +13,7 @@ import org.mapdb.Fun.Tuple2;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class TableModelOwnerPersons extends SortedListTableModelCls<String, PersonCls> {
+public class TableModelOwnerPersons extends TimerTableModelCls<PersonCls> {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_BORN = 2;
@@ -24,7 +25,7 @@ public class TableModelOwnerPersons extends SortedListTableModelCls<String, Pers
     public TableModelOwnerPersons(Long key) {
         super(DCSet.getInstance().getItemPersonMap(),
                 new String[]{"Key", "Name", "Birthday"},
-                new Boolean[]{false, true, true, false}, false);
+                new Boolean[]{false, true, true, false}, true);
 
         itemKey = key;
 
@@ -34,11 +35,11 @@ public class TableModelOwnerPersons extends SortedListTableModelCls<String, Pers
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.listSorted == null || row > this.listSorted.size() - 1) {
+        if (this.list == null || row > this.list.size() - 1) {
             return null;
         }
 
-        PersonCls person = this.listSorted.get(row).getB();
+        PersonCls person = this.list.get(row);
 
         switch (column) {
             case COLUMN_KEY:
@@ -66,51 +67,17 @@ public class TableModelOwnerPersons extends SortedListTableModelCls<String, Pers
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
+    @Override
+    public void getIntervalThis(long start, long end) {
 
-        //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.LIST_PERSON_TYPE) {
-
-            setRows();
-            this.fireTableDataChanged();
-
-        } else
-        //CHECK IF LIST UPDATED
-        if (message.getType() == ObserverMessage.ADD_PERSON_TYPE || message.getType() == ObserverMessage.REMOVE_PERSON_TYPE) {
-
-            needUpdate = true;
-
-        } else
-        if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
-            needUpdate = false;
-            setRows();
-            this.fireTableDataChanged();
-        }
-    }
-
-    public void addObservers() {
-        super.addObservers();
-        map.addObserver(this);
-    }
-
-    public void removeObservers() {
-        super.deleteObservers();
-        map.deleteObserver(this);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void setRows() {
-
-        listSorted.clear();
+        list = new ArrayList<>();
 
         Set<String> publicKeys = DCSet.getInstance().getPersonAddressMap().get(itemKey).keySet();
 
         for (String publicKey: publicKeys) {
             NavigableMap<Long, ItemCls> addresses = ((ItemPersonMap) map).getOwnerItems(publicKey);
             for (Long key: addresses.keySet()) {
-                listSorted.add(new Pair(publicKey, addresses.get(key)));
+                list.add((PersonCls)addresses.get(key));
             }
 
         }

@@ -113,6 +113,7 @@ public class PersonAccountsModel extends TimerTableModelCls<Fun.Tuple5<String, I
         return null;
     }
 
+    /*
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -134,6 +135,7 @@ public class PersonAccountsModel extends TimerTableModelCls<Fun.Tuple5<String, I
             this.fireTableDataChanged();
         }
     }
+    */
 
 
     public Account getAccount(int row) {
@@ -179,7 +181,7 @@ public class PersonAccountsModel extends TimerTableModelCls<Fun.Tuple5<String, I
 
     }
 
-    public void setRows() {
+    public void getIntervalThis(long start, long end) {
 
         list = new ArrayList<>();
         TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DCSet.getInstance().getPersonAddressMap().getItems(personKey);

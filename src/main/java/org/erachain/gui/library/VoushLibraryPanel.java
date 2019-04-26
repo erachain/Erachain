@@ -215,17 +215,14 @@ public class VoushLibraryPanel extends JPanel {
         });
         menu.add(Send_Mail_item_Menu);
 
-
         ////////////////////
         TableMenuPopupUtil.installContextMenu(jTable_Vouches, menu); // SELECT
-
 
     }
 
     public void delay_on_close() {
 
-        model.removeObservers();
-
+        model.deleteObservers();
 
     }
 
