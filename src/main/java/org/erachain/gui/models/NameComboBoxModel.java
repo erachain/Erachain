@@ -15,7 +15,7 @@ import java.util.Observer;
 @SuppressWarnings("serial")
 public class NameComboBoxModel extends DefaultComboBoxModel<Name> implements Observer {
 
-    private SortableList<Tuple2<String, String>, Name> names;
+    private SortableList<Tuple2<Long, Long>, Name> names;
 
     public NameComboBoxModel() {
         Controller.getInstance().addWalletObserver(this);
@@ -37,7 +37,7 @@ public class NameComboBoxModel extends DefaultComboBoxModel<Name> implements Obs
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.LIST_NAME_TYPE) {
             if (this.names == null) {
-                this.names = (SortableList<Tuple2<String, String>, Name>) message.getValue();
+                this.names = (SortableList<Tuple2<Long, Long>, Name>) message.getValue();
                 //this.names.registerObserver();
                 this.names.sort(NameMap.NAME_INDEX);
             }
@@ -83,7 +83,7 @@ public class NameComboBoxModel extends DefaultComboBoxModel<Name> implements Obs
         this.removeAllElements();
 
         //INSERT ALL ACCOUNTS
-        for (Pair<Tuple2<String, String>, Name> name : this.names) {
+        for (Pair<Tuple2<Long, Long>, Name> name : this.names) {
             this.addElement(name.getB());
         }
 

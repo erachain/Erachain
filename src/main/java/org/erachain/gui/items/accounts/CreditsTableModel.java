@@ -24,7 +24,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class CreditsTableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> implements Observer {
+public class CreditsTableModel extends SortedListTableModelCls<Tuple2<Long, Long>, Transaction> implements Observer {
     public static final int COLUMN_AMOUNT = 1;
     public static final int COLUMN_TRANSACTION = 2;
     private static final int COLUMN_ADDRESS = 0;
@@ -38,8 +38,8 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<String, St
     private Boolean[] column_AutuHeight = new Boolean[]{true, false, false, false};
     private List<PublicKeyAccount> publicKeyAccounts;
     private long asset_Key = 1l;
-    private SortableList<Tuple2<String, String>, Transaction> transactions;
-    private List<Tuple2<Tuple2<String, String>, Transaction>> transactions_Asset;
+    private SortableList<Tuple2<Long, Long>, Transaction> transactions;
+    private List<Tuple2<Tuple2<Long, Long>, Transaction>> transactions_Asset;
 
     @SuppressWarnings("unchecked")
     public CreditsTableModel() {
@@ -51,7 +51,7 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<String, St
     }
 
     @Override
-    public SortableList<Tuple2<String, String>, Transaction> getSortableList() {
+    public SortableList<Tuple2<Long, Long>, Transaction> getSortableList() {
         return this.transactions;
     }
 
@@ -89,7 +89,7 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<String, St
             //cred.addAll(DLSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
             cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
         }
-		/*		for (Pair<Tuple2<String, String>, Transaction> trans:this.transactions){
+		/*		for (Pair<Tuple2<Long, Long>, Transaction> trans:this.transactions){
 			long a = trans.getB().getAssetKey();
 			this.transactions_Asset.clear();
 				if (a == asset_Key){
@@ -104,9 +104,9 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<String, St
 		 */
         this.transactions_Asset.clear();
         ;
-        for (Pair<Tuple2<String, String>, Transaction> trans : this.transactions) {
+        for (Pair<Tuple2<Long, Long>, Transaction> trans : this.transactions) {
             long a = trans.getB().getAssetKey();
-            Tuple2<Tuple2<String, String>, Transaction> ss = null;
+            Tuple2<Tuple2<Long, Long>, Transaction> ss = null;
             if (a == asset_Key || a == -asset_Key) {
                 ss = new Tuple2(trans.getA(), trans.getB());
                 this.transactions_Asset.add(ss);
@@ -201,15 +201,15 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<String, St
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.transactions == null) {
-                this.transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
+                this.transactions = (SortableList<Tuple2<Long, Long>, Transaction>) message.getValue();
                 //this.transactions.registerObserver();
                 this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
 
                 this.transactions_Asset.clear();
                 ;
-                for (Pair<Tuple2<String, String>, Transaction> trans : this.transactions) {
+                for (Pair<Tuple2<Long, Long>, Transaction> trans : this.transactions) {
                     long a = trans.getB().getAssetKey();
-                    Tuple2<Tuple2<String, String>, Transaction> ss = null;
+                    Tuple2<Tuple2<Long, Long>, Transaction> ss = null;
                     if (a == asset_Key || a == -asset_Key) {
 
                         ss = new Tuple2(trans.getA(), trans.getB());
@@ -268,7 +268,7 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<String, St
 
     public void addObservers() {
 
-        this.transactions_Asset = new ArrayList<Tuple2<Tuple2<String, String>, Transaction>>();
+        this.transactions_Asset = new ArrayList<Tuple2<Tuple2<Long, Long>, Transaction>>();
         this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
 
         cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();

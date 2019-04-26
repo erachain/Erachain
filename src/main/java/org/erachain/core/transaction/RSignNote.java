@@ -759,7 +759,7 @@ public class RSignNote extends Transaction {
 
     public boolean isFavorite() {
 
-        return Controller.getInstance().wallet.database.getDocumentFavoritesSet().contains(this);
+        return Controller.getInstance().wallet.database.getDocumentFavoritesSet().contains(this.dbRef);
 
 
     }
