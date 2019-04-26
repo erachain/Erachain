@@ -130,12 +130,9 @@ public class AssetPairSelect extends JDialog {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
 
-
                 pair_Panel.searchTextField_SearchToolBar_LeftPanel.setText("");
 
-
                 pair_Panel.Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
-
 
                 new Thread() {
                     @Override
