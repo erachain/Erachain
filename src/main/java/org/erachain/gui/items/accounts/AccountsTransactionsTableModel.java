@@ -267,8 +267,10 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
         if (this.asset == null)
             return false;
 
-        if (transaction.getAbsKey() != this.asset.getKey())
-            return false;
+        if (transaction.getAbsKey() != this.asset.getKey()
+                // все для Компушек
+            && this.asset.getKey() != Transaction.FEE_KEY)
+                return false;
 
         Trans trr = new Trans();
         if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
@@ -278,28 +280,31 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             trr.recipient = r_send.viewRecipient();
             trr.transaction = r_send;
             trr.amount = r_send.getAmount();
-            trr.title = r_send.getHead();
+            trr.title = r_send.getTitle();
 
             //if send for *-1
             // view all types
             if (actionTypes == null || actionTypes.isEmpty()) {
 
                 if (r_send.getCreator().getAddress().equals(this.sender.getAddress()))
-                    trr.amount = r_send.getAmount().multiply(new BigDecimal("-1"));
+                    if (r_send.getAmount() != null) {
+                        trr.amount = r_send.getAmount().multiply(new BigDecimal("-1"));
+                    }
 
 
                 trans_Hash_Map.put(transaction.viewSignature(), trr);
-            } else
-            // view set types
-            if (actionTypes.contains(r_send.viewFullTypeName())) {
+            } else {
+                // view set types
+                if (actionTypes.contains(r_send.viewFullTypeName())) {
 
-                if (r_send.getCreator().getAddress().equals(this.sender.getAddress()))
-                    trr.amount = r_send.getAmount().multiply(new BigDecimal("-1"));
+                    if (r_send.getCreator().getAddress().equals(this.sender.getAddress()))
+                        if (r_send.getAmount() != null) {
+                            trr.amount = r_send.getAmount().multiply(new BigDecimal("-1"));
+                        }
 
-
-                trans_Hash_Map.put(transaction.viewSignature(), trr);
+                    trans_Hash_Map.put(transaction.viewSignature(), trr);
+                }
             }
-
         } else if (transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
             GenesisTransferAssetTransaction gen_send = (GenesisTransferAssetTransaction) transaction;
 
@@ -313,7 +318,7 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             trr.transaction = gen_send;
             trr.recipient = own;
             trr.amount = gen_send.getAmount();
-            trr.title = "";
+            trr.title = gen_send.getTitle();
 
             if (!gen_send.getRecipient().getAddress().equals(this.sender.getAddress()))
                 trr.amount = gen_send.getAmount().multiply(new BigDecimal("-1"));
@@ -362,7 +367,7 @@ public class AccountsTransactionsTableModel extends SortedListTableModelCls<Tupl
             trr.transaction = transaction;
             trr.amount = transaction.getAmount();
             trr.recipient = "";
-            trr.title = "";
+            trr.title = transaction.getTitle();
             trans_Hash_Map.put(transaction.viewSignature(), trr);
 
         }
