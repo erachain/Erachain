@@ -174,7 +174,7 @@ public class ItemSplitPanel extends SplitPanel {
         } else {
             Controller.getInstance().addItemFavorite(itemCls);
         }
-        ((SearchItemsTableModel) jTableJScrollPanelLeftPanel.getModel()).fireTableDataChanged();
+        ((TimerTableModelCls) jTableJScrollPanelLeftPanel.getModel()).fireTableDataChanged();
 
     }
 
