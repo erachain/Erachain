@@ -6,7 +6,9 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.assets.ExchangeFrame;
+import org.erachain.gui.items.assets.Exchange_Panel;
 import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -17,34 +19,35 @@ public class MenuExchange extends JMenu {
 
     public MenuExchange() {
 
-        // DEALS
-        // Send
+        /// DEPOSIT
         JMenuItem deposit = new JMenuItem(Lang.getInstance().translate("Deposit"));
         deposit.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Deposit funds to Exchange"));
         deposit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                new ExchangeFrame((AssetCls) DCSet.getInstance().getItemAssetMap().get((long) 2), null, "Buy", null);
+                MainPanel.getInstance().addTab(Exchange_Panel.class.getName());
             }
         });
         add(deposit);
 
+        // TRADE
         JMenuItem trade = new JMenuItem(Lang.getInstance().translate("Trade"));
         trade.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Trade on Exchange"));
         trade.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                new ExchangeFrame((AssetCls) DCSet.getInstance().getItemAssetMap().get((long) 2), null, "Buy", null);
+                MainPanel.getInstance().addTab(Exchange_Panel.class.getSimpleName());
             }
         });
         add(trade);
 
+        // WITHDRAW
         JMenuItem withdraw = new JMenuItem(Lang.getInstance().translate("Withdraw"));
         withdraw.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Withdraw funds from Exchange"));
         withdraw.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                new ExchangeFrame((AssetCls) DCSet.getInstance().getItemAssetMap().get((long) 2), null, "Buy", null);
+                MainPanel.getInstance().addTab(Exchange_Panel.class.getName());
             }
         });
         add(withdraw);
