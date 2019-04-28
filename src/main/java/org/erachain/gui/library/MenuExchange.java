@@ -5,6 +5,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.accounts.*;
+import org.erachain.gui.items.assets.DepositExchange;
 import org.erachain.gui.items.assets.ExchangeFrame;
 import org.erachain.gui.items.assets.Exchange_Panel;
 import org.erachain.gui.records.VouchRecordDialog;
@@ -25,7 +26,7 @@ public class MenuExchange extends JMenu {
         deposit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                MainPanel.getInstance().addTab(Exchange_Panel.class.getName());
+                MainPanel.getInstance().addTab(DepositExchange.class.getSimpleName());
             }
         });
         add(deposit);
@@ -47,7 +48,7 @@ public class MenuExchange extends JMenu {
         withdraw.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                MainPanel.getInstance().addTab(Exchange_Panel.class.getName());
+                MainPanel.getInstance().addTab(Exchange_Panel.class.getSimpleName());
             }
         });
         add(withdraw);
