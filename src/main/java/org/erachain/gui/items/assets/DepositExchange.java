@@ -63,7 +63,7 @@ public class DepositExchange extends JDialog {
     private JTextField jTextField_Address2;
     private JTextField jTextField_Address3;
 
-    public DepositExchange(PersonCls person, PublicKeyAccount publicKey) {
+    public DepositExchange() {
         super();
 
         // ICON

@@ -402,11 +402,16 @@ public class MainPanel extends javax.swing.JPanel {
         if (str.equals(Lang.getInstance().translate("Issue Asset")) || str.equals("IssueAssetPanel")) {
             insertTab(Lang.getInstance().translate("Issue Asset"), new IssueAssetPanel());
             return;
-        }
+        } else
         if (str.equals(Lang.getInstance().translate("Exchange")) || str.equals("Exchange_Panel")) {
             insertTab(Lang.getInstance().translate("Exchange"), new Exchange_Panel(null, null, null, null));
             return;
+        } else
+        if (str.equals(Lang.getInstance().translate("DepositExchange")) || str.equals(DepositExchange.class.getSimpleName())) {
+            insertTab(Lang.getInstance().translate("DepositExchange"), new DepositExchange());
+            return;
         }
+
         if (str.equals(Lang.getInstance().translate("Search Templates")) || str.equals("SearchTemplatesSplitPanel")) {
             insertTab(Lang.getInstance().translate("Search Templates"), new SearchTemplatesSplitPanel());
             return;
