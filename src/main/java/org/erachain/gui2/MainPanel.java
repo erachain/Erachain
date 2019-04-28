@@ -408,7 +408,7 @@ public class MainPanel extends javax.swing.JPanel {
             return;
         } else
         if (str.equals(Lang.getInstance().translate("DepositExchange")) || str.equals(DepositExchange.class.getSimpleName())) {
-            insertTab(Lang.getInstance().translate("DepositExchange"), new DepositExchange());
+            insertTab(Lang.getInstance().translate("DepositExchange"), new DepositExchange(null, null));
             return;
         }
 

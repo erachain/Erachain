@@ -7,6 +7,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSertifyPubKeys;
 import org.erachain.core.transaction.Transaction;
@@ -33,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
-public class DepositExchange extends JDialog {
+public class DepositExchange extends JPanel {
 
     // private JComboBox<Account> accountLBox;
 
@@ -43,6 +44,7 @@ public class DepositExchange extends JDialog {
     private MButton jButton_Cansel;
     private MButton jButton_Confirm;
     private JComboBox<Account> jComboBox_YourAddress;
+    public JComboBox<ItemCls> cbxFavorites;
     private JTextField jFormattedTextField_Fee;
     private JTextField jTextField_addDays;
     private JLabel jLabel_Address1;
@@ -53,8 +55,8 @@ public class DepositExchange extends JDialog {
     private JLabel jLabel_Adress1_Check;
     private JLabel jLabel_Fee;
     private JLabel jLabel_Fee_Check;
-    // private javax.swing.JLabel jLabel_PersonInfo;
-    private JScrollPane jLabel_PersonInfo;
+    // private javax.swing.JLabel jLabel_AssetInfo;
+    private JScrollPane jLabel_AssetInfo;
     private JLabel jLabel_Title;
     private JLabel jLabel_addDays;
     private JLabel jLabel_addDays_Check;
@@ -63,30 +65,10 @@ public class DepositExchange extends JDialog {
     private JTextField jTextField_Address2;
     private JTextField jTextField_Address3;
 
-    public DepositExchange() {
-        super();
+    public DepositExchange(AssetCls asset, Account account) {
 
-        // ICON
-        List<Image> icons = new ArrayList<Image>();
-        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-        this.setIconImages(icons);
-
-        initComponents(person, publicKey);
-
-        this.setTitle(Lang.getInstance().translate("Person confirm"));
-        this.setResizable(true);
-        this.setModal(true);
-
-         setPreferredSize(MainFrame.getInstance().getPreferredSize());
-        // PACK
-        this.pack();
-        this.setResizable(true);
-        this.setLocationRelativeTo(null);
+        initComponents(asset, account);
         this.setVisible(true);
-        // MainFrame.this.add(comp, constraints).setFocusable(false);
     }
 
     private void refreshReceiverDetails(JTextField pubKeyTxt, JLabel pubKeyDetails) {
@@ -139,7 +121,7 @@ public class DepositExchange extends JDialog {
 
     }
 
-    public void onGoClick(PersonCls person, JButton Button_Confirm, JComboBox<Account> jComboBox_YourAddress,
+    public void onGoClick(AssetCls asset, JButton Button_Confirm, JComboBox<Account> jComboBox_YourAddress,
                           JTextField pubKey1Txt, JTextField pubKey2Txt, JTextField pubKey3Txt, JTextField toDateTxt,
                           JTextField feePowTxt) {
 
@@ -213,7 +195,7 @@ public class DepositExchange extends JDialog {
         int version = 0; // without user signs
 
         Transaction transaction = Controller.getInstance().r_SertifyPerson(version, Transaction.FOR_NETWORK, authenticator, feePow,
-                person.getKey(), sertifiedPublicKeys, toDate);
+                asset.getKey(), sertifiedPublicKeys, toDate);
 
         String Status_text = "";
         IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
@@ -234,7 +216,6 @@ public class DepositExchange extends JDialog {
                 JOptionPane.showMessageDialog(new JFrame(),
                         Lang.getInstance().translate("Public Key was Certified") + "!",
                         Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-                this.dispose();
             } else {
                 JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             }
@@ -244,10 +225,18 @@ public class DepositExchange extends JDialog {
 
     }
 
-    private void initComponents(PersonCls person, PublicKeyAccount publicKey) {
+    private void initComponents(AssetCls asset_in, Account account) {
+
+        AssetCls asset;
+        if (asset_in == null) {
+            asset = Controller.getInstance().getAsset(1l);
+        } else {
+            asset = asset_in;
+        }
+
         GridBagConstraints gridBagConstraints;
 
-        jLabel_PersonInfo = new JScrollPane();
+        jLabel_AssetInfo = new JScrollPane();
         jLabel_YourAddress = new JLabel();
         jComboBox_YourAddress = new JComboBox<>();
         jLabel_Address1 = new JLabel();
@@ -269,10 +258,6 @@ public class DepositExchange extends JDialog {
         jLabel_Fee_Check = new JLabel();
         jLabel_Title = new JLabel();
 
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        // setMinimumSize(new java.awt.Dimension(800, 600));
-        setModal(true);
-        // setPreferredSize(new java.awt.Dimension(800, 600));
         addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
             public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
                 formAncestorMoved(evt);
@@ -284,17 +269,19 @@ public class DepositExchange extends JDialog {
         GridBagLayout layout = new GridBagLayout();
         layout.columnWidths = new int[]{0, 9, 0, 9, 0, 9, 0};
         layout.rowHeights = new int[]{0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0};
-        getContentPane().setLayout(layout);
+        //getContentPane().setLayout(layout);
+        this.setLayout(layout);
 
-        jLabel_PersonInfo.setBorder(BorderFactory.createEtchedBorder());
-        PersonInfo info = new PersonInfo();
-        info.show_001(person);
+        jLabel_AssetInfo.setBorder(BorderFactory.createEtchedBorder());
+        AssetInfo info = new AssetInfo(asset); //new PersonInfo();
+        //jScrollPane2.setViewportView(new AssetInfo(asset));
+        //info.sho.show_001(asset);
         info.setFocusable(false);
-        jLabel_PersonInfo.setViewportView(info);
-        // jLabel_PersonInfo.set
-        // jLabel_PersonInfo.setText(Lang.getInstance().translate("Public Keys
+        jLabel_AssetInfo.setViewportView(info);
+        // jLabel_AssetInfo.set
+        // jLabel_AssetInfo.setText(Lang.getInstance().translate("Public Keys
         // of") + " " + person.viewName() +":");
-        // jLabel_PersonInfo.setText(new
+        // jLabel_AssetInfo.setText(new
         // PersonInfo().Get_HTML_Person_Info_001(person) );
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -306,7 +293,8 @@ public class DepositExchange extends JDialog {
         gridBagConstraints.weighty = 1.0;
         // gridBagConstraints.insets = new java.awt.Insets(12, 9, 0, 9);
         gridBagConstraints.insets = new Insets(0, 9, 0, 9);
-        getContentPane().add(jLabel_PersonInfo, gridBagConstraints);
+        //getContentPane().add(jLabel_AssetInfo, gridBagConstraints);
+        add(jLabel_AssetInfo, gridBagConstraints);
 
         jLabel_YourAddress.setText(Lang.getInstance().translate("Your account") + ":");
         gridBagConstraints = new GridBagConstraints();
@@ -315,7 +303,7 @@ public class DepositExchange extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.LINE_END;
         // gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
         gridBagConstraints.insets = new Insets(21, 27, 0, 0);
-        getContentPane().add(jLabel_YourAddress, gridBagConstraints);
+        add(jLabel_YourAddress, gridBagConstraints);
 
         jComboBox_YourAddress = new JComboBox<Account>(new AccountsComboBoxModel());
         // jComboBox_YourAddress.setMinimumSize(new java.awt.Dimension(500,
@@ -330,7 +318,21 @@ public class DepositExchange extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         // gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 13);
         gridBagConstraints.insets = new Insets(21, 0, 0, 13);
-        getContentPane().add(jComboBox_YourAddress, gridBagConstraints);
+        add(jComboBox_YourAddress, gridBagConstraints);
+
+        //FAVORITES GBC
+        GridBagConstraints favoritesGBC = new GridBagConstraints();
+        favoritesGBC.insets = new Insets(21, 0, 0, 13);
+        favoritesGBC.fill = GridBagConstraints.HORIZONTAL;
+        favoritesGBC.anchor = GridBagConstraints.LINE_END;
+        favoritesGBC.gridwidth = 3;
+        favoritesGBC.gridx = 2;
+        favoritesGBC.gridy = 1;
+
+        //ASSET FAVORITES
+        cbxFavorites = new JComboBox<ItemCls>(new ComboBoxAssetsModel());
+        this.add(cbxFavorites, favoritesGBC);
+
 
         jLabel_Address1.setText(Lang.getInstance().translate("Public key") + ":");
         gridBagConstraints = new GridBagConstraints();
@@ -338,7 +340,7 @@ public class DepositExchange extends JDialog {
         gridBagConstraints.gridy = 6;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(0, 27, 0, 0);
-        getContentPane().add(jLabel_Address1, gridBagConstraints);
+        add(jLabel_Address1, gridBagConstraints);
 
         // jTextField_Address1.setMinimumSize(new java.awt.Dimension(300, 20));
         jTextField_Address1.setName(""); // NOI18N
@@ -363,10 +365,10 @@ public class DepositExchange extends JDialog {
             }
         });
 
-        if (publicKey == null || publicKey.isPerson()) {
+        if (account == null || account.isPerson()) {
             jLabel_Adress1_Check.setText(Lang.getInstance().translate("Insert Public Key"));
         } else {
-            jTextField_Address1.setText(publicKey.getBase58());
+            jTextField_Address1.setText(account.getAddress());
             // refreshReceiverDetails(jTextField_Address1,
             // jLabel_Adress1_Check);
         }
@@ -377,14 +379,14 @@ public class DepositExchange extends JDialog {
         // gridBagConstraints.gridheight =7;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        getContentPane().add(jLabel_Adress1_Check, gridBagConstraints);
+        add(jLabel_Adress1_Check, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        getContentPane().add(jTextField_Address1, gridBagConstraints);
+        add(jTextField_Address1, gridBagConstraints);
 
         jLabel_Address2.setText(Lang.getInstance().translate("Public Key") + ":");
         gridBagConstraints = new GridBagConstraints();
@@ -506,7 +508,7 @@ public class DepositExchange extends JDialog {
         gridBagConstraints.gridy = 16;
         gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
         gridBagConstraints.insets = new Insets(0, 27, 0, 0);
-        getContentPane().add(jLabel_Fee, gridBagConstraints);
+        add(jLabel_Fee, gridBagConstraints);
 
         // jFormattedTextField_Fee.setFormatterFactory(new
         // javax.swing.text.DefaultFormatterFactory(new
@@ -530,12 +532,11 @@ public class DepositExchange extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        getContentPane().add(jFormattedTextField_Fee, gridBagConstraints);
+        add(jFormattedTextField_Fee, gridBagConstraints);
 
         jButton_Cansel = new MButton(Lang.getInstance().translate("Cancel"), 2);
         jButton_Cansel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                dispose();
             }
         });
 
@@ -544,13 +545,13 @@ public class DepositExchange extends JDialog {
         gridBagConstraints.gridy = 18;
         gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
-        getContentPane().add(jButton_Cansel, gridBagConstraints);
+        add(jButton_Cansel, gridBagConstraints);
 
         jButton_Confirm = new MButton(Lang.getInstance().translate("Confirm"), 2);
         jButton_Confirm.setToolTipText("");
         jButton_Confirm.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                onGoClick(person, jButton_Confirm, jComboBox_YourAddress, jTextField_Address1, jTextField_Address2,
+                onGoClick(asset, jButton_Confirm, jComboBox_YourAddress, jTextField_Address1, jTextField_Address2,
                         jTextField_Address3, jTextField_addDays, jFormattedTextField_Fee);
             }
         });
@@ -559,7 +560,7 @@ public class DepositExchange extends JDialog {
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 18;
         gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
-        getContentPane().add(jButton_Confirm, gridBagConstraints);
+        add(jButton_Confirm, gridBagConstraints);
 
         jLabel_addDays_Check.setText("<html>'.' =2 " + Lang.getInstance().translate("year") + ",<br> '+' ="
                 + Lang.getInstance().translate("MAX days") + ",<br> '-' =" + Lang.getInstance().translate("Unconfirmed")
@@ -572,7 +573,7 @@ public class DepositExchange extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new Insets(0, 0, 0, 8);
-        getContentPane().add(jLabel_addDays_Check, gridBagConstraints);
+        add(jLabel_addDays_Check, gridBagConstraints);
 
         jLabel_Fee_Check.setText("0..6");
         gridBagConstraints = new GridBagConstraints();
@@ -590,17 +591,16 @@ public class DepositExchange extends JDialog {
         gridBagConstraints.weightx = 1.0;
         // gridBagConstraints.insets = new java.awt.Insets(12, 9, 11, 9);
         gridBagConstraints.insets = new Insets(12, 23, 0, 9);
-        getContentPane().add(jLabel_Title, gridBagConstraints);
+        add(jLabel_Title, gridBagConstraints);
         jLabel_Title.setText(Lang.getInstance().translate("Information about the person"));
-        getContentPane().add(jLabel_Title, gridBagConstraints);
+        add(jLabel_Title, gridBagConstraints);
 
-        pack();
-    }// <
+    }
 
     private void jFormattedTextField_ToDoActionPerformed(ActionEvent evt) {
         // TODO add your handling code here:
     }
-    // private javax.swing.JEditorPane jLabel_PersonInfo;
+    // private javax.swing.JEditorPane jLabel_AssetInfo;
 
     private void jTextField_Address2ActionPerformed(ActionEvent evt) {
         // TODO add your handling code here:
