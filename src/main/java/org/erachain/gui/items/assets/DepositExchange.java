@@ -37,6 +37,7 @@ public class DepositExchange extends JPanel {
     private JTextField jTextField_addDays;
     private JLabel jLabel_Address;
     private JLabel jLabel_Adress_Check;
+    private JLabel jLabel_Asset;
     private JScrollPane paneAssetInfo;
     private JLabel jLabel_Title;
     private JLabel jLabel_addDays;
@@ -129,6 +130,8 @@ public class DepositExchange extends JPanel {
         jLabel_YourAddress = new JLabel();
         jComboBox_YourAddress = new JComboBox<>();
         jLabel_Address = new JLabel();
+        jLabel_Asset = new JLabel();
+
         jLabel_Adress_Check = new JLabel();
         jLabel_addDays = new JLabel();
         jTextField_addDays = new JTextField();
@@ -151,7 +154,7 @@ public class DepositExchange extends JPanel {
         this.setLayout(layout);
 
         paneAssetInfo.setBorder(BorderFactory.createEtchedBorder());
-        AssetInfo info = new AssetInfo(asset); //new PersonInfo();
+        AssetInfo info = new AssetInfo(asset, false); //new PersonInfo();
         //jScrollPane2.setViewportView(new AssetInfo(asset));
         //info.sho.show_001(asset);
         info.setFocusable(false);
@@ -207,6 +210,15 @@ public class DepositExchange extends JPanel {
         gridBagConstraints.insets = new Insets(21, 0, 0, 13);
         add(jComboBox_YourAddress, gridBagConstraints);
 
+        jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
+        // gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
+        gridBagConstraints.insets = new Insets(21, 27, 0, 0);
+        add(jLabel_Asset, gridBagConstraints);
+
         //FAVORITES GBC
         GridBagConstraints favoritesGBC = new GridBagConstraints();
         favoritesGBC.insets = new Insets(21, 0, 0, 13);
@@ -227,12 +239,12 @@ public class DepositExchange extends JPanel {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-                    paneAssetInfo.setViewportView(new AssetInfo(asset));
+                    paneAssetInfo.setViewportView(new AssetInfo(asset, false));
                 }
             }
         });
 
-        jLabel_Address.setText(Lang.getInstance().translate("Public key") + ":");
+        jLabel_Address.setText(Lang.getInstance().translate("Account to Deposit") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -340,7 +352,7 @@ public class DepositExchange extends JPanel {
         // gridBagConstraints.insets = new java.awt.Insets(12, 9, 11, 9);
         gridBagConstraints.insets = new Insets(12, 23, 0, 9);
         add(jLabel_Title, gridBagConstraints);
-        jLabel_Title.setText(Lang.getInstance().translate("Information about the person"));
+        jLabel_Title.setText(Lang.getInstance().translate("Information about the Asset"));
         add(jLabel_Title, gridBagConstraints);
 
     }

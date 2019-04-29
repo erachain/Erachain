@@ -229,7 +229,7 @@ public class AssetPairSelect extends JDialog {
                     AssetPairSelectTableModel tableModelAssets1 = (AssetPairSelectTableModel) pair_Panel.jTableJScrollPanelLeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTableJScrollPanelLeftPanel.getModel();
                     Object asset = tableModelAssets1.getItem(pair_Panel.jTableJScrollPanelLeftPanel.convertRowIndexToModel(pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow()));
 
-                    pair_Panel.jScrollPaneJPanelRightPanel.setViewportView(new AssetInfo((AssetCls) asset));
+                    pair_Panel.jScrollPaneJPanelRightPanel.setViewportView(new AssetInfo((AssetCls) asset, false));
                     pair_Panel.button1ToolBarLeftPanel.setEnabled(true);
 
                 }

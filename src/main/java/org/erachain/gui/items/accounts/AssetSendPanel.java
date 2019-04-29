@@ -156,7 +156,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
                    jTextField_Ammount.setScale(scale);
                  // set description
                  //  jTextArea_Account_Description.setText(asset.getDescription());
-                   jScrollPane2.setViewportView(new AssetInfo(asset));
+                   jScrollPane2.setViewportView(new AssetInfo(asset, false));
                    
                }
 
@@ -184,7 +184,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
                    if(asset!=null)scale = asset.getScale();
                    jTextField_Ammount.setScale(scale);
                   // jTextArea_Account_Description.setText(asset.getDescription());
-                   jScrollPane2.setViewportView(new AssetInfo(asset));
+                   jScrollPane2.setViewportView(new AssetInfo(asset, false));
                    
                }
 
@@ -245,7 +245,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
     MenuPopupUtil.installContextMenu(this.jTextField_Recive_Detail);
     jTextArea_Account_Description.setWrapStyleWord(true);
     jTextArea_Account_Description.setLineWrap(true);
-    jScrollPane2.setViewportView(new AssetInfo(asset)); //jTextArea_Account_Description);
+    jScrollPane2.setViewportView(new AssetInfo(asset, false)); //jTextArea_Account_Description);
    }
    
    private void refreshReceiverDetails() {
