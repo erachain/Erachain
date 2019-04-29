@@ -10,9 +10,11 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
+import org.erachain.gui.models.FundTokensComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.ntp.NTP;
+import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple4;
 
 import javax.swing.*;
@@ -32,7 +34,7 @@ public class DepositExchange extends JPanel {
     private MButton jButton_Cansel;
     private MButton jButton_Confirm;
     private JComboBox<Account> jComboBox_YourAddress;
-    public JComboBox<ItemCls> cbxFavorites;
+    public JComboBox<AssetCls> cbxAssets;
     private JTextField jFormattedTextField_Fee;
     private JTextField jTextField_addDays;
     private JLabel jLabel_Address;
@@ -229,16 +231,16 @@ public class DepositExchange extends JPanel {
         favoritesGBC.gridy = 1;
 
         //ASSET FAVORITES
-        cbxFavorites = new JComboBox<ItemCls>(new ComboBoxAssetsModel());
-        this.add(cbxFavorites, favoritesGBC);
+        cbxAssets = new JComboBox<AssetCls>(new FundTokensComboBoxModel());
+        this.add(cbxAssets, favoritesGBC);
 
         //ON FAVORITES CHANGE
-        cbxFavorites.addItemListener(new ItemListener() {
+        cbxAssets.addItemListener(new ItemListener() {
 
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
+                    AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
                     paneAssetInfo.setViewportView(new AssetInfo(asset, false));
                 }
             }
@@ -271,7 +273,7 @@ public class DepositExchange extends JPanel {
         });
 
         if (account == null || account.isPerson()) {
-            jLabel_Adress_Check.setText(Lang.getInstance().translate("Insert Public Key"));
+            jLabel_Adress_Check.setText(Lang.getInstance().translate("Insert Deposit Account"));
         } else {
             jTextField_Address.setText(account.getAddress());
         }
