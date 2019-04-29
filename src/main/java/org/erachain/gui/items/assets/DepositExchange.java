@@ -141,14 +141,6 @@ public class DepositExchange extends JPanel {
         jLabel_addDays_Check = new JLabel();
         jLabel_Title = new JLabel();
 
-        addHierarchyBoundsListener(new HierarchyBoundsListener() {
-            public void ancestorMoved(HierarchyEvent evt) {
-                formAncestorMoved(evt);
-            }
-
-            public void ancestorResized(HierarchyEvent evt) {
-            }
-        });
         GridBagLayout layout = new GridBagLayout();
         layout.columnWidths = new int[]{0, 9, 0, 9, 0, 9, 0};
         layout.rowHeights = new int[]{0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0};
@@ -306,11 +298,6 @@ public class DepositExchange extends JPanel {
 
         jFormattedTextField_Fee.setHorizontalAlignment(JTextField.LEFT);
         jFormattedTextField_Fee.setText("0");
-        jFormattedTextField_Fee.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                jFormattedTextField_FeeActionPerformed(evt);
-            }
-        });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 16;
@@ -362,36 +349,5 @@ public class DepositExchange extends JPanel {
     private void jFormattedTextField_ToDoActionPerformed(ActionEvent evt) {
         // TODO add your handling code here:
     }
-    // private javax.swing.JEditorPane paneAssetInfo;
-
-    private void jTextField_Address2ActionPerformed(ActionEvent evt) {
-        // TODO add your handling code here:
-    }
-
-    private void jButton_CanselActionPerformed(ActionEvent evt) {
-        // TODO add your handling code here:
-
-    }
-
-    private void jButton_ConfirmActionPerformed(ActionEvent evt) {
-        // TODO add your handling code here:
-    }
-
-    private void jTextField_Address1ActionPerformed(ActionEvent evt) {
-        // TODO add your handling code here:
-    }
-
-    private void jFormattedTextField_FeeActionPerformed(ActionEvent evt) {
-        // TODO add your handling code here:
-    }
-
-    private void formAncestorMoved(java.awt.event.HierarchyEvent evt) {
-        // TODO add your handling code here:
-    }
-
-    private void jTextField_Address3ActionPerformed(ActionEvent evt) {
-        // TODO add your handling code here:
-    }
-    // End of variables declaration
 
 }
