@@ -135,7 +135,6 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
             Block block = (Block) message.getValue();
             blocks.add(0, block.blockHead);
             fireTableRowsInserted(0, 0);
-            boolean needFire = false;
             while (blocks.size() > maxSize) {
                 blocks.remove(maxSize);
                 fireTableRowsDeleted(maxSize, maxSize);
