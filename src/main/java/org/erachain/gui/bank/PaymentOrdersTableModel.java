@@ -21,7 +21,7 @@ import java.util.Observer;
 
 @SuppressWarnings("serial")
 // in list of org.erachain.records in wallet
-public class PaymentOrdersTableModel extends SortedListTableModelCls<Tuple2<String, String>, Transaction> implements Observer {
+public class PaymentOrdersTableModel extends SortedListTableModelCls<Tuple2<Long, Long>, Transaction> implements Observer {
 
     public static final int COLUMN_CONFIRMATIONS = 0;
     public static final int COLUMN_TIMESTAMP = 1;
@@ -33,7 +33,7 @@ public class PaymentOrdersTableModel extends SortedListTableModelCls<Tuple2<Stri
     public static final int COLUMN_FEE = 7;
     public static final int COLUMN_SIZE = 8;
 
-    private SortableList<Tuple2<String, String>, Transaction> transactions;
+    private SortableList<Tuple2<Long, Long>, Transaction> transactions;
     //ItemAssetMap dbItemAssetMap;
     private ArrayList<RSend> trans;
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
@@ -46,7 +46,7 @@ public class PaymentOrdersTableModel extends SortedListTableModelCls<Tuple2<Stri
     }
 
     @Override
-    public SortableList<Tuple2<String, String>, Transaction> getSortableList() {
+    public SortableList<Tuple2<Long, Long>, Transaction> getSortableList() {
         return this.transactions;
     }
 
@@ -61,7 +61,7 @@ public class PaymentOrdersTableModel extends SortedListTableModelCls<Tuple2<Stri
     }
 
     public Transaction getTransaction(int row) {
-        Pair<Tuple2<String, String>, Transaction> data = this.transactions.get(row);
+        Pair<Tuple2<Long, Long>, Transaction> data = this.transactions.get(row);
         if (data == null || data.getB() == null) {
             return null;
         }
@@ -200,7 +200,7 @@ public class PaymentOrdersTableModel extends SortedListTableModelCls<Tuple2<Stri
         //CHECK IF NEW LIST
         if (false && messageType == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.transactions == null) {
-                transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
+                transactions = (SortableList<Tuple2<Long, Long>, Transaction>) message.getValue();
                 //transactions.registerObserver();
                 transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
                 read_trans();
@@ -225,10 +225,10 @@ public class PaymentOrdersTableModel extends SortedListTableModelCls<Tuple2<Stri
 
     private void read_trans() {
         // TODO Auto-generated method stub
-        Iterator<Pair<Tuple2<String, String>, Transaction>> it = transactions.iterator();
+        Iterator<Pair<Tuple2<Long, Long>, Transaction>> it = transactions.iterator();
         trans = new ArrayList<RSend>();
         while (it.hasNext()) {
-            Pair<Tuple2<String, String>, Transaction> tr = it.next();
+            Pair<Tuple2<Long, Long>, Transaction> tr = it.next();
             Transaction ss = tr.getB();
             if (!(ss instanceof RSend)) continue;
             String hh = ((RSend) ss).getHead();

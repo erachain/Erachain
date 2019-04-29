@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import java.util.Observable;
 
 @SuppressWarnings("serial")
-public class WalletBlocksTableModel extends WalletSortedTableModel<Tuple2<String, String>, Block.BlockHead> {
+public class WalletBlocksTableModel extends WalletSortedTableModel<Tuple2<Long, Long>, Block.BlockHead> {
     private int count;
     public static final int COLUMN_HEIGHT = 0;
     public static final int COLUMN_TIMESTAMP = 1;
@@ -38,7 +38,7 @@ public class WalletBlocksTableModel extends WalletSortedTableModel<Tuple2<String
             if (listSorted == null || listSorted.size() - 1 < row) {
                 return null;
             }
-            Pair<Tuple2<String, String>, Block.BlockHead> data = listSorted.get(row);
+            Pair<Tuple2<Long, Long>, Block.BlockHead> data = listSorted.get(row);
             if (data == null) {
                 return null;
             }

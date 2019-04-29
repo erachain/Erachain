@@ -25,7 +25,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<String, String>, Transaction> implements Observer {
+public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<Long, Long>, Transaction> implements Observer {
     public static final int COLUMN_AMOUNT = 1;
     public static final int COLUMN_TRANSACTION = 2;
     private static final int COLUMN_ADDRESS = 0;
@@ -40,7 +40,7 @@ public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<Str
     private Account account;
     private long asset_Key = 1l;
     private AssetCls asset = GenesisBlock.makeAsset(asset_Key);
-    private SortableList<Tuple2<String, String>, Transaction> transactions;
+    private SortableList<Tuple2<Long, Long>, Transaction> transactions;
     private List<Transaction> transactions_Asset;
     //private  Account_Cls account;
 
@@ -58,7 +58,7 @@ public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<Str
     }
 
     @Override
-    public SortableList<Tuple2<String, String>, Transaction> getSortableList() {
+    public SortableList<Tuple2<Long, Long>, Transaction> getSortableList() {
         return this.transactions;
     }
 
@@ -201,16 +201,16 @@ public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<Str
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.transactions == null) {
-                this.transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
+                this.transactions = (SortableList<Tuple2<Long, Long>, Transaction>) message.getValue();
                 //this.transactions.registerObserver();
                 this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
 
                 this.transactions_Asset.clear();
                 ;
-                for (Pair<Tuple2<String, String>, Transaction> trans : this.transactions) {
+                for (Pair<Tuple2<Long, Long>, Transaction> trans : this.transactions) {
                     long a = trans.getB().getAssetKey();
                     Transaction trans1 = trans.getB();
-                    Tuple2<Tuple2<String, String>, Transaction> ss = null;
+                    Tuple2<Tuple2<Long, Long>, Transaction> ss = null;
 
                     if ((a == asset_Key || a == -asset_Key) && (account.getAddress() == trans1.viewCreator() || account.getAddress() == trans1.viewRecipient())) {
                         this.transactions_Asset.add(trans.getB());

@@ -166,7 +166,6 @@ public class StatusesLibraryPanel extends JPanel {
         });
         menu.add(Send_Mail_item_Menu);
 
-
         ////////////////////
         TableMenuPopupUtil.installContextMenu(jTable_Statuses, menu); // SELECT
 
@@ -174,10 +173,8 @@ public class StatusesLibraryPanel extends JPanel {
 
     public void delay_on_close() {
 
-        statusModel.removeObservers();
-
+        statusModel.deleteObservers();
 
     }
-
 
 }

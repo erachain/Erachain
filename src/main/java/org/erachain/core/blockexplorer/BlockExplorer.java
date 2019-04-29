@@ -1177,63 +1177,127 @@ public class BlockExplorer {
         output.put("Label_accounts_table_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
 
         Map accountsJSON = new LinkedHashMap();
-
-        PersonAccountsModel personModel = new PersonAccountsModel(person.getKey());
-        rowCount = personModel.getRowCount();
-
         List<Transaction> myIssuePersons = new ArrayList<Transaction>();
-        if (rowCount > 0) {
-            BigDecimal eraBalanceA = new BigDecimal(0);
-            BigDecimal eraBalanceB = new BigDecimal(0);
-            BigDecimal eraBalanceC = new BigDecimal(0);
-            BigDecimal eraBalanceTotal = new BigDecimal(0);
-            BigDecimal compuBalance = new BigDecimal(0);
-            BigDecimal liaBalanceA = new BigDecimal(0);
-            BigDecimal liaBalanceB = new BigDecimal(0);
 
-            output.put("label_registered", Lang.getInstance().translateFromLangObj("Registered", langObj));
-            output.put("label_certified", Lang.getInstance().translateFromLangObj("Certified", langObj));
+        if (false) {
+            PersonAccountsModel personModel = new PersonAccountsModel(person.getKey());
+            rowCount = personModel.getRowCount();
+            if (rowCount > 0) {
+                TransactionFinalMap transactionsMap = DCSet.getInstance().getTransactionFinalMap();
+                BigDecimal eraBalanceA = new BigDecimal(0);
+                BigDecimal eraBalanceB = new BigDecimal(0);
+                BigDecimal eraBalanceC = new BigDecimal(0);
+                BigDecimal eraBalanceTotal = new BigDecimal(0);
+                BigDecimal compuBalance = new BigDecimal(0);
+                BigDecimal liaBalanceA = new BigDecimal(0);
+                BigDecimal liaBalanceB = new BigDecimal(0);
 
-
-            for (int i = 0; i < rowCount; i++) {
-                Map accountJSON = new LinkedHashMap();
-                accountJSON.put("address", personModel.getValueAt(i, PersonAccountsModel.COLUMN_ADDRESS));
-                accountJSON.put("to_date", personModel.getValueAt(i, PersonAccountsModel.COLUMN_TO_DATE));
-                accountJSON.put("creator", personModel.getValueAt(i, PersonAccountsModel.COLUMN_CREATOR));
-                accountJSON.put("creator_address", personModel.getValueAt(i, PersonAccountsModel.COLUMN_CREATOR_ADDRESS));
+                output.put("label_registered", Lang.getInstance().translateFromLangObj("Registered", langObj));
+                output.put("label_certified", Lang.getInstance().translateFromLangObj("Certified", langObj));
 
 
-                accountsJSON.put(i, accountJSON);
+                for (int i = 0; i < rowCount; i++) {
+                    Map accountJSON = new LinkedHashMap();
+                    accountJSON.put("address", personModel.getValueAt(i, PersonAccountsModel.COLUMN_ADDRESS));
+                    accountJSON.put("to_date", personModel.getValueAt(i, PersonAccountsModel.COLUMN_TO_DATE));
+                    accountJSON.put("creator", personModel.getValueAt(i, PersonAccountsModel.COLUMN_CREATOR));
+                    accountJSON.put("creator_address", personModel.getValueAt(i, PersonAccountsModel.COLUMN_CREATOR_ADDRESS));
 
-                String acc = personModel.getValueAt(i, 0).toString();
+                    accountsJSON.put(i, accountJSON);
 
-                myIssuePersons.addAll(dcSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(acc,
-                        Transaction.ISSUE_PERSON_TRANSACTION, 0));
+                    String acc = personModel.getValueAt(i, 0).toString();
 
-                Account account = new Account(acc);
-                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
-                        = account.getBalance(AssetCls.ERA_KEY);
+                    myIssuePersons.addAll(transactionsMap.getTransactionsByTypeAndAddress(acc,
+                            Transaction.ISSUE_PERSON_TRANSACTION, 200));
 
-                eraBalanceA = eraBalanceA.add(balance.a.b);
-                eraBalanceB = eraBalanceB.add(balance.b.b);
-                eraBalanceC = eraBalanceC.add(balance.c.b);
-                eraBalanceTotal = eraBalanceA.add(eraBalanceB).add(eraBalanceC);
+                    Account account = new Account(acc);
+                    Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
+                            = account.getBalance(AssetCls.ERA_KEY);
 
-                balance = account.getBalance(AssetCls.FEE_KEY);
-                compuBalance = compuBalance.add(balance.a.b);
+                    eraBalanceA = eraBalanceA.add(balance.a.b);
+                    eraBalanceB = eraBalanceB.add(balance.b.b);
+                    eraBalanceC = eraBalanceC.add(balance.c.b);
+                    eraBalanceTotal = eraBalanceA.add(eraBalanceB).add(eraBalanceC);
 
-                balance = account.getBalance(AssetCls.LIA_KEY);
-                liaBalanceA = liaBalanceA.add(balance.a.b);
-                liaBalanceB = liaBalanceB.add(balance.b.b);
+                    balance = account.getBalance(AssetCls.FEE_KEY);
+                    compuBalance = compuBalance.add(balance.a.b);
+
+                    balance = account.getBalance(AssetCls.LIA_KEY);
+                    liaBalanceA = liaBalanceA.add(balance.a.b);
+                    liaBalanceB = liaBalanceB.add(balance.b.b);
+                }
+                output.put("era_balance_a", NumberAsString.formatAsString(eraBalanceA));
+                output.put("era_balance_b", NumberAsString.formatAsString(eraBalanceB));
+                output.put("era_balance_c", NumberAsString.formatAsString(eraBalanceC));
+                output.put("era_balance_total", NumberAsString.formatAsString(eraBalanceTotal));
+                output.put("compu_balance", NumberAsString.formatAsString(compuBalance));
+                output.put("lia_balance_a", NumberAsString.formatAsString(liaBalanceA));
+                output.put("lia_balance_b", NumberAsString.formatAsString(liaBalanceB));
             }
-            output.put("era_balance_a", NumberAsString.formatAsString(eraBalanceA));
-            output.put("era_balance_b", NumberAsString.formatAsString(eraBalanceB));
-            output.put("era_balance_c", NumberAsString.formatAsString(eraBalanceC));
-            output.put("era_balance_total", NumberAsString.formatAsString(eraBalanceTotal));
-            output.put("compu_balance", NumberAsString.formatAsString(compuBalance));
-            output.put("lia_balance_a", NumberAsString.formatAsString(liaBalanceA));
-            output.put("lia_balance_b", NumberAsString.formatAsString(liaBalanceB));
+
+        } else {
+
+            // НОВЫЙ ЛАД - без Обсерверов и Модели
+            TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DCSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+
+            if (!addresses.isEmpty()) {
+                TransactionFinalMap transactionsMap = DCSet.getInstance().getTransactionFinalMap();
+                BigDecimal eraBalanceA = new BigDecimal(0);
+                BigDecimal eraBalanceB = new BigDecimal(0);
+                BigDecimal eraBalanceC = new BigDecimal(0);
+                BigDecimal eraBalanceTotal = new BigDecimal(0);
+                BigDecimal compuBalance = new BigDecimal(0);
+                BigDecimal liaBalanceA = new BigDecimal(0);
+                BigDecimal liaBalanceB = new BigDecimal(0);
+
+                output.put("label_registered", Lang.getInstance().translateFromLangObj("Registered", langObj));
+                output.put("label_certified", Lang.getInstance().translateFromLangObj("Certified", langObj));
+
+                int i = 0;
+                for (String address: addresses.keySet()) {
+
+                    Stack<Tuple3<Integer, Integer, Integer>> stack = addresses.get(address);
+                    Tuple3<Integer, Integer, Integer> item = stack.peek();
+                    Transaction transactionIssue = transactionsMap.get(item.b, item.c);
+
+                    Map accountJSON = new LinkedHashMap();
+                    accountJSON.put("address", address);
+                    accountJSON.put("to_date", DateTimeFormat.timestamptoString(item.a * 86400000l));
+                    accountJSON.put("creator", transactionIssue.getCreator().getPersonAsString());
+                    accountJSON.put("creator_address", transactionIssue.getCreator().getAddress());
+
+                    accountsJSON.put(i++, accountJSON);
+
+                    myIssuePersons.addAll(transactionsMap.getTransactionsByTypeAndAddress(address,
+                            Transaction.ISSUE_PERSON_TRANSACTION, 200));
+
+                    Account account = new Account(address);
+                    Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
+                            = account.getBalance(AssetCls.ERA_KEY);
+
+                    eraBalanceA = eraBalanceA.add(balance.a.b);
+                    eraBalanceB = eraBalanceB.add(balance.b.b);
+                    eraBalanceC = eraBalanceC.add(balance.c.b);
+                    eraBalanceTotal = eraBalanceA.add(eraBalanceB).add(eraBalanceC);
+
+                    balance = account.getBalance(AssetCls.FEE_KEY);
+                    compuBalance = compuBalance.add(balance.a.b);
+
+                    balance = account.getBalance(AssetCls.LIA_KEY);
+                    liaBalanceA = liaBalanceA.add(balance.a.b);
+                    liaBalanceB = liaBalanceB.add(balance.b.b);
+                }
+                output.put("era_balance_a", NumberAsString.formatAsString(eraBalanceA));
+                output.put("era_balance_b", NumberAsString.formatAsString(eraBalanceB));
+                output.put("era_balance_c", NumberAsString.formatAsString(eraBalanceC));
+                output.put("era_balance_total", NumberAsString.formatAsString(eraBalanceTotal));
+                output.put("compu_balance", NumberAsString.formatAsString(compuBalance));
+                output.put("lia_balance_a", NumberAsString.formatAsString(liaBalanceA));
+                output.put("lia_balance_b", NumberAsString.formatAsString(liaBalanceB));
+            }
+
         }
+
         output.put("accounts", accountsJSON);
 
         // my persons
@@ -1245,18 +1309,20 @@ public class BlockExplorer {
 
         Map myPersonsJSON = new LinkedHashMap();
 
-        int i = 0;
-        for (Transaction myIssuePerson : myIssuePersons) {
-            Map myPersonJSON = new LinkedHashMap();
-            IssueItemRecord record = (IssueItemRecord) myIssuePerson;
-            ItemCls item = record.getItem();
+        if (myIssuePersons != null) {
+            int i = 0;
+            for (Transaction myIssuePerson : myIssuePersons) {
+                Map myPersonJSON = new LinkedHashMap();
+                IssueItemRecord record = (IssueItemRecord) myIssuePerson;
+                ItemCls item = record.getItem();
 
-            myPersonJSON.put("key", item.getKey());
-            myPersonJSON.put("name", item.getName());
+                myPersonJSON.put("key", item.getKey());
+                myPersonJSON.put("name", item.getName());
 
-            myPersonJSON.put("date", df.format(new Date(myIssuePerson.getTimestamp())));
-            myPersonsJSON.put(i, myPersonJSON);
-            i++;
+                myPersonJSON.put("date", df.format(new Date(myIssuePerson.getTimestamp())));
+                myPersonsJSON.put(i, myPersonJSON);
+                i++;
+            }
         }
 
         output.put("My_Persons", myPersonsJSON);

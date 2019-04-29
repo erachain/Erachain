@@ -44,14 +44,14 @@ public class VoushLibraryPanel extends JPanel {
         col_data.setPreferredWidth(120);// .setWidth(30);
 
 
-        TableColumn Date_Column = jTable_Vouches.getColumnModel().getColumn(StatementsVouchTableModel.COLUMN_TIMESTAMP);
+        TableColumn Date_Column = column_mod.getColumn(StatementsVouchTableModel.COLUMN_TIMESTAMP);
         //favoriteColumn.setCellRenderer(new RendererBoolean()); //personsTable.getDefaultRenderer(Boolean.class));
         int rr = (int) (getFontMetrics(UIManager.getFont("Table.font")).stringWidth("0022-22-2222"));
         Date_Column.setMinWidth(rr + 1);
         Date_Column.setMaxWidth(rr * 10);
         Date_Column.setPreferredWidth(rr + 5);//.setWidth(30);
 
-        TableColumn height_Column = jTable_Vouches.getColumnModel().getColumn(StatementsVouchTableModel.COLUMN_HEIGHT);
+        TableColumn height_Column = column_mod.getColumn(StatementsVouchTableModel.COLUMN_HEIGHT);
         //favoriteColumn.setCellRenderer(new RendererBoolean()); //personsTable.getDefaultRenderer(Boolean.class));
         rr = (int) (getFontMetrics(UIManager.getFont("Table.font")).stringWidth("002222222222"));
         height_Column.setMinWidth(rr + 1);
@@ -196,7 +196,6 @@ public class VoushLibraryPanel extends JPanel {
                 Account account = (Account) model.getCreator(row);
 
                 new AccountSendDialog(null, null, account, null);
-                ;
 
             }
         });
@@ -215,17 +214,14 @@ public class VoushLibraryPanel extends JPanel {
         });
         menu.add(Send_Mail_item_Menu);
 
-
         ////////////////////
         TableMenuPopupUtil.installContextMenu(jTable_Vouches, menu); // SELECT
-
 
     }
 
     public void delay_on_close() {
 
-        model.removeObservers();
-
+        model.deleteObservers();
 
     }
 

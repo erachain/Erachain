@@ -243,7 +243,7 @@ public RightTelegramPanel() {
            public void actionPerformed(ActionEvent e) {
                
                
-             Tuple3<String, String, Transaction> tt = (Tuple3<String,String,Transaction>) walletTelegramsFilterTableModel.getValueAt(row, 0);
+             Tuple3<Long, Long, Transaction> tt = (Tuple3<Long, Long, Transaction>) walletTelegramsFilterTableModel.getValueAt(row, 0);
              Controller.getInstance().getWallet().database.getTelegramsMap().delete(tt.c.viewSignature()) ;
         //     System.out.println(row);
            }

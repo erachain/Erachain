@@ -13,7 +13,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletVotesTableModel extends WalletSortedTableModel<Tuple2<String, String>, Poll> {
+public class WalletVotesTableModel extends WalletSortedTableModel<Tuple2<Long, Long>, Poll> {
     public static final int COLUMN_NAME = 0;
     public static final int COLUMN_ADDRESS = 1;
     public static final int COLUMN_TOTAL_VOTES = 2;
@@ -30,7 +30,7 @@ public class WalletVotesTableModel extends WalletSortedTableModel<Tuple2<String,
             return null;
         }
 
-        Pair<Tuple2<String, String>, Poll> data = this.listSorted.get(row);
+        Pair<Tuple2<Long, Long>, Poll> data = this.listSorted.get(row);
 
         if (data == null || data.getB() == null) {
             return -1;
@@ -70,7 +70,7 @@ public class WalletVotesTableModel extends WalletSortedTableModel<Tuple2<String,
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_POLL_TYPE) {
             if (this.listSorted == null) {
-                this.listSorted = (SortableList<Tuple2<String, String>, Poll>) message.getValue();
+                this.listSorted = (SortableList<Tuple2<Long, Long>, Poll>) message.getValue();
                 //this.polls.registerObserver();
                 this.listSorted.sort(PollMap.NAME_INDEX);
             }

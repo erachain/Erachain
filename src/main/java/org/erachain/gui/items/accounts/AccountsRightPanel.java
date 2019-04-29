@@ -85,7 +85,7 @@ public class AccountsRightPanel extends JPanel {
         
        // sort list  - AUTO sort
         List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-        sortKeys.add(new RowSorter.SortKey(table_Model.COLUMN_TRANSACTION, SortOrder.ASCENDING));
+        sortKeys.add(new RowSorter.SortKey(table_Model.COLUMN_TRANSACTION, SortOrder.DESCENDING));
         t.setSortKeys(sortKeys);
        // sort table
         jTable1.setRowSorter(t);
@@ -170,10 +170,10 @@ public class AccountsRightPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-               Transaction transaction = table_Model.getItem(th.row);
-               IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Lang.getInstance().translate("Transaction"));
-               dd.setLocationRelativeTo(th);
-               dd.setVisible(true);
+                AccountsTransactionsTableModel.Trans transaction = table_Model.getItem(th.row);
+                IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction.transaction, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Lang.getInstance().translate("Transaction"));
+                dd.setLocationRelativeTo(th);
+                dd.setVisible(true);
             }
             
         });
@@ -185,7 +185,8 @@ public class AccountsRightPanel extends JPanel {
     public void set_Asset(AssetCls asset){
         table_Model.set_Asset(asset);
         table_Model.set_Encryption(false);
-        table_Model.get_R_Send();
+        table_Model.getInterval();
+        table_Model.fireTableDataChanged();
         jTable1.setDefaultRenderer(BigDecimal.class, new RendererBigDecimals(asset.getScale()));
     }
     

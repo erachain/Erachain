@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.database.DBMap;
 import org.erachain.lang.Lang;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
@@ -36,6 +37,7 @@ public abstract class SearchTableModelCls<U> extends AbstractTableModel {
 
     public SearchTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight,
                                boolean descending) {
+        logger = LoggerFactory.getLogger(this.getClass().getName());
         this.map = map;
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
