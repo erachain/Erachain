@@ -21,9 +21,6 @@ public abstract class WalletSortedTableModel<T, U> extends SortedListTableModelC
     public WalletSortedTableModel(DBMap map, String[] columnNames, Boolean[] column_AutoHeight, boolean descending) {
         super(map, columnNames, column_AutoHeight, descending);
 
-        // сначала ЛОГЕР задаем
-        logger = LoggerFactory.getLogger(this.getClass().getName());
-
         addObservers();
     }
 

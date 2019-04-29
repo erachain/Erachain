@@ -28,8 +28,6 @@ public abstract class WalletAutoKeyTableModel<T, U> extends WalletSortedTableMod
 
         super(map, columnNames, column_AutoHeight, descending);
 
-        logger = LoggerFactory.getLogger(this.getClass().getName());
-
         RESET_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_RESET);
         LIST_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_LIST);
         ADD_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_ADD);

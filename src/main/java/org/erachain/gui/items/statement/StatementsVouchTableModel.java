@@ -46,8 +46,6 @@ public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
             recNo = transaction.getSeqNo();
         }
 
-        logger = LoggerFactory.getLogger(StatementsVouchTableModel.class.getName());
-
         transactionMap = DCSet.getInstance().getTransactionFinalMap();
 
         addObservers();
@@ -109,27 +107,8 @@ public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
 
     }
 
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        if (message.getType() == ObserverMessage.LIST_VOUCH_TYPE) {
-
-            setRows();
-            fireTableDataChanged();
-
-        } else if (message.getType() == ObserverMessage.LIST_VOUCH_TYPE
-                || message.getType() == ObserverMessage.ADD_VOUCH_TYPE || message.getType() == ObserverMessage.REMOVE_VOUCH_TYPE) {
-            needUpdate = true;
-
-        } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
-
-            needUpdate = false;
-            setRows();
-            fireTableDataChanged();
-        }
-    }
-
-    public void setRows() {
+    @Override
+    public void getIntervalThis(long start, long end) {
 
         if (list == null) {
             list = new ArrayList<>();
@@ -151,16 +130,5 @@ public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
 
         }
     }
-
-    public void addObservers() {
-        super.addObservers();
-        map.addObserver(this);
-    }
-
-    public void removeObservers() {
-        super.deleteObservers();
-        map.deleteObserver(this);
-    }
-
 
 }

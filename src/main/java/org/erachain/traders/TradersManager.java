@@ -37,10 +37,13 @@ public class TradersManager extends Observable {
 
     private void start() {
 
-        if (true)
+        Controller cnt = Controller.getInstance();
+        String address = "7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP";
+
+        if (!cnt.isMyAccountByAddress(address))
             return;
 
-        Controller cnt = Controller.getInstance();
+        Account account = new Account(address);
 
         try {
             Thread.sleep(3000);
@@ -48,9 +51,8 @@ public class TradersManager extends Observable {
             //FAILED TO SLEEP
         }
 
-        Account account = new Account("7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP");
 
-        if (true) {
+        if (false) {
             //START RATERs THREADs
             RaterWEX raterForex = new RaterWEX(this, 300);
             this.knownRaters.add(raterForex);

@@ -165,6 +165,16 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
         return accountKeys.iterator();
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Iterator<Tuple2<Long, Long>> getAddressDescendingIterator(Account account) {
+
+        Set<Tuple2<Long, Long>> accountKeys = ((BTreeMap) this.map).subMap(
+                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
+                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI())).keySet();
+
+        return ((NavigableSet<Tuple2<Long, Long>>) accountKeys).descendingIterator();
+    }
+
     public List<Pair<Account, Transaction>> get(List<Account> accounts, int limit) {
         List<Pair<Account, Transaction>> transactions = new ArrayList<Pair<Account, Transaction>>();
 
