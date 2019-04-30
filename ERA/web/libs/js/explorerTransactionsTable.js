@@ -19,8 +19,7 @@ function makePageUri(page, linkName) {
     for (var paramKey in urlParams) {
         if (uri === '') {
             uri += '?';
-        }
-        else {
+        } else {
             uri += '&';
         }
 
@@ -38,8 +37,7 @@ function pagesComponent(data) {
         for (var page = 1; page <= data.pageCount; page++) {
             if (page == data.pageNumber) {
                 output += '<b>' + page + '</b>&nbsp;';
-            }
-            else {
+            } else {
                 output += '<a href="' + makePageUri(page, 'page') + '">' + page + '</a>&nbsp;';
             }
         }
@@ -47,6 +45,52 @@ function pagesComponent(data) {
 
     return output;
 }
+
+function pagesComponentMixed(data) {
+    if (data.pageCount < 10) {
+        return pagesComponent(data);
+    } else if (data.pageCount >= 10) {
+        return pagesComplexComponent(data);
+    }
+}
+
+function pagesComplexComponent(data) {
+    var output = '';
+    if (data.pageCount > 1) {
+        output += 'Pages: ';
+        //В начале пагинация первых 3ех
+        for (var page = 1; page <= 3; page++) {
+            if (page == data.pageNumber) {
+                output += '<b>' + page + '</b>&nbsp;';
+            } else {
+                output += '<a href="' + makePageUri(page, 'page') + '">' + page + '</a>&nbsp;';
+            }
+        }
+        output += '...';
+        //пагинация от текущего
+
+        for (var page = data.pageNumber - 2; page <= data.pageNumber + 2; page++) {
+            if (page > 2 && page < data.pageCount - 2) {
+                if (page == data.pageNumber) {
+                    output += '<b>' + page + '</b>&nbsp;';
+                } else {
+                    output += '<a href="' + makePageUri(page, 'page') + '">' + page + '</a>&nbsp;';
+                }
+            }
+        }
+        output += '...';
+        //В конце пагинация последних 3ех
+        for (var page = data.pageCount - 2; page <= data.pageCount; page++) {
+            if (page == data.pageNumber) {
+                output += '<b>' + page + '</b>&nbsp;';
+            } else {
+                output += '<a href="' + makePageUri(page, 'page') + '">' + page + '</a>&nbsp;';
+            }
+        }
+    }
+    return output;
+}
+
 
 function pageCreation(from, to, step, restriction, start, linkName) {
     var output = '';
@@ -84,7 +128,7 @@ function transactions_Table(data) {
     console.log("data=")
     console.log(data)
     var output = data.Transactions.label_transactions_table + ':<br>';
-    output += pagesComponent(data);
+    output += pagesComponentMixed(data);
     output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
         ' class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
 
@@ -112,7 +156,7 @@ function transactions_Table(data) {
 
     }
     output += '</table></td></tr></table>';
-    output += pagesComponent(data);
+    output += pagesComponentMixed(data);
 
     return output;
 
