@@ -2,6 +2,7 @@ package org.erachain.gui.items.assets;
 
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
+import org.erachain.core.Synchronizer;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
@@ -14,19 +15,31 @@ import org.erachain.gui.models.FundTokensComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.ntp.NTP;
+import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple4;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
 public class DepositExchange extends JPanel {
 
     // private JComboBox<Account> accountLBox;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DepositExchange.class);
 
     // private static final long serialVersionUID = 1L;
     private static final long serialVersionUID = 2717571093561259483L;
@@ -108,10 +121,47 @@ public class DepositExchange extends JPanel {
                           JTextField pubKeyTxt, JTextField toDateTxt,
                           JTextField feePowTxt) {
 
-        if (!OnDealClick.proccess1(Button_Confirm))
-            return;
 
-        Account creator = (Account) jComboBox_YourAddress.getSelectedItem();
+        // http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
+        String url_string = "https://api.face2face.cash/apipay/index.json";
+
+        JSONObject jsonObject;
+        try {
+
+            // CREATE CONNECTION
+            URL url = new URL(url_string);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // EXECUTE
+            int resCode = connection.getResponseCode();
+
+            //READ RESULT
+            InputStream stream;
+            if (resCode == 400) {
+                stream = connection.getErrorStream();
+            } else {
+                stream = connection.getInputStream();
+            }
+
+            InputStreamReader isReader = new InputStreamReader(stream, "UTF-8");
+            //String result = new BufferedReader(isReader).readLine();
+
+            BufferedReader bufferedReader = new BufferedReader(isReader);
+            String inputText = "";
+            String inputLine;
+            while ((inputLine = bufferedReader.readLine()) != null)
+                inputText += inputLine;
+            bufferedReader.close();
+
+            jsonObject = (JSONObject) JSONValue.parse(inputText);
+
+        } catch (Exception e) {
+            jsonObject = null;
+        }
+
+        if (jsonObject != null) {
+            jsonObject.toString();
+        }
 
         Button_Confirm.setEnabled(true);
 
@@ -264,7 +314,7 @@ public class DepositExchange extends JPanel {
             }
         });
 
-        if (account == null || account.isPerson()) {
+        if (account == null) {
             jLabel_Adress_Check.setText(Lang.getInstance().translate("Insert Deposit Account"));
         } else {
             jTextField_Address.setText(account.getAddress());
@@ -315,7 +365,7 @@ public class DepositExchange extends JPanel {
         });
 
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 18;
         gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
@@ -330,6 +380,13 @@ public class DepositExchange extends JPanel {
                         jTextField_addDays, jFormattedTextField_Fee);
             }
         });
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 18;
+        gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
+        gridBagConstraints.insets = new Insets(1, 0, 29, 0);
+        add(jButton_Confirm, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
