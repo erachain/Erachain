@@ -248,7 +248,7 @@ public class DepositExchange extends JPanel {
         jTextField_Details.setToolTipText("");
         jTextField_Details.setText(""); // NOI18N
 
-        jButton_Cansel = new MButton(Lang.getInstance().translate("Cancel"), 2);
+        jButton_Cansel = new MButton(Lang.getInstance().translate("See Deposit Tranastions"), 2);
         jButton_Cansel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
             }
