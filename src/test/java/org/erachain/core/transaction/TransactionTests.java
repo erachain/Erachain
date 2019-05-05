@@ -316,7 +316,7 @@ String  s= "";
         nameRegistration.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME REGISTRATION IS INVALID
-        assertEquals(Transaction.INVALID_NAME_LENGTH, nameRegistration.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_NAME_LENGTH_MAX, nameRegistration.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME REGISTRATION INVALID NAME LENGTH
         String longValue = "";
@@ -328,7 +328,7 @@ String  s= "";
         nameRegistration.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME REGISTRATION IS INVALID
-        assertEquals(Transaction.INVALID_VALUE_LENGTH, nameRegistration.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_VALUE_LENGTH_MAX, nameRegistration.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME REGISTRATION NAME ALREADY TAKEN
         name = new Name(maker, "test", "this is the value");
@@ -526,7 +526,7 @@ String  s= "";
         nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.INVALID_NAME_LENGTH, nameUpdate.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_NAME_LENGTH_MAX, nameUpdate.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME UPDATE NAME DOES NOT EXIST
         name = new Name(maker, "test2", "this is the value");
@@ -761,7 +761,7 @@ String  s= "";
         nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.INVALID_NAME_LENGTH, nameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_NAME_LENGTH_MAX, nameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME SALE NAME DOES NOT EXIST
         nameSale = new NameSale("test2", BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
@@ -1000,7 +1000,7 @@ String  s= "";
         cancelNameSaleTransaction = new CancelSellNameTransaction(maker, longName, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.INVALID_NAME_LENGTH, cancelNameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_NAME_LENGTH_MAX, cancelNameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID CANCEL NAME SALE NAME DOES NOT EXIST
         cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test2", FEE_POWER, timestamp, last_ref);
@@ -1257,7 +1257,7 @@ String  s= "";
         namePurchaseTransaction = new BuyNameTransaction(buyer, nameSaleInvalid, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet));
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.INVALID_NAME_LENGTH, namePurchaseTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_NAME_LENGTH_MAX, namePurchaseTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME PURCHASE NAME DOES NOT EXIST
         nameSaleInvalid = new NameSale("test2", BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
@@ -1508,7 +1508,7 @@ String  s= "";
         pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL CREATION IS INVALID
-        assertEquals(Transaction.INVALID_NAME_LENGTH, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_NAME_LENGTH_MAX, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID POLL CREATION INVALID DESCRIPTION LENGTH
         String longDescription = "";
@@ -1519,7 +1519,7 @@ String  s= "";
         pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL CREATION IS INVALID
-        assertEquals(Transaction.INVALID_DESCRIPTION_LENGTH, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_DESCRIPTION_LENGTH_MAX, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID POLL CREATION NAME ALREADY TAKEN
         poll = new Poll(maker, "test", "this is the value", Arrays.asList(new PollOption("test")));
@@ -1739,7 +1739,7 @@ String  s= "";
         pollVote = new VoteOnPollTransaction(maker, longName, 0, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL VOTE IS INVALID
-        assertEquals(Transaction.INVALID_NAME_LENGTH, pollVote.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_NAME_LENGTH_MAX, pollVote.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID POLL VOTE POLL DOES NOT EXIST
         pollVote = new VoteOnPollTransaction(maker, "test2", 0, FEE_POWER, timestamp, last_ref);

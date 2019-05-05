@@ -30,8 +30,6 @@ public class UnconfirmedTransactionsTableModel extends SortedListTableModelCls<L
                 new String[]{"Timestamp", "Type", "Name", "Creator", "Fee"},
                 new Boolean[]{true, false, true, true, false}, false);
 
-        logger = LoggerFactory.getLogger(UnconfirmedTransactionsTableModel.class);
-
         addObservers();
 
     }

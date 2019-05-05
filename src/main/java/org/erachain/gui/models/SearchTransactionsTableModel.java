@@ -40,7 +40,6 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
                 new Boolean[]{true, true, true, true, true, true, true, true},
                 false);
 
-        logger = LoggerFactory.getLogger(this.getClass().getName());
     }
 
     public void setBlockNumber(String string) {

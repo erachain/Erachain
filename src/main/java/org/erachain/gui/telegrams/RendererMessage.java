@@ -62,7 +62,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
             int blue = col.getBlue();
             background = "rgb(" + red +"," + green + "," + blue + ")";
            
-            Tuple3<String, String, Transaction> val = (Tuple3<String,String,Transaction>)value;
+            Tuple3<Long, Long, Transaction> val = (Tuple3<Long, Long, Transaction>)value;
             if (model.getSender() == null ) return this;
             String image;
             if (model.getSender().equals(val.a)) {

@@ -71,10 +71,6 @@ public class GZIP {
         return ss;
     }
 
-    public static String getZippedCharacterCount(KeyValueTableModel namesModel) {
-        return "Compressed Character Count:" + GZIP.compress(namesModel.getCurrentValueAsJsonStringOpt()).length() + "/4000";
-    }
-
     public static String webDecompress(String value) {
         if (value.startsWith("?gz!")) {
             value = value.substring(4, value.length());
