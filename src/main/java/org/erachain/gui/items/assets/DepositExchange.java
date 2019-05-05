@@ -59,14 +59,16 @@ public class DepositExchange extends JPanel {
 
         // http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
         //String url_string = "https://api.face2face.cash/apipay/index.json";
-        String url_string = "https://api.face2face.cash/apipay/get_rate.json/10/9/1";
+        String urlGetRate = "https://api.face2face.cash/apipay/get_rate.json/10/9/1";
+        String urlGetHistory = "https://api.face2face.cash/apipay/history.json/ERA/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5";
+        String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in,json/2/9/10/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1000";
 
         JSONObject jsonObject;
         String inputText = "";
         try {
 
             // CREATE CONNECTION
-            URL url = new URL(url_string);
+            URL url = new URL(urlGetDetails);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
             // EXECUTE
@@ -98,7 +100,10 @@ public class DepositExchange extends JPanel {
 
         if (jsonObject != null) {
             jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
-            jTextField_Details.setText(jsonObject.get("rate").toString());
+            jTextField_Details.setText(jsonObject.get("addr_in").toString());
+            if (true) {
+                // указать что при вывод
+            }
         } else {
             jLabel_Adress_Check.setText("<html>" + inputText + "</html>");
         }
