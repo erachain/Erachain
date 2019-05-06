@@ -1,6 +1,7 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.library.MButton;
@@ -61,7 +62,7 @@ public class DepositExchange extends JPanel {
         //String url_string = "https://api.face2face.cash/apipay/index.json";
         String urlGetRate = "https://api.face2face.cash/apipay/get_rate.json/10/9/1";
         String urlGetHistory = "https://api.face2face.cash/apipay/history.json/ERA/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5";
-        String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in,json/2/9/10/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1000";
+        String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/9/10/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1000";
 
         JSONObject jsonObject;
         String inputText = "";
@@ -98,9 +99,12 @@ public class DepositExchange extends JPanel {
             inputText = "";
         }
 
-        if (jsonObject != null) {
-            jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
+        if (jsonObject != null && jsonObject.containsKey("addr_in")) {
+            if (BlockChain.DEVELOP_USE) {
+                jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
+            }
             jTextField_Details.setText(jsonObject.get("addr_in").toString());
+
             if (true) {
                 // указать что при вывод
             }
@@ -234,38 +238,9 @@ public class DepositExchange extends JPanel {
             }
         });
 
+        //////////////// BUTTONS
 
-        ////////////// DETAILS
-        gridy++;
-
-        jLabel_Details.setHorizontalAlignment(JTextField.LEFT);
-        jLabel_Details.setText(Lang.getInstance().translate("Details") + ":");
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = ++gridy;
-
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jTextField_Details, gridBagConstraints);
-        jTextField_Details.setToolTipText("");
-        jTextField_Details.setText(""); // NOI18N
-
-        jButton_Cansel = new MButton(Lang.getInstance().translate("See Deposit Tranastions"), 2);
-        jButton_Cansel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-            }
-        });
-
-        gridy += 5;
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
-        gridBagConstraints.insets = new Insets(1, 0, 29, 0);
-        add(jButton_Cansel, gridBagConstraints);
+        gridy += 3;
 
         jButton_Confirm = new MButton(Lang.getInstance().translate("Get Payment Details"), 2);
         jButton_Confirm.setToolTipText("");
@@ -278,9 +253,64 @@ public class DepositExchange extends JPanel {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        //gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
         add(jButton_Confirm, gridBagConstraints);
+
+        ////////////// DETAILS
+        gridy += 3;
+
+
+        JLabel detailsHead = new JLabel();
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        gridBagConstraints.insets = new Insets(0, 27, 0, 0);
+        add(detailsHead, gridBagConstraints);
+        detailsHead.setHorizontalAlignment(JTextField.LEFT);
+        detailsHead.setText(Lang.getInstance().translate("Payment Details"));
+
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(0, 27, 0, 0);
+        add(jLabel_Details, gridBagConstraints);
+        jLabel_Details.setHorizontalAlignment(JTextField.LEFT);
+        jLabel_Details.setText(Lang.getInstance().translate("Deposit to Address") + ":");
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        add(jTextField_Details, gridBagConstraints);
+        jTextField_Details.setEditable(false);
+        jTextField_Details.setToolTipText("");
+        jTextField_Details.setText(""); // NOI18N
+
+        //////////////////////////
+        gridy += 3;
+
+        jButton_Cansel = new MButton(Lang.getInstance().translate("See Deposit Tranastions"), 2);
+        jButton_Cansel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+            }
+        });
+
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        //gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
+        gridBagConstraints.insets = new Insets(1, 0, 29, 0);
+        add(jButton_Cansel, gridBagConstraints);
 
     }
 
