@@ -62,7 +62,7 @@ public class DepositExchange extends JPanel {
         //String url_string = "https://api.face2face.cash/apipay/index.json";
         String urlGetRate = "https://api.face2face.cash/apipay/get_rate.json/10/9/1";
         String urlGetHistory = "https://api.face2face.cash/apipay/history.json/ERA/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5";
-        String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/9/10/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1000";
+        String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/9/3/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1000";
 
         JSONObject jsonObject;
         String inputText = "";

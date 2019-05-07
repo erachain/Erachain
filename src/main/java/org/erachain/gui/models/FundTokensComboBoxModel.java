@@ -20,9 +20,18 @@ import java.util.concurrent.locks.ReentrantLock;
 public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
 
     public FundTokensComboBoxModel() {
-        this.addElement(Controller.getInstance().getAsset(BlockChain.DEVELOP_USE? 1031 : 12));
-        this.addElement(Controller.getInstance().getAsset(BlockChain.DEVELOP_USE? 1077 : 95));
-        this.addElement(Controller.getInstance().getAsset(2));
+        if (BlockChain.DEVELOP_USE) {
+            //this.addElement(Controller.getInstance().getAsset(1031));
+            this.addElement(Controller.getInstance().getAsset(1077));
+            this.addElement(Controller.getInstance().getAsset(1078));
+            this.addElement(Controller.getInstance().getAsset(1079));
+            this.addElement(Controller.getInstance().getAsset(2));
+        } else {
+            this.addElement(Controller.getInstance().getAsset(12));
+            this.addElement(Controller.getInstance().getAsset(94));
+            this.addElement(Controller.getInstance().getAsset(95));
+            this.addElement(Controller.getInstance().getAsset(93));
+        }
 
     }
 

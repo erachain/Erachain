@@ -113,8 +113,9 @@ public class WithdrawExchange extends JPanel {
 
         } catch (Exception e) {
             jsonObject = null;
-            inputText = "";
             account_to = null;
+            jLabel_Adress_Check.setText("<html>" + inputText + "</html>");
+            inputText = "";
         }
 
         if (account_to != null) {
@@ -143,8 +144,6 @@ public class WithdrawExchange extends JPanel {
             message += ":" + jTextField_Address.getText();
             new AccountSendDialog(asset[0], null, new Account(account_to), null, message);
 
-        } else {
-            jLabel_Adress_Check.setText("<html>" + inputText + "</html>");
         }
 
         jButton_Confirm.setEnabled(true);
