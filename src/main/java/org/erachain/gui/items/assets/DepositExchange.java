@@ -69,22 +69,25 @@ public class DepositExchange extends JPanel {
 
         String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
 
+        String incomeAssetName;
         AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
         switch ((int)asset.getKey()) {
             case 12:
-                urlGetDetails += "3/12"; // BTC -> eBTC
+                urlGetDetails += "3/12/" + jTextField_Address.getText() + "/0.1"; // BTC -> eBTC
+                incomeAssetName = "bitcoins";
                 break;
             case 95:
-                urlGetDetails += "3/13"; // BTC -> eUSD
+                urlGetDetails += "3/13/" + jTextField_Address.getText() + "/0.1"; // BTC -> eUSD
+                incomeAssetName = "bitcoins";
                 break;
             case 94:
-                urlGetDetails += "3/14"; // BTC -> eEUR
+                urlGetDetails += "3/14/" + jTextField_Address.getText() + "/0.1"; // BTC -> eEUR
+                incomeAssetName = "bitcoins";
                 break;
             default:
-                urlGetDetails += "3/10"; // BTC -> COMPU
+                urlGetDetails += "3/10/" + jTextField_Address.getText() + "/0.1"; // BTC -> COMPU
+                incomeAssetName = "bitcoins";
         }
-
-        urlGetDetails += "/" + jTextField_Address.getText() + "/0.1";
 
         String inputText = "";
         try {
@@ -126,7 +129,7 @@ public class DepositExchange extends JPanel {
             }
             jTextField_Details.setText(jsonObject.get("addr_in").toString());
             jTextField_Details_Check.setText(Lang.getInstance().translate("Transfer %1 to this address fo deposit your account on Exchange")
-                .replace("%1", asset.getName()));
+                .replace("%1", incomeAssetName));
 
         } else {
             jLabel_Adress_Check.setText("<html>" + inputText + "</html>");
