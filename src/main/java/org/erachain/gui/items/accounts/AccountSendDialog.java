@@ -17,13 +17,16 @@ public class AccountSendDialog extends JDialog {
 
 
     public AccountSendDialog(AssetCls asset, Account account, Account account_To, PersonCls person, boolean receive ) {
-        init(asset, account, account_To, person, receive);
+        init(asset, account, account_To, person, receive, null);
     }
 
     public AccountSendDialog(AssetCls asset, Account account, Account account_To, PersonCls person) {
-        init(asset, account, account_To, person, true);
+        init(asset, account, account_To, person, true, null);
     }
-    
+    public AccountSendDialog(AssetCls asset, Account account, Account account_To, PersonCls person, String message) {
+        init(asset, account, account_To, person, true, message);
+    }
+
     
     public void sertParams(String ammount, String title, String message) {
 
@@ -38,7 +41,7 @@ public class AccountSendDialog extends JDialog {
         panel.noRecive = noR;
 
     }
-    private void  init(AssetCls asset, Account account, Account account_To, PersonCls person, boolean receive){
+    private void  init(AssetCls asset, Account account, Account account_To, PersonCls person, boolean receive, String message){
      // ICON
         List<Image> icons = new ArrayList<Image>();
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
@@ -46,7 +49,7 @@ public class AccountSendDialog extends JDialog {
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
         this.setIconImages(icons);
-        panel = new AccountSendPanel(asset, account, account_To,  person);
+        panel = new AccountSendPanel(asset, account, account_To,  person, message);
         // no recieve
         this.setNoRecive(!receive);
         

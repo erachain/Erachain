@@ -249,6 +249,13 @@ public class AssetSendPanel extends javax.swing.JPanel {
         jScrollPane2.setViewportView(new AssetInfo(asset, false)); //jTextArea_Account_Description);
     }
 
+    public AssetSendPanel(AssetCls asset_in, Account account2, Account account_To, PersonCls person, String message) {
+        this(asset_in, account2, account_To, person);
+
+        jTextArea_Description.setText(message);
+
+    }
+
     private void refreshReceiverDetails() {
         String toValue = jTextField_To.getText();
         AssetCls asset = ((AssetCls) jComboBox_Asset.getSelectedItem());

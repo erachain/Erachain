@@ -8,6 +8,7 @@ import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.assets.DepositExchange;
 import org.erachain.gui.items.assets.ExchangeFrame;
 import org.erachain.gui.items.assets.Exchange_Panel;
+import org.erachain.gui.items.assets.WithdrawExchange;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -48,7 +49,7 @@ public class MenuExchange extends JMenu {
         withdraw.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                MainPanel.getInstance().addTab(Exchange_Panel.class.getSimpleName());
+                MainPanel.getInstance().addTab(WithdrawExchange.class.getSimpleName());
             }
         });
         add(withdraw);

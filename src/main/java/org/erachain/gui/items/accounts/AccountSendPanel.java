@@ -19,8 +19,8 @@ public class AccountSendPanel extends AssetSendPanel {
     //private AccountSendPanel th;
     public boolean noRecive;
 
-    public AccountSendPanel(AssetCls asset, Account account, Account account_To, PersonCls person) {
-        super(asset, account, account_To, person);
+    public AccountSendPanel(AssetCls asset, Account account, Account account_To, PersonCls person, String message) {
+        super(asset, account, account_To, person, message);
         String assetName = "";
         if (asset != null) {
             assetName = asset.viewName();
@@ -38,6 +38,11 @@ public class AccountSendPanel extends AssetSendPanel {
         this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Receiver details") + ":");
 
     }
+    /*
+    public AccountSendPanel(AssetCls asset, Account account, Account account_To, PersonCls person, String message) {
+        this(asset, account, account_To, person);
+    }
+    */
 
    
     @Override

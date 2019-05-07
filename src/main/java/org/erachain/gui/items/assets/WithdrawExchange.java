@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.gui.items.accounts.AccountSendDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.FundTokensComboBoxModel;
@@ -16,7 +17,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,11 +28,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
-public class DepositExchange extends JPanel {
+public class WithdrawExchange extends JPanel {
 
     // private JComboBox<Account> accountLBox;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DepositExchange.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WithdrawExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;
     private MButton jButton_Cansel;
@@ -43,7 +47,9 @@ public class DepositExchange extends JPanel {
     private JLabel jLabel_YourAddress;
     private JTextField jTextField_Address = new JTextField();
 
-    public DepositExchange(AssetCls asset, Account account) {
+    final AssetCls[] asset = new AssetCls[1];
+
+    public WithdrawExchange(AssetCls asset, Account account) {
 
         initComponents(asset, account);
         this.setVisible(true);
@@ -62,7 +68,7 @@ public class DepositExchange extends JPanel {
         //String url_string = "https://api.face2face.cash/apipay/index.json";
         String urlGetRate = "https://api.face2face.cash/apipay/get_rate.json/10/9/1";
         String urlGetHistory = "https://api.face2face.cash/apipay/history.json/ERA/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5";
-        String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/9/10/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1000";
+        String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/10/9/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1000";
 
         JSONObject jsonObject;
         String inputText = "";
@@ -107,6 +113,9 @@ public class DepositExchange extends JPanel {
 
             if (true) {
                 // указать что при вывод
+                String message = "BTC:" + jTextField_Address.getText();
+                new AccountSendDialog(asset[0], null, new Account(jsonObject.get("addr_in").toString()), null, message);
+
             }
         } else {
             jLabel_Adress_Check.setText("<html>" + inputText + "</html>");
@@ -118,11 +127,10 @@ public class DepositExchange extends JPanel {
 
     private void initComponents(AssetCls asset_in, Account account) {
 
-        AssetCls asset;
         if (asset_in == null) {
-            asset = Controller.getInstance().getAsset(1l);
+            asset[0] = Controller.getInstance().getAsset(1l);
         } else {
-            asset = asset_in;
+            asset[0] = asset_in;
         }
 
         GridBagConstraints gridBagConstraints;
@@ -144,68 +152,7 @@ public class DepositExchange extends JPanel {
         this.setLayout(layout);
 
         int gridy = 0;
-        jLabel_YourAddress.setText(Lang.getInstance().translate("Your account") + ":");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new Insets(21, 27, 0, 0);
-        add(jLabel_YourAddress, gridBagConstraints);
 
-        jComboBox_YourAddress = new JComboBox<Account>(new AccountsComboBoxModel());
-        jTextField_Address.setText(((Account) jComboBox_YourAddress.getSelectedItem()).getAddress());
-
-        jComboBox_YourAddress.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                jTextField_Address.setText(((Account) jComboBox_YourAddress.getSelectedItem()).getAddress());
-
-            }
-        });
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new Insets(21, 0, 0, 13);
-        add(jComboBox_YourAddress, gridBagConstraints);
-
-        ////////////////
-        jLabel_Address.setText(Lang.getInstance().translate("Account to Deposit") + ":");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(0, 27, 0, 0);
-        add(jLabel_Address, gridBagConstraints);
-
-        if (account == null) {
-            jLabel_Adress_Check.setText(Lang.getInstance().translate("Insert Deposit Account"));
-        } else {
-            jTextField_Address.setText(account.getAddress());
-        }
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jTextField_Address, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        add(jLabel_Adress_Check, gridBagConstraints);
-
-        gridy++;
         /////////////// ASSET
         jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
         gridBagConstraints = new GridBagConstraints();
@@ -232,11 +179,44 @@ public class DepositExchange extends JPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
-                    //paneAssetInfo.setViewportView(new AssetInfo(asset, false));
+                    asset[0] = (AssetCls) cbxAssets.getSelectedItem();
                 }
             }
         });
+
+        ////////////////
+        jLabel_Address.setText(Lang.getInstance().translate("Address to Withdraw") + ":");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(0, 27, 0, 0);
+        add(jLabel_Address, gridBagConstraints);
+
+        if (account == null) {
+            jLabel_Adress_Check.setText(Lang.getInstance().translate("Insert Withdraw Address"));
+        } else {
+            jTextField_Address.setText(account.getAddress());
+        }
+
+        gridy++;
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        add(jTextField_Address, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        add(jLabel_Adress_Check, gridBagConstraints);
 
         //////////////// BUTTONS
 
@@ -280,7 +260,7 @@ public class DepositExchange extends JPanel {
         gridBagConstraints.insets = new Insets(0, 27, 0, 0);
         add(jLabel_Details, gridBagConstraints);
         jLabel_Details.setHorizontalAlignment(JTextField.LEFT);
-        jLabel_Details.setText(Lang.getInstance().translate("Deposit to Address") + ":");
+        jLabel_Details.setText(Lang.getInstance().translate("Withdraw to Address") + ":");
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -297,7 +277,7 @@ public class DepositExchange extends JPanel {
         //////////////////////////
         gridy += 3;
 
-        jButton_Cansel = new MButton(Lang.getInstance().translate("See Deposit Transactions"), 2);
+        jButton_Cansel = new MButton(Lang.getInstance().translate("See Withdraw Transactions"), 2);
         jButton_Cansel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
             }
