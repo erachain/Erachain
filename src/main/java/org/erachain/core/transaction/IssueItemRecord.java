@@ -71,14 +71,6 @@ public abstract class IssueItemRecord extends Transaction {
 
     @Override
     public boolean hasPublicText() {
-
-        // Анонимные счета для активов
-        Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(item.getName());
-        if (pair != null
-                && this.getCreator().equals(pair.getB())) {
-            return false;
-        }
-
         return true;
     }
 
@@ -148,7 +140,7 @@ public abstract class IssueItemRecord extends Transaction {
         int nameLen = name.length();
         if (nameLen < item.getMinNameLen()
                 //&& !BlockChain.DEVELOP_USE
-                && this.getBlockHeightByParentOrLast(this.dcSet) > 114000
+                && height > 114000
                 ) {
             // IF already in DB
             Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(name);
