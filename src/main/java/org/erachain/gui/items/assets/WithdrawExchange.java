@@ -184,11 +184,14 @@ public class WithdrawExchange extends JPanel {
             }
         });
 
+
+        gridy +=3;
+
         ////////////////
         jLabel_Address.setText(Lang.getInstance().translate("Address to Withdraw") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(0, 27, 0, 0);
         add(jLabel_Address, gridBagConstraints);
@@ -198,8 +201,6 @@ public class WithdrawExchange extends JPanel {
         } else {
             jTextField_Address.setText(account.getAddress());
         }
-
-        gridy++;
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -222,7 +223,8 @@ public class WithdrawExchange extends JPanel {
 
         gridy += 3;
 
-        jButton_Confirm = new MButton(Lang.getInstance().translate("Get Payment Details"), 2);
+
+        jButton_Confirm = new MButton(Lang.getInstance().translate("Withdraw"), 2);
         jButton_Confirm.setToolTipText("");
         jButton_Confirm.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -238,6 +240,7 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
         add(jButton_Confirm, gridBagConstraints);
 
+        /*
         ////////////// DETAILS
         gridy += 3;
 
@@ -273,6 +276,8 @@ public class WithdrawExchange extends JPanel {
         jTextField_Details.setEditable(false);
         jTextField_Details.setToolTipText("");
         jTextField_Details.setText(""); // NOI18N
+
+        */
 
         //////////////////////////
         gridy += 3;
