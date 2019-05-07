@@ -407,13 +407,13 @@ public class MainPanel extends javax.swing.JPanel {
             insertTab(Lang.getInstance().translate("Exchange"), new Exchange_Panel(null, null, null, null));
             return;
         } else
-        if (str.equals(Lang.getInstance().translate("WithdrawExchange")) || str.equals(WithdrawExchange.class.getSimpleName())) {
-            insertTab(Lang.getInstance().translate("WithdrawExchange"), new WithdrawExchange(null, null));
+        if (str.equals(Lang.getInstance().translate("Withdraw Exchange")) || str.equals(WithdrawExchange.class.getSimpleName())) {
+            insertTab(Lang.getInstance().translate("Withdraw Exchange"), new WithdrawExchange(null, null));
             return;
         }
 
-        if (str.equals(Lang.getInstance().translate("DepositExchange")) || str.equals(DepositExchange.class.getSimpleName())) {
-            insertTab(Lang.getInstance().translate("DepositExchange"), new DepositExchange(null, null));
+        if (str.equals(Lang.getInstance().translate("Deposit Exchange")) || str.equals(DepositExchange.class.getSimpleName())) {
+            insertTab(Lang.getInstance().translate("Deposit Exchange"), new DepositExchange(null, null));
             return;
         }
 

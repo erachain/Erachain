@@ -72,51 +72,77 @@ public class WithdrawExchange extends JPanel {
 
         JSONObject jsonObject;
         String inputText = "";
+        String account_to;
         try {
 
-            // CREATE CONNECTION
-            URL url = new URL(urlGetDetails);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-            // EXECUTE
-            int resCode = connection.getResponseCode();
-
-            //READ RESULT
-            InputStream stream;
-            if (resCode == 400) {
-                stream = connection.getErrorStream();
+            if (true) {
+                account_to = "7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK";
             } else {
-                stream = connection.getInputStream();
+                // CREATE CONNECTION
+                URL url = new URL(urlGetDetails);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+                // EXECUTE
+                int resCode = connection.getResponseCode();
+
+                //READ RESULT
+                InputStream stream;
+                if (resCode == 400) {
+                    stream = connection.getErrorStream();
+                } else {
+                    stream = connection.getInputStream();
+                }
+
+                InputStreamReader isReader = new InputStreamReader(stream, "UTF-8");
+                //String result = new BufferedReader(isReader).readLine();
+
+                BufferedReader bufferedReader = new BufferedReader(isReader);
+                String inputLine;
+                while ((inputLine = bufferedReader.readLine()) != null)
+                    inputText += inputLine;
+                bufferedReader.close();
+
+                jsonObject = (JSONObject) JSONValue.parse(inputText);
+
+                if (BlockChain.DEVELOP_USE) {
+                    jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
+                }
+
+                account_to = jsonObject.get("addr_in").toString();
             }
-
-            InputStreamReader isReader = new InputStreamReader(stream, "UTF-8");
-            //String result = new BufferedReader(isReader).readLine();
-
-            BufferedReader bufferedReader = new BufferedReader(isReader);
-            String inputLine;
-            while ((inputLine = bufferedReader.readLine()) != null)
-                inputText += inputLine;
-            bufferedReader.close();
-
-            jsonObject = (JSONObject) JSONValue.parse(inputText);
 
         } catch (Exception e) {
             jsonObject = null;
             inputText = "";
+            account_to = null;
         }
 
-        if (jsonObject != null && jsonObject.containsKey("addr_in")) {
-            if (BlockChain.DEVELOP_USE) {
-                jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
-            }
-            jTextField_Details.setText(jsonObject.get("addr_in").toString());
+        if (account_to != null) {
+            jTextField_Details.setText(account_to);
 
-            if (true) {
-                // указать что при вывод
-                String message = "BTC:" + jTextField_Address.getText();
-                new AccountSendDialog(asset[0], null, new Account(jsonObject.get("addr_in").toString()), null, message);
-
+            String message = "";
+            switch ((int)asset[0].getKey()) {
+                case 12:
+                    message += "BTC";
+                    break;
+                case 95:
+                    message += "USD";
+                    break;
+                case 94:
+                    message += "EUR";
+                    break;
+                default:
+                    String assetName = asset[0].getName();
+                    if (assetName.equals("Bitcoin")) {
+                        message += "BTC";
+                    } else {
+                        message += assetName;
+                    }
             }
+
+            message += ":" + jTextField_Address.getText();
+            new AccountSendDialog(asset[0], null, new Account(account_to), null, message);
+
         } else {
             jLabel_Adress_Check.setText("<html>" + inputText + "</html>");
         }

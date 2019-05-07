@@ -909,7 +909,13 @@ public abstract class TransactionAmount extends Transaction {
             // TODO: PERSON RULE 1
             if (BlockChain.PERSON_SEND_PROTECT && isPerson && this.key != FEE_KEY
                     && actionType != ACTION_DEBT && actionType != ACTION_HOLD
-                    && assetType != AssetCls.AS_INSIDE_BONUS) {
+                    && this.key != 12 // BTC
+                    && assetType != AssetCls.AS_ACCOUNTING
+                    //&& assetType != AssetCls.AS_INSIDE_ACCESS
+                    && assetType != AssetCls.AS_INSIDE_BONUS
+                    && assetType != AssetCls.AS_INDEX
+                    && assetType != AssetCls.AS_INSIDE_VOTE
+            ) {
                 HashSet<Account> recipients = this.getRecipientAccounts();
                 for (Account recipient : recipients) {
                     if (!recipient.isPerson(dcSet, height)
