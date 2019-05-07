@@ -43,7 +43,6 @@ public class WithdrawExchange extends JPanel {
     private JLabel jLabel_Adress_Check;
     private JLabel jLabel_Asset;
     private JLabel jLabel_Details;
-    private JTextField jTextField_Details;
     private JLabel jLabel_YourAddress;
     private JTextField jTextField_Address = new JTextField();
 
@@ -68,16 +67,44 @@ public class WithdrawExchange extends JPanel {
         //String url_string = "https://api.face2face.cash/apipay/index.json";
         String urlGetRate = "https://api.face2face.cash/apipay/get_rate.json/10/9/1";
         String urlGetHistory = "https://api.face2face.cash/apipay/history.json/ERA/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5";
-        String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/10/9/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1000";
+        String urlGetDetails2 = "https://api.face2face.cash/apipay/get_uri_in.json/2/10/9/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1000";
 
         JSONObject jsonObject;
         String inputText = "";
         String account_to;
+        String message = "";
+
         try {
 
-            if (true) {
+            if (false) {
                 account_to = "7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK";
             } else {
+
+                String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
+                AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
+                switch ((int)asset.getKey()) {
+                    case 12:
+                        urlGetDetails += "12/3/" + jTextField_Address.getText() + "/0.1"; // eBTC -> BTC
+                        message += "BTC";
+                        break;
+                    case 95:
+                        urlGetDetails += "13/3/" + jTextField_Address.getText() + "/100"; // eUSD -> BTC
+                        message += "BTC";
+                        break;
+                    case 94:
+                        urlGetDetails += "14/3/" + jTextField_Address.getText() + "/100"; // eEUR -> BTC
+                        message += "BTC";
+                        break;
+                    default:
+                        urlGetDetails += "10/3/" + jTextField_Address.getText() + "/1"; // COMPU -> BTC
+                        String assetName = asset.getName();
+                        if (assetName.equals("Bitcoin")) {
+                            message += "BTC";
+                        } else {
+                            message += assetName;
+                        }
+                }
+
                 // CREATE CONNECTION
                 URL url = new URL(urlGetDetails);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -112,34 +139,12 @@ public class WithdrawExchange extends JPanel {
             }
 
         } catch (Exception e) {
-            jsonObject = null;
             account_to = null;
-            jLabel_Adress_Check.setText("<html>" + inputText + "</html>");
+            jLabel_Adress_Check.setText(inputText);
             inputText = "";
         }
 
         if (account_to != null) {
-            jTextField_Details.setText(account_to);
-
-            String message = "";
-            switch ((int)asset[0].getKey()) {
-                case 12:
-                    message += "BTC";
-                    break;
-                case 95:
-                    message += "USD";
-                    break;
-                case 94:
-                    message += "EUR";
-                    break;
-                default:
-                    String assetName = asset[0].getName();
-                    if (assetName.equals("Bitcoin")) {
-                        message += "BTC";
-                    } else {
-                        message += assetName;
-                    }
-            }
 
             message += ":" + jTextField_Address.getText();
             new AccountSendDialog(asset[0], null, new Account(account_to), null, message);
@@ -168,7 +173,6 @@ public class WithdrawExchange extends JPanel {
 
         jLabel_Adress_Check = new JLabel();
         jLabel_Details = new JLabel();
-        jTextField_Details = new JTextField();
 
         GridBagLayout layout = new GridBagLayout();
         layout.columnWidths = new int[]{0, 9, 0, 9, 0, 9, 0};
@@ -241,6 +245,7 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        jLabel_Adress_Check.setText("qweqwe");
         add(jLabel_Adress_Check, gridBagConstraints);
 
         //////////////// BUTTONS

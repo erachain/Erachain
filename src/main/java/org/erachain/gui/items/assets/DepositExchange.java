@@ -67,18 +67,18 @@ public class DepositExchange extends JPanel {
 
         JSONObject jsonObject;
 
-        AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
-
         String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
+
+        AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
         switch ((int)asset.getKey()) {
             case 12:
-                urlGetDetails += "3/12"; // BTC -> BTC
+                urlGetDetails += "3/12"; // BTC -> eBTC
                 break;
             case 95:
-                urlGetDetails += "3/13"; // BTC -> USD
+                urlGetDetails += "3/13"; // BTC -> eUSD
                 break;
             case 94:
-                urlGetDetails += "3/14"; // BTC -> EUR
+                urlGetDetails += "3/14"; // BTC -> eEUR
                 break;
             default:
                 urlGetDetails += "3/10"; // BTC -> COMPU
@@ -128,9 +128,6 @@ public class DepositExchange extends JPanel {
             jTextField_Details_Check.setText(Lang.getInstance().translate("Transfer %1 to this address fo deposit your account on Exchange")
                 .replace("%1", asset.getName()));
 
-            if (true) {
-                // указать что при вывод
-            }
         } else {
             jLabel_Adress_Check.setText("<html>" + inputText + "</html>");
             jTextField_Details.setText("");
