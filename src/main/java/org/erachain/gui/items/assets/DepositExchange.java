@@ -40,6 +40,7 @@ public class DepositExchange extends JPanel {
     private JLabel jLabel_Asset;
     private JLabel jLabel_Details;
     private JTextField jTextField_Details;
+    private JLabel jTextField_Details_Check;
     private JLabel jLabel_YourAddress;
     private JTextField jTextField_Address = new JTextField();
 
@@ -62,9 +63,29 @@ public class DepositExchange extends JPanel {
         //String url_string = "https://api.face2face.cash/apipay/index.json";
         String urlGetRate = "https://api.face2face.cash/apipay/get_rate.json/10/9/1";
         String urlGetHistory = "https://api.face2face.cash/apipay/history.json/ERA/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5";
-        String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/9/3/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1000";
+        String urlGetDetailsTest = "https://api.face2face.cash/apipay/get_uri_in.json/2/3/12/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1000";
 
         JSONObject jsonObject;
+
+        AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
+
+        String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
+        switch ((int)asset.getKey()) {
+            case 12:
+                urlGetDetails += "3/12"; // BTC -> BTC
+                break;
+            case 95:
+                urlGetDetails += "3/13"; // BTC -> USD
+                break;
+            case 94:
+                urlGetDetails += "3/14"; // BTC -> EUR
+                break;
+            default:
+                urlGetDetails += "3/10"; // BTC -> COMPU
+        }
+
+        urlGetDetails += "/" + jTextField_Address.getText() + "/0.1";
+
         String inputText = "";
         try {
 
@@ -104,12 +125,16 @@ public class DepositExchange extends JPanel {
                 jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
             }
             jTextField_Details.setText(jsonObject.get("addr_in").toString());
+            jTextField_Details_Check.setText(Lang.getInstance().translate("Transfer %1 to this address fo deposit your account on Exchange")
+                .replace("%1", asset.getName()));
 
             if (true) {
                 // указать что при вывод
             }
         } else {
             jLabel_Adress_Check.setText("<html>" + inputText + "</html>");
+            jTextField_Details.setText("");
+            jTextField_Details_Check.setText(Lang.getInstance().translate("error"));
         }
 
         jButton_Confirm.setEnabled(true);
@@ -120,7 +145,7 @@ public class DepositExchange extends JPanel {
 
         AssetCls asset;
         if (asset_in == null) {
-            asset = Controller.getInstance().getAsset(1l);
+            asset = Controller.getInstance().getAsset(2l);
         } else {
             asset = asset_in;
         }
@@ -136,6 +161,7 @@ public class DepositExchange extends JPanel {
         jLabel_Adress_Check = new JLabel();
         jLabel_Details = new JLabel();
         jTextField_Details = new JTextField();
+        jTextField_Details_Check = new JLabel();
 
         GridBagLayout layout = new GridBagLayout();
         layout.columnWidths = new int[]{0, 9, 0, 9, 0, 9, 0};
@@ -232,7 +258,7 @@ public class DepositExchange extends JPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
+                    //AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
                     //paneAssetInfo.setViewportView(new AssetInfo(asset, false));
                 }
             }
@@ -272,7 +298,6 @@ public class DepositExchange extends JPanel {
         detailsHead.setHorizontalAlignment(JTextField.LEFT);
         detailsHead.setText(Lang.getInstance().translate("Payment Details"));
 
-
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++gridy;
@@ -293,6 +318,14 @@ public class DepositExchange extends JPanel {
         jTextField_Details.setEditable(false);
         jTextField_Details.setToolTipText("");
         jTextField_Details.setText(""); // NOI18N
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        add(jTextField_Details_Check, gridBagConstraints);
 
         //////////////////////////
         gridy += 3;
