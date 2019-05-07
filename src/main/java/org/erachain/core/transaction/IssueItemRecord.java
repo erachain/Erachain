@@ -71,6 +71,14 @@ public abstract class IssueItemRecord extends Transaction {
 
     @Override
     public boolean hasPublicText() {
+
+        // Анонимные счета для активов
+        Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(item.getName());
+        if (pair != null
+                && this.getCreator().equals(pair.getB())) {
+            return false;
+        }
+
         return true;
     }
 

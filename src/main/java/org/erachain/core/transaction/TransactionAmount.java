@@ -9,6 +9,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
@@ -469,7 +470,12 @@ public abstract class TransactionAmount extends Transaction {
                 if (asset == null) {
                     return ITEM_ASSET_NOT_EXIST;
                 }
-                
+
+                // самому себе нельзя пересылать
+                if (height > (BlockChain.DEVELOP_USE ? 259300 : BlockChain.VERS_4_11) && creator.equals(recipient)) {
+                    return Transaction.INVALID_ADDRESS;
+                }
+
                 // for PARSE and toBYTES need only AMOUNT_LENGTH bytes
                 if (true || this.getAbsKey() > BlockChain.AMOUNT_SCALE_FROM) {
                     byte[] amountBytes = this.amount.unscaledValue().toByteArray();
@@ -870,9 +876,15 @@ public abstract class TransactionAmount extends Transaction {
 
                 // IF send from PERSON to ANONYMOUS
                 // TODO: PERSON RULE 1
-                if (BlockChain.PERSON_SEND_PROTECT && isPerson && absKey != FEE_KEY
+                if (BlockChain.PERSON_SEND_PROTECT && isPerson && this.key != FEE_KEY
                         && actionType != ACTION_DEBT && actionType != ACTION_HOLD
-                        && assetType != AssetCls.AS_INSIDE_BONUS) {
+                        && (this.key < 10 || this.key > IssueAssetTransaction.START_KEY) //
+                        && assetType != AssetCls.AS_ACCOUNTING
+                        //&& assetType != AssetCls.AS_INSIDE_ACCESS
+                        && assetType != AssetCls.AS_INSIDE_BONUS
+                        && assetType != AssetCls.AS_INDEX
+                        && assetType != AssetCls.AS_INSIDE_VOTE
+                ) {
                     HashSet<Account> recipients = this.getRecipientAccounts();
                     for (Account recipient : recipients) {
                         if (!recipient.isPerson(dcSet, height)
@@ -884,11 +896,6 @@ public abstract class TransactionAmount extends Transaction {
 
             }
 
-            if (height > (BlockChain.DEVELOP_USE ? 259300 : BlockChain.VERS_4_11) && creator.equals(recipient)) {
-                // TODO 4.11 перенести это вверх где Сумма есть а сейчас там балансы не проверяются
-                return Transaction.INVALID_ADDRESS;
-            }
-
         } else {
             // TODO first org.erachain.records is BAD already ((
             // CHECK IF CREATOR HAS ENOUGH FEE MONEY
@@ -897,33 +904,6 @@ public abstract class TransactionAmount extends Transaction {
                 return NOT_ENOUGH_FEE;
             }
             
-        }
-
-        // TODO: develop use - убрать потом это при старте нового 4.11 - так как это дублирует выше проверку
-        if (this.amount != null && height < BlockChain.ALL_BALANCES_OK_TO && !BlockChain.DEVELOP_USE) {
-            // дублированиме кода для отлова ошибочных трнзакций версией новой в протоколе 4.10
-            int actionType = Account.actionType(this.key, this.amount);
-            int assetType = this.asset.getAssetType();
-
-            // IF send from PERSON to ANONYMOUS
-            // TODO: PERSON RULE 1
-            if (BlockChain.PERSON_SEND_PROTECT && isPerson && this.key != FEE_KEY
-                    && actionType != ACTION_DEBT && actionType != ACTION_HOLD
-                    && this.key != 12 // BTC
-                    && assetType != AssetCls.AS_ACCOUNTING
-                    //&& assetType != AssetCls.AS_INSIDE_ACCESS
-                    && assetType != AssetCls.AS_INSIDE_BONUS
-                    && assetType != AssetCls.AS_INDEX
-                    && assetType != AssetCls.AS_INSIDE_VOTE
-            ) {
-                HashSet<Account> recipients = this.getRecipientAccounts();
-                for (Account recipient : recipients) {
-                    if (!recipient.isPerson(dcSet, height)
-                            && !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {
-                        return RECEIVER_NOT_PERSONALIZED;
-                    }
-                }
-            }
         }
 
         // так как мы не лезем в супер класс то тут проверим тоже ее
