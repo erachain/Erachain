@@ -876,9 +876,9 @@ public abstract class TransactionAmount extends Transaction {
 
                 // IF send from PERSON to ANONYMOUS
                 // TODO: PERSON RULE 1
-                if (BlockChain.PERSON_SEND_PROTECT && isPerson && this.key != FEE_KEY
+                if (BlockChain.PERSON_SEND_PROTECT && isPerson && absKey != FEE_KEY
                         && actionType != ACTION_DEBT && actionType != ACTION_HOLD
-                        && (this.key < 10 || this.key > IssueAssetTransaction.START_KEY) // GATE Assets
+                        && (absKey < 10 || absKey > IssueAssetTransaction.START_KEY) // GATE Assets
                         && assetType != AssetCls.AS_ACCOUNTING
                         && assetType != AssetCls.AS_INSIDE_BONUS
                         && assetType != AssetCls.AS_INSIDE_VOTE
