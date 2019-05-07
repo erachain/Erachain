@@ -184,7 +184,6 @@ public class WithdrawExchange extends JPanel {
             }
         });
 
-
         gridy +=3;
 
         ////////////////
@@ -240,45 +239,6 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
         add(jButton_Confirm, gridBagConstraints);
 
-        /*
-        ////////////// DETAILS
-        gridy += 3;
-
-
-        JLabel detailsHead = new JLabel();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.anchor = GridBagConstraints.CENTER;
-        gridBagConstraints.insets = new Insets(0, 27, 0, 0);
-        add(detailsHead, gridBagConstraints);
-        detailsHead.setHorizontalAlignment(JTextField.LEFT);
-        detailsHead.setText(Lang.getInstance().translate("Payment Details"));
-
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(0, 27, 0, 0);
-        add(jLabel_Details, gridBagConstraints);
-        jLabel_Details.setHorizontalAlignment(JTextField.LEFT);
-        jLabel_Details.setText(Lang.getInstance().translate("Withdraw to Address") + ":");
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jTextField_Details, gridBagConstraints);
-        jTextField_Details.setEditable(false);
-        jTextField_Details.setToolTipText("");
-        jTextField_Details.setText(""); // NOI18N
-
-        */
-
         //////////////////////////
         gridy += 3;
 
@@ -287,7 +247,6 @@ public class WithdrawExchange extends JPanel {
             public void actionPerformed(ActionEvent evt) {
             }
         });
-
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
