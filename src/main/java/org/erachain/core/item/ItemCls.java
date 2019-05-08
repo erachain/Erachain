@@ -4,6 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RSetStatusToItem;
@@ -431,26 +432,49 @@ public abstract class ItemCls {
         return itemJSON;
     }
 
+    /**
+     *
+     * @param creator
+     * @param dcSet
+     * @return key если еще не добавлен, -key если добавлен и 0 - если это не НОВА
+     */
+    public long isNovaAsset(Account creator, DCSet dcSet) {
+        Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
+        if (pair != null && creator.equals(pair.getB())) {
+            ItemMap dbMap = this.getDBMap(dcSet);
+            long key = (long)pair.getA();
+            if (dbMap.contains(key)) {
+                return -key;
+            } else {
+                return key;
+            }
+        }
+
+        return 0l;
+    }
+
     //
     public void insertToMap(DCSet db, long startKey) {
         //INSERT INTO DATABASE
         ItemMap dbMap = this.getDBMap(db);
 
         long newKey;
-        Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
-        if (pair == null) {
+        long novaKey = this.isNovaAsset(this.owner, db);
+        if (novaKey > 0) {
 
+            // INSERT WITH NOVA KEY
+            newKey = novaKey;
+            dbMap.set(newKey, this);
+
+        } else {
+
+            // INSERT WITH NEW KEY
             newKey = dbMap.getLastKey();
             if (newKey < startKey) {
                 // IF this not GENESIS issue - start from startKey
                 dbMap.setLastKey(startKey);
             }
             newKey = dbMap.add(this);
-
-        } else {
-            // INSERT WITH NEW KEY
-            newKey = pair.getA();
-            dbMap.set(newKey, this);
 
         }
 

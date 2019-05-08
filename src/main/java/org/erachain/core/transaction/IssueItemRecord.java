@@ -142,11 +142,8 @@ public abstract class IssueItemRecord extends Transaction {
                 //&& !BlockChain.DEVELOP_USE
                 && this.getBlockHeightByParentOrLast(this.dcSet) > 114000
                 ) {
-            // IF already in DB
-            Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(name);
-            if (pair == null
-                    || this.item.getKey(this.dcSet) > 0
-                    || !this.getCreator().equals(pair.getB())) {
+            // IF is NEW NOVA
+            if (this.item.isNovaAsset(this.creator, this.dcSet) <= 0) {
                 return INVALID_NAME_LENGTH_MIN;
             }
         }
