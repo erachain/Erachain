@@ -333,11 +333,11 @@ public class ObserverMessage {
     }
 
     public int getType() {
-        return this.type;
+        return type;
     }
 
     public Object getValue() {
-        return this.value;
+        return value;
     }
 
 }

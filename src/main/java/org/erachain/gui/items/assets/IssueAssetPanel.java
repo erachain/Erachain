@@ -90,6 +90,10 @@ public class IssueAssetPanel extends JPanel {
                 0, ItemCls.MAX_ICON_LENGTH);
         addLogoIconLabel.setPreferredSize(new Dimension(WIDTH_LOGO, HEIGHT_LOGO));
 
+        JPanel panelAddImageLabel = new JPanel(new BorderLayout());
+        panelAddImageLabel.add(addImageLabel,BorderLayout.CENTER);
+        JPanel panelAddImageLogo = new JPanel(new BorderLayout());
+        panelAddImageLogo.add(addLogoIconLabel,BorderLayout.CENTER);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -103,15 +107,17 @@ public class IssueAssetPanel extends JPanel {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridheight = 3;
+        gridBagConstraints.gridheight = 5;
         gridBagConstraints.insets = new Insets(0, 12, 8, 8);
-        add(addImageLabel, gridBagConstraints);
+//        add(addImageLabel, gridBagConstraints);
+        add(panelAddImageLabel, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridheight = 1;
-        add(addLogoIconLabel, gridBagConstraints);
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridheight = 4;
+//        add(addLogoIconLabel, gridBagConstraints);
+        add(panelAddImageLogo, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;

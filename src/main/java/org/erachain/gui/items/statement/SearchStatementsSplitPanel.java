@@ -115,9 +115,9 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         });
 
         // Sorter
-        // search_Sorter = new
+        // searchSorter = new
         // TableRowSorter<ItemsPersonsTableModel>(this.search_Table_Model);
-        // search_Table.setRowSorter(search_Sorter);
+        // search_Table.setRowSorter(searchSorter);
 
         // UPDATE FILTER ON TEXT CHANGE
         searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener() {
