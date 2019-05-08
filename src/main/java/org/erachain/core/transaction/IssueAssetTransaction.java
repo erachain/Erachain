@@ -7,6 +7,8 @@ import org.erachain.core.block.Block;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemMap;
+import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -191,6 +193,15 @@ public class IssueAssetTransaction extends IssueItemRecord {
     }
 
     //PARSE CONVERT
+
+    @Override
+    public boolean hasPublicText() {
+        if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
+                return false;
+        }
+
+        return true;
+    }
 
     //@Override
     @Override

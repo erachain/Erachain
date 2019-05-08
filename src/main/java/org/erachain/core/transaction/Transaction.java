@@ -1235,7 +1235,6 @@ public abstract class Transaction {
         if ((flags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0l
                 && this.hasPublicText()
                 && !BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
-                && !BlockChain.NOVA_ASSETS.containsKey(this.creator.getAddress())
                 && !this.creator.isPerson(dcSet, height)) {
             if (BlockChain.DEVELOP_USE) {
                 boolean good = false;
