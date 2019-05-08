@@ -438,7 +438,9 @@ public abstract class ItemCls {
 
         long newKey;
         Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
-        if (pair == null) {
+        if (pair == null
+                || !this.owner.equals(pair.getB()) // если не совпал создатель
+        ) {
 
             newKey = dbMap.getLastKey();
             if (newKey < startKey) {
