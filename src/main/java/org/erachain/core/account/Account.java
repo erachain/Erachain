@@ -816,7 +816,7 @@ public class Account {
             return this.address.equals(b);
         } else if (b instanceof byte[]) {
             byte[] bs = (byte[]) b;
-            if (bytes.length == ADDRESS_LENGTH) {
+            if (bs.length == ADDRESS_LENGTH) {
                 return Arrays.equals(this.bytes, bs);
             } else {
                 return Arrays.equals(this.shortBytes, bs);
