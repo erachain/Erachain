@@ -62,7 +62,7 @@ public class IssueAssetPanel extends JPanel {
         titleJLabel.setText(Lang.getInstance().translate("Issue Asset"));
         textAreaDescription.setLineWrap(true);
         textQuantity.setMaskType(textQuantity.maskLong);
-        textQuantity.setText("1");
+        textQuantity.setText("0");
         textFeePow.setSelectedItem("0");
         issueJButton.addActionListener(arg0 -> onIssueClick());
         // select combobox Asset type
