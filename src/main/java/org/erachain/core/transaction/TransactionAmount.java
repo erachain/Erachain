@@ -828,7 +828,7 @@ public abstract class TransactionAmount extends Transaction {
                                         return NO_BALANCE;
                                 }
                                 
-                                if (height > BlockChain.FREEZE_FROM && !BlockChain.DEVELOP_USE) {
+                                if (height > BlockChain.FREEZE_FROM) {
                                     String unlock = BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress());
                                     if (unlock != null && !this.recipient.equals(unlock))
                                         return INVALID_CREATOR;
