@@ -3,7 +3,7 @@ package org.erachain.gui.items.accounts;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.library;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.models.RendererBigDecimals;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -19,7 +19,6 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableRowSorter;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 public class AccountsRightPanel extends JPanel {
 
@@ -77,8 +76,8 @@ public class AccountsRightPanel extends JPanel {
         t.setComparator(table_Model.COLUMN_TRANSACTION, new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
-                 BigDecimal transaction1 = library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(o1));
-                 BigDecimal transaction2 = library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(o2));
+                 BigDecimal transaction1 = Library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(o1));
+                 BigDecimal transaction2 = Library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(o2));
                return transaction1.compareTo(transaction2);
             }
           });

@@ -10,10 +10,10 @@ import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
+import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MDecimalFormatedTextField;
-import org.erachain.gui.library.AddImageLabel;
-import org.erachain.gui.library.library;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -84,16 +84,12 @@ public class IssueAssetPanel extends JPanel {
 
         addImageLabel = new AddImageLabel(
                 Lang.getInstance().translate("Add image"), WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG,
-                0, ItemCls.MAX_IMAGE_LENGTH);
-        addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
-        addLogoIconLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"), WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF,
-                0, ItemCls.MAX_ICON_LENGTH);
-        addLogoIconLabel.setPreferredSize(new Dimension(WIDTH_LOGO, HEIGHT_LOGO));
+                0, ItemCls.MAX_IMAGE_LENGTH, WIDTH_IMAGE_INITIAL, HEIGHT_IMAGE_INITIAL);
 
-        JPanel panelAddImageLabel = new JPanel(new BorderLayout());
-        panelAddImageLabel.add(addImageLabel,BorderLayout.CENTER);
-        JPanel panelAddImageLogo = new JPanel(new BorderLayout());
-        panelAddImageLogo.add(addLogoIconLabel,BorderLayout.CENTER);
+        addLogoIconLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
+                WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF,
+                0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL);
+
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -108,16 +104,16 @@ public class IssueAssetPanel extends JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridheight = 5;
-        gridBagConstraints.insets = new Insets(0, 12, 8, 8);
-//        add(addImageLabel, gridBagConstraints);
-        add(panelAddImageLabel, gridBagConstraints);
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+//        gridBagConstraints.insets = new Insets(0, 12, 8, 8);
+        add(addImageLabel, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.gridheight = 4;
-//        add(addLogoIconLabel, gridBagConstraints);
-        add(panelAddImageLogo, gridBagConstraints);
+        add(addLogoIconLabel, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -178,14 +174,14 @@ public class IssueAssetPanel extends JPanel {
         add(textName, gridBagConstraints);
 
         textAreaDescription.setColumns(20);
-        textAreaDescription.setRows(5);
+        textAreaDescription.setRows(3);
         jScrollPane1.setViewportView(textAreaDescription);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.gridheight = 3;
-        gridBagConstraints.weighty=0.1;
+        gridBagConstraints.weighty = 0.1;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.insets = new Insets(0, 0, 6, 8);
@@ -272,7 +268,7 @@ public class IssueAssetPanel extends JPanel {
     public void onIssueClick() {
         // DISABLE
         issueJButton.setEnabled(false);
-        if (checkWalletUnlock(issueJButton)){
+        if (checkWalletUnlock(issueJButton)) {
             return;
         }
 
@@ -299,8 +295,8 @@ public class IssueAssetPanel extends JPanel {
             parsestep++;
             // SCALE, ASSET_TYPE, QUANTITY
             PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-            // if (currency_unmovabl_chk.isSelected()) asset_type = 1;
-            // if (claim_right_obligation_chk.isSelected()) asset_type = 2;
+            // if (currency_unmovabl_chk.isSelected()) assetType = 1;
+            // if (claim_right_obligation_chk.isSelected()) assetType = 2;
             parsestep++;
             int assetType = ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getId();
 
@@ -320,7 +316,7 @@ public class IssueAssetPanel extends JPanel {
                     + Lang.getInstance().translate(asset.viewAssetType() + "") + "<br>"
                     + Lang.getInstance().translate("Scale") + ":&nbsp;" + asset.getScale() + "<br>"
                     + Lang.getInstance().translate("Description") + ":<br>"
-                    + library.to_HTML(Lang.getInstance().translate(asset.viewDescription())) + "<br>";
+                    + Library.to_HTML(Lang.getInstance().translate(asset.viewDescription())) + "<br>";
             String statusText = "";
 
             IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(),

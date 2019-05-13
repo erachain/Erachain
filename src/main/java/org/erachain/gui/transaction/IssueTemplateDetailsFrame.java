@@ -1,7 +1,7 @@
 package org.erachain.gui.transaction;
 
 import org.erachain.core.transaction.IssueTemplateRecord;
-import org.erachain.gui.library.library;
+import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -31,7 +31,7 @@ public class IssueTemplateDetailsFrame extends RecDetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        String txt = "<HTML>" + library.to_HTML(templateIssue.getItem().getDescription());
+        String txt = "<HTML>" + Library.to_HTML(templateIssue.getItem().getDescription());
         JLabel txtAreaDescription = new JLabel(txt);
         //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());

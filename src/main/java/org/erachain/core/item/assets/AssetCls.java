@@ -204,17 +204,17 @@ public abstract class AssetCls extends ItemCls {
     // + or -
     protected int scale;
     //
-    protected int asset_type;
+    protected int assetType;
 
-    protected AssetCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale) {
+    protected AssetCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType, int scale) {
         super(typeBytes, owner, name, icon, image, description);
-        this.asset_type = asset_type;
+        this.assetType = assetType;
         this.scale = (byte) scale;
 
     }
 
-    public AssetCls(int type, byte pars, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale) {
-        this(new byte[TYPE_LENGTH], owner, name, icon, image, description, asset_type, scale);
+    public AssetCls(int type, byte pars, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType, int scale) {
+        this(new byte[TYPE_LENGTH], owner, name, icon, image, description, assetType, scale);
         this.typeBytes[0] = (byte) type;
         this.typeBytes[1] = pars;
     }
@@ -242,7 +242,7 @@ public abstract class AssetCls extends ItemCls {
             return "" + this.name; // ®
         }
 
-        switch (this.asset_type) {
+        switch (this.assetType) {
             case AS_OUTSIDE_GOODS:
                 return "▲" + this.name;
             case AS_OUTSIDE_IMMOVABLE:
@@ -254,13 +254,13 @@ public abstract class AssetCls extends ItemCls {
                 return "±" + this.name;
         }
 
-        if (this.asset_type >= AS_OUTSIDE_CURRENCY
-                && this.asset_type <= AS_OUTSIDE_OTHER_CLAIM)
+        if (this.assetType >= AS_OUTSIDE_CURRENCY
+                && this.assetType <= AS_OUTSIDE_OTHER_CLAIM)
             return "◄" + this.name;
 
-        if (this.asset_type == AS_INSIDE_ASSETS
-                || this.asset_type >= AS_INSIDE_CURRENCY
-                && this.asset_type <= AS_INSIDE_OTHER_CLAIM)
+        if (this.assetType == AS_INSIDE_ASSETS
+                || this.assetType >= AS_INSIDE_CURRENCY
+                && this.assetType <= AS_INSIDE_OTHER_CLAIM)
             return "►" + this.name;
 
         return "?" + this.name;
@@ -345,7 +345,7 @@ public abstract class AssetCls extends ItemCls {
                 this.key > 1000 &&
                         this.key < BlockChain.AMOUNT_SCALE_FROM
         ) {
-            //return this.asset_type == 1? BlockChain.AMOUNT_DEDAULT_SCALE : 0;
+            //return this.assetType == 1? BlockChain.AMOUNT_DEDAULT_SCALE : 0;
             // IN ANY CASE
             return BlockChain.AMOUNT_DEDAULT_SCALE;
         }
@@ -354,96 +354,96 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public int getAssetType() {
-        return this.asset_type;
+        return this.assetType;
     }
 
     public boolean isMovable() {
         if (false && this.key < BlockChain.AMOUNT_SCALE_FROM) {
             return (this.typeBytes[1] & (byte) 1) > 0;
         }
-        return this.asset_type == AS_OUTSIDE_GOODS;
+        return this.assetType == AS_OUTSIDE_GOODS;
     }
 
     public boolean isImMovable() {
         if (false && this.key < BlockChain.AMOUNT_SCALE_FROM) {
             return (this.typeBytes[1] & (byte) 1) <= 0;
         }
-        return this.asset_type == AS_OUTSIDE_IMMOVABLE;
+        return this.assetType == AS_OUTSIDE_IMMOVABLE;
     }
 
     public boolean isInsideType() {
-        return this.asset_type == AS_INSIDE_ASSETS
-                || this.asset_type >= AS_INSIDE_CURRENCY
-                && this.asset_type <= AS_INSIDE_OTHER_CLAIM;
+        return this.assetType == AS_INSIDE_ASSETS
+                || this.assetType >= AS_INSIDE_CURRENCY
+                && this.assetType <= AS_INSIDE_OTHER_CLAIM;
     }
 
     public boolean isInsideAsset() {
-        return this.asset_type == AS_INSIDE_ASSETS;
+        return this.assetType == AS_INSIDE_ASSETS;
     }
 
     public boolean isInsideCurrency() {
-        return this.asset_type == AS_INSIDE_CURRENCY;
+        return this.assetType == AS_INSIDE_CURRENCY;
     }
 
     public boolean isInsideUtility() {
-        return this.asset_type == AS_INSIDE_UTILITY;
+        return this.assetType == AS_INSIDE_UTILITY;
     }
 
     public boolean isInsideShare() {
-        return this.asset_type == AS_INSIDE_SHARE;
+        return this.assetType == AS_INSIDE_SHARE;
     }
 
     public boolean isInsideBonus() {
-        return this.asset_type == AS_INSIDE_BONUS;
+        return this.assetType == AS_INSIDE_BONUS;
     }
 
     public boolean isInsideAccess() {
-        return this.asset_type == AS_INSIDE_ACCESS;
+        return this.assetType == AS_INSIDE_ACCESS;
     }
 
     public boolean isInsideVote() {
-        return this.asset_type == AS_INSIDE_VOTE;
+        return this.assetType == AS_INSIDE_VOTE;
     }
 
     public boolean isIndex() {
-        return this.asset_type == AS_INDEX;
+        return this.assetType == AS_INDEX;
     }
 
     public boolean isInsideOtherClaim() {
-        return this.asset_type == AS_INSIDE_OTHER_CLAIM;
+        return this.assetType == AS_INSIDE_OTHER_CLAIM;
     }
 
     public boolean isOutsideType() {
-        return this.asset_type >= AS_OUTSIDE_CURRENCY
-                && this.asset_type <= AS_OUTSIDE_OTHER_CLAIM;
+        return this.assetType >= AS_OUTSIDE_CURRENCY
+                && this.assetType <= AS_OUTSIDE_OTHER_CLAIM;
     }
 
     public boolean isOutsideCurrency() {
-        return this.asset_type == AS_OUTSIDE_CURRENCY;
+        return this.assetType == AS_OUTSIDE_CURRENCY;
     }
 
     public boolean isOutsideService() {
-        return this.asset_type == AS_OUTSIDE_SERVICE;
+        return this.assetType == AS_OUTSIDE_SERVICE;
     }
 
     public boolean isOutsideShare() {
-        return this.asset_type == AS_OUTSIDE_SHARE;
+        return this.assetType == AS_OUTSIDE_SHARE;
     }
 
     public boolean isOutsideBill() {
-        return this.asset_type == AS_OUTSIDE_BILL;
+        return this.assetType == AS_OUTSIDE_BILL;
     }
 
     public boolean isOutsideBillEx() {
-        return this.asset_type == AS_OUTSIDE_BILL_EX;
+        return this.assetType == AS_OUTSIDE_BILL_EX;
     }
 
     public boolean isOutsideOtherClaim() {
-        return this.asset_type == AS_OUTSIDE_OTHER_CLAIM;
+        return this.assetType == AS_OUTSIDE_OTHER_CLAIM;
     }
 
     public boolean isAccounting() {
-        return this.asset_type == AS_ACCOUNTING;
+        return this.assetType == AS_ACCOUNTING;
     }
 
     public static String viewAssetTypeCls(int asset_type) {
@@ -492,7 +492,7 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public String viewAssetType() {
-        return viewAssetTypeCls(this.asset_type);
+        return viewAssetTypeCls(this.assetType);
     }
 
     public static String viewAssetTypeFullCls(int asset_type) {
@@ -540,7 +540,7 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public String viewAssetTypeFull() {
-        return viewAssetTypeFullCls(this.asset_type);
+        return viewAssetTypeFullCls(this.assetType);
     }
 
     public static String viewAssetTypeDescriptionCls(int asset_type) {
@@ -626,7 +626,7 @@ public abstract class AssetCls extends ItemCls {
 
         // ADD DATA
         assetJSON.put("scale", this.getScale());
-        assetJSON.put("asset_type", this.asset_type);
+        assetJSON.put("assetType", this.assetType);
 
         return assetJSON;
     }

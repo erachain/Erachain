@@ -6,9 +6,9 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.VoushLibraryPanel;
-import org.erachain.gui.library.library;
 import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
@@ -129,7 +129,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
                 Transaction trans = transactionsTableModel.getItem(row);
                 if (trans == null) return;
                 // save
-                library.saveTransactionJSONtoFileSystem(getParent(), trans);
+                Library.saveTransactionJSONtoFileSystem(getParent(), trans);
             }
 
             

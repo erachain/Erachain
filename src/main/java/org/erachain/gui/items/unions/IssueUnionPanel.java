@@ -9,9 +9,9 @@ import org.erachain.core.transaction.IssueUnionRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
-import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.AddImageLabel;
-import org.erachain.gui.library.library;
+import org.erachain.gui.library.IssueConfirmDialog;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -149,7 +149,7 @@ public class IssueUnionPanel extends JPanel {
         text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;" + Lang.getInstance().translate("Issue Union") + "<br><br><br>";
         text += Lang.getInstance().translate("Creator") + ":&nbsp;" + issue_Union.getCreator() + "<br>";
         text += Lang.getInstance().translate("Name") + ":&nbsp;" + issue_Union.getItem().viewName() + "<br>";
-        text += Lang.getInstance().translate("Description") + ":<br>" + library.to_HTML(issue_Union.getItem().getDescription()) + "<br>";
+        text += Lang.getInstance().translate("Description") + ":<br>" + Library.to_HTML(issue_Union.getItem().getDescription()) + "<br>";
         text += Lang.getInstance().translate("Date") + ":&nbsp;" + ((UnionCls) issue_Union.getItem()).getBirthday() + "<br>";
         text += Lang.getInstance().translate("Parent") + ":&nbsp;" + ((UnionCls) issue_Union.getItem()).getParent() + "<br>";
 
@@ -191,13 +191,12 @@ public class IssueUnionPanel extends JPanel {
         GridBagConstraints gridBagConstraints;
 
         addImageLabel = new AddImageLabel((Lang.getInstance().translate("Add image")),
-                WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG, 0, ItemCls.MAX_IMAGE_LENGTH);
-        addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
+                WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG,
+                0, ItemCls.MAX_IMAGE_LENGTH, WIDTH_IMAGE_INITIAL, HEIGHT_IMAGE_INITIAL);
 
         addLogoLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
                 WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF,
-                0, ItemCls.MAX_ICON_LENGTH);
-        addLogoLabel.setPreferredSize(new Dimension(WIDTH_LOGO, HEIGHT_LOGO));
+                0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL);
 
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleJLabel.setText(Lang.getInstance().translate("Issue Union"));

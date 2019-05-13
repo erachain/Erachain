@@ -9,9 +9,9 @@ import org.erachain.core.transaction.IssueTemplateRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
-import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.AddImageLabel;
-import org.erachain.gui.library.library;
+import org.erachain.gui.library.IssueConfirmDialog;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssueTemplateDetailsFrame;
 import org.erachain.lang.Lang;
@@ -77,7 +77,7 @@ public class IssueTemplatePanel extends JPanel {
         text += Lang.getInstance().translate("Creator") + ":&nbsp;" + issueTemplate.getCreator() + "<br>";
         text += Lang.getInstance().translate("Title") + ":&nbsp;" + issueTemplate.getItem().viewName() + "<br>";
         text += Lang.getInstance().translate("Description") + ":<br>"
-                + library.to_HTML(issueTemplate.getItem().getDescription()) + "<br>";
+                + Library.to_HTML(issueTemplate.getItem().getDescription()) + "<br>";
         String Status_text = "";
 
         IssueConfirmDialog issueConfirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, issueTemplate,
@@ -162,8 +162,7 @@ public class IssueTemplatePanel extends JPanel {
 
         addImageLabel = new AddImageLabel(
                 Lang.getInstance().translate("Add image"), WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG,
-                0, ItemCls.MAX_IMAGE_LENGTH);
-        addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
+                0, ItemCls.MAX_IMAGE_LENGTH, WIDTH_IMAGE_INITIAL, HEIGHT_IMAGE_INITIAL);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.gridx = 0;
@@ -174,8 +173,7 @@ public class IssueTemplatePanel extends JPanel {
 
         addLogoIconPanel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
                 WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF,
-                0, ItemCls.MAX_ICON_LENGTH);
-        addLogoIconPanel.setPreferredSize(new Dimension(WIDTH_LOGO, HEIGHT_LOGO));
+                0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.insets = new Insets(0, 0, 5, 0);
         gridBagConstraints.gridx = 0;
@@ -213,7 +211,6 @@ public class IssueTemplatePanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new Insets(0, 15, 5, 5);
         add(jLabelFee, gridBagConstraints);
-
 
 
         gridBagConstraints = new GridBagConstraints();
@@ -255,8 +252,6 @@ public class IssueTemplatePanel extends JPanel {
         gridBagConstraints.weighty = 0.7;
         gridBagConstraints.insets = new Insets(0, 0, 5, 15);
         add(jScrollPane1, gridBagConstraints);
-
-
 
 
         txtFeePow.setToolTipText("Level of FEE Power");

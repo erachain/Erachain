@@ -18,13 +18,12 @@ import org.erachain.core.naming.Name;
 import org.erachain.core.naming.NameSale;
 import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
-import org.erachain.database.DBMap;
 import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.SecureWalletDatabase;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.ObserverWaiter;
-import org.erachain.gui.library.library;
+import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
@@ -32,7 +31,6 @@ import org.erachain.utils.Pair;
 import org.erachain.utils.SaveStrToFile;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
-import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
@@ -1748,7 +1746,7 @@ public class Wallet extends Observable implements Observer {
             if (Controller.getInstance().useGui) {
                 Pair<Tuple2<String, String>, Transaction> item = (Pair<Tuple2<String, String>, Transaction>) message.getValue();
                 Transaction transaction = item.getB();
-                library.notifySysTrayRecord(transaction);
+                Library.notifySysTrayRecord(transaction);
             }
 
             return;

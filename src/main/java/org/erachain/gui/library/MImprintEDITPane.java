@@ -50,7 +50,7 @@ public class MImprintEDITPane extends JTextPane {
         // начальный разбор и присвоение начальных параметров строке
         while (m.find()) {
             if (first) pars.put(m.group(), m.group(1));
-            out = library.viewDescriptionHTML(out);
+            out = Library.viewDescriptionHTML(out);
             out = out.replace(m.group(), "<A href='!$@!" + m.group(1) + "' style='color:green'>" + to_HTML(pars.get(m.group())) + "</a>");
 
         }

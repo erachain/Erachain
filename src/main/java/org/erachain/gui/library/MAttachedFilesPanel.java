@@ -21,7 +21,7 @@ public class MAttachedFilesPanel extends JPanel {
     private Attache_Files_Model model;
     private MTable table;
     private JScrollPane scrollPane;
-    private fileChooser chooser;
+    private FileChooser chooser;
 
     public MAttachedFilesPanel() {
 
@@ -42,7 +42,7 @@ public class MAttachedFilesPanel extends JPanel {
 
                 if (table.getSelectedRow() < 0) return;
                 int row = table.convertRowIndexToModel(table.getSelectedRow());
-                chooser = new fileChooser();
+                chooser = new FileChooser();
                 String str = (String) model.getValueAt(row, 0);
                 chooser.setDialogTitle(Lang.getInstance().translate("Save File") + ": " + str);
                 //chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -199,7 +199,7 @@ public class MAttachedFilesPanel extends JPanel {
         return bos.toByteArray();
     }
 
-    public fileChooser getchooser() {
+    public FileChooser getchooser() {
         return chooser;
     }
 

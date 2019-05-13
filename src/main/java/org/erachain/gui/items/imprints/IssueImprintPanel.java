@@ -9,7 +9,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.IssueConfirmDialog;
-import org.erachain.gui.library.library;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.lang.Lang;
 
@@ -315,7 +315,7 @@ public class IssueImprintPanel extends JPanel {
             String text = "<HTML><body>";
             text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;" + Lang.getInstance().translate("Issue Imprint") + "<br><br><br>";
             text += Lang.getInstance().translate("Creator") + ":&nbsp;" + result.getCreator() + "<br>";
-            text += library.to_HTML(result.getItem().getDescription()) + "<br>";
+            text += Library.to_HTML(result.getItem().getDescription()) + "<br>";
 
             String Status_text = "";
 

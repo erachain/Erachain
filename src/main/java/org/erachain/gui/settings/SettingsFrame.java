@@ -174,12 +174,12 @@ public class SettingsFrame extends JDialog {
         //	{
         if (settingsTabPane.uI_Settings_Panel.size_Font.getSelectedItem().toString() != "") {
             settingsJSONbuf.put("font_size", settingsTabPane.uI_Settings_Panel.size_Font.getSelectedItem().toString());
-            //		gui.library.library.Set_GUI_Font(settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString());
+            //		gui.Library.Library.Set_GUI_Font(settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString());
         }
 
         if (settingsTabPane.uI_Settings_Panel.font_Name.getSelectedItem().toString() != "") {
             settingsJSONbuf.put("font_name", settingsTabPane.uI_Settings_Panel.font_Name.getSelectedItem().toString());
-            //		gui.library.library.Set_GUI_Font(settingsTabPane.settingsBasicPanel.font_Name.getSelectedItem().toString());
+            //		gui.Library.Library.Set_GUI_Font(settingsTabPane.settingsBasicPanel.font_Name.getSelectedItem().toString());
         }
 
         // themes
