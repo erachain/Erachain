@@ -145,7 +145,7 @@ public class BlockExplorer {
                     case "asset":
                         //search assets
                         output.put("search", type);
-                        output.putAll(jsonQuerySearchAssets(search, start));
+                        output.putAll(jsonQuerySearchAssets(search, pageNumber));
                         break;
                     case "statuses":
                     case "status":
@@ -1254,7 +1254,7 @@ public class BlockExplorer {
                 output.put("label_certified", Lang.getInstance().translateFromLangObj("Certified", langObj));
 
                 int i = 0;
-                for (String address: addresses.keySet()) {
+                for (String address : addresses.keySet()) {
 
                     Stack<Tuple3<Integer, Integer, Integer>> stack = addresses.get(address);
                     Tuple3<Integer, Integer, Integer> item = stack.peek();
@@ -2373,7 +2373,7 @@ public class BlockExplorer {
                         try {
                             params = (JSONObject) JSONValue.parseWithException(str);
                         } catch (ParseException e) {
-                            logger.error(e.getMessage(),e);
+                            logger.error(e.getMessage(), e);
                         }
                         Set<String> kS = params.keySet();
 
@@ -2397,7 +2397,7 @@ public class BlockExplorer {
                     try {
                         params = (JSONObject) JSONValue.parseWithException(str);
                     } catch (ParseException e) {
-                        logger.error(e.getMessage(),e);
+                        logger.error(e.getMessage(), e);
                     }
                     Set<String> kS = params.keySet();
 
@@ -2427,7 +2427,7 @@ public class BlockExplorer {
                     try {
                         params = (JSONObject) JSONValue.parseWithException(str);
                     } catch (ParseException e) {
-                        logger.error(e.getMessage(),e);
+                        logger.error(e.getMessage(), e);
                     }
                     Set<String> kS = params.keySet();
 
@@ -2861,7 +2861,7 @@ public class BlockExplorer {
         result.put("Persons", personsJSON);
         //Элемент, с которого идет отсчет страниц в обозревателе блоков(block explorer)
         result.put("start", start);
-        result.put("numberLastPerson", dcSet.getItemPersonMap().getLastKey());
+        result.put("numberLast", dcSet.getItemPersonMap().getLastKey());
         return result;
     }
 
@@ -2882,7 +2882,7 @@ public class BlockExplorer {
         Map assetsJSON = ConverterListInMap.assetsJSON(assets, dcSet, langObj);
         result.put("Assets", assetsJSON);
         result.put("start", start);
-        result.put("numberLastPerson", dcSet.getItemAssetMap().getLastKey());
+        result.put("numberLast", dcSet.getItemAssetMap().getLastKey());
         return result;
     }
 
@@ -2903,7 +2903,7 @@ public class BlockExplorer {
         Map statusesJSON = ConverterListInMap.statusTemplateJSON(StatusCls.class, statuses);
         result.put("Statuses", statusesJSON);
         result.put("start", start);
-        result.put("numberLastPerson", dcSet.getItemStatusMap().getLastKey());
+        result.put("numberLast", dcSet.getItemStatusMap().getLastKey());
         return result;
     }
 
@@ -2922,7 +2922,7 @@ public class BlockExplorer {
         Map templateJSON = ConverterListInMap.statusTemplateJSON(TemplateCls.class, templates);
         result.put("Templates", templateJSON);
         result.put("start", start);
-        result.put("numberLastPerson", dcSet.getItemTemplateMap().getLastKey());
+        result.put("numberLast", dcSet.getItemTemplateMap().getLastKey());
         return result;
     }
 
@@ -2973,6 +2973,57 @@ public class BlockExplorer {
     }
 
 
+    private Map jsonQuerySearchAssets(String search, int page) throws WrongSearchException, Exception {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        List<ItemCls> listAssets = new ArrayList();
+        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
+        //В зависимости от выбранного языка(ru,en)
+        AdderHeadInfo.addHeadInfoCapAssets(result, langObj);
+        try {
+            //Если в строке ввели число
+            if (search.matches("\\d+")) {
+                if (dcSet.getItemAssetMap().contains(Long.valueOf(search))) {
+                    //Элемент найден - добавляем его
+                    listAssets.add(dcSet.getItemAssetMap().get(Long.valueOf(search)));
+                    //Не отображать для одного элемента навигацию и пагинацию
+                    result.put("notDisplayPages", "true");
+                }
+            } else {
+                //Поиск элементов по имени
+                listAssets = dcSet.getItemAssetMap().getByFilterAsArray(search, 0, 100);
+            }
+        } catch (Exception e) {
+            logger.info("Wrong search while process assets... ");
+            throw new WrongSearchException();
+        }
+        if (listAssets == null) {
+            logger.info("Wrong search while process assets... ");
+            throw new WrongSearchException();
+        }
+        //Количество найденных элементов
+        int size = listAssets.size();
+        if (size == 0) {
+            logger.info("Wrong search while process assets... ");
+            throw new WrongSearchException();
+        }
+        //Параметр показывающий сколько элементов располагать на странице
+        int numberOfRepresentsItemsOnPage = 3;
+        //Вспомогательный объект
+        ReceiverMapForBlockExplorer receiverMapForBlockExplorer =
+                new ReceiverMapForBlockExplorer(page, listAssets, numberOfRepresentsItemsOnPage);
+        //Преобразовать соответствующие данные
+        receiverMapForBlockExplorer.process(AssetCls.class, dcSet, langObj);
+        //Добавляем количество элементов для отображения на странице для отправки
+        result.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
+        result.put("Assets", receiverMapForBlockExplorer.getMap());
+        //Добавляем ключ в JSON для отправки
+        result.put("pageNumber", receiverMapForBlockExplorer.getPage());
+        result.put("pageCount", listAssets.size()/numberOfRepresentsItemsOnPage);
+        result.put("numberLast", listAssets.get(listAssets.size() - 1).getKey());
+        return result;
+    }
+
     private Map jsonQuerySearchPersons(String search, int startPerson) throws WrongSearchException, Exception {
         //Результирующий сортированный в порядке добавления словарь(map)
         Map result = new LinkedHashMap();
@@ -3009,11 +3060,11 @@ public class BlockExplorer {
             logger.info("Wrong search while process persons... ");
             throw new WrongSearchException();
         }
-        //Вспомогательный объект
-        ReceiverMapForBlockExplorer receiverMapForBlockExplorer = new ReceiverMapForBlockExplorer(startPerson, listPersons, size);
         //Параметр показывающий сколько элементов располагать на странице
         int numberOfRepresentsItemsOnPage = 10;
-        receiverMapForBlockExplorer.setNumberOfRepresentsItemsOnPage(numberOfRepresentsItemsOnPage);
+        //Вспомогательный объект
+        ReceiverMapForBlockExplorer receiverMapForBlockExplorer =
+                new ReceiverMapForBlockExplorer(startPerson, listPersons, numberOfRepresentsItemsOnPage);
         //Преобразовать соответствующие данные
         receiverMapForBlockExplorer.process(PersonCls.class, dcSet, langObj);
         //Добавляем количество элементов для отображения на странице для отправки
@@ -3021,57 +3072,7 @@ public class BlockExplorer {
         result.put("Persons", receiverMapForBlockExplorer.getMap());
         //Добавляем ключ в JSON для отправки
         result.put("start", receiverMapForBlockExplorer.getKey());
-        result.put("numberLastPerson", listPersons.get(listPersons.size() - 1).getKey());
-        return result;
-    }
-
-    private Map jsonQuerySearchAssets(String search, int startAssets) throws WrongSearchException, Exception {
-        //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
-        List<ItemCls> listAssets = new ArrayList();
-        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
-        //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCapAssets(result, langObj);
-        try {
-            //Если в строке ввели число
-            if (search.matches("\\d+")) {
-                if (dcSet.getItemAssetMap().contains(Long.valueOf(search))) {
-                    //Элемент найден - добавляем его
-                    listAssets.add(dcSet.getItemAssetMap().get(Long.valueOf(search)));
-                    //Не отображать для одного элемента навигацию и пагинацию
-                    result.put("notDisplayPages", "true");
-                }
-            } else {
-                //Поиск элементов по имени
-                listAssets = dcSet.getItemAssetMap().getByFilterAsArray(search, 0, 100);
-            }
-        } catch (Exception e) {
-            logger.info("Wrong search while process assets... ");
-            throw new WrongSearchException();
-        }
-        if (listAssets == null) {
-            logger.info("Wrong search while process assets... ");
-            throw new WrongSearchException();
-        }
-        //Количество найденных элементов
-        int size = listAssets.size();
-        if (size == 0) {
-            logger.info("Wrong search while process assets... ");
-            throw new WrongSearchException();
-        }
-        //Вспомогательный объект
-        ReceiverMapForBlockExplorer receiverMapForBlockExplorer = new ReceiverMapForBlockExplorer(startAssets, listAssets, size);
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 10;
-        receiverMapForBlockExplorer.setNumberOfRepresentsItemsOnPage(numberOfRepresentsItemsOnPage);
-        //Преобразовать соответствующие данные
-        receiverMapForBlockExplorer.process(AssetCls.class, dcSet, langObj);
-        //Добавляем количество элементов для отображения на странице для отправки
-        result.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
-        result.put("Assets", receiverMapForBlockExplorer.getMap());
-        //Добавляем ключ в JSON для отправки
-        result.put("start", receiverMapForBlockExplorer.getKey());
-        result.put("numberLastPerson", listAssets.get(listAssets.size() - 1).getKey());
+        result.put("numberLast", listPersons.get(listPersons.size() - 1).getKey());
         return result;
     }
 
@@ -3111,11 +3112,11 @@ public class BlockExplorer {
             logger.info("Wrong search while process assets... ");
             throw new WrongSearchException();
         }
-        //Вспомогательный объект
-        ReceiverMapForBlockExplorer receiverMapForBlockExplorer = new ReceiverMapForBlockExplorer(startStatuses, listStatuses, size);
         //Параметр показывающий сколько элементов располагать на странице
         int numberOfRepresentsItemsOnPage = 20;
-        receiverMapForBlockExplorer.setNumberOfRepresentsItemsOnPage(numberOfRepresentsItemsOnPage);
+        //Вспомогательный объект
+        ReceiverMapForBlockExplorer receiverMapForBlockExplorer =
+                new ReceiverMapForBlockExplorer(startStatuses, listStatuses, numberOfRepresentsItemsOnPage);
         //Преобразовать соответствующие данные
         receiverMapForBlockExplorer.process(StatusCls.class, dcSet, langObj);
         //Добавляем количество элементов для отображения на странице для отправки
@@ -3123,7 +3124,7 @@ public class BlockExplorer {
         result.put("Statuses", receiverMapForBlockExplorer.getMap());
         //Добавляем ключ в JSON для отправки
         result.put("start", receiverMapForBlockExplorer.getKey());
-        result.put("numberLastPerson", listStatuses.get(listStatuses.size() - 1).getKey());
+        result.put("numberLast", listStatuses.get(listStatuses.size() - 1).getKey());
         return result;
     }
 

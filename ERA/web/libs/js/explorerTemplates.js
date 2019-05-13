@@ -17,7 +17,7 @@ function templates(data) {
 
     if (!notDisplayPages) {
         //Отображение компонента страниц(вверху)
-        output += pagesComponentBeauty(start, data.Label_Templates, data.numberLastPerson, numberShiftDelta, 'start');
+        output += pagesComponentBeauty(start, data.Label_Templates, data.numberLast, numberShiftDelta, 'start');
     }
 
     output += '<table width="1280" border=0><tr><td align=left><br>';
@@ -44,13 +44,13 @@ function templates(data) {
         }
         //Отображение ссылки следующая
         output += '<td colspan=4 align=right>';
-        if (data.numberLastPerson > start) {
+        if (data.numberLast > start) {
             output += '<a href=?templates&start=' +
                 (start + numberShiftDelta) + get_lang() + '>' + data.Label_Later;
         }
         output += '</table></td></tr></table>';
         //Отображение компонента страниц(снизу)
-        output += pagesComponentBeauty(start, data.Label_Statuses, data.numberLastPerson, numberShiftDelta, 'start');
+        output += pagesComponentBeauty(start, data.Label_Statuses, data.numberLast, numberShiftDelta, 'start');
     }
 
     return output;

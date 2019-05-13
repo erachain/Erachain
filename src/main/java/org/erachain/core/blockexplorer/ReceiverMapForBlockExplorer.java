@@ -15,17 +15,18 @@ import java.util.Map;
 
 public class ReceiverMapForBlockExplorer {
     private static final Logger logger = LoggerFactory.getLogger(ReceiverMapForBlockExplorer.class);
-    private int start;
+    private int page;
     private List<ItemCls> listItems;
     private int size;
     private int numberOfRepresentsItemsOnPage;
     private Map map;
     private long key;
 
-    ReceiverMapForBlockExplorer(int startPerson, List<ItemCls> listPersons, int size) {
-        this.start = startPerson;
-        this.listItems = listPersons;
-        this.size = size;
+    ReceiverMapForBlockExplorer(int page, List<ItemCls> list, int numberOfRepresentsItemsOnPage) {
+        this.page = page;
+        this.listItems = list;
+        this.size = list.size();
+        this.numberOfRepresentsItemsOnPage = numberOfRepresentsItemsOnPage;
     }
 
     Map getMap() {
@@ -40,22 +41,19 @@ public class ReceiverMapForBlockExplorer {
         this.numberOfRepresentsItemsOnPage = numberOfRepresentsItemsOnPage;
     }
 
+    public int getPage() {
+        return page;
+    }
+
     <T> void process(Class<T> type, DCSet dcSet, JSONObject langObj) throws Exception {
-        //Если начальный номер элемента не задан - берем последний
-        if (start == -1) {
-            start = (int) listItems.get(size - 1).getKey();
-        }
-        int number = 0;
-        //Подсчитать количество элементов, ключи которых меньше или равны переданному параметру из url
-        while (size > number && start >= listItems.get(number).getKey()) {
-            number++;
+        //Если начальный номер элемента не задан - берем первый
+        if (page == -1) {
+            page = 1;
         }
         //Данные для отправки
         List<T> list = new ArrayList<>();
-        //Если количество найденных элементов меньше количества элементов для отображения на странице,
-        //то передаем все элементы
-        int max = Math.max(0, number - numberOfRepresentsItemsOnPage);
-        for (int i = max; i >= 0 && i < number; i++) {
+
+        for (int i = (page - 1) * numberOfRepresentsItemsOnPage; i < page * numberOfRepresentsItemsOnPage; i++) {
             //Получаем элемент из списка найденных личностей(person)
             T element = (T) listItems.get(i);
             //Если элемент не null - то добавляем его
@@ -71,7 +69,7 @@ public class ReceiverMapForBlockExplorer {
                 key = ((List<PersonCls>) (list)).get(list.size() - 1).getKey();
             }
         } else if (type == AssetCls.class) {
-            map = ConverterListInMap.assetsJSON((List<AssetCls>) list,dcSet, langObj);
+            map = ConverterListInMap.assetsJSON((List<AssetCls>) list, dcSet, langObj);
             if (list.size() != 0) {
                 //Берем последний ключ в найденном списке
                 key = ((List<AssetCls>) (list)).get(list.size() - 1).getKey();
@@ -85,11 +83,9 @@ public class ReceiverMapForBlockExplorer {
         } else {
             logger.error("Incorrect generic type in receiver JSON");
         }
-        //Добавление полученного словаря(map) в данные для отправки
-        //Элемент, с которого идет отсчет страниц в обозревателе блоков(block explorer)
         if (list.size() == 0) {
             //Если элементов в списке найденных элементов нет - берем, который пришел
-            key = start;
+            key = page;
         }
     }
 }
