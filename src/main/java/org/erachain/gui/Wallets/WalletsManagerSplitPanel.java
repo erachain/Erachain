@@ -3,7 +3,7 @@ package org.erachain.gui.Wallets;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.accounts.AccountsPanel;
 import org.erachain.gui.items.accounts.AccountsRightPanel;
-import org.erachain.gui.library.fileChooser;
+import org.erachain.gui.library.FileChooser;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -38,7 +38,7 @@ public class WalletsManagerSplitPanel extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                fileChooser chooser = new fileChooser();
+                FileChooser chooser = new FileChooser();
                 chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 chooser.setMultiSelectionEnabled(false);
                 chooser.setDialogTitle(Lang.getInstance().translate("Open Wallet") + "...");

@@ -7,7 +7,7 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.library.IssueConfirmDialog;
-import org.erachain.gui.library.library;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 
@@ -75,7 +75,7 @@ public class AccountSendPanel extends AssetSendPanel {
             if (noRecive) {
 
                 // save
-                library.saveJSONStringToEraFile(getParent(), transaction.toJson().toJSONString());
+                Library.saveJSONStringToEraFile(getParent(), transaction.toJson().toJSONString());
                
 
             } else {

@@ -7,7 +7,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.library.library;
+import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.TransactionTimestampComparator;
@@ -328,7 +328,7 @@ public class APITransactionsResource {
         for (Transaction transaction : result) {
             if (asset != null) {
                 if (asset.equals(transaction.getAbsKey())) {
-                    rec.put(library.getBlockSegToBigInteger(transaction), transaction);
+                    rec.put(Library.getBlockSegToBigInteger(transaction), transaction);
                 }
 
             }

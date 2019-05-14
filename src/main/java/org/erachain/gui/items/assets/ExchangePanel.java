@@ -9,7 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Exchange_Panel extends JPanel {
+public class ExchangePanel extends JPanel {
     private static final long serialVersionUID = -7052380905136603354L;
     public CreateOrderPanel buyOrderPanel;
     EchangeSellBuyPanel tt;
@@ -26,7 +26,7 @@ public class Exchange_Panel extends JPanel {
     private JPanel jSelect_Trade;
     private JScrollPane jScrollPane_jPanel_RightPanel;
 
-    public Exchange_Panel(AssetCls have, AssetCls want, String action, String account) {
+    public ExchangePanel(AssetCls have, AssetCls want, String action, String account) {
 
         this.account = account;
         this.action = action;
@@ -40,7 +40,7 @@ public class Exchange_Panel extends JPanel {
         initComponents();
     }
 
-    public Exchange_Panel(AssetCls have, String account) {
+    public ExchangePanel(AssetCls have, String account) {
 
         this.account = account;
         this.action = "";

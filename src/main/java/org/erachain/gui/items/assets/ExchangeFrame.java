@@ -74,7 +74,7 @@ public class ExchangeFrame extends JDialog {
 
         //LAYOUT
 
-        getContentPane().add(new Exchange_Panel(have, want, action, account), java.awt.BorderLayout.CENTER);
+        getContentPane().add(new ExchangePanel(have, want, action, account), java.awt.BorderLayout.CENTER);
 
         //PACK
         this.pack();

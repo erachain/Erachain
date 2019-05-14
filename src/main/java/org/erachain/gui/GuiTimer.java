@@ -13,7 +13,7 @@ import java.util.TimerTask;
 
 /**
  * только запускает событи - "обновиться"
- * Используется в gui.library.SetIntervalPanel#syncUpdate(java.util.Observable, java.lang.Object) и других
+ * Используется в gui.Library.SetIntervalPanel#syncUpdate(java.util.Observable, java.lang.Object) и других
  */
 public class GuiTimer extends Thread {
 

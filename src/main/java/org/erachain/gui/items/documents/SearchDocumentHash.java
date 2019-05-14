@@ -5,7 +5,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.persons.PersonInfo002;
-import org.erachain.gui.library.fileChooser;
+import org.erachain.gui.library.FileChooser;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -124,7 +124,7 @@ public class SearchDocumentHash extends SplitPanel {
         //JFileChooser chooser = new JFileChooser();
         // руссификация диалога выбора файла
         //new All_Options().setUpdateUI(chooser);
-        fileChooser chooser = new fileChooser();
+        FileChooser chooser = new FileChooser();
         chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
 
 

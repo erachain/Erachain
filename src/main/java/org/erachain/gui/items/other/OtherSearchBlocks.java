@@ -5,7 +5,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.records.SearchTransactionsSplitPanel;
-import org.erachain.gui.library.fileChooser;
+import org.erachain.gui.library.FileChooser;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -131,7 +131,7 @@ public class OtherSearchBlocks extends SplitPanel {
         // JFileChooser chooser = new JFileChooser();
         // руссификация диалога выбора файла
         // new All_Options().setUpdateUI(chooser);
-        fileChooser chooser = new fileChooser();
+        FileChooser chooser = new FileChooser();
         chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
 
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

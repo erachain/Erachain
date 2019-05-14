@@ -16,8 +16,7 @@ import java.util.TreeSet;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import org.erachain.gui.library.MenuExchange;
-import org.erachain.gui.library.fileChooser;
+import org.erachain.gui.library.FileChooser;
 import org.erachain.gui2.MainPanel;
 import org.json.simple.JSONObject;
 
@@ -379,9 +378,9 @@ public class MainFrame extends JFrame implements Observer {
         settingsJSON.put("Main_Frame_Selected_Tab", mainPanel.jTabbedPane1.getSelectedIndex() + "");
 
         settingsJSONbuf.put("Main_Frame_Setting", settingsJSON);
-        settingsJSONbuf.put("FileChooser_Path", new String(fileChooser.get_Default_Path()));
-        settingsJSONbuf.put("FileChooser_Wight", fileChooser.get_Default_Width());
-        settingsJSONbuf.put("FileChooser_Height", fileChooser.get_Default_Height());
+        settingsJSONbuf.put("FileChooser_Path", new String(FileChooser.get_Default_Path()));
+        settingsJSONbuf.put("FileChooser_Wight", FileChooser.get_Default_Width());
+        settingsJSONbuf.put("FileChooser_Height", FileChooser.get_Default_Height());
 
         settingsJSONbuf.put("Telegram_Sender", Settings.getInstance().getTelegramDefaultSender());
         settingsJSONbuf.put("Telegram_Reciever", Settings.getInstance().getTelegramDefaultReciever());

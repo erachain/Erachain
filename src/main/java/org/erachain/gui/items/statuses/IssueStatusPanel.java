@@ -9,9 +9,9 @@ import org.erachain.core.transaction.IssueStatusRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
-import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.AddImageLabel;
-import org.erachain.gui.library.library;
+import org.erachain.gui.library.IssueConfirmDialog;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -39,12 +39,12 @@ public class IssueStatusPanel extends JPanel {
 
         addImageLabel = new AddImageLabel(
                 Lang.getInstance().translate("Add image"),
-                WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG, 0, ItemCls.MAX_IMAGE_LENGTH);
-        addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
+                WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG,
+                0, ItemCls.MAX_IMAGE_LENGTH, WIDTH_IMAGE_INITIAL, HEIGHT_IMAGE_INITIAL);
 
         addLogoIconPanel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
-                WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF, 0, ItemCls.MAX_ICON_LENGTH);
-        addLogoIconPanel.setPreferredSize(new Dimension(WIDTH_LOGO, HEIGHT_LOGO));
+                WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF,
+                0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL);
 
         JLabel labelCaption = new JLabel();
         labelCaption.setFont(FONT_TITLE);
@@ -117,7 +117,6 @@ public class IssueStatusPanel extends JPanel {
         add(singleLabel, gbcSingleLabel);
 
 
-
         cbxFrom = new JComboBox<>(new AccountsComboBoxModel());
         GridBagConstraints gbcCbxFrom = new GridBagConstraints();
         gbcCbxFrom.gridx = 2;
@@ -133,8 +132,6 @@ public class IssueStatusPanel extends JPanel {
         gbcTxtName.fill = GridBagConstraints.HORIZONTAL;
         gbcTxtName.gridwidth = 3;
         add(txtName, gbcTxtName);
-
-
 
 
         JScrollPane scrollDescription = new JScrollPane();
@@ -168,7 +165,6 @@ public class IssueStatusPanel extends JPanel {
         gbcJCheckUnique.gridy = 7;
         gbcJCheckUnique.anchor = GridBagConstraints.NORTHEAST;
         add(jcheckUnique, gbcJCheckUnique);
-
 
 
         setVisible(true);
@@ -205,7 +201,7 @@ public class IssueStatusPanel extends JPanel {
         text += Lang.getInstance().translate("Creator") + ":&nbsp;" + issueStatus.getCreator() + "<br>";
         text += Lang.getInstance().translate("Name") + ":&nbsp;" + issueStatus.getItem().viewName() + "<br>";
         text += Lang.getInstance().translate("Description") + ":<br>"
-                + library.to_HTML(issueStatus.getItem().getDescription()) + "<br>";
+                + Library.to_HTML(issueStatus.getItem().getDescription()) + "<br>";
         text += Lang.getInstance().translate("Unique") + ": " + ((StatusCls) issueStatus.getItem()).isUnique()
                 + "<br>";
         String Status_text = "";

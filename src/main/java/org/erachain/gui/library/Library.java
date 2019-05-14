@@ -30,7 +30,7 @@ import org.jvnet.substance.org.erachain.api.skin.*;
 import org.jvnet.substance.skin.SubstanceNebulaBrickWallLookAndFeel;
  */
 
-public class library {
+public class Library {
 
     // PLAY SOUND
     public static void notifySysTrayRecord(Transaction transaction) {
@@ -423,7 +423,7 @@ public class library {
      */
     public static void saveJSONStringToEraFile(Container parent, String JSONString){
         // String raw = Base58.encode(transaction.toBytes(false, null));
-        fileChooser chooser = new fileChooser();
+        FileChooser chooser = new FileChooser();
         chooser.setDialogTitle(Lang.getInstance().translate("Save File"));
         // chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
@@ -621,6 +621,6 @@ public class library {
         
         }
         if (jsonString.equals("")) return;
-        library.saveJSONStringToEraFile(parent, jsonString);
+        Library.saveJSONStringToEraFile(parent, jsonString);
     }
 }

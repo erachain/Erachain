@@ -580,7 +580,7 @@ public class Synchronizer {
             Block lastCommonBlock = dcSet.getBlockSignsMap().getBlock(lastCommonBlockSignature);
 
             // SYNCHRONIZE BLOCKS
-            LOGGER.error("synchronize with OPRHAN from common block [" + lastCommonBlock.getHeight()
+            LOGGER.info("synchronize with OPRHAN from common block [" + lastCommonBlock.getHeight()
                     + "] for blocks: " + blocks.size());
             List<Transaction> orphanedTransactions = this.synchronize_blocks(dcSet, lastCommonBlock, checkPointHeight,
                     blocks, peer);
