@@ -17,6 +17,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.erachain.gui.library.FileChooser;
+import org.erachain.gui.library.MenuExchange;
 import org.erachain.gui2.MainPanel;
 import org.json.simple.JSONObject;
 

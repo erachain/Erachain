@@ -7,7 +7,7 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.assets.DepositExchange;
 import org.erachain.gui.items.assets.ExchangeFrame;
-import org.erachain.gui.items.assets.Exchange_Panel;
+import org.erachain.gui.items.assets.ExchangePanel;
 import org.erachain.gui.items.assets.WithdrawExchange;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
@@ -38,7 +38,7 @@ public class MenuExchange extends JMenu {
         trade.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                MainPanel.getInstance().addTab(Exchange_Panel.class.getSimpleName());
+                MainPanel.getInstance().addTab(ExchangePanel.class.getSimpleName());
             }
         });
         add(trade);

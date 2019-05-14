@@ -403,8 +403,8 @@ public class MainPanel extends javax.swing.JPanel {
             insertTab(Lang.getInstance().translate("Issue Asset"), new IssueAssetPanel());
             return;
         } else
-        if (str.equals(Lang.getInstance().translate("Exchange")) || str.equals("Exchange_Panel")) {
-            insertTab(Lang.getInstance().translate("Exchange"), new Exchange_Panel(null, null, null, null));
+        if (str.equals(Lang.getInstance().translate("Exchange")) || str.equals("ExchangePanel")) {
+            insertTab(Lang.getInstance().translate("Exchange"), new ExchangePanel(null, null, null, null));
             return;
         } else
         if (str.equals(Lang.getInstance().translate("Withdraw Exchange")) || str.equals(WithdrawExchange.class.getSimpleName())) {
