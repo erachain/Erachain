@@ -138,7 +138,7 @@ public class BlockExplorer {
                     case "person":
                         //search persons
                         output.put("search", type);
-                        output.putAll(jsonQuerySearchPersons(search, start));
+                        output.putAll(jsonQuerySearchPersons(search, pageNumber));
 
                         break;
                     case "assets":
@@ -151,7 +151,7 @@ public class BlockExplorer {
                     case "status":
                         //search statuses
                         output.put("search", type);
-                        output.putAll(jsonQuerySearchStatuses(search, start));
+                        output.putAll(jsonQuerySearchStatuses(search, pageNumber));
                         break;
                     case "blocks":
                     case "block":
@@ -3008,7 +3008,7 @@ public class BlockExplorer {
             throw new WrongSearchException();
         }
         //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 3;
+        int numberOfRepresentsItemsOnPage = 10;
         //Вспомогательный объект
         ReceiverMapForBlockExplorer receiverMapForBlockExplorer =
                 new ReceiverMapForBlockExplorer(page, listAssets, numberOfRepresentsItemsOnPage);
@@ -3019,9 +3019,18 @@ public class BlockExplorer {
         result.put("Assets", receiverMapForBlockExplorer.getMap());
         //Добавляем ключ в JSON для отправки
         result.put("pageNumber", receiverMapForBlockExplorer.getPage());
-        result.put("pageCount", listAssets.size()/numberOfRepresentsItemsOnPage);
-        result.put("numberLast", listAssets.get(listAssets.size() - 1).getKey());
+        int pageCount = evaluatePageCount(listAssets, numberOfRepresentsItemsOnPage);
+        result.put("pageCount", pageCount);
+        result.put("numberLast", listAssets.get(size - 1).getKey());
         return result;
+    }
+
+    private int evaluatePageCount(List<ItemCls> listAssets, int numberOfRepresentsItemsOnPage) {
+        int pageCount = listAssets.size() / numberOfRepresentsItemsOnPage;
+        if (listAssets.size() % numberOfRepresentsItemsOnPage != 0) {
+            pageCount++;
+        }
+        return pageCount;
     }
 
     private Map jsonQuerySearchPersons(String search, int startPerson) throws WrongSearchException, Exception {
@@ -3070,9 +3079,10 @@ public class BlockExplorer {
         //Добавляем количество элементов для отображения на странице для отправки
         result.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
         result.put("Persons", receiverMapForBlockExplorer.getMap());
-        //Добавляем ключ в JSON для отправки
-        result.put("start", receiverMapForBlockExplorer.getKey());
-        result.put("numberLast", listPersons.get(listPersons.size() - 1).getKey());
+        result.put("pageNumber", receiverMapForBlockExplorer.getPage());
+        int pageCount = evaluatePageCount(listPersons, numberOfRepresentsItemsOnPage);
+        result.put("pageCount", pageCount);
+        result.put("numberLast", listPersons.get(size - 1).getKey());
         return result;
     }
 
@@ -3113,7 +3123,7 @@ public class BlockExplorer {
             throw new WrongSearchException();
         }
         //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 20;
+        int numberOfRepresentsItemsOnPage = 10;
         //Вспомогательный объект
         ReceiverMapForBlockExplorer receiverMapForBlockExplorer =
                 new ReceiverMapForBlockExplorer(startStatuses, listStatuses, numberOfRepresentsItemsOnPage);
@@ -3122,9 +3132,10 @@ public class BlockExplorer {
         //Добавляем количество элементов для отображения на странице для отправки
         result.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
         result.put("Statuses", receiverMapForBlockExplorer.getMap());
-        //Добавляем ключ в JSON для отправки
-        result.put("start", receiverMapForBlockExplorer.getKey());
-        result.put("numberLast", listStatuses.get(listStatuses.size() - 1).getKey());
+        result.put("pageNumber", receiverMapForBlockExplorer.getPage());
+        int pageCount = evaluatePageCount(listStatuses, numberOfRepresentsItemsOnPage);
+        result.put("pageCount", pageCount);
+        result.put("numberLast", listStatuses.get(size - 1).getKey());
         return result;
     }
 

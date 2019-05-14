@@ -53,7 +53,7 @@ public class ReceiverMapForBlockExplorer {
         //Данные для отправки
         List<T> list = new ArrayList<>();
 
-        for (int i = (page - 1) * numberOfRepresentsItemsOnPage; i < page * numberOfRepresentsItemsOnPage; i++) {
+        for (int i = (page - 1) * numberOfRepresentsItemsOnPage; i < page * numberOfRepresentsItemsOnPage && i < listItems.size(); i++) {
             //Получаем элемент из списка найденных личностей(person)
             T element = (T) listItems.get(i);
             //Если элемент не null - то добавляем его
