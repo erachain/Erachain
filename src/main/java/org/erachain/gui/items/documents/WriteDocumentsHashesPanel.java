@@ -11,7 +11,7 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.link_hashes.IssueHashImprint;
 import org.erachain.gui.items.link_hashes.TableModelIssueHashes;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.fileChooser;
+import org.erachain.gui.library.FileChooser;
 import org.erachain.lang.Lang;
 import org.erachain.utils.FileHash;
 import org.erachain.utils.Pair;
@@ -206,7 +206,7 @@ public class WriteDocumentsHashesPanel extends SplitPanel {
         //JFileChooser chooser = new JFileChooser();
         // руссификация диалога выбора файла
         //new All_Options().setUpdateUI(chooser);
-        fileChooser chooser = new fileChooser();
+        FileChooser chooser = new FileChooser();
         chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
 
 

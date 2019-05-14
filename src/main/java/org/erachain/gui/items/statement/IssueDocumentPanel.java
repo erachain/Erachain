@@ -261,7 +261,7 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
         // text += Lang.getInstance().translate("Scale") +":&nbsp;"+
         // ((AssetCls)issueAssetTransaction.getItem()).getScale()+ "<br>";
         // text += Lang.getInstance().translate("Description")+":<br>"+
-        // library.to_HTML(issueAssetTransaction.getItem().getDescription())+"<br>";
+        // Library.to_HTML(issueAssetTransaction.getItem().getDescription())+"<br>";
         String Status_text = "";
 
         // System.out.print("\n"+ text +"\n");

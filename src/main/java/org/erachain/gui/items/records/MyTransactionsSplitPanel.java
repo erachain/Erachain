@@ -7,7 +7,7 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.SetIntervalPanel;
 import org.erachain.gui.library.VoushLibraryPanel;
-import org.erachain.gui.library.library;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.models.WalletTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
@@ -175,7 +175,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
                 if (selectedTransaction == null) return;
                 // save
-                library.saveTransactionJSONtoFileSystem(getParent(), selectedTransaction);
+                Library.saveTransactionJSONtoFileSystem(getParent(), selectedTransaction);
             }
 
             

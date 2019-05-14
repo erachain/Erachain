@@ -22,8 +22,8 @@ import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.library;
 import org.erachain.gui.models.UnconfirmedTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
@@ -215,7 +215,7 @@ public class UnconfirmedTransactionsPanel extends JPanel
                 Transaction trans = transactionsModel.getItem(row);
                 if (trans == null) return;
                 // save
-                library.saveTransactionJSONtoFileSystem(getParent(), trans);
+                Library.saveTransactionJSONtoFileSystem(getParent(), trans);
             }
 
             

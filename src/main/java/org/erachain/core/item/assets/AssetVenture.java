@@ -35,7 +35,7 @@ public class AssetVenture extends AssetCls {
     }
 
     public AssetVenture(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
-        //this(new byte[]{(byte)TYPE_ID, movable?(byte)1:(byte)0}, owner, name, asset_type, icon, image, description, quantity, scale);
+        //this(new byte[]{(byte)TYPE_ID, movable?(byte)1:(byte)0}, owner, name, assetType, icon, image, description, quantity, scale);
         this(new byte[]{(byte) TYPE_ID, (byte) 0}, owner, name, icon, image, description, asset_type, scale, quantity);
     }
 
@@ -181,7 +181,7 @@ public class AssetVenture extends AssetCls {
         //WRITE ASSET TYPE
         byte[] assetTypeBytes = new byte[1];
         //assetTypeBytes[0] = (byte) (this.divisible == true ? 1 : 0);
-        assetTypeBytes[0] = (byte) this.asset_type;
+        assetTypeBytes[0] = (byte) this.assetType;
         data = Bytes.concat(data, assetTypeBytes);
 
         return data;

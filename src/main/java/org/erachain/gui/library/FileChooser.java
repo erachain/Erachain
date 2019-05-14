@@ -8,15 +8,15 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class fileChooser extends JFileChooser {
+public class FileChooser extends JFileChooser {
 
     protected static int default_Wight = Settings.getInstance().get_File_Chooser_Wight();
     protected static int default_Height = Settings.getInstance().get_File_Chooser_Height();
     private static String default_path = Settings.getInstance().get_File_Chooser_Paht();
-    private fileChooser th;
+    private FileChooser th;
 
     // настройка диалога файлового на русский язык
-    public fileChooser() {
+    public FileChooser() {
         super(default_path);
         th = this;
         if (default_Wight != 0 || default_Height != 0)
@@ -111,7 +111,7 @@ public class fileChooser extends JFileChooser {
     FileChooser.upFolderToolTipText=Вверх
 		 */
 
-//   fileChooser.set_Default_Path(chooser.getCurrentDirectory().getPath());
+//   FileChooser.set_Default_Path(chooser.getCurrentDirectory().getPath());
         // save path
         addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

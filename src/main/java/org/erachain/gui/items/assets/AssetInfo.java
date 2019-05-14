@@ -34,7 +34,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.library.HoldersLibraryPanel;
 import org.erachain.gui.library.HyperLinkAccount;
 import org.erachain.gui.library.VoushLibraryPanel;
-import org.erachain.gui.library.library;
+import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -121,7 +121,7 @@ public class AssetInfo extends JTextPane {
             text += "<td><div  style='float:left'><div><b>" + Lang.getInstance().translate("Block-SeqNo") + ": </b>" + record.viewHeightSeq() + "</div>";
         text += "<div><b>" + Lang.getInstance().translate("Name") + ": </b>" + asset.viewName() + "</div>";
         text += "<div   style='word-wrap: break-word; '>"
-                + library.to_HTML(Lang.getInstance().translate(asset.viewDescription())) + "</div>";
+                + Library.to_HTML(Lang.getInstance().translate(asset.viewDescription())) + "</div>";
         text += "<div>" + Lang.getInstance().translate("Owner") + ": <a href = '!!Owner'><b>" + hl_Owner.get_Text() + "</b></a></div>";
         text += "<div>" + Lang.getInstance().translate("TYPE") + ": <b>" + Lang.getInstance().translate(asset.viewAssetType()) + "</b>,";
         text += " " + Lang.getInstance().translate("accuracy") + ": <b>" + asset.getScale() + "</b>,";

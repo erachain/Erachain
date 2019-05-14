@@ -2780,11 +2780,11 @@ public class Controller extends Observable {
     }
 
     public Transaction issueAsset(PrivateKeyAccount creator, String name, String description, byte[] icon, byte[] image,
-                                  boolean movable, int scale, int asset_type, long quantity, int feePow) {
+                                  boolean movable, int scale, int assetType, long quantity, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
             return this.transactionCreator.createIssueAssetTransaction(creator, name, description, icon, image, scale,
-                    asset_type, quantity, feePow);
+                    assetType, quantity, feePow);
         }
     }
 

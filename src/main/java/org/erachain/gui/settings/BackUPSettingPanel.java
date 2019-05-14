@@ -1,6 +1,6 @@
 package org.erachain.gui.settings;
 
-import org.erachain.gui.library.fileChooser;
+import org.erachain.gui.library.FileChooser;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MenuPopupUtil;
@@ -42,11 +42,11 @@ public class BackUPSettingPanel extends JPanel {
 
         jButton_Paht_DIR.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                fileChooser fileopen = new fileChooser();
-                fileopen.setFileSelectionMode(fileChooser.DIRECTORIES_ONLY);
+                FileChooser fileopen = new FileChooser();
+                fileopen.setFileSelectionMode(FileChooser.DIRECTORIES_ONLY);
                 fileopen.setCurrentDirectory(new File(jTextField_BuckUp_Dir.getText()));
                 int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set BackUp dir"));
-                if (ret == fileChooser.APPROVE_OPTION) {
+                if (ret == FileChooser.APPROVE_OPTION) {
                     jTextField_BuckUp_Dir.setText(fileopen.getSelectedFile().toString());
                 }
             }

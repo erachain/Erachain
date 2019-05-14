@@ -10,7 +10,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.library.fileChooser;
+import org.erachain.gui.library.FileChooser;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Pair;
 
@@ -232,7 +232,7 @@ public class IssueLinkedHashPanel extends SplitPanel {
         // JFileChooser chooser = new JFileChooser();
         // руссификация диалога выбора файла
         // new All_Options().setUpdateUI(chooser);
-        fileChooser chooser = new fileChooser();
+        FileChooser chooser = new FileChooser();
         chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
 
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

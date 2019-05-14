@@ -16,7 +16,7 @@ import org.erachain.core.transaction.RSend;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.erachain.gui.library.library;
+import org.erachain.gui.library.Library;
 import org.mapdb.Fun.Tuple3;
 
 import org.erachain.controller.Controller;
@@ -82,7 +82,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
             }
            
           String text = enscript((RSend)val.c);
-          text = library.to_HTML(text);
+          text = Library.to_HTML(text);
           
           if (isSelected) {
           //    Color col = UIManager.getColor("Table.selectionBackground");

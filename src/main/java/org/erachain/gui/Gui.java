@@ -17,7 +17,7 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SysTray;
 
-import static org.erachain.gui.library.library.setGuiLookAndFeel;
+import static org.erachain.gui.library.Library.setGuiLookAndFeel;
 
 public class Gui extends JFrame {
 

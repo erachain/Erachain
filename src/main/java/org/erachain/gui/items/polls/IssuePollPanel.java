@@ -4,7 +4,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
@@ -12,7 +11,7 @@ import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.library;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.CreateOptionsTableModel;
 import org.erachain.gui.transaction.OnDealClick;
@@ -43,13 +42,11 @@ public class IssuePollPanel extends JPanel {
         optionsTableModel = new CreateOptionsTableModel(new Object[]{Lang.getInstance().translate("Name")}, 0);
         addImageLabel = new AddImageLabel(
                 Lang.getInstance().translate("Add image"), WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG,
-                0, ItemCls.MAX_IMAGE_LENGTH);
-        addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
+                0, ItemCls.MAX_IMAGE_LENGTH, WIDTH_IMAGE_INITIAL, HEIGHT_IMAGE_INITIAL);
 
         addLogoIconLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
                 WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF,
-                0, ItemCls.MAX_ICON_LENGTH);
-        addLogoIconLabel.setPreferredSize(new Dimension(WIDTH_LOGO, HEIGHT_LOGO));
+                0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
@@ -146,7 +143,6 @@ public class IssuePollPanel extends JPanel {
         add(txtName, gbcTxtName);
 
 
-
         // TXTAREA NAME
         GridBagConstraints gbcDescription = new GridBagConstraints();
         gbcDescription.gridx = 2;
@@ -204,7 +200,7 @@ public class IssuePollPanel extends JPanel {
     public void onRegisterClick() {
         // DISABLE
         createButton.setEnabled(false);
-        if (checkWalletUnlock(createButton)){
+        if (checkWalletUnlock(createButton)) {
             return;
         }
 
@@ -251,7 +247,7 @@ public class IssuePollPanel extends JPanel {
         text += Lang.getInstance().translate("Creator") + ":&nbsp;" + issuePoll.getCreator() + "<br>";
         text += Lang.getInstance().translate("Name") + ":&nbsp;" + this.txtName.getText() + "<br>";
         text += "<br>" + Lang.getInstance().translate("Description") + ":<br>"
-                + library.to_HTML(this.txtareaDescription.getText()) + "<br>";
+                + Library.to_HTML(this.txtareaDescription.getText()) + "<br>";
         text += "<br>" + Lang.getInstance().translate("Options") + ":<br>";
 
         List<String> options = optionsTableModel.getOptions();
@@ -288,7 +284,6 @@ public class IssuePollPanel extends JPanel {
         // ENABLE
         createButton.setEnabled(true);
     }
-
 
 
     private void deleteRow() {

@@ -7,7 +7,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.library.library;
+import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -53,7 +53,7 @@ public class RecStatementDetailsFrame extends RecDetailsFrame {
             detailGBC.gridwidth = 2;
             messageText = new JTextPane();
             messageText.setContentType("text/html");
-            String ss = ((r_Statement.isText()) ? library.viewDescriptionHTML(new String(r_Statement.getData(), Charset.forName("UTF-8"))) : Processor.process(Converter.toHex(r_Statement.getData())));
+            String ss = ((r_Statement.isText()) ? Library.viewDescriptionHTML(new String(r_Statement.getData(), Charset.forName("UTF-8"))) : Processor.process(Converter.toHex(r_Statement.getData())));
             messageText.setEditable(false);
             //messageText.setSize(200, 300);
             //messageText.setPreferredSize(new Dimension(800,200));

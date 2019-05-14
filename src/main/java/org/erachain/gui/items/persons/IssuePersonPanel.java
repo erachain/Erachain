@@ -33,9 +33,7 @@ import java.awt.event.*;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import static org.erachain.gui.items.utils.GUIConstants.HEIGHT_IMAGE;
-import static org.erachain.gui.items.utils.GUIConstants.WIDTH_IMAGE;
-import static org.erachain.gui.items.utils.GUIConstants.FONT_TITLE;
+import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 @SuppressWarnings("serial")
@@ -134,8 +132,9 @@ public class IssuePersonPanel extends JPanel {
         copyButton.addActionListener(e -> onIssueClick(false));
 
         addImageLabel = new AddImageLabel(Lang.getInstance().translate("Add image"),
-                WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG, PersonCls.MIN_IMAGE_LENGTH, PersonCls.MAX_IMAGE_LENGTH);
-        addImageLabel.setPreferredSize(new Dimension(WIDTH_IMAGE, HEIGHT_IMAGE));
+                WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG,
+                PersonCls.MIN_IMAGE_LENGTH, PersonCls.MAX_IMAGE_LENGTH,
+                WIDTH_IMAGE_INITIAL,HEIGHT_IMAGE_INITIAL);
 
         // SET ONE TIME ZONE for Birthday
         TimeZone tz = TimeZone.getDefault();
@@ -367,12 +366,12 @@ public class IssuePersonPanel extends JPanel {
         JMenuItem jMenuItemCopy = new JMenuItem(Lang.getInstance().translate("Копировать"), KeyEvent.VK_C);
         jMenuItemCopy.setMnemonic(KeyEvent.VK_C);
         jMenuItemCopy.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_C, ActionEvent.CTRL_MASK));
+                KeyEvent.VK_C, InputEvent.CTRL_MASK));
 
         JMenuItem jMenuItemPaste = new JMenuItem(Lang.getInstance().translate("Вставить"), KeyEvent.VK_P);
         jMenuItemPaste.setMnemonic(KeyEvent.VK_P);
         jMenuItemPaste.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_P, ActionEvent.CTRL_MASK));
+                KeyEvent.VK_P, InputEvent.CTRL_MASK));
 
         popup.add(jMenuItemCopy);
         popup.add(jMenuItemPaste);
@@ -410,8 +409,6 @@ public class IssuePersonPanel extends JPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 7;
         gridBagConstraints.gridheight = 5;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.05;
         jPanelHead.add(addImageLabel, gridBagConstraints);
 
