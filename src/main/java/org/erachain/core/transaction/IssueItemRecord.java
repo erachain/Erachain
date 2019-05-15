@@ -140,7 +140,7 @@ public abstract class IssueItemRecord extends Transaction {
         int nameLen = name.length();
         if (nameLen < item.getMinNameLen()
                 //&& !BlockChain.DEVELOP_USE
-                && this.getBlockHeightByParentOrLast(this.dcSet) > 114000
+                && height > 114000
                 ) {
             // IF is NEW NOVA
             if (this.item.isNovaAsset(this.creator, this.dcSet) <= 0) {

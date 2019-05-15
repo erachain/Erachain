@@ -432,6 +432,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         return transactions;
     }
 
+    // TODO выдает ошибку на шаге treeKeys.addAll(Sets.newTreeSet(senderKeys));
     public List<Transaction> getTransactionsByAddressFast100(String address) {
 
         Iterable senderKeys = null;

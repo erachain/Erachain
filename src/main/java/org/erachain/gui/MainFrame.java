@@ -16,7 +16,9 @@ import java.util.TreeSet;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.erachain.core.BlockChain;
 import org.erachain.gui.library.FileChooser;
+import org.erachain.gui.library.MenuExchange;
 import org.erachain.gui2.MainPanel;
 import org.json.simple.JSONObject;
 
@@ -37,6 +39,7 @@ public class MainFrame extends JFrame implements Observer {
     // Variables declaration - do not modify
     public MenuFiles jMenu_Files;
     private MenuDeals jMenu2;
+    private MenuExchange jMenuExchange;
     private javax.swing.JMenuBar jMenuBar1;
     public MainPanel mainPanel;
     private StatusPanel statusPanel;
@@ -83,7 +86,7 @@ public class MainFrame extends JFrame implements Observer {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu_Files = new MenuFiles();
         jMenu2 = new MenuDeals();
-
+        jMenuExchange = new MenuExchange();
 
         // getContentPane().setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -124,6 +127,12 @@ public class MainFrame extends JFrame implements Observer {
 
         jMenu2.setText(Lang.getInstance().translate("Deals"));
         jMenuBar1.add(jMenu2);
+
+        jMenuExchange.setText(Lang.getInstance().translate("Exchange"));
+
+        if (BlockChain.DEVELOP_USE)
+            jMenuBar1.add(jMenuExchange);
+
 
         setJMenuBar(jMenuBar1);
 

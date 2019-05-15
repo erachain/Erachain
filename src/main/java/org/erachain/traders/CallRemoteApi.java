@@ -77,6 +77,10 @@ public class CallRemoteApi {
             response.append(in.readLine());
         }
         in.close();
-        return StrJSonFine.convert(response.toString());
+        String result = response.toString();
+        if (result.endsWith("null")) {
+            return result.substring(0, result.length() - 4);
+        }
+        return StrJSonFine.convert(result);
     }
 }
