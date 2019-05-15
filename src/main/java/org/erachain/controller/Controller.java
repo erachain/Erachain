@@ -792,7 +792,9 @@ public class Controller extends Observable {
         mamoryViewer.start();
 
         // CREATE NETWORK
-        this.tradersManager = new TradersManager();
+        if (false) {
+            this.tradersManager = new TradersManager();
+        }
 
         updateCompuRaes();
     }

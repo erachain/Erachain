@@ -10,6 +10,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
+import org.erachain.datachain.DCMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
@@ -176,7 +177,10 @@ public class TransactionsResource {
     @GET
     @Path("/unconfirmedof/{address}")
     public String getNetworkTransactions(@PathParam("address") String address) {
-        List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactionsByAddressFast100(address);
+        // TODO ошибку выдает
+        //List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactionsByAddressFast100(address);
+        List<Transaction> transactions = DCSet.getInstance().getTransactionMap().getTransactionsByAddress(address);
+
         JSONArray array = new JSONArray();
 
         for (Transaction transaction : transactions) {
