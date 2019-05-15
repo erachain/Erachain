@@ -16,6 +16,7 @@ import java.util.TreeSet;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.erachain.core.BlockChain;
 import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.library.MenuExchange;
 import org.erachain.gui2.MainPanel;
@@ -128,7 +129,9 @@ public class MainFrame extends JFrame implements Observer {
         jMenuBar1.add(jMenu2);
 
         jMenuExchange.setText(Lang.getInstance().translate("Exchange"));
-        jMenuBar1.add(jMenuExchange);
+
+        if (BlockChain.DEVELOP_USE)
+            jMenuBar1.add(jMenuExchange);
 
 
         setJMenuBar(jMenuBar1);
