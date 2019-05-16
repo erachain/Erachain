@@ -6,10 +6,12 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.Order;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
+import org.jsoup.Connection;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -18,7 +20,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class CancelOrderTransaction extends Transaction {
-    private static long ALL_VALID = 187550l * 2l * (long)Integer.MAX_VALUE;
+    // TODO убрать в новой цепочке
+    private static long CANCEL_ORDERS_ALL_VALID = 380000;
     public static final byte[][] VALID_REC = new byte[][]{
         //Base58.decode("2SEfiztfaj9wNE2k8h3Wiko3oVHtdjawosfua5PbjeAwPTFMHhFoJqVxpYvswZUdJFfQZ7i6xXep85UvCkZoxHqi"),
         //Base58.decode("34BaZfvWJpyEKAL7i3txFcTqRcVJt2GgumJm2ANqNcvBHCxngfoXBUKhm24uhqmZx1qvShj1KwUK6WHwHX2FQpfy"),
@@ -174,9 +177,8 @@ public class CancelOrderTransaction extends Transaction {
         //GET BASE
         JSONObject transaction = this.getJsonBase();
 
-        //ADD CREATOR/ORDER
-        transaction.put("creator", this.creator.getAddress());
         transaction.put("orderID", this.orderID);
+        transaction.put("orderSignature", Base58.encode(this.orderSignature));
 
         return transaction;
     }
@@ -193,31 +195,24 @@ public class CancelOrderTransaction extends Transaction {
         }
 
         //CHECK IF ORDER EXISTS
-        //if (!this.dcSet.getTransactionFinalMapSigns().contains(this.orderSignature)) {
-        //        return ORDER_DOES_NOT_EXIST;
-        //}
-
-        ///Tuple2<Integer, Integer> transactionRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
-        ///this.orderID = Transaction.makeDBRef(transactionIndex);
-        Order order = null;
-        if (this.orderID != null && this.dcSet.getOrderMap().contains(this.orderID))
-            order = this.dcSet.getOrderMap().get(this.orderID);
-
-        if (order == null) {
-            if (!(
-                    BlockChain.DEVELOP_USE
-                            && (this.orderID == null || this.orderID < ALL_VALID)
-            )) {
+        boolean emptyOrder = false;
+        if (this.orderID == null || !this.dcSet.getOrderMap().contains(this.orderID)) {
+            if (!(BlockChain.DEVELOP_USE && this.height < CANCEL_ORDERS_ALL_VALID)
+                ) {
                 return ORDER_DOES_NOT_EXIST;
+            } else {
+                emptyOrder = true;
             }
-        } else {
+        }
+
+        if (!emptyOrder) {
+            Order order = this.dcSet.getOrderMap().get(this.orderID);
+
+            //CHECK IF CREATOR IS CREATOR
             if (!order.getCreator().equals(this.creator.getAddress())) {
                 return INVALID_ORDER_CREATOR;
             }
         }
-
-
-        //CHECK IF CREATOR IS CREATOR
 
         return super.isValid(asDeal, flags);
     }
@@ -245,12 +240,6 @@ public class CancelOrderTransaction extends Transaction {
     }
 
     public static void process_it(DCSet db, Order order) {
-        if (false & !db.isFork() &&
-                (order.getHave() == 1027l && order.getWant() == 2l
-                        || order.getWant() == 2l && order.getHave() == 1027l)) {
-            int ii = 123;
-            ii++;
-        }
 
         //SET ORPHAN DATA
         db.getCompletedOrderMap().add(order);
@@ -276,8 +265,7 @@ public class CancelOrderTransaction extends Transaction {
 
         Order order = this.dcSet.getOrderMap().get(this.orderID);
 
-        if (order == null && BlockChain.DEVELOP_USE
-                && this.orderID < ALL_VALID) {
+        if (order == null) {
             return;
         }
 
@@ -309,8 +297,7 @@ public class CancelOrderTransaction extends Transaction {
         //REMOVE ORDER DATABASE
         Order order = this.dcSet.getCompletedOrderMap().get(this.orderID);
 
-        if (order == null && BlockChain.DEVELOP_USE
-            && this.orderID < ALL_VALID) {
+        if (order == null) {
            return;
         }
 
