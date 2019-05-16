@@ -273,8 +273,16 @@ public class WebTransactionsHTML {
     private String cancel_Order_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
         String out = "";
-        CancelOrderTransaction orderCreation = (CancelOrderTransaction) transaction;
-        out += orderCreation.toJson();
+        CancelOrderTransaction cancelOrder = (CancelOrderTransaction) transaction;
+        Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(cancelOrder.getorderSignature());
+        if (key == null) {
+            out += cancelOrder.toJson();
+        }
+
+        CreateOrderTransaction createOrder = (CreateOrderTransaction) DCSet.getInstance().getTransactionFinalMap().get(key);
+
+        out += "</br><h3>" + Lang.getInstance().translateFromLangObj("Order to Cancel", langObj) + "</h3>";
+        out += create_Order_HTML(createOrder, langObj);
         return out;
     }
 
