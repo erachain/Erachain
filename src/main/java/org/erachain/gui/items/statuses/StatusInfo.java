@@ -3,7 +3,7 @@ package org.erachain.gui.items.statuses;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.gui.library.MTextPane;
-import org.erachain.gui.library.library;
+import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 
 // Info for status
@@ -29,7 +29,7 @@ public class StatusInfo extends MTextPane {
         }
         message = "<div><b>" + message + "</b> : " + status.viewName() + "</div>";
 
-        message += "<div>" + library.to_HTML(status.getDescription()) + "</div>";
+        message += "<div>" + Library.to_HTML(status.getDescription()) + "</div>";
         message += "<div>" + (status.isUnique() ? "UNIQUE" : "multi") + "</div>";
 
         String creator = GenesisBlock.CREATOR.equals(status.getOwner()) ? "GENESIS" : status.getOwner().getPersonAsString_01(false);
