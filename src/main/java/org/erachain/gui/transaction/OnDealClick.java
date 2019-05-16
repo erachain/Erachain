@@ -193,7 +193,7 @@ public class OnDealClick {
                 mess = "Invalid description MAX length";
                 break;
             case Transaction.INVALID_OPTIONS_LENGTH:
-                mess = "Invalid oprion length";
+                mess = "Invalid options length";
                 break;
             case Transaction.INVALID_OPTION_LENGTH:
                 mess = "Invalid option length";
