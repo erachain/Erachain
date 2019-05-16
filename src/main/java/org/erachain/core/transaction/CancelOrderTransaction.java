@@ -6,6 +6,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.Order;
 import org.erachain.datachain.DCSet;
@@ -176,6 +177,7 @@ public class CancelOrderTransaction extends Transaction {
 
         //ADD CREATOR/ORDER
         transaction.put("creator", this.creator.getAddress());
+        transaction.put("orderSignature", Base58.encode(this.orderSignature));
         transaction.put("orderID", this.orderID);
 
         return transaction;
