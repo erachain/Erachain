@@ -292,8 +292,13 @@ public class WebTransactionsHTML {
         CreateOrderTransaction orderCreation = (CreateOrderTransaction) transaction;
 
         Order order = null;
+        boolean canceled = false;
         if (DCSet.getInstance().getCompletedOrderMap().contains(orderCreation.getDBRef())) {
-            out += "<b>" + Lang.getInstance().translateFromLangObj("Completed", langObj) + "</b><br>";
+            order = DCSet.getInstance().getCompletedOrderMap().get(orderCreation.getDBRef());
+            if (!order.getFulfilledHave().equals(order.getAmountHave())) {
+                canceled = true;
+            }
+            out += "<b>" + Lang.getInstance().translateFromLangObj(canceled?"Canceled":"Completed", langObj) + "</b><br>";
         } else if (DCSet.getInstance().getOrderMap().contains(orderCreation.getDBRef())) {
             order = DCSet.getInstance().getOrderMap().get(orderCreation.getDBRef());
             out += "<b>" + Lang.getInstance().translateFromLangObj("ACTIVE", langObj) + "</b><br>";
