@@ -653,8 +653,16 @@ public class SendPanel extends JPanel {
 
             if (encryptMessage) {
                 //sender
-                PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress().toString());
-                byte[] privateKey = account.getPrivateKey();
+                PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+
+                if (creator == null) {
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                byte[] privateKey = creator.getPrivateKey();
 
                 //recipient
                 byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());

@@ -58,7 +58,7 @@ public class AssetInfo extends JTextPane {
      * Creates new form Asset_Info003
      */
 
-    public AssetInfo(AssetCls asset) {
+    public AssetInfo(AssetCls asset, boolean fullView) {
         //   initComponents();
         th = this;
         this.asset = asset;
@@ -133,7 +133,9 @@ public class AssetInfo extends JTextPane {
         HTML_Add_Local_Images();
         this.setEditable(false);
         MenuPopupUtil.installContextMenu(this);
-        add_comp();
+        if (fullView) {
+            add_comp();
+        }
         setCaretPosition(0);
 
         this.addHyperlinkListener(new HyperlinkListener() {

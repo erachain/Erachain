@@ -380,18 +380,18 @@ public class RSend extends TransactionAmount {
     public boolean isText() {
         if (data == null || data.length == 0)
             return false;
-        return (Arrays.equals(this.isText, new byte[1])) ? false : true;
+        return !Arrays.equals(this.isText, new byte[1]);
     }
 
     public boolean isEncrypted() {
         if (data == null || data.length == 0)
             return false;
-        return (Arrays.equals(this.encrypted, new byte[1])) ? false : true;
+        return !Arrays.equals(this.encrypted, new byte[1]);
     }
 
     @Override
     public boolean hasPublicText() {
-        if (head.length() > 100
+        if (head.length() > (BlockChain.DEVELOP_USE? 100 : 40)
         ) {
             String[] words = head.split("[:., _-]");
             for (String word: words) {
@@ -400,13 +400,9 @@ public class RSend extends TransactionAmount {
             }
         }
 
-
         if (data == null || data.length == 0)
             return false;
-        if (!Arrays.equals(this.encrypted, new byte[1]))
-            return false;
 
-        //return this.isText() && Base58.isExtraSymbols(new String(this.data, Charset.forName("UTF-8")));
         if (this.isText() && !this.isEncrypted()) {
             String text = new String(this.data, Charset.forName("UTF-8"));
             if (text.contains(" ") || text.contains("_"))

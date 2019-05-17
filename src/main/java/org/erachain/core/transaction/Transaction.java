@@ -228,6 +228,7 @@ public abstract class Transaction {
     public static final int INVALID_URL_LENGTH = 391;
     public static final int INVALID_HEAD_LENGTH = 392;
 
+    public static final int PRIVATE_KEY_NOT_FOUND = 530;
     public static final int INVALID_UPDATE_VALUE = 540;
     public static final int INVALID_TRANSACTION_TYPE = 550;
     public static final int INVALID_BLOCK_HEIGHT = 599;

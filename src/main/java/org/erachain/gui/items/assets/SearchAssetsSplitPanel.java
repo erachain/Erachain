@@ -91,7 +91,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
     @Override
     protected Component getShow(ItemCls item) {
 
-        return new AssetInfo((AssetCls) item);
+        return new AssetInfo((AssetCls) item, false);
 
     }
 

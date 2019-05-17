@@ -3,6 +3,7 @@ package org.erachain.gui.items.statement;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
+import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.ExDataPanel;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
@@ -238,8 +239,16 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
         byte property1 = (byte) 0;
         byte property2 = (byte) 0;
 
+        PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+        if (creator == null) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+
         RSignNote issueDoc = (RSignNote) Controller.getInstance().r_SignNote(version, property1, property2, asDeal,
-                Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, key, messageBytes,
+                creator, feePow, key, messageBytes,
                 new byte[]{1}, new byte[]{0});
 
         // Issue_Asset_Confirm_Dialog cont = new

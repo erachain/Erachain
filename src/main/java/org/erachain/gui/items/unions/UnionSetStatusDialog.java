@@ -69,7 +69,7 @@ public class UnionSetStatusDialog extends JDialog {
 
         if (!OnDealClick.proccess1(Button_Confirm)) return;
 
-        Account creator = (Account) this.accountLBox.getSelectedItem();
+        Account creatorAccount = (Account) this.accountLBox.getSelectedItem();
         int parse = 0;
         String toDateStr = toDateTxt.getText();
         try {
@@ -101,7 +101,13 @@ public class UnionSetStatusDialog extends JDialog {
         }
 
         //Account authenticator =  new Account(address);
-        PrivateKeyAccount authenticator = Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress());
+        PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(creatorAccount.getAddress());
+        if (creator == null) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         Pair<Transaction, Integer> result = null;
         //Controller.getInstance().r_SertifyUnion(version, false, authenticator,

@@ -1257,6 +1257,10 @@ public class BlockExplorer {
                 for (String address : addresses.keySet()) {
 
                     Stack<Tuple3<Integer, Integer, Integer>> stack = addresses.get(address);
+                    if (stack == null || stack.isEmpty()) {
+                        continue;
+                    }
+
                     Tuple3<Integer, Integer, Integer> item = stack.peek();
                     Transaction transactionIssue = transactionsMap.get(item.b, item.c);
 

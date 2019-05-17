@@ -231,7 +231,7 @@ public class AssetPairSelect extends JDialog {
                                     .jTableJScrollPanelLeftPanel
                                         .getSelectedRow()));
 
-                    pair_Panel.jScrollPaneJPanelRightPanel.setViewportView(new AssetInfo((AssetCls) asset));
+                    pair_Panel.jScrollPaneJPanelRightPanel.setViewportView(new AssetInfo((AssetCls) asset, false));
                     pair_Panel.button1ToolBarLeftPanel.setEnabled(true);
 
                 }

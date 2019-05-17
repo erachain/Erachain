@@ -565,6 +565,13 @@ public class IssuePersonPanel extends JPanel {
             return;
         }
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+        if (creator == null) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(forIssue, creator,
                 txtName.getText(), feePow, birthday, deathday, gender, textPersonNumber.getText(), birthLatitude,
                 birthLongitude, txtSkinColor.getText(), txtEyeColor.getText(), txtHairColor.getText(),

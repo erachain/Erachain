@@ -199,6 +199,7 @@ public class TradeResource {
         Controller cntr = Controller.getInstance();
 
         if (!DCSet.getInstance().getTransactionMap().contains(signature)) {
+            // ЕСЛИ нет его в неподтвержденных то пытаемся найти в действующих
             Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
             if (key == null) {
                 throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);

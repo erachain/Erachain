@@ -103,7 +103,8 @@ public class KKMap extends DCMap<
         }
 
         Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value_new.get(itemKey);
-        if (stack == null) {
+        // если пустой то тоже пересоздаим и все - иначе ниже на .peek может вылететь ошибка
+        if (stack == null || stack.isEmpty()) {
             stack = new Stack<Tuple5<Long, Long, byte[], Integer, Integer>>();
             stack.push(item);
             value_new.put(itemKey, stack);

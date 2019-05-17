@@ -12,7 +12,7 @@ public class IssueAssetDetailsFrame extends RecDetailsFrame {
     public IssueAssetDetailsFrame(IssueAssetTransaction assetIssue) {
         super(assetIssue);
 
-        AssetInfo as_info = new AssetInfo((AssetCls) assetIssue.getItem());
+        AssetInfo as_info = new AssetInfo((AssetCls) assetIssue.getItem(), false);
         //LABEL NAME
         ++labelGBC.gridy;
         labelGBC.gridwidth = 4;

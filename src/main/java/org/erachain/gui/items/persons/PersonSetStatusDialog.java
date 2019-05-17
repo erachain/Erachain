@@ -244,6 +244,13 @@ public class PersonSetStatusDialog extends JDialog {
 
         //Account authenticator =  new Account(address);
         PrivateKeyAccount authenticator = Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress());
+        if (authenticator == null) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
 
         int version = 0;
         if (PersonSetStatusDialog.parentRecord != null) {

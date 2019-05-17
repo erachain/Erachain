@@ -42,7 +42,7 @@ import java.nio.charset.StandardCharsets;
 
 public class AssetSendPanel extends javax.swing.JPanel {
 
- // TODO - "A" - &
+    // TODO - "A" - &
     //static String wrongFirstCharOfAddress = "A";
     public Account recipient;
 
@@ -78,185 +78,194 @@ public class AssetSendPanel extends javax.swing.JPanel {
     private String defaultImagePath = "images/icons/coin.png";
 
     private PersonCls person_To;
-/**
-    * Creates new form AssetSendPanel
-    */
+    /**
+     * Creates new form AssetSendPanel
+     */
 
     private AccountsComboBoxModel accountsModel;
-   public AssetSendPanel(AssetCls asset_in, Account account2,  Account account_To, PersonCls person) {
 
-       this.account = account2;
-       if (asset_in == null)
-           this.asset = Controller.getInstance().getAsset(2);
-       else
-           this.asset = asset_in;
+    public AssetSendPanel(AssetCls asset_in, Account account2, Account account_To, PersonCls person) {
+
+        this.account = account2;
+        if (asset_in == null)
+            this.asset = Controller.getInstance().getAsset(2);
+        else
+            this.asset = asset_in;
 
 
-       recipient = account_To;
-       person_To = person;
+        recipient = account_To;
+        person_To = person;
 
-       initComponents();
+        initComponents();
 
-       this.jTextField_Recive_Detail.setText("");
-       this.jTextField_Mess_Title.setText("");
-       this.jTextField_Ammount.setText("0");
-       this.jLabel_Icon.setText("");
+        this.jTextField_Recive_Detail.setText("");
+        this.jTextField_Mess_Title.setText("");
+        this.jTextField_Ammount.setText("0");
+        this.jLabel_Icon.setText("");
 
-       // icon
-       jLabel_Icon.setIcon(new ImageIcon(defaultImagePath));
+        // icon
+        jLabel_Icon.setIcon(new ImageIcon(defaultImagePath));
 
-       // account model
-       this.accountsModel = new AccountsComboBoxModel();
-       jComboBox_Account.setModel(accountsModel);
+        // account model
+        this.accountsModel = new AccountsComboBoxModel();
+        jComboBox_Account.setModel(accountsModel);
 
-       // favorite combo box
-       jComboBox_Asset.setModel(new ComboBoxAssetsModel());
-       if (asset != null) {
-           this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
+        // favorite combo box
+        jComboBox_Asset.setModel(new ComboBoxAssetsModel());
+        if (asset != null) {
+            this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
 
-           for (int i = 0; i < jComboBox_Asset.getItemCount(); i++) {
-               ItemCls item = jComboBox_Asset.getItemAt(i);
-               if (item.getKey() == asset.getKey()) {
-                   // not worked jComboBox_Asset.setSelectedItem(asset);
-                   jComboBox_Asset.setSelectedIndex(i);
-               //    jComboBox_Asset.setEnabled(false);// .setEditable(false);
-                   break;
-               } else {
-               //    jComboBox_Asset.setEnabled(true);
-               }
-           }
-       }
+            for (int i = 0; i < jComboBox_Asset.getItemCount(); i++) {
+                ItemCls item = jComboBox_Asset.getItemAt(i);
+                if (item.getKey() == asset.getKey()) {
+                    // not worked jComboBox_Asset.setSelectedItem(asset);
+                    jComboBox_Asset.setSelectedIndex(i);
+                    //    jComboBox_Asset.setEnabled(false);// .setEditable(false);
+                    break;
+                } else {
+                    //    jComboBox_Asset.setEnabled(true);
+                }
+            }
+        }
 
-       this.jComboBox_Fee.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        this.jComboBox_Fee.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
 
-       // account ComboBox
-       this.accountsModel = new AccountsComboBoxModel();
-       this.jComboBox_Account.setModel(accountsModel);
-     //  this.jComboBox_Account.setRenderer(new AccountRenderer(0));
-     //  ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(((AssetCls) jComboBox_Account.getSelectedItem()).getKey());
-       if (account != null) jComboBox_Account.setSelectedItem(account);
+        // account ComboBox
+        this.accountsModel = new AccountsComboBoxModel();
+        this.jComboBox_Account.setModel(accountsModel);
+        //  this.jComboBox_Account.setRenderer(new AccountRenderer(0));
+        //  ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(((AssetCls) jComboBox_Account.getSelectedItem()).getKey());
+        if (account != null) jComboBox_Account.setSelectedItem(account);
 
-       //ON FAVORITES CHANGE
+        //ON FAVORITES CHANGE
 
-       jComboBox_Account.addActionListener(new ActionListener() {
-           @Override
-           public void actionPerformed(ActionEvent e) {
+        jComboBox_Account.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
-              asset = ((AssetCls) jComboBox_Account.getSelectedItem());
+                asset = ((AssetCls) jComboBox_Account.getSelectedItem());
 
-               if (asset != null) {
-                   ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(asset.getKey());
-                   jComboBox_Account.repaint();
-                // set image
-                   setImage();
-                   jLabel_Icon.repaint();
-                // set scale
-                   int scale = 8;
-                   if(asset!=null)scale = asset.getScale();
-                   jTextField_Ammount.setScale(scale);
-                 // set description
-                 //  jTextArea_Account_Description.setText(asset.getDescription());
-                   jScrollPane2.setViewportView(new AssetInfo(asset));
-                   
-               }
+                if (asset != null) {
+                    ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(asset.getKey());
+                    jComboBox_Account.repaint();
+                    // set image
+                    setImage();
+                    jLabel_Icon.repaint();
+                    // set scale
+                    int scale = 8;
+                    if (asset != null) scale = asset.getScale();
+                    jTextField_Ammount.setScale(scale);
+                    // set description
+                    //  jTextArea_Account_Description.setText(asset.getDescription());
+                    jScrollPane2.setViewportView(new AssetInfo(asset, false));
 
-           }
-       });
+                }
 
-       
-       // default set asset
-       if (asset == null) asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
-       
-       this.jComboBox_Asset.addActionListener(new ActionListener() {
-           @Override
-           public void actionPerformed(ActionEvent e) {
+            }
+        });
 
-              asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
 
-               if (asset != null) {
-      //             ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(asset.getKey());
-                   jComboBox_Account.repaint();
-                // set image
-                   setImage();
-                  jLabel_Icon.repaint();
-                // set scale
-                   int scale = 8;
-                   if(asset!=null)scale = asset.getScale();
-                   jTextField_Ammount.setScale(scale);
-                  // jTextArea_Account_Description.setText(asset.getDescription());
-                   jScrollPane2.setViewportView(new AssetInfo(asset));
-                   
-               }
+        // default set asset
+        if (asset == null) asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
 
-           }
-       });
-       
-       jButton_ok.addActionListener(new ActionListener() {
-           @Override
-           public void actionPerformed(ActionEvent e) {
-               onSendClick();
-           }
-       });
-       
-      // set image asset
-       setImage();
+        this.jComboBox_Asset.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
-      // set acoount TO
-      this.jTextField_To.getDocument().addDocumentListener(new DocumentListener() {
+                asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
 
-          @Override
-          public void changedUpdate(DocumentEvent arg0) {
-          }
+                if (asset != null) {
+                    //             ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(asset.getKey());
+                    jComboBox_Account.repaint();
+                    // set image
+                    setImage();
+                    jLabel_Icon.repaint();
+                    // set scale
+                    int scale = 8;
+                    if (asset != null) scale = asset.getScale();
+                    jTextField_Ammount.setScale(scale);
+                    // jTextArea_Account_Description.setText(asset.getDescription());
+                    jScrollPane2.setViewportView(new AssetInfo(asset, false));
 
-          @Override
-          public void insertUpdate(DocumentEvent arg0) {
-              refreshReceiverDetails();
-          }
+                }
 
-          @Override
-          public void removeUpdate(DocumentEvent arg0) {
-              refreshReceiverDetails();
-          }
-      });
+            }
+        });
 
-       if( recipient != null){
-           jTextField_To.setText(recipient.getAddress());
-           //refreshReceiverDetails()
+        jButton_ok.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onSendClick();
+            }
+        });
 
-       }
+        // set image asset
+        setImage();
 
-    this.jLabel_Title.setText(Lang.getInstance().translate("Title"));
-    this.jLabel_Account.setText(Lang.getInstance().translate("Select account") + ":");
-    this.jLabel_To.setText(Lang.getInstance().translate("To: (address or name)"));
-    this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Receiver details") + ":");
-    this.jLabel_Mess_Title.setText(Lang.getInstance().translate("Title") + ":");
-    this.jLabel_Mess.setText(Lang.getInstance().translate("Message") + ":");
-    this.jCheckBox_Enscript.setText(Lang.getInstance().translate("Encrypt message") + ":");
-    this.jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
-    this.jLabel_Ammount.setText(Lang.getInstance().translate("Amount") + ":");
-    this.jLabel_Fee.setText(Lang.getInstance().translate("Fee level") + ":");
+        // set acoount TO
+        this.jTextField_To.getDocument().addDocumentListener(new DocumentListener() {
 
-    this.jButton_ok.setText(Lang.getInstance().translate("Send"));
+            @Override
+            public void changedUpdate(DocumentEvent arg0) {
+            }
 
-    // CONTEXT MENU
-    MenuPopupUtil.installContextMenu(this.jTextField_To);
-    MenuPopupUtil.installContextMenu(this.jTextField_Ammount);
-    MenuPopupUtil.installContextMenu(this.jTextArea_Description);
-    MenuPopupUtil.installContextMenu(this.jTextField_Recive_Detail);
-    jTextArea_Account_Description.setWrapStyleWord(true);
-    jTextArea_Account_Description.setLineWrap(true);
-    jScrollPane2.setViewportView(new AssetInfo(asset)); //jTextArea_Account_Description);
-   }
-   
-   private void refreshReceiverDetails() {
-       String toValue = jTextField_To.getText();
-       AssetCls asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
+            @Override
+            public void insertUpdate(DocumentEvent arg0) {
+                refreshReceiverDetails();
+            }
 
-       this.jTextField_Recive_Detail.setText(Account.getDetails(toValue, asset));
+            @Override
+            public void removeUpdate(DocumentEvent arg0) {
+                refreshReceiverDetails();
+            }
+        });
 
-       this.jCheckBox_Enscript.setEnabled(true);
-   }
-    public boolean cheskError(){
+        if (recipient != null) {
+            jTextField_To.setText(recipient.getAddress());
+            //refreshReceiverDetails()
+
+        }
+
+        this.jLabel_Title.setText(Lang.getInstance().translate("Title"));
+        this.jLabel_Account.setText(Lang.getInstance().translate("Select account") + ":");
+        this.jLabel_To.setText(Lang.getInstance().translate("To: (address or name)"));
+        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Receiver details") + ":");
+        this.jLabel_Mess_Title.setText(Lang.getInstance().translate("Title") + ":");
+        this.jLabel_Mess.setText(Lang.getInstance().translate("Message") + ":");
+        this.jCheckBox_Enscript.setText(Lang.getInstance().translate("Encrypt message") + ":");
+        this.jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
+        this.jLabel_Ammount.setText(Lang.getInstance().translate("Amount") + ":");
+        this.jLabel_Fee.setText(Lang.getInstance().translate("Fee level") + ":");
+
+        this.jButton_ok.setText(Lang.getInstance().translate("Send"));
+
+        // CONTEXT MENU
+        MenuPopupUtil.installContextMenu(this.jTextField_To);
+        MenuPopupUtil.installContextMenu(this.jTextField_Ammount);
+        MenuPopupUtil.installContextMenu(this.jTextArea_Description);
+        MenuPopupUtil.installContextMenu(this.jTextField_Recive_Detail);
+        jTextArea_Account_Description.setWrapStyleWord(true);
+        jTextArea_Account_Description.setLineWrap(true);
+        jScrollPane2.setViewportView(new AssetInfo(asset, false)); //jTextArea_Account_Description);
+    }
+
+    public AssetSendPanel(AssetCls asset_in, Account account2, Account account_To, PersonCls person, String message) {
+        this(asset_in, account2, account_To, person);
+
+        jTextArea_Description.setText(message);
+
+    }
+
+    private void refreshReceiverDetails() {
+        String toValue = jTextField_To.getText();
+        AssetCls asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
+
+        this.jTextField_Recive_Detail.setText(Account.getDetails(toValue, asset));
+
+        this.jCheckBox_Enscript.setEnabled(true);
+    }
+
+    public boolean cheskError() {
         this.jButton_ok.setEnabled(false);
 
         //READ SENDER
@@ -282,9 +291,9 @@ public class AssetSendPanel extends javax.swing.JPanel {
         //READ RECIPIENT
         String recipientAddress = jTextField_To.getText();
 
-         //ORDINARY RECIPIENT
+        //ORDINARY RECIPIENT
         if (Crypto.getInstance().isValidAddress(recipientAddress)) {
-           this.recipient = new Account(recipientAddress);
+            this.recipient = new Account(recipientAddress);
         } else {
             //IS IS NAME of RECIPIENT - resolve ADDRESS
             Pair<Account, NameResult> result = NameUtils.nameToAdress(recipientAddress);
@@ -301,8 +310,8 @@ public class AssetSendPanel extends javax.swing.JPanel {
         }
 
         int parsing = 0;
-       
-       
+
+
         try {
             //READ AMOUNT
             parsing = 1;
@@ -310,7 +319,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
 
             //READ FEE
             parsing = 2;
-            feePow = Integer.parseInt((String)this.jComboBox_Fee.getSelectedItem());
+            feePow = Integer.parseInt((String) this.jComboBox_Fee.getSelectedItem());
         } catch (Exception e) {
             //CHECK WHERE PARSING ERROR HAPPENED
             switch (parsing) {
@@ -339,8 +348,8 @@ public class AssetSendPanel extends javax.swing.JPanel {
 
         this.message = jTextArea_Description.getText();
 
-       isTextB = true;
-       messageBytes =null;
+        isTextB = true;
+        messageBytes = null;
         if (message != null && message.length() > 0) {
             if (isTextB) {
                 messageBytes = message.getBytes(Charset.forName("UTF-8"));
@@ -370,7 +379,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
         encrypted = (encryptMessage) ? new byte[]{1} : new byte[]{0};
         isTextByte = (isTextB) ? new byte[]{1} : new byte[]{0};
 
-       
+
         if (amount != null) {
             //CHECK IF PAYMENT OR ASSET TRANSFER
             asset = (AssetCls) this.jComboBox_Asset.getSelectedItem();
@@ -405,7 +414,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
                 messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey, publicKey);
             }
         }
-       head = this.jTextField_Mess_Title.getText();
+        head = this.jTextField_Mess_Title.getText();
         if (head == null)
             head = "";
         if (head.getBytes(StandardCharsets.UTF_8).length > 256) {
@@ -415,11 +424,11 @@ public class AssetSendPanel extends javax.swing.JPanel {
 
         }
 
-        
+
         return true;
     }
 
-    public void confirmaftecreatetransaction(){
+    public void confirmaftecreatetransaction() {
 
         //CHECK VALIDATE MESSAGE
         if (result == Transaction.VALIDATE_OK) {
@@ -438,322 +447,323 @@ public class AssetSendPanel extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
         }
-    
-   
-    }
-    public void onSendClick(){
-        
+
+
     }
 
-   /**
-    * This method is called from within the constructor to initialize the form.
-    * WARNING: Do NOT modify this code. The content of this method is always
-    * regenerated by the Form Editor.
-    */
-   @SuppressWarnings("unchecked")
-   // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
-   private void initComponents() {
-       java.awt.GridBagConstraints gridBagConstraints;
+    public void onSendClick() {
 
-       jLabel_Recive_Detail = new javax.swing.JLabel();
-       jTextField_To = new javax.swing.JTextField();
-       jLabel_Account = new javax.swing.JLabel();
-       jLabel_To = new javax.swing.JLabel();
-       jComboBox_Account = new javax.swing.JComboBox<>();
-       jLabel_Mess_Title = new javax.swing.JLabel();
-       jTextField_Recive_Detail = new javax.swing.JTextField();
-       jLabel_Title = new javax.swing.JLabel();
-       jTextField_Mess_Title = new javax.swing.JTextField();
-       jLabel_Mess = new javax.swing.JLabel();
-       jScrollPane1 = new javax.swing.JScrollPane();
-       jTextArea_Description = new javax.swing.JTextArea();
-       jCheckBox_Enscript = new javax.swing.JCheckBox();
-       jLabel_Asset = new javax.swing.JLabel();
-       jComboBox_Asset = new javax.swing.JComboBox<>();
-       jLabel_Ammount = new javax.swing.JLabel();
-       jTextField_Ammount = new MDecimalFormatedTextField();
-       jLabel_Fee = new javax.swing.JLabel();
-       jComboBox_Fee = new javax.swing.JComboBox<>();
-       jButton_ok = new javax.swing.JButton();
-       jLabel_Icon = new javax.swing.JLabel();
-       jScrollPane2 = new javax.swing.JScrollPane();
-       jTextArea_Account_Description = new javax.swing.JTextArea();
+    }
 
-       java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
-       layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
-       layout.rowHeights = new int[] {0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0};
-       setLayout(layout);
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">
+    private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-       jLabel_Recive_Detail.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-       jLabel_Recive_Detail.setText("");
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 0;
-       gridBagConstraints.gridy = 6;
-       gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-       add(jLabel_Recive_Detail, gridBagConstraints);
+        jLabel_Recive_Detail = new javax.swing.JLabel();
+        jTextField_To = new javax.swing.JTextField();
+        jLabel_Account = new javax.swing.JLabel();
+        jLabel_To = new javax.swing.JLabel();
+        jComboBox_Account = new javax.swing.JComboBox<>();
+        jLabel_Mess_Title = new javax.swing.JLabel();
+        jTextField_Recive_Detail = new javax.swing.JTextField();
+        jLabel_Title = new javax.swing.JLabel();
+        jTextField_Mess_Title = new javax.swing.JTextField();
+        jLabel_Mess = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextArea_Description = new javax.swing.JTextArea();
+        jCheckBox_Enscript = new javax.swing.JCheckBox();
+        jLabel_Asset = new javax.swing.JLabel();
+        jComboBox_Asset = new javax.swing.JComboBox<>();
+        jLabel_Ammount = new javax.swing.JLabel();
+        jTextField_Ammount = new MDecimalFormatedTextField();
+        jLabel_Fee = new javax.swing.JLabel();
+        jComboBox_Fee = new javax.swing.JComboBox<>();
+        jButton_ok = new javax.swing.JButton();
+        jLabel_Icon = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTextArea_Account_Description = new javax.swing.JTextArea();
 
-       jTextField_To.setText("");
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 2;
-       gridBagConstraints.gridy = 4;
-       gridBagConstraints.gridwidth = 15;
-       gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-       gridBagConstraints.weightx = 0.3;
-       gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
-       add(jTextField_To, gridBagConstraints);
+        java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
+        layout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
+        layout.rowHeights = new int[]{0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0};
+        setLayout(layout);
 
-       jLabel_Account.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-       jLabel_Account.setText("jLabel2");
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 0;
-       gridBagConstraints.gridy = 2;
-       gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-       add(jLabel_Account, gridBagConstraints);
+        jLabel_Recive_Detail.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel_Recive_Detail.setText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
+        add(jLabel_Recive_Detail, gridBagConstraints);
 
-       jLabel_To.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-       jLabel_To.setText("jLabel3");
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 0;
-       gridBagConstraints.gridy = 4;
-       gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-       add(jLabel_To, gridBagConstraints);
+        jTextField_To.setText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 15;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.3;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
+        add(jTextField_To, gridBagConstraints);
 
-       
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 2;
-       gridBagConstraints.gridy = 2;
-       gridBagConstraints.gridwidth = 15;
-       gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-       gridBagConstraints.weightx = 0.3;
-       gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
-       add(jComboBox_Account, gridBagConstraints);
+        jLabel_Account.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel_Account.setText("jLabel2");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
+        add(jLabel_Account, gridBagConstraints);
 
-       jLabel_Mess_Title.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-       jLabel_Mess_Title.setText("");
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 0;
-       gridBagConstraints.gridy = 8;
-       gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-       add(jLabel_Mess_Title, gridBagConstraints);
-
-       jTextField_Recive_Detail.setEditable(false);
-       jTextField_Recive_Detail.setText("");
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 2;
-       gridBagConstraints.gridy = 6;
-       gridBagConstraints.gridwidth = 15;
-       gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-       gridBagConstraints.weightx = 0.3;
-       gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
-       add(jTextField_Recive_Detail, gridBagConstraints);
-
-       jLabel_Title.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-       jLabel_Title.setText("jLabel5");
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 0;
-       gridBagConstraints.gridy = 0;
-       gridBagConstraints.gridwidth = 17;
-       gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-       gridBagConstraints.insets = new java.awt.Insets(15, 15, 6, 15);
-       add(jLabel_Title, gridBagConstraints);
-
-       jTextField_Mess_Title.setText("");
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 2;
-       gridBagConstraints.gridy = 8;
-       gridBagConstraints.gridwidth = 15;
-       gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-       gridBagConstraints.weightx = 0.3;
-       gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
-       add(jTextField_Mess_Title, gridBagConstraints);
-
-       jLabel_Mess.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-       jLabel_Mess.setText("");
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 0;
-       gridBagConstraints.gridy = 10;
-       gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-       add(jLabel_Mess, gridBagConstraints);
-
-       jTextArea_Description.setColumns(20);
-       jTextArea_Description.setRows(5);
-       jScrollPane1.setViewportView(jTextArea_Description);
-
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 2;
-       gridBagConstraints.gridy = 10;
-       gridBagConstraints.gridwidth = 15;
-       gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-       gridBagConstraints.weightx = 0.3;
-       gridBagConstraints.weighty = 0.1;
-       gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 15);
-       add(jScrollPane1, gridBagConstraints);
-
-       jCheckBox_Enscript.setText("");
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 2;
-       gridBagConstraints.gridy = 12;
-       gridBagConstraints.gridwidth = 7;
-       gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-       gridBagConstraints.insets = new java.awt.Insets(0, 0, 8, 0);
-       add(jCheckBox_Enscript, gridBagConstraints);
-
-       jLabel_Asset.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-       jLabel_Asset.setText("");
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 0;
-       gridBagConstraints.gridy = 14;
-       gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-       add(jLabel_Asset, gridBagConstraints);
-
-       
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 2;
-       gridBagConstraints.gridy = 14;
-       gridBagConstraints.gridwidth = 15;
-       gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-       gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
-       add(jComboBox_Asset, gridBagConstraints);
-
-       jLabel_Ammount.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-       jLabel_Ammount.setText("");
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 0;
-       gridBagConstraints.gridy = 18;
-       gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-       add(jLabel_Ammount, gridBagConstraints);
-
-       jTextField_Ammount.setText("");
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 2;
-       gridBagConstraints.gridy = 18;
-       gridBagConstraints.gridwidth = 7;
-       gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-       gridBagConstraints.weightx = 0.2;
-       gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 0);
-       add(jTextField_Ammount, gridBagConstraints);
-
-       jLabel_Fee.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-       jLabel_Fee.setText("");
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 12;
-       gridBagConstraints.gridy = 18;
-       gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-       gridBagConstraints.weightx = 0.1;
-       gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 0);
-       add(jLabel_Fee, gridBagConstraints);
-
-       jComboBox_Fee.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 14;
-       gridBagConstraints.gridy = 18;
-       gridBagConstraints.gridwidth = 3;
-       gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-       gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
-       gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
-       add(jComboBox_Fee, gridBagConstraints);
-
-       jButton_ok.setText("");
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 16;
-       gridBagConstraints.gridy = 20;
-       gridBagConstraints.insets = new java.awt.Insets(7, 0, 15, 15);
-       add(jButton_ok, gridBagConstraints);
-
-       jLabel_Icon.setText("");
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 2;
-       gridBagConstraints.gridy = 16;
-       gridBagConstraints.gridwidth = 1;
-       gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-       gridBagConstraints.weightx = 0.4;
-      // add(jLabel_Icon, gridBagConstraints);
-
-       jTextArea_Account_Description.setEditable(false);
-       jTextArea_Account_Description.setColumns(20);
-       jTextArea_Account_Description.setRows(5);
-       jTextArea_Account_Description.setEnabled(false);
-       
-
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 2;
-       gridBagConstraints.gridy = 16;
-       gridBagConstraints.gridwidth = 17;
-       gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-       gridBagConstraints.weightx = 0.4;
-       gridBagConstraints.weighty = 0.2;
-       gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
-       add(jScrollPane2, gridBagConstraints);
-   }// </editor-fold>                        
-
-   public void setImage(){
-       // image view
-              InputStream inputStream = null;
-              if(asset == null) return;
-              byte[] image_Byte = asset.getImage();
-              if (image_Byte.length > 0) {
-                  inputStream = new ByteArrayInputStream(asset.getImage());
-              
-                  try {
-                      image1 = ImageIO.read(inputStream);
-
-                      // jLabel2.setText("jLabel2");
-                      ImageIcon image = new ImageIcon(image1);
-                      int x = image.getIconWidth();
-                      max_Height = image.getIconHeight();
-
-                      max_Widht = 150;
-                      double k = ((double) x / (double) max_Widht);
-                      max_Height = (int) (max_Height / k);
+        jLabel_To.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel_To.setText("jLabel3");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
+        add(jLabel_To, gridBagConstraints);
 
 
-                      if (max_Height != 0) {
-                          Im = image.getImage().getScaledInstance(max_Widht, max_Height, 1);
-                          ImageIcon ic = new ImageIcon(Im);
-                          jLabel_Icon.setIcon(ic);
-                          jLabel_Icon.setSize(ic.getIconWidth(), ic.getIconHeight());
-                      }
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 15;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.3;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
+        add(jComboBox_Account, gridBagConstraints);
+
+        jLabel_Mess_Title.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel_Mess_Title.setText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
+        add(jLabel_Mess_Title, gridBagConstraints);
+
+        jTextField_Recive_Detail.setEditable(false);
+        jTextField_Recive_Detail.setText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 15;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.3;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
+        add(jTextField_Recive_Detail, gridBagConstraints);
+
+        jLabel_Title.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel_Title.setText("jLabel5");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 17;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(15, 15, 6, 15);
+        add(jLabel_Title, gridBagConstraints);
+
+        jTextField_Mess_Title.setText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 15;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.3;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
+        add(jTextField_Mess_Title, gridBagConstraints);
+
+        jLabel_Mess.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel_Mess.setText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
+        add(jLabel_Mess, gridBagConstraints);
+
+        jTextArea_Description.setColumns(20);
+        jTextArea_Description.setRows(5);
+        jScrollPane1.setViewportView(jTextArea_Description);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridwidth = 15;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.3;
+        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 15);
+        add(jScrollPane1, gridBagConstraints);
+
+        jCheckBox_Enscript.setText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 8, 0);
+        add(jCheckBox_Enscript, gridBagConstraints);
+
+        jLabel_Asset.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel_Asset.setText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 14;
+        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
+        add(jLabel_Asset, gridBagConstraints);
 
 
-                  } catch (IOException e) {
-                      // TODO Auto-generated catch block
-                      e.printStackTrace();
-                  }
-                  return;
-              }
-              // if era then file system icon
-             if(asset.getKey()== 1l){
-                 jLabel_Icon.setIcon(new ImageIcon("images/icons/icon64.png"));
-                  return;
-             }
-             jLabel_Icon.setIcon(new ImageIcon(defaultImagePath));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 14;
+        gridBagConstraints.gridwidth = 15;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
+        add(jComboBox_Asset, gridBagConstraints);
 
-              
-          }
+        jLabel_Ammount.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel_Ammount.setText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 18;
+        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
+        add(jLabel_Ammount, gridBagConstraints);
 
-   // Variables declaration - do not modify                     
-   public javax.swing.JButton jButton_ok;
-   private javax.swing.JCheckBox jCheckBox_Enscript;
-   private javax.swing.JComboBox<Account> jComboBox_Account;
-   public javax.swing.JComboBox<ItemCls> jComboBox_Asset;
-   private javax.swing.JComboBox<String> jComboBox_Fee;
-   private javax.swing.JLabel jLabel_Asset;
-   private javax.swing.JLabel jLabel_Account;
-   private javax.swing.JLabel jLabel_Ammount;
-   private javax.swing.JLabel jLabel_Fee;
-   private javax.swing.JLabel jLabel_Icon;
-   private javax.swing.JLabel jLabel_Mess;
-   private javax.swing.JLabel jLabel_Mess_Title;
-   public javax.swing.JLabel jLabel_Recive_Detail;
-   public javax.swing.JLabel jLabel_Title;
-   public javax.swing.JLabel jLabel_To;
-   private javax.swing.JScrollPane jScrollPane1;
-   private javax.swing.JScrollPane jScrollPane2;
-   private javax.swing.JTextArea jTextArea_Account_Description;
-   public javax.swing.JTextArea jTextArea_Description;
-   public MDecimalFormatedTextField jTextField_Ammount;
-   public javax.swing.JTextField jTextField_Mess_Title;
-   private javax.swing.JTextField jTextField_Recive_Detail;
-   public javax.swing.JTextField jTextField_To;
-   // End of variables declaration                   
+        jTextField_Ammount.setText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 0);
+        add(jTextField_Ammount, gridBagConstraints);
+
+        jLabel_Fee.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel_Fee.setText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 12;
+        gridBagConstraints.gridy = 18;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 0);
+        add(jLabel_Fee, gridBagConstraints);
+
+        jComboBox_Fee.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 14;
+        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
+        add(jComboBox_Fee, gridBagConstraints);
+
+        jButton_ok.setText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 16;
+        gridBagConstraints.gridy = 20;
+        gridBagConstraints.insets = new java.awt.Insets(7, 0, 15, 15);
+        add(jButton_ok, gridBagConstraints);
+
+        jLabel_Icon.setText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 16;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.4;
+        // add(jLabel_Icon, gridBagConstraints);
+
+        jTextArea_Account_Description.setEditable(false);
+        jTextArea_Account_Description.setColumns(20);
+        jTextArea_Account_Description.setRows(5);
+        jTextArea_Account_Description.setEnabled(false);
+
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 16;
+        gridBagConstraints.gridwidth = 17;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.4;
+        gridBagConstraints.weighty = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
+        add(jScrollPane2, gridBagConstraints);
+    }// </editor-fold>
+
+    public void setImage() {
+        // image view
+        InputStream inputStream = null;
+        if (asset == null) return;
+        byte[] image_Byte = asset.getImage();
+        if (image_Byte.length > 0) {
+            inputStream = new ByteArrayInputStream(asset.getImage());
+
+            try {
+                image1 = ImageIO.read(inputStream);
+
+                // jLabel2.setText("jLabel2");
+                ImageIcon image = new ImageIcon(image1);
+                int x = image.getIconWidth();
+                max_Height = image.getIconHeight();
+
+                max_Widht = 150;
+                double k = ((double) x / (double) max_Widht);
+                max_Height = (int) (max_Height / k);
+
+
+                if (max_Height != 0) {
+                    Im = image.getImage().getScaledInstance(max_Widht, max_Height, 1);
+                    ImageIcon ic = new ImageIcon(Im);
+                    jLabel_Icon.setIcon(ic);
+                    jLabel_Icon.setSize(ic.getIconWidth(), ic.getIconHeight());
+                }
+
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            return;
+        }
+        // if era then file system icon
+        if (asset.getKey() == 1l) {
+            jLabel_Icon.setIcon(new ImageIcon("images/icons/icon64.png"));
+            return;
+        }
+        jLabel_Icon.setIcon(new ImageIcon(defaultImagePath));
+
+
+    }
+
+    // Variables declaration - do not modify
+    public javax.swing.JButton jButton_ok;
+    private javax.swing.JCheckBox jCheckBox_Enscript;
+    private javax.swing.JComboBox<Account> jComboBox_Account;
+    public javax.swing.JComboBox<ItemCls> jComboBox_Asset;
+    private javax.swing.JComboBox<String> jComboBox_Fee;
+    private javax.swing.JLabel jLabel_Asset;
+    private javax.swing.JLabel jLabel_Account;
+    private javax.swing.JLabel jLabel_Ammount;
+    private javax.swing.JLabel jLabel_Fee;
+    private javax.swing.JLabel jLabel_Icon;
+    private javax.swing.JLabel jLabel_Mess;
+    private javax.swing.JLabel jLabel_Mess_Title;
+    public javax.swing.JLabel jLabel_Recive_Detail;
+    public javax.swing.JLabel jLabel_Title;
+    public javax.swing.JLabel jLabel_To;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextArea jTextArea_Account_Description;
+    public javax.swing.JTextArea jTextArea_Description;
+    public MDecimalFormatedTextField jTextField_Ammount;
+    public javax.swing.JTextField jTextField_Mess_Title;
+    private javax.swing.JTextField jTextField_Recive_Detail;
+    public javax.swing.JTextField jTextField_To;
+    // End of variables declaration
 }
