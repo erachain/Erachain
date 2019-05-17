@@ -102,6 +102,10 @@ public class PersonVouchFromTableModel extends TimerTableModelCls<RSertifyPubKey
             //CHECK IF NEW LIST
             TreeMap<String, Stack<Fun.Tuple3<Integer, Integer, Integer>>> pubKeysitems = DCSet.getInstance().getPersonAddressMap().get(person.getKey());
             for (Stack<Fun.Tuple3<Integer, Integer, Integer>> stack: pubKeysitems.values()) {
+                if (stack == null || stack.isEmpty()) {
+                    continue;
+                }
+
                 Fun.Tuple3<Integer, Integer, Integer> itemTransaction = stack.peek();
                 RSertifyPubKeys transaction = (RSertifyPubKeys)mapTransactions.get(itemTransaction.b, itemTransaction.c);
                 if (transaction != null) {

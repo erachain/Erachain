@@ -100,6 +100,8 @@ public class PersonAddressMap extends DCMap<
                 value_new.put(address, stack);
             } else {
                 Stack<Tuple3<Integer, Integer, Integer>> stack_new;
+                // !!!! NEEED .clone() !!!
+                // need for updates only in fork - not in parent DB
                 stack_new = (Stack<Tuple3<Integer, Integer, Integer>>) stack.clone();
                 stack_new.push(item);
                 value_new.put(address, stack_new);
