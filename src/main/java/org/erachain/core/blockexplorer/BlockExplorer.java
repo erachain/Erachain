@@ -21,6 +21,7 @@ import org.erachain.core.voting.Poll;
 import org.erachain.core.voting.PollOption;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetMap;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.gui.models.PersonAccountsModel;
@@ -892,6 +893,10 @@ public class BlockExplorer {
 
 
             createOrder = finalMap.get(order.getId());
+
+            sellJSON.put("creator", createOrder.getCreator().getPersonAsString());
+            sellJSON.put("creator_addr", createOrder.getCreator().getAddress());
+
             sellsJSON.put(Base58.encode(createOrder.getSignature()), sellJSON);
         }
 
@@ -934,6 +939,10 @@ public class BlockExplorer {
             sumBuyingAmount = sumBuyingAmount.add(buyingAmount);
 
             createOrder = finalMap.get(order.getId());
+
+            buyJSON.put("creator", createOrder.getCreator().getPersonAsString());
+            buyJSON.put("creator_addr", createOrder.getCreator().getAddress());
+
             buysJSON.put(Base58.encode(createOrder.getSignature()), buyJSON);
         }
         output.put("buys", buysJSON);
@@ -1479,25 +1488,32 @@ public class BlockExplorer {
 
         // balance assets from
         LinkedHashMap output = new LinkedHashMap();
-        WebBalanceFromAddressTableModel balanceTableModel = new WebBalanceFromAddressTableModel(account);
-        int ad = balanceTableModel.getRowCount();
-        int idr;
-        TreeMap bal_Assets = new TreeMap();
-        if (ad > 0)
-            for (idr = 0; idr < ad; idr++) {
-                Map bal = new LinkedHashMap();
-                bal.put("asset_key", balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_ASSET_KEY));
-                bal.put("asset_name", balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_ASSET_NAME));
-                bal.put("balance_A", balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_A));
-                bal.put("balance_B", balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_B));
-                bal.put("balance_C", balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_C));
-                if (!(balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_A).equals("0.00000000")
-                        && balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_B).equals("0.00000000")
-                        && balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_C).equals("0.00000000")))
-                    bal_Assets.put(balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_ASSET_KEY), bal);
-            }
+        SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances = Controller.getInstance().getBalances(account);
 
-        output.put("balances", bal_Assets);
+        ItemAssetMap assetsMap = DCSet.getInstance().getItemAssetMap();
+
+        TreeMap balAssets = new TreeMap();
+        if (balances != null && !balances.isEmpty()) {
+            Iterator<Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> iterator = balances.iterator();
+            while (iterator.hasNext()) {
+                Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> item = iterator.next();
+
+                if (item.getB().a.b.signum() != 0
+                        && item.getB().b.b.signum() != 0
+                        && item.getB().c.b.signum() != 0) {
+                    Map bal = new LinkedHashMap();
+                    bal.put("asset_key", item.getA().b);
+                    bal.put("asset_name", assetsMap.get(item.getA().b).viewName());
+                    bal.put("balance_A", item.getB().a.b);
+                    bal.put("balance_B", item.getB().b.b);
+                    bal.put("balance_C", item.getB().c.b);
+                    balAssets.put(item.getA().b.toString(), bal);
+                }
+            }
+        }
+
+        output.put("balances", balAssets);
+
         output.put("label_Balance_table", Lang.getInstance().translateFromLangObj("Balance", langObj));
         output.put("label_asset_key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("label_asset_name", Lang.getInstance().translateFromLangObj("Name", langObj));
