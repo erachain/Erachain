@@ -1,7 +1,7 @@
 package org.erachain.webserver;
 
+import org.erachain.CallRemoteApi;
 import org.erachain.SettingTests;
-import org.erachain.traders.CallRemoteApi;
 import org.junit.Assert;
 import org.junit.Test;
 //import test.CallRemoteApi;
