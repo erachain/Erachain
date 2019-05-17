@@ -93,7 +93,12 @@ public class PersonInfo extends JTextPane {
             for (Map.Entry<Long, java.util.Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> status : statuses.entrySet()) {
                 if (status == null) continue;
 
-                Tuple5<Long, Long, byte[], Integer, Integer> dates = status.getValue().peek();
+                Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = status.getValue();
+                if (stack == null || stack.isEmpty()) {
+                    continue;
+                }
+
+                Tuple5<Long, Long, byte[], Integer, Integer> dates = stack.peek();
 
                 message += "<div>" + statusesMap.get(status.getKey()).toString(DCSet.getInstance(), dates.c) + " : ";
 
