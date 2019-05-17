@@ -70,7 +70,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
     }
 
     private void init() {
-        titleJLabel.setText("Enter Person");
+        titleJLabel.setText(Lang.getInstance().translate("Enter Person"));
         textPersonNumber.setText("");
         txtBirthLatitude.setText("");
         txtBirthLongitudeLatitude.setText("");
