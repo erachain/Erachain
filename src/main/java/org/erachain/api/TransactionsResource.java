@@ -60,9 +60,6 @@ public class TransactionsResource {
             throw ApiErrorFactory.getInstance().createError(Transaction.TRANSACTION_DOES_NOT_EXIST);
         }
 
-        // NEED for CANCER ORDER etc.
-        transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK,
-                transaction.getBlockHeight(), transaction.getSeqNo());
         return transaction.toJson().toJSONString();
     }
 
