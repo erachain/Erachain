@@ -402,7 +402,7 @@ if(order.getKey() >= AssetCls.INITIAL_FAVORITES)
             //info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,jScrollPaneJPanelRightPanel.getSize().height-50));
             int div = th.jSplitPanel.getDividerLocation();
             int or = th.jSplitPanel.getOrientation();
-            AssetInfo info_panel = new AssetInfo(asset);
+            AssetInfo info_panel = new AssetInfo(asset, false);
             //info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,jScrollPaneJPanelRightPanel.getSize().height-50));
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);
             //jSplitPanel.setRightComponent(info_panel);

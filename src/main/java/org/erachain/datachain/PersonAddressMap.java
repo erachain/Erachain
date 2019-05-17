@@ -100,6 +100,8 @@ public class PersonAddressMap extends DCMap<
                 value_new.put(address, stack);
             } else {
                 Stack<Tuple3<Integer, Integer, Integer>> stack_new;
+                // !!!! NEEED .clone() !!!
+                // need for updates only in fork - not in parent DB
                 stack_new = (Stack<Tuple3<Integer, Integer, Integer>>) stack.clone();
                 stack_new.push(item);
                 value_new.put(address, stack_new);
@@ -119,8 +121,7 @@ public class PersonAddressMap extends DCMap<
     public Tuple3<Integer, Integer, Integer> getItem(Long person, String address) {
         TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> tree = this.get(person);
         Stack<Tuple3<Integer, Integer, Integer>> stack = tree.get(address);
-        if (stack == null) return null;
-        return !stack.isEmpty() ? stack.peek() : null;
+        return stack == null || stack.isEmpty() ? null : stack.peek();
     }
 
     @SuppressWarnings("unchecked")

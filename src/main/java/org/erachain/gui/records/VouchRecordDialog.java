@@ -133,7 +133,7 @@ public class VouchRecordDialog extends JDialog {
 
         if (!OnDealClick.proccess1(jButton_Confirm)) return;
 
-        Account creator = (Account) jComboBox_YourAddress.getSelectedItem();
+        Account creatorAccount = (Account) jComboBox_YourAddress.getSelectedItem();
         //String address = pubKey1Txt.getText();
         int feePow = 0;
         int parse = 0;
@@ -154,12 +154,18 @@ public class VouchRecordDialog extends JDialog {
         }
 
         //Account authenticator =  new Account(address);
-        PrivateKeyAccount authenticator = Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress());
+        PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(creatorAccount.getAddress());
+        if (creator == null) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         int version = 0; // without user signs
 
         Transaction transaction = Controller.getInstance().r_Vouch(0, Transaction.FOR_NETWORK,
-                authenticator, feePow,
+                creator, feePow,
                 record.getBlockHeight(), record.getSeqNo());
         //Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 0);
 

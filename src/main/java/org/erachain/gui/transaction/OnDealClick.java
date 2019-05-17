@@ -144,6 +144,9 @@ public class OnDealClick {
                 mess = "Name name key id default key";
                 break;
 
+            case Transaction.PRIVATE_KEY_NOT_FOUND:
+                mess = "Private key not found in Wallet";
+                break;
 
             case Transaction.BUYER_ALREADY_OWNER:
                 mess = "Buyer already owner";

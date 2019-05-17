@@ -14,6 +14,7 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssueTemplateDetailsFrame;
+import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -69,6 +70,13 @@ public class IssueTemplatePanel extends JPanel {
 
         // CREATE PLATE
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+        if (creator == null) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         IssueTemplateRecord issueTemplate = (IssueTemplateRecord) Controller.getInstance().issueTemplate(creator,
                 jTextFieldTitle.getText(), jTextAreaContent.getText(), icon, image, feePow);
 

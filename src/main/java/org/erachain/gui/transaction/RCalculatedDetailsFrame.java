@@ -76,15 +76,17 @@ public class RCalculatedDetailsFrame extends RecDetailsFrame {
             this.add(amount, detailGBC);
 
             //ASSET
-            //detailGBC.gridy;
-            detailGBC.gridx = 3;
-            detailGBC.gridwidth = 1;
-            JTextField asset = new JTextField(Controller.getInstance().getAsset(r_Calc.getAbsKey()).toString());
-            asset.setEditable(false);
-            MenuPopupUtil.installContextMenu(asset);
-            this.add(asset, detailGBC);
-            detailGBC.gridx = 1;
-            detailGBC.gridwidth = 3;
+            long assetKey = r_Calc.getAbsKey();
+            if (assetKey > 0) {
+                detailGBC.gridx = 3;
+                detailGBC.gridwidth = 1;
+                JTextField asset = new JTextField(Controller.getInstance().getAsset(assetKey).toString());
+                asset.setEditable(false);
+                MenuPopupUtil.installContextMenu(asset);
+                this.add(asset, detailGBC);
+                detailGBC.gridx = 1;
+                detailGBC.gridwidth = 3;
+            }
         }
 
         //PACK

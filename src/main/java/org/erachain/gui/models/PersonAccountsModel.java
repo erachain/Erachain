@@ -189,6 +189,10 @@ public class PersonAccountsModel extends TimerTableModelCls<Fun.Tuple5<String, I
 
         for (String address: addresses.keySet()) {
             Stack<Tuple3<Integer, Integer, Integer>> stack = addresses.get(address);
+            if (stack == null || stack.isEmpty()) {
+                continue;
+            }
+
             Tuple3<Integer, Integer, Integer> item = stack.peek();
             list.add(new Fun.Tuple5<String, Integer, Integer, Integer, Transaction>(address, item.a, item.b, item.c,
                     transactionsMap.get(item.b, item.c)));

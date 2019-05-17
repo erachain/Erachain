@@ -278,6 +278,7 @@ public class BlockChain {
 
         // GENERAL TRUST
         TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
+        TRUSTED_ANONYMOUS.add("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh");
         //TRUSTED_ANONYMOUS.add("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
 
 
@@ -296,6 +297,8 @@ public class BlockChain {
             TRUSTED_ANONYMOUS.add("762eatKnsB3xbyy2t9fwjjqUG1GoxQ8Rhx");
             ANONYMASERS.add("7CzxxwH7u9aQtx5iNHskLQjyJvybyKg8rF");
 
+
+            ANONYMASERS.add("7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK"); // face2face
         } else {
             // ANOMIMASER for incomes from PERSONALIZED
             ANONYMASERS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");

@@ -125,7 +125,7 @@ public class KKKMap extends DCMap<
         Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey);
 
         //stack.elementAt()
-        return stack != null ? !stack.isEmpty() ? stack.peek() : null : null;
+        return stack == null || stack.isEmpty() ? null : stack.peek();
     }
 
     // remove only last item from stack for this key of itemKey
