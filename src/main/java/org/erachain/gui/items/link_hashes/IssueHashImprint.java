@@ -13,6 +13,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.models.AccountsComboBoxModel;
+import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Pair;
 
@@ -135,6 +136,13 @@ public class IssueHashImprint extends javax.swing.JPanel {
 
             //CREATE IMPRINT
             PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+            if (creator == null) {
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             Pair<Transaction, Integer> result = Controller.getInstance().r_Hashes(creator, feePow, url, description,
                     String.join(" ", hashes));
 

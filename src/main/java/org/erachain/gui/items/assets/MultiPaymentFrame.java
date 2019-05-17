@@ -1,12 +1,14 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.models.PaymentsTableModel;
+import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.utils.BigDecimalStringComparator;
 import org.erachain.utils.Pair;
@@ -184,7 +186,15 @@ public class MultiPaymentFrame extends JFrame {
             int feePow = Integer.parseInt(txtFeePow.getText());
 
             //CREATE MULTI PAYMENT
-            Pair<Transaction, Integer> result = Controller.getInstance().sendMultiPayment(Controller.getInstance().getPrivateKeyAccountByAddress(this.asset.getOwner().getAddress()), this.payments, feePow);
+            PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(this.asset.getOwner().getAddress());
+            if (creator == null) {
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            Pair<Transaction, Integer> result = Controller.getInstance().sendMultiPayment(creator, this.payments, feePow);
 
             //CHECK VALIDATE MESSAGE
             switch (result.getB()) {

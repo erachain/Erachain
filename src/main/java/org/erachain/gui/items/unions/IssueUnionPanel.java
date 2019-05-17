@@ -140,6 +140,13 @@ public class IssueUnionPanel extends JPanel {
 
         byte[] image = null;
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+        if (creator == null) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         IssueUnionRecord issue_Union = (IssueUnionRecord) Controller.getInstance().issueUnion(
                 creator, this.txtName.getText(), birthday, parent, txtareaDescription.getText(),
                 addLogoLabel.getImgBytes(), image,

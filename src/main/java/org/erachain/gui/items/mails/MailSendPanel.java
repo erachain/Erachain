@@ -683,9 +683,16 @@ public class MailSendPanel extends JPanel {
 
             if (encryptMessage) {
                 // sender
-                PrivateKeyAccount account = Controller.getInstance()
-                        .getPrivateKeyAccountByAddress(sender.getAddress().toString());
-                byte[] privateKey = account.getPrivateKey();
+                PrivateKeyAccount creator = Controller.getInstance()
+                        .getPrivateKeyAccountByAddress(sender.getAddress());
+                if (creator == null) {
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                byte[] privateKey = creator.getPrivateKey();
 
                 // recipient
                 byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
@@ -717,9 +724,16 @@ public class MailSendPanel extends JPanel {
 
         }
 
+        PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+        if (creator == null) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         // CREATE TX MESSAGE
-        Transaction transaction = Controller.getInstance().r_Send(
-                Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key,
+        Transaction transaction = Controller.getInstance().r_Send(creator, feePow, recipient, key,
                 amount, head, messageBytes, isTextByte, encrypted);
         // test result = new Pair<Transaction, Integer>(null,
         // Transaction.VALIDATE_OK);

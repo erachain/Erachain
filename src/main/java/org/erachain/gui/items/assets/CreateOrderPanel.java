@@ -538,6 +538,13 @@ public class CreateOrderPanel extends JPanel {
         }
 
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+        if (creator == null) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         Transaction transaction = Controller.getInstance().createOrder(creator, this.have, this.want,
                 amountHave.setScale(this.have.getScale(), RoundingMode.HALF_DOWN),
                 amountWant.setScale(this.want.getScale(), RoundingMode.HALF_DOWN), feePow);

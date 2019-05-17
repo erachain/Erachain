@@ -193,6 +193,13 @@ public class IssueStatusPanel extends JPanel {
         byte[] image = addImageLabel.getImgBytes();
         boolean unique = jcheckUnique.isSelected();
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+        if (creator == null) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         IssueStatusRecord issueStatus = (IssueStatusRecord) Controller.getInstance().issueStatus(creator,
                 txtName.getText(), txtareaDescription.getText(), unique, icon, image, feePow);
         String text = "<HTML><body>";
