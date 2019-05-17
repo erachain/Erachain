@@ -1,7 +1,7 @@
 package org.erachain.api;
 
+import org.erachain.CallRemoteApi;
 import org.erachain.SettingTests;
-import org.erachain.traders.CallRemoteApi;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

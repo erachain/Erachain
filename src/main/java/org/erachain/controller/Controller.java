@@ -52,7 +52,6 @@ import org.erachain.network.Peer;
 import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
-import org.erachain.traders.TradersManager;
 import org.erachain.utils.*;
 import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
@@ -94,8 +93,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.11.13 beta dev";
-    public static String buildTime = "2019-04-29 13:33:33 UTC";
+    public static String version = "4.11.13 beta test";
+    public static String buildTime = "2019-05-15 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -139,7 +138,6 @@ public class Controller extends Observable {
     private boolean dcSetWithObserver = false;
     private boolean dynamicGUI = false;
     public Network network;
-    private TradersManager tradersManager;
     private ApiService rpcService;
     private WebService webService;
     public TransactionsPool transactionsPool;
@@ -790,11 +788,6 @@ public class Controller extends Observable {
         // start memory viewer
         MemoryViewer mamoryViewer = new MemoryViewer(this);
         mamoryViewer.start();
-
-        // CREATE NETWORK
-        if (false) {
-            this.tradersManager = new TradersManager();
-        }
 
         updateCompuRaes();
     }

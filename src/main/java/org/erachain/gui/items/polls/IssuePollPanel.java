@@ -237,6 +237,13 @@ public class IssuePollPanel extends JPanel {
 
         // CREATE POLL
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+        if (creator == null) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         IssuePollRecord issuePoll = (IssuePollRecord) Controller.getInstance().issuePoll(creator,
                 txtName.getText(), txtareaDescription.getText(),
                 optionsTableModel.getOptions(), icon, image, feePow);

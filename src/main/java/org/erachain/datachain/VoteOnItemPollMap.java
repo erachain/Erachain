@@ -160,7 +160,7 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, 
     public Tuple2<Integer, Integer> getItem(long pollKey, int optionKey, BigInteger accountShort) {
         Tuple3<Long, Integer, BigInteger> key = new Tuple3<Long, Integer, BigInteger>(pollKey, optionKey, accountShort);
         Stack<Tuple2<Integer, Integer>> stack = this.get(key);
-        return !stack.isEmpty() ? stack.peek() : null;
+        return stack == null || stack.isEmpty() ? null : stack.peek();
     }
 
     @SuppressWarnings("unchecked")

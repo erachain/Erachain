@@ -86,7 +86,7 @@ public class APIPerson {
                     .entity("person not found").build();
 
         Stack<Fun.Tuple5<Long, Long, byte[], Integer, Integer>> status = statuses.get(statusKey);
-        if (status == null)
+        if (status == null || status.isEmpty())
             return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
                     .entity("status not found").build();

@@ -5,6 +5,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
@@ -272,8 +273,16 @@ public class WebTransactionsHTML {
     private String cancel_Order_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
         String out = "";
-        CancelOrderTransaction orderCreation = (CancelOrderTransaction) transaction;
-        out += orderCreation.toJson();
+        CancelOrderTransaction cancelOrder = (CancelOrderTransaction) transaction;
+        Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(cancelOrder.getorderSignature());
+        if (key == null) {
+            out += cancelOrder.toJson();
+        }
+
+        CreateOrderTransaction createOrder = (CreateOrderTransaction) DCSet.getInstance().getTransactionFinalMap().get(key);
+
+        out += "</br><h3>" + Lang.getInstance().translateFromLangObj("Order to Cancel", langObj) + "</h3>";
+        out += create_Order_HTML(createOrder, langObj);
         return out;
     }
 
@@ -281,16 +290,38 @@ public class WebTransactionsHTML {
         // TODO Auto-generated method stub
         String out = "";
         CreateOrderTransaction orderCreation = (CreateOrderTransaction) transaction;
-        //tradeMap.getTradesByOrderID(new BigInteger(transaction.getSignature());
-        //Order order = orderCreation.getOrder();
+
+        Order order = null;
+        boolean canceled = false;
+        if (DCSet.getInstance().getCompletedOrderMap().contains(orderCreation.getDBRef())) {
+            order = DCSet.getInstance().getCompletedOrderMap().get(orderCreation.getDBRef());
+            if (!order.getFulfilledHave().equals(order.getAmountHave())) {
+                canceled = true;
+            }
+            out += "<b>" + Lang.getInstance().translateFromLangObj(canceled?"Canceled":"Completed", langObj) + "</b><br>";
+        } else if (DCSet.getInstance().getOrderMap().contains(orderCreation.getDBRef())) {
+            order = DCSet.getInstance().getOrderMap().get(orderCreation.getDBRef());
+            out += "<b>" + Lang.getInstance().translateFromLangObj("ACTIVE", langObj) + "</b><br>";
+        } else {
+            out += "<b>" + Lang.getInstance().translateFromLangObj("unknown", langObj) + "</b></br>";
+        }
+
         out += "<b>" + Lang.getInstance().translateFromLangObj("Have", langObj) + ":</b> "
                 + orderCreation.getAmountHave().toPlainString() + " x "
-                + String.valueOf(orderCreation.getHaveAsset().toString()) + "<br>";
+                + String.valueOf(orderCreation.getHaveAsset().toString())
+                + (order != null? " (" + order.getFulfilledHave().toPlainString() + " "
+                    + Lang.getInstance().translateFromLangObj("fulfilled", langObj) + ")" : "")
+                + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Want", langObj) + ":</b> "
                 + orderCreation.getAmountWant().toPlainString() + " x "
-                + String.valueOf(orderCreation.getWantAsset().toString()) + "<br>";
+                + String.valueOf(orderCreation.getWantAsset().toString())
+                + (order != null? " (" + order.getFulfilledWant().toPlainString() + " "
+                    + Lang.getInstance().translateFromLangObj("fulfilled", langObj) + ")" : "")
+                + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Price", langObj) + ":</b> "
                 + orderCreation.getPriceCalc().toPlainString() + " / " + orderCreation.getPriceCalcReverse().toPlainString() + "<br>";
+
+
         return out;
     }
 
