@@ -6,6 +6,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -220,8 +221,15 @@ public class CancelOrderFrame extends JDialog {
         }
 
         //CREATE NAME UPDATE
-        PrivateKeyAccount owner = Controller.getInstance().getPrivateKeyAccountByAddress(order.getCreator().getAddress());
-        Pair<Transaction, Integer> result = Controller.getInstance().cancelOrder(owner, order, feePow);
+        PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(order.getCreator().getAddress());
+        if (creator == null) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Pair<Transaction, Integer> result = Controller.getInstance().cancelOrder(creator, order, feePow);
 
         //CHECK VALIDATE MESSAGE
         switch (result.getB()) {

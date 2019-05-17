@@ -295,6 +295,14 @@ public class IssueAssetPanel extends JPanel {
             parsestep++;
             // SCALE, ASSET_TYPE, QUANTITY
             PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+            if (creator == null) {
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+
             // if (currency_unmovabl_chk.isSelected()) assetType = 1;
             // if (claim_right_obligation_chk.isSelected()) assetType = 2;
             parsestep++;

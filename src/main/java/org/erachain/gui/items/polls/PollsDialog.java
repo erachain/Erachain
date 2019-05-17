@@ -262,6 +262,13 @@ public class PollsDialog extends JDialog {
 
         // CREATE POLL
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+        if (creator == null) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         int option = this.cbxOptions.getSelectedIndex();
 
         Transaction transaction = Controller.getInstance().createItemPollVote(creator, poll.getKey(DCSet.getInstance()),

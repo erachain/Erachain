@@ -84,7 +84,7 @@ public class AddressPersonMap extends DCMap<String, Stack<Tuple4<
 
     public Tuple4<Long, Integer, Integer, Integer> getItem(String address) {
         Stack<Tuple4<Long, Integer, Integer, Integer>> value = this.get(address);
-        return !value.isEmpty() ? value.peek() : null;
+        return value == null || value.isEmpty() ? null : value.peek();
     }
 
     @SuppressWarnings("unchecked")

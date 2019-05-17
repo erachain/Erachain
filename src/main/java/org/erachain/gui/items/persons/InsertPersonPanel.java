@@ -266,6 +266,14 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
             PrivateKeyAccount creator = Controller.getInstance()
                     .getPrivateKeyAccountByAddress(creatorAccount.getAddress());
+
+            if (creator == null) {
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             Pair<Transaction, Integer> result = Controller.getInstance().issuePersonHuman(creator, feePow, person);
 
             // CHECK VALIDATE MESSAGE
