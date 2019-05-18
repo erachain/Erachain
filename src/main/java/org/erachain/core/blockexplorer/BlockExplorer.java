@@ -116,7 +116,7 @@ public class BlockExplorer {
         output.put("id_menu_pals_asset", Lang.getInstance().translateFromLangObj("Polls", langObj));
         output.put("id_menu_assets", Lang.getInstance().translateFromLangObj("Assets", langObj));
         output.put("id_menu_aTs", Lang.getInstance().translateFromLangObj("ATs", langObj));
-        output.put("id_menu_documents", Lang.getInstance().translateFromLangObj("Documents", langObj));
+        output.put("id_menu_transactions", Lang.getInstance().translateFromLangObj("Transactions", langObj));
 
         //информация о последнем блоке
         output.put("lastBlock", jsonQueryLastBlock());
@@ -134,6 +134,14 @@ public class BlockExplorer {
                 String type = info.getQueryParameters().getFirst("search");
                 String search = info.getQueryParameters().getFirst("q");
                 switch (type) {
+                    case "txs":
+                    case "transactions":
+                    case "transaction":
+                        //search transactions
+                        output.put("search", type);
+                        output.putAll(jsonQuerySearchTransactions(search, pageNumber));
+
+                        break;
                     case "persons":
                     case "person":
                         //search persons
@@ -162,11 +170,15 @@ public class BlockExplorer {
                 }
 
             }
+        } else if (info.getQueryParameters().containsKey("transactions")) {
+            output.put("search", "transaction");
+            output.putAll(jsonQueryTransactions(start));
+            // polls list
             // top 100
-        } else if (info.getQueryParameters().containsKey("top"))
+        } else if (info.getQueryParameters().containsKey("top")) {
             output.putAll(jsonQueryTopRichest(info));
             // asset lite
-        else if (info.getQueryParameters().containsKey("assetsLite")) {
+        } else if (info.getQueryParameters().containsKey("assetsLite")) {
             output.put("assetsLite", jsonQueryAssetsLite());
             // assets list
         } else if (info.getQueryParameters().containsKey("assets")) {
@@ -237,6 +249,10 @@ public class BlockExplorer {
         } else if (info.getQueryParameters().containsKey("block")) {
             output.put("search", "block");
             output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), pageNumber));
+        }
+        // transaction
+        else if (info.getQueryParameters().containsKey("transactions")) {
+            output.putAll(jsonQueryTransactions(info.getQueryParameters().getFirst("type"), start));
         }
 
         // transaction
@@ -1976,6 +1992,30 @@ public class BlockExplorer {
     }
 
     @SuppressWarnings({"serial", "static-access"})
+    public Map jsonQueryTransactions(String typeStr, int pageNumber) {
+
+        List<Transaction> transactions;
+        if (typeStr != null) {
+            int type = Integer.parseInt(typeStr);
+            transactions = dcSet.getTransactionFinalMap().getTransactionsByTitleAndType(null, type, 333, true);
+        } else {
+            transactions = dcSet.getTransactionFinalMap().findTransactions(null, null, null,
+                    0, 0, 0, 0, true, 0, 333);
+        }
+
+        LinkedHashMap output = new LinkedHashMap();
+
+        // Transactions view
+        output.put("Transactions", transactionsJSON(null, transactions, (pageNumber - 1) * 100, pageNumber * 100));
+        output.put("pageCount", (int) Math.ceil((transactions.size()) / 100d));
+        output.put("pageNumber", pageNumber);
+
+        output.put("type", "standardAccount");
+
+        return output;
+    }
+
+    @SuppressWarnings({"serial", "static-access"})
     public Map jsonQueryAddress(String address, int pageNumber) {
 
         List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddress(address);
@@ -2826,6 +2866,27 @@ public class BlockExplorer {
 
     //  todo Gleb -----------------------------------------------------------------------------------------------------------------
 
+    private Map jsonQueryTransactions(long start) {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
+        //В зависимости от выбранного языка(ru,en)
+        AdderHeadInfo.addHeadInfoCapAssets(result, langObj);
+        //Если номер с какого элемента отображать не задан - берем последний
+        if (start == -1) {
+            start = dcSet.getItemAssetMap().getLastKey();
+        }
+        //Параметр показывающий сколько элементов располагать на странице
+        int numberOfRepresentsItemsOnPage = 20;
+        //Получение списка активов из бд
+        List<AssetCls> assets = receiveListElements(AssetCls.class, start, result, numberOfRepresentsItemsOnPage);
+        Map assetsJSON = ConverterListInMap.assetsJSON(assets, dcSet, langObj);
+        result.put("Assets", assetsJSON);
+        result.put("start", start);
+        result.put("numberLast", dcSet.getItemAssetMap().getLastKey());
+        return result;
+    }
+
     private Map jsonQueryBlocks(int start) {
         //Результирующий сортированный в порядке добавления словарь(map)
         Map result = new LinkedHashMap();
@@ -2976,6 +3037,58 @@ public class BlockExplorer {
         return list;
     }
 
+
+    private Map jsonQuerySearchTransactions(String search, int page) throws WrongSearchException, Exception {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        List<ItemCls> listAssets = new ArrayList();
+        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
+        //В зависимости от выбранного языка(ru,en)
+        AdderHeadInfo.addHeadInfoCapAssets(result, langObj);
+        try {
+            //Если в строке ввели число
+            if (search.matches("\\d+")) {
+                if (dcSet.getItemAssetMap().contains(Long.valueOf(search))) {
+                    //Элемент найден - добавляем его
+                    listAssets.add(dcSet.getItemAssetMap().get(Long.valueOf(search)));
+                    //Не отображать для одного элемента навигацию и пагинацию
+                    result.put("notDisplayPages", "true");
+                }
+            } else {
+                //Поиск элементов по имени
+                listAssets = dcSet.getItemAssetMap().getByFilterAsArray(search, 0, 100);
+            }
+        } catch (Exception e) {
+            logger.info("Wrong search while process assets... ");
+            throw new WrongSearchException();
+        }
+        if (listAssets == null) {
+            logger.info("Wrong search while process assets... ");
+            throw new WrongSearchException();
+        }
+        //Количество найденных элементов
+        int size = listAssets.size();
+        if (size == 0) {
+            logger.info("Wrong search while process assets... ");
+            throw new WrongSearchException();
+        }
+        //Параметр показывающий сколько элементов располагать на странице
+        int numberOfRepresentsItemsOnPage = 10;
+        //Вспомогательный объект
+        ReceiverMapForBlockExplorer receiverMapForBlockExplorer =
+                new ReceiverMapForBlockExplorer(page, listAssets, numberOfRepresentsItemsOnPage);
+        //Преобразовать соответствующие данные
+        receiverMapForBlockExplorer.process(AssetCls.class, dcSet, langObj);
+        //Добавляем количество элементов для отображения на странице для отправки
+        result.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
+        result.put("Assets", receiverMapForBlockExplorer.getMap());
+        //Добавляем ключ в JSON для отправки
+        result.put("pageNumber", receiverMapForBlockExplorer.getPage());
+        int pageCount = evaluatePageCount(listAssets, numberOfRepresentsItemsOnPage);
+        result.put("pageCount", pageCount);
+        result.put("numberLast", listAssets.get(size - 1).getKey());
+        return result;
+    }
 
     private Map jsonQuerySearchAssets(String search, int page) throws WrongSearchException, Exception {
         //Результирующий сортированный в порядке добавления словарь(map)
