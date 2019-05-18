@@ -252,7 +252,7 @@ public class BlockExplorer {
         }
         // transaction
         else if (info.getQueryParameters().containsKey("transactions")) {
-            output.putAll(jsonQueryTransactions(info.getQueryParameters().getFirst("type"), start));
+            output.putAll(jsonQueryTransactions(info.getQueryParameters().getFirst("type"), pageNumber));
         }
 
         // transaction
@@ -1997,20 +1997,32 @@ public class BlockExplorer {
         List<Transaction> transactions;
         if (typeStr != null) {
             int type = Integer.parseInt(typeStr);
-            transactions = dcSet.getTransactionFinalMap().getTransactionsByTitleAndType(null, type, 333, true);
+            transactions = dcSet.getTransactionFinalMap().getTransactionsByTitleAndType(null, type, 50, true);
         } else {
-            transactions = dcSet.getTransactionFinalMap().findTransactions(null, null, null,
-                    0, 0, 0, 0, true, 0, 333);
+            // берем все с перебором с последней
+            TransactionFinalMap map = dcSet.getTransactionFinalMap();
+            Iterator<Long> iterator = map.getIterator(0, true);
+            int counter = 333;
+            transactions = new ArrayList<>();
+            while (iterator.hasNext() && counter > 0 ) {
+                Transaction transaction = map.get(iterator.next());
+                if (transaction.getType() == Transaction.CALCULATED_TRANSACTION
+                        && ((RCalculated)transaction).getMessage().equals("forging"))
+                    continue;
+
+                transactions.add(transaction);
+                counter--;
+            }
         }
 
         LinkedHashMap output = new LinkedHashMap();
 
         // Transactions view
-        output.put("Transactions", transactionsJSON(null, transactions, (pageNumber - 1) * 100, pageNumber * 100));
+        output.put("Transactions", transactionsJSON(null, transactions, (pageNumber - 1) * 25, pageNumber * 100));
         output.put("pageCount", (int) Math.ceil((transactions.size()) / 100d));
         output.put("pageNumber", pageNumber);
 
-        output.put("type", "standardAccount");
+        output.put("type", "transactions");
 
         return output;
     }
@@ -2047,7 +2059,7 @@ public class BlockExplorer {
 
         // Transactions view
         output.put("Transactions", transactionsJSON(acc, transactions, (pageNumber - 1) * 100, pageNumber * 100));
-        output.put("pageCount", (int) Math.ceil((transactions.size()) / 100d));
+        output.put("pageCount", (int) Math.ceil((transactions.size()) / 100));
         output.put("pageNumber", pageNumber);
 
         output.put("type", "standardAccount");
@@ -2867,24 +2879,7 @@ public class BlockExplorer {
     //  todo Gleb -----------------------------------------------------------------------------------------------------------------
 
     private Map jsonQueryTransactions(long start) {
-        //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
-        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
-        //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCapAssets(result, langObj);
-        //Если номер с какого элемента отображать не задан - берем последний
-        if (start == -1) {
-            start = dcSet.getItemAssetMap().getLastKey();
-        }
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 20;
-        //Получение списка активов из бд
-        List<AssetCls> assets = receiveListElements(AssetCls.class, start, result, numberOfRepresentsItemsOnPage);
-        Map assetsJSON = ConverterListInMap.assetsJSON(assets, dcSet, langObj);
-        result.put("Assets", assetsJSON);
-        result.put("start", start);
-        result.put("numberLast", dcSet.getItemAssetMap().getLastKey());
-        return result;
+        return jsonQueryTransactions(null, 0);
     }
 
     private Map jsonQueryBlocks(int start) {
@@ -3075,13 +3070,16 @@ public class BlockExplorer {
         //Параметр показывающий сколько элементов располагать на странице
         int numberOfRepresentsItemsOnPage = 10;
         //Вспомогательный объект
+
         ReceiverMapForBlockExplorer receiverMapForBlockExplorer =
                 new ReceiverMapForBlockExplorer(page, listAssets, numberOfRepresentsItemsOnPage);
         //Преобразовать соответствующие данные
+
         receiverMapForBlockExplorer.process(AssetCls.class, dcSet, langObj);
+
         //Добавляем количество элементов для отображения на странице для отправки
         result.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
-        result.put("Assets", receiverMapForBlockExplorer.getMap());
+        result.put("Transactionss", receiverMapForBlockExplorer.getMap());
         //Добавляем ключ в JSON для отправки
         result.put("pageNumber", receiverMapForBlockExplorer.getPage());
         int pageCount = evaluatePageCount(listAssets, numberOfRepresentsItemsOnPage);
