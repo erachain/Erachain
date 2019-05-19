@@ -3076,7 +3076,7 @@
             output += lastBlock(data.lastBlock);
             //Отображение компонента страниц(вверху)
             var start = data.start;
-            output += pagesComponentBeauty(start, data.Label_Blocks, data.lastNumber, pageSze, 'start');
+            output += pagesComponentBeauty(start, data.Label_Blocks, data.lastNumber, data.pageSize, 'start');
 
             //Отображение шапки таблицы
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
@@ -3100,8 +3100,8 @@
                 '<td><b>' + data.Label_Fee;
 
             //Отображение таблицы элементов блоков
-            var length = Object.keys(data.Blocks).length;
-            for (var key = length - 1; key >= 0; key--) {
+            var length = Object.keys(data.pageItems).length;
+            for (var i = 0; i < length - 1; i++) {
                 output += '<tr>' +
                     '<td><a href=?block=' + data.Blocks[key].height + get_lang() + '>' + data.Blocks[key].height + '</a>' +
                     '<td>' + addCommas(data.Blocks[key].target) +
@@ -3128,7 +3128,7 @@
 
             output += '</table></td></tr></table>';
             //Отображение компонента страниц(снизу)
-            output += pagesComponentBeauty(start, data.Label_Blocks, data.lastNumber, pageSze, 'start');
+            output += pagesComponentBeauty(start, data.Label_Blocks, data.lastNumber, data.pageSize, 'start');
 
             return output;
         }
@@ -3154,7 +3154,7 @@
             var start = data.start;
             if (!notDisplayPages) {
                 //Отображение компонента страниц(вверху)
-                output += pagesComponentBeauty(start, data.Label_Persons, data.lastNumber, pageSze, 'start');
+                output += pagesComponentBeauty(start, data.Label_Persons, data.lastNumber, data.pageSize, 'start');
             }
             //Отображение шапки таблицы
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
@@ -3166,8 +3166,8 @@
             output += '<tr><td><td><b>' + data.Label_key + ' <td><b>' +
                 data.Label_name + '<td><b>' + data.Label_creator;
             //Отображение таблицы элементов персон
-            var length = Object.keys(data.Persons).length;
-            for (var i = length - 1; i >= 0; i--) {
+            var length = Object.keys(data.pageItems).length;
+            for (var i = 0; i < length - 1; i++) {
                 output += '<tr>';
                 output += ' <td><img src="personimage?key=' + data.Persons[i].key + '" width="100"/></td>';
                 output += '<td>' + addCommas(data.Persons[i].key) + '<td><a href=?person=' +
@@ -3189,7 +3189,7 @@
                 }
                 output += '</table></td></tr></table>';
                 //Отображение компонента страниц(снизу)
-                output += pagesComponentBeauty(start, data.Label_Persons, data.lastNumber, pageSze, 'start');
+                output += pagesComponentBeauty(start, data.Label_Persons, data.lastNumber, data.pageSize, 'start');
             }
             return output;
         }
@@ -3218,8 +3218,8 @@
             output += '<tr><td><td><b>' + data.Label_key + ' <td><b>' +
                 data.Label_name + '<td><b>' + data.Label_creator;
             //Отображение таблицы элементов персон
-            var length = Object.keys(data.Persons).length;
-            for (var i = length - 1; i >= 0; i--) {
+            var length = Object.keys(data.pageItems).length;
+            for (var i = 0; i < length - 1; i++) {
                 output += '<tr>';
                 output += ' <td><img src="personimage?key=' + data.Persons[i].key + '" width="100"/></td>';
                 output += '<td>' + addCommas(data.Persons[i].key) + '<td><a href=?person=' +
@@ -3238,7 +3238,7 @@
                 }
                 output += '</table></td></tr></table>';
                 //Отображение компонента страниц(снизу)
-                // output += pagesComponentBeauty(start, data.Label_Persons, data.lastNumber, pageSze, 'start');
+                output += pagesComponentBeauty(start, data.Label_Persons, data.lastNumber, data.pageSize, 'start');
                 output += pagesComponentMixed(data);
             }
             return output;
@@ -3252,7 +3252,7 @@
             output += lastBlock(data.lastBlock);
             var start = data.start;
             if (!notDisplayPages) {
-                output += pagesComponentBeauty(start, data.label_Assets, data.lastNumber, pageSze, 'start');
+                output += pagesComponentBeauty(start, data.label_Assets, data.lastNumber, data.pageSize, 'start');
             }
             output += '<table width="1280" border=0><tr><td align=left><br>';
             output += '<a href="?assets"' + get_lang() + '><h3 style="display:inline;">' + data.label_Title + '</h3></a>';
@@ -3267,7 +3267,7 @@
 
             //Отображение таблицы элементов активов
             var length = Object.keys(data.pageItems).length;
-            for (var i = length - 1; i >= 0; i--) {
+            for (var i = 0; i < length - 1; i++) {
                 var item = data.pageItems[i];
                 output += '<tr>';
                 output += '<td> <a href=?asset=' + encodeURIComponent(item.key) + get_lang() + '>';
@@ -3298,7 +3298,7 @@
                         + (start + numberShiftDelta) + get_lang() + '>+&gt;'; // + data.Label_Later;
                 }
                 output += '</table></td></tr></table>';
-                output += pagesComponentBeauty(start, data.label_Assets, data.lastNumber, pageSze, 'start');
+                output += pagesComponentBeauty(start, data.label_Assets, data.lastNumber, data.pageSize, 'start');
             }
             return output;
         }
@@ -3325,7 +3325,7 @@
 
             //Отображение таблицы элементов активов
             var length = Object.keys(data.pageItems).length;
-            for (var i = length - 1; i >= 0; i--) {
+            for (var i = 0; i < length - 1; i++) {
                 var item = data.pageItems[i];
                 output += '<tr>';
                 output += '<td> <a href=?asset=' + encodeURIComponent(item.key) + get_lang() + '>';
