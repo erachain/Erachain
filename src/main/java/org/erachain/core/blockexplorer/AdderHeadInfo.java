@@ -1,5 +1,14 @@
 package org.erachain.core.blockexplorer;
 
+import org.erachain.core.block.Block;
+import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.imprints.ImprintCls;
+import org.erachain.core.item.persons.PersonCls;
+import org.erachain.core.item.polls.PollCls;
+import org.erachain.core.item.statuses.StatusCls;
+import org.erachain.core.item.templates.TemplateCls;
+import org.erachain.core.item.unions.UnionCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
@@ -8,11 +17,35 @@ import java.util.Map;
 
 public class AdderHeadInfo {
 
-    /**
-     * Добавляет переведенные на соответствующий язык информацию(бирки) для блоков
-     *
-     * @param output словарь, в который добавляется информация
-     */
+    public static void addHeadInfoCap(Class type, Map output, DCSet dcSet, JSONObject langObj) {
+        if(type == Transaction.class) {
+            addHeadInfoCapBlocks(output, dcSet, langObj);
+
+        } else if(type == Block.class) {
+            addHeadInfoCapBlocks(output, dcSet, langObj);
+
+        } else if(type == Block.BlockHead.class) {
+            addHeadInfoCapBlocks(output, dcSet, langObj);
+
+        } else if(type == AssetCls.class) {
+            addHeadInfoCapAssets(output, langObj);
+
+        } else if (type == PersonCls.class) {
+            addHeadInfoCapPersons(output, dcSet, langObj);
+
+        } else if (type == StatusCls.class || type == TemplateCls.class || type == PollCls.class
+                || type == ImprintCls.class || type == UnionCls.class) {
+            addHeadInfoCapStatusesTemplates(output, langObj);
+
+        }
+
+    }
+
+        /**
+         * Добавляет переведенные на соответствующий язык информацию(бирки) для блоков
+         *
+         * @param output словарь, в который добавляется информация
+         */
     public static void addHeadInfoCapBlocks(Map output, DCSet dcSet, JSONObject langObj) {
         output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
         output.put("totaltransactions", dcSet.getTransactionFinalMap().size());

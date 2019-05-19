@@ -19,8 +19,8 @@ import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
 import org.erachain.core.voting.PollOption;
-import org.erachain.database.DBASet;
 import org.erachain.database.SortableList;
+import org.erachain.database.FilteredByStringArray;
 import org.erachain.datachain.DCMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
@@ -110,45 +110,6 @@ public class BlockExplorer {
 
     }
 
-    public Map jsonQuerySearch(String search, long start) throws WrongSearchException, Exception {
-        //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
-        List<Long> assetsKeys = new ArrayList();
-        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
-        //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCapAssets(result, langObj);
-        try {
-            //Если в строке ввели число
-            if (search.matches("\\d+")) {
-                if (dcSet.getItemAssetMap().contains(Long.valueOf(search))) {
-                    //Элемент найден - добавляем его
-                    assetsKeys.add(Long.valueOf(search));
-                    //Не отображать для одного элемента навигацию и пагинацию
-                    result.put("notDisplayPages", "true");
-                }
-            } else {
-                //Поиск элементов по имени
-                //listAssets = dcSet.getItemAssetMap().getByFilterAsArray(search, 0, 100);
-                assetsKeys = dcSet.getItemAssetMap().getKeysByFilterAsArray(search, 0, 100);
-            }
-        } catch (Exception e) {
-            logger.error("Wrong search while process assets... " + e.getMessage());
-            throw new WrongSearchException();
-        }
-        if (assetsKeys == null || assetsKeys.isEmpty()) {
-            logger.info("Wrong search while process assets... ");
-            throw new WrongSearchException();
-        }
-
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 25;
-        makePage(AssetCls.class, assetsKeys, start,
-                numberOfRepresentsItemsOnPage, result, langObj);
-
-        return result;
-    }
-
-
     public void makePage(Class type, List<Long> keys, long start, int numberOfRepresentsItemsOnPage,
                      Map output, JSONObject langObj) {
 
@@ -179,6 +140,85 @@ public class BlockExplorer {
         output.put("lastNumber", key);
 
     }
+
+    public Map jsonQuerySearchLongKeys(Class type, String search, int start) throws WrongSearchException, Exception {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        List<Integer> keys = new ArrayList();
+        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
+        //В зависимости от выбранного языка(ru,en)
+        AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
+
+        try {
+            //Если в строке ввели число
+            if (search.matches("\\d+")) {
+                if (dcSet.getItemAssetMap().contains(Long.valueOf(search))) {
+                    //Элемент найден - добавляем его
+                    keys.add(Integer.valueOf(search));
+                    //Не отображать для одного элемента навигацию и пагинацию
+                    result.put("notDisplayPages", "true");
+                }
+            } else {
+                //Поиск элементов по имени
+                DCMap map = dcSet.getMap(type);
+                keys = ((FilteredByStringArray)map).getKeysByFilterAsArray(search, 0, 100);
+            }
+        } catch (Exception e) {
+            logger.error("Wrong search while process assets... " + e.getMessage());
+            throw new WrongSearchException();
+        }
+        if (keys == null || keys.isEmpty()) {
+            logger.info("Wrong search while process assets... ");
+            throw new WrongSearchException();
+        }
+
+        //Параметр показывающий сколько элементов располагать на странице
+        int numberOfRepresentsItemsOnPage = 25;
+        makePage(AssetCls.class, keys, start,
+                numberOfRepresentsItemsOnPage, result, langObj);
+
+        return result;
+    }
+
+    public Map jsonQuerySearchLongKeys(Class type, String search, long start) throws WrongSearchException, Exception {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        List<Long> keys = new ArrayList();
+        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
+        //В зависимости от выбранного языка(ru,en)
+        AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
+
+        try {
+            //Если в строке ввели число
+            if (search.matches("\\d+")) {
+                if (dcSet.getItemAssetMap().contains(Long.valueOf(search))) {
+                    //Элемент найден - добавляем его
+                    keys.add(Long.valueOf(search));
+                    //Не отображать для одного элемента навигацию и пагинацию
+                    result.put("notDisplayPages", "true");
+                }
+            } else {
+                //Поиск элементов по имени
+                DCMap map = dcSet.getMap(type);
+                keys = ((FilteredByStringArray)map).getKeysByFilterAsArray(search, 0, 100);
+            }
+        } catch (Exception e) {
+            logger.error("Wrong search while process assets... " + e.getMessage());
+            throw new WrongSearchException();
+        }
+        if (keys == null || keys.isEmpty()) {
+            logger.info("Wrong search while process assets... ");
+            throw new WrongSearchException();
+        }
+
+        //Параметр показывающий сколько элементов располагать на странице
+        int numberOfRepresentsItemsOnPage = 25;
+        makePage(AssetCls.class, keys, start,
+                numberOfRepresentsItemsOnPage, result, langObj);
+
+        return result;
+    }
+
 
     public static String timestampToStr ( long timestamp){
         return DateTimeFormat.timestamptoString(timestamp);
@@ -3226,23 +3266,10 @@ public class BlockExplorer {
             throw new WrongSearchException();
         }
         //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 10;
-        //Вспомогательный объект
+        int numberOfRepresentsItemsOnPage = 25;
+        makePage(AssetCls.class, assetsKeys, start,
+                numberOfRepresentsItemsOnPage, result, langObj);
 
-        ReceiverMapForBlockExplorer receiverMapForBlockExplorer =
-                new ReceiverMapForBlockExplorer(page, listAssets, numberOfRepresentsItemsOnPage);
-        //Преобразовать соответствующие данные
-
-        receiverMapForBlockExplorer.process(AssetCls.class, dcSet, langObj);
-
-        //Добавляем количество элементов для отображения на странице для отправки
-        result.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
-        result.put("Transactions", receiverMapForBlockExplorer.getMap());
-        //Добавляем ключ в JSON для отправки
-        result.put("pageNumber", receiverMapForBlockExplorer.getPage());
-        int pageCount = evaluatePageCount(listAssets, numberOfRepresentsItemsOnPage);
-        result.put("count", pageCount);
-        result.put("numberLast", listAssets.get(size - 1).getKey());
         return result;
     }
 
@@ -3276,7 +3303,6 @@ public class BlockExplorer {
             throw new WrongSearchException();
         }
 
-        //Параметр показывающий сколько элементов располагать на странице
         int numberOfRepresentsItemsOnPage = 25;
         makePage(AssetCls.class, assetsKeys, start,
                         numberOfRepresentsItemsOnPage, result, langObj);

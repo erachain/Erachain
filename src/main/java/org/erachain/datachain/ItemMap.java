@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.DBMap;
+import org.erachain.database.FilteredByStringArray;
 import org.erachain.utils.Pair;
 import org.mapdb.*;
 
@@ -15,7 +16,7 @@ import java.util.*;
  * ключ: номер, с самоувеличением
  * Значение: Сущность
  */
-public abstract class ItemMap extends DCMap<Long, ItemCls> {
+public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredByStringArray<Long> {
 
     //private static Logger logger;
 
