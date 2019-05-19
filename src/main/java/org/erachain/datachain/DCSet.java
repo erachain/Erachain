@@ -3,7 +3,16 @@ package org.erachain.datachain;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.imprints.ImprintCls;
+import org.erachain.core.item.persons.PersonCls;
+import org.erachain.core.item.polls.PollCls;
+import org.erachain.core.item.statuses.StatusCls;
+import org.erachain.core.item.templates.TemplateCls;
+import org.erachain.core.item.unions.UnionCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.NameStorageMap;
 import org.erachain.core.web.OrphanNameStorageHelperMap;
 import org.erachain.core.web.OrphanNameStorageMap;
@@ -1239,6 +1248,41 @@ public class DCSet extends DBASet implements Observer {
             case ItemCls.UNION_TYPE: {
                 return this.getItemUnionMap();
             }
+        }
+        return null;
+    }
+
+    public DCMap getMap(Class type) {
+
+        if(type == Transaction.class) {
+            return this.getTransactionFinalMap();
+
+        } else if(type == Block.class) {
+            return this.getBlockMap();
+
+        } else if(type == Block.BlockHead.class) {
+            return this.getBlocksHeadsMap();
+
+        } else if(type == AssetCls.class) {
+            return this.getItemAssetMap();
+
+        } else if (type == PersonCls.class) {
+            return this.getItemPersonMap();
+
+        } else if (type == PollCls.class) {
+            return this.getItemPollMap();
+
+        } else if (type == StatusCls.class) {
+            return this.getItemStatusMap();
+
+        } else if (type == ImprintCls.class) {
+            return this.getItemImprintMap();
+
+        } else if (type == UnionCls.class) {
+            return this.getItemUnionMap();
+
+        } else if (type == TemplateCls.class) {
+            return this.getItemTemplateMap();
         }
         return null;
     }

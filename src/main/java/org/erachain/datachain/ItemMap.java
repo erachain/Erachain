@@ -3,14 +3,9 @@ package org.erachain.datachain;
 import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
-import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.utils.Pair;
-import org.erachain.utils.ReverseComparator;
 import org.mapdb.*;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 import java.util.*;
 
@@ -294,7 +289,7 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
      * @return
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Pair<String, Iterable> getKeysByFilterAsArray(String filter, int offset, int limit) {
+    public Pair<String, Iterable> getKeysIteratorByFilterAsArray(String filter, int offset, int limit) {
 
         String filterLower = filter.toLowerCase();
         String[] filterArray = filterLower.split(" ");
@@ -322,13 +317,40 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
 
     // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<Long> getKeysByFilterAsArray(String filter, int offset, int limit) {
+
+        if (filter == null || filter.isEmpty()){
+            return new ArrayList<>();
+        }
+
+        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
+        if (resultKeys.getA() != null) {
+            return new ArrayList<>();
+        }
+
+        List<Long> result = new ArrayList<>();
+
+        Iterator<Long> iterator = resultKeys.getB().iterator();
+
+        while (iterator.hasNext()) {
+            Long key = iterator.next();
+            ItemCls item = get(key);
+            if (item != null)
+                result.add(key);
+        }
+
+        return result;
+    }
+
+    // get list items in name substring str
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public List<ItemCls> getByFilterAsArray(String filter, int offset, int limit) {
 
         if (filter == null || filter.isEmpty()){
             return new ArrayList<>();
         }
 
-        Pair<String, Iterable> resultKeys = getKeysByFilterAsArray(filter, offset, limit);
+        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
         if (resultKeys.getA() != null) {
             return new ArrayList<>();
         }

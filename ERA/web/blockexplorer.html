@@ -3203,7 +3203,7 @@
             var notDisplayPages = data.notDisplayPages;
             //Отображение последнего блока
             output += lastBlock(data.lastBlock);
-            var page = data.pageNumber;
+            var start = data.start;
             if (!notDisplayPages) {
                 //Отображение компонента страниц(вверху)
                 output += pagesComponentMixed(data);
@@ -3229,12 +3229,12 @@
             if (!notDisplayPages) {
                 //Отображение ссылки предыдущая
                 output += '<tr><td colspan=4>';
-                if (page > 1) {
-                    output += '<a href="' + makePageUri(page - 1, 'page') + '">' + data.Label_Previous;
+                if (start > 0) {
+                    output += '<a href="' + makePageUri(start - data.pageCount, 'start') + '">' + data.Label_Previous;
                 }
                 output += '<td colspan=4 align=right>';
-                if (page < data.pageCount) {
-                    output += '<a href="' + makePageUri(page + 1, 'page') + '">' + data.Label_Later;
+                if (start < data.arraySize) {
+                    output += '<a href="' + makePageUri(start + data.pageCount, 'start') + '">' + data.Label_Later;
                 }
                 output += '</table></td></tr></table>';
                 //Отображение компонента страниц(снизу)
@@ -3707,7 +3707,8 @@
             }
 
             if (params.hasOwnProperty('transactions')) {
-                asyncAjax('blockexplorer.json?transactions' + '&lang=' + params['lang'] + '&start=' + params['start'], 'transactions');
+                //asyncAjax('blockexplorer.json?transactions' + '&lang=' + params['lang'] + '&start=' + params['start'], 'transactions');
+                asyncAjax('blockexplorer.json?transactions' + '&lang=' + params['lang'] + '&page=' + params['page'], 'transactions');
                 document.title = title + ' - Search - ' + decodeURIComponent(params['transactions']);
                 return;
             }

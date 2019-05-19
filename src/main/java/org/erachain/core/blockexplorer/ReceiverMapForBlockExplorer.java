@@ -63,13 +63,13 @@ public class ReceiverMapForBlockExplorer {
         }
         //Преобразование данных из списка(list) в словарь(map)
         if (type == PersonCls.class) {
-            map = ConverterListInMap.personsJSON((List<PersonCls>) list);
+            map = ConverterListInMap.personsJSON((List<ItemCls>) list);
             if (list.size() != 0) {
                 //Берем последний ключ в найденном списке
                 key = ((List<PersonCls>) (list)).get(list.size() - 1).getKey();
             }
         } else if (type == AssetCls.class) {
-            map = ConverterListInMap.assetsJSON((List<AssetCls>) list, dcSet, langObj);
+            map = ConverterListInMap.assetsJSON((List<ItemCls>) list, dcSet, langObj);
             if (list.size() != 0) {
                 //Берем последний ключ в найденном списке
                 key = ((List<AssetCls>) (list)).get(list.size() - 1).getKey();

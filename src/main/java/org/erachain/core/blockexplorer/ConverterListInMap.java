@@ -10,7 +10,7 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
-import org.erachain.datachain.DCSet;
+import org.erachain.datachain.*;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
@@ -22,8 +22,95 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ConverterListInMap {
+public class ConverterListInMap<T> {
     private static final Logger logger = LoggerFactory.getLogger(ConverterListInMap.class);
+
+    public static Map mapJSON(Class type, List keys, JSONObject langObj) {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        DCSet dcSet = DCSet.getInstance();
+
+        if (type == PersonCls.class) {
+            ItemPersonMap sourceMap = dcSet.getItemPersonMap();
+            for (int i = 0; i < keys.size(); i++) {
+                Map personJSON = new LinkedHashMap();
+                PersonCls person = (PersonCls) sourceMap.get((Long)keys.get(i));
+                personJSON.put("key", person.getKey());
+                personJSON.put("name", person.getName());
+                personJSON.put("creator", person.getOwner().getAddress());
+                personJSON.put("img", Base64.encodeBase64String(person.getImage()));
+                personJSON.put("ico", Base64.encodeBase64String(person.getIcon()));
+                result.put(i, personJSON);
+            }
+        } else if (type == AssetCls.class) {
+            ItemAssetMap sourceMap = dcSet.getItemAssetMap();
+            for (int i = 0; i < keys.size(); i++) {
+                Map assetJSON = new LinkedHashMap();
+                AssetCls asset = (AssetCls) sourceMap.get((Long)keys.get(i));
+                assetJSON.put("key", asset.getKey());
+                assetJSON.put("name", asset.getName());
+                assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+                assetJSON.put("owner", asset.getOwner().getAddress());
+                assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
+                assetJSON.put("scale", asset.getScale());
+                assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
+                assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
+                assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
+                List<Order> orders = dcSet
+                        .getOrderMap().getOrders(asset.getKey());
+                List<Trade> trades = dcSet.getTradeMap()
+                        .getTrades(asset.getKey());
+                assetJSON.put("operations", orders.size() + trades.size());
+                result.put(i, assetJSON);
+            }
+        } else if (type == Block.class) {
+            BlockMap sourceMap = dcSet.getBlockMap();
+            for (int i = 0; i < keys.size(); i++) {
+                Map mapJSON = new LinkedHashMap();
+                Block item = sourceMap.get((Integer)keys.get(i));
+                mapJSON.put("height", item.getHeight());
+                mapJSON.put("signature", Base58.encode(item.getSignature()));
+                mapJSON.put("generator", item.getCreator().getAddress());
+                mapJSON.put("generatingBalance", item.getForgingValue());
+                mapJSON.put("target", item.getTarget());
+                mapJSON.put("winValue", item.getWinValue());
+                mapJSON.put("winValueTargeted", item.calcWinValueTargeted() - 100000);
+                mapJSON.put("transactionsCount", item.getTransactionCount());
+                mapJSON.put("timestamp", item.getTimestamp());
+                mapJSON.put("dateTime", BlockExplorer.timestampToStr(item.getTimestamp()));
+                item.loadHeadMind(dcSet);
+                mapJSON.put("totalFee", item.viewFeeAsBigDecimal());
+                Block.BlockHead blockHead = item.blockHead;
+                Fun.Tuple2<Integer, Integer> forgingPoint = blockHead.creator.getForgingData(DCSet.getInstance(), item.heightBlock);
+                mapJSON.put("deltaHeight", blockHead.heightBlock - forgingPoint.a);
+                result.put(i, mapJSON);
+            }
+        } else if (type == StatusCls.class) {
+            ItemStatusMap sourceMap = dcSet.getItemStatusMap();
+            for (int i = 0; i < keys.size(); i++) {
+                Map mapJSON = new LinkedHashMap();
+                StatusCls item = (StatusCls) sourceMap.get((Long)keys.get(i));
+                mapJSON.put("key", item.getKey());
+                mapJSON.put("name", item.getName());
+                mapJSON.put("description", item.getDescription());
+                mapJSON.put("owner", item.getOwner().getAddress());
+                result.put(i, mapJSON);
+            }
+        } else if (type == TemplateCls.class) {
+            ItemTemplateMap sourceMap = dcSet.getItemTemplateMap();
+            for (int i = 0; i < keys.size(); i++) {
+                Map mapJSON = new LinkedHashMap();
+                TemplateCls item = (TemplateCls) sourceMap.get((Long)keys.get(i));
+                mapJSON.put("key", item.getKey());
+                mapJSON.put("name", item.getName());
+                mapJSON.put("description", item.getDescription());
+                mapJSON.put("owner", item.getOwner().getAddress());
+                result.put(i, mapJSON);
+            }
+        }
+
+        return result;
+    }
 
     /**
      * Перегоняет информацию из списка блоков в словарь
@@ -65,12 +152,28 @@ public class ConverterListInMap {
      * @return словарь с добавленной информацией из списка персон
      * с ключами соответствующими номерам элементов в исходном списке
      */
-    public static Map personsJSON(List<PersonCls> persons) {
+    public static Map personsJSON(List<ItemCls> persons) {
         //Результирующий сортированный в порядке добавления словарь(map)
         Map result = new LinkedHashMap();
         for (int i = 0; i < persons.size(); i++) {
             Map personJSON = new LinkedHashMap();
-            PersonCls person = persons.get(i);
+            PersonCls person = (PersonCls)persons.get(i);
+            personJSON.put("key", person.getKey());
+            personJSON.put("name", person.getName());
+            personJSON.put("creator", person.getOwner().getAddress());
+            personJSON.put("img", Base64.encodeBase64String(person.getImage()));
+            personJSON.put("ico", Base64.encodeBase64String(person.getIcon()));
+            result.put(i, personJSON);
+        }
+        return result;
+    }
+
+    public static Map personsJSON(DCMap<Long, ItemCls> map, List<Long> keys) {
+        //Результирующий сортированный в порядке добавления словарь(map)
+        Map result = new LinkedHashMap();
+        for (int i = 0; i < keys.size(); i++) {
+            Map personJSON = new LinkedHashMap();
+            PersonCls person = (PersonCls)map.get(keys.get(i));
             personJSON.put("key", person.getKey());
             personJSON.put("name", person.getName());
             personJSON.put("creator", person.getOwner().getAddress());
@@ -88,12 +191,12 @@ public class ConverterListInMap {
      * @return словарь с добавленной информацией из списка активов
      * с ключами соответствующими номерам элементов в исходном списке
      */
-    public static Map assetsJSON(List<AssetCls> assets, DCSet dcSet, JSONObject langObj) {
+    public static Map assetsJSON(List<ItemCls> assets, DCSet dcSet, JSONObject langObj) {
         //Результирующий сортированный в порядке добавления словарь(map)
         Map result = new LinkedHashMap();
         for (int i = 0; i < assets.size(); i++) {
             Map assetJSON = new LinkedHashMap();
-            AssetCls asset = assets.get(i);
+            AssetCls asset = (AssetCls) assets.get(i);
             assetJSON.put("key", asset.getKey());
             assetJSON.put("name", asset.getName());
             assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
