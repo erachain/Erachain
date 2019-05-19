@@ -3076,7 +3076,7 @@
             output += lastBlock(data.lastBlock);
             //Отображение компонента страниц(вверху)
             var start = data.start;
-            output += pagesComponentBeauty(start, data.Label_Blocks, data.lastBlock.height, numberShiftDelta, 'startBlock');
+            output += pagesComponentBeauty(start, data.Label_Blocks, data.lastNumber, pageSze, 'start');
 
             //Отображение шапки таблицы
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
@@ -3128,7 +3128,7 @@
 
             output += '</table></td></tr></table>';
             //Отображение компонента страниц(снизу)
-            output += pagesComponentBeauty(start, data.Label_Blocks, data.lastBlock.height, numberShiftDelta, 'startBlock');
+            output += pagesComponentBeauty(start, data.Label_Blocks, data.lastNumber, pageSze, 'start');
 
             return output;
         }
@@ -3154,7 +3154,7 @@
             var start = data.start;
             if (!notDisplayPages) {
                 //Отображение компонента страниц(вверху)
-                output += pagesComponentBeauty(start, data.Label_Persons, data.numberLast, numberShiftDelta, 'startPerson');
+                output += pagesComponentBeauty(start, data.Label_Persons, data.lastNumber, pageSze, 'start');
             }
             //Отображение шапки таблицы
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
@@ -3189,7 +3189,7 @@
                 }
                 output += '</table></td></tr></table>';
                 //Отображение компонента страниц(снизу)
-                output += pagesComponentBeauty(start, data.Label_Persons, data.numberLast, numberShiftDelta, 'startPerson');
+                output += pagesComponentBeauty(start, data.Label_Persons, data.lastNumber, pageSze, 'start');
             }
             return output;
         }
@@ -3238,7 +3238,7 @@
                 }
                 output += '</table></td></tr></table>';
                 //Отображение компонента страниц(снизу)
-                // output += pagesComponentBeauty(start, data.Label_Persons, data.numberLast, numberShiftDelta, 'startPerson');
+                // output += pagesComponentBeauty(start, data.Label_Persons, data.lastNumber, pageSze, 'start');
                 output += pagesComponentMixed(data);
             }
             return output;
@@ -3252,7 +3252,7 @@
             output += lastBlock(data.lastBlock);
             var start = data.start;
             if (!notDisplayPages) {
-                output += pagesComponentBeauty(start, data.label_Assets, data.numberLast, numberShiftDelta, 'start');
+                output += pagesComponentBeauty(start, data.label_Assets, data.lastNumber, pageSze, 'start');
             }
             output += '<table width="1280" border=0><tr><td align=left><br>';
             output += '<a href="?assets"' + get_lang() + '><h3 style="display:inline;">' + data.label_Title + '</h3></a>';
@@ -3298,7 +3298,7 @@
                         + (start + numberShiftDelta) + get_lang() + '>+&gt;'; // + data.Label_Later;
                 }
                 output += '</table></td></tr></table>';
-                output += pagesComponentBeauty(start, data.label_Assets, data.numberLast, numberShiftDelta, 'start');
+                output += pagesComponentBeauty(start, data.label_Assets, data.lastNumber, pageSze, 'start');
             }
             return output;
         }
