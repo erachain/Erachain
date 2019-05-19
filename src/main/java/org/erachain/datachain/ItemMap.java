@@ -72,6 +72,11 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
         return key;
     }
 
+    @Override
+    public int size() {
+        return (int)key;
+    }
+
     public void setLastKey(long key) {
         // INCREMENT ATOMIC KEY IF EXISTS
         if (atomicKey != null) {

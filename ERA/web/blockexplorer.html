@@ -3248,7 +3248,7 @@
         function assets(data) {
             var output = '';
             var notDisplayPages = data.notDisplayPages;
-            var numberShiftDelta = data.numberOfRepresentsItemsOnPage;
+            var numberShiftDelta = data.pageSize;
             output += lastBlock(data.lastBlock);
             var start = data.start;
             if (!notDisplayPages) {
@@ -3266,35 +3266,36 @@
                 data.label_table_asset_amount + '<td><b>' + data.label_table_asset_divisible;
 
             //Отображение таблицы элементов активов
-            var length = Object.keys(data.Assets).length;
+            var length = Object.keys(data.pageItems).length;
             for (var i = length - 1; i >= 0; i--) {
+                var item = data.pageItems[i];
                 output += '<tr>';
-                output += '<td> <a href=?asset=' + encodeURIComponent(data.Assets[i].key) + get_lang() + '>';
-                output += '<b>' + data.Assets[i].key + '</b>: ';
-                if (data.Assets[i].icon.length > 0)
-                    output += '<img src="data:image/gif;base64,' + data.Assets[i].icon + '" width="30" /> ';
+                output += '<td> <a href=?asset=' + encodeURIComponent(item.key) + get_lang() + '>';
+                output += '<b>' + item.key + '</b>: ';
+                if (item.icon.length > 0)
+                    output += '<img src="data:image/gif;base64,' + item.icon + '" width="30" /> ';
 
-                output += htmlFilter(data.Assets[i].name);
+                output += htmlFilter(item.name);
                 output += '</a>';
-                output += '<td>' + data.Assets[i].operations;
+                output += '<td>' + item.operations;
                 //Здесь возникает html injection - решено убрать это поле
                 // table += '<td>' + data.assets[key].description.substr(0, 80);
-                output += '<td><a href =?addr=' + data.Assets[i].owner + get_lang()
-                    + '> ' + htmlFilter(data.Assets[i].owner) + '</a>';
-                output += '<td>' + htmlFilter(data.Assets[i].assetType);
-                output += '<td>' + data.Assets[i].quantity;
-                output += '<td>' + data.Assets[i].scale;
+                output += '<td><a href =?addr=' + item.owner + get_lang()
+                    + '> ' + htmlFilter(item.owner) + '</a>';
+                output += '<td>' + htmlFilter(item.assetType);
+                output += '<td>' + item.quantity;
+                output += '<td>' + item.scale;
             }
             if (!notDisplayPages) {
                 output += '<tr><td colspan=4>';
                 if (start > 1) {
                     output += '<a href=?assets&start='
-                        + (start - numberShiftDelta) + get_lang() + '>' + data.Label_Previous;
+                        + (start - numberShiftDelta) + get_lang() + '>&lt;-'; // + data.Label_Previous;
                 }
                 output += '<td colspan=4 align=right>';
                 if (data.numberLast > start) {
                     output += '<a href=?assets&start='
-                        + (start + numberShiftDelta) + get_lang() + '>' + data.Label_Later;
+                        + (start + numberShiftDelta) + get_lang() + '>+&gt;'; // + data.Label_Later;
                 }
                 output += '</table></td></tr></table>';
                 output += pagesComponentBeauty(start, data.label_Assets, data.numberLast, numberShiftDelta, 'start');
@@ -3307,7 +3308,7 @@
             var output = '';
             var notDisplayPages = data.notDisplayPages;
             output += lastBlock(data.lastBlock);
-            var page = data.pageNumber;
+            var start = data.start;
             if (!notDisplayPages) {
                 output += pagesComponentMixed(data);
             }
@@ -3323,33 +3324,34 @@
                 data.label_table_asset_amount + '<td><b>' + data.label_table_asset_divisible;
 
             //Отображение таблицы элементов активов
-            var length = Object.keys(data.Assets).length;
+            var length = Object.keys(data.pageItems).length;
             for (var i = length - 1; i >= 0; i--) {
+                var item = data.pageItems[i];
                 output += '<tr>';
-                output += '<td> <a href=?asset=' + encodeURIComponent(data.Assets[i].key) + get_lang() + '>';
-                output += '<b>' + data.Assets[i].key + '</b>: ';
-                if (data.Assets[i].icon.length > 0)
-                    output += '<img src="data:image/gif;base64,' + data.Assets[i].icon + '" width="30" /> ';
+                output += '<td> <a href=?asset=' + encodeURIComponent(item.key) + get_lang() + '>';
+                output += '<b>' + item.key + '</b>: ';
+                if (item.icon.length > 0)
+                    output += '<img src="data:image/gif;base64,' + item.icon + '" width="30" /> ';
 
-                output += htmlFilter(data.Assets[i].name);
+                output += htmlFilter(item.name);
                 output += '</a>';
-                output += '<td>' + data.Assets[i].operations;
+                output += '<td>' + item.operations;
                 //Здесь возникает html injection - решено убрать это поле
                 // table += '<td>' + data.assets[key].description.substr(0, 80);
-                output += '<td><a href =?addr=' + data.Assets[i].owner + get_lang()
-                    + '> ' + htmlFilter(data.Assets[i].owner) + '</a>';
-                output += '<td>' + htmlFilter(data.Assets[i].assetType);
-                output += '<td>' + data.Assets[i].quantity;
-                output += '<td>' + data.Assets[i].scale;
+                output += '<td><a href =?addr=' + item.owner + get_lang()
+                    + '> ' + htmlFilter(item.owner) + '</a>';
+                output += '<td>' + htmlFilter(item.assetType);
+                output += '<td>' + item.quantity;
+                output += '<td>' + item.scale;
             }
             if (!notDisplayPages) {
                 output += '<tr><td colspan=4>';
-                if (page > 1) {
-                    output += '<a href="' + makePageUri(page - 1, 'page') + '">' + data.Label_Previous;
+                if (start > 1) {
+                    output += '<a href="' + makePageUri(start - data.pageSize, 'start') + '">+&gt;'; // + data.Label_Previous;
                 }
                 output += '<td colspan=4 align=right>';
                 if (page < data.pageCount) {
-                    output += '<a href="' + makePageUri(page + 1, 'page') + '">' + data.Label_Later;
+                    output += '<a href="' + makePageUri(start + data.pageSize, 'start') + '">&lt;-'; // + data.Label_Later;
                 }
                 output += '</table></td></tr></table>';
                 output += pagesComponentMixed(data);

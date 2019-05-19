@@ -72,6 +72,64 @@ public class BlockExplorer {
         return output;
     }
 
+    public void makePage(Class type, int start, int numberOfRepresentsItemsOnPage,
+                         Map output, JSONObject langObj) {
+
+        DCMap map = dcSet.getMap(type);
+        ExplorerJsonLine element;
+        int size = map.size();
+
+        if (start < 1) {
+            start = size;
+        }
+
+        int key = start;
+        JSONArray array = new JSONArray();
+
+        while (key > start - numberOfRepresentsItemsOnPage && key > 0) {
+            element = (ExplorerJsonLine) map.get(key);
+            if (element != null) {
+                array.add(element.jsonForExolorerPage(langObj));
+                key--;
+            }
+        }
+
+        output.put("pageItems", array);
+        output.put("pageSize", numberOfRepresentsItemsOnPage);
+        output.put("listSize", array.size());
+        output.put("lastNumber", key);
+
+    }
+
+    public void makePage(Class type, long start, int numberOfRepresentsItemsOnPage,
+                         Map output, JSONObject langObj) {
+
+        DCMap map = dcSet.getMap(type);
+        ExplorerJsonLine element;
+        long size = map.size();
+
+        if (start < 1) {
+            start = size;
+        }
+
+        long key = start;
+        JSONArray array = new JSONArray();
+
+        while (key > start - numberOfRepresentsItemsOnPage && key > 0) {
+            element = (ExplorerJsonLine) map.get(key);
+            if (element != null) {
+                array.add(element.jsonForExolorerPage(langObj));
+                key--;
+            }
+        }
+
+        output.put("pageItems", array);
+        output.put("pageSize", numberOfRepresentsItemsOnPage);
+        output.put("listSize", array.size());
+        output.put("lastNumber", key);
+
+    }
+
     /**
      * @param type
      * @param keys
@@ -83,11 +141,13 @@ public class BlockExplorer {
     public void makePage(Class type, List<Integer> keys, int start, int numberOfRepresentsItemsOnPage,
                          Map output, JSONObject langObj) {
 
+        int size = keys.size();
+
         if (start < 1) {
-            start = 1;
+            start = size;
         }
 
-        long key = start;
+        int key = start;
         JSONArray array = new JSONArray();
 
         if (keys.size() > 0) {
@@ -102,25 +162,26 @@ public class BlockExplorer {
                 }
             }
         }
-        ;
 
-        output.put("items", array);
-        output.put("pageCount", numberOfRepresentsItemsOnPage);
-        output.put("lastNumber", key - 1);
+        output.put("pageItems", array);
+        output.put("pageSize", numberOfRepresentsItemsOnPage);
+        output.put("listSize", array.size());
+        output.put("lastNumber", key);
 
     }
 
     public void makePage(Class type, List<Long> keys, long start, int numberOfRepresentsItemsOnPage,
                      Map output, JSONObject langObj) {
 
-        if (start < 0) {
-            start = 0;
+        long size = keys.size();
+
+        if (start < 1) {
+            start = size;
         }
 
         long key = start;
         JSONArray array = new JSONArray();
 
-        long size = keys.size();
         if (size > 0) {
             DCMap map = dcSet.getMap(type);
             ExplorerJsonLine element;
@@ -134,14 +195,21 @@ public class BlockExplorer {
             }
         };
 
-        output.put("items", array);
-        output.put("pageCount", numberOfRepresentsItemsOnPage);
-        output.put("arraySize", array.size());
+        output.put("pageItems", array);
+        output.put("pageSize", numberOfRepresentsItemsOnPage);
+        output.put("listSize", array.size());
         output.put("lastNumber", key);
 
     }
 
-    public Map jsonQuerySearchLongKeys(Class type, String search, int start) throws WrongSearchException, Exception {
+    public Map jsonQueryPages(Class type, long start, int pageSize) {
+        Map result = new LinkedHashMap();
+        AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
+        makePage(type, start, pageSize, result, langObj);
+        return result;
+    }
+
+    public Map jsonQuerySearchPages(Class type, String search, int start, int pageSize) throws WrongSearchException, Exception {
         //Результирующий сортированный в порядке добавления словарь(map)
         Map result = new LinkedHashMap();
         List<Integer> keys = new ArrayList();
@@ -149,10 +217,12 @@ public class BlockExplorer {
         //В зависимости от выбранного языка(ru,en)
         AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
 
+        DCMap map = dcSet.getMap(type);
+
         try {
             //Если в строке ввели число
             if (search.matches("\\d+")) {
-                if (dcSet.getItemAssetMap().contains(Long.valueOf(search))) {
+                if (map.contains(Long.valueOf(search))) {
                     //Элемент найден - добавляем его
                     keys.add(Integer.valueOf(search));
                     //Не отображать для одного элемента навигацию и пагинацию
@@ -160,7 +230,6 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                DCMap map = dcSet.getMap(type);
                 keys = ((FilteredByStringArray)map).getKeysByFilterAsArray(search, 0, 100);
             }
         } catch (Exception e) {
@@ -172,15 +241,12 @@ public class BlockExplorer {
             throw new WrongSearchException();
         }
 
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 25;
-        makePage(AssetCls.class, keys, start,
-                numberOfRepresentsItemsOnPage, result, langObj);
+        makePage(type, keys, start, pageSize, result, langObj);
 
         return result;
     }
 
-    public Map jsonQuerySearchLongKeys(Class type, String search, long start) throws WrongSearchException, Exception {
+    public Map jsonQuerySearchPages(Class type, String search, long start, int pageSize) throws WrongSearchException, Exception {
         //Результирующий сортированный в порядке добавления словарь(map)
         Map result = new LinkedHashMap();
         List<Long> keys = new ArrayList();
@@ -188,10 +254,12 @@ public class BlockExplorer {
         //В зависимости от выбранного языка(ru,en)
         AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
 
+        DCMap map = dcSet.getMap(type);
+
         try {
             //Если в строке ввели число
             if (search.matches("\\d+")) {
-                if (dcSet.getItemAssetMap().contains(Long.valueOf(search))) {
+                if (map.contains(Long.valueOf(search))) {
                     //Элемент найден - добавляем его
                     keys.add(Long.valueOf(search));
                     //Не отображать для одного элемента навигацию и пагинацию
@@ -199,7 +267,6 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                DCMap map = dcSet.getMap(type);
                 keys = ((FilteredByStringArray)map).getKeysByFilterAsArray(search, 0, 100);
             }
         } catch (Exception e) {
@@ -211,14 +278,46 @@ public class BlockExplorer {
             throw new WrongSearchException();
         }
 
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 25;
-        makePage(AssetCls.class, keys, start,
-                numberOfRepresentsItemsOnPage, result, langObj);
+        makePage(type, keys, start, pageSize, result, langObj);
 
         return result;
     }
 
+    private Map jsonQueryBlocks(int start) {
+        return jsonQueryPages(Block.class, start, 25);
+    }
+
+    private Map jsonQueryPersons(long start) {
+        return jsonQueryPages(PersonCls.class, start, 25);
+    }
+
+    private Map jsonQueryAssets(long start) {
+        return jsonQueryPages(AssetCls.class, start, 25);
+    }
+
+    private Map jsonQueryStatuses(long start) throws Exception {
+        return jsonQueryPages(StatusCls.class, start, 25);
+    }
+
+    private Map jsonQueryTemplates(long start) throws Exception {
+        return jsonQueryPages(TemplateCls.class, start, 25);
+    }
+
+    private Map jsonQuerySearchTransactions(String search, long start) throws WrongSearchException, Exception {
+        return jsonQuerySearchPages(Transaction.class, search, start, 25);
+    }
+
+    private Map jsonQuerySearchAssets(String search, long start) throws WrongSearchException, Exception {
+        return jsonQuerySearchPages(Transaction.class, search, start, 25);
+    }
+
+    private Map jsonQuerySearchPersons(String search, long start) throws WrongSearchException, Exception {
+        return jsonQuerySearchPages(PersonCls.class, search, start, 25);
+    }
+
+    private Map jsonQuerySearchStatuses(String search, long start) throws WrongSearchException, Exception {
+        return jsonQuerySearchPages(StatusCls.class, search, start, 25);
+    }
 
     public static String timestampToStr ( long timestamp){
         return DateTimeFormat.timestamptoString(timestamp);
@@ -227,10 +326,8 @@ public class BlockExplorer {
     @SuppressWarnings("static-access")
     public Map jsonQueryMain(UriInfo info) throws WrongSearchException, Exception {
         Stopwatch stopwatchAll = new Stopwatch();
-        int start = 1;
+        int start = 0;
         start = checkAndGetIntParam(info, start, "start");
-        //int pageNumber = 1;
-        //pageNumber = checkAndGetIntParam(info, pageNumber, "page");
 
         int txOnPage = 100;
         String filter = "standart";
@@ -3027,389 +3124,6 @@ public class BlockExplorer {
 
     }
 
-    private <K, U> List<U> receiveListElements2(DCMap<K, U> map, List<K> keys, int page, int numberOfRepresentsItemsOnPage) {
-        //Параметр показывающий сколько элементов располагать на странице
-        output.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
-        List<U> list = new ArrayList<>();
-        int start = page * numberOfRepresentsItemsOnPage;
-        int end = page * numberOfRepresentsItemsOnPage - numberOfRepresentsItemsOnPage;
-        for (int i = start; i <= end; i++) {
-            U item = map.get(keys.get(i));
-            if (item == null) {
-                continue;
-            }
-            list.add(item);
-        }
-        return list;
-    }
-
-    private <U> List<U> receiveListElementsLong(DCMap<Long, U> map, long start, int numberOfRepresentsItemsOnPage) {
-        //Параметр показывающий сколько элементов располагать на странице
-        output.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
-        List<U> list = new ArrayList<>();
-        for (long i = start - numberOfRepresentsItemsOnPage + 1; i <= start; i++) {
-            U item = map.get(i);
-            if (item == null) {
-                continue;
-            }
-            list.add(item);
-        }
-        return list;
-    }
-    private <U> List<U> receiveListElementsInt(DCMap<Integer, U> map, int start, int numberOfRepresentsItemsOnPage) {
-        //Параметр показывающий сколько элементов располагать на странице
-        output.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
-        List<U> list = new ArrayList<>();
-        for (int i = start - numberOfRepresentsItemsOnPage + 1; i <= start; i++) {
-            U item = map.get(i);
-            if (item == null) {
-                continue;
-            }
-            list.add(item);
-        }
-        return list;
-    }
-
-    //  todo Gleb -----------------------------------------------------------------------------------------------------------------
-
-    private Map jsonQueryBlocks(int start) {
-        //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
-        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
-        //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCapBlocks(result, dcSet, langObj);
-        //Если номер с какого элемента отображать не задан - берем последний
-        if (start == -1) {
-            start = dcSet.getBlockMap().size();
-        }
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 40;
-        List<Block> blocks;
-        if (true)
-            blocks = receiveListElementsInt(dcSet.getBlockMap(), start, numberOfRepresentsItemsOnPage);
-        else
-            blocks = receiveListElements(Block.class, start, result, numberOfRepresentsItemsOnPage);
-
-        //Выделение map со списком блоков в соответствии с запрошенной страницей
-        Map blocksJSON = ConverterListInMap.blocksJSON(blocks, dcSet);
-        result.put("Blocks", blocksJSON);
-        result.put("start", start);
-        return result;
-    }
-
-    private Map jsonQueryPersons(long start) {
-        //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
-        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
-        //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCapPersons(result, dcSet, langObj);
-        //Если номер с какого элемента отображать не задан - берем последний
-        if (start == -1) {
-            start = dcSet.getItemPersonMap().size();
-        }
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 20;
-        //List<PersonCls> persons = receiveListElements(PersonCls.class, start, result, numberOfRepresentsItemsOnPage);
-        List<ItemCls> persons = receiveListElementsLong(dcSet.getItemPersonMap(), start, numberOfRepresentsItemsOnPage);
-
-        //Преобразование данных из списка(list) в словарь(map)
-        Map personsJSON = ConverterListInMap.personsJSON(persons);
-        //Добавление полученного словаря(map) в данные для отправки
-        result.put("Persons", personsJSON);
-        //Элемент, с которого идет отсчет страниц в обозревателе блоков(block explorer)
-        result.put("start", start);
-        result.put("numberLast", dcSet.getItemPersonMap().getLastKey());
-        return result;
-    }
-
-    private Map jsonQueryAssets(long start) {
-        //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
-        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
-        //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCapAssets(result, langObj);
-        //Если номер с какого элемента отображать не задан - берем последний
-        if (start == -1) {
-            start = dcSet.getItemAssetMap().getLastKey();
-        }
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 20;
-        //Получение списка активов из бд
-        //List<AssetCls> assets = receiveListElements(AssetCls.class, start, result, numberOfRepresentsItemsOnPage);
-        List<ItemCls> assets = receiveListElementsLong(dcSet.getItemAssetMap(), start, numberOfRepresentsItemsOnPage);
-        Map assetsJSON = ConverterListInMap.assetsJSON(assets, dcSet, langObj);
-        result.put("Assets", assetsJSON);
-        result.put("start", start);
-        result.put("numberLast", dcSet.getItemAssetMap().getLastKey());
-        return result;
-    }
-
-    private Map jsonQueryStatuses(long start) throws Exception {
-        //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
-        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
-        //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCapStatusesTemplates(result, langObj);
-        //Если номер с какого элемента отображать не задан - берем последний
-        if (start == -1) {
-            start = dcSet.getItemStatusMap().getLastKey();
-        }
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 20;
-        //Получение списка статусов из бд
-        List<StatusCls> statuses = receiveListElements(StatusCls.class, start, result, numberOfRepresentsItemsOnPage);
-        Map statusesJSON = ConverterListInMap.statusTemplateJSON(StatusCls.class, statuses);
-        result.put("Statuses", statusesJSON);
-        result.put("start", start);
-        result.put("numberLast", dcSet.getItemStatusMap().getLastKey());
-        return result;
-    }
-
-    private Map jsonQueryTemplates(long start) throws Exception {
-        //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
-        AdderHeadInfo.addHeadInfoCapStatusesTemplates(result, langObj);
-        //Если номер с какого элемента отображать не задан - берем последний
-        if (start == -1) {
-            start = dcSet.getItemTemplateMap().getLastKey();
-        }
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 20;
-        //Получение списка шаблонов из бд
-        List<TemplateCls> templates = receiveListElements(TemplateCls.class, start, result, numberOfRepresentsItemsOnPage);
-        Map templateJSON = ConverterListInMap.statusTemplateJSON(TemplateCls.class, templates);
-        result.put("Templates", templateJSON);
-        result.put("start", start);
-        result.put("numberLast", dcSet.getItemTemplateMap().getLastKey());
-        return result;
-    }
-
-    private <T> List<T> receiveListElements(Class<T> type, long start, Map output, int numberOfRepresentsItemsOnPage) {
-        //Параметр показывающий сколько элементов располагать на странице
-        output.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
-        List<T> list = new ArrayList<>();
-        //Получение списка блоков из бд
-        for (long i = start - numberOfRepresentsItemsOnPage + 1; i <= start; i++) {
-            //Если тип блок, то добавляем блок в список
-            if (type == Block.class) {
-                Block block = dcSet.getBlockMap().get((int) i);
-                if (block != null) {
-                    list.add((T) block);
-                }
-            }//Если тип первона, то добавляем персону в список
-            else if (type == PersonCls.class) {
-                //Получаем элемент из списка найденных личностей(person)
-                PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(i);
-                //Если элемент не null - то добавляем его
-                if (person != null) {
-                    list.add((T) person);
-                }
-            }//Если тип актив, то добавляем актив в список
-            else if (type == AssetCls.class) {
-                AssetCls asset = dcSet.getItemAssetMap().get(i);
-                if (asset != null) {
-                    list.add((T) asset);
-                }
-            }//Если тип статус, то добавляем статус в список
-            else if (type == StatusCls.class) {
-                StatusCls status = (StatusCls) dcSet.getItemStatusMap().get(i);
-                if (status != null) {
-                    list.add((T) status);
-                }
-            }//Если тип шаблон, то добавляем шаблон в список
-            else if (type == TemplateCls.class) {
-                TemplateCls template = (TemplateCls) dcSet.getItemTemplateMap().get(i);
-                if (template != null) {
-                    list.add((T) template);
-                }
-            } else {
-                logger.error("Incorrect type generic while converting list in Map");
-            }
-        }
-        //Возвращаем список элементов типа T
-        return list;
-    }
-
-
-    private Map jsonQuerySearchTransactions(String search, int page) throws WrongSearchException, Exception {
-        //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
-        List<ItemCls> listAssets = new ArrayList();
-        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
-        //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCapAssets(result, langObj);
-        try {
-            //Если в строке ввели число
-            if (search.matches("\\d+")) {
-                if (dcSet.getItemAssetMap().contains(Long.valueOf(search))) {
-                    //Элемент найден - добавляем его
-                    listAssets.add(dcSet.getItemAssetMap().get(Long.valueOf(search)));
-                    //Не отображать для одного элемента навигацию и пагинацию
-                    result.put("notDisplayPages", "true");
-                }
-            } else {
-                //Поиск элементов по имени
-                listAssets = dcSet.getItemAssetMap().getByFilterAsArray(search, 0, 100);
-            }
-        } catch (Exception e) {
-            logger.info("Wrong search while process assets... ");
-            throw new WrongSearchException();
-        }
-        if (listAssets == null) {
-            logger.info("Wrong search while process assets... ");
-            throw new WrongSearchException();
-        }
-        //Количество найденных элементов
-        int size = listAssets.size();
-        if (size == 0) {
-            logger.info("Wrong search while process assets... ");
-            throw new WrongSearchException();
-        }
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 25;
-        makePage(AssetCls.class, assetsKeys, start,
-                numberOfRepresentsItemsOnPage, result, langObj);
-
-        return result;
-    }
-
-    private Map jsonQuerySearchAssets(String search, long start) throws WrongSearchException, Exception {
-        //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
-        List<Long> assetsKeys = new ArrayList();
-        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
-        //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCapAssets(result, langObj);
-        try {
-            //Если в строке ввели число
-            if (search.matches("\\d+")) {
-                if (dcSet.getItemAssetMap().contains(Long.valueOf(search))) {
-                    //Элемент найден - добавляем его
-                    assetsKeys.add(Long.valueOf(search));
-                    //Не отображать для одного элемента навигацию и пагинацию
-                    result.put("notDisplayPages", "true");
-                }
-            } else {
-                //Поиск элементов по имени
-                //listAssets = dcSet.getItemAssetMap().getByFilterAsArray(search, 0, 100);
-                assetsKeys = dcSet.getItemAssetMap().getKeysByFilterAsArray(search, 0, 100);
-            }
-        } catch (Exception e) {
-            logger.error("Wrong search while process assets... " + e.getMessage());
-            throw new WrongSearchException();
-        }
-        if (assetsKeys == null || assetsKeys.isEmpty()) {
-            logger.info("Wrong search while process assets... ");
-            throw new WrongSearchException();
-        }
-
-        int numberOfRepresentsItemsOnPage = 25;
-        makePage(AssetCls.class, assetsKeys, start,
-                        numberOfRepresentsItemsOnPage, result, langObj);
-
-        return result;
-    }
-
-    private int evaluatePageCount_old(List listAssets, int numberOfRepresentsItemsOnPage) {
-        int pageCount = listAssets.size() / numberOfRepresentsItemsOnPage;
-        if (listAssets.size() % numberOfRepresentsItemsOnPage != 0) {
-            pageCount++;
-        }
-        return pageCount;
-    }
-
-    private Map jsonQuerySearchPersons(String search, long startPerson) throws WrongSearchException, Exception {
-        //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
-        List<ItemCls> listPersons = new ArrayList();
-        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
-        //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCapPersons(result, dcSet, langObj);
-        try {
-            //Если в строке ввели число
-            if (search.matches("\\d+")) {
-                if (dcSet.getItemPersonMap().contains(Long.valueOf(search))) {
-                    //Элемент найден - добавляем его
-                    listPersons.add(dcSet.getItemPersonMap().get(Long.valueOf(search)));
-                    //Не отображать для одного элемента навигацию и пагинацию
-                    result.put("notDisplayPages", "true");
-                }
-            } else {
-                //Поиск элементов по имени
-                listPersons = dcSet.getItemPersonMap().getKeysByFilterAsArray(search, 0, 100);
-            }
-        } catch (Exception e) {
-            //Ошибка при поиске - пробрасываем WrongSearchException для отображения пустого списка элементов
-            logger.error("Wrong search while process persons... " + e.getMessage());
-            throw new WrongSearchException();
-        }
-
-        if (listPersons == null || listPersons.isEmpty()) {
-            logger.info("Wrong search while process assets... ");
-            throw new WrongSearchException();
-        }
-
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 25;
-        makePage(AssetCls.class, Keys, start,
-                numberOfRepresentsItemsOnPage, result, langObj);
-
-        return result;
-    }
-
-    private Map jsonQuerySearchStatuses(String search, int startStatuses) throws WrongSearchException, Exception {
-        //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
-        //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
-        //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCapStatusesTemplates(result, langObj);
-
-        List<ItemCls> listStatuses = new ArrayList();
-
-        try {
-            //Если в строке ввели число
-            if (search.matches("\\d+")) {
-                if (dcSet.getItemStatusMap().contains(Long.valueOf(search))) {
-                    //Элемент найден - добавляем его
-                    listStatuses.add(dcSet.getItemStatusMap().get(Long.valueOf(search)));
-                    //Не отображать для одного элемента навигацию и пагинацию
-                    result.put("notDisplayPages", "true");
-                }
-            } else {
-                //Поиск элементов по имени
-                listStatuses = dcSet.getItemStatusMap().getByFilterAsArray(search, 0, 100);
-            }
-        } catch (Exception e) {
-            logger.info("Wrong search while process statuses... ");
-            throw new WrongSearchException();
-        }
-        if (listStatuses == null) {
-            logger.info("Wrong search while process assets... ");
-            throw new WrongSearchException();
-        }
-        //Количество найденных элементов
-        int size = listStatuses.size();
-        if (size == 0) {
-            logger.info("Wrong search while process assets... ");
-            throw new WrongSearchException();
-        }
-        //Параметр показывающий сколько элементов располагать на странице
-        int numberOfRepresentsItemsOnPage = 10;
-        //Вспомогательный объект
-        ReceiverMapForBlockExplorer receiverMapForBlockExplorer =
-                new ReceiverMapForBlockExplorer(startStatuses, listStatuses, numberOfRepresentsItemsOnPage);
-        //Преобразовать соответствующие данные
-        receiverMapForBlockExplorer.process(StatusCls.class, dcSet, langObj);
-        //Добавляем количество элементов для отображения на странице для отправки
-        result.put("numberOfRepresentsItemsOnPage", numberOfRepresentsItemsOnPage);
-        result.put("Statuses", receiverMapForBlockExplorer.getMap());
-        result.put("pageNumber", receiverMapForBlockExplorer.getPage());
-        int pageCount = evaluatePageCount(listStatuses, numberOfRepresentsItemsOnPage);
-        result.put("pageCount", pageCount);
-        result.put("numberLast", listStatuses.get(size - 1).getKey());
-        return result;
-    }
-
 
 //  todo Gleb -----------------------------------------------------------------------------------------------------------
 
@@ -3552,6 +3266,5 @@ public class BlockExplorer {
         return output;
 
     }
-
 
 }
