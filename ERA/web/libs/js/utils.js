@@ -2,6 +2,8 @@
 function fformat(text){
 
 if (text == null || text.lenght == 0) return "";
+text = text.toString();
+if (text.lenght <5) return text;
 
 var pref1 = text.substring(0,1);
 var pref2 = text.substring(1,2);

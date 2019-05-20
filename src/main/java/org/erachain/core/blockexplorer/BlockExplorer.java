@@ -14,6 +14,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.statuses.StatusCls;
+import org.erachain.core.item.templates.Template;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
@@ -300,6 +301,12 @@ public class BlockExplorer {
                         //search statuses
                         output.put("search", "status");
                         output.putAll(jsonQuerySearchPages(StatusCls.class, search, (int)start, pageSize));
+                        break;
+                    case "templates":
+                    case "template":
+                        //search templates
+                        output.put("search", "template");
+                        output.putAll(jsonQuerySearchPages(TemplateCls.class, search, (int)start, pageSize));
                         break;
                     case "blocks":
                     case "block":

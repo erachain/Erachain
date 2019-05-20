@@ -47,7 +47,8 @@ public class WebTransactionsHTML {
         tt.add(transaction);
         LinkedHashMap json = new LinkedHashMap();
         BlockExplorer.getInstance().transactionsJSON(json, null, tt, 0, BlockExplorer.pageSize);
-        LinkedHashMap tras_json = (LinkedHashMap) ((LinkedHashMap) json.get("Transactions")).get(0);
+        LinkedHashMap tras_json = (LinkedHashMap) ((LinkedHashMap) ((LinkedHashMap) json.get("Transactions"))
+                .get("transactions")).get(0);
 
         HashMap output = new HashMap();
 
