@@ -3175,12 +3175,13 @@ button.white-bgc[disabled]:focus,
             if (data.hasOwnProperty('error')) {
                 return '<h2>' + data.error + '</h2>';
             }
-            var numberShiftDelta = data.numberOfRepresentsItemsOnPage;
+            var notDisplayPages = data.notDisplayPages;
+            var numberShiftDelta = data.pageSize;
             //Отображение последнего блока
             output += lastBlock(data.lastBlock);
-            //Отображение компонента страниц(вверху)
             var start = data.start;
-            //output += pagesComponentBeauty(start, data.Label_Blocks, data.lastNumber, data.pageSize, 'start');
+            //Отображение компонента страниц(вверху)
+            //output += pagesComponentBeauty(start, data.Label_Persons, data.lastNumber, data.pageSize, 'start');
             output += pagesComponent2(data);
 
             //Отображение шапки таблицы
@@ -3209,32 +3210,23 @@ button.white-bgc[disabled]:focus,
             //for (var i = 0; i < length - 1; i++) {
             for (var i in data.pageItems) {
                 output += '<tr>' +
-                    '<td><a href=?block=' + data.Blocks[key].height + get_lang() + '>' + data.Blocks[key].height + '</a>' +
-                    '<td>' + addCommas(data.Blocks[key].target) +
-                    '<td>' + data.Blocks[key].dateTime +
-                    '<td>' + '<a href=?addr=' + data.Blocks[key].generator + get_lang() + '>' + data.Blocks[key].generator +
-                    '<td>' + addCommas(data.Blocks[key].generatingBalance) +
-                    '<td>' + data.Blocks[key].deltaHeight +
-                    '<td>' + addCommas(data.Blocks[key].winValue) +
-                    '<td>' + addCommas(data.Blocks[key].winValueTargeted) + '%' +
-                    '<td>' + data.Blocks[key].transactionsCount +
-                    '<td>' + addCommas(data.Blocks[key].totalFee);
+                    '<td><a href=?block=' + data.pageItems[i].height + get_lang() + '>' + data.pageItems[i].height + '</a>' +
+                    '<td>' + addCommas(data.pageItems[i].target) +
+                    '<td>' + data.pageItems[i].dateTime +
+                    '<td>' + '<a href=?addr=' + data.pageItems[i].generator + get_lang() + '>' + data.pageItems[i].generator +
+                    '<td>' + addCommas(data.pageItems[i].generatingBalance) +
+                    '<td>' + data.pageItems[i].deltaHeight +
+                    '<td>' + addCommas(data.pageItems[i].winValue) +
+                    '<td>' + addCommas(data.pageItems[i].winValueTargeted) + '%' +
+                    '<td>' + data.pageItems[i].transactionsCount +
+                    '<td>' + addCommas(data.pageItems[i].totalFee);
             }
 
             //Отображение ссылки предыдущая
-            output += '<tr><td colspan=4>';
-            if (start >= 1) {
-                output += '<a href=?startBlock=' + (start - numberShiftDelta) + get_lang() + '>' + data.Label_Previous;
-            }
-            //Отображение ссылки следующая
-            output += '<td colspan=4 align=right>';
-            if (data.lastBlock.height > start) {
-                output += '<a href=?startBlock=' + (start + numberShiftDelta) + get_lang() + '>' + data.Label_Later;
-            }
-
             output += '</table></td></tr></table>';
             //Отображение компонента страниц(снизу)
-            output += pagesComponentBeauty(start, data.Label_Blocks, data.lastNumber, data.pageSize, 'start');
+            //output += pagesComponentBeauty(start, data.Label_Blocks, data.lastNumber, data.pageSize, 'start');
+            output += pagesComponent2(data);
 
             return output;
         }
@@ -3498,8 +3490,7 @@ button.white-bgc[disabled]:focus,
             document.getElementById('menu_transactions').href = '?transactions&lang=' + params['lang'];
 
             document.getElementById('menu_top_100').href = '?top=100&lang=' + params['lang'];
-            document.getElementById('menu_percons').href = '?persons&startPerson&lang=' + params['lang'];
-            document.getElementById('menu_pals_asset').href = '?polls&asset=1&lang=' + params['lang'];
+            document.getElementById('menu_percons').href = '?persons&lang=' + params['lang'];
             document.getElementById('menu_assets').href = '?assets&lang=' + params['lang'];
             document.getElementById('menu_statuses').href = '?statuses&lang=' + params['lang'];
             document.getElementById('menu_peers').href = '?peers&lang=' + params['lang'];
@@ -3830,7 +3821,7 @@ button.white-bgc[disabled]:focus,
                 return;
             }
 
-            asyncAjax('blockexplorer.json?blocks' + '&lang=' + params['lang'], 'blocks');
+            asyncAjax('blockexplorer.json?blocks&start=' + params['start'] + '&lang=' + params['lang'], 'blocks');
 
             document.title = title;
 
@@ -3959,7 +3950,7 @@ button.white-bgc[disabled]:focus,
                                     <li id=menuTransactions><a href="?transactions" id=menu_transactions translate="true">Transactions</a></li>
                                     <li id=menuTop100Richest><a href="?top=100" id=menu_top_100 translate="true">Top 100
                                         Richest</a></li>
-                                    <li id=menuPersons><a href="?persons&startPerson" id=menu_percons translate="true">Persons</a></li>
+                                    <li id=menuPersons><a href="?persons" id=menu_percons translate="true">Persons</a></li>
                                     <li id=menuPolls><a href="?polls&asset=1" id=menu_pals_asset translate="true">Polls</a></li>
                                     <li id=menuAssets><a href="?assets" id=menu_assets translate="true">Assets</a></li>
                                     <li id=menuStatuses><a href="?statuses" id=menu_statuses translate="true">Statuses</a></li>

@@ -12,6 +12,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
@@ -363,27 +364,23 @@ public class Block implements ExplorerJsonLine {
     }
 
     public JSONObject jsonForExolorerPage(JSONObject langObj) {
-        DCSet dcSet = DCSet.getInstance();
+        JSONObject blockJSON = new JSONObject();
+        blockJSON.put("height", heightBlock);
+        blockJSON.put("signature", Base58.encode(signature));
+        blockJSON.put("generator", creator.getAddress());
+        blockJSON.put("generatingBalance", getForgingValue());
+        blockJSON.put("target", getTarget());
+        blockJSON.put("winValue", getWinValue());
+        blockJSON.put("winValueTargeted", calcWinValueTargeted() - 100000);
+        blockJSON.put("transactionsCount", getTransactionCount());
+        blockJSON.put("timestamp", getTimestamp());
+        blockJSON.put("dateTime", BlockExplorer.timestampToStr(getTimestamp()));
 
-        JSONObject json = new JSONObject();
-        json.put("key", this.getKey());
-        json.put("name", this.getName());
-
-        if (description != null && !description.isEmpty()) {
-            if (description.length() > 100) {
-                json.put("description", description.substring(0, 100));
-            } else {
-                json.put("description", description);
-            }
-        } else {
-            json.put("description", "");
-        }
-
-        json.put("creator", this.getOwner().getAddress());
-        if (icon != null)
-            json.put("icon", Base64.encodeBase64String(icon));
-
-        return json;
+        loadHeadMind(DCSet.getInstance());
+        blockJSON.put("totalFee", viewFeeAsBigDecimal());
+        Tuple2<Integer, Integer> forgingPoint = blockHead.creator.getForgingData(DCSet.getInstance(), heightBlock);
+        blockJSON.put("deltaHeight", blockHead.heightBlock - forgingPoint.a);
+        return blockJSON;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
