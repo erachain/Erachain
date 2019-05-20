@@ -319,51 +319,34 @@ button.white-bgc[disabled]:focus,
                             if (!data.noSearchedElements) {
                                 if (type == 'blocks') {
                                     document.getElementById('main').innerHTML = blocks(data);
-                                }
-
+                                } else
                                 if (type == 'peers') {
                                     document.getElementById('main').innerHTML = peers(data);
                                 } else
                                 if (type == 'transactions') {
                                     document.getElementById('main').innerHTML = transactions(data);
                                 } else
-                                if (type == 'transactionsSearch') {
-                                    document.getElementById('main').innerHTML = transactionsSearch(data);
-                                }
-
                                 if (type == 'templates') {
                                     document.getElementById('main').innerHTML = templates(data);
-                                }
-
+                                } else
                                 if (type == 'template') {
                                     document.getElementById('main').innerHTML = template(data);
-                                }
-
+                                } else
                                 if (type == 'statement') {
                                     document.getElementById('main').innerHTML = statement(data);
-                                }
-
-
+                                } else
                                 if (type == 'topRichest') {
                                     document.getElementById('main').innerHTML = topRichest(data);
-                                }
-
+                                } else
                                 if (type == 'persons') {
                                     document.getElementById('main').innerHTML = persons(data);
-                                }
-
-                                if (type == 'personsSearch') {
-                                    document.getElementById('main').innerHTML = personsSearch(data);
-                                }
-
+                                } else
                                 if (type == 'person') {
                                     document.getElementById('main').innerHTML = person(data);
-                                }
+                                } else
                                 if (type == 'person_asset') {
                                     document.getElementById('main').innerHTML = person_asset(data);
-                                }
-
-
+                                } else
                                 if (type == 'mainQuery') {
                                     document.getElementById('main').innerHTML = mainQuery(data);
                                     genFilterUrlForAll();
@@ -371,54 +354,40 @@ button.white-bgc[disabled]:focus,
                                     if (window.location.hash) {
                                         window.location.href = window.location.hash;
                                     }
-                                }
-
+                                } else
                                 if (type == 'aTs') {
-
                                     document.getElementById('main').innerHTML = aTs(data)
-                                }
-
+                                } else
                                 if (type == 'polls') {
                                     document.getElementById('main').innerHTML = oppa();
                                     document.getElementById('main').innerHTML = polls(data)
-                                }
-
+                                } else
                                 if (type == 'poll') {
                                     document.getElementById('main').innerHTML = poll(data)
 
-                                }
-
+                                } else
                                 if (type == 'assets') {
                                     document.getElementById('main').innerHTML = assets(data)
-                                }
-
+                                } else
                                 if (type == 'assetsSearch') {
                                     document.getElementById('main').innerHTML = assetsSearch(data)
-                                }
-
+                                } else
                                 if (type == 'asset') {
                                     document.getElementById('main').innerHTML = asset(data);
-                                }
-
+                                } else
                                 if (type == 'trades') {
                                     document.getElementById('main').innerHTML = trades(data)
-                                }
-
+                                } else
                                 if (type == 'search') {
                                     document.getElementById('main').innerHTML = search(data);
                                     $('#searchparam').val(data.search);
-                                }
+                                } else
                                 if (type == 'statuses') {
                                     document.getElementById('main').innerHTML = statuses(data);
-                                }
-
-                                if (type == 'statusesSearch') {
-                                    document.getElementById('main').innerHTML = statusesSearch(data);
-                                }
-
+                                } else
                                 if (type == 'status') {
                                     document.getElementById('main').innerHTML = status(data);
-                                }
+                                } else
                                 if (type == 'block') {
                                     document.getElementById('main').innerHTML = block(data);
                                 }
@@ -3463,16 +3432,6 @@ button.white-bgc[disabled]:focus,
             document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value) + get_lang() + '&search=' + par;
         }
 
-        function receiveNumberPage() {
-            var page;
-            if (params.hasOwnProperty('page') && isFinite(params['page'])) {
-                page = params['page'];
-            } else {
-                page = 1;
-            }
-            return page;
-        }
-
         function start() {
 
             params = parseUrlQuery();
@@ -3504,8 +3463,6 @@ button.white-bgc[disabled]:focus,
 
 
             var title = 'Erachain BlockExplorer';
-            var page = receiveNumberPage();
-
 
             if (params.hasOwnProperty('aTs')) {
                 asyncAjax('blockexplorer.json?aTs' + '&lang=' + params['lang'], 'aTs')
@@ -3606,7 +3563,7 @@ button.white-bgc[disabled]:focus,
                     allonOnePage = '';
                 }
 
-                asyncAjax('blockexplorer.json?addr=' + params['addr'] + "&page=" + page + '&start=' + start + showOnly + showWithout + allonOnePage + withoutBlocks + '&lang=' + params['lang'], 'mainQuery');
+                asyncAjax('blockexplorer.json?addr=' + params['addr'] + '&start=' + start + showOnly + showWithout + allonOnePage + withoutBlocks + '&lang=' + params['lang'], 'mainQuery');
 
                 if (params['addr'].substring(0, 1) == 'A') {
                     document.title = title + ' - AT Address - ' + params['addr'];
@@ -3731,7 +3688,7 @@ button.white-bgc[disabled]:focus,
 
 
             if (params.hasOwnProperty('block')) {
-                asyncAjax('blockexplorer.json?block=' + params['block'] + '&lang=' + params['lang'] + '&page=' + page, 'mainQuery');
+                asyncAjax('blockexplorer.json?block=' + params['block'] + '&lang=' + params['lang'] + '&start=' + start, 'mainQuery');
 
                 document.title = title + ' - Block - ' + params['block'];
 
@@ -3751,19 +3708,22 @@ button.white-bgc[disabled]:focus,
             if (params.hasOwnProperty('q')) {
                 if (params['search'] == 'transaction' || params['search'] == 'transaction') {
                     asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'] + '&page=' + params['page'], 'transactionsSearch');
+                        '&search=' + params['search'] + '&start=' + params['start'], 'transactions');
                 } else if (params['search'] == 'person' || params['search'] == 'persons') {
                     asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'] + '&page=' + params['page'], 'personsSearch');
+                        '&search=' + params['search'] + '&start=' + params['start'], 'persons');
                 } else if (params['search'] == 'asset' || params['search'] == 'assets') {
                     asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'] + '&page=' + params['page'], 'assetsSearch');
+                        '&search=' + params['search'] + '&start=' + params['start'], 'assets');
                 } else if (params['search'] == 'status' || params['search'] == 'statuses') {
                     asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'] + '&page=' + params['page'], 'statusesSearch');
+                        '&search=' + params['search'] + '&start=' + params['start'], 'statuses');
+                } else if (params['search'] == 'template' || params['search'] == 'templates') {
+                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
+                        '&search=' + params['search'] + '&start=' + params['start'], 'templates');
                 } else if (params['search'] == 'block' || params['search'] == 'blocks') {
                     asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'] + '&page=' + page, 'block');
+                        '&search=' + params['search'] + '&start=' + start, 'block');
                 }
                 document.title = title + ' - Search - ' + decodeURIComponent(params['q']);
                 document.getElementById('q').value = decodeURIComponent(params['q']);
@@ -3773,7 +3733,7 @@ button.white-bgc[disabled]:focus,
 
             if (params.hasOwnProperty('transactions')) {
                 //asyncAjax('blockexplorer.json?transactions' + '&lang=' + params['lang'] + '&start=' + params['start'], 'transactions');
-                asyncAjax('blockexplorer.json?transactions' + '&lang=' + params['lang'] + '&page=' + params['page'], 'transactions');
+                asyncAjax('blockexplorer.json?transactions' + '&lang=' + params['lang'] + '&start=' + params['start'], 'transactions');
                 document.title = title + ' - Search - ' + decodeURIComponent(params['transactions']);
                 return;
             }
@@ -3916,10 +3876,8 @@ button.white-bgc[disabled]:focus,
                                 <option value=transaction id=menu_transactions_op translate="true">Transactions</option>
                                 <option value=asset id=menu_assets_op translate="true">Assets</option>
                                 <option value=person id=menu_percons_op translate="true">Persons</option>
-                                <!--<option value=transaction translate="true">Transaction</option>-->
                                 <option value=status id=menu_statuses_op translate="true">Statuses</option>
-                                <!--<option value=template id=menu_templates_op translate="true">Templates</option>-->
-                                <!--<option value=template id=menu_documents_op translate="true">Documents</option>-->
+                                <option value=template id=menu_templates_op translate="true">Templates</option>
 
                             </select>
                         </div>
