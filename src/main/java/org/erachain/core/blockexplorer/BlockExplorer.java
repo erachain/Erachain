@@ -224,8 +224,6 @@ public class BlockExplorer {
         Stopwatch stopwatchAll = new Stopwatch();
         long start = 0;
         start = checkAndGetIntParam(info, start, "start");
-        if (start < pageSize >> 2)
-            start = pageSize >> 2;
 
         output = new LinkedHashMap();
         output.put("search", "block");

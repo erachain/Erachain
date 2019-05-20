@@ -67,7 +67,7 @@ function pagesComponent2(data) {
         output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize * 10, 'start') + '"><b>' + (start - pageSize * 10) + '&lt;&lt;</b></a>';
         //output += (start - pageSize * 10) + ' --- ';
     }
-    if (start > pageSize) {
+    if (start > pageSize + 1) {
         output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize, 'start') + '"><b>' + (start - pageSize) + '&lt;</b></a>';
         //output += (start - pageSize) + ' - ';
     }
