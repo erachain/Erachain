@@ -89,8 +89,8 @@ public class BlockExplorer {
         int key = start;
         JSONArray array = new JSONArray();
 
-        while (key > start - pageSize && key > 1) {
-            element = (ExplorerJsonLine) map.get(--key);
+        while (key > start - pageSize && key > 0) {
+            element = (ExplorerJsonLine) map.get(key--);
             if (element != null) {
                 array.add(element.jsonForExolorerPage(langObj));
             }
@@ -118,8 +118,8 @@ public class BlockExplorer {
         long key = start;
         JSONArray array = new JSONArray();
 
-        while (key > start - pageSize && key > 1) {
-            element = (ExplorerJsonLine) map.get(--key);
+        while (key > start - pageSize && key > 0) {
+            element = (ExplorerJsonLine) map.get(key--);
             if (element != null) {
                 array.add(element.jsonForExolorerPage(langObj));
             }
@@ -150,7 +150,7 @@ public class BlockExplorer {
             DCMap map = dcSet.getMap(type);
             ExplorerJsonLine element;
 
-            while (index > start - pageSize && index > 1) {
+            while (index > start - pageSize && index > 0) {
                 element = (ExplorerJsonLine) map.get(keys.get(--index));
                 if (element != null) {
                     array.add(element.jsonForExolorerPage(langObj));
