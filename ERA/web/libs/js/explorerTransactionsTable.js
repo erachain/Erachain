@@ -64,25 +64,25 @@ function pagesComponent2(data) {
 
     if (start > pageSize * 10) {
 
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize * 10, 'start') + '">' + (start - pageSize * 10) + '&lt;&lt;</a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize * 10, 'start') + '"><b>' + (start - pageSize * 10) + '&lt;&lt;</b></a>';
         //output += (start - pageSize * 10) + ' --- ';
     }
     if (start > pageSize) {
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize, 'start') + '">' + (start - pageSize) + '&lt;</a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize, 'start') + '"><b>' + (start - pageSize) + '&lt;</b></a>';
         //output += (start - pageSize) + ' - ';
     }
 
-    output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start, 'start') + '">[' + start + ']</a>';
+    output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start, 'start') + '"><b>[' + start + ']</b></a>';
 
     if (start + pageSize < listSize) {
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize, 'start') + '">&gt;' + (start + pageSize) + '</a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize, 'start') + '"><b>&gt;' + (start + pageSize) + '</b></a>';
     }
     if (start + pageSize * 10 < listSize) {
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize * 10, 'start') + '">&gt;&gt;' + (start + pageSize * 10) + '</a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize * 10, 'start') + '"><b>&gt;&gt;' + (start + pageSize * 10) + '</b></a>';
     }
 
     if (listSize != start)
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(listSize, 'start') + '">' + '&gt;&gt;&gt;' + listSize + '</a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(listSize, 'start') + '"><b>&gt;&gt;&gt;' + listSize + '</b></a>';
 
     return output;
 }
