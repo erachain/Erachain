@@ -26,12 +26,13 @@ function templates(data) {
     output += '<thead><tr><td><b>' + data.label_table_key + ': ' + data.label_table_name + '</b></td><td><b>' + data.label_table_description + '</b></td><td><b>' + data.label_table_creator + '</b></td></tr></thead>';
 
     //Отображение таблицы элементов шаблонов
-    var length = Object.keys(data.Templates).length;
-    for (var i = length - 1; i >= 0; i--) {
-        output += '<tr><td><a href="?template=' + data.Templates[i].key + get_lang() + '">' + data.Templates[i].key + ': ';
-        output += '<b>' + data.Templates[i].name + '</b></a></td>';
-        output += '<td>' + data.Templates[i].description.substr(0, 100) + '</td>';
-        output += '<td><a href=?addr=' + data.Templates[i].owner + get_lang() + '>' + htmlFilter(data.Templates[i].owner) + '</a></td>';
+    for (var i in data.pageItems) {
+    //var length = Object.keys(data.pageItems).length;
+    //for (var i = 0; i < length; i++) {
+        output += '<tr><td><a href="?template=' + data.pageItems[i].key + get_lang() + '">' + data.pageItems[i].key + ': ';
+        output += '<b>' + data.pageItems[i].name + '</b></a></td>';
+        output += '<td>' + data.pageItems[i].description.substr(0, 100) + '</td>';
+        output += '<td><a href=?addr=' + data.pageItems[i].owner + get_lang() + '>' + htmlFilter(data.pageItems[i].owner) + '</a></td>';
         output += '</tr>';
     }
 

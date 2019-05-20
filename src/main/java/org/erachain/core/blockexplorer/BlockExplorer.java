@@ -88,11 +88,10 @@ public class BlockExplorer {
         int key = start;
         JSONArray array = new JSONArray();
 
-        while (key > start - pageSize && key > 0) {
+        while (key > start - pageSize && key-- > 0) {
             element = (ExplorerJsonLine) map.get(key);
             if (element != null) {
                 array.add(element.jsonForExolorerPage(langObj));
-                key--;
             }
         }
 
@@ -117,11 +116,10 @@ public class BlockExplorer {
         long key = start;
         JSONArray array = new JSONArray();
 
-        while (key > start - pageSize && key > 0) {
+        while (key > start - pageSize && key-- > 0) {
             element = (ExplorerJsonLine) map.get(key);
             if (element != null) {
                 array.add(element.jsonForExolorerPage(langObj));
-                key--;
             }
         }
 
@@ -156,11 +154,10 @@ public class BlockExplorer {
             DCMap map = dcSet.getMap(type);
             ExplorerJsonLine element;
 
-            while (key < start + pageSize && key < keys.size()) {
+            while (key < start + pageSize && key++ < keys.size()) {
                 element = (ExplorerJsonLine) map.get(key);
                 if (element != null) {
                     array.add(element.jsonForExolorerPage(langObj));
-                    key++;
                 }
             }
         }
@@ -188,11 +185,10 @@ public class BlockExplorer {
             DCMap map = dcSet.getMap(type);
             ExplorerJsonLine element;
 
-            while (key < start + pageSize && key < size) {
+            while (key < start + pageSize && key++ < size) {
                 element = (ExplorerJsonLine) map.get(key);
                 if (element != null) {
                     array.add(element.jsonForExolorerPage(langObj));
-                    key++;
                 }
             }
         };

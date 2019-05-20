@@ -18,7 +18,7 @@ function statements(data){
 	output += '<tr><td><b>'+ data.Label_Timestamp+'<td><b>'+ data.Label_Creator +' <td><b>'+data.Label_Template+'<td><b>'+ data.Label_Statement; 
 
 	minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
-	for(var i  in data.Peers)
+	for(var i in data.Peers)
 	{
 		output += '<tr><td>'+ i;
 		output += '<td>'+ data.Peers[i].Timestamp+'<td>'+data.Peers[i].Creator+'<td>'+data.Peers[i].Template;

@@ -17,7 +17,7 @@ function statements(data) {
 
     minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
 
-    for (var i  in data.Statements) {
+    for (var i in data.Statements) {
         output += '<tr><td>' + i;
         output += '<td>' + data.Statements[i].Timestamp;
         output += '<td><a href =?block=' + data.Statements[i].Block + get_lang() + '>' + data.Statements[i].Block + '</a>';

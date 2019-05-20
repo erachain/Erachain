@@ -23,12 +23,13 @@ function statuses(data){
         '</b></td><td><b>' + data.label_table_creator + '</b></td></tr></thead>';
 
     //Отображение таблицы элементов статусов
-    var length = Object.keys(data.Statuses).length;
-    for (var i = length - 1; i >= 0; i--) {
-        output += '<tr><td><a href="?status=' + data.Statuses[i].key + get_lang()+ '">'+ data.Statuses[i].key + ': ';
-        output += '<b>'+ data.Statuses[i].name + '</b></a></td>';
-        output += '<td>' + data.Statuses[i].description.substr(0, 100) + '</td>';
-        output += '<td><a href=?addr='+ data.Statuses[i].owner + get_lang() +'>'+ htmlFilter(data.Statuses[i].owner) +'</a></td>';
+    for (var i in data.pageItems) {
+    //var length = Object.keys(data.pageItems).length;
+    //for (var i = 0; i < length; i++) {
+        output += '<tr><td><a href="?status=' + data.pageItems[i].key + get_lang()+ '">'+ data.pageItems[i].key + ': ';
+        output += '<b>'+ data.pageItems[i].name + '</b></a></td>';
+        output += '<td>' + data.pageItems[i].description + '</td>';
+        output += '<td><a href=?addr='+ data.pageItems[i].owner + get_lang() +'>'+ htmlFilter(data.pageItems[i].owner) +'</a></td>';
         output += '</tr>';
     }
     if (!notDisplayPages) {
@@ -75,12 +76,12 @@ function statusesSearch(data) {
         '</b></td><td><b>' + data.label_table_creator + '</b></td></tr></thead>';
 
     //Отображение таблицы элементов статусов
-    var length = Object.keys(data.Statuses).length;
+    var length = Object.keys(data.pageItems).length;
     for (var i = length - 1; i >= 0; i--) {
-        output += '<tr><td><a href="?status=' + data.Statuses[i].key + get_lang() + '">' + data.Statuses[i].key + ': ';
-        output += '<b>' + data.Statuses[i].name + '</b></a></td>';
-        output += '<td>' + data.Statuses[i].description.substr(0, 100) + '</td>';
-        output += '<td><a href=?addr=' + data.Statuses[i].owner + get_lang() + '>' + htmlFilter(data.Statuses[i].owner) + '</a></td>';
+        output += '<tr><td><a href="?status=' + data.pageItems[i].key + get_lang() + '">' + data.pageItems[i].key + ': ';
+        output += '<b>' + data.pageItems[i].name + '</b></a></td>';
+        output += '<td>' + data.pageItems[i].description.substr(0, 100) + '</td>';
+        output += '<td><a href=?addr=' + data.pageItems[i].owner + get_lang() + '>' + htmlFilter(data.pageItems[i].owner) + '</a></td>';
         output += '</tr>';
     }
     if (!notDisplayPages) {

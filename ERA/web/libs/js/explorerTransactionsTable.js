@@ -56,24 +56,26 @@ function pagesComponent2(data) {
     if (data.hasOwnProperty('start')) {
         start = data.start;
     } else {
-        var start = listSize >> 1;
+        var start = listSize;
     }
 
+    output += ' 1 ';
+
     if (start > pageSize * 10) {
-        output += start - pageSize * 10 + ' --- ';
+        output += (start - pageSize * 10) + ' --- ';
     }
     if (start > pageSize) {
-        output += start - pageSize + ' - ';
+        output += (start - pageSize) + ' - ';
     }
 
     if (data.hasOwnProperty('start'))
         output += '[' + start + ']';
 
     if (start + pageSize < listSize) {
-        output += ' + ' + start + pageSize;
+        output += ' + ' + (start + pageSize);
     }
     if (start + pageSize * 10 < listSize) {
-        output += ' +++ ' + start + pageSize * 10;
+        output += ' +++ ' + (start + pageSize * 10);
     }
 
     output += ' =' + data.listSize;

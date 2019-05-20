@@ -3166,13 +3166,14 @@
             output += '<tr><td><td><b>' + data.Label_key + ' <td><b>' +
                 data.Label_name + '<td><b>' + data.Label_creator;
             //Отображение таблицы элементов персон
-            var length = Object.keys(data.pageItems).length;
-            for (var i = 0; i < length - 1; i++) {
+            for (var i in data.pageItems) {
+            //var length = Object.keys(data.pageItems).length;
+            //for (var i = 0; i < length; i++) {
                 output += '<tr>';
-                output += ' <td><img src="personimage?key=' + data.Persons[i].key + '" width="100"/></td>';
-                output += '<td>' + addCommas(data.Persons[i].key) + '<td><a href=?person=' +
-                    data.Persons[i].key + get_lang() + '>' + data.Persons[i].name + '</a>';
-                output += '<td><a href=?addr=' + data.Persons[i].creator + get_lang() + '>' + data.Persons[i].creator + '</a>';
+                output += ' <td><img src="personimage?key=' + data.pageItems[i].key + '" width="100"/></td>';
+                output += '<td>' + addCommas(data.pageItems[i].key) + '<td><a href=?person=' +
+                    data.pageItems[i].key + get_lang() + '>' + data.pageItems[i].name + '</a>';
+                output += '<td><a href=?addr=' + data.pageItems[i].creator + get_lang() + '>' + data.pageItems[i].creator + '</a>';
             }
             if (!notDisplayPages) {
                 //Отображение ссылки предыдущая
@@ -3221,10 +3222,10 @@
             var length = Object.keys(data.pageItems).length;
             for (var i = 0; i < length - 1; i++) {
                 output += '<tr>';
-                output += ' <td><img src="personimage?key=' + data.Persons[i].key + '" width="100"/></td>';
-                output += '<td>' + addCommas(data.Persons[i].key) + '<td><a href=?person=' +
-                    data.Persons[i].key + get_lang() + '>' + data.Persons[i].name + '</a>';
-                output += '<td><a href=?addr=' + data.Persons[i].creator + get_lang() + '>' + data.Persons[i].creator + '</a>';
+                output += ' <td><img src="personimage?key=' + data.pageItems[i].key + '" width="100"/></td>';
+                output += '<td>' + addCommas(data.pageItems[i].key) + '<td><a href=?person=' +
+                    data.pageItems[i].key + get_lang() + '>' + data.pageItems[i].name + '</a>';
+                output += '<td><a href=?addr=' + data.pageItems[i].creator + get_lang() + '>' + data.pageItems[i].creator + '</a>';
             }
             if (!notDisplayPages) {
                 //Отображение ссылки предыдущая
