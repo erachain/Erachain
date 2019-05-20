@@ -1712,7 +1712,7 @@ public class BlockExplorer {
                 if (!(balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_A).equals("0.00000000")
                         && balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_B).equals("0.00000000")
                         && balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_C).equals("0.00000000")))
-                    bal_Assets.put(balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_ASSET_KEY), bal);
+                    bal_Assets.put(balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_ASSET_KEY).toString(), bal);
             }
 
         output.put("balances", bal_Assets);

@@ -3180,7 +3180,8 @@ button.white-bgc[disabled]:focus,
             output += lastBlock(data.lastBlock);
             //Отображение компонента страниц(вверху)
             var start = data.start;
-            output += pagesComponentBeauty(start, data.Label_Blocks, data.lastNumber, data.pageSize, 'start');
+            //output += pagesComponentBeauty(start, data.Label_Blocks, data.lastNumber, data.pageSize, 'start');
+            output += pagesComponent2(data);
 
             //Отображение шапки таблицы
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
@@ -3286,7 +3287,6 @@ button.white-bgc[disabled]:focus,
                 //Отображение компонента страниц(снизу)
                 //output += pagesComponentBeauty(start, data.Label_Persons, data.lastNumber, data.pageSize, 'start');
                 output += pagesComponent2(data);
-
             }
             return output;
         }
@@ -3757,14 +3757,6 @@ button.white-bgc[disabled]:focus,
                 return;
             }
 
-            if (params.hasOwnProperty('startBlock')) {
-                asyncAjax('blockexplorer.json?blocks&start=' + params['startBlock'] + '&lang=' + params['lang'], 'blocks');
-
-                document.title = title + ' - Start from ' + params['startBlock'] + ' block';
-
-                return;
-            }
-
             if (params.hasOwnProperty('q')) {
                 if (params['search'] == 'transaction' || params['search'] == 'transaction') {
                     asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
@@ -3796,19 +3788,10 @@ button.white-bgc[disabled]:focus,
             }
 
             if (params.hasOwnProperty('persons')) {
-                asyncAjax('blockexplorer.json?persons' + '&lang=' + params['lang'] + '&start=' + params['startPerson'], 'persons');
+                asyncAjax('blockexplorer.json?persons&lang=' + params['lang'] + '&start=' + params['start'], 'persons');
                 document.title = title + ' - Search - ' + decodeURIComponent(params['persons']);
                 return;
             }
-
-            if (params.hasOwnProperty('startPerson')) {
-                asyncAjax('blockexplorer.json?persons&start=' + params['startBlock'] + '&lang=' + params['lang'], 'persons');
-
-                document.title = title + ' - Start from ' + params['startPerson'] + ' persons';
-
-                return;
-            }
-
 
             if (params.hasOwnProperty('person')) {
                 if (params.hasOwnProperty('asset')) {
