@@ -15,13 +15,117 @@
     <script src="/index/libs/js/explorerTemplates.js"></script>
     <script src="/index/libs/js/explorerTransactionsTable.js"></script>
     <script src="/index/libs/js/third-party/qrcode.min.js"></script>
-    <link href="/index/libs/css/sidebar.css" rel="stylesheet">
+
     <script src="/index/libs/js/Base58.js" charset="utf-8"></script>
+
+    <link href="/index/libs/css/sidebar.css" rel="stylesheet">
 
     <style type="text/css">
         body {
             padding-top: 50px;
         }
+
+        .ll-blue-bgc {
+            background-color: #57D7FC;
+            color: #000;
+            //width: 100%;
+            //float: left;
+            margin: 0;
+            margin-top: -6px;
+            cursor: pointer;
+    border: 3px solid transparent;
+    box-sizing: border-box;
+    outline: none;
+    padding: 0.4em 2%;
+    position: relative;
+    -webkit-transition: all 0.15s;
+    transition: all 0.15s;
+    text-align: center;
+    vertical-align: middle;
+    margin: 0;
+    text-decoration: none;
+    font-size: 16px;
+        }
+
+button,
+.button {
+    cursor: pointer;
+    border: 3px solid transparent; /* !important; */
+    box-sizing: border-box;
+    outline: none;
+    padding: 0.4em 2%;
+    position: relative;
+    /* -webkit-transition: all 0.15s; */
+    transition: all 0.15s
+}
+.button[disabled] {
+    opacity: 0.5
+}
+button:hover, button:active, button:focus,
+.button:hover, .button:active, .button:focus {
+    text-decoration: none
+}
+.button.lightblue {
+    background-color: #00BCF2
+}
+.button.lightblue-bgc:hover,
+.button.lightblue-bgc:focus,
+.button.ll-blue-bgc:focus,
+.button.ll-blue-bgc:hover {
+    color: #000;
+    border: 3px solid #FFF  !important;
+}
+.button.ll-blue-bgc:active,
+.button.lightblue-bgc:active {
+    background-color: #009fcd  !important;
+}
+.button.ll-blue-bgc[disabled]:hover,
+.button.ll-blue-bgc[disabled]:focus,
+.button.lightblue-bgc[disabled]:hover,
+.button.lightblue-bgc[disabled]:focus {
+    border-color: #00BCF2 !important;
+    background-color: #00BCF2
+}
+.button.blue-bgc:hover,
+.button.blue-bgc:focus {
+    color: #FFF; /*aliceblue; */
+    border: 3px solid #FFF !important;
+}
+button.blue-bgc:active,
+.button.blue-bgc:active {
+    background-color: #0066b6
+}
+button.blue-bgc[disabled]:hover,
+button.blue-bgc[disabled]:focus,
+.button.blue-bgc[disabled]:hover,
+.button.blue-bgc[disabled]:focus {
+    border-color: #0078D7;  !important
+    background-color: #0078D7
+}
+button.white-bgc:hover,
+button.white-bgc:focus,
+.button.white-bgc:hover,
+.button.white-bgc:focus {
+    border: 3px solid #bfbfbf !important;
+}
+button.white-bgc:active,
+.button.white-bgc:active {
+    background-color: #d8d8d8
+}
+button.white-bgc[disabled]:hover,
+button.white-bgc[disabled]:focus,
+.button.white-bgc[disabled]:hover,
+.button.white-bgc[disabled]:focus {
+    border-color: #FFFFFF;
+    background-color: #FFFFFF
+}
+
+.lightblue-c {
+    color: #00BCF2
+}
+.blue-c {
+    color: #0078D7;
+}
 
         .sub-header {
             padding-bottom: 10px;
@@ -3100,8 +3204,9 @@
                 '<td><b>' + data.Label_Fee;
 
             //Отображение таблицы элементов блоков
-            var length = Object.keys(data.pageItems).length;
-            for (var i = 0; i < length - 1; i++) {
+            //var length = Object.keys(data.pageItems).length;
+            //for (var i = 0; i < length - 1; i++) {
+            for (var i in data.pageItems) {
                 output += '<tr>' +
                     '<td><a href=?block=' + data.Blocks[key].height + get_lang() + '>' + data.Blocks[key].height + '</a>' +
                     '<td>' + addCommas(data.Blocks[key].target) +
@@ -3219,8 +3324,9 @@
             output += '<tr><td><td><b>' + data.Label_key + ' <td><b>' +
                 data.Label_name + '<td><b>' + data.Label_creator;
             //Отображение таблицы элементов персон
-            var length = Object.keys(data.pageItems).length;
-            for (var i = 0; i < length - 1; i++) {
+            //var length = Object.keys(data.pageItems).length;
+            //for (var i = 0; i < length - 1; i++) {
+            for (var i in data.pageItems) {
                 output += '<tr>';
                 output += ' <td><img src="personimage?key=' + data.pageItems[i].key + '" width="100"/></td>';
                 output += '<td>' + addCommas(data.pageItems[i].key) + '<td><a href=?person=' +
@@ -3270,8 +3376,9 @@
                 data.label_table_asset_amount + '<td><b>' + data.label_table_asset_divisible;
 
             //Отображение таблицы элементов активов
-            var length = Object.keys(data.pageItems).length;
-            for (var i = 0; i < length - 1; i++) {
+            //var length = Object.keys(data.pageItems).length;
+            //for (var i = 0; i < length - 1; i++) {
+            for (var i in data.pageItems) {
                 var item = data.pageItems[i];
                 output += '<tr>';
                 output += '<td> <a href=?asset=' + encodeURIComponent(item.key) + get_lang() + '>';
@@ -3328,8 +3435,9 @@
                 data.label_table_asset_amount + '<td><b>' + data.label_table_asset_divisible;
 
             //Отображение таблицы элементов активов
-            var length = Object.keys(data.pageItems).length;
-            for (var i = 0; i < length - 1; i++) {
+            //var length = Object.keys(data.pageItems).length;
+            //for (var i = 0; i < length - 1; i++) {
+            for (var i in data.pageItems) {
                 var item = data.pageItems[i];
                 output += '<tr>';
                 output += '<td> <a href=?asset=' + encodeURIComponent(item.key) + get_lang() + '>';

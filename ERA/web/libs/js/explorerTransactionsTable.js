@@ -59,26 +59,30 @@ function pagesComponent2(data) {
         var start = listSize;
     }
 
-    output += ' 1 ';
+    if (1 != start)
+        output += '<a class="button ll-blue-bgc" href="' + makePageUri(1, 'start') + '"><b>' + ' 1&lt;&lt;&lt; </b></a>';
 
     if (start > pageSize * 10) {
-        output += (start - pageSize * 10) + ' --- ';
+
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize * 10, 'start') + '">' + (start - pageSize * 10) + '&lt;&lt;</a>';
+        //output += (start - pageSize * 10) + ' --- ';
     }
     if (start > pageSize) {
-        output += (start - pageSize) + ' - ';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize, 'start') + '">' + (start - pageSize) + '&lt;</a>';
+        //output += (start - pageSize) + ' - ';
     }
 
-    if (data.hasOwnProperty('start'))
-        output += '[' + start + ']';
+    output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start, 'start') + '">[' + start + ']</a>';
 
     if (start + pageSize < listSize) {
-        output += ' + ' + (start + pageSize);
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize, 'start') + '">&gt;' + (start + pageSize) + '</a>';
     }
     if (start + pageSize * 10 < listSize) {
-        output += ' +++ ' + (start + pageSize * 10);
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize * 10, 'start') + '">&gt;&gt;' + (start + pageSize * 10) + '</a>';
     }
 
-    output += ' =' + data.listSize;
+    if (listSize != start)
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(listSize, 'start') + '">' + '&gt;&gt;&gt;' + listSize + '</a>';
 
     return output;
 }

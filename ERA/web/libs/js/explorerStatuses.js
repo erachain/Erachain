@@ -76,8 +76,9 @@ function statusesSearch(data) {
         '</b></td><td><b>' + data.label_table_creator + '</b></td></tr></thead>';
 
     //Отображение таблицы элементов статусов
-    var length = Object.keys(data.pageItems).length;
-    for (var i = length - 1; i >= 0; i--) {
+    //var length = Object.keys(data.pageItems).length;
+    //for (var i = 0; i < length - 1; i++) {
+    for (var i in data.pageItems) {
         output += '<tr><td><a href="?status=' + data.pageItems[i].key + get_lang() + '">' + data.pageItems[i].key + ': ';
         output += '<b>' + data.pageItems[i].name + '</b></a></td>';
         output += '<td>' + data.pageItems[i].description.substr(0, 100) + '</td>';

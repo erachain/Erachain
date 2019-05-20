@@ -83,13 +83,15 @@ public class BlockExplorer {
 
         if (start < 1) {
             start = size;
+        } else {
+            output.put("start", start);
         }
 
         int key = start;
         JSONArray array = new JSONArray();
 
-        while (key > start - pageSize && key-- > 0) {
-            element = (ExplorerJsonLine) map.get(key);
+        while (key > start - pageSize && key > 0) {
+            element = (ExplorerJsonLine) map.get(key--);
             if (element != null) {
                 array.add(element.jsonForExolorerPage(langObj));
             }
@@ -111,16 +113,19 @@ public class BlockExplorer {
 
         if (start < 1) {
             start = size;
+        } else {
+            output.put("start", start);
         }
 
         long key = start;
         JSONArray array = new JSONArray();
 
-        while (key > start - pageSize && key-- > 0) {
-            element = (ExplorerJsonLine) map.get(key);
+        while (key > start - pageSize && key > 0) {
+            element = (ExplorerJsonLine) map.get(key--);
             if (element != null) {
                 array.add(element.jsonForExolorerPage(langObj));
             }
+
         }
 
         output.put("pageItems", array);
@@ -145,6 +150,8 @@ public class BlockExplorer {
 
         if (start < 1) {
             start = size;
+        } else {
+            output.put("start", start);
         }
 
         int key = start;
@@ -154,8 +161,8 @@ public class BlockExplorer {
             DCMap map = dcSet.getMap(type);
             ExplorerJsonLine element;
 
-            while (key < start + pageSize && key++ < keys.size()) {
-                element = (ExplorerJsonLine) map.get(key);
+            while (key < start + pageSize && key < keys.size()) {
+                element = (ExplorerJsonLine) map.get(key++);
                 if (element != null) {
                     array.add(element.jsonForExolorerPage(langObj));
                 }
@@ -176,6 +183,8 @@ public class BlockExplorer {
 
         if (start < 1) {
             start = size;
+        } else {
+            output.put("start", start);
         }
 
         long key = start;
@@ -185,8 +194,8 @@ public class BlockExplorer {
             DCMap map = dcSet.getMap(type);
             ExplorerJsonLine element;
 
-            while (key < start + pageSize && key++ < size) {
-                element = (ExplorerJsonLine) map.get(key);
+            while (key < start + pageSize && key < size) {
+                element = (ExplorerJsonLine) map.get(key++);
                 if (element != null) {
                     array.add(element.jsonForExolorerPage(langObj));
                 }
@@ -297,10 +306,6 @@ public class BlockExplorer {
         Stopwatch stopwatchAll = new Stopwatch();
         long start = 0;
         start = checkAndGetIntParam(info, start, "start");
-
-        int txOnPage = 100;
-        String filter = "standart";
-        boolean allOnOnePage = false;
 
         output = new LinkedHashMap();
         output.put("search", "block");
