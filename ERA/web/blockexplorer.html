@@ -3252,8 +3252,11 @@
             output += lastBlock(data.lastBlock);
             var start = data.start;
             if (!notDisplayPages) {
-                output += pagesComponentBeauty(start, data.label_Assets, data.lastNumber, data.pageSize, 'start');
+                //output += pagesComponentBeauty(start, data.label_Assets, data.lastNumber, data.pageSize, 'start');
             }
+
+            output += pagesComponent2(data);
+
             output += '<table width="1280" border=0><tr><td align=left><br>';
             output += '<a href="?assets"' + get_lang() + '><h3 style="display:inline;">' + data.label_Title + '</h3></a>';
             output += '<br><br>';

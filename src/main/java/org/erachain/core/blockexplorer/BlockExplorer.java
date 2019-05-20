@@ -50,6 +50,8 @@ import java.util.Map.Entry;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class BlockExplorer {
+
+    public static final int pageSize = 25;
     private static final String LANG_DEFAULT = "en";
     private static final Logger logger = LoggerFactory.getLogger(BlockExplorer.class);
     private volatile static BlockExplorer blockExplorer;
@@ -72,7 +74,7 @@ public class BlockExplorer {
         return output;
     }
 
-    public void makePage(Class type, int start, int numberOfRepresentsItemsOnPage,
+    public void makePage(Class type, int start, int pageSize,
                          Map output, JSONObject langObj) {
 
         DCMap map = dcSet.getMap(type);
@@ -86,7 +88,7 @@ public class BlockExplorer {
         int key = start;
         JSONArray array = new JSONArray();
 
-        while (key > start - numberOfRepresentsItemsOnPage && key > 0) {
+        while (key > start - pageSize && key > 0) {
             element = (ExplorerJsonLine) map.get(key);
             if (element != null) {
                 array.add(element.jsonForExolorerPage(langObj));
@@ -95,13 +97,13 @@ public class BlockExplorer {
         }
 
         output.put("pageItems", array);
-        output.put("pageSize", numberOfRepresentsItemsOnPage);
-        output.put("listSize", array.size());
+        output.put("pageSize", pageSize);
+        output.put("listSize", map.size());
         output.put("lastNumber", key);
 
     }
 
-    public void makePage(Class type, long start, int numberOfRepresentsItemsOnPage,
+    public void makePage(Class type, long start, int pageSize,
                          Map output, JSONObject langObj) {
 
         DCMap map = dcSet.getMap(type);
@@ -115,7 +117,7 @@ public class BlockExplorer {
         long key = start;
         JSONArray array = new JSONArray();
 
-        while (key > start - numberOfRepresentsItemsOnPage && key > 0) {
+        while (key > start - pageSize && key > 0) {
             element = (ExplorerJsonLine) map.get(key);
             if (element != null) {
                 array.add(element.jsonForExolorerPage(langObj));
@@ -124,8 +126,8 @@ public class BlockExplorer {
         }
 
         output.put("pageItems", array);
-        output.put("pageSize", numberOfRepresentsItemsOnPage);
-        output.put("listSize", array.size());
+        output.put("pageSize", pageSize);
+        output.put("listSize", map.size());
         output.put("lastNumber", key);
 
     }
@@ -134,11 +136,11 @@ public class BlockExplorer {
      * @param type
      * @param keys
      * @param start
-     * @param numberOfRepresentsItemsOnPage - если минус то обратный отсчет
+     * @param pageSize - если минус то обратный отсчет
      * @param output
      * @param langObj
      */
-    public void makePage(Class type, List<Integer> keys, int start, int numberOfRepresentsItemsOnPage,
+    public void makePage(Class type, List<Integer> keys, int start, int pageSize,
                          Map output, JSONObject langObj) {
 
         int size = keys.size();
@@ -154,7 +156,7 @@ public class BlockExplorer {
             DCMap map = dcSet.getMap(type);
             ExplorerJsonLine element;
 
-            while (key < start + numberOfRepresentsItemsOnPage && key < keys.size()) {
+            while (key < start + pageSize && key < keys.size()) {
                 element = (ExplorerJsonLine) map.get(key);
                 if (element != null) {
                     array.add(element.jsonForExolorerPage(langObj));
@@ -164,13 +166,13 @@ public class BlockExplorer {
         }
 
         output.put("pageItems", array);
-        output.put("pageSize", numberOfRepresentsItemsOnPage);
-        output.put("listSize", array.size());
+        output.put("pageSize", pageSize);
+        output.put("listSize", keys.size());
         output.put("lastNumber", key);
 
     }
 
-    public void makePage(Class type, List<Long> keys, long start, int numberOfRepresentsItemsOnPage,
+    public void makePage(Class type, List<Long> keys, long start, int pageSize,
                      Map output, JSONObject langObj) {
 
         long size = keys.size();
@@ -186,7 +188,7 @@ public class BlockExplorer {
             DCMap map = dcSet.getMap(type);
             ExplorerJsonLine element;
 
-            while (key < start + numberOfRepresentsItemsOnPage && key < size) {
+            while (key < start + pageSize && key < size) {
                 element = (ExplorerJsonLine) map.get(key);
                 if (element != null) {
                     array.add(element.jsonForExolorerPage(langObj));
@@ -196,10 +198,17 @@ public class BlockExplorer {
         };
 
         output.put("pageItems", array);
-        output.put("pageSize", numberOfRepresentsItemsOnPage);
-        output.put("listSize", array.size());
+        output.put("pageSize", pageSize);
+        output.put("listSize", keys.size());
         output.put("lastNumber", key);
 
+    }
+
+    public Map jsonQueryPages(Class type, int start, int pageSize) {
+        Map result = new LinkedHashMap();
+        AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
+        makePage(type, start, pageSize, result, langObj);
+        return result;
     }
 
     public Map jsonQueryPages(Class type, long start, int pageSize) {
@@ -283,42 +292,6 @@ public class BlockExplorer {
         return result;
     }
 
-    private Map jsonQueryBlocks(int start) {
-        return jsonQueryPages(Block.class, start, 25);
-    }
-
-    private Map jsonQueryPersons(long start) {
-        return jsonQueryPages(PersonCls.class, start, 25);
-    }
-
-    private Map jsonQueryAssets(long start) {
-        return jsonQueryPages(AssetCls.class, start, 25);
-    }
-
-    private Map jsonQueryStatuses(long start) throws Exception {
-        return jsonQueryPages(StatusCls.class, start, 25);
-    }
-
-    private Map jsonQueryTemplates(long start) throws Exception {
-        return jsonQueryPages(TemplateCls.class, start, 25);
-    }
-
-    private Map jsonQuerySearchTransactions(String search, long start) throws WrongSearchException, Exception {
-        return jsonQuerySearchPages(Transaction.class, search, start, 25);
-    }
-
-    private Map jsonQuerySearchAssets(String search, long start) throws WrongSearchException, Exception {
-        return jsonQuerySearchPages(Transaction.class, search, start, 25);
-    }
-
-    private Map jsonQuerySearchPersons(String search, long start) throws WrongSearchException, Exception {
-        return jsonQuerySearchPages(PersonCls.class, search, start, 25);
-    }
-
-    private Map jsonQuerySearchStatuses(String search, long start) throws WrongSearchException, Exception {
-        return jsonQuerySearchPages(StatusCls.class, search, start, 25);
-    }
-
     public static String timestampToStr ( long timestamp){
         return DateTimeFormat.timestamptoString(timestamp);
     }
@@ -326,7 +299,7 @@ public class BlockExplorer {
     @SuppressWarnings("static-access")
     public Map jsonQueryMain(UriInfo info) throws WrongSearchException, Exception {
         Stopwatch stopwatchAll = new Stopwatch();
-        int start = 0;
+        long start = 0;
         start = checkAndGetIntParam(info, start, "start");
 
         int txOnPage = 100;
@@ -387,40 +360,40 @@ public class BlockExplorer {
                     case "transaction":
                         //search transactions
                         output.put("search", type);
-                        output.putAll(jsonQuerySearchTransactions(search, start));
+                        output.putAll(jsonQuerySearchPages(Transaction.class, search, start, pageSize));
 
                         break;
                     case "persons":
                     case "person":
                         //search persons
                         output.put("search", type);
-                        output.putAll(jsonQuerySearchPersons(search, start));
+                        output.putAll(jsonQuerySearchPages(PersonCls.class, search, start, pageSize));
 
                         break;
                     case "assets":
                     case "asset":
                         //search assets
                         output.put("search", type);
-                        output.putAll(jsonQuerySearchAssets(search, start));
+                        output.putAll(jsonQuerySearchPages(AssetCls.class, search, start, pageSize));
                         break;
                     case "statuses":
                     case "status":
                         //search statuses
                         output.put("search", type);
-                        output.putAll(jsonQuerySearchStatuses(search, start));
+                        output.putAll(jsonQuerySearchPages(StatusCls.class, search, start, pageSize));
                         break;
                     case "blocks":
                     case "block":
                         //search block
                         output.put("search", "block");
-                        output.putAll(jsonQueryBlock(search, start));
+                        output.putAll(jsonQuerySearchPages(Block.class, search, (int)start, pageSize));
                         break;
                 }
 
             }
         } else if (info.getQueryParameters().containsKey("transactions")) {
             output.put("search", "transaction");
-            output.putAll(jsonQueryTransactions(null, start));
+            output.putAll(jsonQuerySearchPages(Transaction.class, null, start, pageSize));
             // polls list
             // top 100
         } else if (info.getQueryParameters().containsKey("top")) {
@@ -431,7 +404,7 @@ public class BlockExplorer {
             // assets list
         } else if (info.getQueryParameters().containsKey("assets")) {
             output.put("search", "asset");
-            output.putAll(jsonQueryAssets(start));
+            output.putAll(jsonQueryPages(AssetCls.class, start, pageSize));
             // polls list
         } else if (info.getQueryParameters().containsKey("polls")) {
             output.putAll(jsonQueryPools(info));
@@ -464,7 +437,7 @@ public class BlockExplorer {
                 }
             }
         } else if (info.getQueryParameters().containsKey("blocks")) {
-            output.putAll(jsonQueryBlocks(start));
+            output.putAll(jsonQueryPages(Block.class, (int)start, pageSize));
         }
         //peers
         else if (info.getQueryParameters().containsKey("peers")) {
@@ -476,31 +449,15 @@ public class BlockExplorer {
 //        }
         // address
         else if (info.getQueryParameters().containsKey("addr")) {
-            output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("addr"), start));
-            // name
-        } else if (info.getQueryParameters().containsKey("name")) {
-
-            if (info.getQueryParameters().containsKey("txOnPage")) {
-                txOnPage = Integer.valueOf((info.getQueryParameters().getFirst("txOnPage")));
-            }
-
-            if (info.getQueryParameters().containsKey("filter")) {
-                filter = info.getQueryParameters().getFirst("filter");
-            }
-
-            if (info.getQueryParameters().containsKey("allOnOnePage")) {
-                allOnOnePage = true;
-            }
-            output.putAll(
-                    jsonQueryName(info.getQueryParameters().getFirst("name"), start, txOnPage, filter, allOnOnePage));
+            output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("addr"), (int)start));
             // block
         } else if (info.getQueryParameters().containsKey("block")) {
             output.put("search", "block");
-            output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), start));
+            output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), (int)start));
         }
         // transaction
         else if (info.getQueryParameters().containsKey("transactions")) {
-            output.putAll(jsonQueryTransactions(info.getQueryParameters().getFirst("type"), start));
+            output.putAll(jsonQueryTransactions(info.getQueryParameters().getFirst("type"), (int)start));
         }
 
         // transaction
@@ -527,7 +484,7 @@ public class BlockExplorer {
         // persons list
         else if (info.getQueryParameters().containsKey("persons")) {
             output.put("search", "person");
-            output.putAll(jsonQueryPersons(start));
+            output.putAll(jsonQueryPages(PersonCls.class, start, pageSize));
         }
         // person
         else if (info.getQueryParameters().containsKey("person")) {
@@ -546,16 +503,16 @@ public class BlockExplorer {
         // templates list
         else if (info.getQueryParameters().containsKey("templates")) {
             output.put("search", "block");
-            output.putAll(jsonQueryTemplates(start));
+            output.putAll(jsonQueryPages(TemplateCls.class, start, pageSize));
         }
         // statises list
         else if (info.getQueryParameters().containsKey("statuses")) {
             output.put("search", "status");
-            output.putAll(jsonQueryStatuses(start));
+            output.putAll(jsonQueryPages(StatusCls.class, start, pageSize));
         }
         // template
         else if (info.getQueryParameters().containsKey("template")) {
-            output.put("search", "block");
+            output.put("search", "template");
             output.putAll(jsonQueryTemplate(Long.valueOf(info.getQueryParameters().getFirst("template"))));
         }
         // status
@@ -586,11 +543,11 @@ public class BlockExplorer {
         return output;
     }
 
-    private int checkAndGetIntParam(UriInfo info, int param, String name) {
+    private long checkAndGetIntParam(UriInfo info, long param, String name) {
         if (info.getQueryParameters().containsKey(name)
                 && !info.getQueryParameters().getFirst(name).equals("")
                 && !info.getQueryParameters().getFirst(name).equals("undefined")) {
-            param = Integer.valueOf((info.getQueryParameters().getFirst(name)));
+            param = Long.valueOf((info.getQueryParameters().getFirst(name)));
         }
         return param;
     }
@@ -1733,10 +1690,6 @@ public class BlockExplorer {
         return output;
     }
 
-    public LinkedHashMap transactionsJSON(Account account, List<Transaction> transactions) {
-        return transactionsJSON(account, transactions, 0, 25);
-    }
-
 
     @SuppressWarnings("static-access")
     private LinkedHashMap balanceJSON(Account account) {
@@ -2093,100 +2046,6 @@ public class BlockExplorer {
         return transactionJSON;
     }
 
-    public Map jsonQueryName(String query, int start, int txOnPage, String filter, boolean allOnOnePage) {
-        TreeSet<BlExpUnit> all = new TreeSet<>();
-        String name = query;
-
-        int[] txsTypeCount = new int[256];
-
-        Map output = new LinkedHashMap();
-
-        int txsCount;
-        int height = 1;
-
-        Block block = new GenesisBlock();
-        do {
-            int seqNo = 1;
-            for (Transaction transaction : block.getTransactions()) {
-                if ((transaction.getType() == Transaction.REGISTER_NAME_TRANSACTION
-                        && ((RegisterNameTransaction) transaction).getName().toString().equals(name))
-                        || (transaction.getType() == Transaction.UPDATE_NAME_TRANSACTION
-                        && ((UpdateNameTransaction) transaction).getName().toString().equals(name))
-                        || (transaction.getType() == Transaction.SELL_NAME_TRANSACTION
-                        && ((SellNameTransaction) transaction).getNameSale().toString().equals(name))
-                        || (transaction.getType() == Transaction.CANCEL_SELL_NAME_TRANSACTION
-                        && ((CancelSellNameTransaction) transaction).getName().equals(name))
-                        || (transaction.getType() == Transaction.BUY_NAME_TRANSACTION
-                        && ((BuyNameTransaction) transaction).getNameSale().toString().equals(name))) {
-                    all.add(new BlExpUnit(height, seqNo, transaction));
-                    txsTypeCount[transaction.getType() - 1]++;
-                }
-                seqNo++;
-            }
-            block = block.getChild(dcSet);
-            height++;
-        } while (block != null);
-
-        int size = all.size();
-        txsCount = size;
-
-        if (start == -1) {
-            start = size;
-        }
-
-        output.put("type", "name");
-
-        output.put("name", name);
-
-        Map txCountJSON = new LinkedHashMap();
-
-        txCountJSONPut(txsTypeCount, txsCount, txCountJSON);
-
-        txCountJSON.put("allCount", txsCount);
-
-        output.put("countTx", txCountJSON);
-
-        output.put("txOnPage", txOnPage);
-
-        output.put("filter", filter);
-
-        output.put("allOnOnePage", allOnOnePage);
-
-        output.put("start", start);
-
-        int end;
-
-        if (start > txOnPage) {
-            if (allOnOnePage) {
-                end = 1;
-            } else {
-                end = start - txOnPage;
-            }
-        } else {
-            end = 1;
-        }
-
-        output.put("end", end);
-
-        int counter = 0;
-
-        //AssetNames assetNames = new AssetNames();
-
-        for (BlExpUnit unit : all) {
-            if (counter >= size - start) {
-                output.put(size - counter, jsonUnitPrint(unit.getUnit())); //, assetNames));
-            }
-
-            if (counter > size - end) {
-                break;
-            }
-
-            counter++;
-        }
-
-        return output;
-    }
-
     private void txCountJSONPut(int[] txsTypeCount, int txsCount, Map txCountJSON) {
         if (txsCount > 0) {
             txCountJSON.put("txsCount", txsCount);
@@ -2240,12 +2099,12 @@ public class BlockExplorer {
     }
 
     @SuppressWarnings({"serial", "static-access"})
-    public Map jsonQueryTransactions(String typeStr, int pageNumber) {
+    public Map jsonQueryTransactions(String typeStr, int start) {
 
         List<Transaction> transactions;
         if (typeStr != null) {
             int type = Integer.parseInt(typeStr);
-            transactions = dcSet.getTransactionFinalMap().getTransactionsByTitleAndType(null, type, 50, true);
+            transactions = dcSet.getTransactionFinalMap().getTransactionsByTitleAndType(null, type, 333, true);
         } else {
             // берем все с перебором с последней
             TransactionFinalMap map = dcSet.getTransactionFinalMap();
@@ -2266,9 +2125,7 @@ public class BlockExplorer {
         LinkedHashMap output = new LinkedHashMap();
 
         // Transactions view
-        output.put("Transactions", transactionsJSON(null, transactions, (pageNumber - 1) * 25, pageNumber * 100));
-        output.put("pageCount", (int) Math.ceil((transactions.size()) / 100d));
-        output.put("pageNumber", pageNumber);
+        transactionsJSON(output, null, transactions, start, pageSize);
 
         output.put("type", "transactions");
 
@@ -2276,7 +2133,7 @@ public class BlockExplorer {
     }
 
     @SuppressWarnings({"serial", "static-access"})
-    public Map jsonQueryAddress(String address, int pageNumber) {
+    public Map jsonQueryAddress(String address, int start) {
 
         List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddress(address);
         LinkedHashMap output = new LinkedHashMap();
@@ -2306,9 +2163,7 @@ public class BlockExplorer {
         output.put("Balance", balanceJSON(new Account(address)));
 
         // Transactions view
-        output.put("Transactions", transactionsJSON(acc, transactions, (pageNumber - 1) * 100, pageNumber * 100));
-        output.put("pageCount", (int) Math.ceil((transactions.size()) / 100));
-        output.put("pageNumber", pageNumber);
+        transactionsJSON(output, acc, transactions, start, pageSize);
 
         output.put("type", "standardAccount");
 
@@ -2878,9 +2733,9 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryBlock(String query, int pageNumber) throws WrongSearchException {
+    public Map jsonQueryBlock(String query, int start) throws WrongSearchException {
 
-        Map output = new LinkedHashMap();
+        LinkedHashMap output = new LinkedHashMap();
         List<Object> all = new ArrayList<Object>();
         int[] txsTypeCount = new int[256];
         int aTTxsCount = 0;
@@ -2923,10 +2778,7 @@ public class BlockExplorer {
         }
 
         // Transactions view
-        output.put("Transactions", transactionsJSON(null, block.getTransactions(),
-                (pageNumber - 1) * 100, pageNumber * 100));
-        output.put("pageCount", (int) Math.ceil((block.getTransactionCount()) / 100d));
-        output.put("pageNumber", pageNumber);
+        transactionsJSON(output, null, block.getTransactions(), start, pageSize);
 
         int txsCount = all.size();
 
@@ -3127,16 +2979,17 @@ public class BlockExplorer {
 
 //  todo Gleb -----------------------------------------------------------------------------------------------------------
 
-    private LinkedHashMap transactionsJSON(Account account, List<Transaction> transactions, int fromIndex, int toIndex) {
-        LinkedHashMap output = new LinkedHashMap();
+    public void transactionsJSON(LinkedHashMap output, Account account, List<Transaction> transactions, int fromIndex, int pageSize) {
+        LinkedHashMap outputTXs = new LinkedHashMap();
         int i = 0;
         boolean outcome;
         int type;
         int height = Controller.getInstance().getMyHeight();
 
         LinkedHashMap transactionsJSON = new LinkedHashMap();
-        List<Transaction> transactionList = (toIndex == 0) ? transactions
-                : transactions.subList(fromIndex, Math.min(toIndex, transactions.size()));
+        int listSize = transactions.size();
+        List<Transaction> transactionList = (pageSize == 0) ? transactions
+                : transactions.subList(fromIndex, Math.min(fromIndex + pageSize, listSize));
         for (Transaction transaction : transactionList) {
 
             transaction.setDC(dcSet);
@@ -3246,24 +3099,30 @@ public class BlockExplorer {
             i++;
         }
 
-        output.put("transactions", transactionsJSON);
-        output.put("label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
-        output.put("label_date", Lang.getInstance().translateFromLangObj("Date", langObj));
-        output.put("label_type_transaction", Lang.getInstance().translateFromLangObj("Type", langObj));
-        output.put("label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_atside", Lang.getInstance().translateFromLangObj("Side", langObj));
-        output.put("label_asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
-        output.put("label_amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
-        output.put("label_confirmations", Lang.getInstance().translateFromLangObj("Confirmations", langObj));
-        output.put("label_recipient", Lang.getInstance().translateFromLangObj("Recipient", langObj));
-        output.put("label_size", Lang.getInstance().translateFromLangObj("Size", langObj));
-        output.put("label_seqNo", Lang.getInstance().translateFromLangObj("SeqNo", langObj));
-        output.put("label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
-        output.put("label_amount_key", Lang.getInstance().translateFromLangObj("Amount:Key", langObj));
-        output.put("label_fee", Lang.getInstance().translateFromLangObj("Fee", langObj));
-        output.put("label_transactions_table", Lang.getInstance().translateFromLangObj("Transactions", langObj));
+        outputTXs.put("transactions", transactionsJSON);
+        outputTXs.put("label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
+        outputTXs.put("label_date", Lang.getInstance().translateFromLangObj("Date", langObj));
+        outputTXs.put("label_type_transaction", Lang.getInstance().translateFromLangObj("Type", langObj));
+        outputTXs.put("label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        outputTXs.put("label_atside", Lang.getInstance().translateFromLangObj("Side", langObj));
+        outputTXs.put("label_asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
+        outputTXs.put("label_amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
+        outputTXs.put("label_confirmations", Lang.getInstance().translateFromLangObj("Confirmations", langObj));
+        outputTXs.put("label_recipient", Lang.getInstance().translateFromLangObj("Recipient", langObj));
+        outputTXs.put("label_size", Lang.getInstance().translateFromLangObj("Size", langObj));
+        outputTXs.put("label_seqNo", Lang.getInstance().translateFromLangObj("SeqNo", langObj));
+        outputTXs.put("label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
+        outputTXs.put("label_amount_key", Lang.getInstance().translateFromLangObj("Amount:Key", langObj));
+        outputTXs.put("label_fee", Lang.getInstance().translateFromLangObj("Fee", langObj));
+        outputTXs.put("label_transactions_table", Lang.getInstance().translateFromLangObj("Transactions", langObj));
 
-        return output;
+        output.put("Transactions", outputTXs);
+
+        output.put("pageSize", pageSize);
+        output.put("start", fromIndex);
+        output.put("listSize", listSize);
+
+        return;
 
     }
 

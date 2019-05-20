@@ -45,8 +45,9 @@ public class WebTransactionsHTML {
         this.langObj = langObj;
         List<Transaction> tt = new ArrayList<Transaction>();
         tt.add(transaction);
-        LinkedHashMap json = BlockExplorer.getInstance().transactionsJSON(null, tt);
-        LinkedHashMap tras_json = (LinkedHashMap) ((LinkedHashMap) json.get("transactions")).get(0);
+        LinkedHashMap json = new LinkedHashMap();
+        BlockExplorer.getInstance().transactionsJSON(json, null, tt, 0, BlockExplorer.pageSize);
+        LinkedHashMap tras_json = (LinkedHashMap) ((LinkedHashMap) json.get("Transactions")).get(0);
 
         HashMap output = new HashMap();
 

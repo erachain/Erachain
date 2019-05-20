@@ -46,6 +46,41 @@ function pagesComponent(data) {
     return output;
 }
 
+function pagesComponent2(data) {
+    var output = '';
+
+    var listSize = data.listSize;
+    var pageSize = data.pageSize;
+    var start = data.start;
+
+    if (data.hasOwnProperty('start')) {
+        start = data.start;
+    } else {
+        var start = listSize >> 1;
+    }
+
+    if (start > pageSize * 10) {
+        output += start - pageSize * 10 + ' --- ';
+    }
+    if (start > pageSize) {
+        output += start - pageSize + ' - ';
+    }
+
+    if (data.hasOwnProperty('start'))
+        output += '[' + start + ']';
+
+    if (start + pageSize < listSize) {
+        output += ' + ' + start + pageSize;
+    }
+    if (start + pageSize * 10 < listSize) {
+        output += ' +++ ' + start + pageSize * 10;
+    }
+
+    output += ' =' + data.listSize;
+
+    return output;
+}
+
 function pagesComponentMixed(data) {
     if (data.pageCount < 10) {
         return pagesComponent(data);
@@ -128,7 +163,9 @@ function transactions_Table(data) {
     console.log("data=")
     console.log(data)
     var output = data.Transactions.label_transactions_table + ':<br>';
-    output += pagesComponentMixed(data);
+    //output += pagesComponentMixed(data);
+    output += pagesComponent2(data);
+
     output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
         ' class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
 
@@ -156,7 +193,9 @@ function transactions_Table(data) {
 
     }
     output += '</table></td></tr></table>';
-    output += pagesComponentMixed(data);
+    //output += pagesComponentMixed(data);
+    output += pagesComponent2(data);
+
 
     return output;
 
