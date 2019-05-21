@@ -3433,7 +3433,6 @@ button.white-bgc[disabled]:focus,
 
             params = parseUrlQuery();
 
-
             document.getElementById('main').innerHTML = '';
             if (params['lang'] == null) params['lang'] = "en";
             $('#selectID').val('block');
@@ -3442,15 +3441,13 @@ button.white-bgc[disabled]:focus,
 
 //	document.getElementById('home').href = document.location.pathname;
             document.getElementById('home2').href = document.location.pathname + '?lang=' + params['lang'];
-
             document.getElementById('menu_transactions').href = '?transactions&lang=' + params['lang'];
-
-            document.getElementById('menu_top_100').href = '?top=100&lang=' + params['lang'];
-            document.getElementById('menu_percons').href = '?persons&lang=' + params['lang'];
+            document.getElementById('menu_persons').href = '?persons&lang=' + params['lang'];
             document.getElementById('menu_assets').href = '?assets&lang=' + params['lang'];
             document.getElementById('menu_statuses').href = '?statuses&lang=' + params['lang'];
-            document.getElementById('menu_peers').href = '?peers&lang=' + params['lang'];
             document.getElementById('menu_templates').href = '?templates&lang=' + params['lang'];
+            document.getElementById('menu_top_100').href = '?top=100&lang=' + params['lang'];
+            document.getElementById('menu_peers').href = '?peers&lang=' + params['lang'];
 
             document.getElementById('menuBlocks').setAttribute('class', '');
             document.getElementById('menuTop100Richest').setAttribute('class', '');
@@ -3874,10 +3871,9 @@ button.white-bgc[disabled]:focus,
                                 <option value=block id=home2_op translate="true">Blocks</option>
                                 <option value=transaction id=menu_transactions_op translate="true">Transactions</option>
                                 <option value=asset id=menu_assets_op translate="true">Assets</option>
-                                <option value=person id=menu_percons_op translate="true">Persons</option>
+                                <option value=person id=menu_persons_op translate="true">Persons</option>
                                 <option value=status id=menu_statuses_op translate="true">Statuses</option>
                                 <option value=template id=menu_templates_op translate="true">Templates</option>
-
                             </select>
                         </div>
                         <div class="input-group">
@@ -3905,14 +3901,13 @@ button.white-bgc[disabled]:focus,
                                 <ul role="tablist" class="nav nav-tabs">
                                     <li id=menuBlocks><a href="#" id=home2 translate="true">Blocks</a></li>
                                     <li id=menuTransactions><a href="?transactions" id=menu_transactions translate="true">Transactions</a></li>
-                                    <li id=menuTop100Richest><a href="?top=100" id=menu_top_100 translate="true">Top 100
-                                        Richest</a></li>
-                                    <li id=menuPersons><a href="?persons" id=menu_percons translate="true">Persons</a></li>
+                                    <li id=menuPersons><a href="?persons" id=menu_persons translate="true">Persons</a></li>
                                     <li id=menuPolls><a href="?polls&asset=1" id=menu_pals_asset translate="true">Polls</a></li>
                                     <li id=menuAssets><a href="?assets" id=menu_assets translate="true">Assets</a></li>
                                     <li id=menuStatuses><a href="?statuses" id=menu_statuses translate="true">Statuses</a></li>
-                                    <li id=menuPeers><a href="?peers" id=menu_peers translate="true">Peers</a></li>
                                     <li id=menuTemplates><a href="?templates" id=menu_templates translate="true">Templates</a></li>
+                                    <li id=menuTop100Richest><a href="?top=100" id=menu_top_100 translate="true">Top 100 Richest</a></li>
+                                    <li id=menuPeers><a href="?peers" id=menu_peers translate="true">Peers</a></li>
                                 </ul>
                             </div>
                         </div>

@@ -278,6 +278,7 @@ public class BlockExplorer {
                     case "txs":
                     case "transactions":
                     case "transaction":
+                    case "tx":
                         //search transactions
                         output.put("search", "transaction");
                         output.putAll(jsonQuerySearchPages(Transaction.class, search, (int)start, pageSize));
@@ -2052,7 +2053,7 @@ public class BlockExplorer {
         transactionsJSON(output, null, transactions, start, pageSize,
                 Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" + size));
 
-        output.put("search", "transactions");
+        output.put("search", "transaction");
         output.put("type", "transactions");
 
         return output;
@@ -2094,6 +2095,7 @@ public class BlockExplorer {
                 Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" + limit));
 
         output.put("type", "standardAccount");
+        output.put("search", "address");
 
         return output;
     }
@@ -2657,6 +2659,7 @@ public class BlockExplorer {
             }
         }
 
+        output.put("search", "transaction");
 
         return output;
     }
