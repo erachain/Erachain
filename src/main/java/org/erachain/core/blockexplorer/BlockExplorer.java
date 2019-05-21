@@ -2049,7 +2049,8 @@ public class BlockExplorer {
         LinkedHashMap output = new LinkedHashMap();
 
         // Transactions view
-        transactionsJSON(output, null, transactions, start, pageSize);
+        transactionsJSON(output, null, transactions, start, pageSize,
+                Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" + size));
 
         output.put("search", "transactions");
         output.put("type", "transactions");
@@ -2060,7 +2061,8 @@ public class BlockExplorer {
     @SuppressWarnings({"serial", "static-access"})
     public Map jsonQueryAddress(String address, int start) {
 
-        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressLimit(address, 100);
+        int limit = 100;
+        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressLimit(address, limit);
         LinkedHashMap output = new LinkedHashMap();
         output.put("account", address);
 
@@ -2088,7 +2090,8 @@ public class BlockExplorer {
         output.put("Balance", balanceJSON(new Account(address)));
 
         // Transactions view
-        transactionsJSON(output, acc, transactions, start, pageSize);
+        transactionsJSON(output, acc, transactions, start, pageSize,
+                Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" + limit));
 
         output.put("type", "standardAccount");
 
@@ -2703,7 +2706,8 @@ public class BlockExplorer {
         }
 
         // Transactions view
-        transactionsJSON(output, null, block.getTransactions(), start, pageSize);
+        transactionsJSON(output, null, block.getTransactions(), start, pageSize,
+                Lang.getInstance().translateFromLangObj("Transactions found", langObj));
 
         int txsCount = all.size();
 
@@ -2904,7 +2908,8 @@ public class BlockExplorer {
 
 //  todo Gleb -----------------------------------------------------------------------------------------------------------
 
-    public void transactionsJSON(LinkedHashMap output, Account account, List<Transaction> transactions, int fromIndex, int pageSize) {
+    public void transactionsJSON(LinkedHashMap output, Account account, List<Transaction> transactions, int fromIndex, int pageSize,
+                                 String title) {
         LinkedHashMap outputTXs = new LinkedHashMap();
         int i = 0;
         boolean outcome;
@@ -3039,7 +3044,7 @@ public class BlockExplorer {
         outputTXs.put("label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
         outputTXs.put("label_amount_key", Lang.getInstance().translateFromLangObj("Amount:Key", langObj));
         outputTXs.put("label_fee", Lang.getInstance().translateFromLangObj("Fee", langObj));
-        outputTXs.put("label_transactions_table", Lang.getInstance().translateFromLangObj("Transactions", langObj));
+        outputTXs.put("label_transactions_table", title);
 
         output.put("Transactions", outputTXs);
 
