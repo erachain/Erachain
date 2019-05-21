@@ -33,7 +33,7 @@ public class SellOrdersTableModel extends SortedListTableModelCls<Long, Order> i
     private long wantKey;
 
     public SellOrdersTableModel(AssetCls have, AssetCls want) {
-        super(new String[]{"Have", "Price", "Want"}, true);
+        super(new String[]{"Have", "Price", "Who"}, true);
 
         this.have = have;
         this.want = want;
@@ -116,6 +116,10 @@ public class SellOrdersTableModel extends SortedListTableModelCls<Long, Order> i
                 // It shows unacceptably small amount of red.
                 BigDecimal amount = order.getAmountHaveLeft();
                 String amountStr = NumberAsString.formatAsString(amount, have.getScale());
+
+                if (isMine)
+                    amountStr = "<html><b>" + amountStr + "</b></html>";
+
                 return amountStr;
 
             case COLUMN_PRICE:
@@ -124,14 +128,19 @@ public class SellOrdersTableModel extends SortedListTableModelCls<Long, Order> i
                     return "<html><b>" + Lang.getInstance().translate("Total") + "</b></html>";
 
                 BigDecimal price = Order.calcPrice(order.getAmountHave(), order.getAmountWant(), 2);
-                return NumberAsString.formatAsString(price.stripTrailingZeros());
+                amountStr = NumberAsString.formatAsString(price.stripTrailingZeros());
+
+                if (isMine)
+                    amountStr = "<html><b>" + amountStr + "</b></html>";
+
+                return amountStr;
 
             case COLUMN_AMOUNT_WANT:
 
                 if (row == this.orders.size())
                     return "<html><i>" + NumberAsString.formatAsString(sumAmountWant, want.getScale()) + "</i></html>";
 
-                amountStr = NumberAsString.formatAsString(order.getAmountWantLeft(), want.getScale());
+                amountStr = order.getCreator().getPersonAsString();
 
                 if (isMine)
                     amountStr = "<html><b>" + amountStr + "</b></html>";

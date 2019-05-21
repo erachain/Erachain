@@ -36,7 +36,7 @@ public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> im
     private long wantKey;
 
     public BuyOrdersTableModel(AssetCls have, AssetCls want) {
-        super(new String[]{"Want", "Price", "Have"}, true);
+        super(new String[]{"Who", "Price", "Have"}, true);
 
         this.have = have;
         this.want = want;
@@ -120,27 +120,13 @@ public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> im
 
         switch (column) {
 
-            /*
-             * case COLUMN_BUYING_PRICE:
-             *
-             * if(row == this.orders.size()) return "<html>Total:</html>";
-             *
-             *
-             * return
-             * NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.b
-             * .b, order.c.b));
-             */
-
             case COLUMN_AMOUNT_WANT:
 
                 if (row == this.orders.size())
                     return "<html><i>" + NumberAsString.formatAsString(sumAmountWant, want.getScale()) + "</i></html>";
 
-                // It shows unacceptably small amount of red.
-                BigDecimal amount = order.getAmountWantLeft();
-
-                String amountStr = NumberAsString.formatAsString(amount, want.getScale());
-                return amountStr;
+                String amountStr;
+                    amountStr = order.getCreator().getPersonAsString();
 
             case COLUMN_PRICE:
 
@@ -149,7 +135,13 @@ public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> im
 
                 //BigDecimal price = Order.calcPrice(order.getAmountWant(), order.getAmountHave());
                 BigDecimal price = Order.calcPrice(order.getAmountWant(), order.getAmountHave(), 2);
-                return NumberAsString.formatAsString(price.stripTrailingZeros());
+                amountStr = NumberAsString.formatAsString(price.stripTrailingZeros());
+
+                if (isMine)
+                    amountStr = "<html><b>" + amountStr + "</b></html>";
+
+                return amountStr;
+
 
             case COLUMN_AMOUNT_HAVE:
 
