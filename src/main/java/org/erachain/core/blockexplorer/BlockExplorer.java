@@ -194,7 +194,7 @@ public class BlockExplorer {
             if (search.matches("\\d+")) {
                 if (map.contains(Long.valueOf(search))) {
                     //Элемент найден - добавляем его
-                    keys.add(Integer.valueOf(search));
+                    keys.add(Long.valueOf(search));
                     //Не отображать для одного элемента навигацию и пагинацию
                     result.put("notDisplayPages", "true");
                 }

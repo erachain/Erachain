@@ -350,14 +350,6 @@ button.white-bgc[disabled]:focus,
                                 if (type == 'person_asset') {
                                     document.getElementById('main').innerHTML = person_asset(data);
                                 } else
-                                if (type == 'mainQuery') {
-                                    document.getElementById('main').innerHTML = mainQuery(data);
-                                    genFilterUrlForAll();
-                                    genFilterUrl();
-                                    if (window.location.hash) {
-                                        window.location.href = window.location.hash;
-                                    }
-                                } else
                                 if (type == 'aTs') {
                                     document.getElementById('main').innerHTML = aTs(data)
                                 } else
@@ -393,6 +385,14 @@ button.white-bgc[disabled]:focus,
                                 } else
                                 if (type == 'block') {
                                     document.getElementById('main').innerHTML = block(data);
+                                } else
+                                if (type == 'mainQuery') {
+                                    document.getElementById('main').innerHTML = mainQuery(data);
+                                    genFilterUrlForAll();
+                                    genFilterUrl();
+                                    if (window.location.hash) {
+                                        window.location.href = window.location.hash;
+                                    }
                                 }
                             }
                         }
@@ -3499,6 +3499,7 @@ button.white-bgc[disabled]:focus,
             document.getElementById('menu_peers').href = '?peers&lang=' + params['lang'];
 
             document.getElementById('menuBlocks').setAttribute('class', '');
+            document.getElementById('menuAddresses').setAttribute('class', '');
             document.getElementById('menuTop100Richest').setAttribute('class', '');
             document.getElementById('menuPolls').setAttribute('class', '');
             document.getElementById('menuAssets').setAttribute('class', '');
