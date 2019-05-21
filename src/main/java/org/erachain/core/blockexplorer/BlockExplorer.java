@@ -2024,15 +2024,16 @@ public class BlockExplorer {
     @SuppressWarnings({"serial", "static-access"})
     public Map jsonQueryTransactions(String typeStr, int start) {
 
+        int size = 200;
         List<Transaction> transactions;
         if (typeStr != null) {
             int type = Integer.parseInt(typeStr);
-            transactions = dcSet.getTransactionFinalMap().getTransactionsByTitleAndType(null, type, 333, true);
+            transactions = dcSet.getTransactionFinalMap().getTransactionsByTitleAndType(null, type, size, true);
         } else {
             // берем все с перебором с последней
             TransactionFinalMap map = dcSet.getTransactionFinalMap();
             Iterator<Long> iterator = map.getIterator(0, true);
-            int counter = 1111;
+            int counter = size;
             transactions = new ArrayList<>();
             while (iterator.hasNext() && counter > 0 ) {
                 Transaction transaction = map.get(iterator.next());
