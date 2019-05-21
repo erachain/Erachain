@@ -364,7 +364,7 @@ button.white-bgc[disabled]:focus,
                                 if (type == 'assets') {
                                     document.getElementById('main').innerHTML = assets(data)
                                 } else
-                                if (type == 'assetsSearch') {
+                                if (type == '--assetsSearch') {
                                     document.getElementById('main').innerHTML = assetsSearch(data)
                                 } else
                                 if (type == 'asset') {
@@ -3379,8 +3379,7 @@ button.white-bgc[disabled]:focus,
                 output += htmlFilter(item.name);
                 output += '</a>';
                 output += '<td>' + item.operations;
-                //Здесь возникает html injection - решено убрать это поле
-                // table += '<td>' + data.assets[key].description.substr(0, 80);
+                output += '<td>' + htmlFilter(item.description.substr(0, 60));
                 output += '<td><a href =?address=' + item.owner + get_lang()
                     + '> ' + htmlFilter(item.owner) + '</a>';
                 output += '<td>' + htmlFilter(item.assetType);

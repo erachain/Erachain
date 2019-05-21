@@ -192,9 +192,15 @@ public class BlockExplorer {
         try {
             //Если в строке ввели число
             if (search.matches("\\d+")) {
-                if (map.contains(Long.valueOf(search))) {
+                Object key;
+                if (type == Block.class) {
+                    key = Integer.valueOf(search);
+                } else {
+                    key = Long.valueOf(search);
+                }
+                if (map.contains(key)) {
                     //Элемент найден - добавляем его
-                    keys.add(Long.valueOf(search));
+                    keys.add(key);
                     //Не отображать для одного элемента навигацию и пагинацию
                     result.put("notDisplayPages", "true");
                 }
@@ -481,7 +487,12 @@ public class BlockExplorer {
         if (info.getQueryParameters().containsKey(name)
                 && !info.getQueryParameters().getFirst(name).equals("")
                 && !info.getQueryParameters().getFirst(name).equals("undefined")) {
-            param = Long.valueOf((info.getQueryParameters().getFirst(name)));
+            try {
+                param = Long.valueOf((info.getQueryParameters().getFirst(name)));
+            } catch (Exception e) {
+                logger.debug(info.getQueryParameters().toString());
+                return 1000;
+            }
         }
         return param;
     }
@@ -886,16 +897,18 @@ public class BlockExplorer {
         assetJSON.put("owner", asset.getOwner().getAddress());
         assetJSON.put("quantity", asset.getQuantity());
         assetJSON.put("scale", asset.getScale());
-        // String a =
-        // Lang.getInstance().translateFromLangObj("False",langObj);
-        // if (asset.isDivisible()) a =
-        // Lang.getInstance().translateFromLangObj("True",langObj);
-        // assetJSON.put("isDivisible", a);
+
+        assetJSON.put("key", asset.getKey());
+        assetJSON.put("name", asset.getName());
+        assetJSON.put("operations", orders.size() + trades.size());
+        assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+        assetJSON.put("owner", asset.getOwner().getAddress());
+        assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
+        assetJSON.put("scale", asset.getScale());
         assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
-        // a = Lang.getInstance().translateFromLangObj("False",langObj);
-        // if (asset.isMovable()) a =
-        // Lang.getInstance().translateFromLangObj("True",langObj);
-        // assetJSON.put("isMovable", a);
+        assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
+        assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
+        assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
         assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
         assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
 
