@@ -49,6 +49,8 @@ public class SellOrdersTableModel extends SortedListTableModelCls<Long, Order> i
 
         totalCalc();
 
+        addObservers();
+
     }
 
     private void totalCalc() {
