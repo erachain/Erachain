@@ -2024,7 +2024,7 @@ public class BlockExplorer {
     @SuppressWarnings({"serial", "static-access"})
     public Map jsonQueryTransactions(String typeStr, int start) {
 
-        int size = 200;
+        int size = 500;
         List<Transaction> transactions;
         if (typeStr != null) {
             int type = Integer.parseInt(typeStr);

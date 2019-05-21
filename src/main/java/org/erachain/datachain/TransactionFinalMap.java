@@ -102,8 +102,10 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
             @Override
             public String run(Long key, Transaction val) {
                 Account account = val.getCreator();
+                if (account == null)
+                    return "";
                 // make UNIQUE key??  + val.viewTimestamp()
-                return (account == null ? "genesis" : account.getAddress());
+                return account.getAddress();
             }
         });
 
@@ -490,7 +492,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public Set<BlExpUnit> getBlExpTransactionsByAddress(String address) {
+    public Iterator getIteratorByAddress(String address) {
         Iterable senderKeys = Fun.filter(this.senderKey, address);
         Iterable recipientKeys = Fun.filter(this.recipientKey, address);
 
@@ -499,47 +501,24 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         treeKeys.addAll(Sets.newTreeSet(senderKeys));
         treeKeys.addAll(Sets.newTreeSet(recipientKeys));
 
-        Iterator iter = treeKeys.iterator();
-        treeKeys = null;
-        recipientKeys = null;
-        senderKeys = null;
-        Set<BlExpUnit> txs = new TreeSet<>();
-        while (iter.hasNext()) {
-            Long key = (Long) iter.next();
-            Tuple2<Integer, Integer> request = Transaction.parseDBRef(key);
-            txs.add(new BlExpUnit(request.a, request.b, this.map.get(request)));
-        }
-        iter = null;
-        return txs;
+        return ((TreeSet<Long>) treeKeys).descendingIterator();
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Transaction> getTransactionsByAddressLimit(String address, int limit) {
-        Iterable senderKeys = Fun.filter(this.senderKey, address);
-        Iterable recipientKeys = Fun.filter(this.recipientKey, address);
-
-        Set<Long> treeKeys = new TreeSet<>();
-
-        treeKeys.addAll(Sets.newTreeSet(senderKeys));
-        treeKeys.addAll(Sets.newTreeSet(recipientKeys));
-
-        Iterator iter = treeKeys.iterator();
-        treeKeys = null;
-        recipientKeys = null;
-        senderKeys = null;
+        Iterator iterator = getIteratorByAddress(address);
         List<Transaction> txs = new ArrayList<>();
         Transaction item;
         Long key;
-        while (iter.hasNext() && (limit == -1 || limit-- > 0)) {
-            key = (Long) iter.next();
+        while (iterator.hasNext() && (limit == -1 || limit-- > 0)) {
+            key = (Long) iterator.next();
             item = this.map.get(key);
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item.setDC((DCSet)databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
 
             txs.add(item);
         }
-        treeKeys = null;
         return txs;
     }
 
