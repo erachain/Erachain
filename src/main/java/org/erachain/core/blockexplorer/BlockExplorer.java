@@ -288,7 +288,7 @@ public class BlockExplorer {
                     case "address":
                         //search address
                         output.put("search", "address");
-                        jsonQueryAddress(search, (int) start);
+                        output.putAll(jsonQueryAddress(search, (int) start));
                         break;
                     case "persons":
                     case "person":
@@ -379,7 +379,7 @@ public class BlockExplorer {
         // address
         else if (info.getQueryParameters().containsKey("address")) {
             output.put("search", "address");
-            putput = jsonQueryAddress(info.getQueryParameters().getFirst("address"), (int)start);
+            output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("address"), (int)start));
             // block
         } else if (info.getQueryParameters().containsKey("addresses")) {
             output.put("search", "address");
