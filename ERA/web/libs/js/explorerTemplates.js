@@ -34,7 +34,7 @@ function templates(data) {
         output += '<tr><td><a href="?template=' + data.pageItems[i].key + get_lang() + '">' + data.pageItems[i].key + ': ';
         output += '<b>' + data.pageItems[i].name + '</b></a></td>';
         output += '<td>' + data.pageItems[i].description.substr(0, 100) + '</td>';
-        output += '<td><a href=?addr=' + data.pageItems[i].owner + get_lang() + '>' + htmlFilter(data.pageItems[i].owner) + '</a></td>';
+        output += '<td><a href=?address=' + data.pageItems[i].owner + get_lang() + '>' + htmlFilter(data.pageItems[i].owner) + '</a></td>';
         output += '</tr>';
     }
 
@@ -76,7 +76,7 @@ function template(data) {
     output += '<br><br>';
 
 
-    output += '<b>' + data.label_Creator + ':</b> <a href=?addr=' + data.template.owner + get_lang() + '>' + data.template.owner + '</a>';
+    output += '<b>' + data.label_Creator + ':</b> <a href=?address=' + data.template.owner + get_lang() + '>' + data.template.owner + '</a>';
 
     output += '<br><br>';
 

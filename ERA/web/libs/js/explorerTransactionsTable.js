@@ -246,7 +246,7 @@ function transactions_Table(data) {
         }
         output += data.Transactions.transactions[key].type +
             '</a><td>' + data.Transactions.transactions[key].amount_key + '<td>' + data.Transactions.transactions[key].date;
-        output += '<td><a href ="?addr=' + data.Transactions.transactions[key].creator_addr + get_lang() + '">' +
+        output += '<td><a href ="?address=' + data.Transactions.transactions[key].creator_addr + get_lang() + '">' +
             data.Transactions.transactions[key].creator + '</a>';
         output += '<td>' + data.Transactions.transactions[key].size + '<td>' +
             data.Transactions.transactions[key].fee + '<td>' + data.Transactions.transactions[key].confirmations + '</td></tr>';

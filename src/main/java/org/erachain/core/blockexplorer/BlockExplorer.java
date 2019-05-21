@@ -284,6 +284,12 @@ public class BlockExplorer {
                         output.putAll(jsonQuerySearchPages(Transaction.class, search, (int)start, pageSize));
 
                         break;
+                    case "addresses":
+                    case "address":
+                        //search address
+                        output.put("search", "address");
+                        jsonQueryAddress(search, (int) start);
+                        break;
                     case "persons":
                     case "person":
                         //search persons
@@ -371,9 +377,13 @@ public class BlockExplorer {
 //            output = jsonQueryLastBlock();
 //        }
         // address
-        else if (info.getQueryParameters().containsKey("addr")) {
-            output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("addr"), (int)start));
+        else if (info.getQueryParameters().containsKey("address")) {
+            output.put("search", "address");
+            putput = jsonQueryAddress(info.getQueryParameters().getFirst("address"), (int)start);
             // block
+        } else if (info.getQueryParameters().containsKey("addresses")) {
+            output.put("search", "address");
+            jsonQueryTopRichest(info);
         } else if (info.getQueryParameters().containsKey("block")) {
             output.put("search", "block");
             output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), (int)start));
@@ -493,9 +503,9 @@ public class BlockExplorer {
         help.put("Transaction", "blockexplorer.json?tx={txSignature}");
         help.put("Name", "blockexplorer.json?name={name}");
         help.put("Name (additional)", "blockexplorer.json?name={name}&start={offset}&allOnOnePage");
-        help.put("Address", "blockexplorer.json?addr={address}");
+        help.put("Address", "blockexplorer.json?address={address}");
         help.put("Address (additional)",
-                "blockexplorer.json?addr={address}&start={offset}&allOnOnePage&withoutBlocks&showWithout={1,2,blocks}&showOnly={type}");
+                "blockexplorer.json?address={address}&start={offset}&allOnOnePage&withoutBlocks&showWithout={1,2,blocks}&showOnly={type}");
         help.put("Top Richest", "blockexplorer.json?top");
         help.put("Top Richest", "blockexplorer.json?top={limit}&asset={asset}");
         help.put("Address All Not Zero", "blockexplorer.json?top=allnotzero");
@@ -504,7 +514,7 @@ public class BlockExplorer {
         help.put("Assets List", "blockexplorer.json?assets");
         help.put("AT List", "blockexplorer.json?aTs");
         help.put("Names List", "blockexplorer.json?names");
-        help.put("BlogPosts of Address", "blockexplorer.json?blogposts={addr}");
+        help.put("BlogPosts of Address", "blockexplorer.json?blogposts={address}");
         help.put("Search", "blockexplorer.json?q={text}");
         help.put("Balance", "blockexplorer.json?balance={address}[&balance=address2...]");
 
@@ -512,7 +522,7 @@ public class BlockExplorer {
     }
 
 
-    public Map jsonQueryBlogPostsTx(String addr) {
+    public Map jsonQueryBlogPostsTx(String address) {
 
         Map output = new LinkedHashMap();
         try {
@@ -521,10 +531,10 @@ public class BlockExplorer {
 
             List<Transaction> transactions = new ArrayList<Transaction>();
 
-            if (Crypto.getInstance().isValidAddress(addr)) {
-                Account account = new Account(addr);
+            if (Crypto.getInstance().isValidAddress(address)) {
+                Account account = new Account(address);
 
-                String address = account.getAddress();
+                address = account.getAddress();
                 // get reference to parent record for this account
                 Long timestampRef = account.getLastTimestamp();
                 // get signature for account + time
@@ -538,7 +548,7 @@ public class BlockExplorer {
                     if (transaction == null) {
                         break;
                     }
-                    if (transaction.getCreator() == null && !transaction.getCreator().getAddress().equals(addr)) {
+                    if (transaction.getCreator() == null && !transaction.getCreator().getAddress().equals(address)) {
                         break;
                     }
 
@@ -2065,7 +2075,7 @@ public class BlockExplorer {
         int limit = 100;
         List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressLimit(address, limit);
         LinkedHashMap output = new LinkedHashMap();
-        output.put("account", address);
+        output.put("address", address);
 
         Account acc = new Account(address);
         long personKey = -10;
@@ -2094,7 +2104,7 @@ public class BlockExplorer {
         transactionsJSON(output, acc, transactions, start, pageSize,
                 Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" + limit));
 
-        output.put("type", "standardAccount");
+        output.put("type", "address");
         output.put("search", "address");
 
         return output;
@@ -2921,115 +2931,126 @@ public class BlockExplorer {
 
         LinkedHashMap transactionsJSON = new LinkedHashMap();
         int listSize = transactions.size();
-        List<Transaction> transactionList = (pageSize == 0) ? transactions
-                : transactions.subList(fromIndex, Math.min(fromIndex + pageSize, listSize));
-        for (Transaction transaction : transactionList) {
+        if (listSize > 0) {
+            List<Transaction> transactionList;
+            if (pageSize == 0) {
+                transactionList = transactions;
+            } else {
+                int max = Math.min(fromIndex + pageSize, listSize);
+                if (fromIndex < max)
+                    transactionList = transactions.subList(fromIndex, max);
+                else
+                    transactionList = transactions;
+            }
 
-            transaction.setDC(dcSet);
+            for (Transaction transaction : transactionList) {
 
-            outcome = true;
+                transaction.setDC(dcSet);
 
-            LinkedHashMap out = new LinkedHashMap();
+                outcome = true;
 
-            out.put("block", transaction.getBlockHeight());// .getSeqNo(dcSet));
+                LinkedHashMap out = new LinkedHashMap();
 
-            out.put("seqNo", transaction.getSeqNo());
+                out.put("block", transaction.getBlockHeight());// .getSeqNo(dcSet));
 
-            if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
-                RCalculated txCalculated = (RCalculated) transaction;
-                outcome = txCalculated.getAmount().signum() < 0;
+                out.put("seqNo", transaction.getSeqNo());
 
-                //out.put("reference", "--");
-                out.put("signature", transaction.getBlockHeight() + "-" + transaction.getSeqNo());
+                if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
+                    RCalculated txCalculated = (RCalculated) transaction;
+                    outcome = txCalculated.getAmount().signum() < 0;
+
+                    //out.put("reference", "--");
+                    out.put("signature", transaction.getBlockHeight() + "-" + transaction.getSeqNo());
 
 
-                String message = txCalculated.getMessage();
-                if (message.equals("forging")) {
-                    out.put("date", DateTimeFormat.timestamptoString(dcSet.getBlockMap().get(transaction.getBlockHeight()).getTimestamp()));
+                    String message = txCalculated.getMessage();
+                    if (message.equals("forging")) {
+                        out.put("date", DateTimeFormat.timestamptoString(dcSet.getBlockMap().get(transaction.getBlockHeight()).getTimestamp()));
+                    } else {
+                        out.put("date", message);
+                    }
+
+                    String typeName = transaction.viewFullTypeName();
+                    if (typeName.equals("_protocol_")) {
+                        out.put("type", message);
+                    } else {
+                        out.put("type", typeName);
+                    }
+
+                    out.put("confirmations", transaction.getConfirmations(height));
+
+                    out.put("creator", txCalculated.getRecipient().getPersonAsString());
+                    out.put("creator_addr", txCalculated.getRecipient().getAddress());
+
+                    out.put("size", "--");
+                    out.put("fee", "--");
+
                 } else {
-                    out.put("date", message);
-                }
-
-                String typeName = transaction.viewFullTypeName();
-                if (typeName.equals("_protocol_")) {
-                    out.put("type", message);
-                } else {
+                    out.put("signature", Base58.encode(transaction.getSignature()));
+                    out.put("date", DateTimeFormat.timestamptoString(transaction.getTimestamp()));
+                    String typeName = transaction.viewFullTypeName();
                     out.put("type", typeName);
-                }
-
-                out.put("confirmations", transaction.getConfirmations(height));
-
-                out.put("creator", txCalculated.getRecipient().getPersonAsString());
-                out.put("creator_addr", txCalculated.getRecipient().getAddress());
-
-                out.put("size", "--");
-                out.put("fee", "--");
-
-            } else {
-                out.put("signature", Base58.encode(transaction.getSignature()));
-                out.put("date", DateTimeFormat.timestamptoString(transaction.getTimestamp()));
-                String typeName = transaction.viewFullTypeName();
-                out.put("type", typeName);
-                if (transaction.getCreator() == null) {
-                    out.put("creator", GenesisBlock.CREATOR.getAddress());
-                    out.put("creator_addr", "GENESIS");
-                    if (transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
-                        outcome = false;
-                    }
-
-                } else {
-
-                    out.put("publickey", Base58.encode(transaction.getCreator().getPublicKey()));
-
-                    Account atSideAccount;
-                    atSideAccount = transaction.getCreator();
-                    if (account != null) {
-                        atSideAccount = transaction.getCreator();
-                        type = transaction.getType();
-                        if (type == Transaction.SEND_ASSET_TRANSACTION) {
-                            RSend rSend = (RSend) transaction;
-                            if (rSend.getCreator().equals(account)) {
-                                outcome = false;
-                                atSideAccount = rSend.getRecipient();
-                            }
-                            // возврат и взять на харенение обратный
-                            outcome = outcome ^ !rSend.isBackward() ^ (rSend.getActionType() == TransactionAmount.ACTION_HOLD);
+                    if (transaction.getCreator() == null) {
+                        out.put("creator", GenesisBlock.CREATOR.getAddress());
+                        out.put("creator_addr", "GENESIS");
+                        if (transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
+                            outcome = false;
                         }
+
+                    } else {
+
+                        out.put("publickey", Base58.encode(transaction.getCreator().getPublicKey()));
+
+                        Account atSideAccount;
+                        atSideAccount = transaction.getCreator();
+                        if (account != null) {
+                            atSideAccount = transaction.getCreator();
+                            type = transaction.getType();
+                            if (type == Transaction.SEND_ASSET_TRANSACTION) {
+                                RSend rSend = (RSend) transaction;
+                                if (rSend.getCreator().equals(account)) {
+                                    outcome = false;
+                                    atSideAccount = rSend.getRecipient();
+                                }
+                                // возврат и взять на харенение обратный
+                                outcome = outcome ^ !rSend.isBackward() ^ (rSend.getActionType() == TransactionAmount.ACTION_HOLD);
+                            }
+                        }
+
+                        out.put("creator", atSideAccount.getPersonAsString());
+                        out.put("creator_addr", atSideAccount.getAddress());
+
                     }
 
-                    out.put("creator", atSideAccount.getPersonAsString());
-                    out.put("creator_addr", atSideAccount.getAddress());
+                    out.put("size", transaction.viewSize(Transaction.FOR_NETWORK));
+                    out.put("fee", transaction.getFee());
+                    out.put("confirmations", transaction.getConfirmations(height));
 
                 }
 
-                out.put("size", transaction.viewSize(Transaction.FOR_NETWORK));
-                out.put("fee", transaction.getFee());
-                out.put("confirmations", transaction.getConfirmations(height));
 
-            }
-
-
-            long absKey = transaction.getAbsKey();
-            String amount = transaction.viewAmount();
-            if (absKey > 0) {
-                if (amount.length() > 0) {
-                    out.put("amount_key",
-                            (outcome ? "-" : "+") + transaction.viewAmount() + ":" + absKey);
+                long absKey = transaction.getAbsKey();
+                String amount = transaction.viewAmount();
+                if (absKey > 0) {
+                    if (amount.length() > 0) {
+                        out.put("amount_key",
+                                (outcome ? "-" : "+") + transaction.viewAmount() + ":" + absKey);
+                    } else {
+                        out.put("amount_key", "" + absKey);
+                    }
                 } else {
-                    out.put("amount_key", "" + absKey);
+                    out.put("amount_key", "");
                 }
-            } else {
-                out.put("amount_key", "");
-            }
 
-            if (transaction.viewRecipient() == null) {
-                out.put("recipient", "-");
-            } else {
-                out.put("recipient", transaction.viewRecipient());
-            }
+                if (transaction.viewRecipient() == null) {
+                    out.put("recipient", "-");
+                } else {
+                    out.put("recipient", transaction.viewRecipient());
+                }
 
-            transactionsJSON.put(i, out);
-            i++;
+                transactionsJSON.put(i, out);
+                i++;
+            }
         }
 
         outputTXs.put("transactions", transactionsJSON);
