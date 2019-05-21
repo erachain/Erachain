@@ -36,7 +36,7 @@ public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> im
     private long wantKey;
 
     public BuyOrdersTableModel(AssetCls have, AssetCls want) {
-        super(new String[]{"Who", "Price", "Have"}, true);
+        super(new String[]{"Who", "Price", "Amount"}, true);
 
         this.have = have;
         this.want = want;
@@ -127,6 +127,8 @@ public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> im
 
                 String amountStr;
                     amountStr = order.getCreator().getPersonAsString();
+
+                return amountStr;
 
             case COLUMN_PRICE:
 

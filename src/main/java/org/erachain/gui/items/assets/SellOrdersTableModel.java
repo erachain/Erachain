@@ -33,7 +33,7 @@ public class SellOrdersTableModel extends SortedListTableModelCls<Long, Order> i
     private long wantKey;
 
     public SellOrdersTableModel(AssetCls have, AssetCls want) {
-        super(new String[]{"Have", "Price", "Who"}, true);
+        super(new String[]{"Amount", "Price", "Who"}, true);
 
         this.have = have;
         this.want = want;
