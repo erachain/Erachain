@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.SortableList;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.ntp.NTP;
@@ -22,21 +23,16 @@ public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> im
     public static final int COLUMN_PRICE = 1;
     public static final int COLUMN_AMOUNT_HAVE = 2;
 
-    private boolean needRepaint = false;
-    private long updateTime = 0l;
-
-    public SortableList<Long, Order> orders;
     BigDecimal sumAmountWant;
     BigDecimal sumAmountHave;
-    // private String[] columnNames = Lang.getInstance().translate(new
-    // String[]{"Buying Price", "Buying Amount", "Price", "Amount"});
+
     private AssetCls have;
     private AssetCls want;
     private long haveKey;
     private long wantKey;
 
     public BuyOrdersTableModel(AssetCls have, AssetCls want) {
-        super(new String[]{"Who", "Price", "Amount"}, true);
+        super(DCSet.getInstance().getOrderMap(), new String[]{"Who", "Price", "Amount"}, true);
 
         this.have = have;
         this.want = want;
@@ -44,13 +40,7 @@ public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> im
         this.haveKey = this.have.getKey();
         this.wantKey = this.want.getKey();
 
-        this.orders = Controller.getInstance().getOrders(have, want, false);
-
-        // columnNames[COLUMN_BUYING_PRICE] += " " + have.getShort();
-        ///columnNames[COLUMN_PRICE] += " " + have.getShort();
-        ///columnNames[COLUMN_AMOUNT_WANT] += " " + want.getShort();
-        ///columnNames[COLUMN_AMOUNT_HAVE] += " " + have.getShort();
-
+        repaint();
         totalCalc();
 
         addObservers();
@@ -60,46 +50,25 @@ public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> im
     private void totalCalc() {
         sumAmountWant = BigDecimal.ZERO;
         sumAmountHave = BigDecimal.ZERO;
-        for (Pair<Long, Order> orderPair : this.orders) {
+        for (Pair<Long, Order> orderPair : this.listSorted) {
 
             Order order = orderPair.getB();
-
             sumAmountHave = sumAmountHave.add(order.getAmountHaveLeft());
-
             sumAmountWant = sumAmountWant.add(order.getAmountWantLeft());
         }
     }
 
     @Override
-    public SortableList<Long, Order> getSortableList() {
-        return this.orders;
-    }
-
-    public Order getOrder(int row) {
-        Pair<Long, Order> rec = this.orders.get(row);
-        if (rec == null)
-            return null;
-
-        return this.orders.get(row).getB();
-    }
-
-    @Override
-    public int getRowCount() {
-        return this.orders.size() + 1;
-
-    }
-
-    @Override
     public Object getValueAt(int row, int column) {
-        if (this.orders == null || row > this.orders.size()) {
+        if (this.listSorted == null || row > this.listSorted.size()) {
             return null;
         }
 
         Order order = null;
         boolean isMine = false;
-        int size = this.orders.size();
+        int size = this.listSorted.size();
         if (row < size) {
-            order = this.orders.get(row).getB();
+            order = this.listSorted.get(row).getB();
             if (order == null) {
                 //totalCalc();
                 //this.fireTableRowsDeleted(row, row);
@@ -111,28 +80,29 @@ public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> im
                 isMine = true;
             }
 
-        } else if (size > row) {
-            this.orders = Controller.getInstance().getOrders(have, want, false);
-            totalCalc();
-            this.fireTableDataChanged();
+        } else  {
+            repaint();
             return null;
         }
 
+        String amountStr;
         switch (column) {
 
             case COLUMN_AMOUNT_WANT:
 
-                if (row == this.orders.size())
+                if (row == this.listSorted.size())
                     return "<html><i>" + NumberAsString.formatAsString(sumAmountWant, want.getScale()) + "</i></html>";
 
-                String amountStr;
-                    amountStr = order.getCreator().getPersonAsString();
+                amountStr = order.getCreator().getPersonAsString();
+
+                if (isMine)
+                    amountStr = "<html><b>" + amountStr + "</b></html>";
 
                 return amountStr;
 
             case COLUMN_PRICE:
 
-                if (row == this.orders.size())
+                if (row == this.listSorted.size())
                     return "<html><b>" + Lang.getInstance().translate("Total") + "</b></html>";
 
                 //BigDecimal price = Order.calcPrice(order.getAmountWant(), order.getAmountHave());
@@ -147,7 +117,7 @@ public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> im
 
             case COLUMN_AMOUNT_HAVE:
 
-                if (row == this.orders.size())
+                if (row == this.listSorted.size())
                     return "<html><i>" + NumberAsString.formatAsString(sumAmountHave, have.getScale()) + "</i></html>";
 
                 amountStr = NumberAsString.formatAsString(order.getAmountHaveLeft(), have.getScale());
@@ -163,23 +133,14 @@ public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> im
     }
 
     public synchronized void repaint() {
-        this.needRepaint = false;
-        this.updateTime = NTP.getTime();
 
-        this.orders = Controller.getInstance().getOrders(this.have, this.want, false);
+        this.needUpdate = false;
+
+        this.listSorted = Controller.getInstance().getOrders(this.have, this.want, false);
 
         totalCalc();
         this.fireTableDataChanged();
 
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            // GUI ERROR
-        }
     }
 
     public synchronized void syncUpdate(Observable o, Object arg) {
@@ -200,25 +161,18 @@ public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> im
                 return;
             }
 
-            this.needRepaint = true;
+            this.needUpdate = true;
             return;
 
-        } else if (this.needRepaint == true) {
-            if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
-                    || type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
-                if (Controller.getInstance().isStatusOK()) {
+        } else if (this.needUpdate == true) {
+            if (Controller.getInstance().isStatusOK()) {
+                if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE || type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE
+                        || type == ObserverMessage.GUI_REPAINT) {
                     this.repaint();
                     return;
-                } else {
-                    if (NTP.getTime() - updateTime > 100000) {
-                        this.repaint();
-                        return;
-
-                    }
                 }
-            } else if (type == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
-                    || type == ObserverMessage.NETWORK_STATUS) {
-                if (Controller.getInstance().isStatusOK()) {
+            } else {
+                if (type == ObserverMessage.GUI_REPAINT) {
                     this.repaint();
                     return;
                 }
@@ -227,19 +181,12 @@ public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> im
     }
 
     public void addObservers() {
-        Controller.getInstance().addObserver(this);
-        //this.orders.registerObserver();
-
+        super.addObservers();
+        DCSet.getInstance().getBlockMap().addObserver(this);
     }
 
     public void deleteObservers() {
-        //this.orders.removeObserver();
-        Controller.getInstance().deleteObserver(this);
-    }
-
-    @Override
-    public Order getItem(int k) {
-        // TODO Auto-generated method stub
-        return this.orders.get(k).getB();
+        super.deleteObservers();
+        DCSet.getInstance().getBlockMap().deleteObserver(this);
     }
 }
