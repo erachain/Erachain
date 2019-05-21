@@ -59,33 +59,87 @@ function pagesComponent2(data) {
         var start = listSize;
     }
 
+    if (start == 0)
+        start = 1;
+
     if (1 != start)
-        output += '<a class="button ll-blue-bgc" href="' + makePageUri(1, 'start') + '"><b>' + ' 1&lt;&lt;&lt; </b></a>';
+        output += '<a class="button ll-blue-bgc" href="' + makePageUri(1, 'start') + '"><b>' + '1</b></a>';
 
     if (start > pageSize * 10) {
 
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize * 10, 'start') + '"><b>' + (start - pageSize * 10) + '&lt;&lt;</b></a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize * 10, 'start') + '"><b>' + (start - pageSize * 10) + '</b></a>';
         //output += (start - pageSize * 10) + ' --- ';
     }
     if (start > pageSize + 1) {
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize, 'start') + '"><b>' + (start - pageSize) + '&lt;</b></a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize, 'start') + '"><b>' + (start - pageSize) + '</b></a>';
         //output += (start - pageSize) + ' - ';
     }
 
-    output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start, 'start') + '"><b>[' + start + ']</b></a>';
+    output += '&emsp; <a class="button ll-blue-bgc active" href="' + makePageUri(start, 'start') + '"><b> ' + start + ' </b></a>';
 
     if (start + pageSize < listSize) {
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize, 'start') + '"><b>&gt;' + (start + pageSize) + '</b></a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize, 'start') + '"><b>' + (start + pageSize) + '</b></a>';
     }
     if (start + pageSize * 10 < listSize) {
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize * 10, 'start') + '"><b>&gt;&gt;' + (start + pageSize * 10) + '</b></a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize * 10, 'start') + '"><b>' + (start + pageSize * 10) + '</b></a>';
     }
 
     if (listSize != start)
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(listSize, 'start') + '"><b>&gt;&gt;&gt;' + listSize + '</b></a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(listSize, 'start') + '"><b>' + listSize + '</b></a>';
 
     return output;
 }
+
+function pagesComponent3(data) {
+    var output = '';
+
+    var listSize = data.listSize;
+    var pageSize = data.pageSize;
+    var start = data.start;
+
+    if (data.hasOwnProperty('start')) {
+        start = data.start;
+    } else {
+        var start = listSize;
+    }
+
+    if (start == 0)
+        start = 1;
+
+    if (start == 1) {
+        output += '<a class="button ll-blue-bgc active" href="' + makePageUri(1, 'start') + '"><b>' + 'last</b></a>';
+    } else {
+        output += '<a class="button ll-blue-bgc" href="' + makePageUri(1, 'start') + '"><b>' + 'last</b></a>';
+    }
+
+    if (start > pageSize * 10) {
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize * 10, 'start') + '"><b>' + '&lt;' + '</b></a>';
+    }
+
+    if (start > pageSize + 1) {
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize, 'start') + '"><b>' + '&lt;&lt;' + '</b></a>';
+    }
+
+    if (start != 1 && start < listSize - pageSize) {
+        output += '&emsp; <a class="button ll-blue-bgc active" href="' + makePageUri(start, 'start') + '"><b> -' + start + ' </b></a>';
+    }
+
+    if (start + pageSize < listSize) {
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize, 'start') + '"><b>' + '&gt;' + '</b></a>';
+    }
+    if (start + pageSize * 10 < listSize) {
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize * 10, 'start') + '"><b>' + '&gt;&gt;' + '</b></a>';
+    }
+
+    if (start >= listSize - pageSize) {
+        output += '&emsp; <a class="button ll-blue-bgc active" href="' + makePageUri(listSize - pageSize, 'start') + '"><b>' + '-' + (listSize - pageSize) + '</b></a>';
+    } else {
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(listSize - pageSize, 'start') + '"><b>' + '-' + (listSize - pageSize) + '</b></a>';
+    }
+
+    return output;
+}
+
 
 function pagesComponentMixed(data) {
     if (data.pageCount < 10) {
@@ -170,7 +224,7 @@ function transactions_Table(data) {
     console.log(data)
     var output = data.Transactions.label_transactions_table + ':<br>';
     //output += pagesComponentMixed(data);
-    output += pagesComponent2(data);
+    output += pagesComponent3(data);
 
     output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
         ' class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
@@ -200,7 +254,7 @@ function transactions_Table(data) {
     }
     output += '</table></td></tr></table>';
     //output += pagesComponentMixed(data);
-    output += pagesComponent2(data);
+    output += pagesComponent3(data);
 
 
     return output;

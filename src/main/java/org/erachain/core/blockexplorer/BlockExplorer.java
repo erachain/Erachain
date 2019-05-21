@@ -2060,7 +2060,7 @@ public class BlockExplorer {
     @SuppressWarnings({"serial", "static-access"})
     public Map jsonQueryAddress(String address, int start) {
 
-        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddress(address);
+        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressLimit(address, 100);
         LinkedHashMap output = new LinkedHashMap();
         output.put("account", address);
 
@@ -2931,7 +2931,7 @@ public class BlockExplorer {
                 RCalculated txCalculated = (RCalculated) transaction;
                 outcome = txCalculated.getAmount().signum() < 0;
 
-                out.put("reference", "--");
+                //out.put("reference", "--");
                 out.put("signature", transaction.getBlockHeight() + "-" + transaction.getSeqNo());
 
 

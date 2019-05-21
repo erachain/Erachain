@@ -515,7 +515,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public List<Transaction> getTransactionsByAddress(String address) {
+    public List<Transaction> getTransactionsByAddressLimit(String address, int limit) {
         Iterable senderKeys = Fun.filter(this.senderKey, address);
         Iterable recipientKeys = Fun.filter(this.recipientKey, address);
 
@@ -531,7 +531,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         List<Transaction> txs = new ArrayList<>();
         Transaction item;
         Long key;
-        while (iter.hasNext()) {
+        while (iter.hasNext() && (limit == -1 || limit-- > 0)) {
             key = (Long) iter.next();
             item = this.map.get(key);
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
