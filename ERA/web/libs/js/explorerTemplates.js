@@ -1,4 +1,5 @@
 function templates(data) {
+
     var output = '';
 
     if (data.hasOwnProperty('error')) {
@@ -56,6 +57,8 @@ function templates(data) {
 
 
 function template(data) {
+    $('#selectID').val('templates');
+
     var output = '';
 
     if (data.hasOwnProperty('error')) {

@@ -26,7 +26,7 @@ function statuses(data){
     //Отображение таблицы элементов статусов
     for (var i in data.pageItems) {
         var item = data.pageItems[i];
-        output += '<tr><td><a href="?template=' + item.key + get_lang() + '">' + item.key + ': ';
+        output += '<tr><td><a href="?status=' + item.key + get_lang() + '">' + item.key + ': ';
         output += '<b>' + item.name + '</b></a></td>';
         output += '<td>' + item.description.substr(0, 100) + '</td>';
 
@@ -100,6 +100,9 @@ function statusesSearch(data) {
 }
 
 function status(data) {
+
+    $('#selectID').val('statuses');
+
     var output = '';
 
     if (data.hasOwnProperty('error')) {
@@ -110,7 +113,7 @@ function status(data) {
 
     output += '<table width="1280" border=0><tr><td align=left><br>';
 
-    output += '<h3 style="display:inline;">' + data.label_Template + ':</h3>';
+    output += '<h3 style="display:inline;">' + data.label_Status + ':</h3>';
 
     //output += '<h3 style="display:inline;"> | </h3>';
 

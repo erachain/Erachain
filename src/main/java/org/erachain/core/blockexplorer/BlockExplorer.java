@@ -232,7 +232,7 @@ public class BlockExplorer {
         start = checkAndGetIntParam(info, start, "start");
 
         output = new LinkedHashMap();
-        output.put("search", "block");
+        output.put("search", "blocks");
 
         //lang
         if (!info.getQueryParameters().containsKey("lang")) {
@@ -329,14 +329,12 @@ public class BlockExplorer {
         } else if (info.getQueryParameters().containsKey("asset")) {
             // person asset balance
             if (info.getQueryParameters().containsKey("person")) {
-                output.put("search", "person");
                 output.putAll(jsonQueryPersonBalance(new Long(info.getQueryParameters().getFirst("person")),
                         new Long(info.getQueryParameters().getFirst("asset")),
                         new Integer(info.getQueryParameters().getFirst("position"))
                 ));
             } else {
                 if (info.getQueryParameters().get("asset").size() == 1) {
-                    output.put("search", "assets");
                     try {
                         output.put("asset", jsonQueryAsset(Long.valueOf((info.getQueryParameters().getFirst("asset")))));
                     } catch (Exception e) {
@@ -368,7 +366,7 @@ public class BlockExplorer {
 
         // address
         else if (info.getQueryParameters().containsKey("address")) {
-            output.put("search", "address");
+            output.put("search", "addresses");
             output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("address"), (int)start));
 
         ///////// BLOCKS /////////////
@@ -990,6 +988,9 @@ public class BlockExplorer {
         output.put("label_Trades_Volume", Lang.getInstance().translateFromLangObj("Trades Volume", langObj));
         output.put("label_Total", Lang.getInstance().translateFromLangObj("Total", langObj));
         output.put("label_View", Lang.getInstance().translateFromLangObj("View", langObj));
+
+        output.put("search", "assets");
+        output.put("type", "asset");
 
         return output;
     }
@@ -2071,7 +2072,7 @@ public class BlockExplorer {
         transactionsJSON(output, null, transactions, start, pageSize,
                 Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" + size));
 
-        output.put("search", "transaction");
+        output.put("search", "transactions");
         output.put("type", "transactions");
 
         return output;
@@ -2112,7 +2113,7 @@ public class BlockExplorer {
         transactionsJSON(output, acc, transactions, start, pageSize,
                 Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" + limit));
 
-        output.put("search", "address");
+        output.put("search", "addresses");
         output.put("type", "address");
 
         return output;
@@ -2283,7 +2284,7 @@ public class BlockExplorer {
 
         output.put("status", statusJSON);
 
-        output.put("label_Template", Lang.getInstance().translateFromLangObj("Status", langObj));
+        output.put("label_Status", Lang.getInstance().translateFromLangObj("Status", langObj));
         output.put("label_Key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
         output.put("label_Description", Lang.getInstance().translateFromLangObj("Description", langObj));
@@ -2638,7 +2639,7 @@ public class BlockExplorer {
             }
         }
 
-        output.put("search", "transaction");
+        output.put("search", "transactions");
 
         return output;
     }

@@ -579,6 +579,8 @@ button.white-bgc[disabled]:focus,
 
         function address(data) {
 
+            $('#selectID').val('addresses'); // for switch selector
+
             var output ='';
             output += '<table width="1280" border=0><tr><td align=left>';
             if (data.person_key != -10) {
@@ -651,17 +653,18 @@ button.white-bgc[disabled]:focus,
             var table = '<table id=top100 BORDER=0  cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>' + data.Label_Table_Account + '<td><b>' + data.Label_Table_person + '<td><b>' + data.Label_Table_Balance + '<td><b>' + data.Label_Table_in_OWN + '<td><b>' + data.Label_Table_Prop;
 
             for (key in data.top) {
+                var item = data.top[key];
                 table += '<tr>';
-                table += '<td>' + key + '<td>' + '<a href="?address=' + data.top[key].address + get_lang() + '">' + data.top[key].address + '</a>';
+                table += '<td>' + key + '<td>' + '<a href="?address=' + item.address + get_lang() + '">' + item.address + '</a>';
 
-                if (data.top[key].person_key != '-') {
-                    table += '<td><a href="?person=' + data.top[key].person_key + get_lang() + '">' + data.top[key].person + '</a>';
+                if (item.hasOwnProperty('person')) {
+                    table += '<td><a href="?person=' + item.person_key + get_lang() + '">' + item.person + '</a>';
                 } else {
-                    table += '<td>' + data.top[key].person;
+                    table += '<td>';
                 }
-                table += '<td>' + addCommas(data.top[key].balance);
-                table += '<td>' + addCommas(data.top[key].in_OWN);
-                table += '<td>' + ((data.top[key].in_OWN / data.allTotal) * 100).toFixed(2) + "%";
+                table += '<td>' + addCommas(item.balance);
+                table += '<td>' + addCommas(item.in_OWN);
+                table += '<td>' + ((item.in_OWN / data.allTotal) * 100).toFixed(2) + "%";
             }
             table += '</table>';
 
@@ -671,6 +674,9 @@ button.white-bgc[disabled]:focus,
         }
 
         function top100(data) {
+
+            $('#selectID').val('top');
+
             var output = "";
 
             output += lastBlock(data.lastBlock);
@@ -698,17 +704,18 @@ button.white-bgc[disabled]:focus,
             var table = '<table id=top100 BORDER=0  cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>' + data.Label_Table_Account + '<td><b>' + data.Label_Table_person + '<td><b>' + data.Label_Table_Balance + '<td><b>' + data.Label_Table_in_OWN + '<td><b>' + data.Label_Table_Prop;
 
             for (key in data.top) {
+                var item = data.top[key];
                 table += '<tr>';
-                table += '<td>' + key + '<td>' + '<a href="?address=' + data.top[key].address + get_lang() + '">' + data.top[key].address + '</a>';
+                table += '<td>' + key + '<td>' + '<a href="?address=' + item.address + get_lang() + '">' + item.address + '</a>';
 
-                if (data.top[key].person_key != '-') {
-                    table += '<td><a href="?person=' + data.top[key].person_key + get_lang() + '">' + data.top[key].person + '</a>';
+                if (item.hasOwnProperty('person')) {
+                    table += '<td><a href="?person=' + item.person_key + get_lang() + '">' + item.person + '</a>';
                 } else {
-                    table += '<td>' + data.top[key].person;
+                    table += '<td>';
                 }
-                table += '<td>' + addCommas(data.top[key].balance);
-                table += '<td>' + addCommas(data.top[key].in_OWN);
-                table += '<td>' + ((data.top[key].in_OWN / data.allTotal) * 100).toFixed(2) + "%";
+                table += '<td>' + addCommas(item.balance);
+                table += '<td>' + addCommas(item.in_OWN);
+                table += '<td>' + ((item.in_OWN / data.allTotal) * 100).toFixed(2) + "%";
             }
             table += '</table>';
 
@@ -733,6 +740,9 @@ button.white-bgc[disabled]:focus,
         }
 
         function polls(data) {
+
+            $('#selectID').val('polls');
+
             var output = "";
 
             output += lastBlock(data.lastBlock);
@@ -797,6 +807,9 @@ button.white-bgc[disabled]:focus,
         }
 
         function poll(data) {
+
+            $('#selectID').val('polls');
+
             var output = "";
 
             output += lastBlock(data.lastBlock);
@@ -863,6 +876,9 @@ button.white-bgc[disabled]:focus,
 
 
         function asset(data) {
+
+            $('#selectID').val('assets');
+
             var output = "";
 
             output += lastBlock(data.lastBlock);
@@ -1331,6 +1347,9 @@ button.white-bgc[disabled]:focus,
             }
 
             else if (data.type == 'transaction') {
+
+                $('#selectID').val('transactions');
+
                 output += '<table width="1280" border=0><tr><td align=left>';
                 if (data.body.hasOwnProperty('head')) {
                     output += data.body.head + '<br>';
@@ -1431,6 +1450,7 @@ button.white-bgc[disabled]:focus,
 
                     if (data[i].type == 'block') // block
                     {
+
                         output += '<table width=100%><tr><td>';
 
                         output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
@@ -2733,6 +2753,9 @@ button.white-bgc[disabled]:focus,
         }
 
         function block(data) {
+
+            $('#selectID').val('blocks');
+
             var output = '';
             url = '?block=' + data.blockHeight;
             urlstart = url;
@@ -3081,6 +3104,9 @@ button.white-bgc[disabled]:focus,
         }
 
         function person(data) {
+
+            $('#selectID').val('persons');
+
             var output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
             output += '<tr><td align=left>';
             output += '<table><tr><td>';
@@ -3160,6 +3186,9 @@ button.white-bgc[disabled]:focus,
         }
 
         function blocks(data) {
+
+            $('#selectID').val('blocks');
+
             var output = '';
             if (data.hasOwnProperty('error')) {
                 return '<h2>' + data.error + '</h2>';
@@ -3424,7 +3453,11 @@ button.white-bgc[disabled]:focus,
             document.getElementById('main').innerHTML = '';
             if (params['lang'] == null) params['lang'] = "en";
             $('#selectID').val('block');
-            if (params[search] != null) $('#selectID').val(params[search]);
+            if (params[search] != null) {
+                $('#selectID').val(params[search]);
+            } else {
+            }
+
 //document.getElementById('menuBlocks').innerHTML = '<a href="#?lang=111'+params['lang'] +'" id=home2>Blocks</a>'
 
 //	document.getElementById('home').href = document.location.pathname;
@@ -3651,6 +3684,7 @@ button.white-bgc[disabled]:focus,
 
                         document.title = title + ' - Trades - ' + assets[0] + ' - ' + assets[1];
                     } else {
+                        $('#selectID').val('assets');
                         asyncAjax('blockexplorer.json?asset=' + params['asset'] + '&lang=' + params['lang'], 'asset');
 
                         document.title = title + ' - Asset - ' + params['asset'];
