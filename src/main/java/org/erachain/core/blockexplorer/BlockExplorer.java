@@ -285,7 +285,7 @@ public class BlockExplorer {
                         //search transactions
                         output.putAll(jsonQuerySearchPages(Transaction.class, search, (int)start, pageSize));
                         break;
-                    case "addresses":
+                    case "address":
                         //search address
                         output.putAll(jsonQueryAddress(search, (int) start));
                         break;
@@ -366,8 +366,11 @@ public class BlockExplorer {
 
         // address
         else if (info.getQueryParameters().containsKey("address")) {
-            output.put("search", "addresses");
-            output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("address"), (int)start));
+            output.put("search", "address");
+            output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("address"), (int) start));
+        } else if (info.getQueryParameters().containsKey("addresses")) {
+            output.put("search", "address");
+            return output;
 
         ///////// BLOCKS /////////////
         } else if (info.getQueryParameters().containsKey("blocks")) {
@@ -2087,14 +2090,12 @@ public class BlockExplorer {
         output.put("address", address);
 
         Account acc = new Account(address);
-        long personKey = -10;
         Tuple2<Integer, PersonCls> person = acc.getPerson();
 
         if (person != null) {
             output.put("label_person_name", Lang.getInstance().translateFromLangObj("Name", langObj));
             output.put("person_Img", Base64.encodeBase64String(person.b.getImage()));
-            output.put("Person_Name", person.b.getName());
-            personKey = person.b.getKey();
+            output.put("person", person.b.getName());
 
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balabce_LIA = acc.getBalance(AssetCls.LIA_KEY);
             output.put("registered", balabce_LIA.a.b.toPlainString());
@@ -2103,7 +2104,7 @@ public class BlockExplorer {
             output.put("label_certified", Lang.getInstance().translateFromLangObj("Certified", langObj));
 
         }
-        output.put("person_key", personKey);
+        output.put("person_key", person.b.getKey());
         output.put("label_account", Lang.getInstance().translateFromLangObj("Account", langObj));
 
         // balance assets from

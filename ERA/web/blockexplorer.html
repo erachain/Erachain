@@ -576,37 +576,43 @@ button.white-bgc[disabled]:focus,
             return output;
         }
 
+        function addresses(data) {
+
+            $('#selectID').val('address'); // for switch selector
+            var output = 'insert Address for search';
+            return output;
+
+        }
 
         function address(data) {
 
-            $('#selectID').val('addresses'); // for switch selector
+            $('#selectID').val('address'); // for switch selector
 
             var output ='';
             output += '<table width="1280" border=0><tr><td align=left>';
-            if (data.person_key != -10) {
+            if (data.hasOwnProperty('person')) {
 
                 output += '<tr><td><br><img src="personimage?key=' +
                     data.person_key +
                     '" width="100"/></td><td style ="padding-left:20px">';
                 output += '<td><font size="+1">' +
                     data.label_account + ': <a href="?address=' +
-                    data.account + get_lang() + '">' + data.account + '</a></font>';
-                output += '<br><a href ="?person=' +
-                    data.person_key + get_lang() + '">' +
-                    data.label_person_name + ': ' + data.Person_Name + '</a>';
+                    data.address + get_lang() + '">' + data.address + '</a><br>';
+                output += data.label_person_name + ': <a href ="?person=' +
+                    data.person_key + get_lang() + '">[' + data.person_key + ']' + data.person + '</a>';
                 if ('registered' in data) {
                     output += '<br>' + data.label_registered + ': <b>' +
                         data.registered + '</b>, ' + data.label_certified +
                         ': <b>' + data.certified + '</b>';
                 }
-                output += '</tr>';
+                output += '</font></tr>';
 
             } else {
 
                 output += '<br><br>';
                 output += '<font size="+1">' + data.label_account +
-                    ': <a href="?address=' + data.account + get_lang() +
-                    '">' + data.account + '</a></font>';
+                    ': <a href="?address=' + data.address + get_lang() +
+                    '">' + data.address + '</a></font>';
             }
             output += '</table>';
             output += '<table width="1280" border=0><tr><td align=left>';
@@ -2971,7 +2977,7 @@ button.white-bgc[disabled]:focus,
             for (key in data.foundList) {
                 var row = data.foundList[key];
                 switch (row[1]) {
-                    case 'addresses':
+                    case 'address':
                         foundList += '<li><a href="?address=' + encodeURIComponent(data.query) + get_lang() + '">' + row[2] + ': ' + htmlFilter(data.query) + '</a></li>';
                         foundOne = '?address=' + encodeURIComponent(data.query);
                         break
@@ -3449,7 +3455,7 @@ button.white-bgc[disabled]:focus,
             var n = document.getElementById("selectID").options.selectedIndex;
             var par = document.getElementById("selectID").options[n].value;
             document.getElementById("searchparam").value = par;
-            document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value) + get_lang() + '&search=' + par;
+            document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value.trim()) + get_lang() + '&search=' + par;
         }
 
         function start() {
@@ -3495,6 +3501,16 @@ button.white-bgc[disabled]:focus,
 
                 document.title = title + ' - Search - ' + decodeURIComponent(params['q']);
                 document.getElementById('q').value = decodeURIComponent(params['q']);
+
+                return;
+            }
+
+            if (params.hasOwnProperty('addresses')) {
+                asyncAjax('blockexplorer.json?addresses' + '&lang=' + params['lang'], 'addresses')
+
+                document.title = title + ' - Addresses';
+
+                document.getElementById('menuAddresses').setAttribute('class', 'active');
 
                 return;
             }
@@ -3879,7 +3895,7 @@ button.white-bgc[disabled]:focus,
                         <div class="input-group">
                             <select id="selectID" class="form-control" role="tablist">
                                 <option value=blocks id=home2_op translate="true">Block</option>
-                                <option value=addresses id=menu_addresses_op translate="true">Address</option>
+                                <option value=address id=menu_address_op translate="true">Address</option>
                                 <option value=transactions id=menu_transactions_op translate="true">Transaction</option>
                                 <option value=assets id=menu_assets_op translate="true">Asset</option>
                                 <option value=persons id=menu_persons_op translate="true">Person</option>
