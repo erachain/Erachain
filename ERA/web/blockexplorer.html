@@ -312,7 +312,7 @@ button.white-bgc[disabled]:focus,
                             $("#searchparam").val(type);
                             document.getElementById('Langs').innerHTML = langs(data);
 
-                            $('#selectID').val(data.search);
+                            $('#selectID').val(type);
                             if (!data.noSearchedElements) {
                                 if (type == 'blocks') {
                                     document.getElementById('main').innerHTML = blocks(data);
@@ -354,20 +354,15 @@ button.white-bgc[disabled]:focus,
                                     document.getElementById('main').innerHTML = aTs(data)
                                 } else
                                 if (type == 'polls') {
-                                    document.getElementById('main').innerHTML = oppa();
                                     document.getElementById('main').innerHTML = polls(data)
                                 } else
                                 if (type == 'poll') {
                                     document.getElementById('main').innerHTML = poll(data)
-
                                 } else
-                                if (type == 'assets') {
-                                    document.getElementById('main').innerHTML = assets(data)
+                                if (type == 'assets') { // list and for search
+                                    document.getElementById('main').innerHTML = assets(data);
                                 } else
-                                if (type == '--assetsSearch') {
-                                    document.getElementById('main').innerHTML = assetsSearch(data)
-                                } else
-                                if (type == 'asset') {
+                                if (type == 'asset') { // for one Asset
                                     document.getElementById('main').innerHTML = asset(data);
                                 } else
                                 if (type == 'trades') {
@@ -2973,7 +2968,7 @@ button.white-bgc[disabled]:focus,
             for (key in data.foundList) {
                 var row = data.foundList[key];
                 switch (row[1]) {
-                    case 'address':
+                    case 'addresses':
                         foundList += '<li><a href="?address=' + encodeURIComponent(data.query) + get_lang() + '">' + row[2] + ': ' + htmlFilter(data.query) + '</a></li>';
                         foundOne = '?address=' + encodeURIComponent(data.query);
                         break
@@ -2995,7 +2990,7 @@ button.white-bgc[disabled]:focus,
                         foundList += '<li><a href="?name=' + encodeURIComponent(data.query) + get_lang() + '">' + row[2] + ': ' + htmlFilter(data.query) + '</a></li>';
                         foundOne = '?name=' + encodeURIComponent(data.query);
                         break
-                    case 'asset':
+                    case 'assets':
                         foundList += '<li><a href="?asset=' + encodeURIComponent(data.query) + get_lang() + '">' + row[2] + ': ' + htmlFilter(data.query) + '</a></li>';
                         foundOne = '?asset=' + encodeURIComponent(data.query);
                         break
@@ -3393,57 +3388,6 @@ button.white-bgc[disabled]:focus,
             return output;
         }
 
-
-        function assetsSearch(data) {
-            var output = '';
-            var notDisplayPages = data.notDisplayPages;
-            output += lastBlock(data.lastBlock);
-            var start = data.start;
-            if (!notDisplayPages) {
-                //output += pagesComponentMixed(data);
-                output += pagesComponent2(data);
-            }
-            output += '<table width="1280" border=0><tr><td align=left><br>';
-            output += '<a href="?assets"' + get_lang() + '><h3 style="display:inline;">' + data.label_Title + '</h3></a>';
-            output += '<br><br>';
-
-            output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 ' +
-                'class="table table-striped" style="border: 1px solid #ddd;"><tr>';
-            output += '<td><b>' + data.label_table_key + ': <b>' + data.label_table_asset_name +
-                '<td><b>' + data.label_operations + '<td><b>' + data.label_table_asset_creator;
-            output += '<td><b>' + data.label_table_asset_movable + '<td><b>' +
-                data.label_table_asset_amount + '<td><b>' + data.label_table_asset_divisible;
-
-            //Отображение таблицы элементов активов
-            //var length = Object.keys(data.pageItems).length;
-            //for (var i = 0; i < length - 1; i++) {
-            for (var i in data.pageItems) {
-                var item = data.pageItems[i];
-                output += '<tr>';
-                output += '<td> <a href=?asset=' + encodeURIComponent(item.key) + get_lang() + '>';
-                output += '<b>' + item.key + '</b>: ';
-                if (item.icon.length > 0)
-                    output += '<img src="data:image/gif;base64,' + item.icon + '" width="30" /> ';
-
-                output += htmlFilter(item.name);
-                output += '</a>';
-                output += '<td>' + item.operations;
-                //Здесь возникает html injection - решено убрать это поле
-                // table += '<td>' + data.assets[key].description.substr(0, 80);
-                output += '<td><a href =?address=' + item.owner + get_lang()
-                    + '> ' + htmlFilter(item.owner) + '</a>';
-                output += '<td>' + htmlFilter(item.assetType);
-                output += '<td>' + item.quantity;
-                output += '<td>' + item.scale;
-            }
-            if (!notDisplayPages) {
-                output += '</table></td></tr></table>';
-                //output += pagesComponentMixed(data);
-                output += pagesComponent2(data);
-            }
-            return output;
-        }
-
         function get_lang() {
 
 // получаем индекс выбранного элемента
@@ -3509,6 +3453,16 @@ button.white-bgc[disabled]:focus,
 
             var title = 'Erachain BlockExplorer';
 
+            if (params.hasOwnProperty('q')) {
+                asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
+                        '&search=' + params['search'] + '&start=' + params['start'], params['search']);
+
+                document.title = title + ' - Search - ' + decodeURIComponent(params['q']);
+                document.getElementById('q').value = decodeURIComponent(params['q']);
+
+                return;
+            }
+
             if (params.hasOwnProperty('aTs')) {
                 asyncAjax('blockexplorer.json?aTs' + '&lang=' + params['lang'], 'aTs')
 
@@ -3520,7 +3474,7 @@ button.white-bgc[disabled]:focus,
             }
 
             if (params.hasOwnProperty('polls')) {
-                asyncAjax('blockexplorer.json?polls& asset = ' + params['asset'] + '&lang=' + params['lang'], 'polls')
+                asyncAjax('blockexplorer.json?polls& asset = ' + params['poll'] + '&lang=' + params['lang'], 'polls')
 
                 document.title = title + ' - Polls';
 
@@ -3542,7 +3496,6 @@ button.white-bgc[disabled]:focus,
 
             if (params.hasOwnProperty('statuses')) {
                 asyncAjax('blockexplorer.json?statuses' + '&lang=' + params['lang'] + '&start=' + params['start'], 'statuses')
-
 
                 document.title = title + ' - Statuses';
 
@@ -3677,7 +3630,7 @@ button.white-bgc[disabled]:focus,
             }
 
             if (params.hasOwnProperty('poll')) {
-                asyncAjax('blockexplorer.json?poll=' + params['poll'] + '& asset=' + params['asset'] + '&lang=' + params['lang'], 'poll');
+                asyncAjax('blockexplorer.json?poll=' + params['poll'] + '& poll=' + params['poll'] + '&lang=' + params['lang'], 'poll');
 
                 document.title = title + ' - Poll - ' + decodeURIComponent(params['poll']);
 
@@ -3731,7 +3684,6 @@ button.white-bgc[disabled]:focus,
                 return;
             }
 
-
             if (params.hasOwnProperty('block')) {
                 asyncAjax('blockexplorer.json?block=' + params['block'] + '&lang=' + params['lang'] + '&start=' + start, 'mainQuery');
 
@@ -3739,7 +3691,6 @@ button.white-bgc[disabled]:focus,
 
                 return;
             }
-
 
             if (params.hasOwnProperty('unconfirmed')) {
 
@@ -3750,34 +3701,7 @@ button.white-bgc[disabled]:focus,
                 return;
             }
 
-            if (params.hasOwnProperty('q')) {
-                if (params['search'] == 'transaction' || params['search'] == 'transaction') {
-                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'] + '&start=' + params['start'], 'transactions');
-                } else if (params['search'] == 'person' || params['search'] == 'persons') {
-                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'] + '&start=' + params['start'], 'persons');
-                } else if (params['search'] == 'asset' || params['search'] == 'assets') {
-                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'] + '&start=' + params['start'], 'assets');
-                } else if (params['search'] == 'status' || params['search'] == 'statuses') {
-                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'] + '&start=' + params['start'], 'statuses');
-                } else if (params['search'] == 'template' || params['search'] == 'templates') {
-                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'] + '&start=' + params['start'], 'templates');
-                } else if (params['search'] == 'block' || params['search'] == 'blocks') {
-                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'] + '&start=' + start, 'block');
-                }
-                document.title = title + ' - Search - ' + decodeURIComponent(params['q']);
-                document.getElementById('q').value = decodeURIComponent(params['q']);
-
-                return;
-            }
-
             if (params.hasOwnProperty('transactions')) {
-                //asyncAjax('blockexplorer.json?transactions' + '&lang=' + params['lang'] + '&start=' + params['start'], 'transactions');
                 asyncAjax('blockexplorer.json?transactions' + '&lang=' + params['lang'] + '&start=' + params['start'], 'transactions');
                 document.title = title + ' - Search - ' + decodeURIComponent(params['transactions']);
                 return;
@@ -3917,13 +3841,13 @@ button.white-bgc[disabled]:focus,
                     <div class="navbar-form navbar-left">
                         <div class="input-group">
                             <select id="selectID" class="form-control" role="tablist">
-                                <option value=block id=home2_op translate="true">Blocks</option>
-                                <option value=address id=menu_addresses_op translate="true">Addresses</option>
-                                <option value=transaction id=menu_transactions_op translate="true">Transactions</option>
-                                <option value=asset id=menu_assets_op translate="true">Assets</option>
-                                <option value=person id=menu_persons_op translate="true">Persons</option>
-                                <option value=status id=menu_statuses_op translate="true">Statuses</option>
-                                <option value=template id=menu_templates_op translate="true">Templates</option>
+                                <option value=blocks id=home2_op translate="true">Block</option>
+                                <option value=addresses id=menu_addresses_op translate="true">Address</option>
+                                <option value=transactions id=menu_transactions_op translate="true">Transaction</option>
+                                <option value=assets id=menu_assets_op translate="true">Asset</option>
+                                <option value=persons id=menu_persons_op translate="true">Person</option>
+                                <option value=statuses id=menu_statuses_op translate="true">Status</option>
+                                <option value=templates id=menu_templates_op translate="true">Template</option>
                             </select>
                         </div>
                         <div class="input-group">
@@ -3953,7 +3877,7 @@ button.white-bgc[disabled]:focus,
                                     <li id=menuAddresses><a href="?addresses" id=menu_addresses translate="true">Addresses</a></li>
                                     <li id=menuTransactions><a href="?transactions" id=menu_transactions translate="true">Transactions</a></li>
                                     <li id=menuPersons><a href="?persons" id=menu_persons translate="true">Persons</a></li>
-                                    <li id=menuPolls><a href="?polls&asset=1" id=menu_pals_asset translate="true">Polls</a></li>
+                                    <li id=menuPolls><a href="?polls&asset=2" id=menu_pals_asset translate="true">Polls</a></li>
                                     <li id=menuAssets><a href="?assets" id=menu_assets translate="true">Assets</a></li>
                                     <li id=menuStatuses><a href="?statuses" id=menu_statuses translate="true">Statuses</a></li>
                                     <li id=menuTemplates><a href="?templates" id=menu_templates translate="true">Templates</a></li>

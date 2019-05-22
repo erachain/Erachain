@@ -280,67 +280,50 @@ public class BlockExplorer {
             if (info.getQueryParameters().containsKey("search")) {
                 String type = info.getQueryParameters().getFirst("search");
                 String search = info.getQueryParameters().getFirst("q");
+                output.put("search", type);
                 switch (type) {
-                    case "txs":
                     case "transactions":
-                    case "transaction":
-                    case "tx":
                         //search transactions
-                        output.put("search", "transaction");
                         output.putAll(jsonQuerySearchPages(Transaction.class, search, (int)start, pageSize));
-
                         break;
                     case "addresses":
-                    case "address":
                         //search address
-                        output.put("search", "address");
                         output.putAll(jsonQueryAddress(search, (int) start));
                         break;
                     case "persons":
-                    case "person":
                         //search persons
-                        output.put("search", "person");
                         output.putAll(jsonQuerySearchPages(PersonCls.class, search, (int)start, pageSize));
-
                         break;
                     case "assets":
-                    case "asset":
                         //search assets
-                        output.put("search", "asset");
                         output.putAll(jsonQuerySearchPages(AssetCls.class, search, (int)start, pageSize));
                         break;
                     case "statuses":
-                    case "status":
                         //search statuses
-                        output.put("search", "status");
                         output.putAll(jsonQuerySearchPages(StatusCls.class, search, (int)start, pageSize));
                         break;
                     case "templates":
-                    case "template":
                         //search templates
-                        output.put("search", "template");
                         output.putAll(jsonQuerySearchPages(TemplateCls.class, search, (int)start, pageSize));
                         break;
                     case "blocks":
-                    case "block":
                         //search block
-                        output.put("search", "block");
                         output.putAll(jsonQuerySearchPages(Block.class, search, (int)start, pageSize));
                         break;
                 }
-
             }
+        //////////////////////////// ASSETS //////////////////////////
             // top 100
         } else if (info.getQueryParameters().containsKey("top")) {
+            output.put("search", "top");
             output.putAll(jsonQueryTopRichest(info));
             // asset lite
+        } else if (info.getQueryParameters().containsKey("assets")) {
+            output.put("search", "assets");
+            output.putAll(jsonQueryPages(AssetCls.class, start, pageSize));
         } else if (info.getQueryParameters().containsKey("assetsLite")) {
             output.put("assetsLite", jsonQueryAssetsLite());
             // assets list
-        } else if (info.getQueryParameters().containsKey("assets")) {
-            output.put("search", "asset");
-            output.putAll(jsonQueryPages(AssetCls.class, start, pageSize));
-            // asset
         } else if (info.getQueryParameters().containsKey("asset")) {
             // person asset balance
             if (info.getQueryParameters().containsKey("person")) {
@@ -350,8 +333,8 @@ public class BlockExplorer {
                         new Integer(info.getQueryParameters().getFirst("position"))
                 ));
             } else {
-                output.put("search", "asset");
                 if (info.getQueryParameters().get("asset").size() == 1) {
+                    output.put("search", "assets");
                     try {
                         output.put("asset", jsonQueryAsset(Long.valueOf((info.getQueryParameters().getFirst("asset")))));
                     } catch (Exception e) {
@@ -359,8 +342,7 @@ public class BlockExplorer {
                         logger.error(e.getMessage(), e);
                         return output;
                     }
-                }
-
+                } else
                 if (info.getQueryParameters().get("asset").size() == 2) {
                     long have = Integer.valueOf(info.getQueryParameters().get("asset").get(0));
                     long want = Integer.valueOf(info.getQueryParameters().get("asset").get(1));
@@ -368,8 +350,7 @@ public class BlockExplorer {
                     output.putAll(jsonQueryTrades(have, want));
                 }
             }
-        } else if (info.getQueryParameters().containsKey("blocks")) {
-            output.putAll(jsonQueryPages(Block.class, (int)start, pageSize));
+
         // polls list
         } else if (info.getQueryParameters().containsKey("polls")) {
             output.putAll(jsonQueryPools(info));
@@ -390,75 +371,20 @@ public class BlockExplorer {
         } else if (info.getQueryParameters().containsKey("addresses")) {
             output.put("search", "address");
             jsonQueryTopRichest(info);
+
+        ///////// BLOCKS /////////////
+        } else if (info.getQueryParameters().containsKey("blocks")) {
+            output.put("search", "blocks");
+            output.putAll(jsonQueryPages(Block.class, (int)start, pageSize));
         } else if (info.getQueryParameters().containsKey("block")) {
-            output.put("search", "block");
+            output.put("search", "blocks");
             output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), (int)start));
         }
-        // transaction
-        else if (info.getQueryParameters().containsKey("transactions")) {
-            output.put("search", "transaction");
-            output.putAll(jsonQueryTransactions(null, (int)start));
-        }
-        // transaction
+
+        ///////////////////////////// TRANSACTIONS ///////////////
+        /// TX = signature
         else if (info.getQueryParameters().containsKey("tx")) {
-            output.put("search", "transaction");
             output.putAll(jsonQueryTX(info.getQueryParameters().getFirst("tx")));
-        }
-        // trade
-        else if (info.getQueryParameters().containsKey("trade")) {
-            output.putAll(jsonQueryTrade(info.getQueryParameters().getFirst("trade")));
-        }
-        //poll
-        else if (info.getQueryParameters().containsKey("poll")) {
-            output.putAll(jsonQueryPool(info.getQueryParameters().getFirst("poll"),
-                    info.getQueryParameters().getFirst(" asset")));
-        }
-        // unconfirmed transactions
-        else if (info.getQueryParameters().containsKey("unconfirmed")) {
-            output.putAll(jsonQueryUnconfirmedTXs());
-        }
-        // blog tx
-        else if (info.getQueryParameters().containsKey("blogposts")) {
-            output.putAll(jsonQueryBlogPostsTx(info.getQueryParameters().getFirst("blogposts")));
-        }
-        // persons list
-        else if (info.getQueryParameters().containsKey("persons")) {
-            output.put("search", "person");
-            output.putAll(jsonQueryPages(PersonCls.class, start, pageSize));
-        }
-        // person
-        else if (info.getQueryParameters().containsKey("person")) {
-            output.put("search", "person");
-            // person asset balance
-            if (info.getQueryParameters().containsKey("asset")) {
-//                output.put("search", "person");
-                output.putAll(jsonQueryPersonBalance(new Long(info.getQueryParameters().getFirst("person")),
-                        new Long(info.getQueryParameters().getFirst("asset")),
-                        new Integer(info.getQueryParameters().getFirst("position"))
-                ));
-            } else {
-                output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
-            }
-        }
-        // templates list
-        else if (info.getQueryParameters().containsKey("templates")) {
-            output.put("search", "template");
-            output.putAll(jsonQueryPages(TemplateCls.class, start, pageSize));
-        }
-        // template
-        else if (info.getQueryParameters().containsKey("template")) {
-            output.put("search", "template");
-            output.putAll(jsonQueryTemplate(Long.valueOf(info.getQueryParameters().getFirst("template"))));
-        }
-        // statuses list
-        else if (info.getQueryParameters().containsKey("statuses")) {
-            output.put("search", "status");
-            output.putAll(jsonQueryPages(StatusCls.class, start, pageSize));
-        }
-        // status
-        else if (info.getQueryParameters().containsKey("status")) {
-            output.put("search", "status");
-            output.putAll(jsonQueryStatus(Long.valueOf(info.getQueryParameters().getFirst("status"))));
         }
         // tx from seq-No
         else if (info.getQueryParameters().containsKey("seqNo")) {
@@ -473,6 +399,74 @@ public class BlockExplorer {
                 output.put("body", WebTransactionsHTML.getInstance().get_HTML(transaction, langObj));
             }
         }
+
+        // transactions
+        else if (info.getQueryParameters().containsKey("transactions")) {
+            output.putAll(jsonQueryTransactions(null, (int)start));
+        }
+        // unconfirmed transactions
+        else if (info.getQueryParameters().containsKey("unconfirmed")) {
+            output.putAll(jsonQueryUnconfirmedTXs());
+        }
+
+        // trade
+        else if (info.getQueryParameters().containsKey("trade")) {
+            output.putAll(jsonQueryTrade(info.getQueryParameters().getFirst("trade")));
+        }
+        //poll
+        else if (info.getQueryParameters().containsKey("poll")) {
+            output.putAll(jsonQueryPool(info.getQueryParameters().getFirst("poll"),
+                    info.getQueryParameters().getFirst(" asset")));
+        }
+        // blog tx
+        else if (info.getQueryParameters().containsKey("blogposts")) {
+            output.putAll(jsonQueryBlogPostsTx(info.getQueryParameters().getFirst("blogposts")));
+        }
+
+        ///////////////////////////////////////// PERSONS /////////////////////////////////
+        // persons list
+        else if (info.getQueryParameters().containsKey("persons")) {
+            output.put("search", "persons");
+            output.putAll(jsonQueryPages(PersonCls.class, start, pageSize));
+        }
+        // person
+        else if (info.getQueryParameters().containsKey("person")) {
+            output.put("search", "persons");
+            // person asset balance
+            if (info.getQueryParameters().containsKey("asset")) {
+                output.putAll(jsonQueryPersonBalance(new Long(info.getQueryParameters().getFirst("person")),
+                        new Long(info.getQueryParameters().getFirst("asset")),
+                        new Integer(info.getQueryParameters().getFirst("position"))
+                ));
+            } else {
+                output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
+            }
+        }
+
+        //////////////////////// TEMPLATES ///////////////////
+        // templates list
+        else if (info.getQueryParameters().containsKey("templates")) {
+            output.put("search", "templates");
+            output.putAll(jsonQueryPages(TemplateCls.class, start, pageSize));
+        }
+        // template
+        else if (info.getQueryParameters().containsKey("template")) {
+            output.put("search", "templates");
+            output.putAll(jsonQueryTemplate(Long.valueOf(info.getQueryParameters().getFirst("template"))));
+        }
+
+        ////////////////////// STATUSES ///////////////////////
+        // statuses list
+        else if (info.getQueryParameters().containsKey("statuses")) {
+            output.put("search", "statuses");
+            output.putAll(jsonQueryPages(StatusCls.class, start, pageSize));
+        }
+        // status
+        else if (info.getQueryParameters().containsKey("status")) {
+            output.put("search", "statuses");
+            output.putAll(jsonQueryStatus(Long.valueOf(info.getQueryParameters().getFirst("status"))));
+        }
+
         // not key
         else {
             output.put("error", "Not enough parameters.");
@@ -2117,8 +2111,8 @@ public class BlockExplorer {
         transactionsJSON(output, acc, transactions, start, pageSize,
                 Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" + limit));
 
-        output.put("type", "address");
         output.put("search", "address");
+        output.put("type", "address");
 
         return output;
     }
