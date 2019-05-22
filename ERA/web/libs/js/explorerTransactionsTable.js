@@ -221,8 +221,6 @@ function pagesComponentBeauty(start, label, numberLast, step, linkName) {
 
 function transactions_Table(data) {
 
-    $('#selectID').val('transactions');
-
     console.log("data=")
     console.log(data)
     var output = data.Transactions.label_transactions_table + ':<br>';

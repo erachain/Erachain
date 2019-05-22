@@ -3250,10 +3250,16 @@ button.white-bgc[disabled]:focus,
         }
 
         function transactions(data) {
+
+            $('#selectID').val('transactions');
+
             return transactions_Table(data);
         }
 
         function transactionsSearch(data) {
+
+            $('#selectID').val('transactions');
+
             var output = 'transactionsSearch';
             return output;
         }
