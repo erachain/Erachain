@@ -208,7 +208,7 @@ public class BlockExplorer {
                 keys = ((FilteredByStringArray)map).getKeysByFilterAsArray(search, 0, 100);
             }
         } catch (Exception e) {
-            logger.error("Wrong search while process assets... " + e.getMessage());
+            logger.error("Wrong search while process assets... ", e.getMessage());
             throw new WrongSearchException();
         }
         if (keys == null || keys.isEmpty()) {

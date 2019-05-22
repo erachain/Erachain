@@ -83,7 +83,7 @@ public class StatementsTableModelSearch extends SearchTableModelCls<Transaction>
 
         DCSet dcSet = DCSet.getInstance();
 
-        Pair<String, Iterable> result = dcSet.getTransactionFinalMap().getKeysByFilterAsArray(filter, start, step);
+        Pair<String, Iterable> result = dcSet.getTransactionFinalMap().getKeysIteratorByFilterAsArray(filter, start, step);
 
         if (result.getA() != null) {
             findMessage = result.getA();

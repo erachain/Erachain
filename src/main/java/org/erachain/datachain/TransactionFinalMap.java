@@ -11,6 +11,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
+import org.erachain.database.FilteredByStringArray;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
@@ -44,7 +45,7 @@ import java.util.*;
  * (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  * <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-public class TransactionFinalMap extends DCMap<Long, Transaction> {
+public class TransactionFinalMap extends DCMap<Long, Transaction> implements FilteredByStringArray {
 
     private static int CUT_NAME_INDEX = 12;
 
@@ -464,7 +465,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
      * @return
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Pair<String, Iterable> getKeysByFilterAsArray(String filter, int offset, int limit) {
+    public Pair<String, Iterable> getKeysIteratorByFilterAsArray(String filter, int offset, int limit) {
 
         String filterLower = filter.toLowerCase();
         String[] filterArray = filterLower.split(" ");
@@ -488,6 +489,58 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
 
         return new Pair<>(null, iterable);
 
+    }
+
+    // get list items in name substring str
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<Long> getKeysByFilterAsArray(String filter, int offset, int limit) {
+
+        if (filter == null || filter.isEmpty()){
+            return new ArrayList<>();
+        }
+
+        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
+        if (resultKeys.getA() != null) {
+            return new ArrayList<>();
+        }
+
+        List<Long> result = new ArrayList<>();
+
+        Iterator<Long> iterator = resultKeys.getB().iterator();
+
+        while (iterator.hasNext()) {
+            Long key = iterator.next();
+            Transaction item = get(key);
+            if (item != null)
+                result.add(key);
+        }
+
+        return result;
+    }
+
+    // get list items in name substring str
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<Transaction> getByFilterAsArray(String filter, int offset, int limit) {
+
+        if (filter == null || filter.isEmpty()){
+            return new ArrayList<>();
+        }
+
+        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
+        if (resultKeys.getA() != null) {
+            return new ArrayList<>();
+        }
+
+        List<Transaction> result = new ArrayList<>();
+
+        Iterator<Long> iterator = resultKeys.getB().iterator();
+
+        while (iterator.hasNext()) {
+            Transaction item = get(iterator.next());
+            result.add(item);
+        }
+
+        return result;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
