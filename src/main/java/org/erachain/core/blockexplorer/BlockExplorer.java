@@ -2927,6 +2927,7 @@ public class BlockExplorer {
                 out.put("seqNo", transaction.getSeqNo());
 
                 out.put("title", transaction.getTitle());
+                out.put("confirmations", transaction.getConfirmations(height));
 
                 if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
                     RCalculated txCalculated = (RCalculated) transaction;
@@ -2949,8 +2950,6 @@ public class BlockExplorer {
                     } else {
                         out.put("type", typeName);
                     }
-
-                    out.put("confirmations", transaction.getConfirmations(height));
 
                     out.put("creator", txCalculated.getRecipient().getPersonAsString());
                     out.put("creator_addr", txCalculated.getRecipient().getAddress());
@@ -2998,7 +2997,6 @@ public class BlockExplorer {
 
                     out.put("size", transaction.viewSize(Transaction.FOR_NETWORK));
                     out.put("fee", transaction.getFee());
-                    out.put("confirmations", transaction.getConfirmations(height));
 
                 }
 

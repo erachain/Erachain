@@ -257,11 +257,11 @@ function transactions_Table(data) {
         output += item.amount_key + '<td>'
             + item.date;
         output += '<td><a href ="?address=' + item.creator_addr + get_lang() + '">' +
-            item.creator + '</a>';
-        output += '<td>' + item.size + '<td>'
-            + item.fee
-            + item.confirmations
-            + '</td></tr>';
+            item.creator + '</a><td>';
+        output += item.size
+            + '<td>'+ item.fee
+            + '<td>' + item.confirmations + '</td>'
+            + '</tr>';
 
     }
     output += '</table></td></tr></table>';
