@@ -3252,16 +3252,25 @@ button.white-bgc[disabled]:focus,
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  ' +
                 'class="table table-striped" style="border: 1px solid #ddd;">';
             output += '<tr><td><td><b>' + data.Label_key + ' <td><b>' +
-                data.Label_name + '<td><b>' + data.Label_creator;
+                data.Label_name + '<td><b>'+ data.Label_description + ' <td><b>' + data.Label_creator;
             //Отображение таблицы элементов персон
             for (var i in data.pageItems) {
             //var length = Object.keys(data.pageItems).length;
             //for (var i = 0; i < length; i++) {
+                var item = data.pageItems[i];
+
+
                 output += '<tr>';
-                output += ' <td><img src="personimage?key=' + data.pageItems[i].key + '" width="100"/></td>';
-                output += '<td>' + addCommas(data.pageItems[i].key) + '<td><a href=?person=' +
-                    data.pageItems[i].key + get_lang() + '>' + data.pageItems[i].name + '</a>';
-                output += '<td><a href=?address=' + data.pageItems[i].creator + get_lang() + '>' + data.pageItems[i].creator + '</a>';
+                output += ' <td><img src="personimage?key=' + item.key + '" width="100"/></td>';
+                output += '<td>' + item.key + '<td><a href=?person=' +
+                    item.key + get_lang() + '>' + item.name + '</a>';
+                output += '<td>' + item.description.substr(0, 100) + '</td>';
+                output += '<td><a href=?address=' + item.owner + get_lang() + '>';
+                if (item.hasOwnProperty('person'))
+                    output += '[' + item.person_key + ']' + htmlFilter(item.person);
+                else
+                    output += item.owner;
+                output += '</a>';
             }
             if (!notDisplayPages) {
                 output += '</table></td></tr></table>';

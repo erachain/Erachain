@@ -79,6 +79,8 @@ public class AdderHeadInfo {
         output.put("Label_key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("Label_name", Lang.getInstance().translateFromLangObj("Name", langObj));
         output.put("Label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        output.put("Label_image", Lang.getInstance().translateFromLangObj("Image", langObj));
+        output.put("Label_description", Lang.getInstance().translateFromLangObj("Description", langObj));
         output.put("Label_Persons", Lang.getInstance().translateFromLangObj("Persons", langObj));
         addLaterPrevious(output, langObj);
     }
