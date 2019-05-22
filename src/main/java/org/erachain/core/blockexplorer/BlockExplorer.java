@@ -92,7 +92,7 @@ public class BlockExplorer {
         while (key > start - pageSize && key > 0) {
             element = (ExplorerJsonLine) map.get(key--);
             if (element != null) {
-                array.add(element.jsonForExolorerPage(langObj));
+                array.add(element.jsonForExplorerPage(langObj));
             }
         }
 
@@ -121,7 +121,7 @@ public class BlockExplorer {
         while (key > start - pageSize && key > 0) {
             element = (ExplorerJsonLine) map.get(key--);
             if (element != null) {
-                array.add(element.jsonForExolorerPage(langObj));
+                array.add(element.jsonForExplorerPage(langObj));
             }
 
         }
@@ -153,7 +153,7 @@ public class BlockExplorer {
             while (index > start - pageSize && index > 0) {
                 element = (ExplorerJsonLine) map.get(keys.get(--index));
                 if (element != null) {
-                    array.add(element.jsonForExolorerPage(langObj));
+                    array.add(element.jsonForExplorerPage(langObj));
                 }
             }
         }

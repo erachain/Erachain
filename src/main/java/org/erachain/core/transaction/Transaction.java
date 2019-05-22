@@ -1029,7 +1029,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         return transaction;
     }
 
-    public JSONObject jsonForExolorerPage(JSONObject langObj) {
+    public JSONObject jsonForExplorerPage(JSONObject langObj) {
         return toJson();
     }
 

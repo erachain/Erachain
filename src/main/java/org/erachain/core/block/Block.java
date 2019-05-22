@@ -363,7 +363,7 @@ public class Block implements ExplorerJsonLine {
 
     }
 
-    public JSONObject jsonForExolorerPage(JSONObject langObj) {
+    public JSONObject jsonForExplorerPage(JSONObject langObj) {
         JSONObject blockJSON = new JSONObject();
         blockJSON.put("height", heightBlock);
         blockJSON.put("signature", Base58.encode(signature));

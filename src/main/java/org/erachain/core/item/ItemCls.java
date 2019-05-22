@@ -442,7 +442,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
      * @param langObj
      * @return
      */
-    public JSONObject jsonForExolorerPage(JSONObject langObj) {
+    public JSONObject jsonForExplorerPage(JSONObject langObj) {
         //DCSet dcSet = DCSet.getInstance();
 
         JSONObject json = new JSONObject();
