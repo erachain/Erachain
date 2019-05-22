@@ -235,22 +235,33 @@ function transactions_Table(data) {
         data.Transactions.label_amount_key + '<td><b>' + data.Transactions.label_date + '<td><b>' +
         data.Transactions.label_atside + '<td><b>' + data.Transactions.label_size + '<td><b>' +
         data.Transactions.label_fee + '<td><b>' + data.Transactions.label_confirmations + '</tr>';
+
     for (key in data.Transactions.transactions) {
-        output += '<tr><td><a href ="?tx=' + data.Transactions.transactions[key].block + '-'
-            + data.Transactions.transactions[key].seqNo + get_lang() + '">' + data.Transactions.transactions[key].block + '-' +
-            data.Transactions.transactions[key].seqNo + '</a><td><a href="?tx=' +
-            data.Transactions.transactions[key].signature + get_lang() + '" title = "' +
-            data.Transactions.transactions[key].signature + get_lang() + '">' +
-            data.Transactions.transactions[key].signature.slice(0, 11) + '...</a><td>'
-        if (data.Transactions.transactions[key].type !== 'forging') {
-            output += '<a href="?tx=' + data.Transactions.transactions[key].signature + get_lang() + '">'
+        var item = data.Transactions.transactions[key];
+        output += '<tr><td><a href ="?tx=' + item.block + '-'
+            + item.seqNo + get_lang() + '">' + item.block + '-' + item.seqNo + '</a><td>';
+
+        if (item.title != null) {
+            output += '<a href="?tx=' + item.signature + get_lang() + '">'
+                + htmlFilter(item.title) + '</a><td>';
+        } else {
+            output += '<td>';
         }
-        output += data.Transactions.transactions[key].type +
-            '</a><td>' + data.Transactions.transactions[key].amount_key + '<td>' + data.Transactions.transactions[key].date;
-        output += '<td><a href ="?address=' + data.Transactions.transactions[key].creator_addr + get_lang() + '">' +
-            data.Transactions.transactions[key].creator + '</a>';
-        output += '<td>' + data.Transactions.transactions[key].size + '<td>' +
-            data.Transactions.transactions[key].fee + '<td>' + data.Transactions.transactions[key].confirmations + '</td></tr>';
+
+        if (item.type != 'forging') {
+            output += item.type + '<td>';
+        } else {
+            output += item.type + '<td>';
+        }
+
+        output += item.amount_key + '<td>'
+            + item.date;
+        output += '<td><a href ="?address=' + item.creator_addr + get_lang() + '">' +
+            item.creator + '</a>';
+        output += '<td>' + item.size + '<td>'
+            + item.fee
+            + item.confirmations
+            + '</td></tr>';
 
     }
     output += '</table></td></tr></table>';

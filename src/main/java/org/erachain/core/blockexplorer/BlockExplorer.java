@@ -283,7 +283,8 @@ public class BlockExplorer {
                 switch (type) {
                     case "transactions":
                         //search transactions
-                        output.putAll(jsonQuerySearchPages(Transaction.class, search, (int)start, pageSize));
+                        //output.putAll(jsonQuerySearchPages(Transaction.class, search, (int)start, pageSize));
+                        output.putAll(jsonQueryTransactions(search, (int)start));
                         break;
                     case "address":
                         //search address
@@ -2045,13 +2046,12 @@ public class BlockExplorer {
     }
 
     @SuppressWarnings({"serial", "static-access"})
-    public Map jsonQueryTransactions(String typeStr, int start) {
+    public Map jsonQueryTransactions(String filterStr, int start) {
 
         int size = 500;
         List<Transaction> transactions;
-        if (typeStr != null) {
-            int type = Integer.parseInt(typeStr);
-            transactions = dcSet.getTransactionFinalMap().getTransactionsByTitleAndType(null, type, size, true);
+        if (filterStr != null) {
+            transactions = dcSet.getTransactionFinalMap().getTransactionsByTitleAndType(filterStr, null, size, true);
         } else {
             // берем все с перебором с последней
             TransactionFinalMap map = dcSet.getTransactionFinalMap();
@@ -2926,6 +2926,8 @@ public class BlockExplorer {
 
                 out.put("seqNo", transaction.getSeqNo());
 
+                out.put("title", transaction.getTitle());
+
                 if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
                     RCalculated txCalculated = (RCalculated) transaction;
                     outcome = txCalculated.getAmount().signum() < 0;
@@ -2961,6 +2963,7 @@ public class BlockExplorer {
                     out.put("date", DateTimeFormat.timestamptoString(transaction.getTimestamp()));
                     String typeName = transaction.viewFullTypeName();
                     out.put("type", typeName);
+
                     if (transaction.getCreator() == null) {
                         out.put("creator", GenesisBlock.CREATOR.getAddress());
                         out.put("creator_addr", "GENESIS");
