@@ -9,6 +9,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSetStatusToItem;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -17,6 +18,7 @@ import org.erachain.datachain.ItemMap;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple6;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -441,7 +443,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
      * @return
      */
     public JSONObject jsonForExolorerPage(JSONObject langObj) {
-        DCSet dcSet = DCSet.getInstance();
+        //DCSet dcSet = DCSet.getInstance();
 
         JSONObject json = new JSONObject();
         json.put("key", this.getKey());
@@ -457,7 +459,13 @@ public abstract class ItemCls implements ExplorerJsonLine {
             json.put("description", "");
         }
 
-        json.put("creator", this.getOwner().getAddress());
+        json.put("owner", this.getOwner().getAddress());
+        Fun.Tuple2<Integer, PersonCls> person = this.getOwner().getPerson();
+        if (person != null) {
+            json.put("person", person.b.getName());
+            json.put("person_key", person.b.getKey());
+        }
+
         if (icon != null)
             json.put("icon", Base64.encodeBase64String(icon));
 

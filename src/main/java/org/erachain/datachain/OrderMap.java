@@ -185,6 +185,15 @@ public class OrderMap extends DCMap<Long, Order> {
         return keys;
     }
 
+    public long getCountHave(long have) {
+
+        long size = ((BTreeMap<Tuple4, Long>) this.haveWantKeyMap).subMap(
+                Fun.t4(have, null, null, null),
+                Fun.t4(have, Fun.HI(), Fun.HI(), Fun.HI())).size();
+
+        return size;
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Order> getOrdersHave(long have, int limit) {
 
@@ -218,6 +227,16 @@ public class OrderMap extends DCMap<Long, Order> {
                 Fun.t4(want, Fun.HI(), Fun.HI(), Fun.HI())).values();
 
         return keys;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public long getCountWant(long want) {
+
+        long size = ((BTreeMap<Tuple4, Long>) this.wantHaveKeyMap).subMap(
+                Fun.t4(want, null, null, null),
+                Fun.t4(want, Fun.HI(), Fun.HI(), Fun.HI())).size();
+
+        return size;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -258,6 +277,11 @@ public class OrderMap extends DCMap<Long, Order> {
         }
 
         return orders;
+    }
+
+    public long getCountOrders(long haveWant) {
+
+        return this.getCountHave(haveWant) + this.getCountWant(haveWant);
     }
 
     public List<Order> getOrdersForTradeWithFork(long have, long want, boolean reverse) {

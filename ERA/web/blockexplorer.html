@@ -338,8 +338,8 @@ button.white-bgc[disabled]:focus,
                                 if (type == 'statement') {
                                     document.getElementById('main').innerHTML = statement(data);
                                 } else
-                                if (type == 'topRichest') {
-                                    document.getElementById('main').innerHTML = topRichest(data);
+                                if (type == 'top') {
+                                    document.getElementById('main').innerHTML = top100(data);
                                 } else
                                 if (type == 'persons') {
                                     document.getElementById('main').innerHTML = persons(data);
@@ -670,7 +670,7 @@ button.white-bgc[disabled]:focus,
             return output;
         }
 
-        function topRichest(data) {
+        function top100(data) {
             var output = "";
 
             output += lastBlock(data.lastBlock);
@@ -713,26 +713,6 @@ button.white-bgc[disabled]:focus,
             table += '</table>';
 
             output += table;
-            /*
-	if(data.assetKey != 0)
-	{
-		assetUrl = '&asset='+data.assetKey;
-	}
-	else
-	{
-		assetUrl = '';
-	}
-
-	output += '<br><a href=?top=100'+assetUrl+get_lang()+'>Top 100</a> | <a href=?top=250'+assetUrl+get_lang()+'>Top 250</a> | <a href=?top=all'+assetUrl+get_lang()+'>All addresses</a> | <a href=?top=allnotzero'+assetUrl+get_lang()+'>All non-empty addresses';
-
-	output += '<br><br><font size=-2>';
-
-	var assetstxt = "";
-	for(key in data.assets) {
-		assetstxt += '<a href=?top=100&asset='+key+get_lang()+'>'+'(' + key + ')' + data.assets[key] + '</a>' + ', ';
-	}
-	output += assetstxt.slice(0, -2) + '</font>';
-	*/
             return output;
         }
 
@@ -3355,10 +3335,11 @@ button.white-bgc[disabled]:focus,
 
             output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 ' +
                 'class="table table-striped" style="border: 1px solid #ddd;"><tr>';
-            output += '<td><b>' + data.label_table_key + ': <b>' + data.label_table_asset_name +
-                '<td><b>' + data.label_operations + '<td><b>' + data.label_table_asset_creator;
-            output += '<td><b>' + data.label_table_asset_movable + '<td><b>' +
-                data.label_table_asset_amount + '<td><b>' + data.label_table_asset_divisible;
+            output += '<td><b>' + data.label_table_asset_key + ': <b>' + data.label_table_asset_name +
+                '<td><b>' + data.label_table_asset_description + '<td><b>' + data.label_table_asset_owner;
+            output += '<td><b>' + data.label_table_asset_orders + '<td><b>' +
+                data.label_table_asset_type + '<td><b>' + data.label_table_asset_amount
+                 + '<td><b>' + data.label_table_asset_scale;
 
             //Отображение таблицы элементов активов
             //var length = Object.keys(data.pageItems).length;
@@ -3366,20 +3347,27 @@ button.white-bgc[disabled]:focus,
             for (var i in data.pageItems) {
                 var item = data.pageItems[i];
                 output += '<tr>';
-                output += '<td> <a href=?asset=' + encodeURIComponent(item.key) + get_lang() + '>';
+                output += '<td> <a href=?asset=' + item.key + get_lang() + '>';
                 output += '<b>' + item.key + '</b>: ';
                 if (item.icon.length > 0)
                     output += '<img src="data:image/gif;base64,' + item.icon + '" width="30" /> ';
 
                 output += htmlFilter(item.name);
                 output += '</a>';
-                output += '<td>' + item.operations;
                 output += '<td>' + htmlFilter(item.description.substr(0, 60));
-                output += '<td><a href =?address=' + item.owner + get_lang()
-                    + '> ' + htmlFilter(item.owner) + '</a>';
-                output += '<td>' + htmlFilter(item.assetType);
+
+                output += '<td><a href=?address=' + item.owner + get_lang() + '>';
+                if (item.hasOwnProperty('person'))
+                    output += '[' + item.person_key + ']' + htmlFilter(item.person);
+                else
+                    output += item.owner;
+                output += '</a></td>';
+
+                output += '<td>' + item.orders;
+                output += '<td>' + item.assetTypeName;
                 output += '<td>' + item.quantity;
                 output += '<td>' + item.scale;
+
             }
             if (!notDisplayPages) {
                 output += '</table></td></tr></table>';
@@ -3443,7 +3431,7 @@ button.white-bgc[disabled]:focus,
 
             document.getElementById('menuBlocks').setAttribute('class', '');
             document.getElementById('menuAddresses').setAttribute('class', '');
-            document.getElementById('menuTop100Richest').setAttribute('class', '');
+            document.getElementById('menuTop100').setAttribute('class', '');
             document.getElementById('menuPolls').setAttribute('class', '');
             document.getElementById('menuAssets').setAttribute('class', '');
             document.getElementById('menuStatuses').setAttribute('class', '');
@@ -3521,11 +3509,11 @@ button.white-bgc[disabled]:focus,
                     asset = 1;
                 }
 
-                asyncAjax('blockexplorer.json?top=' + limit + '&asset=' + asset + '&lang=' + params['lang'], 'topRichest')
+                asyncAjax('blockexplorer.json?top=' + limit + '&asset=' + asset + '&lang=' + params['lang'], 'top')
 
                 document.title = title + ' - Top ' + limit;
 
-                document.getElementById('menuTop100Richest').setAttribute('class', 'active');
+                document.getElementById('menuTop100').setAttribute('class', 'active');
 
                 return;
             }
@@ -3848,6 +3836,7 @@ button.white-bgc[disabled]:focus,
                                 <option value=persons id=menu_persons_op translate="true">Person</option>
                                 <option value=statuses id=menu_statuses_op translate="true">Status</option>
                                 <option value=templates id=menu_templates_op translate="true">Template</option>
+                                <option value=top id=menu_tops_op translate="false">TOP 100</option>
                             </select>
                         </div>
                         <div class="input-group">
@@ -3881,7 +3870,7 @@ button.white-bgc[disabled]:focus,
                                     <li id=menuAssets><a href="?assets" id=menu_assets translate="true">Assets</a></li>
                                     <li id=menuStatuses><a href="?statuses" id=menu_statuses translate="true">Statuses</a></li>
                                     <li id=menuTemplates><a href="?templates" id=menu_templates translate="true">Templates</a></li>
-                                    <li id=menuTop100Richest><a href="?top=100" id=menu_top_100 translate="true">Top 100 Richest</a></li>
+                                    <li id=menuTop100><a href="?top=100" id=menu_top_100 translate="true">Top 100 Richest</a></li>
                                     <li id=menuPeers><a href="?peers" id=menu_peers translate="true">Peers</a></li>
                                 </ul>
                             </div>

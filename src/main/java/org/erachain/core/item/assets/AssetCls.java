@@ -1,14 +1,19 @@
 package org.erachain.core.item.assets;
 
 
+import org.apache.commons.net.util.Base64;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
+
+import java.util.List;
 
 
 // 1019 - Movable = true; Divisible = NO; Quantity = 1
@@ -586,6 +591,10 @@ public abstract class AssetCls extends ItemCls {
         return "";
     }
 
+    public long getOperations(DCSet dcSet) {
+        long total = dcSet.getOrderMap().getCountOrders(key);
+        return total;
+    }
     
 	/*
 	public void setMovable(boolean movable) {
@@ -626,9 +635,23 @@ public abstract class AssetCls extends ItemCls {
 
         // ADD DATA
         assetJSON.put("scale", this.getScale());
-        assetJSON.put("assetType", this.assetType);
+        assetJSON.put("assetTypeKey", this.assetType);
+        assetJSON.put("assetTypeName", viewAssetType());
 
         return assetJSON;
+    }
+
+    public JSONObject jsonForExolorerPage(JSONObject langObj) {
+        //DCSet dcSet = DCSet.getInstance();
+
+        JSONObject json =super.jsonForExolorerPage(langObj);
+        json.put("assetTypeKey", this.assetType);
+        json.put("assetTypeName", viewAssetType());
+        json.put("quantity", getTotalQuantity(DCSet.getInstance()));
+        json.put("scale", scale);
+        json.put("orders", getOperations(DCSet.getInstance()));
+
+        return json;
     }
 
 }

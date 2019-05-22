@@ -25,13 +25,17 @@ function statuses(data){
 
     //Отображение таблицы элементов статусов
     for (var i in data.pageItems) {
-    //var length = Object.keys(data.pageItems).length;
-    //for (var i = 0; i < length; i++) {
-        output += '<tr><td><a href="?status=' + data.pageItems[i].key + get_lang()+ '">'+ data.pageItems[i].key + ': ';
-        output += '<b>'+ data.pageItems[i].name + '</b></a></td>';
-        output += '<td>' + data.pageItems[i].description + '</td>';
-        output += '<td><a href=?address='+ data.pageItems[i].owner + get_lang() +'>'+ htmlFilter(data.pageItems[i].owner) +'</a></td>';
-        output += '</tr>';
+        var item = data.pageItems[i];
+        output += '<tr><td><a href="?template=' + item.key + get_lang() + '">' + item.key + ': ';
+        output += '<b>' + item.name + '</b></a></td>';
+        output += '<td>' + item.description.substr(0, 100) + '</td>';
+
+        output += '<td><a href=?address=' + item.owner + get_lang() + '>';
+        if (item.hasOwnProperty('person'))
+            output += '[' + item.person_key + ']' + htmlFilter(item.person);
+        else
+            output += item.owner;
+        output += '</a></td></tr>';
     }
     if (!notDisplayPages) {
         //Отображение ссылки предыдущая

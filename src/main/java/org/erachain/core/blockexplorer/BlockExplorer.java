@@ -14,7 +14,6 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.statuses.StatusCls;
-import org.erachain.core.item.templates.Template;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
@@ -310,6 +309,9 @@ public class BlockExplorer {
                         //search block
                         output.putAll(jsonQuerySearchPages(Block.class, search, (int)start, pageSize));
                         break;
+                    case "top":
+                        output.putAll(jsonQueryTopRichest100(100, Long.valueOf(search)));
+                        break;
                 }
             }
         //////////////////////////// ASSETS //////////////////////////
@@ -363,14 +365,11 @@ public class BlockExplorer {
 //        else if (info.getQueryParameters().containsKey("lastBlock")) {
 //            output = jsonQueryLastBlock();
 //        }
+
         // address
         else if (info.getQueryParameters().containsKey("address")) {
             output.put("search", "address");
             output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("address"), (int)start));
-            // block
-        } else if (info.getQueryParameters().containsKey("addresses")) {
-            output.put("search", "address");
-            jsonQueryTopRichest(info);
 
         ///////// BLOCKS /////////////
         } else if (info.getQueryParameters().containsKey("blocks")) {
@@ -409,6 +408,7 @@ public class BlockExplorer {
             output.putAll(jsonQueryUnconfirmedTXs());
         }
 
+        //////////////// EXCHANGE ///////////////////
         // trade
         else if (info.getQueryParameters().containsKey("trade")) {
             output.putAll(jsonQueryTrade(info.getQueryParameters().getFirst("trade")));
@@ -1520,15 +1520,13 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryTopRichest(UriInfo info) {
+    public Map jsonQueryTopRichest100(int limit, long key) {
+
         Map output = new LinkedHashMap();
         Map balances = new LinkedHashMap();
         BigDecimal all = BigDecimal.ZERO;
         BigDecimal alloreders = BigDecimal.ZERO;
-        int limit = Integer.valueOf((info.getQueryParameters().getFirst("top")));
-        long key = 1l;
-        if (info.getQueryParameters().containsKey("asset"))
-            key = Long.valueOf(info.getQueryParameters().getFirst("asset"));
+
         List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
 
         Collection<Tuple2<String, Long>> addrs = dcSet.getAssetBalanceMap().getKeys();
@@ -1572,20 +1570,15 @@ public class BlockExplorer {
 
             Account account = new Account(top100.a);
 
-            Tuple2<Integer, PersonCls> person = account.getPerson();
-
             Map balance = new LinkedHashMap();
             balance.put("address", top100.a);
             balance.put("balance", top100.b.toPlainString());
             balance.put("in_OWN", top100.c.toPlainString());
 
+            Tuple2<Integer, PersonCls> person = account.getPerson();
             if (person != null) {
                 balance.put("person", person.b.getName());
                 balance.put("person_key", person.b.getKey());
-            } else {
-                balance.put("person", "-");
-                balance.put("person_key", "-");// (String)person.b.getKey());
-
             }
 
             balances.put(couter, balance);
@@ -1629,6 +1622,14 @@ public class BlockExplorer {
 
         output.put("assets", jsonQueryAssetsLite());
         return output;
+    }
+    public Map jsonQueryTopRichest(UriInfo info) {
+        int limit = Integer.valueOf((info.getQueryParameters().getFirst("top")));
+        long key = 1l;
+        if (info.getQueryParameters().containsKey("asset"))
+            key = Long.valueOf(info.getQueryParameters().getFirst("asset"));
+
+        return jsonQueryTopRichest100(limit, key);
     }
 
 
@@ -2246,45 +2247,6 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryStatements(int start) {
-        Map output = new LinkedHashMap();
-        WebStatementsTableModelSearch model_Statements = new WebStatementsTableModelSearch();
-        int rowCount = start + 20;
-        int column_Count = model_Statements.getColumnCount();
-
-        for (int column = 0; column < column_Count; column++) {
-
-            output.put("Label_" + model_Statements.getColumnNameNO_Translate(column).replace(' ', '_'), Lang
-                    .getInstance().translateFromLangObj(model_Statements.getColumnNameNO_Translate(column), langObj));
-        }
-
-        Map out_Statements = new LinkedHashMap();
-        // if (rowCount> model_Peers.getRowCount()) rowCount =
-        // model_Peers.getRowCount();
-        rowCount = model_Statements.getRowCount();
-        for (int row = 0; row < rowCount; row++) {
-            Map out_statement = new LinkedHashMap();
-            Transaction statement = model_Statements.get_Statement(row);
-            out_statement.put("Block", statement.getBlockHeight());
-            out_statement.put("seqNo", statement.getSeqNo());
-            out_statement.put("person_key", model_Statements.get_person_key(row));
-
-            for (int column = 0; column < column_Count; column++) {
-                String value = model_Statements.getValueAt(row, column).toString();
-                if (value == null || value.isEmpty())
-                    value = "***";
-
-                out_statement.put(model_Statements.getColumnNameNO_Translate(column).replace(' ', '_'), value);
-            }
-            out_Statements.put(row, out_statement);
-        }
-        // output.put("rowCount", rowCount);
-        // output.put("start", start);
-        output.put("Label_No", Lang.getInstance().translateFromLangObj("No.", langObj));
-        output.put("Label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
-        output.put("Statements", out_Statements);
-        return output;
-    }
 
 
     public Map jsonQueryTemplate(Long key) {
@@ -2311,15 +2273,15 @@ public class BlockExplorer {
     public Map jsonQueryStatus(Long key) {
         Map output = new LinkedHashMap();
 
-        StatusCls template = (StatusCls) dcSet.getItemStatusMap().get(key);
+        StatusCls status = (StatusCls) dcSet.getItemStatusMap().get(key);
 
-        Map templateJSON = new LinkedHashMap();
-        templateJSON.put("key", template.getKey());
-        templateJSON.put("name", template.getName());
-        templateJSON.put("description", template.getDescription());
-        templateJSON.put("owner", template.getOwner().getAddress());
+        Map statusJSON = new LinkedHashMap();
+        statusJSON.put("key", status.getKey());
+        statusJSON.put("name", status.getName());
+        statusJSON.put("description", status.getDescription());
+        statusJSON.put("owner", status.getOwner().getAddress());
 
-        output.put("status", templateJSON);
+        output.put("status", statusJSON);
 
         output.put("label_Template", Lang.getInstance().translateFromLangObj("Status", langObj));
         output.put("label_Key", Lang.getInstance().translateFromLangObj("Key", langObj));

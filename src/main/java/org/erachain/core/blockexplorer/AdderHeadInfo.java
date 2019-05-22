@@ -90,15 +90,15 @@ public class AdderHeadInfo {
      */
     public static void addHeadInfoCapAssets(Map output, JSONObject langObj) {
         output.put("label_Title", Lang.getInstance().translateFromLangObj("Assets", langObj));
-        output.put("label_table_key", Lang.getInstance().translateFromLangObj("Key", langObj));
+        output.put("label_table_asset_key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("label_table_asset_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-        output.put("label_table_asset_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_table_asset_movable", Lang.getInstance().translateFromLangObj("Movable", langObj));
+        output.put("label_table_asset_owner", Lang.getInstance().translateFromLangObj("Owner", langObj));
+        output.put("label_table_asset_type", Lang.getInstance().translateFromLangObj("Type", langObj));
         output.put("label_table_asset_description", Lang.getInstance().translateFromLangObj("Description", langObj));
-        output.put("label_table_asset_divisible", Lang.getInstance().translateFromLangObj("Divisible", langObj));
+        output.put("label_table_asset_scale", Lang.getInstance().translateFromLangObj("Scale", langObj));
         output.put("label_table_asset_amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
         output.put("label_Assets", Lang.getInstance().translateFromLangObj("Assets", langObj));
-        output.put("label_operations", Lang.getInstance().translateFromLangObj("Operations", langObj));
+        output.put("label_table_asset_orders", Lang.getInstance().translateFromLangObj("Orders", langObj));
         addLaterPrevious(output, langObj);
     }
 
