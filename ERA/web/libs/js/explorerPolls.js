@@ -82,8 +82,30 @@ function poll(data) {
     output += '<br><br>';
 
 
-    output += '<b>' + data.label_Description + ':</b><br>'
+    output += '<b>' + data.label_Description + ':</b><br>';
     output += fformat(data.poll.description);
+
+    output += '<hl>';
+
+    output += '<table width="1280" border=0><tr><td align=left><br>';
+    output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd;">';
+    output += '<thead><tr><td><b>'+ data.label_table_key  +' - ' +
+        data.label_table_option_name + '</b></td><td><b>' + data.label_table_person_votes +
+        '</b></td><td><b>' + data.label_table_option_votes + '</b></td></tr></thead>';
+
+    for (var i in data.poll.votes) {
+        var item = data.poll.votes[i];
+        output += '<tr><td><b>' + i + ' - ' + item.name + ':</b></td>';
+        output += '<td>' + item.persons + '</td>';
+        output += '<td>' + item.votes + '</td>';
+
+        output += '</td></tr>';
+    }
+        output += '<tr><td><b>TOTAL:</b></td>';
+        output += '<td>' + data.poll.personsTotal + '</td>';
+        output += '<td>' + data.poll.votesTotal + '</td>';
+
+        output += '</td></tr>';
 
     return output;
 }

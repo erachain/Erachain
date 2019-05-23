@@ -613,6 +613,8 @@ public class BlockExplorer {
         }
 
         PollCls poll = (PollCls) dcSet.getItemPollMap().get(pollKey);
+        List<String> options = poll.getOptions();
+        int optionsSize = options.size();
 
         Map pollJSON = new LinkedHashMap();
         pollJSON.put("key", poll.getKey());
@@ -620,21 +622,18 @@ public class BlockExplorer {
         pollJSON.put("description", poll.getDescription());
         pollJSON.put("owner", poll.getOwner().getAddress());
         pollJSON.put("totalVotes", poll.getTotalVotes(DCSet.getInstance()).toPlainString());
-        pollJSON.put("timestamp", 0l);//transactions.getTimestamp());
-        pollJSON.put("dateTime", BlockExplorer.timestampToStr(0l)); //transactions.getTimestamp()));
 
-        output.put("poll", pollJSON);
+        long[] personVotes = new long[optionsSize];
+        long personsTotal = 0;
 
-        Map votesJSON = new LinkedHashMap();
+        BigDecimal[] optionVotes = new BigDecimal[optionsSize];
+        for (int i = 0; i < optionVotes.length; i++) {
+            optionVotes[i] = BigDecimal.ZERO;
+        }
 
         BigDecimal votesSum = BigDecimal.ZERO;
-        VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
-        NavigableSet<Tuple3> optionVoteKeys;
-        Account voter;
 
-        long[] personsVote = new long[poll.getOptions().size()];
-        BigDecimal[] optionsVote = new BigDecimal[poll.getOptions().size()];
-
+        Set personsVotedSet = new HashSet<Long>();
         Iterable<Pair<Account, Integer>> votes = poll.getVotes(DCSet.getInstance());
         Iterator iterator = votes.iterator();
         while (iterator.hasNext()) {
@@ -644,22 +643,44 @@ public class BlockExplorer {
             int option = item.getB();
             // voter = Account.makeAccountFromShort(item.getA());
 
-            voter = item.getA();
-            if (voter.isPerson(dcSet, Integer.MAX_VALUE)) {
-                personsVote[option]++;
+            Account voter = item.getA();
+            Tuple4<Long, Integer, Integer, Integer> personInfo = voter.getPersonDuration(dcSet);
+
+            // запретим голосовать много раз разными счетами одной персоне
+            if (personInfo != null
+                    && !personsVotedSet.contains(personInfo.a)) {
+                personVotes[option]++;
+                personsTotal++;
+
+                // запомним что он голосовал
+                personsVotedSet.add(personInfo.a);
             }
 
             BigDecimal votesVol = voter.getBalanceUSE(assetKey);
-            optionsVote[option] = optionsVote[option].add(votesVol);
+            optionVotes[option] = optionVotes[option].add(votesVol);
             votesSum = votesSum.add(votesVol);
 
         }
 
-        votesJSON.put("votesSum", votesSum);
-        votesJSON.put("personsVote", personsVote);
-        votesJSON.put("optionVotes", optionsVote);
+        JSONArray array = new JSONArray();
+        for (int i = 0; i < optionsSize; i++) {
+            Map itemMap = new LinkedHashMap();
+            itemMap.put("name", options.get(i));
+            itemMap.put("persons", personVotes[i]);
+            itemMap.put("votes", optionVotes[i]);
+            array.add(itemMap);
+        }
 
-        pollJSON.put("votes", votesJSON);
+        pollJSON.put("votes", array);
+        pollJSON.put("personsTotal", personsTotal);
+        pollJSON.put("votesTotal", votesSum);
+
+        output.put("poll", pollJSON);
+
+        output.put("label_table_key", Lang.getInstance().translateFromLangObj("Number", langObj));
+        output.put("label_table_option_name", Lang.getInstance().translateFromLangObj("Option", langObj));
+        output.put("label_table_person_votes", Lang.getInstance().translateFromLangObj("Personal Voters", langObj));
+        output.put("label_table_option_votes", Lang.getInstance().translateFromLangObj("Votes", langObj));
 
         output.put("label_Poll", Lang.getInstance().translateFromLangObj("Poll", langObj));
         output.put("label_Key", Lang.getInstance().translateFromLangObj("Key", langObj));
