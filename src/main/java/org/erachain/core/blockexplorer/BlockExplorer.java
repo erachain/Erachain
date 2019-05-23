@@ -25,6 +25,7 @@ import org.erachain.database.FilteredByStringArray;
 import org.erachain.datachain.DCMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
+import org.erachain.datachain.VoteOnItemPollMap;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.gui.models.PersonAccountsModel;
 import org.erachain.lang.Lang;
@@ -41,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.UriInfo;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
@@ -596,14 +598,21 @@ public class BlockExplorer {
     }
 
 
-    public Map jsonQueryPoll(Long key, String assetStr) {
+    public Map jsonQueryPoll(Long pollKey, String assetStr) {
 
         output.put("type", "poll");
         output.put("search", "polls");
 
         Map output = new LinkedHashMap();
+        Long assetKey;
 
-        PollCls poll = (PollCls) dcSet.getItemPollMap().get(key);
+        try {
+            assetKey = Long.valueOf(assetStr);
+        } catch (Exception e) {
+            assetKey = 2l;
+        }
+
+        PollCls poll = (PollCls) dcSet.getItemPollMap().get(pollKey);
 
         Map pollJSON = new LinkedHashMap();
         pollJSON.put("key", poll.getKey());
@@ -618,16 +627,38 @@ public class BlockExplorer {
 
         Map votesJSON = new LinkedHashMap();
 
+        BigDecimal votesSum = BigDecimal.ZERO;
+        VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
+        NavigableSet<Tuple3> optionVoteKeys;
+        Account voter;
+
+        long[] personsVote = new long[poll.getOptions().size()];
+        BigDecimal[] optionsVote = new BigDecimal[poll.getOptions().size()];
+
         Iterable<Pair<Account, Integer>> votes = poll.getVotes(DCSet.getInstance());
         Iterator iterator = votes.iterator();
         while (iterator.hasNext()) {
-            Object vote = iterator.next();
-            Map voteJSON = new LinkedHashMap();
-            voteJSON.put("option", vote);
-            //voteJSON.put("votes", vote.getA().getBalanceUSE(asset_q).toPlainString());
 
-            //votesJSON.put(vote.getA().getAddress(), voteJSON);
+            Pair<Account, Integer> item = (Pair<Account, Integer>)iterator.next();
+
+            int option = item.getB();
+            // voter = Account.makeAccountFromShort(item.getA());
+
+            voter = item.getA();
+            if (voter.isPerson(dcSet, Integer.MAX_VALUE)) {
+                personsVote[option]++;
+            }
+
+            BigDecimal votesVol = voter.getBalanceUSE(assetKey);
+            optionsVote[option] = optionsVote[option].add(votesVol);
+            votesSum = votesSum.add(votesVol);
+
         }
+
+        votesJSON.put("votesSum", votesSum);
+        votesJSON.put("personsVote", personsVote);
+        votesJSON.put("optionVotes", optionsVote);
+
         pollJSON.put("votes", votesJSON);
 
         output.put("label_Poll", Lang.getInstance().translateFromLangObj("Poll", langObj));
