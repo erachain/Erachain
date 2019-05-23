@@ -2053,10 +2053,33 @@ public class BlockExplorer {
 
         output.put("type", "transactions");
 
-        int size = 500;
+        int size = 200;
         List<Transaction> transactions;
         if (filterStr != null) {
             transactions = dcSet.getTransactionFinalMap().getTransactionsByTitleAndType(filterStr, null, size, true);
+            if (Base58.isExtraSymbols(filterStr)) {
+                try {
+                    String[] strA = filterStr.split("\\-");
+                    int height = Integer.parseInt(strA[0]);
+                    int seq = Integer.parseInt(strA[1]);
+                    Transaction one = DCSet.getInstance().getTransactionFinalMap().get(height, seq);
+                    if (one != null) {
+                        transactions.add(one);
+                    }
+                } catch (Exception e1) {
+                }
+
+            } else {
+                try {
+                    byte[] signature = Base58.decode(filterStr);
+                    Transaction one = DCSet.getInstance().getTransactionFinalMap().get(signature);
+                    if (one != null) {
+                        transactions.add(one);
+                    }
+                } catch (Exception e2) {
+                }
+            }
+
         } else {
             // берем все с перебором с последней
             TransactionFinalMap map = dcSet.getTransactionFinalMap();
@@ -2106,15 +2129,15 @@ public class BlockExplorer {
             output.put("label_person_name", Lang.getInstance().translateFromLangObj("Name", langObj));
             output.put("person_Img", Base64.encodeBase64String(person.b.getImage()));
             output.put("person", person.b.getName());
+            output.put("person_key", person.b.getKey());
 
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balabce_LIA = acc.getBalance(AssetCls.LIA_KEY);
             output.put("registered", balabce_LIA.a.b.toPlainString());
             output.put("certified", balabce_LIA.b.b.toPlainString());
             output.put("label_registered", Lang.getInstance().translateFromLangObj("Registered", langObj));
             output.put("label_certified", Lang.getInstance().translateFromLangObj("Certified", langObj));
-
         }
-        output.put("person_key", person.b.getKey());
+
         output.put("label_account", Lang.getInstance().translateFromLangObj("Account", langObj));
 
         // balance assets from
@@ -2629,25 +2652,16 @@ public class BlockExplorer {
 
         Map output = new LinkedHashMap();
 
-        //AssetNames assetNames = new AssetNames();
-
-        TreeSet<BlExpUnit> all = new TreeSet<>();
-        Map<Tuple2<byte[], byte[]>, Trade> trades = new TreeMap<Tuple2<byte[], byte[]>, Trade>();
-
         String[] signatures = query.split(",");
-
-        byte[] signatureBytes = null; // new clear
 
         for (int i = 0; i < signatures.length; i++) {
 
             Transaction transaction = null; // new
-            try {
-                // as Base58
-                signatureBytes = Base58.decode(signatures[i]);
-                transaction = Controller.getInstance().getTransaction(signatureBytes);
-            } catch (Exception e) {
-                // as 12345-12
-                transaction = dcSet.getTransactionFinalMap().getRecord(signatures[i]);
+            String signature = signatures[i];
+            if (Base58.isExtraSymbols(signature)) {
+                transaction = dcSet.getTransactionFinalMap().getRecord(signature);
+            } else {
+                transaction = Controller.getInstance().getTransaction(Base58.decode(signature));
             }
 
             if (transaction == null)
