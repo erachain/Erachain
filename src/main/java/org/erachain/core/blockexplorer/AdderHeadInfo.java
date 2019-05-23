@@ -33,9 +33,14 @@ public class AdderHeadInfo {
         } else if (type == PersonCls.class) {
             addHeadInfoCapPersons(output, dcSet, langObj);
 
-        } else if (type == StatusCls.class || type == TemplateCls.class || type == PollCls.class
+        } else if (type == StatusCls.class || type == TemplateCls.class
                 || type == ImprintCls.class || type == UnionCls.class) {
             addHeadInfoCapStatusesTemplates(output, langObj);
+        } else if (type == PollCls.class
+                ) {
+            addHeadInfoCapStatusesTemplates(output, langObj);
+            output.put("label_table_total_votes", Lang.getInstance().translateFromLangObj("Total Vote", langObj));
+            output.put("label_table_options_count", Lang.getInstance().translateFromLangObj("Options Count", langObj));
 
         }
 

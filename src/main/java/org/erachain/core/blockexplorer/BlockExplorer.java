@@ -13,6 +13,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.payment.Payment;
@@ -80,6 +81,20 @@ public class BlockExplorer {
 
     public Map getOutput() {
         return output;
+    }
+
+    private long checkAndGetLongParam(UriInfo info, long param, String name) {
+        if (info.getQueryParameters().containsKey(name)
+                && !info.getQueryParameters().getFirst(name).equals("")
+                && !info.getQueryParameters().getFirst(name).equals("undefined")) {
+            try {
+                param = Long.valueOf((info.getQueryParameters().getFirst(name)));
+            } catch (Exception e) {
+                logger.debug(info.getQueryParameters().toString());
+                return 1000;
+            }
+        }
+        return param;
     }
 
     public void makePage(Class type, int start, int pageSize,
@@ -240,7 +255,7 @@ public class BlockExplorer {
 
         Stopwatch stopwatchAll = new Stopwatch();
         long start = 0;
-        start = checkAndGetIntParam(info, start, "start");
+        start = checkAndGetLongParam(info, start, "start");
 
         //lang
         if (!info.getQueryParameters().containsKey("lang")) {
@@ -306,6 +321,10 @@ public class BlockExplorer {
                         //search templates
                         output.putAll(jsonQuerySearchPages(TemplateCls.class, search, (int)start, pageSize));
                         break;
+                    case "polls":
+                        //search templates
+                        output.putAll(jsonQuerySearchPages(PollCls.class, search, (int)start, pageSize));
+                        break;
                     case "blocks":
                         //search block
                         output.putAll(jsonQuerySearchPages(Block.class, search, (int)start, pageSize));
@@ -351,11 +370,8 @@ public class BlockExplorer {
                     output.putAll(jsonQueryTrades(have, want));
                 }
             }
-
-        // polls list
-        } else if (info.getQueryParameters().containsKey("polls")) {
-            output.putAll(jsonQueryPools(info));
         }
+
         //peers
         else if (info.getQueryParameters().containsKey("peers")) {
             output.putAll(jsonQueryPeers(info));
@@ -399,7 +415,7 @@ public class BlockExplorer {
         }
         //poll
         else if (info.getQueryParameters().containsKey("poll")) {
-            output.putAll(jsonQueryPool(info.getQueryParameters().getFirst("poll"),
+            output.putAll(jsonQueryPoll(Long.valueOf(info.getQueryParameters().getFirst("poll")),
                     info.getQueryParameters().getFirst(" asset")));
         }
         // blog tx
@@ -426,6 +442,16 @@ public class BlockExplorer {
             }
         }
 
+        ///////////////////// POLLS ////////////////////////
+        // polls list
+        else if (info.getQueryParameters().containsKey("polls")) {
+            output.put("type", "polls");
+            output.putAll(jsonQueryPages(PollCls.class, start, pageSize));
+        }
+        else if (info.getQueryParameters().containsKey("poll")) {
+            output.putAll(jsonQueryPoll(Long.valueOf(info.getQueryParameters().getFirst("poll")),
+                    info.getQueryParameters().getFirst("asset")));
+        }
         //////////////////////// TEMPLATES ///////////////////
         // templates list
         else if (info.getQueryParameters().containsKey("templates")) {
@@ -456,20 +482,6 @@ public class BlockExplorer {
         // time guery
         output.put("queryTimeMs", stopwatchAll.elapsedTime());
         return output;
-    }
-
-    private long checkAndGetIntParam(UriInfo info, long param, String name) {
-        if (info.getQueryParameters().containsKey(name)
-                && !info.getQueryParameters().getFirst(name).equals("")
-                && !info.getQueryParameters().getFirst(name).equals("undefined")) {
-            try {
-                param = Long.valueOf((info.getQueryParameters().getFirst(name)));
-            } catch (Exception e) {
-                logger.debug(info.getQueryParameters().toString());
-                return 1000;
-            }
-        }
-        return param;
     }
 
     public Map jsonQueryHelp() {
@@ -584,143 +596,47 @@ public class BlockExplorer {
     }
 
 
-    public Map jsonQueryPools(UriInfo info) {
-
-        output.put("type", "polls");
-
-        Map lastPools = new LinkedHashMap();
-        Map output = new LinkedHashMap();
-        String key = info.getQueryParameters().getFirst("asset");
-        Long asset_g;
-        if (key == null) {
-            asset_g = (long) 1;
-        } else {
-            asset_g = Long.valueOf(key);
-        }
-
-        List<Poll> pools = new ArrayList<Poll>(dcSet.getPollMap().getValues());
-
-        if (pools.isEmpty()) {
-            output.put("error", "There is no Polls.");
-            return output;
-        }
-
-        // SCAN
-        int back = 815; // 3*24*60*60/318 = 815 // 3 days
-        // back = 40815;
-        Pair<Block, List<Transaction>> result = Controller.getInstance().scanTransactions(
-                Controller.getInstance().getBlockByHeight(getHeight() - back), back, 100,
-                Transaction.CREATE_POLL_TRANSACTION, -1, null);
-
-        for (Transaction transaction : result.getB()) {
-            lastPools.put(((CreatePollTransaction) transaction).getPoll().getName(), true);
-        }
-
-        Comparator<Poll> comparator = new Comparator<Poll>() {
-            @Override
-            public int compare(Poll c1, Poll c2) {
-
-                BigDecimal c1votes = c1.getTotalVotes(asset_g);
-                BigDecimal c2votes = c2.getTotalVotes(asset_g);
-
-                return c2votes.compareTo(c1votes);
-            }
-        };
-
-        Collections.sort(pools, comparator);
-
-        Map poolsJSON = new LinkedHashMap();
-
-        for (Poll pool : pools) {
-            Map poolJSON = new LinkedHashMap();
-
-            poolJSON.put("totalVotes", pool.getTotalVotes(asset_g).toPlainString());
-
-            poolJSON.put("new", lastPools.containsKey(pool.getName()));
-
-            poolsJSON.put(JSONObject.escape(pool.getName()), poolJSON);
-        }
-
-        output.put("pools", poolsJSON);
-
-        Map assets1 = jsonQueryAssets();
-        output.put("assets", assets1);
-
-        return output;
-    }
-
-    public Map jsonQueryPool(String query, String asset_1) {
+    public Map jsonQueryPoll(Long key, String assetStr) {
 
         output.put("type", "poll");
         output.put("search", "polls");
 
-        Long asset_q = Long.valueOf(asset_1);
-
         Map output = new LinkedHashMap();
 
-        Poll poll = Controller.getInstance().getPoll(query);
+        PollCls poll = (PollCls) dcSet.getItemPollMap().get(key);
 
         Map pollJSON = new LinkedHashMap();
-
-        pollJSON.put("creator", poll.getCreator().getAddress());
-        pollJSON.put("name", JSONObject.escape(poll.getName()));
+        pollJSON.put("key", poll.getKey());
+        pollJSON.put("name", poll.getName());
         pollJSON.put("description", poll.getDescription());
-        pollJSON.put("totalVotes", poll.getTotalVotes(asset_q).toPlainString());
+        pollJSON.put("owner", poll.getOwner().getAddress());
+        pollJSON.put("totalVotes", poll.getTotalVotes(DCSet.getInstance()).toPlainString());
+        pollJSON.put("timestamp", 0l);//transactions.getTimestamp());
+        pollJSON.put("dateTime", BlockExplorer.timestampToStr(0l)); //transactions.getTimestamp()));
 
-        if (true) {
-            //Tuple2<Integer, Integer> blocNoSeqNo = dcSet.getTransactionFinalMapSigns().get(poll.getReference());
-            //Transaction transactions = dcSet.getTransactionFinalMap().get(blocNoSeqNo);
-            pollJSON.put("timestamp", 0l);//transactions.getTimestamp());
-            pollJSON.put("dateTime", BlockExplorer.timestampToStr(0l)); //transactions.getTimestamp()));
-        } else {
-            // OLD
-            List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(
-                    poll.getCreator().getAddress(), Transaction.CREATE_POLL_TRANSACTION, 0);
-            for (Transaction transaction : transactions) {
-                CreatePollTransaction createPollTransaction = ((CreatePollTransaction) transaction);
-                if (createPollTransaction.getPoll().getName().equals(poll.getName())) {
-                    pollJSON.put("timestamp", createPollTransaction.getTimestamp());
-                    pollJSON.put("dateTime", BlockExplorer.timestampToStr(createPollTransaction.getTimestamp()));
-                    break;
-                }
-            }
-        }
-
-        Map optionsJSON = new LinkedHashMap();
-        for (PollOption option : poll.getOptions()) {
-            optionsJSON.put(option.getName(), option.getVotes(asset_q).toPlainString());
-        }
-        pollJSON.put("options", optionsJSON);
-
-        Comparator<Pair<Account, PollOption>> comparator = new Comparator<Pair<Account, PollOption>>() {
-            @Override
-            public int compare(Pair<Account, PollOption> c1, Pair<Account, PollOption> c2) {
-
-                BigDecimal c1votes = c1.getA().getBalanceUSE(asset_q);
-                BigDecimal c2votes = c2.getA().getBalanceUSE(asset_q);
-
-                return c2votes.compareTo(c1votes);
-            }
-        };
+        output.put("poll", pollJSON);
 
         Map votesJSON = new LinkedHashMap();
 
-        List<Pair<Account, PollOption>> votes = poll.getVotes();
-
-        Collections.sort(votes, comparator);
-
-        for (Pair<Account, PollOption> vote : votes) {
+        Iterable<Pair<Account, Integer>> votes = poll.getVotes(DCSet.getInstance());
+        Iterator iterator = votes.iterator();
+        while (iterator.hasNext()) {
+            Object vote = iterator.next();
             Map voteJSON = new LinkedHashMap();
-            voteJSON.put("option", vote.getB().getName());
-            voteJSON.put("votes", vote.getA().getBalanceUSE(asset_q).toPlainString());
+            voteJSON.put("option", vote);
+            //voteJSON.put("votes", vote.getA().getBalanceUSE(asset_q).toPlainString());
 
-            votesJSON.put(vote.getA().getAddress(), voteJSON);
+            //votesJSON.put(vote.getA().getAddress(), voteJSON);
         }
         pollJSON.put("votes", votesJSON);
 
-        output.put("pool", pollJSON);
+        output.put("label_Poll", Lang.getInstance().translateFromLangObj("Poll", langObj));
+        output.put("label_Key", Lang.getInstance().translateFromLangObj("Key", langObj));
+        output.put("label_Owner", Lang.getInstance().translateFromLangObj("Owner", langObj));
+        output.put("label_Description", Lang.getInstance().translateFromLangObj("Description", langObj));
 
         return output;
+
     }
 
     // TODO: что-то тут напутано

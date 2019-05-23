@@ -1444,6 +1444,18 @@ public class WebResource {
         }
     }
 
+    @Path("index/libs/js/explorerPolls.js")
+    @GET
+    public Response explorerPolls() {
+        File file = new File("web/libs/js/explorerPolls.js");
+
+        if (file.exists()) {
+            return Response.ok(file, "text/explorerPolls").build();
+        } else {
+            return error404(request, null);
+        }
+    }
+
     @Path("index/libs/js/explorerTransactionsTable.js")
     @GET
     public Response explorerTransactionsTable() {
