@@ -1654,7 +1654,7 @@ button.white-bgc[disabled]:focus,
 
                     ////// TRANSACTIONS ////////
                     if (data[i].type == 'tx') {
-                        output += tx_old(data);
+                        output += transactionLite(data, i, data[i]);
                     }
                 }
 

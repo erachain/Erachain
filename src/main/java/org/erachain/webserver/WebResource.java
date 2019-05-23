@@ -1432,6 +1432,18 @@ public class WebResource {
         }
     }
 
+    @Path("index/libs/js/explorerTransactions.js")
+    @GET
+    public Response explorerTransactions() {
+        File file = new File("web/libs/js/explorerTransactions.js");
+
+        if (file.exists()) {
+            return Response.ok(file, "text/explorerTransactions").build();
+        } else {
+            return error404(request, null);
+        }
+    }
+
     @Path("index/libs/js/explorerTransactionsTable.js")
     @GET
     public Response explorerTransactionsTable() {
