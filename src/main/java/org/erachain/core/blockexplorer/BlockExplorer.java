@@ -48,6 +48,14 @@ import java.util.Map.Entry;
 
 // 30/03 ++ asset - Trans_Amount
 
+/**
+ * В запросе q - фильтр поиска, а в search - тип данных где ищем, но тут на сервере этот тип может изменитсья в ответе
+ *
+ * В ответе параметр:<br>
+ *     - type - задает тип полученных данных - по нему в Ajax запросах выбираем что делать дальше с полученными данными<br>
+ *     - search - задает выбор у поископого элемента searchID, необходимо задавать если он отличается от значения в type<br>
+ *
+ */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class BlockExplorer {
 
@@ -227,12 +235,12 @@ public class BlockExplorer {
 
     @SuppressWarnings("static-access")
     public Map jsonQueryMain(UriInfo info) throws WrongSearchException, Exception {
+
+        output = new LinkedHashMap();
+
         Stopwatch stopwatchAll = new Stopwatch();
         long start = 0;
         start = checkAndGetIntParam(info, start, "start");
-
-        output = new LinkedHashMap();
-        output.put("search", "blocks");
 
         //lang
         if (!info.getQueryParameters().containsKey("lang")) {
@@ -265,21 +273,13 @@ public class BlockExplorer {
         output.put("id_menu_transactions", Lang.getInstance().translateFromLangObj("Transactions", langObj));
 
         //информация о последнем блоке
-        output.put("lastBlock", jsonQueryLastBlock());
-
-        //todo Gleb непонятно зачем - выпиливаю
-//        if (info.getQueryParameters().containsKey("balance")) {
-//            for (String address : info.getQueryParameters().get("balance")) {
-//                output.put(address, jsonQueryBalance(address));
-//            }
-//
-//        }
+        output.put("lastBlock", jsonLastBlock());
 
         if (info.getQueryParameters().containsKey("q")) {
             if (info.getQueryParameters().containsKey("search")) {
                 String type = info.getQueryParameters().getFirst("search");
                 String search = info.getQueryParameters().getFirst("q");
-                output.put("search", type);
+                output.put("type", type);
                 switch (type) {
                     case "transactions":
                         //search transactions
@@ -315,14 +315,14 @@ public class BlockExplorer {
                         break;
                 }
             }
+
         //////////////////////////// ASSETS //////////////////////////
             // top 100
         } else if (info.getQueryParameters().containsKey("top")) {
-            output.put("search", "top");
             output.putAll(jsonQueryTopRichest(info));
             // asset lite
         } else if (info.getQueryParameters().containsKey("assets")) {
-            output.put("search", "assets");
+            output.put("type", "assets");
             output.putAll(jsonQueryPages(AssetCls.class, start, pageSize));
         } else if (info.getQueryParameters().containsKey("assetsLite")) {
             output.put("assetsLite", jsonQueryAssetsLite());
@@ -360,25 +360,20 @@ public class BlockExplorer {
         else if (info.getQueryParameters().containsKey("peers")) {
             output.putAll(jsonQueryPeers(info));
         }
-        //todo Gleb непонятно зачем. Информация о последнем блоке добавляется в другом месте. URL с таким параметром не нашел.
-//        else if (info.getQueryParameters().containsKey("lastBlock")) {
-//            output = jsonQueryLastBlock();
-//        }
 
+        ///////////////////////////// ADDRESSES //////////////////////
         // address
         else if (info.getQueryParameters().containsKey("address")) {
-            output.put("search", "address");
             output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("address"), (int) start));
-        } else if (info.getQueryParameters().containsKey("addresses")) {
-            output.put("search", "address");
-            return output;
+        }
+        else if (info.getQueryParameters().containsKey("addresses")) {
+            jsonQueryAddresses();
 
         ///////// BLOCKS /////////////
         } else if (info.getQueryParameters().containsKey("blocks")) {
-            output.put("search", "blocks");
+            output.put("type", "blocks");
             output.putAll(jsonQueryPages(Block.class, (int)start, pageSize));
         } else if (info.getQueryParameters().containsKey("block")) {
-            output.put("search", "blocks");
             output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), (int)start));
         }
 
@@ -386,19 +381,6 @@ public class BlockExplorer {
         /// TX = signature
         else if (info.getQueryParameters().containsKey("tx")) {
             output.putAll(jsonQueryTX(info.getQueryParameters().getFirst("tx")));
-        }
-        // tx from seq-No
-        else if (info.getQueryParameters().containsKey("seqNo")) {
-            if (info.getQueryParameters().containsKey("statement")) {
-                output.putAll(jsonQueryStatement(info.getQueryParameters().getFirst("statement"),
-                        info.getQueryParameters().getFirst("seqNo")));
-            } else {
-
-                Transaction transaction = dcSet.getTransactionFinalMap().get(
-                        new Integer(info.getQueryParameters().getFirst("block")),
-                        new Integer(info.getQueryParameters().getFirst("seqNo")));
-                output.put("body", WebTransactionsHTML.getInstance().get_HTML(transaction, langObj));
-            }
         }
 
         // transactions
@@ -428,12 +410,11 @@ public class BlockExplorer {
         ///////////////////////////////////////// PERSONS /////////////////////////////////
         // persons list
         else if (info.getQueryParameters().containsKey("persons")) {
-            output.put("search", "persons");
+            output.put("type", "persons");
             output.putAll(jsonQueryPages(PersonCls.class, start, pageSize));
         }
         // person
         else if (info.getQueryParameters().containsKey("person")) {
-            output.put("search", "persons");
             // person asset balance
             if (info.getQueryParameters().containsKey("asset")) {
                 output.putAll(jsonQueryPersonBalance(new Long(info.getQueryParameters().getFirst("person")),
@@ -448,24 +429,22 @@ public class BlockExplorer {
         //////////////////////// TEMPLATES ///////////////////
         // templates list
         else if (info.getQueryParameters().containsKey("templates")) {
-            output.put("search", "templates");
+            output.put("type", "templates");
             output.putAll(jsonQueryPages(TemplateCls.class, start, pageSize));
         }
         // template
         else if (info.getQueryParameters().containsKey("template")) {
-            output.put("search", "templates");
             output.putAll(jsonQueryTemplate(Long.valueOf(info.getQueryParameters().getFirst("template"))));
         }
 
         ////////////////////// STATUSES ///////////////////////
         // statuses list
         else if (info.getQueryParameters().containsKey("statuses")) {
-            output.put("search", "statuses");
+            output.put("type", "statuses");
             output.putAll(jsonQueryPages(StatusCls.class, start, pageSize));
         }
         // status
         else if (info.getQueryParameters().containsKey("status")) {
-            output.put("search", "statuses");
             output.putAll(jsonQueryStatus(Long.valueOf(info.getQueryParameters().getFirst("status"))));
         }
 
@@ -592,6 +571,7 @@ public class BlockExplorer {
     }
 
     public Map jsonQueryAssetsLite() {
+
         Map output = new LinkedHashMap();
 
         Collection<ItemCls> items = Controller.getInstance().getAllItems(ItemCls.ASSET_TYPE);
@@ -605,6 +585,9 @@ public class BlockExplorer {
 
 
     public Map jsonQueryPools(UriInfo info) {
+
+        output.put("type", "polls");
+
         Map lastPools = new LinkedHashMap();
         Map output = new LinkedHashMap();
         String key = info.getQueryParameters().getFirst("asset");
@@ -667,6 +650,9 @@ public class BlockExplorer {
     }
 
     public Map jsonQueryPool(String query, String asset_1) {
+
+        output.put("type", "poll");
+        output.put("search", "polls");
 
         Long asset_q = Long.valueOf(asset_1);
 
@@ -877,6 +863,10 @@ public class BlockExplorer {
     }
 
     public Map jsonQueryAsset(long key) {
+
+        output.put("type", "asset");
+        output.put("search", "assets");
+
         Map output = new LinkedHashMap();
 
         List<Order> orders = dcSet.getOrderMap().getOrders(key);
@@ -993,13 +983,14 @@ public class BlockExplorer {
         output.put("label_Total", Lang.getInstance().translateFromLangObj("Total", langObj));
         output.put("label_View", Lang.getInstance().translateFromLangObj("View", langObj));
 
-        output.put("search", "assets");
-        output.put("type", "asset");
-
         return output;
     }
 
     public Map jsonQueryTrades(long have, long want) {
+
+        output.put("type", "trades");
+        output.put("search", "assets");
+
         Map output = new LinkedHashMap();
 
         List<Order> ordersHave = dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
@@ -1190,6 +1181,9 @@ public class BlockExplorer {
 
     private Map jsonQueryPersonBalance(Long personKey, Long assetKey, int position) {
 
+        output.put("type", "person_assets");
+        output.put("search", "persons");
+
         Map output = new HashMap();
         if (position < 1 || position > 5) {
             output.put("error", "wrong position");
@@ -1231,6 +1225,8 @@ public class BlockExplorer {
 
     //todo Gleb for future убрать duplicateCodeAssets. Проблема в ключе.  заменит на assetsJSON
     public Map jsonQueryAssets() {
+        output.put("type", "assets");
+
         Map output = new LinkedHashMap();
         Collection<ItemCls> items = Controller.getInstance().getAllItems(ItemCls.ASSET_TYPE);
         for (ItemCls item : items) {
@@ -1260,6 +1256,9 @@ public class BlockExplorer {
     }
 
     private Map jsonQueryPerson(String first) {
+        output.put("type", "person");
+        output.put("search", "persons");
+
         Map output = new LinkedHashMap();
         PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(new Long(first));
         if (person == null) {
@@ -1502,7 +1501,8 @@ public class BlockExplorer {
     }
 
 
-    private Map jsonQueryLastBlock() {
+    private Map jsonLastBlock() {
+
         Map output = new LinkedHashMap();
 
         Block lastBlock = getLastBlock();
@@ -1526,6 +1526,8 @@ public class BlockExplorer {
     }
 
     public Map jsonQueryTopRichest100(int limit, long key) {
+
+        output.put("type", "top");
 
         Map output = new LinkedHashMap();
         Map balances = new LinkedHashMap();
@@ -1628,6 +1630,7 @@ public class BlockExplorer {
         output.put("assets", jsonQueryAssetsLite());
         return output;
     }
+
     public Map jsonQueryTopRichest(UriInfo info) {
         int limit = Integer.valueOf((info.getQueryParameters().getFirst("top")));
         long key = 1l;
@@ -2048,6 +2051,8 @@ public class BlockExplorer {
     @SuppressWarnings({"serial", "static-access"})
     public Map jsonQueryTransactions(String filterStr, int start) {
 
+        output.put("type", "transactions");
+
         int size = 500;
         List<Transaction> transactions;
         if (filterStr != null) {
@@ -2075,14 +2080,19 @@ public class BlockExplorer {
         transactionsJSON(output, null, transactions, start, pageSize,
                 Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" + size));
 
-        output.put("search", "transactions");
-        output.put("type", "transactions");
-
         return output;
     }
 
     @SuppressWarnings({"serial", "static-access"})
+    public void jsonQueryAddresses() {
+        output.put("type", "addresses");
+    }
+
+    @SuppressWarnings({"serial", "static-access"})
     public Map jsonQueryAddress(String address, int start) {
+
+        output.put("type", "address");
+        output.put("search", "addresses");
 
         int limit = 100;
         List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressLimit(address, limit);
@@ -2114,13 +2124,14 @@ public class BlockExplorer {
         transactionsJSON(output, acc, transactions, start, pageSize,
                 Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" + limit));
 
-        output.put("search", "addresses");
-        output.put("type", "address");
-
         return output;
     }
 
     public Map jsonQueryTrade(String query) {
+
+        output.put("type", "trade");
+        output.put("search", "assets");
+
         Map output = new LinkedHashMap();
 
         //AssetNames assetNames = new AssetNames();
@@ -2166,6 +2177,8 @@ public class BlockExplorer {
     // row_view=3 view org.erachain.records 1.....
 
     public Map jsonQueryPeers(UriInfo info) {
+
+        output.put("type", "peers");
 
         int start = 0;
         int end = 100;
@@ -2249,9 +2262,11 @@ public class BlockExplorer {
         return output;
     }
 
-
-
     public Map jsonQueryTemplate(Long key) {
+
+        output.put("type", "template");
+        output.put("search", "templates");
+
         Map output = new LinkedHashMap();
 
         TemplateCls template = (TemplateCls) dcSet.getItemTemplateMap().get(key);
@@ -2273,6 +2288,10 @@ public class BlockExplorer {
     }
 
     public Map jsonQueryStatus(Long key) {
+
+        output.put("type", "status");
+        output.put("search", "statuses");
+
         Map output = new LinkedHashMap();
 
         StatusCls status = (StatusCls) dcSet.getItemStatusMap().get(key);
@@ -2293,8 +2312,14 @@ public class BlockExplorer {
         return output;
     }
 
-    private Map jsonQueryStatement(String block, String seqNo) {
-        // TODO Auto-generated method stub
+    /**
+     * не использыется как отдельный запрос - поэтому в ней нельзя output.put("search", "statements"); и ТИП задавать
+     * @param block
+     * @param seqNo
+     * @return
+     */
+    private Map jsonStatement(String block, String seqNo) {
+
         Map output = new LinkedHashMap();
 
         RSignNote trans = (RSignNote) dcSet.getTransactionFinalMap().get(new Integer(block),
@@ -2600,6 +2625,9 @@ public class BlockExplorer {
 
     public Map jsonQueryTX(String query) {
 
+        output.put("type", "tx");
+        output.put("search", "transactions");
+
         Map output = new LinkedHashMap();
 
         //AssetNames assetNames = new AssetNames();
@@ -2629,7 +2657,7 @@ public class BlockExplorer {
             if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {//.ISSUE_STATEMENT_TRANSACTION){
                 int block = transaction.getBlockHeight();
                 int seqNo = transaction.getSeqNo();
-                output.putAll(jsonQueryStatement(block + "", seqNo + ""));
+                output.putAll(jsonStatement(block + "", seqNo + ""));
                 output.put("type", "statement");
 
             } else {
@@ -2640,12 +2668,13 @@ public class BlockExplorer {
             }
         }
 
-        output.put("search", "transactions");
-
         return output;
     }
 
     public Map jsonQueryBlock(String query, int start) throws WrongSearchException {
+
+        output.put("type", "block");
+        output.put("search", "blocks");
 
         LinkedHashMap output = new LinkedHashMap();
         List<Object> all = new ArrayList<Object>();
@@ -2702,7 +2731,6 @@ public class BlockExplorer {
             all.add(e.getValue());
             aTTxsCount++;
         }
-        output.put("type", "block");
 
         output.put("blockSignature", Base58.encode(block.getSignature()));
         output.put("blockHeight", block.getHeight());
@@ -2809,19 +2837,19 @@ public class BlockExplorer {
         output.put("label_Including", Lang.getInstance().translateFromLangObj("Including", langObj));
         output.put("label_Signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
 
-
         return output;
     }
 
     public Map jsonQueryUnconfirmedTXs() {
+
+        output.put("type", "unconfirmeds");
+
         Map output = new LinkedHashMap();
 
         //AssetNames assetNames = new AssetNames();
 
         List<Transaction> all = new ArrayList<>(
                 Controller.getInstance().getUnconfirmedTransactions(0, 100, true));
-
-        output.put("type", "unconfirmed");
 
         int size = all.size();
 
