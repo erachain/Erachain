@@ -1932,7 +1932,7 @@ public class BlockExplorer {
 
             transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(transaction.getTimestamp()));
 
-            transactionJSON.put("type", "transaction");
+            transactionJSON.put("type", "tx");
             transactionJSON.put("transaction", transactionDataJSON);
             return transactionJSON;
         }
@@ -2136,8 +2136,6 @@ public class BlockExplorer {
 
         //AssetNames assetNames = new AssetNames();
 
-        List<Object> all = new ArrayList<Object>();
-
         String[] signatures = query.split("/");
 
         Transaction initiator = dcSet.getTransactionFinalMap().get(Base58.decode(signatures[0]));
@@ -2148,6 +2146,7 @@ public class BlockExplorer {
         output.put("type", "trade");
         output.put("trade", query);
 
+        List<Object> all = new ArrayList<Object>();
         all.add(trade.toJson(0));
 
         all.add(Controller.getInstance().getTransaction(Base58.decode(signatures[0])));
@@ -2661,7 +2660,7 @@ public class BlockExplorer {
                 output.put("type", "statement");
 
             } else {
-                output.put("type", "transaction");
+                output.put("type", "tx");
                 output.put("body", WebTransactionsHTML.getInstance().get_HTML(transaction, langObj));
                 output.put("Label_Transaction", Lang.getInstance().translateFromLangObj("Transaction", langObj));
                 output.put("heightSeqNo", transaction.viewHeightSeq());

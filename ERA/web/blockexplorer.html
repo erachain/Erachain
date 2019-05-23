@@ -13,6 +13,7 @@
     <script src="/index/libs/js/explorerStatements.js"></script>
     <script src="/index/libs/js/explorerStatuses.js"></script>
     <script src="/index/libs/js/explorerTemplates.js"></script>
+    <script src="/index/libs/js/explorerTransactions.js"></script>
     <script src="/index/libs/js/explorerTransactionsTable.js"></script>
     <script src="/index/libs/js/third-party/qrcode.min.js"></script>
 
@@ -319,7 +320,6 @@ button.white-bgc[disabled]:focus,
                                 $('#selectID').val(type);
                             }
 
-
                             if (!data.noSearchedElements) {
                                 if (type == 'blocks') {
                                     document.getElementById('main').innerHTML = blocks(data);
@@ -334,6 +334,9 @@ button.white-bgc[disabled]:focus,
                                     document.getElementById('main').innerHTML = peers(data);
                                 } else
                                 if (type == 'transactions') {
+                                    document.getElementById('main').innerHTML = transactions(data);
+                                } else
+                                if (type == 'tx') {
                                     document.getElementById('main').innerHTML = transactions(data);
                                 } else
                                 if (type == 'templates') {
@@ -387,7 +390,8 @@ button.white-bgc[disabled]:focus,
                                 if (type == 'block') {
                                     document.getElementById('main').innerHTML = block(data);
                                 } else
-                                if (type == 'mainQuery') {
+                                ///if (type == 'mainQuery')
+                                {
                                     document.getElementById('main').innerHTML = mainQuery(data);
                                     genFilterUrlForAll();
                                     genFilterUrl();
@@ -1358,32 +1362,10 @@ button.white-bgc[disabled]:focus,
                 output += '<br><br>';
             }
 
-            else if (data.type == 'transaction') {
+            else if (data.type == 'tx') {
 
                 $('#selectID').val('transactions');
-
-                output += '<table width="1280" border=0><tr><td align=left>';
-                if (data.body.hasOwnProperty('head')) {
-                    output += data.body.head + '<br>';
-                }
-                if (data.body.hasOwnProperty('body')) {
-                    output += fformat(data.body.body) + '<br>';
-                }
-                if (data.body.hasOwnProperty('message')) {
-                    output += fformat(data.body.message) + '<br>';
-                }
-                if (data.body.hasOwnProperty('foot')) {
-                    output += fformat(data.body.foot) + '<br>';
-                }
-                if (data.body.hasOwnProperty('vouches')) {
-                    output += fformat(data.body.vouches) + '<br>';
-                }
-
-                output += '<br><a href ="/api/recordrawbynumber/' + data.heightSeqNo + '"> RAW </a>';
-
-                //	output += data.Json ;
-
-                return output;
+                return tx(data);
             }
 
             else if (data.type == 'unconfirmed') {
@@ -1671,8 +1653,8 @@ button.white-bgc[disabled]:focus,
                     }
 
                     ////// TRANSACTIONS ////////
-                    if (data[i].type == 'transaction') {
-                        output += transaction_old(data);
+                    if (data[i].type == 'tx') {
+                        output += tx_old(data);
                     }
                 }
 
@@ -2564,6 +2546,14 @@ button.white-bgc[disabled]:focus,
                 }
 
                 document.getElementById('menuAssets').setAttribute('class', 'active');
+
+                return;
+            }
+
+            if (params.hasOwnProperty('status')) {
+                asyncAjax('blockexplorer.json?status=' + params['status'] + '&lang=' + params['lang'] + '&start=' + start);
+
+                document.title = title + ' - Status - ' + params['status'];
 
                 return;
             }

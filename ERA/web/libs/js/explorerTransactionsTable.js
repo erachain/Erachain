@@ -219,6 +219,31 @@ function pagesComponentBeauty(start, label, numberLast, step, linkName) {
     return output;
 }
 
+function tx_old(data) {
+    var output = '<table width="1280" border=0><tr><td align=left>';
+    if (data.body.hasOwnProperty('head')) {
+        output += data.body.head + '<br>';
+    }
+    if (data.body.hasOwnProperty('body')) {
+        output += fformat(data.body.body) + '<br>';
+    }
+    if (data.body.hasOwnProperty('message')) {
+        output += fformat(data.body.message) + '<br>';
+    }
+    if (data.body.hasOwnProperty('foot')) {
+        output += fformat(data.body.foot) + '<br>';
+    }
+    if (data.body.hasOwnProperty('vouches')) {
+        output += fformat(data.body.vouches) + '<br>';
+    }
+
+    output += '<br><a href ="/api/recordrawbynumber/' + data.heightSeqNo + '"> RAW </a>';
+
+    //	output += data.Json ;
+
+    return output;
+}
+
 function transactions_Table(data) {
 
     console.log("data=")
