@@ -298,14 +298,14 @@ public class BlockExplorer {
                 String type = info.getQueryParameters().getFirst("search");
                 String search = info.getQueryParameters().getFirst("q");
                 output.put("type", type);
+                output.put("search_message", search);
                 switch (type) {
                     case "transactions":
                         //search transactions
-                        //output.putAll(jsonQuerySearchPages(Transaction.class, search, (int)start, pageSize));
                         output.putAll(jsonQueryTransactions(search, (int)start));
                         break;
-                    case "address":
-                        //search address
+                    case "addresses":
+                        //search addresses
                         output.putAll(jsonQueryAddress(search, (int) start));
                         break;
                     case "persons":
@@ -2093,6 +2093,7 @@ public class BlockExplorer {
     @SuppressWarnings({"serial", "static-access"})
     public void jsonQueryAddresses() {
         output.put("type", "addresses");
+        output.put("search_message", Lang.getInstance().translateFromLangObj("Insert Address for search", langObj));
     }
 
     @SuppressWarnings({"serial", "static-access"})
@@ -2100,6 +2101,7 @@ public class BlockExplorer {
 
         output.put("type", "address");
         output.put("search", "addresses");
+        output.put("search_message", Lang.getInstance().translateFromLangObj("Insert Address for search", langObj));
 
         int limit = 100;
         List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressLimit(address, limit);
@@ -2633,6 +2635,7 @@ public class BlockExplorer {
 
         output.put("type", "tx");
         output.put("search", "transactions");
+        output.put("search_message", Lang.getInstance().translateFromLangObj("Insert search words", langObj));
 
         Map output = new LinkedHashMap();
 

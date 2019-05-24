@@ -321,6 +321,10 @@ button.white-bgc[disabled]:focus,
                                 $('#selectID').val(type);
                             }
 
+                            if (data.hasOwnProperty('search_message')) {
+                                $('#q').val(data.search_message);
+                            }
+
                             if (!data.noSearchedElements) {
                                 if (type == 'blocks') {
                                     document.getElementById('main').innerHTML = blocks(data);
@@ -589,7 +593,7 @@ button.white-bgc[disabled]:focus,
 
         function addresses(data) {
 
-            var output = 'insert Address for search';
+            var output = data.message;
             return output;
 
         }
@@ -737,7 +741,7 @@ button.white-bgc[disabled]:focus,
 
 
         function polls11(a) {
-            window.location = "/index/blockexplorer.html?polls& asset=" + a.value;
+            window.location = "/index/blockexplorer.html?polls&asset=" + a.value + get_lang();
 
 
         }
@@ -2324,6 +2328,7 @@ button.white-bgc[disabled]:focus,
             document.getElementById('menu_transactions').href = '?transactions&lang=' + params['lang'];
             document.getElementById('menu_addresses').href = '?addresses&lang=' + params['lang'];
             document.getElementById('menu_persons').href = '?persons&lang=' + params['lang'];
+            document.getElementById('menu_polls').href = '?polls&lang=' + params['lang'];
             document.getElementById('menu_assets').href = '?assets&lang=' + params['lang'];
             document.getElementById('menu_statuses').href = '?statuses&lang=' + params['lang'];
             document.getElementById('menu_templates').href = '?templates&lang=' + params['lang'];
@@ -2373,7 +2378,7 @@ button.white-bgc[disabled]:focus,
             }
 
             if (params.hasOwnProperty('polls')) {
-                asyncAjax('blockexplorer.json?polls& asset = ' + params['poll'] + '&lang=' + params['lang'])
+                asyncAjax('blockexplorer.json?polls&asset = ' + params['poll'] + '&lang=' + params['lang'])
 
                 document.title = title + ' - Polls';
 
@@ -2699,7 +2704,7 @@ button.white-bgc[disabled]:focus,
                         <div class="input-group">
                             <select id="selectID" class="form-control" role="tablist">
                                 <option value=blocks id=home2_op translate="true">Block</option>
-                                <option value=address id=menu_address_op translate="true">Address</option>
+                                <option value=addresses id=menu_addresses_op translate="true">Address</option>
                                 <option value=transactions id=menu_transactions_op translate="true">Transaction</option>
                                 <option value=assets id=menu_assets_op translate="true">Asset</option>
                                 <option value=persons id=menu_persons_op translate="true">Person</option>
@@ -2735,7 +2740,7 @@ button.white-bgc[disabled]:focus,
                                     <li id=menuAddresses><a href="?addresses" id=menu_addresses translate="true">Addresses</a></li>
                                     <li id=menuTransactions><a href="?transactions" id=menu_transactions translate="true">Transactions</a></li>
                                     <li id=menuPersons><a href="?persons" id=menu_persons translate="true">Persons</a></li>
-                                    <li id=menuPolls><a href="?polls&asset=2" id=menu_pals_asset translate="true">Polls</a></li>
+                                    <li id=menuPolls><a href="?polls" id=menu_polls translate="true">Polls</a></li>
                                     <li id=menuAssets><a href="?assets" id=menu_assets translate="true">Assets</a></li>
                                     <li id=menuStatuses><a href="?statuses" id=menu_statuses translate="true">Statuses</a></li>
                                     <li id=menuTemplates><a href="?templates" id=menu_templates translate="true">Templates</a></li>
