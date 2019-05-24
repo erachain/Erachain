@@ -1046,10 +1046,13 @@ button.white-bgc[disabled]:focus,
 
                 output += '<tr>';
                 output += '<td><a href=?tx=' + key + get_lang() + '>#' + (Object.keys(data.sells).length - i++) + '</a>';
-                output += '<td>' + addCommas(data.sells[key].price) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-                //output += '<td>' + addCommas(data.sells[key].sellingPrice) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-                output += '<td>' + addCommas(data.sells[key].amount) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
-                output += '<td>' + addCommas(data.sells[key].sellingAmount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                output += '<td>' + addCommas(data.sells[key].price); // + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                //output += '<td>' + addCommas(data.sells[key].sellingPrice); // + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                output += '<td>' + addCommas(data.sells[key].amount); // + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+                //output += '<td>' + addCommas(data.sells[key].sellingAmount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                output += '<td><a href ="?addr=' + data.sells[key].creator_addr + get_lang() + '">' +
+                        data.sells[key].creator + '</a>';
+
             }
 
             output += '<tr bgcolor="#f9f9f9">';
@@ -1077,9 +1080,12 @@ button.white-bgc[disabled]:focus,
                 output += '<tr>';
 
                 output += '<td><a href=?tx=' + key + get_lang() + '>#' + i++ + '</a>';
-                output += '<td>' + addCommas(data.buys[key].buyingPrice) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-                output += '<td>' + addCommas(data.buys[key].buyingAmount) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
-                output += '<td>' + addCommas(data.buys[key].amount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                output += '<td>' + addCommas(data.buys[key].buyingPrice); // + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                output += '<td>' + addCommas(data.buys[key].buyingAmount); // + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+                //output += '<td>' + addCommas(data.buys[key].amount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                output += '<td><a href ="?addr=' + data.buys[key].creator_addr + get_lang() + '">' +
+                        data.buys[key].creator + '</a>';
+
             }
 
             output += '<tr bgcolor="#f9f9f9">';
