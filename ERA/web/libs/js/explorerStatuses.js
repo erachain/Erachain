@@ -50,8 +50,6 @@ function statuses(data){
 
 function status(data) {
 
-    $('#selectID').val('statuses');
-
     var output = '';
 
     if (data.hasOwnProperty('error')) {

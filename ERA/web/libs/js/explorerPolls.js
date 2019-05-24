@@ -51,8 +51,6 @@ function polls(data){
 
 function poll(data) {
 
-    $('#selectID').val('polls');
-
     var output = '';
 
     if (data.hasOwnProperty('error')) {
