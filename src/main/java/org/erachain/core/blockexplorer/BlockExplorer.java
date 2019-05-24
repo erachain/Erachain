@@ -436,10 +436,23 @@ public class BlockExplorer {
         else if (info.getQueryParameters().containsKey("person")) {
             // person asset balance
             if (info.getQueryParameters().containsKey("asset")) {
-                output.putAll(jsonQueryPersonBalance(new Long(info.getQueryParameters().getFirst("person")),
-                        new Long(info.getQueryParameters().getFirst("asset")),
-                        new Integer(info.getQueryParameters().getFirst("position"))
-                ));
+                boolean assetKey = false;
+                // найдем что раньше в строке запроса - персона или актив
+                for(String param:info.getQueryParameters().keySet()) {
+                    if (param.equals("asset")) {
+                        assetKey = true;
+                    }
+                    if (param.equals("person")) {
+                        if (!assetKey) {
+                            // персона раньше в параметрах - значит покажем баланс по активу у персоны
+                            output.putAll(jsonQueryPersonBalance(new Long(info.getQueryParameters().getFirst("person")),
+                                    new Long(info.getQueryParameters().getFirst("asset")),
+                                    new Integer(info.getQueryParameters().getFirst("position"))
+                            ));
+                            return output;
+                        }
+                    }
+                }
             } else {
                 output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
             }
