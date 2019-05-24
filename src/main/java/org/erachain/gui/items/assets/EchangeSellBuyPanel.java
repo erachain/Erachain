@@ -199,7 +199,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                     return;
                 row = sellOrdersTable.convertRowIndexToModel(row);
 
-                Order order = sellOrdersTableModel.getOrder(row);
+                Order order = sellOrdersTableModel.getItem(row);
                 
                 Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
 
@@ -230,8 +230,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                     return;
                 row = sellOrdersTable.convertRowIndexToModel(row);
 
-                Order order = sellOrdersTableModel
-                        .getOrder(row);
+                Order order = sellOrdersTableModel.getItem(row);
                 new TradesFrame(order);
             }
         });
@@ -248,7 +247,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                     return;
                 int row1 = sellOrdersTable.convertRowIndexToModel(row);
 
-                Order order = sellOrdersTableModel.getOrder(row1);
+                Order order = sellOrdersTableModel.getItem(row1);
                 new CancelOrderFrame(order);
             }
         });
@@ -264,13 +263,10 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 MTable target = (MTable) e.getSource();
                 int row = target.getSelectedRow();
 
-                if (row > sellOrdersTableModel.orders.size())
+                if (row > sellOrdersTableModel.getRowCount())
                     return;
 
-                Pair<Long, Order> rowObj = sellOrdersTableModel.orders.get(row);
-                if (rowObj == null)
-                    return;
-                Order order = rowObj.getB();
+                Order order = sellOrdersTableModel.getItem(row);
                 if (order == null)
                     return;
 
@@ -281,7 +277,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
                 if (e.getClickCount() == 2) {
 
-                    if (row < sellOrdersTableModel.orders.size()) {
+                    if (row < sellOrdersTableModel.getRowCount()) {
                         buyOrderPanel.txtAmountHave.setText(order.getAmountHaveLeft().toPlainString());
                         // MAKE BIG SCALE
                         buyOrderPanel.txtPrice.setText(Order.calcPrice(order.getAmountHave(), order.getAmountWant(), 2).toPlainString());
@@ -312,14 +308,10 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 MTable target = (MTable) e.getSource();
                 int row = target.getSelectedRow();
 
-                if (row > buyOrdersTableModel.orders.size())
+                if (row > buyOrdersTableModel.getRowCount())
                     return;
 
-                Pair<Long, Order> rowObj = buyOrdersTableModel.orders.get(row);
-                if (rowObj == null)
-                    return;
-                Order order = rowObj
-                        .getB();
+                Order order = buyOrdersTableModel.getItem(row);
                 if (order == null)
                     return;
 
@@ -349,7 +341,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                     return;
                 row = buyOrdersTable.convertRowIndexToModel(row);
 
-                Order order = buyOrdersTableModel.getOrder(row);
+                Order order = buyOrdersTableModel.getItem(row);
                 Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
 
                 IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, createOrder,
@@ -380,7 +372,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                     return;
                 row = buyOrdersTable.convertRowIndexToModel(row);
 
-                Order order = buyOrdersTableModel.getOrder(row);
+                Order order = buyOrdersTableModel.getItem(row);
                 if (order != null)
                     new TradesFrame(order);
             }
@@ -398,7 +390,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                     return;
                 row = buyOrdersTable.convertRowIndexToModel(row);
 
-                Order order = buyOrdersTableModel.getOrder(row);
+                Order order = buyOrdersTableModel.getItem(row);
                 new CancelOrderFrame(order);
             }
         });
