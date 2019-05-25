@@ -302,7 +302,7 @@ public class BlockExplorer {
                 switch (type) {
                     case "transactions":
                         //search transactions
-                        output.putAll(jsonQueryTransactions(search, (int)start));
+                        output.putAll(jsonQueryTransactions(search, (int) start));
                         break;
                     case "addresses":
                         //search addresses
@@ -310,32 +310,83 @@ public class BlockExplorer {
                         break;
                     case "persons":
                         //search persons
-                        output.putAll(jsonQuerySearchPages(PersonCls.class, search, (int)start, pageSize));
+                        output.putAll(jsonQuerySearchPages(PersonCls.class, search, (int) start, pageSize));
                         break;
                     case "assets":
                         //search assets
-                        output.putAll(jsonQuerySearchPages(AssetCls.class, search, (int)start, pageSize));
+                        output.putAll(jsonQuerySearchPages(AssetCls.class, search, (int) start, pageSize));
                         break;
                     case "statuses":
                         //search statuses
-                        output.putAll(jsonQuerySearchPages(StatusCls.class, search, (int)start, pageSize));
+                        output.putAll(jsonQuerySearchPages(StatusCls.class, search, (int) start, pageSize));
                         break;
                     case "templates":
                         //search templates
-                        output.putAll(jsonQuerySearchPages(TemplateCls.class, search, (int)start, pageSize));
+                        output.putAll(jsonQuerySearchPages(TemplateCls.class, search, (int) start, pageSize));
                         break;
                     case "polls":
                         //search templates
-                        output.putAll(jsonQuerySearchPages(PollCls.class, search, (int)start, pageSize));
+                        output.putAll(jsonQuerySearchPages(PollCls.class, search, (int) start, pageSize));
                         break;
                     case "blocks":
                         //search block
-                        output.putAll(jsonQuerySearchPages(Block.class, search, (int)start, pageSize));
+                        output.putAll(jsonQuerySearchPages(Block.class, search, (int) start, pageSize));
                         break;
                     case "top":
                         output.putAll(jsonQueryTopRichest100(100, Long.valueOf(search)));
                         break;
                 }
+            }
+
+        }
+
+        ///////////////////////////////////////// PERSONS /////////////////////////////////
+        // persons list
+        else if (info.getQueryParameters().containsKey("persons")) {
+            output.put("type", "persons");
+            output.putAll(jsonQueryPages(PersonCls.class, start, pageSize));
+        }
+        // person
+        else if (info.getQueryParameters().containsKey("person")) {
+            // person asset balance
+            if (info.getQueryParameters().containsKey("asset")) {
+                boolean assetKey = false;
+                // найдем что раньше в строке запроса - персона или актив
+                for (String param : info.getQueryParameters().keySet()) {
+                    if (param.equals("asset")) {
+                        assetKey = true;
+                    }
+                    if (param.equals("person")) {
+                        if (!assetKey) {
+                            // персона раньше в параметрах - значит покажем баланс по активу у персоны
+                            output.putAll(jsonQueryPersonBalance(new Long(info.getQueryParameters().getFirst("person")),
+                                    new Long(info.getQueryParameters().getFirst("asset")),
+                                    new Integer(info.getQueryParameters().getFirst("position"))
+                            ));
+                            return output;
+                        }
+                    }
+                }
+            } else if (info.getQueryParameters().containsKey("status")) {
+                boolean statusKey = false;
+                // найдем что раньше в строке запроса - персона или актив
+                for(String param:info.getQueryParameters().keySet()) {
+                    if (param.equals("status")) {
+                        statusKey = true;
+                    }
+                    if (param.equals("person")) {
+                        if (!statusKey) {
+                            // персона раньше в параметрах - значит покажем баланс по активу у персоны
+                            output.putAll(jsonQueryPersonStatus(new Long(info.getQueryParameters().getFirst("person")),
+                                    new Long(info.getQueryParameters().getFirst("status")),
+                                    new Integer(info.getQueryParameters().getFirst("position"))
+                            ));
+                            return output;
+                        }
+                    }
+                }
+            } else {
+                output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
             }
 
         //////////////////////////// ASSETS //////////////////////////
@@ -424,38 +475,6 @@ public class BlockExplorer {
         // blog tx
         else if (info.getQueryParameters().containsKey("blogposts")) {
             output.putAll(jsonQueryBlogPostsTx(info.getQueryParameters().getFirst("blogposts")));
-        }
-
-        ///////////////////////////////////////// PERSONS /////////////////////////////////
-        // persons list
-        else if (info.getQueryParameters().containsKey("persons")) {
-            output.put("type", "persons");
-            output.putAll(jsonQueryPages(PersonCls.class, start, pageSize));
-        }
-        // person
-        else if (info.getQueryParameters().containsKey("person")) {
-            // person asset balance
-            if (info.getQueryParameters().containsKey("asset")) {
-                boolean assetKey = false;
-                // найдем что раньше в строке запроса - персона или актив
-                for(String param:info.getQueryParameters().keySet()) {
-                    if (param.equals("asset")) {
-                        assetKey = true;
-                    }
-                    if (param.equals("person")) {
-                        if (!assetKey) {
-                            // персона раньше в параметрах - значит покажем баланс по активу у персоны
-                            output.putAll(jsonQueryPersonBalance(new Long(info.getQueryParameters().getFirst("person")),
-                                    new Long(info.getQueryParameters().getFirst("asset")),
-                                    new Integer(info.getQueryParameters().getFirst("position"))
-                            ));
-                            return output;
-                        }
-                    }
-                }
-            } else {
-                output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
-            }
         }
 
         ///////////////////// POLLS ////////////////////////
@@ -1213,6 +1232,55 @@ public class BlockExplorer {
         output.put("Label_sum", Lang.getInstance().translateFromLangObj("SUM", langObj));
         BigDecimal sum = PersonCls.getBalance(personKey, assetKey, position);
         output.put("sum", sum);
+
+        return output;
+    }
+
+    private Map jsonQueryPersonStatus(Long personKey, Long statusKey, int position) {
+
+        output.put("type", "person_status");
+        output.put("search", "persons");
+
+        Map output = new HashMap();
+        if (position < 1 || position > 5) {
+            output.put("error", "wrong position");
+            return output;
+        }
+
+        PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(new Long(personKey));
+        if (person == null) {
+            output.put("error", "person not found");
+            return output;
+        }
+
+        StatusCls status = (StatusCls) dcSet.getItemStatusMap().get(new Long(statusKey));
+        if (status == null) {
+            output.put("error", "person not found");
+            return output;
+        }
+
+        byte[] b = person.getImage();
+        String a = Base64.encodeBase64String(b);
+
+        output.put("Label_key", Lang.getInstance().translateFromLangObj("Key", langObj));
+        output.put("Label_name", Lang.getInstance().translateFromLangObj("Name", langObj));
+
+        output.put("person_img", a);
+        output.put("person_key", person.getKey());
+        output.put("person_name", person.getName());
+
+        output.put("status_key", status.getKey());
+        output.put("status_name", status.getName());
+
+        output.put("Label_status", Lang.getInstance().translateFromLangObj("Satus", langObj));
+        output.put("Label_person", Lang.getInstance().translateFromLangObj("Person", langObj));
+
+        output.put("Label_denied", Lang.getInstance().translateFromLangObj("DENIED", langObj));
+        output.put("Label_sum", Lang.getInstance().translateFromLangObj("SUM", langObj));
+
+        BigDecimal sum = PersonCls.getBalance(personKey, statusKey, position);
+
+        output.put("status", sum);
 
         return output;
     }

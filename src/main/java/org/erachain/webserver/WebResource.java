@@ -1400,6 +1400,18 @@ public class WebResource {
         }
     }
 
+    @Path("index/libs/js/explorerPersons.js")
+    @GET
+    public Response explorerPersons() {
+        File file = new File("web/libs/js/explorerPersons.js");
+
+        if (file.exists()) {
+            return Response.ok(file, "text/explorerPersons").build();
+        } else {
+            return error404(request, null);
+        }
+    }
+
     @Path("index/libs/js/explorerStatements.js")
     @GET
     public Response explorerStatements() {
