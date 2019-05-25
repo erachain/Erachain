@@ -116,12 +116,10 @@ function person(data) {
     output += '<br>' + data.Label_statuses + ':';
     output += '<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>' + data.Label_Status_table_status + '<td><b>' + data.Label_Status_table_period + '<td><b>' + data.Label_accounts_table_creator + '<tr>';
 
-    key = 0;
     for (key in data.statuses) {
-        output += '<tr ><td >' + data.statuses[key].status_name + '<td>' + data.statuses[key].status_period
+        output += '<tr ><td ><a href ="?person=' + data.key + '&status=' + data.statuses[key].status_key + get_lang() + '">' + data.statuses[key].status_name
+            + '<td>' + data.statuses[key].status_period
             + '<td><a href ="?address=' + data.statuses[key].status_creator_address + get_lang() + '">' + data.statuses[key].status_creator + '</a><tr>';
-
-        key++;
     }
     output += '</table><br>';
 
@@ -130,12 +128,9 @@ function person(data) {
     output += '<br>' + data.Label_accounts + ':';
     output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>' + data.Label_accounts_table_adress + '<td><b>' + data.Label_accounts_table_to_date + '<td><b>' + data.Label_accounts_table_creator + '<tr>';
 
-    key = 0;
     for (key in data.accounts) {
         output += '<tr><td><a href = "?address=' + data.accounts[key].address + get_lang() + '">' + data.accounts[key].address + '</a><td>'
             + data.accounts[key].to_date + '<td><a href ="?address=' + data.accounts[key].creator_address + get_lang() + '">' + data.accounts[key].creator + '</a><tr>';
-
-        key++;
     }
     output += '</table><br>';
 

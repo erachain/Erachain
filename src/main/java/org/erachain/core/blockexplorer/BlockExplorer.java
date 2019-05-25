@@ -373,10 +373,14 @@ public class BlockExplorer {
                     if (param.equals("person")) {
                         if (!statusKey) {
                             // персона раньше в параметрах - значит покажем баланс по активу у персоны
+                            int position = 1;
+                            if (info.getQueryParameters().containsKey("position")) {
+                                position = new Integer(info.getQueryParameters().getFirst("position"));
+                            }
                             output.putAll(jsonQueryPersonStatus(
                                     new Long(info.getQueryParameters().getFirst("person")),
                                     new Long(info.getQueryParameters().getFirst("status")),
-                                    new Integer(info.getQueryParameters().getFirst("position")),
+                                    position,
                                     true
                             ));
                             return output;
@@ -1424,6 +1428,7 @@ public class BlockExplorer {
         if (rowCount > 0) {
             for (int i = 0; i < rowCount; i++) {
                 Map statusJSON = new LinkedHashMap();
+                statusJSON.put("status_key", statusModel.getValueAt(i, WebPersonStatusesModel.COLUMN_STATUS_KEY));
                 statusJSON.put("status_name", statusModel.getValueAt(i, WebPersonStatusesModel.COLUMN_STATUS_NAME));
                 statusJSON.put("status_period", statusModel.getValueAt(i, WebPersonStatusesModel.COLUMN_PERIOD));
                 Account creator = (Account) statusModel.getValueAt(i, WebPersonStatusesModel.COLUMN_MAKER_ACCOUNT);
