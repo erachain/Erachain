@@ -1205,6 +1205,9 @@ public class BlockExplorer {
         output.put("asset_key", asset.getKey());
         output.put("asset_name", asset.getName());
 
+        output.put("Label_asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
+        output.put("Label_person", Lang.getInstance().translateFromLangObj("Person", langObj));
+
         output.put("Label_denied", Lang.getInstance().translateFromLangObj("DENIED", langObj));
         output.put("Label_sum", Lang.getInstance().translateFromLangObj("SUM", langObj));
         BigDecimal sum = PersonCls.getBalance(personKey, assetKey, position);
@@ -1646,15 +1649,17 @@ public class BlockExplorer {
             while (iterator.hasNext()) {
                 Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> item = iterator.next();
 
-                if (item.getB().a.b.signum() != 0
-                        && item.getB().b.b.signum() != 0
-                        && item.getB().c.b.signum() != 0) {
+                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> itemBals = item.getB();
+                if (true || itemBals.a.b.signum() != 0
+                        && itemBals.b.b.signum() != 0
+                        && itemBals.c.b.signum() != 0) {
                     Map bal = new LinkedHashMap();
                     bal.put("asset_key", item.getA().b);
                     bal.put("asset_name", assetsMap.get(item.getA().b).viewName());
-                    bal.put("balance_A", item.getB().a.b);
-                    bal.put("balance_B", item.getB().b.b);
-                    bal.put("balance_C", item.getB().c.b);
+                    bal.put("balance_1", itemBals.a.b);
+                    bal.put("balance_2", itemBals.b.b);
+                    bal.put("balance_3", itemBals.c.b);
+                    bal.put("balance_4", itemBals.d.b);
                     balAssets.put(item.getA().b.toString(), bal);
                 }
             }
@@ -1665,9 +1670,10 @@ public class BlockExplorer {
         output.put("label_Balance_table", Lang.getInstance().translateFromLangObj("Balance", langObj));
         output.put("label_asset_key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("label_asset_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-        output.put("label_Balance_A", Lang.getInstance().translateFromLangObj("Balance", langObj) + " A");
-        output.put("label_Balance_B", Lang.getInstance().translateFromLangObj("Balance", langObj) + " B");
-        output.put("label_Balance_C", Lang.getInstance().translateFromLangObj("Balance", langObj) + " C");
+        output.put("label_Balance_1", Lang.getInstance().translateFromLangObj("Balance", langObj) + " 1");
+        output.put("label_Balance_2", Lang.getInstance().translateFromLangObj("Balance", langObj) + " 2");
+        output.put("label_Balance_3", Lang.getInstance().translateFromLangObj("Balance", langObj) + " 3");
+        output.put("label_Balance_4", Lang.getInstance().translateFromLangObj("Balance", langObj) + " 4");
 
         return output;
 

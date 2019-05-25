@@ -632,15 +632,28 @@ button.white-bgc[disabled]:focus,
             output += '<table id="balance" id=balance BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
                 ' class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
             output += '<tr bgcolor="f1f1f1"><td><b>' + data.Balance.label_asset_key +
-                '<td><b>' + data.Balance.label_asset_name + '<td><b>' + data.Balance.label_Balance_A +
-                '<td><b>' + data.Balance.label_Balance_B + '<td><b>' + data.Balance.label_Balance_C + '</tr>';
+                '<td><b>' + data.Balance.label_asset_name + '<td><b>' + data.Balance.label_Balance_1 +
+                '<td><b>' + data.Balance.label_Balance_2 + '<td><b>' + data.Balance.label_Balance_3 + '<td><b>'
+                 + data.Balance.label_Balance_4 + '</tr>';
             for (key in data.Balance.balances) {
                 output += '<tr><td><a href ="?asset=' + data.Balance.balances[key].asset_key +
                     get_lang() + '">' + data.Balance.balances[key].asset_key + '</a>';
                 output += '<td><a href="?asset=' + data.Balance.balances[key].asset_key +
                     get_lang() + '">' + data.Balance.balances[key].asset_name + '</a>';
-                output += '<td>' + data.Balance.balances[key].balance_A + '<td>' +
-                    data.Balance.balances[key].balance_B + '<td>' + data.Balance.balances[key].balance_C;
+                if (data.hasOwnProperty('person')) {
+                output += '<td><a href ="?person=' + data.person_key + '&asset=' + data.Balance.balances[key].asset_key +
+                    '&position=1' + get_lang() + '">' + data.Balance.balances[key].balance_1 + '</a>';
+                output += '<td><a href ="?person=' + data.person_key + '&asset=' + data.Balance.balances[key].asset_key +
+                    '&position=2' + get_lang() + '">' + data.Balance.balances[key].balance_2 + '</a>';
+                output += '<td><a href ="?person=' + data.person_key + '&asset=' + data.Balance.balances[key].asset_key +
+                    '&position=3' + get_lang() + '">' + data.Balance.balances[key].balance_3 + '</a>';
+                output += '<td><a href ="?person=' + data.person_key + '&asset=' + data.Balance.balances[key].asset_key +
+                    '&position=4' + get_lang() + '">' + data.Balance.balances[key].balance_4 + '</a>';
+                } else {
+                output += '<td>' + data.Balance.balances[key].balance_1 + '<td>' +
+                    data.Balance.balances[key].balance_2 + '<td>' + data.Balance.balances[key].balance_3
+                    + '<td>' + data.Balance.balances[key].balance_4;
+                }
 
             }
             output += '</table><br><br>';
@@ -2012,8 +2025,9 @@ button.white-bgc[disabled]:focus,
                 output += '<br>';
             }
 
-            output += ' &nbsp&nbsp<b>' + data.person_key + '</b>';
-            output += ' &nbsp&nbsp<b>' + data.person_name + '</b><br>';
+            output += data.Label_asset
+            output += data.Label_person + ': <a href ="?person=' +
+                data.person_key + get_lang() + '">[' + data.person_key + ']' + data.person_name + '</a>';
 
             output += '<br>';
             output += '<br>';
