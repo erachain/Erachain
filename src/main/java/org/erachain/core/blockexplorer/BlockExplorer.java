@@ -694,7 +694,8 @@ public class BlockExplorer {
         output.put("label_table_key", Lang.getInstance().translateFromLangObj("Number", langObj));
         output.put("label_table_option_name", Lang.getInstance().translateFromLangObj("Option", langObj));
         output.put("label_table_person_votes", Lang.getInstance().translateFromLangObj("Personal Voters", langObj));
-        output.put("label_table_option_votes", Lang.getInstance().translateFromLangObj("Votes", langObj));
+        output.put("label_table_option_votes", Lang.getInstance().translateFromLangObj("Asset Votes", langObj));
+        output.put("label_Total", Lang.getInstance().translateFromLangObj("Total", langObj));
 
         output.put("label_Poll", Lang.getInstance().translateFromLangObj("Poll", langObj));
         output.put("label_Key", Lang.getInstance().translateFromLangObj("Key", langObj));

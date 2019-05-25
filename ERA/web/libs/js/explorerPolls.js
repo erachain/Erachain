@@ -88,22 +88,28 @@ function poll(data) {
     output += '<table width="1280" border=0><tr><td align=left><br>';
     output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd;">';
     output += '<thead><tr><td><b>'+ data.label_table_key  +' - ' +
-        data.label_table_option_name + '</b></td><td><b>' + data.label_table_person_votes +
-        '</b></td><td><b>' + data.label_table_option_votes + '</b></td></tr></thead>';
+        data.label_table_option_name +
+        '</b></td><td><b>' + data.label_table_person_votes +
+        '</b></td><td><b>%%' +
+        '</b></td><td><b>' + data.label_table_option_votes +
+        '</b></td><td><b>%%</b></td></tr></thead>';
 
     for (var i in data.poll.votes) {
         var item = data.poll.votes[i];
         output += '<tr><td><b>' + i + ' - ' + item.name + ':</b></td>';
         output += '<td>' + item.persons + '</td>';
+        output += '<td>' + (100.0 * item.persons / data.poll.personsTotal).toPrecision(6)  + '</td>';
         output += '<td>' + item.votes + '</td>';
+        output += '<td>' + (100.0 * item.votes / data.poll.votesTotal).toPrecision(6) + '</td>';
 
         output += '</td></tr>';
     }
-        output += '<tr><td><b>TOTAL:</b></td>';
-        output += '<td>' + data.poll.personsTotal + '</td>';
-        output += '<td>' + data.poll.votesTotal + '</td>';
 
-        output += '</td></tr>';
+    output += '<tr><td><b>' + data.label_Total + '</b></td>';
+    output += '<td>' + data.poll.personsTotal + '</td>';
+    output += '<td><td>' + data.poll.votesTotal + '</td><td>';
+
+    output += '</td></tr>';
 
     return output;
 }

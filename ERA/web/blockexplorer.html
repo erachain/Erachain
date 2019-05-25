@@ -2016,16 +2016,19 @@ button.white-bgc[disabled]:focus,
             output += '<img src="data:image/gif;base64,' + data.person_img + '" width = "350" /></td><td style ="padding-left:20px">';
 
             if (data.sum > 0) {
-                output += '<b><span style="font-size:4em; color:lime"> &nbsp&nbsp +' + data.sum + '</span></b><br>';
-                output += '<fon_t size=10> &nbsp&nbsp' + data.asset_name + '</fon_t><br>';
+                output += '<img src="img/check-yes.png" style="height:110px">'
+                output += '<b><span style="font-size:4em; color:#0cb70c"> &nbsp&nbsp +' + data.sum + '</span></b><br>';
                 output += '<br>';
+            } else if (data.sum == 0) {
+                output += '<img src="img/check-no.png" style="height:120px">'
+                output += '<br><br>';
             } else {
-                output += '<b><span style="font-size:4em; color:crimson"> &nbsp&nbsp ' + data.Label_denied + '</span></b><br>';
-                output += '<br>';
+                output += '<img src="img/check-no.png" style="height:120px">'
+                output += '<b><span style="font-size:3em; color:crimson"> &nbsp&nbsp ' + data.sum + '</span></b><br>';
                 output += '<br>';
             }
 
-            output += data.Label_asset
+            output += data.Label_asset + ': <fon_t size=10> &nbsp&nbsp' + data.asset_name + '</fon_t><br>';
             output += data.Label_person + ': <a href ="?person=' +
                 data.person_key + get_lang() + '">[' + data.person_key + ']' + data.person_name + '</a>';
 

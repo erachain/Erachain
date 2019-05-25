@@ -78,7 +78,7 @@ public class WebResource {
             "09_poll_vote.jpg", "10_arbitrary_transaction.png",
             "11_asset_issue.png", "12_asset_transfer_in.png",
             "12_asset_transfer_out.png", "13_order_creation.png",
-            "14_cancel_order.png", "15_multi_payment_in.png",
+            "14_cancel_order.png", "15_multi_payment_in.png", "check-yes.png", "check-no.png",
             "15_multi_payment_out.png", "16_deploy_at.png",
             "17_message_in.png", "17_message_out.png", "asset_trade.png",
             "at_tx_in.png", "at_tx_out.png", "grleft.png", "grright.png",
