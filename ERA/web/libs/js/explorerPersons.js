@@ -37,7 +37,7 @@ function person_asset(data) {
     return output;
 }
 
-function person_asset(data) {
+function person_status(data) {
     var output = '';
     if (data.error != null) {
         return data.error;

@@ -22,11 +22,7 @@ import org.erachain.core.voting.Poll;
 import org.erachain.core.voting.PollOption;
 import org.erachain.database.SortableList;
 import org.erachain.database.FilteredByStringArray;
-import org.erachain.datachain.DCMap;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetMap;
-import org.erachain.datachain.TransactionFinalMap;
-import org.erachain.datachain.VoteOnItemPollMap;
+import org.erachain.datachain.*;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.gui.models.PersonAccountsModel;
 import org.erachain.lang.Lang;
@@ -377,9 +373,11 @@ public class BlockExplorer {
                     if (param.equals("person")) {
                         if (!statusKey) {
                             // персона раньше в параметрах - значит покажем баланс по активу у персоны
-                            output.putAll(jsonQueryPersonStatus(new Long(info.getQueryParameters().getFirst("person")),
+                            output.putAll(jsonQueryPersonStatus(
+                                    new Long(info.getQueryParameters().getFirst("person")),
                                     new Long(info.getQueryParameters().getFirst("status")),
-                                    new Integer(info.getQueryParameters().getFirst("position"))
+                                    new Integer(info.getQueryParameters().getFirst("position")),
+                                    true
                             ));
                             return output;
                         }
@@ -1236,7 +1234,7 @@ public class BlockExplorer {
         return output;
     }
 
-    private Map jsonQueryPersonStatus(Long personKey, Long statusKey, int position) {
+    private Map jsonQueryPersonStatus(Long personKey, Long statusKey, int position, boolean history) {
 
         output.put("type", "person_status");
         output.put("search", "persons");
@@ -1278,9 +1276,55 @@ public class BlockExplorer {
         output.put("Label_denied", Lang.getInstance().translateFromLangObj("DENIED", langObj));
         output.put("Label_sum", Lang.getInstance().translateFromLangObj("SUM", langObj));
 
-        BigDecimal sum = PersonCls.getBalance(personKey, statusKey, position);
+        //BigDecimal sum = PersonCls.getBalance(personKey, statusKey, position);
+        KKPersonStatusMap map = DCSet.getInstance().getPersonStatusMap();
+        TreeMap<Long, Stack<Fun.Tuple5<Long, Long, byte[], Integer, Integer>>> statuses = map.get(personKey);
+        if (statuses == null) {
+            output.put("error", "person statuses not found");
+            return output;
+        }
 
-        output.put("status", sum);
+        Stack<Fun.Tuple5<Long, Long, byte[], Integer, Integer>> statusValue = statuses.get(statusKey);
+        if (statusValue == null || statusValue.isEmpty()) {
+            output.put("error", "person status not found");
+            return output;
+        }
+
+        Fun.Tuple5<Long, Long, byte[], Integer, Integer> last = statusValue.peek();
+
+        JSONArray lastJSON = new JSONArray();
+        lastJSON.add(last.a);
+        lastJSON.add(last.b);
+        lastJSON.add(RSetStatusToItem.unpackDataJSON(last.c));
+        lastJSON.add(last.d);
+        lastJSON.add(last.e);
+
+        JSONObject out = new JSONObject();
+        out.put("last", lastJSON);
+
+        out.put("text", DCSet.getInstance().getItemStatusMap().get(statusKey).toString(DCSet.getInstance(), last.c));
+
+        if (history) {
+            JSONArray historyJSON = new JSONArray();
+            Iterator<Fun.Tuple5<Long, Long, byte[], Integer, Integer>> iterator = statusValue.iterator();
+            iterator.next();
+
+            while (iterator.hasNext()) {
+                Fun.Tuple5<Long, Long, byte[], Integer, Integer> item = iterator.next();
+                JSONArray historyItemJSON = new JSONArray();
+
+                historyItemJSON.add(item.a);
+                historyItemJSON.add(item.b);
+                historyItemJSON.add(RSetStatusToItem.unpackDataJSON(last.c));
+                historyItemJSON.add(item.d);
+                historyItemJSON.add(item.e);
+
+                historyJSON.add(historyItemJSON);
+            }
+            out.put("history", historyJSON);
+        }
+
+        output.put("status", out);
 
         return output;
     }
