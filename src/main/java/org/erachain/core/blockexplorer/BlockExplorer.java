@@ -1171,7 +1171,7 @@ public class BlockExplorer {
 
     private Map jsonQueryPersonBalance(Long personKey, Long assetKey, int position) {
 
-        output.put("type", "person_assets");
+        output.put("type", "person_asset");
         output.put("search", "persons");
 
         Map output = new HashMap();

@@ -256,7 +256,8 @@ public class WebResource {
                     .entity(StrJSonFine.convert(output))
                     .build();
         } catch (Exception ee) {
-            ee.printStackTrace();
+            //ee.printStackTrace();
+            logger.error(ee.getMessage(), ee);
             StringBuilder ss = new StringBuilder();
             for (StackTraceElement item : ee.getStackTrace()) {
                 ss.append(item.toString()).append("<br>");
@@ -289,7 +290,8 @@ public class WebResource {
             String type = URLConnection.guessContentTypeFromStream(is);
             return Response.ok(file, type).build();
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return Response.status(500).build();
         }
     }
@@ -309,7 +311,8 @@ public class WebResource {
             String type = URLConnection.guessContentTypeFromStream(is);
             return Response.ok(file, type).build();
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return Response.status(500).build();
         }
     }
@@ -953,6 +956,7 @@ public class WebResource {
                         .entity(json.toJSONString()).build();
 
             } catch (WebApplicationException e) {
+                logger.error(e.getMessage(), e);
 
                 json = new JSONObject();
                 json.put("type", "error");
@@ -1639,6 +1643,7 @@ public class WebResource {
                         .entity(json.toJSONString()).build();
 
             } catch (WebApplicationException e) {
+                logger.error(e.getMessage(), e);
 
                 json = new JSONObject();
                 json.put("type", "error");
@@ -1916,6 +1921,8 @@ public class WebResource {
                                         .getFollowedBlogs().contains(blogname));
 
                             } catch (WebApplicationException e) {
+                                logger.error(e.getMessage(), e);
+
                                 result = "<center><div class=\"alert alert-danger\" role=\"alert\">Blog follow not successful<br>"
                                         + e.getResponse().getEntity()
                                         + "</div></center>";
@@ -1956,6 +1963,8 @@ public class WebResource {
                                 json.put("isFollowing", activeProfileOpt
                                         .getFollowedBlogs().contains(blogname));
                             } catch (WebApplicationException e) {
+                                logger.error(e.getMessage(), e);
+
                                 result = "<center><div class=\"alert alert-danger\" role=\"alert\">Blog unfollow not successful<br>"
                                         + e.getResponse().getEntity()
                                         + "</div></center>";
@@ -2059,6 +2068,7 @@ public class WebResource {
                                     "application/json; charset=utf-8")
                             .entity(jsonanswer.toJSONString()).build();
                 } catch (WebApplicationException e) {
+                    logger.error(e.getMessage(), e);
 
                     jsonanswer.put("type", "deleteError");
                     jsonanswer.put("errordetail", e.getResponse().getEntity());
@@ -2191,6 +2201,7 @@ public class WebResource {
                                     "application/json; charset=utf-8")
                             .entity(jsonanswer.toJSONString()).build();
                 } catch (WebApplicationException e) {
+                    logger.error(e.getMessage(), e);
 
                     jsonanswer.put("type", "deleteError");
                     jsonanswer.put("errordetail", e.getResponse().getEntity());
@@ -2307,6 +2318,7 @@ public class WebResource {
                         json.put("result", result);
 
                     } catch (WebApplicationException e) {
+                        logger.error(e.getMessage(), e);
 
                         json.put("type", "ShareNotSuccessful");
                         json.put("result", e.getResponse().getEntity());
@@ -2414,6 +2426,7 @@ public class WebResource {
                             json.put("result", result);
 
                         } catch (WebApplicationException e) {
+                            logger.error(e.getMessage(), e);
 
                             json.put("type", "LikeNotSuccessful");
                             json.put("result", e.getResponse().getEntity());
@@ -2437,6 +2450,7 @@ public class WebResource {
                                 json.put("result", result);
 
                             } catch (WebApplicationException e) {
+                                logger.error(e.getMessage(), e);
 
                                 json.put("type", "LikeRemovedNotSuccessful");
                                 json.put("result", e.getResponse().getEntity());
