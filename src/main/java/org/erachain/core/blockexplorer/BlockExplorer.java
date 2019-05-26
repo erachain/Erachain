@@ -1263,7 +1263,6 @@ public class BlockExplorer {
         output.put("Label_from", Lang.getInstance().translateFromLangObj("From #date", langObj));
         output.put("Label_to", Lang.getInstance().translateFromLangObj("To #date", langObj));
         output.put("Label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("Label_history", Lang.getInstance().translateFromLangObj("History", langObj));
 
         output.put("person_img", a);
         output.put("person_key", person.getKey());
@@ -1298,7 +1297,8 @@ public class BlockExplorer {
             // остальные - как ситория изменения храним
 
             /// start Timestamp, end Timestamp, DATA, Block, SeqNo
-            Fun.Tuple5<Long, Long, byte[], Integer, Integer> last = statusValue.pop();
+            // нельзя изменять сам обзект с помощью POP - так как он в КЭШЕ изменяется тоже
+            Fun.Tuple5<Long, Long, byte[], Integer, Integer> last = statusValue.peek(); // .pop()
 
             Map currentStatus = new HashMap();
             currentStatus.put("text", itemStatusMap.get(statusKey).toString(dcSet, last.c));
@@ -1314,13 +1314,24 @@ public class BlockExplorer {
 
             output.put("last", currentStatus);
 
+            output.put("Label_status_history", Lang.getInstance().translateFromLangObj("Update History", langObj));
+            output.put("Label_current_state", Lang.getInstance().translateFromLangObj("Current State", langObj));
+
+        } else {
+            output.put("Label_statuses_list", Lang.getInstance().translateFromLangObj("Statuses List", langObj));
         }
 
         if (!status.isUnique() || history) {
             JSONArray historyJSON = new JSONArray();
 
-            while (!statusValue.isEmpty()) {
-                Fun.Tuple5<Long, Long, byte[], Integer, Integer> item = statusValue.pop();
+            // нельзя изменять сам обзект с помощью POP - так как он в КЭШЕ изменяется тоже
+            Iterator<Tuple5<Long, Long, byte[], Integer, Integer>> iterator = statusValue.iterator(); // .pop();
+            if (status.isUnique()) {
+                // пропустим первое значение
+                iterator.next();
+            }
+            while (iterator.hasNext()) {
+                Fun.Tuple5<Long, Long, byte[], Integer, Integer> item = iterator.next();
                 JSONObject historyItemJSON = new JSONObject();
 
                 transaction = dcSet.getTransactionFinalMap().get(item.d, item.e);

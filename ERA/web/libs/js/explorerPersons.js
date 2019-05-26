@@ -49,24 +49,27 @@ function person_status(data) {
 
     output += '<img src="data:image/gif;base64,' + data.person_img + '" width = "350" /></td><td style ="padding-left:20px">';
 
-    output += data.last.text + ': <br>';
-    if (data.last.hasOwnProperty('beginTimestamp')) {
-        output += '<img src="img/check-yes.png" style="height:4em; margin-bottom:20px;">'
-        output += '<b><span style="font-size:3em; color:#0cb70c"> &nbsp' + convertTimestamp(data.last.beginTimestamp) + '</span></b><br>';
-    }
-    if (data.last.hasOwnProperty('endTimestamp')) {
-        output += '<img src="img/check-no.png" style="height:4em; margin-bottom:20px;">'
-        output += '<b><span style="font-size:3em; color:crimson"> &nbsp' + convertTimestamp(data.last.endTimestamp) + '</span></b><br>';
+    if (data.hasOwnProperty('last')) {
+        output += '<h3>' + data.Label_current_state + '</h3>';
+        output += data.last.text + ': <br>';
+        if (data.last.hasOwnProperty('beginTimestamp')) {
+            output += '<img src="img/check-yes.png" style="height:4em; margin-bottom:20px;">'
+            output += '<b><span style="font-size:3em; color:#0cb70c"> &nbsp' + convertTimestamp(data.last.beginTimestamp) + '</span></b><br>';
+        }
+        if (data.last.hasOwnProperty('endTimestamp')) {
+            output += '<img src="img/check-no.png" style="height:4em; margin-bottom:20px;">'
+            output += '<b><span style="font-size:3em; color:crimson"> &nbsp' + convertTimestamp(data.last.endTimestamp) + '</span></b><br>';
+        }
+        output += data.Label_creator + ': <a href ="?address=' +
+            data.last.creator + get_lang() + '">' + data.last.creator + '</a><br>';
+        output += data.Label_transaction + ': <a href ="?tx=' + data.last.txBlock + '-' + data.last.txSeqNo + get_lang()
+        + '">' + data.last.txBlock + '-' + data.last.txSeqNo + '</a><br>';
     }
 
     output += data.Label_person + ': <a href ="?person=' +
         data.person_key + get_lang() + '">[' + data.person_key + ']' + data.person_name + '</a><br>';
     output += data.Label_status + ': <a href ="?status=' +
         data.status_key + get_lang() + '">[' + data.status_key + ']' + data.status_name + '</a><br>';
-    output += data.Label_creator + ': <a href ="?address=' +
-        data.last.creator + get_lang() + '">' + data.last.creator + '</a><br>';
-    output += data.Label_transaction + ': <a href ="?tx=' + data.last.txBlock + '-' + data.last.txSeqNo + get_lang()
-        + '">' + data.last.txBlock + '-' + data.last.txSeqNo + '</a><br>';
 
     output += '<br>';
     output += '<br>';
@@ -75,8 +78,11 @@ function person_status(data) {
     output += '</table>';
 
     output += '<hl>';
-    output += '<h3>' + data.Label_history + '</h3>';
-
+    if (data.hasOwnProperty('last')) {
+        output += '<h3>' + data.Label_status_history + '</h3>';
+    } else {
+        output += '<h3>' + data.Label_statuses_list + '</h3>';
+    }
 
     if (data.hasOwnProperty('history')) {
         output += '<table id=history BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
