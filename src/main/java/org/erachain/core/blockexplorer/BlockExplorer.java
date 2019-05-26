@@ -2468,12 +2468,17 @@ public class BlockExplorer {
         statusJSON.put("description", status.getDescription());
         statusJSON.put("owner", status.getOwner().getAddress());
 
+        statusJSON.put("unique", status.isUnique());
+
         output.put("status", statusJSON);
 
         output.put("label_Status", Lang.getInstance().translateFromLangObj("Status", langObj));
         output.put("label_Key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
         output.put("label_Description", Lang.getInstance().translateFromLangObj("Description", langObj));
+
+        output.put("label_unique_state", Lang.getInstance().translateFromLangObj("Unique State", langObj));
+        output.put("label_multi_states", Lang.getInstance().translateFromLangObj("Multi States", langObj));
 
         return output;
     }

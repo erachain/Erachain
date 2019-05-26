@@ -78,6 +78,11 @@ function status(data) {
 
     output += '<br><br>';
 
+    if (data.status.unique) {
+        output += '<b>' + data.label_unique_state + '</b><br>'
+    } else {
+        output += '<b>' + data.label_multi_states + '</b><br>'
+    }
 
     output += '<b>' + data.label_Description + ':</b><br>'
     output += fformat(data.status.description); // wordwrap(data.status.description, 80, '\n', true);
