@@ -1326,12 +1326,15 @@ public class BlockExplorer {
 
             // нельзя изменять сам обзект с помощью POP - так как он в КЭШЕ изменяется тоже
             Iterator<Tuple5<Long, Long, byte[], Integer, Integer>> iterator = statusValue.iterator(); // .pop();
-            if (status.isUnique()) {
-                // пропустим первое значение
-                iterator.next();
-            }
+            int size = statusValue.size();
+            int i = 0;
             while (iterator.hasNext()) {
+                if (status.isUnique() && ++i == size) {
+                    // пропустим последнее значение - оно уже взято было как текущее
+                    break;
+                }
                 Fun.Tuple5<Long, Long, byte[], Integer, Integer> item = iterator.next();
+
                 JSONObject historyItemJSON = new JSONObject();
 
                 transaction = dcSet.getTransactionFinalMap().get(item.d, item.e);
@@ -1346,7 +1349,7 @@ public class BlockExplorer {
                 historyItemJSON.put("txBlock", item.d);
                 historyItemJSON.put("txSeqNo", item.e);
 
-                historyJSON.add(historyItemJSON);
+                historyJSON.add(0, historyItemJSON);
             }
             output.put("history", historyJSON);
         }

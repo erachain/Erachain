@@ -51,19 +51,20 @@ function person_status(data) {
 
     if (data.hasOwnProperty('last')) {
         output += '<h3>' + data.Label_current_state + '</h3>';
-        output += data.last.text + ': <br>';
-        if (data.last.hasOwnProperty('beginTimestamp')) {
-            output += '<img src="img/check-yes.png" style="height:4em; margin-bottom:20px;">'
-            output += '<b><span style="font-size:3em; color:#0cb70c"> &nbsp' + convertTimestamp(data.last.beginTimestamp) + '</span></b><br>';
-        }
+        output += '<span style="font-size:2em;">' + data.last.text + '</span><br>';
         if (data.last.hasOwnProperty('endTimestamp')) {
             output += '<img src="img/check-no.png" style="height:4em; margin-bottom:20px;">'
             output += '<b><span style="font-size:3em; color:crimson"> &nbsp' + convertTimestamp(data.last.endTimestamp) + '</span></b><br>';
+        }
+        if (data.last.hasOwnProperty('beginTimestamp')) {
+            output += '<img src="img/check-yes.png" style="height:4em; margin-bottom:20px;">'
+            output += '<b><span style="font-size:3em; color:#0cb70c"> &nbsp' + convertTimestamp(data.last.beginTimestamp) + '</span></b><br>';
         }
         output += data.Label_creator + ': <a href ="?address=' +
             data.last.creator + get_lang() + '">' + data.last.creator + '</a><br>';
         output += data.Label_transaction + ': <a href ="?tx=' + data.last.txBlock + '-' + data.last.txSeqNo + get_lang()
         + '">' + data.last.txBlock + '-' + data.last.txSeqNo + '</a><br>';
+        output += '<br>';
     }
 
     output += data.Label_person + ': <a href ="?person=' +
@@ -86,12 +87,17 @@ function person_status(data) {
 
     if (data.hasOwnProperty('history')) {
         output += '<table id=history BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
-        output += '<tr><td width="30%"><b>' + data.Label_result + '<td><b>' + data.Label_from
+        output += '<tr><td width="40%"><b>' + data.Label_result + '<td><b>' + data.Label_from
             + '<td><b>' + data.Label_to + '<td><b>' + data.Label_creator + '<td><b>' + data.Label_transaction;
         for (key in data.history) {
             var item = data.history[key];
 
-            output += '<tr><td>' + item.text;
+            output += '<tr><td>'
+            if (data.hasOwnProperty('last')) {
+                output += '<span style="font-size:1.2em;">' + item.text + '</span>';
+            } else {
+                output += '<span style="font-size:1.3em;">' + item.text + '</span>';
+            }
             output += '<td>';
             if (item.hasOwnProperty('beginTimestamp')) {
                 output += convertTimestamp(item.beginTimestamp);
@@ -101,7 +107,7 @@ function person_status(data) {
                 output += convertTimestamp(item.endTimestamp);
             }
             output += '<td> <a href ="?address=' +
-                item.creator + get_lang() + '">' + item.creator + '</a>';
+                item.creator + get_lang() + '">' + item.creator.substr(0, 12) + '...</a>';
             output += '<td> <a href ="?tx=' +
                 item.txBlock + '-' + item.txSeqNo + get_lang() + '">' + item.txBlock + '-' + item.txSeqNo + '</a>';
 
