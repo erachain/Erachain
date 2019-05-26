@@ -43,61 +43,61 @@ function person_status(data) {
         return data.error;
     }
 
-    output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+    output = '<table id=last BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
     output += '<tr><td align=left>';
     output += '<table><tr><td>';
 
     output += '<img src="data:image/gif;base64,' + data.person_img + '" width = "350" /></td><td style ="padding-left:20px">';
 
-    if (data.sum > 0) {
-        output += '<img src="img/check-yes.png" style="height:110px">'
-        output += '<b><span style="font-size:4em; color:#0cb70c"> &nbsp&nbsp +' + data.sum + '</span></b><br>';
-        output += '<br>';
-    } else if (data.sum == 0) {
-        output += '<img src="img/check-no.png" style="height:120px">'
-        output += '<br><br>';
-    } else {
-        output += '<img src="img/check-no.png" style="height:120px">'
-        output += '<b><span style="font-size:3em; color:crimson"> &nbsp&nbsp ' + data.sum + '</span></b><br>';
-        output += '<br>';
-    }
-
     output += data.last.text + ': <br>';
     if (data.last.hasOwnProperty('beginTimestamp')) {
-        output += ' start :' + data.last.beginTimestamp;
+        output += '<img src="img/check-yes.png" style="height:4em; margin-bottom:20px;">'
+        output += '<b><span style="font-size:3em; color:#0cb70c"> &nbsp' + convertTimestamp(data.last.beginTimestamp) + '</span></b><br>';
     }
     if (data.last.hasOwnProperty('endTimestamp')) {
-        output += ' stop :' + data.last.endTimestamp;
+        output += '<img src="img/check-no.png" style="height:4em; margin-bottom:20px;">'
+        output += '<b><span style="font-size:3em; color:crimson"> &nbsp' + convertTimestamp(data.last.endTimestamp) + '</span></b><br>';
     }
-    output += ': <a href ="?tx=' +
-        data.last.txBlock + '-' + data.last.txSeqNo + get_lang() + '">[ TX </a>';
 
-    output += data.Label_status + ':  &nbsp&nbsp' + data.status_name + '<br>';
     output += data.Label_person + ': <a href ="?person=' +
-        data.person_key + get_lang() + '">[' + data.person_key + ']' + data.person_name + '</a>';
+        data.person_key + get_lang() + '">[' + data.person_key + ']' + data.person_name + '</a><br>';
+    output += data.Label_status + ': <a href ="?status=' +
+        data.status_key + get_lang() + '">[' + data.status_key + ']' + data.status_name + '</a><br>';
+    output += data.Label_creator + ': <a href ="?address=' +
+        data.last.creator + get_lang() + '">' + data.last.creator + '</a><br>';
+    output += data.Label_transaction + ': <a href ="?tx=' + data.last.txBlock + '-' + data.last.txSeqNo + get_lang()
+        + '">' + data.last.txBlock + '-' + data.last.txSeqNo + '</a><br>';
 
     output += '<br>';
     output += '<br>';
 
-    output += '</td>';
-    output += '</tr>';
     output += '</table>';
     output += '</table>';
+
+    output += '<hl>';
+    output += '<h3>' + data.Label_history + '</h3>';
+
 
     if (data.hasOwnProperty('history')) {
-        output += '<table>';
+        output += '<table id=history BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+        output += '<tr><td width="30%"><b>' + data.Label_result + '<td><b>' + data.Label_from
+            + '<td><b>' + data.Label_to + '<td><b>' + data.Label_creator + '<td><b>' + data.Label_transaction;
         for (key in data.history) {
             var item = data.history[key];
 
             output += '<tr><td>' + item.text;
+            output += '<td>';
             if (item.hasOwnProperty('beginTimestamp')) {
-                output += '<td>' + item.beginTimestamp;
+                output += convertTimestamp(item.beginTimestamp);
             }
+            output += '<td>';
             if (item.hasOwnProperty('endTimestamp')) {
-                output += '<td>' + item.endTimestamp;
+                output += convertTimestamp(item.endTimestamp);
             }
+            output += '<td> <a href ="?address=' +
+                item.creator + get_lang() + '">' + item.creator + '</a>';
             output += '<td> <a href ="?tx=' +
-                item.txBlock + '-' + item.txSeqNo + get_lang() + '">[ TX ]</a>';
+                item.txBlock + '-' + item.txSeqNo + get_lang() + '">' + item.txBlock + '-' + item.txSeqNo + '</a>';
 
         }
     }

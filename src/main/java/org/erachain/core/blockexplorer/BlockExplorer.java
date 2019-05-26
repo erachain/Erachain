@@ -1257,6 +1257,13 @@ public class BlockExplorer {
 
         output.put("Label_key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("Label_name", Lang.getInstance().translateFromLangObj("Name", langObj));
+        output.put("Label_result", Lang.getInstance().translateFromLangObj("Result", langObj));
+        output.put("Label_denied", Lang.getInstance().translateFromLangObj("DENIED", langObj));
+        output.put("Label_sum", Lang.getInstance().translateFromLangObj("SUM", langObj));
+        output.put("Label_from", Lang.getInstance().translateFromLangObj("From #date", langObj));
+        output.put("Label_to", Lang.getInstance().translateFromLangObj("To #date", langObj));
+        output.put("Label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        output.put("Label_history", Lang.getInstance().translateFromLangObj("History", langObj));
 
         output.put("person_img", a);
         output.put("person_key", person.getKey());
@@ -1267,9 +1274,7 @@ public class BlockExplorer {
 
         output.put("Label_status", Lang.getInstance().translateFromLangObj("Status", langObj));
         output.put("Label_person", Lang.getInstance().translateFromLangObj("Person", langObj));
-
-        output.put("Label_denied", Lang.getInstance().translateFromLangObj("DENIED", langObj));
-        output.put("Label_sum", Lang.getInstance().translateFromLangObj("SUM", langObj));
+        output.put("Label_transaction", Lang.getInstance().translateFromLangObj("Transaction", langObj));
 
         //BigDecimal sum = PersonCls.getBalance(personKey, statusKey, position);
         KKPersonStatusMap map = DCSet.getInstance().getPersonStatusMap();
@@ -1285,35 +1290,46 @@ public class BlockExplorer {
             return output;
         }
 
+        Transaction transaction;
         ItemStatusMap itemStatusMap = dcSet.getItemStatusMap();
-        /// start Timestamp, end Timestamp, DATA, Block, SeqNo
-        Fun.Tuple5<Long, Long, byte[], Integer, Integer> last = statusValue.peek();
 
-        Map currentStatus = new HashMap();
-        currentStatus.put("text", itemStatusMap.get(statusKey).toString(dcSet, last.c));
-        if (last.a != null)
-            currentStatus.put("beginTimestamp", last.a);
-        if (last.b != null)
-            currentStatus.put("endTimestamp", last.b);
-        currentStatus.put("params", RSetStatusToItem.unpackDataJSON(last.c));
-        currentStatus.put("txBlock", last.d);
-        currentStatus.put("txSeqNo", last.e);
+        if (status.isUnique()) {
+            // это уникальный статус - у него только последнее значение является действующим
+            // остальные - как ситория изменения храним
 
-        output.put("last", currentStatus);
+            /// start Timestamp, end Timestamp, DATA, Block, SeqNo
+            Fun.Tuple5<Long, Long, byte[], Integer, Integer> last = statusValue.pop();
 
-        if (history) {
+            Map currentStatus = new HashMap();
+            currentStatus.put("text", itemStatusMap.get(statusKey).toString(dcSet, last.c));
+            if (last.a != null && last.a > Long.MIN_VALUE)
+                currentStatus.put("beginTimestamp", last.a);
+            if (last.b != null && last.b < Long.MAX_VALUE)
+                currentStatus.put("endTimestamp", last.b);
+            currentStatus.put("params", RSetStatusToItem.unpackDataJSON(last.c));
+            currentStatus.put("txBlock", last.d);
+            currentStatus.put("txSeqNo", last.e);
+            transaction = dcSet.getTransactionFinalMap().get(last.d, last.e);
+            currentStatus.put("creator", transaction.getCreator().getAddress());
+
+            output.put("last", currentStatus);
+
+        }
+
+        if (!status.isUnique() || history) {
             JSONArray historyJSON = new JSONArray();
-            Iterator<Fun.Tuple5<Long, Long, byte[], Integer, Integer>> iterator = statusValue.iterator();
-            iterator.next();
 
-            while (iterator.hasNext()) {
-                Fun.Tuple5<Long, Long, byte[], Integer, Integer> item = iterator.next();
+            while (!statusValue.isEmpty()) {
+                Fun.Tuple5<Long, Long, byte[], Integer, Integer> item = statusValue.pop();
                 JSONObject historyItemJSON = new JSONObject();
 
+                transaction = dcSet.getTransactionFinalMap().get(item.d, item.e);
+                historyItemJSON.put("creator", transaction.getCreator().getAddress());
+
                 historyItemJSON.put("text", itemStatusMap.get(statusKey).toString(dcSet, item.c));
-                if (last.a != null)
+                if (item.a != null && item.a > Long.MIN_VALUE)
                     historyItemJSON.put("beginTimestamp", item.a);
-                if (last.b != null)
+                if (item.b != null && item.b < Long.MAX_VALUE)
                     historyItemJSON.put("endTimestamp", item.b);
                 historyItemJSON.put("params", RSetStatusToItem.unpackDataJSON(item.c));
                 historyItemJSON.put("txBlock", item.d);
