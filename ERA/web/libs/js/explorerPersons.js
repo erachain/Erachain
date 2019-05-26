@@ -62,7 +62,17 @@ function person_status(data) {
         output += '<br>';
     }
 
-    output += data.Label_asset + ': <fon_t size=10> &nbsp&nbsp' + data.asset_name + '</fon_t><br>';
+    output += data.last.text + ': <br>';
+    if (data.last.hasOwnProperty('beginTimestamp')) {
+        output += ' start :' + data.last.beginTimestamp;
+    }
+    if (data.last.hasOwnProperty('endTimestamp')) {
+        output += ' stop :' + data.last.endTimestamp;
+    }
+    output += ': <a href ="?tx=' +
+        data.last.txBlock + '-' + data.last.txSeqNo + get_lang() + '">[ TX </a>';
+
+    output += data.Label_status + ':  &nbsp&nbsp' + data.status_name + '<br>';
     output += data.Label_person + ': <a href ="?person=' +
         data.person_key + get_lang() + '">[' + data.person_key + ']' + data.person_name + '</a>';
 
@@ -71,6 +81,27 @@ function person_status(data) {
 
     output += '</td>';
     output += '</tr>';
+    output += '</table>';
+    output += '</table>';
+
+    if (data.hasOwnProperty('history')) {
+        output += '<table>';
+        for (key in data.history) {
+            var item = data.history[key];
+
+            output += '<tr><td>' + item.text;
+            if (item.hasOwnProperty('beginTimestamp')) {
+                output += '<td>' + item.beginTimestamp;
+            }
+            if (item.hasOwnProperty('endTimestamp')) {
+                output += '<td>' + item.endTimestamp;
+            }
+            output += '<td> <a href ="?tx=' +
+                item.txBlock + '-' + item.txSeqNo + get_lang() + '">[ TX ]</a>';
+
+        }
+    }
+
     output += '</table>';
 
     return output;

@@ -377,12 +377,12 @@ public class BlockExplorer {
                             if (info.getQueryParameters().containsKey("position")) {
                                 position = new Integer(info.getQueryParameters().getFirst("position"));
                             }
-                            output.putAll(jsonQueryPersonStatus(
+                            jsonQueryPersonStatus(
                                     new Long(info.getQueryParameters().getFirst("person")),
                                     new Long(info.getQueryParameters().getFirst("status")),
                                     position,
                                     true
-                            ));
+                            );
                             return output;
                         }
                     }
@@ -403,28 +403,20 @@ public class BlockExplorer {
             output.put("assetsLite", jsonQueryAssetsLite());
             // assets list
         } else if (info.getQueryParameters().containsKey("asset")) {
-            // person asset balance
-            if (info.getQueryParameters().containsKey("person")) {
-                output.putAll(jsonQueryPersonBalance(new Long(info.getQueryParameters().getFirst("person")),
-                        new Long(info.getQueryParameters().getFirst("asset")),
-                        new Integer(info.getQueryParameters().getFirst("position"))
-                ));
-            } else {
-                if (info.getQueryParameters().get("asset").size() == 1) {
-                    try {
-                        output.put("asset", jsonQueryAsset(Long.valueOf((info.getQueryParameters().getFirst("asset")))));
-                    } catch (Exception e) {
-                        output.put("error", e.getMessage());
-                        logger.error(e.getMessage(), e);
-                        return output;
-                    }
-                } else
-                if (info.getQueryParameters().get("asset").size() == 2) {
-                    long have = Integer.valueOf(info.getQueryParameters().get("asset").get(0));
-                    long want = Integer.valueOf(info.getQueryParameters().get("asset").get(1));
-
-                    output.putAll(jsonQueryTrades(have, want));
+            if (info.getQueryParameters().get("asset").size() == 1) {
+                try {
+                    output.put("asset", jsonQueryAsset(Long.valueOf((info.getQueryParameters().getFirst("asset")))));
+                } catch (Exception e) {
+                    output.put("error", e.getMessage());
+                    logger.error(e.getMessage(), e);
+                    return output;
                 }
+            } else
+            if (info.getQueryParameters().get("asset").size() == 2) {
+                long have = Integer.valueOf(info.getQueryParameters().get("asset").get(0));
+                long want = Integer.valueOf(info.getQueryParameters().get("asset").get(1));
+
+                output.putAll(jsonQueryTrades(have, want));
             }
         }
 
@@ -1243,7 +1235,6 @@ public class BlockExplorer {
         output.put("type", "person_status");
         output.put("search", "persons");
 
-        Map output = new HashMap();
         if (position < 1 || position > 5) {
             output.put("error", "wrong position");
             return output;
@@ -1274,7 +1265,7 @@ public class BlockExplorer {
         output.put("status_key", status.getKey());
         output.put("status_name", status.getName());
 
-        output.put("Label_status", Lang.getInstance().translateFromLangObj("Satus", langObj));
+        output.put("Label_status", Lang.getInstance().translateFromLangObj("Status", langObj));
         output.put("Label_person", Lang.getInstance().translateFromLangObj("Person", langObj));
 
         output.put("Label_denied", Lang.getInstance().translateFromLangObj("DENIED", langObj));
@@ -1294,19 +1285,21 @@ public class BlockExplorer {
             return output;
         }
 
+        ItemStatusMap itemStatusMap = dcSet.getItemStatusMap();
+        /// start Timestamp, end Timestamp, DATA, Block, SeqNo
         Fun.Tuple5<Long, Long, byte[], Integer, Integer> last = statusValue.peek();
 
-        JSONArray lastJSON = new JSONArray();
-        lastJSON.add(last.a);
-        lastJSON.add(last.b);
-        lastJSON.add(RSetStatusToItem.unpackDataJSON(last.c));
-        lastJSON.add(last.d);
-        lastJSON.add(last.e);
+        Map currentStatus = new HashMap();
+        currentStatus.put("text", itemStatusMap.get(statusKey).toString(dcSet, last.c));
+        if (last.a != null)
+            currentStatus.put("beginTimestamp", last.a);
+        if (last.b != null)
+            currentStatus.put("endTimestamp", last.b);
+        currentStatus.put("params", RSetStatusToItem.unpackDataJSON(last.c));
+        currentStatus.put("txBlock", last.d);
+        currentStatus.put("txSeqNo", last.e);
 
-        JSONObject out = new JSONObject();
-        out.put("last", lastJSON);
-
-        out.put("text", DCSet.getInstance().getItemStatusMap().get(statusKey).toString(DCSet.getInstance(), last.c));
+        output.put("last", currentStatus);
 
         if (history) {
             JSONArray historyJSON = new JSONArray();
@@ -1315,20 +1308,21 @@ public class BlockExplorer {
 
             while (iterator.hasNext()) {
                 Fun.Tuple5<Long, Long, byte[], Integer, Integer> item = iterator.next();
-                JSONArray historyItemJSON = new JSONArray();
+                JSONObject historyItemJSON = new JSONObject();
 
-                historyItemJSON.add(item.a);
-                historyItemJSON.add(item.b);
-                historyItemJSON.add(RSetStatusToItem.unpackDataJSON(last.c));
-                historyItemJSON.add(item.d);
-                historyItemJSON.add(item.e);
+                historyItemJSON.put("text", itemStatusMap.get(statusKey).toString(dcSet, item.c));
+                if (last.a != null)
+                    historyItemJSON.put("beginTimestamp", item.a);
+                if (last.b != null)
+                    historyItemJSON.put("endTimestamp", item.b);
+                historyItemJSON.put("params", RSetStatusToItem.unpackDataJSON(item.c));
+                historyItemJSON.put("txBlock", item.d);
+                historyItemJSON.put("txSeqNo", item.e);
 
                 historyJSON.add(historyItemJSON);
             }
-            out.put("history", historyJSON);
+            output.put("history", historyJSON);
         }
-
-        output.put("status", out);
 
         return output;
     }
