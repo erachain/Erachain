@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.RSetStatusToItem;
+import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.MenuPopupUtil;
@@ -16,13 +17,8 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
     public SetStatusToItemDetailsFrame(RSetStatusToItem setStatusToItem) {
         super(setStatusToItem);
 
-        //ItemCls item = ItemCls.setStatusToItem.getItemType();
-        //ItemCls item = db.getItem_Map(this.itemType).get(this.itemKey);
-        ItemCls item = Controller.getInstance().getItem(setStatusToItem.getItemType(), setStatusToItem.getItemKey());
-
-        //NAME
-        long status_key = setStatusToItem.getKey();
-        StatusCls status = Controller.getInstance().getItemStatus(status_key);
+        ItemCls item = setStatusToItem.getItem();
+        StatusCls status = setStatusToItem.getStatus();
 
         // STATUS
         //LABEL NAME
@@ -165,10 +161,22 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
         ++detailGBC.gridy;
         JTextArea txtAreaItemDescription = new JTextArea(item.getDescription());
         txtAreaItemDescription.setRows(4);
-        txtAreaItemDescription.setBorder(statusName.getBorder());
+        txtAreaItemDescription.setBorder(itemName.getBorder());
         txtAreaItemDescription.setEditable(false);
         MenuPopupUtil.installContextMenu(txtAreaItemDescription);
         this.add(txtAreaItemDescription, detailGBC);
+
+        //LABEL RESULT
+        ++labelGBC.gridy;
+        JLabel resutLabel = new JLabel(Lang.getInstance().translate("Result") + ":");
+        this.add(resutLabel, labelGBC);
+
+        //RESULT
+        ++detailGBC.gridy;
+        JTextField result = new JTextField(setStatusToItem.getResultText());
+        result.setEditable(false);
+        MenuPopupUtil.installContextMenu(result);
+        this.add(result, detailGBC);
 
         //PACK
         //	this.pack();

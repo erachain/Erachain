@@ -57,7 +57,6 @@ function templates(data) {
 
 
 function template(data) {
-    $('#selectID').val('templates');
 
     var output = '';
 

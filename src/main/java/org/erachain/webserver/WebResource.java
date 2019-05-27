@@ -78,7 +78,7 @@ public class WebResource {
             "09_poll_vote.jpg", "10_arbitrary_transaction.png",
             "11_asset_issue.png", "12_asset_transfer_in.png",
             "12_asset_transfer_out.png", "13_order_creation.png",
-            "14_cancel_order.png", "15_multi_payment_in.png",
+            "14_cancel_order.png", "15_multi_payment_in.png", "check-yes.png", "check-no.png",
             "15_multi_payment_out.png", "16_deploy_at.png",
             "17_message_in.png", "17_message_out.png", "asset_trade.png",
             "at_tx_in.png", "at_tx_out.png", "grleft.png", "grright.png",
@@ -256,7 +256,8 @@ public class WebResource {
                     .entity(StrJSonFine.convert(output))
                     .build();
         } catch (Exception ee) {
-            ee.printStackTrace();
+            //ee.printStackTrace();
+            logger.error(ee.getMessage(), ee);
             StringBuilder ss = new StringBuilder();
             for (StackTraceElement item : ee.getStackTrace()) {
                 ss.append(item.toString()).append("<br>");
@@ -289,7 +290,8 @@ public class WebResource {
             String type = URLConnection.guessContentTypeFromStream(is);
             return Response.ok(file, type).build();
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return Response.status(500).build();
         }
     }
@@ -309,7 +311,8 @@ public class WebResource {
             String type = URLConnection.guessContentTypeFromStream(is);
             return Response.ok(file, type).build();
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return Response.status(500).build();
         }
     }
@@ -953,6 +956,7 @@ public class WebResource {
                         .entity(json.toJSONString()).build();
 
             } catch (WebApplicationException e) {
+                logger.error(e.getMessage(), e);
 
                 json = new JSONObject();
                 json.put("type", "error");
@@ -1396,6 +1400,18 @@ public class WebResource {
         }
     }
 
+    @Path("index/libs/js/explorerPersons.js")
+    @GET
+    public Response explorerPersons() {
+        File file = new File("web/libs/js/explorerPersons.js");
+
+        if (file.exists()) {
+            return Response.ok(file, "text/explorerPersons").build();
+        } else {
+            return error404(request, null);
+        }
+    }
+
     @Path("index/libs/js/explorerStatements.js")
     @GET
     public Response explorerStatements() {
@@ -1639,6 +1655,7 @@ public class WebResource {
                         .entity(json.toJSONString()).build();
 
             } catch (WebApplicationException e) {
+                logger.error(e.getMessage(), e);
 
                 json = new JSONObject();
                 json.put("type", "error");
@@ -1916,6 +1933,8 @@ public class WebResource {
                                         .getFollowedBlogs().contains(blogname));
 
                             } catch (WebApplicationException e) {
+                                logger.error(e.getMessage(), e);
+
                                 result = "<center><div class=\"alert alert-danger\" role=\"alert\">Blog follow not successful<br>"
                                         + e.getResponse().getEntity()
                                         + "</div></center>";
@@ -1956,6 +1975,8 @@ public class WebResource {
                                 json.put("isFollowing", activeProfileOpt
                                         .getFollowedBlogs().contains(blogname));
                             } catch (WebApplicationException e) {
+                                logger.error(e.getMessage(), e);
+
                                 result = "<center><div class=\"alert alert-danger\" role=\"alert\">Blog unfollow not successful<br>"
                                         + e.getResponse().getEntity()
                                         + "</div></center>";
@@ -2059,6 +2080,7 @@ public class WebResource {
                                     "application/json; charset=utf-8")
                             .entity(jsonanswer.toJSONString()).build();
                 } catch (WebApplicationException e) {
+                    logger.error(e.getMessage(), e);
 
                     jsonanswer.put("type", "deleteError");
                     jsonanswer.put("errordetail", e.getResponse().getEntity());
@@ -2191,6 +2213,7 @@ public class WebResource {
                                     "application/json; charset=utf-8")
                             .entity(jsonanswer.toJSONString()).build();
                 } catch (WebApplicationException e) {
+                    logger.error(e.getMessage(), e);
 
                     jsonanswer.put("type", "deleteError");
                     jsonanswer.put("errordetail", e.getResponse().getEntity());
@@ -2307,6 +2330,7 @@ public class WebResource {
                         json.put("result", result);
 
                     } catch (WebApplicationException e) {
+                        logger.error(e.getMessage(), e);
 
                         json.put("type", "ShareNotSuccessful");
                         json.put("result", e.getResponse().getEntity());
@@ -2414,6 +2438,7 @@ public class WebResource {
                             json.put("result", result);
 
                         } catch (WebApplicationException e) {
+                            logger.error(e.getMessage(), e);
 
                             json.put("type", "LikeNotSuccessful");
                             json.put("result", e.getResponse().getEntity());
@@ -2437,6 +2462,7 @@ public class WebResource {
                                 json.put("result", result);
 
                             } catch (WebApplicationException e) {
+                                logger.error(e.getMessage(), e);
 
                                 json.put("type", "LikeRemovedNotSuccessful");
                                 json.put("result", e.getResponse().getEntity());
