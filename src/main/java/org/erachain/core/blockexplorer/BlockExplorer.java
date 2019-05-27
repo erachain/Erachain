@@ -68,7 +68,7 @@ public class BlockExplorer {
     private DateFormat df = DateFormat.getDateInstance(DateFormat.DATE_FIELD, local); // for
     private String langFile;
     private DCSet dcSet;
-    private Map output;
+    private LinkedHashMap output;
 
     public static BlockExplorer getInstance() {
         if (blockExplorer == null) {
@@ -298,7 +298,7 @@ public class BlockExplorer {
                 switch (type) {
                     case "transactions":
                         //search transactions
-                        output.putAll(jsonQueryTransactions(search, (int) start));
+                        jsonQueryTransactions(search, (int) start);
                         break;
                     case "addresses":
                         //search addresses
@@ -449,7 +449,7 @@ public class BlockExplorer {
 
         // transactions
         else if (info.getQueryParameters().containsKey("transactions")) {
-            output.putAll(jsonQueryTransactions(null, (int)start));
+            jsonQueryTransactions(null, (int)start);
         }
         // unconfirmed transactions
         else if (info.getQueryParameters().containsKey("unconfirmed")) {
@@ -2194,14 +2194,27 @@ public class BlockExplorer {
     }
 
     @SuppressWarnings({"serial", "static-access"})
-    public Map jsonQueryTransactions(String filterStr, int start) {
+    public void jsonQueryTransactions(String filterStr, int start) {
 
         output.put("type", "transactions");
 
+        TransactionFinalMap map = dcSet.getTransactionFinalMap();
         int size = 200;
         List<Transaction> transactions;
         if (filterStr != null) {
-            transactions = dcSet.getTransactionFinalMap().getTransactionsByTitleAndType(filterStr, null, size, true);
+            //transactions = map.getTransactionsByTitleAndType(filterStr, null, size, true);
+            Pair<String, Iterable> pair = map.getKeysIteratorByFilterAsArray(filterStr, 0, size);
+            if (pair.getA() != null) {
+                output.put("error", pair.getA());
+                return;
+            }
+
+            transactions = new ArrayList<>();
+            Iterator iterator = pair.getB().iterator();
+            while (iterator.hasNext()) {
+                transactions.add(map.get((Long) iterator.next()));
+            }
+
             if (Base58.isExtraSymbols(filterStr)) {
                 try {
                     String[] strA = filterStr.split("\\-");
@@ -2227,7 +2240,6 @@ public class BlockExplorer {
 
         } else {
             // берем все с перебором с последней
-            TransactionFinalMap map = dcSet.getTransactionFinalMap();
             Iterator<Long> iterator = map.getIterator(0, true);
             int counter = size;
             transactions = new ArrayList<>();
@@ -2242,13 +2254,10 @@ public class BlockExplorer {
             }
         }
 
-        LinkedHashMap output = new LinkedHashMap();
-
         // Transactions view
         transactionsJSON(output, null, transactions, start, pageSize,
                 Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" + size));
 
-        return output;
     }
 
     @SuppressWarnings({"serial", "static-access"})
