@@ -391,7 +391,7 @@ public class RSend extends TransactionAmount {
 
     @Override
     public boolean hasPublicText() {
-        String[] words = head.split("[:., _-]");
+        String[] words = head.split("[!?/_., -/+/:/]");
         int length = 0;
         for (String word: words) {
             word = word.trim();
