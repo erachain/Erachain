@@ -391,11 +391,14 @@ public class RSend extends TransactionAmount {
 
     @Override
     public boolean hasPublicText() {
-        if (head.length() > (BlockChain.DEVELOP_USE? 100 : 40)
-        ) {
-            String[] words = head.split("[:., _-]");
-            for (String word: words) {
-                if (Base58.isExtraSymbols(word))
+        String[] words = head.split("[:., _-]");
+        int length = 0;
+        for (String word: words) {
+            word = word.trim();
+            if (Base58.isExtraSymbols(word)) {
+                // все слова сложим по длинне
+                length += word.length();
+                if (length > (BlockChain.DEVELOP_USE? 100 : 20))
                     return true;
             }
         }
