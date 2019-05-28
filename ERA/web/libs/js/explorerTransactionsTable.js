@@ -60,6 +60,52 @@ function pagesComponent2(data) {
     }
 
     if (start == 0)
+        start = listSize;
+
+    if (start != listSize)
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(listSize, 'start') + '"><b>' + listSize + '</b></a>';
+
+    if (start + pageSize * 10 < listSize) {
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize * 10, 'start') + '"><b>' + (start + pageSize * 10) + '</b></a>';
+    }
+
+    if (start + pageSize < listSize) {
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize, 'start') + '"><b>' + (start + pageSize) + '</b></a>';
+    }
+
+    output += '&emsp; <a class="button ll-blue-bgc active" href="' + makePageUri(start, 'start') + '"><b> ' + start + ' </b></a>';
+
+    if (start > pageSize + 1) {
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize, 'start') + '"><b>' + (start - pageSize) + '</b></a>';
+        //output += (start - pageSize) + ' - ';
+    }
+
+    if (start > pageSize * 10) {
+
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize * 10, 'start') + '"><b>' + (start - pageSize * 10) + '</b></a>';
+        //output += (start - pageSize * 10) + ' --- ';
+    }
+
+    if (start > pageSize)
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(pageSize, 'start') + '"><b>' + pageSize + '</b></a>';
+
+    return output;
+}
+
+function pagesComponent2forward(data) {
+    var output = '';
+
+    var listSize = data.listSize;
+    var pageSize = data.pageSize;
+    var start = data.start;
+
+    if (data.hasOwnProperty('start')) {
+        start = data.start;
+    } else {
+        var start = listSize;
+    }
+
+    if (start == 0)
         start = 1;
 
     if (1 != start)
