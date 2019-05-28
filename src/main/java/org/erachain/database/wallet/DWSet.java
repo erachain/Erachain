@@ -46,16 +46,16 @@ public class DWSet extends DBASet {
     private FavoriteTransactionMap transactionFavoritesSet;
 
     private FavoriteItemMapAsset assetFavoritesSet;
-    private FavoriteItemMapTemplate templateFavoritesSet;
     private FavoriteItemMapImprint imprintFavoritesSet;
-    private FavoriteItemMapPoll pollFavoriteSet;
-    private TelegramsMap telegramsMap;
-
     private FavoriteItemMapPerson personFavoritesSet;
+    private FavoriteItemMapPoll pollFavoriteSet;
     private FavoriteItemMapStatus statusFavoritesSet;
+    private FavoriteItemMapTemplate templateFavoritesSet;
     private FavoriteItemMapUnion unionFavoritesSet;
 
     private FavoriteDocument statementFavoritesSet;
+
+    private TelegramsMap telegramsMap;
 
     public DWSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI) {
         super(dbFile, database, withObserver,  dynamicGUI);

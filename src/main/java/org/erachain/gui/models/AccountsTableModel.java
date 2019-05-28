@@ -38,11 +38,11 @@ public class AccountsTableModel extends AbstractTableModel implements Observer {
     private Account account;
 
     public AccountsTableModel() {
-        if (!Controller.getInstance().doesWalletDatabaseExists()) {
-            this.publicKeyAccounts = new ArrayList<>();
-        } else {
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
             this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
             Controller.getInstance().wallet.database.getAccountMap().addObserver(this);
+        } else {
+            this.publicKeyAccounts = new ArrayList<>();
         }
 
     }
