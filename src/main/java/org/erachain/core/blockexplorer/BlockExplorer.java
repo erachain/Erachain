@@ -3256,6 +3256,7 @@ public class BlockExplorer {
         outputTXs.put("label_size", Lang.getInstance().translateFromLangObj("Size", langObj));
         outputTXs.put("label_seqNo", Lang.getInstance().translateFromLangObj("SeqNo", langObj));
         outputTXs.put("label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
+        outputTXs.put("label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
         outputTXs.put("label_amount_key", Lang.getInstance().translateFromLangObj("Amount:Key", langObj));
         outputTXs.put("label_fee", Lang.getInstance().translateFromLangObj("Fee", langObj));
         outputTXs.put("label_transactions_table", title);
