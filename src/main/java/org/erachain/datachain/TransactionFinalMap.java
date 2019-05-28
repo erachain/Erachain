@@ -163,7 +163,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> implements Fil
                 if (title == null || title.isEmpty() || title.equals(""))
                     return null;
 
-                String[] tokens = title.toLowerCase().split(" ");
+                String[] tokens = title.toLowerCase().split("[!?/_., -/+/:/]");
                 Tuple2<String, Integer>[] keys = new Tuple2[tokens.length];
                 for (int i = 0; i < tokens.length; ++i) {
                         if (tokens[i].length() > CUT_NAME_INDEX) {
