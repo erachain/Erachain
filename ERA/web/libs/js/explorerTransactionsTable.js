@@ -231,7 +231,7 @@ function transactions_Table(data) {
         ' class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
 
     output += '<tr bgcolor="f1f1f1"><td><b>' + data.Transactions.label_block + '<td><b>' +
-        data.Transactions.label_signature + '<td><b>' + data.Transactions.label_type_transaction + '<td><b>' +
+        data.Transactions.label_title + '<td><b>' + data.Transactions.label_type_transaction + '<td><b>' +
         data.Transactions.label_amount_key + '<td><b>' + data.Transactions.label_date + '<td><b>' +
         data.Transactions.label_atside + '<td><b>' + data.Transactions.label_size + '<td><b>' +
         data.Transactions.label_fee + '<td><b>' + data.Transactions.label_confirmations + '</tr>';
