@@ -118,7 +118,8 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
                 new Fun.Function2<String[], Long, ItemCls>() {
                     @Override
                     public String[] run(Long key, ItemCls item) {
-                        String[] keys = item.getName().toLowerCase().split("[!?/_., +:\\\\]");
+                        // see https://regexr.com/
+                        String[] keys = item.getName().toLowerCase().split("[!?/_., \\-~`+&^@#№%*()<>\\\"\\'|\\[\\]{}=;:\\\\]");
                         for (int i=0; i < keys.length; ++i) {
                             if (keys[i].length() > CUT_NAME_INDEX) {
                                 keys[i] = keys[i].substring(0, CUT_NAME_INDEX);
