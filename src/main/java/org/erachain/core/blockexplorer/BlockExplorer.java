@@ -1663,6 +1663,7 @@ public class BlockExplorer {
     public Map jsonQueryTopRichest100(int limit, long key) {
 
         output.put("type", "top");
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type asset key", langObj));
 
         Map output = new LinkedHashMap();
         Map balances = new LinkedHashMap();
@@ -2212,6 +2213,7 @@ public class BlockExplorer {
     public void jsonQueryTransactions(String filterStr, int start) {
 
         output.put("type", "transactions");
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or signature or BlockNo-SeqNo", langObj));
 
         TransactionFinalMap map = dcSet.getTransactionFinalMap();
         int size = 200;
@@ -2278,7 +2280,7 @@ public class BlockExplorer {
     @SuppressWarnings({"serial", "static-access"})
     public void jsonQueryAddresses() {
         output.put("type", "addresses");
-        output.put("search_message", Lang.getInstance().translateFromLangObj("Insert Address for search", langObj));
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Insert searching address", langObj));
     }
 
     @SuppressWarnings({"serial", "static-access"})
@@ -2286,7 +2288,8 @@ public class BlockExplorer {
 
         output.put("type", "address");
         output.put("search", "addresses");
-        output.put("search_message", Lang.getInstance().translateFromLangObj("Insert Address for search", langObj));
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Insert searching address", langObj));
+        output.put("search_message", address);
 
         int limit = 100;
         List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressLimit(address, limit);
@@ -2825,7 +2828,7 @@ public class BlockExplorer {
 
         output.put("type", "tx");
         output.put("search", "transactions");
-        output.put("search_message", Lang.getInstance().translateFromLangObj("Insert search words", langObj));
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or signature or BlockNo-SeqNo", langObj));
 
         Map output = new LinkedHashMap();
 

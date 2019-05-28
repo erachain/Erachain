@@ -52,6 +52,8 @@ public class AdderHeadInfo {
          * @param output словарь, в который добавляется информация
          */
     public static void addHeadInfoCapBlocks(Map output, DCSet dcSet, JSONObject langObj) {
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Insert block number or signature", langObj));
+
         output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
         output.put("totaltransactions", dcSet.getTransactionFinalMap().size());
         output.put("Label_Unconfirmed_transactions",
@@ -78,6 +80,8 @@ public class AdderHeadInfo {
      * @param output словарь, в который добавляется информация
      */
     public static void addHeadInfoCapPersons(Map output, DCSet dcSet, JSONObject langObj) {
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or person key", langObj));
+
         output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
         output.put("Label_Unconfirmed_transactions",
                 Lang.getInstance().translateFromLangObj("Unconfirmed transactions", langObj));
@@ -96,6 +100,8 @@ public class AdderHeadInfo {
      * @param output словарь, в который добавляется информация
      */
     public static void addHeadInfoCapAssets(Map output, JSONObject langObj) {
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or asset key", langObj));
+
         output.put("label_Title", Lang.getInstance().translateFromLangObj("Assets", langObj));
         output.put("label_table_asset_key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("label_table_asset_name", Lang.getInstance().translateFromLangObj("Name", langObj));
@@ -115,6 +121,8 @@ public class AdderHeadInfo {
      * @param output словарь, в который добавляется информация
      */
     public static void addHeadInfoCapStatusesTemplates(Map output, JSONObject langObj) {
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or item key", langObj));
+
         output.put("label_table_key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("label_table_name", Lang.getInstance().translateFromLangObj("Name", langObj));
         output.put("label_table_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));

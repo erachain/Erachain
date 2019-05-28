@@ -322,6 +322,9 @@ button.white-bgc[disabled]:focus,
                                 $('#selectID').val(type);
                             }
 
+                            if (data.hasOwnProperty('search_placeholder')) {
+                                $('#q').attr('placeholder', data.search_placeholder);
+                            }
                             if (data.hasOwnProperty('search_message')) {
                                 $('#q').val(data.search_message);
                             }
