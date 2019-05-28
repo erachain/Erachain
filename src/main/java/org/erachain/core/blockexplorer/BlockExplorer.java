@@ -1704,10 +1704,13 @@ public class BlockExplorer {
 
         int couter = 0;
         for (Tuple3<String, BigDecimal, BigDecimal> top100 : top100s) {
-            /*
-             * if(limit == -1) // allnotzero {
-             * if(top100.b.compareTo(BigDecimal.ZERO) <= 0) { break; } }
-             */
+            if (limit == -1) {
+                // allnotzero {
+                if (top100.b.compareTo(BigDecimal.ZERO) <= 0) {
+                    break;
+                }
+            }
+
             couter++;
 
             Account account = new Account(top100.a);
@@ -1767,7 +1770,19 @@ public class BlockExplorer {
     }
 
     public Map jsonQueryTopRichest(UriInfo info) {
-        int limit = Integer.valueOf((info.getQueryParameters().getFirst("top")));
+        String limitStr = info.getQueryParameters().getFirst("top");
+        int limit = 100;
+        if (limitStr.equals("all")) {
+            limit = -2;
+        } else if (limitStr.equals("allnotzero")) {
+            limit = -1;
+        } else {
+            try {
+                limit = Integer.valueOf(limitStr);
+            } catch (Exception eee) {
+            }
+        }
+
         long key = 1l;
         if (info.getQueryParameters().containsKey("asset"))
             key = Long.valueOf(info.getQueryParameters().getFirst("asset"));
