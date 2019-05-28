@@ -164,7 +164,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> implements Fil
                     return null;
 
                 // see https://regexr.com/
-                String[] tokens = title.toLowerCase().split("[!?/_., \\-~`+&^@#№%*()<>\\\"\\'|\\[\\]{}=;:\\\\]");
+                String[] tokens = title.toLowerCase().split(DCSet.SPLIT_CHARS);
                 Tuple2<String, Integer>[] keys = new Tuple2[tokens.length];
                 for (int i = 0; i < tokens.length; ++i) {
                         if (tokens[i].length() > CUT_NAME_INDEX) {

@@ -43,6 +43,8 @@ public class DCSet extends DBASet implements Observer {
     private volatile static DCSet instance;
     private DCSet parent;
 
+    public static String SPLIT_CHARS = "[!?/_., \\-~`+&^@#№%*()<>\\\"\\'|\\[\\]{}=;:\\\\]";
+
     private boolean inMemory = false;
 
     private BlockChain bchain;
