@@ -132,7 +132,9 @@ function pagesComponent3(data) {
     }
 
     if (start >= listSize - pageSize) {
-        output += '&emsp; <a class="button ll-blue-bgc active" href="' + makePageUri(listSize - pageSize, 'start') + '"><b>' + '-' + (listSize - pageSize) + '</b></a>';
+        if (start < listSize) {
+            output += '&emsp; <a class="button ll-blue-bgc active" href="' + makePageUri(listSize - pageSize, 'start') + '"><b>' + '-' + (listSize - pageSize) + '</b></a>';
+        }
     } else {
         output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(listSize - pageSize, 'start') + '"><b>' + '-' + (listSize - pageSize) + '</b></a>';
     }
