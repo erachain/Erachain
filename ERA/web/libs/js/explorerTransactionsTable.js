@@ -273,7 +273,7 @@ function transactions_Table(data) {
     console.log(data)
     var output = data.Transactions.label_transactions_table + ':<br>';
     //output += pagesComponentMixed(data);
-    output += pagesComponent3(data);
+    output += pagesComponent2(data);
 
     output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
         ' class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
@@ -314,7 +314,7 @@ function transactions_Table(data) {
     }
     output += '</table></td></tr></table>';
     //output += pagesComponentMixed(data);
-    output += pagesComponent3(data);
+    output += pagesComponent2(data);
 
 
     return output;
