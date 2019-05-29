@@ -366,7 +366,7 @@ public class BlockExplorer {
             } else if (info.getQueryParameters().containsKey("status")) {
                 boolean statusKey = false;
                 // найдем что раньше в строке запроса - персона или актив
-                for(String param:info.getQueryParameters().keySet()) {
+                for (String param : info.getQueryParameters().keySet()) {
                     if (param.equals("status")) {
                         statusKey = true;
                     }
@@ -391,7 +391,16 @@ public class BlockExplorer {
                 output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
             }
 
-        //////////////////////////// ASSETS //////////////////////////
+            ///////////////////// POLLS ////////////////////////
+            // polls list
+        } else if (info.getQueryParameters().containsKey("polls")) {
+            output.put("type", "polls");
+            output.putAll(jsonQueryPages(PollCls.class, start, pageSize));
+        } else if (info.getQueryParameters().containsKey("poll")) {
+            output.putAll(jsonQueryPoll(Long.valueOf(info.getQueryParameters().getFirst("poll")),
+                    info.getQueryParameters().getFirst("asset")));
+
+            //////////////////////////// ASSETS //////////////////////////
             // top 100
         } else if (info.getQueryParameters().containsKey("top")) {
             output.putAll(jsonQueryTopRichest(info));
@@ -461,26 +470,11 @@ public class BlockExplorer {
         else if (info.getQueryParameters().containsKey("trade")) {
             output.putAll(jsonQueryTrade(info.getQueryParameters().getFirst("trade")));
         }
-        //poll
-        else if (info.getQueryParameters().containsKey("poll")) {
-            output.putAll(jsonQueryPoll(Long.valueOf(info.getQueryParameters().getFirst("poll")),
-                    info.getQueryParameters().getFirst(" asset")));
-        }
         // blog tx
         else if (info.getQueryParameters().containsKey("blogposts")) {
             output.putAll(jsonQueryBlogPostsTx(info.getQueryParameters().getFirst("blogposts")));
         }
 
-        ///////////////////// POLLS ////////////////////////
-        // polls list
-        else if (info.getQueryParameters().containsKey("polls")) {
-            output.put("type", "polls");
-            output.putAll(jsonQueryPages(PollCls.class, start, pageSize));
-        }
-        else if (info.getQueryParameters().containsKey("poll")) {
-            output.putAll(jsonQueryPoll(Long.valueOf(info.getQueryParameters().getFirst("poll")),
-                    info.getQueryParameters().getFirst("asset")));
-        }
         //////////////////////// TEMPLATES ///////////////////
         // templates list
         else if (info.getQueryParameters().containsKey("templates")) {
@@ -639,6 +633,14 @@ public class BlockExplorer {
             assetKey = 2l;
         }
 
+        AssetCls asset = (AssetCls) dcSet.getItemAssetMap().get(assetKey);
+        if (asset == null) {
+            assetKey = 2l;
+            asset = (AssetCls) dcSet.getItemAssetMap().get(assetKey);
+        }
+        output.put("assetKey", assetKey);
+        output.put("assetName", asset.getName());
+
         PollCls poll = (PollCls) dcSet.getItemPollMap().get(pollKey);
         List<String> options = poll.getOptions();
         int optionsSize = options.size();
@@ -711,6 +713,7 @@ public class BlockExplorer {
         output.put("label_Total", Lang.getInstance().translateFromLangObj("Total", langObj));
 
         output.put("label_Poll", Lang.getInstance().translateFromLangObj("Poll", langObj));
+        output.put("label_Asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
         output.put("label_Key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("label_Owner", Lang.getInstance().translateFromLangObj("Owner", langObj));
         output.put("label_Description", Lang.getInstance().translateFromLangObj("Description", langObj));

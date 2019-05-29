@@ -73,15 +73,14 @@ function poll(data) {
 
     output += '<br><br>';
 
-    output += '<b>' + data.label_Key + ':</b> ' + data.poll.key;
+    output += '<b>' + data.label_Asset + ':</b> <a href ="?asset=' +
+        data.assetKey + get_lang() + '">[' + getAssetName2(data.assetKey, data.assetName) + '</a><br>';
 
-    output += '<br><br>';
-
+    output += '<br>';
 
     output += '<b>' + data.label_Owner + ':</b> <a href=?address=' + data.poll.owner + get_lang() + '>' + data.poll.owner + '</a>';
 
-    output += '<br><br>';
-
+    output += '<br>';
 
     output += '<b>' + data.label_Description + ':</b><br>';
     output += fformat(data.poll.description);
