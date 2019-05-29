@@ -63,31 +63,31 @@ function pagesComponent2(data) {
         start = listSize;
 
     if (start != listSize)
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(listSize, 'start') + '"><b>' + listSize + '</b></a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(listSize, 'start') + '"><b><span class="glyphicon glyphicon-fast-backward"></span></b></a>';
 
     if (start + pageSize * 10 < listSize) {
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize * 10, 'start') + '"><b>' + (start + pageSize * 10) + '</b></a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize * 10, 'start') + '"><b><span class="glyphicon glyphicon-backward"></span></b></a>';
     }
 
     if (start + pageSize < listSize) {
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize, 'start') + '"><b>' + (start + pageSize) + '</b></a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize, 'start') + '"><b><span class="glyphicon glyphicon-chevron-left"></span></b></a>';
     }
 
     output += '&emsp; <a class="button ll-blue-bgc active" href="' + makePageUri(start, 'start') + '"><b> ' + start + ' </b></a>';
 
     if (start > pageSize + 1) {
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize, 'start') + '"><b>' + (start - pageSize) + '</b></a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize, 'start') + '"><b><span class="glyphicon glyphicon-chevron-right"></span></b></a>';
         //output += (start - pageSize) + ' - ';
     }
 
     if (start > pageSize * 10) {
 
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize * 10, 'start') + '"><b>' + (start - pageSize * 10) + '</b></a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize * 10, 'start') + '"><b><span class="glyphicon glyphicon-forward"></span></b></a>';
         //output += (start - pageSize * 10) + ' --- ';
     }
 
     if (start > pageSize)
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(pageSize, 'start') + '"><b>' + pageSize + '</b></a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(pageSize, 'start') + '"><b><span class="glyphicon glyphicon-fast-forward"></span></b></a>';
 
     return output;
 }

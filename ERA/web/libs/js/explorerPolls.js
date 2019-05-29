@@ -59,6 +59,9 @@ function poll(data) {
 
     output += lastBlock(data.lastBlock);
 
+    output += '<div class="input-group"><input id="key" size="10" type="text" value="" class="form-control"'
+                   + ' onkeydown="if (event.keyCode == 13) buttonSearch()"></div>';
+
     output += '<table width="1280" border=0><tr><td align=left><br>';
 
     output += '<h3 style="display:inline;">' + data.label_Poll + ':</h3>';
