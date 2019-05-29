@@ -70,13 +70,13 @@ function pagesComponent2(data) {
     }
 
     if (start + pageSize < listSize) {
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize, 'start') + '"><b><span class="glyphicon glyphicon-chevron-left"></span></b></a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start + pageSize, 'start') + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a>';
     }
 
     output += '&emsp; <a class="button ll-blue-bgc active" href="' + makePageUri(start, 'start') + '"><b> ' + start + ' </b></a>';
 
     if (start > pageSize + 1) {
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize, 'start') + '"><b><span class="glyphicon glyphicon-chevron-right"></span></b></a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(start - pageSize, 'start') + '"><b><span class="glyphicon glyphicon-triangle-right"></span></b></a>';
         //output += (start - pageSize) + ' - ';
     }
 
