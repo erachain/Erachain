@@ -59,22 +59,22 @@ function poll(data) {
 
     output += lastBlock(data.lastBlock);
 
-    output += '<div class="input-group"><input id="key" size="10" type="text" value="" class="form-control"'
-                   + ' onkeydown="if (event.keyCode == 13) buttonSearch()"></div>';
+    //output += '<div class="input-group"><input id="key" size="10" type="text" value="" class="form-control"'
+    //               + ' onkeydown="if (event.keyCode == 13) buttonSearch()"></div>';
 
     output += '<table width="1280" border=0><tr><td align=left><br>';
 
-    output += '<h3 style="display:inline;">' + data.label_Poll + ':</h3>';
+    output += '<h3 style="display:inline;"><b>' + data.label_Poll + ':</b>';
 
     //output += '<h3 style="display:inline;"> | </h3>';
 
-    output += '<a href="?poll=' + data.poll.key + get_lang() + '"><h3 style="display:inline;">';
-    output += getAssetName2(data.poll.key, data.poll.name) + '</h3></a>';
+    output += ' <a href="?poll=' + data.poll.key + get_lang() + '">';
+    output += getAssetName2(data.poll.key, data.poll.name) + '</a></h3>';
 
     output += '<br><br>';
 
-    output += '<b>' + data.label_Asset + ':</b> <a href ="?asset=' +
-        data.assetKey + get_lang() + '">[' + getAssetName2(data.assetKey, data.assetName) + '</a><br>';
+    output += '<h4><b>' + data.label_Asset + ':</b> <a href ="?asset=' +
+        data.assetKey + get_lang() + '">' + getAssetName2(data.assetKey, data.assetName) + '</a></h4>';
 
     output += '<br>';
 
