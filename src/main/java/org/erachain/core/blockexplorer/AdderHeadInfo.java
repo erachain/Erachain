@@ -1,5 +1,14 @@
 package org.erachain.core.blockexplorer;
 
+import org.erachain.core.block.Block;
+import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.imprints.ImprintCls;
+import org.erachain.core.item.persons.PersonCls;
+import org.erachain.core.item.polls.PollCls;
+import org.erachain.core.item.statuses.StatusCls;
+import org.erachain.core.item.templates.TemplateCls;
+import org.erachain.core.item.unions.UnionCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
@@ -8,12 +17,43 @@ import java.util.Map;
 
 public class AdderHeadInfo {
 
-    /**
-     * Добавляет переведенные на соответствующий язык информацию(бирки) для блоков
-     *
-     * @param output словарь, в который добавляется информация
-     */
+    public static void addHeadInfoCap(Class type, Map output, DCSet dcSet, JSONObject langObj) {
+        if(type == Transaction.class) {
+            addHeadInfoCapBlocks(output, dcSet, langObj);
+
+        } else if(type == Block.class) {
+            addHeadInfoCapBlocks(output, dcSet, langObj);
+
+        } else if(type == Block.BlockHead.class) {
+            addHeadInfoCapBlocks(output, dcSet, langObj);
+
+        } else if(type == AssetCls.class) {
+            addHeadInfoCapAssets(output, langObj);
+
+        } else if (type == PersonCls.class) {
+            addHeadInfoCapPersons(output, dcSet, langObj);
+
+        } else if (type == StatusCls.class || type == TemplateCls.class
+                || type == ImprintCls.class || type == UnionCls.class) {
+            addHeadInfoCapStatusesTemplates(output, langObj);
+        } else if (type == PollCls.class
+                ) {
+            addHeadInfoCapStatusesTemplates(output, langObj);
+            output.put("label_table_total_votes", Lang.getInstance().translateFromLangObj("Total Vote", langObj));
+            output.put("label_table_options_count", Lang.getInstance().translateFromLangObj("Options Count", langObj));
+
+        }
+
+    }
+
+        /**
+         * Добавляет переведенные на соответствующий язык информацию(бирки) для блоков
+         *
+         * @param output словарь, в который добавляется информация
+         */
     public static void addHeadInfoCapBlocks(Map output, DCSet dcSet, JSONObject langObj) {
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Insert block number or signature", langObj));
+
         output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
         output.put("totaltransactions", dcSet.getTransactionFinalMap().size());
         output.put("Label_Unconfirmed_transactions",
@@ -40,12 +80,16 @@ public class AdderHeadInfo {
      * @param output словарь, в который добавляется информация
      */
     public static void addHeadInfoCapPersons(Map output, DCSet dcSet, JSONObject langObj) {
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or person key", langObj));
+
         output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
         output.put("Label_Unconfirmed_transactions",
                 Lang.getInstance().translateFromLangObj("Unconfirmed transactions", langObj));
         output.put("Label_key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("Label_name", Lang.getInstance().translateFromLangObj("Name", langObj));
         output.put("Label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        output.put("Label_image", Lang.getInstance().translateFromLangObj("Image", langObj));
+        output.put("Label_description", Lang.getInstance().translateFromLangObj("Description", langObj));
         output.put("Label_Persons", Lang.getInstance().translateFromLangObj("Persons", langObj));
         addLaterPrevious(output, langObj);
     }
@@ -56,16 +100,18 @@ public class AdderHeadInfo {
      * @param output словарь, в который добавляется информация
      */
     public static void addHeadInfoCapAssets(Map output, JSONObject langObj) {
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or asset key", langObj));
+
         output.put("label_Title", Lang.getInstance().translateFromLangObj("Assets", langObj));
-        output.put("label_table_key", Lang.getInstance().translateFromLangObj("Key", langObj));
+        output.put("label_table_asset_key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("label_table_asset_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-        output.put("label_table_asset_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_table_asset_movable", Lang.getInstance().translateFromLangObj("Movable", langObj));
+        output.put("label_table_asset_owner", Lang.getInstance().translateFromLangObj("Owner", langObj));
+        output.put("label_table_asset_type", Lang.getInstance().translateFromLangObj("Type", langObj));
         output.put("label_table_asset_description", Lang.getInstance().translateFromLangObj("Description", langObj));
-        output.put("label_table_asset_divisible", Lang.getInstance().translateFromLangObj("Divisible", langObj));
+        output.put("label_table_asset_scale", Lang.getInstance().translateFromLangObj("Scale", langObj));
         output.put("label_table_asset_amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
         output.put("label_Assets", Lang.getInstance().translateFromLangObj("Assets", langObj));
-        output.put("label_operations", Lang.getInstance().translateFromLangObj("Operations", langObj));
+        output.put("label_table_asset_orders", Lang.getInstance().translateFromLangObj("Orders", langObj));
         addLaterPrevious(output, langObj);
     }
 
@@ -75,6 +121,8 @@ public class AdderHeadInfo {
      * @param output словарь, в который добавляется информация
      */
     public static void addHeadInfoCapStatusesTemplates(Map output, JSONObject langObj) {
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or item key", langObj));
+
         output.put("label_table_key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("label_table_name", Lang.getInstance().translateFromLangObj("Name", langObj));
         output.put("label_table_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));

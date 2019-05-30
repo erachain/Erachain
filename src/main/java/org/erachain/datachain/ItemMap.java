@@ -3,14 +3,10 @@ package org.erachain.datachain;
 import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
-import org.erachain.database.serializer.ItemSerializer;
+import org.erachain.database.FilteredByStringArray;
 import org.erachain.utils.Pair;
-import org.erachain.utils.ReverseComparator;
 import org.mapdb.*;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 import java.util.*;
 
@@ -20,7 +16,7 @@ import java.util.*;
  * ключ: номер, с самоувеличением
  * Значение: Сущность
  */
-public abstract class ItemMap extends DCMap<Long, ItemCls> {
+public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredByStringArray<Long> {
 
     //private static Logger logger;
 
@@ -76,6 +72,11 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
         return key;
     }
 
+    @Override
+    public int size() {
+        return (int)key;
+    }
+
     public void setLastKey(long key) {
         // INCREMENT ATOMIC KEY IF EXISTS
         if (atomicKey != null) {
@@ -117,7 +118,8 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
                 new Fun.Function2<String[], Long, ItemCls>() {
                     @Override
                     public String[] run(Long key, ItemCls item) {
-                        String[] keys = item.getName().toLowerCase().split(" ");
+                        // see https://regexr.com/
+                        String[] keys = item.getName().toLowerCase().split(DCSet.SPLIT_CHARS);
                         for (int i=0; i < keys.length; ++i) {
                             if (keys[i].length() > CUT_NAME_INDEX) {
                                 keys[i] = keys[i].substring(0, CUT_NAME_INDEX);
@@ -294,7 +296,7 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
      * @return
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Pair<String, Iterable> getKeysByFilterAsArray(String filter, int offset, int limit) {
+    public Pair<String, Iterable> getKeysIteratorByFilterAsArray(String filter, int offset, int limit) {
 
         String filterLower = filter.toLowerCase();
         String[] filterArray = filterLower.split(" ");
@@ -322,13 +324,40 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> {
 
     // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<Long> getKeysByFilterAsArray(String filter, int offset, int limit) {
+
+        if (filter == null || filter.isEmpty()){
+            return new ArrayList<>();
+        }
+
+        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
+        if (resultKeys.getA() != null) {
+            return new ArrayList<>();
+        }
+
+        List<Long> result = new ArrayList<>();
+
+        Iterator<Long> iterator = resultKeys.getB().iterator();
+
+        while (iterator.hasNext()) {
+            Long key = iterator.next();
+            ItemCls item = get(key);
+            if (item != null)
+                result.add(key);
+        }
+
+        return result;
+    }
+
+    // get list items in name substring str
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public List<ItemCls> getByFilterAsArray(String filter, int offset, int limit) {
 
         if (filter == null || filter.isEmpty()){
             return new ArrayList<>();
         }
 
-        Pair<String, Iterable> resultKeys = getKeysByFilterAsArray(filter, offset, limit);
+        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
         if (resultKeys.getA() != null) {
             return new ArrayList<>();
         }

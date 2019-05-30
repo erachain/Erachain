@@ -30,7 +30,7 @@ public class RecDetailsFrame extends JPanel //JFrame
 
         this.record = record1;
         DCSet dcSet = DCSet.getInstance();
-        //this.record.setDC(dcSet, Transaction.FOR_NETWORK);
+        this.record.setDC(dcSet);
 
         //ICON
         List<Image> icons = new ArrayList<Image>();

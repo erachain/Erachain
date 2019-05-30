@@ -11,6 +11,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
+import org.erachain.database.FilteredByStringArray;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
@@ -44,7 +45,7 @@ import java.util.*;
  * (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  * <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-public class TransactionFinalMap extends DCMap<Long, Transaction> {
+public class TransactionFinalMap extends DCMap<Long, Transaction> implements FilteredByStringArray {
 
     private static int CUT_NAME_INDEX = 12;
 
@@ -102,8 +103,10 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
             @Override
             public String run(Long key, Transaction val) {
                 Account account = val.getCreator();
+                if (account == null)
+                    return "";
                 // make UNIQUE key??  + val.viewTimestamp()
-                return (account == null ? "genesis" : account.getAddress());
+                return account.getAddress();
             }
         });
 
@@ -160,7 +163,8 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
                 if (title == null || title.isEmpty() || title.equals(""))
                     return null;
 
-                String[] tokens = title.toLowerCase().split(" ");
+                // see https://regexr.com/
+                String[] tokens = title.toLowerCase().split(DCSet.SPLIT_CHARS);
                 Tuple2<String, Integer>[] keys = new Tuple2[tokens.length];
                 for (int i = 0; i < tokens.length; ++i) {
                         if (tokens[i].length() > CUT_NAME_INDEX) {
@@ -462,7 +466,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
      * @return
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Pair<String, Iterable> getKeysByFilterAsArray(String filter, int offset, int limit) {
+    public Pair<String, Iterable> getKeysIteratorByFilterAsArray(String filter, int offset, int limit) {
 
         String filterLower = filter.toLowerCase();
         String[] filterArray = filterLower.split(" ");
@@ -488,34 +492,61 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
 
     }
 
+    // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public Set<BlExpUnit> getBlExpTransactionsByAddress(String address) {
-        Iterable senderKeys = Fun.filter(this.senderKey, address);
-        Iterable recipientKeys = Fun.filter(this.recipientKey, address);
+    public List<Long> getKeysByFilterAsArray(String filter, int offset, int limit) {
 
-        Set<Long> treeKeys = new TreeSet<>();
-
-        treeKeys.addAll(Sets.newTreeSet(senderKeys));
-        treeKeys.addAll(Sets.newTreeSet(recipientKeys));
-
-        Iterator iter = treeKeys.iterator();
-        treeKeys = null;
-        recipientKeys = null;
-        senderKeys = null;
-        Set<BlExpUnit> txs = new TreeSet<>();
-        while (iter.hasNext()) {
-            Long key = (Long) iter.next();
-            Tuple2<Integer, Integer> request = Transaction.parseDBRef(key);
-            txs.add(new BlExpUnit(request.a, request.b, this.map.get(request)));
+        if (filter == null || filter.isEmpty()){
+            return new ArrayList<>();
         }
-        iter = null;
-        return txs;
+
+        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
+        if (resultKeys.getA() != null) {
+            return new ArrayList<>();
+        }
+
+        List<Long> result = new ArrayList<>();
+
+        Iterator<Long> iterator = resultKeys.getB().iterator();
+
+        while (iterator.hasNext()) {
+            Long key = iterator.next();
+            Transaction item = get(key);
+            if (item != null)
+                result.add(key);
+        }
+
+        return result;
+    }
+
+    // get list items in name substring str
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<Transaction> getByFilterAsArray(String filter, int offset, int limit) {
+
+        if (filter == null || filter.isEmpty()){
+            return new ArrayList<>();
+        }
+
+        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
+        if (resultKeys.getA() != null) {
+            return new ArrayList<>();
+        }
+
+        List<Transaction> result = new ArrayList<>();
+
+        Iterator<Long> iterator = resultKeys.getB().iterator();
+
+        while (iterator.hasNext()) {
+            Transaction item = get(iterator.next());
+            result.add(item);
+        }
+
+        return result;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public List<Transaction> getTransactionsByAddress(String address) {
+    public Iterator getIteratorByAddress(String address) {
         Iterable senderKeys = Fun.filter(this.senderKey, address);
         Iterable recipientKeys = Fun.filter(this.recipientKey, address);
 
@@ -524,22 +555,24 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> {
         treeKeys.addAll(Sets.newTreeSet(senderKeys));
         treeKeys.addAll(Sets.newTreeSet(recipientKeys));
 
-        Iterator iter = treeKeys.iterator();
-        treeKeys = null;
-        recipientKeys = null;
-        senderKeys = null;
+        return ((TreeSet<Long>) treeKeys).descendingIterator();
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    // TODO ERROR - not use PARENT MAP and DELETED in FORK
+    public List<Transaction> getTransactionsByAddressLimit(String address, int limit) {
+        Iterator iterator = getIteratorByAddress(address);
         List<Transaction> txs = new ArrayList<>();
         Transaction item;
         Long key;
-        while (iter.hasNext()) {
-            key = (Long) iter.next();
+        while (iterator.hasNext() && (limit == -1 || limit-- > 0)) {
+            key = (Long) iterator.next();
             item = this.map.get(key);
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item.setDC((DCSet)databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
 
             txs.add(item);
         }
-        treeKeys = null;
         return txs;
     }
 

@@ -1,13 +1,10 @@
 package org.erachain.gui.items;
 
-import com.sun.corba.se.impl.oa.toa.TOAImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
@@ -16,7 +13,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class ImageCropDisplayPanelNavigator2D extends JPanel {
     private final int cropY;

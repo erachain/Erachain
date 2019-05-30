@@ -1,6 +1,7 @@
 package org.erachain.gui.transaction;
 
 import org.erachain.core.transaction.*;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.statement.StatementInfo;
 
 import javax.swing.*;

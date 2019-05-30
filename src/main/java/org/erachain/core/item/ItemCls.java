@@ -2,18 +2,23 @@ package org.erachain.core.item;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
+import org.apache.commons.net.util.Base64;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSetStatusToItem;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.utils.Pair;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple6;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +29,7 @@ import java.nio.charset.StandardCharsets;
 //import java.math.BigDecimal;
 //import com.google.common.primitives.Longs;
 
-public abstract class ItemCls {
+public abstract class ItemCls implements ExplorerJsonLine {
 
     public static final int ASSET_TYPE = 1;
     public static final int IMPRINT_TYPE = 2;
@@ -430,6 +435,41 @@ public abstract class ItemCls {
         itemJSON.put("image", Base58.encode(this.image));
 
         return itemJSON;
+    }
+
+    /**
+     * JSON for BlockExplorer lists
+     * @param langObj
+     * @return
+     */
+    public JSONObject jsonForExplorerPage(JSONObject langObj) {
+        //DCSet dcSet = DCSet.getInstance();
+
+        JSONObject json = new JSONObject();
+        json.put("key", this.getKey());
+        json.put("name", this.getName());
+
+        if (description != null && !description.isEmpty()) {
+            if (description.length() > 100) {
+                json.put("description", description.substring(0, 100));
+            } else {
+                json.put("description", description);
+            }
+        } else {
+            json.put("description", "");
+        }
+
+        json.put("owner", this.getOwner().getAddress());
+        Fun.Tuple2<Integer, PersonCls> person = this.getOwner().getPerson();
+        if (person != null) {
+            json.put("person", person.b.getName());
+            json.put("person_key", person.b.getKey());
+        }
+
+        if (icon != null)
+            json.put("icon", Base64.encodeBase64String(icon));
+
+        return json;
     }
 
     /**

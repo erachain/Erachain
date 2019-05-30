@@ -3,6 +3,7 @@ package org.erachain.core.block;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import org.apache.commons.net.util.Base64;
 import org.erachain.at.ATBlock;
 import org.erachain.at.ATController;
 import org.erachain.at.ATException;
@@ -11,6 +12,8 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.blockexplorer.BlockExplorer;
+import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.RCalculated;
@@ -39,7 +42,7 @@ import java.util.*;
 /**
  * обработка блоков - все что с ними связано. Без базы данных - сухие данные в вакууме
  */
-public class Block {
+public class Block implements ExplorerJsonLine {
 
     static private HashMap totalCOMPUtest = new HashMap();
 
@@ -358,6 +361,26 @@ public class Block {
         }
 
 
+    }
+
+    public JSONObject jsonForExplorerPage(JSONObject langObj) {
+        JSONObject blockJSON = new JSONObject();
+        blockJSON.put("height", heightBlock);
+        blockJSON.put("signature", Base58.encode(signature));
+        blockJSON.put("generator", creator.getAddress());
+        blockJSON.put("generatingBalance", getForgingValue());
+        blockJSON.put("target", getTarget());
+        blockJSON.put("winValue", getWinValue());
+        blockJSON.put("winValueTargeted", calcWinValueTargeted() - 100000);
+        blockJSON.put("transactionsCount", getTransactionCount());
+        blockJSON.put("timestamp", getTimestamp());
+        blockJSON.put("dateTime", BlockExplorer.timestampToStr(getTimestamp()));
+
+        loadHeadMind(DCSet.getInstance());
+        blockJSON.put("totalFee", viewFeeAsBigDecimal());
+        Tuple2<Integer, Integer> forgingPoint = blockHead.creator.getForgingData(DCSet.getInstance(), heightBlock);
+        blockJSON.put("deltaHeight", blockHead.heightBlock - forgingPoint.a);
+        return blockJSON;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////

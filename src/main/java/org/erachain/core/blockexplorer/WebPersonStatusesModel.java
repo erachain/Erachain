@@ -28,6 +28,7 @@ public class WebPersonStatusesModel extends AbstractTableModel implements Observ
     public static final int COLUMN_MAKER = 3;
     public static final int COLUMN_RECORD_NO = 4;
     public static final int COLUMN_MAKER_ACCOUNT = 31;
+    public static final int COLUMN_STATUS_KEY = 32;
 
     TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses;
     List<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>> statusesRows;
@@ -132,6 +133,9 @@ public class WebPersonStatusesModel extends AbstractTableModel implements Observ
         Transaction record;
 
         switch (column) {
+
+            case COLUMN_STATUS_KEY:
+                return value.a;
 
             case COLUMN_MAKE_DATE:
 

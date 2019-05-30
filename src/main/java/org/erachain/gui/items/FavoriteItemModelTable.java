@@ -121,10 +121,10 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
     public void addObservers() {
 
         if (Controller.getInstance().doesWalletDatabaseExists()) {
+            favoriteMap.addObserver(this);
+        } else {
             // ожидаем открытия кошелька
             Controller.getInstance().wallet.addWaitingObserver(this);
-        } else {
-            favoriteMap.addObserver(this);
         }
     }
 

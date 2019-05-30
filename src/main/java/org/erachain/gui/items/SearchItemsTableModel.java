@@ -2,14 +2,10 @@ package org.erachain.gui.items;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.DBMap;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.ItemMap;
-import org.erachain.gui.models.SearchTableModelCls;
-import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.Pair;
 
-import javax.swing.text.html.HTMLDocument;
 import java.util.*;
 
 @SuppressWarnings("serial")
@@ -45,7 +41,7 @@ public abstract class SearchItemsTableModel extends TimerTableModelCls<ItemCls> 
     }
 
     public void findByName(String filter) {
-        Pair<String, Iterable> result = ((ItemMap) map).getKeysByFilterAsArray(filter, 0, 1000);
+        Pair<String, Iterable> result = ((ItemMap) map).getKeysIteratorByFilterAsArray(filter, 0, 1000);
         Iterator iterator = result.getB().iterator();
         fill(iterator);
     }

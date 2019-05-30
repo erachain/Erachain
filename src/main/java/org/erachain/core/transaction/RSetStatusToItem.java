@@ -9,6 +9,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
+import org.erachain.datachain.DCSet;
 import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -39,8 +40,10 @@ public class RSetStatusToItem extends Transaction {
     protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
 
     protected Long key; // STATUS KEY
+    protected StatusCls status;
     protected int itemType; // ITEM TYPE (CAnnot read ITEMS on start DB - need reset ITEM after
     protected Long itemKey; // ITEM KEY
+    protected ItemCls item;
     protected long beg_date;
     protected long end_date = Long.MAX_VALUE;
     protected long value_1; // first any value
@@ -473,6 +476,23 @@ public class RSetStatusToItem extends Transaction {
 
     public long getItemKey() {
         return this.itemKey;
+    }
+
+    public StatusCls getStatus() {
+        if (status == null) {
+            status = (StatusCls) ItemCls.getItem(dcSet, ItemCls.STATUS_TYPE, this.key);
+        }
+        return status;
+    }
+    public ItemCls getItem() {
+        if (item == null) {
+            item = ItemCls.getItem(dcSet, this.itemType, this.itemKey);
+        }
+        return item;
+    }
+
+    public String getResultText() {
+        return status.toString(dcSet, packData());
     }
 
     public Long getBeginDate() {

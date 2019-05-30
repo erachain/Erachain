@@ -9,7 +9,7 @@ import org.erachain.utils.ObserverMessage;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class FavoriteStatusesTableModel extends FavoriteItemModelTable implements Observer {
+public class FavoriteStatusesTableModel extends FavoriteItemModelTable {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;

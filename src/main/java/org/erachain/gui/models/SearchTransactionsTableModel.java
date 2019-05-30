@@ -74,7 +74,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
 
         if (account != null) {
             // ИЩЕМ по СЧЕТУ
-            list = ((TransactionFinalMap)map).getTransactionsByAddress(account.getAddress());
+            list = ((TransactionFinalMap)map).getTransactionsByAddressLimit(account.getAddress(), 1000);
         } else {
 
             try {
@@ -92,7 +92,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
                 // ИЩЕМ по Заголовку
                 DCSet dcSet = DCSet.getInstance();
 
-                Pair<String, Iterable> result = dcSet.getTransactionFinalMap().getKeysByFilterAsArray(filter, start, step);
+                Pair<String, Iterable> result = dcSet.getTransactionFinalMap().getKeysIteratorByFilterAsArray(filter, start, step);
 
                 if (result.getA() != null) {
                     findMessage = result.getA();

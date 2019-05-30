@@ -147,6 +147,9 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
                             //IF SENDER ANOTHER
                             if (account == null) {
                                 PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(r_Send.getRecipient().getAddress());
+                                if (accountRecipient == null) {
+                                    return;
+                                }
                                 privateKey = accountRecipient.getPrivateKey();
 
                                 publicKey = r_Send.getCreator().getPublicKey();
@@ -154,6 +157,9 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
                             //IF SENDER ME
                             else {
                                 PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(account.getAddress());
+                                if (accountRecipient == null) {
+                                    return;
+                                }
                                 privateKey = accountRecipient.getPrivateKey();
 
                                 publicKey = Controller.getInstance().getPublicKeyByAddress(r_Send.getRecipient().getAddress());

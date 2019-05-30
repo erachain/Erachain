@@ -586,6 +586,10 @@ public abstract class AssetCls extends ItemCls {
         return "";
     }
 
+    public long getOperations(DCSet dcSet) {
+        long total = dcSet.getOrderMap().getCountOrders(key);
+        return total;
+    }
     
 	/*
 	public void setMovable(boolean movable) {
@@ -626,9 +630,23 @@ public abstract class AssetCls extends ItemCls {
 
         // ADD DATA
         assetJSON.put("scale", this.getScale());
-        assetJSON.put("assetType", this.assetType);
+        assetJSON.put("assetTypeKey", this.assetType);
+        assetJSON.put("assetTypeName", viewAssetType());
 
         return assetJSON;
+    }
+
+    public JSONObject jsonForExplorerPage(JSONObject langObj) {
+        //DCSet dcSet = DCSet.getInstance();
+
+        JSONObject json =super.jsonForExplorerPage(langObj);
+        json.put("assetTypeKey", this.assetType);
+        json.put("assetTypeName", viewAssetType());
+        json.put("quantity", getTotalQuantity(DCSet.getInstance()));
+        json.put("scale", scale);
+        json.put("orders", getOperations(DCSet.getInstance()));
+
+        return json;
     }
 
 }

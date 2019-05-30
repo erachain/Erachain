@@ -10,6 +10,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
+import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
@@ -39,7 +40,7 @@ import java.util.*;
 //import org.erachain.lang.Lang;
 //import org.erachain.settings.Settings;
 
-public abstract class Transaction {
+public abstract class Transaction implements ExplorerJsonLine {
 
     public static final byte[][] DISCREDIR_ADDRESSES = new byte[][]{
             Base58.decode("HPftF6gmSH3mn9dKSAwSEoaxW2Lb6SVoguhKyHXbyjr7"),
@@ -1026,6 +1027,10 @@ public abstract class Transaction {
 
         transaction.put("size", this.viewSize(Transaction.FOR_NETWORK));
         return transaction;
+    }
+
+    public JSONObject jsonForExplorerPage(JSONObject langObj) {
+        return toJson();
     }
 
     public abstract JSONObject toJson();

@@ -7,6 +7,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -391,11 +392,14 @@ public class RSend extends TransactionAmount {
 
     @Override
     public boolean hasPublicText() {
-        if (head.length() > (BlockChain.DEVELOP_USE? 100 : 40)
-        ) {
-            String[] words = head.split("[:., _-]");
-            for (String word: words) {
-                if (Base58.isExtraSymbols(word))
+        String[] words = head.split(DCSet.SPLIT_CHARS);
+        int length = 0;
+        for (String word: words) {
+            word = word.trim();
+            if (Base58.isExtraSymbols(word)) {
+                // все слова сложим по длинне
+                length += word.length();
+                if (length > (BlockChain.DEVELOP_USE? 100 : 100))
                     return true;
             }
         }

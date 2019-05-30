@@ -1,4 +1,5 @@
 function templates(data) {
+
     var output = '';
 
     if (data.hasOwnProperty('error')) {
@@ -17,7 +18,9 @@ function templates(data) {
 
     if (!notDisplayPages) {
         //Отображение компонента страниц(вверху)
-        output += pagesComponentBeauty(start, data.Label_Templates, data.numberLast, numberShiftDelta, 'start');
+        //output += pagesComponentBeauty(start, data.Label_Templates, data.numberLast, numberShiftDelta, 'start');
+        output += pagesComponent2(data);
+
     }
 
     output += '<table width="1280" border=0><tr><td align=left><br>';
@@ -26,31 +29,27 @@ function templates(data) {
     output += '<thead><tr><td><b>' + data.label_table_key + ': ' + data.label_table_name + '</b></td><td><b>' + data.label_table_description + '</b></td><td><b>' + data.label_table_creator + '</b></td></tr></thead>';
 
     //Отображение таблицы элементов шаблонов
-    var length = Object.keys(data.Templates).length;
-    for (var i = length - 1; i >= 0; i--) {
-        output += '<tr><td><a href="?template=' + data.Templates[i].key + get_lang() + '">' + data.Templates[i].key + ': ';
-        output += '<b>' + data.Templates[i].name + '</b></a></td>';
-        output += '<td>' + data.Templates[i].description.substr(0, 100) + '</td>';
-        output += '<td><a href=?addr=' + data.Templates[i].owner + get_lang() + '>' + htmlFilter(data.Templates[i].owner) + '</a></td>';
-        output += '</tr>';
+    for (var i in data.pageItems) {
+        var item = data.pageItems[i];
+        output += '<tr><td><a href="?template=' + item.key + get_lang() + '">' + item.key + ': ';
+        output += '<b>' + item.name + '</b></a></td>';
+        output += '<td>' + item.description.substr(0, 100) + '</td>';
+
+        output += '<td><a href=?address=' + item.owner + get_lang() + '>';
+        if (item.hasOwnProperty('person'))
+            output += '[' + item.person_key + ']' + htmlFilter(item.person);
+        else
+            output += item.owner;
+        output += '</a></td></tr>';
     }
 
     if (!notDisplayPages) {
         //Отображение ссылки предыдущая
-        output += '<tr><td colspan=4>';
-        if (start > 1) {
-            output += '<a href=?templates&start=' +
-                (start - numberShiftDelta) + get_lang() + '>' + data.Label_Previous;
-        }
-        //Отображение ссылки следующая
-        output += '<td colspan=4 align=right>';
-        if (data.numberLast > start) {
-            output += '<a href=?templates&start=' +
-                (start + numberShiftDelta) + get_lang() + '>' + data.Label_Later;
-        }
         output += '</table></td></tr></table>';
         //Отображение компонента страниц(снизу)
-        output += pagesComponentBeauty(start, data.Label_Statuses, data.numberLast, numberShiftDelta, 'start');
+        //output += pagesComponentBeauty(start, data.Label_Statuses, data.numberLast, numberShiftDelta, 'start');
+        output += pagesComponent2(data);
+
     }
 
     return output;
@@ -58,6 +57,7 @@ function templates(data) {
 
 
 function template(data) {
+
     var output = '';
 
     if (data.hasOwnProperty('error')) {
@@ -82,7 +82,7 @@ function template(data) {
     output += '<br><br>';
 
 
-    output += '<b>' + data.label_Creator + ':</b> <a href=?addr=' + data.template.owner + get_lang() + '>' + data.template.owner + '</a>';
+    output += '<b>' + data.label_Creator + ':</b> <a href=?address=' + data.template.owner + get_lang() + '>' + data.template.owner + '</a>';
 
     output += '<br><br>';
 

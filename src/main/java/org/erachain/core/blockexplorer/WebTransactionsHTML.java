@@ -45,8 +45,10 @@ public class WebTransactionsHTML {
         this.langObj = langObj;
         List<Transaction> tt = new ArrayList<Transaction>();
         tt.add(transaction);
-        LinkedHashMap json = BlockExplorer.getInstance().transactionsJSON(null, tt);
-        LinkedHashMap tras_json = (LinkedHashMap) ((LinkedHashMap) json.get("transactions")).get(0);
+        LinkedHashMap json = new LinkedHashMap();
+        BlockExplorer.getInstance().transactionsJSON(json, null, tt, 0, BlockExplorer.pageSize, "tx");
+        LinkedHashMap tras_json = (LinkedHashMap) ((LinkedHashMap) ((LinkedHashMap) json.get("Transactions"))
+                .get("transactions")).get(0);
 
         HashMap output = new HashMap();
 
@@ -63,7 +65,7 @@ public class WebTransactionsHTML {
         out += "<br><b>" + Lang.getInstance().translateFromLangObj("Signature", langObj) + ": </b>" + tras_json.get("signature");
         out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Fee", langObj) + ": </b>" + tras_json.get("fee");
         out += "<br> ";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Creator", langObj) + ": </b><a href=?addr=" + tras_json.get("creator_addr") + get_Lang(langObj) + ">" + tras_json.get("creator") + "</a>";
+        out += "<b>" + Lang.getInstance().translateFromLangObj("Creator", langObj) + ": </b><a href=?address=" + tras_json.get("creator_addr") + get_Lang(langObj) + ">" + tras_json.get("creator") + "</a>";
 
         output.put("head", out);
 
@@ -164,7 +166,7 @@ public class WebTransactionsHTML {
                         + assetTransfer.getOwner().getPerson().b.getKey() + get_Lang(langObj) + ">"
                         + assetTransfer.getOwner().viewPerson() + "</a><br>";
             } else {
-                out += "<b>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ":</b> <a href=?addr="
+                out += "<b>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ":</b> <a href=?address="
                         + assetTransfer.getOwner().getAddress() + get_Lang(langObj) + ">" + assetTransfer.getOwner().getAddress()
                         + "</a><br>";
             }
@@ -177,7 +179,7 @@ public class WebTransactionsHTML {
 
         } else {
 
-            out += "<b>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ":</b> <a href=?addr="
+            out += "<b>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ":</b> <a href=?address="
                     + assetTransfer.getRecipient().getAddress() + get_Lang(langObj) + ">" + assetTransfer.getRecipient().getAddress()
                     + "</a><br>";
         }
@@ -224,7 +226,7 @@ public class WebTransactionsHTML {
 
         } else {
 
-            out += "<b>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ":</b> <a href=?addr="
+            out += "<b>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ":</b> <a href=?address="
                     + record.getRecipient().getAddress() + get_Lang(langObj) + ">" + record.getRecipient().getAddress()
                     + "</a><br>";
         }
@@ -513,7 +515,7 @@ public class WebTransactionsHTML {
             // ">" + person.getOwner().viewPerson() +"</a><br>";
         } else {
             // out += "<b>" +Lang.getInstance().translateFromLangObj("Owner",
-            // langObj) + ":</b> <a href=?addr=" +
+            // langObj) + ":</b> <a href=?address=" +
             // person.getOwner().getAddress() + get_Lang(langObj) + ">" +
             // person.getOwner().getAddress() +"</a><br>";
         }
@@ -559,7 +561,7 @@ public class WebTransactionsHTML {
         RSend tr = (RSend) transaction;
         String out = "";
 
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ":</b> <a href=?addr="
+        out += "<b>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ":</b> <a href=?address="
                 + tr.getRecipient().getAddress() + get_Lang(langObj) + ">" + tr.getRecipient().getPersonAsString()
                 + "</a><br>";
 
@@ -611,7 +613,7 @@ public class WebTransactionsHTML {
                         + Lang.getInstance().translateFromLangObj("Public Key", langObj) + ": "
                         + Base58.encode(transaction.getCreator().getPublicKey()) + ")<br>";
             } else {
-                out += "<a href=?addr=" + transaction.getCreator().getAddress() + get_Lang(langObj) + ">" + transaction.getCreator().getAddress()
+                out += "<a href=?address=" + transaction.getCreator().getAddress() + get_Lang(langObj) + ">" + transaction.getCreator().getAddress()
                         + "</a> ("
                         + Lang.getInstance().translateFromLangObj("Public Key", langObj) + ": "
                         + Base58.encode(transaction.getCreator().getPublicKey()) + ")<br>";
@@ -635,7 +637,7 @@ public class WebTransactionsHTML {
                     + Lang.getInstance().translateFromLangObj("Public key", langObj) + ": "
                     + Base58.encode(publicKey.getPublicKey()) + ")<br>";
         } else {
-            out += "<a href=?addr=" + publicKey.getAddress() + get_Lang(langObj) + ">" + publicKey.getAddress()
+            out += "<a href=?address=" + publicKey.getAddress() + get_Lang(langObj) + ">" + publicKey.getAddress()
                     + "</a> ("
                     + Lang.getInstance().translateFromLangObj("Public key", langObj) + ": "
                     + Base58.encode(publicKey.getPublicKey()) + ")<br>";

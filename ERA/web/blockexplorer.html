@@ -10,18 +10,122 @@
     <script src="/index/libs/js/common.js"></script>
     <script src="/index/libs/js/marked.js"></script>
     <script src="/index/libs/js/utils.js"></script>
+    <script src="/index/libs/js/explorerPersons.js"></script>
+    <script src="/index/libs/js/explorerPolls.js"></script>
     <script src="/index/libs/js/explorerStatements.js"></script>
     <script src="/index/libs/js/explorerStatuses.js"></script>
     <script src="/index/libs/js/explorerTemplates.js"></script>
+    <script src="/index/libs/js/explorerTransactions.js"></script>
     <script src="/index/libs/js/explorerTransactionsTable.js"></script>
     <script src="/index/libs/js/third-party/qrcode.min.js"></script>
-    <link href="/index/libs/css/sidebar.css" rel="stylesheet">
+
     <script src="/index/libs/js/Base58.js" charset="utf-8"></script>
+
+    <link href="/index/libs/css/sidebar.css" rel="stylesheet">
 
     <style type="text/css">
         body {
             padding-top: 50px;
         }
+
+        .ll-blue-bgc {
+            background-color: #dadada; // #94e7ff;
+            color: #333;
+            margin: 0;
+            margin-top: -6px;
+            cursor: pointer;
+    border: 3px solid transparent;
+    box-sizing: border-box;
+    outline: none;
+    position: relative;
+    -webkit-transition: all 0.15s;
+    transition: all 0.15s;
+    text-align: center;
+    vertical-align: middle;
+    margin: 0;
+    text-decoration: none;
+    font-size: 14px;
+        }
+
+button,
+.button {
+    cursor: pointer;
+    border: 3px solid transparent; /* !important; */
+    box-sizing: border-box;
+    outline: none;
+    padding: 0.1em 1%;
+    position: relative;
+    /* -webkit-transition: all 0.15s; */
+    transition: all 0.15s
+}
+.button[disabled] {
+    opacity: 0.5
+}
+button:hover, button:active, button:focus,
+.button:hover, .button:active, .button:focus {
+    text-decoration: none
+}
+.button.lightblue {
+    background-color: #00BCF2
+}
+.button.lightblue-bgc:hover,
+.button.lightblue-bgc:focus,
+.button.ll-blue-bgc:focus,
+.button.ll-blue-bgc:hover {
+    color: #000;
+    border: 3px solid #FFF  !important;
+}
+.button.ll-blue-bgc.active, .button.ll-blue-bgc:active,
+.button.lightblue-bgc:active {
+    background-color: #aaa  !important;
+}
+.button.ll-blue-bgc[disabled]:hover,
+.button.ll-blue-bgc[disabled]:focus,
+.button.lightblue-bgc[disabled]:hover,
+.button.lightblue-bgc[disabled]:focus {
+    border-color: #00BCF2 !important;
+    background-color: #00BCF2
+}
+.button.blue-bgc:hover,
+.button.blue-bgc:focus {
+    color: #FFF; /*aliceblue; */
+    border: 3px solid #FFF !important;
+}
+button.blue-bgc:active,
+.button.blue-bgc:active {
+    background-color: #0066b6
+}
+button.blue-bgc[disabled]:hover,
+button.blue-bgc[disabled]:focus,
+.button.blue-bgc[disabled]:hover,
+.button.blue-bgc[disabled]:focus {
+    border-color: #0078D7;  !important
+    background-color: #0078D7
+}
+button.white-bgc:hover,
+button.white-bgc:focus,
+.button.white-bgc:hover,
+.button.white-bgc:focus {
+    border: 3px solid #bfbfbf !important;
+}
+button.white-bgc:active,
+.button.white-bgc:active {
+    background-color: #d8d8d8
+}
+button.white-bgc[disabled]:hover,
+button.white-bgc[disabled]:focus,
+.button.white-bgc[disabled]:hover,
+.button.white-bgc[disabled]:focus {
+    border-color: #FFFFFF;
+    background-color: #FFFFFF
+}
+
+.lightblue-c {
+    color: #00BCF2
+}
+.blue-c {
+    color: #0078D7;
+}
 
         .sub-header {
             padding-bottom: 10px;
@@ -192,7 +296,7 @@
             }
         }
 
-        function asyncAjax(url, type) {
+        function asyncAjax(url) {
             var xmlhttp = getXmlHttp()
             xmlhttp.open('GET', url, true);
             loading = true;
@@ -208,109 +312,104 @@
                         var data = JSON.parse(xmlhttp.responseText);
                         if (Object.keys(data).length > 0) {
 
-                            $("#searchparam").val(type);
+                            var type = data.type;
                             document.getElementById('Langs').innerHTML = langs(data);
 
-                            $('#selectID').val(data.search);
+                            // select searchID in need
+                            if (data.hasOwnProperty('search')) {
+                                $('#selectID').val(data.search);
+                            } else {
+                                $('#selectID').val(type);
+                            }
+
+                            if (data.hasOwnProperty('search_placeholder')) {
+                                $('#q').attr('placeholder', data.search_placeholder);
+                            }
+                            if (data.hasOwnProperty('search_message')) {
+                                $('#q').val(data.search_message);
+                            }
+
                             if (!data.noSearchedElements) {
                                 if (type == 'blocks') {
                                     document.getElementById('main').innerHTML = blocks(data);
-                                }
-
+                                } else
+                                if (type == 'address') {
+                                    document.getElementById('main').innerHTML = address(data);
+                                } else
+                                if (type == 'addresses') {
+                                    document.getElementById('main').innerHTML = addresses(data);
+                                } else
                                 if (type == 'peers') {
                                     document.getElementById('main').innerHTML = peers(data);
-                                }
-
+                                } else
+                                if (type == 'transactions') {
+                                    document.getElementById('main').innerHTML = transactions(data);
+                                } else
+                                if (type == 'tx') {
+                                    document.getElementById('main').innerHTML = tx(data);
+                                } else
                                 if (type == 'templates') {
                                     document.getElementById('main').innerHTML = templates(data);
-                                }
-
+                                } else
                                 if (type == 'template') {
                                     document.getElementById('main').innerHTML = template(data);
-                                }
-
+                                } else
                                 if (type == 'statement') {
                                     document.getElementById('main').innerHTML = statement(data);
-                                }
-
-
-                                if (type == 'topRichest') {
-                                    document.getElementById('main').innerHTML = topRichest(data);
-                                }
-
+                                } else
+                                if (type == 'top') {
+                                    document.getElementById('main').innerHTML = top100(data);
+                                } else
                                 if (type == 'persons') {
                                     document.getElementById('main').innerHTML = persons(data);
-                                }
-                                
-                                if (type == 'personsSearch') {
-                                    document.getElementById('main').innerHTML = personsSearch(data);
-                                }
-
+                                } else
                                 if (type == 'person') {
                                     document.getElementById('main').innerHTML = person(data);
-                                }
+                                } else
                                 if (type == 'person_asset') {
                                     document.getElementById('main').innerHTML = person_asset(data);
-                                }
-
-
-                                if (type == 'mainQuery') {
+                                } else
+                                if (type == 'person_status') {
+                                    document.getElementById('main').innerHTML = person_status(data);
+                                } else
+                                if (type == 'aTs') {
+                                    document.getElementById('main').innerHTML = aTs(data)
+                                } else
+                                if (type == 'polls') {
+                                    document.getElementById('main').innerHTML = polls(data)
+                                } else
+                                if (type == 'poll') {
+                                    document.getElementById('main').innerHTML = poll(data)
+                                } else
+                                if (type == 'assets') { // list and for search
+                                    document.getElementById('main').innerHTML = assets(data);
+                                } else
+                                if (type == 'asset') { // for one Asset
+                                    document.getElementById('main').innerHTML = asset(data);
+                                } else
+                                if (type == 'trades') {
+                                    document.getElementById('main').innerHTML = trades(data)
+                                } else
+                                if (type == 'search') {
+                                    document.getElementById('main').innerHTML = search(data);
+                                } else
+                                if (type == 'statuses') {
+                                    document.getElementById('main').innerHTML = statuses(data);
+                                } else
+                                if (type == 'status') {
+                                    document.getElementById('main').innerHTML = status(data);
+                                } else
+                                if (type == 'block') {
+                                    document.getElementById('main').innerHTML = block(data);
+                                } else
+                                ///if (type == 'mainQuery')
+                                {
                                     document.getElementById('main').innerHTML = mainQuery(data);
                                     genFilterUrlForAll();
                                     genFilterUrl();
                                     if (window.location.hash) {
                                         window.location.href = window.location.hash;
                                     }
-                                }
-
-                                if (type == 'aTs') {
-
-                                    document.getElementById('main').innerHTML = aTs(data)
-                                }
-
-                                if (type == 'polls') {
-                                    document.getElementById('main').innerHTML = oppa();
-                                    document.getElementById('main').innerHTML = polls(data)
-                                }
-
-                                if (type == 'poll') {
-                                    document.getElementById('main').innerHTML = poll(data)
-
-                                }
-
-                                if (type == 'assets') {
-                                    document.getElementById('main').innerHTML = assets(data)
-                                }
-
-                                if (type == 'assetsSearch') {
-                                    document.getElementById('main').innerHTML = assetsSearch(data)
-                                }
-
-                                if (type == 'asset') {
-                                    document.getElementById('main').innerHTML = asset(data);
-                                }
-
-                                if (type == 'trades') {
-                                    document.getElementById('main').innerHTML = trades(data)
-                                }
-
-                                if (type == 'search') {
-                                    document.getElementById('main').innerHTML = search(data);
-                                    $('#searchparam').val(data.search);
-                                }
-                                if (type == 'statuses') {
-                                    document.getElementById('main').innerHTML = statuses(data);
-                                }
-
-                                if (type == 'statusesSearch') {
-                                    document.getElementById('main').innerHTML = statusesSearch(data);
-                                }
-
-                                if (type == 'status') {
-                                    document.getElementById('main').innerHTML = status(data);
-                                }
-                                if (type == 'block') {
-                                    document.getElementById('main').innerHTML = block(data);
                                 }
                             }
                         }
@@ -420,7 +519,7 @@
 
                 output += '<tr><td> ';
 
-                output += '<b><a href=?addr=' + key + get_lang() + '>' + key + '</a></td>';
+                output += '<b><a href=?address=' + key + get_lang() + '>' + key + '</a></td>';
 
                 output += '<td align=right>';
 
@@ -436,7 +535,7 @@
 
                 output += '<td>';
                 output += '<b>Name: </b>' + data.aTs[key].name;
-                output += '<br><b>Creator:</b> <a href=?addr=' + data.aTs[key].creator + get_lang() + '>' + data.aTs[key].creator + '</a>';
+                output += '<br><b>Creator:</b> <a href=?address=' + data.aTs[key].creator + get_lang() + '>' + data.aTs[key].creator + '</a>';
                 output += '<br><b>AT Type:</b> ' + data.aTs[key].type;
 
                 output += '<br><b>Description:</b> ' + fformat(data.aTs[key].description);
@@ -499,8 +598,79 @@
             return output;
         }
 
+        function addresses(data) {
 
-        function topRichest(data) {
+            var output = data.message;
+            return output;
+
+        }
+
+        function address(data) {
+
+            var output ='';
+            output += '<table width="1280" border=0><tr><td align=left>';
+            if (data.hasOwnProperty('person')) {
+
+                output += '<tr><td><br><img src="personimage?key=' +
+                    data.person_key +
+                    '" width="100"/></td><td style ="padding-left:20px">';
+                output += '<td><font size="+1">' +
+                    data.label_account + ': <a href="?address=' +
+                    data.address + get_lang() + '">' + data.address + '</a><br>';
+                output += data.label_person_name + ': <a href ="?person=' +
+                    data.person_key + get_lang() + '">[' + data.person_key + ']' + data.person + '</a>';
+                if ('registered' in data) {
+                    output += '<br>' + data.label_registered + ': <b>' +
+                        data.registered + '</b>, ' + data.label_certified +
+                        ': <b>' + data.certified + '</b>';
+                }
+                output += '</font></tr>';
+
+            } else {
+
+                output += '<br><br>';
+                output += '<font size="+1">' + data.label_account +
+                    ': <a href="?address=' + data.address + get_lang() +
+                    '">' + data.address + '</a></font>';
+            }
+            output += '</table>';
+            output += '<table width="1280" border=0><tr><td align=left>';
+            output += data.Balance.label_Balance_table + ':<br>';
+            output += '<table id="balance" id=balance BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
+                ' class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
+            output += '<tr bgcolor="f1f1f1"><td><b>' + data.Balance.label_asset_key +
+                '<td><b>' + data.Balance.label_asset_name + '<td><b>' + data.Balance.label_Balance_1 +
+                '<td><b>' + data.Balance.label_Balance_2 + '<td><b>' + data.Balance.label_Balance_3 + '<td><b>'
+                 + data.Balance.label_Balance_4 + '</tr>';
+            for (key in data.Balance.balances) {
+                output += '<tr><td><a href ="?asset=' + data.Balance.balances[key].asset_key +
+                    get_lang() + '">' + data.Balance.balances[key].asset_key + '</a>';
+                output += '<td><a href="?asset=' + data.Balance.balances[key].asset_key +
+                    get_lang() + '">' + data.Balance.balances[key].asset_name + '</a>';
+                if (data.hasOwnProperty('person')) {
+                output += '<td><a href ="?person=' + data.person_key + '&asset=' + data.Balance.balances[key].asset_key +
+                    '&position=1' + get_lang() + '">' + data.Balance.balances[key].balance_1 + '</a>';
+                output += '<td><a href ="?person=' + data.person_key + '&asset=' + data.Balance.balances[key].asset_key +
+                    '&position=2' + get_lang() + '">' + data.Balance.balances[key].balance_2 + '</a>';
+                output += '<td><a href ="?person=' + data.person_key + '&asset=' + data.Balance.balances[key].asset_key +
+                    '&position=3' + get_lang() + '">' + data.Balance.balances[key].balance_3 + '</a>';
+                output += '<td><a href ="?person=' + data.person_key + '&asset=' + data.Balance.balances[key].asset_key +
+                    '&position=4' + get_lang() + '">' + data.Balance.balances[key].balance_4 + '</a>';
+                } else {
+                output += '<td>' + data.Balance.balances[key].balance_1 + '<td>' +
+                    data.Balance.balances[key].balance_2 + '<td>' + data.Balance.balances[key].balance_3
+                    + '<td>' + data.Balance.balances[key].balance_4;
+                }
+
+            }
+            output += '</table><br><br>';
+            output += transactions_Table(data);
+
+            return output;
+        }
+
+        function top100(data) {
+
             var output = "";
 
             output += lastBlock(data.lastBlock);
@@ -528,47 +698,28 @@
             var table = '<table id=top100 BORDER=0  cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>' + data.Label_Table_Account + '<td><b>' + data.Label_Table_person + '<td><b>' + data.Label_Table_Balance + '<td><b>' + data.Label_Table_in_OWN + '<td><b>' + data.Label_Table_Prop;
 
             for (key in data.top) {
+                var item = data.top[key];
                 table += '<tr>';
-                table += '<td>' + key + '<td>' + '<a href="?addr=' + data.top[key].address + get_lang() + '">' + data.top[key].address + '</a>';
+                table += '<td>' + key + '<td>' + '<a href="?address=' + item.address + get_lang() + '">' + item.address + '</a>';
 
-                if (data.top[key].person_key != '-') {
-                    table += '<td><a href="?person=' + data.top[key].person_key + get_lang() + '">' + data.top[key].person + '</a>';
+                if (item.hasOwnProperty('person')) {
+                    table += '<td><a href="?person=' + item.person_key + get_lang() + '">' + item.person + '</a>';
                 } else {
-                    table += '<td>' + data.top[key].person;
+                    table += '<td>';
                 }
-                table += '<td>' + addCommas(data.top[key].balance);
-                table += '<td>' + addCommas(data.top[key].in_OWN);
-                table += '<td>' + ((data.top[key].in_OWN / data.allTotal) * 100).toFixed(2) + "%";
+                table += '<td>' + addCommas(item.balance);
+                table += '<td>' + addCommas(item.in_OWN);
+                table += '<td>' + ((item.in_OWN / data.allTotal) * 100).toFixed(2) + "%";
             }
             table += '</table>';
 
             output += table;
-            /*
-	if(data.assetKey != 0)
-	{
-		assetUrl = '&asset='+data.assetKey;
-	}
-	else
-	{
-		assetUrl = '';
-	}
-
-	output += '<br><a href=?top=100'+assetUrl+get_lang()+'>Top 100</a> | <a href=?top=250'+assetUrl+get_lang()+'>Top 250</a> | <a href=?top=all'+assetUrl+get_lang()+'>All addresses</a> | <a href=?top=allnotzero'+assetUrl+get_lang()+'>All non-empty addresses';
-
-	output += '<br><br><font size=-2>';
-
-	var assetstxt = "";
-	for(key in data.assets) {
-		assetstxt += '<a href=?top=100&asset='+key+get_lang()+'>'+'(' + key + ')' + data.assets[key] + '</a>' + ', ';
-	}
-	output += assetstxt.slice(0, -2) + '</font>';
-	*/
             return output;
         }
 
 
         function polls11(a) {
-            window.location = "/index/blockexplorer.html?polls& asset=" + a.value;
+            window.location = "/index/blockexplorer.html?polls&asset=" + a.value + get_lang();
 
 
         }
@@ -582,7 +733,8 @@
             return output;
         }
 
-        function polls(data) {
+        function polls_old(data) {
+
             var output = "";
 
             output += lastBlock(data.lastBlock);
@@ -646,7 +798,8 @@
             }
         }
 
-        function poll(data) {
+        function poll_old(data) {
+
             var output = "";
 
             output += lastBlock(data.lastBlock);
@@ -663,7 +816,7 @@
 
             output += '<b>Description:</b><br>' + fformat(data.pool.description) + '<br><br>';
 
-            output += '<b>Creator:</b> <a href=?addr=' + data.pool.creator + get_lang() + '>' + data.pool.creator + '</a><br><br>';
+            output += '<b>Creator:</b> <a href=?address=' + data.pool.creator + get_lang() + '>' + data.pool.creator + '</a><br><br>';
 
             if (data.pool.hasOwnProperty('dateTime')) {
                 output += '<b>Creation date:</b> ' + data.pool.dateTime + '<br><br>';
@@ -701,7 +854,7 @@
 
             for (key in data.pool.votes) {
                 output += '<tr>';
-                output += '<td>' + '<a href=?addr=' + key + get_lang() + '>' + key + '</a>';
+                output += '<td>' + '<a href=?address=' + key + get_lang() + '>' + key + '</a>';
                 output += '<td>' + htmlFilter(data.pool.votes[key].option);
                 output += '<td>' + addCommas(data.pool.votes[key].votes);
             }
@@ -713,6 +866,7 @@
 
 
         function asset(data) {
+
             var output = "";
 
             output += lastBlock(data.lastBlock);
@@ -741,7 +895,7 @@
 
             output += '<br><br>';
 
-            output += '<b>' + data.asset.label_Creator + ':</b> <a href=?addr=' + data.asset.this.owner + get_lang() + '>' + data.asset.this.owner + '</a>';
+            output += '<b>' + data.asset.label_Creator + ':</b> <a href=?address=' + data.asset.this.owner + get_lang() + '>' + data.asset.this.owner + '</a>';
 
             output += '<br><br>';
 
@@ -841,7 +995,7 @@
 
             output += '<h3 style="display:inline;"> | </h3>';
 
-            output += '<a href="?trades=' + data.assetHave + '-' + data.assetWant + get_lang() + '"><h3 style="display:inline;">';
+            output += '<a href="?asset=' + data.assetHave + '&asset=' + data.assetWant + get_lang() + '"><h3 style="display:inline;">';
             output += getAssetName2(data.assetHave, data.assetHaveName) + '/';
             output += getAssetName2(data.assetWant, data.assetWantName) + '</h3></a>';
 
@@ -867,7 +1021,7 @@
                 //output += '<td>' + addCommas(data.sells[key].sellingPrice); // + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
                 output += '<td>' + addCommas(data.sells[key].amount); // + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
                 //output += '<td>' + addCommas(data.sells[key].sellingAmount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-                output += '<td><a href ="?addr=' + data.sells[key].creator_addr + get_lang() + '">' +
+                output += '<td><a href ="?address=' + data.sells[key].creator_addr + get_lang() + '">' +
                         data.sells[key].creator + '</a>';
 
             }
@@ -900,7 +1054,7 @@
                 output += '<td>' + addCommas(data.buys[key].buyingPrice); // + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
                 output += '<td>' + addCommas(data.buys[key].buyingAmount); // + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
                 //output += '<td>' + addCommas(data.buys[key].amount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-                output += '<td><a href ="?addr=' + data.buys[key].creator_addr + get_lang() + '">' +
+                output += '<td><a href ="?address=' + data.buys[key].creator_addr + get_lang() + '">' +
                         data.buys[key].creator + '</a>';
 
             }
@@ -943,7 +1097,7 @@
                     if (data.trades[key].initiatorCreator == data.assetWantOwner) {
                         output += ' <b>&#9655;</b> ';
                     }
-                    output += '<a href=?addr=' + data.trades[key].initiatorCreator + '>' + data.trades[key].initiatorCreator + '</a>';
+                    output += '<a href=?address=' + data.trades[key].initiatorCreator + '>' + data.trades[key].initiatorCreator + '</a>';
                     output += '<br>';
                     output += addCommas(data.trades[key].amountHave);
                     output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
@@ -953,7 +1107,7 @@
                     output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 
                     output += '<td style="line-height: 150%;">';
-                    output += '<a href=?addr=' + data.trades[key].targetCreator + '>' + data.trades[key].targetCreator + '</a>';
+                    output += '<a href=?address=' + data.trades[key].targetCreator + '>' + data.trades[key].targetCreator + '</a>';
 
                     if (data.trades[key].targetCreator == data.assetHaveOwner) {
                         output += ' <b>&#9664;</b> ';
@@ -977,7 +1131,7 @@
                     if (data.trades[key].targetCreator == data.assetWantOwner) {
                         output += ' <b>&#9655;</b> ';
                     }
-                    output += '<a href=?addr=' + data.trades[key].targetCreator + '>' + data.trades[key].targetCreator + '</a>';
+                    output += '<a href=?address=' + data.trades[key].targetCreator + '>' + data.trades[key].targetCreator + '</a>';
                     output += '<br>';
                     output += addCommas(data.trades[key].amountHave);
                     output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
@@ -987,7 +1141,7 @@
                     output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 
                     output += '<td style="line-height: 150%;">';
-                    output += '<a href=?addr=' + data.trades[key].initiatorCreator + '>' + data.trades[key].initiatorCreator + '</a>';
+                    output += '<a href=?address=' + data.trades[key].initiatorCreator + '>' + data.trades[key].initiatorCreator + '</a>';
 
                     if (data.trades[key].initiatorCreator == data.assetHaveOwner) {
                         output += ' <b>&#9664;</b> ';
@@ -1103,6 +1257,13 @@
 
         function mainQuery(data) {
             var output = '';
+
+            if (data.hasOwnProperty('error')) {
+                output += '<h2>' + data.error + '</h2>';
+                output += '<h4>for Help use blockexplorer.json</h4>';
+                return output;
+            }
+
             var transactionTypes = ["", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Asset Issue", "Asset Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message",
                 "", ""];
             transactionTypes[31] = "Send Record";
@@ -1113,7 +1274,7 @@
 
             //try {
 
-            if (data.type == 'standardAccount' || data.type == 'at') {
+            if (data.type == 'address' || data.type == 'at') {
                 if (data.withoutBlocks) {
                     withoutBlocks = '&withoutBlocks';
                 } else {
@@ -1138,68 +1299,16 @@
                     allOnOnePage = '';
                 }
 
-                urlstart = '?addr=' + data.address + '&start=' + data.start + withoutBlocks + allOnOnePage + showOnly + showWithout;
-                url = '?addr=' + data.address + withoutBlocks + allOnOnePage + showOnly + showWithout;
+                urlstart = '?address=' + data.address + '&start=' + data.start + withoutBlocks + allOnOnePage + showOnly + showWithout;
+                url = '?address=' + data.address + withoutBlocks + allOnOnePage + showOnly + showWithout;
             }
 
-            if (data.hasOwnProperty('error')) {
-                return '<h2>' + data.error + '</h2>';
-            }
-
-            if (data.type == 'standardAccount') {
-
-                output += '<table width="1280" border=0><tr><td align=left>';
-                if (data.person_key != -10) {
-
-                    output += '<tr><td><br><img src="personimage?key=' +
-                        data.person_key +
-                        '" width="100"/></td><td style ="padding-left:20px">';
-                    output += '<td><font size="+1">' +
-                        data.label_account + ': <a href="?addr=' +
-                        data.account + get_lang() + '">' + data.account + '</a></font>';
-                    output += '<br><a href ="?person=' +
-                        data.person_key + get_lang() + '">' +
-                        data.label_person_name + ': ' + data.Person_Name + '</a>';
-                    if ('registered' in data) {
-                        output += '<br>' + data.label_registered + ': <b>' +
-                            data.registered + '</b>, ' + data.label_certified +
-                            ': <b>' + data.certified + '</b>';
-                    }
-                    output += '</tr>';
-
-                } else {
-
-                    output += '<br><br>';
-                    output += '<font size="+1">' + data.label_account +
-                        ': <a href="?addr=' + data.account + get_lang() +
-                        '">' + data.account + '</a></font>';
-                }
-                output += '</table>';
-                output += '<table width="1280" border=0><tr><td align=left>';
-                output += data.Balance.label_Balance_table + ':<br>';
-                output += '<table id="balance" id=balance BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
-                    ' class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
-                output += '<tr bgcolor="f1f1f1"><td><b>' + data.Balance.label_asset_key +
-                    '<td><b>' + data.Balance.label_asset_name + '<td><b>' + data.Balance.label_Balance_A +
-                    '<td><b>' + data.Balance.label_Balance_B + '<td><b>' + data.Balance.label_Balance_C + '</tr>';
-                for (key in data.Balance.balances) {
-                    output += '<tr><td><a href ="?asset=' + data.Balance.balances[key].asset_key +
-                        get_lang() + '">' + data.Balance.balances[key].asset_key + '</a>';
-                    output += '<td><a href="?asset=' + data.Balance.balances[key].asset_key +
-                        get_lang() + '">' + data.Balance.balances[key].asset_name + '</a>';
-                    output += '<td>' + data.Balance.balances[key].balance_A + '<td>' +
-                        data.Balance.balances[key].balance_B + '<td>' + data.Balance.balances[key].balance_C;
-
-                }
-                output += '</table><br><br>';
-                output += transactions_Table(data);
-            }
-
+            if (data.type == 'address') {
+                return output + address(data);
+            } else
             if (data.type == 'block') {
                 return output + block(data);
-            }
-
-
+            } else
             if (data.type == 'person') {
                 if (data.allOnOnePage) {
                     allOnOnePage = '&allOnOnePage';
@@ -1214,13 +1323,10 @@
                 output += '<font size="+1">Person: <a href=?name=' + encodeURIComponent(data.name) + get_lang() + '>' + htmlFilter(data.name) + '</a></font>';
 
                 output += '<br><br>';
-            }
-
+            } else
             if (data.type == 'statement') {
                 output += statement(data);
-            }
-
-
+            } else
             if (data.type == 'name') {
                 if (data.allOnOnePage) {
                     allOnOnePage = '&allOnOnePage';
@@ -1237,32 +1343,12 @@
                 output += '<br><br>';
             }
 
-            if (data.type == 'transaction') {
-                output += '<table width="1280" border=0><tr><td align=left>';
-                if (data.body.hasOwnProperty('head')) {
-                    output += data.body.head + '<br>';
-                }
-                if (data.body.hasOwnProperty('body')) {
-                    output += fformat(data.body.body) + '<br>';
-                }
-                if (data.body.hasOwnProperty('message')) {
-                    output += fformat(data.body.message) + '<br>';
-                }
-                if (data.body.hasOwnProperty('foot')) {
-                    output += fformat(data.body.foot) + '<br>';
-                }
-                if (data.body.hasOwnProperty('vouches')) {
-                    output += fformat(data.body.vouches) + '<br>';
-                }
+            else if (data.type == 'tx') {
 
-                output += '<br><a href ="/api/recordrawbynumber/' + data.heightSeqNo + '"> RAW </a>';
-
-                //	output += data.Json ;
-
-                return output;
+                return tx(data);
             }
 
-            if (data.type == 'unconfirmed') {
+            else if (data.type == 'unconfirmed') {
                 url = '?unconfirmed';
                 urlstart = url;
                 output += '<table width="1280" border=0><tr><td align=left>';
@@ -1281,10 +1367,10 @@
 
             if (data.type == 'at') {
                 output += '<table width="1280" border=0><tr><td align=left>';
-                output += '<br><font size="+1">AT Account: <a href=?addr=' + data.address + get_lang() + '>' + data.address + '</a></font>';
+                output += '<br><font size="+1">AT Account: <a href=?address=' + data.address + get_lang() + '>' + data.address + '</a></font>';
 
                 output += '<table width="100%" border=0><tr><td valign=top align=left rowspan=2>';
-                output += '<br><b>Creator:</b> <a href=?addr=' + data.at.creator + get_lang() + '>' + data.at.creator + '</a>';
+                output += '<br><b>Creator:</b> <a href=?address=' + data.at.creator + get_lang() + '>' + data.at.creator + '</a>';
                 output += '<br><br><b>AT Type:</b> ' + data.at.type;
                 output += '<br><br><b>Description:</b> ' + fformat(data.at.description);
                 output += '<br><br><b>Tags:</b> ' + fformat(data.at.tags);
@@ -1317,7 +1403,7 @@
                 output += '<font size="+1">Trade</font><br>';
             }
 
-            //if(data.type == 'standardAccount' || data.type == 'at')
+            //if(data.type == 'address' || data.type == 'at')
             if (data.type == 'at') {
                 output += pages(data.pages, data.start, data.end, url, data.allOnOnePage);
             }
@@ -1338,6 +1424,7 @@
 
                     if (data[i].type == 'block') // block
                     {
+
                         output += '<table width=100%><tr><td>';
 
                         output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
@@ -1364,7 +1451,7 @@
                         output += '</tr>';
                         output += '<tr><td align="center"><img src="img/00_generating.png"><br><font size="-2">Generating</font></td>';
                         if (data[i].type == 'block') {
-                            output += '<td><a href=?addr=' + data[i].block.generator + get_lang() + '>' + data[i].block.generator + '</a>';
+                            output += '<td><a href=?address=' + data[i].block.generator + get_lang() + '>' + data[i].block.generator + '</a>';
                         } else {
                             output += '<td><font color="dimgray">' + data[i].block.generator + '</font></td>';
                         }
@@ -1416,7 +1503,7 @@
                             output += '<td><font color="dimgray">' + data[i].trade.targetCreator + '</font>';
                             img1 = 'img/redright.png';
                         } else {
-                            output += '<td><a href=?addr=' + data[i].trade.targetCreator + get_lang() + '>' + data[i].trade.targetCreator + '</a>';
+                            output += '<td><a href=?address=' + data[i].trade.targetCreator + get_lang() + '>' + data[i].trade.targetCreator + '</a>';
                             img1 = 'img/grright.png';
                         }
 
@@ -1438,7 +1525,7 @@
                             output += '<td><font color="dimgray">' + data[i].trade.initiatorCreator + '</font><br>';
                             img2 = 'img/redleft.png';
                         } else {
-                            output += '<td><a href=?addr=' + data[i].trade.initiatorCreator + get_lang() + '>' + data[i].trade.initiatorCreator + '</a>';
+                            output += '<td><a href=?address=' + data[i].trade.initiatorCreator + get_lang() + '>' + data[i].trade.initiatorCreator + '</a>';
                             img2 = 'img/grleft.png';
                         }
 
@@ -1511,7 +1598,7 @@
                         if (data[i].attransaction.creator == data.address) {
                             output += '<td rowspan=2><font color="dimgray">' + data[i].attransaction.creator + '</font></td>';
                         } else {
-                            output += '<td rowspan=2><a href=?addr=' + data[i].attransaction.creator + get_lang() + '>' + data[i].attransaction.creator + '</a></td>';
+                            output += '<td rowspan=2><a href=?address=' + data[i].attransaction.creator + get_lang() + '>' + data[i].attransaction.creator + '</a></td>';
                         }
                         output += '<td>' + addCommas(data[i].atTransaction.amount) + ' <font size="-2">ERA</font>';
 
@@ -1521,9 +1608,9 @@
                             if (data[i].atTransaction.recipient == '11111111111111111111111111') {
                                 output += '<td>11111111111111111111111111<br>';
                                 output += '(generator of <a href=?block=' + data[i].atTransaction.blockHeight + get_lang() + '>' + data[i].atTransaction.blockHeight + '</a> block: ';
-                                output += '<a href=?addr=' + data[i].atTransaction.generatorAddress + get_lang() + '>' + data[i].atTransaction.generatorAddress + '</a>)';
+                                output += '<a href=?address=' + data[i].atTransaction.generatorAddress + get_lang() + '>' + data[i].atTransaction.generatorAddress + '</a>)';
                             } else {
-                                output += '<td><a href=?addr=' + data[i].atTransaction.recipient + get_lang() + '>' + data[i].atTransaction.recipient + '</font></td>';
+                                output += '<td><a href=?address=' + data[i].atTransaction.recipient + get_lang() + '>' + data[i].atTransaction.recipient + '</font></td>';
                             }
                         }
 
@@ -1546,1081 +1633,12 @@
                     }
 
                     ////// TRANSACTIONS ////////
-                    if (data[i].type == 'transaction') {
-
-                        if (data[i].transaction.type == 1) // GENESIS_ISSUE_ASSET_TRANSACTION
-                        {
-
-                            output += '<tr><td>';
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Sender</b></td><td width=200><b>Amount</b></td>';
-                            output += '<td><b>Recipient</b></td>';
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td align="center" valign="top">';
-
-                            output += '<img src=img/01_genesis.jpg>';
-                            output += '<br><font size="-2">Genesis</font></td>';
-
-                            output += '<td>Genesis</td>';
-
-                            output += '<td>' + addCommas(data[i].transaction.amount) + ' <font size="-2">ERA</font>';
-                            output += '<br>fee: ' + addCommas(data[i].transaction.fee) + ' <font size="-2">ERA</font></td>';
-
-                            if (data[i].transaction.recipient == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.recipient + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.recipient + get_lang() + '>' + data[i].transaction.recipient + '</font></td>';
-                            }
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td>' + printBalance(data[i].balance) + '</td>';
-                            }
-
-                            output += '</tr></table>';
-
-                            output += '</table>';
-
-                        } else if (data[i].transaction.type == 6) // GENESIS_SEND_ASSET_TRANSACTION
-                        {
-
-                        } else if (data[i].transaction.type == 2) // Payment
-                        {
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<tr><td>';
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Sender</b></td><td width=200><b>Amount</b></td>';
-                            output += '<td><b>Recipient</b></td>';
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td align="center" valign="top">';
-
-                            if (data[i].transaction.creator == data.address) {
-                                output += '<img src=img/02_payment_out.png>';
-                            } else {
-                                output += '<img src=img/02_payment_in.png>';
-                            }
-                            output += '<br><font size="-2">Payment</font></td>';
-
-                            if (data[i].transaction.creator == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.creator + get_lang() + '>' + data[i].transaction.creator + '</a></td>';
-                            }
-                            output += '<td>' + addCommas(data[i].transaction.amount) + ' <font size="-2">ERA</font>';
-                            output += '<br>fee: ' + addCommas(data[i].transaction.fee) + ' <font size="-2">ERA</font></td>';
-
-                            if (data[i].transaction.recipient == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.recipient + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.recipient + get_lang() + '>' + data[i].transaction.recipient + '</font></td>';
-                            }
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td>' + printBalance(data[i].balance) + '</td>';
-                            }
-                            output += '</tr></table>';
-
-                            output += '</table>';
-
-                        } else if (data[i].transaction.type == 3) // Name registration
-                        {
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<tr><td>';
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Owner</b></td><td width=100><b>Fee</b></td>';
-                            output += '<td><b>Name:</b> <a href="?name=' + encodeURIComponent(data[i].transaction.name) + get_lang() + '">' + htmlFilter(data[i].transaction.name) + '</a></td>';
-                            output += '<td><b>Site:</b> <a href=/' + encodeURIComponent(data[i].transaction.name) + get_lang() + '>http://' + document.location.host + '/' + htmlFilter(data[i].transaction.name) + '</a></td>';
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td align="center" valign="top">';
-
-                            output += '<img src=img/03_name_registration.png>';
-                            output += '<br><font size="-2">Name Registration</font></td>';
-
-                            if (data[i].transaction.owner == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.owner + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.owner + get_lang() + '>' + data[i].transaction.owner + '</a></td>';
-                            }
-                            output += '<td>' + addCommas(data[i].transaction.fee) + ' <font size="-2">ERA</font>';
-
-                            output += '<td colspan=2><b>';
-                            if (data[i].transaction.сompressed) {
-                                output += 'Compressed';
-                            }
-                            output += ' Value:</b><pre style="width: 95%;">' + htmlFilter(wordwrap(data[i].transaction.value, 80, '\n', true)) + '</pre>';
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td>' + printBalance(data[i].balance) + '</td>';
-                            }
-                            output += '</tr></table>';
-
-                            output += '</table><br>';
-
-                        } else if (data[i].transaction.type == 4) // Name Update
-                        {
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a> ';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>New Owner</b></td><td width=100><b>Fee</b></td>';
-                            output += '<td><b>Name:</b> <a href="?name=' + encodeURIComponent(data[i].transaction.name) + get_lang() + '">' + htmlFilter(data[i].transaction.name) + '</a></td>';
-                            output += '<td><b>Site:</b> <a href=/' + encodeURIComponent(data[i].transaction.name) + get_lang() + '>http://' + document.location.host + '/' + htmlFilter(data[i].transaction.name) + '</a></td>';
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-
-                            output += '</tr>';
-                            output += '<tr><td align="center" valign="top">';
-
-                            output += '<img src=img/04_name_update.png>';
-                            output += '<br><font size="-2">Name Update</font></td>';
-
-                            if (data[i].transaction.newOwner == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.newOwner + '</font>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.newOwner + get_lang() + '>' + data[i].transaction.newOwner + '</a>';
-                            }
-                            output += '<br><font color="e5e5e5">' + data[i].transaction.owner + '</font>';
-
-                            output += '<td>' + addCommas(data[i].transaction.fee) + ' <font size="-2">ERA</font>';
-
-                            output += '<td colspan=2><b>New ';
-                            if (data[i].transaction.сompressed) {
-                                output += 'Compressed';
-                            }
-                            output += ' Value:</b><pre style="width: 95%;">' + htmlFilter(wordwrap(data[i].transaction.newValue, 80, '\n', true)) + '</pre>';
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td>' + printBalance(data[i].balance) + '</td>';
-                            }
-                            output += '</tr></table>';
-
-                            output += '</table><br>';
-
-                        } else if (data[i].transaction.type == 5) // Name to Sale
-                        {
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<tr><td>';
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Owner</b></td><td width=100><b>Fee</b></td>';
-                            output += '<td width=200><b>Price</b></td><td><b>Name</b></td>';
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td align="center" valign="top">';
-
-                            output += '<img src=img/05_name_sale.png>';
-                            output += '<br><font size="-2">Name to Sale</font></td>';
-
-                            if (data[i].transaction.owner == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.owner + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.owner + get_lang() + '>' + data[i].transaction.owner + '</a></td>';
-                            }
-                            output += '<td>' + addCommas(data[i].transaction.fee) + ' <font size="-2">ERA</font></td>';
-
-                            output += '<td>' + addCommas(data[i].transaction.amount) + ' <font size="-2">ERA</font></td>';
-
-                            output += '<td><a href="?name=' + encodeURIComponent(data[i].transaction.name) + get_lang() + '">' + htmlFilter(data[i].transaction.name) + '</td>';
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td>' + printBalance(data[i].balance) + '</td>';
-                            }
-                            output += '</tr></table>';
-
-                            output += '</table><br>';
-
-                        } else if (data[i].transaction.type == 6) // Cancel Name Sale
-                        {
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<tr><td>';
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Owner</b></td><td width=200><b>Fee</b></td>';
-                            output += '<td><b>Name</b></td>';
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td align="center" valign="top">';
-
-                            output += '<img src=img/06_cancel_name_sale.png>';
-                            output += '<br><font size="-2">Cancel Name Sale</font></td>';
-
-                            if (data[i].transaction.owner == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.owner + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.owner + get_lang() + '>' + data[i].transaction.owner + '</a></td>';
-                            }
-
-                            output += '<td>' + addCommas(data[i].transaction.fee) + ' <font size="-2">ERA</font></td>';
-
-                            output += '<td><a href="?name=' + encodeURIComponent(data[i].transaction.name) + get_lang() + '">' + htmlFilter(data[i].transaction.name) + '</td>';
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td>' + printBalance(data[i].balance) + '</td>';
-                            }
-                            output += '</tr></table>';
-
-                            output += '</table><br>';
-
-                        } else if (data[i].transaction.type == 7) // Name Purchase
-                        {
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<tr><td>';
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Seller</b></td><td><b>Name</b></td><td width=200><b>Amount</b></td>';
-                            output += '<td><b>Buyer</b></td>';
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td align="center" valign="top">';
-
-                            if (data[i].transaction.seller == data.address) {
-                                output += '<img src=img/07_name_purchase_in.png>';
-                                output += '<br><font size="-2">Name Selling</font></td>';
-                            } else {
-                                output += '<img src=img/07_name_purchase_out.png>';
-                                output += '<br><font size="-2">Name Buying</font></td>';
-                            }
-
-                            if (data[i].transaction.seller == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.seller + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.seller + get_lang() + '>' + data[i].transaction.seller + '</a></td>';
-                            }
-
-                            output += '<td><a href="?name=' + encodeURIComponent(data[i].transaction.name) + get_lang() + '">' + htmlFilter(data[i].transaction.name) + '</a></td>';
-
-                            output += '<td>' + addCommas(data[i].transaction.amount) + ' <font size="-2">ERA</font>';
-                            output += '<br>fee: ' + addCommas(data[i].transaction.fee) + ' <font size="-2">ERA</font></td>';
-
-                            if (data[i].transaction.buyer == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.buyer + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.buyer + get_lang() + '>' + data[i].transaction.buyer + '</font></td>';
-                            }
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td>' + printBalance(data[i].balance) + '</td>';
-                            }
-                            output += '</tr></table>';
-
-                            output += '</table><br>';
-
-                        } else if (data[i].transaction.type == 8) // Poll Creation
-                        {
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<tr><td>';
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Creator</b></td><td width=100><b>Fee</b></td>';
-                            output += '<td><b>Poll</b></td><td><b>Options</b></td>';
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td align="center" valign="top" rowspan=2>';
-
-                            output += '<img src=img/08_poll_creation.jpg>';
-                            output += '<br><font size="-2">Poll Creation</font></td>';
-
-                            if (data[i].transaction.creator == data.address) {
-                                output += '<td rowspan=2><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
-                            } else {
-                                output += '<td rowspan=2><a href=?addr=' + data[i].transaction.creator + get_lang() + '>' + data[i].transaction.creator + '</a></td>';
-                            }
-                            output += '<td rowspan=2>' + addCommas(data[i].transaction.fee) + ' <font size="-2">ERA</font></td>';
-
-                            output += '<td><a href="?poll=' + encodeURIComponent(data[i].transaction.name) + get_lang() + '">' + htmlFilter(data[i].transaction.name) + '</a></td>';
-
-                            output += '<td><ul>';
-
-                            for (key in data[i].transaction.options) {
-                                output += '<li>' + htmlFilter(data[i].transaction.options[key]) + '</li>';
-                            }
-                            output += '</ul></td>';
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td>' + printBalance(data[i].balance) + '</td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td colspan=2><b>Description:</b> ' + fformat(data[i].transaction.description);
-                            output += '</table>';
-
-                            output += '</table><br>';
-
-                        } else if (data[i].transaction.type == 9) // Poll Vote
-                        {
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<tr><td>';
-
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Creator</b></td><td width=100><b>Fee</b></td>';
-                            output += '<td><b>Poll</b></td><td><b>Option</b></td>';
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td align="center" valign="top">';
-
-                            output += '<img src=img/09_poll_vote.jpg>';
-                            output += '<br><font size="-2">Poll Vote</font></td>';
-
-                            if (data[i].transaction.creator == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.creator + get_lang() + '>' + data[i].transaction.creator + '</a></td>';
-                            }
-                            output += '<td>' + addCommas(data[i].transaction.fee) + ' <font size="-2">ERA</font></td>';
-
-                            output += '<td><a href="?poll=' + encodeURIComponent(data[i].transaction.poll) + get_lang() + '">' + htmlFilter(data[i].transaction.poll) + '</a></td>';
-
-                            output += '<td>' + htmlFilter(data[i].transaction.optionString) + '</td>';
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td>' + printBalance(data[i].balance) + '</td>';
-                            }
-                            output += '</tr></table>';
-
-                            output += '</table><br>';
-
-                        } else if (data[i].transaction.type == 10) // Arbitrary Transaction
-                        {
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<tr><td>';
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Creator</b></td><td width=150><b>Fee:</b> ' + addCommas(data[i].transaction.fee) + ' <font size="-2">ERA</font>' + '</td>';
-                            output += '<td><b>Data Base58</b></td>';
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td rowspan=3 align="center" valign="top">';
-
-                            output += '<img src=img/10_arbitrary_transaction.png>';
-                            output += '<br><font size="-2">Arbitrary Transaction</font></td>';
-
-                            if (data[i].transaction.creator == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.creator + get_lang() + '>' + data[i].transaction.creator + '</a></td>';
-                            }
-
-                            output += '<td><b>Service:</b> ' + data[i].transaction.service + '</td>';
-
-
-                            dataText = uintToString(Base58.decode(data[i].transaction.data));
-
-                            dataText = dataText.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-                            output += '<td rowspan=3><abbr title="' + dataText + '"><pre>' + wordwrap(data[i].transaction.data, 70, '\n', true) + '</pre></abbr>';
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td rowspan=3>' + printBalance(data[i].balance) + '</td>';
-                            }
-                            output += '</tr>';
-
-                            if (data[i].transaction.hasOwnProperty('payments')) {
-                                assetsAmounts = data[i].transaction.assetsAmounts;
-
-                                output += '<tr><td colspan=2><b>Payments:</b><br>';
-                                payments = data[i].transaction.payments;
-                                for (key in payments) {
-                                    output += addCommas(payments[key].amount) + ' ' + getAssetNameMini(payments[key].asset,
-                                        assetsAmounts[payments[key].asset].name) + ' -> ';
-                                    if (payments[key].recipient == data.address) {
-                                        output += '<font color="dimgray">' + payments[key].recipient + '</font>';
-                                    } else {
-                                        output += '<a href=?addr=' + payments[key].recipient + get_lang() + '>' + payments[key].recipient + '</font></a>';
-                                    }
-                                    output += '<br>';
-                                }
-
-                                output += '<tr><td colspan=2 height=99%><b>Amount:</b><br>';
-
-                                for (key in assetsAmounts) {
-                                    output += addCommas(assetsAmounts[key].amount) + ' ' + getAssetNameMini(key, assetsAmounts[key].name) + '<br>';
-                                }
-                            }
-
-                            output += '</table>';
-
-                            output += '</table><br>';
-
-                        } else if (data[i].transaction.type == 21) // ISSUE_ASSET_TRANSACTION
-                        {
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<tr><td>';
-
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Creator</b></td>';
-                            output += '<td width="100"><b>Fee</b></td><td><b>Name:</b> ';
-
-                            if (data[i].transaction.asset != '0') {
-                                output += '<a href=?asset=' + data[i].transaction.asset + get_lang() + '>' + htmlFilter(data[i].transaction.assetName) + '</a>'
-                            } else {
-                                output += htmlFilter(data[i].transaction.assetName);
-                            }
-
-                            output += '</td><td><b>Key</b><td align=center><b>Quantity</b><td><b>Divisible</b>';
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td align="center" valign="top">';
-
-                            output += '<img src=img/11_asset_issue.png>';
-                            output += '<br><font size="-2">Asset Issue</font></td>';
-
-                            if (data[i].transaction.creator == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.creator + get_lang() + '>' + data[i].transaction.creator + '</a></td>';
-                            }
-                            output += '<td>' + addCommas(data[i].transaction.fee) + ' <font size="-2">ERA</font></td>';
-
-                            output += '<td><b>Description:</b> ' + fformat(data[i].transaction.description) + '</td>';
-
-                            output += '<td align=center>' + data[i].transaction.asset + '</td>';
-                            output += '<td align=center>' + addCommas(data[i].transaction.quantity) + '</td>';
-                            output += '<td align=center>' + data[i].transaction.divisible + '</td>';
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td>' + printBalance(data[i].balance) + '</td>';
-                            }
-                            output += '</tr></table>';
-
-                            output += '</table><br>';
-
-                        } else if (data[i].transaction.type == 31) // SEND_ASSET_TRANSACTION
-                        {
-
-                            ////////////////////// MESSAGE ////////////////
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<tr><td>';
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Sender</b></td><td width=200><b>Amount</b></td>';
-                            output += '<td><b>Asset</b></td><td><b>Recipient</b></td>';
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td align="center" valign="top">';
-
-                            if (data[i].transaction.creator == data.address) {
-                                output += '<img src=img/12_asset_transfer_out.png>';
-                            } else {
-                                output += '<img src=img/12_asset_transfer_in.png>';
-                            }
-
-                            output += '<br><font size="-2">Asset Transfer</font></td>';
-
-                            if (data[i].transaction.creator == data.address) {
-                                //output += '<td><font color="dimgray">'+data[i].transaction.creator+'</font></td>';
-                                output += '<td><a href=?addr=' + data[i].transaction.creator + get_lang() + '>' + data[i].transaction.recipient + '</a></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.creator + get_lang() + '>' + data[i].transaction.creator + '</a></td>';
-                            }
-                            output += '<td>' + addCommas(data[i].transaction.amount);
-                            //output += ' ' + getAssetNameMini(data[i].transaction.asset, data[i].transaction.assetName);
-
-                            output += '<br>fee: ' + addCommas(data[i].transaction.fee) + ' <font size="-2">COMPU</font></td>';
-
-                            output += '<td>' + ' <a href=?asset=' + data[i].transaction.asset + get_lang() + '>' + getAssetName(data[i].transaction.asset, data[i].transaction.assetName) + '</a>';
-
-                            if (data[i].transaction.recipient == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.recipient + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.recipient + get_lang() + '>' + data[i].transaction.recipient + '</font></td>';
-                            }
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td>' + printBalance(data[i].balance) + '</td>';
-                            }
-
-                            output += '<td>' + data[i].transaction.isText + '</td>';
-                            output += '<td>' + data[i].transaction.encrypted + '</td>';
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td rowspan=2>' + printBalance(data[i].balance) + '</td>';
-                            }
-                            output += '</tr>';
-
-                            output += '<tr><td colspan=5><b>Message:</b> <pre>';
-
-                            if (!data[i].transaction.isText) {
-                                output += '<b>base58:</b> ';
-                            }
-
-                            if (data[i].transaction.encrypted) {
-                                output += '<font color=red>encrypted</font>';
-                            } else {
-                                output += fformat(data[i].transaction.data); // wordwrap(data[i].transaction.data, 120, '\n', true);
-                            }
-
-                            output += '</pre></td>';
-
-                            output += '</table>';
-
-                            output += '</table><br>';
-
-
-                        } else if (data[i].transaction.type == 41) // HASHES_RECORD
-                        {
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<tr><td>';
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Sender</b></td><td width=200><b>Amount</b></td>';
-                            output += '<td><b>Asset</b></td><td><b>Recipient</b></td>';
-
-                            if (data[i].hasOwnProperty('data')) {
-                                output += '<td width=180><b>Description</b></td>';
-                            }
-                            output += '</tr>';
-
-
-                            output += '<tr><td align="center" valign="top">';
-
-                            if (data[i].transaction.creator == data.address) {
-                                output += '<img src=img/12_asset_transfer_out.png>';
-                            } else {
-                                output += '<img src=img/12_asset_transfer_in.png>';
-                            }
-
-                            output += '<br><font size="-2">Hashes Record</font></td>';
-
-                            if (data[i].transaction.creator == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.creator + get_lang() + '>' + data[i].transaction.creator + '</a></td>';
-                            }
-
-                            output += '<td> fee: ' + addCommas(data[i].transaction.fee) + ' <font size="-2">COMPU</font></td>';
-
-                            output += '</tr>';
-                            output += '</table>';
-
-                            if (data[i].transaction.hasOwnProperty("url") && data[i].transaction.url.length > 0) {
-                                output += '<tr><td width="100%"><b>';
-                                output += data[i].transaction.url;
-                                output += '</b></td></tr>';
-                            }
-                            output += '<tr><td width="100%">';
-                            output += data[i].transaction.data;
-                            output += '</td></tr>';
-
-                            output += '<tr><td width="100%">';
-
-                            for (key in data[i].transaction.hashes) {
-                                if (data[i].transaction.hasOwnProperty("url") && data[i].transaction.url.length > 10) {
-                                    output += ' <b>' + key + '</b>:<a target="blank" href="' + data[i].transaction.url + '/' + data[i].transaction.hashes[key] + get_lang() + '">' + data[i].transaction.hashes[key] + '</a>';
-                                } else {
-                                    output += ' <b>' + key + '</b>:' + data[i].transaction.hashes[key];
-                                }
-                            }
-
-                            output += '</td></tr>';
-
-                            output += '</table><br>';
-
-                        } else if (data[i].transaction.type == 13) // Create Order
-                        {
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<tr><td>';
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Сreator</b></td><td width=100><b>Fee</b></td>';
-                            output += '<td width=135><b>Have</b></td><td width=135><b>Want</b></td>';
-                            output += '<td width=135><b>Price</b></td><td width=135><b>Amount</b></td>';
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td align="center" valign="top">';
-
-                            output += '<img src=img/13_order_creation.png>';
-                            output += '<br><font size="-2">Order Creation</font></td>';
-
-                            if (data[i].transaction.creator == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.creator + get_lang() + '>' + data[i].transaction.creator + '</a></td>';
-                            }
-
-                            output += '<td>' + addCommas(data[i].transaction.fee) + ' <font size="-2">ERA</font></td>';
-
-                            output += '<td>' + ' <a href=?asset=' + data[i].transaction.order.have + get_lang() + '>' + getAssetName(data[i].transaction.order.have, data[i].transaction.haveName) + '</a>';
-
-                            output += '<td>' + ' <a href=?asset=' + data[i].transaction.order.want + get_lang() + '>' + getAssetName(data[i].transaction.order.want, data[i].transaction.wantName) + '</a>';
-
-                            output += '<td>' + addCommas(data[i].transaction.order.price);
-
-                            output += '<br>' + getAssetNameMini(data[i].transaction.order.want, data[i].transaction.wantName);
-                            output += '/' + getAssetNameMini(data[i].transaction.order.have, data[i].transaction.haveName);
-
-                            output += '<td>' + addCommas(data[i].transaction.order.amount);
-
-                            output += ' ' + getAssetNameMini(data[i].transaction.order.have, data[i].transaction.haveName);
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td>' + printBalance(data[i].balance) + '</td>';
-                            }
-                            output += '</tr></table>';
-
-                            output += '</table><br>';
-
-                        } else if (data[i].transaction.type == 14) // Asset cancel order
-                        {
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<tr><td>';
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Сreator</b></td><td width=100><b>Fee</b></td>';
-                            output += '<td width=135><b>Have</b></td><td width=135><b>Want</b></td>';
-                            output += '<td width=135><b>Price</b></td><td width=135><b>Amount<font size=-2> left from <a href=?order=' + data[i].transaction.order + get_lang() + '>order</a></b></td>';
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td align="center" valign="top">';
-
-                            output += '<img src=img/14_cancel_order.png>';
-                            output += '<br><font size="-2">Cancel Order</font></td>';
-
-                            if (data[i].transaction.creator == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.creator + get_lang() + '>' + data[i].transaction.creator + '</a></td>';
-                            }
-
-                            output += '<td>' + addCommas(data[i].transaction.fee) + ' <font size="-2">ERA</font></td>';
-
-                            output += '<td>' + ' <a href=?asset=' + data[i].transaction.orderSource.have + get_lang() + '>' + getAssetName(data[i].transaction.orderSource.have, data[i].transaction.orderSource.haveName) + '</a>';
-
-                            output += '<td>' + ' <a href=?asset=' + data[i].transaction.orderSource.want + get_lang() + '>' + getAssetName(data[i].transaction.orderSource.want, data[i].transaction.orderSource.wantName) + '</a>';
-
-                            output += '<td>' + addCommas(data[i].transaction.orderSource.price);
-
-                            output += '<br>' + getAssetNameMini(data[i].transaction.orderSource.want, data[i].transaction.orderSource.wantName);
-                            output += '/' + getAssetNameMini(data[i].transaction.orderSource.have, data[i].transaction.orderSource.haveName);
-
-                            output += '<td>' + addCommas(data[i].transaction.orderSource.amountLeft);
-
-                            output += ' ' + getAssetNameMini(data[i].transaction.orderSource.have, data[i].transaction.orderSource.haveName);
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td>' + printBalance(data[i].balance) + '</td>';
-                            }
-                            output += '</tr></table>';
-
-                            output += '</table><br>';
-
-                        } else if (data[i].transaction.type == 15) // Multi Payment
-                        {
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<tr><td>';
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Sender</b></td><td width=200><b>Amount</b></td>';
-                            output += '<td><b>Recipient</b></td>';
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td align="center" valign="top">';
-
-                            if (data[i].transaction.creator == data.address) {
-                                output += '<img src=img/15_multi_payment_out.png>';
-                            } else {
-                                output += '<img src=img/15_multi_payment_in.png>';
-                            }
-                            output += '<br><font size="-2">Multi Payment</font></td>';
-
-                            if (data[i].transaction.creator == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.creator + get_lang() + '>' + data[i].transaction.creator + '</a></td>';
-                            }
-
-                            output += '<td>';
-
-                            assetsAmounts = data[i].transaction.assetsAmounts;
-                            for (key in assetsAmounts) {
-                                output += addCommas(assetsAmounts[key].amount) + ' ' + getAssetNameMini(key, assetsAmounts[key].name) + '<br>';
-                            }
-
-                            output += 'fee: ' + addCommas(data[i].transaction.fee) + ' <font size="-2">ERA</font></td>';
-
-                            output += '<td>';
-                            payments = data[i].transaction.payments;
-                            for (key in payments) {
-                                output += addCommas(payments[key].amount) + ' ' + getAssetNameMini(payments[key].asset,
-                                    assetsAmounts[payments[key].asset].assetName) + ' -> ';
-                                if (payments[key].recipient == data.address) {
-                                    output += '<font color="dimgray">' + payments[key].recipient + '</font>';
-                                } else {
-                                    output += '<a href=?addr=' + payments[key].recipient + get_lang() + '>' + payments[key].recipient + '</font></a>';
-                                }
-                                output += '<br>';
-                            }
-                            output += '</td>';
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td>' + printBalance(data[i].balance) + '</td>';
-                            }
-                            output += '</tr></table>';
-
-                            output += '</table><br>';
-
-                        } else if (data[i].transaction.type == 16) // Deploy AT
-                        {
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<tr><td>';
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Creator</b></td><td width=200><b>Amount</b></td>';
-                            output += '<td><b>Values';
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td align="center" valign="top" rowspan=2>';
-
-                            output += '<img src=img/16_deploy_at.png>';
-                            output += '<br><font size="-2">Deploy AT</font></td>';
-
-                            if (data[i].transaction.creator == data.address) {
-                                output += '<td><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
-                            } else {
-                                output += '<td><a href=?addr=' + data[i].transaction.creator + get_lang() + '>' + data[i].transaction.creator + '</a></td>';
-                            }
-                            output += '<td>' + addCommas(data[i].transaction.amount) + ' <font size="-2">ERA</font>';
-                            output += '<br>fee: ' + addCommas(data[i].transaction.fee) + ' <font size="-2">ERA</font></td>';
-
-                            output += '<td><b>Name: </b>' + data[i].transaction.name;
-                            if (data[i].transaction.atAddress == data.address) {
-                                output += '<br><b>AT Address: </b> <font color="dimgray">' + data[i].transaction.atAddress + '</font>';
-                            } else {
-                                output += '<br><b>AT Address: </b><a href=?addr=' + data[i].transaction.atAddress + get_lang() + '>' + data[i].transaction.atAddress + '</a>';
-                            }
-                            output += '<br><b>AT Type:</b> ' + data[i].transaction.atType;
-                            output += '<br><b>Description:</b> ' + fformat(data[i].transaction.description);
-                            output += '<br><b>Tags:</b> ' + data[i].transaction.tags;
-                            output += '</td>';
-
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td rowspan=2>' + printBalance(data[i].balance) + '</td>';
-                            }
-                            output += '</tr>';
-
-
-                            output += '<tr><td colspan=3><b>Creation Bytes:</b><pre>' + wordwrap(data[i].transaction.creationBytes, 138, '\n', true);
-
-                            output += '</tr></table>';
-
-                            output += '</table><br>';
-
-                        } else {
-                            output += '<table width="100%"><tr><td>';
-
-                            output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-
-                            output += '<tr><td><a href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-
-                            output += '<a href=?tx=' + data[i].transaction.signature + get_lang() + '>' + data[i].transaction.signature + '</a></td>';
-                            output += '<td align=right width=250>';
-                            if (data[i].transaction.hasOwnProperty('blockHeight')) {
-                                output += 'Height: <a href=?block=' + data[i].transaction.blockHeight + get_lang() + '>' + data[i].transaction.blockHeight + '</a>';
-                                output += ' / confirmations: ' + data[i].transaction.confirmations;
-                            }
-                            output += '</td>';
-                            output += '<td align=right width=200>' + data[i].transaction.dateTime + '</td></tr></table>';
-
-                            output += '<tr><td>';
-                            output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-                            output += '<b>Action</b></td><td width="290"><b>Sender</b></td><td width=200><b>Amount</b></td>';
-                            output += '<td><b>Asset</b></td><td><b>Recipient</b></td>';
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td width=180><b>Balance</b></td>';
-                            }
-                            output += '</tr>';
-                            output += '<tr><td align="center" valign="top">';
-
-                            if (data[i].transaction.creator == data.address) {
-                                output += '<img src=img/12_asset_transfer_out.png>';
-                            } else {
-                                output += '<img src=img/12_asset_transfer_in.png>';
-                            }
-
-                            output += '<td>';
-                            if (data[i].transaction.creator == data.address) {
-                                output += '<font color="dimgray">' + data[i].transaction.creator + '</font>';
-                            } else {
-                                output += '<a href=?addr=' + data[i].transaction.creator + get_lang() + '>' + data[i].transaction.creator + '</a>';
-                            }
-                            output += '<br><font>' + data[i].transaction.record_type + '</font>';
-                            output += '<br>fee: ' + addCommas(data[i].transaction.fee) + ' <font size="-2">COMPU</font>';
-                            output += '</td>';
-
-                            if (data[i].hasOwnProperty('balance')) {
-                                output += '<td>' + printBalance(data[i].balance) + '</td>';
-                            }
-                            output += '</tr></table>';
-
-                            output += '</table><br>';
-                        }
+                    if (data[i].type == 'tx') {
+                        output += transactionLite(data, i, data[i]);
                     }
                 }
 
-                //	if(data.type == 'standardAccount' || data.type == 'at')
+                //	if(data.type == 'address' || data.type == 'at')
                 if (data.type == 'at') {
                     output += pages(data.pages, data.start, data.end, url, data.allOnOnePage);
                 }
@@ -2640,6 +1658,7 @@
         }
 
         function block(data) {
+
             var output = '';
             url = '?block=' + data.blockHeight;
             urlstart = url;
@@ -2855,13 +1874,13 @@
             for (key in data.foundList) {
                 var row = data.foundList[key];
                 switch (row[1]) {
-                    case 'standardAccount':
-                        foundList += '<li><a href="?addr=' + encodeURIComponent(data.query) + get_lang() + '">' + row[2] + ': ' + htmlFilter(data.query) + '</a></li>';
-                        foundOne = '?addr=' + encodeURIComponent(data.query);
+                    case 'address':
+                        foundList += '<li><a href="?address=' + encodeURIComponent(data.query) + get_lang() + '">' + row[2] + ': ' + htmlFilter(data.query) + '</a></li>';
+                        foundOne = '?address=' + encodeURIComponent(data.query);
                         break
                     case 'atAccount':
-                        foundList += '<li><a href="?addr=' + encodeURIComponent(data.query) + get_lang() + '">' + row[2] + ': ' + htmlFilter(data.query) + '</a></li>';
-                        foundOne = '?addr=' + encodeURIComponent(data.query);
+                        foundList += '<li><a href="?address=' + encodeURIComponent(data.query) + get_lang() + '">' + row[2] + ': ' + htmlFilter(data.query) + '</a></li>';
+                        foundOne = '?address=' + encodeURIComponent(data.query);
                         break
                     case 'transactionSignature':
                         foundList += '<li><a href="?tx=' + encodeURIComponent(data.query) + get_lang() + '">' + row[2] + ': ' + htmlFilter(data.query) + '</a></li>';
@@ -2877,7 +1896,7 @@
                         foundList += '<li><a href="?name=' + encodeURIComponent(data.query) + get_lang() + '">' + row[2] + ': ' + htmlFilter(data.query) + '</a></li>';
                         foundOne = '?name=' + encodeURIComponent(data.query);
                         break
-                    case 'asset':
+                    case 'assets':
                         foundList += '<li><a href="?asset=' + encodeURIComponent(data.query) + get_lang() + '">' + row[2] + ': ' + htmlFilter(data.query) + '</a></li>';
                         foundOne = '?asset=' + encodeURIComponent(data.query);
                         break
@@ -2950,133 +1969,20 @@
             return data;
         }
 
-
-        function person_asset(data) {
-            var output = '';
-            if (data.error != null) {
-                return data.error;
-            }
-
-
-            output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
-            output += '<tr><td align=left>';
-            output += '<table><tr><td>';
-
-            output += '<img src="data:image/gif;base64,' + data.person_img + '" width = "350" /></td><td style ="padding-left:20px">';
-
-            if (data.sum > 0) {
-                output += '<b><span style="font-size:4em; color:lime"> &nbsp&nbsp +' + data.sum + '</span></b><br>';
-                output += '<fon_t size=10> &nbsp&nbsp' + data.asset_name + '</fon_t><br>';
-                output += '<br>';
-            } else {
-                output += '<b><span style="font-size:4em; color:crimson"> &nbsp&nbsp ' + data.Label_denied + '</span></b><br>';
-                output += '<br>';
-                output += '<br>';
-            }
-
-            output += ' &nbsp&nbsp<b>' + data.person_key + '</b>';
-            output += ' &nbsp&nbsp<b>' + data.person_name + '</b><br>';
-
-            output += '<br>';
-            output += '<br>';
-
-            output += '</td>';
-            output += '</tr>';
-            output += '</table>';
-
-            return output;
-        }
-
-        function person(data) {
-            var output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
-            output += '<tr><td align=left>';
-            output += '<table><tr><td>';
-
-
-            output += '<img src="data:image/gif;base64,' + data.img + '" width = "350" /></td><td style ="padding-left:20px">';
-            output += data.Label_key + ':  &nbsp&nbsp<b>' + data.key + '</b><br>';
-            output += data.Label_name + ': &nbsp&nbsp <b>' + data.name + '</b><br>';
-            if (data.creator_key != "") {
-                output += data.Label_creator + ': &nbsp&nbsp<a href ="?person=' + data.creator_key + get_lang() + '"><b> ' + data.creator + '</b></a><br>';
-            } else {
-                output += data.Label_creator + ': &nbsp&nbsp<b> ' + data.creator + '</b><br>';
-            }
-            output += data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b>';
-            if ('deathday' in data) {
-                output += ', &nbsp&nbsp ' + data.Label_dead + ': &nbsp&nbsp<b> ' + data.deathday + '</b><br>'
-            } else {
-                output += '<br>';
-            }
-            output += data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br>';
-            output += data.Label_description + ': &nbsp&nbsp' + fformat(data.description) + '<br>';
-            if (data.era_balance_a) {
-                output += '<h4>ERA: &nbsp&nbsp<u>A</u>:' + data.era_balance_a + '&nbsp&nbsp<u>B</u>:' + data.era_balance_b + '&nbsp&nbsp<u>C</u>:' + data.era_balance_c + '</h4>';
-            }
-            if (data.compu_balance) {
-                output += '<h4>COMPU: &nbsp&nbsp <b>' + data.compu_balance + '</b></h4>';
-            }
-            if (data.lia_balance_a) {
-                output += '<h5>' + data.label_registered + ': <b>' + data.lia_balance_a + '</b>, ' + data.label_certified + ': <b>' + data.lia_balance_b + '</b></h5></br>';
-            }
-            output += '</td>';
-            output += '</tr>';
-            output += '</table>';
-
-//statuses
-            output += '<br>' + data.Label_statuses + ':';
-            output += '<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>' + data.Label_Status_table_status + '<td><b>' + data.Label_Status_table_period + '<td><b>' + data.Label_accounts_table_creator + '<tr>';
-
-            key = 0;
-            for (key in data.statuses) {
-                output += '<tr ><td >' + data.statuses[key].status_name + '<td>' + data.statuses[key].status_period
-                    + '<td><a href ="?addr=' + data.statuses[key].status_creator_address + get_lang() + '">' + data.statuses[key].status_creator + '</a><tr>';
-
-                key++;
-            }
-            output += '</table><br>';
-
-
-// accounts
-
-            output += '<br>' + data.Label_accounts + ':';
-            output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>' + data.Label_accounts_table_adress + '<td><b>' + data.Label_accounts_table_to_date + '<td><b>' + data.Label_accounts_table_creator + '<tr>';
-
-            key = 0;
-            for (key in data.accounts) {
-                output += '<tr><td><a href = "?addr=' + data.accounts[key].address + get_lang() + '">' + data.accounts[key].address + '</a><td>'
-                    + data.accounts[key].to_date + '<td><a href ="?addr=' + data.accounts[key].creator_address + get_lang() + '">' + data.accounts[key].creator + '</a><tr>';
-
-                key++;
-            }
-            output += '</table><br>';
-
-//my p3ersons
-            output += '<br>' + data.Label_My_Persons + ':';
-            output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>' + data.Label_accounts_table_date + '<td><b>' + data.Label_My_Person_key + '<td><b>' + data.Label_My_Persons_Name + '<tr>';
-
-
-            key = 0;
-            for (key in data.My_Persons) {
-
-                output += '<tr><td>' + data.My_Persons[key].date + '<td>' + data.My_Persons[key].key + '<td><a href ="?person=' + data.My_Persons[key].key + get_lang() + '">' + data.My_Persons[key].name + '</a><tr>';
-            }
-
-            output += '</table><br>';
-            output += '</table><br>';
-            return output;
-        }
-
         function blocks(data) {
+
             var output = '';
             if (data.hasOwnProperty('error')) {
                 return '<h2>' + data.error + '</h2>';
             }
-            var numberShiftDelta = data.numberOfRepresentsItemsOnPage;
+            var notDisplayPages = data.notDisplayPages;
+            var numberShiftDelta = data.pageSize;
             //Отображение последнего блока
             output += lastBlock(data.lastBlock);
-            //Отображение компонента страниц(вверху)
             var start = data.start;
-            output += pagesComponentBeauty(start, data.Label_Blocks, data.lastBlock.height, numberShiftDelta, 'startBlock');
+            //Отображение компонента страниц(вверху)
+            //output += pagesComponentBeauty(start, data.Label_Persons, data.lastNumber, data.pageSize, 'start');
+            output += pagesComponent2(data);
 
             //Отображение шапки таблицы
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
@@ -3100,250 +2006,91 @@
                 '<td><b>' + data.Label_Fee;
 
             //Отображение таблицы элементов блоков
-            var length = Object.keys(data.Blocks).length;
-            for (var key = length - 1; key >= 0; key--) {
+            //var length = Object.keys(data.pageItems).length;
+            //for (var i = 0; i < length - 1; i++) {
+            for (var i in data.pageItems) {
                 output += '<tr>' +
-                    '<td><a href=?block=' + data.Blocks[key].height + get_lang() + '>' + data.Blocks[key].height + '</a>' +
-                    '<td>' + addCommas(data.Blocks[key].target) +
-                    '<td>' + data.Blocks[key].dateTime +
-                    '<td>' + '<a href=?addr=' + data.Blocks[key].generator + get_lang() + '>' + data.Blocks[key].generator +
-                    '<td>' + addCommas(data.Blocks[key].generatingBalance) +
-                    '<td>' + data.Blocks[key].deltaHeight +
-                    '<td>' + addCommas(data.Blocks[key].winValue) +
-                    '<td>' + addCommas(data.Blocks[key].winValueTargeted) + '%' +
-                    '<td>' + data.Blocks[key].transactionsCount +
-                    '<td>' + addCommas(data.Blocks[key].totalFee);
+                    '<td><a href=?block=' + data.pageItems[i].height + get_lang() + '>' + data.pageItems[i].height + '</a>' +
+                    '<td>' + addCommas(data.pageItems[i].target) +
+                    '<td>' + data.pageItems[i].dateTime +
+                    '<td>' + '<a href=?address=' + data.pageItems[i].generator + get_lang() + '>' + data.pageItems[i].generator +
+                    '<td>' + addCommas(data.pageItems[i].generatingBalance) +
+                    '<td>' + data.pageItems[i].deltaHeight +
+                    '<td>' + addCommas(data.pageItems[i].winValue) +
+                    '<td>' + addCommas(data.pageItems[i].winValueTargeted) + '%' +
+                    '<td>' + data.pageItems[i].transactionsCount +
+                    '<td>' + addCommas(data.pageItems[i].totalFee);
             }
 
             //Отображение ссылки предыдущая
-            output += '<tr><td colspan=4>';
-            if (start >= 1) {
-                output += '<a href=?startBlock=' + (start - numberShiftDelta) + get_lang() + '>' + data.Label_Previous;
-            }
-            //Отображение ссылки следующая
-            output += '<td colspan=4 align=right>';
-            if (data.lastBlock.height > start) {
-                output += '<a href=?startBlock=' + (start + numberShiftDelta) + get_lang() + '>' + data.Label_Later;
-            }
-
             output += '</table></td></tr></table>';
             //Отображение компонента страниц(снизу)
-            output += pagesComponentBeauty(start, data.Label_Blocks, data.lastBlock.height, numberShiftDelta, 'startBlock');
+            //output += pagesComponentBeauty(start, data.Label_Blocks, data.lastNumber, data.pageSize, 'start');
+            output += pagesComponent2(data);
 
             return output;
         }
 
-        function persons(data) {
-            var output = '';
-            if (data.hasOwnProperty('error')) {
-                return '<h2>' + data.error + '</h2>';
-            }
-            var notDisplayPages = data.notDisplayPages;
-            var numberShiftDelta = data.numberOfRepresentsItemsOnPage;
-            //Отображение последнего блока
-            output += lastBlock(data.lastBlock);
-            var start = data.start;
-            if (!notDisplayPages) {
-                //Отображение компонента страниц(вверху)
-                output += pagesComponentBeauty(start, data.Label_Persons, data.numberLast, numberShiftDelta, 'startPerson');
-            }
-            //Отображение шапки таблицы
-            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
-            output += '<tr><td align=left>';
-            output += '<a href=?unconfirmed' + get_lang() + '>' +
-                data.Label_Unconfirmed_transactions + ': ' + data.unconfirmedTxs + '</a>.';
-            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  ' +
-                'class="table table-striped" style="border: 1px solid #ddd;">';
-            output += '<tr><td><td><b>' + data.Label_key + ' <td><b>' +
-                data.Label_name + '<td><b>' + data.Label_creator;
-            //Отображение таблицы элементов персон
-            var length = Object.keys(data.Persons).length;
-            for (var i = length - 1; i >= 0; i--) {
-                output += '<tr>';
-                output += ' <td><img src="personimage?key=' + data.Persons[i].key + '" width="100"/></td>';
-                output += '<td>' + addCommas(data.Persons[i].key) + '<td><a href=?person=' +
-                    data.Persons[i].key + get_lang() + '>' + data.Persons[i].name + '</a>';
-                output += '<td><a href=?addr=' + data.Persons[i].creator + get_lang() + '>' + data.Persons[i].creator + '</a>';
-            }
-            if (!notDisplayPages) {
-                //Отображение ссылки предыдущая
-                output += '<tr><td colspan=4>';
-                if (start > 1) {
-                    output += '<a href=?persons&startPerson=' +
-                        (start - numberShiftDelta) + get_lang() + '>' + data.Label_Previous;
-                }
-                //Отображение ссылки следующая
-                output += '<td colspan=4 align=right>';
-                if (data.numberLast > start) {
-                    output += '<a href=?persons&startPerson=' +
-                        (start + numberShiftDelta) + get_lang() + '>' + data.Label_Later;
-                }
-                output += '</table></td></tr></table>';
-                //Отображение компонента страниц(снизу)
-                output += pagesComponentBeauty(start, data.Label_Persons, data.numberLast, numberShiftDelta, 'startPerson');
-            }
-            return output;
+        function transactions(data) {
+
+            return transactions_Table(data);
         }
-
-
-        function personsSearch(data) {
-            var output = '';
-            if (data.hasOwnProperty('error')) {
-                return '<h2>' + data.error + '</h2>';
-            }
-            var notDisplayPages = data.notDisplayPages;
-            //Отображение последнего блока
-            output += lastBlock(data.lastBlock);
-            var page = data.pageNumber;
-            if (!notDisplayPages) {
-                //Отображение компонента страниц(вверху)
-                output += pagesComponentMixed(data);
-            }
-            //Отображение шапки таблицы
-            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
-            output += '<tr><td align=left>';
-            output += '<a href=?unconfirmed' + get_lang() + '>' +
-                data.Label_Unconfirmed_transactions + ': ' + data.unconfirmedTxs + '</a>.';
-            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  ' +
-                'class="table table-striped" style="border: 1px solid #ddd;">';
-            output += '<tr><td><td><b>' + data.Label_key + ' <td><b>' +
-                data.Label_name + '<td><b>' + data.Label_creator;
-            //Отображение таблицы элементов персон
-            var length = Object.keys(data.Persons).length;
-            for (var i = length - 1; i >= 0; i--) {
-                output += '<tr>';
-                output += ' <td><img src="personimage?key=' + data.Persons[i].key + '" width="100"/></td>';
-                output += '<td>' + addCommas(data.Persons[i].key) + '<td><a href=?person=' +
-                    data.Persons[i].key + get_lang() + '>' + data.Persons[i].name + '</a>';
-                output += '<td><a href=?addr=' + data.Persons[i].creator + get_lang() + '>' + data.Persons[i].creator + '</a>';
-            }
-            if (!notDisplayPages) {
-                //Отображение ссылки предыдущая
-                output += '<tr><td colspan=4>';
-                if (page > 1) {
-                    output += '<a href="' + makePageUri(page - 1, 'page') + '">' + data.Label_Previous;
-                }
-                output += '<td colspan=4 align=right>';
-                if (page < data.pageCount) {
-                    output += '<a href="' + makePageUri(page + 1, 'page') + '">' + data.Label_Later;
-                }
-                output += '</table></td></tr></table>';
-                //Отображение компонента страниц(снизу)
-                // output += pagesComponentBeauty(start, data.Label_Persons, data.numberLast, numberShiftDelta, 'startPerson');
-                output += pagesComponentMixed(data);
-            }
-            return output;
-        }
-
 
         function assets(data) {
             var output = '';
             var notDisplayPages = data.notDisplayPages;
-            var numberShiftDelta = data.numberOfRepresentsItemsOnPage;
+            var numberShiftDelta = data.pageSize;
             output += lastBlock(data.lastBlock);
             var start = data.start;
             if (!notDisplayPages) {
-                output += pagesComponentBeauty(start, data.label_Assets, data.numberLast, numberShiftDelta, 'start');
+                //output += pagesComponentBeauty(start, data.label_Assets, data.lastNumber, data.pageSize, 'start');
+                output += pagesComponent2(data);
             }
+
+
             output += '<table width="1280" border=0><tr><td align=left><br>';
             output += '<a href="?assets"' + get_lang() + '><h3 style="display:inline;">' + data.label_Title + '</h3></a>';
             output += '<br><br>';
 
             output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 ' +
                 'class="table table-striped" style="border: 1px solid #ddd;"><tr>';
-            output += '<td><b>' + data.label_table_key + ': <b>' + data.label_table_asset_name +
-                '<td><b>' + data.label_operations + '<td><b>' + data.label_table_asset_creator;
-            output += '<td><b>' + data.label_table_asset_movable + '<td><b>' +
-                data.label_table_asset_amount + '<td><b>' + data.label_table_asset_divisible;
+            output += '<td><b>' + data.label_table_asset_key + ': <b>' + data.label_table_asset_name +
+                '<td><b>' + data.label_table_asset_description + '<td><b>' + data.label_table_asset_owner;
+            output += '<td><b>' + data.label_table_asset_orders + '<td><b>' +
+                data.label_table_asset_type + '<td><b>' + data.label_table_asset_amount
+                 + '<td><b>' + data.label_table_asset_scale;
 
             //Отображение таблицы элементов активов
-            var length = Object.keys(data.Assets).length;
-            for (var i = length - 1; i >= 0; i--) {
+            //var length = Object.keys(data.pageItems).length;
+            //for (var i = 0; i < length - 1; i++) {
+            for (var i in data.pageItems) {
+                var item = data.pageItems[i];
                 output += '<tr>';
-                output += '<td> <a href=?asset=' + encodeURIComponent(data.Assets[i].key) + get_lang() + '>';
-                output += '<b>' + data.Assets[i].key + '</b>: ';
-                if (data.Assets[i].icon.length > 0)
-                    output += '<img src="data:image/gif;base64,' + data.Assets[i].icon + '" width="30" /> ';
+                output += '<td> <a href=?asset=' + item.key + get_lang() + '>';
+                output += '<b>' + item.key + '</b>: ';
+                if (item.icon.length > 0)
+                    output += '<img src="data:image/gif;base64,' + item.icon + '" width="30" /> ';
 
-                output += htmlFilter(data.Assets[i].name);
+                output += htmlFilter(item.name);
                 output += '</a>';
-                output += '<td>' + data.Assets[i].operations;
-                //Здесь возникает html injection - решено убрать это поле
-                // table += '<td>' + data.assets[key].description.substr(0, 80);
-                output += '<td><a href =?addr=' + data.Assets[i].owner + get_lang()
-                    + '> ' + htmlFilter(data.Assets[i].owner) + '</a>';
-                output += '<td>' + htmlFilter(data.Assets[i].assetType);
-                output += '<td>' + data.Assets[i].quantity;
-                output += '<td>' + data.Assets[i].scale;
+                output += '<td>' + htmlFilter(item.description.substr(0, 60));
+
+                output += '<td><a href=?address=' + item.owner + get_lang() + '>';
+                if (item.hasOwnProperty('person'))
+                    output += '[' + item.person_key + ']' + htmlFilter(item.person);
+                else
+                    output += item.owner;
+                output += '</a></td>';
+
+                output += '<td>' + item.orders;
+                output += '<td>' + item.assetTypeName;
+                output += '<td>' + item.quantity;
+                output += '<td>' + item.scale;
+
             }
             if (!notDisplayPages) {
-                output += '<tr><td colspan=4>';
-                if (start > 1) {
-                    output += '<a href=?assets&start='
-                        + (start - numberShiftDelta) + get_lang() + '>' + data.Label_Previous;
-                }
-                output += '<td colspan=4 align=right>';
-                if (data.numberLast > start) {
-                    output += '<a href=?assets&start='
-                        + (start + numberShiftDelta) + get_lang() + '>' + data.Label_Later;
-                }
                 output += '</table></td></tr></table>';
-                output += pagesComponentBeauty(start, data.label_Assets, data.numberLast, numberShiftDelta, 'start');
-            }
-            return output;
-        }
-
-
-        function assetsSearch(data) {
-            var output = '';
-            var notDisplayPages = data.notDisplayPages;
-            output += lastBlock(data.lastBlock);
-            var page = data.pageNumber;
-            if (!notDisplayPages) {
-                output += pagesComponentMixed(data);
-            }
-            output += '<table width="1280" border=0><tr><td align=left><br>';
-            output += '<a href="?assets"' + get_lang() + '><h3 style="display:inline;">' + data.label_Title + '</h3></a>';
-            output += '<br><br>';
-
-            output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 ' +
-                'class="table table-striped" style="border: 1px solid #ddd;"><tr>';
-            output += '<td><b>' + data.label_table_key + ': <b>' + data.label_table_asset_name +
-                '<td><b>' + data.label_operations + '<td><b>' + data.label_table_asset_creator;
-            output += '<td><b>' + data.label_table_asset_movable + '<td><b>' +
-                data.label_table_asset_amount + '<td><b>' + data.label_table_asset_divisible;
-
-            //Отображение таблицы элементов активов
-            var length = Object.keys(data.Assets).length;
-            for (var i = length - 1; i >= 0; i--) {
-                output += '<tr>';
-                output += '<td> <a href=?asset=' + encodeURIComponent(data.Assets[i].key) + get_lang() + '>';
-                output += '<b>' + data.Assets[i].key + '</b>: ';
-                if (data.Assets[i].icon.length > 0)
-                    output += '<img src="data:image/gif;base64,' + data.Assets[i].icon + '" width="30" /> ';
-
-                output += htmlFilter(data.Assets[i].name);
-                output += '</a>';
-                output += '<td>' + data.Assets[i].operations;
-                //Здесь возникает html injection - решено убрать это поле
-                // table += '<td>' + data.assets[key].description.substr(0, 80);
-                output += '<td><a href =?addr=' + data.Assets[i].owner + get_lang()
-                    + '> ' + htmlFilter(data.Assets[i].owner) + '</a>';
-                output += '<td>' + htmlFilter(data.Assets[i].assetType);
-                output += '<td>' + data.Assets[i].quantity;
-                output += '<td>' + data.Assets[i].scale;
-            }
-            if (!notDisplayPages) {
-                output += '<tr><td colspan=4>';
-                if (page > 1) {
-                    output += '<a href="' + makePageUri(page - 1, 'page') + '">' + data.Label_Previous;
-                }
-                output += '<td colspan=4 align=right>';
-                if (page < data.pageCount) {
-                    output += '<a href="' + makePageUri(page + 1, 'page') + '">' + data.Label_Later;
-                }
-                output += '</table></td></tr></table>';
-                output += pagesComponentMixed(data);
+                output += pagesComponent2(data);
             }
             return output;
         }
@@ -3374,383 +2121,59 @@
         }
 
         function buttonSearch() {
-            var n = document.getElementById("selectID").options.selectedIndex;
-            var par = document.getElementById("selectID").options[n].value;
-            document.getElementById("searchparam").value = par;
-            document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value) + get_lang() + '&search=' + par;
-        }
+            if (document.getElementById("key1")) {
+                var pars = document.getElementById("key1").getAttribute("name") + '=' + document.getElementById("key1").value.trim();
+                if (document.getElementById("key2")) {
+                    pars += '&' + document.getElementById("key2").getAttribute("name") + '=' + document.getElementById("key2").value.trim();
+                }
 
-        function receiveNumberPage() {
-            var page;
-            if (params.hasOwnProperty('page') && isFinite(params['page'])) {
-                page = params['page'];
+                document.location.href = '?' + pars + get_lang();
+
             } else {
-                page = 1;
+                var n = document.getElementById("selectID").options.selectedIndex;
+                var par = document.getElementById("selectID").options[n].value;
+
+                document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value.trim()) + get_lang() + '&search=' + par;
             }
-            return page;
         }
 
         function start() {
 
             params = parseUrlQuery();
 
-
             document.getElementById('main').innerHTML = '';
             if (params['lang'] == null) params['lang'] = "en";
-            $('#selectID').val('block');
-            if (params[search] != null) $('#selectID').val(params[search]);
-//document.getElementById('menuBlocks').innerHTML = '<a href="#?lang=111'+params['lang'] +'" id=home2>Blocks</a>'
 
-//	document.getElementById('home').href = document.location.pathname;
-            document.getElementById('home2').href = document.location.pathname + '?lang=' + params['lang'];
-
-            document.getElementById('menu_top_100').href = '?top=100&lang=' + params['lang'];
-            document.getElementById('menu_percons').href = '?persons&startPerson&lang=' + params['lang'];
-            document.getElementById('menu_pals_asset').href = '?polls&asset=1&lang=' + params['lang'];
+        //	document.getElementById('home').href = document.location.pathname;
+            document.getElementById('home').href = '?blocks&lang=' + params['lang'];
+            document.getElementById('menu_transactions').href = '?transactions&lang=' + params['lang'];
+            document.getElementById('menu_addresses').href = '?addresses&lang=' + params['lang'];
+            document.getElementById('menu_persons').href = '?persons&lang=' + params['lang'];
+            document.getElementById('menu_polls').href = '?polls&lang=' + params['lang'];
             document.getElementById('menu_assets').href = '?assets&lang=' + params['lang'];
             document.getElementById('menu_statuses').href = '?statuses&lang=' + params['lang'];
-            document.getElementById('menu_peers').href = '?peers&lang=' + params['lang'];
             document.getElementById('menu_templates').href = '?templates&lang=' + params['lang'];
-            document.getElementById('menu_documents').href = '?documents&startdocument&lang=' + params['lang'];
-
+            document.getElementById('menu_top_100').href = '?top=100&lang=' + params['lang'];
+            document.getElementById('menu_peers').href = '?peers&lang=' + params['lang'];
 
             document.getElementById('menuBlocks').setAttribute('class', '');
-            document.getElementById('menuTop100Richest').setAttribute('class', '');
+            document.getElementById('menuAddresses').setAttribute('class', '');
+            document.getElementById('menuTop100').setAttribute('class', '');
             document.getElementById('menuPolls').setAttribute('class', '');
             document.getElementById('menuAssets').setAttribute('class', '');
             document.getElementById('menuStatuses').setAttribute('class', '');
-
+            document.getElementById('menuTemplates').setAttribute('class', '');
+            document.getElementById('menuTransactions').setAttribute('class', '');
 
             var title = 'Erachain BlockExplorer';
-            var page = receiveNumberPage();
 
-
-            if (params.hasOwnProperty('aTs')) {
-                asyncAjax('blockexplorer.json?aTs' + '&lang=' + params['lang'], 'aTs')
-
-                document.title = title + ' - AT';
-
-                //	document.getElementById('menuATs').setAttribute('class', 'active');
-
+            if (document.location.search) {
+                asyncAjax('blockexplorer.json' + location.search);
                 return;
             }
 
-            if (params.hasOwnProperty('polls')) {
-                asyncAjax('blockexplorer.json?polls& asset = ' + params['asset'] + '&lang=' + params['lang'], 'polls')
+            asyncAjax('blockexplorer.json?blocks&start=' + params['start'] + '&lang=' + params['lang']);
 
-                document.title = title + ' - Polls';
-
-                document.getElementById('menuPolls').setAttribute('class', 'active');
-
-                return;
-            }
-
-            if (params.hasOwnProperty('assets')) {
-                asyncAjax('blockexplorer.json?assets' + '&lang=' + params['lang'] + '&start=' + params['start'], 'assets')
-
-
-                document.title = title + ' - Assets';
-
-                document.getElementById('menuAssets').setAttribute('class', 'active');
-
-                return;
-            }
-
-            if (params.hasOwnProperty('statuses')) {
-                asyncAjax('blockexplorer.json?statuses' + '&lang=' + params['lang'] + '&start=' + params['start'], 'statuses')
-
-
-                document.title = title + ' - Statuses';
-
-                document.getElementById('menuStatuses').setAttribute('class', 'active');
-
-                return;
-            }
-
-            if (params.hasOwnProperty('top')) {
-                if (isFinite(params['top'])) {
-                    limit = params['top'];
-                } else if (params['top'] == 'allnotzero') {
-                    limit = -1;
-                } else if (params['top'] == 'all') {
-                    limit = -2;
-                } else {
-                    limit = 100;
-                }
-
-                if (params.hasOwnProperty('asset') && isFinite(params['asset'])) {
-                    asset = params['asset'];
-                } else {
-                    asset = 1;
-                }
-
-                asyncAjax('blockexplorer.json?top=' + limit + '&asset=' + asset + '&lang=' + params['lang'], 'topRichest')
-
-                document.title = title + ' - Top ' + limit;
-
-                document.getElementById('menuTop100Richest').setAttribute('class', 'active');
-
-                return;
-            }
-
-            if (params.hasOwnProperty('addr')) {
-                if (params.hasOwnProperty('start') && isFinite(params['start'])) {
-                    start = params['start'];
-                } else {
-                    start = 0; // -1
-                }
-
-                if (params.hasOwnProperty('showOnly')) {
-                    showOnly = '&showOnly=' + params['showOnly'];
-                } else {
-                    showOnly = '';
-                }
-
-                if (params.hasOwnProperty('showWithout')) {
-                    showWithout = '&showWithout=' + params['showWithout'];
-                } else {
-                    showWithout = '';
-                }
-
-                if (params.hasOwnProperty('withoutBlocks')) {
-                    withoutBlocks = '&withoutBlocks=' + params['withoutBlocks'];
-                } else {
-                    withoutBlocks = '';
-                }
-
-                if (params.hasOwnProperty('allOnOnePage')) {
-                    allonOnePage = '&allOnOnePage';
-                } else {
-                    allonOnePage = '';
-                }
-
-                asyncAjax('blockexplorer.json?addr=' + params['addr'] + "&page=" + page + '&start=' + start + showOnly + showWithout + allonOnePage + withoutBlocks + '&lang=' + params['lang'], 'mainQuery');
-
-                if (params['addr'].substring(0, 1) == 'A') {
-                    document.title = title + ' - AT Address - ' + params['addr'];
-                } else if (params['addr'].substring(0, 1) == 'Q') {
-                    document.title = title + ' - Address - ' + params['addr'];
-                }
-
-                return;
-            }
-
-            if (params.hasOwnProperty('name')) {
-                if (params.hasOwnProperty('start') && isFinite(params['start'])) {
-                    start = params['start'];
-                } else {
-                    start = 0;
-                }
-
-                if (params.hasOwnProperty('allOnOnePage')) {
-                    allonOnePage = '&allOnOnePage';
-                } else {
-                    allonOnePage = '';
-                }
-
-                if (params.hasOwnProperty('showOnly')) {
-                    showOnly = '&showOnly=' + params['showOnly'];
-                } else {
-                    showOnly = '';
-                }
-
-                if (params.hasOwnProperty('showWithout')) {
-                    showWithout = '&showWithout=' + params['showWithout'];
-                } else {
-                    showWithout = '';
-                }
-
-                asyncAjax('blockexplorer.json?name=' + params['name'] + '&start=' + start + allonOnePage + showOnly + showWithout + '&lang=' + params['lang'], 'mainQuery');
-
-                document.title = title + ' - Name - ' + decodeURIComponent(params['name']);
-
-                return;
-            }
-
-            if (params.hasOwnProperty('tx')) {
-                asyncAjax('blockexplorer.json?tx=' + params['tx'] + '&lang=' + params['lang'], 'mainQuery');
-
-                document.title = title + ' - Transaction - ' + params['tx'];
-
-                return;
-            }
-
-            if (params.hasOwnProperty('trade')) {
-                asyncAjax('blockexplorer.json?trade=' + params['trade'] + '&lang=' + params['lang'], 'mainQuery');
-
-                document.title = title + ' - Trade - ' + params['trade'];
-
-                return;
-            }
-
-            if (params.hasOwnProperty('atTx')) {
-
-                asyncAjax('blockexplorer.json?atTx=' + params['atTx'] + '&lang=' + params['lang'], 'mainQuery');
-
-                document.title = title + ' - AT TX - ' + params['atTx'];
-
-                return;
-            }
-
-            if (params.hasOwnProperty('poll')) {
-                asyncAjax('blockexplorer.json?poll=' + params['poll'] + '& asset=' + params['asset'] + '&lang=' + params['lang'], 'poll');
-
-                document.title = title + ' - Poll - ' + decodeURIComponent(params['poll']);
-
-                document.getElementById('menuPolls').setAttribute('class', 'active');
-
-                return;
-            }
-
-            if (params.hasOwnProperty('asset')) {
-                if (params.hasOwnProperty('person')) {
-                    asyncAjax('blockexplorer.json?person=' + params['person']
-                        + '&asset=' + params['asset']
-                        + '&position=' + params['position']
-                        + '&lang=' + params['lang'], 'person_asset');
-
-                    document.title = title + ' - Person Balances - ';
-                } else {
-                    var assets = getQueryParams('asset');
-                    if (assets.length == 2) {
-                        asyncAjax('blockexplorer.json?asset=' + assets[0] + '&asset=' + assets[1] + '&lang=' + params['lang'], 'trades');
-
-                        document.title = title + ' - Trades - ' + assets[0] + ' - ' + assets[1];
-                    } else {
-                        asyncAjax('blockexplorer.json?asset=' + params['asset'] + '&lang=' + params['lang'], 'asset');
-
-                        document.title = title + ' - Asset - ' + params['asset'];
-
-                    }
-                }
-
-                document.getElementById('menuAssets').setAttribute('class', 'active');
-
-                return;
-            }
-
-            if (params.hasOwnProperty('status')) {
-                var assets = getQueryParams('status');
-                if (assets.length == 2) {
-                    asyncAjax('blockexplorer.json?status=' + assets[0] + '&status=' + assets[1] + '&lang=' + params['lang'], 'trades');
-
-                    document.title = title + ' - Trades - ' + assets[0] + ' - ' + assets[1];
-                } else {
-                    asyncAjax('blockexplorer.json?status=' + params['status'] + '&lang=' + params['lang'], 'status');
-
-                    document.title = title + ' - Asset - ' + params['status'];
-
-                }
-
-                document.getElementById('menuStatuses').setAttribute('class', 'active');
-
-                return;
-            }
-
-
-            if (params.hasOwnProperty('block')) {
-                asyncAjax('blockexplorer.json?block=' + params['block'] + '&lang=' + params['lang'] + '&page=' + page, 'mainQuery');
-
-                document.title = title + ' - Block - ' + params['block'];
-
-                return;
-            }
-
-
-            if (params.hasOwnProperty('unconfirmed')) {
-
-                asyncAjax('blockexplorer.json?unconfirmed' + '&lang=' + params['lang'], 'mainQuery');
-
-                document.title = title + ' - Unconfirmed Transactions';
-
-                return;
-            }
-
-            if (params.hasOwnProperty('startBlock')) {
-                asyncAjax('blockexplorer.json?blocks&start=' + params['startBlock'] + '&lang=' + params['lang'], 'blocks');
-
-                document.title = title + ' - Start from ' + params['startBlock'] + ' block';
-
-                return;
-            }
-
-            if (params.hasOwnProperty('q')) {
-                if (params['search'] == 'person' || params['search'] == 'persons') {
-                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'] + '&page=' + params['page'], 'personsSearch');
-                } else if (params['search'] == 'asset' || params['search'] == 'assets') {
-                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'] + '&page=' + params['page'], 'assetsSearch');
-                } else if (params['search'] == 'status' || params['search'] == 'statuses') {
-                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'] + '&page=' + params['page'], 'statusesSearch');
-                } else if (params['search'] == 'block' || params['search'] == 'blocks') {
-                    asyncAjax('blockexplorer.json?q=' + params['q'] + '&lang=' + params['lang'] +
-                        '&search=' + params['search'] + '&page=' + page, 'block');
-                }
-                document.title = title + ' - Search - ' + decodeURIComponent(params['q']);
-                document.getElementById('q').value = decodeURIComponent(params['q']);
-
-                return;
-            }
-
-            if (params.hasOwnProperty('persons')) {
-                asyncAjax('blockexplorer.json?persons' + '&lang=' + params['lang'] + '&start=' + params['startPerson'], 'persons');
-                document.title = title + ' - Search - ' + decodeURIComponent(params['persons']);
-                return;
-            }
-
-            if (params.hasOwnProperty('startPerson')) {
-                asyncAjax('blockexplorer.json?persons&start=' + params['startBlock'] + '&lang=' + params['lang'], 'persons');
-
-                document.title = title + ' - Start from ' + params['startPerson'] + ' persons';
-
-                return;
-            }
-
-
-            if (params.hasOwnProperty('person')) {
-                if (params.hasOwnProperty('asset')) {
-                    asyncAjax('blockexplorer.json?person=' + params['person']
-                        + '&asset=' + params['asset']
-                        + '&position=' + params['position']
-                        + '&lang=' + params['lang'], 'person_asset');
-                    document.title = title + ' - Person Balances - ';
-                } else {
-                    asyncAjax('blockexplorer.json?person=' + params['person'] + '&lang=' + params['lang'], 'person');
-                    document.title = title;
-                    return;
-                }
-            }
-
-            if (params.hasOwnProperty('peers')) {
-                asyncAjax('blockexplorer.json?peers&lang=' + params['lang'], 'peers');
-                document.title = title;
-                return;
-            }
-            if (params.hasOwnProperty('templates')) {
-                asyncAjax('blockexplorer.json?templates&lang=' + params['lang'] + '&start=' + params['start'], 'templates');
-                document.title = title;
-                return;
-            }
-
-            if (params.hasOwnProperty('template')) {
-                asyncAjax('blockexplorer.json?template=' + params['template'] + '&lang=' + params['lang'], 'template');
-                document.title = title;
-                return;
-            }
-
-            if (params.hasOwnProperty('statement')) {
-                asyncAjax('blockexplorer.json?statement=' + params['statement'] + '&seqNo=' + params['seqNo'] + '&lang=' + params['lang'], 'statement');
-                document.title = title;
-                return;
-            }
-
-            asyncAjax('blockexplorer.json?blocks' + '&lang=' + params['lang'], 'blocks');
-
-            document.title = title;
-
-            document.getElementById('menuBlocks').setAttribute('class', 'active');
         }
 
         function Lang_setting() {
@@ -3837,14 +2260,15 @@
                     <div class="navbar-form navbar-left">
                         <div class="input-group">
                             <select id="selectID" class="form-control" role="tablist">
-                                <option value=block id=home2_op translate="true">Blocks</option>
-                                <option value=asset id=menu_assets_op translate="true">Assets</option>
-                                <option value=person id=menu_percons_op translate="true">Persons</option>
-                                <!--<option value=transaction translate="true">Transaction</option>-->
-                                <option value=status id=menu_statuses_op translate="true">Statuses</option>
-                                <!--<option value=template id=menu_templates_op translate="true">Templates</option>-->
-                                <!--<option value=template id=menu_documents_op translate="true">Documents</option>-->
-
+                                <option value=blocks id=home_op translate="true">Block</option>
+                                <option value=addresses id=menu_addresses_op translate="true">Address</option>
+                                <option value=transactions id=menu_transactions_op translate="true">Transaction</option>
+                                <option value=assets id=menu_assets_op translate="true">Asset</option>
+                                <option value=persons id=menu_persons_op translate="true">Person</option>
+                                <option value=polls id=menu_polls_op translate="true">Poll</option>
+                                <option value=statuses id=menu_statuses_op translate="true">Status</option>
+                                <option value=templates id=menu_templates_op translate="true">Template</option>
+                                <option value=top id=menu_tops_op translate="false">TOP 100</option>
                             </select>
                         </div>
                         <div class="input-group">
@@ -3852,7 +2276,6 @@
                                    onkeydown="if (event.keyCode == 13) buttonSearch()"><span class="input-group-btn">
                 <button id="button" type="button" value="!searchval!" class="btn btn-link"
                         onClick="buttonSearch()"><span class="glyphicon glyphicon-search"></span><span class="sr-only">Search</span></button></span>
-                            <input hidden id="searchparam">
                         </div>
                         <select id="Langs" OnChange="Lang_setting()" class="form-control">
                         </select>
@@ -3869,25 +2292,17 @@
                     <div class="main-tabs">
                         <div class="container">
                             <div class="row" id="main-menu">
-                                <ul role="tablist" class="nav nav-tabs">
-                                    <li id=menuBlocks><a href="#" id=home2 translate="true">Blocks</a></li>
-                                    <li id=menuTop100Richest><a href="?top=100" id=menu_top_100 translate="true">Top 100
-                                        Richest</a></li>
-                                    <li id=menuPersons><a href="?persons&startPerson" id=menu_percons translate="true">Persons</a>
-                                    </li>
-                                    <li id=menuPolls><a href="?polls&asset=1" id=menu_pals_asset translate="true">
-                                        Polls </a></li>
-                                    <li id=menuAssets><a href="?assets" id=menu_assets translate="true"> Assets </a>
-                                    </li>
-                                    <li id=menuStatuses><a href="?statuses" id=menu_statuses translate="true">
-                                        Statuses </a></li>
-                                    <li id=menupeers><a href="?peers" id=menu_peers translate="true"> Peers </a></li>
-                                    <li id=menudocument><a href="?templates" id=menu_documents translate="true">
-                                        Documents </a></li>
-                                    <li id=menutemplates><a href="?templates" id=menu_templates translate="true">
-                                        Templates </a></li>
-
-
+                                <ul role="tablist" class="nav nav-tabs" style="font-size:1.2em;">
+                                    <li id=menuBlocks><a href="?blocks" id=home translate="true">Blocks</a></li>
+                                    <li id=menuAddresses><a href="?addresses" id=menu_addresses translate="true">Addresses</a></li>
+                                    <li id=menuTransactions><a href="?transactions" id=menu_transactions translate="true">Transactions</a></li>
+                                    <li id=menuPersons><a href="?persons" id=menu_persons translate="true">Persons</a></li>
+                                    <li id=menuPolls><a href="?polls" id=menu_polls translate="true">Polls</a></li>
+                                    <li id=menuAssets><a href="?assets" id=menu_assets translate="true">Assets</a></li>
+                                    <li id=menuStatuses><a href="?statuses" id=menu_statuses translate="true">Statuses</a></li>
+                                    <li id=menuTemplates><a href="?templates" id=menu_templates translate="true">Templates</a></li>
+                                    <li id=menuTop100><a href="?top=100" id=menu_top_100 translate="true">Top 100 Richest</a></li>
+                                    <li id=menuPeers><a href="?peers" id=menu_peers translate="true">Peers</a></li>
                                 </ul>
                             </div>
                         </div>
