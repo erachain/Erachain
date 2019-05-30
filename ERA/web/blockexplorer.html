@@ -2172,6 +2172,7 @@ button.white-bgc[disabled]:focus,
                 return;
             }
 
+            location.search = '?blocks';
             asyncAjax('blockexplorer.json?blocks&start=' + params['start'] + '&lang=' + params['lang']);
 
         }
