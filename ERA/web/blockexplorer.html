@@ -2121,9 +2121,20 @@ button.white-bgc[disabled]:focus,
         }
 
         function buttonSearch() {
-            var n = document.getElementById("selectID").options.selectedIndex;
-            var par = document.getElementById("selectID").options[n].value;
-            document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value.trim()) + get_lang() + '&search=' + par;
+            if (document.getElementById("key1")) {
+                var pars = document.getElementById("key1").getAttribute("name") + '=' + document.getElementById("key1").value.trim();
+                if (document.getElementById("key2")) {
+                    pars += '&' + document.getElementById("key2").getAttribute("name") + '=' + document.getElementById("key2").value.trim();
+                }
+
+                document.location.href = '?' + pars + get_lang();
+
+            } else {
+                var n = document.getElementById("selectID").options.selectedIndex;
+                var par = document.getElementById("selectID").options[n].value;
+
+                document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value.trim()) + get_lang() + '&search=' + par;
+            }
         }
 
         function start() {

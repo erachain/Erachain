@@ -64,18 +64,19 @@ function poll(data) {
 
     output += '<h3 style="display:inline;"><b>' + data.label_Poll + ':</b>';
 
-    //output += '<h3 style="display:inline;"> | </h3>';
+    output += ' [ <input id="key1" name="poll" size="4" type="text" value="' + data.poll.key + '" class="" style="font-size: 1em;"'
+                   + ' onkeydown="if (event.keyCode == 13) buttonSearch()"> ] ';
 
-    output += ' <a href="?poll=' + data.poll.key + get_lang() + '">';
-    output += getAssetName2(data.poll.key, data.poll.name) + '</a></h3>';
+    output += '<a href="?poll=' + data.poll.key + get_lang() + '">';
+    //output += getAssetName2(data.poll.key, data.poll.name) + '</a></h3>';
+    output += data.poll.name + '</a></h3>';
 
     output += '<br><br>';
 
-    output += '<h4><b>' + data.label_Asset + ':</b> <a href ="?asset=' +
-        data.assetKey + get_lang() + '">' + getAssetName2(data.assetKey, data.assetName) + '</a></h4>';
-
-    output += '<input id="key" size="10" type="text" value="' + data.assetKey + '" class="form-control"'
-                   + ' onkeydown="if (event.keyCode == 13) buttonSearch()">';
+    output += '<h4 style="display:inline;"><b>' + data.label_Asset + ':</b>';
+    output += ' [ <input id="key2" name="asset" size="4" type="text" value="' + data.assetKey + '" class="" style="font-size: 1em;"'
+                   + ' onkeydown="if (event.keyCode == 13) buttonSearch()"> ] ';
+    output += '<a href ="?asset=' +  data.assetKey + get_lang() + '">' + data.assetName + '</a></h4>';
 
     output += '<br>';
 

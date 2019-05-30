@@ -148,6 +148,8 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
 
             U old = this.map.put(key, value);
 
+            U test = this.map.get(key);
+
             if (this.parent != null) {
                 //if (old != null)
                 //	++this.shiftSize;
