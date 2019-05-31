@@ -81,7 +81,7 @@ public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> im
             }
 
         } else  {
-            repaint();
+            needUpdate = true;
             return null;
         }
 
