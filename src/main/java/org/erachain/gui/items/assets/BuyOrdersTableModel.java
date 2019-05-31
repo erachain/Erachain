@@ -118,9 +118,9 @@ public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> im
             case COLUMN_AMOUNT_HAVE:
 
                 if (row == this.listSorted.size())
-                    return "<html><i>" + NumberAsString.formatAsString(sumAmountHave, have.getScale()) + "</i></html>";
+                    return "<html><i>" + NumberAsString.formatAsString(sumAmountWant, want.getScale()) + "</i></html>";
 
-                amountStr = NumberAsString.formatAsString(order.getAmountHaveLeft(), have.getScale());
+                amountStr = NumberAsString.formatAsString(order.getAmountWantLeft(), want.getScale());
 
                 if (isMine)
                     amountStr = "<html><b>" + amountStr + "</b></html>";
