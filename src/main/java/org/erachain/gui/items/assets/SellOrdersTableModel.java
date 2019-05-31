@@ -84,7 +84,7 @@ public class SellOrdersTableModel extends SortedListTableModelCls<Long, Order> i
             }
 
         } else {
-            repaint();
+            needUpdate = true;
             return null;
         }
 
