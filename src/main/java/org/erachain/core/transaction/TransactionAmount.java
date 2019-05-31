@@ -828,20 +828,21 @@ public abstract class TransactionAmount extends Transaction {
                                         return NO_BALANCE;
                                 }
                                 
-                                if (height > BlockChain.FREEZE_FROM) {
-                                    String unlock = BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress());
-                                    if (unlock != null && !this.recipient.equals(unlock))
-                                        return INVALID_CREATOR;
-                                    
-                                    Tuple3<String, Integer, Integer> unlockItem = BlockChain.LOCKED__ADDRESSES_PERIOD
-                                            .get(this.creator.getAddress());
-                                    if (unlockItem != null && unlockItem.b > height && height < unlockItem.c
-                                            && !this.recipient.equals(unlockItem.a))
-                                        return INVALID_CREATOR;
-                                    
-                                }
                             }
-                            
+
+                            if (height > BlockChain.FREEZE_FROM) {
+                                String unlock = BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress());
+                                if (unlock != null && !this.recipient.equals(unlock))
+                                    return INVALID_CREATOR;
+
+                                Tuple3<String, Integer, Integer> unlockItem = BlockChain.LOCKED__ADDRESSES_PERIOD
+                                        .get(this.creator.getAddress());
+                                if (unlockItem != null && unlockItem.b > height && height < unlockItem.c
+                                        && !this.recipient.equals(unlockItem.a))
+                                    return INVALID_CREATOR;
+
+                            }
+
                             break;
                         
                         case ACTION_SPEND: // PRODUCE - SPEND
