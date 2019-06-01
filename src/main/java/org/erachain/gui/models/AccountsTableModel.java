@@ -11,6 +11,7 @@ import javax.validation.constraints.Null;
 
 import org.erachain.gui.ObserverWaiter;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
 import org.erachain.controller.Controller;
@@ -111,18 +112,27 @@ public class AccountsTableModel extends TimerTableModelCls<PublicKeyAccount> imp
         return null;
     }
 
-    public BigDecimal getTotalBalance() {
-        BigDecimal totalBalance = BigDecimal.ZERO;
+    public Tuple4<BigDecimal, BigDecimal, BigDecimal, BigDecimal> getTotalBalance() {
 
+        if (this.asset == null)
+            return new Tuple4(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+
+        BigDecimal totalBalance1 = BigDecimal.ZERO;
+        BigDecimal totalBalance2 = BigDecimal.ZERO;
+        BigDecimal totalBalance3 = BigDecimal.ZERO;
+        BigDecimal totalBalance4 = BigDecimal.ZERO;
+
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance;
         for (Account account : this.list) {
-            if (this.asset == null) {
-                totalBalance = totalBalance.add(account.getBalanceUSE(Transaction.FEE_KEY));
-            } else {
-                totalBalance = totalBalance.add(account.getBalanceUSE(assetKey));
-            }
+            balance = account.getBalance(assetKey);
+
+            totalBalance1 = totalBalance1.add(balance.a.b);
+            totalBalance2 = totalBalance2.add(balance.b.b);
+            totalBalance3 = totalBalance3.add(balance.c.b);
+            totalBalance4 = totalBalance4.add(balance.d.b);
         }
 
-        return totalBalance;
+        return new Tuple4(totalBalance1, totalBalance2, totalBalance3, totalBalance4);
     }
 
     @Override
