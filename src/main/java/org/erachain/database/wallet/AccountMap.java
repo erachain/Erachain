@@ -52,7 +52,7 @@ public class AccountMap extends DBMap <String, Integer> {
                 .makeOrGet();
 
         this.assetsBalanceMap = database.getTreeMap(ADDRESS_ASSETS);
-        return database.getHashMap(ADDRESSES_NO);
+        return database.getTreeMap(ADDRESSES_NO);
     }
 
     @Override

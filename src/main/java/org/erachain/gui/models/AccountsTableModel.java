@@ -34,12 +34,13 @@ public class AccountsTableModel extends TimerTableModelCls<PublicKeyAccount> imp
     public static final int COLUMN_FEE_BALANCE = 7;
     public final int COLUMN_NO = 0;
     private AssetCls asset;
+    private Long assetKey;
     private Account account;
 
     public AccountsTableModel() {
         super(Controller.getInstance().wallet.database.getAccountMap(),
                 new String[]{"No.", "Account", "Name",
-                        "Balance 1", "Balance 2", "Balance 3", "Balance 4", AssetCls.FEE_NAME},
+                        "Balance 1 (OWN)", "Balance 2 (DEBT)", "Balance 3 (HOLD)", "Balance 4 (SPEND)", AssetCls.FEE_NAME},
                 new Boolean[]{true, false, false, false, false, false, false, false}, false);
 
         getInterval();
@@ -53,7 +54,11 @@ public class AccountsTableModel extends TimerTableModelCls<PublicKeyAccount> imp
 
     public void setAsset(AssetCls asset) {
         this.asset = asset;
-        this.fireTableDataChanged();
+        assetKey = asset.getKey(DCSet.getInstance());
+
+        fireTableDataChanged();
+        needUpdate = false;
+
     }
 
     @Override
@@ -64,9 +69,7 @@ public class AccountsTableModel extends TimerTableModelCls<PublicKeyAccount> imp
 
         account = list.get(row);
 
-
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance;
-        //Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfBalance;
         String str;
 
         switch (column) {
@@ -83,22 +86,22 @@ public class AccountsTableModel extends TimerTableModelCls<PublicKeyAccount> imp
 
             case COLUMN_BALANCE_1:
                 if (this.asset == null) return "-";
-                balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
+                balance = account.getBalance(assetKey);
                 str = NumberAsString.formatAsString(balance.a.b.setScale(asset.getScale()));
                 return str;
             case COLUMN_BALANCE_2:
                 if (this.asset == null) return "-";
-                balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
+                balance = account.getBalance(assetKey);
                 str = NumberAsString.formatAsString(balance.b.b.setScale(asset.getScale()));
                 return str;
             case COLUMN_BALANCE_3:
                 if (this.asset == null) return "-";
-                balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
+                balance = account.getBalance(assetKey);
                 str = NumberAsString.formatAsString(balance.c.b.setScale(asset.getScale()));
                 return str;
             case COLUMN_BALANCE_4:
                 if (this.asset == null) return "-";
-                balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
+                balance = account.getBalance(assetKey);
                 str = NumberAsString.formatAsString(balance.d.b.setScale(asset.getScale()));
                 return str;
             case COLUMN_FEE_BALANCE:
@@ -115,7 +118,7 @@ public class AccountsTableModel extends TimerTableModelCls<PublicKeyAccount> imp
             if (this.asset == null) {
                 totalBalance = totalBalance.add(account.getBalanceUSE(Transaction.FEE_KEY));
             } else {
-                totalBalance = totalBalance.add(account.getBalanceUSE(this.asset.getKey(DCSet.getInstance())));
+                totalBalance = totalBalance.add(account.getBalanceUSE(assetKey));
             }
         }
 
