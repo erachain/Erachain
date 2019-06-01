@@ -271,9 +271,9 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                     return;
 
                 if (Controller.getInstance().isAddressIsMine(order.getCreator().getAddress()))
-                    sellOrdersMenu.getComponent(1).setEnabled(true);
+                    sellOrdersMenu.getComponent(2).setEnabled(true);
                 else
-                    sellOrdersMenu.getComponent(1).setEnabled(false);
+                    sellOrdersMenu.getComponent(2).setEnabled(false);
 
                 if (e.getClickCount() == 2) {
 
@@ -316,12 +316,12 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                     return;
 
                 if (Controller.getInstance().isAddressIsMine(order.getCreator().getAddress()))
-                    buyOrdersMenu.getComponent(1).setEnabled(true);
+                    buyOrdersMenu.getComponent(2).setEnabled(true);
                 else
-                    buyOrdersMenu.getComponent(1).setEnabled(false);
+                    buyOrdersMenu.getComponent(2).setEnabled(false);
 
                 if (e.getClickCount() == 2) {
-                    sellOrderPanel.txtAmountHave.setText(order.getAmountWant().toPlainString());
+                    sellOrderPanel.txtAmountHave.setText(order.getAmountWantLeft().toPlainString());
                     // MAKE BIG SCALE
                     sellOrderPanel.txtPrice.setText(Order.calcPrice(order.getAmountWant(), order.getAmountHave(), 2).toPlainString());
                 }
