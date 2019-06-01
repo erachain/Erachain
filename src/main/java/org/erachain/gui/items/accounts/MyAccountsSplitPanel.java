@@ -50,7 +50,7 @@ public class MyAccountsSplitPanel extends SplitPanel {
     @Override
     public void onClose() {
         rightPanel.table_Model.deleteObservers();
-        accountPanel.tableModel.deleteObserver();
+        accountPanel.tableModel.deleteObservers();
         Controller.getInstance().deleteObserver(accountPanel.reload_Button);
         Controller.getInstance().deleteObserver(accountPanel.newAccount_Button);
     }
@@ -63,7 +63,7 @@ public class MyAccountsSplitPanel extends SplitPanel {
             AssetCls asset = (AssetCls) accountPanel.cbxFavorites.getSelectedItem();
             Account account = null;
             if (accountPanel.table.getSelectedRow() >= 0)
-                account = accountPanel.tableModel.getAccount(accountPanel.table.convertRowIndexToModel(accountPanel.table.getSelectedRow()));
+                account = accountPanel.tableModel.getItem(accountPanel.table.convertRowIndexToModel(accountPanel.table.getSelectedRow()));
             if (account == null) return;
             if(asset == null)return;
             if (account.equals(selecArg) && asset.equals(assetSelect)) return;
