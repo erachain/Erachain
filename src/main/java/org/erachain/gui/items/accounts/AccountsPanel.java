@@ -179,56 +179,31 @@ public class AccountsPanel extends JPanel // implements ItemListener
 
 
         //ADD TOTAL BALANCE
-        Fun.Tuple4<BigDecimal, BigDecimal, BigDecimal, BigDecimal> total = tableModel.getTotalBalance();
-        final JLabel totalBalance = new JLabel(Lang.getInstance().translate("Confirmed Balance") + ": "
-                + total.a.toPlainString() + " "
-                + total.b.toPlainString() + " "
-                + total.c.toPlainString() + " "
-                + total.d.toPlainString() + " ");
+        final JLabel totalBalance = new JLabel(getTotals());
         this.add(totalBalance, buttonGBC);
 
         //ON TABLE CHANGE
         table.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent arg0) {
-                totalBalance.setText(Lang.getInstance().translate("Confirmed Balance") + ": " + NumberAsString.formatAsString(tableModel.getTotalBalance()));
+                totalBalance.setText(getTotals());
             }
         });
 
         //ADD ACCOUNTS TABLE
         this.add(new JScrollPane(table), tableGBC);
 
-		/*
-		//ADD NEW ACCOUNT BUTTON
-		buttonGBC.gridy++;
-		JButton newButton = new JButton(Lang.getInstance().translate("New account"));
-		newButton.setPreferredSize(new Dimension(150, 25));
-		newButton.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-		        onNewClick();
-		    }
-		});	
-		this.add(newButton, buttonGBC);
-		*/
-
     }
 	
-	
-/*	
-	@Override
-	public void itemStateChanged(ItemEvent e) 
-	{
-		
-		if(e.getStateChange() == ItemEvent.SELECTED) 
-		{		
-			AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-        	tableModel.setAsset(asset);  
-		} 
-	}
-*/
-    // set select in Favorites to FEE asset
 
+    private String getTotals() {
+        Fun.Tuple4<BigDecimal, BigDecimal, BigDecimal, BigDecimal> total = tableModel.getTotalBalance();
+        return Lang.getInstance().translate("Confirmed Balance") + ": "
+                + total.a.toPlainString() + " / "
+                + total.b.toPlainString() + " / "
+                + total.c.toPlainString() + " / "
+                + total.d.toPlainString();
+
+    }
 
 }
