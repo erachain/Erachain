@@ -224,6 +224,11 @@ public abstract class ItemCls implements ExplorerJsonLine {
         }
     }
 
+    public static String getItemTypeStr(int itemType) {
+        return "@" + getItemTypeChar(itemType);
+    }
+
+
     public long getHeight(DCSet db) {
         //INSERT INTO DATABASE
         ItemMap dbMap = this.getDBMap(db);
@@ -385,9 +390,27 @@ public abstract class ItemCls implements ExplorerJsonLine {
         //+ (creator.length()==0?"": " (" +creator + ")");
     }
 
-
     public String toString(DCSet db, byte[] data) {
         String str = this.toString(db);
+
+        Tuple6<Long, Long, byte[], byte[], Long, byte[]> tuple = RSetStatusToItem.unpackData(data);
+
+        if (str.contains("%1") && tuple.a != null)
+            str = str.replace("%1", tuple.a.toString());
+        if (str.contains("%2") && tuple.b != null)
+            str = str.replace("%2", tuple.b.toString());
+        if (str.contains("%3") && tuple.c != null)
+            str = str.replace("%3", new String(tuple.c, Charset.forName("UTF-8")));
+        if (str.contains("%4") && tuple.d != null)
+            str = str.replace("%4", new String(tuple.d, Charset.forName("UTF-8")));
+        if (str.contains("%D") && tuple.f != null)
+            str = str.replace("%D", new String(new String(tuple.f, Charset.forName("UTF-8"))));
+
+        return str;
+    }
+
+    public String toStringNoKey(byte[] data) {
+        String str = name;
 
         Tuple6<Long, Long, byte[], byte[], Long, byte[]> tuple = RSetStatusToItem.unpackData(data);
 
