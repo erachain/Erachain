@@ -365,6 +365,18 @@ public abstract class AssetCls extends ItemCls {
     @Override
     public byte[] getIcon() {
         switch ((int) (long) key) {
+            case 1:
+                try {
+                    icon = Files.readAllBytes(Paths.get("images/icons/assets/ERA.png"));
+                } catch (Exception e) {
+                }
+                return icon;
+            case 2:
+                try {
+                    icon = Files.readAllBytes(Paths.get("images/icons/assets/COMPU.png"));
+                } catch (Exception e) {
+                }
+                return icon;
             case 92:
                 try {
                     icon = Files.readAllBytes(Paths.get("images/icons/assets/RUB.png"));
