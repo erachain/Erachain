@@ -478,8 +478,8 @@ public abstract class ItemCls implements ExplorerJsonLine {
         JSONObject itemJSON = new JSONObject();
 
         // ADD DATA
-        itemJSON.put("icon", Base58.encode(this.icon));
-        itemJSON.put("image", Base58.encode(this.image));
+        itemJSON.put("icon", Base58.encode(this.getIcon()));
+        itemJSON.put("image", Base58.encode(this.getImage()));
 
         return itemJSON;
     }
@@ -514,7 +514,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
         }
 
         if (icon != null)
-            json.put("icon", Base64.encodeBase64String(icon));
+            json.put("icon", Base64.encodeBase64String(getIcon()));
 
         return json;
     }
