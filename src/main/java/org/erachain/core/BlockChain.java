@@ -34,7 +34,7 @@ public class BlockChain {
     //public static final int START_LEVEL = 1;
 
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = true;
+    public static final boolean DEVELOP_USE = false;
     public static final boolean HARD_WORK = false;
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
@@ -168,7 +168,7 @@ public class BlockChain {
     public static final int AMOUNT_SCALE_FROM = DEVELOP_USE ? 1034 : 1033;
     public static final int AMOUNT_DEDAULT_SCALE = 8;
     public static final int TRADE_PRECISION = 5;
-    public static final int FREEZE_FROM = DEVELOP_USE ? 12980 : 248113;
+    public static final int FREEZE_FROM = DEVELOP_USE ? 12980 : 249113;
     // только на них можно замороженные средства вернуть из списка FOUNDATION_ADDRESSES (там же и замароженные из-за утраты)
     public static final String[] TRUE_ADDRESSES = new String[]{
             "7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"

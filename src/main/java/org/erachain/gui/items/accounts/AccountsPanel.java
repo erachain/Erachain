@@ -8,6 +8,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -33,6 +34,7 @@ import org.erachain.gui.models.AccountsTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.mapdb.Fun;
 
 @SuppressWarnings("serial")
 public class AccountsPanel extends JPanel // implements ItemListener
@@ -177,7 +179,12 @@ public class AccountsPanel extends JPanel // implements ItemListener
 
 
         //ADD TOTAL BALANCE
-        final JLabel totalBalance = new JLabel(Lang.getInstance().translate("Confirmed Balance") + ": " + tableModel.getTotalBalance().toPlainString());
+        Fun.Tuple4<BigDecimal, BigDecimal, BigDecimal, BigDecimal> total = tableModel.getTotalBalance();
+        final JLabel totalBalance = new JLabel(Lang.getInstance().translate("Confirmed Balance") + ": "
+                + total.a.toPlainString() + " "
+                + total.b.toPlainString() + " "
+                + total.c.toPlainString() + " "
+                + total.d.toPlainString() + " ");
         this.add(totalBalance, buttonGBC);
 
         //ON TABLE CHANGE

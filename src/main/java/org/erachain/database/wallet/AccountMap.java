@@ -4,9 +4,10 @@ import com.google.common.primitives.UnsignedBytes;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.block.Block;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.database.DBMap;
 import org.erachain.utils.ObserverMessage;
-import org.mapdb.Atomic.Var;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
@@ -18,7 +19,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 // UNCONFIRMED balances for accounts in owner wallet only
-public class AccountMap extends Observable {
+public class AccountMap extends DBMap <String, Integer> {
 
     private static final String ADDRESS_ASSETS = "address_assets";
     private static final String ADDRESSES = "addresses";
@@ -27,53 +28,49 @@ public class AccountMap extends Observable {
     private Map<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalanceMap;
     private Set<byte[]> publickKeys;
 
-    // nom account from create. if <0 - not show
-    private Map<String, Integer> acountsNoMap;
-
-    //private List<Account> accounts;
-    //private List<PublicKeyAccount> publickKeys;
-
     public AccountMap(DWSet dWSet, DB database) {
-        //this.publickKeys = new ArrayList<PublicKeyAccount>();
-        //OPEN MAP
-        //this.publickKeys = database.getHashSet(ADDRESSES);
+        super(dWSet, database);
+
+        if (databaseSet.isWithObserver()) {
+            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_ALL_ACCOUNT_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_ALL_ACCOUNT_TYPE);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_ACCOUNT_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_ACCOUNT_TYPE);
+        }
+
+    }
+
+    @Override
+    protected void createIndexes(DB database) {
+    }
+
+    @Override
+    protected Map<String, Integer> getMap(DB database) {
         this.publickKeys = database.createTreeSet(ADDRESSES)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .serializer(BTreeKeySerializer.BASIC)
                 .makeOrGet();
 
         this.assetsBalanceMap = database.getTreeMap(ADDRESS_ASSETS);
-        this.acountsNoMap = database.getTreeMap(ADDRESSES_NO);
-
+        return database.getTreeMap(ADDRESSES_NO);
     }
 
-	/*
-	private void loadPublickKeys()
-	{
-		//RESET ACCOUNTS LIST
-		this.publickKeys = new ArrayList<PublicKeyAccount>();
+    @Override
+    protected Map<String, Integer> getMemoryMap() {
+        return new TreeMap<String, Integer>();
+    }
 
-		synchronized(this.publickKeys)
-		{
+    @Override
+    protected Integer getDefaultValue() {
+        return null;
+    }
 
-			for(Tuple2<String, Long> item: this.assetsBalanceMap.keySet())
-			{
-				//CREATE ACCOUNT FROM ADDRESS
-				//Account account = new Account(item.a);
-
-				//ADD TO LIST
-				//this.publickKeys.add(account);
-			}
-		}
-	}
-	 */
 
     public List<Account> getAccounts() {
 
         List<Account> accounts = new ArrayList<Account>();
 
         synchronized (this.publickKeys) {
-
 
             for (byte[] publickKey : this.publickKeys) {
                 accounts.add(new PublicKeyAccount(publickKey));
@@ -131,22 +128,7 @@ public class AccountMap extends Observable {
     }
 
     public Account getAccount(String address) {
-
         return getPublicKeyAccount(address);
-		/*
-		synchronized(this.publickKeys)
-		{
-			for(PublicKeyAccount publickKey: this.publickKeys)
-			{
-				if(publickKey.getAddress().equals(address))
-				{
-					return publickKey;
-				}
-			}
-		}
-
-		return null;
-		 */
     }
 
     public PublicKeyAccount getPublicKeyAccount(String address) {
@@ -216,35 +198,6 @@ public class AccountMap extends Observable {
         return balance;
     }
 
-	/*
-	private BigDecimal getUnconfirmedBalance(String address, Long key)
-	{
-
-		int type = 1; // OWN
-		if (key < 0) {
-			type = 2; // RENT
-			key = -key;
-		}
-
-		Tuple2<String, Long> k = new Tuple2<String, Long>(address, key);
-
-		if(!this.assetsBalanceMap.containsKey(k))
-			return BigDecimal.ZERO;
-
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> value = this.assetsBalanceMap.get(k);
-		if (type == 1)
-			return value.a;
-		else if (type == 2)
-			return value.b;
-		else
-			return value.c;
-	}
-	public BigDecimal getUnconfirmedBalance(Account account, Long key)
-	{
-		return getUnconfirmedBalance(account.getAddress(), key);
-	}
-	 */
-
     private Tuple3<BigDecimal, BigDecimal, BigDecimal> getBalance(String address, Long key) {
 
         if (key < 0) {
@@ -263,16 +216,8 @@ public class AccountMap extends Observable {
         return getBalance(account.getAddress(), key);
     }
 
-	/*
-	public void add(PublicKeyAccount account, long key)
-	{
-		this.assetsBalanceMap.put(new Tuple2<String, Long>(account.getAddress(), key),
-				account.getConfirmedBalance(key));
-	}
-	 */
-
     // ADD AN PUBLIC KEY ACCOUNT in wallet
-    public void add(PublicKeyAccount account, int number) {
+    public void add(PublicKeyAccount account, Integer number) {
 
         synchronized (this.publickKeys) {
             if (!this.publickKeys.contains(account.getPublicKey())) {
@@ -280,73 +225,32 @@ public class AccountMap extends Observable {
                 if (number < 0) {
                     number = Controller.getInstance().wallet.getAccountNonce();
                 }
-                acountsNoMap.put(account.getAddress(), number);
-                this.setChanged();
-                this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
+
+                map.put(account.getAddress(), number);
 
             }
         }
     }
 
-    public int getAccountNo(String account) {
+    public Integer getAccountNo(String account) {
 
-        return acountsNoMap.get(account);
+        return map.get(account);
     }
-
-	/*
-	public void update(Account account, long key, Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfirmedBalance)
-	{
-		this.assetsBalanceMap.put(new Tuple2<String, Long>(account.getAddress(), key), unconfirmedBalance);
-
-		this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
-
-	}
-	public void update(Account account, long key, BigDecimal unconfirmedBalance)
-	{
-		int type = 1; // OWN
-		if (key < 0) {
-			type = 2; // RENT
-			key = -key;
-		}
-
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> value;
-
-		Tuple2<String, Long> k = new Tuple2<String, Long>(account.getAddress(), key);
-		if(!this.assetsBalanceMap.containsKey(k)) {
-			value =	new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO), BigDecimal.ZERO);
-		} else {
-			value = this.assetsBalanceMap.get(k);
-		}
-
-		if (type == 1)
-			value = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(unconfirmedBalance, value.b, value.c);
-		else if (type == 2)
-			value = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(value.a, unconfirmedBalance, value.c);
-		else
-			value = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(value.a, value.b, unconfirmedBalance);
-
-
-		this.assetsBalanceMap.put(k, value);
-
-		this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
-
-	}
-	 */
 
     // delete all assets for this account
     public void delete(PublicKeyAccount account) {
 
-        // TODO - its work?
         Map<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> keys = ((BTreeMap) this.assetsBalanceMap).subMap(
                 //BTreeMap keys = ((BTreeMap) this.assetsBalanceMap).subMap(
                 Fun.t2(account.getAddress(), null),
                 Fun.t2(account.getAddress(), Fun.HI()));
-		/*
+
+        /*
 		if(this.publickKeys == null)
 		{
 			this.loadPublickKeys();
 		}
-		 */
+		*/
 
         synchronized (this.publickKeys) {
             //DELETE NAMES
@@ -357,19 +261,16 @@ public class AccountMap extends Observable {
 
             this.publickKeys.remove(account.getPublicKey());
 
-            this.notifyObservers(new ObserverMessage(ObserverMessage.REMOVE_ACCOUNT_TYPE, account));
         }
     }
 
     public void reset() {
         synchronized (this.publickKeys) {
             this.publickKeys.clear();
-            this.acountsNoMap.clear();
             this.assetsBalanceMap.clear();
-        }
 
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.RESET_ALL_ACCOUNT_TYPE, this));
+            this.map.clear();
+        }
 
     }
 
