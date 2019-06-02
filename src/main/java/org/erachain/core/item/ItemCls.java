@@ -200,6 +200,30 @@ public abstract class ItemCls implements ExplorerJsonLine {
         return this.key;
     }
 
+    public static String getItemTypeChar(int itemType) {
+        switch (itemType) {
+            case ItemCls.ASSET_TYPE:
+                return "A";
+            case ItemCls.IMPRINT_TYPE:
+                return "I";
+            case ItemCls.PERSON_TYPE:
+                return "P";
+            case ItemCls.POLL_TYPE:
+                return "O"; // Opinion
+            case ItemCls.UNION_TYPE:
+                return "U";
+            case ItemCls.STATEMENT_TYPE:
+                return "T"; // TeXT
+            case ItemCls.STATUS_TYPE:
+                return "S";
+            case ItemCls.TEMPLATE_TYPE:
+                return "E"; // exDATA
+            default:
+                return "x";
+
+        }
+    }
+
     public long getHeight(DCSet db) {
         //INSERT INTO DATABASE
         ItemMap dbMap = this.getDBMap(db);

@@ -43,7 +43,10 @@ public class DCSet extends DBASet implements Observer {
     private volatile static DCSet instance;
     private DCSet parent;
 
-    public static String SPLIT_CHARS = "[!?/_., \\-~`+&^@#№%*()<>\\\"\\'|\\[\\]{}=;:\\\\]";
+    // % и @ и # - пусть они будут служебные и по ним не делать разделения
+    // так чтобы можно было найти @P указатель на персон например
+    // % - это указатель на параметр например иак - %1
+    public static String SPLIT_CHARS = "[!?/_., \\-~`+&^№*()<>\\\"\\'|\\[\\]{}=;:\\\\]";
 
     private boolean inMemory = false;
 
