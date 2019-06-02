@@ -10,6 +10,11 @@ import org.erachain.datachain.ItemMap;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 
+import javax.swing.*;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 
 // 1019 - Movable = true; Divisible = NO; Quantity = 1
 public abstract class AssetCls extends ItemCls {
@@ -355,6 +360,33 @@ public abstract class AssetCls extends ItemCls {
 
     public int getAssetType() {
         return this.assetType;
+    }
+
+    @Override
+    public byte[] getIcon() {
+        switch ((int) (long) key) {
+            case 92:
+                try {
+                    icon = Files.readAllBytes(Paths.get("images/icons/assets/RUB.png"));
+                } catch (Exception e) {
+                }
+                return icon;
+            case 95:
+                try {
+                    icon = Files.readAllBytes(Paths.get("images/icons/assets/USD.png"));
+                } catch (Exception e) {
+                }
+                return icon;
+        }
+        return icon;
+    }
+
+    @Override
+    public byte[] getImage() {
+        if (key < 1000)
+            return null;
+
+        return image;
     }
 
     public boolean isMovable() {
