@@ -2005,10 +2005,22 @@ button.white-bgc[disabled]:focus,
                 '<td><b>' + data.Label_TXs +
                 '<td><b>' + data.Label_Fee;
 
+            var dtWV;
+            var abs;
             //Отображение таблицы элементов блоков
             //var length = Object.keys(data.pageItems).length;
             //for (var i = 0; i < length - 1; i++) {
             for (var i in data.pageItems) {
+                dtWV = (data.pageItems[i].winValueTargeted - 100000) * 0.001;
+                abs = Math.abs(dtWV);
+                if (abs < 1) {
+                    dtWV = dtWV.toFixed(3);
+                } else if (abs > 100) {
+                    dtWV = dtWV.toFixed(0);
+                } else {
+                    dtWV = dtWV.toPrecision(3);
+                }
+
                 output += '<tr>' +
                     '<td><a href=?block=' + data.pageItems[i].height + get_lang() + '>' + data.pageItems[i].height + '</a>' +
                     '<td>' + addCommas(data.pageItems[i].target) +
@@ -2017,7 +2029,9 @@ button.white-bgc[disabled]:focus,
                     '<td>' + addCommas(data.pageItems[i].generatingBalance) +
                     '<td>' + data.pageItems[i].deltaHeight +
                     '<td>' + addCommas(data.pageItems[i].winValue) +
-                    '<td>' + addCommas(data.pageItems[i].winValueTargeted) + '%' +
+
+                    '<td>' + dtWV + '%' +
+
                     '<td>' + data.pageItems[i].transactionsCount +
                     '<td>' + addCommas(data.pageItems[i].totalFee);
             }
