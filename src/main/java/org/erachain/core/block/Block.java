@@ -379,7 +379,9 @@ public class Block implements ExplorerJsonLine {
         loadHeadMind(DCSet.getInstance());
         blockJSON.put("totalFee", viewFeeAsBigDecimal());
         Tuple2<Integer, Integer> forgingPoint = blockHead.creator.getForgingData(DCSet.getInstance(), heightBlock);
-        blockJSON.put("deltaHeight", blockHead.heightBlock - forgingPoint.a);
+        if (forgingPoint != null) {
+            blockJSON.put("deltaHeight", blockHead.heightBlock - forgingPoint.a);
+        }
         return blockJSON;
     }
 
