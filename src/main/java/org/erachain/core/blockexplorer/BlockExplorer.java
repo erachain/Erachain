@@ -285,6 +285,7 @@ public class BlockExplorer {
         output.put("id_menu_assets", Lang.getInstance().translateFromLangObj("Assets", langObj));
         output.put("id_menu_aTs", Lang.getInstance().translateFromLangObj("ATs", langObj));
         output.put("id_menu_transactions", Lang.getInstance().translateFromLangObj("Transactions", langObj));
+        output.put("id_menu_exchange", Lang.getInstance().translateFromLangObj("Exchange", langObj));
 
         //информация о последнем блоке
         output.put("lastBlock", jsonLastBlock());
@@ -296,6 +297,10 @@ public class BlockExplorer {
                 output.put("type", type);
                 output.put("search_message", search);
                 switch (type) {
+                    case "exchange":
+                        //search exchange
+                        jsonQueryExchange(search, (int) start);
+                        break;
                     case "transactions":
                         //search transactions
                         jsonQueryTransactions(search, (int) start);
@@ -432,6 +437,11 @@ public class BlockExplorer {
         //peers
         else if (info.getQueryParameters().containsKey("peers")) {
             output.putAll(jsonQueryPeers(info));
+        }
+
+        // Exchange
+        else if (info.getQueryParameters().containsKey("exchange")) {
+            jsonQueryExchange(null, (int)start);
         }
 
         ///////////////////////////// ADDRESSES //////////////////////
@@ -2210,6 +2220,56 @@ public class BlockExplorer {
         }
 
         return output;
+    }
+
+    @SuppressWarnings({"serial", "static-access"})
+    public void jsonQueryExchange(String filterStr, int start) {
+
+        output.put("type", "exchange");
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching asset keys", langObj));
+
+        List<Pair<Long, Long>> list = new ArrayList<>();
+
+        list.add(new Pair<Long, Long>(1l, 2l));
+        list.add(new Pair<Long, Long>(12l, 95l));
+        list.add(new Pair<Long, Long>(14l, 12l));
+
+        OrderMap map = dcSet.getOrderMap();
+
+        Map pairsJSON = new LinkedHashMap();
+
+        for (Pair<Long, Long> pair : list) {
+
+            AssetCls assetHave = Controller.getInstance().getAsset(pair.getA());
+            AssetCls assetWant = Controller.getInstance().getAsset(pair.getB());
+
+            Map pairJSON = new LinkedHashMap();
+            pairJSON.put("have", assetHave.jsonForExplorerPage(langObj));
+            pairJSON.put("want", assetWant.jsonForExplorerPage(langObj));
+            pairJSON.put("orders", map.getCount(pair.getA(), pair.getB()));
+        }
+
+        ///makePage(type, keys, start, pageSize, result, langObj);
+
+        output.put("pairs", pairsJSON);
+        output.put("label_Asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
+        output.put("label_Key", Lang.getInstance().translateFromLangObj("Key", langObj));
+        output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        output.put("label_Description", Lang.getInstance().translateFromLangObj("Description", langObj));
+        output.put("label_Scale", Lang.getInstance().translateFromLangObj("Accuracy", langObj));
+        output.put("label_AssetType", Lang.getInstance().translateFromLangObj("TYPE", langObj));
+        output.put("label_Quantity", Lang.getInstance().translateFromLangObj("Quantity", langObj));
+        output.put("label_Holders", Lang.getInstance().translateFromLangObj("Holders", langObj));
+        output.put("label_Available_pairs", Lang.getInstance().translateFromLangObj("Available pairs", langObj));
+        output.put("label_Pair", Lang.getInstance().translateFromLangObj("Pair", langObj));
+        output.put("label_Orders_Count", Lang.getInstance().translateFromLangObj("Orders Count", langObj));
+        output.put("label_Open_Orders_Volume",
+                Lang.getInstance().translateFromLangObj("Open Orders Volume", langObj));
+        output.put("label_Trades_Count", Lang.getInstance().translateFromLangObj("Trades Count", langObj));
+        output.put("label_Trades_Volume", Lang.getInstance().translateFromLangObj("Trades Volume", langObj));
+        output.put("label_Total", Lang.getInstance().translateFromLangObj("Total", langObj));
+        output.put("label_View", Lang.getInstance().translateFromLangObj("View", langObj));
+
     }
 
     @SuppressWarnings({"serial", "static-access"})

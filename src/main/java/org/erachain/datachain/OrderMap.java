@@ -145,6 +145,15 @@ public class OrderMap extends DCMap<Long, Order> {
         return null;
     }
 
+    public long getCount(long have, long want) {
+
+        long size = ((BTreeMap<Tuple4, Long>) this.haveWantKeyMap).subMap(
+                Fun.t4(have, want, null, null),
+                Fun.t4(have, want, Fun.HI(), Fun.HI())).size();
+
+        return size;
+    }
+
     // GET KEYs with FORKED rules
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected List<Long> getSubKeysWithParent(long have, long want) {
