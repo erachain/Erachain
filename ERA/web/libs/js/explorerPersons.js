@@ -226,11 +226,11 @@ function persons(data) {
         output += '<tr>';
         output += ' <td><img src="personimage?key=' + item.key + '" width="100"/></td>';
         output += '<td>' + item.key + '<td><a href=?person=' +
-            item.key + get_lang() + '>' + item.name + '</a>';
-        output += '<td>' + item.description.substr(0, 100) + '</td>';
+            item.key + get_lang() + '>' + escapeHtml(item.name) + '</a>';
+        output += '<td>' + escapeHtml(item.description.substr(0, 100)) + '</td>';
         output += '<td><a href=?address=' + item.owner + get_lang() + '>';
         if (item.hasOwnProperty('person'))
-            output += '[' + item.person_key + ']' + htmlFilter(item.person);
+            output += '[' + item.person_key + ']' + escapeHtml(item.person);
         else
             output += item.owner;
         output += '</a>';

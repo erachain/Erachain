@@ -482,14 +482,14 @@ button.white-bgc[disabled]:focus,
 
         function getAssetName(assetKey, assetName) {
             if (assetKey == 2) {
-                return htmlFilter(assetName);
+                return escapeHtml(assetName);
             } else {
-                return '(' + assetKey + ')' + htmlFilter(assetName);
+                return '(' + assetKey + ')' + escapeHtml(assetName);
             }
         }
 
         function getAssetName2(assetKey, assetName) {
-            return '[' + assetKey + '] ' + htmlFilter(assetName);
+            return '[' + assetKey + '] ' + escapeHtml(assetName);
         }
 
         function addCommas(str) {
@@ -539,7 +539,7 @@ button.white-bgc[disabled]:focus,
                 output += '<br><b>AT Type:</b> ' + data.aTs[key].type;
 
                 output += '<br><b>Description:</b> ' + fformat(data.aTs[key].description);
-                output += '<br><b>Tags:</b> ' + htmlFilter(wordwrap(data.aTs[key].tags, 80, '\n', true));
+                output += '<br><b>Tags:</b> ' + escapeHtml(wordwrap(data.aTs[key].tags, 80, '\n', true));
                 //output += '<br><b>Dead:</b> ' + data.aTs[key].state.dead;
                 //output += '<br><b>Frozen:</b> ' + data.aTs[key].state.frozen;
                 output += '</td>';
@@ -758,7 +758,7 @@ button.white-bgc[disabled]:focus,
             for (key in data.pools) {
                 table += '<tr>';
 
-                table += '<td>' + htmlFilter(key);
+                table += '<td>' + escapeHtml(key);
                 if (data.pools[key].new) {
                     table += ' <b>New!</b>';
                 }
@@ -812,7 +812,7 @@ button.white-bgc[disabled]:focus,
 
             output += '<table width="" border=0><tr><td align=left><br>';
 
-            output += '<font size=+1><b>Poll:</b> <a href=?poll=' + encodeURIComponent(data.pool.name) + get_lang() + '>' + htmlFilter(data.pool.name) + '</a></font><br><br>';
+            output += '<font size=+1><b>Poll:</b> <a href=?poll=' + encodeURIComponent(data.pool.name) + get_lang() + '>' + escapeHtml(data.pool.name) + '</a></font><br><br>';
 
             output += '<b>Description:</b><br>' + fformat(data.pool.description) + '<br><br>';
 
@@ -827,7 +827,7 @@ button.white-bgc[disabled]:focus,
 
             for (key in data.pool.options) {
                 output += '<tr>';
-                output += '<td>' + htmlFilter(key);
+                output += '<td>' + escapeHtml(key);
                 output += '<td>' + addCommas(data.pool.options[key]);
 
                 if (data.pool.totalVotes != '0.00000000') {
@@ -855,7 +855,7 @@ button.white-bgc[disabled]:focus,
             for (key in data.pool.votes) {
                 output += '<tr>';
                 output += '<td>' + '<a href=?address=' + key + get_lang() + '>' + key + '</a>';
-                output += '<td>' + htmlFilter(data.pool.votes[key].option);
+                output += '<td>' + escapeHtml(data.pool.votes[key].option);
                 output += '<td>' + addCommas(data.pool.votes[key].votes);
             }
             output += '</table>';
@@ -971,7 +971,7 @@ button.white-bgc[disabled]:focus,
                     output += '<br><font color=black>' + addCommas(data.asset.pairs[key].tradesPriceVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
                 }
 
-                output += '<td>' + fformat(data.asset.pairs[key].description);
+                output += '<td>' + escapeHtml(data.asset.pairs[key].description.substr(0, 100));
             }
             output += '<tr><td><b>' + data.asset.label_Total + ':';
             output += '<td>' + data.asset.totalOpenOrdersCount;
@@ -1320,7 +1320,7 @@ button.white-bgc[disabled]:focus,
                 url = '?person=' + data.name + allOnOnePage;
 
                 output += '<table width="1280" border=0><tr><td align=left>';
-                output += '<font size="+1">Person: <a href=?name=' + encodeURIComponent(data.name) + get_lang() + '>' + htmlFilter(data.name) + '</a></font>';
+                output += '<font size="+1">Person: <a href=?name=' + encodeURIComponent(data.name) + get_lang() + '>' + escapeHtml(data.name) + '</a></font>';
 
                 output += '<br><br>';
             } else
@@ -1338,7 +1338,7 @@ button.white-bgc[disabled]:focus,
                 url = '?name=' + data.name + allOnOnePage;
 
                 output += '<table width="1280" border=0><tr><td align=left>';
-                output += '<font size="+1">Name: <a href=?name=' + encodeURIComponent(data.name) + get_lang() + '>' + htmlFilter(data.name) + '</a></font>';
+                output += '<font size="+1">Name: <a href=?name=' + encodeURIComponent(data.name) + get_lang() + '>' + escapeHtml(data.name) + '</a></font>';
 
                 output += '<br><br>';
             }
@@ -2085,13 +2085,13 @@ button.white-bgc[disabled]:focus,
                 if (item.icon.length > 0)
                     output += '<img src="data:image/gif;base64,' + item.icon + '" width="30" /> ';
 
-                output += htmlFilter(item.name);
+                output += escapeHtml(item.name);
                 output += '</a>';
-                output += '<td>' + htmlFilter(item.description.substr(0, 60));
+                output += '<td>' + escapeHtml(item.description.substr(0, 60));
 
                 output += '<td><a href=?address=' + item.owner + get_lang() + '>';
                 if (item.hasOwnProperty('person'))
-                    output += '[' + item.person_key + ']' + htmlFilter(item.person);
+                    output += '[' + item.person_key + ']' + escapeHtml(item.person);
                 else
                     output += item.owner;
                 output += '</a></td>';
