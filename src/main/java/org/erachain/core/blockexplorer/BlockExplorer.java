@@ -2238,6 +2238,8 @@ public class BlockExplorer {
 
         Map pairsJSON = new LinkedHashMap();
 
+        JSONArray array = new JSONArray();
+
         for (Pair<Long, Long> pair : list) {
 
             AssetCls assetHave = Controller.getInstance().getAsset(pair.getA());
@@ -2246,12 +2248,15 @@ public class BlockExplorer {
             Map pairJSON = new LinkedHashMap();
             pairJSON.put("have", assetHave.jsonForExplorerPage(langObj));
             pairJSON.put("want", assetWant.jsonForExplorerPage(langObj));
-            pairJSON.put("orders", map.getCount(pair.getA(), pair.getB()));
+            pairJSON.put("orders", map.getCount(pair.getA(), pair.getB())
+                    + map.getCount(pair.getB(), pair.getA()));
+
+            array.add(pairJSON);
         }
 
-        ///makePage(type, keys, start, pageSize, result, langObj);
+        //makePage(type, keys, start, pageSize, result, langObj);
 
-        output.put("pairs", pairsJSON);
+        output.put("pairs", array);
         output.put("label_Asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
         output.put("label_Key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));

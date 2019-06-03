@@ -12,11 +12,6 @@ function exchange(data){
     output += lastBlock(data.lastBlock);
     var start = data.start;
 
-    if (!notDisplayPages) {
-        //Отображение компонента страниц(вверху)
-        //output += pagesComponentBeauty(start, data.Label_Statuses, data.numberLast, numberShiftDelta, 'start');
-        output += pagesComponent2(data);
-    }
     output += '<table width="1280" border=0><tr><td align=left><br>';
     output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd;">';
     output += '<thead><tr><td><b>'+ data.label_table_key  +': ' +
@@ -24,25 +19,15 @@ function exchange(data){
         '</b></td><td><b>' + data.label_table_creator + '</b></td></tr></thead>';
 
     //Отображение таблицы элементов статусов
-    for (var i in data.pageItems) {
-        var item = data.pageItems[i];
-        output += '<tr><td><a href="?status=' + item.key + get_lang() + '">' + item.key + ': ';
-        output += '<b>' + escapeHtml(item.name) + '</b></a></td>';
-        output += '<td>' + escapeHtml(item.description.substr(0, 100)) + '</td>';
+    for (var i in data.pairs) {
+        var item = data.pairs[i];
+        output += '<tr><td><a href="?asset=' + item.have.key + get_lang() + '">' + item.have.key + ': ';
+        output += '<b>' + getAssetName2(item.have.key, item.have.name) + '</b></a>';
+        output += '<td><a href="?asset=' + item.want.key + get_lang() + '">' + item.want.key + ': ';
+        output += '<b>' + getAssetName2(item.want.key, item.want.name) + '</b></a></td>';
+        output += '<td>' + item.orders;
 
-        output += '<td><a href=?address=' + item.owner + get_lang() + '>';
-        if (item.hasOwnProperty('person'))
-            output += '[' + item.person_key + ']' + escapeHtml(item.person);
-        else
-            output += item.owner;
-        output += '</a></td></tr>';
-    }
-    if (!notDisplayPages) {
-        //Отображение ссылки предыдущая
-        output += '</table></td></tr></table>';
-        //Отображение компонента страниц(снизу)
-        //output += pagesComponentBeauty(start, data.Label_Statuses, data.numberLast, numberShiftDelta, 'start');
-        output += pagesComponent2(data);
+        output += '</tr>';
     }
 
     return output;

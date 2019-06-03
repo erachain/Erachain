@@ -485,15 +485,17 @@ button.white-bgc[disabled]:focus,
         }
 
         function getAssetName(assetKey, assetName) {
-            if (assetKey == 2) {
-                return htmlFilter(assetName);
-            } else {
-                return '(' + assetKey + ')' + htmlFilter(assetName);
-            }
+            if (assetKey < 1000)
+                return escapeHtml(assetName);
+
+            return '(' + assetKey + ')' + escapeHtml(assetName);
         }
 
         function getAssetName2(assetKey, assetName) {
-            return '[' + assetKey + '] ' + htmlFilter(assetName);
+            if (assetKey < 1000)
+                return escapeHtml(assetName);
+
+            return '[' + assetKey + '] ' + escapeHtml(assetName);
         }
 
         function addCommas(str) {
