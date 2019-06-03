@@ -2796,12 +2796,17 @@ public class BlockExplorer {
 
                 } catch (ParseException e) {
 
+                    output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
+                    output.put("title", trans.getTitle());
                     output.put("statement", new String(trans.getData(), Charset.forName("UTF-8")));
 
                 }
             }
 
         } else {
+
+            output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
+            output.put("title", trans.getTitle());
 
             TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
             output.put("statement",
