@@ -55,7 +55,7 @@ public class MyLoansSplitPanel extends SplitPanel {
             AssetCls asset = (AssetCls) accountPanel.cbxFavorites.getSelectedItem();
             Account account = null;
             if (accountPanel.table.getSelectedRow() >= 0)
-                account = accountPanel.tableModel.getAccount(accountPanel.table.convertRowIndexToModel(accountPanel.table.getSelectedRow()));
+                account = accountPanel.tableModel.getItem(accountPanel.table.convertRowIndexToModel(accountPanel.table.getSelectedRow()));
             //info1.show_001(person);
             //	rightPanel.jTable1.Search_Accoutnt_Transaction_From_Asset(account, asset);
 //			my_Accounts_SplitPanel.rightPanel.jTable1.revalidate();

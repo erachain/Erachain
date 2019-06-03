@@ -185,7 +185,7 @@ public class DealsPopupMenu extends JPopupMenu {
                     return;
                 row = table.convertRowIndexToModel(row);
                 
-                pubKey = tableModel.getPublicKeyAccount(row);
+                pubKey = tableModel.getItem(row);
                 init();
 
             }

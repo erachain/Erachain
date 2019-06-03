@@ -8,6 +8,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -33,6 +34,7 @@ import org.erachain.gui.models.AccountsTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.mapdb.Fun;
 
 @SuppressWarnings("serial")
 public class AccountsPanel extends JPanel // implements ItemListener
@@ -177,51 +179,31 @@ public class AccountsPanel extends JPanel // implements ItemListener
 
 
         //ADD TOTAL BALANCE
-        final JLabel totalBalance = new JLabel(Lang.getInstance().translate("Confirmed Balance") + ": " + tableModel.getTotalBalance().toPlainString());
+        final JLabel totalBalance = new JLabel(getTotals());
         this.add(totalBalance, buttonGBC);
 
         //ON TABLE CHANGE
         table.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent arg0) {
-                totalBalance.setText(Lang.getInstance().translate("Confirmed Balance") + ": " + NumberAsString.formatAsString(tableModel.getTotalBalance()));
+                totalBalance.setText(getTotals());
             }
         });
 
         //ADD ACCOUNTS TABLE
         this.add(new JScrollPane(table), tableGBC);
 
-		/*
-		//ADD NEW ACCOUNT BUTTON
-		buttonGBC.gridy++;
-		JButton newButton = new JButton(Lang.getInstance().translate("New account"));
-		newButton.setPreferredSize(new Dimension(150, 25));
-		newButton.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-		        onNewClick();
-		    }
-		});	
-		this.add(newButton, buttonGBC);
-		*/
-
     }
 	
-	
-/*	
-	@Override
-	public void itemStateChanged(ItemEvent e) 
-	{
-		
-		if(e.getStateChange() == ItemEvent.SELECTED) 
-		{		
-			AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-        	tableModel.setAsset(asset);  
-		} 
-	}
-*/
-    // set select in Favorites to FEE asset
 
+    private String getTotals() {
+        Fun.Tuple4<BigDecimal, BigDecimal, BigDecimal, BigDecimal> total = tableModel.getTotalBalance();
+        return Lang.getInstance().translate("Confirmed Balance") + ": "
+                + total.a.toPlainString() + " / "
+                + total.b.toPlainString() + " / "
+                + total.c.toPlainString() + " / "
+                + total.d.toPlainString();
+
+    }
 
 }
