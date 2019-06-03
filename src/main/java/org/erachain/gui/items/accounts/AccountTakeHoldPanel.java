@@ -44,7 +44,7 @@ public class AccountTakeHoldPanel extends AssetSendPanel {
                 (byte) 2, TransactionAmount.BACKWARD_MASK, (byte) 0,
                 Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
                 key, BigDecimal.ZERO.subtract(amount),
-                head, isTextByte, messageBytes, encrypted);
+                head, messageBytes, isTextByte, encrypted);
         // test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);
 
         String Status_text = "";
