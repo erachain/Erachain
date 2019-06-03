@@ -353,6 +353,35 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
         return trades;
     }
 
+    @SuppressWarnings("unchecked")
+    public Trade getLastTrade(long have, long want) {
+
+        if (this.pairKeyMap == null)
+            return null;
+
+        String pairKey;
+        if (have > want) {
+            pairKey = have + "/" + want;
+        } else {
+            pairKey = want + "/" + have;
+        }
+
+        //FILTER ALL KEYS
+        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
+                Fun.t3(pairKey, null, null),
+                Fun.t3(pairKey, Fun.HI(), Fun.HI()))
+                    //.descendingMap()
+                    .values();
+
+        Iterator iterator = keys.iterator();
+        if (iterator.hasNext()) {
+             return this.get((Tuple2<Long, Long>) iterator.next());
+        }
+
+        //RETURN
+        return null;
+    }
+
     /**
      * Get transaction by timestamp
      *  @param have      include

@@ -1007,7 +1007,7 @@ public class BlockExplorer {
 
         // Collections.reverse(ordersWant);
 
-        List<Trade> trades = dcSet.getTradeMap().getTrades(have, want, 0, 100);
+        List<Trade> trades = dcSet.getTradeMap().getTrades(have, want, 0, 25);
 
         AssetCls assetHave = Controller.getInstance().getAsset(have);
         AssetCls assetWant = Controller.getInstance().getAsset(want);
@@ -1127,8 +1127,6 @@ public class BlockExplorer {
 
         int i = 0;
         for (Trade trade : trades) {
-
-            i++;
 
             Map tradeJSON = new LinkedHashMap();
 
@@ -2234,7 +2232,8 @@ public class BlockExplorer {
         list.add(new Pair<Long, Long>(12l, 95l));
         list.add(new Pair<Long, Long>(14l, 12l));
 
-        OrderMap map = dcSet.getOrderMap();
+        OrderMap orders = dcSet.getOrderMap();
+        TradeMap trades = dcSet.getTradeMap();
 
         Map pairsJSON = new LinkedHashMap();
 
@@ -2248,8 +2247,15 @@ public class BlockExplorer {
             Map pairJSON = new LinkedHashMap();
             pairJSON.put("have", assetHave.jsonForExplorerPage(langObj));
             pairJSON.put("want", assetWant.jsonForExplorerPage(langObj));
-            pairJSON.put("orders", map.getCount(pair.getA(), pair.getB())
-                    + map.getCount(pair.getB(), pair.getA()));
+            pairJSON.put("orders", orders.getCount(pair.getA(), pair.getB())
+                    + orders.getCount(pair.getB(), pair.getA()));
+
+            Trade trade = trades.getLastTrade(pair.getA(), pair.getB());
+            if (trade == null) {
+                pairJSON.put("last", "--");
+            } else {
+                pairJSON.put("last", trade.calcPrice().toPlainString());
+            }
 
             array.add(pairJSON);
         }
@@ -2257,23 +2263,10 @@ public class BlockExplorer {
         //makePage(type, keys, start, pageSize, result, langObj);
 
         output.put("pairs", array);
-        output.put("label_Asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
-        output.put("label_Key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_Description", Lang.getInstance().translateFromLangObj("Description", langObj));
-        output.put("label_Scale", Lang.getInstance().translateFromLangObj("Accuracy", langObj));
-        output.put("label_AssetType", Lang.getInstance().translateFromLangObj("TYPE", langObj));
-        output.put("label_Quantity", Lang.getInstance().translateFromLangObj("Quantity", langObj));
-        output.put("label_Holders", Lang.getInstance().translateFromLangObj("Holders", langObj));
-        output.put("label_Available_pairs", Lang.getInstance().translateFromLangObj("Available pairs", langObj));
-        output.put("label_Pair", Lang.getInstance().translateFromLangObj("Pair", langObj));
-        output.put("label_Orders_Count", Lang.getInstance().translateFromLangObj("Orders Count", langObj));
-        output.put("label_Open_Orders_Volume",
-                Lang.getInstance().translateFromLangObj("Open Orders Volume", langObj));
-        output.put("label_Trades_Count", Lang.getInstance().translateFromLangObj("Trades Count", langObj));
-        output.put("label_Trades_Volume", Lang.getInstance().translateFromLangObj("Trades Volume", langObj));
-        output.put("label_Total", Lang.getInstance().translateFromLangObj("Total", langObj));
-        output.put("label_View", Lang.getInstance().translateFromLangObj("View", langObj));
+        output.put("label_table_have", Lang.getInstance().translateFromLangObj("Have Asset", langObj));
+        output.put("label_table_want", Lang.getInstance().translateFromLangObj("Want Asset", langObj));
+        output.put("label_table_orders", Lang.getInstance().translateFromLangObj("Opened Orders", langObj));
+        output.put("label_table_last_price", Lang.getInstance().translateFromLangObj("Last Price", langObj));
 
     }
 
