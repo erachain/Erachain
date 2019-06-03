@@ -200,6 +200,35 @@ public abstract class ItemCls implements ExplorerJsonLine {
         return this.key;
     }
 
+    public static String getItemTypeChar(int itemType) {
+        switch (itemType) {
+            case ItemCls.ASSET_TYPE:
+                return "A";
+            case ItemCls.IMPRINT_TYPE:
+                return "I";
+            case ItemCls.PERSON_TYPE:
+                return "P";
+            case ItemCls.POLL_TYPE:
+                return "O"; // Opinion
+            case ItemCls.UNION_TYPE:
+                return "U";
+            case ItemCls.STATEMENT_TYPE:
+                return "T"; // TeXT
+            case ItemCls.STATUS_TYPE:
+                return "S";
+            case ItemCls.TEMPLATE_TYPE:
+                return "E"; // exDATA
+            default:
+                return "x";
+
+        }
+    }
+
+    public static String getItemTypeStr(int itemType) {
+        return "@" + getItemTypeChar(itemType);
+    }
+
+
     public long getHeight(DCSet db) {
         //INSERT INTO DATABASE
         ItemMap dbMap = this.getDBMap(db);
@@ -361,9 +390,27 @@ public abstract class ItemCls implements ExplorerJsonLine {
         //+ (creator.length()==0?"": " (" +creator + ")");
     }
 
-
     public String toString(DCSet db, byte[] data) {
         String str = this.toString(db);
+
+        Tuple6<Long, Long, byte[], byte[], Long, byte[]> tuple = RSetStatusToItem.unpackData(data);
+
+        if (str.contains("%1") && tuple.a != null)
+            str = str.replace("%1", tuple.a.toString());
+        if (str.contains("%2") && tuple.b != null)
+            str = str.replace("%2", tuple.b.toString());
+        if (str.contains("%3") && tuple.c != null)
+            str = str.replace("%3", new String(tuple.c, Charset.forName("UTF-8")));
+        if (str.contains("%4") && tuple.d != null)
+            str = str.replace("%4", new String(tuple.d, Charset.forName("UTF-8")));
+        if (str.contains("%D") && tuple.f != null)
+            str = str.replace("%D", new String(new String(tuple.f, Charset.forName("UTF-8"))));
+
+        return str;
+    }
+
+    public String toStringNoKey(byte[] data) {
+        String str = name;
 
         Tuple6<Long, Long, byte[], byte[], Long, byte[]> tuple = RSetStatusToItem.unpackData(data);
 
@@ -431,8 +478,8 @@ public abstract class ItemCls implements ExplorerJsonLine {
         JSONObject itemJSON = new JSONObject();
 
         // ADD DATA
-        itemJSON.put("icon", Base58.encode(this.icon));
-        itemJSON.put("image", Base58.encode(this.image));
+        itemJSON.put("icon", Base58.encode(this.getIcon()));
+        itemJSON.put("image", Base58.encode(this.getImage()));
 
         return itemJSON;
     }
@@ -467,7 +514,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
         }
 
         if (icon != null)
-            json.put("icon", Base64.encodeBase64String(icon));
+            json.put("icon", Base64.encodeBase64String(getIcon()));
 
         return json;
     }

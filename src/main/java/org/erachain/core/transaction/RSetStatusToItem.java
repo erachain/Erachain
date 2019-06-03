@@ -170,6 +170,174 @@ public class RSetStatusToItem extends Transaction {
 
     //public static String getName() { return "Send"; }
 
+    public void setDC(DCSet dcSet) {
+        super.setDC(dcSet);
+        status = (StatusCls) ItemCls.getItem(dcSet, ItemCls.STATUS_TYPE, this.key);
+    }
+
+    @Override
+    public long getKey() {
+        return this.key;
+    }
+
+    public int getItemType() {
+        return this.itemType;
+    }
+
+    public long getItemKey() {
+        return this.itemKey;
+    }
+
+    public StatusCls getStatus() {
+        if (status == null) {
+            status = (StatusCls) ItemCls.getItem(dcSet, ItemCls.STATUS_TYPE, this.key);
+        }
+        return status;
+    }
+    public ItemCls getItem() {
+        if (item == null) {
+            item = ItemCls.getItem(dcSet, this.itemType, this.itemKey);
+        }
+        return item;
+    }
+
+    @Override
+    public String getTitle() {
+        String title = ItemCls.getItemTypeStr(ItemCls.STATUS_TYPE) + key + " > ";
+        title += ItemCls.getItemTypeStr(itemType) + itemKey + " = ";
+        title += getStatus().toStringNoKey(packData());
+
+        return title;
+    }
+
+
+    public String getResultText() {
+        return status.toString(dcSet, packData());
+    }
+
+    public Long getBeginDate() {
+        return this.beg_date;
+    }
+
+    public Long getEndDate() {
+        return this.end_date;
+    }
+
+    public long getValue1() {
+        return this.value_1;
+    }
+
+    public long getValue2() {
+        return this.value_2;
+    }
+
+    public byte[] getData1() {
+        return this.data_1;
+    }
+
+    public byte[] getData2() {
+        return this.data_2;
+    }
+
+    public byte[] getDescription() {
+        return this.description;
+    }
+
+    @Override
+    public boolean hasPublicText() {
+        return true;
+    }
+
+    // pack values for DB
+    public byte[] packData() {
+        byte[] add_data = new byte[0];
+        add_data = Bytes.concat(add_data, Longs.toByteArray(this.value_1));
+        add_data = Bytes.concat(add_data, Longs.toByteArray(this.value_2));
+
+        if (this.data_1 != null) {
+            byte len1 = (byte) this.data_1.length;
+            add_data = Bytes.concat(add_data, new byte[]{len1});
+            add_data = Bytes.concat(add_data, data_1);
+        } else {
+            add_data = Bytes.concat(add_data, new byte[]{0});
+        }
+        if (this.data_2 != null) {
+            byte len2 = (byte) this.data_2.length;
+            add_data = Bytes.concat(add_data, new byte[]{len2});
+            add_data = Bytes.concat(add_data, data_2);
+        } else {
+            add_data = Bytes.concat(add_data, new byte[]{0});
+        }
+
+        add_data = Bytes.concat(add_data, Longs.toByteArray(this.ref_to_parent));
+
+        if (this.description != null && this.description.length > 0)
+            add_data = Bytes.concat(add_data, this.description);
+
+        return add_data;
+    }
+
+    public long getRefParent() {
+        return this.ref_to_parent;
+    }
+
+    // VIEWS
+    public String viewRefParent() {
+        byte[] bytes = Longs.toByteArray(this.ref_to_parent);
+        int blockID = Ints.fromByteArray(Arrays.copyOfRange(bytes, 0, 4));
+        int seqNo = Ints.fromByteArray(Arrays.copyOfRange(bytes, 4, 8));
+        return blockID + "-" + seqNo;
+    }
+
+    @Override
+    public String viewItemName() {
+        ItemCls status = dcSet.getItemStatusMap().get(this.key);
+        return status == null ? "null" : status.toString();
+    }
+
+    @Override
+    public String viewAmount(String address) {
+        return DateTimeFormat.timestamptoString(end_date);
+    }
+
+    @Override
+    public String viewRecipient() {
+        ItemCls item = ItemCls.getItem(dcSet, this.itemType, this.itemKey);
+        return item == null ? "null" : item.toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public JSONObject toJson() {
+        //GET BASE
+        JSONObject transaction = this.getJsonBase();
+
+        //ADD CREATOR/SERVICE/DATA
+        transaction.put("key", this.key);
+        transaction.put("itemType", this.itemType);
+        transaction.put("itemKey", this.itemKey);
+        transaction.put("begin_date", this.beg_date);
+        transaction.put("end_date", this.end_date);
+
+        if (this.value_1 != 0)
+            transaction.put("value1", this.value_1);
+
+        if (this.value_2 != 0)
+            transaction.put("value2", this.value_2);
+
+        if (this.data_1 != null)
+            transaction.put("data1", new String(this.data_1, Charset.forName("UTF-8")));
+        if (this.data_2 != null)
+            transaction.put("data2", new String(this.data_2, Charset.forName("UTF-8")));
+        if (this.description != null)
+            transaction.put("description", new String(this.description, Charset.forName("UTF-8")));
+
+        if (this.ref_to_parent != 0l)
+            transaction.put("ref_parent", this.ref_to_parent);
+
+        return transaction;
+    }
+
     // Unpack data from DB
     // value 1, value 2, data_1, data_2, parent_ref as (int, int), description,
     public static Tuple6<Long, Long, byte[], byte[], Long, byte[]> unpackData(byte[] data_add) {
@@ -465,159 +633,6 @@ public class RSetStatusToItem extends Transaction {
 
     }
 
-    @Override
-    public long getKey() {
-        return this.key;
-    }
-
-    public int getItemType() {
-        return this.itemType;
-    }
-
-    public long getItemKey() {
-        return this.itemKey;
-    }
-
-    public StatusCls getStatus() {
-        if (status == null) {
-            status = (StatusCls) ItemCls.getItem(dcSet, ItemCls.STATUS_TYPE, this.key);
-        }
-        return status;
-    }
-    public ItemCls getItem() {
-        if (item == null) {
-            item = ItemCls.getItem(dcSet, this.itemType, this.itemKey);
-        }
-        return item;
-    }
-
-    public String getResultText() {
-        return status.toString(dcSet, packData());
-    }
-
-    public Long getBeginDate() {
-        return this.beg_date;
-    }
-
-    public Long getEndDate() {
-        return this.end_date;
-    }
-
-    public long getValue1() {
-        return this.value_1;
-    }
-
-    public long getValue2() {
-        return this.value_2;
-    }
-
-    public byte[] getData1() {
-        return this.data_1;
-    }
-
-    public byte[] getData2() {
-        return this.data_2;
-    }
-
-    public byte[] getDescription() {
-        return this.description;
-    }
-
-    @Override
-    public boolean hasPublicText() {
-        return true;
-    }
-
-    // pack values for DB
-    public byte[] packData() {
-        byte[] add_data = new byte[0];
-        add_data = Bytes.concat(add_data, Longs.toByteArray(this.value_1));
-        add_data = Bytes.concat(add_data, Longs.toByteArray(this.value_2));
-
-        if (this.data_1 != null) {
-            byte len1 = (byte) this.data_1.length;
-            add_data = Bytes.concat(add_data, new byte[]{len1});
-            add_data = Bytes.concat(add_data, data_1);
-        } else {
-            add_data = Bytes.concat(add_data, new byte[]{0});
-        }
-        if (this.data_2 != null) {
-            byte len2 = (byte) this.data_2.length;
-            add_data = Bytes.concat(add_data, new byte[]{len2});
-            add_data = Bytes.concat(add_data, data_2);
-        } else {
-            add_data = Bytes.concat(add_data, new byte[]{0});
-        }
-
-        add_data = Bytes.concat(add_data, Longs.toByteArray(this.ref_to_parent));
-
-        if (this.description != null && this.description.length > 0)
-            add_data = Bytes.concat(add_data, this.description);
-
-        return add_data;
-    }
-
-    public long getRefParent() {
-        return this.ref_to_parent;
-    }
-
-    // VIEWS
-    public String viewRefParent() {
-        byte[] bytes = Longs.toByteArray(this.ref_to_parent);
-        int blockID = Ints.fromByteArray(Arrays.copyOfRange(bytes, 0, 4));
-        int seqNo = Ints.fromByteArray(Arrays.copyOfRange(bytes, 4, 8));
-        return blockID + "-" + seqNo;
-    }
-
-    @Override
-    public String viewItemName() {
-        ItemCls status = dcSet.getItemStatusMap().get(this.key);
-        return status == null ? "null" : status.toString();
-    }
-
-    @Override
-    public String viewAmount(String address) {
-        return DateTimeFormat.timestamptoString(end_date);
-    }
-
-    @Override
-    public String viewRecipient() {
-        ItemCls item = ItemCls.getItem(dcSet, this.itemType, this.itemKey);
-        return item == null ? "null" : item.toString();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public JSONObject toJson() {
-        //GET BASE
-        JSONObject transaction = this.getJsonBase();
-
-        //ADD CREATOR/SERVICE/DATA
-        transaction.put("key", this.key);
-        transaction.put("itemType", this.itemType);
-        transaction.put("itemKey", this.itemKey);
-        transaction.put("begin_date", this.beg_date);
-        transaction.put("end_date", this.end_date);
-
-        if (this.value_1 != 0)
-            transaction.put("value1", this.value_1);
-
-        if (this.value_2 != 0)
-            transaction.put("value2", this.value_2);
-
-        if (this.data_1 != null)
-            transaction.put("data1", new String(this.data_1, Charset.forName("UTF-8")));
-        if (this.data_2 != null)
-            transaction.put("data2", new String(this.data_2, Charset.forName("UTF-8")));
-        if (this.description != null)
-            transaction.put("description", new String(this.description, Charset.forName("UTF-8")));
-
-        if (this.ref_to_parent != 0l)
-            transaction.put("ref_parent", this.ref_to_parent);
-
-        return transaction;
-    }
-
     //@Override
     @Override
     public byte[] toBytes(int forDeal, boolean withSignature) {
@@ -796,7 +811,6 @@ public class RSetStatusToItem extends Transaction {
                                 heightSeqNo.a, heightSeqNo.b
                         );
 
-        StatusCls status = (StatusCls) this.dcSet.getItemStatusMap().get(this.key);
         if (status.isUnique()) {
             // SET STATUS of ITEM for DURATION
             // TODO set STATUSES by reference of it record - not by key!

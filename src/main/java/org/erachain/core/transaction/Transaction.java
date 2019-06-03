@@ -553,7 +553,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public void setDC_HeightSeq(DCSet dcSet) {
-        this.dcSet = dcSet;
+        setDC(dcSet);
 
         if (this.typeBytes[0] == Transaction.CALCULATED_TRANSACTION) {
 
@@ -570,7 +570,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        this.dcSet = dcSet;
+        setDC(dcSet);
         this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);
         this.seqNo = seqNo;
         this.dbRef = Transaction.makeDBRef(height, seqNo);
