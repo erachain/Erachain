@@ -484,6 +484,20 @@ button.white-bgc[disabled]:focus,
             }
         }
 
+        function getAssetURL(key, name, icon, imgSize) {
+            var output = '<a href="?asset=' + key + get_lang() + '">';
+            if (key > 1000)
+                output += '[' + key + ']';
+
+            if (icon.length > 0)
+                output += ' <img src="data:image/gif;base64,' + icon + '" style="width:' + imgSize + 'px;" /> ';
+
+            output += '<b>' +  escapeHtml(name) + '</b></a>';
+
+            return output;
+        }
+
+
         function getAssetName(assetKey, assetName) {
             if (assetKey < 1000)
                 return escapeHtml(assetName);

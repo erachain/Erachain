@@ -21,10 +21,8 @@ function exchange(data){
     //Отображение таблицы элементов статусов
     for (var i in data.pairs) {
         var item = data.pairs[i];
-        output += '<tr><td><a href="?asset=' + item.have.key + get_lang() + '">';
-        output += '<b>' + getAssetName2(item.have.key, item.have.name) + '</b></a>';
-        output += '<td><a href="?asset=' + item.want.key + get_lang() + '">';
-        output += '<b>' + getAssetName2(item.want.key, item.want.name) + '</b></a></td>';
+        output += '<tr><td>' + getAssetURL(item.have.key, item.have.name, item.have.icon, 30);
+        output += '<td>' + getAssetURL(item.want.key, item.want.name, item.want.icon, 30);;
         output += '<td><a href="?asset=' + item.have.key
             + '&asset=' + item.want.key + get_lang() + '"><b>' + item.orders + '</b></a>';
         output += '<td><a href="?asset=' + item.have.key
