@@ -3,6 +3,7 @@ package org.erachain.core.blockexplorer;
 import org.apache.commons.net.util.Base64;
 import org.erachain.at.ATTransaction;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
@@ -2237,13 +2238,17 @@ public class BlockExplorer {
 
         List<Pair<Long, Long>> list = new ArrayList<>();
 
-        list.add(new Pair<Long, Long>(12l, 95l));
-        list.add(new Pair<Long, Long>(1l, 2l));
-        list.add(new Pair<Long, Long>(1l, 12l));
-        list.add(new Pair<Long, Long>(1l, 95l));
-        list.add(new Pair<Long, Long>(2l, 12l));
-        list.add(new Pair<Long, Long>(2l, 95l));
-        list.add(new Pair<Long, Long>(14l, 12l));
+        if (BlockChain.DEVELOP_USE) {
+            list.add(new Pair<Long, Long>(1l, 2l));
+        } else {
+            list.add(new Pair<Long, Long>(12l, 95l));
+            list.add(new Pair<Long, Long>(1l, 2l));
+            list.add(new Pair<Long, Long>(1l, 12l));
+            list.add(new Pair<Long, Long>(1l, 95l));
+            list.add(new Pair<Long, Long>(2l, 12l));
+            list.add(new Pair<Long, Long>(2l, 95l));
+            list.add(new Pair<Long, Long>(14l, 12l));
+        }
 
         OrderMap orders = dcSet.getOrderMap();
         TradeMap trades = dcSet.getTradeMap();
