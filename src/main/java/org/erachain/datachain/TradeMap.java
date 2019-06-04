@@ -12,6 +12,7 @@ import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -422,6 +423,41 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
 
         //RETURN
         return trades;
+    }
+
+    long diff24h = 24 * 60 * 60000;
+    public BigDecimal getVolume24(long have, long want) {
+
+        BigDecimal volume = BigDecimal.ZERO;
+
+        if (this.pairKeyMap == null)
+            return volume;
+
+        String pairKey;
+        if (have > want)
+            pairKey = have + "/" + want;
+        else
+            pairKey = want + "/" + have;
+
+        long timestamp = System.currentTimeMillis() - diff24h;
+
+        //FILTER ALL KEYS
+        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
+                Fun.t3(pairKey, timestamp, timestamp),
+                Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
+
+        Iterator iterator = keys.iterator();
+        while (iterator.hasNext()) {
+            Trade trade = this.get((Tuple2<Long, Long>) iterator.next());
+            if (trade.getHaveKey() == want) {
+                volume = volume.add(trade.getAmountHave());
+            } else {
+                volume = volume.add(trade.getAmountWant());
+            }
+        }
+
+        //RETURN
+        return volume;
     }
 
     public void delete(Trade trade) {

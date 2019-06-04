@@ -28,6 +28,8 @@ function exchange(data){
             + '&asset=' + item.want.key + get_lang() + '"><b>' + item.orders + '</b></a>';
         output += '<td><a href="?asset=' + item.have.key
             + '&asset=' + item.want.key + get_lang() + '"><b>' + item.last + '</b></a>';
+        output += '<td><a href="?asset=' + item.have.key
+            + '&asset=' + item.want.key + get_lang() + '"><b>' + item.volume24 + '</b></a>';
 
         output += '</tr>';
     }

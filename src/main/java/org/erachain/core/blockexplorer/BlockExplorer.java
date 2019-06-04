@@ -299,7 +299,14 @@ public class BlockExplorer {
                 switch (type) {
                     case "exchange":
                         //search exchange
-                        jsonQueryExchange(search, (int) start);
+                        /////jsonQueryExchange(search, (int) start);
+                        try {
+                            String[] strA = search.split("[ /]");
+                            long have = Long.parseLong(strA[0]);
+                            long want = Long.parseLong(strA[1]);
+                            output.putAll(jsonQueryTrades(have, want));
+                        } catch (Exception e) {
+                        }
                         break;
                     case "transactions":
                         //search transactions
@@ -512,6 +519,7 @@ public class BlockExplorer {
             output.put("error", "Not enough parameters.");
             output.put("help", jsonQueryHelp());
         }
+
         // time guery
         output.put("queryTimeMs", stopwatchAll.elapsedTime());
         return output;
@@ -998,7 +1006,8 @@ public class BlockExplorer {
     public Map jsonQueryTrades(long have, long want) {
 
         output.put("type", "trades");
-        output.put("search", "assets");
+        output.put("search", "exchange");
+        output.put("search_message", have + "/" + want);
 
         Map output = new LinkedHashMap();
 
@@ -1166,7 +1175,7 @@ public class BlockExplorer {
             tradeJSON.put("timestamp", trade.getTimestamp());
             tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
 
-            tradesJSON.put(i, tradeJSON);
+            tradesJSON.put(i++, tradeJSON);
 
             if (i > 100)
                 break;
@@ -2228,14 +2237,16 @@ public class BlockExplorer {
 
         List<Pair<Long, Long>> list = new ArrayList<>();
 
-        list.add(new Pair<Long, Long>(1l, 2l));
         list.add(new Pair<Long, Long>(12l, 95l));
+        list.add(new Pair<Long, Long>(1l, 2l));
+        list.add(new Pair<Long, Long>(1l, 12l));
+        list.add(new Pair<Long, Long>(1l, 95l));
+        list.add(new Pair<Long, Long>(2l, 12l));
+        list.add(new Pair<Long, Long>(2l, 95l));
         list.add(new Pair<Long, Long>(14l, 12l));
 
         OrderMap orders = dcSet.getOrderMap();
         TradeMap trades = dcSet.getTradeMap();
-
-        Map pairsJSON = new LinkedHashMap();
 
         JSONArray array = new JSONArray();
 
@@ -2254,8 +2265,14 @@ public class BlockExplorer {
             if (trade == null) {
                 pairJSON.put("last", "--");
             } else {
-                pairJSON.put("last", trade.calcPrice().toPlainString());
+                if (trade.getHaveKey() == pair.getB()) {
+                    pairJSON.put("last", trade.calcPrice().toPlainString());
+                } else {
+                    pairJSON.put("last", trade.calcPriceRevers().toPlainString());
+                }
             }
+
+            pairJSON.put("volume24", trades.getVolume24(pair.getA(), pair.getB()).toPlainString());
 
             array.add(pairJSON);
         }
