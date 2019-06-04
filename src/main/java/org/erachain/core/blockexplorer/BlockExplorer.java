@@ -2280,8 +2280,8 @@ public class BlockExplorer {
         //makePage(type, keys, start, pageSize, result, langObj);
 
         output.put("pairs", array);
-        output.put("label_table_have", Lang.getInstance().translateFromLangObj("Have Asset", langObj));
-        output.put("label_table_want", Lang.getInstance().translateFromLangObj("Want Asset", langObj));
+        output.put("label_table_have", Lang.getInstance().translateFromLangObj("Base Asset", langObj));
+        output.put("label_table_want", Lang.getInstance().translateFromLangObj("Price Asset", langObj));
         output.put("label_table_orders", Lang.getInstance().translateFromLangObj("Opened Orders", langObj));
         output.put("label_table_last_price", Lang.getInstance().translateFromLangObj("Last Price", langObj));
         output.put("label_table_volume24", Lang.getInstance().translateFromLangObj("Day Volume", langObj));
