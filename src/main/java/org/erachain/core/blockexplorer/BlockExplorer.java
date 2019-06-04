@@ -2239,15 +2239,15 @@ public class BlockExplorer {
         List<Pair<Long, Long>> list = new ArrayList<>();
 
         if (BlockChain.DEVELOP_USE) {
-            list.add(new Pair<Long, Long>(1l, 2l));
+            list.add(new Pair<Long, Long>(1L, 2L));
         } else {
-            list.add(new Pair<Long, Long>(12l, 95l));
-            list.add(new Pair<Long, Long>(1l, 2l));
-            list.add(new Pair<Long, Long>(1l, 12l));
-            list.add(new Pair<Long, Long>(1l, 95l));
-            list.add(new Pair<Long, Long>(2l, 12l));
-            list.add(new Pair<Long, Long>(2l, 95l));
-            list.add(new Pair<Long, Long>(14l, 12l));
+            list.add(new Pair<Long, Long>(12L, 95L));
+            list.add(new Pair<Long, Long>(1L, 2L));
+            list.add(new Pair<Long, Long>(1L, 12L));
+            list.add(new Pair<Long, Long>(1L, 95L));
+            list.add(new Pair<Long, Long>(2L, 12L));
+            list.add(new Pair<Long, Long>(2L, 95L));
+            list.add(new Pair<Long, Long>(14L, 12L));
         }
 
         OrderMap orders = dcSet.getOrderMap();
