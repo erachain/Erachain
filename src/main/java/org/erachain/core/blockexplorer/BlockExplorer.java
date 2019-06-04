@@ -2247,7 +2247,7 @@ public class BlockExplorer {
             list.add(new Pair<Long, Long>(1L, 95L));
             list.add(new Pair<Long, Long>(2L, 12L));
             list.add(new Pair<Long, Long>(2L, 95L));
-            list.add(new Pair<Long, Long>(14L, 12L));
+            list.add(new Pair<Long, Long>(14L, 12L ));
         }
 
         OrderMap orders = dcSet.getOrderMap();
