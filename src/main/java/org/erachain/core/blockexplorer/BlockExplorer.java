@@ -2284,6 +2284,8 @@ public class BlockExplorer {
         output.put("label_table_want", Lang.getInstance().translateFromLangObj("Want Asset", langObj));
         output.put("label_table_orders", Lang.getInstance().translateFromLangObj("Opened Orders", langObj));
         output.put("label_table_last_price", Lang.getInstance().translateFromLangObj("Last Price", langObj));
+        output.put("label_table_volume24", Lang.getInstance().translateFromLangObj("Day Volume", langObj));
+
 
     }
 

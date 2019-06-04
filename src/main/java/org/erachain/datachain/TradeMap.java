@@ -2,8 +2,10 @@ package org.erachain.datachain;
 
 import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.database.serializer.TradeSerializer;
@@ -401,10 +403,16 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
         else
             pairKey = want + "/" + have;
 
+        // тут индекс не по времени а по номерам блоков как лонг
+        int heightStart = Controller.getInstance().getMyHeight();
+        int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
+        long refDBend = Transaction.makeDBRef(heightEnd, 0);
+
         //FILTER ALL KEYS
+        //// обратный отсчет по номерам блоков
         Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
-                Fun.t3(pairKey, timestamp, timestamp),
-                Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
+                Fun.t3(pairKey, null, null), // с самого посденего и до нужного вверх
+                Fun.t3(pairKey, Long.MAX_VALUE - refDBend, Fun.HI())).values();
 
         Iterable iterable;
 
@@ -425,7 +433,6 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
         return trades;
     }
 
-    long diff24h = 24 * 60 * 60000;
     public BigDecimal getVolume24(long have, long want) {
 
         BigDecimal volume = BigDecimal.ZERO;
@@ -439,12 +446,18 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
         else
             pairKey = want + "/" + have;
 
-        long timestamp = System.currentTimeMillis() - diff24h;
+        // тут индекс не по времени а по номерам блоков как лонг
+        int heightStart = Controller.getInstance().getMyHeight();
+        //// с последнего -- long refDBstart = Transaction.makeDBRef(heightStart, 0);
+        int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY;
+        long refDBend = Transaction.makeDBRef(heightEnd, 0);
 
         //FILTER ALL KEYS
+        //// обратный отсчет по номерам блоков
         Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
-                Fun.t3(pairKey, timestamp, timestamp),
-                Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
+                //Fun.t3(pairKey, Long.MAX_VALUE - refDBstart, null),
+                Fun.t3(pairKey, null, null), // с самого посденего и до нужного вверх
+                Fun.t3(pairKey, Long.MAX_VALUE - refDBend, Fun.HI())).values();
 
         Iterator iterator = keys.iterator();
         while (iterator.hasNext()) {
