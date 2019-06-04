@@ -49,6 +49,8 @@ public class APIExchange {
         help.put("apiexchange/trades?have={have}&want={want}&timestamp={timestamp}&limit={limit}",
                 "Get trades from timestamp for HaveKey & WantKey, "
                         + "limit is count record. The number of transactions is limited by input param. Max 200, default 50.");
+        help.put("apiexchange/volume24?have={have}&want={want}",
+                "Get day volume of trades for HaveKey & WantKey");
         help.put("apiexchange/ordersfull?have={have}&want={want}&limit={limit}",
                 "Get Orders. Only for local requests");
         help.put("apiexchange/tradesfull?have={have}&want={want}&limit={limit}",
@@ -153,6 +155,28 @@ public class APIExchange {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(arrayJSON.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("volume24")
+    // apiexchange/get?have=1&want=2&timestamp=3&limit=4
+    public Response getVolume24(@QueryParam("have") Long have, @QueryParam("want") Long want) {
+
+        ItemAssetMap map = this.dcSet.getItemAssetMap();
+        // DOES ASSETID EXIST
+        if (have == null || !map.contains(have)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+        if (want == null || !map.contains(want)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity("\"" + dcSet.getTradeMap().getVolume24(have, want).toPlainString() + "\"")
                 .build();
     }
 
