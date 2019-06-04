@@ -2286,7 +2286,6 @@ public class BlockExplorer {
         output.put("label_table_last_price", Lang.getInstance().translateFromLangObj("Last Price", langObj));
         output.put("label_table_volume24", Lang.getInstance().translateFromLangObj("Day Volume", langObj));
 
-
     }
 
     @SuppressWarnings({"serial", "static-access"})
