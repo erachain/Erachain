@@ -6,6 +6,7 @@ import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
+import java.awt.*;
 
 @SuppressWarnings("serial")
 public class IssueTemplateDetailsFrame extends RecDetailsFrame {
@@ -32,12 +33,16 @@ public class IssueTemplateDetailsFrame extends RecDetailsFrame {
         //DESCRIPTION
         ++detailGBC.gridy;
         String txt = "<HTML>" + Library.to_HTML(templateIssue.getItem().getDescription());
+
         JLabel txtAreaDescription = new JLabel(txt);
+        JScrollPane scroller = new JScrollPane(txtAreaDescription, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scroller.setPreferredSize(new Dimension(0,400));
         //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         //txtAreaDescription.setEditable(false);
         //MenuPopupUtil.installContextMenu(txtAreaDescription);
-        this.add(txtAreaDescription, detailGBC);
+        this.add(scroller, detailGBC);
+
 
         //PACK
 //		this.pack();

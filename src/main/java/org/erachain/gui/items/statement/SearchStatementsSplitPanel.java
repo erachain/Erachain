@@ -1,15 +1,12 @@
 package org.erachain.gui.items.statement;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.persons.ItemsPersonsTableModel;
-import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
-import org.erachain.gui.transaction.RecDetailsFrame;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
@@ -295,8 +292,16 @@ public class SearchStatementsSplitPanel extends SplitPanel {
             Transaction transaction = search_Table_Model.getItem(jTableJScrollPanelLeftPanel
                     .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             JPanel info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
-            info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50,
-                    jScrollPaneJPanelRightPanel.getSize().height - 50));
+
+            int infoPanelWidth = jScrollPaneJPanelRightPanel.getSize().width;
+            int infoPanelHeight = jScrollPaneJPanelRightPanel.getSize().height;
+
+            info_panel.setPreferredSize(new Dimension(infoPanelWidth, infoPanelHeight));
+            info_panel.setMinimumSize(new Dimension(infoPanelWidth, infoPanelHeight));
+            info_panel.setMaximumSize(new Dimension(infoPanelWidth, infoPanelHeight));
+
+            jScrollPaneJPanelRightPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            jScrollPaneJPanelRightPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);
             // jSplitPanel.setRightComponent(info_panel);
         }

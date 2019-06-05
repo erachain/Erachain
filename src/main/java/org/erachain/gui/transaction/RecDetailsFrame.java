@@ -51,16 +51,15 @@ public class RecDetailsFrame extends JPanel //JFrame
 
         //LABEL GBC
         labelGBC = new GridBagConstraints();
-        labelGBC.insets = new Insets(0, 5, 5, 0);
+        labelGBC.insets = new Insets(10, 5, 5, 5);
         labelGBC.fill = GridBagConstraints.HORIZONTAL;
         labelGBC.anchor = GridBagConstraints.FIRST_LINE_START;//..NORTHWEST;
         labelGBC.weightx = 0;
         labelGBC.gridx = 0;
 
-
         //DETAIL GBC
         detailGBC = new GridBagConstraints();
-        detailGBC.insets = new Insets(0, 5, 5, 0);
+        detailGBC.insets = new Insets(10, 5, 5, 5);
         detailGBC.fill = GridBagConstraints.HORIZONTAL;
         detailGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
         detailGBC.weightx = 1;
@@ -223,9 +222,6 @@ public class RecDetailsFrame extends JPanel //JFrame
         });
         shorn_Info_Meny.add(copy_Heigt_Block);
 
-
         shorn_Info.setComponentPopupMenu(shorn_Info_Meny);
-
-
     }
 }
