@@ -106,9 +106,9 @@ function statement(data) {
     }
 
     if (data.hasOwnProperty('statement')) {
-        output += '<hr>' + data.statement;
+        output += '<hr>' + fformat(data.statement);
     } else if (data.hasOwnProperty('title')) {
-        output += '<br><b>' + data.Label_title + '</b>:' + data.title + "<hr>";
+        output += '<br><b>' + data.Label_title + '</b>:' + escapeHtml(data.title) + "<hr>";
     }
 
 

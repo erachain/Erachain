@@ -22,7 +22,7 @@ function statements(data){
 	{
 		output += '<tr><td>'+ i;
 		output += '<td>'+ data.Peers[i].Timestamp+'<td>'+data.Peers[i].Creator+'<td>'+data.Peers[i].Template;
-		output += '<td>'+ data.Peers[i].Statement;
+		output += '<td>'+ escapeHtml(data.Peers[i].Statement);
 		
 	}
 	

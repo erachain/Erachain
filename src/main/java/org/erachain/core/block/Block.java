@@ -338,6 +338,10 @@ public class Block implements ExplorerJsonLine {
 
         }
 
+        public int calcWinValueTargeted() {
+            return (int) (BlockChain.BASE_TARGET * winValue / target);
+        }
+
         @SuppressWarnings("unchecked")
         public JSONObject toJson() {
             JSONObject head = new JSONObject();
@@ -348,6 +352,7 @@ public class Block implements ExplorerJsonLine {
             head.put("timestamp", this.getTimestamp());
             head.put("forgingValue", this.forgingValue);
             head.put("winValue", this.winValue);
+            head.put("winValueTargeted", calcWinValueTargeted());
             head.put("target", this.target);
             head.put("creator", this.creator.getAddress());
             head.put("fee", this.totalFee);
@@ -368,20 +373,20 @@ public class Block implements ExplorerJsonLine {
         blockJSON.put("height", heightBlock);
         blockJSON.put("signature", Base58.encode(signature));
         blockJSON.put("generator", creator.getAddress());
-        blockJSON.put("generatingBalance", getForgingValue());
-        blockJSON.put("target", getTarget());
-        blockJSON.put("winValue", getWinValue());
-        blockJSON.put("winValueTargeted", calcWinValueTargeted() - 100000);
         blockJSON.put("transactionsCount", getTransactionCount());
         blockJSON.put("timestamp", getTimestamp());
         blockJSON.put("dateTime", BlockExplorer.timestampToStr(getTimestamp()));
 
-        loadHeadMind(DCSet.getInstance());
+        ///loadHeadMind(DCSet.getInstance());
         blockJSON.put("totalFee", viewFeeAsBigDecimal());
         Tuple2<Integer, Integer> forgingPoint = blockHead.creator.getForgingData(DCSet.getInstance(), heightBlock);
         if (forgingPoint != null) {
             blockJSON.put("deltaHeight", blockHead.heightBlock - forgingPoint.a);
         }
+        blockJSON.put("generatingBalance", blockHead.forgingValue);
+        blockJSON.put("target", blockHead.target);
+        blockJSON.put("winValue", blockHead.winValue);
+        blockJSON.put("winValueTargeted", blockHead.calcWinValueTargeted());
         return blockJSON;
     }
 
@@ -1019,7 +1024,7 @@ public class Block implements ExplorerJsonLine {
         block.put("generatingBalance", this.forgingValue);
         block.put("winValue", this.getWinValue());
         block.put("target", this.getTarget());
-        ///block.put("winValueTargeted", this.calcWinValueTargeted(DCSet.getInstance()));
+        block.put("winValueTargeted", blockHead.calcWinValueTargeted());
         block.put("creator", this.creator.getAddress());
         block.put("fee", this.viewFeeAsBigDecimal());
         block.put("transactionsHash", Base58.encode(this.transactionsHash));

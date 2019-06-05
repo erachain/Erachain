@@ -142,8 +142,8 @@ function transactionLite(data, i, item) {
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
 
         output += '<b>Action</b></td><td width="290"><b>Owner</b></td><td width=100><b>Fee</b></td>';
-        output += '<td><b>Name:</b> <a href="?name=' + encodeURIComponent(item.transaction.name) + get_lang() + '">' + htmlFilter(item.transaction.name) + '</a></td>';
-        output += '<td><b>Site:</b> <a href=/' + encodeURIComponent(item.transaction.name) + get_lang() + '>http://' + document.location.host + '/' + htmlFilter(item.transaction.name) + '</a></td>';
+        output += '<td><b>Name:</b> <a href="?name=' + encodeURIComponent(item.transaction.name) + get_lang() + '">' + escapeHtml(item.transaction.name) + '</a></td>';
+        output += '<td><b>Site:</b> <a href=/' + encodeURIComponent(item.transaction.name) + get_lang() + '>http://' + document.location.host + '/' + escapeHtml(item.transaction.name) + '</a></td>';
         if (item.hasOwnProperty('balance')) {
             output += '<td width=180><b>Balance</b></td>';
         }
@@ -429,7 +429,7 @@ function transactionLite(data, i, item) {
         output += '<td><ul>';
 
         for (key in item.transaction.options) {
-            output += '<li>' + htmlFilter(item.transaction.options[key]) + '</li>';
+            output += '<li>' + escapeHtml(item.transaction.options[key]) + '</li>';
         }
         output += '</ul></td>';
 
@@ -481,9 +481,9 @@ function transactionLite(data, i, item) {
         }
         output += '<td>' + addCommas(item.transaction.fee) + ' <font size="-2">ERA</font></td>';
 
-        output += '<td><a href="?poll=' + encodeURIComponent(item.transaction.poll) + get_lang() + '">' + htmlFilter(item.transaction.poll) + '</a></td>';
+        output += '<td><a href="?poll=' + encodeURIComponent(item.transaction.poll) + get_lang() + '">' + escapeHtml(item.transaction.poll) + '</a></td>';
 
-        output += '<td>' + htmlFilter(item.transaction.optionString) + '</td>';
+        output += '<td>' + escapeHtml(item.transaction.optionString) + '</td>';
 
         if (item.hasOwnProperty('balance')) {
             output += '<td>' + printBalance(item.balance) + '</td>';
@@ -595,9 +595,9 @@ function transactionLite(data, i, item) {
         output += '<td width="100"><b>Fee</b></td><td><b>Name:</b> ';
 
         if (item.transaction.asset != '0') {
-            output += '<a href=?asset=' + item.transaction.asset + get_lang() + '>' + htmlFilter(item.transaction.assetName) + '</a>'
+            output += '<a href=?asset=' + item.transaction.asset + get_lang() + '>' + escapeHtml(item.transaction.assetName) + '</a>'
         } else {
-            output += htmlFilter(item.transaction.assetName);
+            output += escapeHtml(item.transaction.assetName);
         }
 
         output += '</td><td><b>Key</b><td align=center><b>Quantity</b><td><b>Divisible</b>';
