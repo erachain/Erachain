@@ -26,7 +26,9 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     private int DELETE_EVENT;
     private int LIST_EVENT;
 
+    public int COLUMN_FOR_ICON = 1;
     public int COLUMN_FAVORITE = 1000;
+    public static final int COLUMN_ITEM_VALUE = 200;
 
     protected List<U> list;
 

@@ -45,7 +45,7 @@ public class FavoriteImprintsTableModel extends FavoriteItemModelTable implement
 
             case COLUMN_NAME:
 
-                return item.viewName();
+                return item;
 
             case COLUMN_ADDRESS:
 

@@ -31,7 +31,7 @@ public class PollsItemsTableModel extends SearchItemsTableModel {
 
             case COLUMN_NAME:
 
-                return poll.viewName();
+                return poll;
 
             case COLUMN_ADDRESS:
 
