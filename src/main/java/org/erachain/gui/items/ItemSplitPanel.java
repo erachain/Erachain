@@ -4,9 +4,8 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.items.assets.ItemAssetsTableModel;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.models.SortedListTableModelCls;
+import org.erachain.gui.models.RendererIcon;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
@@ -49,6 +47,11 @@ public class ItemSplitPanel extends SplitPanel {
 
         // CREATE TABLE
         jTableJScrollPanelLeftPanel = new MTable(this.tableModel);
+
+        // иконку будем рисовать
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(tableModel.COLUMN_FOR_ICON)
+                .setCellRenderer(new RendererIcon());
+
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
         columnModel.getColumn(0).setMaxWidth((100));
 

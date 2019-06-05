@@ -3,6 +3,7 @@ package org.erachain.core.blockexplorer;
 import org.apache.commons.net.util.Base64;
 import org.erachain.at.ATTransaction;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
@@ -285,6 +286,7 @@ public class BlockExplorer {
         output.put("id_menu_assets", Lang.getInstance().translateFromLangObj("Assets", langObj));
         output.put("id_menu_aTs", Lang.getInstance().translateFromLangObj("ATs", langObj));
         output.put("id_menu_transactions", Lang.getInstance().translateFromLangObj("Transactions", langObj));
+        output.put("id_menu_exchange", Lang.getInstance().translateFromLangObj("Exchange", langObj));
 
         //информация о последнем блоке
         output.put("lastBlock", jsonLastBlock());
@@ -296,6 +298,17 @@ public class BlockExplorer {
                 output.put("type", type);
                 output.put("search_message", search);
                 switch (type) {
+                    case "exchange":
+                        //search exchange
+                        /////jsonQueryExchange(search, (int) start);
+                        try {
+                            String[] strA = search.split("[ /]");
+                            long have = Long.parseLong(strA[0]);
+                            long want = Long.parseLong(strA[1]);
+                            output.putAll(jsonQueryTrades(have, want));
+                        } catch (Exception e) {
+                        }
+                        break;
                     case "transactions":
                         //search transactions
                         jsonQueryTransactions(search, (int) start);
@@ -434,6 +447,11 @@ public class BlockExplorer {
             output.putAll(jsonQueryPeers(info));
         }
 
+        // Exchange
+        else if (info.getQueryParameters().containsKey("exchange")) {
+            jsonQueryExchange(null, (int)start);
+        }
+
         ///////////////////////////// ADDRESSES //////////////////////
         // address
         else if (info.getQueryParameters().containsKey("address")) {
@@ -502,6 +520,7 @@ public class BlockExplorer {
             output.put("error", "Not enough parameters.");
             output.put("help", jsonQueryHelp());
         }
+
         // time guery
         output.put("queryTimeMs", stopwatchAll.elapsedTime());
         return output;
@@ -988,7 +1007,8 @@ public class BlockExplorer {
     public Map jsonQueryTrades(long have, long want) {
 
         output.put("type", "trades");
-        output.put("search", "assets");
+        output.put("search", "exchange");
+        output.put("search_message", have + "/" + want);
 
         Map output = new LinkedHashMap();
 
@@ -997,7 +1017,7 @@ public class BlockExplorer {
 
         // Collections.reverse(ordersWant);
 
-        List<Trade> trades = dcSet.getTradeMap().getTrades(have, want, 0, 100);
+        List<Trade> trades = dcSet.getTradeMap().getTrades(have, want, 0, 25);
 
         AssetCls assetHave = Controller.getInstance().getAsset(have);
         AssetCls assetWant = Controller.getInstance().getAsset(want);
@@ -1118,8 +1138,6 @@ public class BlockExplorer {
         int i = 0;
         for (Trade trade : trades) {
 
-            i++;
-
             Map tradeJSON = new LinkedHashMap();
 
             Order orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
@@ -1158,7 +1176,7 @@ public class BlockExplorer {
             tradeJSON.put("timestamp", trade.getTimestamp());
             tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
 
-            tradesJSON.put(i, tradeJSON);
+            tradesJSON.put(i++, tradeJSON);
 
             if (i > 100)
                 break;
@@ -2210,6 +2228,69 @@ public class BlockExplorer {
         }
 
         return output;
+    }
+
+    @SuppressWarnings({"serial", "static-access"})
+    public void jsonQueryExchange(String filterStr, int start) {
+
+        output.put("type", "exchange");
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching asset keys", langObj));
+
+        List<Pair<Long, Long>> list = new ArrayList<>();
+
+        if (BlockChain.DEVELOP_USE) {
+            list.add(new Pair<Long, Long>(1L, 2L));
+        } else {
+            list.add(new Pair<Long, Long>(12L, 95L));
+            list.add(new Pair<Long, Long>(1L, 2L));
+            list.add(new Pair<Long, Long>(1L, 12L));
+            list.add(new Pair<Long, Long>(1L, 95L));
+            list.add(new Pair<Long, Long>(2L, 12L));
+            list.add(new Pair<Long, Long>(2L, 95L));
+            list.add(new Pair<Long, Long>(14L, 12L ));
+        }
+
+        OrderMap orders = dcSet.getOrderMap();
+        TradeMap trades = dcSet.getTradeMap();
+
+        JSONArray array = new JSONArray();
+
+        for (Pair<Long, Long> pair : list) {
+
+            AssetCls assetHave = Controller.getInstance().getAsset(pair.getA());
+            AssetCls assetWant = Controller.getInstance().getAsset(pair.getB());
+
+            Map pairJSON = new LinkedHashMap();
+            pairJSON.put("have", assetHave.jsonForExplorerPage(langObj));
+            pairJSON.put("want", assetWant.jsonForExplorerPage(langObj));
+            pairJSON.put("orders", orders.getCount(pair.getA(), pair.getB())
+                    + orders.getCount(pair.getB(), pair.getA()));
+
+            Trade trade = trades.getLastTrade(pair.getA(), pair.getB());
+            if (trade == null) {
+                pairJSON.put("last", "--");
+            } else {
+                if (trade.getHaveKey() == pair.getB()) {
+                    pairJSON.put("last", trade.calcPrice().toPlainString());
+                } else {
+                    pairJSON.put("last", trade.calcPriceRevers().toPlainString());
+                }
+            }
+
+            pairJSON.put("volume24", trades.getVolume24(pair.getA(), pair.getB()).toPlainString());
+
+            array.add(pairJSON);
+        }
+
+        //makePage(type, keys, start, pageSize, result, langObj);
+
+        output.put("pairs", array);
+        output.put("label_table_have", Lang.getInstance().translateFromLangObj("Base Asset", langObj));
+        output.put("label_table_want", Lang.getInstance().translateFromLangObj("Price Asset", langObj));
+        output.put("label_table_orders", Lang.getInstance().translateFromLangObj("Opened Orders", langObj));
+        output.put("label_table_last_price", Lang.getInstance().translateFromLangObj("Last Price", langObj));
+        output.put("label_table_volume24", Lang.getInstance().translateFromLangObj("Day Volume", langObj));
+
     }
 
     @SuppressWarnings({"serial", "static-access"})

@@ -39,7 +39,7 @@ public class WalletItemPersonsTableModel extends WalletAutoKeyTableModel<Tuple2<
             case COLUMN_KEY:
                 return person.getKey(DCSet.getInstance());
             case COLUMN_NAME:
-                return person.viewName();
+                return person;
             case COLUMN_ADDRESS:
                 return person.getOwner().getPersonAsString();
             case COLUMN_CONFIRMED:

@@ -2,8 +2,10 @@ package org.erachain.datachain;
 
 import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.database.serializer.TradeSerializer;
@@ -12,6 +14,7 @@ import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -353,6 +356,35 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
         return trades;
     }
 
+    @SuppressWarnings("unchecked")
+    public Trade getLastTrade(long have, long want) {
+
+        if (this.pairKeyMap == null)
+            return null;
+
+        String pairKey;
+        if (have > want) {
+            pairKey = have + "/" + want;
+        } else {
+            pairKey = want + "/" + have;
+        }
+
+        //FILTER ALL KEYS
+        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
+                Fun.t3(pairKey, null, null),
+                Fun.t3(pairKey, Fun.HI(), Fun.HI()))
+                    //.descendingMap()
+                    .values();
+
+        Iterator iterator = keys.iterator();
+        if (iterator.hasNext()) {
+             return this.get((Tuple2<Long, Long>) iterator.next());
+        }
+
+        //RETURN
+        return null;
+    }
+
     /**
      * Get transaction by timestamp
      *  @param have      include
@@ -371,10 +403,16 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
         else
             pairKey = want + "/" + have;
 
+        // тут индекс не по времени а по номерам блоков как лонг
+        int heightStart = Controller.getInstance().getMyHeight();
+        int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
+        long refDBend = Transaction.makeDBRef(heightEnd, 0);
+
         //FILTER ALL KEYS
+        //// обратный отсчет по номерам блоков
         Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
-                Fun.t3(pairKey, timestamp, timestamp),
-                Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
+                Fun.t3(pairKey, null, null), // с самого посденего и до нужного вверх
+                Fun.t3(pairKey, Long.MAX_VALUE - refDBend, Fun.HI())).values();
 
         Iterable iterable;
 
@@ -393,6 +431,46 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
 
         //RETURN
         return trades;
+    }
+
+    public BigDecimal getVolume24(long have, long want) {
+
+        BigDecimal volume = BigDecimal.ZERO;
+
+        if (this.pairKeyMap == null)
+            return volume;
+
+        String pairKey;
+        if (have > want)
+            pairKey = have + "/" + want;
+        else
+            pairKey = want + "/" + have;
+
+        // тут индекс не по времени а по номерам блоков как лонг
+        int heightStart = Controller.getInstance().getMyHeight();
+        //// с последнего -- long refDBstart = Transaction.makeDBRef(heightStart, 0);
+        int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY;
+        long refDBend = Transaction.makeDBRef(heightEnd, 0);
+
+        //FILTER ALL KEYS
+        //// обратный отсчет по номерам блоков
+        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
+                //Fun.t3(pairKey, Long.MAX_VALUE - refDBstart, null),
+                Fun.t3(pairKey, null, null), // с самого посденего и до нужного вверх
+                Fun.t3(pairKey, Long.MAX_VALUE - refDBend, Fun.HI())).values();
+
+        Iterator iterator = keys.iterator();
+        while (iterator.hasNext()) {
+            Trade trade = this.get((Tuple2<Long, Long>) iterator.next());
+            if (trade.getHaveKey() == want) {
+                volume = volume.add(trade.getAmountHave());
+            } else {
+                volume = volume.add(trade.getAmountWant());
+            }
+        }
+
+        //RETURN
+        return volume;
     }
 
     public void delete(Trade trade) {

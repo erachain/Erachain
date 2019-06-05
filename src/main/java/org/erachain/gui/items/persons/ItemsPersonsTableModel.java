@@ -36,7 +36,7 @@ public class ItemsPersonsTableModel extends SearchItemsTableModel {
 
             case COLUMN_NAME:
 
-                return person.getName();
+                return person;
 
             case COLUMN_PUBLISHER:
 

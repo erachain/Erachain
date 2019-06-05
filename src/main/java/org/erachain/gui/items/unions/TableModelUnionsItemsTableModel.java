@@ -32,7 +32,7 @@ public class TableModelUnionsItemsTableModel extends SearchItemsTableModel {
 
             case COLUMN_NAME:
 
-                return union.viewName();
+                return union;
 
             case COLUMN_ADDRESS:
 

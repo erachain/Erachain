@@ -46,7 +46,7 @@ public class FavoriteStatusesTableModel extends FavoriteItemModelTable {
 
             case COLUMN_NAME:
 
-                return status.viewName();
+                return status;
 
             case COLUMN_ADDRESS:
 

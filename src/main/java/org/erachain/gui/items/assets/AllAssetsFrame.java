@@ -2,7 +2,9 @@ package org.erachain.gui.items.assets;
 
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.CoreRowSorter;
+import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.models.RendererIcon;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -82,6 +84,10 @@ public class AllAssetsFrame extends JFrame {
         //CREATE TABLE
         this.tableModelItemAssets = new ItemAssetsTableModel();
         final MTable assetsTable = new MTable(this.tableModelItemAssets);
+
+        // иконку будем рисовать
+        assetsTable.getColumnModel().getColumn(tableModelItemAssets.COLUMN_FOR_ICON)
+                .setCellRenderer(new RendererIcon());
 
         //CHECKBOX FOR ASSET TYPE
         TableColumn divisibleColumn = assetsTable.getColumnModel().getColumn(ItemAssetsTableModel.COLUMN_ASSET_TYPE);

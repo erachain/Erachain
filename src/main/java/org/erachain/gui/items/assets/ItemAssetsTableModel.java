@@ -21,6 +21,7 @@ public class ItemAssetsTableModel extends SearchItemsTableModel {
         super(DCSet.getInstance().getItemAssetMap(), new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"},
                 new Boolean[]{false, true, true, false, false, false, false, false},
                 COLUMN_FAVORITE);
+
         logger = LoggerFactory.getLogger(ItemAssetsTableModel.class.getName());
     }
 
@@ -39,7 +40,7 @@ public class ItemAssetsTableModel extends SearchItemsTableModel {
 
             case COLUMN_NAME:
 
-                return asset.viewName();
+                return asset; // use renderer .viewName();
 
             case COLUMN_ASSET_TYPE:
 

@@ -1460,6 +1460,18 @@ public class WebResource {
         }
     }
 
+    @Path("index/libs/js/explorerExchange.js")
+    @GET
+    public Response explorerExchange() {
+        File file = new File("web/libs/js/explorerExchange.js");
+
+        if (file.exists()) {
+            return Response.ok(file, "text/explorerExchange").build();
+        } else {
+            return error404(request, null);
+        }
+    }
+
     @Path("index/libs/js/explorerPolls.js")
     @GET
     public Response explorerPolls() {

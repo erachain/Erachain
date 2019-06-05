@@ -6,12 +6,18 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.DBMap;
 import org.erachain.database.wallet.FavoriteItemMap;
 import org.erachain.gui.ObserverWaiter;
+import org.erachain.gui.items.TypeOfImage;
 import org.erachain.utils.ObserverMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -125,6 +131,25 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
 
     }
 
+    public static class IconListRenderer extends DefaultListCellRenderer{
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
+        {
+            JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+            // Get icon to use for the list item value
+            byte[] iconBytes = ((ItemCls) value).getIcon();
+            if (iconBytes != null && iconBytes.length > 0) {
+                ImageIcon image = new ImageIcon(iconBytes);
+                Image Im = image.getImage().getScaledInstance(25, 25, 1);
+                label.setIcon(new ImageIcon(Im));
+            }
+
+            return label;
+        }
+    }
 
     public void addObservers() {
         if (Controller.getInstance().doesWalletDatabaseExists()) {
