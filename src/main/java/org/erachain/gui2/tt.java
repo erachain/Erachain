@@ -55,6 +55,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
 
         if (BlockChain.DEVELOP_USE)
             root.add(bank_Tree);
+
         root.add(account_Node);
         root.add(person_Node);
         root.add(document_Node);
@@ -62,10 +63,12 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         root.add(assets_Node);
         root.add(templates_Node);
         root.add(statuses_Node);
+
         if (BlockChain.DEVELOP_USE)
             root.add(unions_Node);
-        if (BlockChain.DEVELOP_USE)
-            root.add(polls_Node);
+
+        root.add(polls_Node);
+
         if (BlockChain.DEVELOP_USE)
             root.add(hashes_Node);
         if (BlockChain.DEVELOP_USE)
