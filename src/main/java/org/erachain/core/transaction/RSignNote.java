@@ -484,10 +484,11 @@ public class RSignNote extends Transaction {
         } else {
 
             // version 1
-            try {
+            String text = new String(getData(), Charset.forName("UTF-8"));
 
+            try {
                 JSONObject data = new JSONObject();
-                data = (JSONObject) JSONValue.parseWithException(new String(getData(), Charset.forName("UTF-8")));
+                data = (JSONObject) JSONValue.parseWithException(text);
                 String title = data.get("Title").toString();
                 if (title == null || title.equals(""))
                     return null;
@@ -495,8 +496,8 @@ public class RSignNote extends Transaction {
                 return title;
 
             } catch (ParseException e) {
-                LOGGER.error(e.getMessage(), e);
-                return "error " + e.getMessage();
+                // version 0
+                return text.split("\n")[0];
             }
         }
     }

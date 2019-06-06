@@ -291,7 +291,7 @@ function transactions_Table(data) {
 
         if (item.title != null) {
             output += '<a href="?tx=' + item.signature + get_lang() + '">'
-                + htmlFilter(item.title) + '</a><td>';
+                + escapeHtml(item.title) + '</a><td>';
         } else {
             output += '<td>';
         }

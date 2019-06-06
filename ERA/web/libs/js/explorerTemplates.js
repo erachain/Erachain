@@ -32,12 +32,12 @@ function templates(data) {
     for (var i in data.pageItems) {
         var item = data.pageItems[i];
         output += '<tr><td><a href="?template=' + item.key + get_lang() + '">' + item.key + ': ';
-        output += '<b>' + item.name + '</b></a></td>';
-        output += '<td>' + item.description.substr(0, 100) + '</td>';
+        output += '<b>' + escapeHtml(item.name) + '</b></a></td>';
+        output += '<td>' + escapeHtml(item.description.substr(0, 100)) + '</td>';
 
         output += '<td><a href=?address=' + item.owner + get_lang() + '>';
         if (item.hasOwnProperty('person'))
-            output += '[' + item.person_key + ']' + htmlFilter(item.person);
+            output += '[' + item.person_key + ']' + escapeHtml(item.person);
         else
             output += item.owner;
         output += '</a></td></tr>';
