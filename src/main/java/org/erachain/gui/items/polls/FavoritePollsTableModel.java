@@ -46,7 +46,7 @@ public class FavoritePollsTableModel extends FavoriteItemModelTable implements O
 
             case COLUMN_NAME:
 
-                return status.viewName();
+                return status;
 
             case COLUMN_ADDRESS:
 

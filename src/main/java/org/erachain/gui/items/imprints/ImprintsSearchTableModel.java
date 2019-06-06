@@ -36,7 +36,7 @@ public class ImprintsSearchTableModel extends SearchItemsTableModel {
 
             case COLUMN_NAME:
 
-                return item.getName();
+                return item;
 
             case COLUMN_PUBLISHER:
 

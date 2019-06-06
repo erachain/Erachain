@@ -6,7 +6,11 @@ import org.erachain.datachain.ItemMap;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.Pair;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 @SuppressWarnings("serial")
 public abstract class SearchItemsTableModel extends TimerTableModelCls<ItemCls> {

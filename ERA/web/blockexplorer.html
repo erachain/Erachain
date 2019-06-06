@@ -15,6 +15,7 @@
     <script src="/index/libs/js/explorerStatements.js"></script>
     <script src="/index/libs/js/explorerStatuses.js"></script>
     <script src="/index/libs/js/explorerTemplates.js"></script>
+    <script src="/index/libs/js/explorerExchange.js"></script>
     <script src="/index/libs/js/explorerTransactions.js"></script>
     <script src="/index/libs/js/explorerTransactionsTable.js"></script>
     <script src="/index/libs/js/third-party/qrcode.min.js"></script>
@@ -25,7 +26,7 @@
 
     <style type="text/css">
         body {
-            padding-top: 50px;
+            padding-top: 5px;
         }
 
         .ll-blue-bgc {
@@ -181,7 +182,7 @@ button.white-bgc[disabled]:focus,
 
         .main-tabs {
             width: 100%;
-            padding-top: 15px;
+            padding-top: 5px;
             padding-left: 0px;
             padding-right: 0px;
             background-color: lightgray;
@@ -342,6 +343,9 @@ button.white-bgc[disabled]:focus,
                                 if (type == 'peers') {
                                     document.getElementById('main').innerHTML = peers(data);
                                 } else
+                                if (type == 'exchange') {
+                                    document.getElementById('main').innerHTML = exchange(data);
+                                } else
                                 if (type == 'transactions') {
                                     document.getElementById('main').innerHTML = transactions(data);
                                 } else
@@ -480,15 +484,31 @@ button.white-bgc[disabled]:focus,
             }
         }
 
+        function getAssetURL(key, name, icon, imgSize) {
+            var output = '<a href="?asset=' + key + get_lang() + '">';
+            if (key > 1000)
+                output += '[' + key + ']';
+
+            if (icon.length > 0)
+                output += ' <img src="data:image/gif;base64,' + icon + '" style="width:' + imgSize + 'px;" /> ';
+
+            output += '<b>' +  escapeHtml(name) + '</b></a>';
+
+            return output;
+        }
+
+
         function getAssetName(assetKey, assetName) {
-            if (assetKey == 2) {
+            if (assetKey < 1000)
                 return escapeHtml(assetName);
-            } else {
-                return '(' + assetKey + ')' + escapeHtml(assetName);
-            }
+
+            return '(' + assetKey + ')' + escapeHtml(assetName);
         }
 
         function getAssetName2(assetKey, assetName) {
+            if (assetKey < 1000)
+                return escapeHtml(assetName);
+
             return '[' + assetKey + '] ' + escapeHtml(assetName);
         }
 
@@ -1027,7 +1047,8 @@ button.white-bgc[disabled]:focus,
             }
 
             output += '<tr bgcolor="#f9f9f9">';
-            output += '<td colspan=2><b>' + data.label_Total_For_Sell + ':<td>' + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+            output += '<td colspan=2><b>' + data.label_Total_For_Sell + ':<td>'
+                    + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
             output += '<td>' + addCommas(data.sellsSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 
             output += '</table>';
@@ -1072,8 +1093,8 @@ button.white-bgc[disabled]:focus,
 
             output += '<h4 style="text-align: left;">' + data.label_Trade_History + '</h4>';
 
-            output += '<table border="0" cellspacing="3" cellpadding="5" width="100%" class="table table-striped" style="border: 1px solid #ddd;">';
-            output += '<tr bgcolor="e0e0e0"><td align=center><b>tx<td align=center><b>' + data.label_Date + '<td align=center><b>' + data.label_Type + '</b></td>';
+            output += '<table border="0" cellspacing="3" cellpadding="5" width="100%" class="table table-striped" style="vertical-align: baseline; border: 1px solid #ddd;">';
+            output += '<tr bgcolor="e0e0e0"><td align=center><b>tx<td align=center><b>' + data.label_Date; // + '<td align=center><b>' + data.label_Type + '</b></td>';
             output += '<td align=right><b><a href=?asset=' + data.assetHave + get_lang() + '>' + getAssetName2(data.assetHave, data.assetHaveName) + '</b></td><td align=center><b>' + data.label_Price + '</b></td>';
 
             output += '<td><b><a href=?asset=' + data.assetWant + get_lang() + '>' + getAssetName2(data.assetWant, data.assetWantName) + '</b></td></tr>';
@@ -1084,7 +1105,7 @@ button.white-bgc[disabled]:focus,
 
                 output += '<td align=center><a href=?trade=' + data.trades[key].initiatorTxSignature + '/' + data.trades[key].targetTxSignature + get_lang() + '>#' + i++;
                 output += '<td align=center>' + data.trades[key].dateTime;
-                output += '<td align=center>' + data.trades[key].type;
+                //output += '<td align=center>' + data.trades[key].type;
 
 
                 if (data.trades[key].type == 'sell') {
@@ -1097,29 +1118,30 @@ button.white-bgc[disabled]:focus,
                     if (data.trades[key].initiatorCreator == data.assetWantOwner) {
                         output += ' <b>&#9655;</b> ';
                     }
-                    output += '<a href=?address=' + data.trades[key].initiatorCreator + '>' + data.trades[key].initiatorCreator + '</a>';
-                    output += '<br>';
+                    output += '<a href=?address=' + data.trades[key].initiatorCreator + '>' + data.trades[key].initiatorCreator.substr(0,12) + '..</a>';
+                    //output += '<br>';
                     output += addCommas(data.trades[key].amountHave);
-                    output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
-                    output += ' <img src=img/grright.png style="vertical-align: middle;">';
+                    //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+                    //output += ' <img src=img/grright.png style="vertical-align: middle;">';
 
-                    output += '<td align=center>' + addCommas(data.trades[key].realReversePrice);
+                    output += '<td align=left><span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.4em"></span>'
+                        + '<span style="font-size:1.4em">' + addCommas(data.trades[key].realReversePrice) + '</span>';
                     output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 
                     output += '<td style="line-height: 150%;">';
-                    output += '<a href=?address=' + data.trades[key].targetCreator + '>' + data.trades[key].targetCreator + '</a>';
+                    output += '<a href=?address=' + data.trades[key].targetCreator + '>' + data.trades[key].targetCreator.substr(0,12) + '..</a>';
 
                     if (data.trades[key].targetCreator == data.assetHaveOwner) {
-                        output += ' <b>&#9664;</b> ';
+                        output += ' <b>&#9664;</span></b> ';
                     }
                     if (data.trades[key].targetCreator == data.assetWantOwner) {
                         output += ' <b>&#9665;</b> ';
                     }
 
-                    output += '<br>';
-                    output += '<img src=img/grleft.png style="vertical-align: middle;"> ';
+                    //output += '<br>';
+                    //output += '<img src=img/grleft.png style="vertical-align: middle;"> ';
                     output += addCommas(data.trades[key].amountWant);
-                    output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 
                 } else {
                     output += '<td align=right style="line-height: 150%;">';
@@ -1131,17 +1153,18 @@ button.white-bgc[disabled]:focus,
                     if (data.trades[key].targetCreator == data.assetWantOwner) {
                         output += ' <b>&#9655;</b> ';
                     }
-                    output += '<a href=?address=' + data.trades[key].targetCreator + '>' + data.trades[key].targetCreator + '</a>';
-                    output += '<br>';
+                    output += '<a href=?address=' + data.trades[key].targetCreator + '>' + data.trades[key].targetCreator.substr(0,12) + '..</a>';
+                    //output += '<br>';
                     output += addCommas(data.trades[key].amountHave);
-                    output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
-                    output += ' <img src=img/grright.png style="vertical-align: middle;">';
+                    //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+                    //output += ' <img src=img/grright.png style="vertical-align: middle;">';
 
-                    output += '<td align=center>' + addCommas(data.trades[key].realPrice);
-                    output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                    output += '<td align=left><span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.4em"></span>'
+                        + '<span style="font-size:1.4em">' + addCommas(data.trades[key].realPrice) + '</span>';
+                    output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName) + '';
 
                     output += '<td style="line-height: 150%;">';
-                    output += '<a href=?address=' + data.trades[key].initiatorCreator + '>' + data.trades[key].initiatorCreator + '</a>';
+                    output += '<a href=?address=' + data.trades[key].initiatorCreator + '>' + data.trades[key].initiatorCreator.substr(0,12) + '..</a>';
 
                     if (data.trades[key].initiatorCreator == data.assetHaveOwner) {
                         output += ' <b>&#9664;</b> ';
@@ -1150,10 +1173,10 @@ button.white-bgc[disabled]:focus,
                         output += ' <b>&#9665;</b> ';
                     }
 
-                    output += '<br>';
-                    output += '<img src=img/grleft.png style="vertical-align: middle;"> ';
+                    //output += '<br>';
+                    //output += '<img src=img/grleft.png style="vertical-align: middle;"> ';
                     output += addCommas(data.trades[key].amountWant);
-                    output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
                 }
             }
 
@@ -2161,6 +2184,7 @@ button.white-bgc[disabled]:focus,
         //	document.getElementById('home').href = document.location.pathname;
             document.getElementById('home').href = '?blocks&lang=' + params['lang'];
             document.getElementById('menu_transactions').href = '?transactions&lang=' + params['lang'];
+            document.getElementById('menu_exchange').href = '?exchange&lang=' + params['lang'];
             document.getElementById('menu_addresses').href = '?addresses&lang=' + params['lang'];
             document.getElementById('menu_persons').href = '?persons&lang=' + params['lang'];
             document.getElementById('menu_polls').href = '?polls&lang=' + params['lang'];
@@ -2178,6 +2202,7 @@ button.white-bgc[disabled]:focus,
             document.getElementById('menuStatuses').setAttribute('class', '');
             document.getElementById('menuTemplates').setAttribute('class', '');
             document.getElementById('menuTransactions').setAttribute('class', '');
+            document.getElementById('menuExchange').setAttribute('class', '');
 
             var title = 'Erachain BlockExplorer';
 
@@ -2243,7 +2268,7 @@ button.white-bgc[disabled]:focus,
                             class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
                     </button>
                     <a href="http://erachain.org" class="navbar-brand"><img src="img/logo_header.png"
-                                                                            style="height:35px" alt=""
+                                                                            style="height:65px" alt=""
                                                                             class="logo-header"></a>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
@@ -2276,8 +2301,9 @@ button.white-bgc[disabled]:focus,
                         <div class="input-group">
                             <select id="selectID" class="form-control" role="tablist">
                                 <option value=blocks id=home_op translate="true">Block</option>
-                                <option value=addresses id=menu_addresses_op translate="true">Address</option>
+                                <option value=exchange id=menu_exchange_op translate="true">Exchange</option>
                                 <option value=transactions id=menu_transactions_op translate="true">Transaction</option>
+                                <option value=addresses id=menu_addresses_op translate="true">Address</option>
                                 <option value=assets id=menu_assets_op translate="true">Asset</option>
                                 <option value=persons id=menu_persons_op translate="true">Person</option>
                                 <option value=polls id=menu_polls_op translate="true">Poll</option>
@@ -2287,7 +2313,7 @@ button.white-bgc[disabled]:focus,
                             </select>
                         </div>
                         <div class="input-group">
-                            <input id="q" size="55" type="text" value="" class="form-control"
+                            <input id="q" size="70" type="text" value="" class="form-control"
                                    onkeydown="if (event.keyCode == 13) buttonSearch()"><span class="input-group-btn">
                 <button id="button" type="button" value="!searchval!" class="btn btn-link"
                         onClick="buttonSearch()"><span class="glyphicon glyphicon-search"></span><span class="sr-only">Search</span></button></span>
@@ -2309,8 +2335,9 @@ button.white-bgc[disabled]:focus,
                             <div class="row" id="main-menu">
                                 <ul role="tablist" class="nav nav-tabs" style="font-size:1.2em;">
                                     <li id=menuBlocks><a href="?blocks" id=home translate="true">Blocks</a></li>
-                                    <li id=menuAddresses><a href="?addresses" id=menu_addresses translate="true">Addresses</a></li>
                                     <li id=menuTransactions><a href="?transactions" id=menu_transactions translate="true">Transactions</a></li>
+                                    <li id=menuExchange><a href="?exchange" id=menu_exchange translate="true">Exchange</a></li>
+                                    <li id=menuAddresses><a href="?addresses" id=menu_addresses translate="true">Addresses</a></li>
                                     <li id=menuPersons><a href="?persons" id=menu_persons translate="true">Persons</a></li>
                                     <li id=menuPolls><a href="?polls" id=menu_polls translate="true">Polls</a></li>
                                     <li id=menuAssets><a href="?assets" id=menu_assets translate="true">Assets</a></li>

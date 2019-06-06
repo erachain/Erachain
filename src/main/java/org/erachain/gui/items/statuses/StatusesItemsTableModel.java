@@ -33,7 +33,7 @@ public class StatusesItemsTableModel extends SearchItemsTableModel {
 
             case COLUMN_NAME:
 
-                return status.viewName();
+                return status;
 
             case COLUMN_ADDRESS:
 

@@ -31,6 +31,7 @@ import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.WalletCreateAccountButton;
 import org.erachain.gui.library.WalletSyncButton;
 import org.erachain.gui.models.AccountsTableModel;
+import org.erachain.gui.models.FavoriteComboBoxModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -93,6 +94,7 @@ public class AccountsPanel extends JPanel // implements ItemListener
 
         //ASSET FAVORITES
         cbxFavorites = new JComboBox<ItemCls>(new ComboBoxAssetsModel());
+        cbxFavorites.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
         this.add(cbxFavorites, favoritesGBC);
 
 

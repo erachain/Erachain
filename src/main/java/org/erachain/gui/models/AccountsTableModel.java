@@ -41,7 +41,8 @@ public class AccountsTableModel extends TimerTableModelCls<PublicKeyAccount> imp
     public AccountsTableModel() {
         super(Controller.getInstance().wallet.database.getAccountMap(),
                 new String[]{"No.", "Account", "Name",
-                        "Balance 1 (OWN)", "Balance 2 (DEBT)", "Balance 3 (HOLD)", "Balance 4 (SPEND)", AssetCls.FEE_NAME},
+                        "Balance 1 (OWN)", "Balance 2 (DEBT)", "Balance 3 (HOLD)", // "Balance 4 (SPEND)",
+                        AssetCls.FEE_NAME},
                 new Boolean[]{true, false, false, false, false, false, false, false}, false);
 
         getInterval();

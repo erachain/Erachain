@@ -8,9 +8,13 @@ import org.erachain.datachain.DCMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.gui.models.SortedListTableModelCls;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
 import java.util.*;
 
 @SuppressWarnings("serial")

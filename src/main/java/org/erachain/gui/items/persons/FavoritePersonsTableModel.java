@@ -44,7 +44,7 @@ public class FavoritePersonsTableModel extends FavoriteItemModelTable {
 
             case COLUMN_NAME:
 
-                return person.viewName();
+                return person;
 
             case COLUMN_ADDRESS:
 

@@ -46,7 +46,7 @@ public class FavoriteTemplatesTableModel extends FavoriteItemModelTable implemen
 
             case COLUMN_NAME:
 
-                return template.viewName();
+                return template;
 
             case COLUMN_ADDRESS:
 

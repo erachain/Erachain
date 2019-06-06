@@ -769,6 +769,11 @@ public class BlockChain {
         return this.genesisTimestamp + (long) getHeight(dcSet) * GENERATING_MIN_BLOCK_TIME_MS;
     }
 
+    public int getBlockOnTimestamp(long timestamp) {
+        long diff = timestamp = genesisTimestamp;
+        return (int) (diff / GENERATING_MIN_BLOCK_TIME_MS);
+    }
+
     // BUFFER of BLOCK for WIN solving
     public Block getWaitWinBuffer() {
         return this.waitWinBuffer;
