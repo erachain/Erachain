@@ -827,9 +827,25 @@ public class Order implements Comparable<Order> {
         this.creator.changeBalance(this.dcSet, true, this.wantKey, thisAmountFulfilledWant, false);
     }
 
-    //COMPARE
+    @Override
+    public int hashCode() {
+        return id.hashCode() - fulfilledHave.hashCode();
+    }
 
-    //@Override
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof Order) {
+            Order order = (Order) object;
+            // только если Ид сопало и Остаок тоже - так чтобы в базе данных при обновлении выскакивало событие
+            if (id.equals(order.id) && fulfilledHave.equals(order.fulfilledHave)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    //COMPARE
     @Override
     public int compareTo(Order order) {
         //COMPARE ONLY BY PRICE
