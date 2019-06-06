@@ -235,7 +235,8 @@ public class CancelOrderFrame extends JDialog {
         switch (result.getB()) {
             case Transaction.VALIDATE_OK:
 
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Cancel order has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Cancel order has been sent") + "!",
+                        Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
                 this.dispose();
                 break;
 

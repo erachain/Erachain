@@ -257,7 +257,7 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel {
             // CHECK VALIDATE MESSAGE
             if (result == transaction.VALIDATE_OK) {
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Payment Order has been sent!"),
+                        Lang.getInstance().translate("Payment Order has been sent") + "!",
                         Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 
             } else {
