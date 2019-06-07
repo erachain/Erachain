@@ -46,7 +46,7 @@ public class WithdrawExchange extends JPanel {
     private JLabel jLabel_YourAddress;
     private JTextField jTextField_Address = new JTextField();
 
-    final AssetCls[] asset = new AssetCls[1];
+    private AssetCls asset;
 
     public WithdrawExchange(AssetCls asset, Account account) {
 
@@ -74,69 +74,65 @@ public class WithdrawExchange extends JPanel {
         String account_to;
         String message = "";
 
+        AssetCls assetIn = null;
         try {
 
-            if (false) {
-                account_to = "7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK";
-            } else {
-
-                String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
-                AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
-                switch ((int)asset.getKey()) {
-                    case 12:
-                        urlGetDetails += "12/3/" + jTextField_Address.getText() + "/0.1"; // eBTC -> BTC
+            String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
+            assetIn = (AssetCls) cbxAssets.getSelectedItem();
+            switch ((int)assetIn.getKey()) {
+                case 12:
+                    urlGetDetails += "12/3/" + jTextField_Address.getText() + "/0.1"; // eBTC -> BTC
+                    message += "BTC";
+                    break;
+                case 95:
+                    urlGetDetails += "13/3/" + jTextField_Address.getText() + "/100"; // eUSD -> BTC
+                    message += "BTC";
+                    break;
+                case 94:
+                    urlGetDetails += "14/3/" + jTextField_Address.getText() + "/100"; // eEUR -> BTC
+                    message += "BTC";
+                    break;
+                default:
+                    urlGetDetails += "10/3/" + jTextField_Address.getText() + "/1"; // COMPU -> BTC
+                    String assetName = assetIn.getName();
+                    if (assetName.equals("Bitcoin")) {
                         message += "BTC";
-                        break;
-                    case 95:
-                        urlGetDetails += "13/3/" + jTextField_Address.getText() + "/100"; // eUSD -> BTC
-                        message += "BTC";
-                        break;
-                    case 94:
-                        urlGetDetails += "14/3/" + jTextField_Address.getText() + "/100"; // eEUR -> BTC
-                        message += "BTC";
-                        break;
-                    default:
-                        urlGetDetails += "10/3/" + jTextField_Address.getText() + "/1"; // COMPU -> BTC
-                        String assetName = asset.getName();
-                        if (assetName.equals("Bitcoin")) {
-                            message += "BTC";
-                        } else {
-                            message += assetName;
-                        }
-                }
-
-                // CREATE CONNECTION
-                URL url = new URL(urlGetDetails);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-                // EXECUTE
-                int resCode = connection.getResponseCode();
-
-                //READ RESULT
-                InputStream stream;
-                if (resCode == 400) {
-                    stream = connection.getErrorStream();
-                } else {
-                    stream = connection.getInputStream();
-                }
-
-                InputStreamReader isReader = new InputStreamReader(stream, "UTF-8");
-                //String result = new BufferedReader(isReader).readLine();
-
-                BufferedReader bufferedReader = new BufferedReader(isReader);
-                String inputLine;
-                while ((inputLine = bufferedReader.readLine()) != null)
-                    inputText += inputLine;
-                bufferedReader.close();
-
-                jsonObject = (JSONObject) JSONValue.parse(inputText);
-
-                if (BlockChain.DEVELOP_USE) {
-                    jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
-                }
-
-                account_to = jsonObject.get("addr_in").toString();
+                    } else {
+                        message += assetName;
+                    }
             }
+
+            // CREATE CONNECTION
+            URL url = new URL(urlGetDetails);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // EXECUTE
+            int resCode = connection.getResponseCode();
+
+            //READ RESULT
+            InputStream stream;
+            if (resCode == 400) {
+                stream = connection.getErrorStream();
+            } else {
+                stream = connection.getInputStream();
+            }
+
+            InputStreamReader isReader = new InputStreamReader(stream, "UTF-8");
+            //String result = new BufferedReader(isReader).readLine();
+
+            BufferedReader bufferedReader = new BufferedReader(isReader);
+            String inputLine;
+            while ((inputLine = bufferedReader.readLine()) != null)
+                inputText += inputLine;
+            bufferedReader.close();
+
+            jsonObject = (JSONObject) JSONValue.parse(inputText);
+
+            if (BlockChain.DEVELOP_USE) {
+                jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
+            }
+
+            account_to = jsonObject.get("addr_in").toString();
 
         } catch (Exception e) {
             account_to = null;
@@ -144,10 +140,10 @@ public class WithdrawExchange extends JPanel {
             inputText = "";
         }
 
-        if (account_to != null) {
+        if (assetIn != null && account_to != null) {
 
             message += ":" + jTextField_Address.getText();
-            new AccountSendDialog(asset[0], null, new Account(account_to), null, message);
+            new AccountSendDialog(assetIn, null, new Account(account_to), null, message);
 
         }
 
@@ -158,9 +154,9 @@ public class WithdrawExchange extends JPanel {
     private void initComponents(AssetCls asset_in, Account account) {
 
         if (asset_in == null) {
-            asset[0] = Controller.getInstance().getAsset(1l);
+            asset = Controller.getInstance().getAsset(1l);
         } else {
-            asset[0] = asset_in;
+            asset = asset_in;
         }
 
         GridBagConstraints gridBagConstraints;
@@ -208,7 +204,7 @@ public class WithdrawExchange extends JPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    asset[0] = (AssetCls) cbxAssets.getSelectedItem();
+                    asset = (AssetCls) cbxAssets.getSelectedItem();
                 }
             }
         });
@@ -245,7 +241,7 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        jLabel_Adress_Check.setText("qweqwe");
+        jLabel_Adress_Check.setText("");
         add(jLabel_Adress_Check, gridBagConstraints);
 
         //////////////// BUTTONS

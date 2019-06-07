@@ -233,6 +233,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
         this.jLabel_Mess_Title.setText(Lang.getInstance().translate("Title") + ":");
         this.jLabel_Mess.setText(Lang.getInstance().translate("Message") + ":");
         this.jCheckBox_Enscript.setText(Lang.getInstance().translate("Encrypt message") + ":");
+        this.jCheckBox_Enscript.setSelected(true);
         this.jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
         this.jLabel_Ammount.setText(Lang.getInstance().translate("Amount") + ":");
         this.jLabel_Fee.setText(Lang.getInstance().translate("Fee level") + ":");
@@ -434,7 +435,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
         if (result == Transaction.VALIDATE_OK) {
             //RESET FIELDS
 
-            if (amount != null && amount.compareTo(BigDecimal.ZERO) == 1) //IF MORE THAN ZERO
+            if (amount != null && amount.compareTo(BigDecimal.ZERO) != 0) //IF MORE THAN ZERO
             {
                 this.jTextField_Ammount.setText("0");
             }
@@ -447,7 +448,6 @@ public class AssetSendPanel extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
         }
-
 
     }
 
