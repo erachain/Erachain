@@ -13,6 +13,10 @@ public class AccountsComboBoxModel extends DefaultComboBoxModel<Account> impleme
 
     private int viewBalancePosition;
 
+    /**
+     * Show balance at Position
+     * @param viewBalancePosition
+     */
     public AccountsComboBoxModel(int viewBalancePosition) {
         this.viewBalancePosition = viewBalancePosition;
 
@@ -27,7 +31,7 @@ public class AccountsComboBoxModel extends DefaultComboBoxModel<Account> impleme
     }
 
     /**
-     * not show balance on accounts
+     * Not show balance on accounts
      */
     public AccountsComboBoxModel() {
         this(0);

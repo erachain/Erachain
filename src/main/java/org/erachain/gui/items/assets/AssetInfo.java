@@ -1,21 +1,14 @@
 package org.erachain.gui.items.assets;
 
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.MouseInfo;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTextPane;
@@ -37,9 +30,13 @@ import org.erachain.gui.library.VoushLibraryPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
+import org.slf4j.LoggerFactory;
 
 
 public class AssetInfo extends JTextPane {
+
+    // in pack toByte and Parse - reference not included
+    static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Transaction.class.getName());
 
     //private BalancesTableModel balancesTableModel;
     private static String img_Local_URL = "http:\\img";
@@ -48,10 +45,10 @@ public class AssetInfo extends JTextPane {
     private Transaction transaction;
     private AssetInfo th;
     private PublicKeyAccount owner;
-    private JLabel image_Label;
+    private JLabel imageLabel;
     private int max_Widht;
     private int max_Height;
-    private Image Im;
+    private Image cachedImage;
     ImageIcon image = null;
 
     /**
@@ -68,8 +65,20 @@ public class AssetInfo extends JTextPane {
         byte[] recordReference = asset.getReference();
         transaction = Transaction.findByDBRef(DCSet.getInstance(), recordReference);
         this.setMinimumSize(new Dimension(0, 0));
-        image_Label = new JLabel("");
 
+        imageLabel = new JLabel();
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.gridheight = 5;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.05;
+        add(imageLabel, gridBagConstraints);
+
+        image = null;
         byte[] imageByte = asset.getImage();
         if (imageByte != null && imageByte.length > 0) {
             //   img_HTML = "<img src='data:image/gif;base64," + a + "' width = '350' /></td><td style ='padding-left:20px'>";
@@ -83,21 +92,24 @@ public class AssetInfo extends JTextPane {
             double k = ((double) x / (double) max_Widht);
             max_Height = (int) (max_Height / k);
 
-            if (max_Height != 0) {
-                Im = image.getImage().getScaledInstance(max_Widht, max_Height, 1);
-                image = new ImageIcon(Im);
-                image_Label.setIcon(image);
-                //image_Label.setSize(image.getIconWidth(), image.getIconHeight());
+            if (max_Height > 1 ) {
+                cachedImage = image.getImage().getScaledInstance(max_Widht, max_Height, 1);
+                image = new ImageIcon(cachedImage);
+                imageLabel.setIcon(image);
+            } else {
+                image = null;
             }
 
-        } else {
+        }
+
+        if (image == null){
             imageByte = asset.getIcon();
             if (imageByte != null && imageByte.length > 1) {
                 //if (asset.getKey() == 1l) image = new ImageIcon("images/icons/icon32.png");
                 image = new ImageIcon(imageByte);
-                Im = image.getImage().getScaledInstance(45, 45, 1);
-                image = new ImageIcon(Im);
-                image_Label.setIcon(image);
+                cachedImage = image.getImage().getScaledInstance(40, 40, 1);
+                image = new ImageIcon(cachedImage);
+                imageLabel.setIcon(image);
             }
         }
 
@@ -110,8 +122,9 @@ public class AssetInfo extends JTextPane {
 
         text += "<table><tr valign='top' align = 'left'><td>";
         text += "<DIV  style='float:left'><b>" + Lang.getInstance().translate("Key") + ": </b>" + asset.getKey() + "</DIV>";
-        if (image != null)
+        if (false && image != null) {
             text += "<div><a href ='!!img'  style='color: " + color + "' ><img src=\"" + img_Local_URL + "\"></a></div>";
+        }
         Transaction record = Transaction.findByDBRef(DCSet.getInstance(), asset.getReference());
         if (record != null)
             text += "<td><div  style='float:left'><div><b>" + Lang.getInstance().translate("Block-SeqNo") + ": </b>" + record.viewHeightSeq() + "</div>";
@@ -126,7 +139,10 @@ public class AssetInfo extends JTextPane {
 
         this.setContentType("text/html");
         this.setText(text);
-        HTML_Add_Local_Images();
+
+        if (false)
+            HTML_Add_Local_Images();
+
         this.setEditable(false);
         MenuPopupUtil.installContextMenu(this);
         if (fullView) {
@@ -221,11 +237,11 @@ public class AssetInfo extends JTextPane {
             }
 
             URL u = new URL(img_Local_URL);
-            if (Im != null) cache.put(u, Im);
+            if (cachedImage != null) cache.put(u, cachedImage);
 
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         }
 
 

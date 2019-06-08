@@ -103,7 +103,6 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         this.jTextField_Recive_Detail.setText("");
         this.jTextField_Mess_Title.setText("");
         this.jTextField_Amount.setText("0");
-        this.jLabel_Icon.setText("");
 
         // account ComboBox
         this.accountsModel = new AccountsComboBoxModel(balancePosition);
@@ -471,7 +470,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         jLabel_Fee = new javax.swing.JLabel();
         jComboBox_Fee = new javax.swing.JComboBox<>();
         jButton_ok = new javax.swing.JButton();
-        jLabel_Icon = new javax.swing.JLabel();
+
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea_Account_Description = new javax.swing.JTextArea();
 
@@ -665,20 +664,8 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(7, 0, 15, 15);
         add(jButton_ok, gridBagConstraints);
 
-        jLabel_Icon.setText("");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 16;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.4;
-        // add(jLabel_Icon, gridBagConstraints);
-
         jTextArea_Account_Description.setColumns(20);
         jTextArea_Account_Description.setRows(5);
-        //jTextArea_Account_Description.setEditable(false);
-        //jTextArea_Account_Description.setEnabled(false);
-
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -703,7 +690,6 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel_Amount;
     private javax.swing.JLabel jLabel_AmountHave;
     private javax.swing.JLabel jLabel_Fee;
-    private javax.swing.JLabel jLabel_Icon;
     private javax.swing.JLabel jLabel_Mess;
     private javax.swing.JLabel jLabel_Mess_Title;
     public javax.swing.JLabel jLabel_Recive_Detail;

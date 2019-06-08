@@ -7,6 +7,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
@@ -134,8 +135,9 @@ public class CreateOrderPanel extends JPanel {
         detailGBC.gridx = 0;
         detailGBC.gridy = ++detailGBC.gridy;
         detailGBC.gridwidth = 3;
-        this.cbxAccount = new JComboBox<Account>(new AccountsComboBoxModel());
+        this.cbxAccount = new JComboBox<Account>(new AccountsComboBoxModel(TransactionAmount.ACTION_SEND));
         this.cbxAccount.setRenderer(new AccountRenderer(this.have.getKey()));
+
         // select accounts in combobox
         if (account != "" && account != null) {
             for (int i = 0; this.cbxAccount.getModel().getSize() > i; i++) {
