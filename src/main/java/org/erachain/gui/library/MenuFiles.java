@@ -213,8 +213,8 @@ public class MenuFiles extends JMenu {
                     panel.jTextField_To.setEditable(false);
                     panel.jTextField_Mess_Title.setText(head);
                     panel.jTextField_Mess_Title.setEditable(false);
-                    panel.jTextField_Ammount.setText(amount);
-                    panel.jTextField_Ammount.setEditable(false);
+                    panel.jTextField_Amount.setText(amount);
+                    panel.jTextField_Amount.setEditable(false);
                     panel.jComboBox_Asset.setSelectedItem(asset);
                     panel.jComboBox_Asset.setEnabled(false);
                 } catch (Exception e1) {

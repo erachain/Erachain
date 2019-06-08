@@ -9,11 +9,8 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.datachain.DCSet;
-import org.erachain.gui.AccountRenderer;
+//import org.erachain.gui.AccountRenderer;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.assets.AssetInfo;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
@@ -79,6 +76,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
     private Image Im;
     private String defaultImagePath = "images/icons/coin.png";
 
+    private int balancePosition;
     /**
      * Creates new form AccountAssetActionPanelCls
      */
@@ -96,6 +94,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
         this.account = accountFrom;
         recipient = accountTo;
+        this.balancePosition = balancePosition;
 
         initComponents();
 
@@ -103,7 +102,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
         this.jTextField_Recive_Detail.setText("");
         this.jTextField_Mess_Title.setText("");
-        this.jTextField_Ammount.setText("0");
+        this.jTextField_Amount.setText("0");
         this.jLabel_Icon.setText("");
 
         // account ComboBox
@@ -142,6 +141,10 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
 
                 account = ((Account) jComboBox_Account.getSelectedItem());
+                if (asset != null)
+                    jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
+                            + account.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
+
             }
         });
 
@@ -163,18 +166,15 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
                         jComboBox_Account.repaint();
                     }
 
-                    // set image
-                    if (false) setImage();
-
                     // set scale
                     int scale = 8;
                     if (asset != null) scale = asset.getScale();
-                    jTextField_Ammount.setScale(scale);
+                    jTextField_Amount.setScale(scale);
                     // jTextArea_Account_Description.setText(asset.getDescription());
                     jScrollPane2.setViewportView(new AssetInfo(asset, false));
 
-                    jLabel_Ammount = new javax.swing.JLabel(account
-                            .getBalanceInPosition(asset.getKey(), 1).b.toPlainString());
+                    jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
+                            + account.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
 
                 }
 
@@ -187,9 +187,6 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
                 onSendClick();
             }
         });
-
-        // set image asset
-        if (false) setImage();
 
         // set acoount TO
         this.jTextField_To.getDocument().addDocumentListener(new DocumentListener() {
@@ -224,10 +221,11 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         this.jCheckBox_Enscript.setText(Lang.getInstance().translate("Encrypt message") + ":");
         this.jCheckBox_Enscript.setSelected(true);
         this.jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
-        this.jLabel_Ammount.setText(Lang.getInstance().translate("Amount") + ":");
+        this.jLabel_Amount.setText(Lang.getInstance().translate("Amount") + ":");
 
         if (account != null && asset != null) {
-            this.jLabel_AmmountHave.setText(account.getBalance(DCSet.getInstance(), asset.getKey(), TransactionAmount.ACTION_SEND).b.toPlainString());
+            jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
+                    + account.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
         }
 
         this.jLabel_Fee.setText(Lang.getInstance().translate("Fee level") + ":");
@@ -236,12 +234,12 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
         // CONTEXT MENU
         MenuPopupUtil.installContextMenu(this.jTextField_To);
-        MenuPopupUtil.installContextMenu(this.jTextField_Ammount);
+        MenuPopupUtil.installContextMenu(this.jTextField_Amount);
         MenuPopupUtil.installContextMenu(this.jTextArea_Description);
         MenuPopupUtil.installContextMenu(this.jTextField_Recive_Detail);
         jTextArea_Account_Description.setWrapStyleWord(true);
         jTextArea_Account_Description.setLineWrap(true);
-        jScrollPane2.setViewportView(new AssetInfo(asset, false)); //jTextArea_Account_Description);
+        jScrollPane2.setViewportView(new AssetInfo(asset, false));
     }
 
     private void refreshReceiverDetails() {
@@ -303,7 +301,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         try {
             //READ AMOUNT
             parsing = 1;
-            amount = new BigDecimal(jTextField_Ammount.getText());
+            amount = new BigDecimal(jTextField_Amount.getText());
 
             //READ FEE
             parsing = 2;
@@ -424,7 +422,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
             if (amount != null && amount.compareTo(BigDecimal.ZERO) != 0) //IF MORE THAN ZERO
             {
-                this.jTextField_Ammount.setText("0");
+                this.jTextField_Amount.setText("0");
             }
 
             this.jTextArea_Description.setText("");
@@ -467,9 +465,9 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         jCheckBox_Enscript = new javax.swing.JCheckBox();
         jLabel_Asset = new javax.swing.JLabel();
         jComboBox_Asset = new javax.swing.JComboBox<>();
-        jLabel_Ammount = new javax.swing.JLabel();
-        jTextField_Ammount = new MDecimalFormatedTextField();
-        jLabel_AmmountHave = new javax.swing.JLabel();
+        jLabel_Amount = new javax.swing.JLabel();
+        jTextField_Amount = new MDecimalFormatedTextField();
+        jLabel_AmountHave = new javax.swing.JLabel();
         jLabel_Fee = new javax.swing.JLabel();
         jComboBox_Fee = new javax.swing.JComboBox<>();
         jButton_ok = new javax.swing.JButton();
@@ -613,25 +611,24 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
         add(jComboBox_Asset, gridBagConstraints);
 
-        jTextField_Ammount.setText("");
+        jTextField_Amount.setText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 18;
-        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 0);
-        add(jTextField_Ammount, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 3, 0);
+        add(jTextField_Amount, gridBagConstraints);
 
-        jLabel_AmmountHave.setHorizontalAlignment(SwingConstants.RIGHT);
-        jLabel_AmmountHave.setText("werwer");
+        jLabel_AmountHave.setHorizontalAlignment(SwingConstants.RIGHT);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 10;
         gridBagConstraints.gridy = 18;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
-        add(jLabel_AmmountHave, gridBagConstraints);
+        add(jLabel_AmountHave, gridBagConstraints);
 
-        jTextField_Ammount.setText("");
+        jTextField_Amount.setText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 18;
@@ -639,7 +636,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 0);
-        add(jTextField_Ammount, gridBagConstraints);
+        add(jTextField_Amount, gridBagConstraints);
 
         jLabel_Fee.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel_Fee.setText("");
@@ -694,52 +691,6 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         add(jScrollPane2, gridBagConstraints);
     }// </editor-fold>
 
-    public void setImage() {
-        // image view
-        InputStream inputStream = null;
-        if (asset == null) return;
-        byte[] image_Byte = asset.getImage();
-        if (image_Byte.length > 0) {
-            inputStream = new ByteArrayInputStream(asset.getImage());
-
-            try {
-                image1 = ImageIO.read(inputStream);
-
-                // jLabel2.setText("jLabel2");
-                ImageIcon image = new ImageIcon(image1);
-                int x = image.getIconWidth();
-                max_Height = image.getIconHeight();
-
-                max_Widht = 150;
-                double k = ((double) x / (double) max_Widht);
-                max_Height = (int) (max_Height / k);
-
-
-                if (max_Height != 0) {
-                    Im = image.getImage().getScaledInstance(max_Widht, max_Height, 1);
-                    ImageIcon ic = new ImageIcon(Im);
-                    jLabel_Icon.setIcon(ic);
-                    jLabel_Icon.setSize(ic.getIconWidth(), ic.getIconHeight());
-                }
-
-
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            return;
-        }
-
-        // if era then file system icon
-        if (asset.getKey() == 1l) {
-            jLabel_Icon.setIcon(new ImageIcon("images/icons/icon64.png"));
-            return;
-        }
-        jLabel_Icon.setIcon(new ImageIcon(defaultImagePath));
-        jLabel_Icon.repaint();
-
-
-    }
 
     // Variables declaration - do not modify
     public javax.swing.JButton jButton_ok;
@@ -749,8 +700,8 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> jComboBox_Fee;
     private javax.swing.JLabel jLabel_Asset;
     private javax.swing.JLabel jLabel_Account;
-    private javax.swing.JLabel jLabel_Ammount;
-    private javax.swing.JLabel jLabel_AmmountHave;
+    private javax.swing.JLabel jLabel_Amount;
+    private javax.swing.JLabel jLabel_AmountHave;
     private javax.swing.JLabel jLabel_Fee;
     private javax.swing.JLabel jLabel_Icon;
     private javax.swing.JLabel jLabel_Mess;
@@ -762,7 +713,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea_Account_Description;
     public javax.swing.JTextArea jTextArea_Description;
-    public MDecimalFormatedTextField jTextField_Ammount;
+    public MDecimalFormatedTextField jTextField_Amount;
     public javax.swing.JTextField jTextField_Mess_Title;
     private javax.swing.JTextField jTextField_Recive_Detail;
     public javax.swing.JTextField jTextField_To;

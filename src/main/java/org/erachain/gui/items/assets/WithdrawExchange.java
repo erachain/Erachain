@@ -80,7 +80,7 @@ public class WithdrawExchange extends JPanel {
 
             String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
             assetIn = (AssetCls) cbxAssets.getSelectedItem();
-            switch ((int)assetIn.getKey()) {
+            switch ((int) assetIn.getKey()) {
                 case 12:
                     urlGetDetails += "12/3/" + jTextField_Address.getText() + "/0.1"; // eBTC -> BTC
                     message += "BTC";
@@ -133,8 +133,7 @@ public class WithdrawExchange extends JPanel {
                 jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
             }
 
-                accountTo = jsonObject.get("addr_in").toString();
-            }
+            accountTo = jsonObject.get("addr_in").toString();
 
         } catch (Exception e) {
             accountTo = null;
@@ -142,27 +141,26 @@ public class WithdrawExchange extends JPanel {
             inputText = "";
         }
 
-        if (assetIn != null && account_to != null) {
-        if (accountTo != null) {
+        if (assetIn != null && accountTo != null) {
+            if (accountTo != null) {
 
-            message += ":" + jTextField_Address.getText();
-            //new AccountSendDialog(asset[0], null, new Account(accountTo), null, message);
-            MainPanel.getInstance().insertTab(new AccountAssetSendPanel(asset[0], TransactionAmount.ACTION_SEND,
-                    null, new Account(accountTo), null, message));
-            new AccountSendDialog(assetIn, null, new Account(account_to), null, message);
+                message += ":" + jTextField_Address.getText();
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(assetIn, TransactionAmount.ACTION_SEND,
+                        null, new Account(accountTo), null, message));
+
+            }
+
+            jButton_Confirm.setEnabled(true);
 
         }
-
-        jButton_Confirm.setEnabled(true);
-
     }
 
-    private void initComponents(AssetCls asset_in, Account account) {
+    private void initComponents(AssetCls assetIn, Account account) {
 
-        if (asset_in == null) {
+        if (assetIn == null) {
             asset = Controller.getInstance().getAsset(1l);
         } else {
-            asset = asset_in;
+            asset = assetIn;
         }
 
         GridBagConstraints gridBagConstraints;
