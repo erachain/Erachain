@@ -39,7 +39,7 @@ import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public class AssetSendPanel extends javax.swing.JPanel {
+public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
     // TODO - "A" - &
     //static String wrongFirstCharOfAddress = "A";
@@ -77,13 +77,13 @@ public class AssetSendPanel extends javax.swing.JPanel {
     private String defaultImagePath = "images/icons/coin.png";
 
     /**
-     * Creates new form AssetSendPanel
+     * Creates new form AccountAssetActionPanelCls
      */
 
     private AccountsComboBoxModel accountsModel;
 
-    public AssetSendPanel(AssetCls assetIn, int balancePosition,
-                          Account accountFrom, Account accountTo) {
+    public AccountAssetActionPanelCls(AssetCls assetIn, int balancePosition,
+                                      Account accountFrom, Account accountTo) {
 
         this.jComboBox_Asset.setEnabled(assetIn != null);
 

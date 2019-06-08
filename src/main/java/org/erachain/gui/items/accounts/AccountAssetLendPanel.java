@@ -15,36 +15,36 @@ import org.erachain.lang.Lang;
 
 @SuppressWarnings("serial")
 
-public class AccountRepayDebtPanel extends AssetSendPanel {
-    // private final MessagesTableModel messagesTableModel;
+public class AccountAssetLendPanel extends AccountAssetActionPanelCls {
 
-    public AccountRepayDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
+    public AccountAssetLendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
         super(assetIn, TransactionAmount.ACTION_DEBT, accountFrom, accountTo);
 
-        this.jLabel_Title.setText(Lang.getInstance()
-                .translate("If You want to give the borrowed asset %asset%, fill in this form").replace("%asset%", asset.viewName()));
+        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to give a loan asset %asset%, fill in this form")
+                .replace("%asset%", asset.viewName()));
 
-        // icon.setIcon(null);
-        this.jButton_ok.setText(Lang.getInstance().translate("Repay Debt"));
-        this.jLabel_To.setText(Lang.getInstance().translate("Lender Account") + ":");
-        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Lender Details") + ":");
+        //	icon.setIcon(null);
+        this.jButton_ok.setText(Lang.getInstance().translate("Lend"));
+        this.jLabel_To.setText(Lang.getInstance().translate("Debtor account") + ":");
+        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Debtor details") + ":");
 
     }
 
     @Override
     public void onSendClick() {
         // confirm params
-     
         if (!cheskError()) return;
-        // CREATE TX MESSAGE
-        Transaction transaction = Controller.getInstance().r_Send(
-                Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, -key,
-                amount, head, messageBytes, isTextByte, encrypted);
+
+        //CREATE TX MESSAGE
+        Transaction transaction = Controller.getInstance()
+                .r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
+                        -key, amount,
+                        head, messageBytes, isTextByte, encrypted);
 
         String Status_text = "";
         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, transaction,
-                Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2),
-                (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+                Lang.getInstance().translate("Lend"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2),
+                Status_text, Lang.getInstance().translate("Confirmation Transaction"));
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);
 
         dd.jScrollPane1.setViewportView(ww);
@@ -52,16 +52,19 @@ public class AccountRepayDebtPanel extends AssetSendPanel {
         dd.setLocationRelativeTo(this);
         dd.setVisible(true);
 
-        // JOptionPane.OK_OPTION
+        //	JOptionPane.OK_OPTION
         if (dd.isConfirm) {
+
 
             result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
             confirmaftecreatetransaction();
         }
 
-        // ENABLE
+        //ENABLE
         this.jButton_ok.setEnabled(true);
     }
 
 }
+
+

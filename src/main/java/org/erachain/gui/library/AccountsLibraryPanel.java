@@ -5,8 +5,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.gui.items.accounts.AccountActionSendPanel;
-import org.erachain.gui.items.accounts.AccountSendDialog;
+import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.accounts.AccountSetNameDialog;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.models.PersonAccountsModel;
@@ -170,7 +169,7 @@ public class AccountsLibraryPanel extends JPanel {
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account accountTo = person_Accounts_Model.getAccount(row);
-                MainPanel.getInstance().insertTab(new AccountActionSendPanel(null, TransactionAmount.ACTION_SEND,
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
                         null, accountTo, person, null));
 
             }

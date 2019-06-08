@@ -2,8 +2,7 @@ package org.erachain.gui.items.persons;
 
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.gui.items.accounts.AccountActionSendPanel;
-import org.erachain.gui.items.accounts.AccountSendDialog;
+import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui2.MainPanel;
@@ -125,7 +124,7 @@ public class PersonOwnerPanel extends JPanel {
         JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new AccountActionSendPanel(null, TransactionAmount.ACTION_SEND,
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
                         null, null, person_Accounts_Model.getItem(row), null));
 
             }

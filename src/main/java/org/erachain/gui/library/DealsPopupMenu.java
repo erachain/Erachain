@@ -4,7 +4,6 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base32;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.mails.MailSendPanel;
@@ -45,7 +44,7 @@ public class DealsPopupMenu extends JPopupMenu {
         sendAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //new AccountSendDialog(asset, pubKey, null, null);
-                MainPanel.getInstance().insertTab(new AccountActionSendPanel(asset, TransactionAmount.ACTION_SEND, pubKey, null, null, null));
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(asset, TransactionAmount.ACTION_SEND, pubKey, null, null, null));
 
             }
         });
@@ -76,7 +75,7 @@ public class DealsPopupMenu extends JPopupMenu {
         debtAssetReturn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new AccountRepayDebtPanel(asset, pubKey, null, null));
+                MainPanel.getInstance().insertTab(new AccountAssetRepayDebtPanel(asset, pubKey, null, null));
 
             }
         });
@@ -87,7 +86,7 @@ public class DealsPopupMenu extends JPopupMenu {
         debtAssetBackward.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new AccountConfiscateDebtPanel(asset, pubKey, null, null));
+                MainPanel.getInstance().insertTab(new AccountAssetConfiscateDebtPanel(asset, pubKey, null, null));
 
             }
         });
@@ -99,7 +98,7 @@ public class DealsPopupMenu extends JPopupMenu {
         holdAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new AccountTakeHoldPanel(asset, pubKey, null, null));
+                MainPanel.getInstance().insertTab(new AccountAssetHoldPanel(asset, pubKey, null, null));
 
             }
         });

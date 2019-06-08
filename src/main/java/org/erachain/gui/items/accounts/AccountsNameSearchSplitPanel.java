@@ -11,7 +11,6 @@ import org.erachain.database.wallet.AccountsPropertisMap;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.items.assets.MyAssetsTab;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.library.MTable;
@@ -225,7 +224,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
             public void actionPerformed(ActionEvent e) {
                 Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
                 Account accountTo = new Account(account1.getA());
-                MainPanel.getInstance().insertTab(new AccountActionSendPanel(null, TransactionAmount.ACTION_SEND,
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
                         null, accountTo, null, null));
 
             }

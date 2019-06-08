@@ -5,8 +5,7 @@ import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.ItemSplitPanel;
-import org.erachain.gui.items.accounts.AccountActionSendPanel;
-import org.erachain.gui.items.accounts.AccountSendDialog;
+import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -30,7 +29,7 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //new AccountSendDialog(null, null, null, (PersonCls) th.itemMenu);
-                MainPanel.getInstance().insertTab(new AccountActionSendPanel(null, TransactionAmount.ACTION_SEND,
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
                         null, null, (PersonCls) th.itemMenu, null));
 
             }

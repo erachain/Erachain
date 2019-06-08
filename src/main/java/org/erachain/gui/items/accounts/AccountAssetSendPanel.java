@@ -14,12 +14,12 @@ import org.erachain.lang.Lang;
 
 @SuppressWarnings("serial")
 
-public class AccountActionSendPanel extends AssetSendPanel {
+public class AccountAssetSendPanel extends AccountAssetActionPanelCls {
     
-    //private AccountActionSendPanel th;
+    //private AccountAssetSendPanel th;
     public boolean noRecive;
 
-    public AccountActionSendPanel(AssetCls assetIn, int balancePosition, Account accountFrom, Account accountTo, PersonCls person, String message) {
+    public AccountAssetSendPanel(AssetCls assetIn, int balancePosition, Account accountFrom, Account accountTo, PersonCls person, String message) {
         super(assetIn, balancePosition, accountFrom, accountTo);
 
         this.jLabel_Title.setText(Lang.getInstance().translate("If You want to send asset %asset%, fill in this form").
@@ -33,7 +33,7 @@ public class AccountActionSendPanel extends AssetSendPanel {
 
     }
     /*
-    public AccountActionSendPanel(AssetCls asset, Account account, Account account_To, PersonCls person, String message) {
+    public AccountAssetSendPanel(AssetCls asset, Account account, Account account_To, PersonCls person, String message) {
         this(asset, account, account_To, person);
     }
     */

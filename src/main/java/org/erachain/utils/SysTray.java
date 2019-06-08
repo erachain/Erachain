@@ -8,7 +8,7 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.*;
-import org.erachain.gui.items.accounts.AccountActionSendPanel;
+import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.accounts.MyAccountsSplitPanel;
 import org.erachain.gui.items.assets.SearchAssetsSplitPanel;
 import org.erachain.gui.models.WalletTransactionsTableModel;
@@ -232,7 +232,7 @@ public class SysTray implements Observer {
                 //    frame.setSize(800, 600);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-                AccountActionSendPanel ap = new AccountActionSendPanel(null, TransactionAmount.ACTION_SEND, null,null,null, null);
+                AccountAssetSendPanel ap = new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND, null,null,null, null);
                 frame.getContentPane().add(ap);
                 frame.setIconImage(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
                 frame.pack();

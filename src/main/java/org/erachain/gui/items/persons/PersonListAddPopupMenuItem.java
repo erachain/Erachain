@@ -10,8 +10,7 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.items.accounts.AccountActionSendPanel;
-import org.erachain.gui.items.accounts.AccountSendDialog;
+import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
@@ -27,7 +26,7 @@ public class PersonListAddPopupMenuItem {
             public void actionPerformed(ActionEvent e) {
 
                 //new AccountSendDialog(null, null, null, person);
-                MainPanel.getInstance().insertTab(new AccountActionSendPanel(null, TransactionAmount.ACTION_SEND,
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
                         null, null, person, null));
 
             }

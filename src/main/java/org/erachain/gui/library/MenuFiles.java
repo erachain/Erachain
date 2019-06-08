@@ -6,7 +6,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.*;
 import org.erachain.gui.create.LicenseJFrame;
-import org.erachain.gui.items.accounts.AccountActionSendPanel;
+import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.settings.SettingsFrame;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -204,7 +204,7 @@ public class MenuFiles extends JMenu {
                     String head = (String) js.get("head");
                     if (!js.containsKey("amount")) return;
                     String amount = (String) js.get("amount");
-                    AccountActionSendPanel panel = new AccountActionSendPanel(ct.getAsset(assetKey), TransactionAmount.ACTION_SEND,
+                    AccountAssetSendPanel panel = new AccountAssetSendPanel(ct.getAsset(assetKey), TransactionAmount.ACTION_SEND,
                             ct.getAccountByAddress(creator), ct.getAccountByAddress(recipient), null, null);
                     MainPanel.getInstance().insertTab(panel);
 
@@ -236,7 +236,7 @@ public class MenuFiles extends JMenu {
                 //  new SettingsFrame();
                 // no receive
                 //AccountSendDialog dd = new AccountSendDialog(null, null, null, null, false);
-                MainPanel.getInstance().insertTab(new AccountActionSendPanel(null, TransactionAmount.ACTION_SEND,
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
                         null, null, null, null));
 
 

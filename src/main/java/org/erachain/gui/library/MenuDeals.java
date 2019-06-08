@@ -23,23 +23,14 @@ public class MenuDeals extends JMenu {
     public MenuDeals() {
 
         // DEALS
-        // Send
-        JMenuItem BueCompyItem = new JMenuItem(Lang.getInstance().translate("Buy COMPU"));
-        BueCompyItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
-        BueCompyItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                //
-                new ExchangeFrame((AssetCls) DCSet.getInstance().getItemAssetMap().get((long) 2), null, "Buy", null);
-            }
-        });
-        add(BueCompyItem);
+
         // Send
         JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Send"));
         dealsMenuSendMessage.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
         dealsMenuSendMessage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                MainPanel.getInstance().insertTab(new AccountActionSendPanel(null, TransactionAmount.ACTION_SEND,
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
                         null, null, null, null));
 
             }
@@ -68,7 +59,7 @@ public class MenuDeals extends JMenu {
         dealsMenu_Take_On_Hold.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new AccountTakeHoldPanel(null, null, null, null));
+                MainPanel.getInstance().insertTab(new AccountAssetHoldPanel(null, null, null, null));
             }
         });
         add(dealsMenu_Take_On_Hold);
@@ -99,7 +90,7 @@ public class MenuDeals extends JMenu {
         dealsMenu_Confiscate_Debt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new AccountConfiscateDebtPanel(null, null, null, null));
+                MainPanel.getInstance().insertTab(new AccountAssetConfiscateDebtPanel(null, null, null, null));
 
             }
         });
@@ -112,7 +103,7 @@ public class MenuDeals extends JMenu {
         dealsMenu_Repay_Debt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new AccountRepayDebtPanel(null, null, null, null));
+                MainPanel.getInstance().insertTab(new AccountAssetRepayDebtPanel(null, null, null, null));
 
             }
         });
