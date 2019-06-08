@@ -12,10 +12,7 @@ import java.util.Hashtable;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
+import javax.swing.text.*;
 
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.assets.AssetCls;
@@ -65,6 +62,7 @@ public class AssetInfo extends JTextPane {
         this.setMinimumSize(new Dimension(0, 0));
 
         image = null;
+        cachedImage = null;
         byte[] imageByte = asset.getImage();
         if (imageByte != null && imageByte.length > 0) {
             //   img_HTML = "<img src='data:image/gif;base64," + a + "' width = '350' /></td><td style ='padding-left:20px'>";
@@ -80,20 +78,19 @@ public class AssetInfo extends JTextPane {
 
             if (max_Height > 1 ) {
                 cachedImage = image.getImage().getScaledInstance(max_Widht, max_Height, 1);
-                image = new ImageIcon(cachedImage);
             } else {
-                image = null;
+                cachedImage = null;
             }
 
         }
 
-        if (image == null){
+        if (cachedImage == null) {
             imageByte = asset.getIcon();
             if (imageByte != null && imageByte.length > 1) {
                 //if (asset.getKey() == 1l) image = new ImageIcon("images/icons/icon32.png");
                 image = new ImageIcon(imageByte);
                 cachedImage = image.getImage().getScaledInstance(40, 40, 1);
-                image = new ImageIcon(cachedImage);
+                ///image = new ImageIcon(cachedImage);
             }
         }
 
@@ -108,7 +105,7 @@ public class AssetInfo extends JTextPane {
         text += "<DIV  style='float:left'><b>" + Lang.getInstance().translate("Key") + ": </b>" + asset.getKey() + "</DIV>";
 
         // ADD IMAGE to THML
-        if (image != null) {
+        if (cachedImage != null) {
             text += "<div><a href ='!!img'  style='color: " + color + "' ><img src=\"" + img_Local_URL + "\"></a></div>";
         }
 
@@ -127,7 +124,10 @@ public class AssetInfo extends JTextPane {
         setContentType("text/html");
         setText(text);
 
-        HTML_Add_Local_Images();
+        if (true)
+            HTML_Add_Local_Images();
+        else
+            iii();
 
         this.setEditable(false);
         MenuPopupUtil.installContextMenu(this);
@@ -213,8 +213,19 @@ public class AssetInfo extends JTextPane {
         }
     }
 
+    // работает - добавляет в конец после всего текста
+    public void iii() {
+        ///ImageIcon currentIcon = new ImageIcon(manaSymbolImages.get(currentMatch));
+
+        SimpleAttributeSet iconAtts = new SimpleAttributeSet();
+        JLabel iconLabel = new JLabel(image);
+        StyleConstants.setComponent(iconAtts, iconLabel);
+
+        insertIcon(image);
+    }
+
     public void HTML_Add_Local_Images() {
-        // TODO ADD image into URL
+        // ADD image into URL
         try {
             Dictionary cache = (Dictionary) this.getDocument().getProperty("imageCache");
             if (cache == null) {
@@ -229,7 +240,6 @@ public class AssetInfo extends JTextPane {
         } catch (MalformedURLException e) {
             LOGGER.error(e.getMessage(), e);
         }
-
 
     }
 
