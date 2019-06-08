@@ -61,8 +61,6 @@ public class AssetInfo extends JTextPane {
         transaction = Transaction.findByDBRef(DCSet.getInstance(), recordReference);
         this.setMinimumSize(new Dimension(0, 0));
 
-        image = null;
-        cachedImage = null;
         byte[] imageByte = asset.getImage();
         if (imageByte != null && imageByte.length > 0) {
             //   img_HTML = "<img src='data:image/gif;base64," + a + "' width = '350' /></td><td style ='padding-left:20px'>";
@@ -81,7 +79,8 @@ public class AssetInfo extends JTextPane {
             } else {
                 cachedImage = null;
             }
-
+        } else {
+            cachedImage = null;
         }
 
         if (cachedImage == null) {
@@ -90,7 +89,6 @@ public class AssetInfo extends JTextPane {
                 //if (asset.getKey() == 1l) image = new ImageIcon("images/icons/icon32.png");
                 image = new ImageIcon(imageByte);
                 cachedImage = image.getImage().getScaledInstance(40, 40, 1);
-                ///image = new ImageIcon(cachedImage);
             }
         }
 
