@@ -106,9 +106,12 @@ public class AssetInfo extends JTextPane {
 
         text += "<table><tr valign='top' align = 'left'><td>";
         text += "<DIV  style='float:left'><b>" + Lang.getInstance().translate("Key") + ": </b>" + asset.getKey() + "</DIV>";
+
+        // ADD IMAGE to THML
         if (image != null) {
             text += "<div><a href ='!!img'  style='color: " + color + "' ><img src=\"" + img_Local_URL + "\"></a></div>";
         }
+
         Transaction record = Transaction.findByDBRef(DCSet.getInstance(), asset.getReference());
         if (record != null)
             text += "<td><div  style='float:left'><div><b>" + Lang.getInstance().translate("Block-SeqNo") + ": </b>" + record.viewHeightSeq() + "</div>";
