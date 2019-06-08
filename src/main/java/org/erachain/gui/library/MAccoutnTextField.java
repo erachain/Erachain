@@ -96,10 +96,11 @@ public class MAccoutnTextField extends JTextField {
         Send_Mail_Creator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, account, null));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
             }
         });
         creator_Meny.add(Send_Mail_Creator);
+
         this.setComponentPopupMenu(creator_Meny);
 
     }

@@ -357,7 +357,7 @@ public class TelegramSplitPanel extends SplitPanel {
         public void actionPerformed(ActionEvent e) {
             Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
             Account account = new Account(account1.getA());
-            MainPanel.getInstance().insertTab(new MailSendPanel(null, null, account, null));
+            MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
 
         }
     });

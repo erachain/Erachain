@@ -201,7 +201,7 @@ public class PersonVouchedPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 Account account = (Account) model.getPublicKey(row);
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, account, null));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
 
             }
         });

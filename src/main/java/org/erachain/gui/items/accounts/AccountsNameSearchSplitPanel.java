@@ -219,6 +219,21 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
         });
         menu.add(menu_copyPublicKey);
 
+        menu.addSeparator();
+
+        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail"));
+        Send_Mail_item_Menu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
+                Account account = new Account(account1.getA());
+
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
+            }
+        });
+        menu.add(Send_Mail_item_Menu);
+
+        menu.addSeparator();
+
         JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -231,16 +246,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
         });
         menu.add(Send_Coins_item_Menu);
 
-        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail"));
-        Send_Mail_item_Menu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
-                Account account = new Account(account1.getA());
-
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, account, null));
-            }
-        });
-        menu.add(Send_Mail_item_Menu);
+        menu.addSeparator();
 
         JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Edit name"));
         setName.addActionListener(new ActionListener() {

@@ -134,7 +134,7 @@ public class PersonOwnerPanel extends JPanel {
         JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, person_Accounts_Model.getItem(row)));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, person_Accounts_Model.getItem(row)));
 
             }
         });

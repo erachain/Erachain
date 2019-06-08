@@ -6,7 +6,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.assets.DepositExchange;
-import org.erachain.gui.items.assets.ExchangeFrame;
 import org.erachain.gui.items.assets.ExchangePanel;
 import org.erachain.gui.items.assets.WithdrawExchange;
 import org.erachain.gui.records.VouchRecordDialog;

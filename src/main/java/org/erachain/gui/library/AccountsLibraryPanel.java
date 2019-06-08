@@ -181,7 +181,7 @@ public class AccountsLibraryPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 Account account = person_Accounts_Model.getAccount(row);
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, account, null));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
 
             }
         });

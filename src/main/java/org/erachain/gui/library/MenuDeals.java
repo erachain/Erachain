@@ -1,11 +1,8 @@
 package org.erachain.gui.library;
 
-import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.accounts.*;
-import org.erachain.gui.items.assets.ExchangeFrame;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
@@ -24,6 +21,19 @@ public class MenuDeals extends JMenu {
 
         // DEALS
 
+        // MAIL
+        JMenuItem dealsMenuMail = new JMenuItem(Lang.getInstance().translate("Send mail"));
+        dealsMenuMail.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null));
+
+            }
+        });
+        add(dealsMenuMail);
+
+        addSeparator();
+
         // Send
         JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Send"));
         dealsMenuSendMessage.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
@@ -36,21 +46,8 @@ public class MenuDeals extends JMenu {
             }
         });
         add(dealsMenuSendMessage);
-        //vouch
-        JMenuItem dealsMenuVouchRecord = new JMenuItem(Lang.getInstance().translate("Vouch"));
-        dealsMenuVouchRecord.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Vouching record"));
-        dealsMenuVouchRecord.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                new VouchRecordDialog(null, null);
-            }
-        });
-        add(dealsMenuVouchRecord);
-
 
         addSeparator();
-
 
         // Take on HOLD
 
@@ -64,7 +61,6 @@ public class MenuDeals extends JMenu {
         });
         add(dealsMenu_Take_On_Hold);
 
-
         addSeparator();
 
         // to lend
@@ -73,15 +69,12 @@ public class MenuDeals extends JMenu {
         //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
         dealsMenuLend.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                //new AccountLendDialog(null, null);
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, null));
+
+                MainPanel.getInstance().insertTab(new AccountAssetLendPanel(null, null, null, null));
 
             }
         });
         add(dealsMenuLend);
-
 
         // Confiscate_Debt
 
@@ -109,6 +102,21 @@ public class MenuDeals extends JMenu {
         });
         add(dealsMenu_Repay_Debt);
 
+        addSeparator();
+
+        //vouch
+        JMenuItem dealsMenuVouchRecord = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        dealsMenuVouchRecord.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Vouching record"));
+        dealsMenuVouchRecord.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //
+                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
+                new VouchRecordDialog(null, null);
+            }
+        });
+        add(dealsMenuVouchRecord);
+
+
         JMenuItem dealsMenu_Open_Wallet = new JMenuItem(Lang.getInstance().translate("Open Wallet"));
         //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
         dealsMenu_Open_Wallet.addActionListener(new ActionListener() {
@@ -131,6 +139,7 @@ public class MenuDeals extends JMenu {
         });
 
         add(dealsMenu_Open_Wallet);
+
 
 		     /*   
 		        

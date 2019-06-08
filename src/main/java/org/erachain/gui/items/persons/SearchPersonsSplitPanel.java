@@ -47,7 +47,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, (PersonCls)th.itemMenu));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls)th.itemMenu));
             }
         });
 

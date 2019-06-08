@@ -20,6 +20,8 @@ public class AccountAssetLendPanel extends AccountAssetActionPanelCls {
     public AccountAssetLendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
         super(assetIn, TransactionAmount.ACTION_DEBT, accountFrom, accountTo);
 
+        setName("Lend");
+
         this.jLabel_Title.setText(Lang.getInstance().translate("If You want to give a loan asset %asset%, fill in this form")
                 .replace("%asset%", asset.viewName()));
 

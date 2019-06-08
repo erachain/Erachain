@@ -1,5 +1,6 @@
 package org.erachain.gui.library;
 
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.records.VouchRecordDialog;
@@ -51,13 +52,24 @@ public class MenuPopupDealsButton extends JButton {
         dealsMenu = new JPopupMenu("popup menu");
 
         // DEALS
+
+        JMenuItem Send_Mail_Creator = new JMenuItem(Lang.getInstance().translate("Send Mail"));
+        Send_Mail_Creator.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null));
+            }
+        });
+        dealsMenu.add(Send_Mail_Creator);
+
         // Send
         JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Send"));
         dealsMenuSendMessage.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
         dealsMenuSendMessage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //
-                //Library.selectOrAdd(new SendFrame(null, null), MainFrame.getInstance().desktopPane.getAllFrames());
+
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND, null, null, null, null));
+
             }
         });
         dealsMenu.add(dealsMenuSendMessage);
@@ -75,7 +87,6 @@ public class MenuPopupDealsButton extends JButton {
 
 
         dealsMenu.addSeparator();
-
 
         // Take on HOLD
 
@@ -99,10 +110,8 @@ public class MenuPopupDealsButton extends JButton {
         //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
         dealsMenuLend.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                //new AccountLendDialog(null, null);
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, null));
+
+                MainPanel.getInstance().insertTab(new AccountAssetLendPanel(null, null, null, null));
 
             }
         });

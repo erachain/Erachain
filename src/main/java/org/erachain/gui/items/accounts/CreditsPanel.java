@@ -178,10 +178,8 @@ public class CreditsPanel extends JPanel // implements ItemListener
 
                 AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
                 Account account = tableModel.getAccount(row);
-                //Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
-                //Menu.selectOrAdd( new AccountSendDialog(asset, account), null);
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(asset, account, null, null));
+                MainPanel.getInstance().insertTab(new AccountAssetLendPanel(asset, account, null, null));
 
             }
         });

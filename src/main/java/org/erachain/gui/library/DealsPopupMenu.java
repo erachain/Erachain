@@ -39,11 +39,21 @@ public class DealsPopupMenu extends JPopupMenu {
         this.tableModel = tableModel;
         this.table = table;
         this.assetSelector = assetSelector;
-        
+
+        sendMail = new JMenuItem(Lang.getInstance().translate("Send mail"));
+        sendMail.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                MainPanel.getInstance().insertTab(new MailSendPanel(pubKey, null, null));
+            }
+        });
+        this.add(sendMail);
+
+        this.addSeparator();
+
         sendAsset = new JMenuItem(Lang.getInstance().translate("Send"));
         sendAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //new AccountSendDialog(asset, pubKey, null, null);
+                // AccountAssetLendPanel
                 MainPanel.getInstance().insertTab(new AccountAssetSendPanel(asset, TransactionAmount.ACTION_SEND, pubKey, null, null, null));
 
             }
@@ -51,21 +61,12 @@ public class DealsPopupMenu extends JPopupMenu {
         this.add(sendAsset);
 
         this.addSeparator();
-        sendMail = new JMenuItem();
-        sendMail.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new MailSendPanel(asset, pubKey, null, null));
-            }
-        });
-        this.add(sendMail);
-
-        this.addSeparator();
 
         debtAsset = new JMenuItem(Lang.getInstance().translate("Lend"));
         debtAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //new AccountLendDialog(asset, pubKey);
-                MainPanel.getInstance().insertTab(new MailSendPanel(asset, pubKey, null, null));
+                MainPanel.getInstance().insertTab(new AccountAssetLendPanel(asset, pubKey, null, null));
 
             }
         });

@@ -89,12 +89,11 @@ public class HyperLinkAccount {
         Send_Mail_Creator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, account, null));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
                 //new MailSendDialog(null, null, account, null);
             }
         });
         account_Menu.add(Send_Mail_Creator);
-//	this.setComponentPopupMenu(account_Menu);
 
     }
 

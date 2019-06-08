@@ -63,16 +63,16 @@ public class MailSendPanel extends JPanel {
     private JLabel messageLabel;
     private MailSendPanel th;
 
-    public MailSendPanel(AssetCls asset, Account accountFrom, Account accountTo, PersonCls person) {
+    public MailSendPanel(Account accountFrom, Account accountTo, PersonCls person) {
 
         th = this;
         this.person = person;
         sendButton = new MButton(Lang.getInstance().translate("Send"), 2);
         y = 0;
+
         this.setName(Lang.getInstance().translate("Send Mail"));
-        if (asset == null) {
-            asset = Controller.getInstance().getAsset(1l);
-        }
+        //asset = Controller.getInstance().getAsset(2l);
+
         GridBagLayout gridBagLayout = new GridBagLayout();
         // gridBagLayout.columnWidths = new int[]{0, 112, 140, 0, 0};
         // gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
@@ -119,7 +119,7 @@ public class MailSendPanel extends JPanel {
         cbxFromGBC.gridy = y;
 
         this.cbxFrom = new JComboBox<Account>(accountsModel);
-        this.cbxFrom.setRenderer(new AccountRenderer(asset.getKey()));
+        this.cbxFrom.setRenderer(new AccountRenderer(Transaction.FEE_KEY));
         this.add(this.cbxFrom, cbxFromGBC);
         if (accountFrom != null)
             cbxFrom.setSelectedItem(accountFrom);

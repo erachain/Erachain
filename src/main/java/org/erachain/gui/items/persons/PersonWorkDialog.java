@@ -130,7 +130,7 @@ public class PersonWorkDialog extends JDialog {
                     if (addresses.isEmpty()) {
 
                     } else {
-                        MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, person));
+                        MainPanel.getInstance().insertTab(new MailSendPanel(null, null, person));
                     }
                     dispose();
                 }

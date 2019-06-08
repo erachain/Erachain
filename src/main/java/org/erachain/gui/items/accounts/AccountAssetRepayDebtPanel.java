@@ -21,6 +21,8 @@ public class AccountAssetRepayDebtPanel extends AccountAssetActionPanelCls {
     public AccountAssetRepayDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
         super(assetIn, TransactionAmount.ACTION_DEBT, accountFrom, accountTo);
 
+        setName("Repay Debt");
+
         this.jLabel_Title.setText(Lang.getInstance()
                 .translate("If You want to give the borrowed asset %asset%, fill in this form").replace("%asset%", asset.viewName()));
 

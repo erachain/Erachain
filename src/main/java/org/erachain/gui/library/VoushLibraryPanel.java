@@ -212,7 +212,7 @@ public class VoushLibraryPanel extends JPanel {
 
                 Account account = (Account) model.getCreator(row);
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, account, null));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
 
             }
         });

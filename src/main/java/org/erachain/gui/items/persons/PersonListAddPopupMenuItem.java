@@ -40,7 +40,7 @@ public class PersonListAddPopupMenuItem {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, (PersonCls) person));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) person));
             }
         });
 

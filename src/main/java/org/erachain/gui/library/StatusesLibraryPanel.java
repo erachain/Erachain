@@ -165,7 +165,7 @@ public class StatusesLibraryPanel extends JPanel {
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account account = statusModel.getCreator(row);
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, account, null));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
                 //new MailSendDialog(null, null, account, null);
 
             }

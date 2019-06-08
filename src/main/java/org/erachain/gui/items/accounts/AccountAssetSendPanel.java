@@ -22,6 +22,8 @@ public class AccountAssetSendPanel extends AccountAssetActionPanelCls {
     public AccountAssetSendPanel(AssetCls assetIn, int balancePosition, Account accountFrom, Account accountTo, PersonCls person, String message) {
         super(assetIn, balancePosition, accountFrom, accountTo);
 
+        setName("Send");
+
         this.jLabel_Title.setText(Lang.getInstance().translate("If You want to send asset %asset%, fill in this form").
                 replace("%asset%", asset.viewName()));
 

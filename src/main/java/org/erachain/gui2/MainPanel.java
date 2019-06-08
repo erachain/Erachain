@@ -374,7 +374,7 @@ public class MainPanel extends javax.swing.JPanel {
             return;
         }
         if (str.equals(Lang.getInstance().translate("Send Mail")) || str.equals("MailSendPanel")) {
-            insertTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, null, null, null));
+            insertTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, null, null));
             return;
         }
 
@@ -590,7 +590,8 @@ public class MainPanel extends javax.swing.JPanel {
 
     // insert tab in tabbedpane
     public boolean insertTab(JPanel panel) {
-        String name = Lang.getInstance().translate(panel.getClass().getSimpleName());
+        //String name = Lang.getInstance().translate(panel.getClass().getSimpleName());
+        String name = Lang.getInstance().translate(panel.getName());
         int index = jTabbedPane1.indexOfTab(name);
         boolean inserted = false;
         if (index == -1) {

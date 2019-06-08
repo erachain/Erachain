@@ -85,8 +85,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
     public AccountAssetActionPanelCls(AssetCls assetIn, int balancePosition,
                                       Account accountFrom, Account accountTo) {
 
-        this.jComboBox_Asset.setEnabled(assetIn != null);
-
+        setName("Send");
         if (assetIn == null)
             this.asset = Controller.getInstance().getAsset(2);
         else
@@ -97,34 +96,37 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
         initComponents();
 
+        //this.jComboBox_Asset.setEnabled(assetIn != null);
+
         this.jTextField_Recive_Detail.setText("");
         this.jTextField_Mess_Title.setText("");
         this.jTextField_Ammount.setText("0");
         this.jLabel_Icon.setText("");
 
-        // icon
-        jLabel_Icon.setIcon(new ImageIcon(defaultImagePath));
-
         // account ComboBox
         this.accountsModel = new AccountsComboBoxModel(balancePosition);
         jComboBox_Account.setModel(accountsModel);
-        if (account != null) jComboBox_Account.setSelectedItem(account);
+
+        if (account != null) {
+            jComboBox_Account.setSelectedItem(account);
+        }
+
+        jComboBox_Account.setRenderer(new AccountRenderer(asset.getKey()));
 
         // favorite combo box
         jComboBox_Asset.setModel(new ComboBoxAssetsModel());
-        if (asset != null) {
-            this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
 
-            for (int i = 0; i < jComboBox_Asset.getItemCount(); i++) {
-                ItemCls item = jComboBox_Asset.getItemAt(i);
-                if (item.getKey() == asset.getKey()) {
-                    // not worked jComboBox_Asset.setSelectedItem(asset);
-                    jComboBox_Asset.setSelectedIndex(i);
-                    //    jComboBox_Asset.setEnabled(false);// .setEditable(false);
-                    break;
-                } else {
-                    //    jComboBox_Asset.setEnabled(true);
-                }
+        this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
+
+        for (int i = 0; i < jComboBox_Asset.getItemCount(); i++) {
+            ItemCls item = jComboBox_Asset.getItemAt(i);
+            if (item.getKey() == asset.getKey()) {
+                // not worked jComboBox_Asset.setSelectedItem(asset);
+                jComboBox_Asset.setSelectedIndex(i);
+                //    jComboBox_Asset.setEnabled(false);// .setEditable(false);
+                break;
+            } else {
+                //    jComboBox_Asset.setEnabled(true);
             }
         }
 
@@ -136,30 +138,13 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                asset = ((AssetCls) jComboBox_Account.getSelectedItem());
-
-                if (asset != null) {
-                    ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(asset.getKey());
-                    jComboBox_Account.repaint();
-                    // set image
-                    setImage();
-                    jLabel_Icon.repaint();
-                    // set scale
-                    int scale = 8;
-                    if (asset != null) scale = asset.getScale();
-                    jTextField_Ammount.setScale(scale);
-                    // set description
-                    //  jTextArea_Account_Description.setText(asset.getDescription());
-                    jScrollPane2.setViewportView(new AssetInfo(asset, false));
-
-                }
-
+                account = ((Account) jComboBox_Account.getSelectedItem());
             }
         });
 
 
         // default set asset
-        if (asset == null) asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
+        ////if (asset == null) asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
 
         this.jComboBox_Asset.addActionListener(new ActionListener() {
             @Override
@@ -168,11 +153,16 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
                 asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
 
                 if (asset != null) {
-                    //             ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(asset.getKey());
-                    jComboBox_Account.repaint();
+
+                    account = ((Account) jComboBox_Account.getSelectedItem());
+                    if (account != null) {
+                        ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(asset.getKey());
+                        jComboBox_Account.repaint();
+                    }
+
                     // set image
-                    setImage();
-                    jLabel_Icon.repaint();
+                    if (false) setImage();
+
                     // set scale
                     int scale = 8;
                     if (asset != null) scale = asset.getScale();
@@ -193,7 +183,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         });
 
         // set image asset
-        setImage();
+        if (false) setImage();
 
         // set acoount TO
         this.jTextField_To.getDocument().addDocumentListener(new DocumentListener() {
@@ -248,7 +238,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
         this.jTextField_Recive_Detail.setText(Account.getDetails(toValue, asset));
 
-        this.jCheckBox_Enscript.setEnabled(true);
+        //this.jCheckBox_Enscript.setEnabled(true);
     }
 
     public boolean cheskError() {
@@ -665,10 +655,10 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.4;
         // add(jLabel_Icon, gridBagConstraints);
 
-        jTextArea_Account_Description.setEditable(false);
         jTextArea_Account_Description.setColumns(20);
         jTextArea_Account_Description.setRows(5);
-        jTextArea_Account_Description.setEnabled(false);
+        //jTextArea_Account_Description.setEditable(false);
+        //jTextArea_Account_Description.setEnabled(false);
 
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -683,6 +673,16 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
     }// </editor-fold>
 
     public void setImage() {
+
+        // icon
+        if (false) {
+            jLabel_Icon.setIcon(new ImageIcon(defaultImagePath));
+        } else {
+            jLabel_Icon.setIcon(new ImageIcon(asset.getIcon()));
+            jLabel_Icon.repaint();
+            return;
+        }
+
         // image view
         InputStream inputStream = null;
         if (asset == null) return;
@@ -717,12 +717,14 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
             }
             return;
         }
+
         // if era then file system icon
         if (asset.getKey() == 1l) {
             jLabel_Icon.setIcon(new ImageIcon("images/icons/icon64.png"));
             return;
         }
         jLabel_Icon.setIcon(new ImageIcon(defaultImagePath));
+        jLabel_Icon.repaint();
 
 
     }

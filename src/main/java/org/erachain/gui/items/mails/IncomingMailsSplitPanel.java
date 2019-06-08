@@ -91,7 +91,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
                 row = inciming_Mail_Table.convertRowIndexToModel(row);
                 Account account = incoming_Mails_Model.getTransaction(row).getCreator();
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, account, null));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
 
             }
         });

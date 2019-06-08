@@ -802,8 +802,8 @@ public class Account {
         Tuple2<BigDecimal, BigDecimal> balance = this.getBalanceInSettedPosition(key);
 
         return (statusBad ? "??? " : "")
-                + (balance == null? "" : NumberAsString.formatAsString(balance) + " ")
-                + (key == Transaction.FEE_KEY?"" : "{" + viewFEEbalance() + "} ")
+                + (balance == null? "" : NumberAsString.formatAsString(balance.b) + " ")
+                + (key == Transaction.FEE_KEY?" " : "{" + viewFEEbalance() + "} ")
                 + addressStr + "" + personStr;
     }
 
