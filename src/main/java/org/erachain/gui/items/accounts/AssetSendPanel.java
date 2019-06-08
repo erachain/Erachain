@@ -11,6 +11,8 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.AccountRenderer;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.assets.AssetInfo;
@@ -233,8 +235,14 @@ public class AssetSendPanel extends javax.swing.JPanel {
         this.jLabel_Mess_Title.setText(Lang.getInstance().translate("Title") + ":");
         this.jLabel_Mess.setText(Lang.getInstance().translate("Message") + ":");
         this.jCheckBox_Enscript.setText(Lang.getInstance().translate("Encrypt message") + ":");
+        this.jCheckBox_Enscript.setSelected(true);
         this.jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
         this.jLabel_Ammount.setText(Lang.getInstance().translate("Amount") + ":");
+
+        if (account != null && asset != null) {
+            this.jLabel_AmmountHave.setText(account.getBalance(DCSet.getInstance(), asset.getKey(), TransactionAmount.ACTION_SEND).b.toPlainString());
+        }
+
         this.jLabel_Fee.setText(Lang.getInstance().translate("Fee level") + ":");
 
         this.jButton_ok.setText(Lang.getInstance().translate("Send"));
@@ -434,7 +442,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
         if (result == Transaction.VALIDATE_OK) {
             //RESET FIELDS
 
-            if (amount != null && amount.compareTo(BigDecimal.ZERO) == 1) //IF MORE THAN ZERO
+            if (amount != null && amount.compareTo(BigDecimal.ZERO) != 0) //IF MORE THAN ZERO
             {
                 this.jTextField_Ammount.setText("0");
             }
@@ -447,7 +455,6 @@ public class AssetSendPanel extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
         }
-
 
     }
 
@@ -482,6 +489,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
         jComboBox_Asset = new javax.swing.JComboBox<>();
         jLabel_Ammount = new javax.swing.JLabel();
         jTextField_Ammount = new MDecimalFormatedTextField();
+        jLabel_AmmountHave = new javax.swing.JLabel();
         jLabel_Fee = new javax.swing.JLabel();
         jComboBox_Fee = new javax.swing.JComboBox<>();
         jButton_ok = new javax.swing.JButton();
@@ -643,6 +651,15 @@ public class AssetSendPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 0);
         add(jTextField_Ammount, gridBagConstraints);
 
+        jLabel_AmmountHave.setHorizontalAlignment(SwingConstants.RIGHT);
+        jLabel_AmmountHave.setText("werwer");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 10;
+        gridBagConstraints.gridy = 18;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
+        add(jLabel_AmmountHave, gridBagConstraints);
+
+
         jLabel_Fee.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel_Fee.setText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -750,6 +767,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel_Asset;
     private javax.swing.JLabel jLabel_Account;
     private javax.swing.JLabel jLabel_Ammount;
+    private javax.swing.JLabel jLabel_AmmountHave;
     private javax.swing.JLabel jLabel_Fee;
     private javax.swing.JLabel jLabel_Icon;
     private javax.swing.JLabel jLabel_Mess;
