@@ -9,10 +9,7 @@ import java.net.URL;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JTextPane;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
@@ -45,7 +42,6 @@ public class AssetInfo extends JTextPane {
     private Transaction transaction;
     private AssetInfo th;
     private PublicKeyAccount owner;
-    private JLabel imageLabel;
     private int max_Widht;
     private int max_Height;
     private Image cachedImage;
@@ -56,6 +52,8 @@ public class AssetInfo extends JTextPane {
      */
 
     public AssetInfo(AssetCls asset, boolean fullView) {
+        super();
+
         //   initComponents();
         th = this;
         this.asset = asset;
@@ -65,18 +63,6 @@ public class AssetInfo extends JTextPane {
         byte[] recordReference = asset.getReference();
         transaction = Transaction.findByDBRef(DCSet.getInstance(), recordReference);
         this.setMinimumSize(new Dimension(0, 0));
-
-        imageLabel = new JLabel();
-
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.gridheight = 5;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.05;
-        add(imageLabel, gridBagConstraints);
 
         image = null;
         byte[] imageByte = asset.getImage();
@@ -95,7 +81,6 @@ public class AssetInfo extends JTextPane {
             if (max_Height > 1 ) {
                 cachedImage = image.getImage().getScaledInstance(max_Widht, max_Height, 1);
                 image = new ImageIcon(cachedImage);
-                imageLabel.setIcon(image);
             } else {
                 image = null;
             }
@@ -109,7 +94,6 @@ public class AssetInfo extends JTextPane {
                 image = new ImageIcon(imageByte);
                 cachedImage = image.getImage().getScaledInstance(40, 40, 1);
                 image = new ImageIcon(cachedImage);
-                imageLabel.setIcon(image);
             }
         }
 
@@ -122,7 +106,7 @@ public class AssetInfo extends JTextPane {
 
         text += "<table><tr valign='top' align = 'left'><td>";
         text += "<DIV  style='float:left'><b>" + Lang.getInstance().translate("Key") + ": </b>" + asset.getKey() + "</DIV>";
-        if (false && image != null) {
+        if (image != null) {
             text += "<div><a href ='!!img'  style='color: " + color + "' ><img src=\"" + img_Local_URL + "\"></a></div>";
         }
         Transaction record = Transaction.findByDBRef(DCSet.getInstance(), asset.getReference());
@@ -137,11 +121,10 @@ public class AssetInfo extends JTextPane {
         text += " " + Lang.getInstance().translate("quantity") + ": <b>" + asset.getQuantity() + "</b></div><<BR></td></tr></table>";
         text += "<div>";
 
-        this.setContentType("text/html");
-        this.setText(text);
+        setContentType("text/html");
+        setText(text);
 
-        if (false)
-            HTML_Add_Local_Images();
+        HTML_Add_Local_Images();
 
         this.setEditable(false);
         MenuPopupUtil.installContextMenu(this);
@@ -251,10 +234,4 @@ public class AssetInfo extends JTextPane {
         // 	balancesTableModel.deleteObservers();
 
     }
-    // Variables declaration - do not modify
-    //  private javax.swing.JPanel jPanelHead;
-    // private javax.swing.JScrollPane scrollPaneDescription;
-    //  private javax.swing.JScrollPane jScrollPane3;
-
-    // End of variables declaration
 }
