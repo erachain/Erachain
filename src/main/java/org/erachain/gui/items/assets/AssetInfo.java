@@ -65,7 +65,6 @@ public class AssetInfo extends JTextPane {
         owner = asset.getOwner();
         HyperLinkAccount hl_Owner = new HyperLinkAccount(owner);
 
-
         byte[] recordReference = asset.getReference();
         transaction = Transaction.findByDBRef(DCSet.getInstance(), recordReference);
         this.setMinimumSize(new Dimension(0, 0));

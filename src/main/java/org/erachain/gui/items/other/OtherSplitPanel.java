@@ -220,7 +220,8 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-         jLabelAllBlocksSum.setText(String.valueOf(Controller.getInstance().getBlockChain().
+        if (jLabelAllBlocksSum != null)
+            jLabelAllBlocksSum.setText(String.valueOf(Controller.getInstance().getBlockChain().
                  getFullWeight(DCSet.getInstance())));
     }
 }
