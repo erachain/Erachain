@@ -170,6 +170,9 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
                     // jTextArea_Account_Description.setText(asset.getDescription());
                     jScrollPane2.setViewportView(new AssetInfo(asset, false));
 
+                    jLabel_Ammount = new javax.swing.JLabel(account
+                            .getBalanceInPosition(asset.getKey(), 1).b.toPlainString());
+
                 }
 
             }
@@ -457,6 +460,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         jLabel_Asset = new javax.swing.JLabel();
         jComboBox_Asset = new javax.swing.JComboBox<>();
         jLabel_Ammount = new javax.swing.JLabel();
+        jLabel_AmmountHave = new javax.swing.JLabel();
         jTextField_Ammount = new MDecimalFormatedTextField();
         jLabel_Fee = new javax.swing.JLabel();
         jComboBox_Fee = new javax.swing.JComboBox<>();
@@ -601,13 +605,23 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
         add(jComboBox_Asset, gridBagConstraints);
 
-        jLabel_Ammount.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel_Ammount.setText("");
+        jTextField_Ammount.setText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 18;
-        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-        add(jLabel_Ammount, gridBagConstraints);
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 0);
+        add(jTextField_Ammount, gridBagConstraints);
+
+        jLabel_AmmountHave.setHorizontalAlignment(SwingConstants.RIGHT);
+        jLabel_AmmountHave.setText("werwer");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 10;
+        gridBagConstraints.gridy = 18;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
+        add(jLabel_AmmountHave, gridBagConstraints);
 
         jTextField_Ammount.setText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -738,6 +752,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel_Asset;
     private javax.swing.JLabel jLabel_Account;
     private javax.swing.JLabel jLabel_Ammount;
+    private javax.swing.JLabel jLabel_AmmountHave;
     private javax.swing.JLabel jLabel_Fee;
     private javax.swing.JLabel jLabel_Icon;
     private javax.swing.JLabel jLabel_Mess;
