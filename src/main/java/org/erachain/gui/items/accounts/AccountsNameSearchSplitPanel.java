@@ -5,13 +5,13 @@ import com.google.common.io.Files;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.AccountsPropertisMap;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.assets.MyAssetsTab;
-import org.erachain.gui.items.mails.MailSendDialog;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.library.MTable;
@@ -224,8 +224,9 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
-                Account account = new Account(account1.getA());
-                new AccountSendDialog(null, null, account, null);
+                Account accountTo = new Account(account1.getA());
+                MainPanel.getInstance().insertTab(new AccountActionSendPanel(null, TransactionAmount.ACTION_SEND,
+                        null, accountTo, null, null));
 
             }
         });
@@ -237,9 +238,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
                 Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
                 Account account = new Account(account1.getA());
 
-                MainPanel mainPanel = MainPanel.getInstance();
-                mainPanel.insertTab(new MailSendPanel(null, null, account, null));
-
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, account, null));
             }
         });
         menu.add(Send_Mail_item_Menu);

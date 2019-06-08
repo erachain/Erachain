@@ -7,7 +7,6 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.accounts.*;
-import org.erachain.gui.items.mails.MailSendDialog;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.models.AccountsTableModel;
 import org.erachain.gui2.MainPanel;
@@ -45,7 +44,8 @@ public class DealsPopupMenu extends JPopupMenu {
         sendAsset = new JMenuItem(Lang.getInstance().translate("Send"));
         sendAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new AccountSendDialog(asset, pubKey, null, null);
+                //new AccountSendDialog(asset, pubKey, null, null);
+                MainPanel.getInstance().insertTab(new AccountActionSendPanel(asset, TransactionAmount.ACTION_SEND, pubKey, null, null, null));
 
             }
         });
@@ -55,8 +55,7 @@ public class DealsPopupMenu extends JPopupMenu {
         sendMail = new JMenuItem();
         sendMail.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, (PersonCls) person));
-                //new MailSendDialog(asset, pubKey, null, null);
+                MainPanel.getInstance().insertTab(new MailSendPanel(asset, pubKey, null, null));
             }
         });
         this.add(sendMail);
@@ -66,7 +65,8 @@ public class DealsPopupMenu extends JPopupMenu {
         debtAsset = new JMenuItem(Lang.getInstance().translate("Lend"));
         debtAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new AccountLendDialog(asset, pubKey);
+                //new AccountLendDialog(asset, pubKey);
+                MainPanel.getInstance().insertTab(new MailSendPanel(asset, pubKey, null, null));
 
             }
         });

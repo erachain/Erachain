@@ -30,8 +30,11 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
+import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -132,7 +135,9 @@ public class CreditsPanel extends JPanel // implements ItemListener
                 //Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
                 //Menu.selectOrAdd( new AccountSendDialog(asset, account), null);
 
-                new AccountSendDialog(asset, account, null, null);
+                //new AccountSendDialog(asset, account, null, null);
+                MainPanel.getInstance().insertTab(new AccountActionSendPanel(asset, TransactionAmount.ACTION_SEND, account, null, null, null));
+
 
             }
         });
@@ -177,7 +182,7 @@ public class CreditsPanel extends JPanel // implements ItemListener
                 //Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
                 //Menu.selectOrAdd( new AccountSendDialog(asset, account), null);
 
-                new AccountLendDialog(asset, account);
+                MainPanel.getInstance().insertTab(new MailSendPanel(asset, account, null, null));
 
             }
         });

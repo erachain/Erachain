@@ -2,9 +2,10 @@ package org.erachain.gui.items.persons;
 
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.items.accounts.AccountActionSendPanel;
 import org.erachain.gui.items.accounts.AccountSendDialog;
-import org.erachain.gui.items.mails.MailSendDialog;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.PersonAccountsModel;
@@ -111,7 +112,9 @@ public class PersonWorkDialog extends JDialog {
                     if (addresses.isEmpty()) {
 
                     } else {
-                        new AccountSendDialog(null, null, null, person);
+                        MainPanel.getInstance().insertTab(new AccountActionSendPanel(null, TransactionAmount.ACTION_SEND,
+                                null, null, person, null));
+
                     }
                     dispose();
                 }
@@ -128,8 +131,7 @@ public class PersonWorkDialog extends JDialog {
                     if (addresses.isEmpty()) {
 
                     } else {
-                        MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, (PersonCls) person));
-                        //MailSendDialog fm = new MailSendDialog(null, null, null, person);
+                        MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, person));
                     }
                     dispose();
                 }

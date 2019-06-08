@@ -1,11 +1,14 @@
 package org.erachain.gui.library;
 
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.assets.ExchangeFrame;
+import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -36,8 +39,9 @@ public class MenuDeals extends JMenu {
         dealsMenuSendMessage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                new AccountSendDialog(null, null, null, null);
-                ;
+                MainPanel.getInstance().insertTab(new AccountActionSendPanel(null, TransactionAmount.ACTION_SEND,
+                        null, null, null, null));
+
             }
         });
         add(dealsMenuSendMessage);
@@ -81,7 +85,9 @@ public class MenuDeals extends JMenu {
             public void actionPerformed(ActionEvent e) {
                 //
                 //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                new AccountLendDialog(null, null);
+                //new AccountLendDialog(null, null);
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, null));
+
             }
         });
         add(dealsMenuLend);

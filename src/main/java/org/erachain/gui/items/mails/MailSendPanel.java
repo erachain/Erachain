@@ -63,7 +63,7 @@ public class MailSendPanel extends JPanel {
     private JLabel messageLabel;
     private MailSendPanel th;
 
-    public MailSendPanel(AssetCls asset, Account account, Account account_To, PersonCls person) {
+    public MailSendPanel(AssetCls asset, Account accountFrom, Account accountTo, PersonCls person) {
 
         th = this;
         this.person = person;
@@ -121,8 +121,8 @@ public class MailSendPanel extends JPanel {
         this.cbxFrom = new JComboBox<Account>(accountsModel);
         this.cbxFrom.setRenderer(new AccountRenderer(asset.getKey()));
         this.add(this.cbxFrom, cbxFromGBC);
-        if (account != null)
-            cbxFrom.setSelectedItem(account);
+        if (accountFrom != null)
+            cbxFrom.setSelectedItem(accountFrom);
 
         // LABEL TO
         GridBagConstraints labelToGBC = new GridBagConstraints();
@@ -176,8 +176,8 @@ public class MailSendPanel extends JPanel {
             }
         } else {
 
-            if (account_To != null) {
-                txtTo.setText(account_To.getAddress());
+            if (accountTo != null) {
+                txtTo.setText(accountTo.getAddress());
             }
             this.add(txtTo, txtToGBC);
         }

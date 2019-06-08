@@ -4,8 +4,9 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.gui.items.accounts.AccountActionSendPanel;
 import org.erachain.gui.items.accounts.AccountSendDialog;
-import org.erachain.gui.items.mails.MailSendDialog;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.items.statement.StatementsVouchTableModel;
 import org.erachain.gui2.MainPanel;
@@ -198,7 +199,9 @@ public class VoushLibraryPanel extends JPanel {
 
                 Account account = (Account) model.getCreator(row);
 
-                new AccountSendDialog(null, null, account, null);
+                MainPanel.getInstance().insertTab(new AccountActionSendPanel(null, TransactionAmount.ACTION_SEND,
+                        null, account, null, null));
+
 
             }
         });
@@ -211,8 +214,7 @@ public class VoushLibraryPanel extends JPanel {
 
                 Account account = (Account) model.getCreator(row);
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, (PersonCls) person));
-                //new MailSendDialog(null, null, account, null);
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, account, null));
 
             }
         });

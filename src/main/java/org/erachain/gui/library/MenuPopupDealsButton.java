@@ -4,7 +4,9 @@ import org.erachain.gui.items.accounts.AccountConfiscateDebtDialog;
 import org.erachain.gui.items.accounts.AccountLendDialog;
 import org.erachain.gui.items.accounts.AccountRepayDebtDialog;
 import org.erachain.gui.items.accounts.AccountTakeHoldDialog;
+import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -102,7 +104,9 @@ public class MenuPopupDealsButton extends JButton {
             public void actionPerformed(ActionEvent e) {
                 //
                 //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                new AccountLendDialog(null, null);
+                //new AccountLendDialog(null, null);
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, null));
+
             }
         });
         dealsMenu.add(dealsMenuLend);

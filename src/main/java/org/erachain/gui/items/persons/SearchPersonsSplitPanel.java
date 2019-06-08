@@ -3,10 +3,11 @@ package org.erachain.gui.items.persons;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemSplitPanel;
+import org.erachain.gui.items.accounts.AccountActionSendPanel;
 import org.erachain.gui.items.accounts.AccountSendDialog;
-import org.erachain.gui.items.mails.MailSendDialog;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
@@ -33,7 +34,9 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                new AccountSendDialog(null, null, null, (PersonCls) th.itemMenu);
+                MainPanel.getInstance().insertTab(new AccountActionSendPanel(null, TransactionAmount.ACTION_SEND,
+                        null, null, (PersonCls) th.itemMenu, null));
+
             }
         });
 
@@ -45,8 +48,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, (PersonCls) person));
-                //new MailSendDialog(null, null, null, (PersonCls) th.itemMenu);
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, (PersonCls)th.itemMenu));
             }
         });
 

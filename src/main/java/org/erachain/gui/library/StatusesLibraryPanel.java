@@ -4,8 +4,9 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.gui.items.accounts.AccountActionSendPanel;
 import org.erachain.gui.items.accounts.AccountSendDialog;
-import org.erachain.gui.items.mails.MailSendDialog;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.models.PersonStatusesModel;
 import org.erachain.gui2.MainPanel;
@@ -152,7 +153,10 @@ public class StatusesLibraryPanel extends JPanel {
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account account = statusModel.getCreator(row);
-                new AccountSendDialog(null, null, account, null);
+                //new AccountSendDialog(null, null, account, null);
+                MainPanel.getInstance().insertTab(new AccountActionSendPanel(null, TransactionAmount.ACTION_SEND,
+                        null, null, person, null));
+
 
             }
         });
@@ -162,7 +166,7 @@ public class StatusesLibraryPanel extends JPanel {
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account account = statusModel.getCreator(row);
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, (PersonCls) person));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, account, null));
                 //new MailSendDialog(null, null, account, null);
 
             }

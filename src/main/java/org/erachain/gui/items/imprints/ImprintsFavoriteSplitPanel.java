@@ -3,9 +3,10 @@ package org.erachain.gui.items.imprints;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.ItemSplitPanel;
+import org.erachain.gui.items.accounts.AccountActionSendPanel;
 import org.erachain.gui.items.accounts.AccountSendDialog;
-import org.erachain.gui.items.mails.MailSendDialog;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -28,7 +29,10 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
         vsend_Coins_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new AccountSendDialog(null, null, null, (PersonCls) th.itemMenu);
+                //new AccountSendDialog(null, null, null, (PersonCls) th.itemMenu);
+                MainPanel.getInstance().insertTab(new AccountActionSendPanel(null, TransactionAmount.ACTION_SEND,
+                        null, null, (PersonCls) th.itemMenu, null));
+
             }
         });
 
@@ -37,9 +41,7 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel mainPanel = MainPanel.getInstance();
-                mainPanel.insertTab(new MailSendPanel(null, null, null, (PersonCls) th.itemMenu));
-                //new MailSendDialog(null, null, null, );
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, (PersonCls) th.itemMenu));
             }
         });
 
