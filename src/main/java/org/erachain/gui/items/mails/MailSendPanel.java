@@ -10,7 +10,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.AccountRenderer;
+import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.accounts.AccountsComboBoxModel;
@@ -119,7 +119,7 @@ public class MailSendPanel extends JPanel {
         cbxFromGBC.gridy = y;
 
         this.cbxFrom = new JComboBox<Account>(accountsModel);
-        this.cbxFrom.setRenderer(new AccountRenderer(0));
+        this.cbxFrom.setRenderer(new AccountRenderer(asset.getKey()));
         this.add(this.cbxFrom, cbxFromGBC);
         if (account != null)
             cbxFrom.setSelectedItem(account);

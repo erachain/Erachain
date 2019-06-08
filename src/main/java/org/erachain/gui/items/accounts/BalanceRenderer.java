@@ -1,4 +1,4 @@
-package org.erachain.gui;
+package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;

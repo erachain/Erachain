@@ -5,9 +5,11 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.accounts.AccountSendDialog;
 import org.erachain.gui.items.mails.MailSendDialog;
+import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.PersonAccountsModel;
 import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun.Tuple3;
 
@@ -126,7 +128,8 @@ public class PersonWorkDialog extends JDialog {
                     if (addresses.isEmpty()) {
 
                     } else {
-                        MailSendDialog fm = new MailSendDialog(null, null, null, person);
+                        MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, (PersonCls) person));
+                        //MailSendDialog fm = new MailSendDialog(null, null, null, person);
                     }
                     dispose();
                 }

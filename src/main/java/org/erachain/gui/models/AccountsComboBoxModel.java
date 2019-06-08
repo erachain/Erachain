@@ -11,9 +11,13 @@ import java.util.*;
 @SuppressWarnings("serial")
 public class AccountsComboBoxModel extends DefaultComboBoxModel<Account> implements Observer {
 
-    public AccountsComboBoxModel() {
+    private int viewBalancePosition;
+
+    public AccountsComboBoxModel(int viewBalancePosition) {
+        this.viewBalancePosition = viewBalancePosition;
+
         //INSERT ALL ACCOUNTS
-        List<Account> accounts = Controller.getInstance().getAccounts();
+        List<Account> accounts = Controller.getInstance().getAccountsAndSetBalancePosition(viewBalancePosition);
         synchronized (accounts) {
             sortAndAdd();
         }
@@ -22,7 +26,14 @@ public class AccountsComboBoxModel extends DefaultComboBoxModel<Account> impleme
             Controller.getInstance().wallet.database.getAccountMap().addObserver(this);
     }
 
-    @Override
+    /**
+     * not show balance on accounts
+     */
+    public AccountsComboBoxModel() {
+        this(0);
+    }
+
+        @Override
     public void update(Observable o, Object arg) {
         try {
             this.syncUpdate(o, arg);
@@ -59,11 +70,8 @@ public class AccountsComboBoxModel extends DefaultComboBoxModel<Account> impleme
 
     //SORTING BY BALANCE (BIGGEST BALANCE FIRST)
     private void sortAndAdd() {
-        //TO AVOID PROBLEMS WE DON'T WANT TO SORT THE ORIGINAL LIST!
-        ArrayList<Account> accoountsToSort = new ArrayList<Account>(Controller.getInstance().getAccounts());
-        Collections.sort(accoountsToSort, new AccountBalanceComparator());
-        Collections.reverse(accoountsToSort);
-        for (Account account : accoountsToSort) {
+        List<Account> accounts = Controller.getInstance().getAccountsAndSetBalancePosition(viewBalancePosition);
+        for (Account account : accounts) {
             this.addElement(account);
         }
     }

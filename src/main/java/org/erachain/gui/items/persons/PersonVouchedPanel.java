@@ -5,8 +5,10 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.gui.items.accounts.AccountSendDialog;
 import org.erachain.gui.items.mails.MailSendDialog;
+import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.items.statement.StatementsVouchTableModel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -197,7 +199,8 @@ public class PersonVouchedPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 Account account = (Account) model.getPublicKey(row);
 
-                new MailSendDialog(null, null, account, null);
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, (PersonCls) person));
+                //new MailSendDialog(null, null, account, null);
 
             }
         });

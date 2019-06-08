@@ -3,8 +3,9 @@ package org.erachain.gui.items.persons;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.gui.items.accounts.AccountSendDialog;
 import org.erachain.gui.items.mails.MailSendDialog;
-import org.erachain.gui.items.statement.StatementsVouchTableModel;
+import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -124,8 +125,6 @@ public class PersonOwnerPanel extends JPanel {
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new AccountSendDialog(null, null, null, person_Accounts_Model.getItem(row));
-                ;
-
             }
         });
         menu.add(Send_Coins_item_Menu);
@@ -133,7 +132,8 @@ public class PersonOwnerPanel extends JPanel {
         JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new MailSendDialog(null, null, null, person_Accounts_Model.getItem(row));
+                //new MailSendDialog(null, null, null, person_Accounts_Model.getItem(row));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, (PersonCls) person));
 
             }
         });

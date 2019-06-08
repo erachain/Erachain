@@ -6,7 +6,9 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.gui.items.accounts.AccountSendDialog;
 import org.erachain.gui.items.mails.MailSendDialog;
+import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.models.PersonStatusesModel;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -160,7 +162,8 @@ public class StatusesLibraryPanel extends JPanel {
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account account = statusModel.getCreator(row);
-                new MailSendDialog(null, null, account, null);
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, (PersonCls) person));
+                //new MailSendDialog(null, null, account, null);
 
             }
         });

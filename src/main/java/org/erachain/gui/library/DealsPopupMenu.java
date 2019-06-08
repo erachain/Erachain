@@ -4,9 +4,13 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base32;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.persons.PersonCls;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.mails.MailSendDialog;
+import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.models.AccountsTableModel;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -38,7 +42,7 @@ public class DealsPopupMenu extends JPopupMenu {
         this.table = table;
         this.assetSelector = assetSelector;
         
-        sendAsset = new JMenuItem();
+        sendAsset = new JMenuItem(Lang.getInstance().translate("Send"));
         sendAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new AccountSendDialog(asset, pubKey, null, null);
@@ -51,7 +55,8 @@ public class DealsPopupMenu extends JPopupMenu {
         sendMail = new JMenuItem();
         sendMail.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new MailSendDialog(asset, pubKey, null, null);
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, (PersonCls) person));
+                //new MailSendDialog(asset, pubKey, null, null);
             }
         });
         this.add(sendMail);

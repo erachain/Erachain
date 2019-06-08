@@ -201,7 +201,9 @@ public class MenuFiles extends JMenu {
                     String head = (String) js.get("head");
                     if (!js.containsKey("amount")) return;
                     String amount = (String) js.get("amount");
-                    AccountSendDialog dd = new AccountSendDialog(ct.getAsset(assetKey), ct.getAccountByAddress((String) creator), ct.getAccountByAddress(recipient), null);
+                    AccountSendDialog dd = new AccountSendDialog(ct.getAsset(assetKey),
+                            ct.getAccountByAddress((String) creator), ct.getAccountByAddress(recipient),
+                            null);
                     dd.panel.jTextField_To.setEditable(false);
                     dd.panel.jTextField_Mess_Title.setEditable(false);
                     dd.panel.jTextField_Ammount.setEditable(false);

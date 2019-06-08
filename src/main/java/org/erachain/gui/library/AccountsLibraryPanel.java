@@ -7,7 +7,9 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.gui.items.accounts.AccountSendDialog;
 import org.erachain.gui.items.accounts.AccountSetNameDialog;
 import org.erachain.gui.items.mails.MailSendDialog;
+import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.models.PersonAccountsModel;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -179,7 +181,8 @@ public class AccountsLibraryPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 Account account = person_Accounts_Model.getAccount(row);
 
-                new MailSendDialog(null, null, account, null);
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, (PersonCls) person));
+                //new MailSendDialog(null, null, account, null);
 
             }
         });

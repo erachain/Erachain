@@ -574,14 +574,33 @@ public class MainPanel extends javax.swing.JPanel {
     }
 
     // insert tab in tabbedpane
-    public void insertTab(String str, JPanel pp) {
-        int s = -1;
-        s = jTabbedPane1.indexOfTab(str);
-        if (s == -1) {
+    public boolean insertTab(String str, JPanel pp) {
+        int index = jTabbedPane1.indexOfTab(str);
+        boolean inserted = false;
+        if (index == -1) {
             jTabbedPane1.addTabWithCloseButton(str, pp);
-            s = jTabbedPane1.indexOfTab(str);
+            index = jTabbedPane1.indexOfTab(str);
+            inserted = true;
         }
-        jTabbedPane1.setSelectedIndex(s);
+        jTabbedPane1.setSelectedIndex(index);
+
+        return inserted;
+
+    }
+
+    // insert tab in tabbedpane
+    public boolean insertTab(JPanel panel) {
+        String name = Lang.getInstance().translate(panel.getClass().getSimpleName());
+        int index = jTabbedPane1.indexOfTab(name);
+        boolean inserted = false;
+        if (index == -1) {
+            jTabbedPane1.addTabWithCloseButton(name, panel);
+            index = jTabbedPane1.indexOfTab(name);
+            inserted = true;
+        }
+        jTabbedPane1.setSelectedIndex(index);
+
+        return inserted;
 
     }
 

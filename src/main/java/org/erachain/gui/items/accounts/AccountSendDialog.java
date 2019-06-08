@@ -3,6 +3,7 @@ package org.erachain.gui.items.accounts;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -13,18 +14,18 @@ import java.util.List;
 public class AccountSendDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
-    public AccountSendPanel panel;
+    public AccountActionSendPanel panel;
 
 
-    public AccountSendDialog(AssetCls asset, Account account, Account account_To, PersonCls person, boolean receive ) {
-        init(asset, account, account_To, person, receive, null);
+    public AccountSendDialog(AssetCls asset, Account accountFrom, Account accountTo, PersonCls person, boolean receive) {
+        init(asset, accountFrom, accountTo, person, receive, null);
     }
 
-    public AccountSendDialog(AssetCls asset, Account account, Account account_To, PersonCls person) {
-        init(asset, account, account_To, person, true, null);
+    public AccountSendDialog(AssetCls asset, Account accountFrom, Account accountTo, PersonCls person) {
+        init(asset, accountFrom, accountTo, person, true, null);
     }
-    public AccountSendDialog(AssetCls asset, Account account, Account account_To, PersonCls person, String message) {
-        init(asset, account, account_To, person, true, message);
+    public AccountSendDialog(AssetCls asset, Account accountFrom, Account accountTo, PersonCls person, String message) {
+        init(asset, accountFrom, accountTo, person, true, message);
     }
 
     
@@ -41,7 +42,7 @@ public class AccountSendDialog extends JDialog {
         panel.noRecive = noR;
 
     }
-    private void  init(AssetCls asset, Account account, Account account_To, PersonCls person, boolean receive, String message){
+    private void  init(AssetCls asset, Account accountFrom, Account accountTo, PersonCls person, boolean receive, String message){
      // ICON
         List<Image> icons = new ArrayList<Image>();
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
@@ -49,7 +50,7 @@ public class AccountSendDialog extends JDialog {
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
         this.setIconImages(icons);
-        panel = new AccountSendPanel(asset, account, account_To,  person, message);
+        panel = new AccountActionSendPanel(asset, TransactionAmount.ACTION_SEND, accountFrom, accountTo,  person, message);
         // no recieve
         this.setNoRecive(!receive);
         

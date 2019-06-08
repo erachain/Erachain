@@ -11,7 +11,6 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.AccountRenderer;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.assets.AssetInfo;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
@@ -77,24 +76,23 @@ public class AssetSendPanel extends javax.swing.JPanel {
     private Image Im;
     private String defaultImagePath = "images/icons/coin.png";
 
-    private PersonCls person_To;
     /**
      * Creates new form AssetSendPanel
      */
 
     private AccountsComboBoxModel accountsModel;
 
-    public AssetSendPanel(AssetCls asset_in, Account account2, Account account_To, PersonCls person) {
+    public AssetSendPanel(AssetCls assetIn, int balancePosition,
+                          Account accountFrom, Account accountTo) {
 
-        this.account = account2;
-        if (asset_in == null)
+        this.account = accountFrom;
+        if (assetIn == null)
             this.asset = Controller.getInstance().getAsset(2);
         else
-            this.asset = asset_in;
+            this.asset = assetIn;
 
 
-        recipient = account_To;
-        person_To = person;
+        recipient = accountTo;
 
         initComponents();
 
@@ -106,9 +104,10 @@ public class AssetSendPanel extends javax.swing.JPanel {
         // icon
         jLabel_Icon.setIcon(new ImageIcon(defaultImagePath));
 
-        // account model
-        this.accountsModel = new AccountsComboBoxModel();
+        // account ComboBox
+        this.accountsModel = new AccountsComboBoxModel(balancePosition);
         jComboBox_Account.setModel(accountsModel);
+        if (account != null) jComboBox_Account.setSelectedItem(account);
 
         // favorite combo box
         jComboBox_Asset.setModel(new ComboBoxAssetsModel());
@@ -129,13 +128,6 @@ public class AssetSendPanel extends javax.swing.JPanel {
         }
 
         this.jComboBox_Fee.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
-
-        // account ComboBox
-        this.accountsModel = new AccountsComboBoxModel();
-        this.jComboBox_Account.setModel(accountsModel);
-        //  this.jComboBox_Account.setRenderer(new AccountRenderer(0));
-        //  ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(((AssetCls) jComboBox_Account.getSelectedItem()).getKey());
-        if (account != null) jComboBox_Account.setSelectedItem(account);
 
         //ON FAVORITES CHANGE
 
@@ -249,8 +241,8 @@ public class AssetSendPanel extends javax.swing.JPanel {
         jScrollPane2.setViewportView(new AssetInfo(asset, false)); //jTextArea_Account_Description);
     }
 
-    public AssetSendPanel(AssetCls asset_in, Account account2, Account account_To, PersonCls person, String message) {
-        this(asset_in, account2, account_To, person);
+    public AssetSendPanel(AssetCls asset_in, int balancePosition, Account account2, Account account_To, PersonCls person, String message) {
+        this(asset_in, balancePosition, account2, account_To);
 
         jTextArea_Description.setText(message);
 

@@ -14,13 +14,13 @@ import org.erachain.lang.Lang;
 
 @SuppressWarnings("serial")
 
-public class AccountSendPanel extends AssetSendPanel {
+public class AccountActionSendPanel extends AssetSendPanel {
     
-    //private AccountSendPanel th;
+    //private AccountActionSendPanel th;
     public boolean noRecive;
 
-    public AccountSendPanel(AssetCls asset, Account account, Account account_To, PersonCls person, String message) {
-        super(asset, account, account_To, person, message);
+    public AccountActionSendPanel(AssetCls asset, int balancePosition, Account accountFrom, Account accountTo, PersonCls person, String message) {
+        super(asset, balancePosition, accountFrom, accountTo);
         String assetName = "";
         if (asset != null) {
             assetName = asset.viewName();
@@ -39,7 +39,7 @@ public class AccountSendPanel extends AssetSendPanel {
 
     }
     /*
-    public AccountSendPanel(AssetCls asset, Account account, Account account_To, PersonCls person, String message) {
+    public AccountActionSendPanel(AssetCls asset, Account account, Account account_To, PersonCls person, String message) {
         this(asset, account, account_To, person);
     }
     */

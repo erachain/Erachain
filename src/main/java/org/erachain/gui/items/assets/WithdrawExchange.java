@@ -6,7 +6,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.items.accounts.AccountSendDialog;
 import org.erachain.gui.library.MButton;
-import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.FundTokensComboBoxModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.StrJSonFine;

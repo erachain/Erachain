@@ -11,7 +11,9 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.accounts.AccountSendDialog;
 import org.erachain.gui.items.mails.MailSendDialog;
+import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
 public class PersonListAddPopupMenuItem {
@@ -35,7 +37,8 @@ public class PersonListAddPopupMenuItem {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                new MailSendDialog(null, null, null, (PersonCls)person);
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null, (PersonCls) person));
+                //new MailSendDialog(null, null, null, (PersonCls)person);
             }
         });
 

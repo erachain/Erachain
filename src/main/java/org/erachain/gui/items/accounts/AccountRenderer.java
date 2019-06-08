@@ -1,4 +1,4 @@
-package org.erachain.gui;
+package org.erachain.gui.items.accounts;
 
 import org.erachain.core.account.Account;
 

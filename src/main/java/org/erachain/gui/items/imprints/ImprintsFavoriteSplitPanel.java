@@ -6,6 +6,8 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.gui.items.ItemSplitPanel;
 import org.erachain.gui.items.accounts.AccountSendDialog;
 import org.erachain.gui.items.mails.MailSendDialog;
+import org.erachain.gui.items.mails.MailSendPanel;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -35,7 +37,9 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new MailSendDialog(null, null, null, (PersonCls) th.itemMenu);
+                MainPanel mainPanel = MainPanel.getInstance();
+                mainPanel.insertTab(new MailSendPanel(null, null, null, (PersonCls) th.itemMenu));
+                //new MailSendDialog(null, null, null, );
             }
         });
 
