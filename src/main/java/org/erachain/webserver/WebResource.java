@@ -1738,7 +1738,6 @@ public class WebResource {
 
 
             Collections.sort(resultingAccounts, new AccountBalanceComparator());
-            Collections.reverse(resultingAccounts);
 
             String accountStrings = "";
 
@@ -1814,7 +1813,6 @@ public class WebResource {
             List<Name> resultingNames = ownAllowedElements.getB();
 
             Collections.sort(resultingAccounts, new AccountBalanceComparator());
-            Collections.reverse(resultingAccounts);
 
             String accountStrings = "";
 

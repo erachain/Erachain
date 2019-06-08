@@ -17,10 +17,12 @@ import org.erachain.lang.Lang;
 
 @SuppressWarnings("serial")
 
-public class AccountTakeHoldPanel extends AssetSendPanel {
+public class AccountAssetHoldPanel extends AccountAssetActionPanelCls {
 
-    public AccountTakeHoldPanel(AssetCls asset, Account account, Account account_To, PersonCls person) {
-        super(asset, account, account_To, person);
+    public AccountAssetHoldPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
+        super(assetIn, TransactionAmount.ACTION_HOLD, accountFrom, accountTo);
+
+        setName("Take on Hold");
 
         this.jLabel_Title.setText(Lang.getInstance().translate("If You want to take on hold issued asset %asset%, fill in this form")
                 .replace("%asset%", asset.viewName()));

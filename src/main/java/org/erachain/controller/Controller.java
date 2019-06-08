@@ -1980,6 +1980,11 @@ public class Controller extends Observable {
         return this.wallet.getAccounts();
     }
 
+    public List<Account> getAccountsAndSetBalancePosition(int position) {
+
+        return this.wallet.getAccountsAndSetBalancePosition(position);
+    }
+
     public boolean isAddressIsMine(String address) {
         if (!this.doesWalletExists())
             return false;

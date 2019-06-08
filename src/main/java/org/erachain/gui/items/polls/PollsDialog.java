@@ -9,7 +9,7 @@ import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.VoteOnItemPollTransaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.AccountRenderer;
+import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.ComboBoxModelItemsAll;
 import org.erachain.gui.library.IssueConfirmDialog;

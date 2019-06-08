@@ -4,10 +4,11 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.gui.items.accounts.AccountSendDialog;
+import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.library.MButton;
-import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.FundTokensComboBoxModel;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
@@ -71,7 +72,7 @@ public class WithdrawExchange extends JPanel {
 
         JSONObject jsonObject;
         String inputText = "";
-        String account_to;
+        String accountTo;
         String message = "";
 
         AssetCls assetIn = null;
@@ -132,17 +133,22 @@ public class WithdrawExchange extends JPanel {
                 jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
             }
 
-            account_to = jsonObject.get("addr_in").toString();
+                accountTo = jsonObject.get("addr_in").toString();
+            }
 
         } catch (Exception e) {
-            account_to = null;
+            accountTo = null;
             jLabel_Adress_Check.setText(inputText);
             inputText = "";
         }
 
         if (assetIn != null && account_to != null) {
+        if (accountTo != null) {
 
             message += ":" + jTextField_Address.getText();
+            //new AccountSendDialog(asset[0], null, new Account(accountTo), null, message);
+            MainPanel.getInstance().insertTab(new AccountAssetSendPanel(asset[0], TransactionAmount.ACTION_SEND,
+                    null, new Account(accountTo), null, message));
             new AccountSendDialog(assetIn, null, new Account(account_to), null, message);
 
         }

@@ -6,6 +6,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
@@ -14,10 +15,12 @@ import org.erachain.lang.Lang;
 
 @SuppressWarnings("serial")
 
-public class AccountLendPanel extends AssetSendPanel {
+public class AccountAssetLendPanel extends AccountAssetActionPanelCls {
 
-    public AccountLendPanel(AssetCls asset, Account account, Account account_To, PersonCls person) {
-        super(asset, account, account_To, person);
+    public AccountAssetLendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
+        super(assetIn, TransactionAmount.ACTION_DEBT, accountFrom, accountTo);
+
+        setName("Lend");
 
         this.jLabel_Title.setText(Lang.getInstance().translate("If You want to give a loan asset %asset%, fill in this form")
                 .replace("%asset%", asset.viewName()));

@@ -74,6 +74,7 @@ public abstract class TransactionAmount extends Transaction {
     public static final byte BACKWARD_MASK = 64;
     
     // BALANCES types and ACTION with IT
+    // 0 - not used
     public static final int ACTION_SEND = 1;
     public static final int ACTION_DEBT = 2;
     public static final int ACTION_HOLD = 3;

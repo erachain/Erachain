@@ -1,11 +1,11 @@
 package org.erachain.gui.library;
 
-import org.erachain.core.item.assets.AssetCls;
-import org.erachain.datachain.DCSet;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.accounts.*;
-import org.erachain.gui.items.assets.ExchangeFrame;
+import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -20,27 +20,90 @@ public class MenuDeals extends JMenu {
     public MenuDeals() {
 
         // DEALS
-        // Send
-        JMenuItem BueCompyItem = new JMenuItem(Lang.getInstance().translate("Buy COMPU"));
-        BueCompyItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
-        BueCompyItem.addActionListener(new ActionListener() {
+
+        // MAIL
+        JMenuItem dealsMenuMail = new JMenuItem(Lang.getInstance().translate("Send mail"));
+        dealsMenuMail.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //
-                new ExchangeFrame((AssetCls) DCSet.getInstance().getItemAssetMap().get((long) 2), null, "Buy", null);
+
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null));
+
             }
         });
-        add(BueCompyItem);
+        add(dealsMenuMail);
+
+        addSeparator();
+
         // Send
         JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Send"));
         dealsMenuSendMessage.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
         dealsMenuSendMessage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                new AccountSendDialog(null, null, null, null);
-                ;
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
+                        null, null, null, null));
+
             }
         });
         add(dealsMenuSendMessage);
+
+        addSeparator();
+
+        // Take on HOLD
+
+        JMenuItem dealsMenu_Take_On_Hold = new JMenuItem(Lang.getInstance().translate("Take on Hold"));
+        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
+        dealsMenu_Take_On_Hold.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                MainPanel.getInstance().insertTab(new AccountAssetHoldPanel(null, null, null, null));
+            }
+        });
+        add(dealsMenu_Take_On_Hold);
+
+        addSeparator();
+
+        // to lend
+
+        JMenuItem dealsMenuLend = new JMenuItem(Lang.getInstance().translate("Lend"));
+        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
+        dealsMenuLend.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                MainPanel.getInstance().insertTab(new AccountAssetLendPanel(null, null, null, null));
+
+            }
+        });
+        add(dealsMenuLend);
+
+        // Confiscate_Debt
+
+        JMenuItem dealsMenu_Confiscate_Debt = new JMenuItem(Lang.getInstance().translate("Confiscate Debt"));
+        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
+        dealsMenu_Confiscate_Debt.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                MainPanel.getInstance().insertTab(new AccountAssetConfiscateDebtPanel(null, null, null, null));
+
+            }
+        });
+        add(dealsMenu_Confiscate_Debt);
+
+        // Repay_Debt
+
+        JMenuItem dealsMenu_Repay_Debt = new JMenuItem(Lang.getInstance().translate("Repay Debt"));
+        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
+        dealsMenu_Repay_Debt.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                MainPanel.getInstance().insertTab(new AccountAssetRepayDebtPanel(null, null, null, null));
+
+            }
+        });
+        add(dealsMenu_Repay_Debt);
+
+        addSeparator();
+
         //vouch
         JMenuItem dealsMenuVouchRecord = new JMenuItem(Lang.getInstance().translate("Vouch"));
         dealsMenuVouchRecord.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Vouching record"));
@@ -53,65 +116,6 @@ public class MenuDeals extends JMenu {
         });
         add(dealsMenuVouchRecord);
 
-
-        addSeparator();
-
-
-        // Take on HOLD
-
-        JMenuItem dealsMenu_Take_On_Hold = new JMenuItem(Lang.getInstance().translate("Take on Hold"));
-        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
-        dealsMenu_Take_On_Hold.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                new AccountTakeHoldDialog(null, null);
-            }
-        });
-        add(dealsMenu_Take_On_Hold);
-
-
-        addSeparator();
-
-        // to lend
-
-        JMenuItem dealsMenuLend = new JMenuItem(Lang.getInstance().translate("Lend"));
-        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
-        dealsMenuLend.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                new AccountLendDialog(null, null);
-            }
-        });
-        add(dealsMenuLend);
-
-
-        // Confiscate_Debt
-
-        JMenuItem dealsMenu_Confiscate_Debt = new JMenuItem(Lang.getInstance().translate("Confiscate Debt"));
-        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
-        dealsMenu_Confiscate_Debt.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                new AccountConfiscateDebtDialog(null, null);
-            }
-        });
-        add(dealsMenu_Confiscate_Debt);
-
-        // Repay_Debt
-
-        JMenuItem dealsMenu_Repay_Debt = new JMenuItem(Lang.getInstance().translate("Repay Debt"));
-        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
-        dealsMenu_Repay_Debt.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                new AccountRepayDebtDialog(null, null);
-            }
-        });
-        add(dealsMenu_Repay_Debt);
 
         JMenuItem dealsMenu_Open_Wallet = new JMenuItem(Lang.getInstance().translate("Open Wallet"));
         //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
@@ -135,6 +139,7 @@ public class MenuDeals extends JMenu {
         });
 
         add(dealsMenu_Open_Wallet);
+
 
 		     /*   
 		        

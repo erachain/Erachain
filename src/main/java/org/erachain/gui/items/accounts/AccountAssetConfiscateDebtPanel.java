@@ -15,10 +15,12 @@ import org.erachain.lang.Lang;
 
 @SuppressWarnings("serial")
 
-public class AccountConfiscateDebtPanel extends AssetSendPanel {
+public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls {
 
-    public AccountConfiscateDebtPanel(AssetCls asset, Account account, Account account_To, PersonCls person) {
-        super(asset,account,account_To, person);
+    public AccountAssetConfiscateDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
+        super(assetIn, TransactionAmount.ACTION_DEBT, accountFrom, accountTo);
+
+        setName("Confiscate Debt");
 
         this.jButton_ok.setText(Lang.getInstance().translate(asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"));
         this.jLabel_Title.setText(Lang.getInstance()

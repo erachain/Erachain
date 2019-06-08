@@ -1,6 +1,8 @@
 package org.erachain.gui.bank;
 
 import org.erachain.core.account.Account;
+import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.library.*;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.lang.Lang;
@@ -51,7 +53,7 @@ class IssueSendPaymentOrder1 extends JPanel {
     private AccountsComboBoxModel accountsModel;
 
     public IssueSendPaymentOrder1() {
-        this.accountsModel = new AccountsComboBoxModel();
+        this.accountsModel = new AccountsComboBoxModel(TransactionAmount.ACTION_SEND);
         this.jComboBox_Account = new JComboBox<Account>(accountsModel);
         initComponents();
         // menu

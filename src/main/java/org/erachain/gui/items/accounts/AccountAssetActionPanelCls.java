@@ -42,7 +42,7 @@ import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public class AssetSendPanel extends javax.swing.JPanel {
+public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
     // TODO - "A" - &
     //static String wrongFirstCharOfAddress = "A";
@@ -79,65 +79,61 @@ public class AssetSendPanel extends javax.swing.JPanel {
     private Image Im;
     private String defaultImagePath = "images/icons/coin.png";
 
-    private PersonCls person_To;
     /**
-     * Creates new form AssetSendPanel
+     * Creates new form AccountAssetActionPanelCls
      */
 
     private AccountsComboBoxModel accountsModel;
 
-    public AssetSendPanel(AssetCls asset_in, Account account2, Account account_To, PersonCls person) {
+    public AccountAssetActionPanelCls(AssetCls assetIn, int balancePosition,
+                                      Account accountFrom, Account accountTo) {
 
-        this.account = account2;
-        if (asset_in == null)
+        setName("Send");
+        if (assetIn == null)
             this.asset = Controller.getInstance().getAsset(2);
         else
-            this.asset = asset_in;
+            this.asset = assetIn;
 
-
-        recipient = account_To;
-        person_To = person;
+        this.account = accountFrom;
+        recipient = accountTo;
 
         initComponents();
+
+        //this.jComboBox_Asset.setEnabled(assetIn != null);
 
         this.jTextField_Recive_Detail.setText("");
         this.jTextField_Mess_Title.setText("");
         this.jTextField_Ammount.setText("0");
         this.jLabel_Icon.setText("");
 
-        // icon
-        jLabel_Icon.setIcon(new ImageIcon(defaultImagePath));
-
-        // account model
-        this.accountsModel = new AccountsComboBoxModel();
+        // account ComboBox
+        this.accountsModel = new AccountsComboBoxModel(balancePosition);
         jComboBox_Account.setModel(accountsModel);
+
+        if (account != null) {
+            jComboBox_Account.setSelectedItem(account);
+        }
+
+        jComboBox_Account.setRenderer(new AccountRenderer(asset.getKey()));
 
         // favorite combo box
         jComboBox_Asset.setModel(new ComboBoxAssetsModel());
-        if (asset != null) {
-            this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
 
-            for (int i = 0; i < jComboBox_Asset.getItemCount(); i++) {
-                ItemCls item = jComboBox_Asset.getItemAt(i);
-                if (item.getKey() == asset.getKey()) {
-                    // not worked jComboBox_Asset.setSelectedItem(asset);
-                    jComboBox_Asset.setSelectedIndex(i);
-                    //    jComboBox_Asset.setEnabled(false);// .setEditable(false);
-                    break;
-                } else {
-                    //    jComboBox_Asset.setEnabled(true);
-                }
+        this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
+
+        for (int i = 0; i < jComboBox_Asset.getItemCount(); i++) {
+            ItemCls item = jComboBox_Asset.getItemAt(i);
+            if (item.getKey() == asset.getKey()) {
+                // not worked jComboBox_Asset.setSelectedItem(asset);
+                jComboBox_Asset.setSelectedIndex(i);
+                //    jComboBox_Asset.setEnabled(false);// .setEditable(false);
+                break;
+            } else {
+                //    jComboBox_Asset.setEnabled(true);
             }
         }
 
         this.jComboBox_Fee.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
-
-        // account ComboBox
-        this.accountsModel = new AccountsComboBoxModel();
-        this.jComboBox_Account.setModel(accountsModel);
-        //  this.jComboBox_Account.setRenderer(new AccountRenderer(0));
-        //  ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(((AssetCls) jComboBox_Account.getSelectedItem()).getKey());
-        if (account != null) jComboBox_Account.setSelectedItem(account);
 
         //ON FAVORITES CHANGE
 
@@ -145,30 +141,13 @@ public class AssetSendPanel extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                asset = ((AssetCls) jComboBox_Account.getSelectedItem());
-
-                if (asset != null) {
-                    ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(asset.getKey());
-                    jComboBox_Account.repaint();
-                    // set image
-                    setImage();
-                    jLabel_Icon.repaint();
-                    // set scale
-                    int scale = 8;
-                    if (asset != null) scale = asset.getScale();
-                    jTextField_Ammount.setScale(scale);
-                    // set description
-                    //  jTextArea_Account_Description.setText(asset.getDescription());
-                    jScrollPane2.setViewportView(new AssetInfo(asset, false));
-
-                }
-
+                account = ((Account) jComboBox_Account.getSelectedItem());
             }
         });
 
 
         // default set asset
-        if (asset == null) asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
+        ////if (asset == null) asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
 
         this.jComboBox_Asset.addActionListener(new ActionListener() {
             @Override
@@ -177,17 +156,25 @@ public class AssetSendPanel extends javax.swing.JPanel {
                 asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
 
                 if (asset != null) {
-                    //             ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(asset.getKey());
-                    jComboBox_Account.repaint();
+
+                    account = ((Account) jComboBox_Account.getSelectedItem());
+                    if (account != null) {
+                        ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(asset.getKey());
+                        jComboBox_Account.repaint();
+                    }
+
                     // set image
-                    setImage();
-                    jLabel_Icon.repaint();
+                    if (false) setImage();
+
                     // set scale
                     int scale = 8;
                     if (asset != null) scale = asset.getScale();
                     jTextField_Ammount.setScale(scale);
                     // jTextArea_Account_Description.setText(asset.getDescription());
                     jScrollPane2.setViewportView(new AssetInfo(asset, false));
+
+                    jLabel_Ammount = new javax.swing.JLabel(account
+                            .getBalanceInPosition(asset.getKey(), 1).b.toPlainString());
 
                 }
 
@@ -202,7 +189,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
         });
 
         // set image asset
-        setImage();
+        if (false) setImage();
 
         // set acoount TO
         this.jTextField_To.getDocument().addDocumentListener(new DocumentListener() {
@@ -257,20 +244,13 @@ public class AssetSendPanel extends javax.swing.JPanel {
         jScrollPane2.setViewportView(new AssetInfo(asset, false)); //jTextArea_Account_Description);
     }
 
-    public AssetSendPanel(AssetCls asset_in, Account account2, Account account_To, PersonCls person, String message) {
-        this(asset_in, account2, account_To, person);
-
-        jTextArea_Description.setText(message);
-
-    }
-
     private void refreshReceiverDetails() {
         String toValue = jTextField_To.getText();
         AssetCls asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
 
         this.jTextField_Recive_Detail.setText(Account.getDetails(toValue, asset));
 
-        this.jCheckBox_Enscript.setEnabled(true);
+        //this.jCheckBox_Enscript.setEnabled(true);
     }
 
     public boolean cheskError() {
@@ -633,14 +613,6 @@ public class AssetSendPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
         add(jComboBox_Asset, gridBagConstraints);
 
-        jLabel_Ammount.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel_Ammount.setText("");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 18;
-        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-        add(jLabel_Ammount, gridBagConstraints);
-
         jTextField_Ammount.setText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -659,6 +631,15 @@ public class AssetSendPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
         add(jLabel_AmmountHave, gridBagConstraints);
 
+        jTextField_Ammount.setText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 0);
+        add(jTextField_Ammount, gridBagConstraints);
 
         jLabel_Fee.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel_Fee.setText("");
@@ -696,10 +677,10 @@ public class AssetSendPanel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.4;
         // add(jLabel_Icon, gridBagConstraints);
 
-        jTextArea_Account_Description.setEditable(false);
         jTextArea_Account_Description.setColumns(20);
         jTextArea_Account_Description.setRows(5);
-        jTextArea_Account_Description.setEnabled(false);
+        //jTextArea_Account_Description.setEditable(false);
+        //jTextArea_Account_Description.setEnabled(false);
 
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -748,12 +729,14 @@ public class AssetSendPanel extends javax.swing.JPanel {
             }
             return;
         }
+
         // if era then file system icon
         if (asset.getKey() == 1l) {
             jLabel_Icon.setIcon(new ImageIcon("images/icons/icon64.png"));
             return;
         }
         jLabel_Icon.setIcon(new ImageIcon(defaultImagePath));
+        jLabel_Icon.repaint();
 
 
     }

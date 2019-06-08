@@ -146,6 +146,18 @@ public class Wallet extends Observable implements Observer {
 		return this.database.getAccountMap().getAccounts();
 	}
 
+	public List<Account> getAccountsAndSetBalancePosition(int position) {
+		if (this.database == null)
+			return new ArrayList<>();
+
+		List<Account> accounts = this.database.getAccountMap().getAccounts();
+		for (Account account: accounts) {
+			account.setViewBalancePosition(position);
+		}
+
+		return accounts;
+	}
+
 	public List<PublicKeyAccount> getPublicKeyAccounts() {
 		if (this.database == null)
 			return new ArrayList<>();

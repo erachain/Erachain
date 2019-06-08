@@ -5,7 +5,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.database.SortableList;
-import org.erachain.gui.BalanceRenderer;
+import org.erachain.gui.items.accounts.BalanceRenderer;
 import org.erachain.gui.models.BalancesComboBoxModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Pair;

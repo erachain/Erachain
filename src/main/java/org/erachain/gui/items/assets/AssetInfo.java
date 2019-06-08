@@ -70,43 +70,40 @@ public class AssetInfo extends JTextPane {
         transaction = Transaction.findByDBRef(DCSet.getInstance(), recordReference);
         this.setMinimumSize(new Dimension(0, 0));
         image_Label = new JLabel("");
-        
-        byte[] image_Byte = asset.getImage();
-        if (image_Byte.length > 0) {
+
+        byte[] imageByte = asset.getImage();
+        if (imageByte != null && imageByte.length > 0) {
             //   img_HTML = "<img src='data:image/gif;base64," + a + "' width = '350' /></td><td style ='padding-left:20px'>";
             // label
-            InputStream inputStream = new ByteArrayInputStream(asset.getImage());
-            try {
-                image1 = ImageIO.read(inputStream);
-                image = new ImageIcon(image1);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            image = new ImageIcon(imageByte);
+
+            int x = image.getIconWidth();
+            max_Height = image.getIconHeight();
+
+            max_Widht = 200;
+            double k = ((double) x / (double) max_Widht);
+            max_Height = (int) (max_Height / k);
+
+            if (max_Height != 0) {
+                Im = image.getImage().getScaledInstance(max_Widht, max_Height, 1);
+                image = new ImageIcon(Im);
+                image_Label.setIcon(image);
+                //image_Label.setSize(image.getIconWidth(), image.getIconHeight());
             }
 
+        } else {
+            imageByte = asset.getIcon();
+            if (imageByte != null && imageByte.length > 1) {
+                //if (asset.getKey() == 1l) image = new ImageIcon("images/icons/icon32.png");
+                image = new ImageIcon(imageByte);
+                Im = image.getImage().getScaledInstance(45, 45, 1);
+                image = new ImageIcon(Im);
+                image_Label.setIcon(image);
+            }
         }
-        else{
-            if (asset.getKey() == 1l) image = new ImageIcon("images/icons/icon32.png");
-            else if (asset.getKey() == 2l)  image = new ImageIcon("images/icons/icon32_Se.png");
-            else image = new ImageIcon("images/icons/coin.png");
-        }
-                // jLabel2.setText("jLabel2");
-               
-                int x = image.getIconWidth();
-                max_Height = image.getIconHeight();
 
-                max_Widht = 200;
-                double k = ((double) x / (double) max_Widht);
-                max_Height = (int) (max_Height / k);
+        //   img_HTML = "<img src='data:image/gif;base64," + a + "' width = '350' /></td><td style ='padding-left:20px'>";
 
-
-                if (max_Height != 0) {
-                    Im = image.getImage().getScaledInstance(max_Widht, max_Height, 1);
-                    ImageIcon ic = new ImageIcon(Im);
-                    image_Label.setIcon(ic);
-                    image_Label.setSize(ic.getIconWidth(), ic.getIconHeight());
-                }
-        
         String color = "#" + Integer.toHexString(UIManager.getColor("Panel.background").getRGB()).substring(2);
 
         String text = "<body style= 'font-family:"
@@ -200,8 +197,8 @@ public class AssetInfo extends JTextPane {
             // holders
             jTabbedPane1.add(new HoldersLibraryPanel(asset, -1));
 //            jTabbedPane1.add(new HoldersLibraryPanel(asset, 2));
-  //          jTabbedPane1.add(new HoldersLibraryPanel(asset, 3));
-   //         jTabbedPane1.add(new HoldersLibraryPanel(asset, 4));
+            //          jTabbedPane1.add(new HoldersLibraryPanel(asset, 3));
+            //         jTabbedPane1.add(new HoldersLibraryPanel(asset, 4));
 
             // Get the text pane's document
             // JTextPane textPane = new JTextPane();

@@ -4,10 +4,12 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.gui.items.accounts.AccountSendDialog;
+import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.accounts.AccountSetNameDialog;
-import org.erachain.gui.items.mails.MailSendDialog;
+import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.models.PersonAccountsModel;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -166,9 +168,9 @@ public class AccountsLibraryPanel extends JPanel {
         JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Account account = person_Accounts_Model.getAccount(row);
-                new AccountSendDialog(null, null, account, null);
-                ;
+                Account accountTo = person_Accounts_Model.getAccount(row);
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
+                        null, accountTo, person, null));
 
             }
         });
@@ -179,7 +181,7 @@ public class AccountsLibraryPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 Account account = person_Accounts_Model.getAccount(row);
 
-                new MailSendDialog(null, null, account, null);
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
 
             }
         });

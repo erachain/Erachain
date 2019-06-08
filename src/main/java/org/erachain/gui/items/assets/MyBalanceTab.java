@@ -5,6 +5,7 @@ import org.erachain.database.SortableList;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.BalanceFromAddressTableModel;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 import org.mapdb.Fun.Tuple2;
@@ -193,8 +194,8 @@ public class MyBalanceTab extends SplitPanel {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = BalancesModel.getAsset(row);
                 String account = BalancesModel.getAccount(row);
-                //AssetPairSelect a = new AssetPairSelect(asset.getKey(), "To sell", account);
-                new ExchangeFrame(asset, null, "To sell", account);
+                MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "To sell", account));
+
 
 
             }
@@ -205,8 +206,8 @@ public class MyBalanceTab extends SplitPanel {
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = BalancesModel.getAsset(row);
-                //	new AssetPairSelect(asset.getKey(), "","");
-                new ExchangeFrame(asset, null, "", "");
+                MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "", ""));
+
             }
         });
         assetsMenu.add(excahge);
@@ -216,8 +217,8 @@ public class MyBalanceTab extends SplitPanel {
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = BalancesModel.getAsset(row);
-                //		new AssetPairSelect(asset.getKey(), "Buy","");
-                new ExchangeFrame(asset, null, "Buy", "");
+                MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "Buy", ""));
+
             }
         });
 

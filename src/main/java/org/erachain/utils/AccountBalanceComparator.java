@@ -14,7 +14,7 @@ public class AccountBalanceComparator implements Comparator<Account> {
 
     @Override
     public int compare(Account o1, Account o2) {
-        return o1.getConfBalance3(1, AssetCls.FEE_KEY).a.compareTo(o2.getConfBalance3(1, AssetCls.FEE_KEY).a);
+        return -o1.getBalanceInSettedPosition(AssetCls.FEE_KEY).b.compareTo(o2.getBalanceInSettedPosition(AssetCls.FEE_KEY).b);
     }
 
 }
