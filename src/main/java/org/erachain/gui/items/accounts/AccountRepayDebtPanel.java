@@ -18,8 +18,8 @@ import org.erachain.lang.Lang;
 public class AccountRepayDebtPanel extends AssetSendPanel {
     // private final MessagesTableModel messagesTableModel;
 
-    public AccountRepayDebtPanel(AssetCls asset, Account accountFrom, Account accountTo, PersonCls person) {
-        super(asset, TransactionAmount.ACTION_DEBT, accountFrom, accountTo);
+    public AccountRepayDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
+        super(assetIn, TransactionAmount.ACTION_DEBT, accountFrom, accountTo);
 
         this.jLabel_Title.setText(Lang.getInstance()
                 .translate("If You want to give the borrowed asset %asset%, fill in this form").replace("%asset%", asset.viewName()));

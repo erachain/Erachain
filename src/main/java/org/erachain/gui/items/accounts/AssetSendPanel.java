@@ -85,13 +85,14 @@ public class AssetSendPanel extends javax.swing.JPanel {
     public AssetSendPanel(AssetCls assetIn, int balancePosition,
                           Account accountFrom, Account accountTo) {
 
-        this.account = accountFrom;
+        this.jComboBox_Asset.setEnabled(assetIn != null);
+
         if (assetIn == null)
             this.asset = Controller.getInstance().getAsset(2);
         else
             this.asset = assetIn;
 
-
+        this.account = accountFrom;
         recipient = accountTo;
 
         initComponents();
@@ -239,13 +240,6 @@ public class AssetSendPanel extends javax.swing.JPanel {
         jTextArea_Account_Description.setWrapStyleWord(true);
         jTextArea_Account_Description.setLineWrap(true);
         jScrollPane2.setViewportView(new AssetInfo(asset, false)); //jTextArea_Account_Description);
-    }
-
-    public AssetSendPanel(AssetCls asset_in, int balancePosition, Account account2, Account account_To, PersonCls person, String message) {
-        this(asset_in, balancePosition, account2, account_To);
-
-        jTextArea_Description.setText(message);
-
     }
 
     private void refreshReceiverDetails() {

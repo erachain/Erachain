@@ -75,7 +75,9 @@ public class DealsPopupMenu extends JPopupMenu {
         debtAssetReturn = new JMenuItem(Lang.getInstance().translate("Repay Debt"));
         debtAssetReturn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new AccountRepayDebtDialog(asset, pubKey);
+
+                MainPanel.getInstance().insertTab(new AccountRepayDebtPanel(asset, pubKey, null, null));
+
             }
         });
         this.add(debtAssetReturn);
@@ -84,7 +86,9 @@ public class DealsPopupMenu extends JPopupMenu {
         debtAssetBackward = new JMenuItem(Lang.getInstance().translate("Confiscate Debt"));
         debtAssetBackward.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new AccountConfiscateDebtDialog(asset, pubKey);
+
+                MainPanel.getInstance().insertTab(new AccountConfiscateDebtPanel(asset, pubKey, null, null));
+
             }
         });
         this.add(debtAssetBackward);
@@ -94,7 +98,8 @@ public class DealsPopupMenu extends JPopupMenu {
         holdAsset = new JMenuItem(Lang.getInstance().translate("Hold"));
         holdAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new AccountTakeHoldDialog(asset, pubKey);
+
+                MainPanel.getInstance().insertTab(new AccountTakeHoldPanel(asset, pubKey, null, null));
 
             }
         });

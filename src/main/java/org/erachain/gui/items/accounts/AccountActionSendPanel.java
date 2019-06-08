@@ -19,17 +19,11 @@ public class AccountActionSendPanel extends AssetSendPanel {
     //private AccountActionSendPanel th;
     public boolean noRecive;
 
-    public AccountActionSendPanel(AssetCls asset, int balancePosition, Account accountFrom, Account accountTo, PersonCls person, String message) {
-        super(asset, balancePosition, accountFrom, accountTo);
-        String assetName = "";
-        if (asset != null) {
-            assetName = asset.viewName();
-            this.jComboBox_Asset.setEnabled(false);
-        }else{
-             this.jComboBox_Asset.setEnabled(true);
-        }
+    public AccountActionSendPanel(AssetCls assetIn, int balancePosition, Account accountFrom, Account accountTo, PersonCls person, String message) {
+        super(assetIn, balancePosition, accountFrom, accountTo);
+
         this.jLabel_Title.setText(Lang.getInstance().translate("If You want to send asset %asset%, fill in this form").
-                replace("%asset%", assetName));
+                replace("%asset%", asset.viewName()));
 
         //  icon.setIcon(null);
 

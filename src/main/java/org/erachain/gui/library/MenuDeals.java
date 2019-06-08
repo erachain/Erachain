@@ -67,9 +67,8 @@ public class MenuDeals extends JMenu {
         //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
         dealsMenu_Take_On_Hold.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                new AccountTakeHoldDialog(null, null);
+
+                MainPanel.getInstance().insertTab(new AccountTakeHoldPanel(null, null, null, null));
             }
         });
         add(dealsMenu_Take_On_Hold);
@@ -99,9 +98,9 @@ public class MenuDeals extends JMenu {
         //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
         dealsMenu_Confiscate_Debt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                new AccountConfiscateDebtDialog(null, null);
+
+                MainPanel.getInstance().insertTab(new AccountConfiscateDebtPanel(null, null, null, null));
+
             }
         });
         add(dealsMenu_Confiscate_Debt);
@@ -112,9 +111,9 @@ public class MenuDeals extends JMenu {
         //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
         dealsMenu_Repay_Debt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                new AccountRepayDebtDialog(null, null);
+
+                MainPanel.getInstance().insertTab(new AccountRepayDebtPanel(null, null, null, null));
+
             }
         });
         add(dealsMenu_Repay_Debt);

@@ -160,10 +160,9 @@ public class CreditsPanel extends JPanel // implements ItemListener
 
                 AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
                 Account account = tableModel.getAccount(row);
-                //Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
-                //Menu.selectOrAdd( new AccountSendDialog(asset, account), null);
 
-                new AccountTakeHoldDialog(asset, account);
+                MainPanel.getInstance().insertTab(new AccountTakeHoldPanel(asset, account, null, null));
+
 
             }
         });
@@ -197,11 +196,8 @@ public class CreditsPanel extends JPanel // implements ItemListener
     
                     AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
                     Account account = tableModel.getAccount(row);
-                    //Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
-                    //Menu.selectOrAdd( new AccountSendDialog(asset, account), null);
-    
-                    new AccountRepayDebtDialog(asset, account);
-    
+                    MainPanel.getInstance().insertTab(new AccountRepayDebtPanel(asset, account, null, null));
+
                 }
             });
             menu.add(repay_Debt_Asset);
@@ -215,10 +211,7 @@ public class CreditsPanel extends JPanel // implements ItemListener
 
                 AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
                 Account account = tableModel.getAccount(row);
-                //Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
-                //Menu.selectOrAdd( new AccountSendDialog(asset, account), null);
-
-                new AccountConfiscateDebtDialog(asset, account);
+                MainPanel.getInstance().insertTab(new AccountConfiscateDebtPanel(asset, account, null, null));
 
             }
         });
