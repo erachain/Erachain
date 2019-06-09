@@ -1004,13 +1004,31 @@ public class BlockExplorer {
         return output;
     }
 
-    private Map tradeJSON(long have, Trade trade) {
+    private Map tradeJSON(Long have, Trade trade) {
 
         Map tradeJSON = new HashMap();
 
         Order orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
 
         Order orderTarget = Order.getOrder(dcSet, trade.getTarget());
+        if (have == null) {
+            tradeJSON.put("assetHaveKey", trade.getHaveKey());
+            AssetCls assetHave = dcSet.getItemAssetMap().get(trade.getHaveKey());
+            tradeJSON.put("assetHaveName", assetHave.getName());
+
+            tradeJSON.put("assetWantKey", trade.getWantKey());
+            AssetCls assetWant = dcSet.getItemAssetMap().get(trade.getWantKey());
+            tradeJSON.put("assetWantName", assetWant.getName());
+
+            /// тут нужно определиться с направлением
+            if (trade.getHaveKey().equals(Transaction.FEE_KEY)) {
+                have = Transaction.FEE_KEY;
+            } else if (trade.getHaveKey().equals(12L)) { // BITCOIN
+                have = 12L;
+            } else {
+                //have = trade.getHaveKey();
+            }
+        }
 
         tradeJSON.put("realPrice", trade.calcPrice());
         tradeJSON.put("realReversePrice", trade.calcPriceRevers());
@@ -1025,7 +1043,7 @@ public class BlockExplorer {
 
         tradeJSON.put("timestamp", trade.getTimestamp());
 
-        if (orderInitiator.getHave() == have) {
+        if (have == null || orderInitiator.getHave() == have) {
             tradeJSON.put("type", "sell");
 
             tradeJSON.put("amountHave", trade.getAmountWant().toPlainString());
@@ -2249,7 +2267,7 @@ public class BlockExplorer {
         OrderMap orders = dcSet.getOrderMap();
         TradeMap trades = dcSet.getTradeMap();
 
-        JSONArray array = new JSONArray();
+        JSONArray pairsArray = new JSONArray();
 
         for (Pair<Long, Long> pair : list) {
 
@@ -2275,41 +2293,37 @@ public class BlockExplorer {
 
             pairJSON.put("volume24", trades.getVolume24(pair.getA(), pair.getB()).toPlainString());
 
-            array.add(pairJSON);
+            pairsArray.add(pairJSON);
         }
+
+        output.put("popularPairs", pairsArray);
 
         JSONArray tradesArray = new JSONArray();
 
         int count = 25;
-        Iterator<Tuple2<Long, Long>> iterator = trades.getIterator(0, false);
+        Iterator<Tuple2<Long, Long>> iterator = trades.getIterator(0, true);
         while (count-- > 0 && iterator.hasNext()) {
             Trade trade = trades.get(iterator.next());
-
-            Map tradeJSON = new HashMap(100, 1);
-
-            tradeJSON.put("realPrice", trade.calcPrice());
-            //tradeJSON.put("realReversePrice", trade.calcPriceRevers());
-
-            tradeJSON.put("have", trade.getWantKey());
-            tradeJSON.put("want", trade.getHaveKey());
-
-            tradeJSON.put("amountHave", trade.getAmountWant().toPlainString());
-            tradeJSON.put("amountWant", trade.getAmountHave().toPlainString());
-
-            tradeJSON.put("timestamp", trade.getTimestamp());
-
-            tradesArray.add(tradeJSON);
-
+            tradesArray.add(tradeJSON(null, trade));
         }
 
-        output.put("pairs", array);
-        output.put("trades", tradesArray);
+        output.put("lastTrades", tradesArray);
+
+        output.put("label_table_PopularPairs", Lang.getInstance().translateFromLangObj("Most Popular Pairs", langObj));
         output.put("label_table_LastTrades", Lang.getInstance().translateFromLangObj("Last Trades", langObj));
         output.put("label_table_have", Lang.getInstance().translateFromLangObj("Base Asset", langObj));
         output.put("label_table_want", Lang.getInstance().translateFromLangObj("Price Asset", langObj));
         output.put("label_table_orders", Lang.getInstance().translateFromLangObj("Opened Orders", langObj));
         output.put("label_table_last_price", Lang.getInstance().translateFromLangObj("Last Price", langObj));
         output.put("label_table_volume24", Lang.getInstance().translateFromLangObj("Day Volume", langObj));
+
+        output.put("label_Date", Lang.getInstance().translateFromLangObj("Date", langObj));
+        output.put("label_Pair", Lang.getInstance().translateFromLangObj("Pair", langObj));
+        output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        output.put("label_Volume", Lang.getInstance().translateFromLangObj("Volume", langObj));
+        output.put("label_Price", Lang.getInstance().translateFromLangObj("Price", langObj));
+        output.put("label_Total_Cost", Lang.getInstance().translateFromLangObj("Total Cost", langObj));
+
 
     }
 

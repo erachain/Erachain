@@ -12,17 +12,18 @@ function exchange(data){
     output += lastBlock(data.lastBlock);
     var start = data.start;
 
-    output += '<div class = "row"><div class="col-lg-6">';
-    //output += '<table width="100%" border=0><tr><td align=left><br>';
-    //output += '<center>';
-    output += '<table BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="width:90%; border: 1px solid #ddd;">';
-    output += '<thead><tr><td><b>'+ data.label_table_have + '</b></td><td><b>' + data.label_table_want +
-        '</b></td><td><b>' + data.label_table_orders + '</b></td><td><b>' +
-         data.label_table_last_price + '</b></td><td><b>' + data.label_table_volume24 + '</b></td></tr></thead>';
+    output += '<div class = "row"><div class="col-lg-6" style="padding-left: 5em;">';
+
+    output += '<h4 style="text-align: center;">' + data.label_table_PopularPairs + '</h4>';
+
+    output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
+    output += '<tr bgcolor="e0e0e0"><td align=center><b>' + data.label_table_have;
+    output += '<td><b>' + data.label_table_want + '<td><b>' + data.label_table_orders + '<td><b>' +
+         data.label_table_last_price + '<td><b>' + data.label_table_volume24 + '</tr>';
 
     //Отображение таблицы элементов статусов
-    for (var i in data.pairs) {
-        var item = data.pairs[i];
+    for (var i in data.popularPairs) {
+        var item = data.popularPairs[i];
         output += '<tr><td>' + getAssetURL(item.have.key, item.have.name, item.have.icon, 30);
         output += '<td>' + getAssetURL(item.want.key, item.want.name, item.want.icon, 30);;
         output += '<td><a href="?asset=' + item.have.key
@@ -34,26 +35,38 @@ function exchange(data){
 
         output += '</tr>';
     }
-    output += '</table>';
-    //output += '</center>';
-    output +=  '</div><div class="col-lg-6">';
-    //output += '<table width="100%" border=0><tr><td align=left><br>';
-    output += '<table BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="width:90%; border: 1px solid #ddd;">';
-    output += '<thead><tr><td><b>'+ data.label_table_have + '</b></td><td><b>' + data.label_table_want +
-        '</b></td><td><b>' + data.label_table_orders + '</b></td><td><b>' +
-         data.label_table_last_price + '</b></td><td><b>' + data.label_table_volume24 + '</b></td></tr></thead>';
+    output += '</table></div><div class="col-lg-6" style="padding-right: 5em;">';
 
-    //Отображение таблицы элементов статусов
-    for (var i in data.trades) {
-        var trade = data.trades[i];
-        output += '<tr><td>' + convertTimestamp(trade.timestamp, false);
+    output += '<h4 style="text-align: center;">' + data.label_table_LastTrades + '</h4>';
+
+    output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
+    output += '<tr bgcolor="e0e0e0"><td align=center><b>' + data.label_Date;
+    output += '<td><b>' + data.label_Pair + '<td><b>' + data.label_Creator + '<td><b>' + data.label_Volume + '</b></td><td align=center><b>' + data.label_Price + '</b></td>';
+    output += '<td><b>' + data.label_Creator + '<tr>'
+    //output += data.label_Total_Cost + '</b></td></tr>';
+
+    for (key in data.lastTrades) {
+
+        var trade = data.lastTrades[key];
+        output += '<tr>';
+
+        output += '<td align=center><a href=?trade=' + trade.initiatorTx + '/' + trade.targetTx + get_lang()
+        output += '>' + convertTimestamp( trade.timestamp, false);
+
+        output += '<td><a href=?asset=' + trade.assetHaveKey + '&asset=' + trade.assetWantKey + '>' + trade.assetHaveName + '/' + trade.assetWantName + '</a>';
+
+        output += '<td align=right><a href=?address=' + trade.initiatorCreator + '>' + trade.initiatorCreator.substr(0,12) + '..</a>';
         output += '<td>' + addCommas(trade.amountHave);
-        output += '<td>' + getAssetNameMini(trade.have, '');
 
-        output += '</tr>';
+        output += '<td align=left><span style="font-size:1.4em">' + addCommas(trade.realReversePrice) + '</span>';
+
+        output += '<td><a href=?address=' + trade.targetCreator + '>' + trade.targetCreator.substr(0,12) + '..</a>';
+
+        //output += '<td>' + addCommas(trade.amountWant);
+
     }
 
-    output += '</div></div>';
+    output += '</table>';
 
     return output;
 }
