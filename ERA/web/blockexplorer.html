@@ -1029,41 +1029,41 @@ button.white-bgc[disabled]:focus,
 
             output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="border: 1px solid #ddd; margin-bottom: 0px;">';
 
-            i = 0;
             for (key in data.sells) {
 
                 //if(!data.sells[key].good)
                 //	continue;
 
                 output += '<tr>';
-                output += '<td><a href=?tx=' + key + get_lang() + '>#' + (Object.keys(data.sells).length - i++) + '</a>';
-                output += '<td>' + addCommas(data.sells[key].price); // + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-                //output += '<td>' + addCommas(data.sells[key].sellingPrice); // + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-                output += '<td>' + addCommas(data.sells[key].amount); // + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].amount) + '</a>';
+                //output += '<td>' + addCommas(data.sells[key].amount); // + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
                 //output += '<td>' + addCommas(data.sells[key].sellingAmount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].price) + '</a>';
+                //output += '<td>' + addCommas(data.sells[key].price); // + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                //output += '<td>' + addCommas(data.sells[key].sellingPrice); // + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
                 output += '<td><a href ="?address=' + data.sells[key].creator_addr + get_lang() + '">' +
                         data.sells[key].creator + '</a>';
 
             }
 
             output += '<tr bgcolor="#f9f9f9">';
-            output += '<td colspan=2><b>' + data.label_Total_For_Sell + ':<td>'
-                    + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
-            output += '<td>' + addCommas(data.sellsSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+            output += '<td><b>' + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+            output += '<td><b>' + addCommas(data.sellsSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+            output += '<td>' + data.label_Total_For_Sell;
 
-            output += '</table>';
+            //output += '</table>';
 
-            output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="border: 1px solid #ddd;">';
+            //output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="border: 1px solid #ddd;">';
             //output += '<tr><td><h4>'+data.label_Buy_Orders+' ' + getAssetName2(data.assetHave, data.assetHaveName)+ '</h4></td></tr>';
 
             output += '<tr bgcolor="#f9f9f9">';
-            output += '<tr bgcolor="e0e0e0"><td><b>tx<td><b>' + data.label_Price + '</b></td><td><b>' + data.label_Amount + '</b></td><td><b>' + data.label_Total + '</b></td></tr>';
+            output += '<tr bgcolor="e0e0e0"><td><b>' + data.label_Price + '</b></td><td><b>' + data.label_Amount + '</b></td><td><b>' + data.label_Total + '</b></td></tr>';
 
             output += '<tr bgcolor="#f9f9f9">';
-            output += '<td colspan=2><b>' + data.label_Total_For_Buy + ':<td>' + addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
-            output += '<td>' + addCommas(data.buysSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+            output += '<td colspan><b>' +  addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+            output += '<td><b>' + addCommas(data.buysSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+            output += '<td>' + data.label_Total_For_Buy;
 
-            i = 1;
             for (key in data.buys) {
 
                 //if(!data.buys[key].good)
@@ -1071,10 +1071,11 @@ button.white-bgc[disabled]:focus,
 
                 output += '<tr>';
 
-                output += '<td><a href=?tx=' + key + get_lang() + '>#' + i++ + '</a>';
-                output += '<td>' + addCommas(data.buys[key].buyingPrice); // + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-                output += '<td>' + addCommas(data.buys[key].buyingAmount); // + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a>';
+                //output += '<td>' + addCommas(data.buys[key].buyingAmount); // + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
                 //output += '<td>' + addCommas(data.buys[key].amount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingPrice) + '</a>';
+                //output += '<td>' + addCommas(data.buys[key].buyingPrice); // + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
                 output += '<td><a href ="?address=' + data.buys[key].creator_addr + get_lang() + '">' +
                         data.buys[key].creator + '</a>';
 
@@ -1094,19 +1095,15 @@ button.white-bgc[disabled]:focus,
             output += '<h4 style="text-align: left;">' + data.label_Trade_History + '</h4>';
 
             output += '<table border="0" cellspacing="3" cellpadding="5" width="100%" class="table table-striped" style="vertical-align: baseline; border: 1px solid #ddd;">';
-            output += '<tr bgcolor="e0e0e0"><td align=center><b>tx<td align=center><b>' + data.label_Date; // + '<td align=center><b>' + data.label_Type + '</b></td>';
-            output += '<td align=right><b><a href=?asset=' + data.assetHave + get_lang() + '>' + getAssetName2(data.assetHave, data.assetHaveName) + '</b></td><td align=center><b>' + data.label_Price + '</b></td>';
+            output += '<tr bgcolor="e0e0e0"><td align=center><b>' + data.label_Date; // + '<td align=center><b>' + data.label_Type + '</b></td>';
+            output += '<td align=center><b><a href=?asset=' + data.assetHave + get_lang() + '>' + getAssetName2(data.assetHave, data.assetHaveName) + '</b></td><td align=center><b>' + data.label_Price + '</b></td>';
+            output += '<td align=center><b><a href=?asset=' + data.assetWant + get_lang() + '>' + getAssetName2(data.assetWant, data.assetWantName) + '</b></td></tr>';
 
-            output += '<td><b><a href=?asset=' + data.assetWant + get_lang() + '>' + getAssetName2(data.assetWant, data.assetWantName) + '</b></td></tr>';
-
-            i = 1;
             for (key in data.trades) {
                 output += '<tr>';
 
-                output += '<td align=center><a href=?trade=' + data.trades[key].initiatorTxSignature + '/' + data.trades[key].targetTxSignature + get_lang() + '>#' + i++;
-                output += '<td align=center>' + data.trades[key].dateTime;
+                output += '<td align=center><a href=?trade=' + data.trades[key].initiatorTx + '/' + data.trades[key].targetTxSignature + get_lang() + '>' + convertTimestamp( data.trades[key].timestamp);
                 //output += '<td align=center>' + data.trades[key].type;
-
 
                 if (data.trades[key].type == 'sell') {
                     output += '<td align=right style="line-height: 150%;">';

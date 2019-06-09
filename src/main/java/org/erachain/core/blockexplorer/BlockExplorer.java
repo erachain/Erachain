@@ -1004,6 +1004,46 @@ public class BlockExplorer {
         return output;
     }
 
+    private Map tradeJSON(long have, Trade trade, BigDecimal tradeWantAmount, BigDecimal tradeHaveAmount) {
+
+        Map tradeJSON = new HashMap();
+
+        Order orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
+
+        Order orderTarget = Order.getOrder(dcSet, trade.getTarget());
+
+        tradeJSON.put("realPrice", trade.calcPrice());
+        tradeJSON.put("realReversePrice", trade.calcPriceRevers());
+
+        tradeJSON.put("initiatorTx", Transaction.viewDBRef(orderInitiator.getId()));
+        tradeJSON.put("initiatorCreator", orderInitiator.getCreator().getAddress()); // viewCreator
+        tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().toPlainString());
+
+        tradeJSON.put("targetTx", Transaction.viewDBRef(orderTarget.getId()));
+        tradeJSON.put("targetCreator", orderTarget.getCreator().getAddress()); // viewCreator
+        tradeJSON.put("targetAmount", orderTarget.getAmountHave().toPlainString());
+
+        tradeJSON.put("timestamp", trade.getTimestamp());
+
+        if (orderInitiator.getHave() == have) {
+            tradeJSON.put("type", "sell");
+            tradeWantAmount = tradeWantAmount.add(trade.getAmountHave());
+            tradeHaveAmount = tradeHaveAmount.add(trade.getAmountWant());
+
+            tradeJSON.put("amountHave", trade.getAmountWant().toPlainString());
+            tradeJSON.put("amountWant", trade.getAmountHave().toPlainString());
+        } else {
+            tradeJSON.put("type", "buy");
+            tradeHaveAmount = tradeHaveAmount.add(trade.getAmountHave());
+            tradeWantAmount = tradeWantAmount.add(trade.getAmountWant());
+
+            tradeJSON.put("amountHave", trade.getAmountHave().toPlainString());
+            tradeJSON.put("amountWant", trade.getAmountWant().toPlainString());
+        }
+
+        return tradeJSON;
+    }
+
     public Map jsonQueryTrades(long have, long want) {
 
         output.put("type", "trades");
@@ -1138,6 +1178,7 @@ public class BlockExplorer {
         int i = 0;
         for (Trade trade : trades) {
 
+            /*
             Map tradeJSON = new LinkedHashMap();
 
             Order orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
@@ -1154,8 +1195,8 @@ public class BlockExplorer {
             tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().toPlainString());
             if (orderInitiator.getHave() == have) {
                 tradeJSON.put("type", "sell");
-                tradeWantAmount = tradeWantAmount.add(trade.getAmountHave());
-                tradeHaveAmount = tradeHaveAmount.add(trade.getAmountWant());
+                //tradeWantAmount = tradeWantAmount.add(trade.getAmountHave());
+                //tradeHaveAmount = tradeHaveAmount.add(trade.getAmountWant());
 
                 tradeJSON.put("amountHave", trade.getAmountWant().toPlainString());
                 tradeJSON.put("amountWant", trade.getAmountHave().toPlainString());
@@ -1175,8 +1216,11 @@ public class BlockExplorer {
 
             tradeJSON.put("timestamp", trade.getTimestamp());
             tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
+            */
 
-            tradesJSON.put(i++, tradeJSON);
+
+
+            tradesJSON.put(i++, tradeJSON(have, trade, tradeWantAmount, tradeHaveAmount));
 
             if (i > 100)
                 break;
@@ -2237,6 +2281,7 @@ public class BlockExplorer {
         output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching asset keys", langObj));
 
         List<Pair<Long, Long>> list = new ArrayList<>();
+        HashSet<Pair<Long, Long>> pairsSet = new HashSet<>();
 
         if (BlockChain.DEVELOP_USE) {
             list.add(new Pair<Long, Long>(1L, 2L));
@@ -2250,6 +2295,8 @@ public class BlockExplorer {
             list.add(new Pair<Long, Long>(14L, 12L ));
         }
 
+        pairsSet.addAll(list);
+
         OrderMap orders = dcSet.getOrderMap();
         TradeMap trades = dcSet.getTradeMap();
 
@@ -2260,7 +2307,7 @@ public class BlockExplorer {
             AssetCls assetHave = Controller.getInstance().getAsset(pair.getA());
             AssetCls assetWant = Controller.getInstance().getAsset(pair.getB());
 
-            Map pairJSON = new LinkedHashMap();
+            Map pairJSON = new HashMap(100, 1);
             pairJSON.put("have", assetHave.jsonForExplorerPage(langObj));
             pairJSON.put("want", assetWant.jsonForExplorerPage(langObj));
             pairJSON.put("orders", orders.getCount(pair.getA(), pair.getB())
@@ -2282,9 +2329,33 @@ public class BlockExplorer {
             array.add(pairJSON);
         }
 
-        //makePage(type, keys, start, pageSize, result, langObj);
+        JSONArray tradesArray = new JSONArray();
+
+        int count = 25;
+        Iterator<Tuple2<Long, Long>> iterator = trades.getIterator(0, false);
+        while (count-- > 0 && iterator.hasNext()) {
+            Trade trade = trades.get(iterator.next());
+
+            Map tradeJSON = new HashMap(100, 1);
+
+            tradeJSON.put("realPrice", trade.calcPrice());
+            //tradeJSON.put("realReversePrice", trade.calcPriceRevers());
+
+            tradeJSON.put("have", trade.getWantKey());
+            tradeJSON.put("want", trade.getHaveKey());
+
+            tradeJSON.put("amountHave", trade.getAmountWant().toPlainString());
+            tradeJSON.put("amountWant", trade.getAmountHave().toPlainString());
+
+            tradeJSON.put("timestamp", trade.getTimestamp());
+
+            tradesArray.add(tradeJSON);
+
+        }
 
         output.put("pairs", array);
+        output.put("trades", tradesArray);
+        output.put("label_table_LastTrades", Lang.getInstance().translateFromLangObj("Last Trades", langObj));
         output.put("label_table_have", Lang.getInstance().translateFromLangObj("Base Asset", langObj));
         output.put("label_table_want", Lang.getInstance().translateFromLangObj("Price Asset", langObj));
         output.put("label_table_orders", Lang.getInstance().translateFromLangObj("Opened Orders", langObj));
@@ -2417,21 +2488,33 @@ public class BlockExplorer {
 
         //AssetNames assetNames = new AssetNames();
 
-        String[] signatures = query.split("/");
+        List<Object> all = new ArrayList<Object>();
 
-        Transaction initiator = dcSet.getTransactionFinalMap().get(Base58.decode(signatures[0]));
-        Transaction target = dcSet.getTransactionFinalMap().get(Base58.decode(signatures[1]));
-        Trade trade = dcSet.getTradeMap()
-                .get(Fun.t2(Transaction.makeDBRef(initiator.getHeightSeqNo()),
-                        Transaction.makeDBRef(target.getHeightSeqNo())));
+        Trade trade;
+        if (false) {
+            String[] signatures = query.split("/");
+            Transaction initiator = dcSet.getTransactionFinalMap().get(Base58.decode(signatures[0]));
+            Transaction target = dcSet.getTransactionFinalMap().get(Base58.decode(signatures[1]));
+            trade = dcSet.getTradeMap()
+                    .get(Fun.t2(Transaction.makeDBRef(initiator.getHeightSeqNo()),
+                            Transaction.makeDBRef(target.getHeightSeqNo())));
+            all.add(Controller.getInstance().getTransaction(Base58.decode(signatures[0])));
+            all.add(Controller.getInstance().getTransaction(Base58.decode(signatures[1])));
+
+        } else {
+            String[] refs = query.split("/");
+            long refInitator = Long.parseLong(refs[0]);
+            long refTarget = Long.parseLong(refs[1]);
+            trade = dcSet.getTradeMap().get(Fun.t2(refInitator, refInitator));
+
+            //all.add(DCSet.getInstance().getTransactionFinalMap().get(refInitator));
+            //all.add(DCSet.getInstance().getTransactionFinalMap().get(refTarget));
+
+        }
         output.put("type", "trade");
         output.put("trade", query);
 
-        List<Object> all = new ArrayList<Object>();
         all.add(trade.toJson(0));
-
-        all.add(Controller.getInstance().getTransaction(Base58.decode(signatures[0])));
-        all.add(Controller.getInstance().getTransaction(Base58.decode(signatures[1])));
 
         int size = all.size();
 
