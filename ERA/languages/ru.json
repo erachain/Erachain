@@ -1220,6 +1220,8 @@
   "Total Amount": "Общая Сумма",
   "Total AT Amount": "Общая AT Сумма",
   "Total Fee": "Сумма Сбора",
+  "Total for Buy": "Всего к Покупке",
+  "Total for Sell": "Всего на Продажу",
   "including total fee": "включая общие сборы",
   "Apply filter": "Применить фильтр",
   "Cancel filter": "Отменить фильтр",
