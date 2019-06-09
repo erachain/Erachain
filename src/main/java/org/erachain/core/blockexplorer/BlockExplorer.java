@@ -2452,12 +2452,13 @@ public class BlockExplorer {
 
         } else {
             String[] refs = query.split("/");
-            long refInitator = Long.parseLong(refs[0]);
-            long refTarget = Long.parseLong(refs[1]);
-            trade = dcSet.getTradeMap().get(Fun.t2(refInitator, refInitator));
 
-            //all.add(DCSet.getInstance().getTransactionFinalMap().get(refInitator));
-            //all.add(DCSet.getInstance().getTransactionFinalMap().get(refTarget));
+            long refInitator = Transaction.parseDBRef(refs[0]);
+            long refTarget = Transaction.parseDBRef(refs[1]);
+            trade = dcSet.getTradeMap().get(Fun.t2(refInitator, refTarget));
+
+            all.add(DCSet.getInstance().getTransactionFinalMap().get(refInitator));
+            all.add(DCSet.getInstance().getTransactionFinalMap().get(refTarget));
 
         }
         output.put("type", "trade");
