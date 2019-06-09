@@ -560,6 +560,7 @@ public class CreateOrderPanel extends JPanel {
 
         CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) transaction);
         dd.jScrollPane1.setViewportView(ww);
+        dd.pack();
         dd.setLocationRelativeTo(null);
         dd.setVisible(true);
 
@@ -576,7 +577,7 @@ public class CreateOrderPanel extends JPanel {
 
                 // this.txtFeePow.setText("0");
                 this.txtAmountHave.setText("0");
-                this.txtPrice.setText("0");
+                //this.txtPrice.setText("0");
 
             } else {
                 JOptionPane.showMessageDialog(new JFrame(),
