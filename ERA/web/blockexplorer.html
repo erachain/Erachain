@@ -972,7 +972,7 @@ button.white-bgc[disabled]:focus,
                 }
 
                 if (data.asset.pairs[key].ordersAmountVolume == '0.00000000') {
-                    output += '<br><font color=#e0e0e0>' + addCommas(data.asset.pairs[key].ordersAmountVolume) + ' ' + getAssetNameMiniGrey(data.asset.this.key, data.asset.this.name) + '</font>';
+                    output += '<br><font color="#e0e0e0">' + addCommas(data.asset.pairs[key].ordersAmountVolume) + ' ' + getAssetNameMiniGrey(data.asset.this.key, data.asset.this.name) + '</font>';
                 } else {
                     output += '<br><font color=black>' + addCommas(data.asset.pairs[key].ordersAmountVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name) + '</font>';
                 }
@@ -1036,7 +1036,7 @@ button.white-bgc[disabled]:focus,
             output += '<td><b>' + addCommas(data.sellsSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
             output += '<td>' + data.label_Total_For_Sell;
 
-            output += '<tr bgcolor="e0e0e0"><td><b>' + data.label_Price + '</b></td><td><b>' + data.label_Amount + '</b></td><td><b>' + data.label_Total + '</b></td></tr>';
+            output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td><b>' + data.label_Price + '</b></td><td><b>' + data.label_Amount + '</b></td><td><b>' + data.label_Total + '</b></td></tr>';
 
             output += '<tr bgcolor="#f9f9f9">';
             output += '<td colspan><b>' +  addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
@@ -1061,7 +1061,7 @@ button.white-bgc[disabled]:focus,
             output += '<h4 style="text-align: center;">' + data.label_Trade_History + '</h4>';
 
             output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
-            output += '<tr bgcolor="e0e0e0"><td align=center><b>' + data.label_Date; // + '<td align=center><b>' + data.label_Type + '</b></td>';
+            output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.label_Date; // + '<td align=center><b>' + data.label_Type + '</b></td>';
             output += '<td align=center><b>' + data.label_Creator + '<td align=center><b>' + data.label_Volume;
             output += '<td align=center><b>' + data.label_Price;
             output += '<td align=center><b>' + data.label_Creator

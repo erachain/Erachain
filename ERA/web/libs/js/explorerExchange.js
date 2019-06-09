@@ -12,12 +12,12 @@ function exchange(data){
     output += lastBlock(data.lastBlock);
     var start = data.start;
 
-    output += '<div class = "row"><div class="col-lg-6" style="padding-left: 5em;">';
+    output += '<div class = "row"><div class="col-lg-5" style="padding-left: 5em;">';
 
     output += '<h4 style="text-align: center;">' + data.label_table_PopularPairs + '</h4>';
 
     output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
-    output += '<tr bgcolor="e0e0e0"><td align=center><b>' + data.label_table_have;
+    output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.label_table_have;
     output += '<td><b>' + data.label_table_want + '<td><b>' + data.label_table_orders + '<td><b>' +
          data.label_table_last_price + '<td><b>' + data.label_table_volume24 + '</tr>';
 
@@ -35,12 +35,12 @@ function exchange(data){
 
         output += '</tr>';
     }
-    output += '</table></div><div class="col-lg-6" style="padding-right: 5em;">';
+    output += '</table></div><div class="col-lg-7" style="padding-right: 5em;">';
 
     output += '<h4 style="text-align: center;">' + data.label_table_LastTrades + '</h4>';
 
     output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
-    output += '<tr bgcolor="e0e0e0"><td align=center><b>' + data.label_Date;
+    output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.label_Date;
     output += '<td><b>' + data.label_Pair + '<td><b>' + data.label_Creator + '<td><b>' + data.label_Volume + '</b></td><td align=center><b>' + data.label_Price + '</b></td>';
     output += '<td><b>' + data.label_Creator + '<tr>'
     //output += data.label_Total_Cost + '</b></td></tr>';
