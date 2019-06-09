@@ -46,7 +46,7 @@ function exchange(data){
     //Отображение таблицы элементов статусов
     for (var i in data.trades) {
         var trade = data.trades[i];
-        output += '<tr><td>' + convertTimestamp(trade.timestamp);
+        output += '<tr><td>' + convertTimestamp(trade.timestamp, false);
         output += '<td>' + addCommas(trade.amountHave);
         output += '<td>' + getAssetNameMini(trade.have, '');
 

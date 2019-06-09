@@ -1004,7 +1004,7 @@ public class BlockExplorer {
         return output;
     }
 
-    private Map tradeJSON(long have, Trade trade, BigDecimal tradeWantAmount, BigDecimal tradeHaveAmount) {
+    private Map tradeJSON(long have, Trade trade) {
 
         Map tradeJSON = new HashMap();
 
@@ -1027,15 +1027,11 @@ public class BlockExplorer {
 
         if (orderInitiator.getHave() == have) {
             tradeJSON.put("type", "sell");
-            tradeWantAmount = tradeWantAmount.add(trade.getAmountHave());
-            tradeHaveAmount = tradeHaveAmount.add(trade.getAmountWant());
 
             tradeJSON.put("amountHave", trade.getAmountWant().toPlainString());
             tradeJSON.put("amountWant", trade.getAmountHave().toPlainString());
         } else {
             tradeJSON.put("type", "buy");
-            tradeHaveAmount = tradeHaveAmount.add(trade.getAmountHave());
-            tradeWantAmount = tradeWantAmount.add(trade.getAmountWant());
 
             tradeJSON.put("amountHave", trade.getAmountHave().toPlainString());
             tradeJSON.put("amountWant", trade.getAmountWant().toPlainString());
@@ -1172,63 +1168,15 @@ public class BlockExplorer {
 
         output.put("tradesCount", trades.size());
 
-        BigDecimal tradeWantAmount = BigDecimal.ZERO;
-        BigDecimal tradeHaveAmount = BigDecimal.ZERO;
-
         int i = 0;
         for (Trade trade : trades) {
 
-            /*
-            Map tradeJSON = new LinkedHashMap();
-
-            Order orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
-
-            Order orderTarget = Order.getOrder(dcSet, trade.getTarget());
-
-            tradeJSON.put("realPrice", trade.calcPrice());
-            tradeJSON.put("realReversePrice", trade.calcPriceRevers());
-
-            createOrder = finalMap.get(orderInitiator.getId());
-            tradeJSON.put("initiatorTxSignature", Base58.encode(createOrder.getSignature()));
-
-            tradeJSON.put("initiatorCreator", orderInitiator.getCreator().getAddress()); // viewCreator
-            tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().toPlainString());
-            if (orderInitiator.getHave() == have) {
-                tradeJSON.put("type", "sell");
-                //tradeWantAmount = tradeWantAmount.add(trade.getAmountHave());
-                //tradeHaveAmount = tradeHaveAmount.add(trade.getAmountWant());
-
-                tradeJSON.put("amountHave", trade.getAmountWant().toPlainString());
-                tradeJSON.put("amountWant", trade.getAmountHave().toPlainString());
-            } else {
-                tradeJSON.put("type", "buy");
-                tradeHaveAmount = tradeHaveAmount.add(trade.getAmountHave());
-                tradeWantAmount = tradeWantAmount.add(trade.getAmountWant());
-
-                tradeJSON.put("amountHave", trade.getAmountHave().toPlainString());
-                tradeJSON.put("amountWant", trade.getAmountWant().toPlainString());
-            }
-
-            createOrder = finalMap.get(orderTarget.getId());
-            tradeJSON.put("targetTxSignature", Base58.encode(createOrder.getSignature()));
-            tradeJSON.put("targetCreator", orderTarget.getCreator().getAddress()); // viewCreator
-            tradeJSON.put("targetAmount", orderTarget.getAmountHave().toPlainString());
-
-            tradeJSON.put("timestamp", trade.getTimestamp());
-            tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
-            */
-
-
-
-            tradesJSON.put(i++, tradeJSON(have, trade, tradeWantAmount, tradeHaveAmount));
+            tradesJSON.put(i++, tradeJSON(have, trade));
 
             if (i > 100)
                 break;
         }
         output.put("trades", tradesJSON);
-
-        output.put("tradeWantAmount", tradeWantAmount.toPlainString());
-        output.put("tradeHaveAmount", tradeHaveAmount.toPlainString());
 
         output.put("label_Trades", Lang.getInstance().translateFromLangObj("Trades", langObj));
         output.put("label_Price", Lang.getInstance().translateFromLangObj("Price", langObj));
@@ -1244,6 +1192,7 @@ public class BlockExplorer {
         output.put("label_Type", Lang.getInstance().translateFromLangObj("Type", langObj));
         output.put("label_Trade_Volume", Lang.getInstance().translateFromLangObj("Trade Volume", langObj));
         output.put("label_Go_To", Lang.getInstance().translateFromLangObj("Go To", langObj));
+        output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
 
         return output;
     }

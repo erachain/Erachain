@@ -54,11 +54,11 @@ function person_status(data) {
         output += '<span style="font-size:2em;">' + data.last.text + '</span><br>';
         if (data.last.hasOwnProperty('endTimestamp')) {
             output += '<img src="img/check-no.png" style="height:4em; margin-bottom:20px;">'
-            output += '<b><span style="font-size:3em; color:crimson"> &nbsp' + convertTimestamp(data.last.endTimestamp) + '</span></b><br>';
+            output += '<b><span style="font-size:3em; color:crimson"> &nbsp' + convertTimestamp(data.last.endTimestamp, true) + '</span></b><br>';
         }
         if (data.last.hasOwnProperty('beginTimestamp')) {
             output += '<img src="img/check-yes.png" style="height:4em; margin-bottom:20px;">'
-            output += '<b><span style="font-size:3em; color:#0cb70c"> &nbsp' + convertTimestamp(data.last.beginTimestamp) + '</span></b><br>';
+            output += '<b><span style="font-size:3em; color:#0cb70c"> &nbsp' + convertTimestamp(data.last.beginTimestamp, true) + '</span></b><br>';
         }
         output += data.Label_creator + ': <a href ="?address=' +
             data.last.creator + get_lang() + '">' + data.last.creator + '</a><br>';
@@ -100,11 +100,11 @@ function person_status(data) {
             }
             output += '<td>';
             if (item.hasOwnProperty('beginTimestamp')) {
-                output += convertTimestamp(item.beginTimestamp);
+                output += convertTimestamp(item.beginTimestamp, true);
             }
             output += '<td>';
             if (item.hasOwnProperty('endTimestamp')) {
-                output += convertTimestamp(item.endTimestamp);
+                output += convertTimestamp(item.endTimestamp, true);
             }
             output += '<td> <a href ="?address=' +
                 item.creator + get_lang() + '">' + item.creator.substr(0, 12) + '...</a>';

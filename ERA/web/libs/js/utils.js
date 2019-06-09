@@ -30,10 +30,9 @@ return htmlFilter(wordwrap(text, 0, '\n', true));
 
 }
 
-function convertTimestamp(timestamp) {
+function convertTimestamp(timestamp, withYear) {
     if (timestamp == null) return '';
     var date = new Date(timestamp);
-    var year = date.getFullYear();
     var month = date.getMonth() + 1;
     if (month < 10) month = '0' + month;
     var day = date.getDate();
@@ -45,7 +44,11 @@ function convertTimestamp(timestamp) {
     var seconds = date.getSeconds();
     if (seconds < 10) seconds = '0' + seconds;
 
-    return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+    if (withYear) {
+        var year = date.getFullYear();
+        return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+    }
+    return month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
 
 }
 
