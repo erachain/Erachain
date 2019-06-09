@@ -24,8 +24,8 @@ function exchange(data){
     //Отображение таблицы элементов статусов
     for (var i in data.popularPairs) {
         var item = data.popularPairs[i];
-        output += '<tr><td>' + getAssetURL(item.have.key, item.have.name, item.have.icon, 30);
-        output += '<td>' + getAssetURL(item.want.key, item.want.name, item.want.icon, 30);;
+        output += '<tr><td>' + getShortAssetURL(item.have.key, item.have.name, item.have.icon, 30);
+        output += '<td>' + getShortAssetURL(item.want.key, item.want.name, item.want.icon, 30);;
         output += '<td><a href="?asset=' + item.have.key
             + '&asset=' + item.want.key + get_lang() + '"><b>' + item.orders + '</b></a>';
         output += '<td><a href="?asset=' + item.have.key
@@ -53,7 +53,7 @@ function exchange(data){
         output += '<td align=center><a href=?trade=' + trade.initiatorTx + '/' + trade.targetTx + get_lang()
         output += '>' + convertTimestamp( trade.timestamp, false);
 
-        output += '<td><a href=?asset=' + trade.assetHaveKey + '&asset=' + trade.assetWantKey + '>' + trade.assetHaveName + '/' + trade.assetWantName + '</a>';
+        output += '<td><a href=?asset=' + trade.assetHaveKey + '&asset=' + trade.assetWantKey + '>' + getShortNameBlanked(trade.assetHaveName) + '/' + getShortNameBlanked(trade.assetWantName) + '</a>';
 
         output += '<td><a href=?address=' + trade.initiatorCreator_addr + '>' + cut(trade.initiatorCreator, 30) + '</a>';
 

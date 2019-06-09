@@ -487,12 +487,38 @@ button.white-bgc[disabled]:focus,
         function getAssetURL(key, name, icon, imgSize) {
             var output = '<a href="?asset=' + key + get_lang() + '">';
             if (key > 1000)
-                output += '[' + key + ']';
+                output += '<b>[' + key + ']</b>';
 
             if (icon.length > 0)
                 output += ' <img src="data:image/gif;base64,' + icon + '" style="width:' + imgSize + 'px;" /> ';
 
             output += '<b>' +  escapeHtml(name) + '</b></a>';
+
+            return output;
+        }
+
+        function getShortNameBlanked(name) {
+
+            var shortName = escapeHtml(name).split(' ')[0];
+            if (shortName.length > 12)
+                shortName = shortName.substr(0, 12) + '.';
+
+            return shortName;
+        }
+
+        function getShortAssetURL(key, name, icon, imgSize) {
+            var output = '<a href="?asset=' + key + get_lang() + '">';
+            if (key > 1000)
+                output += '<b>[' + key + ']</b>';
+
+            if (icon.length > 0)
+                output += ' <img src="data:image/gif;base64,' + icon + '" style="width:' + imgSize + 'px;" /> ';
+
+            var shortName = escapeHtml(name).split(' ')[0];
+            if (shortName.length > 10)
+                shortName = shortName.substr(0, 10);
+
+            output += '<b>' +  shortName + '</b></a>';
 
             return output;
         }
@@ -1024,33 +1050,32 @@ button.white-bgc[disabled]:focus,
             for (key in data.sells) {
 
                 output += '<tr>';
-                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].amount) + '</a>';
-                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].price) + '</a>';
                 output += '<td><a href ="?address=' + data.sells[key].creator_addr + get_lang() + '">' +
                         data.sells[key].creator + '</a>';
+                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].amount) + '</a>';
+                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].price) + '</a>';
 
             }
 
             output += '<tr bgcolor="#f9f9f9">';
+            output += '<td>' + data.label_Total_For_Sell;
             output += '<td><b>' + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
             output += '<td><b>' + addCommas(data.sellsSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-            output += '<td>' + data.label_Total_For_Sell;
 
-            output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td><b>' + data.label_Price + '</b></td><td><b>' + data.label_Amount + '</b></td><td><b>' + data.label_Total + '</b></td></tr>';
+            output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td><b>' + data.label_Creator + '<td><b>' + data.label_Amount + '</b></td><td><b>' + data.label_Price + '</b></td></tr>';
 
             output += '<tr bgcolor="#f9f9f9">';
+            output += '<td>' + data.label_Total_For_Buy;
             output += '<td colspan><b>' +  addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
             output += '<td><b>' + addCommas(data.buysSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-            output += '<td>' + data.label_Total_For_Buy;
 
             for (key in data.buys) {
 
                 output += '<tr>';
-
-                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a>';
-                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingPrice) + '</a>';
                 output += '<td><a href ="?address=' + data.buys[key].creator_addr + get_lang() + '">' +
                         data.buys[key].creator + '</a>';
+                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a>';
+                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingPrice) + '</a>';
 
             }
 
