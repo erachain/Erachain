@@ -469,9 +469,9 @@ public class CreateOrderPanel extends JPanel {
             BigDecimal result;
 
             if (buying) {
-                result = price.divide(amount, have.getScale(), RoundingMode.HALF_DOWN);
+                result = amount.divide(price, have.getScale(), RoundingMode.HALF_DOWN);
             } else {
-                result = price.divide(amount, want.getScale(), RoundingMode.HALF_DOWN);
+                result = amount.divide(price, want.getScale(), RoundingMode.HALF_DOWN);
             }
 
             noUpdateFields = true;
