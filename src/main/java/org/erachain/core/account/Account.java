@@ -835,6 +835,15 @@ public class Account {
         }
     }
 
+    public String getPersonOrShortAddress(int max) {
+        Tuple2<Integer, PersonCls> personRes = this.getPerson();
+        if (personRes == null) {
+            return GenesisBlock.CREATOR.equals(this) ? "GENESIS" : this.getAddress().substring(0, max) + "~";
+        } else {
+            return "[" + personRes.b.getKey() + "]" + personRes.b.getName();
+        }
+    }
+
     public String getPersonAsString_01(boolean shrt) {
         Tuple2<Integer, PersonCls> personRes = this.getPerson();
         if (personRes == null) {

@@ -1034,11 +1034,13 @@ public class BlockExplorer {
         tradeJSON.put("realReversePrice", trade.calcPriceRevers());
 
         tradeJSON.put("initiatorTx", Transaction.viewDBRef(orderInitiator.getId()));
-        tradeJSON.put("initiatorCreator", orderInitiator.getCreator().getAddress()); // viewCreator
+        tradeJSON.put("initiatorCreator_addr", orderInitiator.getCreator().getAddress()); // viewCreator
+        tradeJSON.put("initiatorCreator", orderInitiator.getCreator().getPersonOrShortAddress(12));
         tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().toPlainString());
 
         tradeJSON.put("targetTx", Transaction.viewDBRef(orderTarget.getId()));
-        tradeJSON.put("targetCreator", orderTarget.getCreator().getAddress()); // viewCreator
+        tradeJSON.put("targetCreator_addr", orderTarget.getCreator().getAddress()); // viewCreator
+        tradeJSON.put("targetCreator", orderTarget.getCreator().getPersonOrShortAddress(12)); // viewCreator
         tradeJSON.put("targetAmount", orderTarget.getAmountHave().toPlainString());
 
         tradeJSON.put("timestamp", trade.getTimestamp());
@@ -1124,7 +1126,7 @@ public class BlockExplorer {
 
             createOrder = finalMap.get(order.getId());
 
-            sellJSON.put("creator", createOrder.getCreator().getPersonAsString());
+            sellJSON.put("creator", createOrder.getCreator().getPersonOrShortAddress(12));
             sellJSON.put("creator_addr", createOrder.getCreator().getAddress());
 
             sellsJSON.put(Base58.encode(createOrder.getSignature()), sellJSON);
@@ -1170,7 +1172,7 @@ public class BlockExplorer {
 
             createOrder = finalMap.get(order.getId());
 
-            buyJSON.put("creator", createOrder.getCreator().getPersonAsString());
+            buyJSON.put("creator", createOrder.getCreator().getPersonOrShortAddress(12));
             buyJSON.put("creator_addr", createOrder.getCreator().getAddress());
 
             buysJSON.put(Base58.encode(createOrder.getSignature()), buyJSON);
@@ -1197,7 +1199,9 @@ public class BlockExplorer {
         output.put("trades", tradesJSON);
 
         output.put("label_Trades", Lang.getInstance().translateFromLangObj("Trades", langObj));
+        output.put("label_Volume", Lang.getInstance().translateFromLangObj("Volume", langObj));
         output.put("label_Price", Lang.getInstance().translateFromLangObj("Price", langObj));
+        output.put("label_Total_Cost", Lang.getInstance().translateFromLangObj("Total Cost", langObj));
         output.put("label_Amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
         output.put("label_Orders", Lang.getInstance().translateFromLangObj("Orders", langObj));
         output.put("label_Sell_Orders", Lang.getInstance().translateFromLangObj("Sell Orders", langObj));
@@ -2260,6 +2264,7 @@ public class BlockExplorer {
             list.add(new Pair<Long, Long>(2L, 12L));
             list.add(new Pair<Long, Long>(2L, 95L));
             list.add(new Pair<Long, Long>(14L, 12L ));
+            list.add(new Pair<Long, Long>(1L, 1010L ));
         }
 
         pairsSet.addAll(list);

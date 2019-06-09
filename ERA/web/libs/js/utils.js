@@ -68,3 +68,10 @@ function escapeHtml(string) {
     return entityMap[s];
   });
 }
+
+function cut(string, max) {
+    if (string.lenght > max)
+        return string.substr(0,max) + '.';
+
+    return string;
+}

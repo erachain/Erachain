@@ -55,12 +55,27 @@ function exchange(data){
 
         output += '<td><a href=?asset=' + trade.assetHaveKey + '&asset=' + trade.assetWantKey + '>' + trade.assetHaveName + '/' + trade.assetWantName + '</a>';
 
-        output += '<td align=right><a href=?address=' + trade.initiatorCreator + '>' + trade.initiatorCreator.substr(0,12) + '..</a>';
+        output += '<td><a href=?address=' + trade.initiatorCreator_addr + '>' + cut(trade.initiatorCreator, 30) + '</a>';
+
+        // отобрадает что это создатель актива действует
+        if (trade.initiatorCreator_addr == data.assetHaveOwner) {
+            output += ' <b>&#9654;</b> ';
+        } else if (trade.initiatorCreator_addr == data.assetWantOwner) {
+            output += ' <b>&#9655;</b> ';
+        }
+
         output += '<td>' + addCommas(trade.amountHave);
 
         output += '<td align=left><span style="font-size:1.4em">' + addCommas(trade.realReversePrice) + '</span>';
 
-        output += '<td><a href=?address=' + trade.targetCreator + '>' + trade.targetCreator.substr(0,12) + '..</a>';
+        // отобрадает что это создатель актива действует
+        if (trade.targetCreator_addr == data.assetHaveOwner) {
+            output += ' <b>&#9664;</span></b> ';
+        } else if (trade.targetCreator_addr == data.assetWantOwner) {
+            output += ' <b>&#9665;</b> ';
+        }
+
+        output += '<td><a href=?address=' + trade.targetCreator_addr + '>' + cut(trade.targetCreator, 30) + '</a>';
 
         //output += '<td>' + addCommas(trade.amountWant);
 
