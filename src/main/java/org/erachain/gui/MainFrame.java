@@ -129,9 +129,7 @@ public class MainFrame extends JFrame implements Observer {
         jMenuBar1.add(jMenu2);
 
         jMenuExchange.setText(Lang.getInstance().translate("Exchange"));
-
-        if (BlockChain.DEVELOP_USE)
-            jMenuBar1.add(jMenuExchange);
+        jMenuBar1.add(jMenuExchange);
 
 
         setJMenuBar(jMenuBar1);

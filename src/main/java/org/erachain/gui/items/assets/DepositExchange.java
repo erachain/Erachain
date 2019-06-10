@@ -80,10 +80,6 @@ public class DepositExchange extends JPanel {
                 urlGetDetails += "3/13/" + jTextField_Address.getText() + "/0.1"; // BTC -> eUSD
                 incomeAssetName = "bitcoins";
                 break;
-            case 94:
-                urlGetDetails += "3/14/" + jTextField_Address.getText() + "/0.1"; // BTC -> eEUR
-                incomeAssetName = "bitcoins";
-                break;
             default:
                 urlGetDetails += "3/10/" + jTextField_Address.getText() + "/0.1"; // BTC -> COMPU
                 incomeAssetName = "bitcoins";
@@ -330,7 +326,7 @@ public class DepositExchange extends JPanel {
         //////////////////////////
         gridy += 3;
 
-        jButton_Cansel = new MButton(Lang.getInstance().translate("See Deposit Transactions"), 2);
+        jButton_Cansel = new MButton(Lang.getInstance().translate("See Deposit History"), 2);
         jButton_Cansel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
             }
