@@ -18,7 +18,7 @@ import org.erachain.lang.Lang;
 public class AccountAssetLendPanel extends AccountAssetActionPanelCls {
 
     public AccountAssetLendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super(assetIn, TransactionAmount.ACTION_DEBT, accountFrom, accountTo);
+        super(assetIn, TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
         setName("Lend");
 

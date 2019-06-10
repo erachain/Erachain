@@ -20,7 +20,7 @@ import org.erachain.lang.Lang;
 public class AccountAssetHoldPanel extends AccountAssetActionPanelCls {
 
     public AccountAssetHoldPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super(assetIn, TransactionAmount.ACTION_HOLD, accountFrom, accountTo);
+        super(assetIn, TransactionAmount.ACTION_HOLD, accountFrom, accountTo, null);
 
         setName("Take on Hold");
 

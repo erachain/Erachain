@@ -18,7 +18,7 @@ import org.erachain.lang.Lang;
 public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls {
 
     public AccountAssetConfiscateDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super(assetIn, TransactionAmount.ACTION_DEBT, accountFrom, accountTo);
+        super(assetIn, TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
         setName("Confiscate Debt");
 
