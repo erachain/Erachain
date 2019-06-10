@@ -1199,6 +1199,8 @@ public class BlockExplorer {
         output.put("trades", tradesJSON);
 
         output.put("label_Trades", Lang.getInstance().translateFromLangObj("Trades", langObj));
+        output.put("label_Trade_Initiator", Lang.getInstance().translateFromLangObj("Trade Initiator", langObj));
+        output.put("label_Position_Holder", Lang.getInstance().translateFromLangObj("Position Holder", langObj));
         output.put("label_Volume", Lang.getInstance().translateFromLangObj("Volume", langObj));
         output.put("label_Price", Lang.getInstance().translateFromLangObj("Price", langObj));
         output.put("label_Total_Cost", Lang.getInstance().translateFromLangObj("Total Cost", langObj));
@@ -2322,6 +2324,8 @@ public class BlockExplorer {
         output.put("label_table_last_price", Lang.getInstance().translateFromLangObj("Last Price", langObj));
         output.put("label_table_volume24", Lang.getInstance().translateFromLangObj("Day Volume", langObj));
 
+        output.put("label_Trade_Initiator", Lang.getInstance().translateFromLangObj("Trade Initiator", langObj));
+        output.put("label_Position_Holder", Lang.getInstance().translateFromLangObj("Position Holder", langObj));
         output.put("label_Date", Lang.getInstance().translateFromLangObj("Date", langObj));
         output.put("label_Pair", Lang.getInstance().translateFromLangObj("Pair", langObj));
         output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));

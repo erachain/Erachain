@@ -1052,30 +1052,30 @@ button.white-bgc[disabled]:focus,
                 output += '<tr>';
                 output += '<td><a href ="?address=' + data.sells[key].creator_addr + get_lang() + '">' +
                         data.sells[key].creator + '</a>';
-                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].amount) + '</a>';
                 output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].price) + '</a>';
+                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].amount) + '</a>';
 
             }
 
             output += '<tr bgcolor="#f9f9f9">';
-            output += '<td>' + data.label_Total_For_Sell;
-            output += '<td><b>' + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
-            output += '<td><b>' + addCommas(data.sellsSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+            output += '<td><td>' + data.label_Total_For_Sell;
+            ///output += '<td><b>' + addCommas(data.sellsSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+            output += ':<td><b>' + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 
-            output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td><b>' + data.label_Creator + '<td><b>' + data.label_Amount + '</b></td><td><b>' + data.label_Price + '</b></td></tr>';
+            output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td><b>' + data.label_Creator + '<td><b>' + data.label_Price + '</b></td><td><b>' + data.label_Amount + '</b></td></tr>';
 
             output += '<tr bgcolor="#f9f9f9">';
-            output += '<td>' + data.label_Total_For_Buy;
-            output += '<td colspan><b>' +  addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
-            output += '<td><b>' + addCommas(data.buysSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+            output += '<td><td>' + data.label_Total_For_Buy;
+            ///output += '<td><b>' + addCommas(data.buysSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+            output += ':<td><b>' +  addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 
             for (key in data.buys) {
 
                 output += '<tr>';
                 output += '<td><a href ="?address=' + data.buys[key].creator_addr + get_lang() + '">' +
                         data.buys[key].creator + '</a>';
-                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a>';
                 output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingPrice) + '</a>';
+                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a>';
 
             }
 
@@ -1087,10 +1087,12 @@ button.white-bgc[disabled]:focus,
 
             output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
             output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.label_Date; // + '<td align=center><b>' + data.label_Type + '</b></td>';
-            output += '<td align=center><b>' + data.label_Creator + '<td align=center><b>' + data.label_Volume;
+            output += '<td align=center><b>' + data.label_Trade_Initiator
             output += '<td align=center><b>' + data.label_Price;
-            output += '<td align=center><b>' + data.label_Creator
-            output += '<td align=center><b>' + data.label_Total_Cost + '</b></td></tr>';
+            output += '<td align=center><b>' + data.label_Volume;
+            output += '<td align=center><b>' + data.label_Total_Cost;
+            output += '<td align=center><b>' + data.label_Position_Holder
+            output += '</tr>';
 
             for (key in data.trades) {
 
@@ -1119,6 +1121,9 @@ button.white-bgc[disabled]:focus,
                         + '<span style="font-size:1.4em">' + addCommas(trade.realReversePrice) + '</span>';
                     ///output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 
+                    output += '<td>' + addCommas(trade.amountWant);
+                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+
                     output += '<td style="line-height: 150%;">';
                     output += '<a href=?address=' + trade.targetCreator_addr + '>' + cut(trade.targetCreator, 20) + '</a>';
 
@@ -1131,8 +1136,6 @@ button.white-bgc[disabled]:focus,
 
                     //output += '<br>';
                     //output += '<img src=img/grleft.png style="vertical-align: middle;"> ';
-                    output += '<td>' + addCommas(trade.amountWant);
-                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 
                 } else {
                     output += '<td align=right style="line-height: 150%;">';
@@ -1154,6 +1157,9 @@ button.white-bgc[disabled]:focus,
                         + '<span style="font-size:1.4em">' + addCommas(trade.realPrice) + '</span>';
                     //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName) + '';
 
+                    output += '<td>' + addCommas(trade.amountWant);
+                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+
                     output += '<td style="line-height: 150%;">';
                     output += '<a href=?address=' + trade.initiatorCreator_addr + '>' + cut(trade.initiatorCreator, 20) + '</a>';
 
@@ -1166,8 +1172,6 @@ button.white-bgc[disabled]:focus,
 
                     //output += '<br>';
                     //output += '<img src=img/grleft.png style="vertical-align: middle;"> ';
-                    output += '<td>' + addCommas(trade.amountWant);
-                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
                 }
             }
 
