@@ -871,6 +871,18 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     }
 
+    public static Long parseDBRef(String refStr) {
+        try {
+            String[] strA = refStr.split("\\-");
+            int height = Integer.parseInt(strA[0]);
+            int seq = Integer.parseInt(strA[1]);
+            byte[] ref = Ints.toByteArray(height);
+            return Longs.fromByteArray(Bytes.concat(ref, Ints.toByteArray(seq)));
+        } catch (Exception e1) {
+            return null;
+        }
+    }
+
     public static Tuple2<Integer, Integer> parseDBRef(Long dbRef) {
 
         byte[] bytes = Longs.toByteArray(dbRef);

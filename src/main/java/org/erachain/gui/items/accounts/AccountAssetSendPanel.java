@@ -14,22 +14,18 @@ import org.erachain.lang.Lang;
 
 @SuppressWarnings("serial")
 
-public class AccountSendPanel extends AssetSendPanel {
+public class AccountAssetSendPanel extends AccountAssetActionPanelCls {
     
-    //private AccountSendPanel th;
+    //private AccountAssetSendPanel th;
     public boolean noRecive;
 
-    public AccountSendPanel(AssetCls asset, Account account, Account account_To, PersonCls person, String message) {
-        super(asset, account, account_To, person, message);
-        String assetName = "";
-        if (asset != null) {
-            assetName = asset.viewName();
-            this.jComboBox_Asset.setEnabled(false);
-        }else{
-             this.jComboBox_Asset.setEnabled(true);
-        }
+    public AccountAssetSendPanel(AssetCls assetIn, int balancePosition, Account accountFrom, Account accountTo, PersonCls person, String message) {
+        super(assetIn, balancePosition, accountFrom, accountTo);
+
+        setName("Send");
+
         this.jLabel_Title.setText(Lang.getInstance().translate("If You want to send asset %asset%, fill in this form").
-                replace("%asset%", assetName));
+                replace("%asset%", asset.viewName()));
 
         //  icon.setIcon(null);
 
@@ -39,7 +35,7 @@ public class AccountSendPanel extends AssetSendPanel {
 
     }
     /*
-    public AccountSendPanel(AssetCls asset, Account account, Account account_To, PersonCls person, String message) {
+    public AccountAssetSendPanel(AssetCls asset, Account account, Account account_To, PersonCls person, String message) {
         this(asset, account, account_To, person);
     }
     */

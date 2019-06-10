@@ -4,10 +4,11 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.gui.items.accounts.AccountSendDialog;
+import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.library.MButton;
-import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.FundTokensComboBoxModel;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
@@ -71,7 +72,7 @@ public class WithdrawExchange extends JPanel {
 
         JSONObject jsonObject;
         String inputText = "";
-        String account_to;
+        String accountTo;
         String message = "";
 
         AssetCls assetIn = null;
@@ -79,7 +80,7 @@ public class WithdrawExchange extends JPanel {
 
             String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
             assetIn = (AssetCls) cbxAssets.getSelectedItem();
-            switch ((int)assetIn.getKey()) {
+            switch ((int) assetIn.getKey()) {
                 case 12:
                     urlGetDetails += "12/3/" + jTextField_Address.getText() + "/0.1"; // eBTC -> BTC
                     message += "BTC";
@@ -132,31 +133,34 @@ public class WithdrawExchange extends JPanel {
                 jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
             }
 
-            account_to = jsonObject.get("addr_in").toString();
+            accountTo = jsonObject.get("addr_in").toString();
 
         } catch (Exception e) {
-            account_to = null;
+            accountTo = null;
             jLabel_Adress_Check.setText(inputText);
             inputText = "";
         }
 
-        if (assetIn != null && account_to != null) {
+        if (assetIn != null && accountTo != null) {
+            if (accountTo != null) {
 
-            message += ":" + jTextField_Address.getText();
-            new AccountSendDialog(assetIn, null, new Account(account_to), null, message);
+                message += ":" + jTextField_Address.getText();
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(assetIn, TransactionAmount.ACTION_SEND,
+                        null, new Account(accountTo), null, message));
+
+            }
+
+            jButton_Confirm.setEnabled(true);
 
         }
-
-        jButton_Confirm.setEnabled(true);
-
     }
 
-    private void initComponents(AssetCls asset_in, Account account) {
+    private void initComponents(AssetCls assetIn, Account account) {
 
-        if (asset_in == null) {
+        if (assetIn == null) {
             asset = Controller.getInstance().getAsset(1l);
         } else {
-            asset = asset_in;
+            asset = assetIn;
         }
 
         GridBagConstraints gridBagConstraints;

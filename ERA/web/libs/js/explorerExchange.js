@@ -12,17 +12,20 @@ function exchange(data){
     output += lastBlock(data.lastBlock);
     var start = data.start;
 
-    output += '<table width="600" border=0><tr><td align=left><br>';
-    output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd;">';
-    output += '<thead><tr><td><b>'+ data.label_table_have + '</b></td><td><b>' + data.label_table_want +
-        '</b></td><td><b>' + data.label_table_orders + '</b></td><td><b>' +
-         data.label_table_last_price + '</b></td><td><b>' + data.label_table_volume24 + '</b></td></tr></thead>';
+    output += '<div class = "row"><div class="col-lg-5" style="padding-left: 5em;">';
+
+    output += '<h4 style="text-align: center;">' + data.label_table_PopularPairs + '</h4>';
+
+    output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
+    output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.label_table_have;
+    output += '<td><b>' + data.label_table_want + '<td><b>' + data.label_table_orders + '<td><b>' +
+         data.label_table_last_price + '<td><b>' + data.label_table_volume24 + '</tr>';
 
     //Отображение таблицы элементов статусов
-    for (var i in data.pairs) {
-        var item = data.pairs[i];
-        output += '<tr><td>' + getAssetURL(item.have.key, item.have.name, item.have.icon, 30);
-        output += '<td>' + getAssetURL(item.want.key, item.want.name, item.want.icon, 30);;
+    for (var i in data.popularPairs) {
+        var item = data.popularPairs[i];
+        output += '<tr><td>' + getShortAssetURL(item.have.key, item.have.name, item.have.icon, 30);
+        output += '<td>' + getShortAssetURL(item.want.key, item.want.name, item.want.icon, 30);;
         output += '<td><a href="?asset=' + item.have.key
             + '&asset=' + item.want.key + get_lang() + '"><b>' + item.orders + '</b></a>';
         output += '<td><a href="?asset=' + item.have.key
@@ -32,6 +35,53 @@ function exchange(data){
 
         output += '</tr>';
     }
+    output += '</table></div><div class="col-lg-7" style="padding-right: 5em;">';
+
+    output += '<h4 style="text-align: center;">' + data.label_table_LastTrades + '</h4>';
+
+    output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
+    output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.label_Date;
+    output += '<td><b>' + data.label_Pair + '<td><b>' + data.label_Trade_Initiator;
+    output += '<td><b>' + data.label_Price + '<td align=center><b>' + data.label_Volume;
+    output += '<td><b>' + data.label_Position_Holder + '<tr>'
+    //output += data.label_Total_Cost + '</b></td></tr>';
+
+    for (key in data.lastTrades) {
+
+        var trade = data.lastTrades[key];
+        output += '<tr>';
+
+        output += '<td align=center><a href=?trade=' + trade.initiatorTx + '/' + trade.targetTx + get_lang()
+        output += '>' + convertTimestamp( trade.timestamp, false);
+
+        output += '<td><a href=?asset=' + trade.assetHaveKey + '&asset=' + trade.assetWantKey + '>' + getShortNameBlanked(trade.assetHaveName) + '/' + getShortNameBlanked(trade.assetWantName) + '</a>';
+
+        output += '<td><a href=?address=' + trade.initiatorCreator_addr + '>' + cutBlank(trade.initiatorCreator, 20) + '</a>';
+
+        // отобрадает что это создатель актива действует
+        if (trade.initiatorCreator_addr == data.assetHaveOwner) {
+            output += ' <b>&#9654;</b> ';
+        } else if (trade.initiatorCreator_addr == data.assetWantOwner) {
+            output += ' <b>&#9655;</b> ';
+        }
+
+        output += '<td align=left><span style="font-size:1.4em">' + addCommas(trade.realReversePrice) + '</span>';
+        output += '<td>' + addCommas(trade.amountHave);
+
+        // отобрадает что это создатель актива действует
+        if (trade.targetCreator_addr == data.assetHaveOwner) {
+            output += ' <b>&#9664;</span></b> ';
+        } else if (trade.targetCreator_addr == data.assetWantOwner) {
+            output += ' <b>&#9665;</b> ';
+        }
+
+        output += '<td><a href=?address=' + trade.targetCreator_addr + '>' + cutBlank(trade.targetCreator, 20) + '</a>';
+
+        //output += '<td>' + addCommas(trade.amountWant);
+
+    }
+
+    output += '</table>';
 
     return output;
 }

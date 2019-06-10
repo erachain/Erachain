@@ -5,6 +5,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.WalletItemAssetsTableModel;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -208,9 +209,8 @@ public class MyAssetsTab extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = assetsModel.getItem(row).b;
-                //	String account = assetsModel..getAccount(row);
-                //	AssetPairSelect a = new AssetPairSelect(asset.getKey(), "To sell", "");
-                new ExchangeFrame(asset, null, "To sell", "");
+                MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "To sell", ""));
+
             }
 
 
@@ -222,8 +222,7 @@ public class MyAssetsTab extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = assetsModel.getItem(row).b;
-                //	new AssetPairSelect(asset.getKey(), "","");
-                new ExchangeFrame(asset, null, "", "");
+                MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "", ""));
             }
         });
         assetsMenu.add(excahge);
@@ -234,8 +233,8 @@ public class MyAssetsTab extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = assetsModel.getItem(row).b;
-                //	new AssetPairSelect(asset.getKey(), "Buy","");
-                new ExchangeFrame(asset, null, "Buy", "");
+                MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "Buy", ""));
+
             }
         });
 
@@ -342,8 +341,8 @@ public class MyAssetsTab extends SplitPanel {
                 if (e.getClickCount() == 2) {
                     row = table.convertRowIndexToModel(row);
                     AssetCls asset = assetsModel.getItem(row).b;
-                    //			new AssetPairSelect(asset.getKey(), "","");
-                    new ExchangeFrame(asset, null, "", "");
+                    MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "", ""));
+
                     //		new AssetFrame(asset);
                 }
                 if (e.getClickCount() == 1 & e.getButton() == e.BUTTON1) {

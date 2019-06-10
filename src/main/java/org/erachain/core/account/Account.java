@@ -53,7 +53,8 @@ public class Account {
     protected byte[] shortBytes;
     // private long generatingBalance; //used for forging balance
     Tuple4<Long, Integer, Integer, Integer> personDuration;
-
+    Tuple2<Integer, PersonCls> person;
+    int viewBalancePosition = 0;
 
     protected Account() {
         // this.generatingBalance = 0l;
@@ -292,6 +293,10 @@ public class Account {
         return address;
     }
 
+    public void setViewBalancePosition(int viewBalancePosition) {
+        this.viewBalancePosition = viewBalancePosition;
+    }
+
     public byte[] getAddressBytes() {
         return bytes;
     }
@@ -355,6 +360,42 @@ public class Account {
      * Integer days, DBSet db) { //UPDATE PRIMARY TIME IN DB
      * db.getPersonStatusMap().set(personKey, statusKey, days); }
      */
+
+    /**
+     * позиция баланса предустанавливается - нужно для Сравнителей - utils.AccountBalanceComparator#compare
+     * @param key
+     * @return
+     */
+    public Tuple2<BigDecimal, BigDecimal> getBalanceInSettedPosition(long key) {
+        return getBalanceInPosition(DCSet.getInstance(), key, this.viewBalancePosition);
+    }
+    /**
+     * в заданной позиции баланс взять
+     * @param key
+     * @param position
+     * @return
+     */
+    public Tuple2<BigDecimal, BigDecimal> getBalanceInPosition(long key, int position) {
+        return getBalanceInPosition(DCSet.getInstance(), key, position);
+    }
+
+    public Tuple2<BigDecimal, BigDecimal> getBalanceInPosition(DCSet dcSet, long key, int position) {
+        switch (position) {
+            case TransactionAmount.ACTION_SEND:
+                return this.getBalance(dcSet, key).a;
+            case TransactionAmount.ACTION_DEBT:
+                return this.getBalance(dcSet, key).b;
+            case TransactionAmount.ACTION_HOLD:
+                return this.getBalance(dcSet, key).c;
+            case TransactionAmount.ACTION_SPEND:
+                return this.getBalance(dcSet, key).d;
+            case TransactionAmount.ACTION_PLEDGE:
+                return this.getBalance(dcSet, key).e;
+        }
+
+        return null;
+    }
+
 
     public Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> getBalance(
             long key) {
@@ -758,11 +799,12 @@ public class Account {
         }
 
         boolean statusBad = Controller.getInstance().getStatus() != Controller.STATUS_OK;
+        Tuple2<BigDecimal, BigDecimal> balance = this.getBalanceInSettedPosition(key);
 
-        return (statusBad ? "??? " : "") + NumberAsString.formatAsString(this.getBalanceUSE(key)) + " {"
-                //+ NumberAsString.formatAsString(this.getBalanceUSE(FEE_KEY))
-                + viewFEEbalance()
-                + "}" + " " + addressStr + "" + personStr;
+        return (statusBad ? "??? " : "")
+                + (balance == null? "" : NumberAsString.formatAsString(balance.b) + " ")
+                + (key == Transaction.FEE_KEY?" " : "{" + viewFEEbalance() + "} ")
+                + addressStr + "" + personStr;
     }
 
     //////////
@@ -790,6 +832,15 @@ public class Account {
             String personStr = personChar(personRes) + personRes.b.getShort();
             String addressStr = this.getAddress().substring(1, 7);
             return addressStr + "" + personStr;
+        }
+    }
+
+    public String getPersonOrShortAddress(int max) {
+        Tuple2<Integer, PersonCls> personRes = this.getPerson();
+        if (personRes == null) {
+            return GenesisBlock.CREATOR.equals(this) ? "GENESIS" : this.getAddress().substring(0, max) + "~";
+        } else {
+            return "[" + personRes.b.getKey() + "]" + personRes.b.getName();
         }
     }
 
@@ -870,11 +921,13 @@ public class Account {
         return isPerson(DCSet.getInstance(), Controller.getInstance().getMyHeight());
     }
 
-    /*
-     * public void setForgingData(DBSet db, int height, int prevHeight) {
-     * db.getAddressForging().set(this.address, height, prevHeight); }
-     */
 
+    /**
+     * Обновляет данные о персоне даже если они уже были записаны
+     * @param dcSet
+     * @param forHeight
+     * @return
+     */
     public Tuple2<Integer, PersonCls> getPerson(DCSet dcSet, int forHeight) {
 
         // IF DURATION ADDRESS to PERSON IS ENDED
@@ -912,8 +965,15 @@ public class Account {
 
     }
 
+    /**
+     * берет данные из переменной локальной если там что-то было
+     * @return
+     */
     public Tuple2<Integer, PersonCls> getPerson() {
-        return getPerson(DCSet.getInstance(), Controller.getInstance().getMyHeight());
+        if (person == null) {
+            person = getPerson(DCSet.getInstance(), Controller.getInstance().getMyHeight());
+        }
+        return person;
     }
 
     // previous forging block or changed ERA volume

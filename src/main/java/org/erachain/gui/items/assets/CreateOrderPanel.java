@@ -7,7 +7,8 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.AccountRenderer;
+import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -39,11 +40,11 @@ public class CreateOrderPanel extends JPanel {
     private AssetCls want;
     private JButton sellButton;
     private JComboBox<String> txtFeePow;
-    private JTextField txtBuyingAmount;
+    private JTextField txtWantAmount;
     private JTextPane superHintText;
     private boolean SHOW_HINTS = false;
     boolean needUpdatePrice = false;
-    boolean noUpdatePrice = false;
+    boolean noUpdateFields = false;
     
     public CreateOrderPanel(AssetCls have, AssetCls want, boolean buying, String account) {
         this.setLayout(new GridBagLayout());
@@ -134,8 +135,9 @@ public class CreateOrderPanel extends JPanel {
         detailGBC.gridx = 0;
         detailGBC.gridy = ++detailGBC.gridy;
         detailGBC.gridwidth = 3;
-        this.cbxAccount = new JComboBox<Account>(new AccountsComboBoxModel());
+        this.cbxAccount = new JComboBox<Account>(new AccountsComboBoxModel(TransactionAmount.ACTION_SEND));
         this.cbxAccount.setRenderer(new AccountRenderer(this.have.getKey()));
+
         // select accounts in combobox
         if (account != "" && account != null) {
             for (int i = 0; this.cbxAccount.getModel().getSize() > i; i++) {
@@ -202,58 +204,32 @@ public class CreateOrderPanel extends JPanel {
             this.add(priceHintLabel, assetHintGBC);
         }
 
-        if (false & buying) {
-            /*
-             * //LABEL BUYING PRICE labelGBC.gridy++; JLabel buyingPriceLabel =
-             * new JLabel(Lang.getInstance().translate("Buying price") + ":");
-             * this.add(buyingPriceLabel, labelGBC);
-             *
-             * //BUYING PRICE detailGBC.gridy++; txtBuyingPrice = new
-             * JTextField(); txtBuyingPrice.setEnabled(false);
-             * this.add(txtBuyingPrice, detailGBC);
-             *
-             * //ASSET HINT assetHintGBC.gridy = detailGBC.gridy; JLabel
-             * buyingPriceHintLabel = new JLabel( have.getShort() );
-             * this.add(buyingPriceHintLabel, assetHintGBC);
-             *
-             * //ON PRICE CHANGE txtPrice.getDocument().addDocumentListener(new
-             * DocumentListener() { public void changedUpdate(DocumentEvent e) {
-             * calculateBuyingPrice(txtBuyingPrice); }
-             *
-             * public void removeUpdate(DocumentEvent e) {
-             * calculateBuyingPrice(txtBuyingPrice); }
-             *
-             * public void insertUpdate(DocumentEvent e) {
-             * calculateBuyingPrice(txtBuyingPrice); } });
-             */
-        } else {
-            // ON PRICE CHANGE
-            txtPrice.getDocument().addDocumentListener(new DocumentListener() {
-                @Override
-                public void changedUpdate(DocumentEvent e) {
-                    if (!noUpdatePrice) {
-                        needUpdatePrice = false;
-                        calculateBuyingAmount(txtBuyingAmount, buying);
-                    }
-                }
+        // ON PRICE CHANGE
+        txtPrice.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                if (noUpdateFields) return;
 
-                @Override
-                public void removeUpdate(DocumentEvent e) {
-                    if (!noUpdatePrice) {
-                        needUpdatePrice = false;
-                        calculateBuyingAmount(txtBuyingAmount, buying);
-                    }
-                }
+                needUpdatePrice = false;
+                calculateBuyingAmount(txtWantAmount, buying);
+            }
 
-                @Override
-                public void insertUpdate(DocumentEvent e) {
-                    if (!noUpdatePrice) {
-                        needUpdatePrice = false;
-                        calculateBuyingAmount(txtBuyingAmount, buying);
-                    }
-                }
-            });
-        }
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                if (noUpdateFields) return;
+
+                needUpdatePrice = false;
+                calculateBuyingAmount(txtWantAmount, buying);
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                if (noUpdateFields) return;
+
+                needUpdatePrice = false;
+                calculateBuyingAmount(txtWantAmount, buying);
+            }
+        });
 
         // LABEL AMOUNT
         labelGBC.gridy++;
@@ -267,11 +243,39 @@ public class CreateOrderPanel extends JPanel {
 
         // AMOUNT
         detailGBC.gridy++;
-        txtBuyingAmount = new JTextField();
-        txtBuyingAmount.setEditable(false);
-        txtBuyingAmount.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        txtWantAmount = new JTextField();
+        /////////txtWantAmount.setEditable(false);
+        txtWantAmount.setHorizontalAlignment(javax.swing.JTextField.LEFT);
 
-        this.add(txtBuyingAmount, detailGBC);
+        this.add(txtWantAmount, detailGBC);
+
+        // ON PRICE CHANGE
+        txtWantAmount.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                if (noUpdateFields) return;
+
+                needUpdatePrice = false;
+                calculateSellingAmount(txtAmountHave, buying);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                if (noUpdateFields) return;
+
+                needUpdatePrice = false;
+                calculateSellingAmount(txtAmountHave, buying);
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                if (noUpdateFields) return;
+
+                needUpdatePrice = false;
+                calculateSellingAmount(txtAmountHave, buying);
+            }
+        });
+
 
         // ASSET HINT
         assetHintGBC.gridy = detailGBC.gridy;
@@ -284,20 +288,26 @@ public class CreateOrderPanel extends JPanel {
         txtAmountHave.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent e) {
-                needUpdatePrice = true;
-                calculateBuyingAmount(txtBuyingAmount, buying);
+                if (noUpdateFields) return;
+
+                needUpdatePrice = false;
+                calculateBuyingAmount(txtWantAmount, buying);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                needUpdatePrice = true;
-                calculateBuyingAmount(txtBuyingAmount, buying);
+                if (noUpdateFields) return;
+
+                needUpdatePrice = false;
+                calculateBuyingAmount(txtWantAmount, buying);
             }
 
             @Override
             public void insertUpdate(DocumentEvent e) {
-                needUpdatePrice = true;
-                calculateBuyingAmount(txtBuyingAmount, buying);
+                if (noUpdateFields) return;
+
+                needUpdatePrice = false;
+                calculateBuyingAmount(txtWantAmount, buying);
             }
         });
 
@@ -323,11 +333,11 @@ public class CreateOrderPanel extends JPanel {
         labelGBC.gridwidth = 3;
 
         superHintText = new JTextPane();
-        superHintText.setEditable(false);
+        ///////superHintText.setEditable(false);
         superHintText.setBackground(this.getBackground());
         superHintText.setContentType("text/html");
 
-        superHintText.setFont(txtBuyingAmount.getFont());
+        superHintText.setFont(txtWantAmount.getFont());
         superHintText.setText("<html><body style='font-size: 100%'>&nbsp;<br>&nbsp;<br></body></html>");
 
         // superHintText.setPreferredSize(new Dimension(125, 40));
@@ -382,7 +392,7 @@ public class CreateOrderPanel extends JPanel {
                             + "<b>%buyingamount%&nbsp;%want%</b>.")
                     .replace("%amount%", this.txtAmountHave.getText()).replace("%have%", have.getShort())
                     .replace("%price%", this.txtPrice.getText()).replace("%want%", want.getShort())
-                    .replace("%buyingamount%", this.txtBuyingAmount.getText()) + "</body></html>");
+                    .replace("%buyingamount%", this.txtWantAmount.getText()) + "</body></html>");
     }
 
     /*
@@ -392,7 +402,7 @@ public class CreateOrderPanel extends JPanel {
      * divide(price, RoundingMode.DOWN).toPlainString()); } catch(Exception e) {
      * target.setText("0"); }
      *
-     * calculateBuyingAmount(txtBuyingAmount, buying); }
+     * calculateBuyingAmount(txtWantAmount, buying); }
      */
 
     public void calculateBuyingAmount(JTextField target, boolean buying) {
@@ -409,34 +419,83 @@ public class CreateOrderPanel extends JPanel {
             if (buying) {
                 result = price.multiply(amount).setScale(have.getScale(), RoundingMode.HALF_DOWN);
                 if (needUpdatePrice && txtAmountHave.getText().length() > 0) {
-                    noUpdatePrice = true;
+                    noUpdateFields = true;
                     txtPrice.setText(Order.calcPrice(amount, result, 2).toPlainString());
-                    noUpdatePrice = false;
+                    noUpdateFields = false;
                 }
 
             } else {
                 result = price.multiply(amount).setScale(want.getScale(), RoundingMode.HALF_DOWN);
                 if (needUpdatePrice && txtAmountHave.getText().length() > 0) {
-                    noUpdatePrice = true;
+                    noUpdateFields = true;
                     txtPrice.setText(Order.calcPrice(amount, result, 2).toPlainString());
-                    noUpdatePrice = false;
+                    noUpdateFields = false;
                 }
             }
+
+            noUpdateFields = true;
             target.setText(result.toPlainString());
+            noUpdateFields = false;
 
             BigDecimal r = new BigDecimal(target.getText());
             if (r.signum() != 0)
                 sellButton.setEnabled(true);
         } catch (Exception e) {
-            if (i == 1)
-                target.setText("Error: Field 1 must be number. Format ###.#");
-            if (i == 2)
-                target.setText("Error: Field 2 must be number. Format ###.#");
-            // target.setText("0");
             sellButton.setEnabled(false);
         }
 
-        // calculateHint();
+        try {
+            BigDecimal value = new BigDecimal(target.getText());
+            if (value.signum() <= 0 ) {
+                sellButton.setEnabled(false);
+            }
+        } catch (Exception e) {
+            sellButton.setEnabled(false);
+        }
+
+        noUpdateFields = false;
+
+    }
+
+    public void calculateSellingAmount(JTextField target, boolean buying) {
+
+        int i = 1;
+        try {
+
+            BigDecimal amount = new BigDecimal(txtWantAmount.getText());
+            i++;
+            BigDecimal price = new BigDecimal(txtPrice.getText());
+
+            BigDecimal result;
+
+            if (buying) {
+                result = amount.divide(price, have.getScale(), RoundingMode.HALF_DOWN);
+            } else {
+                result = amount.divide(price, want.getScale(), RoundingMode.HALF_DOWN);
+            }
+
+            noUpdateFields = true;
+            target.setText(result.toPlainString());
+            noUpdateFields = false;
+
+            BigDecimal r = new BigDecimal(target.getText());
+            if (r.signum() != 0)
+                sellButton.setEnabled(true);
+        } catch (Exception e) {
+            sellButton.setEnabled(false);
+        }
+
+        try {
+            BigDecimal value = new BigDecimal(target.getText());
+            if (value.signum() <= 0 ) {
+                sellButton.setEnabled(false);
+            }
+        } catch (Exception e) {
+            sellButton.setEnabled(false);
+        }
+
+        noUpdateFields = false;
+
     }
 
     public void onSellClick(boolean buying) {
@@ -476,7 +535,7 @@ public class CreateOrderPanel extends JPanel {
             // READ PRICE
             parse = 2;
             // price = new BigDecimal(this.txtPrice.getText());
-            amountWant = new BigDecimal(this.txtBuyingAmount.getText());
+            amountWant = new BigDecimal(this.txtWantAmount.getText());
 
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -558,6 +617,7 @@ public class CreateOrderPanel extends JPanel {
 
         CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) transaction);
         dd.jScrollPane1.setViewportView(ww);
+        dd.pack();
         dd.setLocationRelativeTo(null);
         dd.setVisible(true);
 
@@ -574,7 +634,7 @@ public class CreateOrderPanel extends JPanel {
 
                 // this.txtFeePow.setText("0");
                 this.txtAmountHave.setText("0");
-                this.txtPrice.setText("0");
+                //this.txtPrice.setText("0");
 
             } else {
                 JOptionPane.showMessageDialog(new JFrame(),

@@ -6,6 +6,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ItemSplitPanel;
 import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -22,13 +23,21 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
 
         JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
 
-        sell.addActionListener(e -> new ExchangeFrame((AssetCls) itemMenu, null, "To sell", ""));
+        sell.addActionListener(e ->
+                //new ExchangeFrame((AssetCls) itemMenu, null, "To sell", "")
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemMenu, null, "To sell", ""))
+        );
 
         JMenuItem exchange = new JMenuItem(Lang.getInstance().translate("Exchange"));
-        exchange.addActionListener(e -> new ExchangeFrame((AssetCls) itemMenu, null, "", ""));
+        exchange.addActionListener(e ->
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemMenu, null, "", ""))
+        );
 
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
-        buy.addActionListener(e -> new ExchangeFrame((AssetCls) itemMenu, null, "Buy", ""));
+        buy.addActionListener(e ->
+                //new ExchangeFrame((AssetCls) itemMenu, null, "Buy", "")
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemMenu, null, "Buy", ""))
+        );
 
         JMenuItem vouchMenu = new JMenuItem(Lang.getInstance().translate("Vouch"));
         vouchMenu.addActionListener(e -> {

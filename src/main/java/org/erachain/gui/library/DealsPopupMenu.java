@@ -4,9 +4,11 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base32;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.accounts.*;
-import org.erachain.gui.items.mails.MailSendDialog;
+import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.models.AccountsTableModel;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -37,31 +39,34 @@ public class DealsPopupMenu extends JPopupMenu {
         this.tableModel = tableModel;
         this.table = table;
         this.assetSelector = assetSelector;
-        
-        sendAsset = new JMenuItem();
-        sendAsset.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                new AccountSendDialog(asset, pubKey, null, null);
 
-            }
-        });
-        this.add(sendAsset);
-
-        this.addSeparator();
-        sendMail = new JMenuItem();
+        sendMail = new JMenuItem(Lang.getInstance().translate("Send mail"));
         sendMail.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new MailSendDialog(asset, pubKey, null, null);
+                MainPanel.getInstance().insertTab(new MailSendPanel(pubKey, null, null));
             }
         });
         this.add(sendMail);
 
         this.addSeparator();
 
+        sendAsset = new JMenuItem(Lang.getInstance().translate("Send"));
+        sendAsset.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // AccountAssetLendPanel
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(asset, TransactionAmount.ACTION_SEND, pubKey, null, null, null));
+
+            }
+        });
+        this.add(sendAsset);
+
+        this.addSeparator();
+
         debtAsset = new JMenuItem(Lang.getInstance().translate("Lend"));
         debtAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new AccountLendDialog(asset, pubKey);
+                //new AccountLendDialog(asset, pubKey);
+                MainPanel.getInstance().insertTab(new AccountAssetLendPanel(asset, pubKey, null, null));
 
             }
         });
@@ -70,7 +75,9 @@ public class DealsPopupMenu extends JPopupMenu {
         debtAssetReturn = new JMenuItem(Lang.getInstance().translate("Repay Debt"));
         debtAssetReturn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new AccountRepayDebtDialog(asset, pubKey);
+
+                MainPanel.getInstance().insertTab(new AccountAssetRepayDebtPanel(asset, pubKey, null, null));
+
             }
         });
         this.add(debtAssetReturn);
@@ -79,7 +86,9 @@ public class DealsPopupMenu extends JPopupMenu {
         debtAssetBackward = new JMenuItem(Lang.getInstance().translate("Confiscate Debt"));
         debtAssetBackward.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new AccountConfiscateDebtDialog(asset, pubKey);
+
+                MainPanel.getInstance().insertTab(new AccountAssetConfiscateDebtPanel(asset, pubKey, null, null));
+
             }
         });
         this.add(debtAssetBackward);
@@ -89,7 +98,8 @@ public class DealsPopupMenu extends JPopupMenu {
         holdAsset = new JMenuItem(Lang.getInstance().translate("Hold"));
         holdAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new AccountTakeHoldDialog(asset, pubKey);
+
+                MainPanel.getInstance().insertTab(new AccountAssetHoldPanel(asset, pubKey, null, null));
 
             }
         });

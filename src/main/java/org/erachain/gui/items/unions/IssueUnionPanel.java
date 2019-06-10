@@ -7,6 +7,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.IssueUnionRecord;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
@@ -268,7 +269,7 @@ public class IssueUnionPanel extends JPanel {
         add(feeJLabel, gridBagConstraints);
 
 
-        cbxFrom = new JComboBox<>(new AccountsComboBoxModel());
+        cbxFrom = new JComboBox<>(new AccountsComboBoxModel(TransactionAmount.ACTION_SEND));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;

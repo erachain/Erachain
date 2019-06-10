@@ -5,15 +5,17 @@ import com.google.common.io.Files;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.AccountsPropertisMap;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.items.mails.MailSendDialog;
+import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.WalletItemImprintsTableModel;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
@@ -217,27 +219,34 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
         });
         menu.add(menu_copyPublicKey);
 
-        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
-        Send_Coins_item_Menu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
-                Account account = new Account(account1.getA());
-                new AccountSendDialog(null, null, account, null);
-
-            }
-        });
-        menu.add(Send_Coins_item_Menu);
+        menu.addSeparator();
 
         JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
                 Account account = new Account(account1.getA());
-                new MailSendDialog(null, null, account, null);
 
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
             }
         });
         menu.add(Send_Mail_item_Menu);
+
+        menu.addSeparator();
+
+        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
+        Send_Coins_item_Menu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
+                Account accountTo = new Account(account1.getA());
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
+                        null, accountTo, null, null));
+
+            }
+        });
+        menu.add(Send_Coins_item_Menu);
+
+        menu.addSeparator();
 
         JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Edit name"));
         setName.addActionListener(new ActionListener() {

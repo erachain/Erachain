@@ -1,9 +1,9 @@
 // select view format 
 function fformat(text){
 
-if (text == null || text.lenght == 0) return "";
+if (text == null || text.length == 0) return "";
 text = text.toString();
-if (text.lenght <5) return text;
+if (text.length <5) return text;
 
 var pref1 = text.substring(0,1);
 var pref2 = text.substring(1,2);
@@ -30,10 +30,9 @@ return htmlFilter(wordwrap(text, 0, '\n', true));
 
 }
 
-function convertTimestamp(timestamp) {
+function convertTimestamp(timestamp, withYear) {
     if (timestamp == null) return '';
     var date = new Date(timestamp);
-    var year = date.getFullYear();
     var month = date.getMonth() + 1;
     if (month < 10) month = '0' + month;
     var day = date.getDate();
@@ -45,7 +44,11 @@ function convertTimestamp(timestamp) {
     var seconds = date.getSeconds();
     if (seconds < 10) seconds = '0' + seconds;
 
-    return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+    if (withYear) {
+        var year = date.getFullYear();
+        return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+    }
+    return month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
 
 }
 
@@ -64,4 +67,41 @@ function escapeHtml(string) {
   return String(string).replace(/[&<>"'`=\/]/g, function (s) {
     return entityMap[s];
   });
+}
+
+function cut(string, max) {
+    if (string.length > max)
+        return string.substring(0,max) + '.';
+
+    return string;
+}
+
+function cutBlank(string, max) {
+    if (string.length > max) {
+        var words = string.split(' ');
+        var result = "";
+        for (index in words) {
+            if (index == 0)
+                result += words[0];
+            else if (index == 1) {
+                if (result.length + 3 < max)
+                    result += words[index].substring(0,3) + '.';
+                else
+                    result += words[index].substring(0,1) + '.';
+            }
+            else
+                if (result.length + 3 < max)
+                    result += words[index].substring(0,3) + '.';
+                else
+                    result += words[index].substring(0,1) + '.';
+
+            if (result > max) break;
+
+            result += ' ';
+        }
+
+        return result;
+    }
+
+    return string;
 }

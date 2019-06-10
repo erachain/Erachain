@@ -31,8 +31,8 @@ public class AccountsTableModel extends TimerTableModelCls<PublicKeyAccount> imp
     public static final int COLUMN_BALANCE_1 = 3;
     public static final int COLUMN_BALANCE_2 = 4;
     public static final int COLUMN_BALANCE_3 = 5;
-    public static final int COLUMN_BALANCE_4 = 6;
-    public static final int COLUMN_FEE_BALANCE = 7;
+    public static final int COLUMN_BALANCE_4 = -6;
+    public static final int COLUMN_FEE_BALANCE = 6;
     public final int COLUMN_NO = 0;
     private AssetCls asset;
     private Long assetKey;

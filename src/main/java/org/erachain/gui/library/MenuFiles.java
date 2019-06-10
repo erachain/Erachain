@@ -2,10 +2,13 @@ package org.erachain.gui.library;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.*;
 import org.erachain.gui.create.LicenseJFrame;
-import org.erachain.gui.items.accounts.AccountSendDialog;
+import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.settings.SettingsFrame;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -201,12 +204,19 @@ public class MenuFiles extends JMenu {
                     String head = (String) js.get("head");
                     if (!js.containsKey("amount")) return;
                     String amount = (String) js.get("amount");
-                    AccountSendDialog dd = new AccountSendDialog(ct.getAsset(assetKey), ct.getAccountByAddress((String) creator), ct.getAccountByAddress(recipient), null);
-                    dd.panel.jTextField_To.setEditable(false);
-                    dd.panel.jTextField_Mess_Title.setEditable(false);
-                    dd.panel.jTextField_Ammount.setEditable(false);
-                    dd.panel.jComboBox_Asset.enable(false);
-                    dd.sertParams(amount, "", head);
+                    AccountAssetSendPanel panel = new AccountAssetSendPanel(ct.getAsset(assetKey), TransactionAmount.ACTION_SEND,
+                            ct.getAccountByAddress(creator), ct.getAccountByAddress(recipient), null, null);
+                    MainPanel.getInstance().insertTab(panel);
+
+                    AssetCls asset = ct.getAsset(assetKey);
+                    panel.jTextField_To.setText(recipient);
+                    panel.jTextField_To.setEditable(false);
+                    panel.jTextField_Mess_Title.setText(head);
+                    panel.jTextField_Mess_Title.setEditable(false);
+                    panel.jTextField_Amount.setText(amount);
+                    panel.jTextField_Amount.setEditable(false);
+                    panel.jComboBox_Asset.setSelectedItem(asset);
+                    panel.jComboBox_Asset.setEnabled(false);
                 } catch (Exception e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
@@ -225,8 +235,10 @@ public class MenuFiles extends JMenu {
             public void actionPerformed(ActionEvent e) {
                 //  new SettingsFrame();
                 // no receive
-                AccountSendDialog dd = new AccountSendDialog(null, null, null, null, false);
-                
+                //AccountSendDialog dd = new AccountSendDialog(null, null, null, null, false);
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
+                        null, null, null, null));
+
 
             }
         });

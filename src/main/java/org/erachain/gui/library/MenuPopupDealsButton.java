@@ -1,10 +1,10 @@
 package org.erachain.gui.library;
 
-import org.erachain.gui.items.accounts.AccountConfiscateDebtDialog;
-import org.erachain.gui.items.accounts.AccountLendDialog;
-import org.erachain.gui.items.accounts.AccountRepayDebtDialog;
-import org.erachain.gui.items.accounts.AccountTakeHoldDialog;
+import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.gui.items.accounts.*;
+import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -52,13 +52,24 @@ public class MenuPopupDealsButton extends JButton {
         dealsMenu = new JPopupMenu("popup menu");
 
         // DEALS
+
+        JMenuItem Send_Mail_Creator = new JMenuItem(Lang.getInstance().translate("Send Mail"));
+        Send_Mail_Creator.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null));
+            }
+        });
+        dealsMenu.add(Send_Mail_Creator);
+
         // Send
         JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Send"));
         dealsMenuSendMessage.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
         dealsMenuSendMessage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //
-                //Library.selectOrAdd(new SendFrame(null, null), MainFrame.getInstance().desktopPane.getAllFrames());
+
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND, null, null, null, null));
+
             }
         });
         dealsMenu.add(dealsMenuSendMessage);
@@ -77,16 +88,15 @@ public class MenuPopupDealsButton extends JButton {
 
         dealsMenu.addSeparator();
 
-
         // Take on HOLD
 
         JMenuItem dealsMenu_Take_On_Hold = new JMenuItem(Lang.getInstance().translate("Take on Hold"));
         //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
         dealsMenu_Take_On_Hold.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                new AccountTakeHoldDialog(null, null);
+
+                MainPanel.getInstance().insertTab(new AccountAssetHoldPanel(null, null, null, null));
+
             }
         });
         dealsMenu.add(dealsMenu_Take_On_Hold);
@@ -100,9 +110,9 @@ public class MenuPopupDealsButton extends JButton {
         //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
         dealsMenuLend.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                new AccountLendDialog(null, null);
+
+                MainPanel.getInstance().insertTab(new AccountAssetLendPanel(null, null, null, null));
+
             }
         });
         dealsMenu.add(dealsMenuLend);
@@ -114,9 +124,9 @@ public class MenuPopupDealsButton extends JButton {
         //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
         dealsMenu_Confiscate_Debt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                new AccountConfiscateDebtDialog(null, null);
+
+                MainPanel.getInstance().insertTab(new AccountAssetConfiscateDebtPanel(null, null, null, null));
+
             }
         });
         dealsMenu.add(dealsMenu_Confiscate_Debt);
@@ -127,9 +137,9 @@ public class MenuPopupDealsButton extends JButton {
         //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
         dealsMenu_Repay_Debt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                new AccountRepayDebtDialog(null, null);
+
+                MainPanel.getInstance().insertTab(new AccountAssetRepayDebtPanel(null, null, null, null));
+
             }
         });
         dealsMenu.add(dealsMenu_Repay_Debt);

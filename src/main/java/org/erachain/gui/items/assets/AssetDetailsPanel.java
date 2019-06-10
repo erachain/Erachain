@@ -20,6 +20,8 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.items.accounts.AccountAssetRepayDebtPanel;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
 public class AssetDetailsPanel extends JPanel {
@@ -215,8 +217,7 @@ public class AssetDetailsPanel extends JPanel {
     public void onOpenPairClick() {
 
         String action = null;
-        //	new AssetPairSelect(this.asset.getKey(), action, "");
-        new ExchangeFrame(this.asset, null, action, "");
+        MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, action, ""));
 
     }
 

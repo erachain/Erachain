@@ -6,6 +6,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemSplitPanel;
 import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -34,7 +35,9 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
         sell.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new ExchangeFrame((AssetCls) th.itemMenu, null, "To sell", "");
+                //new ExchangeFrame((AssetCls) th.itemMenu, null, "To sell", "");
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemMenu, null, "To sell", ""));
+
             }
         });
 
@@ -42,7 +45,8 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new ExchangeFrame((AssetCls) th.itemMenu, null, "", "");
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls)th.itemMenu, null, "", ""));
+
             }
         });
 
@@ -50,7 +54,8 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new ExchangeFrame((AssetCls) th.itemMenu, null, "Buy", "");
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) th.itemMenu, null, "Buy", ""));
+
             }
         });
 
@@ -99,7 +104,8 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
     @Override
     protected void tableMouse2Click(ItemCls item) {
 
-        new ExchangeFrame((AssetCls) item, null, "", "");
+        MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) item, null, "", ""));
+
     }
 
 }
