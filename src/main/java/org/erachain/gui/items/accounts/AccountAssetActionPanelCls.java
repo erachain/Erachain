@@ -24,7 +24,6 @@ import org.erachain.utils.NameUtils;
 import org.erachain.utils.NameUtils.NameResult;
 import org.erachain.utils.Pair;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -32,9 +31,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -84,7 +80,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
     private AccountsComboBoxModel accountsModel;
 
     public AccountAssetActionPanelCls(AssetCls assetIn, int balancePosition,
-                                      Account accountFrom, Account accountTo) {
+                                      Account accountFrom, Account accountTo, String message) {
 
         setName("Send");
         if (assetIn == null)
@@ -96,7 +92,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         recipient = accountTo;
         this.balancePosition = balancePosition;
 
-        initComponents();
+        initComponents(message);
 
         //this.jComboBox_Asset.setEnabled(assetIn != null);
 
@@ -446,7 +442,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
-    private void initComponents() {
+    private void initComponents(String message) {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jLabel_Recive_Detail = new javax.swing.JLabel();
@@ -572,6 +568,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
         jTextArea_Description.setColumns(20);
         jTextArea_Description.setRows(5);
+        jTextArea_Description.setText(message == null? "" : message);
         jScrollPane1.setViewportView(jTextArea_Description);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
