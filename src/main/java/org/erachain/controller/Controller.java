@@ -93,8 +93,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.11.14 beta dev";
-    public static String buildTime = "2019-05-17 13:33:33 UTC";
+    public static String version = "4.11.15 beta dev";
+    public static String buildTime = "2019-06-10 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
