@@ -1045,20 +1045,21 @@ button.white-bgc[disabled]:focus,
             output +='<div class="row"><div class="col-lg-5" style="padding-left:5em;">';
             output += '<h4>' + data.label_Orders + '</h4>';
 
-            output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="width:100%; border: 1px solid #ddd; margin-bottom: 0px;">';
+            output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped"'
+                + 'style="width:100%; border: 1px solid #ddd; margin-bottom: 0px;">';
 
             var width = data.sellsSumAmountGood;
             for (key in data.sells) {
 
-                output += '<tr><td style="position:absolute; z-index:-1; padding:0px; background-color:#ffe4e4; height:50px; width:'
-                    + 85 * width / data.sellsSumAmountGood + '%;"></tr>';
-                    // 90 потому что 5% отступы у таблицы
-
                 width -= data.sells[key].amount;
 
-                output += '<tr style="background-color:transparent;">';
-                output += '<td><a href ="?address=' + data.sells[key].creator_addr + get_lang() + '">' +
-                        data.sells[key].creator + '</a>';
+                output += '<tr style="background-color: transparent">';
+
+                output += '<td style="position: relative">';
+                output += '<span style="z-index: -1; width:' + 250 * width / data.sellsSumAmountGood
+                        + '%; position:absolute; background-color:#ffe4e4; top: 0; bottom: 0; left: 0;"></span>';
+                output += '<span style="position: relat-ive;">'
+                        + '<a href ="?address=' + data.sells[key].creator_addr + get_lang() + '">' + data.sells[key].creator + '</a></span>';
                 output += '<td><a href=?tx=' + key + get_lang() + ' style="font-size:1.3em">' + addCommas(data.sells[key].price) + '</a>';
                 output += '<td align=right><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].amount) + '</a></tr>';
 
@@ -1083,12 +1084,12 @@ button.white-bgc[disabled]:focus,
 
                 width += 1 * data.buys[key].buyingAmount; // преобразование строки в число
                 var eee = 100 * width / data.buysSumAmountGood;
-                output += '<tr><td style="position:absolute; z-index:-1; padding:0px; background-color:#cdfdcc; height:50px; width:'
-                    + 85 * width / data.buysSumAmountGood + '%;"></tr>';
-                    // 90 потому что 5% отступы у таблицы
 
-                output += '<tr style="background-color:transparent;">';
-                output += '<td align=right><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a>';
+                output += '<tr style="background-color: transparent">';
+                output += '<td style="position: relative" align=right>'
+                output += '<span style="position:absolute; z-index: -1; background-color:#cdfdcc; width:'
+                    + 250 * width / data.buysSumAmountGood + '%; top: 0; bottom: 0; left: 0;"></span>';
+                    + '<span style="position: relative;"><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a></span>';
                 output += '<td><a href=?tx=' + key + get_lang() + ' style="font-size:1.3em">' + addCommas(data.buys[key].buyingPrice) + '</a>';
                 output += '<td><a href ="?address=' + data.buys[key].creator_addr + get_lang() + '">' +
                         data.buys[key].creator + '</a>';
