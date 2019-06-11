@@ -70,9 +70,12 @@ function exchange(data){
                     output += '<td align=right>' + addCommas(trade.amountHave);
                     //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 
-                    output += '<td align=left><span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.4em"></span>'
-                        + '<span style="font-size:1.4em">' + addCommas(trade.realReversePrice) + '</span>';
-                    ///output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                    if (trade.unchecked == true) {}
+                    else {
+                        output += '<td align=left><span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.4em"></span>'
+                            + '<span style="font-size:1.4em">' + addCommas(trade.realReversePrice) + '</span>';
+                        ///output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                    }
 
                     //output += '<td>' + addCommas(trade.amountWant);
                     //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
@@ -80,9 +83,12 @@ function exchange(data){
                     output += '<td align=right>' + addCommas(trade.amountHave);
                     //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 
-                    output += '<td align=left><span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.4em"></span>'
-                        + '<span style="font-size:1.4em">' + addCommas(trade.realPrice) + '</span>';
-                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName) + '';
+                    if (trade.unchecked == true) {}
+                    else {
+                        output += '<td align=left><span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.4em"></span>'
+                            + '<span style="font-size:1.4em">' + addCommas(trade.realPrice) + '</span>';
+                        //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName) + '';
+                    }
 
                     //output += '<td>' + addCommas(trade.amountWant);
                     //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);

@@ -1017,22 +1017,34 @@ public class BlockExplorer {
         long pairWantKey;
         long tempKey;
 
+        boolean unchecked = false;
+
         if (assetHaveIn == null) {
 
             pairHaveKey = trade.getHaveKey();
             pairWantKey = trade.getWantKey();
 
+            pairAssetHave = dcSet.getItemAssetMap().get(pairHaveKey);
+            pairAssetWant = dcSet.getItemAssetMap().get(pairWantKey);
+
+            /// если пару нужно перевернуть так как есть общепринятые пары
             if (pairHaveKey == 2L && pairWantKey == 1l
                     || pairHaveKey == 95l
                     || pairHaveKey > 33 && pairHaveKey < 1000
                             && (pairWantKey < 33 && pairWantKey > 1000)
                     || pairHaveKey > 10 && pairHaveKey < 33
-                    && (pairWantKey < 10)
+                        && (pairWantKey < 10)
+                    || pairAssetHave.isIndex() && pairHaveKey < pairWantKey
+                    || pairAssetHave.isInsideCurrency() && pairHaveKey < pairWantKey
+                    || pairHaveKey < 5 && pairWantKey > 1000
                 ) {
                 // swap pair
                 tempKey = pairHaveKey;
                 pairHaveKey = pairWantKey;
                 pairWantKey = tempKey;
+            } else if (pairHaveKey > 1000 && pairWantKey > 1000) {
+                unchecked = true;
+                tradeJSON.put("unchecked", true);
             }
 
             pairAssetHave = dcSet.getItemAssetMap().get(pairHaveKey);
