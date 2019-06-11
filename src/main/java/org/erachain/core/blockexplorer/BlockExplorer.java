@@ -1008,33 +1008,50 @@ public class BlockExplorer {
 
         Map tradeJSON = new HashMap();
 
-        AssetCls assetHave = assetHaveIn;
-        AssetCls assetWant = assetWantIn;
+        AssetCls pairAssetHave;
+        AssetCls pairAssetWant;
 
-        Long haveKey = null;
         Order orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
 
-        Order orderTarget = Order.getOrder(dcSet, trade.getTarget());
-        if (assetHave == null) {
-            tradeJSON.put("assetHaveKey", trade.getHaveKey());
-            assetHave = dcSet.getItemAssetMap().get(trade.getHaveKey());
-            tradeJSON.put("assetHaveName", assetHave.getName());
+        long pairHaveKey;
+        long pairWantKey;
+        long tempKey;
 
-            tradeJSON.put("assetWantKey", trade.getWantKey());
-            assetWant = dcSet.getItemAssetMap().get(trade.getWantKey());
-            tradeJSON.put("assetWantName", assetWant.getName());
+        if (assetHaveIn == null) {
 
-            /// тут нужно определиться с направлением
-            if (trade.getHaveKey().equals(Transaction.FEE_KEY)) {
-                haveKey = Transaction.FEE_KEY;
-            } else if (trade.getHaveKey().equals(12L)) { // BITCOIN
-                haveKey = 12L;
-            } else {
-                //haveKey = trade.getHaveKey();
+            pairHaveKey = trade.getHaveKey();
+            pairWantKey = trade.getWantKey();
+
+            if (pairHaveKey == 2L && pairWantKey == 1l
+                    || pairHaveKey == 95l
+                    || pairHaveKey > 33 && pairHaveKey < 1000
+                            && (pairWantKey < 33 && pairWantKey > 1000)
+                    || pairHaveKey > 10 && pairHaveKey < 33
+                    && (pairWantKey < 10)
+                ) {
+                // swap pair
+                tempKey = pairHaveKey;
+                pairHaveKey = pairWantKey;
+                pairWantKey = tempKey;
             }
+
+            pairAssetHave = dcSet.getItemAssetMap().get(pairHaveKey);
+            pairAssetWant = dcSet.getItemAssetMap().get(pairWantKey);
+
+            tradeJSON.put("assetHaveKey", pairAssetHave.getKey());
+            tradeJSON.put("assetHaveName", pairAssetHave.getName());
+
+            tradeJSON.put("assetWantKey", pairAssetWant.getKey());
+            tradeJSON.put("assetWantName", pairAssetWant.getName());
+
         } else {
-            haveKey = assetHave.getKey();
+            pairAssetHave = assetHaveIn;
+            pairAssetWant = assetWantIn;
+            pairHaveKey = pairAssetHave.getKey();
+            //pairWantKey = pairAssetWant.getKey();
         }
+
+        Order orderTarget = Order.getOrder(dcSet, trade.getTarget());
 
         tradeJSON.put("realPrice", trade.calcPrice().toPlainString());
         tradeJSON.put("realReversePrice", trade.calcPriceRevers().toPlainString());
@@ -1042,25 +1059,27 @@ public class BlockExplorer {
         tradeJSON.put("initiatorTx", Transaction.viewDBRef(orderInitiator.getId()));
         tradeJSON.put("initiatorCreator_addr", orderInitiator.getCreator().getAddress()); // viewCreator
         tradeJSON.put("initiatorCreator", orderInitiator.getCreator().getPersonOrShortAddress(12));
-        tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().setScale(assetHave.getScale()).toPlainString());
+        tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().setScale(pairAssetHave.getScale()).toPlainString());
 
         tradeJSON.put("targetTx", Transaction.viewDBRef(orderTarget.getId()));
         tradeJSON.put("targetCreator_addr", orderTarget.getCreator().getAddress()); // viewCreator
         tradeJSON.put("targetCreator", orderTarget.getCreator().getPersonOrShortAddress(12)); // viewCreator
-        tradeJSON.put("targetAmount", orderTarget.getAmountHave().setScale(assetHave.getScale()).toPlainString());
+        tradeJSON.put("targetAmount", orderTarget.getAmountHave().setScale(pairAssetHave.getScale()).toPlainString());
 
         tradeJSON.put("timestamp", trade.getTimestamp());
 
-        if (assetHaveIn == null || orderInitiator.getHave() == haveKey) {
+        if (pairHaveKey == orderInitiator.getHave()) {
             tradeJSON.put("type", "sell");
 
-            tradeJSON.put("amountHave", trade.getAmountWant().setScale(assetWant.getScale()).toPlainString());
-            tradeJSON.put("amountWant", trade.getAmountHave().setScale(assetHave.getScale()).toPlainString());
+            tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetWant.getScale()).toPlainString());
+            tradeJSON.put("amountWant", trade.getAmountHave().setScale(pairAssetHave.getScale()).toPlainString());
+
+
         } else {
             tradeJSON.put("type", "buy");
 
-            tradeJSON.put("amountHave", trade.getAmountHave().setScale(assetHave.getScale()).toPlainString());
-            tradeJSON.put("amountWant", trade.getAmountWant().setScale(assetWant.getScale()).toPlainString());
+            tradeJSON.put("amountHave", trade.getAmountHave().setScale(pairAssetHave.getScale()).toPlainString());
+            tradeJSON.put("amountWant", trade.getAmountWant().setScale(pairAssetWant.getScale()).toPlainString());
         }
 
         return tradeJSON;
@@ -2315,8 +2334,10 @@ public class BlockExplorer {
 
         int count = 25;
         Iterator<Tuple2<Long, Long>> iterator = trades.getIterator(0, true);
+
         while (count-- > 0 && iterator.hasNext()) {
             Trade trade = trades.get(iterator.next());
+
             tradesArray.add(tradeJSON(trade, null, null));
         }
 
