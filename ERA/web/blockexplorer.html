@@ -1081,12 +1081,13 @@ button.white-bgc[disabled]:focus,
             width = 0;
             for (key in data.buys) {
 
-                width += 1 * data.buys[key].buyingAmount; // преобразование строки в число
-
                 output += '<tr style="background-color: transparent">';
                 output += '<td style="position: relative" align=right>'
                 output += '<span style="position:absolute; z-index: -1; background-color:#cdfdcc; width:'
                     + 250 * width / data.buysSumAmountGood + '%; top: 0; bottom: 0; left: 0;"></span>';
+
+                width += 1 * data.buys[key].buyingAmount; // преобразование строки в число
+
                 output += '<span><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a></span>';
                 output += '<td><a href=?tx=' + key + get_lang() + ' style="font-size:1.3em">' + addCommas(data.buys[key].buyingPrice) + '</a>';
                 output += '<td><a href ="?address=' + data.buys[key].creator_addr + get_lang() + '">' +
