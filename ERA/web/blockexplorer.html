@@ -1056,7 +1056,7 @@ button.white-bgc[disabled]:focus,
                 output += '<tr><td style="position:absolute; z-index:-1; padding:0px; background-color:#ffe4e4; height:50px; width:'
                     + 90 * width / data.sellsSumAmountGood + '%;"></tr>';
 
-                output += '<tr>';
+                output += '<tr style="background-color:transparent;">';
                 output += '<td><a href ="?address=' + data.sells[key].creator_addr + get_lang() + '">' +
                         data.sells[key].creator + '</a>';
                 output += '<td><a href=?tx=' + key + get_lang() + ' style="font-size:1.3em">' + addCommas(data.sells[key].price) + '</a>';
@@ -1081,11 +1081,12 @@ button.white-bgc[disabled]:focus,
             width = 0;
             for (key in data.buys) {
 
-                width += data.buys[key].buyingAmount;
+                width += 1 * data.buys[key].buyingAmount;
+                var eee = 100 * width / data.buysSumAmountGood;
                 output += '<tr><td style="position:absolute; z-index:-1; padding:0px; background-color:#ffe4e4; height:50px; width:'
-                    + 100 * width / data.sellsSumAmountGood + '%;"></tr>';
+                    + 90 * width / data.buysSumAmountGood + '%;"></tr>';
 
-                output += '<tr>';
+                output += '<tr style="background-color:transparent;">';
                 output += '<td align=right><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a>';
                 output += '<td><a href=?tx=' + key + get_lang() + ' style="font-size:1.3em">' + addCommas(data.buys[key].buyingPrice) + '</a>';
                 output += '<td><a href ="?address=' + data.buys[key].creator_addr + get_lang() + '">' +
