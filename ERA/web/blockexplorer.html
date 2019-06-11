@@ -1047,13 +1047,20 @@ button.white-bgc[disabled]:focus,
 
             output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="width:100%; border: 1px solid #ddd; margin-bottom: 0px;">';
 
+            var width = data.sellsSumAmountGood;
+            var amount = 0;
             for (key in data.sells) {
+
+                width -= amount;
+                amount = data.sells[key].amount;
+                output += '<tr><td style="position:absolute; z-index:-1; padding:0px; background-color:#ffe4e4; height:50px; width:'
+                    + 90 * width / data.sellsSumAmountGood + '%;"></tr>';
 
                 output += '<tr>';
                 output += '<td><a href ="?address=' + data.sells[key].creator_addr + get_lang() + '">' +
                         data.sells[key].creator + '</a>';
                 output += '<td><a href=?tx=' + key + get_lang() + ' style="font-size:1.3em">' + addCommas(data.sells[key].price) + '</a>';
-                output += '<td align=right><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].amount) + '</a>';
+                output += '<td align=right><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].amount) + '</a></tr>';
 
             }
 
@@ -1064,14 +1071,19 @@ button.white-bgc[disabled]:focus,
 
             output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td width=40%><b>'
                 + data.label_Creator + ' / ' + data.label_Amount + '<td width=30% style="font-size:1.4em"><b>' + data.label_Price
-                + '</b></td><td width=40%><b>' + data.label_Amount + ' / ' + data.label_Creator + ':</b></td></tr>';
+                + '</b></td><td width=40%><b>' + data.label_Amount + ' / ' + data.label_Creator + '</b></td></tr>';
 
             output += '<tr bgcolor="#f9f9f9">';
             ///output += '<td><b>' + addCommas(data.buysSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-            output += ':<td><b>' +  addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+            output += '<td><b>' +  addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
             output += '<td>- ' + data.label_Total_For_Buy + '<td>';
 
+            width = 0;
             for (key in data.buys) {
+
+                width += data.buys[key].buyingAmount;
+                output += '<tr><td style="position:absolute; z-index:-1; padding:0px; background-color:#ffe4e4; height:50px; width:'
+                    + 100 * width / data.sellsSumAmountGood + '%;"></tr>';
 
                 output += '<tr>';
                 output += '<td align=right><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a>';
