@@ -41,9 +41,10 @@ function exchange(data){
 
     output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
     output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.label_Date;
-    output += '<td><b>' + data.label_Pair + '<td><b>' + data.label_Trade_Initiator;
-    output += '<td><b>' + data.label_Price + '<td align=center><b>' + data.label_Volume;
-    output += '<td><b>' + data.label_Position_Holder + '<tr>'
+    output += '<td align=center><b>' + data.label_Pair + '<td align=center><b>' + data.label_Trade_Initiator;
+    output += '<td align=center><b>' + data.label_Amount;
+    output += '<td align=center><b>' + data.label_Price;
+    output += '<td align=center><b>' + data.label_Position_Holder + '<tr>'
     //output += data.label_Total_Cost + '</b></td></tr>';
 
     for (key in data.lastTrades) {
@@ -65,8 +66,8 @@ function exchange(data){
             output += ' <b>&#9655;</b> ';
         }
 
+        output += '<td align=right>' + addCommas(trade.amountHave);
         output += '<td align=left><span style="font-size:1.4em">' + addCommas(trade.realReversePrice) + '</span>';
-        output += '<td>' + addCommas(trade.amountHave);
 
         // отобрадает что это создатель актива действует
         if (trade.targetCreator_addr == data.assetHaveOwner) {

@@ -1004,57 +1004,63 @@ public class BlockExplorer {
         return output;
     }
 
-    private Map tradeJSON(Long have, Trade trade) {
+    private Map tradeJSON(Trade trade, AssetCls assetHaveIn, AssetCls assetWantIn) {
 
         Map tradeJSON = new HashMap();
 
+        AssetCls assetHave = assetHaveIn;
+        AssetCls assetWant = assetWantIn;
+
+        Long haveKey = null;
         Order orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
 
         Order orderTarget = Order.getOrder(dcSet, trade.getTarget());
-        if (have == null) {
+        if (assetHave == null) {
             tradeJSON.put("assetHaveKey", trade.getHaveKey());
-            AssetCls assetHave = dcSet.getItemAssetMap().get(trade.getHaveKey());
+            assetHave = dcSet.getItemAssetMap().get(trade.getHaveKey());
             tradeJSON.put("assetHaveName", assetHave.getName());
 
             tradeJSON.put("assetWantKey", trade.getWantKey());
-            AssetCls assetWant = dcSet.getItemAssetMap().get(trade.getWantKey());
+            assetWant = dcSet.getItemAssetMap().get(trade.getWantKey());
             tradeJSON.put("assetWantName", assetWant.getName());
 
             /// тут нужно определиться с направлением
             if (trade.getHaveKey().equals(Transaction.FEE_KEY)) {
-                have = Transaction.FEE_KEY;
+                haveKey = Transaction.FEE_KEY;
             } else if (trade.getHaveKey().equals(12L)) { // BITCOIN
-                have = 12L;
+                haveKey = 12L;
             } else {
-                //have = trade.getHaveKey();
+                //haveKey = trade.getHaveKey();
             }
+        } else {
+            haveKey = assetHave.getKey();
         }
 
-        tradeJSON.put("realPrice", trade.calcPrice());
-        tradeJSON.put("realReversePrice", trade.calcPriceRevers());
+        tradeJSON.put("realPrice", trade.calcPrice().toPlainString());
+        tradeJSON.put("realReversePrice", trade.calcPriceRevers().toPlainString());
 
         tradeJSON.put("initiatorTx", Transaction.viewDBRef(orderInitiator.getId()));
         tradeJSON.put("initiatorCreator_addr", orderInitiator.getCreator().getAddress()); // viewCreator
         tradeJSON.put("initiatorCreator", orderInitiator.getCreator().getPersonOrShortAddress(12));
-        tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().toPlainString());
+        tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().setScale(assetHave.getScale()).toPlainString());
 
         tradeJSON.put("targetTx", Transaction.viewDBRef(orderTarget.getId()));
         tradeJSON.put("targetCreator_addr", orderTarget.getCreator().getAddress()); // viewCreator
         tradeJSON.put("targetCreator", orderTarget.getCreator().getPersonOrShortAddress(12)); // viewCreator
-        tradeJSON.put("targetAmount", orderTarget.getAmountHave().toPlainString());
+        tradeJSON.put("targetAmount", orderTarget.getAmountHave().setScale(assetHave.getScale()).toPlainString());
 
         tradeJSON.put("timestamp", trade.getTimestamp());
 
-        if (have == null || orderInitiator.getHave() == have) {
+        if (assetHaveIn == null || orderInitiator.getHave() == haveKey) {
             tradeJSON.put("type", "sell");
 
-            tradeJSON.put("amountHave", trade.getAmountWant().toPlainString());
-            tradeJSON.put("amountWant", trade.getAmountHave().toPlainString());
+            tradeJSON.put("amountHave", trade.getAmountWant().setScale(assetWant.getScale()).toPlainString());
+            tradeJSON.put("amountWant", trade.getAmountHave().setScale(assetHave.getScale()).toPlainString());
         } else {
             tradeJSON.put("type", "buy");
 
-            tradeJSON.put("amountHave", trade.getAmountHave().toPlainString());
-            tradeJSON.put("amountWant", trade.getAmountWant().toPlainString());
+            tradeJSON.put("amountHave", trade.getAmountHave().setScale(assetHave.getScale()).toPlainString());
+            tradeJSON.put("amountWant", trade.getAmountWant().setScale(assetWant.getScale()).toPlainString());
         }
 
         return tradeJSON;
@@ -1191,7 +1197,7 @@ public class BlockExplorer {
         int i = 0;
         for (Trade trade : trades) {
 
-            tradesJSON.put(i++, tradeJSON(have, trade));
+            tradesJSON.put(i++, tradeJSON(trade, assetHave, assetWant));
 
             if (i > 100)
                 break;
@@ -2311,7 +2317,7 @@ public class BlockExplorer {
         Iterator<Tuple2<Long, Long>> iterator = trades.getIterator(0, true);
         while (count-- > 0 && iterator.hasNext()) {
             Trade trade = trades.get(iterator.next());
-            tradesArray.add(tradeJSON(null, trade));
+            tradesArray.add(tradeJSON(trade, null, null));
         }
 
         output.put("lastTrades", tradesArray);
@@ -2329,6 +2335,7 @@ public class BlockExplorer {
         output.put("label_Date", Lang.getInstance().translateFromLangObj("Date", langObj));
         output.put("label_Pair", Lang.getInstance().translateFromLangObj("Pair", langObj));
         output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        output.put("label_Amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
         output.put("label_Volume", Lang.getInstance().translateFromLangObj("Volume", langObj));
         output.put("label_Price", Lang.getInstance().translateFromLangObj("Price", langObj));
         output.put("label_Total_Cost", Lang.getInstance().translateFromLangObj("Total Cost", langObj));

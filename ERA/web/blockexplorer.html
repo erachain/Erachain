@@ -1053,7 +1053,7 @@ button.white-bgc[disabled]:focus,
                 output += '<td><a href ="?address=' + data.sells[key].creator_addr + get_lang() + '">' +
                         data.sells[key].creator + '</a>';
                 output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].price) + '</a>';
-                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].amount) + '</a>';
+                output += '<td align=right><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].amount) + '</a>';
 
             }
 
@@ -1075,7 +1075,7 @@ button.white-bgc[disabled]:focus,
                 output += '<td><a href ="?address=' + data.buys[key].creator_addr + get_lang() + '">' +
                         data.buys[key].creator + '</a>';
                 output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingPrice) + '</a>';
-                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a>';
+                output += '<td align=right><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a>';
 
             }
 
@@ -1088,8 +1088,8 @@ button.white-bgc[disabled]:focus,
             output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
             output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.label_Date; // + '<td align=center><b>' + data.label_Type + '</b></td>';
             output += '<td align=center><b>' + data.label_Trade_Initiator
+            output += '<td align=center><b>' + data.label_Amount;
             output += '<td align=center><b>' + data.label_Price;
-            output += '<td align=center><b>' + data.label_Volume;
             output += '<td align=center><b>' + data.label_Total_Cost;
             output += '<td align=center><b>' + data.label_Position_Holder
             output += '</tr>';
@@ -1113,9 +1113,10 @@ button.white-bgc[disabled]:focus,
                         output += ' <b>&#9655;</b> ';
                     }
                     output += '<a href=?address=' + trade.initiatorCreator_addr + '>' + cut(trade.initiatorCreator, 20) + '</a>';
-                    output += '<td>' + addCommas(trade.amountHave);
-                    //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
                     //output += ' <img src=img/grright.png style="vertical-align: middle;">';
+
+                    output += '<td align=right>' + addCommas(trade.amountHave);
+                    //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 
                     output += '<td align=left><span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.4em"></span>'
                         + '<span style="font-size:1.4em">' + addCommas(trade.realReversePrice) + '</span>';
@@ -1149,9 +1150,10 @@ button.white-bgc[disabled]:focus,
                     }
                     output += '<a href=?address=' + trade.targetCreator_addr + '>' + cut(trade.targetCreator, 20) + '</a>';
                     //output += '<br>';
-                    output += '<td>' + addCommas(trade.amountHave);
-                    //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
                     //output += ' <img src=img/grright.png style="vertical-align: middle;">';
+
+                    output += '<td align=right>' + addCommas(trade.amountHave);
+                    //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 
                     output += '<td align=left><span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.4em"></span>'
                         + '<span style="font-size:1.4em">' + addCommas(trade.realPrice) + '</span>';
