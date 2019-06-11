@@ -72,7 +72,7 @@ function exchange(data){
 
                     if (trade.unchecked == true) {}
                     else {
-                        output += '<td align=left><span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.4em"></span>'
+                        output += '<td align=left><span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.2em"></span>'
                             + '<span style="font-size:1.4em">' + addCommas(trade.realReversePrice) + '</span>';
                         ///output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
                     }
@@ -85,7 +85,7 @@ function exchange(data){
 
                     if (trade.unchecked == true) {}
                     else {
-                        output += '<td align=left><span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.4em"></span>'
+                        output += '<td align=left><span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.2em"></span>'
                             + '<span style="font-size:1.4em">' + addCommas(trade.realPrice) + '</span>';
                         //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName) + '';
                     }

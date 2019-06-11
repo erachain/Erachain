@@ -1052,7 +1052,7 @@ button.white-bgc[disabled]:focus,
                 output += '<tr>';
                 output += '<td><a href ="?address=' + data.sells[key].creator_addr + get_lang() + '">' +
                         data.sells[key].creator + '</a>';
-                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].price) + '</a>';
+                output += '<td><a href=?tx=' + key + get_lang() + ' style="font-size:1.3em">' + addCommas(data.sells[key].price) + '</a>';
                 output += '<td align=right><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].amount) + '</a>';
 
             }
@@ -1062,20 +1062,22 @@ button.white-bgc[disabled]:focus,
             ///output += '<td><b>' + addCommas(data.sellsSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
             output += ':<td><b>' + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 
-            output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td><b>' + data.label_Creator + '<td><b>' + data.label_Price + '</b></td><td><b>' + data.label_Amount + '</b></td></tr>';
+            output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td width=40%><b>'
+                + data.label_Creator + ' / ' + data.label_Amount + '<td width=30% style="font-size:1.4em"><b>' + data.label_Price
+                + '</b></td><td width=40%><b>' + data.label_Amount + ' / ' + data.label_Creator + ':</b></td></tr>';
 
             output += '<tr bgcolor="#f9f9f9">';
-            output += '<td><td>' + data.label_Total_For_Buy;
             ///output += '<td><b>' + addCommas(data.buysSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
             output += ':<td><b>' +  addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+            output += '<td>- ' + data.label_Total_For_Buy + '<td>';
 
             for (key in data.buys) {
 
                 output += '<tr>';
+                output += '<td align=right><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a>';
+                output += '<td><a href=?tx=' + key + get_lang() + ' style="font-size:1.3em">' + addCommas(data.buys[key].buyingPrice) + '</a>';
                 output += '<td><a href ="?address=' + data.buys[key].creator_addr + get_lang() + '">' +
                         data.buys[key].creator + '</a>';
-                output += '<td><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingPrice) + '</a>';
-                output += '<td align=right><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a>';
 
             }
 
@@ -1118,8 +1120,8 @@ button.white-bgc[disabled]:focus,
                     output += '<td align=right>' + addCommas(trade.amountHave);
                     //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 
-                    output += '<td align=left><span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.4em"></span>'
-                        + '<span style="font-size:1.4em">' + addCommas(trade.realReversePrice) + '</span>';
+                    output += '<td align=left><span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.2em"></span>'
+                        + '<span style="font-size:1.3em">' + addCommas(trade.realReversePrice) + '</span>';
                     ///output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 
                     output += '<td>' + addCommas(trade.amountWant);
@@ -1155,8 +1157,8 @@ button.white-bgc[disabled]:focus,
                     output += '<td align=right>' + addCommas(trade.amountHave);
                     //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 
-                    output += '<td align=left><span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.4em"></span>'
-                        + '<span style="font-size:1.4em">' + addCommas(trade.realPrice) + '</span>';
+                    output += '<td align=left><span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.2em"></span>'
+                        + '<span style="font-size:1.3em">' + addCommas(trade.realPrice) + '</span>';
                     //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName) + '';
 
                     output += '<td>' + addCommas(trade.amountWant);
