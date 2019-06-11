@@ -1048,13 +1048,13 @@ button.white-bgc[disabled]:focus,
             output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="width:100%; border: 1px solid #ddd; margin-bottom: 0px;">';
 
             var width = data.sellsSumAmountGood;
-            var amount = 0;
             for (key in data.sells) {
 
-                width -= amount;
-                amount = data.sells[key].amount;
                 output += '<tr><td style="position:absolute; z-index:-1; padding:0px; background-color:#ffe4e4; height:50px; width:'
-                    + 90 * width / data.sellsSumAmountGood + '%;"></tr>';
+                    + 85 * width / data.sellsSumAmountGood + '%;"></tr>';
+                    // 90 потому что 5% отступы у таблицы
+
+                width -= data.sells[key].amount;
 
                 output += '<tr style="background-color:transparent;">';
                 output += '<td><a href ="?address=' + data.sells[key].creator_addr + get_lang() + '">' +
@@ -1081,10 +1081,11 @@ button.white-bgc[disabled]:focus,
             width = 0;
             for (key in data.buys) {
 
-                width += 1 * data.buys[key].buyingAmount;
+                width += 1 * data.buys[key].buyingAmount; // преобразование строки в число
                 var eee = 100 * width / data.buysSumAmountGood;
-                output += '<tr><td style="position:absolute; z-index:-1; padding:0px; background-color:#ffe4e4; height:50px; width:'
-                    + 90 * width / data.buysSumAmountGood + '%;"></tr>';
+                output += '<tr><td style="position:absolute; z-index:-1; padding:0px; background-color:#cdfdcc; height:50px; width:'
+                    + 85 * width / data.buysSumAmountGood + '%;"></tr>';
+                    // 90 потому что 5% отступы у таблицы
 
                 output += '<tr style="background-color:transparent;">';
                 output += '<td align=right><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a>';
