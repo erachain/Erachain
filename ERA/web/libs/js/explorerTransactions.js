@@ -27,6 +27,7 @@ function transactionLite(data, i, item) {
 
     var output = '';
 
+    var urlstart = '?unconfirmed';
     if (item.transaction.type == 1) // GENESIS_ISSUE_ASSET_TRANSACTION
     {
 
