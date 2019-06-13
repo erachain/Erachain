@@ -23,11 +23,11 @@ function tx(data) {
     return output;
 }
 
-function transactionLite(data, i, item) {
+function transactionLite(urlstart, data, i, item) {
 
     var output = '';
 
-    var urlstart = '?unconfirmed';
+    //var urlstart = '?unconfirmed';
     if (item.transaction.type == 1) // GENESIS_ISSUE_ASSET_TRANSACTION
     {
 
