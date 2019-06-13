@@ -1,7 +1,6 @@
 package org.erachain.gui.transaction;
 
 import org.erachain.core.transaction.*;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.statement.StatementInfo;
 
 import javax.swing.*;
@@ -24,13 +23,13 @@ public class TransactionDetailsFactory {
 
     public JPanel createTransactionDetail(Transaction transaction) {
 
-        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         JLabel jLabel9 = new JLabel("");
 
         gridBagConstraints.gridx = 0;
 
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
 
