@@ -39,11 +39,12 @@ function exchange(data){
 
     output += '<h4 style="text-align: center;">' + data.label_table_LastTrades + '</h4>';
 
-    output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
+    output += '<table border="0" cellspacing="3" cellpadding="5" class="tiny table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
     output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.label_Date;
-    output += '<td><b>' + data.label_Pair + '<td><b>' + data.label_Trade_Initiator;
-    output += '<td><b>' + data.label_Price + '<td align=center><b>' + data.label_Volume;
-    output += '<td><b>' + data.label_Position_Holder + '<tr>'
+    output += '<td align=center><b>' + data.label_Pair + '<td align=center><b>' + data.label_Trade_Initiator;
+    output += '<td align=center><b>' + data.label_Amount;
+    output += '<td align=center><b>' + data.label_Price;
+    output += '<td align=center><b>' + data.label_Position_Holder + '<tr>'
     //output += data.label_Total_Cost + '</b></td></tr>';
 
     for (key in data.lastTrades) {
@@ -65,8 +66,33 @@ function exchange(data){
             output += ' <b>&#9655;</b> ';
         }
 
-        output += '<td align=left><span style="font-size:1.4em">' + addCommas(trade.realReversePrice) + '</span>';
-        output += '<td>' + addCommas(trade.amountHave);
+        if (trade.type == 'sell') {
+                    output += '<td align=right>' + addCommas(trade.amountHave);
+                    //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+
+                    if (trade.unchecked == true) {}
+                    else {
+                        output += '<td align=left><span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.2em"></span>'
+                            + '<span style="font-size:1.4em">' + addCommas(trade.realReversePrice) + '</span>';
+                        ///output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                    }
+
+                    //output += '<td>' + addCommas(trade.amountWant);
+                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+            } else {
+                    output += '<td align=right>' + addCommas(trade.amountHave);
+                    //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+
+                    if (trade.unchecked == true) {}
+                    else {
+                        output += '<td align=left><span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.2em"></span>'
+                            + '<span style="font-size:1.4em">' + addCommas(trade.realPrice) + '</span>';
+                        //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName) + '';
+                    }
+
+                    //output += '<td>' + addCommas(trade.amountWant);
+                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+            }
 
         // отобрадает что это создатель актива действует
         if (trade.targetCreator_addr == data.assetHaveOwner) {

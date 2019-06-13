@@ -1,3 +1,9 @@
+table.tiny td {
+    padding: 2px 5px !important;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+}
+
 a {
     color: #6467FF;
     text-decoration: none;
