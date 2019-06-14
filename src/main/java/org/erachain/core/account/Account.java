@@ -158,25 +158,30 @@ public class Account {
         Account account = null;
 
         // CHECK IF RECIPIENT IS VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(toValue)) {
-            Pair<Account, NameResult> nameToAdress = NameUtils.nameToAdress(toValue);
-
-            if (nameToAdress.getB() == NameResult.OK) {
-                account = nameToAdress.getA();
-                return (statusBad ? "??? " : "") + account.toString(asset.getKey());
-            } else {
-                return (statusBad ? "??? " : "") + nameToAdress.getB().getShortStatusMessage();
-            }
-        } else {
+        if (Crypto.getInstance().isValidAddress(toValue)) {
             account = new Account(toValue);
-
-            if (account.getBalanceUSE(asset.getKey()).compareTo(BigDecimal.ZERO) == 0
-                    && account.getBalanceUSE(Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) == 0) {
-                return Lang.getInstance().translate("Warning!") + " " + (statusBad ? "???" : "")
-                        + account.toString(asset.getKey());
+        } else {
+            if (PublicKeyAccount.isValidPublicKey(toValue)) {
+                account = new PublicKeyAccount(toValue);
             } else {
-                return (statusBad ? "???" : "") + account.toString(asset.getKey());
+
+                Pair<Account, NameResult> nameToAdress = NameUtils.nameToAdress(toValue);
+
+                if (nameToAdress.getB() == NameResult.OK) {
+                    account = nameToAdress.getA();
+                    return (statusBad ? "??? " : "") + account.toString(asset.getKey());
+                } else {
+                    return (statusBad ? "??? " : "") + nameToAdress.getB().getShortStatusMessage();
+                }
             }
+        }
+
+        if (account.getBalanceUSE(asset.getKey()).compareTo(BigDecimal.ZERO) == 0
+                && account.getBalanceUSE(Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) == 0) {
+            return Lang.getInstance().translate("Warning!") + " " + (statusBad ? "???" : "")
+                    + account.toString(asset.getKey());
+        } else {
+            return (statusBad ? "???" : "") + account.toString(asset.getKey());
         }
 
     }
