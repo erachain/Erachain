@@ -2695,16 +2695,13 @@ public class BlockExplorer {
 
     /**
      * не использыется как отдельный запрос - поэтому в ней нельзя output.put("search", "statements"); и ТИП задавать
-     * @param block
-     * @param seqNo
+     * @param trans
      * @return
      */
-    private Map jsonStatement(String block, String seqNo) {
+    private Map jsonStatement(RSignNote trans) {
 
         Map output = new LinkedHashMap();
 
-        RSignNote trans = (RSignNote) dcSet.getTransactionFinalMap().get(new Integer(block),
-                new Integer(seqNo));
         output.put("Label_type", Lang.getInstance().translateFromLangObj("Type", langObj));
         output.put("Label_statement", Lang.getInstance().translateFromLangObj("Statement", langObj));
         output.put("Label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
@@ -2714,6 +2711,9 @@ public class BlockExplorer {
         output.put("Label_No", Lang.getInstance().translateFromLangObj("No.", langObj));
         output.put("Label_pubKey", Lang.getInstance().translateFromLangObj("Public Key", langObj));
         output.put("Label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
+
+        int block = trans.getBlockHeight();
+        int seqNo = trans.getSeqNo();
 
         output.put("block", block);
         output.put("seqNo", seqNo);
@@ -3033,9 +3033,7 @@ public class BlockExplorer {
                 continue;
 
             if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {//.ISSUE_STATEMENT_TRANSACTION){
-                int block = transaction.getBlockHeight();
-                int seqNo = transaction.getSeqNo();
-                output.putAll(jsonStatement(block + "", seqNo + ""));
+                output.putAll(jsonStatement((RSignNote) transaction));
                 output.put("type", "statement");
 
             } else {
