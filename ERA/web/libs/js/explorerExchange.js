@@ -12,7 +12,7 @@ function exchange(data){
     output += lastBlock(data.lastBlock);
     var start = data.start;
 
-    output += '<div class = "row"><div class="col-lg-5" style="padding-left: 5em;">';
+    output += '<div><div class="col-lg-5" style="padding-left: 5em;">';
 
     output += '<h4 style="text-align: center;">' + data.label_table_PopularPairs + '</h4>';
 
