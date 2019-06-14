@@ -1672,7 +1672,7 @@ button.white-bgc[disabled]:focus,
 
                     ////// TRANSACTIONS ////////
                     if (data[i].type == 'tx') {
-                        output += transactionLite(urlstart, data, i, data[i]);
+                        output += transactionLite('?tx', data, i, data[i]);
                     }
                 }
 
