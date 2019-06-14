@@ -167,7 +167,16 @@ public abstract class TransactionAmount extends Transaction {
         // return this.amount == null? BigDecimal.ZERO: this.amount;
         return this.amount;
     }
-    
+
+    public BigDecimal getAmountAndBackward() {
+        // return this.amount == null? BigDecimal.ZERO: this.amount;
+        if (isBackward()) {
+            return this.amount.negate();
+        } else {
+            return this.amount;
+        }
+    }
+
     public String getStr() {
         return "transAmount";
     }
