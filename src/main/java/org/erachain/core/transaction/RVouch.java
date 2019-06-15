@@ -288,13 +288,11 @@ public class RVouch extends Transaction {
         if (value == null) {
             listNew = new ArrayList<Long>();
         } else {
-            listNew = value.b;
+            listNew = new ArrayList(value.b); // need clone!
             amount = amount.add(value.a);
         }
 
         listNew.add(Transaction.makeDBRef(this.height, this.seqNo));
-        // for test only!!
-        //listNew.add(new Long(2, 2));
 
         valueNew =
                 new Tuple2<BigDecimal, List<Long>>(
@@ -315,11 +313,9 @@ public class RVouch extends Transaction {
         // find value
         Tuple2<BigDecimal, List<Long>> value = this.dcSet.getVouchRecordMap().get(recordKey);
         // update value
-        List<Long> listNew = value.b;
+        List<Long> listNew = new ArrayList(value.b); // need clone!
 
         listNew.remove(Transaction.makeDBRef(this.height, this.seqNo));
-        // for test ONLY !!!
-        //listNew.remove(new Long(2, 2));
 
         Tuple2<BigDecimal, List<Long>> valueNew =
                 new Tuple2<BigDecimal, List<Long>>(
