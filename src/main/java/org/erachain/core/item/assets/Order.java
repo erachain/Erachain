@@ -590,8 +590,8 @@ public class Order implements Comparable<Order> {
                         } else
                             break;
                     } else if (height > NEW_FLOR2 && thisPriceScale < orderReversePriceScale){
-                        BigDecimal scaledOrderReversePriceScale = orderReversePrice.setScale(thisPriceScale, RoundingMode.HALF_DOWN);
-                        if (scaledOrderReversePriceScale.compareTo(thisPrice) == 0) {
+                        BigDecimal scaledOrderReversePrice = orderReversePrice.setScale(thisPriceScale, RoundingMode.HALF_DOWN);
+                        if (scaledOrderReversePrice.compareTo(thisPrice) == 0) {
                             // да цены совпали
                             // тогда еще так же обратные цены проверим
                             BigDecimal thisReversePrice = Order.calcPrice(this.amountWant, this.amountHave);
