@@ -456,7 +456,6 @@ public abstract class Transaction implements ExplorerJsonLine {
         } else {
             int heightBlock = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 0, 4));
             int seqNo = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 4, 8));
-            //key = new Tuple2<Integer, Integer>(blockHeight, seqNo);
             key = Transaction.makeDBRef(heightBlock, seqNo);
 
         }
@@ -1454,6 +1453,10 @@ public abstract class Transaction implements ExplorerJsonLine {
             this.dcSet.getAddressTime_SignatureMap().delete(creator, timestamp);
 
         }
+
+        // CLEAR all FOOTPRINTS and empty data
+        this.dcSet.getVouchRecordMap().delete(dbRef);
+
     }
 
     public Transaction copy() {
