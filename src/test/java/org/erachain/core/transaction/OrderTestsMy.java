@@ -1074,6 +1074,55 @@ public class OrderTestsMy {
 
     //////////////////////////// когда цена в пери
     @Test
+    public void testOrderProcessing_065period() {
+        // 252649 - 252314 = 335
+
+        // уже есть в блокчейне
+
+        // это прилетел
+        // have = 9.75
+        // want = 15
+
+        init();
+
+        // CREATE ORDER ONE (SELLING 100 A FOR B AT A PRICE OF 10)
+        // amountHAVE 100 - amountWant 1000
+        orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, new BigDecimal("1000"),
+                new BigDecimal("650"), (byte) 0, timestamp++, 0l, new byte[64]);
+        orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+        orderCreation.setDC(db, Transaction.FOR_NETWORK, Order.NEW_FLOR + 1, ++seqNo);
+        orderCreation.process(null, Transaction.FOR_NETWORK);
+
+        Long order_AB_1_ID = orderCreation.makeOrder().getId();
+
+        // CREATE ORDER TWO (SELLING 4995 B FOR A AT A PRICE OF 0.05))
+        // GENERATES TRADE 100 B FOR 1000 A
+        orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, new BigDecimal("0.00000333"),
+                new BigDecimal("0.00100"), (byte) 0, timestamp++, 0l, new byte[]{5, 6});
+        orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+        orderCreation.setDC(db, Transaction.FOR_NETWORK, Order.NEW_FLOR + 1, ++seqNo);
+        orderCreation.process(null, Transaction.FOR_NETWORK);
+        Long order_BA_1_ID = orderCreation.makeOrder().getId();
+
+        // CHECK BALANCES
+        Assert.assertEquals(accountA.getBalanceUSE(keyA, db), new BigDecimal("49970.00000000")); // BALANCE
+        Assert.assertEquals(accountA.getBalanceUSE(keyB, db), new BigDecimal("0.00000333")); // BALANCE
+
+        Assert.assertEquals(accountB.getBalanceUSE(keyB, db), new BigDecimal("49999.99999667")); // BALANCE
+        Assert.assertEquals(accountB.getBalanceUSE(keyA, db), new BigDecimal("0.001")); // BALANCE
+
+        Assert.assertEquals(accountA.getBalanceUSE(keyB, db)
+                        .add(accountB.getBalanceUSE(keyB, db)),
+                new BigDecimal("50000.00000000")); // BALANCE
+
+        Assert.assertEquals(accountB.getBalanceUSE(keyA, db)
+                        .add(accountA.getBalanceUSE(keyA, db)),
+                new BigDecimal("49970.00100000")); // BALANCE
+
+    }
+
+    //////////////////////////// когда цена в пери
+    @Test
     public void testOrderProcessing_33period() {
 
         init();

@@ -29,6 +29,7 @@ public class Order implements Comparable<Order> {
      * с какого номера блока включить новое округление
      */
     public static final int NEW_FLOR = BlockChain.DEVELOP_USE ? 317000 : BlockChain.VERS_4_12;
+    public static final int NEW_FLOR2 = BlockChain.DEVELOP_USE ? 317000 : 252649;
 
     public static final int ID_LENGTH = 8;
     private static final int CREATOR_LENGTH = 20; // as SHORT (old - 25)
@@ -75,6 +76,7 @@ public class Order implements Comparable<Order> {
 
         this.fulfilledHave = BigDecimal.ZERO.setScale(amountHave.scale());
 
+        // TODO: в новой версии нужно сделать везде 0 - иначе несостыкоавка в процессинге ордера - там то 0
         this.price = calcPrice(amountHave, amountWant, 1);
 
     }
@@ -94,6 +96,7 @@ public class Order implements Comparable<Order> {
 
         this.status = status;
 
+        // TODO: в новой версии нужно сделать везде 0 - иначе несостыкоавка в процессинге ордера - там то 0
         this.price = calcPrice(amountHave, amountWant, 1);
 
     }
@@ -558,6 +561,9 @@ public class Order implements Comparable<Order> {
             //CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
             compare = thisPrice.compareTo(orderReversePrice);
             if (compare > 0) {
+                // TODO: тут надо сделать просто проверку на обратную цену и все - без игр с округлением и проверки дополнительной
+                // просто - if (еhisPrice.compareTo(orderReversePrice) == 0) {
+
                 if (height > NEW_FLOR) {
                     // пытаемся поиграть с точностью округления - см примеры в тестах
                     // org.erachain.core.transaction.OrderTestsMy.price33 и org.erachain.core.transaction.OrderTestsMy.price33_1
@@ -572,6 +578,20 @@ public class Order implements Comparable<Order> {
                         // но при этом точность у нашей цены снизим до точности Заказа
                         BigDecimal scaledThisPrice = thisPrice.setScale(orderReversePriceScale, RoundingMode.HALF_DOWN);
                         if (scaledThisPrice.compareTo(orderReversePrice) == 0) {
+                            // да цены совпали
+                            // тогда еще так же обратные цены проверим
+                            BigDecimal thisReversePrice = Order.calcPrice(this.amountWant, this.amountHave);
+                            BigDecimal scaledOrderPrice = orderPrice.setScale(thisReversePrice.scale(), RoundingMode.HALF_DOWN);
+                            // и сравним так же по прямой цене со сниженной точностью у Заказа
+                            if (scaledOrderPrice.compareTo(thisReversePrice) == 0)
+                                compare = 0;
+                            else
+                                break;
+                        } else
+                            break;
+                    } else if (height > NEW_FLOR2 && thisPriceScale < orderReversePriceScale){
+                        BigDecimal scaledOrderReversePriceScale = orderReversePrice.setScale(thisPriceScale, RoundingMode.HALF_DOWN);
+                        if (scaledOrderReversePriceScale.compareTo(thisPrice) == 0) {
                             // да цены совпали
                             // тогда еще так же обратные цены проверим
                             BigDecimal thisReversePrice = Order.calcPrice(this.amountWant, this.amountHave);
