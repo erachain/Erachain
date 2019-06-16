@@ -2296,6 +2296,7 @@ public class BlockExplorer {
         if (BlockChain.DEVELOP_USE) {
             list.add(new Pair<Long, Long>(1L, 2L));
         } else {
+            list.add(new Pair<Long, Long>(12L, 92L));
             list.add(new Pair<Long, Long>(12L, 95L));
             list.add(new Pair<Long, Long>(1L, 2L));
             list.add(new Pair<Long, Long>(1L, 12L));
