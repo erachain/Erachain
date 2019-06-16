@@ -165,7 +165,6 @@ public class WithdrawExchange extends JPanel {
 
             panel.jLabel_Title.setText("<html>" + formTitle + "</html>");
 
-
         }
 
         jButton_Confirm.setEnabled(true);
