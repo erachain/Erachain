@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
@@ -177,7 +178,11 @@ public class MailSendPanel extends JPanel {
         } else {
 
             if (accountTo != null) {
-                txtTo.setText(accountTo.getAddress());
+                if (accountTo instanceof PublicKeyAccount) {
+                    txtTo.setText(((PublicKeyAccount)accountTo).getBase58());
+                } else {
+                    txtTo.setText(accountTo.getAddress());
+                }
             }
             this.add(txtTo, txtToGBC);
         }
@@ -508,11 +513,6 @@ public class MailSendPanel extends JPanel {
             return;
         }
 
-        if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
-            txtRecDetails.setText(Lang.getInstance().translate("Status must be OK to show receiver details."));
-            return;
-        }
-
         Account account = null;
         Tuple2<Account, String> accountRes = Account.tryMakeAccount(toValue);
 
@@ -695,7 +695,12 @@ public class MailSendPanel extends JPanel {
                 byte[] privateKey = creator.getPrivateKey();
 
                 // recipient
-                byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
+                byte[] publicKey;
+                if (recipient instanceof PublicKeyAccount) {
+                    publicKey = ((PublicKeyAccount) recipient).getPublicKey();
+                } else {
+                    publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
+                }
                 if (publicKey == null) {
                     JOptionPane.showMessageDialog(new JFrame(),
                             Lang.getInstance().translate(

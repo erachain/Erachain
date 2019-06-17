@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
@@ -64,15 +65,9 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
     public byte[] encrypted;
     public Integer result;
     public Account account;
-    BufferedImage image1;
-
-    private int max_Height;
-
-    private int max_Widht;
-    private Image Im;
-    private String defaultImagePath = "images/icons/coin.png";
 
     private int balancePosition;
+
     /**
      * Creates new form AccountAssetActionPanelCls
      */
@@ -202,7 +197,11 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         });
 
         if (recipient != null) {
-            jTextField_To.setText(recipient.getAddress());
+            if (recipient instanceof PublicKeyAccount) {
+                jTextField_To.setText(((PublicKeyAccount)recipient).getBase58());
+            } else {
+                jTextField_To.setText(recipient.getAddress());
+            }
             //refreshReceiverDetails()
 
         }
@@ -276,17 +275,21 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         if (Crypto.getInstance().isValidAddress(recipientAddress)) {
             this.recipient = new Account(recipientAddress);
         } else {
-            //IS IS NAME of RECIPIENT - resolve ADDRESS
-            Pair<Account, NameResult> result = NameUtils.nameToAdress(recipientAddress);
-
-            if (result.getB() == NameResult.OK) {
-                recipient = result.getA();
+            if (PublicKeyAccount.isValidPublicKey(recipientAddress)) {
+                recipient = new PublicKeyAccount(recipientAddress);
             } else {
-                JOptionPane.showMessageDialog(null, result.getB().getShortStatusMessage(), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                //IS IS NAME of RECIPIENT - resolve ADDRESS
+                Pair<Account, NameResult> result = NameUtils.nameToAdress(recipientAddress);
 
-                //ENABLE
-                this.jButton_ok.setEnabled(true);
-                return false;
+                if (result.getB() == NameResult.OK) {
+                    recipient = result.getA();
+                } else {
+                    JOptionPane.showMessageDialog(null, result.getB().getShortStatusMessage(), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+
+                    //ENABLE
+                    this.jButton_ok.setEnabled(true);
+                    return false;
+                }
             }
         }
 
@@ -382,7 +385,13 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
                 byte[] privateKey = account.getPrivateKey();
 
                 //recipient
-                byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
+                byte[] publicKey;
+                if (recipient instanceof PublicKeyAccount) {
+                    publicKey = ((PublicKeyAccount) recipient).getPublicKey();
+                } else {
+                    publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
+                }
+
                 if (publicKey == null) {
                     JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 

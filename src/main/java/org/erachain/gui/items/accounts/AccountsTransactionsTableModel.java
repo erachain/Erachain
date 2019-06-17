@@ -218,7 +218,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
             trr.owner = r_send.getCreator();
             trr.recipient = r_send.viewRecipient();
             trr.transaction = r_send;
-            trr.amount = r_send.getAmount();
+            trr.amount = r_send.getAmountAndBackward();
             trr.title = r_send.getTitle();
 
             //if send for *-1
@@ -226,8 +226,8 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
             if (actionTypes == null || actionTypes.isEmpty()) {
 
                 if (r_send.getCreator().getAddress().equals(this.sender.getAddress()))
-                    if (r_send.getAmount() != null) {
-                        trr.amount = r_send.getAmount().multiply(new BigDecimal("-1"));
+                    if (trr.amount != null) {
+                        trr.amount = trr.amount.negate();
                     }
 
             } else {
@@ -235,8 +235,8 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
                 if (actionTypes.contains(r_send.viewFullTypeName())) {
 
                     if (r_send.getCreator().getAddress().equals(this.sender.getAddress())) {
-                        if (r_send.getAmount() != null) {
-                            trr.amount = r_send.getAmount().multiply(new BigDecimal("-1"));
+                        if (trr.amount != null) {
+                            trr.amount = trr.amount.negate();
                         }
                     }
                 }
@@ -257,7 +257,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
             trr.title = gen_send.getTitle();
 
             if (!gen_send.getRecipient().getAddress().equals(this.sender.getAddress()))
-                trr.amount = gen_send.getAmount().multiply(new BigDecimal("-1"));
+                trr.amount = gen_send.getAmount().negate();
             // if is creator
             if (gen_send.getCreator() != null) trr.owner = gen_send.getCreator();
             // if is owner
