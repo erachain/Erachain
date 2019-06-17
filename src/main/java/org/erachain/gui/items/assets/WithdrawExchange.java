@@ -80,27 +80,23 @@ public class WithdrawExchange extends JPanel {
 
             String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
             assetIn = (AssetCls) cbxAssets.getSelectedItem();
+            String address = jTextField_Address.getText().trim();
             switch ((int) assetIn.getKey()) {
                 case 12:
-                    urlGetDetails += "12/3/" + jTextField_Address.getText() + "/0.1"; // eBTC -> BTC
+                    urlGetDetails += "12/3/" + address + "/0.1"; // eBTC -> BTC
                     message += "BTC";
                     break;
                 case 95:
-                    urlGetDetails += "13/3/" + jTextField_Address.getText() + "/100"; // eUSD -> BTC
+                    urlGetDetails += "13/3/" + address + "/100"; // eUSD -> BTC
                     message += "BTC";
                     break;
                 case 94:
-                    urlGetDetails += "14/3/" + jTextField_Address.getText() + "/100"; // eEUR -> BTC
+                    urlGetDetails += "14/3/" + address + "/100"; // eEUR -> BTC
                     message += "BTC";
                     break;
                 default:
-                    urlGetDetails += "10/3/" + jTextField_Address.getText() + "/1"; // COMPU -> BTC
-                    String assetName = assetIn.getName();
-                    if (assetName.equals("Bitcoin")) {
-                        message += "BTC";
-                    } else {
-                        message += assetName;
-                    }
+                    urlGetDetails += "10/3/" + address + "/1"; // COMPU -> BTC
+                    message += "BTC";
             }
 
             // CREATE CONNECTION
@@ -133,26 +129,46 @@ public class WithdrawExchange extends JPanel {
                 jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
             }
 
+            LOGGER.debug(StrJSonFine.convert(jsonObject));
+
             accountTo = jsonObject.get("addr_in").toString();
 
         } catch (Exception e) {
+            jsonObject = null;
             accountTo = null;
             jLabel_Adress_Check.setText(inputText);
             inputText = "";
         }
 
         if (assetIn != null && accountTo != null) {
-            if (accountTo != null) {
 
-                message += ":" + jTextField_Address.getText();
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(assetIn, TransactionAmount.ACTION_SEND,
-                        null, new Account(accountTo), null, message));
+            message += ":" + jTextField_Address.getText();
+            AccountAssetSendPanel panel = new AccountAssetSendPanel(assetIn, TransactionAmount.ACTION_SEND,
+                    null, new Account(accountTo), null, message);
+            MainPanel.getInstance().insertTab(panel);
 
+            String rate = jsonObject.get("rate").toString();
+            String bal = jsonObject.get("bal").toString();
+
+            String formTitle;
+            String incomeAssetName = assetIn.getName();
+            switch ((int) assetIn.getKey()) {
+                case 12:
+                    formTitle = Lang.getInstance().translate("Withdraw BTC to") + " " + accountTo;
+                    break;
+                default:
+                    formTitle = Lang.getInstance().translate("Transfer <b>%1</b> to this address for buy")
+                            .replace("%1", incomeAssetName) + " <b>BTC</B>"
+                            + " " + Lang.getInstance().translate("by rate") + ": <b>" + rate + "</b>"
+                            + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> BTC";
             }
 
-            jButton_Confirm.setEnabled(true);
+            panel.jLabel_Title.setText("<html>" + formTitle + "</html>");
 
         }
+
+        jButton_Confirm.setEnabled(true);
+
     }
 
     private void initComponents(AssetCls assetIn, Account account) {

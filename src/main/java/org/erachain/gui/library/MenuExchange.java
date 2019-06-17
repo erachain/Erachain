@@ -21,7 +21,7 @@ public class MenuExchange extends JMenu {
     public MenuExchange() {
 
         /// DEPOSIT
-        JMenuItem deposit = new JMenuItem(Lang.getInstance().translate("Deposit"));
+        JMenuItem deposit = new JMenuItem(Lang.getInstance().translate("Deposit or Buy"));
         deposit.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Deposit funds to Exchange"));
         deposit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -32,7 +32,7 @@ public class MenuExchange extends JMenu {
         add(deposit);
 
         // TRADE
-        JMenuItem trade = new JMenuItem(Lang.getInstance().translate("Trade"));
+        JMenuItem trade = new JMenuItem(Lang.getInstance().translate("Trade on DEX"));
         trade.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Trade on Exchange"));
         trade.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -43,7 +43,7 @@ public class MenuExchange extends JMenu {
         add(trade);
 
         // WITHDRAW
-        JMenuItem withdraw = new JMenuItem(Lang.getInstance().translate("Withdraw"));
+        JMenuItem withdraw = new JMenuItem(Lang.getInstance().translate("Withdraw or Sell"));
         withdraw.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Withdraw funds from Exchange"));
         withdraw.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

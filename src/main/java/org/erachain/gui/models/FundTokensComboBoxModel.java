@@ -28,6 +28,7 @@ public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
             this.addElement(Controller.getInstance().getAsset(2));
         } else {
             this.addElement(Controller.getInstance().getAsset(12)); // BTC
+            this.addElement(Controller.getInstance().getAsset(2)); // COMPU
             //this.addElement(Controller.getInstance().getAsset(14)); // ETH
             //this.addElement(Controller.getInstance().getAsset(92)); // RUB
             //this.addElement(Controller.getInstance().getAsset(95)); // USD
