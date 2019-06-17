@@ -280,7 +280,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                     if (row < sellOrdersTableModel.getRowCount()) {
                         buyOrderPanel.txtAmountHave.setText(order.getAmountHaveLeft().toPlainString());
                         // MAKE BIG SCALE
-                        buyOrderPanel.txtPrice.setText(Order.calcPrice(order.getAmountHave(), order.getAmountWant(), 2).toPlainString());
+                        buyOrderPanel.txtPrice.setText(Order.calcPrice(order.getAmountHave(), order.getAmountWant()).toPlainString());
 
                     }
                 }
@@ -323,7 +323,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 if (e.getClickCount() == 2) {
                     sellOrderPanel.txtAmountHave.setText(order.getAmountWantLeft().toPlainString());
                     // MAKE BIG SCALE
-                    sellOrderPanel.txtPrice.setText(Order.calcPrice(order.getAmountWant(), order.getAmountHave(), 2).toPlainString());
+                    sellOrderPanel.txtPrice.setText(Order.calcPrice(order.getAmountWant(), order.getAmountHave()).toPlainString());
                 }
             }
         });

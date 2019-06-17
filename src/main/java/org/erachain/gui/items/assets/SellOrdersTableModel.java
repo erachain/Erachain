@@ -109,7 +109,7 @@ public class SellOrdersTableModel extends SortedListTableModelCls<Long, Order> i
                 if (row == this.listSorted.size())
                     return "<html><b>" + Lang.getInstance().translate("Total") + "</b></html>";
 
-                BigDecimal price = Order.calcPrice(order.getAmountHave(), order.getAmountWant(), 2);
+                BigDecimal price = Order.calcPrice(order.getAmountHave(), order.getAmountWant());
                 amountStr = NumberAsString.formatAsString(price.stripTrailingZeros());
 
                 if (isMine)

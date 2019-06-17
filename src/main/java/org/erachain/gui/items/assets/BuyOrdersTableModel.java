@@ -106,7 +106,8 @@ public class BuyOrdersTableModel extends SortedListTableModelCls<Long, Order> im
                     return "<html><b>" + Lang.getInstance().translate("Total") + "</b></html>";
 
                 //BigDecimal price = Order.calcPrice(order.getAmountWant(), order.getAmountHave());
-                BigDecimal price = Order.calcPrice(order.getAmountWant(), order.getAmountHave(), 2);
+                // TODO: в новой версии нужно сделать везде 0 - иначе несостыкоавка в процессинге ордера - там то 0
+                BigDecimal price = Order.calcPrice(order.getAmountWant(), order.getAmountHave());
                 amountStr = NumberAsString.formatAsString(price.stripTrailingZeros());
 
                 if (isMine)
