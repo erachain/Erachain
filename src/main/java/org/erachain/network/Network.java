@@ -183,6 +183,9 @@ public class Network extends Observable {
         if (banForMinutes > peer.getBanMinutes()) {
             //ADD TO BLACKLIST
             peerManager.addPeer(peer, banForMinutes);
+            if (banForMinutes == Integer.MAX_VALUE) {
+                knownPeers.remove(peer);
+            }
         }
 
         //PASS TO CONTROLLER
