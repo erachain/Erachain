@@ -1048,13 +1048,23 @@ button.white-bgc[disabled]:focus,
             output += '<table border="0" cellspacing="3" cellpadding="5" class="tiny table table-striped"'
                 + 'style="width:100%; border: 1px solid #ddd; margin-bottom: 0px;">';
 
+            var averageVolume = 1 * data.sellsSumAmountGood;
+            if (1 * data.buysSumAmountGood > averageVolume)
+                averageVolume = 1 * data.buysSumAmountGood;
+
             var width = data.sellsSumAmountGood;
+
             for (key in data.sells) {
 
                 output += '<tr style="background-color: transparent">';
 
+                var widthLocal = width;
+                if (widthLocal > averageVolume) {
+                    widthLocal = averageVolume;
+                }
+
                 output += '<td style="position: relative">';
-                output += '<span style="z-index: -1; width:' + 250 * width / data.sellsSumAmountGood
+                output += '<span style="z-index: -1; width:' + 250 * widthLocal / averageVolume
                         + '%; position:absolute; background-color:#ffe4e4; top: 0; bottom: 0; left: 0;"></span>';
 
                 width -= data.sells[key].amount;
@@ -1087,8 +1097,13 @@ button.white-bgc[disabled]:focus,
 
                 width += 1 * data.buys[key].buyingAmount; // преобразование строки в число
 
+                var widthLocal = width;
+                if (widthLocal > averageVolume) {
+                    widthLocal = averageVolume;
+                }
+
                 output += '<span style="position:absolute; z-index: -1; background-color:#cdfdcc; width:'
-                    + 250 * width / data.buysSumAmountGood + '%; top: 0; bottom: 0; left: 0;"></span>';
+                    + 250 * widthLocal / averageVolume + '%; top: 0; bottom: 0; left: 0;"></span>';
 
                 output += '<span><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a></span>';
                 output += '<td><a href=?tx=' + key + get_lang() + ' ><b>' + addCommas(data.buys[key].buyingPrice) + '</b></a>';
@@ -1120,79 +1135,47 @@ button.white-bgc[disabled]:focus,
                 output += '<td align=center><a href=?trade=' + trade.initiatorTx + '/' + trade.targetTx + get_lang()
                 output += '>' + convertTimestamp( trade.timestamp, false);
 
+                output += '<td align=right style="line-height: 150%;">';
+
+                if (trade.initiatorCreator_addr == data.assetHaveOwner) {
+                    output += ' <b>&#9654;</b> ';
+                }
+
+                if (trade.initiatorCreator_addr == data.assetWantOwner) {
+                    output += ' <b>&#9655;</b> ';
+                }
+                output += '<a href=?address=' + trade.initiatorCreator_addr + '>' + cutBlank(trade.initiatorCreator, 20) + '</a>';
+
                 if (trade.type == 'sell') {
-                    output += '<td align=right style="line-height: 150%;">';
-
-                    if (trade.initiatorCreator_addr == data.assetHaveOwner) {
-                        output += ' <b>&#9654;</b> ';
-                    }
-
-                    if (trade.initiatorCreator_addr == data.assetWantOwner) {
-                        output += ' <b>&#9655;</b> ';
-                    }
-                    output += '<a href=?address=' + trade.initiatorCreator_addr + '>' + cutBlank(trade.initiatorCreator, 20) + '</a>';
-                    //output += ' <img src=img/grright.png style="vertical-align: middle;">';
 
                     output += '<td align=right>' + addCommas(trade.amountHave);
-                    //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 
                     output += '<td align=left><span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.2em"></span>'
                         + '<b>' + addCommas(trade.realReversePrice) + '</b>';
-                    ///output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 
                     output += '<td align=right>' + addCommas(trade.amountWant);
-                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-
-                    output += '<td style="line-height: 150%;">';
-                    output += '<a href=?address=' + trade.targetCreator_addr + '>' + cutBlank(trade.targetCreator, 20) + '</a>';
-
-                    if (trade.targetCreator_addr == data.assetHaveOwner) {
-                        output += ' <b>&#9664;</span></b> ';
-                    }
-                    if (trade.targetCreator_addr == data.assetWantOwner) {
-                        output += ' <b>&#9665;</b> ';
-                    }
-
-                    //output += '<br>';
-                    //output += '<img src=img/grleft.png style="vertical-align: middle;"> ';
 
                 } else {
-                    output += '<td align=right style="line-height: 150%;">';
-
-                    if (trade.targetCreator_addr == data.assetHaveOwner) {
-                        output += ' <b>&#9654;</b> ';
-                    }
-
-                    if (trade.targetCreator_addr == data.assetWantOwner) {
-                        output += ' <b>&#9655;</b> ';
-                    }
-                    output += '<a href=?address=' + trade.targetCreator_addr + '>' + cut(trade.targetCreator, 20) + '</a>';
-                    //output += '<br>';
-                    //output += ' <img src=img/grright.png style="vertical-align: middle;">';
 
                     output += '<td align=right>' + addCommas(trade.amountHave);
-                    //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 
                     output += '<td align=left><span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.2em"></span>'
                         + '<b>' + addCommas(trade.realPrice) + '</b>';
-                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName) + '';
 
                     output += '<td align=right>' + addCommas(trade.amountWant);
-                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 
-                    output += '<td style="line-height: 150%;">';
-                    output += '<a href=?address=' + trade.initiatorCreator_addr + '>' + cut(trade.initiatorCreator, 20) + '</a>';
-
-                    if (trade.initiatorCreator_addr == data.assetHaveOwner) {
-                        output += ' <b>&#9664;</b> ';
-                    }
-                    if (trade.initiatorCreator_addr == data.assetWantOwner) {
-                        output += ' <b>&#9665;</b> ';
-                    }
-
-                    //output += '<br>';
-                    //output += '<img src=img/grleft.png style="vertical-align: middle;"> ';
                 }
+
+                output += '<td style="line-height: 150%;">';
+                output += '<a href=?address=' + trade.targetCreator_addr + '>' + cutBlank(trade.targetCreator, 20) + '</a>';
+
+                if (trade.targetCreator_addr == data.assetHaveOwner) {
+                    output += ' <b>&#9664;</span></b> ';
+                }
+                if (trade.targetCreator_addr == data.assetWantOwner) {
+                    output += ' <b>&#9665;</b> ';
+                }
+
             }
 
             output += '</table>';

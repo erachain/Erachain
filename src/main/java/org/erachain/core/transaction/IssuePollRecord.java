@@ -13,7 +13,7 @@ public class IssuePollRecord extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_POLL_TRANSACTION;
     private static final String NAME_ID = "Issue Poll";
 
-    public static final long START_KEY = BlockChain.DEVELOP_USE ? 0l : 1l << 0;
+    public static final long START_KEY = BlockChain.DEVELOP_USE ? 0l : 0l;
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, poll, feePow, timestamp, reference);
