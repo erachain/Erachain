@@ -1048,13 +1048,23 @@ button.white-bgc[disabled]:focus,
             output += '<table border="0" cellspacing="3" cellpadding="5" class="tiny table table-striped"'
                 + 'style="width:100%; border: 1px solid #ddd; margin-bottom: 0px;">';
 
+            var averageVolume = 1 * data.sellsSumAmountGood;
+            if (1 * data.buysSumAmountGood > averageVolume)
+                averageVolume = 1 * data.buysSumAmountGood;
+
             var width = data.sellsSumAmountGood;
+
             for (key in data.sells) {
 
                 output += '<tr style="background-color: transparent">';
 
+                var widthLocal = width;
+                if (widthLocal > averageVolume) {
+                    widthLocal = averageVolume;
+                }
+
                 output += '<td style="position: relative">';
-                output += '<span style="z-index: -1; width:' + 250 * width / data.sellsSumAmountGood
+                output += '<span style="z-index: -1; width:' + 250 * widthLocal / averageVolume
                         + '%; position:absolute; background-color:#ffe4e4; top: 0; bottom: 0; left: 0;"></span>';
 
                 width -= data.sells[key].amount;
@@ -1087,8 +1097,13 @@ button.white-bgc[disabled]:focus,
 
                 width += 1 * data.buys[key].buyingAmount; // преобразование строки в число
 
+                var widthLocal = width;
+                if (widthLocal > averageVolume) {
+                    widthLocal = averageVolume;
+                }
+
                 output += '<span style="position:absolute; z-index: -1; background-color:#cdfdcc; width:'
-                    + 250 * width / data.buysSumAmountGood + '%; top: 0; bottom: 0; left: 0;"></span>';
+                    + 250 * widthLocal / averageVolume + '%; top: 0; bottom: 0; left: 0;"></span>';
 
                 output += '<span><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a></span>';
                 output += '<td><a href=?tx=' + key + get_lang() + ' ><b>' + addCommas(data.buys[key].buyingPrice) + '</b></a>';
