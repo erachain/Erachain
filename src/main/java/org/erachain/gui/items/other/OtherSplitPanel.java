@@ -84,7 +84,7 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
 
         addMenuBan("Ban in 24 hours", 1440);
 
-        addMenuBan("Ban always", 999999);
+        addMenuBan("Ban always", Integer.MAX_VALUE);
 
         peersMenu.add(new JSeparator());
 
