@@ -146,7 +146,6 @@ public class AccountsTableModel extends TimerTableModelCls<PublicKeyAccount> imp
 
         super.addObservers();
         if (Controller.getInstance().doesWalletDatabaseExists()) {
-            map.addObserver(this);
         } else {
             // ожидаем открытия кошелька
             Controller.getInstance().wallet.addWaitingObserver(this);
