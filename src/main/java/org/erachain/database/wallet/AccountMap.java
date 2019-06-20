@@ -226,7 +226,8 @@ public class AccountMap extends DBMap <String, Integer> {
                     number = Controller.getInstance().wallet.getAccountNonce();
                 }
 
-                map.put(account.getAddress(), number);
+                // USE NOTIFY
+                super.set(account.getAddress(), number);
 
             }
         }
@@ -260,6 +261,9 @@ public class AccountMap extends DBMap <String, Integer> {
             }
 
             this.publickKeys.remove(account.getPublicKey());
+
+            // USE NOTIFY
+            super.delete(account.getAddress());
 
         }
     }

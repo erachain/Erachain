@@ -527,7 +527,7 @@ public class Wallet extends Observable implements Observer {
 					Lang.getInstance().translate("My Account") + " " + (nonce + 1), StrJSonFine.convert(ob)));
 			LOGGER.info("Added account #" + nonce);
 
-			this.commit();
+			this.database.hardFlush();
 
 			// NOTIFY
 			this.setChanged();
@@ -604,7 +604,7 @@ public class Wallet extends Observable implements Observer {
 
             // SAVE transactions file
             this.database.clearCache();
-            this.database.commit();
+            this.database.hardFlush();
 
             // RESET MAPS
 			this.database.getTransactionMap().reset();
@@ -640,7 +640,7 @@ public class Wallet extends Observable implements Observer {
 
         // SAVE transactions file
         this.database.clearCache();
-        this.database.commit();
+        this.database.hardFlush();
 
 		if (Controller.getInstance().isOnStopping())
 			return;
@@ -974,7 +974,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.getAccountMap().add(account, -1);
 
 			// SAVE TO DISK
-			this.commit();
+			this.database.hardFlush();
 
 			// SYNCHRONIZE
 			this.synchronize(true);
