@@ -44,7 +44,7 @@ public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls 
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send((byte) 2, TransactionAmount.BACKWARD_MASK,
                 (byte) 0, Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow,
-                recipient, -key, amount, head, isTextByte, messageBytes, encrypted);
+                recipient, -key, amount, head, messageBytes, isTextByte, encrypted);
 
         String Status_text = "";
         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, transaction,

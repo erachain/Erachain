@@ -2319,7 +2319,11 @@ public class BlockExplorer {
         for (Pair<Long, Long> pair : list) {
 
             AssetCls assetHave = Controller.getInstance().getAsset(pair.getA());
+            if (assetHave == null)
+                continue;
             AssetCls assetWant = Controller.getInstance().getAsset(pair.getB());
+            if (assetWant == null)
+                continue;
 
             Map pairJSON = new HashMap(100, 1);
             pairJSON.put("have", assetHave.jsonForExplorerPage(langObj));
