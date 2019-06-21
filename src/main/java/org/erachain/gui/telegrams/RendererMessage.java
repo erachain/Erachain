@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -13,6 +14,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.text.View;
 
 import org.erachain.core.transaction.RSend;
+import org.erachain.utils.Converter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
@@ -81,7 +83,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
                  background = "#DCDCDC";
             }
            
-          String text = enscript((RSend)val.c);
+          String text = encrypt((RSend)val.c);
           text = Library.to_HTML(text);
           
           if (isSelected) {
@@ -148,7 +150,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
    
     
     
-    private  String enscript(RSend trans) {
+    private  String encrypt(RSend trans) {
 
         //  jTextArea_Messge.setContentType("text/html");
         //  if (trans.isText())  jTextArea_Messge.setContentType("text");
@@ -160,36 +162,19 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
             return "<span style='color:Navy'>" + Lang.getInstance().translate("Encrypted") + "</span>";
         }
 
-        Account account = Controller.getInstance().getAccountByAddress(trans.getCreator().getAddress());
+        byte[] decryptedData = Controller.getInstance().decrypt(trans.getCreator(),
+                trans.getRecipient(), trans.getData());
 
-        byte[] privateKey = null;
-        byte[] publicKey = null;
-        //IF SENDER ANOTHER
-        if (account == null) {
-            PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(trans.getRecipient().getAddress());
-            privateKey = accountRecipient.getPrivateKey();
-
-            publicKey = trans.getCreator().getPublicKey();
-        }
-        //IF SENDER ME
-        else {
-            PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(account.getAddress());
-            privateKey = accountRecipient.getPrivateKey();
-
-            publicKey = Controller.getInstance().getPublicKeyByAddress(trans.getRecipient().getAddress());
-        }
-
-        try {
-            
-            isScriptImage = Settings.getInstance().getUserPath() + "images/messages/unlockedred.png";
-            return   new String(AEScrypto.dataDecrypt(trans.getData(), privateKey, publicKey), "UTF-8");
-            
-            
-
-        } catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
-            LOGGER.error(e1.getMessage(), e1);
+        if (decryptedData == null) {
             isScriptImage = Settings.getInstance().getUserPath() + "images/messages/locked.png";
+
             return "<span style='color:Red'>" + Lang.getInstance().translate("Error") + "</span>";
+        } else {
+            isScriptImage = Settings.getInstance().getUserPath() + "images/messages/unlockedred.png";
+
+            return trans.isText() ?
+                    new String(decryptedData, Charset.forName("UTF-8"))
+                    : Converter.toHex(decryptedData);
         }
 
     }
