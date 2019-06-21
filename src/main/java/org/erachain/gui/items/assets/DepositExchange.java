@@ -31,7 +31,7 @@ public class DepositExchange extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(DepositExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;
-    private MButton jButton_Cansel;
+    private MButton jButtonHistory;
     private MButton jButton_Confirm;
     private JComboBox<Account> jComboBox_YourAddress;
     public JComboBox<AssetCls> cbxAssets;
@@ -366,9 +366,82 @@ public class DepositExchange extends JPanel {
         //////////////////////////
         gridy += 3;
 
-        jButton_Cansel = new MButton(Lang.getInstance().translate("See Deposit History"), 2);
-        jButton_Cansel.addActionListener(new ActionListener() {
+        jButtonHistory = new MButton(Lang.getInstance().translate("See Deposit History"), 2);
+        jButtonHistory.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
+
+                JSONObject jsonObject;
+
+                // [TOKEN]/[ADDRESS]
+                String urlGetDetails = "https://api.face2face.cash/apipay/history.json/";
+
+                AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
+                switch ((int)asset.getKey()) {
+                    case 12:
+                        urlGetDetails += "12/" + jTextField_Address.getText(); // BTC -> eBTC
+                        break;
+                    case 2:
+                        urlGetDetails += "10/" + jTextField_Address.getText(); // BTC -> COMPU
+                        break;
+                    case 95:
+                        urlGetDetails += "13/" + jTextField_Address.getText(); // BTC -> eUSD
+                        break;
+                    default:
+                        urlGetDetails += "10/" + jTextField_Address.getText(); // BTC -> COMPU
+                }
+
+
+                String inputText = "";
+                try {
+
+                    // CREATE CONNECTION
+                    URL url = new URL(urlGetDetails);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+                    // EXECUTE
+                    int resCode = connection.getResponseCode();
+
+                    //READ RESULT
+                    InputStream stream;
+                    if (resCode == 400) {
+                        stream = connection.getErrorStream();
+                    } else {
+                        stream = connection.getInputStream();
+                    }
+
+                    InputStreamReader isReader = new InputStreamReader(stream, "UTF-8");
+                    //String result = new BufferedReader(isReader).readLine();
+
+                    BufferedReader bufferedReader = new BufferedReader(isReader);
+                    String inputLine;
+                    while ((inputLine = bufferedReader.readLine()) != null)
+                        inputText += inputLine;
+                    bufferedReader.close();
+
+                    jsonObject = (JSONObject) JSONValue.parse(inputText);
+
+                } catch (Exception e) {
+                    jsonObject = null;
+                    inputText = "";
+                }
+
+                if (jsonObject != null) {
+                    if (jsonObject.containsKey("deal")) {
+                        if (BlockChain.DEVELOP_USE) {
+                            jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
+                        }
+
+                        String rate = jsonObject.get("rate").toString();
+                        String bal = jsonObject.get("bal").toString();
+
+                        LOGGER.debug(StrJSonFine.convert(jsonObject));
+                        String help;
+                    } else {
+                        LOGGER.debug(StrJSonFine.convert(jsonObject));
+                    }
+                } else {
+                    jLabel_Adress_Check.setText(inputText);
+                }
             }
         });
 
@@ -379,7 +452,9 @@ public class DepositExchange extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         //gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
-        add(jButton_Cansel, gridBagConstraints);
+
+        if (BlockChain.DEVELOP_USE)
+            add(jButtonHistory, gridBagConstraints);
 
     }
 
