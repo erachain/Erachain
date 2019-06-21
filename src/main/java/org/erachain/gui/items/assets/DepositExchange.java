@@ -9,6 +9,7 @@ import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.FundTokensComboBoxModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.StrJSonFine;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
@@ -378,16 +379,19 @@ public class DepositExchange extends JPanel {
                 AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
                 switch ((int)asset.getKey()) {
                     case 12:
-                        urlGetDetails += "12/" + jTextField_Address.getText(); // BTC -> eBTC
+                        urlGetDetails += "@BTC/" + jTextField_Address.getText(); // BTC -> eBTC
                         break;
-                    case 2:
-                        urlGetDetails += "10/" + jTextField_Address.getText(); // BTC -> COMPU
+                    case 14:
+                        urlGetDetails += "@ETH/" + jTextField_Address.getText(); // BTC -> eBTC
+                        break;
+                    case 92:
+                        urlGetDetails += "@RUB/" + jTextField_Address.getText(); // BTC -> eUSD
                         break;
                     case 95:
-                        urlGetDetails += "13/" + jTextField_Address.getText(); // BTC -> eUSD
+                        urlGetDetails += "@USD/" + jTextField_Address.getText(); // BTC -> eUSD
                         break;
                     default:
-                        urlGetDetails += "10/" + jTextField_Address.getText(); // BTC -> COMPU
+                        urlGetDetails += "COMPU/" + jTextField_Address.getText(); // BTC -> COMPU
                 }
 
 
@@ -425,19 +429,85 @@ public class DepositExchange extends JPanel {
                     inputText = "";
                 }
 
+                LOGGER.debug(inputText);
+
                 if (jsonObject != null) {
                     if (jsonObject.containsKey("deal")) {
                         if (BlockChain.DEVELOP_USE) {
                             jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
                         }
 
-                        String rate = jsonObject.get("rate").toString();
-                        String bal = jsonObject.get("bal").toString();
+                        String resultText = "<html>";
+                        resultText += "<h3>" + Lang.getInstance().translate("Wait") + "</h3>";
+                        /**
+                         *  [{"abbrev": "COMPU", "id": 10},
+                         *      "0.01", "5zAuwca5nvAGboRNagXKamtZCHvLdBs5Zii1Sb51wMMigFccQnPzVdASQSWftmjotaazZKWKZLd4DtaEN5iVJ5qN",
+                         *      0, 0, 2, "2019-06-21 16:35:10", "7KJjTKrj7Zmm7cYJANWHmLfmNPoZbwmbiy"]
+                         */
+                        for (Object item: (JSONArray) jsonObject.get("unconfirmed")) {
+                            try {
+                                JSONArray array = (JSONArray) item;
+                                JSONObject curr = (JSONObject) array.get(0);
+                                resultText += array.get(1) + " " + curr.get("abbrev")
+                                        + " : " + array.get(6)
+                                        + " : " + array.get(2) + "<br>";
 
-                        LOGGER.debug(StrJSonFine.convert(jsonObject));
-                        String help;
+                            } catch (Exception e) {
+                                resultText += item.toString() + "<br>";
+                            }
+                        }
+
+                        resultText += "<h3>" + Lang.getInstance().translate("In Process") + "</h3>";
+                        /**
+                         * ???
+                         */
+                        for (Object item: (JSONArray) jsonObject.get("in_process")) {
+                            try {
+                                JSONArray array = (JSONArray) item;
+                                JSONObject curr = (JSONObject) array.get(0);
+                                resultText += array.get(1) + " " + curr.get("abbrev")
+                                        + " : " + array.get(6)
+                                        + " : " + array.get(2) + "<br>";
+
+                            } catch (Exception e) {
+                                resultText += item.toString() + "<br>";
+                            }
+                        }
+
+                        resultText += "<h3>" + Lang.getInstance().translate("Done") + "</h3>";
+        /**
+         * {"acc": "7KJjTKrj7Zmm7cYJANWHmLfmNPoZbwmbiy", "stasus": "ok",
+         * "curr_in": {"abbrev": "COMPU", "id": 10},
+         * "curr_out": {"abbrev": "COMPU", "id": 10},
+         * "pay_out": {"status": null, "info": null, "created_ts": 1561122345.0, "amo_in": 0.02, "amo_taken": 0.01890641, "tax_mess": null,
+         *      "vars": {"payment_id": "4g1bxW9aA8moR1vEwefmma6B3DpYawtrL2NaBHAaPFsibPgs8UAVZnJ6zytWew8KXNCyt28oL76EYKbJRasjfqUQ", "status": "success"},
+         *      "created_on": "2019-06-21 16:05:45", "txid": "4g1bxW9aA8moR1vEwefmma6B3DpYawtrL2NaBHAaPFsibPgs8UAVZnJ6zytWew8KXNCyt28oL76EYKbJRasjfqUQ",
+         *      "amount": 0.01888609, "amo_to_pay": 0.0, "amo_gift": 2.032e-05, "id": 77, "amo_partner": 0.0
+         *      },
+         *  "amount_in": 0.02, "created": "2019-06-21 16:03:10", "confitmations": 1,
+         *  "txid": "3C82efTYLiPjDgPpJqgeU8Kp5b9Bwe2aKsc1aXjtnXHhxpo9QbuuNrr3juhkEhcBTaV7fxeUynYdkPFSuXb6trU5"},
+         */
+                        for (Object item: (JSONArray) jsonObject.get("done")) {
+                            try {
+                                JSONObject json = (JSONObject) item;
+                                JSONObject curr_in = (JSONObject) json.get("curr_in");
+                                JSONObject curr_out = (JSONObject) json.get("curr_out");
+                                JSONObject pay_out = (JSONObject) json.get("pay_out");
+
+                                resultText += json.get("amount_in") + " " + curr_in.get("abbrev")
+                                        + " : " + pay_out.get("amo_taken") + " " + curr_out.get("abbrev")
+                                        + " : " + pay_out.get("created_on")
+                                        + " : " + pay_out.get("txid") + "<br>";
+                            } catch (Exception e) {
+                                resultText += item.toString() + "<br>";
+                            }
+                        }
+
+                        resultText += "</html>";
+                        jLabel_Adress_Check.setText(resultText);
+
                     } else {
-                        LOGGER.debug(StrJSonFine.convert(jsonObject));
+                        LOGGER.debug(inputText);
                     }
                 } else {
                     jLabel_Adress_Check.setText(inputText);
@@ -453,7 +523,7 @@ public class DepositExchange extends JPanel {
         //gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
 
-        if (BlockChain.DEVELOP_USE)
+        if (true || BlockChain.DEVELOP_USE)
             add(jButtonHistory, gridBagConstraints);
 
     }
