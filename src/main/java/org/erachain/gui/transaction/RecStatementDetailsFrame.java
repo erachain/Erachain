@@ -112,26 +112,18 @@ public class RecStatementDetailsFrame extends RecDetailsFrame {
                             }
                         }
 
-                        Account account = Controller.getInstance().getAccountByAddress(r_Statement.getCreator().getAddress());
+                        byte[] decryptedData = Controller.getInstance().decrypt(r_Statement.getCreator(),
+                                (Account) r_Statement.getRecipientAccounts().toArray()[0], r_Statement.getData());
 
-                        byte[] privateKey = null;
-                        byte[] publicKey = null;
-                        PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(account.getAddress());
-                        privateKey = accountRecipient.getPrivateKey();
+                        if (decryptedData == null) {
+                            messageText.setText(Lang.getInstance().translate("Decrypt Error!"));
+                        } else {
+                            messageText.setText(r_Statement.isText() ?
+                                    new String(decryptedData, Charset.forName("UTF-8"))
+                                    : Converter.toHex(decryptedData));
 
-                        publicKey = accountRecipient.getPublicKey();
-
-                        try {
-                            messageText.setText(new String(AEScrypto.dataDecrypt(r_Statement.getData(), privateKey, publicKey), "UTF-8"));
-                        } catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
-                            LOGGER.error(e1.getMessage(), e1);
                         }
-                    } else {
-                        try {
-                            messageText.setText(new String(r_Statement.getData(), "UTF-8"));
-                        } catch (UnsupportedEncodingException e1) {
-                            LOGGER.error(e1.getMessage(), e1);
-                        }
+
                     }
                     //encrypted.isSelected();
 

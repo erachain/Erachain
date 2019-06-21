@@ -427,7 +427,9 @@ public class OnDealClick {
             case Transaction.KEY_COLLISION:
                 mess = "Key collision, try again";
                 break;
-
+            case Transaction.TELEGRAM_DOES_NOT_EXIST:
+                mess = "Telegram does not exist";
+                break;
 
         }
         return mess;

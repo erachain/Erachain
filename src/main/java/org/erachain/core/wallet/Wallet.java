@@ -563,7 +563,7 @@ public class Wallet extends Observable implements Observer {
 		this.secureDatabase.delete(account);
 
 		// SAVE TO DISK
-		this.commit();
+		this.database.hardFlush();
 
 		// NOTIFY
 		this.setChanged();
@@ -616,7 +616,7 @@ public class Wallet extends Observable implements Observer {
 
             // SAVE transactions file
             this.database.clearCache();
-            this.database.commit();
+            this.database.hardFlush();
 
             // RESET MAPS
 			this.database.getTransactionMap().reset();
@@ -652,7 +652,7 @@ public class Wallet extends Observable implements Observer {
 
         // SAVE transactions file
         this.database.clearCache();
-        this.database.commit();
+        this.database.hardFlush();
 
 		if (Controller.getInstance().isOnStopping())
 			return;
@@ -693,7 +693,7 @@ public class Wallet extends Observable implements Observer {
 						this.syncHeight = height;
 
 						//logger.debug("try Commit");
-						this.database.hardFlush();
+						this.database.commit();
 
                         if (Controller.getInstance().isOnStopping())
                             return;
@@ -986,7 +986,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.getAccountMap().add(account, -1);
 
 			// SAVE TO DISK
-			this.commit();
+			this.database.hardFlush();
 
 			// SYNCHRONIZE
 			this.synchronize(true);
@@ -1843,7 +1843,7 @@ public class Wallet extends Observable implements Observer {
 
 	public void commit() {
 		if (this.database != null) {
-			this.database.commit();
+			this.database.hardFlush();
 		}
 
 		if (this.secureDatabase != null) {

@@ -10,6 +10,7 @@ import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.library.MAccoutnTextField;
 import org.erachain.lang.Lang;
+import org.erachain.utils.Converter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
@@ -20,6 +21,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 @SuppressWarnings("serial")
 public class Send_RecordDetailsFrame extends RecDetailsFrame {
@@ -140,43 +142,22 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
 
                         //	encrypted.setEnabled(false);
                         if (!encrypted.isSelected()) {
-                            Account account = Controller.getInstance().getAccountByAddress(r_Send.getCreator().getAddress());
 
-                            byte[] privateKey = null;
-                            byte[] publicKey = null;
-                            //IF SENDER ANOTHER
-                            if (account == null) {
-                                PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(r_Send.getRecipient().getAddress());
-                                if (accountRecipient == null) {
-                                    return;
-                                }
-                                privateKey = accountRecipient.getPrivateKey();
+                            byte[] decryptedData = Controller.getInstance().decrypt(r_Send.getCreator(),
+                                    r_Send.getRecipient(), r_Send.getData());
 
-                                publicKey = r_Send.getCreator().getPublicKey();
-                            }
-                            //IF SENDER ME
-                            else {
-                                PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(account.getAddress());
-                                if (accountRecipient == null) {
-                                    return;
-                                }
-                                privateKey = accountRecipient.getPrivateKey();
+                            if (decryptedData == null) {
+                                jTextArea_Messge.set_text(Lang.getInstance().translate("Decrypt Error!"));
+                            } else {
+                                jTextArea_Messge.set_text(r_Send.isText() ?
+                                        new String(decryptedData, Charset.forName("UTF-8"))
+                                        : Converter.toHex(decryptedData));
 
-                                publicKey = Controller.getInstance().getPublicKeyByAddress(r_Send.getRecipient().getAddress());
+                                encrypted.setSelected(!encrypted.isSelected());
                             }
 
-                            try {
-                                byte[] ddd = AEScrypto.dataDecrypt(r_data, privateKey, publicKey);
-                                String sss = new String(ddd, "UTF-8");
-                                String str = (new String(AEScrypto.dataDecrypt(r_data, privateKey, publicKey), "UTF-8"));
-                                jTextArea_Messge.set_text(str); //"{{" +  str.substring(0,RSend.MAX_DATA_VIEW) + "...}}");
-                            } catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
-                                jTextArea_Messge.set_text("unknown password");
-                                LOGGER.error(e1.getMessage(), e1);
-                            }
                         } else {
                             jTextArea_Messge.set_text(r_Send.viewData());
-
                         }
                     }
                 });

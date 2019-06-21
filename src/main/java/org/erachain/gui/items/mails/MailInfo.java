@@ -1,8 +1,6 @@
 package org.erachain.gui.items.mails;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
-import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.transaction.RSend;
 import org.erachain.gui.PasswordPane;
@@ -11,9 +9,9 @@ import org.erachain.gui.library.MAccoutnTextField;
 import org.erachain.gui.library.VoushLibraryPanel;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
+import org.erachain.utils.Converter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -23,7 +21,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -257,7 +255,7 @@ public class MailInfo extends javax.swing.JPanel {
 
         {
             public void actionPerformed(ActionEvent e) {
-                enscript();
+                encrypt();
             }
         });
 
@@ -266,7 +264,7 @@ public class MailInfo extends javax.swing.JPanel {
                 if (e.getClickCount() == 2) {
 
 
-                    enscript();
+                    encrypt();
 
                 }
             }
@@ -293,7 +291,7 @@ public class MailInfo extends javax.swing.JPanel {
     }// </editor-fold>
     // End of variables declaration 
 
-    void enscript() {
+    void encrypt() {
 
         //	jTextArea_Messge.setContentType("text/html");
         //	if (trans.isText())  jTextArea_Messge.setContentType("text");
@@ -314,34 +312,18 @@ public class MailInfo extends javax.swing.JPanel {
                 }
             }
 
-            Account account = Controller.getInstance().getAccountByAddress(trans.getCreator().getAddress());
+            byte[] decryptedData = Controller.getInstance().decrypt(trans.getCreator(),
+                    trans.getRecipient(), trans.getData());
 
-            byte[] privateKey = null;
-            byte[] publicKey = null;
-            //IF SENDER ANOTHER
-            if (account == null) {
-                PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(trans.getRecipient().getAddress());
-                privateKey = accountRecipient.getPrivateKey();
+            if (decryptedData == null) {
+                jTextArea_Messge.set_text(Lang.getInstance().translate("Decrypt Error!"));
+            } else {
+                jTextArea_Messge.set_text(trans.isText() ?
+                        new String(decryptedData, Charset.forName("UTF-8"))
+                        : Converter.toHex(decryptedData));
 
-                publicKey = trans.getCreator().getPublicKey();
-            }
-            //IF SENDER ME
-            else {
-                PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(account.getAddress());
-                privateKey = accountRecipient.getPrivateKey();
-
-                publicKey = Controller.getInstance().getPublicKeyByAddress(trans.getRecipient().getAddress());
-            }
-
-            try {
-                jTextArea_Messge.set_text(
-                        new String(AEScrypto.dataDecrypt(trans.getData(), privateKey, publicKey), "UTF-8"));
                 jButton1.setText(Lang.getInstance().translate("Encrypt message"));
                 encrypted = !encrypted;
-
-
-            } catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
-                LOGGER.error(e1.getMessage(), e1);
             }
         } else {
             jTextArea_Messge.set_text(trans.viewData());

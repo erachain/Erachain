@@ -33,8 +33,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
     public static final int COLUMN_SENDER = 5;
     public static final int COLUMN_RECIPIENT = 6;
     public static final int COLUMN_TITLE = 7;
-    public static final int COLUMN_MESSAGE = 8;
-    public static final int COLUMN_CONFIRM = 9;
+    public static final int COLUMN_CONFIRM = 8;
     public static final int COLUMN_ACTION_TYPE = 19;
 
     private boolean isEncrypted = true;
@@ -57,7 +56,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
 
     public AccountsTransactionsTableModel() {
         super(Controller.getInstance().wallet.database.getTransactionMap(),
-                new String[]{"Date", "RecNo", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "Type Asset"},
+                new String[]{"Date", "RecNo", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation"},
                 new Boolean[]{false, true, true, false, false}, false);
 
         dcSet = DCSet.getInstance();
@@ -124,50 +123,6 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
             case COLUMN_TITLE:
                 return r_Tran.title;
 
-            case COLUMN_MESSAGE:
-
-                if (r_Tran.transaction.getType() != Transaction.SEND_ASSET_TRANSACTION)
-                    return "";
-
-                RSend rs = ((RSend) r_Tran.transaction);
-                if (rs == rs)
-                    return rs.getHead();
-                if (!rs.isEncrypted())
-                    return rs.viewData();
-                if (this.isEncrypted)
-                    return rs.viewData();
-                if (!Controller.getInstance().isWalletUnlocked())
-                    return rs.viewData();
-
-                // IF SENDER ANOTHER
-                // if(account == null)
-                if (!r_Tran.transaction.getCreator().getAddress().equals(this.sender.getAddress()))
-
-                {
-                    PrivateKeyAccount accountRecipient = Controller.getInstance()
-                            .getPrivateKeyAccountByAddress(rs.getRecipient().getAddress());
-                    privateKey = accountRecipient.getPrivateKey();
-
-                    publicKey = rs.getCreator().getPublicKey();
-                }
-                // IF SENDER ME
-                else {
-                    PrivateKeyAccount accountRecipient = Controller.getInstance()
-                            .getPrivateKeyAccountByAddress(this.sender.getAddress());
-                    privateKey = accountRecipient.getPrivateKey();
-
-                    publicKey = Controller.getInstance().getPublicKeyByAddress(rs.getRecipient().getAddress());
-                }
-
-                try {
-                    byte[] ddd = AEScrypto.dataDecrypt(rs.getData(), privateKey, publicKey);
-                    String sss = new String(ddd, "UTF-8");
-                    String str1 = (new String(AEScrypto.dataDecrypt(rs.getData(), privateKey, publicKey), "UTF-8"));
-                    return str1; // "{{" + str.substring(0,RSend.MAX_DATA_VIEW) +
-                    // "...}}");
-                } catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
-                    return ("unknown password");
-                }
             case COLUMN_ACTION_TYPE:
 
                 return r_Tran.transaction.viewFullTypeName();
