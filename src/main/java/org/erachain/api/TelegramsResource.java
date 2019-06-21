@@ -531,7 +531,9 @@ public class TelegramsResource {
      */
     @POST
     @Path("delete")
-    public String deleteTelegram(String value) {
+    public String deleteTelegram(String value, @QueryParam("password") String password) {
+
+        //APIUtils.askAPICallAllowed(password, "Delete telegrams request", request, true);
 
         JSONObject jsonObject;
         try {
@@ -542,10 +544,10 @@ public class TelegramsResource {
         }
 
         JSONArray arraySign = (JSONArray) (jsonObject.get("list"));
+        JSONArray arrayNotDelete = new JSONArray();
         JSONObject out = new JSONObject();
         List<String> deleteList = new ArrayList<>();
         Controller controller = Controller.getInstance();
-
 
         String signature;
         for (Object obj : arraySign) {
@@ -553,23 +555,14 @@ public class TelegramsResource {
             signature = obj.toString();
             TelegramMessage telegramMessage = controller.getTelegram(signature);
             if (telegramMessage == null)
-                out.put("signature", signature);
-            else {
-                boolean found = false;
-                for (Account account : controller.getAccounts()) {
-                    if (telegramMessage.getTransaction().isInvolved(account)) {
-                        deleteList.add(signature);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                    out.put("signature", signature);
-            }
+                arrayNotDelete.add(signature);
+
+            deleteList.add(signature);
         }
 
         try {
             controller.deleteTelegram(deleteList);
+            out.put("signature", arrayNotDelete);
             return out.toJSONString();
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(e.getMessage());
