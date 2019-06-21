@@ -539,7 +539,7 @@ public class Wallet extends Observable implements Observer {
 					Lang.getInstance().translate("My Account") + " " + (nonce + 1), StrJSonFine.convert(ob)));
 			LOGGER.info("Added account #" + nonce);
 
-			this.database.hardFlush();
+			this.commit();
 
 			// NOTIFY
 			this.setChanged();
@@ -563,7 +563,7 @@ public class Wallet extends Observable implements Observer {
 		this.secureDatabase.delete(account);
 
 		// SAVE TO DISK
-		this.commit();
+		this.database.hardFlush();
 
 		// NOTIFY
 		this.setChanged();
@@ -693,7 +693,7 @@ public class Wallet extends Observable implements Observer {
 						this.syncHeight = height;
 
 						//logger.debug("try Commit");
-						this.database.hardFlush();
+						this.database.commit();
 
                         if (Controller.getInstance().isOnStopping())
                             return;
@@ -1843,7 +1843,7 @@ public class Wallet extends Observable implements Observer {
 
 	public void commit() {
 		if (this.database != null) {
-			this.database.commit();
+			this.database.hardFlush();
 		}
 
 		if (this.secureDatabase != null) {
