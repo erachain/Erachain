@@ -53,7 +53,7 @@ public class WalletSyncButton extends JButton implements Observer {
                     Controller.getInstance().wallet.database.getAccountMap().add(privateAccount, ++number);
                 }
 
-                Controller.getInstance().wallet.database.commit();
+                Controller.getInstance().wallet.database.hardFlush();
 
                 int n = JOptionPane.showConfirmDialog(
                         new JFrame(), Lang.getInstance().translate("Sync wallet") + "?",
