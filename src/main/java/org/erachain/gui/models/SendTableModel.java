@@ -34,6 +34,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import org.erachain.core.account.PublicKeyAccount;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
@@ -426,44 +427,17 @@ public class SendTableModel extends JTable implements Observer {
                     }
                 }
 
-                Account account = messageBufs.get(row).getSender();
+                byte[] decryptedData = Controller.getInstance().decrypt(messageBufs.get(row).sender,
+                        messageBufs.get(row).recipient, messageBufs.get(row).rawMessage);
 
-                byte[] privateKey = null;
-                byte[] publicKey = null;
-                //IF SENDER ANOTHER
-                if (account == null) {
-                    PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(messageBufs.get(row).getRecipient().getAddress());
-                    privateKey = accountRecipient.getPrivateKey();
-
-                    publicKey = messageBufs.get(row).getSenderPublicKey();
-                }
-                //IF SENDER ME
-                else {
-                    PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(account.getAddress());
-                    privateKey = accountRecipient.getPrivateKey();
-
-                    if (messageBufs.get(row).getToPublicKey() == null) {
-                        messageBufs.get(row).setRecipientPublicKey(Controller.getInstance().getPublicKeyByAddress(messageBufs.get(row).getRecipient().getAddress()));
-                    }
-                    publicKey = messageBufs.get(row).getToPublicKey();
-                }
-
-                byte[] decrypt = null;
-
-                try {
-                    decrypt = AEScrypto.dataDecrypt(messageBufs.get(row).getMessage(), privateKey, publicKey);
-                } catch (InvalidCipherTextException | NullPointerException e1) {
-                    LOGGER.error(e1.getMessage(), e1);
-                    messageBufs.get(row).setDecryptedMessage(Lang.getInstance().translate("Decrypt Error!"));
-                }
-
-                if (decrypt == null) {
+                if (decryptedData == null) {
                     messageBufs.get(row).setDecryptedMessage(Lang.getInstance().translate("Decrypt Error!"));
                 } else {
-                    messageBufs.get(row).setDecryptedMessage((messageBufs.get(row).isText()) ? new String(decrypt, Charset.forName("UTF-8")) : Converter.toHex(decrypt));
+                    messageBufs.get(row).setDecryptedMessage((messageBufs.get(row).isText()) ? new String(decryptedData, Charset.forName("UTF-8")) : Converter.toHex(decryptedData));
                     messageBufs.get(row).setOpend(true);
                     menuDecrypt.setText(Lang.getInstance().translate("Hide decrypted"));
                 }
+
             } else {
                 if (toOpen != 1) {
                     messageBufs.get(row).setDecryptedMessage("");
@@ -504,7 +478,7 @@ public class SendTableModel extends JTable implements Observer {
         private boolean encrypted;
         private boolean opened;
         private boolean isText;
-        private Account sender;
+        private PublicKeyAccount sender;
         private byte[] senderPublicKey;
         private Account recipient;
         private byte[] recipientPublicKey;
@@ -514,7 +488,7 @@ public class SendTableModel extends JTable implements Observer {
         private BigDecimal fee;
         private byte[] signature;
 
-        public MessageBuf(byte[] rawMessage, boolean encrypted, Account sender, Account recipient, long timestamp, BigDecimal amount, long assetKey, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText) {
+        public MessageBuf(byte[] rawMessage, boolean encrypted, PublicKeyAccount sender, Account recipient, long timestamp, BigDecimal amount, long assetKey, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText) {
             this.rawMessage = rawMessage;
             this.encrypted = encrypted;
             this.decryptedMessage = "";
