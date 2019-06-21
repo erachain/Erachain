@@ -234,7 +234,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int INVALID_TRANSACTION_TYPE = 550;
     public static final int INVALID_BLOCK_HEIGHT = 599;
     public static final int INVALID_BLOCK_TRANS_SEQ_ERROR = 501;
-    public static final int TELEGRAM_DOES_NOT_EXIST = 540;
+    public static final int TELEGRAM_DOES_NOT_EXIST = 541;
     public static final int NOT_YET_RELEASED = 599;
     public static final int AT_ERROR = 600; // END error for org.erachain.api.ApiErrorFactory.ERROR
 
