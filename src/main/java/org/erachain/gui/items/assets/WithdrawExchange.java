@@ -286,11 +286,15 @@ public class WithdrawExchange extends JPanel {
         add(jButton_Confirm, gridBagConstraints);
 
         //////////////////////////
+
+        JLabel jText_History = new JLabel();
+
         gridy += 3;
 
         jButton_Cansel = new MButton(Lang.getInstance().translate("See Withdraw Transactions"), 2);
         jButton_Cansel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
+                jText_History.setText(DepositExchange.showHistory((AssetCls) cbxAssets.getSelectedItem(), jTextField_Address.getText()));
             }
         });
 
@@ -301,6 +305,15 @@ public class WithdrawExchange extends JPanel {
         //gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
         add(jButton_Cansel, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        add(jText_History, gridBagConstraints);
 
     }
 
