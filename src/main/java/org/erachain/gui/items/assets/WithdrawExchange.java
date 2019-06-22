@@ -294,7 +294,8 @@ public class WithdrawExchange extends JPanel {
         jButton_Cansel = new MButton(Lang.getInstance().translate("See Withdraw Transactions"), 2);
         jButton_Cansel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                jText_History.setText(DepositExchange.showHistory((AssetCls) cbxAssets.getSelectedItem(), jTextField_Address.getText()));
+                jText_History.setText(DepositExchange.showHistory((AssetCls) cbxAssets.getSelectedItem(),
+                        jTextField_Address.getText(), jLabel_Adress_Check));
             }
         });
 

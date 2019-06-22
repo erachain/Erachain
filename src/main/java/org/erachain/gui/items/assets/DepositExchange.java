@@ -374,7 +374,8 @@ public class DepositExchange extends JPanel {
         jButtonHistory.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
 
-                jText_History.setText(showHistory((AssetCls) cbxAssets.getSelectedItem(), jTextField_Address.getText()));
+                jText_History.setText(showHistory((AssetCls) cbxAssets.getSelectedItem(),
+                        jTextField_Address.getText(), jLabel_Adress_Check));
 
             }
         });
@@ -400,7 +401,7 @@ public class DepositExchange extends JPanel {
 
     }
 
-    public static String showHistory(AssetCls asset, String address) {
+    public static String showHistory(AssetCls asset, String address, JLabel tip) {
         JSONObject jsonObject;
 
         // [TOKEN]/[ADDRESS]
@@ -465,7 +466,7 @@ public class DepositExchange extends JPanel {
         if (jsonObject != null) {
             if (jsonObject.containsKey("deal")) {
                 if (BlockChain.DEVELOP_USE) {
-                    jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
+                    tip.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
                 }
 
                 String resultText = "<html>";
