@@ -1071,27 +1071,27 @@ public class BlockExplorer {
         tradeJSON.put("initiatorTx", Transaction.viewDBRef(orderInitiator.getId()));
         tradeJSON.put("initiatorCreator_addr", orderInitiator.getCreator().getAddress()); // viewCreator
         tradeJSON.put("initiatorCreator", orderInitiator.getCreator().getPersonOrShortAddress(12));
-        tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().setScale(pairAssetHave.getScale()).toPlainString());
+        tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
 
         tradeJSON.put("targetTx", Transaction.viewDBRef(orderTarget.getId()));
         tradeJSON.put("targetCreator_addr", orderTarget.getCreator().getAddress()); // viewCreator
         tradeJSON.put("targetCreator", orderTarget.getCreator().getPersonOrShortAddress(12)); // viewCreator
-        tradeJSON.put("targetAmount", orderTarget.getAmountHave().setScale(pairAssetHave.getScale()).toPlainString());
+        tradeJSON.put("targetAmount", orderTarget.getAmountHave().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
 
         tradeJSON.put("timestamp", trade.getTimestamp());
 
         if (pairHaveKey == orderInitiator.getHave()) {
             tradeJSON.put("type", "sell");
 
-            tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetWant.getScale()).toPlainString());
-            tradeJSON.put("amountWant", trade.getAmountHave().setScale(pairAssetHave.getScale()).toPlainString());
+            tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+            tradeJSON.put("amountWant", trade.getAmountHave().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
 
 
         } else {
             tradeJSON.put("type", "buy");
 
-            tradeJSON.put("amountHave", trade.getAmountHave().setScale(pairAssetHave.getScale()).toPlainString());
-            tradeJSON.put("amountWant", trade.getAmountWant().setScale(pairAssetWant.getScale()).toPlainString());
+            tradeJSON.put("amountHave", trade.getAmountHave().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+            tradeJSON.put("amountWant", trade.getAmountWant().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
         }
 
         return tradeJSON;
