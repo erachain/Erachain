@@ -24,6 +24,11 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
     private Order order;
     private boolean isSell;
 
+    /**
+     * Ордера которые погрызли данный
+     * @param order
+     * @param isSell
+     */
     public OrderTradesTableModel(Order order, boolean isSell) {
         super(new String[]{"Timestamp", "Type", "Amount", "Price", "Total"}, true);
 
@@ -46,13 +51,10 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
 
 
         int type = 0;
-        Order initatorOrder = null;
-        Order targetOrder = null;
-
         DCSet db = DCSet.getInstance();
 
-        initatorOrder = Order.getOrder(db, trade.getInitiator());
-        targetOrder = Order.getOrder(db, trade.getTarget());
+        Order initiatorOrder = Order.getOrder(db, trade.getInitiator());
+        Order targetOrder = Order.getOrder(db, trade.getTarget());
 
         switch (column) {
             case COLUMN_TIMESTAMP:
@@ -72,7 +74,7 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
                 else
                     result = NumberAsString.formatAsString(trade.getAmountWant());
 
-                if (Controller.getInstance().isAddressIsMine(initatorOrder.getCreator().getAddress())) {
+                if (Controller.getInstance().isAddressIsMine(initiatorOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
                 }
 
