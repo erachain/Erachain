@@ -2,6 +2,7 @@ package org.erachain.gui.items.assets;
 
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -11,8 +12,8 @@ import java.awt.event.ActionListener;
 
 public class ExchangePanel extends JPanel {
     private static final long serialVersionUID = -7052380905136603354L;
-    public CreateOrderPanel buyOrderPanel;
-    EchangeSellBuyPanel tt;
+    //public CreateOrderPanel buyOrderPanel;
+    //EchangeSellBuyPanel tt;
     String action;
     String account;
     java.awt.GridBagConstraints gridBagConstraints;
@@ -58,9 +59,13 @@ public class ExchangePanel extends JPanel {
         if (want == null) {
             want = (AssetCls) DCSet.getInstance().getItemAssetMap().get((long) 1);
         }
+
+        setName(Lang.getInstance().translate("Exchange"));
+
     }
 
     private void initComponents() {
+
         // LAYOUT
         this.setLayout(new GridBagLayout());
         // select panel
@@ -84,6 +89,11 @@ public class ExchangePanel extends JPanel {
                 AssetCls a = have;
                 have = want;
                 want = a;
+
+                if (!getName().equals(Lang.getInstance().translate("Exchange"))) {
+                    MainPanel.getInstance().renameTab(getName(),
+                        have.getTickerName() + "/" + want.getTickerName());
+                }
 
                 jTextField_Asset_1.setText(have.viewName());
                 jScrollPane_jPanel_RightPanel.setViewportView(new EchangeSellBuyPanel(have, want, action, account));
@@ -129,6 +139,12 @@ public class ExchangePanel extends JPanel {
                 AssetPairSelect ss = new AssetPairSelect(want.getKey(), "", "");
                 if (ss.pairAsset != null) {
                     have = ss.pairAsset;
+
+                    if (!getName().equals(Lang.getInstance().translate("Exchange"))) {
+                        MainPanel.getInstance().renameTab(getName(),
+                                have.getTickerName() + "/" + want.getTickerName());
+                    }
+
                     jTextField_Asset_1.setText(have.viewName());
                     jScrollPane_jPanel_RightPanel
                             .setViewportView(new EchangeSellBuyPanel(have, want, action, account));
@@ -163,6 +179,11 @@ public class ExchangePanel extends JPanel {
                 AssetPairSelect ss = new AssetPairSelect(have.getKey(), "", "");
                 if (ss.pairAsset != null) {
                     want = ss.pairAsset;
+
+                    if (!getName().equals(Lang.getInstance().translate("Exchange"))) {
+                        MainPanel.getInstance().renameTab(getName(),
+                                have.getTickerName() + "/" + want.getTickerName());
+                    }
 
                     jTextField_Asset_2.setText(want.viewName());
                     jScrollPane_jPanel_RightPanel

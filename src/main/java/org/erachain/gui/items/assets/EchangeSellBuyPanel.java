@@ -352,6 +352,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) createOrder);
                 dd.jScrollPane1.setViewportView(ww);
                 dd.setLocationRelativeTo(null);
+                dd.pack();
                 dd.setVisible(true);
 
             }

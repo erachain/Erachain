@@ -178,6 +178,16 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
     }
 
+    public String getTickerName() {
+        String[] words = this.viewName().split(" ");
+        String name = words[0].trim();
+        if (name.length() >6) {
+            name = name.substring(0, 6);
+        }
+        return name;
+
+    }
+
     public byte[] getIcon() {
         return this.icon;
     }

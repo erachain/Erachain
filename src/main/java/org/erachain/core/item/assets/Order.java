@@ -10,6 +10,7 @@ import org.erachain.datachain.CompletedOrderMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TradeMap;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -246,6 +247,25 @@ public class Order implements Comparable<Order> {
         return this.fulfilledHave.multiply(this.price).setScale(this.amountWant.scale(), RoundingMode.HALF_DOWN);
     }
 
+    public String state() {
+        if (amountHave.compareTo(fulfilledHave) == 0) {
+            return "Done";
+        } else {
+
+            if (DCSet.getInstance().getCompletedOrderMap().contains(id))
+                return "Canceled";
+
+            if (DCSet.getInstance().getOrderMap().contains(id)) {
+                if (fulfilledHave.signum() == 0)
+                    return "Active";
+                else
+                    return "Fulfilled";
+            }
+
+            return "Orphaned"; //"unconfirmed";
+        }
+
+    }
     ///////// PRICE
     public BigDecimal getPrice() {
         return this.price;

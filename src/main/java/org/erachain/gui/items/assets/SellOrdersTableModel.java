@@ -31,7 +31,7 @@ public class SellOrdersTableModel extends SortedListTableModelCls<Long, Order> i
     private long wantKey;
 
     public SellOrdersTableModel(AssetCls have, AssetCls want) {
-        super(DCSet.getInstance().getOrderMap(), new String[]{"Amount", "Price", "Who"}, true);
+        super(DCSet.getInstance().getOrderMap(), new String[]{"Amount", "Price", "Creator"}, true);
 
         this.have = have;
         this.want = want;

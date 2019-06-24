@@ -605,6 +605,16 @@ public class MainPanel extends javax.swing.JPanel {
 
     }
 
+    // insert tab in tabbedpane
+    public void renameTab(String oldTitle, String newTitle) {
+        int index = jTabbedPane1.indexOfTab(oldTitle);
+        if (index > 0) {
+            jTabbedPane1.setTitleAt(index, newTitle);
+            jTabbedPane1.getComponentAt(index).setName(newTitle);
+        }
+
+    }
+
     // get node by name
     private DefaultMutableTreeNode getNodeByName(String sNodeName, DefaultMutableTreeNode parent) {
         if (parent != null)
