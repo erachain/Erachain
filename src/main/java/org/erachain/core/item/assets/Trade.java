@@ -81,8 +81,14 @@ public class Trade {
     public BigDecimal calcPrice() {
         return Order.calcPrice(this.amountHave, this.amountWant);
     }
+    public BigDecimal calcPrice(int addScale) {
+        return Order.calcPrice(this.amountHave, this.amountWant, addScale);
+    }
     public BigDecimal calcPriceRevers() {
         return Order.calcPrice(this.amountWant, this.amountHave);
+    }
+    public BigDecimal calcPriceRevers(int addScale) {
+        return Order.calcPrice(this.amountWant, this.amountHave, addScale);
     }
 
     public int getSequence() {

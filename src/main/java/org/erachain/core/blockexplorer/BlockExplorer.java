@@ -1065,8 +1065,14 @@ public class BlockExplorer {
 
         Order orderTarget = Order.getOrder(dcSet, trade.getTarget());
 
-        tradeJSON.put("realPrice", trade.calcPrice().toPlainString());
-        tradeJSON.put("realReversePrice", trade.calcPriceRevers().toPlainString());
+        //tradeJSON.put("realPrice", trade.calcPrice(pairAssetWant.getScale()).setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+        //.setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+        tradeJSON.put("realPrice", Order.calcPrice(trade.getAmountHave().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN),
+                trade.getAmountWant().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN)));
+
+        //tradeJSON.put("realReversePrice", trade.calcPriceRevers(pairAssetWant.getScale()).setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+        tradeJSON.put("realReversePrice", Order.calcPrice(trade.getAmountWant().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN),
+                trade.getAmountHave().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN)));
 
         tradeJSON.put("initiatorTx", Transaction.viewDBRef(orderInitiator.getId()));
         tradeJSON.put("initiatorCreator_addr", orderInitiator.getCreator().getAddress()); // viewCreator
@@ -1083,8 +1089,8 @@ public class BlockExplorer {
         if (pairHaveKey == orderInitiator.getHave()) {
             tradeJSON.put("type", "sell");
 
-            tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
-            tradeJSON.put("amountWant", trade.getAmountHave().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+            tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+            tradeJSON.put("amountWant", trade.getAmountHave().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
 
 
         } else {
