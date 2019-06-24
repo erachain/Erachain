@@ -112,7 +112,7 @@ public class TradesFrame extends JDialog {
 
         //PACK
         this.pack();
-        //this.setSize(500, this.getHeight());
+        this.setSize(800, this.getHeight());
         this.setResizable(true);
         this.setLocationRelativeTo(null);
         this.setVisible(true);

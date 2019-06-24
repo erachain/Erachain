@@ -30,7 +30,7 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
      * @param isSell
      */
     public OrderTradesTableModel(Order order, boolean isSell) {
-        super(new String[]{"Timestamp", "Type", "Amount", "Price", "Total"}, true);
+        super(new String[]{"Timestamp", "Type", isSell?"Amount":"Creator", "Price", !isSell?"Amount":"Creator"}, true);
 
         this.order = order;
         this.isSell = isSell;
@@ -72,7 +72,7 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
                 if (isSell)
                     result = NumberAsString.formatAsString(trade.getAmountHave());
                 else
-                    result = NumberAsString.formatAsString(trade.getAmountWant());
+                    result = initiatorOrder.getCreator().getPersonAsString();
 
                 if (Controller.getInstance().isAddressIsMine(initiatorOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
@@ -90,7 +90,8 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
             case COLUMN_AMOUNT_WANT:
 
                 if (isSell)
-                    result = NumberAsString.formatAsString(trade.getAmountWant());
+                    result = initiatorOrder.getCreator().getPersonAsString();
+                    //result = NumberAsString.formatAsString(trade.getAmountWant());
                 else
                     result = NumberAsString.formatAsString(trade.getAmountHave());
 
