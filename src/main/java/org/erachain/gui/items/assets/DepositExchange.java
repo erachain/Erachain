@@ -57,7 +57,7 @@ public class DepositExchange extends JPanel {
 
     }
 
-    public void onGoClick() {
+    public void onGoClick(JLabel jText_Help) {
 
         jButton_getDetails.setEnabled(false);
         jTextField_Details.setText("");
@@ -158,6 +158,10 @@ public class DepositExchange extends JPanel {
 
         jButton_getDetails.setEnabled(true);
 
+        jText_Help.setText("<html><h2>5. " + Lang.getInstance().translate(
+                "Transfer bitcoins to address below") + "</h2></html>");
+        jButton_getDetails.setText(Lang.getInstance().translate("Get Payment Details"));
+
     }
 
     private void initComponents(AssetCls asset_in, Account account) {
@@ -189,10 +193,35 @@ public class DepositExchange extends JPanel {
         this.setLayout(layout);
 
         int gridy = 0;
+
+        JLabel jText_Title = new JLabel();
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        add(jText_Title, gridBagConstraints);
+        jText_Title.setText("<html><h1>" + Lang.getInstance().translate("Deposit to Exchange by Bitcoins") + "</h1></html>");
+
+        JLabel jText_Help = new JLabel();
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        add(jText_Help, gridBagConstraints);
+        jText_Help.setText("<html><h2>1. " + Lang.getInstance().translate("Select Your account or insert it in field below") + "</h2></html>");
+
         jLabel_YourAddress.setText(Lang.getInstance().translate("Your account") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.anchor = GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new Insets(21, 27, 0, 0);
         add(jLabel_YourAddress, gridBagConstraints);
@@ -205,6 +234,9 @@ public class DepositExchange extends JPanel {
             public void actionPerformed(ActionEvent e) {
 
                 jTextField_Address.setText(((Account) jComboBox_YourAddress.getSelectedItem()).getAddress());
+
+                jText_Help.setText("<html><h2>2. " + Lang.getInstance().translate(
+                        "Select Asset that Your wish to obtain") + "</h2></html>");
 
             }
         });
@@ -298,6 +330,11 @@ public class DepositExchange extends JPanel {
                                             " " + Lang.getInstance().translate("for deposit") + " bitcoins",
                                     detailsHead);
                     }
+
+                    jText_Help.setText("<html><h2>3. " + Lang.getInstance().translate(
+                            "Click '%1' button and pay bitcoins to that address")
+                            .replace("%1", Lang.getInstance().translate("Get Payment Details")) + "</h2></html>");
+
                 }
             }
         });
@@ -310,7 +347,14 @@ public class DepositExchange extends JPanel {
         jButton_getDetails.setToolTipText("");
         jButton_getDetails.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                onGoClick();
+                jButton_getDetails.setText(Lang.getInstance().translate("Wait") + "...");
+                jText_Help.setText("<html><h2><blink>4. " + Lang.getInstance().translate(
+                        "Please Wait...") + "</blink></h2></html>");
+
+                // чтобы не ждать зависание скрипта - и отображение текста моментальное будеьт
+                new Thread(() -> {
+                    onGoClick(jText_Help);
+                }).start();
             }
         });
 
