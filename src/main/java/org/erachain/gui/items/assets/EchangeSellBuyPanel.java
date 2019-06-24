@@ -231,7 +231,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 row = sellOrdersTable.convertRowIndexToModel(row);
 
                 Order order = sellOrdersTableModel.getItem(row);
-                new TradesFrame(order);
+                new TradesFrame(order, true);
             }
         });
         sellOrdersMenu.add(trades);
@@ -374,7 +374,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
                 Order order = buyOrdersTableModel.getItem(row);
                 if (order != null)
-                    new TradesFrame(order);
+                    new TradesFrame(order, false);
             }
         });
         buyOrdersMenu.add(buyTrades);

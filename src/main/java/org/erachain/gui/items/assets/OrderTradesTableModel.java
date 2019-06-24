@@ -3,13 +3,11 @@ package org.erachain.gui.items.assets;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
-import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.Observable;
@@ -24,11 +22,13 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
     public static final int COLUMN_AMOUNT_WANT = 4;
 
     private Order order;
+    private boolean isSell;
 
-    public OrderTradesTableModel(Order order) {
+    public OrderTradesTableModel(Order order, boolean isSell) {
         super(new String[]{"Timestamp", "Type", "Amount", "Price", "Total"}, true);
 
         this.order = order;
+        this.isSell = isSell;
         this.listSorted = DCSet.getInstance().getTradeMap().getTrades(order.getId());
 
     }
@@ -54,8 +54,6 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
         initatorOrder = Order.getOrder(db, trade.getInitiator());
         targetOrder = Order.getOrder(db, trade.getTarget());
 
-        boolean isBuy = initatorOrder.getHave() == this.order.getHave();
-
         switch (column) {
             case COLUMN_TIMESTAMP:
 
@@ -63,13 +61,13 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
 
             case COLUMN_TYPE:
 
-                return isBuy ? Lang.getInstance().translate("Buy") : Lang.getInstance().translate("Sell");
+                return isSell ? Lang.getInstance().translate("Buy") : Lang.getInstance().translate("Sell");
 
             case COLUMN_AMOUNT:
 
                 String result;
 
-                if (true || isBuy)
+                if (isSell)
                     result = NumberAsString.formatAsString(trade.getAmountHave());
                 else
                     result = NumberAsString.formatAsString(trade.getAmountWant());
@@ -82,14 +80,14 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
 
             case COLUMN_PRICE:
 
-                if (true || isBuy)
+                if (isSell)
                     return NumberAsString.formatAsString(trade.calcPrice(order.getHaveAsset(), order.getWantAsset()));
                 else
                     return NumberAsString.formatAsString(trade.calcPriceRevers(order.getHaveAsset(), order.getWantAsset()));
 
             case COLUMN_AMOUNT_WANT:
 
-                if (true || isBuy)
+                if (isSell)
                     result = NumberAsString.formatAsString(trade.getAmountWant());
                 else
                     result = NumberAsString.formatAsString(trade.getAmountHave());

@@ -2,15 +2,10 @@ package org.erachain.gui.items.assets;
 
 import org.erachain.core.item.assets.Order;
 import org.erachain.lang.Lang;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +14,7 @@ public class TradesFrame extends JDialog {
 
     private OrderTradesTableModel tradesTableModel;
 
-    public TradesFrame(Order order) {
+    public TradesFrame(Order order, boolean isSell) {
 
         //super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Trades"));
         setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Trades"));
@@ -73,7 +68,7 @@ public class TradesFrame extends JDialog {
         tableGBC.gridy = 1;
 
         //CREATE TABLE
-        this.tradesTableModel = new OrderTradesTableModel(order);
+        this.tradesTableModel = new OrderTradesTableModel(order, isSell);
         final JTable tradesTable = new JTable(this.tradesTableModel);
 
         //CHECKBOX FOR CONFIRMED
