@@ -16,7 +16,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
 
     private String name;
     private long timeout;
-    private String[] columnNames;
+    protected String[] columnNames;
     private Timer timer;
     protected boolean needUpdate;
     protected boolean descending;

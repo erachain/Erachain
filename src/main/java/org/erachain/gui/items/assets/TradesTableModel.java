@@ -38,6 +38,9 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
         this.have = have;
         this.want = want;
 
+        columnNames[1] = columnNames[1] + " " + have.getShortName();
+        columnNames[3] = columnNames[3] + " " + want.getShortName();
+
         this.haveKey = this.have.getKey();
         this.wantKey = this.want.getKey();
 
