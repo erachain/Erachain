@@ -434,7 +434,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 if (row > tradesTableModel.getSortableList().size())
                     return;
 
-                Trade trade = tradesTableModel.getTrade(row);
+                Trade trade = tradesTableModel.getItem(row);
                 if (trade == null)
                     return;
 
@@ -445,14 +445,14 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 if (e.getClickCount() == 2) {
 
                     if (type) {
-                        BigDecimal price = trade.calcPriceRevers();
+                        BigDecimal price = trade.calcPriceRevers(have, want);
                         sellOrderPanel.txtAmountHave.setText(trade.getAmountWant().toPlainString());
                         sellOrderPanel.txtPrice.setText(price.toPlainString());
 
                         buyOrderPanel.txtAmountHave.setText(trade.getAmountWant().toPlainString());
                         buyOrderPanel.txtPrice.setText(price.toPlainString());
                     } else {
-                        BigDecimal price = trade.calcPrice();
+                        BigDecimal price = trade.calcPrice(have, want);
                         sellOrderPanel.txtAmountHave.setText(trade.getAmountHave().toPlainString());
                         sellOrderPanel.txtPrice.setText(price.toPlainString());
 

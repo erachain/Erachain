@@ -1067,12 +1067,10 @@ public class BlockExplorer {
 
         //tradeJSON.put("realPrice", trade.calcPrice(pairAssetWant.getScale()).setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
         //.setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
-        tradeJSON.put("realPrice", Order.calcPrice(trade.getAmountHave().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN),
-                trade.getAmountWant().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN)));
+        tradeJSON.put("realPrice", trade.calcPrice(pairAssetHave, pairAssetWant));
 
         //tradeJSON.put("realReversePrice", trade.calcPriceRevers(pairAssetWant.getScale()).setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
-        tradeJSON.put("realReversePrice", Order.calcPrice(trade.getAmountWant().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN),
-                trade.getAmountHave().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN)));
+        tradeJSON.put("realReversePrice", trade.calcPriceRevers(pairAssetHave, pairAssetWant));
 
         tradeJSON.put("initiatorTx", Transaction.viewDBRef(orderInitiator.getId()));
         tradeJSON.put("initiatorCreator_addr", orderInitiator.getCreator().getAddress()); // viewCreator
@@ -2342,9 +2340,9 @@ public class BlockExplorer {
                 pairJSON.put("last", "--");
             } else {
                 if (trade.getHaveKey() == pair.getB()) {
-                    pairJSON.put("last", trade.calcPrice().toPlainString());
+                    pairJSON.put("last", trade.calcPrice(assetHave, assetWant).toPlainString());
                 } else {
-                    pairJSON.put("last", trade.calcPriceRevers().toPlainString());
+                    pairJSON.put("last", trade.calcPriceRevers(assetHave, assetWant).toPlainString());
                 }
             }
 

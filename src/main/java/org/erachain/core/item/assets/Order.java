@@ -187,6 +187,9 @@ public class Order implements Comparable<Order> {
     }
 
     public AssetCls getHaveAsset() {
+        if (dcSet == null)
+            dcSet = DCSet.getInstance();
+
         return this.getHaveAsset(this.dcSet);
     }
 
@@ -199,6 +202,9 @@ public class Order implements Comparable<Order> {
     }
 
     public AssetCls getWantAsset() {
+        if (dcSet == null)
+            dcSet = DCSet.getInstance();
+
         return this.getWantAsset(this.dcSet);
     }
 
