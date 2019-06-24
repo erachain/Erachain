@@ -16,10 +16,9 @@ import java.util.Observer;
 @SuppressWarnings("serial")
 public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>, Trade> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
-    public static final int COLUMN_TYPE = 1;
-    public static final int COLUMN_AMOUNT = 2;
-    public static final int COLUMN_PRICE = 3;
-    public static final int COLUMN_AMOUNT_WANT = 4;
+    public static final int COLUMN_AMOUNT_WHO = 1;
+    public static final int COLUMN_PRICE = 2;
+    public static final int COLUMN_WHO_AMOUNT = 3;
 
     private Order order;
     private boolean isSell;
@@ -30,7 +29,7 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
      * @param isSell
      */
     public OrderTradesTableModel(Order order, boolean isSell) {
-        super(new String[]{"Timestamp", "Type", isSell?"Amount":"Creator", "Price", !isSell?"Amount":"Creator"}, true);
+        super(new String[]{"Timestamp", isSell?"Amount":"Creator", "Price", !isSell?"Amount":"Creator"}, true);
 
         this.order = order;
         this.isSell = isSell;
@@ -61,11 +60,7 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
 
                 return DateTimeFormat.timestamptoString(trade.getTimestamp());
 
-            case COLUMN_TYPE:
-
-                return isSell ? Lang.getInstance().translate("Buy") : Lang.getInstance().translate("Sell");
-
-            case COLUMN_AMOUNT:
+            case COLUMN_AMOUNT_WHO:
 
                 String result;
 
@@ -83,11 +78,15 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
             case COLUMN_PRICE:
 
                 if (isSell)
-                    return NumberAsString.formatAsString(trade.calcPrice(order.getHaveAsset(), order.getWantAsset()));
+                    return "<html><span style='color:green'>▲</span>"
+                            + NumberAsString.formatAsString(trade.calcPrice(order.getHaveAsset(), order.getWantAsset()))
+                            + "</html>";
                 else
-                    return NumberAsString.formatAsString(trade.calcPriceRevers(order.getHaveAsset(), order.getWantAsset()));
+                    return "<html><span style='color:red'>▼</span>"
+                            + NumberAsString.formatAsString(trade.calcPriceRevers(order.getHaveAsset(), order.getWantAsset()))
+                            + "</html>";
 
-            case COLUMN_AMOUNT_WANT:
+            case COLUMN_WHO_AMOUNT:
 
                 if (isSell)
                     result = initiatorOrder.getCreator().getPersonAsString();

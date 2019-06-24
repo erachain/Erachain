@@ -22,10 +22,9 @@ import java.util.Observer;
 @SuppressWarnings("serial")
 public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>, Trade> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
-    public static final int COLUMN_TYPE = 1;
-    public static final int COLUMN_ASSET_1 = 2;
-    public static final int COLUMN_PRICE = 3;
-    public static final int COLUMN_ASSET_2 = 4;
+    public static final int COLUMN_ASSET_1 = 1;
+    public static final int COLUMN_PRICE = 2;
+    public static final int COLUMN_ASSET_2 = 3;
 
     private AssetCls have;
     private AssetCls want;
@@ -34,7 +33,7 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
 
     public TradesTableModel(AssetCls have, AssetCls want) {
 
-        super(DCSet.getInstance().getTradeMap(), new String[]{"Timestamp", "Type", "Amount", "Price", "Total"}, true);
+        super(DCSet.getInstance().getTradeMap(), new String[]{"Timestamp", "Amount", "Price", "Total"}, true);
 
         this.have = have;
         this.want = want;
@@ -85,11 +84,6 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
 
                 return DateTimeFormat.timestamptoString(trade.getTimestamp());
 
-            case COLUMN_TYPE:
-
-                return type == 0 ? "" : type < 0 ? Lang.getInstance().translate("Sell") :
-                        Lang.getInstance().translate("Buy");
-
             case COLUMN_ASSET_1:
 
                 if (row == this.listSorted.size())
@@ -115,10 +109,15 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
                     return "";
                     ///return null;
 
-                if (type > 0)
-                    return NumberAsString.formatAsString(trade.calcPrice(have, want));
+
+            if (type > 0)
+                    return "<html><span style='color:green'>▲</span>"
+                        + NumberAsString.formatAsString(trade.calcPrice(have, want))
+                        + "</html>";
                 else
-                    return NumberAsString.formatAsString(trade.calcPriceRevers(have, want));
+                    return "<html><span style='color:red'>▼</span>"
+                        + NumberAsString.formatAsString(trade.calcPriceRevers(have, want))
+                        + "</html>";
 
             case COLUMN_ASSET_2:
 
