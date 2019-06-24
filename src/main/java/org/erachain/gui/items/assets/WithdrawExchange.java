@@ -250,9 +250,10 @@ public class WithdrawExchange extends JPanel {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     asset = (AssetCls) cbxAssets.getSelectedItem();
 
-                    jText_Help.setText("<html><h2>2. " + Lang.getInstance().translate("Set address of bitcoins to that You want to withdraw")
-                            + ". " + Lang.getInstance().translate("And click '%1' button for open form for payment.").replace("%1", "Withdraw")
-                            + "</h2></html>");
+                    jText_Help.setText("<html><h3>2. " + Lang.getInstance().translate("Set address of bitcoins to that You want to withdraw")
+                            + ". " + Lang.getInstance().translate("And click '%1' button for open payment form.").replace("%1", "Withdraw")
+                            + ". " + Lang.getInstance().translate("You need to set only amount of withdraw asset in payment form.")
+                            + "</h3></html>");
                 }
             }
         });
