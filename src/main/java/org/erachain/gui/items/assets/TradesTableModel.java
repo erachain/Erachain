@@ -6,7 +6,9 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TradeMap;
 import org.erachain.gui.models.SortedListTableModelCls;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.DateTimeFormat;
@@ -20,7 +22,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>, Trade> implements Observer {
+public class TradesTableModel extends TimerTableModelCls<Trade> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_ASSET_1 = 1;
     public static final int COLUMN_PRICE = 2;
@@ -44,7 +46,11 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
         this.haveKey = this.have.getKey();
         this.wantKey = this.want.getKey();
 
-        this.listSorted = Controller.getInstance().getTrades(have, want);
+        getInterval();
+        fireTableDataChanged();
+        addObservers();
+
+        ///this.listSorted = Controller.getInstance().getTrades(have, want);
         //this.trades.registerObserver();
 
         //this.columnNames[2] = have.getShort();
@@ -52,12 +58,13 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
         //this.columnNames[3] = Lang.getInstance().translate("Price") + ": " + this.columnNames[4];
 
         ///totalCalc();
+
     }
 
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.listSorted == null || row > this.listSorted.size()) {
+        if (this.list == null || row > this.list.size()) {
             return null;
         }
 
@@ -66,8 +73,8 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
         Order initatorOrder = null;
         Order targetOrder = null;
 
-        if (row < this.listSorted.size()) {
-            trade = this.listSorted.get(row).getB();
+        if (row < this.list.size()) {
+            trade = this.list.get(row);
             if (trade != null) {
                 DCSet db = DCSet.getInstance();
 
@@ -82,14 +89,14 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
         switch (column) {
             case COLUMN_TIMESTAMP:
 
-                if (row == this.listSorted.size())
+                if (row == this.list.size())
                     return "<html>" + Lang.getInstance().translate("Total") + ":</html>";
 
                 return DateTimeFormat.timestamptoString(trade.getTimestamp());
 
             case COLUMN_ASSET_1:
 
-                if (row == this.listSorted.size())
+                if (row == this.list.size())
                     return "";
                 //    return "<html><i>" + NumberAsString.formatAsString(sumAsset1) + "</i></html>";
 
@@ -108,7 +115,7 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
 
             case COLUMN_PRICE:
 
-                if (row == this.listSorted.size())
+                if (row == this.list.size())
                     return "";
                     ///return null;
 
@@ -124,7 +131,7 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
 
             case COLUMN_ASSET_2:
 
-                if (row == this.listSorted.size())
+                if (row == this.list.size())
                     return "";
                     ///return "<html><i>" + NumberAsString.formatAsString(sumAsset2) + "</i></html>";
 
@@ -147,7 +154,8 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
     @Override
     public void getIntervalThis(long start, long end) {
 
-        this.listSorted = Controller.getInstance().getTrades(this.have, this.want);
+        this.list = ((TradeMap)map).getTrades(haveKey, wantKey,0,300);
+        //this.listSorted = Controller.getInstance().getTrades(this.have, this.want);
 
     }
 

@@ -432,7 +432,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 MTable target = (MTable) e.getSource();
                 int row = target.getSelectedRow();
 
-                if (row > tradesTableModel.getSortableList().size())
+                if (row > tradesTableModel.getRowCount())
                     return;
 
                 Trade trade = tradesTableModel.getItem(row);
