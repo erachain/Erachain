@@ -41,17 +41,6 @@ public class ExchangePanel extends JPanel {
         initComponents();
     }
 
-    public ExchangePanel(AssetCls have, String account) {
-
-        this.account = account;
-        this.action = "";
-        this.have = have;
-        this.want = have;
-        install();
-        initComponents();
-
-    }
-
     private void install() {
         if (have == null) {
             have = (AssetCls) DCSet.getInstance().getItemAssetMap().get((long) 2);

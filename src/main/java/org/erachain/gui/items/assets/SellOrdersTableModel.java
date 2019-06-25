@@ -5,7 +5,9 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.OrderMap;
 import org.erachain.gui.models.SortedListTableModelCls;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.NumberAsString;
@@ -17,14 +19,12 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class SellOrdersTableModel extends SortedListTableModelCls<Long, Order> implements Observer {
+public class SellOrdersTableModel extends TimerTableModelCls<Order> implements Observer {
     public static final int COLUMN_AMOUNT_HAVE = 0;
     public static final int COLUMN_PRICE = 1;
     public static final int COLUMN_AMOUNT_WANT = 2;
 
     ///public SortableList<Long, Order> orders;
-    BigDecimal sumAmountHave;
-    BigDecimal sumAmountWant;
     private AssetCls have;
     private AssetCls want;
     private long haveKey;
@@ -39,38 +39,23 @@ public class SellOrdersTableModel extends SortedListTableModelCls<Long, Order> i
         this.haveKey = this.have.getKey();
         this.wantKey = this.want.getKey();
 
-        this.listSorted = Controller.getInstance().getOrders(have, want, false);
-
         repaint();
-        totalCalc();
 
         addObservers();
 
     }
 
-    private void totalCalc() {
-        sumAmountHave = BigDecimal.ZERO;
-        sumAmountWant = BigDecimal.ZERO;
-        for (Pair<Long, Order> orderPair : this.listSorted) {
-
-            Order order = orderPair.getB();
-            sumAmountHave = sumAmountHave.add(order.getAmountHaveLeft());
-            sumAmountWant = sumAmountWant.add(order.getAmountWantLeft());
-        }
-    }
-
-
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.listSorted == null || row > this.listSorted.size()) {
+        if (this.list == null || row > this.list.size()) {
             return null;
         }
 
-        Order order = null;
+        Order order;
         boolean isMine = false;
-        int size = this.listSorted.size();
+        int size = this.list.size();
         if (row < size) {
-            order = this.listSorted.get(row).getB();
+            order = this.list.get(row);
 
             if (order == null) {
                 //totalCalc();
@@ -92,9 +77,6 @@ public class SellOrdersTableModel extends SortedListTableModelCls<Long, Order> i
         switch (column) {
             case COLUMN_AMOUNT_HAVE:
 
-                if (row == this.listSorted.size())
-                    return "<html><i>" + NumberAsString.formatAsString(sumAmountHave, have.getScale()) + "</i></html>";
-
                 // It shows unacceptably small amount of red.
                 BigDecimal amount = order.getAmountHaveLeft();
                 amountStr = NumberAsString.formatAsString(amount, have.getScale());
@@ -106,21 +88,15 @@ public class SellOrdersTableModel extends SortedListTableModelCls<Long, Order> i
 
             case COLUMN_PRICE:
 
-                if (row == this.listSorted.size())
-                    return "<html><b>" + Lang.getInstance().translate("Total") + "</b></html>";
-
                 BigDecimal price = Order.calcPrice(order.getAmountHave(), order.getAmountWant());
                 amountStr = NumberAsString.formatAsString(price.stripTrailingZeros());
 
                 if (isMine)
-                    amountStr = "<html><b>" + amountStr + "</b></html>";
+                    amountStr = "<b>" + amountStr + "</b>";
 
-                return amountStr;
+                return "<html><span style='color:red'>▼</span>" + amountStr + "</html>";
 
             case COLUMN_AMOUNT_WANT:
-
-                if (row == this.listSorted.size())
-                    return "<html><i>" + NumberAsString.formatAsString(sumAmountWant, want.getScale()) + "</i></html>";
 
                 amountStr = order.getCreator().getPersonAsString();
 
@@ -138,9 +114,8 @@ public class SellOrdersTableModel extends SortedListTableModelCls<Long, Order> i
 
         this.needUpdate = false;
 
-        this.listSorted = Controller.getInstance().getOrders(this.have, this.want, false);
+        this.list = ((OrderMap)map).getOrders(haveKey, wantKey, 300);
 
-        totalCalc();
         this.fireTableDataChanged();
 
     }
@@ -167,17 +142,21 @@ public class SellOrdersTableModel extends SortedListTableModelCls<Long, Order> i
             return;
 
         } else if (this.needUpdate == true) {
-            if (Controller.getInstance().isStatusOK()) {
-                if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE || type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE
-                        || type == ObserverMessage.GUI_REPAINT) {
+            if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
+                    || type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
+                if (Controller.getInstance().isStatusOK()) {
                     this.repaint();
                     return;
+                } else if (type == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
+                        || type == ObserverMessage.NETWORK_STATUS) {
+                    if (Controller.getInstance().isStatusOK()) {
+                        this.repaint();
+                        return;
+                    }
                 }
-            } else {
-                if (type == ObserverMessage.GUI_REPAINT) {
-                    this.repaint();
-                    return;
-                }
+            } else if (type == ObserverMessage.GUI_REPAINT) {
+                this.repaint();
+                return;
             }
         }
     }

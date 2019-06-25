@@ -155,7 +155,6 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
     public void getIntervalThis(long start, long end) {
 
         this.list = ((TradeMap)map).getTrades(haveKey, wantKey,0,300);
-        //this.listSorted = Controller.getInstance().getTrades(this.have, this.want);
 
     }
 
@@ -170,9 +169,9 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
                 || type == ObserverMessage.REMOVE_TRADE_TYPE
         ) {
 
-            Order order = (Order) message.getValue();
-            long haveKey = order.getHave();
-            long wantKey = order.getWant();
+            Trade trade = (Trade) message.getValue();
+            long haveKey = trade.getHaveKey();
+            long wantKey = trade.getWantKey();
             if (!(haveKey == this.haveKey && wantKey == this.wantKey)
                     && !(haveKey == this.wantKey && wantKey == this.haveKey)) {
                 return;
@@ -185,20 +184,23 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
             if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
                     || type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
                 if (Controller.getInstance().isStatusOK()) {
+                    this.needUpdate = false;
                     this.getInterval();
-                    this.needUpdate = true;
+                    fireTableDataChanged();
                     return;
                 } else if (type == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
                         || type == ObserverMessage.NETWORK_STATUS) {
                     if (Controller.getInstance().isStatusOK()) {
+                        this.needUpdate = false;
                         this.getInterval();
-                        this.needUpdate = true;
+                        fireTableDataChanged();
                         return;
                     }
                 }
             } else if (type == ObserverMessage.GUI_REPAINT) {
+                this.needUpdate = false;
                 this.getInterval();
-                this.needUpdate = true;
+                fireTableDataChanged();
                 return;
             }
         }

@@ -1,6 +1,7 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.MDecimalFormatedTextField;
@@ -222,17 +223,24 @@ public class AssetPairSelect extends JDialog {
             @Override
             public void valueChanged(ListSelectionEvent arg0) {
 
-                if (pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow() >= 0
-                        && pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow() < pair_Panel.jTableJScrollPanelLeftPanel.getRowCount() ) {
-                    AssetPairSelectTableModel tableModelAssets1 = (AssetPairSelectTableModel) pair_Panel.jTableJScrollPanelLeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTableJScrollPanelLeftPanel.getModel();
-                    Object asset = tableModelAssets1.getItem(pair_Panel
-                            .jTableJScrollPanelLeftPanel
-                                .convertRowIndexToModel(pair_Panel
-                                    .jTableJScrollPanelLeftPanel
-                                        .getSelectedRow()));
+                if (pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow() >= 0) {
+                    // GET ROW
+                    int row = pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow();
 
-                    pair_Panel.jScrollPaneJPanelRightPanel.setViewportView(new AssetInfo((AssetCls) asset, false));
-                    pair_Panel.button1ToolBarLeftPanel.setEnabled(true);
+                    try {
+                        row = pair_Panel.jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+                        AssetCls asset = (AssetCls)assetPairSelectTableModel.getItem(row);
+
+                        if (asset == null)
+                            return;
+
+                        pair_Panel.jScrollPaneJPanelRightPanel.setViewportView(new AssetInfo((AssetCls) asset, false));
+                        pair_Panel.button1ToolBarLeftPanel.setEnabled(true);
+
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                        pair_Panel.jScrollPaneJPanelRightPanel.setViewportView(null);
+                    }
 
                 }
             }
@@ -293,17 +301,7 @@ public class AssetPairSelect extends JDialog {
                     int row = target.getSelectedRow();
 
                     if (row < assetPairSelectTableModel.getRowCount()) {
-                        // Container ss = getParent();
-                        //if (getParent().getClass().viewName() == "11")
-					/*	new ExchangeFrame(
-								(AssetCls)Controller.getInstance().getItem(ItemCls.ASSET_TYPE, assetPairSelectTableModel.key), 
-								(AssetCls) assetPairSelectTableModel.assets.get(row), action, account);
-						( ((Window) pair_Panel.getTopLevelAncestor())).dispose();
-					*/
-
                         selectAsset();
-                        //	pairAsset = (AssetCls) assetPairSelectTableModel.assets.get(row);
-
                     }
                 }
             }
