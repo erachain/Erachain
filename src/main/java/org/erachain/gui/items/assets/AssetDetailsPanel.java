@@ -23,6 +23,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.accounts.AccountAssetRepayDebtPanel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 public class AssetDetailsPanel extends JPanel {
 
@@ -216,10 +217,10 @@ public class AssetDetailsPanel extends JPanel {
 
     public void onOpenPairClick() {
 
-        AssetCls compu = DCSet.getInstance().getItemAssetMap().get(2L);
         String action = null;
-        ExchangePanel panel = new ExchangePanel(asset, compu, action, "");
-        panel.setName(asset.getTickerName() + "/" + compu.getTickerName());
+        AssetCls assetSell = Settings.getInstance().getDefaultPairAsset();
+        ExchangePanel panel = new ExchangePanel(asset, Settings.getInstance().getDefaultPairAsset(), action, "");
+        panel.setName(asset.getTickerName() + "/" + assetSell.getTickerName());
         MainPanel.getInstance().insertTab(panel);
 
     }
