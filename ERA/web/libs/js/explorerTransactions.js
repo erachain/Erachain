@@ -2,6 +2,7 @@ function tx(data) {
     var output = '<table width="1280" border=0><tr><td align=left>';
     if (data.body.hasOwnProperty('head')) {
         output += data.body.head + '<br>';
+        output += '<b>' + data.body.timestampLabel + '</b>: ' + convertTimestamp(data.body.timestamp, true) + '<br>';
     }
     if (data.body.hasOwnProperty('body')) {
         output += fformat(data.body.body) + '<br>';
@@ -81,7 +82,7 @@ function transactionLite(urlstart, data, i, item) {
             output += ' / confirmations: ' + item.transaction.confirmations;
         }
         output += '</td>';
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
@@ -136,7 +137,7 @@ function transactionLite(urlstart, data, i, item) {
             output += ' / confirmations: ' + item.transaction.confirmations;
         }
         output += '</td>';
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
@@ -189,7 +190,7 @@ function transactionLite(urlstart, data, i, item) {
         }
         output += '</td>';
 
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
 
@@ -244,7 +245,7 @@ function transactionLite(urlstart, data, i, item) {
             output += ' / confirmations: ' + item.transaction.confirmations;
         }
         output += '</td>';
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
@@ -293,7 +294,7 @@ function transactionLite(urlstart, data, i, item) {
             output += ' / confirmations: ' + item.transaction.confirmations;
         }
         output += '</td>';
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
@@ -341,7 +342,7 @@ function transactionLite(urlstart, data, i, item) {
             output += ' / confirmations: ' + item.transaction.confirmations;
         }
         output += '</td>';
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
@@ -401,7 +402,7 @@ function transactionLite(urlstart, data, i, item) {
             output += ' / confirmations: ' + item.transaction.confirmations;
         }
         output += '</td>';
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
@@ -457,7 +458,7 @@ function transactionLite(urlstart, data, i, item) {
             output += ' / confirmations: ' + item.transaction.confirmations;
         }
         output += '</td>';
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<tr><td>';
 
@@ -507,7 +508,7 @@ function transactionLite(urlstart, data, i, item) {
             output += ' / confirmations: ' + item.transaction.confirmations;
         }
         output += '</td>';
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
@@ -585,7 +586,7 @@ function transactionLite(urlstart, data, i, item) {
             output += ' / confirmations: ' + item.transaction.confirmations;
         }
         output += '</td>';
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<tr><td>';
 
@@ -647,7 +648,7 @@ function transactionLite(urlstart, data, i, item) {
             output += ' / confirmations: ' + item.transaction.confirmations;
         }
         output += '</td>';
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
@@ -733,7 +734,7 @@ function transactionLite(urlstart, data, i, item) {
             output += ' / confirmations: ' + item.transaction.confirmations;
         }
         output += '</td>';
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
@@ -806,7 +807,7 @@ function transactionLite(urlstart, data, i, item) {
             output += ' / confirmations: ' + item.transaction.confirmations;
         }
         output += '</td>';
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
@@ -866,7 +867,7 @@ function transactionLite(urlstart, data, i, item) {
             output += ' / confirmations: ' + item.transaction.confirmations;
         }
         output += '</td>';
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
@@ -926,7 +927,7 @@ function transactionLite(urlstart, data, i, item) {
             output += ' / confirmations: ' + item.transaction.confirmations;
         }
         output += '</td>';
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
@@ -997,7 +998,7 @@ function transactionLite(urlstart, data, i, item) {
             output += ' / confirmations: ' + item.transaction.confirmations;
         }
         output += '</td>';
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
@@ -1060,7 +1061,7 @@ function transactionLite(urlstart, data, i, item) {
             output += ' / confirmations: ' + item.transaction.confirmations;
         }
         output += '</td>';
-        output += '<td align=right width=200>' + item.transaction.dateTime + '</td></tr></table>';
+        output += '<td align=right width=200>' + convertTimestamp(item.transaction.timestamp, true) + '</td></tr></table>';
 
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';

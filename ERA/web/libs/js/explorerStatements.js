@@ -97,7 +97,7 @@ function statement(data) {
     output += data.Label_type + ':<b>' + data.type + '</b>';
     output += ' &nbsp&nbsp' + data.Label_block + ': <a href=?block=' + data.block + get_lang() + '><b>' + data.block + '</b></a>';
     output += ' &nbsp&nbsp' + data.Label_seqNo + ': <a href=?tx=' + data.block + '-' + data.seqNo + get_lang() + '><b>' + data.block + '-' + data.seqNo + '</b></a>';
-    output += ' &nbsp&nbsp' + data.Label_date + ': <b>' + data.date + '</b>';
+    output += ' &nbsp&nbsp' + data.Label_date + ': <b>' + convertTimestamp(data.timestamp, true) + '</b>';
 
     if (data.creator_key != "") {
         output += '<br>' + data.Label_creator + ':&nbsp&nbsp <a href=?person=' + data.creator_key + get_lang() + '><b>' + data.creator + '</b></a>';

@@ -59,7 +59,6 @@ public class WebTransactionsHTML {
         // она и так в заголовке будет
         //out += "<br><b>" + Lang.getInstance().translateFromLangObj("Type", langObj) + ": </b>" + tras_json.get("type_name");
         out += "<br><b>" + Lang.getInstance().translateFromLangObj("Confirmations", langObj) + ": </b>" + tras_json.get("confirmations");
-        out += "<br><b>" + Lang.getInstance().translateFromLangObj("Date", langObj) + ": </b>" + tras_json.get("date");
         out += "<br><b>" + Lang.getInstance().translateFromLangObj("Size", langObj) + ": </b>" + tras_json.get("size");
         out += "<br><b>" + Lang.getInstance().translateFromLangObj("Publick Key", langObj) + ": </b>" + tras_json.get("publickey");
         out += "<br><b>" + Lang.getInstance().translateFromLangObj("Signature", langObj) + ": </b>" + tras_json.get("signature");
@@ -68,6 +67,8 @@ public class WebTransactionsHTML {
         out += "<b>" + Lang.getInstance().translateFromLangObj("Creator", langObj) + ": </b><a href=?address=" + tras_json.get("creator_addr") + get_Lang(langObj) + ">" + tras_json.get("creator") + "</a>";
 
         output.put("head", out);
+        output.put("timestampLabel", Lang.getInstance().translateFromLangObj("Date", langObj));
+        output.put("timestamp", transaction.getTimestamp());
 
         int type = transaction.getType();
         switch (type) {

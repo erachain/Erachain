@@ -375,7 +375,6 @@ public class Block implements ExplorerJsonLine {
         blockJSON.put("generator", creator.getAddress());
         blockJSON.put("transactionsCount", getTransactionCount());
         blockJSON.put("timestamp", getTimestamp());
-        blockJSON.put("dateTime", BlockExplorer.timestampToStr(getTimestamp()));
 
         ///loadHeadMind(DCSet.getInstance());
         blockJSON.put("totalFee", viewFeeAsBigDecimal());

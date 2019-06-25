@@ -402,7 +402,6 @@ public class APIExchange {
             tradeJSON.put("targetAmount", orderTarget.getAmountHave());
 
             tradeJSON.put("timestamp", trade.getTimestamp());
-            tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
 
             tradesJSON.add(tradeJSON);
         }
