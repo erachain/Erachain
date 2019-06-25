@@ -616,7 +616,23 @@ public class Settings {
 
         return "100";
     }
-    
+
+    public long getCompuRateAsset() {
+        if (this.settingsJSON.containsKey("compuRateAsset")) {
+            return  Long.valueOf(this.settingsJSON.get("compuRateAsset").toString());
+        }
+
+        return 1L;
+    }
+
+    public long getDefaultPairAsset() {
+        if (this.settingsJSON.containsKey("defaultPairAsset")) {
+            return  Long.valueOf(this.settingsJSON.get("defaultPairAsset").toString());
+        }
+
+        return 2L;
+    }
+
     public boolean getbacUpAskToStart() {
         if (this.settingsJSON.containsKey("backupasktostart")) {
             return ((Boolean) this.settingsJSON.get("backupasktostart")).booleanValue();

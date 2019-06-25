@@ -3128,7 +3128,7 @@ public class Controller extends Observable {
     public void updateCompuRaes() {
         BigDecimal rate = new BigDecimal(Settings.getInstance().getCompuRate()).setScale(2);
         //this.COMPU_RATES.put("ru", new Tuple2<BigDecimal, String>(rate, "$"));
-        this.COMPU_RATES.put("en", new Tuple2<BigDecimal, String>(rate, "$"));
+        this.COMPU_RATES.put("en", new Tuple2<BigDecimal, String>(rate, ));
     }
 
     public Block getBlockByHeight(DCSet db, int parseInt) {
