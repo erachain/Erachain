@@ -204,7 +204,7 @@ public class DepositExchange extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jText_Title, gridBagConstraints);
-        jText_Title.setText("<html><h1>" + Lang.getInstance().translate("Deposit to Exchange by Bitcoins") + "</h1></html>");
+        jText_Title.setText("<html><h1>" + Lang.getInstance().translate("Deposit of Bitcoins to the Exchange") + "</h1></html>");
 
         JLabel jText_Help = new JLabel();
 
@@ -216,7 +216,7 @@ public class DepositExchange extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jText_Help, gridBagConstraints);
-        jText_Help.setText("<html><h2>1. " + Lang.getInstance().translate("Select Your account or insert it in field below") + "</h2></html>");
+        jText_Help.setText("<html><h2>1. " + Lang.getInstance().translate("Select Your account or insert another account in field below") + "</h2></html>");
 
         jLabel_YourAddress.setText(Lang.getInstance().translate("Your account") + ":");
         gridBagConstraints = new GridBagConstraints();
@@ -236,7 +236,7 @@ public class DepositExchange extends JPanel {
                 jTextField_Address.setText(((Account) jComboBox_YourAddress.getSelectedItem()).getAddress());
 
                 jText_Help.setText("<html><h2>2. " + Lang.getInstance().translate(
-                        "Select Asset that Your wish to obtain") + "</h2></html>");
+                        "Select Asset that Your wish to receive") + "</h2></html>");
 
             }
         });
@@ -332,7 +332,7 @@ public class DepositExchange extends JPanel {
                     }
 
                     jText_Help.setText("<html><h2>3. " + Lang.getInstance().translate(
-                            "Click '%1' button and pay bitcoins to that address")
+                            "Click the button '%1' and transfer the bitcoins to the received address")
                             .replace("%1", Lang.getInstance().translate("Get Payment Details")) + "</h2></html>");
 
                 }

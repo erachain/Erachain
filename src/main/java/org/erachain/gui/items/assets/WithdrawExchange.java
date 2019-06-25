@@ -163,7 +163,7 @@ public class WithdrawExchange extends JPanel {
                             + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> BTC";
             }
 
-            panel.jLabel_Title.setText("<html>" + formTitle + "</html>");
+            panel.jLabel_Title.setText("<html><h2>" + formTitle + "</h2></html>");
 
         }
 
@@ -208,7 +208,7 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jText_Title, gridBagConstraints);
-        jText_Title.setText("<html><h1>" + Lang.getInstance().translate("Withdraw from Exchange by Bitcoins") + "</h1></html>");
+        jText_Title.setText("<html><h1>" + Lang.getInstance().translate("Withdraw of Bitcoins from the Exchange") + "</h1></html>");
 
         JLabel jText_Help = new JLabel();
 
@@ -220,7 +220,7 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jText_Help, gridBagConstraints);
-        jText_Help.setText("<html><h2>1. " + Lang.getInstance().translate("Select Asset that You want to withdraw") + "</h2></html>");
+        jText_Help.setText("<html><h2>1. " + Lang.getInstance().translate("Select the Asset that you want to withdraw") + "</h2></html>");
 
         /////////////// ASSET
         jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
@@ -250,10 +250,11 @@ public class WithdrawExchange extends JPanel {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     asset = (AssetCls) cbxAssets.getSelectedItem();
 
-                    jText_Help.setText("<html><h3>2. " + Lang.getInstance().translate("Set address of bitcoins to that You want to withdraw")
-                            + ". " + Lang.getInstance().translate("And click '%1' button for open payment form.").replace("%1", "Withdraw")
-                            + ". " + Lang.getInstance().translate("You need to set only amount of withdraw asset in payment form.")
-                            + "</h3></html>");
+                    jText_Help.setText("<html><h3>2. " + Lang.getInstance().translate("Set the address for bitcoins where you want to withdraw")
+                            + ". " + Lang.getInstance().translate("And click button '%1' to open the panel for payment").replace("%1",
+                                Lang.getInstance().translate("Withdraw"))
+                            + ". " + Lang.getInstance().translate("Where You need to set only amount of withdraw asset in the panel for payment")
+                            + ".</h3></html>");
                 }
             }
         });
