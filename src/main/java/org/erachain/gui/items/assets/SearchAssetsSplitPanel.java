@@ -104,7 +104,12 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
     @Override
     protected void tableMouse2Click(ItemCls item) {
 
-        MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) item, null, "", ""));
+        AssetCls asset = (AssetCls) item;
+        AssetCls compu = DCSet.getInstance().getItemAssetMap().get(2L);
+        String action = null;
+        ExchangePanel panel = new ExchangePanel(asset, compu, action, "");
+        panel.setName(asset.getTickerName() + "/" + compu.getTickerName());
+        MainPanel.getInstance().insertTab(panel);
 
     }
 

@@ -1,13 +1,17 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.items.ItemSplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.WalletItemAssetsTableModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.mapdb.Fun;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -90,12 +94,30 @@ public class MyAssetsTab extends SplitPanel {
         // show
         this.jTableJScrollPanelLeftPanel.setModel(assetsModel);
         this.jTableJScrollPanelLeftPanel = table;
+
+        jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Point point = e.getPoint();
+                int row = jTableJScrollPanelLeftPanel.rowAtPoint(point);
+                jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
+
+                Fun.Tuple2<Long, AssetCls> itemTableSelected = assetsModel.getItem(row);
+
+                if (e.getClickCount() == 2) {
+                    tableMouse2Click(itemTableSelected.b);
+                }
+
+            }
+        });
+
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 
         // UPDATE FILTER ON TEXT CHANGE
         searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
+
             @Override
             public void changedUpdate(DocumentEvent e) {
                 onChange();
@@ -429,4 +451,15 @@ public class MyAssetsTab extends SplitPanel {
 
         }
     }
+
+    protected void tableMouse2Click(ItemCls item) {
+
+        AssetCls asset = (AssetCls) item;
+        AssetCls compu = DCSet.getInstance().getItemAssetMap().get(2L);
+        String action = null;
+        ExchangePanel panel = new ExchangePanel(asset, compu, action, "");
+        panel.setName(asset.getTickerName() + "/" + compu.getTickerName());
+        MainPanel.getInstance().insertTab(panel);
+    }
+
 }

@@ -1,6 +1,7 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.CreateOrderTransaction;
@@ -17,6 +18,7 @@ import org.erachain.gui.transaction.CreateOrderDetailsFrame;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.mapdb.Fun;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -79,6 +81,22 @@ public class MyOrderTab extends SplitPanel {
         this.jTableJScrollPanelLeftPanel = new MTable(ordersModel);
         // this.jTableJScrollPanelLeftPanel = table;
         jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
+        jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Point point = e.getPoint();
+                int row = jTableJScrollPanelLeftPanel.rowAtPoint(point);
+                jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
+
+                Fun.Tuple2<Long, Order> itemTableSelected = ordersModel.getItem(row);
+
+                if (e.getClickCount() == 2) {
+                    tableMouse2Click(itemTableSelected.b);
+                }
+
+            }
+        });
+
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         // UPDATE FILTER ON TEXT CHANGE
@@ -190,11 +208,7 @@ public class MyOrderTab extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                Order order = ordersModel.getItem(row).b;
-                String action = null;
-                ExchangePanel panel = new ExchangePanel(order.getHaveAsset(), order.getWantAsset(), action, "");
-                panel.setName(order.getHaveAsset().getShortName() + "/" + order.getWantAsset().getShortName());
-                MainPanel.getInstance().insertTab(panel);
+                tableMouse2Click(ordersModel.getItem(row).b);
 
             }
         });
@@ -306,6 +320,13 @@ public class MyOrderTab extends SplitPanel {
         setIntervalPanel.deleteObservers();
         
     }
-    
+
+    protected void tableMouse2Click(Order order) {
+
+        String action = null;
+        ExchangePanel panel = new ExchangePanel(order.getHaveAsset(), order.getWantAsset(), action, "");
+        panel.setName(order.getHaveAsset().getShortName() + "/" + order.getWantAsset().getShortName());
+        MainPanel.getInstance().insertTab(panel);
+    }
 
 }

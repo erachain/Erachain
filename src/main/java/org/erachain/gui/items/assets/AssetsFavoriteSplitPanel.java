@@ -1,5 +1,6 @@
 package org.erachain.gui.items.assets;
 
+import com.sun.javafx.binding.SelectBinding;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
@@ -59,6 +60,17 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
     @Override
     public Component getShow(ItemCls item) {
         return new AssetInfo((AssetCls) item, true);
+    }
+
+    @Override
+    protected void tableMouse2Click(ItemCls item) {
+
+        AssetCls asset = (AssetCls) item;
+        AssetCls compu = DCSet.getInstance().getItemAssetMap().get(2L);
+        String action = null;
+        ExchangePanel panel = new ExchangePanel(asset, compu, action, "");
+        panel.setName(asset.getTickerName() + "/" + compu.getTickerName());
+        MainPanel.getInstance().insertTab(panel);
     }
 
 }

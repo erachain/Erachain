@@ -216,8 +216,11 @@ public class AssetDetailsPanel extends JPanel {
 
     public void onOpenPairClick() {
 
+        AssetCls compu = DCSet.getInstance().getItemAssetMap().get(2L);
         String action = null;
-        MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, action, ""));
+        ExchangePanel panel = new ExchangePanel(asset, compu, action, "");
+        panel.setName(asset.getTickerName() + "/" + compu.getTickerName());
+        MainPanel.getInstance().insertTab(panel);
 
     }
 
