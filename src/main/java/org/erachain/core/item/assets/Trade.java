@@ -91,8 +91,8 @@ public class Trade {
         return Order.calcPrice(this.amountWant, this.amountHave);
     }
     public BigDecimal calcPriceRevers(AssetCls assetHave, AssetCls assetWant) {
-        return Order.calcPrice(amountWant.setScale(assetWant.getScale(), RoundingMode.HALF_DOWN),
-                amountHave.setScale(assetHave.getScale(), RoundingMode.HALF_DOWN));
+        return Order.calcPrice(amountWant.setScale(assetHave.getScale(), RoundingMode.HALF_DOWN),
+                amountHave.setScale(assetWant.getScale(), RoundingMode.HALF_DOWN));
     }
 
     public int getSequence() {
