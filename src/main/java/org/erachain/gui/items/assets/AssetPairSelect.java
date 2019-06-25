@@ -194,7 +194,9 @@ public class AssetPairSelect extends JDialog {
                             pair_Panel.jScrollPanelLeftPanel.setViewportView(pair_Panel.search_Info_Panel);
                             return;
                         }
-                        pair_Panel.jTableJScrollPanelLeftPanel.setRowSelectionInterval(0, 0);
+                        if (!assetPairSelectTableModel.isEmpty())
+                            pair_Panel.jTableJScrollPanelLeftPanel.setRowSelectionInterval(0, 0);
+
                         // ddd.dispose();
                         pair_Panel.jScrollPanelLeftPanel.setViewportView(pair_Panel.jTableJScrollPanelLeftPanel);
                     }
@@ -238,7 +240,6 @@ public class AssetPairSelect extends JDialog {
                         pair_Panel.button1ToolBarLeftPanel.setEnabled(true);
 
                         } catch (Exception e) {
-                            // TODO Auto-generated catch block
                         pair_Panel.jScrollPaneJPanelRightPanel.setViewportView(null);
                     }
 
@@ -246,10 +247,9 @@ public class AssetPairSelect extends JDialog {
             }
         });
 
-
         pair_Panel.jTableJScrollPanelLeftPanel.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        //Custom renderer for the String column;
 
+        //Custom renderer for the String column;
 
         // column #1
         TableColumn column1 = pair_Panel.jTableJScrollPanelLeftPanel.getColumnModel().getColumn(AssetPairSelectTableModel.COLUMN_KEY);//.COLUMN_CONFIRMED);
