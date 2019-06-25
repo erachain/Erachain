@@ -4,6 +4,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,10 +44,10 @@ public class ExchangePanel extends JPanel {
 
     private void install() {
         if (have == null) {
-            have = (AssetCls) DCSet.getInstance().getItemAssetMap().get((long) 2);
+            have = (AssetCls) DCSet.getInstance().getItemAssetMap().get(1L);
         }
         if (want == null) {
-            want = (AssetCls) DCSet.getInstance().getItemAssetMap().get((long) 1);
+            want = Settings.getInstance().getDefaultPairAsset();
         }
 
         setName(Lang.getInstance().translate("Exchange"));

@@ -10,6 +10,7 @@ import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.WalletItemAssetsTableModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
 import org.mapdb.Fun;
 
@@ -455,10 +456,10 @@ public class MyAssetsTab extends SplitPanel {
     protected void tableMouse2Click(ItemCls item) {
 
         AssetCls asset = (AssetCls) item;
-        AssetCls compu = DCSet.getInstance().getItemAssetMap().get(2L);
+        AssetCls assetSell = Settings.getInstance().getDefaultPairAsset();
         String action = null;
-        ExchangePanel panel = new ExchangePanel(asset, compu, action, "");
-        panel.setName(asset.getTickerName() + "/" + compu.getTickerName());
+        ExchangePanel panel = new ExchangePanel(asset, assetSell, action, "");
+        panel.setName(asset.getTickerName() + "/" + assetSell.getTickerName());
         MainPanel.getInstance().insertTab(panel);
     }
 
