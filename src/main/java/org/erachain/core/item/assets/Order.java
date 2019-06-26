@@ -10,7 +10,6 @@ import org.erachain.datachain.CompletedOrderMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TradeMap;
-import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -149,6 +148,22 @@ public class Order implements Comparable<Order> {
             i++;
         }
         return i;
+    }
+
+    BigDecimal diffUnresolved = new BigDecimal("0.00001");
+
+    /**
+     * проверяем по остаткам - сильно ли съехала цена для них.
+     * если сильно то это уже ордер который не исполнится - его нужно отменять.
+     * Перед употреблением нужно задать базу
+     * @return
+     */
+    public boolean isUnResolved() {
+        BigDecimal priceForLeft = calcPrice(amountHave.subtract(fulfilledHave), amountWant.subtract(getFulfilledWant()), wantAsset.getScale(), 1);
+        BigDecimal diff = price.subtract(priceForLeft).divide(price, wantAsset.getScale(), RoundingMode.HALF_DOWN).abs();
+        if (diff.compareTo(diffUnresolved) > 0)
+            return true;
+        return false;
     }
 
     // BigDecimal.precision() - is WRONG calculating!!! Sometime = 0 for 100 or 10
@@ -489,6 +504,18 @@ public class Order implements Comparable<Order> {
 
     //PROCESS/ORPHAN
 
+    /**
+     * пересчет если ордер невозможно уже исполнить
+     */
+    public void processOnUnresolved(Block block, Transaction transaction) {
+        // REVERT not completed AMOUNT
+        this.creator.changeBalance(this.dcSet, false,
+                this.haveKey, this.getAmountHaveLeft(), false);
+        transaction.addCalculated(block, this.creator, this.haveKey, this.getAmountHaveLeft(),
+                "ended order @" + transaction.viewDBRef(this.id));
+
+    }
+
     public void processTrade(Trade trade, Order target, BigDecimal tradeAmount, BigDecimal tradeAmountGet) {
 
     }
@@ -507,7 +534,7 @@ public class Order implements Comparable<Order> {
         if (//this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
                 //this.id.equals(Transaction.makeDBRef(12435, 1))
                 //this.id.equals(770667456757788l)
-                height == 255577
+                height == 255843
                 //(this.haveKey == 1004l && this.wantKey == 2l)
                 //|| (this.wantKey == 1004l && this.haveKey == 2l)
                 //Arrays.equals(Base58.decode("3PVq3fcMxEscaBLEYgmmJv9ABATPasYjxNMJBtzp4aKgDoqmLT9MASkhbpaP3RNPv8CECmUyH5sVQtEAux2W9quA"), transaction.getSignature())
@@ -670,20 +697,6 @@ public class Order implements Comparable<Order> {
                     break;
             }
 
-            thisIncrement = orderPrice.scaleByPowerOfTen(-wantScale);
-            if (thisAmountHaveLeft.compareTo(thisIncrement) < 0) {
-                // if left not enough for 1 buy by price this order
-                //error ++;
-                completedOrder = true;
-                // REVERT not completed AMOUNT
-                this.creator.changeBalance(this.dcSet, false,
-                        this.haveKey, this.getAmountHaveLeft(), false);
-                transaction.addCalculated(block, this.creator, this.haveKey, this.getAmountHaveLeft(),
-                        "ended order @" + Transaction.viewDBRef(this.id));
-
-                break;
-            }
-
             orderAmountHaveLeft = order.getAmountHaveLeft();
             // SCALE for HAVE in ORDER
             orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(haveScale, RoundingMode.HALF_UP);
@@ -795,7 +808,19 @@ public class Order implements Comparable<Order> {
                     completedMap.add(order);
                 } else {
                     //UPDATE ORDER
-                    ordersMap.add(order);
+                    order.setDC(dcSet);
+                    if (order.isUnResolved()) {
+                        // if left not enough for 1 buy by price this order
+                        order.processOnUnresolved(block, transaction);
+
+                        //REMOVE FROM ORDERS
+                        ordersMap.delete(order);
+
+                        //ADD TO COMPLETED ORDERS
+                        completedMap.add(order);
+                    } else {
+                        ordersMap.add(order);
+                    }
                 }
 
                 //TRANSFER FUNDS
@@ -813,19 +838,17 @@ public class Order implements Comparable<Order> {
                 processedAmountFulfilledWant = processedAmountFulfilledWant.add(tradeAmountForHave);
 
                 if (!completedOrder
-                        &&
                         // if can't trade by more good price than self - by orderOrice - then  auto cancel!
-                        thisAmountHaveLeft.compareTo(thisIncrement) < 0) {
+                        && this.isUnResolved()) {
+
                     // cancel order if it not fulfiled isDivisible
+
                     // or HAVE not enough to one WANT  = price
                     ///CancelOrderTransaction.process_it(this.dcSet, this);
                     //and stop resolve
                     completedOrder = true;
                     // REVERT not completed AMOUNT
-                    this.creator.changeBalance(this.dcSet, false,
-                            this.haveKey, this.getAmountHaveLeft(), false);
-                    transaction.addCalculated(block, this.creator, this.haveKey, this.getAmountHaveLeft(),
-                            "ended order @" + transaction.viewDBRef(this.id));
+                    processOnUnresolved(block, transaction);
                     break;
                 }
 

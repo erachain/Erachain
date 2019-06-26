@@ -94,14 +94,15 @@ public class BlockChain {
     public static final long BONUS_STOP_PERSON_KEY = 13l;
 
     public static final int VERS_4_11 = DEVELOP_USE ? 230000 : 194400;
-    public static final int VERS_ORDER_0 = DEVELOP_USE ? 230000 : 194400;
-    public static final int CANCEL_ORDERS_ALL_VALID = DEVELOP_USE ? 380000 : 100000;
 
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
 
+    public static final int VERS_ORDER_0 = DEVELOP_USE ? 230000 : 194400;
+    public static final int CANCEL_ORDERS_ALL_VALID = DEVELOP_USE ? 230000 : 255555;
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : DEVELOP_USE? 325555 : CANCEL_ORDERS_ALL_VALID;
+
     public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : DEVELOP_USE? 325555 : VERS_4_11;
 
     public static final int DEVELOP_FORGING_START = 100;
 

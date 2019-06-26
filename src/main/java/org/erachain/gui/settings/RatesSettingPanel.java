@@ -137,11 +137,7 @@ public class RatesSettingPanel extends javax.swing.JPanel {
         // DEFAULT PAIR ASSET
         cbxFavoritesPair = new JComboBox<ItemCls>(new ComboBoxAssetsModel());
         cbxFavoritesPair.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
-        key = Settings.getInstance().getDefaultPairAssetKey();
-        asset = Controller.getInstance().getAsset(key);
-        if (asset == null)
-            asset = Controller.getInstance().getAsset(2L);
-
+        asset = Settings.getInstance().getDefaultPairAsset();
         cbxFavoritesPair.setSelectedItem(asset);
 
         cbxFavoritesPair.setPreferredSize(new java.awt.Dimension(200, 30));

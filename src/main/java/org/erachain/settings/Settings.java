@@ -639,7 +639,7 @@ public class Settings {
 
         AssetCls asset = Controller.getInstance().getAsset(key);
         if (asset == null)
-            Controller.getInstance().getAsset(2L);
+            asset = Controller.getInstance().getAsset(2L);
 
         return asset;
     }
