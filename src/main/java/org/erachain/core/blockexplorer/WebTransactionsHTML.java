@@ -327,7 +327,7 @@ public class WebTransactionsHTML {
         out += "<b>" + Lang.getInstance().translateFromLangObj("Want", langObj) + ":</b> "
                 + orderCreation.getAmountWant().toPlainString() + " x "
                 + String.valueOf(orderCreation.getWantAsset().toString())
-                + (order != null? " (" + order.getFulfilledWant().toPlainString() + " "
+                + (order != null? " (" + order.willFulfilledWant().toPlainString() + " "
                     + Lang.getInstance().translateFromLangObj("fulfilled", langObj) + ")" : "")
                 + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Price", langObj) + ":</b> "

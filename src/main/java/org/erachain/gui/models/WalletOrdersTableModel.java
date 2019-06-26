@@ -7,10 +7,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
-import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.LoggerFactory;
 
 import java.util.Observer;
 
@@ -78,7 +76,7 @@ public class WalletOrdersTableModel extends WalletAutoKeyTableModel<Tuple2<Strin
 
             case COLUMN_LEFT:
 
-                return order.getFulfilledWant().toPlainString();
+                return order.willFulfilledWant().toPlainString();
 
             case COLUMN_CREATOR:
 

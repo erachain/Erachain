@@ -1683,14 +1683,14 @@ public class OrderTestsMy {
         Order orderA = db.getCompletedOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
         Assert.assertEquals(0, orderA.getFulfilledHave().compareTo(BigDecimal.valueOf(1)));
-        Assert.assertEquals(0, orderA.getFulfilledWant().compareTo(BigDecimal.valueOf(15000)));
+        Assert.assertEquals(0, orderA.willFulfilledWant().compareTo(BigDecimal.valueOf(15000)));
         Assert.assertEquals(true, orderA.isFulfilled());
         Assert.assertEquals(true, orderA.isFulfilled());
 
         Order orderB = db.getCompletedOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getOrderMap().contains(orderB.getId()));
         Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
-        Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000));
+        Assert.assertEquals(orderB.willFulfilledWant(), BigDecimal.valueOf(40000));
         Assert.assertEquals(true, orderB.isFulfilled());
 
         Order orderC = db.getOrderMap().get(orderID_C);
@@ -1777,7 +1777,7 @@ public class OrderTestsMy {
         // reload order_B
         orderB = db.getCompletedOrderMap().get(orderB.getId());
         Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
-        Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000));
+        Assert.assertEquals(orderB.willFulfilledWant(), BigDecimal.valueOf(40000));
         Assert.assertEquals(true, orderB.isFulfilled());
 
         // CHECK TRADES
@@ -1890,14 +1890,14 @@ public class OrderTestsMy {
         Order orderA = db.getCompletedOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
         Assert.assertEquals(orderA.getFulfilledHave(), BigDecimal.valueOf(1));
-        Assert.assertEquals(orderA.getFulfilledWant(), BigDecimal.valueOf(15000.88));
+        Assert.assertEquals(orderA.willFulfilledWant(), BigDecimal.valueOf(15000.88));
         Assert.assertEquals(true, orderA.isFulfilled());
         Assert.assertEquals(true, orderA.isFulfilled());
 
         Order orderB = db.getCompletedOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getOrderMap().contains(orderB.getId()));
         Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
-        Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000.33));
+        Assert.assertEquals(orderB.willFulfilledWant(), BigDecimal.valueOf(40000.33));
         Assert.assertEquals(true, orderB.isFulfilled());
 
         Order orderC = db.getOrderMap().get(orderID_C);
@@ -1970,7 +1970,7 @@ public class OrderTestsMy {
         Order orderE = db.getOrderMap().get(orderID_E);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderE.getId()));
         Assert.assertEquals(orderE.getFulfilledHave(), BigDecimal.valueOf(20000.165));
-        Assert.assertEquals(0, orderE.getFulfilledWant().compareTo(BigDecimal.valueOf(1)));
+        Assert.assertEquals(0, orderE.willFulfilledWant().compareTo(BigDecimal.valueOf(1)));
         Assert.assertEquals(false, orderE.isFulfilled());
         Assert.assertEquals(false, orderE.isFulfilled());
 
@@ -1978,7 +1978,7 @@ public class OrderTestsMy {
         // reload order_B
         orderB = db.getCompletedOrderMap().get(orderB.getId());
         Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
-        Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000.33));
+        Assert.assertEquals(orderB.willFulfilledWant(), BigDecimal.valueOf(40000.33));
         Assert.assertEquals(true, orderB.isFulfilled());
 
         // CHECK TRADES

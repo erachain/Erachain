@@ -23,7 +23,7 @@ public class Order implements Comparable<Order> {
 
     private static final MathContext rounding = new java.math.MathContext(12, RoundingMode.HALF_DOWN);
 
-    final private static BigDecimal precisionUnit = BigDecimal.ONE.scaleByPowerOfTen(-BlockChain.TRADE_PRECISION + 1);
+    final private static BigDecimal PRECISION_UNIT = BigDecimal.ONE.scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION));
 
     /**
      * с какого номера блока включить новое округление
@@ -150,7 +150,6 @@ public class Order implements Comparable<Order> {
         return i;
     }
 
-    BigDecimal diffUnresolved = new BigDecimal("0.00001");
 
     /**
      * проверяем по остаткам - сильно ли съехала цена для них.
@@ -159,9 +158,16 @@ public class Order implements Comparable<Order> {
      * @return
      */
     public boolean isUnResolved() {
-        BigDecimal priceForLeft = calcPrice(amountHave.subtract(fulfilledHave), amountWant.subtract(getFulfilledWant()), wantAsset.getScale(), 1);
-        BigDecimal diff = price.subtract(priceForLeft).divide(price, wantAsset.getScale(), RoundingMode.HALF_DOWN).abs();
-        if (diff.compareTo(diffUnresolved) > 0)
+        BigDecimal priceForLeft = calcPrice(amountHave.subtract(fulfilledHave), amountWant.subtract(willFulfilledWant()), wantAsset.getScale(), 1);
+        BigDecimal diff = price.subtract(priceForLeft).divide(price, wantAsset.getScale() + 10, RoundingMode.HALF_DOWN).abs();
+        if (PRECISION_UNIT.compareTo(diff) > 0)
+            return true;
+        return false;
+    }
+    public boolean willUnResolvedFor(BigDecimal fulfilledHave) {
+        BigDecimal priceForLeft = calcPrice(amountHave.subtract(fulfilledHave), amountWant.subtract(willFulfilledWant(fulfilledHave)), wantAsset.getScale(), 1);
+        BigDecimal diff = price.subtract(priceForLeft).divide(price, wantAsset.getScale() + 10, RoundingMode.HALF_DOWN).abs();
+        if (PRECISION_UNIT.compareTo(diff) > 0)
             return true;
         return false;
     }
@@ -210,6 +216,7 @@ public class Order implements Comparable<Order> {
     }
 
     public void setDC(DCSet dcSet) {
+
         this.dcSet = dcSet;
         // TODO: в новой версии нужно сделать везде 0 - иначе несостыкоавка в процессинге ордера - там то 0
         if ((id >> 8) > BlockChain.VERS_ORDER_0)
@@ -289,8 +296,17 @@ public class Order implements Comparable<Order> {
         return this.fulfilledHave.compareTo(this.amountHave) == 0;
     }
 
-    public BigDecimal getFulfilledWant() {
+    public BigDecimal willFulfilledWant() {
         return this.fulfilledHave.multiply(this.price).setScale(this.amountWant.scale(), RoundingMode.HALF_DOWN);
+    }
+
+    /**
+     * Проверка - если уменьшим то остаток норм все еще?
+     * @param fulfilledHave
+     * @return
+     */
+    public BigDecimal willFulfilledWant(BigDecimal fulfilledHave) {
+        return fulfilledHave.multiply(this.price).setScale(this.amountWant.scale(), RoundingMode.HALF_DOWN);
     }
 
     public String state() {
@@ -534,7 +550,7 @@ public class Order implements Comparable<Order> {
         if (//this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
                 //this.id.equals(Transaction.makeDBRef(12435, 1))
                 //this.id.equals(770667456757788l)
-                height == 255843
+                height == 255931
                 //(this.haveKey == 1004l && this.wantKey == 2l)
                 //|| (this.wantKey == 1004l && this.haveKey == 2l)
                 //Arrays.equals(Base58.decode("3PVq3fcMxEscaBLEYgmmJv9ABATPasYjxNMJBtzp4aKgDoqmLT9MASkhbpaP3RNPv8CECmUyH5sVQtEAux2W9quA"), transaction.getSignature())
@@ -732,11 +748,26 @@ public class Order implements Comparable<Order> {
                             // PRECISION soo SMALL
                             differenceTrade = tradeAmountForHave.divide(tradeAmountAccurate, BlockChain.TRADE_PRECISION + 1, RoundingMode.HALF_DOWN);
                             differenceTrade = differenceTrade.subtract(BigDecimal.ONE).abs();
-                            if (differenceTrade.compareTo(precisionUnit) > 0) {
+                            if (differenceTrade.compareTo(PRECISION_UNIT) > 0) {
                                 // it is BAD ACCURACY
                                 continue;
                             }
                         }
+
+                        if(debug) {
+                            debug = true;
+                        }
+
+                        // если там сотаток слишком маленький то добавим его в сделку
+                        // так как выше было округление и оно омгло чуточку недотянуть
+                        order.setDC(dcSet);
+                        BigDecimal diffForLeft = tradeAmountForHave.subtract(orderAmountHaveLeft).abs().divide(tradeAmountForHave, 10, RoundingMode.HALF_DOWN);
+                        if (PRECISION_UNIT.compareTo(diffForLeft) > 0
+                                && order.willUnResolvedFor(tradeAmountForHave)
+                            ) {
+                            tradeAmountForHave = orderAmountHaveLeft;
+                        }
+
                     }
                 }
 
