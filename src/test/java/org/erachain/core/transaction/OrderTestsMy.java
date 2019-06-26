@@ -3289,10 +3289,10 @@ public class OrderTestsMy {
             
             Assert.assertEquals(deletedID.equals(order.getId()), false);
             
-            BigDecimal orderReversePrice = Order.calcPrice(order.getAmountWant(), order.getAmountHave());
+            BigDecimal orderReversePrice = order.calcPriceReverse();
             BigDecimal orderPrice = order.getPrice();
 
-            Assert.assertEquals(Order.calcPrice(order.getAmountHave(), order.getAmountWant()).equals(orderPrice), true);
+            Assert.assertEquals(order.calcPrice().equals(orderPrice), true);
 
             timestamp = 0L;
             compare = tempPrice.compareTo(orderPrice);
