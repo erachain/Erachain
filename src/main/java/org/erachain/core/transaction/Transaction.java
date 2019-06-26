@@ -977,7 +977,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     // PARSE/CONVERT
 
-    public String viewFee1() {
+    public String viewFeeLong() {
         return feePow + ":" + this.fee.unscaledValue().longValue();
     }
 
@@ -1005,7 +1005,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             }
             if (compu_rate != null && compu_rate.a.signum() > 0) {
                 BigDecimal fee_fiat = fee.multiply(compu_rate.a).setScale(compu_rate.a.scale(), BigDecimal.ROUND_HALF_UP);
-                text += "(" + compu_rate.b + fee_fiat.toString() + ")";
+                text += " (" + compu_rate.b + fee_fiat.toString() + ")";
             }
         }
 
