@@ -224,7 +224,7 @@ public class Order implements Comparable<Order> {
         if ((id >> 8) > BlockChain.VERS_ORDER_0)
             this.price = calcPrice();
         else
-            this.price = calcPrice(0);
+            this.price = calcPrice();
 
     }
 
@@ -652,9 +652,11 @@ public class Order implements Comparable<Order> {
 
             BigDecimal orderAmountHaveLeft;
             BigDecimal orderAmountWantLeft;
-            BigDecimal orderReversePrice = order.calcPriceReverse();
-            BigDecimal orderPrice = order.calcPrice();
-            //BigDecimal orderPriceTemp;
+            // REVERSE
+            BigDecimal orderReversePrice = Order.calcPrice(order.amountWant, order.amountHave, wantScale);
+            // PRICE
+            BigDecimal orderPrice = Order.calcPrice(order.amountHave, order.amountWant, haveScale);
+            //BigDecimal orderPrice = order.price;
 
             Trade trade;
             BigDecimal tradeAmountForHave;
