@@ -63,6 +63,10 @@ public class Order implements Comparable<Order> {
     private Account creator;
     private long haveKey;
     private long wantKey;
+
+    private AssetCls haveAsset;
+    private AssetCls wantAsset;
+
     private BigDecimal amountHave;
     private BigDecimal fulfilledHave;
     private BigDecimal amountWant;
@@ -79,15 +83,18 @@ public class Order implements Comparable<Order> {
         this.amountWant = amountWant;
 
         this.fulfilledHave = BigDecimal.ZERO.setScale(amountHave.scale());
+    }
 
-        // TODO: в новой версии нужно сделать везде 0 - иначе несостыкоавка в процессинге ордера - там то 0
-        this.price = calcPrice(amountHave, amountWant, 1);
+    public Order(DCSet dcSet, Long id, Account creator, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant) {
+        this (id, creator, haveKey, wantKey, amountHave, amountWant);
+
+        setDC(dcSet);
 
     }
 
-
     public Order(Long id, Account creator, long haveKey, long wantKey, BigDecimal amountHave,
                  BigDecimal amountWant, BigDecimal fulfilledHave, int status) {
+
         this.id = id;
         this.creator = creator;
         this.haveKey = haveKey;
@@ -100,8 +107,14 @@ public class Order implements Comparable<Order> {
 
         this.status = status;
 
-        // TODO: в новой версии нужно сделать везде 0 - иначе несостыкоавка в процессинге ордера - там то 0
-        this.price = calcPrice(amountHave, amountWant, 1);
+    }
+
+    public Order(DCSet dcSet, Long id, Account creator, long haveKey, long wantKey, BigDecimal amountHave,
+                 BigDecimal amountWant, BigDecimal fulfilledHave, int status) {
+        this(id, creator, haveKey, wantKey, amountHave,
+                amountWant, fulfilledHave, status);
+
+        setDC(dcSet);
 
     }
 
@@ -143,10 +156,9 @@ public class Order implements Comparable<Order> {
         return powerTen(value) + value.scale();
     }
 
-    public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant, int addScale) {
-        int scalePrice = amountWant.scale();
+    public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant, int wantScale, int addScale) {
         // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.UP).precision() + scalePrice>0?scalePrice : 0;
-        scalePrice = Order.powerTen(amountHave) + (scalePrice > 0 ? scalePrice : 0);
+        int scalePrice = Order.powerTen(amountHave) + (wantScale > 0 ? wantScale : 0);
         BigDecimal result = amountWant.divide(amountHave, scalePrice + addScale, RoundingMode.HALF_DOWN).stripTrailingZeros();
 
         // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
@@ -155,8 +167,23 @@ public class Order implements Comparable<Order> {
         return result;
     }
 
-    public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant) {
-        return calcPrice(amountHave, amountWant, 0);
+    public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant, int wantScale) {
+        return calcPrice(amountHave, amountWant, wantScale, 0);
+    }
+
+    public BigDecimal calcPrice(int addScale) {
+        return calcPrice(amountHave, amountWant, getWantAsset().getScale(), addScale);
+    }
+    public BigDecimal calcPrice() {
+        return calcPrice(0);
+    }
+
+    public BigDecimal calcPriceReverse(int addScale) {
+        return calcPrice(amountWant, amountHave, getHaveAsset().getScale(), addScale);
+
+    }
+    public BigDecimal calcPriceReverse() {
+        return calcPriceReverse(0);
     }
 
     public static Order reloadOrder(DCSet dcSet, Long orderID) {
@@ -169,6 +196,12 @@ public class Order implements Comparable<Order> {
 
     public void setDC(DCSet dcSet) {
         this.dcSet = dcSet;
+        // TODO: в новой версии нужно сделать везде 0 - иначе несостыкоавка в процессинге ордера - там то 0
+        if ((id >> 8) > BlockChain.VERS_ORDER_0)
+            this.price = calcPrice();
+        else
+            this.price = calcPrice(0);
+
     }
 
     public Long getId() {
@@ -191,11 +224,10 @@ public class Order implements Comparable<Order> {
         if (dcSet == null)
             dcSet = DCSet.getInstance();
 
-        return this.getHaveAsset(this.dcSet);
-    }
+        if (haveAsset == null)
+            haveAsset = dcSet.getItemAssetMap().get(this.haveKey);
 
-    public AssetCls getHaveAsset(DCSet db) {
-        return (AssetCls) db.getItemAssetMap().get(this.haveKey);
+        return haveAsset;
     }
 
     public long getWant() {
@@ -206,11 +238,10 @@ public class Order implements Comparable<Order> {
         if (dcSet == null)
             dcSet = DCSet.getInstance();
 
-        return this.getWantAsset(this.dcSet);
-    }
+        if (wantAsset == null)
+            wantAsset = dcSet.getItemAssetMap().get(this.wantKey);
 
-    public AssetCls getWantAsset(DCSet db) {
-        return db.getItemAssetMap().get(this.wantKey);
+        return wantAsset;
     }
 
     ///////////////////////// AMOUNTS
@@ -576,8 +607,8 @@ public class Order implements Comparable<Order> {
 
             BigDecimal orderAmountHaveLeft;
             BigDecimal orderAmountWantLeft;
-            BigDecimal orderReversePrice = Order.calcPrice(order.amountWant, order.amountHave);
-            BigDecimal orderPrice = Order.calcPrice(order.amountHave, order.amountWant);
+            BigDecimal orderReversePrice = order.calcPriceReverse();
+            BigDecimal orderPrice = order.calcPrice();
             //BigDecimal orderPriceTemp;
 
             Trade trade;
@@ -610,7 +641,7 @@ public class Order implements Comparable<Order> {
                         if (scaledThisPrice.compareTo(orderReversePrice) == 0) {
                             // да цены совпали
                             // тогда еще так же обратные цены проверим
-                            BigDecimal thisReversePrice = Order.calcPrice(this.amountWant, this.amountHave);
+                            BigDecimal thisReversePrice = calcPriceReverse();
                             BigDecimal scaledOrderPrice = orderPrice.setScale(thisReversePrice.scale(), RoundingMode.HALF_DOWN);
                             // и сравним так же по прямой цене со сниженной точностью у Заказа
                             if (scaledOrderPrice.compareTo(thisReversePrice) == 0)
@@ -624,7 +655,7 @@ public class Order implements Comparable<Order> {
                         if (scaledOrderReversePrice.compareTo(thisPrice) == 0) {
                             // да цены совпали
                             // тогда еще так же обратные цены проверим
-                            BigDecimal thisReversePrice = Order.calcPrice(this.amountWant, this.amountHave);
+                            BigDecimal thisReversePrice = calcPriceReverse();
                             BigDecimal scaledOrderPrice = orderPrice.setScale(thisReversePrice.scale(), RoundingMode.HALF_DOWN);
                             // и сравним так же по прямой цене со сниженной точностью у Заказа
                             if (scaledOrderPrice.compareTo(thisReversePrice) == 0)

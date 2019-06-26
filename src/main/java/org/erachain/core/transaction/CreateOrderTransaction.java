@@ -282,11 +282,13 @@ public class CreateOrderTransaction extends Transaction {
     }
 
     public BigDecimal getPriceCalc() {
-        return Order.calcPrice(this.amountHave, this.amountWant);
+        // precision bad return Order.calcPrice(this.amountHave, this.amountWant);
+        return makeOrder().calcPrice(0);
     }
 
     public BigDecimal getPriceCalcReverse() {
-        return Order.calcPrice(this.amountWant, this.amountHave);
+        //return Order.calcPrice(this.amountWant, this.amountHave);
+        return makeOrder().calcPriceReverse(0);
     }
 
     @Override
@@ -301,7 +303,7 @@ public class CreateOrderTransaction extends Transaction {
         BigDecimal amountHave = this.amountHave.setScale(this.haveAsset.getScale());
         BigDecimal amountWant = this.amountWant.setScale(this.wantAsset.getScale());
 
-        return new Order(Transaction.makeDBRef(this.height, this.seqNo), this.creator, this.haveKey, this.wantKey,
+        return new Order(dcSet, Transaction.makeDBRef(this.height, this.seqNo), this.creator, this.haveKey, this.wantKey,
                 amountHave, amountWant
         );
     }

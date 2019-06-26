@@ -324,7 +324,8 @@ public class WebTransactionsHTML {
                     + Lang.getInstance().translateFromLangObj("fulfilled", langObj) + ")" : "")
                 + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Price", langObj) + ":</b> "
-                + orderCreation.getPriceCalc().toPlainString() + " / " + orderCreation.getPriceCalcReverse().toPlainString() + "<br>";
+                + orderCreation.makeOrder().calcPrice().toPlainString()
+                + " / " + orderCreation.makeOrder().calcPriceReverse().toPlainString() + "<br>";
 
 
         return out;

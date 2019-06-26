@@ -1145,7 +1145,7 @@ public class BlockExplorer {
             sellJSON.put("amount", vol.toPlainString()); // getAmountHaveLeft
             sumAmount = sumAmount.add(vol);
 
-            sellJSON.put("sellingPrice", Order.calcPrice(order.getAmountWant(), order.getAmountHave()).toPlainString());
+            sellJSON.put("sellingPrice", order.calcPriceReverse().toPlainString());
 
             //BigDecimal sellingAmount = Order.calcAmountWantLeft(order);
             BigDecimal sellingAmount = order.getAmountWantLeft();
@@ -1192,7 +1192,7 @@ public class BlockExplorer {
 
             sumAmount = sumAmount.add(vol);
 
-            buyJSON.put("buyingPrice", Order.calcPrice(order.getAmountWant(), order.getAmountHave()).toPlainString());
+            buyJSON.put("buyingPrice", order.calcPriceReverse().toPlainString());
 
             //BigDecimal buyingAmount = Order.calcAmountWantLeft(order);
             BigDecimal buyingAmount = order.getAmountWantLeft();
@@ -2028,7 +2028,7 @@ public class BlockExplorer {
                         orderJSON.put("amountLeft", "??");
                         orderJSON.put("amountWant", createOrder.getAmountWant().toPlainString());
                         orderJSON.put("price", Order.calcPrice(createOrder.getAmountHave(),
-                                createOrder.getAmountWant()).toPlainString());
+                                createOrder.getAmountWant(), 8).toPlainString());
 
                         transactionDataJSON.put("orderSource", orderJSON);
                     }

@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 
 import com.google.common.collect.Iterables;
+import com.sun.org.apache.xpath.internal.operations.Or;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.*;
 import org.erachain.database.DBMap;
@@ -90,7 +91,7 @@ public class OrderMap extends DCMap<Long, Order> {
                     public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
                             Long key, Order value) {
                         return new Fun.Tuple4<>(value.getHave(), value.getWant(),
-                                Order.calcPrice(value.getAmountHave(), value.getAmountWant()),
+                                value.calcPrice(),
                                 value.getId());
                     }
                 });
@@ -131,7 +132,7 @@ public class OrderMap extends DCMap<Long, Order> {
                     public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
                             Long key, Order value) {
                         return new Fun.Tuple4<>(value.getWant(), value.getHave(),
-                                Order.calcPrice(value.getAmountHave(), value.getAmountWant()),
+                                value.calcPrice(),
                                 value.getId());
             }
         });
@@ -410,6 +411,15 @@ public class OrderMap extends DCMap<Long, Order> {
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>(this, keys);
     }
     */
+
+    public Order get(Long id) {
+
+        Order order = super.get(id);
+        if (order != null)
+            order.setDC((DCSet)getDBSet());
+
+        return order;
+    }
 
     public void add(Order order) {
 

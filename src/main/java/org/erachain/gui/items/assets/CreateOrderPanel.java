@@ -420,7 +420,7 @@ public class CreateOrderPanel extends JPanel {
                 result = price.multiply(amount).setScale(have.getScale(), RoundingMode.HALF_DOWN);
                 if (needUpdatePrice && txtAmountHave.getText().length() > 0) {
                     noUpdateFields = true;
-                    txtPrice.setText(Order.calcPrice(amount, result).toPlainString());
+                    txtPrice.setText(Order.calcPrice(amount, result, have.getScale()).toPlainString());
                     noUpdateFields = false;
                 }
 
@@ -428,7 +428,7 @@ public class CreateOrderPanel extends JPanel {
                 result = price.multiply(amount).setScale(want.getScale(), RoundingMode.HALF_DOWN);
                 if (needUpdatePrice && txtAmountHave.getText().length() > 0) {
                     noUpdateFields = true;
-                    txtPrice.setText(Order.calcPrice(amount, result).toPlainString());
+                    txtPrice.setText(Order.calcPrice(amount, result, want.getScale()).toPlainString());
                     noUpdateFields = false;
                 }
             }

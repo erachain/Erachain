@@ -79,20 +79,28 @@ public class Trade {
         return this.amountWant;
     }
 
+    public BigDecimal calcPrice(int wantScale) {
+        return Order.calcPrice(this.amountHave, this.amountWant, wantScale);
+    }
     public BigDecimal calcPrice() {
-        return Order.calcPrice(this.amountHave, this.amountWant);
+        AssetCls asset = DCSet.getInstance().getItemAssetMap().get(wantKey);
+        return calcPrice(asset.getScale());
     }
     public BigDecimal calcPrice(AssetCls assetHave, AssetCls assetWant) {
         return Order.calcPrice(amountHave.setScale(assetHave.getScale(), RoundingMode.HALF_DOWN),
-                amountWant.setScale(assetWant.getScale(), RoundingMode.HALF_DOWN));
+                amountWant.setScale(assetWant.getScale(), RoundingMode.HALF_DOWN), assetWant.getScale());
 
     }
+    public BigDecimal calcPriceRevers(int haveScale) {
+        return Order.calcPrice(this.amountWant, this.amountHave, haveScale);
+    }
     public BigDecimal calcPriceRevers() {
-        return Order.calcPrice(this.amountWant, this.amountHave);
+        AssetCls asset = DCSet.getInstance().getItemAssetMap().get(haveKey);
+        return calcPriceRevers(asset.getScale());
     }
     public BigDecimal calcPriceRevers(AssetCls assetHave, AssetCls assetWant) {
         return Order.calcPrice(amountWant.setScale(assetHave.getScale(), RoundingMode.HALF_DOWN),
-                amountHave.setScale(assetWant.getScale(), RoundingMode.HALF_DOWN));
+                amountHave.setScale(assetWant.getScale(), RoundingMode.HALF_DOWN), assetWant.getScale());
     }
 
     public int getSequence() {

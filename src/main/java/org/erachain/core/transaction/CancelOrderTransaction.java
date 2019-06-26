@@ -12,6 +12,8 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.jsoup.Connection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -20,8 +22,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class CancelOrderTransaction extends Transaction {
+
+    static Logger LOGGER = LoggerFactory.getLogger(Transaction.class.getName());
+
     // TODO убрать в новой цепочке
-    private static long CANCEL_ORDERS_ALL_VALID = 380000;
     public static final byte[][] VALID_REC = new byte[][]{
         //Base58.decode("2SEfiztfaj9wNE2k8h3Wiko3oVHtdjawosfua5PbjeAwPTFMHhFoJqVxpYvswZUdJFfQZ7i6xXep85UvCkZoxHqi"),
         //Base58.decode("34BaZfvWJpyEKAL7i3txFcTqRcVJt2GgumJm2ANqNcvBHCxngfoXBUKhm24uhqmZx1qvShj1KwUK6WHwHX2FQpfy"),
@@ -197,8 +201,8 @@ public class CancelOrderTransaction extends Transaction {
         //CHECK IF ORDER EXISTS
         boolean emptyOrder = false;
         if (this.orderID == null || !this.dcSet.getOrderMap().contains(this.orderID)) {
-            if (!(BlockChain.DEVELOP_USE && this.height < CANCEL_ORDERS_ALL_VALID)
-                ) {
+            if (this.height > BlockChain.CANCEL_ORDERS_ALL_VALID) {
+
                 return ORDER_DOES_NOT_EXIST;
             } else {
                 emptyOrder = true;

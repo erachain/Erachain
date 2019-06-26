@@ -88,7 +88,7 @@ public class SellOrdersTableModel extends TimerTableModelCls<Order> implements O
 
             case COLUMN_PRICE:
 
-                BigDecimal price = Order.calcPrice(order.getAmountHave(), order.getAmountWant());
+                BigDecimal price = order.calcPrice();
                 amountStr = NumberAsString.formatAsString(price.stripTrailingZeros());
 
                 if (isMine)

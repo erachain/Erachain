@@ -243,7 +243,7 @@ public class APIExchange {
             sellJSON.put("amount", vol);
             sumAmount = sumAmount.add(vol);
 
-            sellJSON.put("sellingPrice", Order.calcPrice(order.getAmountWant(), order.getAmountHave()));
+            sellJSON.put("sellingPrice", order.calcPriceReverse());
 
             BigDecimal sellingAmount = order.getAmountWantLeft();
 
@@ -279,7 +279,7 @@ public class APIExchange {
 
             sumAmount = sumAmount.add(vol);
 
-            buyJSON.put("buyingPrice", Order.calcPrice(order.getAmountWant(), order.getAmountHave()));
+            buyJSON.put("buyingPrice", order.calcPriceReverse());
 
             BigDecimal buyingAmount = order.getAmountWantLeft();
 
