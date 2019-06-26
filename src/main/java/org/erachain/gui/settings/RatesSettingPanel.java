@@ -38,6 +38,7 @@ public class RatesSettingPanel extends javax.swing.JPanel {
 
         jLabelTitle = new javax.swing.JLabel();
         jLabelCOMPU = new javax.swing.JLabel();
+        jLabelAsset = new javax.swing.JLabel();
         jTextFieldRate = new MTextFieldOnlyBigDecimal();
 
         jLabelDefaultAsset = new JLabel();
@@ -49,7 +50,7 @@ public class RatesSettingPanel extends javax.swing.JPanel {
 
         int gridy = 0;
         jLabelTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelTitle.setText("<html><h2>" + Lang.getInstance().translate("Exchange and Rates") + "</h2><html>");
+        jLabelTitle.setText("<html><h2>" + Lang.getInstance().translate("COMPU Rates for View Fee") + "</h2><html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridy++;
@@ -60,15 +61,13 @@ public class RatesSettingPanel extends javax.swing.JPanel {
         add(jLabelTitle, gridBagConstraints);
 
         //jLabelCOMPU.setHorizontalAlignment(SwingConstants.RIGHT);
-        jLabelCOMPU.setText(Lang.getInstance().translate("Set rate of COMPU to USD") + ":");
+        jLabelCOMPU.setText(Lang.getInstance().translate("Rate of COMPU") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 10);
-        //gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-
+        gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 10);
         add(jLabelCOMPU, gridBagConstraints);
 
         jTextFieldRate.setText(Settings.getInstance().getCompuRate());
@@ -80,7 +79,15 @@ public class RatesSettingPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         add(jTextFieldRate, gridBagConstraints);
 
-        /*
+        jLabelAsset.setText(Lang.getInstance().translate("Asset of Rate") + ":");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 10);
+        add(jLabelAsset, gridBagConstraints);
+
         // COMPU RATE ASSET
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
@@ -90,17 +97,34 @@ public class RatesSettingPanel extends javax.swing.JPanel {
         //gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         cbxFavoritesRate = new JComboBox<ItemCls>(new ComboBoxAssetsModel());
         cbxFavoritesRate.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
+
+        long key = Settings.getInstance().getCompuRateAsset();
+        AssetCls asset = Controller.getInstance().getAsset(key);
+        if (asset == null)
+            asset = Controller.getInstance().getAsset(2L);
+
+        cbxFavoritesRate.setSelectedItem(asset);
+
         cbxFavoritesRate.setPreferredSize(new java.awt.Dimension(200, 30));
         add(cbxFavoritesRate, gridBagConstraints);
-        */
 
-        jLabelDefaultAsset.setText(Lang.getInstance().translate("Default Asset for Exchange pairs") + ":");
+        JLabel jExchangeTitle = new JLabel("<html><h2>" + Lang.getInstance().translate("Default Asset for Exchange Pair") + "</h2><html>");
+        jExchangeTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.gridwidth = 6;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
+        add(jExchangeTitle, gridBagConstraints);
+
+        jLabelDefaultAsset.setText(Lang.getInstance().translate("Default Asset for Exchange Pair") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 10);
+        gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 10);
         add(jLabelDefaultAsset, gridBagConstraints);
 
         //FAVORITES GBC
@@ -113,10 +137,12 @@ public class RatesSettingPanel extends javax.swing.JPanel {
         // DEFAULT PAIR ASSET
         cbxFavoritesPair = new JComboBox<ItemCls>(new ComboBoxAssetsModel());
         cbxFavoritesPair.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
-        long key = Settings.getInstance().getDefaultPairAssetKey();
-        AssetCls asset = Controller.getInstance().getAsset(key);
-        if (asset != null)
-            cbxFavoritesPair.setSelectedItem(asset);
+        key = Settings.getInstance().getDefaultPairAssetKey();
+        asset = Controller.getInstance().getAsset(key);
+        if (asset == null)
+            asset = Controller.getInstance().getAsset(2L);
+
+        cbxFavoritesPair.setSelectedItem(asset);
 
         cbxFavoritesPair.setPreferredSize(new java.awt.Dimension(200, 30));
         this.add(cbxFavoritesPair, gridBagConstraints);
@@ -137,6 +163,7 @@ public class RatesSettingPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify                     
     private javax.swing.JLabel jLabelTitle;
     private javax.swing.JLabel jLabelCOMPU;
+    private javax.swing.JLabel jLabelAsset;
     public JComboBox<ItemCls> cbxFavoritesRate;
     private MTextFieldOnlyBigDecimal jTextFieldRate;
 

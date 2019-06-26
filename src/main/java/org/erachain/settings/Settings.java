@@ -623,7 +623,7 @@ public class Settings {
             return  Long.valueOf(this.settingsJSON.get("compuRateAsset").toString());
         }
 
-        return 1L;
+        return 95L;
     }
 
     public long getDefaultPairAssetKey() {

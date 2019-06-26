@@ -179,7 +179,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
     }
 
     public String getTickerName() {
-        String[] words = this.viewName().split(" ");
+        String[] words = this.name.split(" ");
         String name = words[0].trim();
         if (name.length() >6) {
             name = name.substring(0, 6);

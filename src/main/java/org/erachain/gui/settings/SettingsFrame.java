@@ -158,7 +158,7 @@ public class SettingsFrame extends JDialog {
         // save Rate
         
         settingsJSONbuf.put("compuRate", settingsTabPane.rates_Setting_Panel.getRate().toString());
-        //settingsJSONbuf.put("compuRateAsset", settingsTabPane.rates_Setting_Panel.getRateAsset().getKey());
+        settingsJSONbuf.put("compuRateAsset", settingsTabPane.rates_Setting_Panel.getRateAsset().getKey());
         settingsJSONbuf.put("defaultPairAsset", settingsTabPane.rates_Setting_Panel.getDefaultPairAsset().getKey());
         Controller.getInstance().updateCompuRaes();
 
