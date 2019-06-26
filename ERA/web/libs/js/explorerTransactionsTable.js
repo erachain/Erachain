@@ -276,7 +276,7 @@ function transactions_Table(data) {
     output += pagesComponent2(data);
 
     output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
-        ' class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
+        ' class="tiny table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
 
     output += '<tr bgcolor="f1f1f1"><td><b>' + data.Transactions.label_block + '<td><b>' +
         data.Transactions.label_title + '<td><b>' + data.Transactions.label_type_transaction + '<td><b>' +

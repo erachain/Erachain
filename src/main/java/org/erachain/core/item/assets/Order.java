@@ -160,14 +160,16 @@ public class Order implements Comparable<Order> {
     public boolean isUnResolved() {
         BigDecimal priceForLeft = calcPrice(amountHave.subtract(fulfilledHave), amountWant.subtract(willFulfilledWant()), wantAsset.getScale(), 1);
         BigDecimal diff = price.subtract(priceForLeft).divide(price, wantAsset.getScale() + 10, RoundingMode.HALF_DOWN).abs();
-        if (PRECISION_UNIT.compareTo(diff) > 0)
+        // если разница цены выросла от начального сильно - то
+        if (diff.compareTo(PRECISION_UNIT) > 0)
             return true;
         return false;
     }
     public boolean willUnResolvedFor(BigDecimal fulfilledHave) {
         BigDecimal priceForLeft = calcPrice(amountHave.subtract(fulfilledHave), amountWant.subtract(willFulfilledWant(fulfilledHave)), wantAsset.getScale(), 1);
         BigDecimal diff = price.subtract(priceForLeft).divide(price, wantAsset.getScale() + 10, RoundingMode.HALF_DOWN).abs();
-        if (PRECISION_UNIT.compareTo(diff) > 0)
+        // если разница цены выросла от начального сильно - то
+        if (diff.compareTo(PRECISION_UNIT) > 0)
             return true;
         return false;
     }
@@ -550,7 +552,7 @@ public class Order implements Comparable<Order> {
         if (//this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
                 //this.id.equals(Transaction.makeDBRef(12435, 1))
                 //this.id.equals(770667456757788l)
-                height == 255931
+                height == 136751 //255931
                 //(this.haveKey == 1004l && this.wantKey == 2l)
                 //|| (this.wantKey == 1004l && this.haveKey == 2l)
                 //Arrays.equals(Base58.decode("3PVq3fcMxEscaBLEYgmmJv9ABATPasYjxNMJBtzp4aKgDoqmLT9MASkhbpaP3RNPv8CECmUyH5sVQtEAux2W9quA"), transaction.getSignature())
@@ -784,6 +786,8 @@ public class Order implements Comparable<Order> {
             if (tradeAmountForHave.compareTo(BigDecimal.ZERO) <= 0
                 || tradeAmountForWant.compareTo(BigDecimal.ZERO) <= 0) {
                 debug = true;
+                Long error = null;
+                error ++;
             }
 
                 //CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
@@ -867,6 +871,10 @@ public class Order implements Comparable<Order> {
                 // update new values
                 thisAmountHaveLeft = this.getAmountHaveLeft();
                 processedAmountFulfilledWant = processedAmountFulfilledWant.add(tradeAmountForHave);
+
+                if (debug) {
+                    debug = true;
+                }
 
                 if (!completedOrder
                         // if can't trade by more good price than self - by orderOrice - then  auto cancel!

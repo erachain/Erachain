@@ -1108,7 +1108,7 @@ public class BlockExplorer {
 
         // Collections.reverse(ordersWant);
 
-        List<Trade> trades = dcSet.getTradeMap().getTrades(have, want, 0, 25);
+        List<Trade> trades = dcSet.getTradeMap().getTrades(have, want, 0, 50);
 
         AssetCls assetHave = Controller.getInstance().getAsset(have);
         AssetCls assetWant = Controller.getInstance().getAsset(want);
