@@ -2517,6 +2517,10 @@ public class BlockExplorer {
             long refInitator = Transaction.parseDBRef(refs[0]);
             long refTarget = Transaction.parseDBRef(refs[1]);
             trade = dcSet.getTradeMap().get(Fun.t2(refInitator, refTarget));
+            if (trade == null) {
+                output.put("error", "Trade not Found");
+                return output;
+            }
 
             all.add(DCSet.getInstance().getTransactionFinalMap().get(refInitator));
             all.add(DCSet.getInstance().getTransactionFinalMap().get(refTarget));

@@ -283,12 +283,12 @@ public class CreateOrderTransaction extends Transaction {
 
     public BigDecimal getPriceCalc() {
         // precision bad return Order.calcPrice(this.amountHave, this.amountWant);
-        return makeOrder().calcPrice(0);
+        return makeOrder().calcPrice();
     }
 
     public BigDecimal getPriceCalcReverse() {
         //return Order.calcPrice(this.amountWant, this.amountHave);
-        return makeOrder().calcPriceReverse(0);
+        return makeOrder().calcPriceReverse();
     }
 
     @Override

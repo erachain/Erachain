@@ -113,8 +113,7 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
                     return "";
                     ///return null;
 
-
-            if (type > 0)
+                if (type > 0)
                     return "<html><span style='color:green'>▲</span>"
                         + NumberAsString.formatAsString(trade.calcPrice())
                         + "</html>";

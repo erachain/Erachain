@@ -798,17 +798,17 @@ public class OrderTestsMy {
                 BigDecimal.valueOf(123451).setScale(BlockChain.AMOUNT_DEDAULT_SCALE << 1),
                 BigDecimal.valueOf(1056789).setScale(BlockChain.AMOUNT_DEDAULT_SCALE >> 1),
                 haveAssetScale, wantAssetScale, 0);
-         byte[] tradeRaw = tradeParse.toBytes();
+        byte[] tradeRaw = tradeParse.toBytes();
 
-         Assert.assertEquals(tradeRaw.length, tradeParse.getDataLength());
+        Assert.assertEquals(tradeRaw.length, tradeParse.getDataLength());
 
-         Trade tradeParse_1 = null;
-         try {
-             tradeParse_1 = Trade.parse(tradeRaw);
-         } catch (Exception e) {
+        Trade tradeParse_1 = null;
+        try {
+            tradeParse_1 = Trade.parse(tradeRaw);
+        } catch (Exception e) {
 
-         }
-         Assert.assertEquals(tradeParse_1.getInitiator(), tradeParse.getInitiator());
+        }
+        Assert.assertEquals(tradeParse_1.getInitiator(), tradeParse.getInitiator());
         Assert.assertEquals(tradeParse_1.getTarget(), tradeParse.getTarget());
 
         Assert.assertEquals(tradeParse_1.getAmountHave(), tradeParse.getAmountHave());
