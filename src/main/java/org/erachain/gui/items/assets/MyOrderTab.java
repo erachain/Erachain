@@ -324,8 +324,10 @@ public class MyOrderTab extends SplitPanel {
     protected void tableMouse2Click(Order order) {
 
         String action = null;
-        ExchangePanel panel = new ExchangePanel(order.getHaveAsset(), order.getWantAsset(), action, "");
-        panel.setName(order.getHaveAsset().getShortName() + "/" + order.getWantAsset().getShortName());
+        AssetCls haveAsset = Controller.getInstance().getAsset(order.getHaveAssetKey());
+        AssetCls wantAsset = Controller.getInstance().getAsset(order.getWantAssetKey());
+        ExchangePanel panel = new ExchangePanel(haveAsset, wantAsset, action, "");
+        panel.setName(haveAsset.getTickerName() + "/" + wantAsset.getTickerName());
         MainPanel.getInstance().insertTab(panel);
     }
 

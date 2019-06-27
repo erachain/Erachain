@@ -217,7 +217,7 @@ public class Account {
         Order order;
         while (iterator.hasNext()) {
             order = map.get(iterator.next());
-            if (order.getHave() == key) {
+            if (order.getHaveAssetKey() == key) {
                 String address = order.getCreator().getAddress();
                 values.put(address, values.get(address).add(order.getAmountHave()));
             }

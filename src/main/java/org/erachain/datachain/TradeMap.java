@@ -145,7 +145,7 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
             Bind.secondaryKey(map, this.haveKeyMap, new Fun.Function2<Tuple3<String, Long, Integer>, Tuple2<Long, Long>, Trade>() {
                 @Override
                 public Tuple3<String, Long, Integer> run(Tuple2<Long, Long> key, Trade value) {
-                    long have = value.getHaveKey(); //order.getHave();
+                    long have = value.getHaveKey(); //order.getHaveAssetKey();
 
                     String haveKey;
                     haveKey = String.valueOf(have);

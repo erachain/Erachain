@@ -75,15 +75,6 @@ public class CompletedOrderMap extends DCMap<Long, Order> {
         return null;
     }
 
-    public Order get(Long id) {
-
-        Order order = super.get(id);
-        if (order != null)
-            order.setDC((DCSet)getDBSet());
-
-        return order;
-    }
-
     public void add(Order order) {
         // this order is NOT executable
         ////order = datachain.OrderMap.setExecutable(order, false);

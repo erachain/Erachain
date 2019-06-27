@@ -577,7 +577,6 @@ public class CreateOrderTransaction extends Transaction {
         // изменяемые объекты нужно заново создавать
         //.copy() // тут надо что-то сделать новым - а то значения впамяти по ссылке меняются
         Order order = makeOrder(); //.copy();
-        order.setDC(dcSet);
         order.process(block, this);
 
     }
@@ -594,7 +593,6 @@ public class CreateOrderTransaction extends Transaction {
 
         // изменяемые объекты нужно заново создавать
         Order order = makeOrder();
-        order.setDC(dcSet);
         order.orphan(block);
 
     }

@@ -1,7 +1,6 @@
 package org.erachain.datachain;
 
 import com.google.common.collect.Iterables;
-import com.sun.org.apache.xpath.internal.operations.Or;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.*;
 import org.erachain.database.DBMap;
@@ -90,7 +89,7 @@ public class OrderMap extends DCMap<Long, Order> {
                     @Override
                     public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
                             Long key, Order value) {
-                        return new Fun.Tuple4<>(value.getHave(), value.getWant(),
+                        return new Fun.Tuple4<>(value.getHaveAssetKey(), value.getWantAssetKey(),
                                 value.calcPrice(),
                                 value.getId());
                     }
@@ -114,7 +113,7 @@ public class OrderMap extends DCMap<Long, Order> {
                     public Fun.Tuple5<String, Long, Long, BigDecimal, Long> run(
                             Long key, Order value) {
                         return new Fun.Tuple5<String, Long, Long, BigDecimal, Long>
-                                (value.getCreator().getAddress(), value.getHave(), value.getWant(), value.getPrice(),
+                                (value.getCreator().getAddress(), value.getHaveAssetKey(), value.getWantAssetKey(), value.getPrice(),
                                         key);
                     }
                 });
@@ -131,7 +130,7 @@ public class OrderMap extends DCMap<Long, Order> {
                     @Override
                     public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
                             Long key, Order value) {
-                        return new Fun.Tuple4<>(value.getWant(), value.getHave(),
+                        return new Fun.Tuple4<>(value.getWantAssetKey(), value.getHaveAssetKey(),
                                 value.calcPrice(),
                                 value.getId());
             }

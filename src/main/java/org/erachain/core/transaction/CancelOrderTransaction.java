@@ -11,7 +11,6 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.Order;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
-import org.jsoup.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -249,8 +248,8 @@ public class CancelOrderTransaction extends Transaction {
         db.getCompletedOrderMap().add(order);
 
         //UPDATE BALANCE OF CREATOR
-        //creator.setBalance(orderSignature.getHave(), creator.getBalance(db, orderSignature.getHave()).add(orderSignature.getAmountHaveLeft()), db);
-        order.getCreator().changeBalance(db, false, order.getHave(), order.getAmountHaveLeft(), false);
+        //creator.setBalance(orderSignature.getHaveAssetKey(), creator.getBalance(db, orderSignature.getHaveAssetKey()).add(orderSignature.getAmountHaveLeft()), db);
+        order.getCreator().changeBalance(db, false, order.getHaveAssetKey(), order.getAmountHaveLeft(), false);
 
         //DELETE FROM DATABASE
         db.getOrderMap().delete(order.getId());
@@ -274,7 +273,7 @@ public class CancelOrderTransaction extends Transaction {
         }
 
         process_it(this.dcSet, order);
-        this.addCalculated(block, this.creator, order.getHave(), order.getAmountHave(),
+        this.addCalculated(block, this.creator, order.getHaveAssetKey(), order.getAmountHave(),
                 "cancel order @" + Transaction.viewDBRef(order.getId()));
     }
 
@@ -282,8 +281,8 @@ public class CancelOrderTransaction extends Transaction {
         db.getOrderMap().add(order);
 
         //REMOVE BALANCE OF CREATOR
-        //creator.setBalance(orderID.getHave(), creator.getBalance(db, orderID.getHave()).subtract(orderID.getAmountHaveLeft()), db);
-        order.getCreator().changeBalance(db, true, order.getHave(), order.getAmountHaveLeft(), false);
+        //creator.setBalance(orderID.getHaveAssetKey(), creator.getBalance(db, orderID.getHaveAssetKey()).subtract(orderID.getAmountHaveLeft()), db);
+        order.getCreator().changeBalance(db, true, order.getHaveAssetKey(), order.getAmountHaveLeft(), false);
 
         //DELETE ORPHAN DATA
         db.getCompletedOrderMap().delete(order.getId());
@@ -361,7 +360,7 @@ public class CancelOrderTransaction extends Transaction {
             order = this.dcSet.getOrderMap().get(this.orderID);
         }
 
-        assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), order.getHave(), order.getAmountHave());
+        assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), order.getHaveAssetKey(), order.getAmountHave());
 
         return assetAmount;
     }

@@ -3,10 +3,7 @@ package org.erachain.core.item.assets;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -27,7 +24,7 @@ public class Trade {
     private static final int SEQUENCE_LENGTH = 4;
     private static final int SCALE_LENGTH = 1;
     private static final int BASE_LENGTH = 2 * ORDER_LENGTH + 2 * ASSET_KEY_LENGTH
-            + 2 * SCALE_LENGTH + 2 * AMOUNT_LENGTH + SEQUENCE_LENGTH;
+            + 4 * SCALE_LENGTH + 2 * AMOUNT_LENGTH + SEQUENCE_LENGTH;
 
     private Long initiator;
     private Long target;
@@ -35,16 +32,21 @@ public class Trade {
     private Long wantKey;
     private BigDecimal amountHave;
     private BigDecimal amountWant;
+    private int haveAssetScale;
+    private int wantAssetScale;
     private int sequence;
 
     // make trading if two orders is seeked
-    public Trade(Long initiator, Long target, Long haveKey, Long wantKey, BigDecimal amountHave, BigDecimal amountWant, int sequence) {
+    public Trade(Long initiator, Long target, Long haveKey, Long wantKey, BigDecimal amountHave, BigDecimal amountWant, int haveAssetScale, int wantAssetScale, int sequence) {
         this.initiator = initiator;
         this.target = target;
         this.haveKey = haveKey;
         this.wantKey = wantKey;
         this.amountHave = amountHave;
         this.amountWant = amountWant;
+        this.haveAssetScale = haveAssetScale;
+        this.wantAssetScale = wantAssetScale;
+
         this.sequence = sequence;
     }
 
@@ -79,28 +81,11 @@ public class Trade {
         return this.amountWant;
     }
 
-    public BigDecimal calcPrice(int wantScale) {
-        return Order.calcPrice(this.amountHave, this.amountWant, wantScale);
-    }
     public BigDecimal calcPrice() {
-        AssetCls asset = DCSet.getInstance().getItemAssetMap().get(wantKey);
-        return calcPrice(asset.getScale());
-    }
-    public BigDecimal calcPrice(AssetCls assetHave, AssetCls assetWant) {
-        return Order.calcPrice(amountHave.setScale(assetHave.getScale(), RoundingMode.HALF_DOWN),
-                amountWant.setScale(assetWant.getScale(), RoundingMode.HALF_DOWN), assetWant.getScale());
-
-    }
-    public BigDecimal calcPriceRevers(int haveScale) {
-        return Order.calcPrice(this.amountWant, this.amountHave, haveScale);
+        return Order.calcPrice(this.amountHave, this.amountWant, wantAssetScale);
     }
     public BigDecimal calcPriceRevers() {
-        AssetCls asset = DCSet.getInstance().getItemAssetMap().get(haveKey);
-        return calcPriceRevers(asset.getScale());
-    }
-    public BigDecimal calcPriceRevers(AssetCls assetHave, AssetCls assetWant) {
-        return Order.calcPrice(amountWant.setScale(assetHave.getScale(), RoundingMode.HALF_DOWN),
-                amountHave.setScale(assetWant.getScale(), RoundingMode.HALF_DOWN), assetWant.getScale());
+        return Order.calcPrice(this.amountWant, this.amountHave, haveAssetScale);
     }
 
     public int getSequence() {
@@ -200,11 +185,16 @@ public class Trade {
         BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), scaleWant);
         position += AMOUNT_LENGTH;
 
+        byte haveAssetScale = Arrays.copyOfRange(data, position, position + 1)[0];
+        position ++;
+        byte wantAssetScale = Arrays.copyOfRange(data, position, position + 1)[0];
+        position ++;
+
         //READ SEQUENCE
         byte[] sequenceBytes = Arrays.copyOfRange(data, position, position + SEQUENCE_LENGTH);
         int sequence = Ints.fromByteArray(sequenceBytes);
 
-        return new Trade(initiator, target, haveKey, wantKey, amountHave, amountWant, sequence);
+        return new Trade(initiator, target, haveKey, wantKey, amountHave, amountWant, haveAssetScale, wantAssetScale, sequence);
 	}
 
 	public byte[] toBytes()
@@ -246,6 +236,10 @@ public class Trade {
 		fill = new byte[AMOUNT_LENGTH - amountWantBytes.length];
 		amountWantBytes = Bytes.concat(fill, amountWantBytes);
 		data = Bytes.concat(data, amountWantBytes);
+
+        // ASSETS SCALE
+        data = Bytes.concat(data, new byte[]{(byte)this.haveAssetScale});
+        data = Bytes.concat(data, new byte[]{(byte)this.wantAssetScale});
 
         //WRITE SEQUENCE
         byte[] sequenceBytes = Ints.toByteArray(this.sequence);
@@ -302,10 +296,10 @@ public class Trade {
         }
 
         //TRANSFER FUNDS
-        //initiator.getCreator().setBalance(initiator.getWant(), initiator.getCreator().getBalance(db, initiator.getWant()).add(this.amountHave), db);
-        initiator.getCreator().changeBalance(db, false, initiator.getWant(), this.amountHave, false);
-        //target.getCreator().setBalance(target.getWant(), target.getCreator().getBalance(db, target.getWant()).add(this.amountWant), db);
-        target.getCreator().changeBalance(db, false, target.getWant(), this.amountWant, false);
+        //initiator.getCreator().setBalance(initiator.getWantAssetKey(), initiator.getCreator().getBalance(db, initiator.getWantAssetKey()).add(this.amountHave), db);
+        initiator.getCreator().changeBalance(db, false, initiator.getWantAssetKey(), this.amountHave, false);
+        //target.getCreator().setBalance(target.getWantAssetKey(), target.getCreator().getBalance(db, target.getWantAssetKey()).add(this.amountWant), db);
+        target.getCreator().changeBalance(db, false, target.getWantAssetKey(), this.amountWant, false);
     }
 
     public void orphan_old(DCSet db) {
@@ -313,10 +307,10 @@ public class Trade {
         Order target = this.getTargetOrder(db);
 
         //REVERSE FUNDS
-        //initiator.getCreator().setBalance(initiator.getWant(), initiator.getCreator().getBalance(db, initiator.getWant()).subtract(this.amountHave), db);
-        initiator.getCreator().changeBalance(db, true, initiator.getWant(), this.amountHave, false);
-        //target.getCreator().setBalance(target.getWant(), target.getCreator().getBalance(db, target.getWant()).subtract(this.amountWant), db);
-        target.getCreator().changeBalance(db, true, target.getWant(), this.amountWant, false);
+        //initiator.getCreator().setBalance(initiator.getWantAssetKey(), initiator.getCreator().getBalance(db, initiator.getWantAssetKey()).subtract(this.amountHave), db);
+        initiator.getCreator().changeBalance(db, true, initiator.getWantAssetKey(), this.amountHave, false);
+        //target.getCreator().setBalance(target.getWantAssetKey(), target.getCreator().getBalance(db, target.getWantAssetKey()).subtract(this.amountWant), db);
+        target.getCreator().changeBalance(db, true, target.getWantAssetKey(), this.amountWant, false);
 
         //CHECK IF ORDER IS FULFILLED
         if (initiator.isFulfilled()) {

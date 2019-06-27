@@ -57,8 +57,8 @@ public class WalletOrdersTableModel extends WalletAutoKeyTableModel<Tuple2<Strin
 
             case COLUMN_HAVE:
 
-                AssetCls asset = DCSet.getInstance().getItemAssetMap().get(order.getHave());
-                return asset == null ? "[" + order.getHave() + "]" : asset.getShort();
+                AssetCls asset = DCSet.getInstance().getItemAssetMap().get(order.getHaveAssetKey());
+                return asset == null ? "[" + order.getHaveAssetKey() + "]" : asset.getShort();
 
             case COLUMN_PRICE:
 
@@ -66,8 +66,8 @@ public class WalletOrdersTableModel extends WalletAutoKeyTableModel<Tuple2<Strin
 
             case COLUMN_WANT:
 
-                asset = DCSet.getInstance().getItemAssetMap().get(order.getWant());
-                return asset == null ? "[" + order.getWant() + "]" : asset.getShort();
+                asset = DCSet.getInstance().getItemAssetMap().get(order.getWantAssetKey());
+                return asset == null ? "[" + order.getWantAssetKey() + "]" : asset.getShort();
 
             case COLUMN_AMOUNT_WANT:
 
@@ -76,7 +76,7 @@ public class WalletOrdersTableModel extends WalletAutoKeyTableModel<Tuple2<Strin
 
             case COLUMN_LEFT:
 
-                return order.willFulfilledWant().toPlainString();
+                return order.getFulfilledWant().toPlainString();
 
             case COLUMN_CREATOR:
 

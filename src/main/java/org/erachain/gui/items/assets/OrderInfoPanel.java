@@ -1,17 +1,14 @@
 package org.erachain.gui.items.assets;
 
+import org.erachain.controller.Controller;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
 import java.awt.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 @SuppressWarnings("serial")
 public class OrderInfoPanel extends JPanel {
@@ -24,7 +21,8 @@ public class OrderInfoPanel extends JPanel {
         // LAYOUT
         this.setLayout(new GridBagLayout());
 
-        order.setDC(DCSet.getInstance());
+        AssetCls haveAsset = Controller.getInstance().getAsset(order.getHaveAssetKey());
+        AssetCls wantAsset = Controller.getInstance().getAsset(order.getWantAssetKey());
 
         // LABEL GBC
         labelGBC = new GridBagConstraints();
@@ -41,8 +39,7 @@ public class OrderInfoPanel extends JPanel {
         // HAVE
         ++detailGBC.gridy;
         JTextField have = new JTextField(
-                order.getAmountHave().toPlainString() + " x " + (order.getHaveAsset() == null?
-                        "[" + order.getHave() + "]" : String.valueOf(order.getHaveAsset().toString())));
+                order.getAmountHave().toPlainString() + " x " + haveAsset.getShortName());
         have.setEditable(false);
         MenuPopupUtil.installContextMenu(have);
         this.add(have, detailGBC);
@@ -55,8 +52,7 @@ public class OrderInfoPanel extends JPanel {
         // HAVE
         ++detailGBC.gridy;
         JTextField want = new JTextField(
-                order.getAmountWant().toPlainString() + " x " + (order.getWantAsset() == null?
-                        "[" + order.getWant() + "]" : String.valueOf(order.getWantAsset().toString())));
+                order.getAmountWant().toPlainString() + " x " + wantAsset.getShortName());
         want.setEditable(false);
         MenuPopupUtil.installContextMenu(want);
         this.add(want, detailGBC);

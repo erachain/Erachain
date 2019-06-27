@@ -4,20 +4,14 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TradeMap;
-import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
-import org.erachain.ntp.NTP;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
-import org.mapdb.Fun.Tuple2;
 
-import java.math.BigDecimal;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -81,7 +75,7 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
                 initatorOrder = Order.getOrder(db, trade.getInitiator());
                 targetOrder = Order.getOrder(db, trade.getTarget());
 
-                type = initatorOrder.getHave() == this.have.getKey() ? -1 : 1;
+                type = initatorOrder.getHaveAssetKey() == this.have.getKey() ? -1 : 1;
 
             }
         }
@@ -122,11 +116,11 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
 
             if (type > 0)
                     return "<html><span style='color:green'>▲</span>"
-                        + NumberAsString.formatAsString(trade.calcPrice(have, want))
+                        + NumberAsString.formatAsString(trade.calcPrice())
                         + "</html>";
                 else
                     return "<html><span style='color:red'>▼</span>"
-                        + NumberAsString.formatAsString(trade.calcPriceRevers(have, want))
+                        + NumberAsString.formatAsString(trade.calcPriceRevers())
                         + "</html>";
 
             case COLUMN_ASSET_2:

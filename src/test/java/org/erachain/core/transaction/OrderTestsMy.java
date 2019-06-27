@@ -105,6 +105,8 @@ public class OrderTestsMy {
     private byte[] icon = new byte[0]; // default value
     private byte[] image = new byte[0]; // default value
 
+    int haveAssetScale = 8;
+    int wantAssetScale = 8;
     private void init() {
 
         db = DCSet.createEmptyDatabaseSet();
@@ -670,9 +672,8 @@ public class OrderTestsMy {
         BigDecimal amountHave = new BigDecimal("123.456");
         BigDecimal amountWant = new BigDecimal("12.456");
 
-        Order order = new Order(Transaction.makeDBRef(12, 3), this.accountA, 12L, amountHave, 8, 13L,
-                amountWant,
-                8);
+        Order order = new Order(db, Transaction.makeDBRef(12, 3), this.accountA, 12L, amountHave, 8,
+                13L, amountWant, 8);
 
 
         // CONVERT TO BYTES
@@ -692,10 +693,10 @@ public class OrderTestsMy {
         assertEquals(true, order.getCreator().equals(parsedOrder.getCreator()));
 
         // CHECK HAVE
-        assertEquals(order.getHave(), parsedOrder.getHave());
+        assertEquals(order.getHaveAssetKey(), parsedOrder.getHaveAssetKey());
 
         // CHECK WANT
-        assertEquals(order.getWant(), parsedOrder.getWant());
+        assertEquals(order.getWantAssetKey(), parsedOrder.getWantAssetKey());
 
         // CHECK AMOUNT
         assertEquals(0, order.getAmountHave().compareTo(parsedOrder.getAmountHave()));
@@ -795,7 +796,8 @@ public class OrderTestsMy {
         /////////// TRADE PARSE //////////
         Trade tradeParse = new Trade(543123456L, 3434546546L, 2l, 1l,
                 BigDecimal.valueOf(123451).setScale(BlockChain.AMOUNT_DEDAULT_SCALE << 1),
-                BigDecimal.valueOf(1056789).setScale(BlockChain.AMOUNT_DEDAULT_SCALE >> 1), 0);
+                BigDecimal.valueOf(1056789).setScale(BlockChain.AMOUNT_DEDAULT_SCALE >> 1),
+                haveAssetScale, wantAssetScale, 0);
          byte[] tradeRaw = tradeParse.toBytes();
 
          Assert.assertEquals(tradeRaw.length, tradeParse.getDataLength());
@@ -1683,14 +1685,14 @@ public class OrderTestsMy {
         Order orderA = db.getCompletedOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
         Assert.assertEquals(0, orderA.getFulfilledHave().compareTo(BigDecimal.valueOf(1)));
-        Assert.assertEquals(0, orderA.willFulfilledWant().compareTo(BigDecimal.valueOf(15000)));
+        Assert.assertEquals(0, orderA.getFulfilledWant().compareTo(BigDecimal.valueOf(15000)));
         Assert.assertEquals(true, orderA.isFulfilled());
         Assert.assertEquals(true, orderA.isFulfilled());
 
         Order orderB = db.getCompletedOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getOrderMap().contains(orderB.getId()));
         Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
-        Assert.assertEquals(orderB.willFulfilledWant(), BigDecimal.valueOf(40000));
+        Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000));
         Assert.assertEquals(true, orderB.isFulfilled());
 
         Order orderC = db.getOrderMap().get(orderID_C);
@@ -1777,7 +1779,7 @@ public class OrderTestsMy {
         // reload order_B
         orderB = db.getCompletedOrderMap().get(orderB.getId());
         Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
-        Assert.assertEquals(orderB.willFulfilledWant(), BigDecimal.valueOf(40000));
+        Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000));
         Assert.assertEquals(true, orderB.isFulfilled());
 
         // CHECK TRADES
@@ -1890,14 +1892,14 @@ public class OrderTestsMy {
         Order orderA = db.getCompletedOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
         Assert.assertEquals(orderA.getFulfilledHave(), BigDecimal.valueOf(1));
-        Assert.assertEquals(orderA.willFulfilledWant(), BigDecimal.valueOf(15000.88));
+        Assert.assertEquals(orderA.getFulfilledWant(), BigDecimal.valueOf(15000.88));
         Assert.assertEquals(true, orderA.isFulfilled());
         Assert.assertEquals(true, orderA.isFulfilled());
 
         Order orderB = db.getCompletedOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getOrderMap().contains(orderB.getId()));
         Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
-        Assert.assertEquals(orderB.willFulfilledWant(), BigDecimal.valueOf(40000.33));
+        Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000.33));
         Assert.assertEquals(true, orderB.isFulfilled());
 
         Order orderC = db.getOrderMap().get(orderID_C);
@@ -1970,7 +1972,7 @@ public class OrderTestsMy {
         Order orderE = db.getOrderMap().get(orderID_E);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderE.getId()));
         Assert.assertEquals(orderE.getFulfilledHave(), BigDecimal.valueOf(20000.165));
-        Assert.assertEquals(0, orderE.willFulfilledWant().compareTo(BigDecimal.valueOf(1)));
+        Assert.assertEquals(0, orderE.getFulfilledWant().compareTo(BigDecimal.valueOf(1)));
         Assert.assertEquals(false, orderE.isFulfilled());
         Assert.assertEquals(false, orderE.isFulfilled());
 
@@ -1978,7 +1980,7 @@ public class OrderTestsMy {
         // reload order_B
         orderB = db.getCompletedOrderMap().get(orderB.getId());
         Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
-        Assert.assertEquals(orderB.willFulfilledWant(), BigDecimal.valueOf(40000.33));
+        Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000.33));
         Assert.assertEquals(true, orderB.isFulfilled());
 
         // CHECK TRADES
@@ -3282,8 +3284,8 @@ public class OrderTestsMy {
         Long timestamp = 0L;
         for (Order order: orders) {
 
-            Assert.assertEquals((long)order.getHave(), wantKey);
-            Assert.assertEquals((long)order.getWant(), haveKey);
+            Assert.assertEquals((long)order.getHaveAssetKey(), wantKey);
+            Assert.assertEquals((long)order.getWantAssetKey(), haveKey);
 
             //String signB58 = Base58.encode(order.a.a);
             
